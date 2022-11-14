@@ -10,8 +10,8 @@ import cls from './index.module.less';
 */
 
 const ConditionGroupItemConfig = () => {
-  const selectedNode = useAppwfConfig((state:any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state:any) => state.setSelectedNode);
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
+  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const onOk = () => {
     setIsOpen(false);
@@ -20,11 +20,12 @@ const ConditionGroupItemConfig = () => {
     setIsOpen(false);
   };
 
-
   return (
     <div>
-    {selectedNode.conditions.map((condition:any,index:number)=> <div>参数{index}</div>)}
-  </div>
+      {selectedNode.conditions.map((condition: any, index: number) => (
+        <div>参数{index}</div>
+      ))}
+    </div>
   );
 };
 export default ConditionGroupItemConfig;

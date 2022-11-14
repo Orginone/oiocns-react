@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React from 'react';
 
 import { Drawer } from 'antd';
 import EditTitle from './components/EditTitle';
@@ -11,24 +11,15 @@ import { useAppwfConfig } from '@/module/flow/flow';
     流程设置抽屉
 */
 
-/* 
-  ROOT:发起人根节点
-  APPROVAL:审批对象
-*/
-
 interface Iprops {
-  title?: string;
   open: boolean;
   onClose: () => void;
-  // type: 'ROOT' | 'APPROVAL' | 'CC' | 'DELAY' | 'CONDITIONS' | 'CONCURRENTS' | 'TRIGGER';
 }
 
 const FlowDrawer = (props: Iprops) => {
-
-  const selectedNode = useAppwfConfig((state:any) => state.selectedNode);
-  const { open, onClose, title } = props;
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
+  const { open, onClose } = props;
   let Comp = null;
-  debugger
   switch (selectedNode.type) {
     case 'ROOT':
       Comp = <RootNode />;
@@ -48,8 +39,6 @@ const FlowDrawer = (props: Iprops) => {
       break;
   }
 
-
-
   return (
     <Drawer
       title={<EditTitle />}
@@ -61,6 +50,5 @@ const FlowDrawer = (props: Iprops) => {
     </Drawer>
   );
 };
-
 
 export default FlowDrawer;

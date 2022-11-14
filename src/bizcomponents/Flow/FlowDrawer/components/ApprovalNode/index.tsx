@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { Row, Button } from 'antd';
+import { Row, Button, Divider, Select } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
 
 /* 
     审批对象
 */
+
+const { Option } = Select;
 
 const ApprovalNode = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -33,6 +35,18 @@ const ApprovalNode = () => {
           选择身份
         </Button>
       </Row>
+      <Divider />
+      <div>
+        多人审批时审批方式
+        <Select
+          defaultValue="a1"
+          // onChange={handleChange}
+          style={{ width: 200 }}
+          // options={options}
+        >
+          <Option>会签</Option>
+        </Select>
+      </div>
     </div>
   );
   return (
