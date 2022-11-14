@@ -1,0 +1,57 @@
+@import '~antd/es/style/themes/variable';
+
+.sider {
+  .container {
+    padding: 0 @padding-xs;
+  }
+  .title {
+    background-color: @system-menu-active-background;
+    border-radius: @border-radius-base;
+    margin: @margin-xs;
+    text-align: center;
+    padding: 6px;
+    clear: both;
+  }
+  .backicon {
+    font-size: 12px;
+    float: left;
+    padding: 6px;
+  }
+  .icon {
+    color: @primary-color;
+    font-size: 18px;
+    padding-top: 4px;
+  }
+  :global(.ogo-menu-item-group-title) {
+    padding-left: 0;
+  }
+  :global(.ogo-menu-sub.ogo-menu-inline) {
+    background: @component-background;
+  }
+  :global(.ogo-menu-item:hover),
+  :global(.ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected) {
+    color: @text-color;
+    background-color: @custom-menu-active-background;
+  }
+  :global(.ogo-menu-item),
+  :global(.ogo-menu-submenu-expand-icon),
+  :global(.ogo-menu-submenu-arrow),
+  :global(.ogo-menu-submenu) {
+    color: @system-menu-color;
+  }
+  :global(.ogo-menu-item:hover .ogo-menu-item-icon),
+  :global(.ogo-menu-item.ogo-menu-item-selected .ogo-menu-item-icon) {
+    color: @primary-color;
+  }
+  :global(.ogo-menu-vertical),
+  :global(.ogo-menu-inline) {
+    border: none;
+  }
+  :global(.ogo-menu-item-acitve),
+  :global(.ogo-menu-item-acitve:hover) {
+    color: @text-color;
+  }
+  :global(.ogo-menu-inline .ogo-menu-item-selected::after) {
+    opacity: 0;
+  }
+}

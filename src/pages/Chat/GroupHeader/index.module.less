@@ -1,0 +1,53 @@
+.group_header_wrap {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 70px;
+  min-height: 70px;
+  box-shadow: 0 1px 2px 1px #e5e5e5;
+  background-color: #fff;
+  .btn_box {
+    .btn {
+      margin-right: 10px;
+    }
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.user {
+  align-items: center;
+  .user_info_top {
+    align-items: center;
+  }
+  .user_info_top_name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 10px;
+    :global {
+      .ogo-breadcrumb {
+        .ogo-breadcrumb-link {
+          color: #666;
+          font-size: 14px;
+          font-weight: normal;
+        }
+      }
+    }
+  }
+
+  &-info {
+    &-top {
+      align-items: center;
+
+      &-name {
+        font-size: 16px;
+        font-weight: 600;
+        margin-right: 10px;
+      }
+    }
+  }
+}

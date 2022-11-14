@@ -1,0 +1,256 @@
+.img_list_add {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 2px;
+  color: rgba(0, 0, 0, 0.45);
+  border: 1px dashed #dcdfe6;
+  font-size: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px !important;
+}
+
+.img_list_del {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border-radius: 2px;
+  border: 1px dashed var(--el-color-danger);
+  font-size: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--el-color-danger);
+  margin-bottom: 20px !important;
+}
+
+// .invitateBox {
+//   width: 100%;
+//   overflow: auto;
+
+//   &.flex {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+
+//     img {
+//       width: 60px;
+//       height: 60px;
+//       background-size: 100% 100%;
+//       border-radius: 50%;
+//     }
+//   }
+
+//   &.name {
+//     margin-left: 20px;
+//   }
+
+//   &.box {
+//     height: 60px;
+//     display: flex;
+//     align-items: center;
+//     margin-bottom: 20px;
+//     justify-content: space-between;
+//     cursor: pointer;
+//   }
+
+//   &.btn {
+//     width: 16px;
+//     height: 16px;
+//     background: #f3f4f9;
+//     border-radius: 50%;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+
+//     &.in {
+//       width: 6px;
+//       height: 6px;
+//       background-color: #f3f4f9;
+//       border-radius: 50%;
+//     }
+//   }
+// }
+
+.group_detail_wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  border-left: 1px solid #dcdfe6;
+  padding: 15px;
+  background-color: #fff;
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    margin-top: 0;
+    .number {
+      margin-left: 4px;
+    }
+  }
+  .base_info_desc {
+    font-size: 12px;
+    color: #666;
+  }
+  // 群基本信息
+  .base {
+    align-items: center;
+    padding-bottom: 15px;
+
+    &-img {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      border-radius: 50%;
+    }
+
+    &-info {
+      display: flex;
+      justify-content: space-around;
+      flex-direction: column;
+      height: 100%;
+
+      &-top {
+        align-items: center;
+
+        &-name {
+          font-size: 16px;
+          font-weight: 600;
+          margin-right: 10px;
+        }
+      }
+
+      &-desc {
+        font-size: 13px;
+        color: var(--el-color-info-dark-2);
+      }
+    }
+  }
+
+  .con {
+    padding: 6px 0 0 0;
+  }
+
+  // 群成员
+  .user_list {
+    .li_search {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      &-con {
+        font-size: 15px;
+        font-weight: 500;
+        &-num {
+          margin-left: 10px;
+        }
+      }
+      &-inp {
+        width: 120px;
+      }
+    }
+  }
+
+  .img_list {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
+    &.con {
+      display: flex;
+      // flex-direction: column;
+      align-self: center;
+      margin-right: 10px;
+      cursor: pointer;
+      border-radius: 2px;
+      .show_persons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .img_list_con_name {
+          display: inline-block;
+          width: 40px;
+        }
+      }
+      .img_list_con {
+        border: 1px solid rgba(0, 0, 0, 0.45);
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      &.img {
+        width: 50px;
+        height: 50px;
+      }
+
+      &.name {
+        font-size: 10px;
+        line-height: 20px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 50px;
+      }
+    }
+
+    &.more_btn {
+      width: 100%;
+      color: #3e5ed8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      .more_btn_icon {
+        margin-left: 6px;
+      }
+    }
+  }
+
+  .setting_con {
+    display: flex;
+    flex-direction: column;
+
+    .con_label {
+      font-weight: bold;
+      width: 100px;
+      min-width: 100px;
+    }
+    .con_value {
+      font-size: 16px;
+      color: #999;
+    }
+  }
+
+  .check_con {
+    display: flex;
+    justify-content: space-between;
+    .el_checkbox {
+      height: 26px;
+    }
+  }
+
+  // 底部按钮
+  .footer {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    :global {
+      .ogo-btn-primary {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}

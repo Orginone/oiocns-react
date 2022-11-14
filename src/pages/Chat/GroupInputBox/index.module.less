@@ -1,0 +1,70 @@
+.qqface_wrap {
+  width: 360px;
+  display: flex;
+  flex-wrap: wrap;
+  .emoji_box {
+    .emoji {
+      width: 20px;
+      height: 20px;
+      margin: 5px;
+    }
+  }
+}
+
+.group_input_wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff;
+
+  .icons_box {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    .icons_oneself {
+      margin-right: 12px;
+      font-size: 18px;
+      cursor: pointer;
+      &:hover {
+        color: #db2828;
+      }
+    }
+  }
+
+  .input_content {
+    display: flex;
+    height: 100%;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 12px;
+
+    .textarea {
+      flex: 1;
+      height: 120px;
+      overflow-y: auto;
+      outline: none;
+      border: none;
+      .emoji {
+        width: 20px;
+        height: 20px;
+        margin: 3px;
+      }
+    }
+
+    .textarea:empty::before {
+      content: attr(placeholder);
+      position: absolute;
+      color: #ccc;
+      background-color: transparent;
+    }
+
+    .send_box {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-left: 30px;
+      margin-top: 80px;
+    }
+  }
+}

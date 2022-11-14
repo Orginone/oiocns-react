@@ -1,0 +1,36 @@
+@import (reference) '~antd/es/style/themes/variable';
+.check-title {
+  padding: @padding-xs 0 @padding-xs @padding-xs;
+  line-height: @height-base;
+}
+.right-common {
+  text-align: right;
+}
+.active {
+  color: @primary-color;
+}
+.sorticon {
+  transform: rotate(90deg);
+  cursor: grab;
+  color: '#999';
+}
+.check-list {
+  width: 100%;
+  &-items {
+    line-height: @height-base;
+    padding: @padding-xxs @padding-xxs @padding-xxs @padding-xs;
+    border: 1px solid @border-color-base;
+    border-radius: @border-radius-base;
+    margin-bottom: @margin-xs;
+  }
+}
+.row-dragging {
+  background: @item-hover-bg;
+  // border: 1px solid #ccc;
+  z-index: 1001;
+}
+
+.row-dragging .drag-visible {
+  visibility: visible;
+  cursor: grab;
+}

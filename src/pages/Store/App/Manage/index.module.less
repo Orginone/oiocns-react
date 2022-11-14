@@ -1,0 +1,151 @@
+.pages-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: #fff;
+
+  :global {
+    .ogo-card-head {
+      border: none;
+    }
+
+    .ogo-card-body {
+      padding: 0 24px;
+    }
+  }
+
+  .con-title {
+    font-size: 16px;
+    color: #303133;
+  }
+
+  .base-info {
+    font-size: 12px;
+
+    .con {
+
+      .con-label {
+        height: 30px;
+        line-height: 30px;
+        font-size: 12px;
+        color: #909399;
+        font-weight: 500;
+      }
+
+      .con-name {
+        font-size: 14px;
+        color: #303133;
+      }
+
+
+
+      .con-info {
+        width: 40%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+      }
+
+      // 图片
+
+      .con-img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+      }
+    }
+
+    .con-name-edit-btn {
+      cursor: pointer;
+      padding: 2px;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+
+    .endBox {
+      font-size: 12px;
+      line-height: 30px;
+      color: #909399;
+    }
+
+  }
+
+  .manage-info {
+    font-size: 16px;
+
+    .con {
+      margin-bottom: 14px;
+
+      .con-label {
+        height: 30px;
+        line-height: 30px;
+        font-size: 12px;
+        color: #909399;
+        font-weight: 500;
+      }
+
+      .con-name {
+        color: #303133;
+        width: 70px;
+      }
+
+      .blue-txt {
+        margin-left: 20px;
+        color: #154AD8;
+        cursor: pointer;
+
+        &-icon {
+          font-size: .9em;
+          margin-left: 6px;
+        }
+      }
+    }
+
+    // 分配卡片
+    .user-show {
+      display: flex;
+      flex-wrap: nowrap;
+      margin-left: 20px;
+
+      .card-title {
+        display: flex;
+        // justify-content: center;
+
+        color: #606266;
+        margin-bottom: 10px;
+
+        &-icon {
+          font-size: 1em;
+          line-height: 30px;
+          margin-right: 6px;
+        }
+      }
+
+      .user-card {
+        width: 160px;
+        text-align: center;
+
+        .card-con {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+
+      .user-tags {
+        width: 90px;
+        // align-self: center;
+        padding: 2px 6px;
+        margin: 3px;
+        border-radius: 16px;
+      }
+    }
+
+  }
+
+}

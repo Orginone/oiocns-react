@@ -1,0 +1,29 @@
+@import '~antd/es/style/themes/variable';
+
+.table-card {
+  border-radius: @item-card-radius;
+  min-width: 300px;
+  width: 22%;
+  margin-bottom: @margin-xxs;
+  font-size: 12px;
+  margin-right: 16px;
+  .card-title {
+    font-size: 16px;
+  }
+  .card-description {
+    margin-bottom: @margin-xxs;
+    font-size: 12px;
+  }
+  .card-icon {
+    background-color: @primary-color;
+    font-size: large;
+  }
+  .drop-down {
+    float: right;
+  }
+
+  :global(.ogo-card-meta),
+  :global(.ogo-card-meta-detail) {
+    width: 100%;
+  }
+}

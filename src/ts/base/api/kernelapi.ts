@@ -1,0 +1,1895 @@
+/* eslint-disable no-unused-vars */
+import AnyStore from './anystore';
+import StoreHub from './storehub';
+import { ReceiveType, ReqestType, ResultType } from '../model';
+import axios from 'axios';
+/**
+ * 奥集能内核api
+ */
+export default class KernelApi {
+  // 存储集线器
+  private _storeHub: StoreHub;
+  // axios实例
+  private readonly _axiosInstance = axios.create({});
+  // 单例
+  private static _instance: KernelApi;
+  // 任意数据存储对象
+  private _anystore: AnyStore | undefined;
+  // 订阅方法
+  private _methods: { [name: string]: ((...args: any[]) => void)[] };
+  /**
+   * 私有构造方法
+   * @param url 远端地址
+   */
+  private constructor(url: string) {
+    this._methods = {};
+    this._storeHub = new StoreHub(url, 'txt');
+    this._storeHub.on('Receive', (res: ReceiveType) => {
+      const methods = this._methods[res.target.toLowerCase()];
+      if (methods) {
+        try {
+          methods.forEach((m) => m.apply(this, res.data));
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    });
+    this._storeHub.onConnected(() => {
+      if (this._anystore) {
+        this._storeHub
+          .invoke('TokenAuth', this.anystore?.accessToken)
+          .then((res: ResultType) => {
+            if (res.success) {
+              console.debug('认证成功！');
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    });
+    this._storeHub.start();
+  }
+  /**
+   * 获取单例
+   * @param {string} url 集线器地址，默认为 "/orginone/kernel/hub"
+   * @returns {KernelApi} 内核api单例
+   */
+  public static getInstance(url: string = '/orginone/kernel/hub'): KernelApi {
+    if (this._instance == null) {
+      this._instance = new KernelApi(url);
+    }
+    return this._instance;
+  }
+  /**
+   * 任意数据存储对象
+   * @returns {AnyStore | undefined} 可能为空的存储对象
+   */
+  public get anystore(): AnyStore | undefined {
+    return this._anystore;
+  }
+  /**
+   * 是否在线
+   * @returns {boolean} 在线状态
+   */
+  public get isOnline(): boolean {
+    return this._storeHub.isConnected;
+  }
+  /**
+   * 登录到后台核心获取accessToken
+   * @param userName 用户名
+   * @param password 密码
+   * @returns {Promise<ResultType>} 异步登录结果
+   */
+  public async login(userName: string, password: string): Promise<ResultType> {
+    var res: ResultType;
+    var req = {
+      account: userName,
+      pwd: password,
+    };
+    if (this._storeHub.isConnected) {
+      res = await this._storeHub.invoke('Login', req);
+    } else {
+      res = await this._restRequest('login', req);
+    }
+    if (res.success) {
+      this._anystore = AnyStore.getInstance(res.data.accessToken);
+    }
+    return res;
+  }
+  /**
+   * 注册到后台核心获取accessToken
+   * @param name 姓名
+   * @param motto 座右铭
+   * @param phone 电话
+   * @param account 账户
+   * @param password 密码
+   * @param nickName 昵称
+   * @returns {Promise<ResultType>} 异步注册结果
+   */
+  public async register(
+    name: string,
+    motto: string,
+    phone: string,
+    account: string,
+    password: string,
+    nickName: string,
+  ): Promise<ResultType> {
+    var res: ResultType;
+    var req = {
+      name,
+      motto,
+      phone,
+      account,
+      password,
+      nickName,
+    };
+    if (this._storeHub.isConnected) {
+      res = await this._storeHub.invoke('Register', req);
+    } else {
+      res = await this._restRequest('Register', req);
+    }
+    if (res.success) {
+      this._anystore = AnyStore.getInstance(res.data.accessToken);
+    }
+    return res;
+  }
+  /**
+   * 创建字典类型
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createDict(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'CreateDict',
+      params: params,
+    });
+  }
+  /**
+   * 创建日志记录
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createLog(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'CreateLog',
+      params: params,
+    });
+  }
+  /**
+   * 创建字典项
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createDictItem(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'CreateDictItem',
+      params: params,
+    });
+  }
+  /**
+   * 删除字典类型
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteDict(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'DeleteDict',
+      params: params,
+    });
+  }
+  /**
+   * 删除字典项
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteDictItem(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'DeleteDictItem',
+      params: params,
+    });
+  }
+  /**
+   * 更新字典类型
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateDict(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'UpdateDict',
+      params: params,
+    });
+  }
+  /**
+   * 更新字典项
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateDictItem(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'base',
+      action: 'UpdateDictItem',
+      params: params,
+    });
+  }
+  /**
+   * 创建类别
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createSpecies(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 创建度量标准
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createAttribute(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 创建物
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createThing(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateThing',
+      params: params,
+    });
+  }
+  /**
+   * 删除类别
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteSpecies(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 删除度量标准
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteAttribute(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 删除物
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteThing(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteThing',
+      params: params,
+    });
+  }
+  /**
+   * 更新类别
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateSpecies(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 更新度量标准
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateAttribute(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 更新物
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateThing(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateThing',
+      params: params,
+    });
+  }
+  /**
+   * 物添加类别
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async thingAddSpecies(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'ThingAddSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 物添加度量数据
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async thingAddAttribute(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'ThingAddAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 物移除类别
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async thingRemoveSpecies(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'ThingRemoveSpecies',
+      params: params,
+    });
+  }
+  /**
+   * 物移除度量数据
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async thingRemoveAttribute(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'ThingRemoveAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 物的元数据查询
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryThingData(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryThingData',
+      params: params,
+    });
+  }
+  /**
+   * 物的历史元数据查询
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryThingHistroyData(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryThingHistroyData',
+      params: params,
+    });
+  }
+  /**
+   * 物的关系元数据查询
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryThingRelationData(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryThingRelationData',
+      params: params,
+    });
+  }
+  /**
+   * 创建职权
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createAuthority(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'CreateAuthority',
+      params: params,
+    });
+  }
+  /**
+   * 创建身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createIdentity(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'CreateIdentity',
+      params: params,
+    });
+  }
+  /**
+   * 创建组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createTarget(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'CreateTarget',
+      params: params,
+    });
+  }
+  /**
+   * 创建标准规则
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createRuleStd(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'CreateRuleStd',
+      params: params,
+    });
+  }
+  /**
+   * 删除职权
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteAuthority(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'DeleteAuthority',
+      params: params,
+    });
+  }
+  /**
+   * 删除身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteIdentity(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'DeleteIdentity',
+      params: params,
+    });
+  }
+  /**
+   * 删除组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteTarget(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'DeleteTarget',
+      params: params,
+    });
+  }
+  /**
+   * 删除标准规则
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteRuleStd(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'DeleteRuleStd',
+      params: params,
+    });
+  }
+  /**
+   * 递归删除组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async recursiveDeleteTarget(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RecursiveDeleteTarget',
+      params: params,
+    });
+  }
+  /**
+   * 更新职权
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateAuthority(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'UpdateAuthority',
+      params: params,
+    });
+  }
+  /**
+   * 更新身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateIdentity(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'UpdateIdentity',
+      params: params,
+    });
+  }
+  /**
+   * 更新组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateTarget(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'UpdateTarget',
+      params: params,
+    });
+  }
+  /**
+   * 更新标准规则
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateRuleStd(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'UpdateRuleStd',
+      params: params,
+    });
+  }
+  /**
+   * 分配身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async giveIdentity(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'GiveIdentity',
+      params: params,
+    });
+  }
+  /**
+   * 移除身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async removeIdentity(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RemoveIdentity',
+      params: params,
+    });
+  }
+  /**
+   * 申请加入组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async applyJoinTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'ApplyJoinTeam',
+      params: params,
+    });
+  }
+  /**
+   * 加入组织/个人申请审批
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async joinTeamApproval(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'JoinTeamApproval',
+      params: params,
+    });
+  }
+  /**
+   * 拉组织/个人加入组织/个人的团队
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async pullAnyToTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'pullAnyToTeam',
+      params: params,
+    });
+  }
+  /**
+   * 取消申请加入组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async cancelJoinTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'CancelJoinTeam',
+      params: params,
+    });
+  }
+  /**
+   * 从组织/个人移除组织/个人的团队
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async removeAnyOfTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RemoveAnyOfTeam',
+      params: params,
+    });
+  }
+  /**
+   * 递归从组织及子组织/个人移除组织/个人的团队
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async recursiveRemoveAnyOfTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RecursiveRemoveAnyOfTeam',
+      params: params,
+    });
+  }
+  /**
+   * 从组织/个人及归属组织移除组织/个人的团队
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async removeAnyOfTeamAndBelong(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RemoveAnyOfTeamAndBelong',
+      params: params,
+    });
+  }
+  /**
+   * 退出组织
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async exitAnyOfTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'ExitAnyOfTeam',
+      params: params,
+    });
+  }
+  /**
+   * 递归退出组织
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async recursiveExitAnyOfTeam(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'RecursiveExitAnyOfTeam',
+      params: params,
+    });
+  }
+  /**
+   * 退出组织及退出组织归属的组织
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async exitAnyOfTeamAndBelong(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'ExitAnyOfTeamAndBelong',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询组织/个人信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTargetById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTargetById',
+      params: params,
+    });
+  }
+  /**
+   * 查询加入关系
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryRelationById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryRelationById',
+      params: params,
+    });
+  }
+  /**
+   * 根据名称和类型查询组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTargetByName(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTargetByName',
+      params: params,
+    });
+  }
+  /**
+   * 模糊查找组织/个人根据名称和类型
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async searchTargetByName(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'SearchTargetByName',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织制定的标准
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTeamRuleAttrs(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTeamRuleAttrs',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询子组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySubTargetById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QuerySubTargetById',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询归属的组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryBelongTargetById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryBelongTargetById',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织/个人加入的组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryJoinedTargetById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryJoinedTargetById',
+      params: params,
+    });
+  }
+  /**
+   * 查询加入组织/个人申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryJoinTeamApply(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryJoinTeamApply',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织/个人加入审批
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTeamJoinApproval(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTeamJoinApproval',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织职权树
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryAuthorityTree(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryAuthorityTree',
+      params: params,
+    });
+  }
+  /**
+   * 查询职权子职权
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySubAuthoritys(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QuerySubAuthoritys',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织职权
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTargetAuthoritys(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTargetAuthoritys',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTargetIdentitys(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTargetIdentitys',
+      params: params,
+    });
+  }
+  /**
+   * 查询职权身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryAuthorityIdentitys(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryAuthorityIdentitys',
+      params: params,
+    });
+  }
+  /**
+   * 查询赋予身份的组织/个人
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryIdentityTargets(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryIdentityTargets',
+      params: params,
+    });
+  }
+  /**
+   * 查询在当前空间拥有角色的组织
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryTargetsByAuthority(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTargetsByAuthority',
+      params: params,
+    });
+  }
+  /**
+   * 查询在当前空间拥有的身份
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySpaceIdentitys(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'target',
+      action: 'QuerySpaceIdentitys',
+      params: params,
+    });
+  }
+  /**
+   * 创建即使消息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createImMsg(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'CreateImMsg',
+      params: params,
+    });
+  }
+  /**
+   * 消息撤回
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async recallImMsg(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'RecallImMsg',
+      params: params,
+    });
+  }
+  /**
+   * 查询聊天会话
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryImChats(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'QueryImChats',
+      params: params,
+    });
+  }
+  /**
+   * 查询群历史消息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryCohortImMsgs(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'QueryCohortImMsgs',
+      params: params,
+    });
+  }
+  /**
+   * 查询好友聊天消息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryFriendImMsgs(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'QueryFriendImMsgs',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询名称
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryNameBySnowId(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'chat',
+      action: 'QueryNameBySnowId',
+      params: params,
+    });
+  }
+  /**
+   * 创建市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateMarket',
+      params: params,
+    });
+  }
+  /**
+   * 产品上架:产品所有者
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 创建产品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateProduct',
+      params: params,
+    });
+  }
+  /**
+   * 创建产品资源
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createProductResource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateProductResource',
+      params: params,
+    });
+  }
+  /**
+   * 商品加入暂存区
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createStaging(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateStaging',
+      params: params,
+    });
+  }
+  /**
+   * 创建订单:商品直接购买
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createOrder(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateOrder',
+      params: params,
+    });
+  }
+  /**
+   * 创建订单:暂存区下单
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createOrderByStags(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateOrderByStags',
+      params: params,
+    });
+  }
+  /**
+   * 创建订单支付
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createOrderPay(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateOrderPay',
+      params: params,
+    });
+  }
+  /**
+   * 创建对象拓展操作
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createSourceExtend(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CreateSourceExtend',
+      params: params,
+    });
+  }
+  /**
+   * 删除市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteMarket',
+      params: params,
+    });
+  }
+  /**
+   * 下架商品:商品所有者
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 下架商品:市场管理员
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteMerchandiseByManager(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteMerchandiseByManager',
+      params: params,
+    });
+  }
+  /**
+   * 删除产品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteProduct',
+      params: params,
+    });
+  }
+  /**
+   * 删除产品资源(产品所属者可以操作)
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteProductResource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteProductResource',
+      params: params,
+    });
+  }
+  /**
+   * 移除暂存区商品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteStaging(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteStaging',
+      params: params,
+    });
+  }
+  /**
+   * 创建对象拓展操作
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteSourceExtend(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeleteSourceExtend',
+      params: params,
+    });
+  }
+  /**
+   * 根据Code查询市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryMarketByCode(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryMarketByCode',
+      params: params,
+    });
+  }
+  /**
+   * 查询拥有的市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryOwnMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryOwnMarket',
+      params: params,
+    });
+  }
+  /**
+   * 查询软件共享仓库的市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async getPublicMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'GetPublicMarket',
+      params: params,
+    });
+  }
+  /**
+   * 查询市场成员集合
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryMarketMember(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryMarketMember',
+      params: params,
+    });
+  }
+  /**
+   * 查询市场对应的暂存区
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryStaging(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryStaging',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询订单信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async getOrderInfo(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'GetOrderInfo',
+      params: params,
+    });
+  }
+  /**
+   * 根据ID查询订单详情项
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async getOrderDetailById(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'GetOrderDetailById',
+      params: params,
+    });
+  }
+  /**
+   * 卖方:查询出售商品的订单列表
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySellOrderList(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QuerySellOrderList',
+      params: params,
+    });
+  }
+  /**
+   * 卖方:查询指定商品的订单列表
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySellOrderListByMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QuerySellOrderListByMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 买方:查询购买订单列表
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryBuyOrderList(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryBuyOrderList',
+      params: params,
+    });
+  }
+  /**
+   * 查询订单支付信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryPayList(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryPayList',
+      params: params,
+    });
+  }
+  /**
+   * 申请者:查询加入市场申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryJoinMarketApply(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryJoinMarketApply',
+      params: params,
+    });
+  }
+  /**
+   * 管理者:查询加入市场申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryJoinMarketApplyByManager(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryJoinMarketApplyByManager',
+      params: params,
+    });
+  }
+  /**
+   * 申请者:查询商品上架申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryMerchandiseApply(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryMerchandiseApply',
+      params: params,
+    });
+  }
+  /**
+   * 市场:查询商品上架申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryMerchandiesApplyByManager(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryMerchandiesApplyByManager',
+      params: params,
+    });
+  }
+  /**
+   * 查询市场中所有商品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async searchMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'SearchMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 查询产品详细信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async getProductInfo(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'GetProductInfo',
+      params: params,
+    });
+  }
+  /**
+   * 查询产品资源列表
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryProductResource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryProductResource',
+      params: params,
+    });
+  }
+  /**
+   * 查询组织/个人产品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async querySelfProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QuerySelfProduct',
+      params: params,
+    });
+  }
+  /**
+   * 根据产品查询商品上架信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryMerchandiseListByProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryMerchandiseListByProduct',
+      params: params,
+    });
+  }
+  /**
+   * 查询指定产品/资源的拓展信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryExtendBySource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryExtendBySource',
+      params: params,
+    });
+  }
+  /**
+   * 查询可用产品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryUsefulProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryUsefulProduct',
+      params: params,
+    });
+  }
+  /**
+   * 查询可用资源列表
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryUsefulResource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryUsefulResource',
+      params: params,
+    });
+  }
+  /**
+   * 更新市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateMarket',
+      params: params,
+    });
+  }
+  /**
+   * 更新商品信息
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 更新产品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateProduct(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateProduct',
+      params: params,
+    });
+  }
+  /**
+   * 更新产品资源
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateProductResource(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateProductResource',
+      params: params,
+    });
+  }
+  /**
+   * 更新订单
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateOrder(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateOrder',
+      params: params,
+    });
+  }
+  /**
+   * 更新订单项
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async updateOrderDetail(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'UpdateOrderDetail',
+      params: params,
+    });
+  }
+  /**
+   * 退出市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async quitMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'QuitMarket',
+      params: params,
+    });
+  }
+  /**
+   * 申请加入市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async applyJoinMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'ApplyJoinMarket',
+      params: params,
+    });
+  }
+  /**
+   * 拉组织/个人加入市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async pullAnyToMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'PullAnyToMarket',
+      params: params,
+    });
+  }
+  /**
+   * 取消加入市场
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async cancelJoinMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelJoinMarket',
+      params: params,
+    });
+  }
+  /**
+   * 取消订单详情
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async cancelOrderDetail(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelOrderDetail',
+      params: params,
+    });
+  }
+  /**
+   * 移除市场成员
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async removeMarketMember(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'RemoveMarketMember',
+      params: params,
+    });
+  }
+  /**
+   * 审核加入市场申请
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async approvalJoinApply(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'ApprovalJoinApply',
+      params: params,
+    });
+  }
+  /**
+   * 交付订单详情中的商品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deliverMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'DeliverMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 退还商品
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async rejectMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'RejectMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 商品上架审核
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async approvalMerchandise(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'ApprovalMerchandise',
+      params: params,
+    });
+  }
+  /**
+   * 产品上架:市场拥有者
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async pullProductToMarket(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'market',
+      action: 'PullProductToMarket',
+      params: params,
+    });
+  }
+  /**
+   * 创建流程定义
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createDefine(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'CreateDefine',
+      params: params,
+    });
+  }
+  /**
+   * 创建流程实例(启动流程)
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createInstance(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'CreateInstance',
+      params: params,
+    });
+  }
+  /**
+   * 创建流程绑定
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async createFlowRelation(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'CreateFlowRelation',
+      params: params,
+    });
+  }
+  /**
+   * 删除流程定义
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteDefine(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'DeleteDefine',
+      params: params,
+    });
+  }
+  /**
+   * 删除流程实例(发起人撤回)
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteInstance(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'DeleteInstance',
+      params: params,
+    });
+  }
+  /**
+   * 删除流程绑定
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async deleteFlowRelation(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'DeleteFlowRelation',
+      params: params,
+    });
+  }
+  /**
+   * 查询流程定义
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryDefine(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryDefine',
+      params: params,
+    });
+  }
+  /**
+   * 查询发起的流程实例
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryInstance(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryInstance',
+      params: params,
+    });
+  }
+  /**
+   * 查询待审批任务
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryApproveTask(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryApproveTask',
+      params: params,
+    });
+  }
+  /**
+   * 查询待审阅抄送
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryNoticeTask(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryNoticeTask',
+      params: params,
+    });
+  }
+  /**
+   * 查询审批记录
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async queryRecord(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryRecord',
+      params: params,
+    });
+  }
+  /**
+   * 流程节点审批
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async approvalTask(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'ApprovalTask',
+      params: params,
+    });
+  }
+  /**
+   * 重置流程定义
+   * @param {any} params 请求参数
+   * @returns {ResultType} 请求结果
+   */
+  public async resetDefine(params: any): Promise<ResultType> {
+    return await this.request({
+      module: 'flow',
+      action: 'ResetDefine',
+      params: params,
+    });
+  }
+  /**
+   * 请求一个内核方法
+   * @param {ReqestType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async request(req: ReqestType): Promise<ResultType> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Request', req);
+    } else {
+      return await this._restRequest('request', req);
+    }
+  }
+  /**
+   * 请求多个内核方法,使用同一个事务
+   * @param {ReqestType[]} reqs 请求体
+   * @returns 异步结果
+   */
+  public async requests(reqs: ReqestType[]): Promise<ResultType> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Requests', reqs);
+    } else {
+      return await this._restRequest('requests', reqs);
+    }
+  }
+  /**
+   * 监听服务端方法
+   * @param {string} methodName 方法名
+   * @returns {void} 无返回值
+   */
+  public on(methodName: string, newMethod: (...args: any[]) => any): void {
+    if (!methodName || !newMethod) {
+      return;
+    }
+
+    methodName = methodName.toLowerCase();
+    if (!this._methods[methodName]) {
+      this._methods[methodName] = [];
+    }
+
+    if (this._methods[methodName].indexOf(newMethod) !== -1) {
+      return;
+    }
+
+    this._methods[methodName].push(newMethod);
+  }
+  /**
+   * 使用rest请求后端
+   * @param methodName 方法
+   * @param data 参数
+   * @returns 返回结果
+   */
+  private async _restRequest(methodName: string, args: any): Promise<ResultType> {
+    const res = await this._axiosInstance({
+      method: 'post',
+      timeout: 2 * 1000,
+      url: '/orginone/kernel/rest/' + methodName,
+      headers: {
+        Authorization: this._anystore?.accessToken,
+      },
+      data: args,
+    });
+    if (res.data && (res.data as ResultType)) {
+      return res.data as ResultType;
+    }
+    return { success: false, data: {}, code: 400, msg: '' };
+  }
+}

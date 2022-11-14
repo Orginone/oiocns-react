@@ -1,0 +1,21 @@
+// import AnyStore, { BadRequst } from '@/hubs/anystore';
+export type OrgChat = {
+  lastMsg: any;
+  stoped: boolean;
+  closed: boolean;
+  //   anyStore: AnyStore;
+  curMsgs: any[];
+  accessToken: string | undefined;
+  userId: string;
+  spaceId: string;
+  authed: boolean;
+  isconnecting: boolean;
+  qunPersons: any[];
+  //   chats: ImMsgType[];
+  //   openChats: ImMsgChildType[];
+  //   curChat: ImMsgChildType | null;
+  messageCallback: (data: any) => void;
+  connection: signalR.HubConnection;
+  nameMap: Record<string, string>;
+  //   orgChat: OrgChat | null = null;
+};

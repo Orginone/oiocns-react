@@ -1,0 +1,36 @@
+.cohort_wrap {
+  width: 100%;
+  height: calc(100vh - 70px);
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  .custom_group_silder_menu {
+    width: 300px;
+    padding: 20px 15px;
+    border-right: 1px solid #dcdfe6;
+    background-color: #fff;
+  }
+
+  .chart_page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    overflow: hidden;
+
+    .chart_content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .chart_input {
+      height: max-content;
+      min-height: 180px;
+      border-top: 1px solid #dcdfe6;
+      .el-textarea__inner {
+        color: #fff;
+      }
+    }
+  }
+}

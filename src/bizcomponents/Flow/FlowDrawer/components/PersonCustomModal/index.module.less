@@ -1,0 +1,23 @@
+.person-custom-modal {
+  .person-card-content {
+    display: flex;
+    justify-content: space-between;
+    .person-card-left {
+      margin-top: 8px;
+      .person-card-left-item {
+        padding: 3px 0;
+        cursor: pointer;
+        &.active {
+          background-color: #ecf5ff;
+        }
+        &.disabled {
+          cursor: not-allowed;
+          color: #c0c4cc;
+        }
+      }
+      :hover {
+        background-color: #f5f7fa;
+      }
+    }
+  }
+}

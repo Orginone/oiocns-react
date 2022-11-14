@@ -1,0 +1,97 @@
+.pages-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: #fff;
+
+  :global {
+    .app-info {
+      .ogo-card-head {
+        border: none;
+      }
+
+
+      .ogo-card-body {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0;
+
+        &::after {
+          display: none;
+        }
+
+        .ant-card-meta {
+          flex: 1;
+        }
+
+        .appLogo {
+          width: 55px;
+          height: 55px;
+          margin-right: 20px;
+        }
+      }
+
+      .ant-card-meta-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      &-con {
+        font-size: 14px;
+
+        p {
+          margin-bottom: 7px;
+        }
+
+
+        &-txt {
+          font-size: 12px;
+
+          span {
+            margin-right: 18px;
+          }
+
+          .linkman {
+            color: #154AD8;
+            cursor: pointer;
+          }
+        }
+
+        .btns {
+          display: flex;
+          align-items: center;
+        }
+
+
+      }
+
+      .ogo-btn-round {
+        font-size: 14px;
+        height: 30px !important;
+        width: 72px !important;
+      }
+    }
+  }
+
+
+
+  .RouterBackBtn {
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .page-content-table {
+    flex: 1;
+    height: calc(100% - 380px);
+
+    .ogo-pro-table-list-toolbar-container {
+      padding-top: 0 !important;
+    }
+
+  }
+}

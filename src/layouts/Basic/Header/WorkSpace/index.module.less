@@ -1,0 +1,55 @@
+@import (reference) '~antd/es/style/themes/variable';
+
+.menu {
+  position: relative;
+  font-size: 16px;
+  .current-item {
+    line-height: @header-height;
+    font-weight: bolder;
+    font-size: 16px;
+  }
+  cursor: pointer;
+
+  .avatar {
+    background-color: @primary-color;
+    font-size: small;
+    font-weight: normal;
+  }
+  .down-icon {
+    font-size: small;
+    color: @text-color-secondary;
+    transition: all 0.3s;
+    &.active {
+      transform: rotate(180deg);
+    }
+  }
+  .list {
+    position: absolute;
+    z-index: 1;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s @ease-in-out;
+    background-color: @component-background;
+    box-shadow: @box-shadow-base;
+    border-radius: @border-radius-base;
+    left: -16px;
+    width: 220px;
+    line-height: @header-height;
+    .menu-list {
+      height: 112px;
+      overflow-y: auto;
+    }
+    .item {
+      padding: 0 16px;
+      &:hover {
+        background-color: @select-item-active-bg;
+      }
+    }
+    &.active {
+      height: 168px;
+    }
+    .divider {
+      margin: 0;
+    }
+  }
+}

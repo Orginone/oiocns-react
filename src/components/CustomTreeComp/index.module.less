@@ -1,0 +1,51 @@
+.customTreeWrap {
+  :global {
+    .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
+      display: none;
+    }
+    .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected{
+      background-color: #F2F6FC;
+    }
+    .ogo-tree .ogo-tree-node-content-wrapper{
+      padding: 2px 4px;
+      font-size: 14px;
+    }
+    // .ogo-tree-switcher-noop {
+    //   display: none;
+    // }
+    // .ogo-tree-node-content-wrapper{
+    //   padding-left: 10px !important;
+    // }
+  }
+
+  .container {
+    padding-left: 18px;
+    padding-right: 6px;
+  }
+
+  .top {
+    height: 40px;
+  }
+
+  .title {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .treeTitleBox {
+    display: flex;
+    justify-content: space-between;
+    margin-right: 6px;
+  }
+
+  .titleIcon {
+    &:nth-of-type(2) {
+      font-size: 17px;
+    }
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+}

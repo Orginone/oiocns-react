@@ -1,0 +1,24 @@
+@import '~antd/es/style/themes/variable';
+.card-wrap {
+  height: 100%;
+  :global(.ogo-tabs-large > .ogo-tabs-nav .ogo-tabs-tab) {
+    font-size: 14px;
+  }
+  :global(.ogo-tabs-tab.ogo-tabs-tab-active .ogo-tabs-tab-btn) {
+    color: @text-color;
+    font-weight: bolder;
+    text-shadow: none;
+  }
+  :global(.ogo-tabs-tab-btn) {
+    color: @text-color-secondary;
+  }
+  :global(.ogo-tabs-tab-btn:hover) {
+    color: @text-color;
+  }
+  :global(.ogo-tabs-top > .ogo-tabs-nav::before) {
+    border: none;
+  }
+  & > :global(.ogo-card-body) {
+    height: calc(100% - 48px);
+  }
+}
