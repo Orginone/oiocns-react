@@ -27,7 +27,7 @@ const ApprovalNode = () => {
   const rovalnode = (
     <div className={cls[`roval-node`]}>
       <Row>
-        <SettingOutlined />
+        <SettingOutlined style={{ marginTop: '3px' }} />
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
@@ -38,7 +38,7 @@ const ApprovalNode = () => {
           onClick={() => {
             setIsOpen(true);
           }}>
-          选择岗位
+          选择身份
         </Button>
       </Row>
       <Divider />
