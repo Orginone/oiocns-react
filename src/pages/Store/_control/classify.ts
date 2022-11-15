@@ -1,3 +1,4 @@
+import { MarketTypes } from 'typings/marketType';
 import API from '@/services';
 import StoreContent from './content';
 import { kernel } from '@/ts/base';
@@ -23,9 +24,20 @@ const _resetParams = (params: any) => {
 };
 class StoreClassify {
   // constructor(parameters) {}
-  public currentPage!: '应用';
-  public curData: any;
-  public TreeCallBack!: Function;
+  private _curMarket: MarketTypes.MarketType; // 当前商店实例
+
+  private currentMenu!: '应用';
+  private curTreeData: any;
+  public TreeCallBack!: Function; //页面传进来的 钩子
+
+  // 底部区域
+  // 缓存 tree 展示数据
+  public footerTree: any = {
+    appTreeData: [],
+    docxTreeData: [],
+    dataTreeData: [],
+    assetsTreeData: [],
+  };
   // 顶部区域
   static SelfMenu = [
     { title: '应用', code: 'app' },
@@ -36,21 +48,12 @@ class StoreClassify {
   // 商店导航
   // static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
 
-  // 底部区域
-  // 缓存 tree 展示数据
-  public footerTree = {
-    appTreeData: [],
-    docxTreeData: [],
-    dataTreeData: [],
-    assetsTreeData: [],
-  };
-
   /**
    * @desc 处理点击顶部导航获取tree 数据
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    this.curData = this.footerTree[`${key}TreeData`];
+    this.curTreeData = this.footerTree[`${key}TreeData`];
     //1. 直接触发展示区 更新展示数据
     StoreContent.changeMenu(key);
     //2. 控制底部分类
@@ -78,7 +81,6 @@ class StoreClassify {
       pageSize: 100,
       filter: '',
     };
-    console.log('canshu1', _resetParams(params));
 
     const { success, data } = await kernel.queryOwnMarket(_resetParams(params));
     console.log('获取拥有的市场55', success, data);

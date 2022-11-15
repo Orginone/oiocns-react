@@ -5,14 +5,6 @@ import API from '@/services';
 // private: 表示'私有的,只在当前类中可见'，对实例对象以及子类也是不可见的
 // readonly： 表示'只读',用来防止在构造函数之外对属性进行赋值
 // static 静态数据
-type CommonParamsType = {
-  offset: number;
-  limit: number;
-  filter?: string;
-  current?: number;
-  pageSize?: number;
-  status?: string | number;
-};
 class MarketServices {
   public marketList: MarketTypes.MarketType[]; //商店列表
   public marketTotal: number; //商店列表 总数

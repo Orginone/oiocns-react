@@ -1,5 +1,5 @@
 import { Card, Form, Modal } from 'antd';
-import React, { useState, createContext } from 'react';
+import React, { useState } from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
@@ -12,7 +12,6 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import useEventEmitter from '@/hooks/useEventEmitter';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -20,11 +19,6 @@ const service = new MarketService({
   deleteApi: API.product.delete,
   updateApi: API.product.update,
 });
-console.log(service);
-interface submitEmmit {
-  aa: string;
-}
-export const EventContext = createContext({} as { TestSub: any });
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
@@ -35,11 +29,6 @@ const StoreApp: React.FC = () => {
     {} as MarketTypes.ProductType,
   );
   const [putawayForm] = Form.useForm();
-
-  const TestSub = useEventEmitter<submitEmmit>();
-  TestSub.useSubScription('hello', (data) => {
-    console.log('订阅', data);
-  });
 
   const items = [
     {
@@ -73,7 +62,6 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        TestSub.emit('hello', { aa: '700' });
         // console.log('点击事件', '创建1231313');
         break;
       case '暂存':
@@ -191,20 +179,18 @@ const StoreApp: React.FC = () => {
         </Modal>
         {/* 详情页面 /store/app/info*/}
       </div>
-      <EventContext.Provider value={{ TestSub }}>
-        <Route
-          exact
-          path="/store/app/info"
-          render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/publish"
-          render={() => <PublishList appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/manage"
-          render={() => <Manage appId={selectAppInfo.id} />}></Route>
-      </EventContext.Provider>
+      <Route
+        exact
+        path="/store/app/info"
+        render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/publish"
+        render={() => <PublishList appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/manage"
+        render={() => <Manage appId={selectAppInfo.id} />}></Route>
     </>
   );
 };
