@@ -1,4 +1,4 @@
-![Image text](https://gitee.com/weibo-2213902562/Bard/raw/master/src/main/resources/readmeImg/addLabelPage.png)
+![Image text](./config/logo/logo1.jpg)
 [app_head](./config/logo/logo1.jpg)
 
 # 奥集能平台前端
