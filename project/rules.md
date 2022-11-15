@@ -2,7 +2,7 @@
 
 1. 模块及组件的文件夹 首字母必须大写
 2. 模块名称下创建 components 存放子组件 子组件需用文件夹包裹
-3. src/module 模块文件夹存放各业务代码，命名规则为：业务名.service.ts; service类处理好相关的业务，返回给UI层的数据是已处理好的数据
+3. src/module 模块文件夹存放各业务代码，命名规则为：业务名.service.ts; service 类处理好相关的业务，返回给 UI 层的数据是已处理好的数据
 
 - 示例如下:
 
@@ -67,8 +67,12 @@ test: 添加测试或者修改现有测试
 perf: 提高性能的改动
 ci: 与 CI（持续集成服务）有关的改动
 chore: 不修改 src 或者 test 的其余修改，例如构建过程或辅助工具的变动
-other: 其他修改
 ```
+
+## (TODO) git 提交跳过检查
+
+尽量少使用
+git commit -m 'fix: description' --no-verify
 
 ## git 分支规范
 
@@ -83,6 +87,6 @@ personal/个人分支名称
 
 ## CSS 使用规范
 
-css文件命名 名称.module.less
+css 文件命名 名称.module.less
 
-使用 import cls  from 'less文件地址'
+使用 import cls from 'less 文件地址'
