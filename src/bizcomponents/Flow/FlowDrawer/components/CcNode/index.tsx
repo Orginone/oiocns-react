@@ -23,6 +23,7 @@ const CcNode = () => {
         <Button
           type="primary"
           shape="round"
+          size="small"
           onClick={() => {
             setIsOpen(true);
           }}>
