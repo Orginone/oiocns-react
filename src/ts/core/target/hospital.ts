@@ -1,9 +1,9 @@
-import { TTarget } from '../entity';
+import { schema } from '../../base';
 import { TargetType } from '../enum';
 import Company from './company';
 
 export default class Hospital extends Company {
-  constructor(target: TTarget) {
+  constructor(target: schema.XTarget) {
     super(target);
   }
 

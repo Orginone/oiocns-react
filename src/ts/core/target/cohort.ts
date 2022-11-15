@@ -1,9 +1,9 @@
-import { TTarget } from '../entity';
+import { schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 
 export default class Cohort extends BaseTarget {
-  constructor(target: TTarget) {
+  constructor(target: schema.XTarget) {
     super(target);
   }
   /**

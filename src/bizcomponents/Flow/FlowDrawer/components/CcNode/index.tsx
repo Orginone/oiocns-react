@@ -20,17 +20,13 @@ const CcNode = () => {
   const rovalnode = (
     <div className={cls[`roval-node`]}>
       <Row>
-        <SettingOutlined />
-        <span className={cls[`roval-node-title`]}>选择抄送对象</span>
-      </Row>
-      <Row>
         <Button
           type="primary"
           shape="round"
           onClick={() => {
             setIsOpen(true);
           }}>
-          选择身份
+          选择抄送对象
         </Button>
       </Row>
     </div>

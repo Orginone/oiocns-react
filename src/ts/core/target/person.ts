@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { TTarget } from '../entity';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 import Cohort from './cohort';
 import Company from './company';
-import { kernel, model } from '../../base';
+import { kernel, model, schema } from '../../base';
 import University from './university';
 import Hospital from './hospital';
 
@@ -12,7 +11,7 @@ export default class Person extends BaseTarget {
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  constructor(target: TTarget) {
+  constructor(target: schema.XTarget) {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
@@ -40,7 +39,6 @@ export default class Person extends BaseTarget {
       teamName: name,
       teamCode: code,
       teamRemark: remark,
-      typeName: TargetType.Cohort,
     });
     if (res.success) {
       const cohort = new Cohort(res.data);
@@ -130,16 +128,16 @@ export default class Person extends BaseTarget {
       joinTypeNames: this.companyTypes,
     });
     if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item: { typeName: any }) => {
+      res.data.result.forEach((item) => {
         switch (item.typeName) {
           case TargetType.University:
-            this._joinedCompanys.push(new University(res.data));
+            this._joinedCompanys.push(new University(item));
             break;
           case TargetType.Hospital:
-            this._joinedCompanys.push(new Hospital(res.data));
+            this._joinedCompanys.push(new Hospital(item));
             break;
           default:
-            this._joinedCompanys.push(new Company(res.data));
+            this._joinedCompanys.push(new Company(item));
             break;
         }
       });
@@ -152,9 +150,11 @@ export default class Person extends BaseTarget {
    * @param data 创建参数
    * @returns 创建结果
    */
-  private async _create(data: any): Promise<model.ResultType> {
+  private async _create(data: any): Promise<model.ResultType<any>> {
     data.belongId = this.target.id;
+    data.typeName = TargetType.Cohort;
     if (this._curCompany && this._curCompany.target.id) {
+      data.typeName = TargetType.JobCohort;
       data.belongId = this._curCompany.target.id;
     }
     return await kernel.createTarget(data);
