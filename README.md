@@ -1,12 +1,13 @@
-![Image text](./config/logo/logo1.jpg)
-[app_head](./config/logo/logo1.jpg)
-
 # 奥集能平台前端
+
+![Image text](./config/logo/logo1.jpg)
+
 
 ## 前往 product/rules 查看编码规则
 
 ## (TODO) git 提交跳过检查
 
+尽量少使用
 git commit -m 'fix: description' --no-verify
 
 ## 进度
