@@ -1,9 +1,9 @@
 import { schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-
+import API from '../../../services';
 export default class Cohort extends BaseTarget {
-  constructor(target: schema.XTarget) {
+    constructor(target: schema.XTarget) {
     super(target);
   }
   /**
@@ -18,4 +18,16 @@ export default class Cohort extends BaseTarget {
     });
     return res.success;
   }
+
+  public async SearchCohort(params: any) {
+    const {data} = await API.cohort.searchCohorts({
+      data: params,
+    });
+    console.log("进入调用")
+    
+    return { data};
+  }
+
+
+
 }

@@ -1,9 +1,9 @@
 
-import { Button, Space, Tabs, Card, Modal } from 'antd';
-import { Divider,Form } from 'antd';
+import { Button, Space, Tabs, Card, Modal, message } from 'antd';
+import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import Person from '../../../bizcomponents/PersonInfo/index'
+import PersonInfo from '../../../bizcomponents/PersonInfo/index'
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -12,10 +12,17 @@ import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
 import useStore from '../../../../src/store';
 import CreateCohort from '../../../bizcomponents/cohort/index'
-import UpdateCohort from '../../../bizcomponents/cohort/UpdateCohort/index'
-import services from '@/module/person';
-import { isTemplateElement } from '@babel/types';
+import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index'
+import Persons from '../../../bizcomponents/SearchPerson/index'
+import AddCohort from '../../../bizcomponents/SearchCohort/index'
+import { Person } from '@/module/org';
+import { sleep } from '@/store/sleep';
+import type { ProFormColumnsType } from '@ant-design/pro-components';
 
+type DataItem = {
+  name: string;
+  state: string;
+};
 /**
  * 个人信息
  * @returns
@@ -24,7 +31,8 @@ const CohortConfig: React.FC = () => {
   const service = new CohortService({
     nameSpace: 'myCohort',
     searchApi: API.cohort.getJoinedCohorts,
-    createApi: API.cohort.create
+    createApi: API.cohort.create,
+    updateApi: API.cohort.update
   });
 
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
@@ -32,15 +40,13 @@ const CohortConfig: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const { user } = useStore((state) => ({ ...state }));
   const [open, setOpen] = useState<boolean>(false);
-
+  const [item, setItem] = useState<CohortConfigType.CohortConfigTeam>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [friend, setFriend] = useState<Person>()
+ 
   useEffect(() => {
     getTableList();
   }, []);
-  
-  const divStyle: React.CSSProperties = {
-    marginTop: '55px',
-  }
-
   const renderOperation = (
     item: CohortConfigType.CohortConfigTeam,
   ): CohortConfigType.OperationType[] => {
@@ -56,6 +62,8 @@ const CohortConfig: React.FC = () => {
         key: 'inviteMembers',
         label: '邀请成员',
         onClick: () => {
+          showModal()
+          setItem(item)
           console.log('按钮事件', 'inviteMembers', item);
         },
       },
@@ -63,8 +71,10 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-          setOpen(true)
-          console.log('按钮事件123', 'updateCohort', item);
+          
+          setItem(item)
+          setOpen(true);
+          console.log('按钮事件1231', 'updateCohort', item);
         },
       },
       {
@@ -78,7 +88,8 @@ const CohortConfig: React.FC = () => {
         key: 'identityManage',
         label: '身份管理',
         onClick: () => {
-          console.log('按钮事件', 'identityManage', item);
+          console.log('按钮事件', 'identityManage', 
+          );
         },
       },
       {
@@ -107,10 +118,10 @@ const CohortConfig: React.FC = () => {
     if (isGofirst) {
       setPage(1);
     }
-    // if (!service.PUBLIC_STORE.id) {
-    //   // 防止页面刷新时,数据请求缓慢造成数据缺失问题
-    //   await sleep(100);
-    // }
+    if (!service.PUBLIC_STORE.id) {
+      // 防止页面刷新时,数据请求缓慢造成数据缺失问题
+      await sleep(100);
+    }
 
     const params = {
       id: service.PUBLIC_STORE.id,
@@ -120,6 +131,7 @@ const CohortConfig: React.FC = () => {
     };
     await service.getList({ ...params, ...req });
     let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
+    console.log("获取值", service.List)
     for (var i = 0; i < service.List.length; i++) {
       if (service.List[i].belongId === { user }.user.workspaceId) {
         const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team
@@ -129,9 +141,8 @@ const CohortConfig: React.FC = () => {
       }
     }
     setList([...resultList]);
-    console.log(66,resultList,resultList.length)
+    console.log(66, resultList, resultList.length)
     setTotal(resultList.length);
-    console.log
   };
 
   const handlePageChange = (page: number, pageSize: number) => {
@@ -146,12 +157,34 @@ const CohortConfig: React.FC = () => {
   const onChange = (key: string) => {
     console.log(key);
   };
-  
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+
+  const handleOk = async () => {
+    setIsModalOpen(false);
+    const { data, code } = await service.getpullPerson({
+      id: item?.id,
+      targetIds: [friend?.id]
+    });
+    if (code === 200) {
+      message.success('邀请成功');
+    } else {
+      message.warning('您不是群管理员');
+    }
+  };
+  const handleCancle = () => {
+    setIsModalOpen(false);
+  };
+  const searchCallback = (person: Person) => {
+    setFriend(person);
+  };
   return (
 
     <div className={cls['person-info-content-container']}>
       <div>
-        <Person />
+        <PersonInfo />
       </div>
       <Card>
         <div className={cls['person-info-content-header']}>
@@ -160,9 +193,22 @@ const CohortConfig: React.FC = () => {
           </Title>
           <div style={{ float: "right" }}>
             <Space split={<Divider type="vertical" />}>
-              <CreateCohort service={service} getTableList = {getTableList}/>
-              <UpdateCohort service = {service} open = {open}/>
-              <Button type="link">加入群组</Button>
+              <Modal title="邀请成员" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px'>
+                <Persons searchCallback={searchCallback} />
+              </Modal>
+              <Modal title="加入群组" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px' >
+                <AddCohort searchCallback={searchCallback} />
+              </Modal>
+              <UpdateCohort
+              key={item?.id}
+               layoutType="ModalForm"
+                title="修改群组"
+                modalProps={{
+                  destroyOnClose: true,
+                  onCancel: () => setOpen(false),
+                }} service={service} open={open} columns = {service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
+              <CreateCohort service={service} getTableList={getTableList} />
+              <Button type="link" onClick = {showModal}>加入群组</Button>
             </Space>
           </div>
         </div>
