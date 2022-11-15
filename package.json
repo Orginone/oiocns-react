@@ -22,11 +22,8 @@
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": "eslint --ext .js,.jsx,.ts,.tsx",
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "prettier --write",
-      "git add"
-    ]
+    "./src/*.{js,jsx,ts,tsx}": ["lint:fix"]
+
   },
   "browserslist": [
     "> 1%",

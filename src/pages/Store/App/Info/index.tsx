@@ -28,11 +28,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
   const { TestSub } = useContext(EventContext);
   const BtnsList = ['编辑应用分配'];
   const history = useHistory();
-  TestSub.useSubScription('hello2', (s: any) => {
-    console.log('监听2222', s);
-  });
   const handleBtnsClick = (item: { text: string }) => {
-    // console.log('按钮点击', item);
     switch (item.text) {
       case '编辑应用分配':
         console.log('编辑应用分配编辑应用分配');
