@@ -61,7 +61,7 @@ class StoreClassify {
    * @desc: 获取树形组件 展示数据
    * @return {*}
    */
-  public getTreeData() {
+  protected getTreeData() {
     //TODO:调用获取节点信息接口
     this.getMarketList();
   }
