@@ -60,4 +60,3 @@ export default class Product {
     return false;
   }
 }
-
