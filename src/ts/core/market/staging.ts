@@ -1,1 +1,1 @@
-export default class Staging { }
+export default class Staging {}

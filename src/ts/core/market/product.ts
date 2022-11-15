@@ -1,14 +1,15 @@
 import Merchandise from './merchandise';
 import { TProduct } from '../entity';
 import { kernel } from '../../base';
+import { XMerchandise, XProduct } from '../../base/schema';
 
 export default class Product {
   // 应用实体
-  private _prod: TProduct;
+  private _prod: XProduct;
   // 应用对应的商品列表
-  private _merchandise: Merchandise[];
+  private _merchandise: XMerchandise[];
 
-  constructor(prod: TProduct) {
+  constructor(prod: XProduct) {
     this._prod = prod;
   }
 
@@ -23,25 +24,25 @@ export default class Product {
    * @returns 是否上架成功
    */
   public async publish(
-    Caption: string,
-    MarketId: string,
-    SellAuth: '所属权' | '使用权',
-    Information: string,
-    Price?: number,
-    Days?: number,
+    caption: string,
+    marketId: string,
+    sellAuth: '所属权' | '使用权',
+    information: string,
+    price: number = 0,
+    days: number = 0,
   ): Promise<boolean> {
     const res = await kernel.createMerchandise({
-      Caption,
-      MarketId,
-      SellAuth,
-      Information,
-      Price,
-      Days,
-      ProductId: this._prod.id,
+      id: '',
+      caption,
+      marketId,
+      sellAuth,
+      information,
+      price,
+      days,
+      productId: this._prod.id,
     });
     if (res.success) {
-      const merchandise = new Merchandise(res.data);
-      this._merchandise.push(merchandise);
+      this._merchandise.push(res.data);
       return true;
     }
     return false;
@@ -52,8 +53,12 @@ export default class Product {
    * @param merchandiseId 下架商品ID
    * @returns 下架是否成功
    */
-  public async unPublish(merchandise: Merchandise): Promise<boolean> {
-    if (await merchandise.delete()) {
+  public async unPublish(merchandise: XMerchandise, belongId: string): Promise<boolean> {
+    const res = await kernel.deleteMerchandise({
+      belongId: belongId,
+      id: merchandise.id,
+    });
+    if (res.success) {
       delete this._merchandise[this._merchandise.indexOf(merchandise)];
       return true;
     }
