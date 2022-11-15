@@ -7,9 +7,11 @@ import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
 import { useAppwfConfig } from '@/module/flow/flow';
-/* 
-    流程设置抽屉
-*/
+
+/**
+ * @description: 流程设置抽屉
+ * @return {*}
+ */
 
 interface Iprops {
   open: boolean;

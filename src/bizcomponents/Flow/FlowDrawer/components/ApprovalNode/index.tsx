@@ -5,9 +5,10 @@ import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
 
-/* 
-    审批对象
-*/
+/**
+ * @description: 审批对象
+ * @return {*}
+ */
 
 const { Option } = Select;
 
