@@ -43,11 +43,12 @@ const ApprovalNode = () => {
         <Button
           type="primary"
           shape="round"
+          size="small"
           onClick={() => {
             setIsOpen(true);
             getJoinedCohort();
           }}>
-          选择身份
+          选择岗位
         </Button>
       </Row>
       <Divider />
@@ -66,8 +67,12 @@ const ApprovalNode = () => {
         <Row>
           <Radio.Group onChange={onChange} value={value}>
             <Radio value={1}>直接结束流程</Radio>
-            <Radio value={2}>驳回到上级审批节点</Radio>
-            <Radio value={3}>驳回到指定节点</Radio>
+            <Radio value={2} disabled>
+              驳回到上级审批节点
+            </Radio>
+            <Radio value={3} disabled>
+              驳回到指定节点
+            </Radio>
           </Radio.Group>
         </Row>
       </div>
