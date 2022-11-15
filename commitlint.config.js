@@ -43,6 +43,7 @@ module.exports = {
         'chore', // 构建过程或辅助工具的变动
         'revert', // 回退
         'build', // 打包
+        'delete', //删除
         'workflow',
         'types',
         'release',
