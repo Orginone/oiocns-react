@@ -22,8 +22,7 @@
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
   "lint-staged": {
-    "./src/*.{js,jsx,ts,tsx}": ["lint:fix"]
-
+    "./src/*.{js,jsx,ts,tsx}": ["npm run lint:fix","git add"]
   },
   "browserslist": [
     "> 1%",
