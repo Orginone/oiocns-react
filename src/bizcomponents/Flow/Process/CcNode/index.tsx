@@ -1,10 +1,11 @@
 import Node from '@/bizcomponents/Flow/Process/Node';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 type CcNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  config: any;
   [key: string]: any;
 };
 

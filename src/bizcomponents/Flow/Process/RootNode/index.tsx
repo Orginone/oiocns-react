@@ -5,6 +5,7 @@ type RootNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  config: any;
   [key: string]: any;
 };
 
@@ -13,10 +14,9 @@ type RootNodeProps = {
  * @returns
  */
 const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
-
   return (
     <Node
-    title={props.config.name}
+      title={props.config.name}
       isRoot={true}
       showError={false}
       content=""

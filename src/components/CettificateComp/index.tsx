@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu,Card } from 'antd';
+import { Avatar, Tag, Dropdown, Menu, Card } from 'antd';
 import React from 'react';
 import './index.less';
 import AppLogo from '@/assets/img/appLogo.png';
@@ -56,17 +56,14 @@ const AppCardComp: React.FC<CertificatesType> = ({
   const gridStyle: React.CSSProperties = {
     width: '20%',
     textAlign: 'center',
-  }
+  };
 
   const Title = () => {
     return (
-      
-    <Card.Grid style={gridStyle}>
-      <Avatar className="card-title-left-logo" size={50} src={AppLogo} />
-      <div>
-      {data[name] || '--'}
-      </div>
-    </Card.Grid>
+      <Card.Grid style={gridStyle}>
+        <Avatar className="card-title-left-logo" size={50} src={AppLogo} />
+        <div>{data[name] || '--'}</div>
+      </Card.Grid>
       // <div className="card-title flex" onClick={onClick}>
       //   <div className="card-title-left">
       //     <Avatar className="card-title-left-logo" size={50} src={AppLogo} />
@@ -74,17 +71,14 @@ const AppCardComp: React.FC<CertificatesType> = ({
       //       {/* <span className="app-size">{data[size] || '--'}MB</span> */}
       //     </div>
       //     <div className="app-name">
-              // <br></br><span className="app-name-label">{data[name] || '--'}</span>
+      // <br></br><span className="app-name-label">{data[name] || '--'}</span>
       //       </div>
       //   </div>
       // </div>
     );
   };
 
-  return (
-      <Title />
-    
-  );
+  return <Title />;
 };
 
 export default AppCardComp;

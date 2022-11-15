@@ -6,22 +6,19 @@ import ReactDOM from 'react-dom';
     编辑名称
 */
 
-interface Iprops {
-
-}
+interface Iprops {}
 
 const EditTitle = (props: Iprops) => {
-  const selectedNode = useAppwfConfig((state:any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state:any) => state.setSelectedNode);
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
+  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-  
-  console.log(selectedNode)
-  const setEditTitle = (e:any)=>{
-    
-    selectedNode.name =e
-    setSelectedNode(selectedNode)
-    setKey(key+1)
-  }
+
+  console.log(selectedNode);
+  const setEditTitle = (e: any) => {
+    selectedNode.name = e;
+    setSelectedNode(selectedNode);
+    setKey(key + 1);
+  };
   return (
     <Typography.Title
       editable={{ onChange: setEditTitle }}

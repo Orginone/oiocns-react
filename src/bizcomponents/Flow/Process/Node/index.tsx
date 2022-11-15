@@ -44,10 +44,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const delNode = () => {
     props.onDelNode();
   };
-  const select = () =>{
-    
+  const select = () => {
     props.onSelected();
-  }
+  };
   const footer = (
     <div className={cls['node-footer']}>
       <div className={cls['btn']}>
@@ -59,7 +58,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     <div className={cls['node-body-header']} style={{ backgroundColor: props.headerBgc }}>
       <UserOutlined style={{ fontSize: '12px', paddingRight: '5px' }} />
       <span className={cls['name']}>{props.title}</span>
-      {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }}  onClick={delNode}/>}
+      {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />}
     </div>
   );
   const nodeContent = (
@@ -90,8 +89,8 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         }
         ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
           props._passed === 2 ? cls['node-completed-state'] : ''
-        }`} >
-        <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`} >
+        }`}>
+        <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
           <div>
             {nodeHeader}
             {nodeContent}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 
 import { Drawer } from 'antd';
 import EditTitle from './components/EditTitle';
@@ -24,11 +24,9 @@ interface Iprops {
 }
 
 const FlowDrawer = (props: Iprops) => {
-
-  const selectedNode = useAppwfConfig((state:any) => state.selectedNode);
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const { open, onClose, title } = props;
   let Comp = null;
-  debugger
   switch (selectedNode.type) {
     case 'ROOT':
       Comp = <RootNode />;
@@ -48,8 +46,6 @@ const FlowDrawer = (props: Iprops) => {
       break;
   }
 
-
-
   return (
     <Drawer
       title={<EditTitle />}
@@ -61,6 +57,5 @@ const FlowDrawer = (props: Iprops) => {
     </Drawer>
   );
 };
-
 
 export default FlowDrawer;
