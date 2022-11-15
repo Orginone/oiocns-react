@@ -17,11 +17,10 @@ type FormProcessDesignProps = {
 const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
   const { Column } = Table;
   const [showConfig, setShowConfig] = useState(false);
-  const [showInput, setShowInput] = useState(false);
   const [dialogTableVisible, setDialogTableVisible] = useState(false);
   const [flowRecords, setFlowRecords] = useState([]);
-  const selectedNode = useAppwfConfig((state:any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state:any) => state.setSelectedNode);
+  const scale =  useAppwfConfig((state:any) => state.scale);
   const close = ()=>{
     setShowConfig(false)
   }
@@ -34,7 +33,7 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
   const configDrawer = (   <FlowDrawer   open={showConfig}   onClose={close}/>)
   return (
     <div>    
-      <div className={cls["design"]} >
+      <div className={cls["design"]} style={{transform: `scale(${scale/100})`}}>
         <ProcessTree  OnSelectedNode={Selected}/>
       </div>
       {configDrawer}

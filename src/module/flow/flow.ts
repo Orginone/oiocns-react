@@ -183,6 +183,7 @@
   }
 
   export const useAppwfConfig = create((set, get) =>({
+      scale: 100,
       nodeMap: new Map(),
       isEdit: null,
       selectedNode: {},
@@ -230,6 +231,7 @@
       setDesignList:async (data: any)=> set({ designList: data }),
       setForm:async (data: any)=> set({ form: data }),
       setIsEdit:async (data: any)=> set({ isEdit: data }),
+      setScale:async (data: any)=> set({ scale: data }),
   }));
 
   

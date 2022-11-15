@@ -34,16 +34,16 @@ const ConditionNode = () => {
     setSelectedNode(selectedNode)
     setKey(key+1)
   };
-
+  
   return (
     <div>
-    <div>
-       <Button  type="primary"   onClick={addConditionGroup} >
-        添加条件
-      </Button>
+      <div>
+        <Button  type="primary"   onClick={addConditionGroup} >
+          添加条件
+        </Button>
+      </div>
+      <ConditionGroupItemConfig/>
     </div>
-    <ConditionGroupItemConfig/>
-  </div>
   );
 };
 export default ConditionNode;
