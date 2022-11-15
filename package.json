@@ -22,9 +22,10 @@
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
   "lint-staged": {
-    "**/*.{js,jsx,tsx,ts,json}": [
-      "npm run lint:fix",
-      "git add --force"
+    "**/*.{js,jsx,ts,tsx}": "eslint --ext .js,.jsx,.ts,.tsx",
+    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+      "prettier --write",
+      "git add"
     ]
   },
   "browserslist": [
