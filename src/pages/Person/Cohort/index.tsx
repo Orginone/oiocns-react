@@ -1,9 +1,8 @@
-
 import { Button, Space, Tabs, Card, Modal } from 'antd';
-import { Divider,Form } from 'antd';
+import { Divider, Form } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import Person from '../../../bizcomponents/PersonInfo/index'
+import Person from '../../../bizcomponents/PersonInfo/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -11,8 +10,8 @@ import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
 import useStore from '../../../../src/store';
-import CreateCohort from '../../../bizcomponents/cohort/index'
-import UpdateCohort from '../../../bizcomponents/cohort/UpdateCohort/index'
+import CreateCohort from '../../../bizcomponents/cohort/index';
+import UpdateCohort from '../../../bizcomponents/cohort/UpdateCohort/index';
 import services from '@/module/person';
 import { isTemplateElement } from '@babel/types';
 
@@ -24,7 +23,7 @@ const CohortConfig: React.FC = () => {
   const service = new CohortService({
     nameSpace: 'myCohort',
     searchApi: API.cohort.getJoinedCohorts,
-    createApi: API.cohort.create
+    createApi: API.cohort.create,
   });
 
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
@@ -36,10 +35,10 @@ const CohortConfig: React.FC = () => {
   useEffect(() => {
     getTableList();
   }, []);
-  
+
   const divStyle: React.CSSProperties = {
     marginTop: '55px',
-  }
+  };
 
   const renderOperation = (
     item: CohortConfigType.CohortConfigTeam,
@@ -63,7 +62,7 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-          setOpen(true)
+          setOpen(true);
           console.log('按钮事件123', 'updateCohort', item);
         },
       },
@@ -122,16 +121,16 @@ const CohortConfig: React.FC = () => {
     let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
     for (var i = 0; i < service.List.length; i++) {
       if (service.List[i].belongId === { user }.user.workspaceId) {
-        const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team
-        chorot.belongId = service.List[i].belongId
-        chorot.thingId = service.List[i].thingId
-        resultList.push(chorot)
+        const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team;
+        chorot.belongId = service.List[i].belongId;
+        chorot.thingId = service.List[i].thingId;
+        resultList.push(chorot);
       }
     }
     setList([...resultList]);
-    console.log(66,resultList,resultList.length)
+    console.log(66, resultList, resultList.length);
     setTotal(resultList.length);
-    console.log
+    console.log;
   };
 
   const handlePageChange = (page: number, pageSize: number) => {
@@ -139,16 +138,14 @@ const CohortConfig: React.FC = () => {
     getTableList({ page, pageSize });
   };
 
-
   const tableAlertRender = (selectedRowKeys: any[]) => {
-    console.log(selectedRowKeys)
+    console.log(selectedRowKeys);
   };
   const onChange = (key: string) => {
     console.log(key);
   };
-  
-  return (
 
+  return (
     <div className={cls['person-info-content-container']}>
       <div>
         <Person />
@@ -158,10 +155,10 @@ const CohortConfig: React.FC = () => {
           <Title level={2}>
             <strong>群组</strong>
           </Title>
-          <div style={{ float: "right" }}>
+          <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
-              <CreateCohort service={service} getTableList = {getTableList}/>
-              <UpdateCohort service = {service} open = {open}/>
+              <CreateCohort service={service} getTableList={getTableList} />
+              <UpdateCohort service={service} open={open} />
               <Button type="link">加入群组</Button>
             </Space>
           </div>
@@ -174,40 +171,40 @@ const CohortConfig: React.FC = () => {
             {
               label: `管理的`,
               key: '1',
-              children: <CardOrTable<CohortConfigType.CohortConfigTeam>
-                dataSource={list}
-                total={total}
-                page={page}
-                tableAlertRender={tableAlertRender}
-                rowSelection={{
-                  // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                  // 注释该行则默认不显示下拉选项
-                  // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                  // defaultSelectedRowKeys: [1],
-                }}
-                // defaultPageType={'table'}
-                showChangeBtn={false}
-                operation={renderOperation}
-                columns={cohortColumn as any}
-                // style={divStyle}
-                onChange={handlePageChange}
-                rowKey={'id'}
-              />,
+              children: (
+                <CardOrTable<CohortConfigType.CohortConfigTeam>
+                  dataSource={list}
+                  total={total}
+                  page={page}
+                  tableAlertRender={tableAlertRender}
+                  rowSelection={
+                    {
+                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+                      // 注释该行则默认不显示下拉选项
+                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                      // defaultSelectedRowKeys: [1],
+                    }
+                  }
+                  // defaultPageType={'table'}
+                  showChangeBtn={false}
+                  operation={renderOperation}
+                  columns={cohortColumn as any}
+                  // style={divStyle}
+                  onChange={handlePageChange}
+                  rowKey={'id'}
+                />
+              ),
             },
             {
               label: `加入的`,
               key: '2',
               children: `Content of Tab Pane 2`,
             },
-
           ]}
         />
       </Card>
-
     </div>
-
   );
-
 };
 
 export default CohortConfig;

@@ -90,8 +90,6 @@ class PersonService {
       },
     );
   }
-  
-
 }
 
 const personService = new PersonService();

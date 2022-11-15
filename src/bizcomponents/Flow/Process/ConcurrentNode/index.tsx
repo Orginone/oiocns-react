@@ -1,11 +1,14 @@
 import React from 'react';
-import InsertButton from '@/bizcomponents/Flow/Process/InsertButton'
+import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
-import  cls from './index.module.less';
+import cls from './index.module.less';
 type ConcurrentNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
+  onSelected: Function;
+  config: any;
+  level: any;
   [key: string]: any;
   // config?: any,
   //  _disabled?: boolean,
@@ -18,18 +21,18 @@ type ConcurrentNodeProps = {
  * 并行节点
  * @returns
  */
-const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props:ConcurrentNodeProps) => {
+const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
   const delNode = () => {
     props.onDelNode();
   };
   const copy = () => {
     props.onCopy();
   };
-  const select = () =>{
+  const select = () => {
     props.onSelected();
-  }
+  };
   const footer = (
-    <div className={cls["btn"]}>
+    <div className={cls['btn']}>
       <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
     </div>
   );
@@ -42,14 +45,14 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props:ConcurrentNodeProps
         </span>
       </span>
       <span className={cls['option']}>
-        <CopyOutlined style={{ fontSize: '12px' ,paddingRight:'5px'}} onClick={copy}/>
-        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode}/>
+        <CopyOutlined style={{ fontSize: '12px', paddingRight: '5px' }} onClick={copy} />
+        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
       </span>
     </div>
   );
   const nodeContent = (
-    <div className={cls["node-body-main-content"]} onClick={select}>
-        <span>并行任务（同时进行）</span>
+    <div className={cls['node-body-main-content']} onClick={select}>
+      <span>并行任务（同时进行）</span>
     </div>
   );
   return (

@@ -20,7 +20,7 @@ const service = new MarketService({
   deleteApi: API.product.delete,
   updateApi: API.product.update,
 });
-console.log(service)
+console.log(service);
 interface submitEmmit {
   aa: string;
 }

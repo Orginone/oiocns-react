@@ -14,7 +14,8 @@ import CommonClass from '../commonClass/BaseServiceClass';
 //   PUBLIC_STORE: CertificateType.; //共享仓库信息,用于获取共享仓库应用列表
 // }
 export default class Certificate extends CommonClass {
-  public PUBLIC_STORE: CertificateType.cerManageType = {} as CertificateType.cerManageType; //共享仓库信息
+  public PUBLIC_STORE: CertificateType.cerManageType =
+    {} as CertificateType.cerManageType; //共享仓库信息
   /**
    * @desc: 获取共享仓库信息
    * @return {*}

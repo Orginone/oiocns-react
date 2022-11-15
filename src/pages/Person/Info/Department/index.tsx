@@ -222,7 +222,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
           getCheckboxProps: getCheckboxProps,
         }}
       />
-
     </div>
   );
 };

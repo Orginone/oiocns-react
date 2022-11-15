@@ -81,6 +81,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
     }
     toMapping(node);
     if (node?.type == 'CC') {
+      console.log('');
     }
     if (isPrimaryNode(node)) {
       //普通业务节点
@@ -620,7 +621,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
     // for in 遍历
     for (var key in obj) {
       // 判断 是否 为自身 的属性值（排除原型链干扰）
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         // 判断 对象的属性值 中 存储的 数据类型 是否为对象
         if (typeof obj[key] === 'object') {
           // 递归调用
@@ -647,11 +648,11 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
           'div',
           {
             className: cls['process-end'],
-            dangerouslySetInnerHTML: { __html: '流程结束' },
+            // dangerouslySetInnerHTML: { __html: '流程结束' },
             // dangerouslySetInnerHTML:{textEndNode},
             key: getRandomId(),
           },
-          null,
+          ['流程结束'],
         ),
       ]),
     );
