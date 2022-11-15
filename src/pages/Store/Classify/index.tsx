@@ -14,12 +14,12 @@ import CloudTreeComp from '@/components/CloudTreeComp';
 import API from '@/services';
 // import { MarketTypes } from 'typings/marketType';
 import CommonClass from '@/module/commonClass/BaseServiceClass';
-import { Page } from '@/module/typings';
 import NewStoreModal from '@/components/NewStoreModal'; // 新建商店
 
 // import JsonFrom from '@/bizcomponents/JsonFrom';
 import { useLocation } from 'react-router-dom';
 import useStore from '@/store';
+import ClassServices from '../_control/classify';
 
 const Service = new CommonClass({
   nameSpace: 'shopTree',
@@ -45,11 +45,13 @@ const StoreClassify: React.FC = () => {
   // const [total, setTotal] = useState<number>(0);
   // const history = useHistory();
   useEffect(() => {
-    getTreeList();
+    // getTreeList();
+    ClassServices.getMarketList();
+    ClassServices.TreeCallBack = setList;
   }, []);
-  useEffect(() => {
-    // console.log('3211232131', router);
-  }, [router]);
+  // useEffect(() => {
+  //   // console.log('3211232131', router);
+  // }, [list]);
 
   const onOk = async (data: any) => {
     setIsStoreOpen(false);
@@ -62,37 +64,6 @@ const StoreClassify: React.FC = () => {
   };
   const onCancel = () => {
     setIsStoreOpen(false);
-  };
-  const getTreeList = async (req = {}, searchKey = '') => {
-    const params = {
-      page: 1,
-      pageSize: 100,
-      filter: searchKey,
-    };
-
-    await Service.getList<Page>({ ...params, ...req });
-    setList(
-      Service.List.map((item, index) => {
-        return {
-          title: item.name,
-          key: `0-${index}`,
-          id: item.id,
-          children: [],
-        };
-      }),
-    );
-    // setTotal(Service.Total);
-    console.log(
-      'treeData',
-      Service.List.map((item, index) => {
-        return {
-          title: item.name,
-          key: `0-${index}`,
-          id: item.id,
-          children: [],
-        };
-      }),
-    );
   };
 
   //菜单跳转
