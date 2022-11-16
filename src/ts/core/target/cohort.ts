@@ -3,7 +3,7 @@ import { TargetType } from '../enum';
 import BaseTarget from './base';
 import API from '../../../services';
 export default class Cohort extends BaseTarget {
-    constructor(target: schema.XTarget) {
+    constructor(target:schema.XTarget) {
     super(target);
   }
   /**
@@ -28,6 +28,29 @@ export default class Cohort extends BaseTarget {
     return { data};
   }
 
+  public async ApplyJoinCohort(params: any) {
+    const {code,msg,success} = await API.cohort.applyJoin({
+      data: params,
+    });
+    console.log("进入调用")
+    
+    return {code,msg,success};
+  }
 
+  public async deleteCohort(params: any) {
+    const {code,msg,success} = await API.cohort.delete({
+      data: params,
+    });
+    console.log("进入调用")
+    return {code,msg,success};
+  }
+  // public async deleteCohort(params: any) {
+  //   const {code,msg,success} = await API.cohort.applyJoin({
+  //     data: params,
+  //   });
+  //   console.log("进入调用")
+    
+  //   return {code,msg,success};
+  // }
 
 }

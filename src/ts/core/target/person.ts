@@ -6,6 +6,7 @@ import Company from './company';
 import { kernel, model, schema } from '../../base';
 import University from './university';
 import Hospital from './hospital';
+import { data } from '@/components/CardOrTableComp/config';
 
 export default class Person extends BaseTarget {
   private _curCompany: Company | undefined;
@@ -19,6 +20,41 @@ export default class Person extends BaseTarget {
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
+  }
+/**
+ * 获取群组列表
+ * @param params 
+ * @returns 
+ */
+  public async getCohort(
+    params: model.IDReqJoinedModel
+  ): Promise<model.ResultType<any>> {
+    let res = await kernel.queryJoinedTargetById(params);
+    if(res.success){
+      for(var i=0;i<res.data.result.length;i++){
+         const cohort = new Cohort(res.data.result[i])
+         this._joinedCohorts.push(cohort);
+      }
+    }
+    return res;
+  }
+
+  /**
+ * 删除群组
+ * @param params 
+ * @returns 
+ */
+   public async deleteCohort(
+    params: model.IdReqModel
+  ): Promise<model.ResultType<any>> {
+    let res = await kernel.deleteTarget(params);
+    // if(res.success){
+    //   for(var i=0;i<res.data.result.length;i++){
+    //      const cohort = new Cohort(res.data.result[i])
+    //      this._joinedCohorts.push(cohort);
+    //   }
+    // }
+    return res;
   }
 
   /**
