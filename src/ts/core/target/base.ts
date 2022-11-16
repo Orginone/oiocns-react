@@ -1,5 +1,6 @@
 import { kernel, model, common, schema } from '../../base';
 
+
 export default class BaseTarget {
   public readonly target: schema.XTarget;
   constructor(target: schema.XTarget) {
