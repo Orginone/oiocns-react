@@ -1,7 +1,12 @@
 import { kernel } from '../../base';
-import { TargetType } from '../enum';
+import { CommonStatus, TargetType } from '../enum';
 import { PageRequest, ResultType } from '../../base/model';
-import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
+import {
+  XMarket,
+  XMarketRelation,
+  XMarketRelationArray,
+  XMerchandiseArray,
+} from '../../base/schema';
 
 export default class AppStore {
   // 商店实体
@@ -24,10 +29,29 @@ export default class AppStore {
   }
 
   /**
+   * 分页获取加入商店申请
+   * @param page
+   */
+  public async getUserApply(page: PageRequest) {}
+
+  /**
+   * 审批商店成员加入申请
+   * @param id 申请ID
+   * @param status 审批结果
+   * @returns 是否成功
+   */
+  public async approvalJoinApply(
+    id: string,
+    status: number = CommonStatus.RejectStartStatus,
+  ): Promise<ResultType<any>> {
+    return await kernel.approvalJoinApply({ id, status });
+  }
+
+  /**
    * 拉对象加入商店
    * @param targetIds 对象ID集合
    * @param typenames 对象类型
-   * @returns
+   * @returns 是否成功
    */
   public async pull(targetIds: string[], typenames: string[]): Promise<ResultType<any>> {
     return await kernel.pullAnyToMarket({
@@ -57,6 +81,33 @@ export default class AppStore {
       id: this._store.id,
       page: page,
     });
+  }
+
+  /**
+   * 获取商品上架申请列表
+   * @param page 分页参数
+   * @returns 返回商品上架申请列表
+   */
+  public async getMerchandiseApply(
+    page: PageRequest,
+  ): Promise<ResultType<XMerchandiseArray>> {
+    return await kernel.queryMerchandiesApplyByManager({
+      id: this._store.id,
+      page: page,
+    });
+  }
+
+  /**
+   * 审批商品上架申请
+   * @param id 申请ID
+   * @param status 审批结果
+   * @returns 是否成功
+   */
+  public async approvalPublishApply(
+    id: string,
+    status: number = CommonStatus.RejectStartStatus,
+  ): Promise<ResultType<any>> {
+    return await kernel.approvalMerchandise({ id, status });
   }
 
   /**
