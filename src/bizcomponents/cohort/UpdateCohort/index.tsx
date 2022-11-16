@@ -1,4 +1,4 @@
-import { Button, Form, Input, } from 'antd';
+import { Button, Form, Input } from 'antd';
 import React, { useEffect } from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
@@ -7,16 +7,12 @@ import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 /* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
-  service: CohortService,
-  open:boolean
+  service: CohortService;
+  open: boolean;
 }
 
-
-const UpdateCohort: React.FC<CohortServiceType> = ({
-  service,
-  open
-}) => {
-  console.log(service)
+const UpdateCohort: React.FC<CohortServiceType> = ({ service, open }) => {
+  console.log(service);
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -105,15 +101,15 @@ const UpdateCohort: React.FC<CohortServiceType> = ({
       columns: ({ title }) => {
         return title !== 'hidden'
           ? [
-            {
-              title: 'title为hidden时隐藏',
-              dataIndex: 'hidden',
-              valueType: 'date',
-              renderFormItem: () => {
-                return <Input />;
+              {
+                title: 'title为hidden时隐藏',
+                dataIndex: 'hidden',
+                valueType: 'date',
+                renderFormItem: () => {
+                  return <Input />;
+                },
               },
-            },
-          ]
+            ]
           : [];
       },
     },
@@ -140,33 +136,33 @@ const UpdateCohort: React.FC<CohortServiceType> = ({
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
   // setIsModalOpen(open)
-console.log(open)
+  console.log(open);
   const showModal = () => {
-    console.log("qqq")
+    console.log('qqq');
     setIsModalOpen(open);
   };
   useEffect(() => {
-    showModal
+    showModal;
   }, []);
   const handleOk = () => {
     setIsModalOpen(false);
   };
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
   const onSave = async () => {
-    const values = await form.validateFields()
-    console.log(values) //2.表单验证并获取表单值
+    const values = await form.validateFields();
+    console.log(values); //2.表单验证并获取表单值
     const params = {
       code: values.cohort.code,
       name: values.cohort.name,
-      teamRemark: values.cohort.remark
-    }
-    service.creatItem(params)
-    console.log("创建成功")
+      teamRemark: values.cohort.remark,
+    };
+    service.creatItem(params);
+    console.log('创建成功');
     setIsModalOpen(false);
-  }
+  };
   return (
     <div>
-      <Modal title="修改群组" open={isModalOpen} onOk={onSave} onCancel={handleOk} >
+      <Modal title="修改群组" open={isModalOpen} onOk={onSave} onCancel={handleOk}>
         <>
           <BetaSchemaForm<DataItem>
             shouldUpdate={false}
@@ -179,7 +175,6 @@ console.log(open)
         </>
       </Modal>
     </div>
-
   );
 };
 export default UpdateCohort;

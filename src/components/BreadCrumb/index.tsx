@@ -45,7 +45,7 @@ const BreadCrumb: React.FC = () => {
   const items = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
     let menu = undefined;
-    if (breadcrumbNameMap[url].routes) {
+    if (breadcrumbNameMap[url]?.routes) {
       const items = breadcrumbNameMap[url].routes?.map((r) => {
         return {
           key: r.path,
@@ -63,8 +63,8 @@ const BreadCrumb: React.FC = () => {
     }
     return (
       <Breadcrumb.Item key={url} className={cls['comp-breadcrumb']} overlay={menu}>
-        {location.pathname === url && createIcon(breadcrumbNameMap[url].icon)}
-        <Typography.Text>{breadcrumbNameMap[url].title}</Typography.Text>
+        {location.pathname === url && createIcon(breadcrumbNameMap[url]?.icon)}
+        <Typography.Text>{breadcrumbNameMap[url]?.title}</Typography.Text>
       </Breadcrumb.Item>
     );
   });

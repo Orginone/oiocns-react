@@ -4,9 +4,10 @@ import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { perpleList } from './mock';
 
-/* 
-    选择人员弹窗
-*/
+/**
+ * @description: 选择人员弹窗
+ * @return {*}
+ */
 
 interface Iprops {
   open: boolean;

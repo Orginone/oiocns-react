@@ -6,12 +6,10 @@ type ConditionNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
+  onSelected: Function;
+  config: any;
+  level: any;
   [key: string]: any;
-  // config?: any;
-  // _disabled?: boolean;
-  // level?: number;
-  // //条件数
-  // size?: number;
 };
 
 /**
@@ -27,9 +25,9 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   const copy = () => {
     props.onCopy();
   };
-  const select = () =>{
+  const select = () => {
     props.onSelected();
-  }
+  };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -57,8 +55,8 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
       <span className={cls['option']}>
-        <CopyOutlined style={{ fontSize: '12px' ,paddingRight:'5px'}} onClick={copy}/>
-        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode}/>
+        <CopyOutlined style={{ fontSize: '12px', paddingRight: '5px' }} onClick={copy} />
+        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
       </span>
     </div>
   );
@@ -69,7 +67,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
     </div>
   );
   return (
-    <div className={`${cls['node']} ${showError ? cls['node-error-state'] : ''}`} >
+    <div className={`${cls['node']} ${showError ? cls['node-error-state'] : ''}`}>
       <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
         <div className={cls['node-body-main']}>
           {nodeHeader}
