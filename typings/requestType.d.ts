@@ -5,6 +5,7 @@ type CommonParamsType = {
   current?: number;
   pageSize?: number;
   status?: string | number;
+  id?: string | number;
 };
 // 翻页props
 type PaginationProps = {
@@ -21,4 +22,38 @@ interface ResultType {
   data: any;
   msg: string;
   success: boolean;
+}
+
+/**
+ * 分页查询
+ * 请求体
+ */
+interface PageParams {
+  page: number;
+  pageSize: number;
+  filter?: string;
+}
+/**
+ * ID分页查询
+ * 请求体
+ */
+interface IdPage extends PageParams {
+  id: string;
+}
+
+/**
+ * 通过状态字段分页查询
+ * 请求体
+ */
+interface StatusPage extends PageParams {
+  status: number | string;
+}
+
+/**
+ * ID和状态分页查询
+ * 请求体
+ */
+interface IdStatusPage extends PageParams {
+  id: number | string;
+  status: number | string;
 }

@@ -206,7 +206,7 @@ export type PageRequest = {
   // 最大数量
   limit: number;
   //过滤条件
-  filter: string;
+  filter?: string;
 };
 
 export type RecursiveReqModel = {
