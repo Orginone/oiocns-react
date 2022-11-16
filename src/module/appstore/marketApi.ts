@@ -27,6 +27,9 @@ class MarketServices {
    * @return {*}
    */
   public async getMarketList(params: CommonParamsType) {
+    if (this.marketList.length > 0) {
+      return this.marketList;
+    }
     const { data, success } = await API.market.searchOwn({
       data: params,
     });

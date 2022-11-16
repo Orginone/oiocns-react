@@ -1,53 +1,31 @@
-# oiocns-web
+# 奥集能平台前端
 
-奥集能平台前端
+![Image text](./config/logo/logo1.jpg)
+
+## 描述
+
+Orginone\*\*利用云原生技术，专注用户价值，秉持“精一”理念，集成各种能力，面向组织用户提供统一应用界面。
+基于用户需求场景，打破技术、产品和服务的边界，更好的帮助客服实现数字化转型。
+
+## 使命和愿景
+
+云原生应用研究院是研究云原生技术，推进领先技术的落地实践，支撑政府、社会、经济等各领域各行业组织变革和业务创新需求而发起成立的开放型非营利公共组织。 负责搭建开放协同创新平台，加速云原生应用平台落地示范以及推广，更好的服务于数字化改革。
+
+## 主要模块
+
+- 沟通
+- 待办
+- 仓库
+- 流程
+- 设置
+- 个人中心
 
 ## 前往 product/rules 查看编码规则
 
-## (TODO) git 提交跳过检查 --no-verify
+## 进度
 
-### 项目目录
-
-├── .husky                              // husky git hooks配置目录
-    ├── _                               // husky 脚本生成的目录文件
-    ├── commit-msg                      // commit-msg钩子，用于验证 message格式
-    ├── pre-commit                      // pre-commit钩子，主要是和eslint配合
-├── config                              // 全局配置文件
-    ├── vite                            // vite 相关配置
-    ├── constant.ts                     // 项目配置
-    ├── themeConfig.ts                  // 主题配置
-├── dist                                // 默认的 build 输出目录
-├── mock                                // 前端数据mock
-├── public                              // vite项目下的静态目录
-└── src                                 // 源码目录
-    ├── assets                          // 公共的文件（如image、css、font等）
-    ├── components                      // 项目组件
-    ├── enums                           // 自定义 常量（枚举写法）
-    ├── hooks                           // 自定义 hooks
-    ├── layouts                          // 全局布局
-    ├── routes                          // 路由
-    ├── store                           // 状态管理器
-    ├── utils                           // 工具库
-    ├── pages                           // 页面模块目录
-        ├── Home                       // Home页面模块
-        ├── ...
-    ├── app.tsx                         // 顶层文件
-    ├── index.tsx                         // 项目入口文件
-    ├── typings                           // 项目type类型定义文件夹
-├── .editorconfig                       // IDE格式规范
-├── .env                                // 环境变量
-├── .eslintignore                       // eslint忽略
-├── .eslintrc                           // eslint配置文件
-├── .gitignore                          // git忽略
-├── .npmrc                              // npm配置文件
-├── .prettierignore                     // prettierc忽略
-├── .prettierrc                         // prettierc配置文件
-├── commitlint.config                   // git提交配置文件
-├── index.html                          // 入口文件
-├── LICENSE.md                          // LICENSE
-├── package.json                        // package
-├── postcss.config.js                   // postcss
-├── README.md                           // README
-├── tsconfig.json                       // typescript配置文件
-└── vite.config.ts                      // vite
-
+- [x] 本地 mockdata.json 完成基础页面逻辑
+- [ ] 完成接口调试,对 mock 进行替换
+- [ ] 完成最小可用功能,发布
+- [ ] 升级,补充
+- [ ] 移除多余组件
