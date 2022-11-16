@@ -10,7 +10,8 @@ import { dataSource } from './datamock';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddDeptModal from './components/AddDeptModal';
-
+import TransferDepartment from './components/TransferDepartment';
+import LookApply from "./components/LookApply";
 /**
  * 部门设置
  * @returns
@@ -20,7 +21,10 @@ const SettingDept: React.FC = () => {
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
+  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false);//查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
+
+  const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -37,7 +41,8 @@ const SettingDept: React.FC = () => {
         key: 'share',
         label: '变更部门',
         onClick: () => {
-          console.log('按钮事件', 'share', item);
+          // console.log('按钮事件', 'share', item);
+          setTransfer(true);
         },
       },
       {
@@ -75,11 +80,15 @@ const SettingDept: React.FC = () => {
     setIsOpen(false);
     setIsAddOpen(false);
     setIsSetPost(false);
+    setTransfer(false);
+    setLookApplyOpen(false);
   };
   const handleOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
     setIsSetPost(false);
+    setTransfer(false);
+    setLookApplyOpen(false);
   };
   // 标题tabs页
   const TitleItems = [
@@ -157,7 +166,11 @@ const SettingDept: React.FC = () => {
           }}>
           添加成员
         </Button>
-        <Button type="link">查看申请</Button>
+        <Button type="link" 
+        onClick={() => {
+            setLookApplyOpen(true);
+          }}
+          >查看申请</Button>
       </Space>
     );
   };
@@ -199,6 +212,21 @@ const SettingDept: React.FC = () => {
       <AddPersonModal
         title={'添加成员'}
         open={isAddOpen}
+        onOk={onOk}
+        handleOk={handleOk}
+      />
+      {/* 查看申请 */}
+      <LookApply
+        title={'查看申请'}
+        open={isLookApplyOpen}
+        onOk={onOk}
+        handleOk={handleOk}
+      />
+
+      {/* 变更部门 */}
+      <TransferDepartment
+        title={'转移部门'}
+        open={Transfer}
         onOk={onOk}
         handleOk={handleOk}
       />

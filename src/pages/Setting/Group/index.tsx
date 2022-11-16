@@ -9,6 +9,7 @@ import { columns } from './config';
 import { dataSource } from './datamock';
 import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
+import LookApply from '../Dept/components/LookApply';
 
 /**
  * 集团设置
@@ -18,14 +19,17 @@ const SettingGroup: React.FC = () => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
+  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false);//查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
   const onOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
+    setLookApplyOpen(false);
   };
   const handleOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
+    setLookApplyOpen(false);
   };
   // 操作内容渲染函数
   const renderOperation = (
@@ -112,7 +116,13 @@ const SettingGroup: React.FC = () => {
           }}>
           添加单位
         </Button>
-        <Button type="link">查看申请</Button>
+        <Button
+          type="link"
+          onClick={() => {
+            setLookApplyOpen(true);
+          }}>
+          查看申请
+        </Button>
       </Space>
     );
   };
@@ -161,6 +171,12 @@ const SettingGroup: React.FC = () => {
         onOk={onOk}
         handleOk={handleOk}
         columns={columns}
+      />
+      <LookApply
+        title={'查看申请'}
+        open={isLookApplyOpen}
+        onOk={onOk}
+        handleOk={handleOk}
       />
     </div>
   );
