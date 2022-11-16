@@ -57,6 +57,10 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
 
   return (
     <Layout className={`${className}`} style={{ height: '100%' }}>
+      {/* {sider?
+        sider:
+        <ContentMenu menuClick={menuClick} data={siderMenuData}></ContentMenu>} */}
+
       {(sider || siderMenuData) && (
         <ContentMenu data={siderMenuData} menuClick={menuClick}>
           {sider && sider}

@@ -69,6 +69,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   );
 
   const menuFlat = menuData ? flatMenuData(menuData) : [];
+
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     setActiveMenu(location.pathname);
@@ -76,25 +77,31 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (menuData) {
       listenPrev(current);
     }
+    // console.log('location.pathname',location.pathname)
   }, [location.pathname]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
     if (props.menuClick) {
+      console.log('________1');
       props.menuClick?.call(this, e);
     } else {
+      console.log('________2');
       props.history.push(e.key);
     }
   };
   /** 监听路由改变或菜单被点击时，当前菜单数据和上级菜单数据*/
   const listenPrev = (current: MemuItemType | null) => {
-    if (!current) {
+    console.log('current',current);
+    if (!current) { // 说明当前为主菜单
       setPrevMenuData([]);
       setCurrentMenuData(menuData);
       return;
     }
-    if (current?.fathKey) {
+    
+    if (current?.fathKey) {//记录当前的子菜单并显示
       const _prevMenuData = menuFlat.find((n) => n.key === current?.fathKey);
+      
       _prevMenuData && setPrevMenuData([...prevMenuData, _prevMenuData?.children || []]);
     } else {
       setPrevMenuData([...prevMenuData, menuData!]);
@@ -114,6 +121,9 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       if (nextRoute && nextRoute.key) {
         props.history.push(nextRoute?.key);
       }
+    } else { 
+      
+      listenPrev({fathKey:location.pathname})
     }
   };
 

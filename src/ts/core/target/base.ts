@@ -1,6 +1,7 @@
 import { TTarget } from '../entity';
 import { kernel, model, common } from '../../base';
 
+
 export default class BaseTarget {
   public readonly target: TTarget;
   constructor(target: TTarget) {
