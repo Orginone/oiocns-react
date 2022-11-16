@@ -1,16 +1,11 @@
-import { common, kernel } from '../../base';
-import { XMerchandise } from '../../base/schema';
-import { TOrderDetail } from '../entity';
-import Order from './order';
-import Product from './product';
+import { kernel } from '../../base';
+import { ResultType, PageRequest } from '../../base/model';
+import { XMerchandise, XOrderDetailArray } from '../../base/schema';
 
 export default class Merchandise {
-  // 商品售卖订单列表
-  private _order: Order[];
   // 商品实例
   private _merchandise: XMerchandise;
   constructor(merchandise: XMerchandise) {
-    this._order = [];
     this._merchandise = merchandise;
   }
 
@@ -36,21 +31,29 @@ export default class Merchandise {
     return res.success;
   }
 
-  public async getOrder(): Promise<void> {
-    if (this._order.length == 0) {
-      const res = await kernel.querySellOrderListByMerchandise({
-        id: this._merchandise.id,
-        page: {
-          offset: 0,
-          limit: common.Constants.MAX_UINT_16,
-          filter: '',
-        },
-      });
-      if (res.success) {
-        res.data.result.forEach((orderDetail) => {
-          this._order.push(new Order(orderDetail));
-        });
-      }
-    }
+  /**
+   * 查询商品交易情况
+   * @param page 分页参数
+   * @returns 交易情况
+   */
+  public async getOrder(page: PageRequest): Promise<ResultType<XOrderDetailArray>> {
+    return await kernel.querySellOrderListByMerchandise({
+      id: this._merchandise.id,
+      page: page,
+    });
+  }
+
+  /**
+   * 交付订单中的商品
+   * @param detailId 订单ID
+   * @param status 交付状态
+   * @returns 交付结果
+   */
+  public async deliver(detailId: string, status: number = 100): Promise<ResultType<any>> {
+    return await kernel.deliverMerchandise({ id: detailId, status: status });
+  }
+
+  public async cancel(detailId: string, status: number = 200): Promise<ResultType<any>> {
+    return await kernel.cancelOrderDetail({ id: detailId, status: status });
   }
 }
