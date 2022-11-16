@@ -12,19 +12,11 @@ export default class Person extends BaseTarget {
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
   private _getJoinedCohorts: Cohort[];
-  private static _instance: null | Person;
   constructor(target: schema.XTarget) {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._getJoinedCohorts = [];
-  }
-
-  public static getInstance(data?: any) {
-    if (this._instance == null) {
-      this._instance = new Person(data);
-    }
-    return this._instance;
   }
 
   /** 支持的单位类型数组 */
