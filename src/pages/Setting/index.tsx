@@ -20,14 +20,27 @@ import { MenuProps } from 'antd';
 /* 信息中心菜单 */
 const infoMenuItems = [
   { label: '单位信息', key: 'info', icon: <InfoCircleOutlined /> },
-  { label: '部门设置', key: 'dept', icon: <ApartmentOutlined /> ,children:[],render:<div>自定义子菜单ß</div>},
-  { label: '集团设置', key: 'group', icon: <FundOutlined />,children: [
-    {
-      label: '集团结构',
-      key: '/setting/group',
-      icon: <ShopOutlined />,
-    },]
-   },
+  {
+    label: '部门设置',
+    key: 'dept',
+    icon: <ApartmentOutlined />,
+    children: [],
+    render: <div>自定义子菜单ß</div>,
+  },
+  {
+    label: '集团设置',
+    key: 'group',
+    icon: <FundOutlined />,
+    children: [
+      {
+        label: '集团结构',
+        key: '/setting/jiegou',
+        icon: <ShopOutlined />,
+        children: [],
+        render: <div>自定义子菜单ß</div>,
+      },
+    ],
+  },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
 ];
 /* 自定义设置菜单 */
@@ -53,26 +66,25 @@ const muneItems: MenuProps[`items`] = [
   },
 ];
 
-const Setting: React.FC<{ route: IRouteConfig,history:any }> = ({ route,history }) => {
+const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
   // const sider = <SettingMenu></SettingMenu>;
   const contentTopLeft = <BreadCrumb></BreadCrumb>;
   const content = <>{renderRoutes(route.routes)}</>;
 
-  const siderDom = () => { 
-    return <div>11111</div>
-  }
+  const siderDom = (
+    <>
+      <div>11111</div>
+    </>
+  );
 
   const toNext = (e: any) => {
     history.push(`${e.key}`);
-    setMuneItems([])
-    setUpdataDom(siderDom())
+    setMuneItems([]);
+    setUpdataDom(siderDom);
   };
 
-
-
-  const [muneItemsData, setMuneItems] = useState(muneItems)
-  const [updataDom, setUpdataDom] = useState<React.ReactDOM>();
-  
+  const [updataDom, setUpdataDom] = useState<React.ReactDOM | JSX.Element>();
+  const [muneItemsData, setMuneItems] = useState(muneItems);
 
   return (
     <ContentTemplate
@@ -81,7 +93,7 @@ const Setting: React.FC<{ route: IRouteConfig,history:any }> = ({ route,history 
       sider={updataDom}
       // contentTopLeft={contentTopLeft}
     >
-       {renderRoutes(route.routes)}
+      {renderRoutes(route.routes)}
     </ContentTemplate>
   );
 };
