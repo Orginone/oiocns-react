@@ -6,16 +6,7 @@ export default class BaseTarget {
   constructor(target: schema.XTarget) {
     this.target = target;
   }
-  /**列表获取参数格式转换 */
-  protected _resetParams = <T extends Page>(params: T) => {
-    const { page, pageSize, ...rest } = params;
 
-    return {
-      offset: (page - 1) * pageSize || 0,
-      limit: pageSize || 20,
-      ...rest,
-    };
-  };
   /**
    * 获取加入的组织
    * @param data 请求参数

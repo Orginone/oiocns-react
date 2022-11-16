@@ -1,23 +1,24 @@
-/* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import { kernel, model, schema } from '../../base';
+import { common, kernel, model, schema } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
+import AppStore from '../market/appstore';
+import { XMarket } from '@/ts/base/schema';
 
 export default class Person extends BaseTarget {
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  private _getJoinedCohorts: Cohort[];
+  private _joinedStores: AppStore[];
   constructor(target: schema.XTarget) {
     super(target);
 
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this._getJoinedCohorts = [];
+    this._joinedStores = [];
   }
 
   /** 支持的单位类型数组 */
@@ -26,7 +27,7 @@ export default class Person extends BaseTarget {
   }
 
   /** 支持的群组类型数组*/
-  public get CohortTypes(): TargetType[] {
+  public get cohortTypes(): TargetType[] {
     return [TargetType.Cohort];
   }
 
@@ -157,13 +158,19 @@ export default class Person extends BaseTarget {
   /** 查询商店列表树
    * queryOwnMarket
    */
-  public getMarketList(data: IdPage) {
-    const { id, ...page } = data;
-    const params: model.IDBelongReq = {
-      id,
-      page: this._resetParams({ ...page }),
-    };
-    return kernel.queryOwnMarket(params);
+  public async getJoinMarkets(): Promise<AppStore[]> {
+    if (this._joinedStores.length <= 0) {
+      const res = await kernel.queryOwnMarket({
+        id: this.target.id,
+        page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+      });
+      if (res.success) {
+        res.data.result.forEach((market) => {
+          this._joinedStores.push(new AppStore(market));
+        });
+      }
+    }
+    return this._joinedStores;
   }
 
   public quitMarket(data: model.IDWithBelongReq) {
@@ -190,22 +197,22 @@ export default class Person extends BaseTarget {
    * @return {*} 查询到的群组
    */
   public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._getJoinedCohorts.length > 0) {
-      return this._getJoinedCohorts;
+    if (this._joinedCohorts.length > 0) {
+      return this._joinedCohorts;
     }
     let res = await this.getjoined({
       spaceId: this.target.id,
-      joinTypeNames: this.CohortTypes,
+      joinTypeNames: this.cohortTypes,
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
         switch (item.typeName) {
           case TargetType.Cohort:
-            this._getJoinedCohorts.push(new Cohort(item));
+            this._joinedCohorts.push(new Cohort(item));
             break;
         }
       });
     }
-    return this._getJoinedCohorts;
+    return this._joinedCohorts;
   }
 }
