@@ -1,5 +1,4 @@
 import { kernel, model } from '../base';
-import { TargetType } from './enum';
 import Person from './target/person';
 
 /**
@@ -19,20 +18,6 @@ export default class Provider {
     let res = await kernel.login(account, password);
     if (res.success) {
       this.person = new Person(res.data.person);
-      const result = await kernel.queryJoinedTargetById({
-        id: this.person.target.id,
-        spaceId: this.person.target.id,
-        typeName: TargetType.Person,
-        JoinTypeNames: [TargetType.Cohort],
-        page: {
-          offset: 0,
-          limit: 10,
-          filter: '',
-        },
-      });
-      console.log('123');
-      console.log(result);
-      debugger;
     }
     return res;
   }
