@@ -1,8 +1,8 @@
-import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
-import { BetaSchemaForm, ProFormSelect } from '@ant-design/pro-components';
+import type { ProFormColumnsType } from '@ant-design/pro-components';
+import cls from './index.module.less';
 import React from 'react';
-import { Button, Alert, DatePicker, Space } from 'antd';
-import dayjs from 'dayjs';
+import { Space } from 'antd';
+
 const valueEnum = {
   all: { text: '全部', status: 'Default' },
   open: {
@@ -24,113 +24,24 @@ type DataItem = {
   name: string;
   state: string;
 };
-
+const groupTitle = (name: string) => {
+  return (
+    <Space className={cls[`new-store-title`]} size={8}>
+      <div className={cls[`new-store-title-before`]}></div>
+      <span className={cls[`new-store-info`]}>{name}</span>
+    </Space>
+  );
+};
 const columns: ProFormColumnsType<DataItem>[] = [
   {
-    title: '应用名称',
-    dataIndex: 'name',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-    initialValue: '默认值',
-    convertValue: (value) => {
-      return `标题：${value}`;
-    },
-    transform: (value) => {
-      return {
-        title: `${value}-转换`,
-      };
-    },
-  },
-  {
-    title: '应用版本号',
-    dataIndex: 'version',
-    valueType: 'select',
-    valueEnum,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '发布平台',
-    dataIndex: 'platfrom',
-    width: 'md',
-    colProps: {
-      xs: 12,
-      md: 4,
-    },
-  },
-  {
-    valueType: 'select',
-    title: '应用类型',
-    dataIndex: 'type',
-    fieldProps: {
-      style: {
-        width: '200px',
-      },
-    },
-    width: 'md',
-    colProps: {
-      xs: 12,
-      md: 20,
-    },
-  },
-  {
-    title: '负责人名称',
-    key: 'showTime',
-    dataIndex: 'createName',
-    initialValue: [dayjs().add(-1, 'm'), dayjs()],
-    renderFormItem: () => <DatePicker.RangePicker />,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '负责人手机号',
-    dataIndex: 'updateName',
-    initialValue: [dayjs().add(-1, 'm'), dayjs()],
-    renderFormItem: () => <DatePicker.RangePicker />,
-    width: 'md',
-    colProps: {
-      xs: 24,
-      md: 12,
-    },
-  },
-  {
-    title: '分组',
+    title: groupTitle('基础信息'),
     valueType: 'group',
+    width: 'md',
+    colProps: { md: 24 },
     columns: [
       {
-        title: '状态',
-        dataIndex: 'groupState',
-        valueType: 'select',
-        width: 'xs',
-        colProps: {
-          xs: 12,
-        },
-        valueEnum,
-      },
-      {
-        title: '标题',
-        width: 'md',
-        dataIndex: 'groupTitle',
-        colProps: {
-          xs: 12,
-        },
+        title: '应用名称',
+        dataIndex: 'name',
         formItemProps: {
           rules: [
             {
@@ -139,110 +50,187 @@ const columns: ProFormColumnsType<DataItem>[] = [
             },
           ],
         },
+        width: 'md',
+      },
+      {
+        title: '应用编码',
+        dataIndex: 'code',
+        width: 'md',
+      },
+      {
+        title: '应用详情',
+        dataIndex: 'platfrom',
+        valueType: 'textarea',
+        width: 'xl',
       },
     ],
   },
   {
-    title: '列表',
-    valueType: 'formList',
-    dataIndex: 'list',
-    initialValue: [{ state: 'all', title: '标题' }],
-    colProps: {
-      xs: 24,
-      sm: 12,
-    },
+    title: groupTitle(`资源信息`),
+    valueType: 'group',
+    width: 'md',
+    colProps: { md: 24 },
     columns: [
       {
-        valueType: 'group',
+        valueType: 'formList',
+        dataIndex: 'sourceList',
+        fieldProps: {
+          // 新增按钮样式配置
+          creatorButtonProps: {
+            type: 'text',
+            position: 'top',
+            creatorButtonText: '',
+            block: false,
+            className: cls.addFormListBtn,
+          },
+        },
+        colProps: { md: 24 },
         columns: [
           {
-            title: '状态',
-            dataIndex: 'state',
-            valueType: 'select',
-            colProps: {
-              xs: 24,
-              sm: 12,
-            },
-            width: 'xs',
-            valueEnum,
-          },
-          {
-            title: '标题',
-            dataIndex: 'title',
+            valueType: 'group',
             width: 'md',
-            formItemProps: {
-              rules: [
-                {
-                  required: true,
-                  message: '此项为必填项',
-                },
-              ],
-            },
-            colProps: {
-              xs: 24,
-              sm: 12,
-            },
+            colProps: { md: 24 },
+            columns: [
+              {
+                title: '资源名称',
+                dataIndex: 'componentName',
+                // valueType: 'select',
+                width: 'md',
+                // valueEnum,
+              },
+              {
+                title: '资源地址',
+                width: 'md',
+                dataIndex: 'componentAddress',
+              },
+              {
+                title: '资源编码',
+                width: 'md',
+                dataIndex: 'componentWidth',
+              },
+            ],
           },
         ],
       },
-      {
-        valueType: 'dateTime',
-        initialValue: new Date(),
-        dataIndex: 'currentTime',
-        width: 'md',
-      },
     ],
   },
   {
-    title: 'FormSet',
-    valueType: 'formSet',
-    dataIndex: 'formSet',
-    colProps: {
-      xs: 24,
-      sm: 12,
-    },
-    rowProps: {
-      gutter: [16, 0],
-    },
+    title: groupTitle(`流程信息`),
+    valueType: 'group',
+    width: 'md',
+    colProps: { md: 24 },
     columns: [
       {
-        title: '状态',
-        dataIndex: 'groupState',
-        valueType: 'select',
-        width: 'md',
-        valueEnum,
-      },
-      {
-        width: 'xs',
-        title: '标题',
-        dataIndex: 'groupTitle',
-        tip: '标题过长会自动收缩',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '此项为必填项',
-            },
-          ],
+        // title: groupTitle(`流程信息`),
+        valueType: 'formList',
+        dataIndex: 'approveList',
+        width: '100%',
+        colProps: { md: 24 },
+        fieldProps: {
+          // 新增按钮样式配置
+          creatorButtonProps: {
+            type: 'text',
+            position: 'top',
+            creatorButtonText: '',
+            block: false,
+            className: cls.addFormListBtn,
+          },
         },
+        columns: [
+          {
+            valueType: 'group',
+            width: 'md',
+            colProps: { md: 24 },
+            columns: [
+              {
+                title: '业务信息',
+                dataIndex: 'componentName',
+                // valueType: 'select',
+                width: 'md',
+                // valueEnum,
+              },
+              {
+                title: '字段名称',
+                width: 'md',
+                dataIndex: 'componentAddress',
+              },
+              {
+                title: '字段编号',
+                width: 'md',
+                dataIndex: 'componentWidth',
+              },
+              {
+                title: '字段类型',
+                width: 'md',
+                dataIndex: 'componentHeight',
+              },
+            ],
+          },
+        ],
       },
     ],
   },
   {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
+    title: groupTitle(`应用组件`),
+    valueType: 'group',
     width: 'md',
-    colProps: {
-      span: 24,
-    },
-    transform: (value) => {
-      return {
-        startTime: value[0],
-        endTime: value[1],
-      };
-    },
+    colProps: { md: 24 },
+    columns: [
+      {
+        // title: groupTitle(`应用组件`),
+        valueType: 'formList',
+        dataIndex: 'componentList',
+        width: '100%',
+        colProps: { md: 24 },
+        fieldProps: {
+          // 新增按钮样式配置
+          creatorButtonProps: {
+            type: 'text',
+            position: 'top',
+            creatorButtonText: '',
+            block: false,
+            className: cls.addFormListBtn,
+          },
+        },
+        columns: [
+          {
+            valueType: 'group',
+            width: 'md',
+            colProps: { md: 24 },
+            columns: [
+              {
+                title: '组件名称',
+                dataIndex: 'componentName',
+                // valueType: 'select',
+                // colSpan: 3,
+                width: 'md',
+                fieldProps: {
+                  colSpan: 11,
+                },
+                // valueEnum,
+              },
+              {
+                title: '链接地址',
+                width: 'md',
+                dataIndex: 'componentAddress',
+              },
+              {
+                title: '组件宽度',
+                width: 'md',
+                dataIndex: 'componentWidth',
+              },
+              {
+                title: '组件高度',
+                width: 'md',
+                dataIndex: 'componentHeight',
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
 ];
 
-export { columns, DataItem, valueEnum };
+export { columns, valueEnum };
+export type { DataItem };

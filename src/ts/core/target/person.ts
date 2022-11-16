@@ -14,6 +14,7 @@ export default class Person extends BaseTarget {
   private _getJoinedCohorts: Cohort[];
   constructor(target: schema.XTarget) {
     super(target);
+
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._getJoinedCohorts = [];
@@ -151,6 +152,22 @@ export default class Person extends BaseTarget {
       });
     }
     return this._joinedCompanys;
+  }
+
+  /** 查询商店列表树
+   * queryOwnMarket
+   */
+  public getMarketList(data: IdPage) {
+    const { id, ...page } = data;
+    const params: model.IDBelongReq = {
+      id,
+      page: this._resetParams({ ...page }),
+    };
+    return kernel.queryOwnMarket(params);
+  }
+
+  public quitMarket(data: model.IDWithBelongReq) {
+    return kernel.quitMarket(data);
   }
 
   /**

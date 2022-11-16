@@ -18,6 +18,7 @@ const useStore = create(
       userSpace: {},
       loading: false,
       editItem: undefined,
+      userObj: null,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
         if (res.success) {

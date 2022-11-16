@@ -1,4 +1,4 @@
-class ShopMenuItem {
+class ShopMenuOptions {
   // 重命名
   RenameItem() {}
   // 拷贝副本
