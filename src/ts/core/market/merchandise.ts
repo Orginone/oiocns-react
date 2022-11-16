@@ -5,8 +5,13 @@ import { XMerchandise, XOrderDetailArray } from '../../base/schema';
 export default class Merchandise {
   // 商品实例
   private _merchandise: XMerchandise;
+
   constructor(merchandise: XMerchandise) {
     this._merchandise = merchandise;
+  }
+
+  public get getMerchandise() {
+    return this._merchandise;
   }
 
   /**

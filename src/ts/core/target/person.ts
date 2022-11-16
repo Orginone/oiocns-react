@@ -1,14 +1,15 @@
+import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import { common, kernel, model, schema } from '../../base';
+import { common, kernel, model, schema, FaildResult } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import AppStore from '../market/appstore';
-import { XMarket } from '@/ts/base/schema';
 
 export default class Person extends BaseTarget {
+  private _friends: schema.XTarget[];
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
@@ -16,6 +17,7 @@ export default class Person extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
 
+    this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._joinedStores = [];
@@ -124,10 +126,57 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public applyJoinCompany(_companyId: string): void {}
+  public async applyJoinCompany(
+    _companyId: string,
+    _companyType: TargetType,
+  ): Promise<model.ResultType<any>> {
+    if (this.companyTypes.includes(_companyType)) {
+      return await kernel.applyJoinTeam({
+        id: _companyId,
+        targetId: this.target.id,
+        teamType: _companyType,
+        targetType: TargetType.Person,
+      });
+    }
+    return FaildResult('无法加入该类型组织!');
+  }
+
+  /**
+   * 申请加入市场
+   * @param id 市场ID
+   * @returns
+   */
+  public async applyJoinStore(id: string): Promise<model.ResultType<any>> {
+    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
+  }
+
+  /**
+   * @description: 查询我加入的群
+   * @return {*} 查询到的群组
+   */
+  public async getJoinedCohorts(): Promise<Cohort[]> {
+    if (this._joinedCohorts.length > 0) {
+      return this._joinedCohorts;
+    }
+    let res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: this.cohortTypes,
+    });
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        switch (item.typeName) {
+          case TargetType.Cohort:
+            this._joinedCohorts.push(new Cohort(item));
+            break;
+        }
+      });
+    }
+    return this._joinedCohorts;
+  }
 
   /**
    * 获取单位列表
+   * @return 加入的单位列表
    */
   public async getJoinedCompanys(): Promise<Company[]> {
     if (this._joinedCompanys.length > 0) {
@@ -155,6 +204,24 @@ export default class Person extends BaseTarget {
     return this._joinedCompanys;
   }
 
+  /**
+   * 获取好友列表
+   * @returns 返回好友列表
+   */
+  public async getFriends(): Promise<XTarget[]> {
+    if (this._friends.length > 0) {
+      return this._friends;
+    }
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: TargetType.Person,
+    });
+    if (res.success) {
+      this._friends = res.data.result;
+    }
+    return this._friends;
+  }
+
   /** 查询商店列表树
    * queryOwnMarket
    */
@@ -173,8 +240,20 @@ export default class Person extends BaseTarget {
     return this._joinedStores;
   }
 
-  public quitMarket(data: model.IDWithBelongReq) {
-    return kernel.quitMarket(data);
+  /**
+   * 退出市场
+   * @param appStore 退出的市场
+   * @returns
+   */
+  public async quitMarket(appStore: AppStore): Promise<model.ResultType<any>> {
+    const res = await kernel.quitMarket({
+      id: appStore.getStore.id,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      delete this._joinedStores[this._joinedStores.indexOf(appStore)];
+    }
+    return res;
   }
 
   /**
@@ -190,29 +269,5 @@ export default class Person extends BaseTarget {
       data.belongId = this._curCompany.target.id;
     }
     return await kernel.createTarget(data);
-  }
-
-  /**
-   * @description: 查询我加入的群
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._joinedCohorts.length > 0) {
-      return this._joinedCohorts;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      joinTypeNames: this.cohortTypes,
-    });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
-        switch (item.typeName) {
-          case TargetType.Cohort:
-            this._joinedCohorts.push(new Cohort(item));
-            break;
-        }
-      });
-    }
-    return this._joinedCohorts;
   }
 }

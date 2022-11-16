@@ -1,12 +1,7 @@
 import { kernel } from '../../base';
 import { CommonStatus, TargetType } from '../enum';
 import { PageRequest, ResultType } from '../../base/model';
-import {
-  XMarket,
-  XMarketRelation,
-  XMarketRelationArray,
-  XMerchandiseArray,
-} from '../../base/schema';
+import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 
 export default class AppStore {
   // 商店实体
@@ -16,6 +11,9 @@ export default class AppStore {
     this._store = store;
   }
 
+  public get getStore() {
+    return this._store;
+  }
   // constructor(info) {
   //判断拥有那些功能
   // }

@@ -1,4 +1,3 @@
-import { Page } from '@/module/typings';
 import { kernel, model, common, schema } from '../../base';
 
 export default class BaseTarget {
