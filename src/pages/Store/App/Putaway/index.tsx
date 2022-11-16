@@ -1,62 +1,20 @@
-import { Button, Card, Dropdown, Menu } from 'antd';
-import React, { useContext } from 'react';
+import { Button, Card, Dropdown, Form, Menu, Input, Radio, Select } from 'antd';
+import React from 'react';
 import API from '@/services';
-import AppShowComp from '@/bizcomponents/AppTablePage';
-import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
-import { BtnGroupDiv } from '@/components/CommonComp';
-import { MarketTypes } from 'typings/marketType';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
-
+const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-const service = new MarketService({
-  nameSpace: 'myApp',
-  searchApi: API.product.searchOwnProduct,
-  createApi: API.product.register,
-  deleteApi: API.product.delete,
-  updateApi: API.product.update,
-});
 interface AppInfoType {
   appId: string;
 }
 
-const StoreAppInfo: React.FC<AppInfoType> = () => {
-  const BtnsList = ['编辑应用分配'];
+const AppPutaway: React.FC<AppInfoType> = () => {
   const history = useHistory();
-  const handleBtnsClick = (item: { text: string }) => {
-    switch (item.text) {
-      case '编辑应用分配':
-        console.log('编辑应用分配编辑应用分配');
 
-        break;
-      default:
-        console.log('点击事件未注册', item.text);
-        break;
-    }
-  };
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
-    return [
-      {
-        key: 'publish',
-        label: '下架',
-        onClick: () => {
-          console.log('按钮事件', 'publish');
-        },
-      },
-      {
-        key: 'share',
-        label: '共享',
-        onClick: () => {
-          console.log('按钮事件', 'share', item);
-        },
-      },
-    ];
-  };
   const menu = (
     <Menu>
       <Menu.Item>退订</Menu.Item>
@@ -64,7 +22,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
     </Menu>
   );
   return (
-    <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+    <div className={`pages-wrap flex flex-direction-col ${cls['AppPutaway-wrap']}`}>
       <Card
         title={
           <IconFont
@@ -95,7 +53,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         />
         <div className="btns">
           <Button className="btn" type="primary" shape="round">
-            续费
+            上架
           </Button>
           <Dropdown overlay={menu} placement="bottom">
             <EllipsisOutlined
@@ -106,18 +64,44 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         </div>
       </Card>
       <div className={cls['page-content-table']}>
-        <AppShowComp
-          service={service}
-          toolBarRender={() => <BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          headerTitle="已分配单位"
-          columns={service.getMyappColumns()}
-          renderOperation={renderOperation}
-          searchParams={''}
-          style={{ paddingTop: 0 }}
-        />
+        <Form
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 14 }}
+          layout="horizontal"
+          autoComplete="off">
+          <Form.Item
+            label="上架平台"
+            name="marketId"
+            rules={[{ required: true, message: '请选择上架平台' }]}>
+            <Select>
+              <Select.Option value="demo">Demo</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label="上架应用" name="name">
+            <Input />
+          </Form.Item>
+          <Form.Item label="应用类型" name="typeName">
+            <Input />
+          </Form.Item>
+          <Form.Item label="应用权限" name="sellAuth">
+            <Radio.Group>
+              <Radio value="使用权"> 使用权 </Radio>
+              <Radio value="所属权"> 所属权 </Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item label="使用费用" name="price">
+            <Input />
+          </Form.Item>
+          <Form.Item label="使用周期" name="days">
+            <Input />
+          </Form.Item>
+          <Form.Item label="应用信息" name="information">
+            <TextArea rows={4} />
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );
 };
 
-export default StoreAppInfo;
+export default AppPutaway;
