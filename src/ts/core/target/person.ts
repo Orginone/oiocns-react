@@ -181,8 +181,6 @@ export default class Person extends BaseTarget {
    * @return {*} 查询到的群组
    */
   public async getJoinedCohorts(): Promise<Cohort[]> {
-    console.log('hahahh');
-
     if (this._getJoinedCohorts.length > 0) {
       return this._getJoinedCohorts;
     }
@@ -190,7 +188,6 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       joinTypeNames: this.CohortTypes,
     });
-    console.log('jjjjj', res);
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
         switch (item.typeName) {
@@ -200,7 +197,6 @@ export default class Person extends BaseTarget {
         }
       });
     }
-    console.log('hhhhh', this._getJoinedCohorts);
     return this._getJoinedCohorts;
   }
 }
