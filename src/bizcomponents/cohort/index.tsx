@@ -95,12 +95,6 @@ const [form] = Form.useForm()
           </Form.Item>
           <Form.Item >
           </Form.Item>
-          {/* <Button className='button-position-confirm' type="primary" htmlType="submit" size="middle" >
-              确认
-            </Button>
-            <Button className='button-position' onClick={()=>handleClick(false)}>
-              取消
-            </Button> */}
         </Form>
         </Modal>
         </div>

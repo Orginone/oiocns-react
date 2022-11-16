@@ -32,4 +32,5 @@ export default class BaseTarget {
     data.teamTypes = [this.target.typeName];
     return await kernel.pullAnyToTeam(data);
   }
+ 
 }

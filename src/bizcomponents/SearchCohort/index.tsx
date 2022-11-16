@@ -9,9 +9,11 @@ import { CheckCard } from '@ant-design/pro-components';
 import { UserOutlined } from '@ant-design/icons';
 
 
+
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
+  setCohort:Function;
 };
 
 let tableProps: CohortSearchTableProps;
@@ -20,34 +22,21 @@ let tableProps: CohortSearchTableProps;
   弹出框表格查询
 */
 const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
-  const [searchKey, setSearchKey] = useState<Cohort[]>();
+  const [searchKey, setSearchKey] = useState<Cohort>();
   const [dataSource, setDataSource] = useState<Cohort[]>([]);
 
   useEffect(() => {
     tableProps = props;
   }, []);
 
-  const doSelectOne = (target: any, item: Cohort) => {
-    // target.preventDefault();
-    if (tableProps.setJoinKey) tableProps.setJoinKey(item.id);
-
-    // 选中的样式
-    dataSource.map((e) => {
-      if (e.id === item.id) {
-        e.selectStyle = 'company-select-type';
-      } else {
-        e.selectStyle = 'company-no-select-type';
-      }
-    });
-  };
   // 单位卡片渲染
   const companyCardList = () => {
     console.log("开始渲染")
     return (
 
       <CheckCard.Group
-        multiple
         onChange={(value) => {
+          props.setCohort(value)
           console.log('value', value);
         }}
         style={{ width: '100%', marginTop: '50px'}}
@@ -91,7 +80,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
     <div className={styles[`search-card`]}>
       <SearchInput
         value={searchKey}
-        placeholder="请输入单位编码"
+        placeholder="请输入群组编码"
         // extra={`找到${dataSource?.length}家单位`}
         onChange={(event) => {
           setSearchKey(event.target.value);

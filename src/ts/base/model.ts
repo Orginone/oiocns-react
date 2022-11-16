@@ -64,7 +64,7 @@ export type IdReqModel = {
   // 实体类型
   typeName: string;
   // 归属ID
-  belongId: number;
+  belongId: string;
 };
 
 export type IdArrayReq = {
@@ -180,13 +180,13 @@ export type IDReqSubModel = {
 
 export type IDReqJoinedModel = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 实体类型
   typeName: string;
   // 加入的节点类型
   JoinTypeNames: string[];
   // 工作空间ID
-  spaceId: number;
+  spaceId: string;
   // 分页
   page: PageRequest;
 };

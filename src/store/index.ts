@@ -5,7 +5,6 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import Person from '@/module/person';
-import $API from '@/services';
 import Provider from '@/ts/core/provider';
 
 import { StateProps, UserType } from './type';
@@ -21,6 +20,7 @@ const useStore = create(
       editItem: undefined,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
+
         if (res.success) {
           set({
             user: res.data,
@@ -32,6 +32,7 @@ const useStore = create(
         }
         return false;
       },
+      
       setUser: async (data: UserType) => {
         set({ user: data });
       },
@@ -49,8 +50,10 @@ const useStore = create(
     {
       name: 'user-storage',
       getStorage: () => sessionStorage,
+      
     },
   ),
+  
 );
 
 // 暴露单一实例 useStore

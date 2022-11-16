@@ -17,8 +17,14 @@ import Persons from '../../../bizcomponents/SearchPerson/index'
 import AddCohort from '../../../bizcomponents/SearchCohort/index'
 import { Person } from '@/module/org';
 import { sleep } from '@/store/sleep';
+import { Cohort } from '../../../module/org/index';
+import CohortServices from '../../../ts/core/target/cohort'
+import { useHistory } from 'react-router-dom';
+import PersonInfoEnty from '../../../ts/core/provider'
 import type { ProFormColumnsType } from '@ant-design/pro-components';
-
+import { DatabaseFilled } from '@ant-design/icons';
+import { model } from '../../../ts/base'
+import {TargetType} from '../../../ts/core/enum'
 type DataItem = {
   name: string;
   state: string;
@@ -34,7 +40,7 @@ const CohortConfig: React.FC = () => {
     createApi: API.cohort.create,
     updateApi: API.cohort.update
   });
-
+  console.log("实体信息", PersonInfoEnty.getPerson)
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -42,8 +48,11 @@ const CohortConfig: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<CohortConfigType.CohortConfigTeam>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [friend, setFriend] = useState<Person>()
- 
+  const [addIsModalOpen, setAddIsModalOpen] = useState(false);
+  const history = useHistory();
+  const [friend, setFriend] = useState<Person>();
+  const [cohort, setcohort] = useState<Cohort>();
+  const newCohortServices = new CohortServices(null);
   useEffect(() => {
     getTableList();
   }, []);
@@ -55,6 +64,7 @@ const CohortConfig: React.FC = () => {
         key: 'enterChat',
         label: '进入会话',
         onClick: () => {
+          history.push("/chat")
           console.log('按钮事件', 'enterChat', item);
         },
       },
@@ -71,7 +81,7 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-          
+
           setItem(item)
           setOpen(true);
           console.log('按钮事件1231', 'updateCohort', item);
@@ -88,7 +98,7 @@ const CohortConfig: React.FC = () => {
         key: 'identityManage',
         label: '身份管理',
         onClick: () => {
-          console.log('按钮事件', 'identityManage', 
+          console.log('按钮事件', 'identityManage',
           );
         },
       },
@@ -96,6 +106,19 @@ const CohortConfig: React.FC = () => {
         key: 'changePermission',
         label: '转移权限',
         onClick: () => {
+          // const page: model.PageRequest = {
+          //   offset: 0,
+          //   limit: 10,
+          //   filter: '',
+          // }
+          const params: model.IdReqModel = {
+            id:item.targetId,
+            typeName:TargetType.Cohort,
+            belongId:item.belongId
+          }
+          console.log("参数",params)
+          console.log("info",PersonInfoEnty.getPerson.deleteCohort(params))
+          // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },
       },
@@ -103,7 +126,12 @@ const CohortConfig: React.FC = () => {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          console.log('按钮事件', 'breakCohort', item);
+          const param = {
+            id: item.targetId
+          }
+          newCohortServices.deleteCohort(param)
+          message.info("解散成功")
+          getTableList();
         },
       },
     ];
@@ -174,6 +202,18 @@ const CohortConfig: React.FC = () => {
       message.warning('您不是群管理员');
     }
   };
+  const cohortHandleOk = async () => {
+    const param = {
+      id: cohort?.id
+    }
+    const data = await newCohortServices.ApplyJoinCohort(param)
+    if (!data.success) {
+      message.error(data.msg)
+    } else (
+      message.info('申请加入成功')
+    )
+    setAddIsModalOpen(false);
+  };
   const handleCancle = () => {
     setIsModalOpen(false);
   };
@@ -196,19 +236,19 @@ const CohortConfig: React.FC = () => {
               <Modal title="邀请成员" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px'>
                 <Persons searchCallback={searchCallback} />
               </Modal>
-              <Modal title="加入群组" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px' >
-                <AddCohort searchCallback={searchCallback} />
+              <Modal title="加入群组" open={addIsModalOpen} onOk={cohortHandleOk} onCancel={() => setAddIsModalOpen(false)} width='1050px' >
+                <AddCohort setCohort={setcohort} />
               </Modal>
               <UpdateCohort
-              key={item?.id}
-               layoutType="ModalForm"
+                key={item?.id}
+                layoutType="ModalForm"
                 title="修改群组"
                 modalProps={{
                   destroyOnClose: true,
                   onCancel: () => setOpen(false),
-                }} service={service} open={open} columns = {service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
+                }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
               <CreateCohort service={service} getTableList={getTableList} />
-              <Button type="link" onClick = {showModal}>加入群组</Button>
+              <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
             </Space>
           </div>
         </div>
