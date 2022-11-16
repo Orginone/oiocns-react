@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
 import { Row, Button } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';

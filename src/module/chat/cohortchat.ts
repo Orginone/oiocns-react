@@ -1,8 +1,9 @@
 import API from '../../services';
 class CohortSericve {
-  /* 
-    邀请加入群聊
-    */
+  /**
+   * @description: 邀请加入群聊
+   * @return {*}
+   */
   public async getpullPerson(params: any) {
     const { data, success, code } = await API.cohort.pullPerson({
       data: params,
@@ -14,9 +15,10 @@ class CohortSericve {
     return { data, success, code };
   }
 
-  /* 
-  移出群聊
-  */
+  /**
+   * @description: 移出群聊
+   * @return {*}
+   */
   public async getremovePerson(params: any) {
     const { data, success, code } = await API.cohort.removePerson({
       data: params,

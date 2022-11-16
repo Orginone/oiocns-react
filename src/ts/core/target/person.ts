@@ -12,19 +12,11 @@ export default class Person extends BaseTarget {
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
   private _getJoinedCohorts: Cohort[];
-  private static _instance: null | Person;
   constructor(target: schema.XTarget) {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._getJoinedCohorts = [];
-  }
-
-  public static getInstance(data?: any) {
-    if (this._instance == null) {
-      this._instance = new Person(data);
-    }
-    return this._instance;
   }
 
   /** 支持的单位类型数组 */
@@ -181,8 +173,6 @@ export default class Person extends BaseTarget {
    * @return {*} 查询到的群组
    */
   public async getJoinedCohorts(): Promise<Cohort[]> {
-    console.log('hahahh');
-
     if (this._getJoinedCohorts.length > 0) {
       return this._getJoinedCohorts;
     }
@@ -190,7 +180,6 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       joinTypeNames: this.CohortTypes,
     });
-    console.log('jjjjj', res);
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
         switch (item.typeName) {
@@ -200,7 +189,6 @@ export default class Person extends BaseTarget {
         }
       });
     }
-    console.log('hhhhh', this._getJoinedCohorts);
     return this._getJoinedCohorts;
   }
 }
