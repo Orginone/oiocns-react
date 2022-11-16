@@ -6,7 +6,7 @@ import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
-import PutawayComp from '../components/PutawayComp'; // 上架弹窗
+import PutawayComp from './Putaway'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
@@ -23,8 +23,6 @@ const service = new MarketService({
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
-  const [showModal, setShowModal] = useState<boolean>(false);
-
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
@@ -62,11 +60,9 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        // console.log('点击事件', '创建1231313');
         break;
       case '暂存':
         console.log('点击事件', '暂存');
-        setShowModal(true);
         break;
       default:
         console.log('点击事件未注册', item.text);
@@ -76,8 +72,6 @@ const StoreApp: React.FC = () => {
   const handlePutawaySumbit = async () => {
     const putawayParams = await putawayForm.validateFields();
     console.log('上架信息打印', putawayParams);
-
-    setShowModal(false);
   };
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -108,11 +102,11 @@ const StoreApp: React.FC = () => {
         },
       },
       {
-        key: 'publish',
+        key: 'putaway',
         label: '上架',
         onClick: () => {
-          console.log('按钮事件', 'publish', item);
-          setShowModal(true);
+          console.log('按钮事件', 'putaway', item);
+          history.push({ pathname: '/store/app/putaway', state: { appId: item.id } });
         },
       },
       {
@@ -162,22 +156,6 @@ const StoreApp: React.FC = () => {
             renderOperation={renderOperation}
           />
         </div>
-        <Modal
-          title="应用上架"
-          width={670}
-          destroyOnClose={true}
-          open={showModal}
-          okText="确定"
-          onOk={() => {
-            handlePutawaySumbit();
-          }}
-          onCancel={() => {
-            console.log(`取消按钮`);
-            setShowModal(false);
-          }}>
-          <PutawayComp initialValues={{}} form={putawayForm} />
-        </Modal>
-        {/* 详情页面 /store/app/info*/}
       </div>
       <Route
         exact
@@ -191,6 +169,10 @@ const StoreApp: React.FC = () => {
         exact
         path="/store/app/manage"
         render={() => <Manage appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/putaway"
+        render={() => <PutawayComp appId={selectAppInfo.id} />}></Route>
     </>
   );
 };

@@ -11,5 +11,6 @@ class ShopMenuItem {
   favorite() {}
   // 删除
   deleteItem() {}
+  //获取列表
   getapps() {}
 }
