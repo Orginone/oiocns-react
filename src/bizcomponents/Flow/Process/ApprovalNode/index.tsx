@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
-import useEventEmitter from '@/hooks/useEventEmitter';
 type ApprovalNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  config: any;
   [key: string]: any;
 };
 
@@ -12,15 +12,19 @@ type ApprovalNodeProps = {
  * 审批节点
  * @returns
  */
-const ApprovalNode: React.FC<ApprovalNodeProps> = (props:ApprovalNodeProps) => {
-  const content:any = useMemo(() => {
-    if (props.config && !!props.config.props && !!props.config.props.assignedUser && props.config
-      .props.assignedUser.length > 0) {
+const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => {
+  const content: any = useMemo(() => {
+    if (
+      props.config &&
+      !!props.config.props &&
+      !!props.config.props.assignedUser &&
+      props.config.props.assignedUser.length > 0
+    ) {
       let texts: any[] = [];
-      props.config.props.assignedUser.forEach((org: any) => texts.push(org.name))
-      return String(texts).replaceAll(',', '、')
+      props.config.props.assignedUser.forEach((org: any) => texts.push(org.name));
+      return String(texts).replaceAll(',', '、');
     } else {
-      return null
+      return null;
     }
   }, [props.config]);
   return (

@@ -62,7 +62,7 @@ class CompanyService {
    * @param id 单位ID
    * @returns
    */
-   public applyJoin(id: string): Promise<CommonResponse> {
+  public applyJoin(id: string): Promise<CommonResponse> {
     return API.company.applyJoin({ data: { id } }).then(
       (res: CommonResponse) => res,
       (error: any) => {
@@ -70,7 +70,6 @@ class CompanyService {
       },
     );
   }
-
 }
 const companyService = new CompanyService();
 

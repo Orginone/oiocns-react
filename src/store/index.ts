@@ -3,7 +3,6 @@
 import create from 'zustand';
 // 数据持久化，会缓存到 storage
 import { persist } from 'zustand/middleware';
-
 import Person from '@/module/person';
 import $API from '@/services';
 import Provider from '@/ts/core/provider';

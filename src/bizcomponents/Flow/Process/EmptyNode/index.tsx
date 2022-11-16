@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
 
@@ -11,11 +10,23 @@ type EmptyNodeProps = {
 
 /**
  * 空节点
- * @returns 
+ * @returns
  */
-const EmptyNode: React.FC<EmptyNodeProps> = (props:EmptyNodeProps) => {
+const EmptyNode: React.FC<EmptyNodeProps> = (props: EmptyNodeProps) => {
   return (
-    <Node title="空节点" show={false} showError={false} content="空节点" errorInfo="空节点" placeholder="空节点" headerBgc="#ff943e" headerIcon="el-icon-s-check" onInsertNode={props.onInsertNode} onDelNode={props.onDelNode} onSelected={props.onSelected}/>
+    <Node
+      title="空节点"
+      show={false}
+      showError={false}
+      content="空节点"
+      errorInfo="空节点"
+      placeholder="空节点"
+      headerBgc="#ff943e"
+      headerIcon="el-icon-s-check"
+      onInsertNode={props.onInsertNode}
+      onDelNode={props.onDelNode}
+      onSelected={props.onSelected}
+    />
   );
 };
 

@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
-import { TTarget } from '../entity';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
+import { kernel, model, schema } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
-import { kernel, model } from '../../base';
 import University from './university';
 import Hospital from './hospital';
 
@@ -12,14 +11,22 @@ export default class Person extends BaseTarget {
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  constructor(target: TTarget) {
+  private _getJoinedCohorts: Cohort[];
+  constructor(target: schema.XTarget) {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this._getJoinedCohorts = [];
   }
+
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
+  }
+
+  /** 支持的群组类型数组*/
+  public get CohortTypes(): TargetType[] {
+    return [TargetType.Cohort];
   }
 
   /**
@@ -40,7 +47,6 @@ export default class Person extends BaseTarget {
       teamName: name,
       teamCode: code,
       teamRemark: remark,
-      typeName: TargetType.Cohort,
     });
     if (res.success) {
       const cohort = new Cohort(res.data);
@@ -130,16 +136,16 @@ export default class Person extends BaseTarget {
       joinTypeNames: this.companyTypes,
     });
     if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item: { typeName: any }) => {
+      res.data.result.forEach((item) => {
         switch (item.typeName) {
           case TargetType.University:
-            this._joinedCompanys.push(new University(res.data));
+            this._joinedCompanys.push(new University(item));
             break;
           case TargetType.Hospital:
-            this._joinedCompanys.push(new Hospital(res.data));
+            this._joinedCompanys.push(new Hospital(item));
             break;
           default:
-            this._joinedCompanys.push(new Company(res.data));
+            this._joinedCompanys.push(new Company(item));
             break;
         }
       });
@@ -152,11 +158,37 @@ export default class Person extends BaseTarget {
    * @param data 创建参数
    * @returns 创建结果
    */
-  private async _create(data: any): Promise<model.ResultType> {
+  private async _create(data: any): Promise<model.ResultType<any>> {
     data.belongId = this.target.id;
+    data.typeName = TargetType.Cohort;
     if (this._curCompany && this._curCompany.target.id) {
+      data.typeName = TargetType.JobCohort;
       data.belongId = this._curCompany.target.id;
     }
     return await kernel.createTarget(data);
+  }
+
+  /**
+   * @description: 查询我加入的群
+   * @return {*} 查询到的群组
+   */
+  public async getJoinedCohorts(): Promise<Cohort[]> {
+    if (this._getJoinedCohorts.length > 0) {
+      return this._getJoinedCohorts;
+    }
+    let res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: this.CohortTypes,
+    });
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        switch (item.typeName) {
+          case TargetType.Cohort:
+            this._getJoinedCohorts.push(new Cohort(item));
+            break;
+        }
+      });
+    }
+    return this._getJoinedCohorts;
   }
 }

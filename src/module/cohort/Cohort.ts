@@ -11,8 +11,9 @@ import CommonClass from '../commonClass/BaseServiceClass';
 // static 静态数据
 
 export default class Cohort extends CommonClass {
-  public PUBLIC_STORE: CohortConfigType.CohortConfig = {} as CohortConfigType.CohortConfig; 
-  
+  public PUBLIC_STORE: CohortConfigType.CohortConfig =
+    {} as CohortConfigType.CohortConfig;
+
   public async getPublicStore() {
     if (this.PUBLIC_STORE?.id) {
       return;

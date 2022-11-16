@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Modal, Radio, Card } from 'antd';
+import { Modal, Radio, Card, Empty } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { perpleList } from './mock';
 
-/* 
-    选择人员弹窗
-*/
+/**
+ * @description: 选择人员弹窗
+ * @return {*}
+ */
 
 interface Iprops {
   open: boolean;
@@ -50,20 +51,17 @@ const PersonCustomModal = (props: Iprops) => {
       </Card>
     );
   };
+
   const cardcenter = (
     <Card style={{ width: 350 }}>
-      <p>Card content</p>
-      <p>Card content</p>
-      <p>Card content</p>
+      <SearchInput onChange={onChange} />
+      <div className={cls['person-card-center']}>
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      </div>
     </Card>
   );
-  const cardright = (
-    <Card style={{ width: 350 }}>
-      <p>Card content</p>
-      <p>Card content</p>
-      <p>Card content</p>
-    </Card>
-  );
+  const cardright = <Card style={{ width: 350 }}></Card>;
+
   const cardcontent = (
     <div className={cls[`person-card-content`]}>
       {cardleft()}

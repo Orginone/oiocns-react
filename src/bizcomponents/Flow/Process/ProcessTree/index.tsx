@@ -3,7 +3,7 @@ import Node from '@/bizcomponents/Flow/Process/Node';
 import ReactDOM from 'react-dom';
 import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { message,Button  } from 'antd';
+import { message, Button } from 'antd';
 import Root from '@/bizcomponents/Flow/Process/RootNode';
 import Approval from '@/bizcomponents/Flow/Process/ApprovalNode';
 import Cc from '@/bizcomponents/Flow/Process/CcNode';
@@ -13,7 +13,7 @@ import Empty from '@/bizcomponents/Flow/Process/EmptyNode';
 import cls from './index.module.less';
 import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
 type ProcessTreeProps = {
-  OnSelectedNode:Function,
+  OnSelectedNode: Function;
   [key: string]: any;
 };
 
@@ -33,7 +33,7 @@ type ProcessTreeProps = {
  * ? 7.DefaultProps
  * √ 8.pinia 状态管理工具 Zustand
  */
-const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
+const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
   // const { FlowSub } = useContext(EventContext);
   // FlowSub.useSubScription('insertNode', (s: any) => {
   //   console.log('监听insertNode事件', s);
@@ -48,10 +48,8 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
   // const proxy = appContext.config.globalProperties;
 
   /**组件渲染中变更dom   共享状态*/
-  let design = useAppwfConfig((state: any) =>
-    state.design,
-  );
-  let dom = design.resource
+  let design = useAppwfConfig((state: any) => state.design);
+  let dom = design.resource;
   // console.log('dom', dom);
   // const setDesign = useAppwfConfig((state: any) => state.setDesign);
   // const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
@@ -78,12 +76,12 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
   const emitter = useEventEmitter();
 
   const getDomTree = (h: any, node: any) => {
-    
-    if(!node || !node.nodeId){
+    if (!node || !node.nodeId) {
       return [];
     }
     toMapping(node);
     if (node?.type == 'CC') {
+      console.log('');
     }
     if (isPrimaryNode(node)) {
       //普通业务节点
@@ -110,7 +108,9 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
       let branchItems = node.branches.map((branchNode: any) => {
         //处理每个分支内子节点
         toMapping(branchNode);
-        let childDoms = branchNode.children?getDomTree(React.createElement, branchNode.children):[];
+        let childDoms = branchNode.children
+          ? getDomTree(React.createElement, branchNode.children)
+          : [];
         decodeAppendDom(React.createElement, branchNode, childDoms, {
           level: index + 1,
           size: node.branches.length,
@@ -155,7 +155,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
                 // innerHTML: `添加${isConditionNode(node)?'条件':'分支'}`
                 // dangerouslySetInnerHTML: { __html: `添加${isConditionNode(node)?'条件':'分支'}` }
               },
-              [`添加${isConditionNode(node)?'条件':'分支'}`],
+              [`添加${isConditionNode(node) ? '条件' : '分支'}`],
             ),
           ],
         ),
@@ -171,14 +171,14 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
         ),
       ];
       //继续遍历分支后的节点
-      
-      let afterChildDoms: any = node.children?getDomTree(h, node.children):[];
-      return [h('div', {key:getRandomId()}, [bchDom, afterChildDoms])];
+
+      let afterChildDoms: any = node.children ? getDomTree(h, node.children) : [];
+      return [h('div', { key: getRandomId() }, [bchDom, afterChildDoms])];
     } else if (isEmptyNode(node)) {
       //空节点，存在于分支尾部
 
-      let childDoms: any = node.children?getDomTree(h, node.children):[];
-      console.log(childDoms)
+      let childDoms: any = node.children ? getDomTree(h, node.children) : [];
+      console.log(childDoms);
       decodeAppendDom(h, node, childDoms, {
         _disabled: node?._disabled,
         _executable: node?._executable,
@@ -223,9 +223,8 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
 
   //解码渲染的时候插入dom到同级
   const decodeAppendDom = (h: any, node: any, dom: any, props = {}) => {
-    
-    if(!node || !node.nodeId){
-      return 
+    if (!node || !node.nodeId) {
+      return;
     }
     const Dom = h(
       compTrans(node.type.toLowerCase()),
@@ -244,12 +243,10 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
       },
       [],
     );
-    
+
     // console.log('888', node, dom, props, Dom);
     dom.unshift(Dom);
   };
-
-
 
   // id映射到map，用来向上遍历
   const toMapping = (node: any) => {
@@ -305,7 +302,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     }
   };
   const copyBranch = (node: any) => {
-    
     let parentNode = nodeMap.get(node.parentId);
     let branchNode: any = deepCopy(node);
     branchNode.name = branchNode.name + '-copy';
@@ -371,10 +367,10 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     console.log('处理节点插入逻辑', type, parentNode);
 
     // ctx.refs['_root'].click()
-        //缓存一下后面的节点
-        
-        let afterNode = parentNode.children;
-        console.log('afterNode',afterNode)
+    //缓存一下后面的节点
+
+    let afterNode = parentNode.children;
+    console.log('afterNode', afterNode);
     //插入新节点
     parentNode.children = {
       nodeId: getRandomId(),
@@ -411,7 +407,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
         type: type,
       })
     ) {
-      
       if (afterNode && afterNode.nodeId) {
         afterNode.parentId = parentNode.children.children.nodeId;
         // afterNode.children = {
@@ -439,7 +434,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     parentNode.children.props = deepCopy(DefaultProps.CC_PROPS);
   };
   const insertConditionsNode = (parentNode: any) => {
-    
     parentNode.children.name = '条件分支';
     parentNode.children.children = {
       nodeId: getRandomId(),
@@ -469,7 +463,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     ];
   };
   const insertConcurrentsNode = (parentNode: any) => {
-    
     parentNode.children.name = '并行分支';
     parentNode.children.children = {
       nodeId: getRandomId(),
@@ -528,7 +521,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
   //删除当前节点
   const delNode = (node: any) => {
     //获取该节点的父节点
-    
+
     let parentNode = nodeMap.get(node.parentId);
     if (parentNode) {
       //判断该节点的父节点是不是分支节点
@@ -628,7 +621,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     // for in 遍历
     for (var key in obj) {
       // 判断 是否 为自身 的属性值（排除原型链干扰）
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         // 判断 对象的属性值 中 存储的 数据类型 是否为对象
         if (typeof obj[key] === 'object') {
           // 递归调用
@@ -644,10 +637,9 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
     return result;
   };
 
-
   const getTree = () => {
     nodeMap.clear();
-    
+
     let processTrees = getDomTree(React.createElement, dom);
     //插入末端节点
     processTrees.push(
@@ -656,11 +648,11 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props:ProcessTreeProps) => {
           'div',
           {
             className: cls['process-end'],
-            dangerouslySetInnerHTML: { __html: '流程结束' },
+            // dangerouslySetInnerHTML: { __html: '流程结束' },
             // dangerouslySetInnerHTML:{textEndNode},
             key: getRandomId(),
           },
-          null,
+          ['流程结束'],
         ),
       ]),
     );

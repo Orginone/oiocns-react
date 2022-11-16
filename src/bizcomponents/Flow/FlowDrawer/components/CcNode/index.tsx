@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
 import { Row, Button } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
 
-/* 
-    抄送对象
-*/
+/**
+ * @description: 抄送对象
+ * @return {*}
+ */
 
 const CcNode = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -20,17 +20,13 @@ const CcNode = () => {
   const rovalnode = (
     <div className={cls[`roval-node`]}>
       <Row>
-        <SettingOutlined />
-        <span className={cls[`roval-node-title`]}>选择抄送对象</span>
-      </Row>
-      <Row>
         <Button
           type="primary"
           shape="round"
           onClick={() => {
             setIsOpen(true);
           }}>
-          选择身份
+          选择抄送对象
         </Button>
       </Row>
     </div>
