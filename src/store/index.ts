@@ -3,7 +3,7 @@
 import create from 'zustand';
 // 数据持久化，会缓存到 storage
 import { persist } from 'zustand/middleware';
-
+import InstallPerson from '@/ts/core/target/person';
 import Person from '@/module/person';
 import $API from '@/services';
 import Provider from '@/ts/core/provider';
@@ -43,6 +43,7 @@ const useStore = create(
           set((state) => ({
             user: { ...state.user, identitys: data.identitys, team: data.team },
           }));
+          InstallPerson.getInstance(data);
         }
       },
     }),

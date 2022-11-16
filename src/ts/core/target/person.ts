@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
 import BaseTarget from './base';
+import { kernel, model, schema } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
-import { kernel, model, schema } from '../../base';
 import University from './university';
 import Hospital from './hospital';
 
@@ -11,14 +11,30 @@ export default class Person extends BaseTarget {
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
+  private _getJoinedCohorts: Cohort[];
+  private static _instance: null | Person;
   constructor(target: schema.XTarget) {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this._getJoinedCohorts = [];
   }
+
+  public static getInstance(data?: any) {
+    if (this._instance == null) {
+      this._instance = new Person(data);
+    }
+    return this._instance;
+  }
+
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
+  }
+
+  /** 支持的群组类型数组*/
+  public get CohortTypes(): TargetType[] {
+    return [TargetType.Cohort];
   }
 
   /**
@@ -158,5 +174,33 @@ export default class Person extends BaseTarget {
       data.belongId = this._curCompany.target.id;
     }
     return await kernel.createTarget(data);
+  }
+
+  /**
+   * @description: 查询我加入的群
+   * @return {*} 查询到的群组
+   */
+  public async getJoinedCohorts(): Promise<Cohort[]> {
+    console.log('hahahh');
+
+    if (this._getJoinedCohorts.length > 0) {
+      return this._getJoinedCohorts;
+    }
+    let res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: this.CohortTypes,
+    });
+    console.log('jjjjj', res);
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        switch (item.typeName) {
+          case TargetType.Cohort:
+            this._getJoinedCohorts.push(new Cohort(item));
+            break;
+        }
+      });
+    }
+    console.log('hhhhh', this._getJoinedCohorts);
+    return this._getJoinedCohorts;
   }
 }

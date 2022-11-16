@@ -6,9 +6,11 @@ import { useAppwfConfig } from '@/module/flow/flow';
 import cls from './index.module.less';
 import ConditionGroupItemConfig from '@/bizcomponents/Flow/FlowDrawer/components/ConditionGroupItemConfig';
 import ReactDOM from 'react-dom';
-/* 
-    条件
-*/
+
+/**
+ * @description: 条件
+ * @return {*}
+ */
 
 const ConditionNode = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
