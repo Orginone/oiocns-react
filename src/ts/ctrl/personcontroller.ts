@@ -27,7 +27,7 @@ export default class personcontroller extends BaseController{
 
     /**构造方法 */
     constructor() {
-        
+        super();
     }
     
 

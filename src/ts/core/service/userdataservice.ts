@@ -33,7 +33,7 @@ export default class userdataservice extends BaseService {
 
     /**构造方法 */
     constructor() {
-
+        super();
     }
     
     /**
