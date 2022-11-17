@@ -1115,7 +1115,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
   public async createMarket(
-    params: model.MarketModel,
+    params: Omit<model.MarketModel, `id`>,
   ): Promise<model.ResultType<schema.XMarket>> {
     return await this.request({
       module: 'market',

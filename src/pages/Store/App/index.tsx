@@ -24,13 +24,11 @@ const service = new MarketService({
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
 
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
   const [putawayForm] = Form.useForm();
-  const [createAppForm] = Form.useForm<Record<string, any>>();
   const items = [
     {
       tab: `全部`,
@@ -63,7 +61,7 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        setShowCreateModal(true);
+        history.push('/store/app/create');
         break;
       case '暂存':
         console.log('点击事件', '暂存');
@@ -139,43 +137,35 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
+  // 应用首页dom
+  const AppIndex: React.FC = () => (
+    <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+      {<StoreRecent />}
+      <Card
+        title="应用"
+        className={cls['app-tabs']}
+        extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
+        tabList={items}
+        onTabChange={(key) => {
+          setStatusKey(key);
+        }}
+      />
+      <div className={cls['page-content-table']}>
+        <AppShowComp
+          service={service}
+          searchParams={{ status: statusKey }}
+          columns={service.getMyappColumns()}
+          renderOperation={renderOperation}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {<StoreRecent />}
-        <Card
-          title="应用"
-          className={cls['app-tabs']}
-          extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          tabList={items}
-          onTabChange={(key) => {
-            setStatusKey(key);
-          }}
-        />
-        <div className={cls['page-content-table']}>
-          <AppShowComp
-            service={service}
-            searchParams={{ status: statusKey }}
-            columns={service.getMyappColumns()}
-            renderOperation={renderOperation}
-          />
-        </div>
-        {/* 创建应用 */}
-        {showCreateModal && (
-          <CreateApp
-            form={createAppForm}
-            layoutType="ModalForm"
-            open={showCreateModal}
-            title="创建应用"
-            modalProps={{
-              destroyOnClose: true,
-              onCancel: () => setShowCreateModal(false),
-            }}
-          />
-        )}
+      <Route exact path="/store/app" render={() => <AppIndex />}></Route>
 
-        {/* 详情页面 /store/app/info*/}
-      </div>
+      {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
@@ -188,6 +178,11 @@ const StoreApp: React.FC = () => {
         exact
         path="/store/app/manage"
         render={() => <Manage appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/create"
+        // component={CreateApp}
+        render={() => <CreateApp />}></Route>
       <Route
         exact
         path="/store/app/putaway"

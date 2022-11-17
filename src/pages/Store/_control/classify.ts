@@ -3,6 +3,7 @@ import API from '@/services';
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
+import { resetParams } from '@/utils/tools';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}/
@@ -101,7 +102,7 @@ class StoreClassify {
       filter: '',
     };
     const { data, success } = await API.market.searchOwn({
-      data: _resetParams(params),
+      data: resetParams(params),
     });
     if (success) {
       const { result = [], total = 0 } = data;

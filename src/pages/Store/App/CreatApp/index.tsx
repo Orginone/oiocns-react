@@ -1,35 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // import cls from './index.module.less';
-import type { ProFormLayoutType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem } from './config';
-import Provider from '@/ts/core/provider';
+import { Form, Card } from 'antd';
 interface indexType {
-  layoutType: ProFormLayoutType; //props
-  open: boolean;
-  form: any;
   [key: string]: any;
 }
-const Index = ({ layoutType, open, form, ...otherConfig }: indexType) => {
+const CreatApp: React.FC<indexType> = () => {
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
+  const [createAppForm] = Form.useForm<Record<string, any>>();
   // 提交表单数据
-  const handleCreateApp = (values) => {
-    Provider.person.createCompany();
+  const handleCreateApp = (values: any) => {
+    // Provider.person.createProduct(values);
+    console.log(values);
   };
+  useEffect(() => {
+    // debugger;
+  }, []);
   return (
-    <>
+    <Card>
       <SchemaForm<DataItem>
-        form={form}
-        layoutType={layoutType}
-        open={open}
+        form={createAppForm}
+        layoutType="Form"
+        open={showCreateModal}
+        title="创建应用"
         colProps={{
           span: 12,
         }}
         onFinish={handleCreateApp}
+        modalProps={{
+          destroyOnClose: true,
+          onCancel: () => setShowCreateModal(false),
+        }}
         columns={columns}
-        {...otherConfig}
       />
-    </>
+    </Card>
   );
 };
 
-export default Index;
+export default CreatApp;
