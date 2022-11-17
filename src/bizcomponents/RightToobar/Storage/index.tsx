@@ -33,6 +33,7 @@ const Storage: React.FC<StorageType> = () => {
           {commentList.map((item, index) => {
             return (
               <div
+                key={index}
                 className={`${cls.allComment} ${
                   index === clickName ? cls.selectAllComment : ''
                 }`}

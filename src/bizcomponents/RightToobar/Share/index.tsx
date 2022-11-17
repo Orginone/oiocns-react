@@ -56,8 +56,9 @@ const Share: React.FC<ShareType> = () => {
             discript: '发布并与部门分享链接',
           },
         ]}
-        renderItem={(item: itemtype) => [
+        renderItem={(item: itemtype, index) => [
           <List.Item
+            key={item.title + index}
             actions={[
               item.isSwiVsi && (
                 <Switch

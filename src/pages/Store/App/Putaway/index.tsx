@@ -1,6 +1,4 @@
 import { Button, Card, Dropdown, Form, Menu, Input, Radio, Select } from 'antd';
-import React from 'react';
-import API from '@/services';
 import cls from './index.module.less';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
@@ -8,6 +6,7 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
+import React from 'react';
 interface AppInfoType {
   appId: string;
 }
@@ -35,7 +34,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
         }
         className="app-info">
         <Meta
-          avatar={<img className="appLogo" src={Appimg}></img>}
+          avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
           title="应用名称"
           description={
