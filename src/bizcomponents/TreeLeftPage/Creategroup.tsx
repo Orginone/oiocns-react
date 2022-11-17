@@ -1,4 +1,4 @@
-import { Input, Tree ,Space} from 'antd';
+import { Input, Tree ,Space,TreeProps} from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
 import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined ,SearchOutlined} from '@ant-design/icons';
@@ -61,7 +61,13 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
   return parentKey!;
 };
 
-const Creategroup: React.FC = () => {
+type CreateGroupPropsType = {
+  onSelect?: TreeProps['onSelect'];
+}
+
+const Creategroup: React.FC<CreateGroupPropsType> = ({ 
+  onSelect,
+}) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -165,11 +171,12 @@ const Creategroup: React.FC = () => {
         switcherIcon={<DownOutlined />}
         autoExpandParent={autoExpandParent}
         treeData={treeData1}
+        onSelect={onSelect}
         showIcon={true}
         titleRender={(e) => { 
           return <div className={cls.rightstyle} onMouseOver={() => {
             setHoverItemMes(e.key);
-          }}>
+          }} onMouseLeave={() => {setHoverItemMes('') }}>
             <span style={{ paddingRight: '8px' }}>{e?.title}</span>
             {hoverItemMes === e.key ? <Space>
               <PlusOutlined />

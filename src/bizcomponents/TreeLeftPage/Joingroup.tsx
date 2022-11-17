@@ -64,7 +64,7 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 const JoinGroup: React.FC = () => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const [hoverItem, setHoverItem] = useState();
+  const [hoverItem, setHoverItem] = useState<React.Key>();
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -115,9 +115,12 @@ const JoinGroup: React.FC = () => {
         switcherIcon={<DownOutlined />}
         autoExpandParent={autoExpandParent}
         treeData={treeData}
+        onClick={(e) => { 
+          console.log(e);
+        } }
         showIcon={true}
         titleRender={(e) => { 
-          return <div className={cls.rightstyle} onMouseOver={() => {
+          return <div className={cls.rightstyle} onMouseLeave={() => { setHoverItem('') }}  onMouseOver={() => {
             setHoverItem(e.key);
           }}>
             <span style={{ paddingRight: '8px' }}>{e?.title}</span>

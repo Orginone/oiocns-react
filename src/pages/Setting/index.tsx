@@ -2,7 +2,7 @@
  * @Author: zhangqiang 1196217890@qq.com
  * @Date: 2022-11-16 17:46:20
  * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-17 13:26:51
+ * @LastEditTime: 2022-11-17 16:12:56
  * @FilePath: /oiocns-react/src/pages/Setting/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,9 +21,10 @@ import {
 import BreadCrumb from '@/components/BreadCrumb';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-import  TreeLeftPage  from '@/bizcomponents/TreeLeftPage';
+import TreeLeftPage from '@/bizcomponents/TreeLeftPage';
 
 import { MenuProps } from 'antd';
+
 
 /* 信息中心菜单 */
 const infoMenuItems = [
@@ -71,7 +72,6 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };
-
 
   return (
     <ContentTemplate

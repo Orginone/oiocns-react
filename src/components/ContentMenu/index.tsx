@@ -40,7 +40,6 @@ const flatMenuData = (menuData: ItemType[] | any, fathKey?: string): MemuItemTyp
 
   for (let index = 0; index < menuData.length; index++) {
     const element = menuData[index];
-    console.log(fathKey);
     if (fathKey) {
       data.push({ ...element, fathKey });
     }
@@ -49,7 +48,6 @@ const flatMenuData = (menuData: ItemType[] | any, fathKey?: string): MemuItemTyp
       if (!element.type) {
         data.push(fathKey ? { ...element, fathKey } : { ...element });
       }
-      console.log(element.key);
       data.push(...flatMenuData(element.children, element.key));
     }
   }
@@ -74,7 +72,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
-  console.log('currentMacthRoute',businessRouteList)
   const menuFlat = menuData ? flatMenuData(menuData) : [];
 
   /**当页面路径改变时，重新绘制相关的菜单*/
@@ -84,22 +81,18 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (menuData) {
       listenPrev(current);
     }
-    // console.log('location.pathname',location.pathname)
   }, [location.pathname]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
     if (props.menuClick) {
-      console.log('________1');
       props.menuClick?.call(this, e);
     } else {
-      console.log('________2');
       props.history.push(e.key);
     }
   };
   /** 监听路由改变或菜单被点击时，当前菜单数据和上级菜单数据*/
   const listenPrev = (current: MemuItemType | null) => {
-    console.log('current', current);
     if (!current) {
       // 说明当前为主菜单
       setPrevMenuData([]);
@@ -133,6 +126,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     } else {
       if (current!.render) {
         listenPrev(current!);
+        console.log('current!.key',current!.key);
         current!.key && props.history.push(current!.key);
         // listenPrev({ fathKey: location.pathname });
       }
