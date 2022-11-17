@@ -1,11 +1,22 @@
+import { MarketTypes } from 'typings/marketType';
 import API from '@/services';
 import StoreContent from './content';
-import { kernel } from '@/ts/base';
+import Provider from '@/ts/core/provider';
+import useStore from '@/store';
+import { UserType } from '@/store/type';
+import { XMarket } from '@/ts/base/schema';
+
 /**
  * @desc: 仓库模块 导航控件
- * @return {*}
+ * @return {*}/
  */
 type menyuType = 'app' | 'docx' | 'data' | 'assets';
+type footerTreeType = {
+  appTreeData: any[];
+  docxTreeData: any[];
+  dataTreeData: any[];
+  assetsTreeData: any[];
+};
 /**
  * @desc: 处理 翻页参数问题
  * @param {T} params
@@ -23,9 +34,21 @@ const _resetParams = (params: any) => {
 };
 class StoreClassify {
   // constructor(parameters) {}
-  public currentPage!: '应用';
-  public curData: any;
-  public TreeCallBack!: Function;
+  private _curMarket: MarketTypes.MarketType; // 当前商店实例
+
+  private currentMenu!: '应用';
+  private curTreeData: any;
+  public TreeCallBack!: Function; //页面传进来的 钩子
+
+  // 底部区域
+  // 缓存 tree 展示数据
+  public footerTree: any = {
+    appTreeData: [],
+    docxTreeData: [],
+    dataTreeData: [],
+    assetsTreeData: [],
+  };
+  public userObj: Person;
   // 顶部区域
   static SelfMenu = [
     { title: '应用', code: 'app' },
@@ -38,19 +61,21 @@ class StoreClassify {
 
   // 底部区域
   // 缓存 tree 展示数据
-  public footerTree = {
+  public footerTree: footerTreeType = {
     appTreeData: [],
     docxTreeData: [],
     dataTreeData: [],
     assetsTreeData: [],
   };
-
+  // constructor(user: any) {
+  //   this.userObj = Person.getInstance(user);
+  // }
   /**
    * @desc 处理点击顶部导航获取tree 数据
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    this.curData = this.footerTree[`${key}TreeData`];
+    this.curTreeData = this.footerTree[`${key}TreeData`];
     //1. 直接触发展示区 更新展示数据
     StoreContent.changeMenu(key);
     //2. 控制底部分类
@@ -72,23 +97,32 @@ class StoreClassify {
    * @param {string} params.filter 过滤关键字
    * @return {*}
    */
-  getOwnMarket = async () => {
+  getOwnMarket = async (id: string) => {
     const params = {
+      id,
       page: 1,
       pageSize: 100,
       filter: '',
     };
-    console.log('canshu1', _resetParams(params));
 
-    const { success, data } = await kernel.queryOwnMarket(_resetParams(params));
+    const { success, data } = await Provider.person.getMarketList(params);
     console.log('获取拥有的市场55', success, data);
     if (!success) {
-      return;
+      return [];
     }
     const { result = [], total = 0 } = data;
-    console.log('获取拥有的市场', result);
+    let arr = result.map((item: { name: any; id: any }, index: any) => {
+      return {
+        title: item.name,
+        key: `0-${index}`,
+        id: item.id,
+        children: [],
+      };
+    });
 
-    this.footerTree.appTreeData = result;
+    this.footerTree.appTreeData = arr;
+
+    this.TreeCallBack(arr);
   };
   /**
    * @desc: 获取市场列表

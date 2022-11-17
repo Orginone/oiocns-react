@@ -18,7 +18,7 @@ const { Content } = Layout;
 type ContentTemplateType = {
   className?: string; //wrap calss
   content?: React.ReactNode; // 内容区
-  sider?: React.ReactNode; // 左侧
+  sider?: React.ReactNode | React.ReactDOM; // 左侧
   contentTop?: React.ReactNode; // 内容区顶部
   contentTopLeft?: React.ReactNode; // 内容区顶部左侧
   contentTopRight?: React.ReactNode; // 内容区顶部右侧
@@ -57,6 +57,10 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
 
   return (
     <Layout className={`${className}`} style={{ height: '100%' }}>
+      {/* {sider?
+        sider:
+        <ContentMenu menuClick={menuClick} data={siderMenuData}></ContentMenu>} */}
+
       {(sider || siderMenuData) && (
         <ContentMenu data={siderMenuData} menuClick={menuClick}>
           {sider && sider}

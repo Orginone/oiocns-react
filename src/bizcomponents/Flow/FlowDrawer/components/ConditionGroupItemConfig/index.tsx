@@ -4,10 +4,11 @@ import { Row, Button, Select, InputNumber, Input } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
 import cls from './index.module.less';
-import ReactDOM from 'react-dom';
-/* 
-    条件
-*/
+
+/**
+ * @description: 条件
+ * @return {*}
+ */
 
 const ConditionGroupItemConfig = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);

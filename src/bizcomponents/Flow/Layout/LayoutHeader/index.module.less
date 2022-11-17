@@ -1,18 +1,31 @@
+.layout-title {
+  display: flex;
+  justify-content: flex-start;
+  .layout-title-business {
+    color: grey;
+  }
+  .layout-titlebinding {
+  }
+}
 .layout-header {
-    // min-width: 640px;
-    margin-top:10px;
-    position: relative;
-    background: white;
+  height: 40px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    .el-menu-demo {
-      top: 0;
-      z-index: 999;
-      display: flex;
-      justify-content: center;
-      font-size: 18px;
-      font-weight:bold;
-      width: 100%;
+  .el-menu-demo {
+    width: 8%;
+    height: 100%;
+    border-bottom: 2px solid #154ad8;
+    display: flex;
+    justify-content: center;
+    // margin-left: 12%;
+    .el-menu-demo-span {
+      color: #154ad8;
+      font-size: 16px;
     }
+  }
 
     .back {
       display: flex;
@@ -31,28 +44,19 @@
     //     align-items: center;
     //   }
 
+  .publish {
+    .scale {
+      margin-left: 20px;
     }
-
-    .publish {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-
-      .scale {
-        z-index: 999;
-        padding-left:10px;
-        span {
-          margin: 0 10px;
-          font-size: 15px;
-          color: #7a7a7a;
-          width: 20px;
-        }
-      }
-
-      i {
-        margin-right: 6px;
-      }
+    i {
+      margin-right: 6px;
     }
-
+    .publish-preview {
+      width: 80px;
+      margin-right: 10px;
+    }
+    .publis-issue {
+      width: 80px;
+    }
   }
+}

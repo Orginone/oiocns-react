@@ -56,7 +56,6 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
   const publish = () => {
     message.warning('该功能尚未开放');
   };
-  // const scale = 100
   return (
     <div>
       <div className={cls['layout-header']}>
@@ -103,37 +102,41 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
         <CloseOutlined />
           退出
         </Button> */}
-        </div>
-
-        <div className={cls['publish']}>
-          <Button
-            size="small"
-            onClick={preview}
-            style={{ width: 100, marginRight: '10px' }}>
-            <EyeOutlined />
-            预览
-          </Button>
-          <Button size="small" type="primary" onClick={publish} style={{ width: 100 }}>
-            <SendOutlined />
-            发布
-          </Button>
-          <span className={cls['scale']}></span>
-          <Button
-            size="small"
-            disabled={scale <= 40}
-            onClick={() => changeScale(scale - 10)}>
-            <MinusOutlined />
-          </Button>
-          <span>{scale}%</span>
-          <Button
-            size="small"
-            disabled={scale >= 150}
-            onClick={() => changeScale(scale + 10)}>
-            <PlusOutlined />
-          </Button>
+          </div>
+          <div className={cls['el-menu-demo']}>
+            <span className={cls['el-menu-demo-span']}>流程设计</span>
+          </div>
+          <div className={cls['publish']}>
+            <Button className={cls['publish-preview']} size="small" onClick={preview}>
+              <EyeOutlined />
+              预览
+            </Button>
+            <Button
+              className={cls['publis-issue']}
+              size="small"
+              type="primary"
+              onClick={publish}>
+              <SendOutlined />
+              发布
+            </Button>
+            <Button
+              className={cls['scale']}
+              size="small"
+              disabled={scale <= 40}
+              onClick={() => changeScale(scale - 10)}>
+              <MinusOutlined />
+            </Button>
+            <span>{scale}%</span>
+            <Button
+              size="small"
+              disabled={scale >= 150}
+              onClick={() => changeScale(scale + 10)}>
+              <PlusOutlined />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

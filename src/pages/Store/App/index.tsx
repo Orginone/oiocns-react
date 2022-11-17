@@ -1,18 +1,18 @@
 import { Card, Form, Modal } from 'antd';
-import React, { useState, createContext } from 'react';
+import React, { useState } from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
-import PutawayComp from '../components/PutawayComp'; // 上架弹窗
+import PutawayComp from './Putaway';
+import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import useEventEmitter from '@/hooks/useEventEmitter';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -20,27 +20,17 @@ const service = new MarketService({
   deleteApi: API.product.delete,
   updateApi: API.product.update,
 });
-console.log(service);
-interface submitEmmit {
-  aa: string;
-}
-export const EventContext = createContext({} as { TestSub: any });
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
 
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
   const [putawayForm] = Form.useForm();
-
-  const TestSub = useEventEmitter<submitEmmit>();
-  TestSub.useSubScription('hello', (data) => {
-    console.log('订阅', data);
-  });
-
+  const [createAppForm] = Form.useForm<Record<string, any>>();
   const items = [
     {
       tab: `全部`,
@@ -73,12 +63,10 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        TestSub.emit('hello', { aa: '700' });
-        // console.log('点击事件', '创建1231313');
+        setShowCreateModal(true);
         break;
       case '暂存':
         console.log('点击事件', '暂存');
-        setShowModal(true);
         break;
       default:
         console.log('点击事件未注册', item.text);
@@ -88,8 +76,6 @@ const StoreApp: React.FC = () => {
   const handlePutawaySumbit = async () => {
     const putawayParams = await putawayForm.validateFields();
     console.log('上架信息打印', putawayParams);
-
-    setShowModal(false);
   };
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -120,11 +106,11 @@ const StoreApp: React.FC = () => {
         },
       },
       {
-        key: 'publish',
+        key: 'putaway',
         label: '上架',
         onClick: () => {
-          console.log('按钮事件', 'publish', item);
-          setShowModal(true);
+          console.log('按钮事件', 'putaway', item);
+          history.push({ pathname: '/store/app/putaway', state: { appId: item.id } });
         },
       },
       {
@@ -174,37 +160,38 @@ const StoreApp: React.FC = () => {
             renderOperation={renderOperation}
           />
         </div>
-        <Modal
-          title="应用上架"
-          width={670}
-          destroyOnClose={true}
-          open={showModal}
-          okText="确定"
-          onOk={() => {
-            handlePutawaySumbit();
-          }}
-          onCancel={() => {
-            console.log(`取消按钮`);
-            setShowModal(false);
-          }}>
-          <PutawayComp initialValues={{}} form={putawayForm} />
-        </Modal>
+        {/* 创建应用 */}
+        {showCreateModal && (
+          <CreateApp
+            form={createAppForm}
+            layoutType="ModalForm"
+            open={showCreateModal}
+            title="创建应用"
+            modalProps={{
+              destroyOnClose: true,
+              onCancel: () => setShowCreateModal(false),
+            }}
+          />
+        )}
+
         {/* 详情页面 /store/app/info*/}
       </div>
-      <EventContext.Provider value={{ TestSub }}>
-        <Route
-          exact
-          path="/store/app/info"
-          render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/publish"
-          render={() => <PublishList appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/manage"
-          render={() => <Manage appId={selectAppInfo.id} />}></Route>
-      </EventContext.Provider>
+      <Route
+        exact
+        path="/store/app/info"
+        render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/publish"
+        render={() => <PublishList appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/manage"
+        render={() => <Manage appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/putaway"
+        render={() => <PutawayComp appId={selectAppInfo.id} />}></Route>
     </>
   );
 };
