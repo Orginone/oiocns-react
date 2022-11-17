@@ -33,6 +33,12 @@ export default class Person extends BaseTarget {
     return [TargetType.Cohort];
   }
 
+  /** 暴露 当前的单位 */
+  //TODO:至少默认 个人空间
+  public get curCompany(): Company | undefined {
+    return this._curCompany;
+  }
+
   /**
    * 创建群组
    * @param name 名称
@@ -126,53 +132,7 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public async applyJoinCompany(
-    _companyId: string,
-    _companyType: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.companyTypes.includes(_companyType)) {
-      return await kernel.applyJoinTeam({
-        id: _companyId,
-        targetId: this.target.id,
-        teamType: _companyType,
-        targetType: TargetType.Person,
-      });
-    }
-    return FaildResult('无法加入该类型组织!');
-  }
-
-  /**
-   * 申请加入市场
-   * @param id 市场ID
-   * @returns
-   */
-  public async applyJoinStore(id: string): Promise<model.ResultType<any>> {
-    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
-  }
-
-  /**
-   * @description: 查询我加入的群
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._joinedCohorts.length > 0) {
-      return this._joinedCohorts;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      joinTypeNames: this.cohortTypes,
-    });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
-        switch (item.typeName) {
-          case TargetType.Cohort:
-            this._joinedCohorts.push(new Cohort(item));
-            break;
-        }
-      });
-    }
-    return this._joinedCohorts;
-  }
+  public applyJoinCompany(_companyId: string): void {}
 
   /**
    * 获取单位列表
@@ -247,7 +207,7 @@ export default class Person extends BaseTarget {
    */
   public async quitMarket(appStore: AppStore): Promise<model.ResultType<any>> {
     const res = await kernel.quitMarket({
-      id: appStore.selfData.id,
+      id: appStore.getStore.id,
       belongId: this.target.id,
     });
     if (res.success) {

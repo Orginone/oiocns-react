@@ -28,10 +28,21 @@
   }
 
   .back {
-    width: 22%;
-    display: flex;
-    font-size: small;
-  }
+      display: flex;
+      position: absolute;
+      z-index: 1000;
+      top: 20px;
+      left: 20px;
+      font-size: small;
+      span {
+      margin-right: 15px;
+      }
+    //   span {
+    //     display: flex;
+    //     margin-left: 10px;
+    //     font-size: 14px;
+    //     align-items: center;
+    //   }
 
   .publish {
     .scale {
@@ -47,5 +58,6 @@
     .publis-issue {
       width: 80px;
     }
+  }
   }
 }

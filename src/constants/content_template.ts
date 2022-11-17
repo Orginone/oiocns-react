@@ -1,4 +1,4 @@
-export enum TOOBAR_TYPE { 
+export enum TOOBAR_TYPE {
   SHARE,
   COMMEMNT,
   STORAGE,

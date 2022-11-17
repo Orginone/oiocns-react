@@ -68,6 +68,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
+          initialValues={{ sellAuth: '使用权' }}
           autoComplete="off">
           <Form.Item
             label="上架平台"
