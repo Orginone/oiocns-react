@@ -74,7 +74,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
-
+  console.log('currentMacthRoute',businessRouteList)
   const menuFlat = menuData ? flatMenuData(menuData) : [];
 
   /**当页面路径改变时，重新绘制相关的菜单*/
