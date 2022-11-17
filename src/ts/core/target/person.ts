@@ -33,6 +33,12 @@ export default class Person extends BaseTarget {
     return [TargetType.Cohort];
   }
 
+  /** 暴露 当前的单位 */
+  //TODO:至少默认 个人空间
+  public get curCompany(): Company | undefined {
+    return this._curCompany;
+  }
+
   /**
    * 创建群组
    * @param name 名称
