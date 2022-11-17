@@ -21,14 +21,8 @@ import { Cohort } from '../../../module/org/index';
 import CohortServices from '../../../ts/core/target/cohort'
 import { useHistory } from 'react-router-dom';
 import PersonInfoEnty from '../../../ts/core/provider'
-import type { ProFormColumnsType } from '@ant-design/pro-components';
-import { DatabaseFilled } from '@ant-design/icons';
-import { model } from '../../../ts/base'
-import {TargetType} from '../../../ts/core/enum'
-type DataItem = {
-  name: string;
-  state: string;
-};
+import { model,schema } from '../../../ts/base'
+import { TargetType } from '../../../ts/core/enum'
 /**
  * 个人信息
  * @returns
@@ -53,7 +47,7 @@ const CohortConfig: React.FC = () => {
   const history = useHistory();
   const [friend, setFriend] = useState<Person>();
   const [cohort, setcohort] = useState<Cohort>();
-  const newCohortServices = new CohortServices(null);
+  const newCohortServices = new CohortServices({} as schema.XTarget);
   useEffect(() => {
     getTableList();
   }, []);
@@ -113,14 +107,14 @@ const CohortConfig: React.FC = () => {
             filter: '',
           }
           const params: model.IDReqJoinedModel = {
-            id:PersonInfoEnty.getPerson.target.id,
-            typeName:TargetType.Person,
-            JoinTypeNames:[TargetType.Person],
-            spaceId:PersonInfoEnty.getPerson.target.id,
-            page:page
+            id: PersonInfoEnty.getPerson.target.id,
+            typeName: TargetType.Person,
+            JoinTypeNames: [TargetType.Person],
+            spaceId: PersonInfoEnty.getPerson.target.id,
+            page: page
           }
-          console.log("群组参数qqbbq",params)
-          console.log("info",PersonInfoEnty.getPerson.searchCohorts('apex'))
+          console.log("群组参数qqbbq", params)
+          console.log("info", PersonInfoEnty.getPerson.searchCohorts('apex'))
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },
@@ -241,15 +235,16 @@ const CohortConfig: React.FC = () => {
               <Modal title="加入群组" open={addIsModalOpen} onOk={cohortHandleOk} onCancel={() => setAddIsModalOpen(false)} width='1050px' >
                 <AddCohort setCohort={setcohort} />
               </Modal>
-              <UpdateCohort
+              {item && (<UpdateCohort
                 key={item?.id}
                 layoutType="ModalForm"
                 title="修改群组"
                 modalProps={{
                   destroyOnClose: true,
                   onCancel: () => setOpen(false),
-                }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
-              <CreateCohort Person = {Person}  service={service} getTableList={getTableList} />
+                }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />)}
+              
+              <CreateCohort Person={Person} service={service} getTableList={getTableList} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
             </Space>
           </div>

@@ -17,7 +17,7 @@ interface indexType {
   [key: string]: any;
   service:CohortService,
   setOpen:Function,
-  item?:CohortConfigType.CohortConfigTeam,
+  item:CohortConfigType.CohortConfigTeam,
   getTableList:Function
   columns:ProFormColumnsType<DataItem>[]
 }
@@ -49,7 +49,7 @@ const CreateCohort: React.FC<indexType> = ({ service,layoutType,item,setOpen,get
           }}
         />
       </Space> */}
-      <BetaSchemaForm<DataItem>
+      <BetaSchemaForm<CohortConfigType.CohortConfigTeam>
         // trigger={<a>点击我</a>}
         layoutType={layoutType}
         open={open}
@@ -66,7 +66,7 @@ const CreateCohort: React.FC<indexType> = ({ service,layoutType,item,setOpen,get
           span: 12,
         }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
-        onFinish={async (values) => {
+        onFinish={async (values:CohortConfigType.CohortConfigTeam) => {
           console.log(values);
           const param = {
             belongId:item.belongId,

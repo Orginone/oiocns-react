@@ -7,7 +7,6 @@ import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import AppStore from '../market/appstore'
-import Friend from '../target/Friend'
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
   private _curCompany: Company | undefined;
