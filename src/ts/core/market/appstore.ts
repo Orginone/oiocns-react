@@ -11,7 +11,7 @@ export default class AppStore {
     this._store = store;
   }
 
-  public get selfData() {
+  public get getStore() {
     return this._store;
   }
   // constructor(info) {

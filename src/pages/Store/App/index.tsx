@@ -14,6 +14,7 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
+import Content from '../_control/content';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,

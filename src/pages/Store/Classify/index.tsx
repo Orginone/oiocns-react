@@ -1,9 +1,3 @@
-// import {
-//   AppstoreOutlined,
-//   DatabaseOutlined,
-//   FileTextOutlined,
-//   FundOutlined,
-// } from '@ant-design/icons';
 import { Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import { useHistory } from 'react-router-dom';
@@ -21,11 +15,6 @@ import { useLocation } from 'react-router-dom';
 import useStore from '@/store';
 import ClassServices from '../_control/classify';
 
-const Service = new CommonClass({
-  nameSpace: 'shopTree',
-  searchApi: API.market.searchOwn,
-  createApi: API.market.create,
-});
 // const items = [
 //   { label: '应用', key: 'app', icon: <AppstoreOutlined /> }, // 菜单项务必填写 key
 //   { label: '文档', key: 'doc', icon: <FileTextOutlined /> },
@@ -46,22 +35,19 @@ const StoreClassify: React.FC = () => {
   // const [total, setTotal] = useState<number>(0);
   // const history = useHistory();
   useEffect(() => {
-    // getTreeList();
-    ClassServices.getOwnMarket();
+    ClassServices.currentMenu = 'myApps';
     ClassServices.TreeCallBack = setList;
+    ClassServices.getTreeData();
   }, []);
-  // useEffect(() => {
-  //   // console.log('3211232131', router);
-  // }, [list]);
 
   const onOk = async (data: any) => {
     setIsStoreOpen(false);
     console.log('form数据', data);
-    await Service.creatItem({
-      ...data,
-      samrId: user.team.targetId,
-      authId: user.workspaceId,
-    });
+    // await Service.creatItem({
+    //   ...data,
+    //   samrId: user.team.targetId,
+    //   authId: user.workspaceId,
+    // });
   };
   const onCancel = () => {
     setIsStoreOpen(false);
