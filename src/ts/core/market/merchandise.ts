@@ -1,17 +1,14 @@
-import { kernel } from '../../base';
+import { common, kernel } from '../../base';
 import { ResultType, PageRequest } from '../../base/model';
 import { XMerchandise, XOrderDetailArray } from '../../base/schema';
+import { CommonStatus } from '../enum';
 
 export default class Merchandise {
   // 商品实例
-  private _merchandise: XMerchandise;
+  public readonly merchandise: XMerchandise;
 
   constructor(merchandise: XMerchandise) {
-    this._merchandise = merchandise;
-  }
-
-  public get getMerchandise() {
-    return this._merchandise;
+    this.merchandise = merchandise;
   }
 
   /**
@@ -19,19 +16,29 @@ export default class Merchandise {
    * @param merchandise 商品信息
    * @returns 是否成功
    */
-  public async update(merchandise: XMerchandise): Promise<boolean> {
+  public async update(
+    caption: string,
+    price: number,
+    sellAuth: '使用权' | '所属权',
+    information: string,
+    days: number,
+  ): Promise<boolean> {
     const res = await kernel.updateMerchandise({
-      id: merchandise.id,
-      caption: merchandise.caption,
-      price: merchandise.price,
-      productId: merchandise.productId,
-      sellAuth: merchandise.sellAuth,
-      marketId: merchandise.marketId,
-      information: merchandise.information,
-      days: merchandise.days,
+      caption,
+      price,
+      sellAuth,
+      information,
+      days,
+      id: this.merchandise.id,
+      marketId: this.merchandise.marketId,
+      productId: this.merchandise.productId,
     });
     if (res.success) {
-      this._merchandise = merchandise;
+      this.merchandise.caption = caption;
+      this.merchandise.price = price;
+      this.merchandise.sellAuth = sellAuth;
+      this.merchandise.information = information;
+      this.merchandise.days = days;
     }
     return res.success;
   }
@@ -43,7 +50,7 @@ export default class Merchandise {
    */
   public async getOrder(page: PageRequest): Promise<ResultType<XOrderDetailArray>> {
     return await kernel.querySellOrderListByMerchandise({
-      id: this._merchandise.id,
+      id: this.merchandise.id,
       page: page,
     });
   }
@@ -54,11 +61,23 @@ export default class Merchandise {
    * @param status 交付状态
    * @returns 交付结果
    */
-  public async deliver(detailId: string, status: number = 100): Promise<ResultType<any>> {
+  public async deliver(
+    detailId: string,
+    status: number = CommonStatus.ApproveStartStatus,
+  ): Promise<ResultType<any>> {
     return await kernel.deliverMerchandise({ id: detailId, status: status });
   }
 
-  public async cancel(detailId: string, status: number = 200): Promise<ResultType<any>> {
+  /**
+   * 买方取消订单
+   * @param detailId 订单Id
+   * @param status 取消状态
+   * @returns
+   */
+  public async cancel(
+    detailId: string,
+    status: number = CommonStatus.RejectStartStatus,
+  ): Promise<ResultType<any>> {
     return await kernel.cancelOrderDetail({ id: detailId, status: status });
   }
 }
