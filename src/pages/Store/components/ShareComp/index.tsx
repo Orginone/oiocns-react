@@ -4,7 +4,13 @@ import React, { useState, useEffect, createContext } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import API from '@/services';
 import cls from './index.module.less';
-const ShareRecent: React.FC = () => {
+
+interface Iprops {
+  onCheckeds?: (checkedValus: any) => void;
+}
+// const ShareRecent: React.FC = () => {
+const ShareRecent = (props: Iprops) => {
+  const { onCheckeds } = props;
   const [radio, setRadio] = useState(1);
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
   const [leftTreeData, setLeftTreeData] = useState([]);
@@ -98,6 +104,7 @@ const ShareRecent: React.FC = () => {
   // 左侧树点击事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
     console.log('点击左侧', checkedKeys, info);
+    onCheckeds(info.checkedNodes);
     if (info.checked) {
       let result = departHisData.some((item: any) => {
         return item.id == info.node.id;
