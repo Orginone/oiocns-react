@@ -601,7 +601,7 @@ export type XMerchandise = {
   // 出售权属
   sellAuth: string;
   // 有效期
-  days: string;
+  days: string | number;
   // 商品出售市场ID
   marketId: string;
   // 描述信息
@@ -643,6 +643,7 @@ export type XOrder = {
   // 编号
   code: string;
   // 总价
+  price: number;
   // 创建组织/个人
   belongId: string;
   // 状态
@@ -686,6 +687,7 @@ export type XOrderDetail = {
   // 出售权属
   sellAuth: string;
   // 总价
+  price: number;
   // 有效期
   days: string;
   // 标题
@@ -723,6 +725,7 @@ export type XOrderPay = {
   // 订单ID
   orderDetailId: string;
   // 支付总价
+  price: number;
   // 支付方式
   paymentType: string;
   // 状态
@@ -1190,6 +1193,7 @@ export type XThingAttr = {
   // 关系ID
   relationId: string;
   // 数值
+  numValue: number;
   // 描述
   strValue: string;
   // 状态
@@ -1231,6 +1235,7 @@ export type XThingAttrHistroy = {
   // 最新度量ID
   thingAttrId: string;
   // 数值
+  numValue: number;
   // 描述
   strValue: string;
   // 状态

@@ -46,7 +46,7 @@ export default class personcontroller extends BaseController {
    * 获取用户已加入的单位组织
    */
     public async getJoinedCompanys(callback: any) {
-        const datas = Provider.getPerson.getJoinedCompanys();
+        const datas = Provider.getPerson().getJoinedCompanys();
         callback(datas);
     }
 
@@ -66,7 +66,7 @@ export default class personcontroller extends BaseController {
      */
     public async applyJoinCompany(id: string): Promise<boolean> {
         const success =
-            await this.userDataService.applyJoinCompany(id,TargetType.Company);
+            await this.userDataService.applyJoinCompany(id, TargetType.Company);
         return success;
     }
 

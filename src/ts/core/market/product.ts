@@ -1,17 +1,70 @@
 import { kernel, model } from '../../base';
 import { XMerchandise, XProduct, XResource } from '../../base/schema';
-import { ResultType, ResourceModel } from '../../base/model';
+import { ResultType, ResourceModel, IdNameArray } from '../../base/model';
 
 export default class Product {
   // 应用实体
-  private _prod: XProduct;
+  public readonly prod: XProduct;
   private _resource: XResource[];
   // 应用对应的商品列表
   private _merchandise: XMerchandise[];
 
   constructor(prod: XProduct, resources: XResource[]) {
-    this._prod = prod;
+    this.prod = prod;
     this._resource = resources;
+  }
+
+  /**
+   * 拓展操作 (应用分享/资源分发)
+   * @param sourceId 操作的Id 应用Id/资源Id
+   * @param sourceType 操作对象类型
+   * @param spaceId 工作空间Id
+   * @param teamId 组织Id
+   * @param destIds 目标Id
+   * @param destType 目标类型
+   * @returns
+   */
+  public async Extend(
+    sourceId: string,
+    sourceType: '产品' | '资源',
+    spaceId: string,
+    teamId: string,
+    destIds: string[],
+    destType: string,
+  ): Promise<ResultType<any>> {
+    return await kernel.createSourceExtend({
+      sourceId,
+      sourceType,
+      destIds,
+      destType,
+      spaceId,
+      teamId,
+    });
+  }
+
+  /**
+   * 查询拓展 (应用分享/资源分发)
+   * @param sourceId 操作的Id 应用Id/资源Id
+   * @param sourceType 操作对象类型
+   * @param spaceId 工作空间Id
+   * @param destType 目标类型
+   * @param teamId 组织Id
+   * @returns
+   */
+  public async queryExtend(
+    sourceId: string,
+    sourceType: '产品' | '资源',
+    spaceId: string,
+    destType: string,
+    teamId?: string,
+  ): Promise<ResultType<IdNameArray>> {
+    return await kernel.queryExtendBySource({
+      sourceId,
+      sourceType,
+      spaceId,
+      destType,
+      teamId,
+    });
   }
 
   /**
@@ -40,7 +93,7 @@ export default class Product {
       information,
       price,
       days,
-      productId: this._prod.id,
+      productId: this.prod.id,
     });
     if (res.success) {
       this._merchandise.unshift(res.data);
@@ -71,30 +124,29 @@ export default class Product {
     return res;
   }
 
-  public async update(prod: XProduct, resources: XResource[]): Promise<ResultType<any>> {
-    if (prod.id != this._prod.id) {
-      return {
-        code: 401,
-        success: false,
-        msg: 'ID不可修改!',
-        data: '',
-      };
-    }
+  public async update(
+    name: string,
+    code: string,
+    typeName: string,
+    remark: string,
+    resources: model.ResourceModel[],
+  ): Promise<ResultType<any>> {
     const res = await kernel.updateProduct({
-      id: prod.id,
-      name: prod.name,
-      code: prod.code,
-      thingId: this._prod.thingId,
-      typeName: prod.typeName,
-      remark: prod.remark,
-      belongId: prod.belongId,
-      resources: <ResourceModel[]>resources,
+      id: this.prod.id,
+      name,
+      code,
+      typeName,
+      remark,
+      thingId: this.prod.thingId,
+      belongId: this.prod.belongId,
+      resources,
     });
     if (res.success) {
-      var thingId = this._prod.thingId;
-      this._prod = prod;
-      this._prod.thingId = thingId;
-      this._resource = resources;
+      this.prod.name = name;
+      this.prod.code = code;
+      this.prod.typeName = typeName;
+      this.prod.remark = remark;
+      this._resource = res.data.resource;
     }
     return res;
   }

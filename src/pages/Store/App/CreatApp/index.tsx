@@ -1,35 +1,50 @@
-import React from 'react';
-// import cls from './index.module.less';
-import type { ProFormLayoutType } from '@ant-design/pro-components';
+import React, { useEffect, useState } from 'react';
+import cls from './index.module.less';
 import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem } from './config';
-import Provider from '@/ts/core/provider';
-interface indexType {
-  layoutType: ProFormLayoutType; //props
-  open: boolean;
-  form: any;
-  [key: string]: any;
-}
-const Index = ({ layoutType, open, form, ...otherConfig }: indexType) => {
+import { Form, Card } from 'antd';
+import { IconFont } from '@/components/IconFont';
+import { RouteComponentProps } from 'react-router-dom';
+
+const CreatApp: React.FC<RouteComponentProps> = (props) => {
+  const { history } = props;
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
+  const [createAppForm] = Form.useForm<Record<string, any>>();
   // 提交表单数据
   const handleCreateApp = (values: any) => {
-    // Provider.getPerson().createCompany();
+    // Provider.person.createProduct(values);
+    console.log(values);
   };
   return (
-    <>
-      <SchemaForm<DataItem>
-        form={form}
-        layoutType={layoutType}
-        open={open}
-        colProps={{
-          span: 12,
-        }}
-        onFinish={handleCreateApp}
-        columns={columns}
-        {...otherConfig}
-      />
-    </>
+    <Card
+      title={
+        <IconFont
+          type="icon-jiantou-left"
+          className={cls.RouterBackBtn}
+          onClick={() => {
+            history.goBack();
+          }}
+        />
+      }>
+      <div style={{ width: 750, margin: 'auto' }}>
+        <SchemaForm<DataItem>
+          form={createAppForm}
+          layoutType="Form"
+          open={showCreateModal}
+          title="创建应用"
+          // colProps={{
+          //   span: 12,
+          // }}
+          onFinish={handleCreateApp}
+          modalProps={{
+            destroyOnClose: true,
+            onCancel: () => setShowCreateModal(false),
+          }}
+          columns={columns}
+        />
+      </div>
+    </Card>
   );
 };
 
-export default Index;
+export default CreatApp;

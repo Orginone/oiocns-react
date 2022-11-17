@@ -57,6 +57,7 @@ const CommentList: React.FC<CommentType> = () => {
         {commentList.map((item, index) => {
           return (
             <div
+              key={index}
               className={`${cls.allComment} ${
                 index === clickName ? cls.selectAllComment : ''
               }`}
@@ -66,9 +67,9 @@ const CommentList: React.FC<CommentType> = () => {
           );
         })}
       </div>
-      {[1, 2, 3].map(() => {
+      {[1, 2, 3].map((index) => {
         return (
-          <AvatarComment>
+          <AvatarComment key={index}>
             <div className={cls.contentStyle}>
               <NoAvatarComment></NoAvatarComment>
             </div>

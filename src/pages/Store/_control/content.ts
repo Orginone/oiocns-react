@@ -1,10 +1,24 @@
+// import storeClassify from './classify';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
  */
+
 class StoreContent {
-  currentMenu: 'Public'; //当前展示 菜单
-  // constructor(parameters) {}
+  currentMenu = 'Public'; //当前展示 菜单
+  // curMarket = storeClassify._curMarket;
+  storeClassify: any;
+  constructor() {
+    this.getMarket();
+  }
+
+  /**
+   * async getMarket
+   */
+  public async getMarket() {
+    this.storeClassify = await import('./classify');
+    console.log('storeClassify', this.storeClassify.currentMenu);
+  }
   /**
    * changeMenu
    */

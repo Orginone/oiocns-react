@@ -1,16 +1,26 @@
 .cardContainer {
   display: flex;
   overflow: hidden;
-  background-color: #fff;
-  margin: 8px;
-  margin-bottom: 0px;
+  background-color: @component-background;
+  padding: @padding-xs;
+  margin-bottom: @margin-xs;
   transition: all 0.6s;
+  height: 148px;
+  border-radius: @border-radius-base;
 }
 
-.cardContainer:hover{
+.cardContainer:hover {
   overflow-x: auto;
 }
 
 .card {
   flex-shrink: 0;
+  border-radius: @item-card-radius;
+  border-color: @border-color-base;
+  :global(.ogo-avatar-square) {
+    border-radius: 16px;
+  }
+  .decription {
+    font-size: 12px;
+  }
 }
