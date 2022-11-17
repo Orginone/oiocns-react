@@ -14,21 +14,7 @@ type footerTreeType = {
   dataTreeData: any[];
   assetsTreeData: any[];
 };
-/**
- * @desc: 处理 翻页参数问题
- * @param {T} params
- * @return {*}
- */
-const _resetParams = (params: any) => {
-  const { page, pageSize, ...rest } = params;
-  const num = (page - 1) * pageSize;
 
-  return {
-    offset: num >= 0 ? num : 0,
-    limit: pageSize || 20,
-    ...rest,
-  };
-};
 class StoreClassify {
   private _curMarket: MarketTypes.MarketType; // 当前商店实例
 
