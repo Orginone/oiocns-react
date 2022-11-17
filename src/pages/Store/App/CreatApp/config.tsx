@@ -1,7 +1,9 @@
 import type { ProFormColumnsType } from '@ant-design/pro-components';
+import { ProCard } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import React from 'react';
 import { Space } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 const valueEnum = {
   all: { text: '全部', status: 'Default' },
@@ -19,6 +21,16 @@ const valueEnum = {
     status: 'Processing',
   },
 };
+const valueEnumType = {
+  1: { text: '枚举' },
+  2: {
+    text: '字符串',
+    status: 'Error',
+  },
+  3: {
+    text: '数字',
+  },
+};
 
 type DataItem = {
   name: string;
@@ -31,6 +43,139 @@ const groupTitle = (name: string) => {
       <span className={cls[`new-store-info`]}>{name}</span>
     </Space>
   );
+};
+// 流程信息
+const flows: ProFormColumnsType<DataItem> = {
+  title: groupTitle(`流程信息`),
+  valueType: 'formList',
+  dataIndex: 'approveList',
+  width: '100%',
+  colProps: { span: 24 },
+  fieldProps: {
+    // 新增按钮样式配置
+    creatorButtonProps: {
+      type: 'text',
+      position: 'top',
+      creatorButtonText: '',
+      block: false,
+      className: cls.addFormListBtn2,
+    },
+    deleteIconProps: {
+      Icon: CloseCircleOutlined,
+      tooltipText: '删除该流程',
+    },
+    itemRender: ({ listDom, action }: any, { record, index }: any) => {
+      // debugger;
+      return (
+        <ProCard
+          bordered
+          extra={action}
+          title={record?.name || `流程${index + 1}`}
+          style={{
+            marginBlockEnd: 8,
+          }}>
+          {listDom}
+        </ProCard>
+      );
+    },
+  },
+  columns: [
+    {
+      title: '业务信息',
+      dataIndex: 'componentName',
+      colProps: { span: 12 },
+    },
+    {
+      valueType: 'formList',
+      dataIndex: 'flowTypes',
+      colProps: { span: 24 },
+      fieldProps: {
+        // 新增按钮样式配置
+        creatorButtonProps: {
+          // type: 'text',
+          position: 'top',
+          creatorButtonText: '添加字段',
+          block: false,
+          className: cls.addFormListBtn,
+        },
+      },
+      columns: [
+        {
+          valueType: 'group',
+          colProps: { span: 24 },
+          columns: [
+            {
+              title: '字段名称',
+              colProps: { span: 8 },
+              // width: 'md',
+              dataIndex: 'componentAddress',
+            },
+            {
+              title: '字段编号',
+              colProps: { span: 8 },
+              dataIndex: 'componentWidth',
+            },
+            {
+              title: '字段类型',
+              colProps: { span: 8 },
+              dataIndex: 'valueType',
+              valueType: 'select',
+              valueEnum: valueEnumType,
+            },
+            {
+              valueType: 'dependency',
+              name: ['valueType'],
+              columns: ({ valueType }) => {
+                return valueType === '1' ? [valueTypeColumns] : [];
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+// 字段为枚举类型时的配置
+const valueTypeColumns: ProFormColumnsType<DataItem> = {
+  title: '枚举配置',
+  valueType: 'group',
+  colProps: { span: 24 },
+
+  columns: [
+    {
+      valueInded
+      valueType: 'formList',
+      colProps: { span: 24 },
+      fieldProps: {
+        itemRender: ({ listDom, action }: any, { record, index }: any) => {
+          // debugger;
+          return (
+            <ProCard
+              bordered
+              extra={action}
+              title={record?.name || `流程${index + 1}`}
+              style={{
+                marginBlockEnd: 8,
+              }}>
+              {listDom}
+            </ProCard>
+          );
+        },
+      },
+      columns: [
+        {
+          title: '枚举名称',
+          colProps: { span: 8 },
+          dataIndex: 'componentAddress',
+        },
+        {
+          title: '枚举值',
+          colProps: { span: 8 },
+          dataIndex: 'componentWidth',
+        },
+      ],
+    },
+  ],
 };
 const columns: ProFormColumnsType<DataItem>[] = [
   {
@@ -83,6 +228,20 @@ const columns: ProFormColumnsType<DataItem>[] = [
             block: false,
             className: cls.addFormListBtn,
           },
+          itemRender: ({ listDom, action }: any, { record, index }: any) => {
+            // console.log(...arg);
+            return (
+              <ProCard
+                bordered
+                extra={action}
+                title={record?.name || `资源 ${index + 1}`}
+                style={{
+                  marginBlockEnd: 8,
+                }}>
+                {listDom}
+              </ProCard>
+            );
+          },
         },
         colProps: { md: 24 },
         columns: [
@@ -110,66 +269,18 @@ const columns: ProFormColumnsType<DataItem>[] = [
               },
             ],
           },
+          { ...flows },
         ],
       },
     ],
   },
-  {
-    title: groupTitle(`流程信息`),
-    valueType: 'group',
-    width: 'md',
-    colProps: { md: 24 },
-    columns: [
-      {
-        // title: groupTitle(`流程信息`),
-        valueType: 'formList',
-        dataIndex: 'approveList',
-        width: '100%',
-        colProps: { md: 24 },
-        fieldProps: {
-          // 新增按钮样式配置
-          creatorButtonProps: {
-            type: 'text',
-            position: 'top',
-            creatorButtonText: '',
-            block: false,
-            className: cls.addFormListBtn,
-          },
-        },
-        columns: [
-          {
-            valueType: 'group',
-            width: 'md',
-            colProps: { md: 24 },
-            columns: [
-              {
-                title: '业务信息',
-                dataIndex: 'componentName',
-                // valueType: 'select',
-                width: 'md',
-                // valueEnum,
-              },
-              {
-                title: '字段名称',
-                width: 'md',
-                dataIndex: 'componentAddress',
-              },
-              {
-                title: '字段编号',
-                width: 'md',
-                dataIndex: 'componentWidth',
-              },
-              {
-                title: '字段类型',
-                width: 'md',
-                dataIndex: 'componentHeight',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   title: groupTitle(`流程信息`),
+  //   valueType: 'group',
+  //   width: 'md',
+  //   colProps: { md: 24 },
+  //   columns: ,
+  // },
   {
     title: groupTitle(`应用组件`),
     valueType: 'group',

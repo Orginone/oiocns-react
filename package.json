@@ -24,6 +24,11 @@
   "lint-staged": {
     "./src/*.{js,jsx,ts,tsx}": ["npm run lint:fix","git add"]
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "browserslist": [
     "> 1%",
     "last 2 versions",

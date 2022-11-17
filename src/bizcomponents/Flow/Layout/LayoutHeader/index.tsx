@@ -59,18 +59,12 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
   return (
     <>
       <div className={cls['layout-title']}>
-        <span className={cls['layout-title-business']}>业务名：测试业务1</span>
-        <span className={cls['layout-titlebinding']} style={{ paddingLeft: '30px' }}>
-          绑定已有流程：
-        </span>
-      </div>
-      <div>
         {form.formId && (
           <div className={cls['layout-header']}>
-            <span style={{ paddingLeft: '20px', color: 'grey' }}>
+            <span className={cls['layout-title-business']}>
               业务名：{form.formName || form.business || form.formId}
             </span>
-            <span style={{ paddingLeft: '10px' }}>
+            <span className={cls['layout-titlebinding']}>
               绑定已有流程：
               <Select
                 style={{ width: 100 }}
@@ -81,6 +75,8 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
             </span>
           </div>
         )}
+      </div>
+      <div>
         <div className={cls['layout-header']}>
           <div className={cls['back']}>
             <span>
