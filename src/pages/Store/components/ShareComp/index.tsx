@@ -104,7 +104,7 @@ const ShareRecent = (props: Iprops) => {
   // 左侧树点击事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
     console.log('点击左侧', checkedKeys, info);
-    onCheckeds(info.checkedNodes);
+    onCheckeds && onCheckeds(info.checkedNodes);
     if (info.checked) {
       let result = departHisData.some((item: any) => {
         return item.id == info.node.id;
