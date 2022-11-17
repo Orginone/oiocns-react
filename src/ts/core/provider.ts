@@ -1,9 +1,14 @@
+/*
+ * @Author: SEN
+ * @Date: 2022-11-17 13:30:54
+ * @LastEditors: zhangqiang 1196217890@qq.com
+ * @LastEditTime: 2022-11-17 13:55:49
+ * @FilePath: /oiocns-react/src/ts/core/provider.ts
+ * @Description: 登录和注册的接口提供层
+ */
 import { kernel, model } from '../base';
 import Person from './target/person';
 
-/**
- * 提供层
- */
 export default class Provider {
   private static person: Person;
 
