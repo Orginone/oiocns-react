@@ -12,8 +12,8 @@ interface indexType {
 }
 const Index = ({ layoutType, open, form, ...otherConfig }: indexType) => {
   // 提交表单数据
-  const handleCreateApp = (values) => {
-    Provider.getPerson().createCompany();
+  const handleCreateApp = (values: any) => {
+    // Provider.getPerson().createCompany();
   };
   return (
     <>

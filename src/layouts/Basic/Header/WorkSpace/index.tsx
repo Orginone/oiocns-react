@@ -11,6 +11,7 @@ import {
   Typography,
   Form,
   Input,
+  Select,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import CompanyServices from '@/module/org/company';
@@ -18,8 +19,9 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import PersonServices from '@/module/person';
 import useStore from '@/store';
 import { SpaceType } from '@/store/type';
-
+import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
+import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
 
 // 菜单列表项
@@ -61,9 +63,16 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const onSave = async () => {
     debugger;
     const values = await form.validateFields();
-    debugger;
-    console.log(values); //2.表单验证并获取表单值
-    setShowFormModal(false);
+    const { name, code, teamName, teamCode, teamRemark, typeName } = values;
+    let success = await Provider.getPerson().createCompany(
+      name,
+      code,
+      teamName,
+      teamCode,
+      teamRemark,
+      typeName,
+    );
+    setShowFormModal(!success);
   };
   const [form] = Form.useForm();
   // 获取工作单位列表
@@ -180,6 +189,28 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
             label="单位名称"
             rules={[{ required: true, message: '单位名称不能为空' }]}>
             <Input placeholder="请输入单位名称" />
+          </Form.Item>
+          <Form.Item
+            name={['company', 'typeName']}
+            label="单位类型"
+            rules={[{ required: true, message: '单位类型不能为空' }]}>
+            <Select
+              defaultValue={TargetType.Company}
+              options={[
+                {
+                  value: TargetType.Company,
+                  label: TargetType.Company,
+                },
+                {
+                  value: TargetType.University,
+                  label: TargetType.University,
+                },
+                {
+                  value: TargetType.Hospital,
+                  label: TargetType.Hospital,
+                },
+              ]}
+            />
           </Form.Item>
           <Form.Item
             name={['company', 'code']}
