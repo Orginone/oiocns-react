@@ -15,7 +15,7 @@ const debounce = (fun: any, delay?: number) => {
  * @param {T} params
  * @return {*}
  */
-const _resetParams = (params: any) => {
+const resetParams = (params: any) => {
   const { page, pageSize, ...rest } = params;
   const num = (page - 1) * pageSize;
 
@@ -31,4 +31,4 @@ const renderNum = (m: number, n: number) => {
   return Math.floor(Math.random() * (n + 1 - m) + m);
 };
 
-export { debounce, renderNum };
+export { debounce, renderNum, resetParams };

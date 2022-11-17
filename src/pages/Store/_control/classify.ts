@@ -3,6 +3,7 @@ import API from '@/services';
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
+import { resetParams } from '@/utils/tools';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}/
@@ -31,7 +32,7 @@ class StoreClassify {
     assetsTreeData: [],
   };
 
-  // 顶部区域
+  // 顶部菜单区域
   static SelfMenu = [
     { title: '应用', code: 'app' },
     { title: '文档', code: 'docx' },
@@ -59,7 +60,9 @@ class StoreClassify {
    */
   protected getTreeData() {
     //TODO:调用获取节点信息接口
+    // 1.获取市场
     this.getMarketList();
+    //获取文档
   }
   /**
    * @desc: 获取市场列表
@@ -101,7 +104,7 @@ class StoreClassify {
       filter: '',
     };
     const { data, success } = await API.market.searchOwn({
-      data: _resetParams(params),
+      data: resetParams(params),
     });
     if (success) {
       const { result = [], total = 0 } = data;
