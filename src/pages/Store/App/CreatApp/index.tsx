@@ -15,9 +15,6 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
     // Provider.person.createProduct(values);
     console.log(values);
   };
-  useEffect(() => {
-    // debugger;
-  }, []);
   return (
     <Card
       title={
@@ -29,21 +26,23 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
           }}
         />
       }>
-      <SchemaForm<DataItem>
-        form={createAppForm}
-        layoutType="Form"
-        open={showCreateModal}
-        title="创建应用"
-        colProps={{
-          span: 12,
-        }}
-        onFinish={handleCreateApp}
-        modalProps={{
-          destroyOnClose: true,
-          onCancel: () => setShowCreateModal(false),
-        }}
-        columns={columns}
-      />
+      <div style={{ width: 750, margin: 'auto' }}>
+        <SchemaForm<DataItem>
+          form={createAppForm}
+          layoutType="Form"
+          open={showCreateModal}
+          title="创建应用"
+          // colProps={{
+          //   span: 12,
+          // }}
+          onFinish={handleCreateApp}
+          modalProps={{
+            destroyOnClose: true,
+            onCancel: () => setShowCreateModal(false),
+          }}
+          columns={columns}
+        />
+      </div>
     </Card>
   );
 };
