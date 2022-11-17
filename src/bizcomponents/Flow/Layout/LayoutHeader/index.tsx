@@ -59,24 +59,6 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
   // const scale = 100
   return (
     <div>
-      {form.formId && (
-        <div className={cls['layout-header']}>
-          <span style={{ paddingLeft: '20px', color: 'grey' }}>
-            {' '}
-            业务名：{form.formName || form.business || form.formId}
-          </span>
-          <span style={{ paddingLeft: '10px' }}>
-            {' '}
-            绑定已有流程：
-            <Select
-              style={{ width: 100 }}
-              placeholder="请选择流程"
-              allowClear
-              options={[]}
-            />
-          </span>
-        </div>
-      )}
       <div className={cls['layout-header']}>
         <Menu
           className={cls['el-menu-demo']}
@@ -102,9 +84,21 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
                 <EditOutlined />
               </span>
             )}
+            <span>业务名：{form.formName || form.business || form.formId}</span>
+            <span>
+              绑定已有流程：
+              <Select
+                size="small"
+                style={{ width: 150 }}
+                placeholder="请选择流程"
+                allowClear
+                options={[]}
+              />
+            </span>
           </span>
-          <span style={{ color: 'grey', paddingLeft: '30px' }}>业务名：</span>
-          <span style={{ paddingLeft: '30px' }}>绑定已有流程：</span>
+
+          {/* <span style={{ color: 'grey', paddingLeft: '30px' }}>业务名：</span>
+          <span style={{ paddingLeft: '30px' }}>绑定已有流程：</span> */}
           {/* <Button  size="small" onClick={exit} style={{ width: 100 }}>
         <CloseOutlined />
           退出

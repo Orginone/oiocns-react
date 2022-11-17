@@ -114,7 +114,7 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public applyJoinCompany(_companyId: string): void {}
+  public applyJoinCompany(_companyId: string): void { }
 
   /**
    * 获取单位列表
