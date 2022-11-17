@@ -1,14 +1,15 @@
 /* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
-// import BaseTarget from '../base';
 import Company from '../target/company';
-import { kernel, model, schema, common } from '../../base';
+import { kernel, schema, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
+import Provider from '../provider';
 import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
-import BaseService from './baseservice';
+import BaseService from './base';
+
 
 /**
  * 我的设置里面的接口
@@ -16,29 +17,30 @@ import BaseService from './baseservice';
  * import Provider from '@/ts/core/provider';
    import Person from '@/ts/core/target/person';   
 
-   import Userdata from '@/ts/core/service/userdataservice';
+   import Userdata from '@/ts/core/target/user';
    Userdata.getInstance().searchCompany();
  */
 export default class userdataservice extends BaseService {
+
   // 单例
   private static _instance: userdataservice;
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice();
+      this._instance = new userdataservice(Provider.getPerson().target);
     }
     return this._instance;
   }
 
   /**构造方法 */
-  constructor() {
-    super();
+  constructor(target: schema.XTarget) {
+    super(target);
   }
 
   /**
-   * 搜索单位(公司) 数组里面还有target
-   * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
-   */
+* 搜索单位(公司) 数组里面还有target 
+* @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
+*/
   public async searchCompany(page: Types.Page): Promise<Types.PageData<XTarget>> {
     // 入参
     let paramData: any = {};
@@ -55,7 +57,7 @@ export default class userdataservice extends BaseService {
       let res = await kernel.searchTargetByName(paramData);
 
       if (res.success && res.data && res.data.result) {
-        // 存放返回数组
+        // 存放返回数组 
         let list: XTarget[] = [];
         res.data.result.map((item) => {
           switch (item.typeName) {
@@ -81,5 +83,27 @@ export default class userdataservice extends BaseService {
       pageData.msg = '接口调用错误';
     }
     return pageData;
+  }
+
+  /**加入公司 */
+  public async applyJoinCompany(targetId: string, applyType: TargetType): Promise<boolean> {
+    const res = await kernel.applyJoinTeam({
+      id: targetId,
+      targetId: this.target.id,
+      teamType: applyType,
+      targetType: TargetType.Person,
+    });
+    return res.success;
+  }
+
+  /**取消加入组织或个人 */
+  public async cancelJoinCompany(targetId: string,
+    belongId: string, applyType: TargetType): Promise<boolean> {
+    const res = await kernel.cancelJoinTeam({
+      id: targetId,
+      typeName: applyType,
+      belongId: belongId,
+    });
+    return res.success;
   }
 }
