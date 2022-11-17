@@ -40,7 +40,6 @@ const flatMenuData = (menuData: ItemType[] | any, fathKey?: string): MemuItemTyp
 
   for (let index = 0; index < menuData.length; index++) {
     const element = menuData[index];
-    console.log(fathKey);
     if (fathKey) {
       data.push({ ...element, fathKey });
     }
