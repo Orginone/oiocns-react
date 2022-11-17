@@ -6,7 +6,8 @@ import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
-import PutawayComp from './Putaway'; // 上架弹窗
+import PutawayComp from './Putaway';
+import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
@@ -23,11 +24,13 @@ const service = new MarketService({
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
+
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
   const [putawayForm] = Form.useForm();
-
+  const [createAppForm] = Form.useForm<Record<string, any>>();
   const items = [
     {
       tab: `全部`,
@@ -60,6 +63,7 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
+        setShowCreateModal(true);
         break;
       case '暂存':
         console.log('点击事件', '暂存');
@@ -156,6 +160,21 @@ const StoreApp: React.FC = () => {
             renderOperation={renderOperation}
           />
         </div>
+        {/* 创建应用 */}
+        {showCreateModal && (
+          <CreateApp
+            form={createAppForm}
+            layoutType="ModalForm"
+            open={showCreateModal}
+            title="创建应用"
+            modalProps={{
+              destroyOnClose: true,
+              onCancel: () => setShowCreateModal(false),
+            }}
+          />
+        )}
+
+        {/* 详情页面 /store/app/info*/}
       </div>
       <Route
         exact

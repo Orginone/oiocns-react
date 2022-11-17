@@ -106,10 +106,10 @@ const ProcessDesign: React.FC<ProcessDesignProps> = () => {
     setDesign(JSON.parse(JSON.stringify(defaultDesign)));
   };
   return (
-    <div className={cls['container']}>
-      <EventContext.Provider value={{ FlowSub }}>
-        <div>
-          <LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>
+    <>
+      <LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>
+      <div className={cls['container']}>
+        <EventContext.Provider value={{ FlowSub }}>
           <div className={cls['layout-body']}>
             {activeSelect === 'processDesign' && (
               <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
@@ -117,15 +117,15 @@ const ProcessDesign: React.FC<ProcessDesignProps> = () => {
               </div>
             )}
           </div>
-        </div>
-        {/* <Modal open={isShowDialog} footer={null}  maskClosable={false} width="100vw"  closable={false} title={<LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>} style={{maxWidth: "100vw",top: 0,paddingBottom: 0}}  bodyStyle={{ height: "calc(100vh - 55px )", overflowY: "auto"}}  >
+          {/* <Modal open={isShowDialog} footer={null}  maskClosable={false} width="100vw"  closable={false} title={<LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>} style={{maxWidth: "100vw",top: 0,paddingBottom: 0}}  bodyStyle={{ height: "calc(100vh - 55px )", overflowY: "auto"}}  >
     <div className={cls["layout-body"]}>
         {activeSelect === 'processDesign' && <div><FormProcessDesign/></div>}
     </div>
 		</Modal> */}
-        <LayoutPreview ref={previewRef} />
-      </EventContext.Provider>
-    </div>
+          <LayoutPreview ref={previewRef} />
+        </EventContext.Provider>
+      </div>
+    </>
   );
 };
 

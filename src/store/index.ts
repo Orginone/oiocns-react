@@ -3,7 +3,6 @@
 import create from 'zustand';
 // 数据持久化，会缓存到 storage
 import { persist } from 'zustand/middleware';
-import InstallPerson from '@/ts/core/target/person';
 import Person from '@/module/person';
 import $API from '@/services';
 import Provider from '@/ts/core/provider';
@@ -19,6 +18,7 @@ const useStore = create(
       userSpace: {},
       loading: false,
       editItem: undefined,
+      userObj: null,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
         if (res.success) {
@@ -43,7 +43,6 @@ const useStore = create(
           set((state) => ({
             user: { ...state.user, identitys: data.identitys, team: data.team },
           }));
-          InstallPerson.getInstance(data);
         }
       },
     }),

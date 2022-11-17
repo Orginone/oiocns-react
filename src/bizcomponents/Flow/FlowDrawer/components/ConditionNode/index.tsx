@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
-import { Row, Button } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
+import { Button } from 'antd';
 import { useAppwfConfig } from '@/module/flow/flow';
 import cls from './index.module.less';
 import ConditionGroupItemConfig from '@/bizcomponents/Flow/FlowDrawer/components/ConditionGroupItemConfig';
-import ReactDOM from 'react-dom';
 
 /**
  * @description: 条件

@@ -7,6 +7,7 @@ import BannerCom from './components/BannerCom';
 import Charts from './components/Charts';
 import SelfAppCom from './components/SelfAppCom';
 import Shortcuts from './components/ShortcutsCom';
+import { kernel } from '@/ts/base';
 
 //TODO: 临时获取本地banner
 let imgList: any[] = [];
@@ -28,6 +29,9 @@ getImgAssets();
  * @desc: 项目首页
  */
 const Home: React.FC = () => {
+  kernel.queryOwnMarket({ offset: 0, limit: 10, filter: '' }).then(res => {
+    console.log(res);
+  });
   useEffect(() => {}, []);
   return (
     <div className="work-home">

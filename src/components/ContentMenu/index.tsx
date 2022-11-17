@@ -26,6 +26,7 @@ interface MemuItemType {
 /**检查当前路由是否是子路由，如果有则显示当前级菜单否则为主菜单 */
 const checkRoute = (currentPath: string, routeMenu: MemuItemType[]) => {
   const current = routeMenu.find((n) => n.key === currentPath);
+  if (current && !current.fathKey && current.render) return current; // 当前路由自定义子路由
   if (!current || !current.fathKey) return null; // 不是子路由
   const currentMenu = routeMenu.find((n) => {
     return current.fathKey === n.key;
@@ -36,14 +37,19 @@ const checkRoute = (currentPath: string, routeMenu: MemuItemType[]) => {
 /** 生成有fathKey为类别的主子混合菜单数据 */
 const flatMenuData = (menuData: ItemType[] | any, fathKey?: string): MemuItemType[] => {
   const data = [];
+
   for (let index = 0; index < menuData.length; index++) {
     const element = menuData[index];
+    console.log(fathKey);
     if (fathKey) {
       data.push({ ...element, fathKey });
     }
     if (element?.children) {
       //没有type代表不是主菜单
-      if (!element.type) data.push(fathKey ? { ...element, fathKey } : { ...element });
+      if (!element.type) {
+        data.push(fathKey ? { ...element, fathKey } : { ...element });
+      }
+      console.log(element.key);
       data.push(...flatMenuData(element.children, element.key));
     }
   }
@@ -64,11 +70,13 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
+  const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
 
   const menuFlat = menuData ? flatMenuData(menuData) : [];
+
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     setActiveMenu(location.pathname);
@@ -76,35 +84,43 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (menuData) {
       listenPrev(current);
     }
+    // console.log('location.pathname',location.pathname)
   }, [location.pathname]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
     if (props.menuClick) {
+      console.log('________1');
       props.menuClick?.call(this, e);
     } else {
+      console.log('________2');
       props.history.push(e.key);
     }
   };
   /** 监听路由改变或菜单被点击时，当前菜单数据和上级菜单数据*/
   const listenPrev = (current: MemuItemType | null) => {
+    console.log('current', current);
     if (!current) {
+      // 说明当前为主菜单
       setPrevMenuData([]);
       setCurrentMenuData(menuData);
       return;
     }
     if (current?.fathKey) {
+      //记录当前的子菜单并显示
       const _prevMenuData = menuFlat.find((n) => n.key === current?.fathKey);
       _prevMenuData && setPrevMenuData([...prevMenuData, _prevMenuData?.children || []]);
     } else {
       setPrevMenuData([...prevMenuData, menuData!]);
     }
+    // 自定义子菜单
+    current.render && setRenderMenu(current.render);
     setCurrentMenuData(current?.children || []);
   };
   /**点击submenu  一定有children*/
   const handleChange: MenuProps[`onOpenChange`] = (paths) => {
     const current = menuFlat.find((n) => n.key === paths[0]);
-    // listenPrev(current);
+
     if (current!.children!.length > 0) {
       const nextRoute: any = current!.children![0];
 
@@ -114,6 +130,12 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       if (nextRoute && nextRoute.key) {
         props.history.push(nextRoute?.key);
       }
+    } else {
+      if (current!.render) {
+        listenPrev(current!);
+        current!.key && props.history.push(current!.key);
+        // listenPrev({ fathKey: location.pathname });
+      }
     }
   };
 
@@ -121,14 +143,15 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     <Sider className={cls.sider} width={220}>
       {currentMacthRoute && (
         <div className={cls.title}>
-          {prevMenuData.length > 0 && (
+          {(prevMenuData.length > 0 || renderMenu) && (
             <LeftOutlined
               className={cls.backicon}
               onClick={() => {
                 if (prevMenuData.length > 0) {
                   setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
-                  setPrevMenuData(prevMenuData.splice(prevMenuData.length, 1));
+                  setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
                 }
+                setRenderMenu(undefined);
               }}
             />
           )}
@@ -152,7 +175,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
             openKeys={[]}
             defaultSelectedKeys={[activeMenu]}></Menu>
         )}
-        {props.children}
+        {props.children || renderMenu}
       </div>
     </Sider>
   );

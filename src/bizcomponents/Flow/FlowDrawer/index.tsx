@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Drawer } from 'antd';
 import EditTitle from './components/EditTitle';
 import RootNode from './components/RootNode';

@@ -183,7 +183,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      <div className={cls.title}>全部分类</div>
+      <div className={cls.title}>全部分类 </div>
       {searchable && (
         <div className={cls.title}>
           <Input prefix={<SearchOutlined />} placeholder="搜索分类" />
