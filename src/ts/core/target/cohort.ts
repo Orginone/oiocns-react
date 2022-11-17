@@ -17,19 +17,8 @@ export default class Cohort extends BaseTarget {
       targetType: TargetType.Person,
       targetIds: personIds,
     });
+    console.log("结果",res)
     return res.success;
-  }
-
-  /**
-   * 删除群组
-   * @param params id:targetId,TypeName:枚举中取当前角色,belongId: 归属ID;
-   * @returns 
-   */
-  public async deleteCohorts(
-    params: model.IdReqModel
-  ): Promise<model.ResultType<any>> {
-    let res = await kernel.deleteTarget(params);
-    return res;
   }
 
   /**

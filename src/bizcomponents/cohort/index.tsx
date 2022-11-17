@@ -3,13 +3,16 @@ import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
 import CohortService from '@/module/cohort/Cohort';
+import Person from '../../ts/core/target/person';
+
 /* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
   service: CohortService;
   getTableList: Function;
+  Person:Person
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({ service, getTableList }) => {
+const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableList }) => {
   console.log(service);
   const layout = {
     labelCol: { span: 8 },
@@ -45,7 +48,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ service, getTableList }) =>
       name: values.cohort.name,
       teamRemark: values.cohort.remark,
     };
-    service.creatItem(params);
+    Person.createCohort(values.cohort.name,values.cohort.code,values.cohort.remark)
     console.log('创建成功');
     setIsModalOpen(false);
     getTableList();

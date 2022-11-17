@@ -7,6 +7,7 @@ import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import AppStore from '../market/appstore'
+import Friend from '../target/Friend'
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
   private _curCompany: Company | undefined;
@@ -19,49 +20,37 @@ export default class Person extends BaseTarget {
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._joinedStores = [];
-    this.setCohort();
+    //初始化时填入信息
+    this.getCohort();
+    this.getFriends();
   }
-  /**
-   * 填入群组信息
-   */
-  private setCohort() {
-    const page: model.PageRequest = {
-      offset: 0,
-      limit: 10,
-      filter: '',
-    }
-    const params: model.IDReqJoinedModel = {
-      id: this.target.id,
-      typeName: TargetType.Person,
-      JoinTypeNames: [TargetType.Cohort],
-      spaceId: this.target.id,
-      page: page
-    }
-    this.getCohort(params)
-  }
-
-
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
   }
+
+  public get ChohortArray(): Cohort[] {
+    return this._joinedCohorts;
+  }
   /**
    * 获取群组列表
-   * @param params id:个人ID TypeName:枚举中取当前角色 JoinTypeNames:枚举中取待查寻组织类型 spaceId:空间id page
+   * @param params 
    * @returns 
    */
-  public async getCohort(
-    params: model.IDReqJoinedModel
-  ): Promise<model.ResultType<any>> {
-    let res = await kernel.queryJoinedTargetById(params);
+  public async getCohort(): Promise<model.ResultType<any>> {
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: [TargetType.Cohort],
+    });
     if (res.success) {
-      for(var i=0;i<res.data.result.length;i++){
+      this._joinedCohorts = [];
+      for (var i = 0; i < res.data.result.length; i++) {
         const cohort = new Cohort(res.data.result[i])
         this._joinedCohorts.push(cohort);
-     }    }
+      }
+    }
     return res;
   }
-
 
   /** 支持的群组类型数组*/
   public get cohortTypes(): TargetType[] {
@@ -87,12 +76,50 @@ export default class Person extends BaseTarget {
       teamCode: code,
       teamRemark: remark,
     });
+    console.log(res)
     if (res.success) {
       const cohort = new Cohort(res.data);
       this._joinedCohorts.push(cohort);
       return cohort.pullPersons([this.target.id]);
     }
     return false;
+  }
+
+  /**
+   * 删除群组
+   * @param params 
+   * @returns 
+   */
+  public async deleteCohorts(
+    params: model.IdReqModel
+  ): Promise<model.ResultType<any>> {
+    let res = await kernel.deleteTarget(params);
+    if (res.success) {
+      this.getCohort();
+    }
+    return res;
+  }
+  /**
+     * 搜索群组
+     * @param params id:targetId,TypeName:枚举中取当前角色,belongId: 归属ID;
+     * @returns 
+     */
+  public async searchCohorts(name: string
+  ): Promise<model.ResultType<any>> {
+    const data:model.NameTypeModel = {
+      name: name,
+      typeName: TargetType.Cohort,
+      page : {
+        offset: 0,
+        filter: name,
+        limit: common.Constants.MAX_UINT_16,
+      }
+    }
+    const res = await kernel.searchTargetByName(data);
+    if (res.success) {
+      this.getCohort();
+    }
+    return res;
   }
 
   /**
@@ -203,7 +230,7 @@ export default class Person extends BaseTarget {
     }
     const res = await this.getjoined({
       spaceId: this.target.id,
-      joinTypeNames: TargetType.Person,
+      joinTypeNames: [TargetType.Person],
     });
     if (res.success) {
       this._friends = res.data.result;
@@ -253,10 +280,6 @@ export default class Person extends BaseTarget {
   private async _create(data: any): Promise<model.ResultType<any>> {
     data.belongId = this.target.id;
     data.typeName = TargetType.Cohort;
-    if (this._curCompany && this._curCompany.target.id) {
-      data.typeName = TargetType.JobCohort;
-      data.belongId = this._curCompany.target.id;
-    }
     return await kernel.createTarget(data);
   }
 }

@@ -26,15 +26,15 @@ export namespace CohortConfigType {
       id: string;
       name:string;
       code:string;
-      typeName:string;
+      typeName?:string;
       status:number;
       remark:string
       targetId:string;
-      varsion:string;
+      varsion?:string;
       createTime:string;
       updateTime:string;
-      belongId:string;
-      thingId:string;
+      belongId?:string;
+      thingId?:string;
 
     }
   }

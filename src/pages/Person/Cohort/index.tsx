@@ -40,6 +40,7 @@ const CohortConfig: React.FC = () => {
     createApi: API.cohort.create,
     updateApi: API.cohort.update
   });
+  const Person = PersonInfoEnty.getPerson;
   console.log("实体信息", PersonInfoEnty.getPerson)
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -106,23 +107,20 @@ const CohortConfig: React.FC = () => {
         key: 'changePermission',
         label: '转移权限',
         onClick: () => {
-          // const page: model.PageRequest = {
-          //   offset: 0,
-          //   limit: 10,
-          //   filter: '',
-          // }
-          const params: model.TargetModel = {
-            id:item.targetId,
-            name:item.name+'修改',
-            code:item.code,
-            typeName:TargetType.Cohort,
-            belongId:item.belongId,
-            teamName:item.name+'修改',
-            teamCode:item.code,
-            teamRemark:item.remark
+          const page: model.PageRequest = {
+            offset: 0,
+            limit: 10,
+            filter: '',
           }
-          console.log("修改群组参数",params)
-          console.log("info",PersonInfoEnty.getPerson.UpdateCohort(params))
+          const params: model.IDReqJoinedModel = {
+            id:PersonInfoEnty.getPerson.target.id,
+            typeName:TargetType.Person,
+            JoinTypeNames:[TargetType.Person],
+            spaceId:PersonInfoEnty.getPerson.target.id,
+            page:page
+          }
+          console.log("群组参数qqbbq",params)
+          console.log("info",PersonInfoEnty.getPerson.searchCohorts('apex'))
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },
@@ -162,18 +160,18 @@ const CohortConfig: React.FC = () => {
       pageSize: 10,
       filter: searchKey,
     };
-    await service.getList({ ...params, ...req });
     let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
-    console.log("获取值", service.List)
-    for (var i = 0; i < service.List.length; i++) {
-      if (service.List[i].belongId === { user }.user.workspaceId) {
-        const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team;
-        chorot.belongId = service.List[i].belongId;
-        chorot.thingId = service.List[i].thingId;
+    const data = PersonInfoEnty.getPerson.ChohortArray
+    console.log("获取值", PersonInfoEnty.getPerson.ChohortArray)
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].target.belongId === Person.target.id) {
+        const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
+        chorot.belongId = data[i].target.belongId;
+        chorot.thingId = data[i].target.thingId;
         resultList.push(chorot);
       }
     }
-    setList([...resultList]);
+    setList(resultList);
     console.log(66, resultList, resultList.length)
     setTotal(resultList.length);
   };
@@ -251,11 +249,11 @@ const CohortConfig: React.FC = () => {
                   destroyOnClose: true,
                   onCancel: () => setOpen(false),
                 }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
-              <CreateCohort service={service} getTableList={getTableList} />
+              <CreateCohort Person = {Person}  service={service} getTableList={getTableList} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
             </Space>
           </div>
-        </div>
+        </div>+
         <Tabs
           // style = {}
           defaultActiveKey="1"
@@ -265,8 +263,9 @@ const CohortConfig: React.FC = () => {
               label: `管理的`,
               key: '1',
               children: (
-                <CardOrTable<CohortConfigType.CohortConfigTeam>
-                  dataSource={list}
+
+                <CardOrTable<CohortServices>
+                  dataSource={Person.ChohortArray}
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
