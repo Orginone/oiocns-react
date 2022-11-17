@@ -8,7 +8,7 @@ type VisbleRangeType = {
   handleOk: () => void;
   handleCancel: () => void;
   title?: string;
-}
+};
 
 interface RecordType {
   key: string;
@@ -21,12 +21,10 @@ const VisbleRange: React.FC<VisbleRangeType> = ({
   isModalOpen,
   handleOk,
   handleCancel,
-  title = "修改可见范围",
+  title = '修改可见范围',
 }) => {
-
   const [mockData, setMockData] = useState<RecordType[]>([]);
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
-
 
   const getMock = () => {
     const tempTargetKeys = [];
@@ -51,7 +49,6 @@ const VisbleRange: React.FC<VisbleRangeType> = ({
     getMock();
   }, []);
 
-
   const filterOption = (inputValue: string, option: RecordType) =>
     option.description.indexOf(inputValue) > -1;
 
@@ -63,30 +60,39 @@ const VisbleRange: React.FC<VisbleRangeType> = ({
     console.log('search:', dir, value);
   };
 
-  return <Modal title={title} width={800} bodyStyle={{height:'460px'}} open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-   <Transfer
-      dataSource={mockData}
-      showSearch
-      filterOption={filterOption}
-      targetKeys={targetKeys}
-      listStyle={{
-        width: 250,
-        height: 400,
-      }}
-      onChange={handleChange}
-      onSearch={handleSearch}
-      render={item => { 
-        return <div className={cls.contentStyle}>
-          <div className={cls.leftStyle}></div>
-          <div className={cls.rightStyle}>
-            <div className={cls.topRightStyle}>成员/部门名称</div>
-            <div className={cls.botRightStyle}>角色头衔</div>
-          </div>
-        </div>
-      }}
-    />
-  </Modal>
-  
-}
+  return (
+    <Modal
+      title={title}
+      width={800}
+      bodyStyle={{ height: '460px' }}
+      open={isModalOpen}
+      onOk={handleOk}
+      onCancel={handleCancel}>
+      <Transfer
+        dataSource={mockData}
+        showSearch
+        filterOption={filterOption}
+        targetKeys={targetKeys}
+        listStyle={{
+          width: 250,
+          height: 400,
+        }}
+        onChange={handleChange}
+        onSearch={handleSearch}
+        render={(item) => {
+          return (
+            <div className={cls.contentStyle}>
+              <div className={cls.leftStyle}></div>
+              <div className={cls.rightStyle}>
+                <div className={cls.topRightStyle}>成员/部门名称</div>
+                <div className={cls.botRightStyle}>角色头衔</div>
+              </div>
+            </div>
+          );
+        }}
+      />
+    </Modal>
+  );
+};
 
 export default VisbleRange;

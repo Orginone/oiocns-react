@@ -57,23 +57,25 @@ export const CONDITION_CONDITIONS: Approvalprops = {
 };
 
 export const getConditionKeys: (type: string) => any[] = (type: string) => {
+  debugger
+  console.log('getConditionKeys', type)
   var keys: any[] = [];
   switch (type) {
     case 'NUMERIC':
       keys = [
-        { code: 'EQ', name: '=' },
-        { code: 'GT', name: '>' },
-        { code: 'GTE', name: '≥' },
-        { code: 'LT', name: '<' },
-        { code: 'LTE', name: '≤' },
-        { code: 'NEQ', name: '≠' },
+        { value: 'EQ', label: '=' },
+        { value: 'GT', label: '>' },
+        { value: 'GTE', label: '≥' },
+        { value: 'LT', label: '<' },
+        { value: 'LTE', label: '≤' },
+        { value: 'NEQ', label: '≠' },
       ];
       break;
     case 'STRING':
     case 'DICT':
       keys = [
-        { code: 'EQ', name: '=' },
-        { code: 'NEQ', name: '≠' },
+        { value: 'EQ', label: '=' },
+        { value: 'NEQ', label: '≠' },
       ];
       break;
   }

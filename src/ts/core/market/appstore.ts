@@ -78,7 +78,7 @@ export default class AppStore {
    * 分页获取加入商店申请
    * @param page
    */
-  public async getUserApply(page: PageRequest) {}
+  public async getUserApply(page: PageRequest) { }
 
   /**
    * 审批商店成员加入申请

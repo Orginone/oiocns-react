@@ -7,7 +7,6 @@ import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
 import PutawayComp from './Putaway';
-import ShareComp from '../components/ShareComp';
 import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
@@ -26,10 +25,11 @@ const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
-  const [showShareModal, setShowShareModal] = useState<boolean>(false);
+
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
+  const [putawayForm] = Form.useForm();
   const [createAppForm] = Form.useForm<Record<string, any>>();
   const items = [
     {
@@ -170,21 +170,6 @@ const StoreApp: React.FC = () => {
             }}
           />
         )}
-        <Modal
-          title="应用分享"
-          width={800}
-          destroyOnClose={true}
-          open={showShareModal}
-          okText="确定"
-          onOk={() => {
-            submitShare();
-          }}
-          onCancel={() => {
-            console.log(`取消按钮`);
-            setShowShareModal(false);
-          }}>
-          <ShareComp></ShareComp>
-        </Modal>
         {/* 详情页面 /store/app/info*/}
       </div>
       <Route
