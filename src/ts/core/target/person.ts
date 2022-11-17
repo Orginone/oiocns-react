@@ -236,7 +236,7 @@ export default class Person extends BaseTarget {
    */
   public async quitMarket(appStore: AppStore): Promise<model.ResultType<any>> {
     const res = await kernel.quitMarket({
-      id: appStore.getStore.id,
+      id: appStore.selfData.id,
       belongId: this.target.id,
     });
     if (res.success) {

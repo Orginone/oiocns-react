@@ -2,10 +2,8 @@ import { MarketTypes } from 'typings/marketType';
 import API from '@/services';
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
-import useStore from '@/store';
-import { UserType } from '@/store/type';
-import { XMarket } from '@/ts/base/schema';
-
+import AppStore from '@/ts/core/market/appstore';
+import { resetParams } from '@/utils/tools';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}/
@@ -17,47 +15,13 @@ type footerTreeType = {
   dataTreeData: any[];
   assetsTreeData: any[];
 };
-/**
- * @desc: 处理 翻页参数问题
- * @param {T} params
- * @return {*}
- */
-const _resetParams = (params: any) => {
-  const { page, pageSize, ...rest } = params;
-  const num = (page - 1) * pageSize;
 
-  return {
-    offset: num >= 0 ? num : 0,
-    limit: pageSize || 20,
-    ...rest,
-  };
-};
 class StoreClassify {
-  // constructor(parameters) {}
   private _curMarket: MarketTypes.MarketType; // 当前商店实例
 
   private currentMenu!: '应用';
   private curTreeData: any;
   public TreeCallBack!: Function; //页面传进来的 钩子
-
-  // 底部区域
-  // 缓存 tree 展示数据
-  public footerTree: any = {
-    appTreeData: [],
-    docxTreeData: [],
-    dataTreeData: [],
-    assetsTreeData: [],
-  };
-  public userObj: Person;
-  // 顶部区域
-  static SelfMenu = [
-    { title: '应用', code: 'app' },
-    { title: '文档', code: 'docx' },
-    { title: '数据', code: 'data' },
-    { title: '资源', code: 'assets' },
-  ];
-  // 商店导航
-  // static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
 
   // 底部区域
   // 缓存 tree 展示数据
@@ -67,9 +31,17 @@ class StoreClassify {
     dataTreeData: [],
     assetsTreeData: [],
   };
-  // constructor(user: any) {
-  //   this.userObj = Person.getInstance(user);
-  // }
+
+  // 顶部菜单区域
+  static SelfMenu = [
+    { title: '应用', code: 'app' },
+    { title: '文档', code: 'docx' },
+    { title: '数据', code: 'data' },
+    { title: '资源', code: 'assets' },
+  ];
+  // 商店导航
+  // static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
+
   /**
    * @desc 处理点击顶部导航获取tree 数据
    * @param  {any}  item 单个菜单
@@ -88,7 +60,9 @@ class StoreClassify {
    */
   protected getTreeData() {
     //TODO:调用获取节点信息接口
+    // 1.获取市场
     this.getMarketList();
+    //获取文档
   }
   /**
    * @desc: 获取市场列表
@@ -97,26 +71,18 @@ class StoreClassify {
    * @param {string} params.filter 过滤关键字
    * @return {*}
    */
-  getOwnMarket = async (id: string) => {
-    const params = {
-      id,
-      page: 1,
-      pageSize: 100,
-      filter: '',
-    };
+  getOwnMarket = async () => {
+    const marketTree = await Provider.person.getJoinMarkets();
+    console.log('获取拥有的市场55', marketTree);
 
-    const { success, data } = await Provider.person.getMarketList(params);
-    console.log('获取拥有的市场55', success, data);
-    if (!success) {
-      return [];
-    }
-    const { result = [], total = 0 } = data;
-    let arr = result.map((item: { name: any; id: any }, index: any) => {
+    let arr = marketTree.map((itemModel: AppStore, index: any) => {
+      const item = itemModel.selfData;
       return {
         title: item.name,
         key: `0-${index}`,
         id: item.id,
         children: [],
+        node: item,
       };
     });
 
@@ -138,7 +104,7 @@ class StoreClassify {
       filter: '',
     };
     const { data, success } = await API.market.searchOwn({
-      data: _resetParams(params),
+      data: resetParams(params),
     });
     if (success) {
       const { result = [], total = 0 } = data;
