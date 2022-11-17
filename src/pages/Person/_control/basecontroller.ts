@@ -1,5 +1,5 @@
 import Provider from '@/ts/core/provider';
-import Person from '../core/target/person';
+import Person from '@/ts/core/target/person';
 
 /**
  * 控制器的基类
