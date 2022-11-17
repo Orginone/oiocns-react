@@ -1,16 +1,15 @@
 /* eslint-disable no-unused-vars */
 import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
-import UserdataService from '@/ts/core/service/userdataservice';
+import UserdataService from '@/ts/core/target/user';
 import BaseController from './basecontroller';
-
 
 /**
  * 控制器
  * import PersonController from '@/ts/ctrl/personcontroller';
    PersonController.getInstance().searchCompany();
  */
-export default class personcontroller extends BaseController{
+export default class personcontroller extends BaseController {
 
     // 单例
     private static _instance: personcontroller;
@@ -23,13 +22,12 @@ export default class personcontroller extends BaseController{
     }
 
     /**用户数据service */
-    private userDataService:UserdataService = UserdataService.getInstance();
+    private userDataService: UserdataService = UserdataService.getInstance();
 
     /**构造方法 */
     constructor() {
         super();
     }
-    
 
 
     /**
@@ -37,10 +35,36 @@ export default class personcontroller extends BaseController{
      * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
      */
     public async searchCompany(page: Types.Page, callback: any) {
-        const datas:Types.PageData<XTarget> = 
+        const datas: Types.PageData<XTarget> =
             await this.userDataService.searchCompany(page);
         callback(datas);
     }
+
+    /**
+   * 获取用户已加入的单位组织
+   */
+    public getJoinedCompany() {
+
+    }
+
+
+    /**
+  * 获取集团下的单位
+  * @returns 单位、公司列表
+  */
+    public getGroupCompanies() {
+
+    }
+
+    /**
+     * 申请加入单位
+     * @param id 单位ID
+     * @returns
+     */
+    public applyJoin(id: string) {
+
+    }
+
 
 
 }

@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
-// import BaseTarget from '../base';
 import Company from '../target/company';
 import { kernel, model, schema, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
+import Provider from '../provider';
 import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
-import BaseService from './baseservice';
+import BaseService from './base';
 
 /**
  * 我的设置里面的接口
@@ -16,7 +16,7 @@ import BaseService from './baseservice';
  * import Provider from '@/ts/core/provider';
    import Person from '@/ts/core/target/person';   
 
-   import Userdata from '@/ts/core/service/userdataservice';
+   import Userdata from '@/ts/core/target/user';
    Userdata.getInstance().searchCompany();
  */
 export default class userdataservice extends BaseService {
@@ -26,14 +26,14 @@ export default class userdataservice extends BaseService {
     /**单例模式 */
     public static getInstance() {
         if (this._instance == null) {
-            this._instance = new userdataservice();
+            this._instance = new userdataservice(Provider.getPerson.target);
         }
         return this._instance;
     }
 
     /**构造方法 */
-    constructor() {
-        super();
+    constructor(target: schema.XTarget) {
+        super(target);
     }
     
     /**
