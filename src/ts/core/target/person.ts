@@ -16,24 +16,46 @@ export default class Person extends BaseTarget {
     super(target);
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this.setCohort();
   }
+  /**
+   * 初始化填入群组信息
+   */
+  private setCohort() {
+    const page: model.PageRequest = {
+      offset: 0,
+      limit: 10,
+      filter: '',
+    }
+    const params: model.IDReqJoinedModel = {
+      id: this.target.id,
+      typeName: TargetType.Person,
+      JoinTypeNames: [TargetType.Cohort],
+      spaceId: this.target.id,
+      page: page
+    }
+    console.log("私有构造方法参数", params)
+    this.getCohort(params)
+  }
+
+
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
   }
-/**
- * 获取群组列表
- * @param params 
- * @returns 
- */
+  /**
+   * 获取群组列表
+   * @param params id:个人ID TypeName:枚举中取当前角色 JoinTypeNames:枚举中取待查寻组织类型 spaceId:空间id page
+   * @returns 
+   */
   public async getCohort(
     params: model.IDReqJoinedModel
   ): Promise<model.ResultType<any>> {
     let res = await kernel.queryJoinedTargetById(params);
-    if(res.success){
-      for(var i=0;i<res.data.result.length;i++){
-         const cohort = new Cohort(res.data.result[i])
-         this._joinedCohorts.push(cohort);
+    if (res.success) {
+      for (var i = 0; i < res.data.result.length; i++) {
+        const cohort = new Cohort(res.data.result[i])
+        this._joinedCohorts.push(cohort);
       }
     }
     return res;
@@ -44,7 +66,7 @@ export default class Person extends BaseTarget {
  * @param params 
  * @returns 
  */
-   public async deleteCohort(
+  public async deleteCohort(
     params: model.IdReqModel
   ): Promise<model.ResultType<any>> {
     let res = await kernel.deleteTarget(params);
@@ -150,7 +172,7 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public applyJoinCompany(_companyId: string): void {}
+  public applyJoinCompany(_companyId: string): void { }
 
   /**
    * 获取单位列表
