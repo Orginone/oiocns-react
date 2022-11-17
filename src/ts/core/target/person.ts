@@ -151,6 +151,23 @@ export default class Person extends BaseTarget {
   }
 
   /**
+   * 查询我的产品/应用
+   * @param params 
+   * @returns 
+   */
+  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
+    // model.IDBelongReq
+    let paramData: any = {};
+    paramData.id = this.target.id;
+    paramData.page = {
+      offset: 0,
+      filter: this.target.id,
+      limit: common.Constants.MAX_UINT_8,
+    };
+    return await kernel.querySelfProduct(paramData);
+  }
+
+  /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
