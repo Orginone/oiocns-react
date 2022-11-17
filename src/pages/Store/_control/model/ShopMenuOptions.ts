@@ -1,10 +1,4 @@
-import { kernel, model, common, schema } from '../../base';
-import BaseTarget from './base';
-export default class Shop extends BaseTarget {
-  constructor(target: schema.XTarget) {
-    super(target);
-  }
-
+class ShopMenuOptions {
   // 重命名
   RenameItem() {}
   // 拷贝副本
