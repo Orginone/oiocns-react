@@ -24,11 +24,10 @@ const _resetParams = (params: any) => {
 };
 class StoreClassify {
   // constructor(parameters) {}
-  private _curMarket: MarketTypes.MarketType; // 当前商店实例
-
-  private currentMenu!: '应用';
-  private curTreeData: any;
-  public TreeCallBack!: Function; //页面传进来的 钩子
+  private _curMarket: MarketTypes.MarketType; // 当前商店信息
+  private currentMenu!: '应用'; // 当前展示菜单
+  private curTreeData: any; // 当前展示树内容
+  public TreeCallBack!: Function; //页面传进来的更新树形区域 钩子
 
   // 底部区域
   // 缓存 tree 展示数据

@@ -1,8 +1,15 @@
-class AppModule {
-  // constructor(info) {
-  //判断拥有那些功能
-  // }
-  //打开
+import { ProductModel } from './../../base/model';
+import { MarketTypes } from 'typings/marketType';
+export default class AppModule {
+  info: MarketTypes.ProductType; //应用详情
+  publishList: any[]; //已上架市场列表
+
+  constructor(target: MarketTypes.ProductType) {
+    super(target);
+    this.info = [];
+    this.publishList = [];
+  }
+  // 打开
   openApp() {
     console.log('打开');
   }
