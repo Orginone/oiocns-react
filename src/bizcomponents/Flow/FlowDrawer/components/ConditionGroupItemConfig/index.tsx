@@ -1,27 +1,18 @@
-import React, { useState, useMemo } from 'react';
-import { SettingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Row, Button, Select, InputNumber, Input } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
+import React, { useState } from 'react';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Select, InputNumber, Input } from 'antd';
 import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
 import cls from './index.module.less';
-import ReactDOM from 'react-dom';
-/* 
-    条件
-*/
+
+/**
+ * @description: 条件
+ * @return {*}
+ */
 
 const ConditionGroupItemConfig = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onOk = () => {
-    setIsOpen(false);
-  };
-  const onCancel = () => {
-    setIsOpen(false);
-  };
-
   const onChange = (e: any) => {};
 
   return (

@@ -42,11 +42,12 @@ const StoreClassify: React.FC = () => {
   const location = useLocation();
   const router = `${location.pathname}${location.search}`;
   const { user } = useStore((state) => ({ ...state })); // 用户信息
+
   // const [total, setTotal] = useState<number>(0);
   // const history = useHistory();
   useEffect(() => {
     // getTreeList();
-    ClassServices.getMarketList();
+    ClassServices.getOwnMarket(user?.workspaceId || '');
     ClassServices.TreeCallBack = setList;
   }, []);
   // useEffect(() => {

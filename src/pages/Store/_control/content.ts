@@ -3,7 +3,7 @@
  * @return {*}
  */
 class StoreContent {
-  currentMenu: ''; //当前展示 菜单
+  currentMenu: 'Public'; //当前展示 菜单
   // constructor(parameters) {}
   /**
    * changeMenu
