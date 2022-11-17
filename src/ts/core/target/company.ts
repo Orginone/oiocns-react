@@ -2,9 +2,8 @@ import { schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 
-
 /**
- * 公司的元操作 
+ * 公司的元操作
  */
 export default class Company extends BaseTarget {
   constructor(target: schema.XTarget) {
@@ -23,7 +22,7 @@ export default class Company extends BaseTarget {
       // 集团
       TargetType.Group,
       // 科室
-      
+
       TargetType.Section,
     ];
   }
@@ -40,8 +39,4 @@ export default class Company extends BaseTarget {
     });
     return res.success;
   }
-
-  
-
-  
 }

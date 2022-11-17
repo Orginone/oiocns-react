@@ -29,7 +29,7 @@ const ConditionGroupItemConfig = () => {
         condition.paramKey = paramKey;
         condition.paramLabel = field.label;
         condition.type = field.type;
-        debugger;
+
         let keys = DefaultProps.getConditionKeys(condition.type).map(
           (el: any) => el.value,
         );
@@ -54,7 +54,6 @@ const ConditionGroupItemConfig = () => {
   };
 
   const valueChange = (value: any, condition: any) => {
-    debugger;
     condition.val = value;
     var filter = DefaultProps.getFormFields().filter(
       (item: any) => item.value == condition.paramKey,
@@ -81,7 +80,7 @@ const ConditionGroupItemConfig = () => {
     var filter = DefaultProps.getFormFields().filter(
       (item: any) => item.value == paramKey,
     );
-    debugger;
+
     if (filter && filter.length > 0) {
       return filter[0].dict.filter((item: any) => item.label && item.value);
     }

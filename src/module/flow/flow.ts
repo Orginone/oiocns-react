@@ -57,8 +57,7 @@ export const CONDITION_CONDITIONS: Approvalprops = {
 };
 
 export const getConditionKeys: (type: string) => any[] = (type: string) => {
-  debugger
-  console.log('getConditionKeys', type)
+  console.log('getConditionKeys', type);
   var keys: any[] = [];
   switch (type) {
     case 'NUMERIC':

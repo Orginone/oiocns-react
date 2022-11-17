@@ -1,9 +1,6 @@
 /**
  * service的基类
  */
-abstract class BaseService {
+abstract class BaseService {}
 
-}
-
-export default BaseService; 
-  
+export default BaseService;

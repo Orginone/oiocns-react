@@ -1,9 +1,6 @@
 /**
  * 控制器的基类
  */
-abstract class BaseController {
+abstract class BaseController {}
 
-}
-
-export default BaseController; 
-  
+export default BaseController;

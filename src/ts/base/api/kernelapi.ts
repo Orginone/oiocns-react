@@ -47,11 +47,10 @@ export default class KernelApi {
           .catch((err) => {
             console.log(err);
           });
-
-      }else {
-        // @modify 解决刷新后重连的问题 
+      } else {
+        // @modify 解决刷新后重连的问题
         this._storeHub
-          .invoke('TokenAuth', sessionStorage.getItem("accessToken"))
+          .invoke('TokenAuth', sessionStorage.getItem('accessToken'))
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               console.debug('认证成功！');
@@ -60,7 +59,6 @@ export default class KernelApi {
           .catch((err) => {
             console.log(err);
           });
-
       }
     });
     this._storeHub.start();
