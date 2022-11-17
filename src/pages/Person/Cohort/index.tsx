@@ -253,7 +253,7 @@ const CohortConfig: React.FC = () => {
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
             </Space>
           </div>
-        </div>+
+        </div>
         <Tabs
           // style = {}
           defaultActiveKey="1"
@@ -263,9 +263,8 @@ const CohortConfig: React.FC = () => {
               label: `管理的`,
               key: '1',
               children: (
-
-                <CardOrTable<CohortServices>
-                  dataSource={Person.ChohortArray}
+                <CardOrTable<CohortConfigType.CohortConfigTeam>
+                  dataSource={list}
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
