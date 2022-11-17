@@ -60,9 +60,16 @@ export default class AnyStore {
   public static getInstance(
     accessToken: string,
     url: string = '/orginone/anydata/hub',
-  ): AnyStore {
+  ): AnyStore | undefined {
     if (this._instance == null) {
-      this._instance = new AnyStore(accessToken, url);
+      if (accessToken === '') {
+        accessToken = sessionStorage.getItem('accessToken') || '';
+      }
+      if (accessToken != '') {
+        this._instance = new AnyStore(accessToken, url);
+      } else {
+        return undefined;
+      }
     } else {
       this._instance.updateToken(accessToken);
     }
@@ -93,14 +100,14 @@ export default class AnyStore {
    * @returns {void} 无返回值
    */
   // eslint-disable-next-line no-unused-vars
-  public subscribed(key: string, domain: string, callback: (data: any) => void): void {
+  public subscribed<T>(key: string, domain: string, callback: (data: T) => void): void {
     if (callback) {
       const fullKey = key + '|' + domain;
       this._subscribeCallbacks[fullKey] = callback;
       if (this._storeHub.isConnected) {
         this._storeHub
           .invoke('Subscribed', key, domain)
-          .then((res: ResultType) => {
+          .then((res: ResultType<T>) => {
             if (res.success) {
               callback.apply(this, [res.data]);
             }
@@ -137,7 +144,7 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 对象异步结果
    */
-  public async get(key: string, domain: string): Promise<ResultType> {
+  public async get<T>(key: string, domain: string): Promise<ResultType<T>> {
     return await this._storeHub.invoke('Get', key, domain);
   }
   /**
@@ -147,7 +154,7 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 变更异步结果
    */
-  public async set(key: string, setData: any, domain: string): Promise<ResultType> {
+  public async set(key: string, setData: any, domain: string): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Set', key, setData, domain);
   }
   /**
@@ -156,7 +163,7 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 删除异步结果
    */
-  public async delete(key: string, domain: string): Promise<ResultType> {
+  public async delete(key: string, domain: string): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Delete', key, domain);
   }
   /**
@@ -166,7 +173,11 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 添加异步结果
    */
-  public async insert(collName: string, data: any, domain: string): Promise<ResultType> {
+  public async insert(
+    collName: string,
+    data: any,
+    domain: string,
+  ): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Insert', collName, data, domain);
   }
   /**
@@ -180,7 +191,7 @@ export default class AnyStore {
     collName: string,
     update: any,
     domain: string,
-  ): Promise<ResultType> {
+  ): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Update', collName, update, domain);
   }
   /**
@@ -190,7 +201,11 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 移除异步结果
    */
-  public async remove(collName: string, match: any, domain: string): Promise<ResultType> {
+  public async remove(
+    collName: string,
+    match: any,
+    domain: string,
+  ): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Remove', collName, match, domain);
   }
   /**
@@ -204,7 +219,7 @@ export default class AnyStore {
     collName: string,
     options: any,
     domain: string,
-  ): Promise<ResultType> {
+  ): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Aggregate', collName, options, domain);
   }
   /**

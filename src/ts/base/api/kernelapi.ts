@@ -24,6 +24,7 @@ export default class KernelApi {
    */
   private constructor(url: string) {
     this._methods = {};
+    this._anystore = AnyStore.getInstance('');
     this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
@@ -47,20 +48,6 @@ export default class KernelApi {
           .catch((err) => {
             console.log(err);
           });
-
-      }else {
-        // @modify 解决刷新后重连的问题 
-        this._storeHub
-          .invoke('TokenAuth', sessionStorage.getItem("accessToken"))
-          .then((res: model.ResultType<any>) => {
-            if (res.success) {
-              console.debug('认证成功！');
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-
       }
     });
     this._storeHub.start();
