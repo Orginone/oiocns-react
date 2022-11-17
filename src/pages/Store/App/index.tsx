@@ -147,23 +147,23 @@ const StoreApp: React.FC = () => {
           tabList={items}
           onTabChange={(key) => {
             setStatusKey(key);
-          }}
-        />
-        <div className={cls['page-content-table']}>
-          <AppShowComp
-            service={service}
-            searchParams={{ status: statusKey }}
-            columns={service.getMyappColumns()}
-            renderOperation={renderOperation}
-          />
-        </div>
+          }}>
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              service={service}
+              searchParams={{ status: statusKey }}
+              columns={service.getMyappColumns()}
+              renderOperation={renderOperation}
+            />
+          </div>
+        </Card>
       </div>
     );
   }, [service]);
 
   return (
     <>
-      {AppIndex}
+      {location.pathname === '/store/app' && AppIndex}
       <Modal
         title="应用分享"
         width={800}
@@ -192,11 +192,7 @@ const StoreApp: React.FC = () => {
         exact
         path="/store/app/manage"
         render={() => <Manage appId={selectAppInfo.id} />}></Route>
-      <Route
-        exact
-        path="/store/app/create"
-        // component={CreateApp}
-        render={() => <CreateApp />}></Route>
+      <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"

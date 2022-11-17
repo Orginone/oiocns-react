@@ -33,7 +33,7 @@ const groupTitle = (name: string) => {
   );
 };
 // 流程信息
-const flows = {
+const flows: ProFormColumnsType<DataItem> = {
   title: groupTitle(`流程信息`),
   valueType: 'formList',
   dataIndex: 'approveList',
