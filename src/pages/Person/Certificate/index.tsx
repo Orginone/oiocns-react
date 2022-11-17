@@ -1,9 +1,8 @@
-
-import { Button,Space } from 'antd';
+import { Button, Space } from 'antd';
 import Certificate from '@/components/CettificateComp';
 import { Typography, Divider } from 'antd';
-import React,{useState} from  'react';
-import Person from '../../../bizcomponents/PersonInfo/index'
+import React, { useState } from 'react';
+import Person from '../../../bizcomponents/PersonInfo/index';
 import { Page } from '@/module/typings';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from 'typings/Certificate';
@@ -11,7 +10,6 @@ import { certificateColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
 import CertificateService from '@/module/certificate/Certificate';
 import API from '@/services';
-
 
 /**
  * 个人信息
@@ -25,60 +23,60 @@ const PersonInfo: React.FC = () => {
     deleteApi: API.product.delete,
     updateApi: API.product.update,
   });
-  console.log(service)
+  console.log(service);
 
   //模拟数据
   const list: any = [
     {
-      "id": "358270758297931776",
-      "cardName": "浙江财政",
-      "network": "代速速发总结地金重体理存空期",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '358270758297931776',
+      cardName: '浙江财政',
+      network: '代速速发总结地金重体理存空期',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "358545770678356320",
-      "cardName": "浙大",
-      "network": "社进青起划自看特公精律存",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '358545770678356320',
+      cardName: '浙大',
+      network: '社进青起划自看特公精律存',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "358541770678456320",
-      "cardName": "杭电",
-      "network": "周往小大头积动段斯美取",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '358541770678456320',
+      cardName: '杭电',
+      network: '周往小大头积动段斯美取',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "358545775678456320",
-      "cardName": "北大",
-      "network": "大苏打倒萨大苏打",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '358545775678456320',
+      cardName: '北大',
+      network: '大苏打倒萨大苏打',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "358545770698456320",
-      "cardName": "清华",
-      "network": "恶趣味全额",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '358545770698456320',
+      cardName: '清华',
+      network: '恶趣味全额',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "359661017162190848",
-      "cardName": "福大",
-      "network": "只需中心城中心",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
+      id: '359661017162190848',
+      cardName: '福大',
+      network: '只需中心城中心',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
     },
     {
-      "id": "361171414562246656",
-      "cardName": "福大大",
-      "network": "只需中心城中心",
-      "address": "浙江财政",
-      "joinDate": "1999-12-10",
-    }
-  ]
+      id: '361171414562246656',
+      cardName: '福大大',
+      network: '只需中心城中心',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
+    },
+  ];
   // 卡片内容渲染函数
   // const renderCardFun = (dataArr: MarketTypes.certificateType[]): React.ReactNode[] => {
   //   return dataArr.map((item: MarketTypes.certificateType) => {
@@ -102,7 +100,7 @@ const PersonInfo: React.FC = () => {
   const { Title } = Typography;
   const divStyle: React.CSSProperties = {
     marginTop: '55px',
-  }
+  };
   const renderOperation = (
     item: CertificateType.cerManageType,
   ): CertificateType.OperationType[] => {
@@ -149,14 +147,12 @@ const PersonInfo: React.FC = () => {
   const params = {
     page: 10,
     pageSize: 1,
-    filter: "search"
-  }
-  service.getList<Page>(params)
+    filter: 'search',
+  };
+  service.getList<Page>(params);
 
-
-  
   const tableAlertRender = (selectedRowKeys: any[]) => {
-    console.log(selectedRowKeys)
+    console.log(selectedRowKeys);
   };
   const renderCardFun = (dataArr: CertificateType.cerManageType[]): React.ReactNode[] => {
     return dataArr.map((item: CertificateType.cerManageType) => {
@@ -181,7 +177,7 @@ const PersonInfo: React.FC = () => {
   return (
     <div className={cls['person-info-container']}>
       <div>
-      <Person/>
+        <Person />
       </div>
       <div>
         <div className={cls['person-info-H']}>
@@ -205,12 +201,14 @@ const PersonInfo: React.FC = () => {
           total={total}
           page={Page}
           tableAlertRender={tableAlertRender}
-          rowSelection={{
-            // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-            // 注释该行则默认不显示下拉选项
-            // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-            // defaultSelectedRowKeys: [1],
-          }}
+          rowSelection={
+            {
+              // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+              // 注释该行则默认不显示下拉选项
+              // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+              // defaultSelectedRowKeys: [1],
+            }
+          }
           renderCardContent={renderCardFun}
           // defaultPageType={'table'}
           showChangeBtn={true}
@@ -223,7 +221,6 @@ const PersonInfo: React.FC = () => {
       </div>
     </div>
   );
-
 };
 
 export default PersonInfo;

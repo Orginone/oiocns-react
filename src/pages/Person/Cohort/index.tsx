@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 
 import { Button, Space, Tabs, Card, Modal, message } from 'antd';
 import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import PersonInfo from '../../../bizcomponents/PersonInfo/index'
+=======
+import { Button, Space, Tabs, Card, Modal } from 'antd';
+import { Divider, Form } from 'antd';
+import Title from 'antd/lib/typography/Title';
+import React, { useState, useEffect } from 'react';
+import Person from '../../../bizcomponents/PersonInfo/index';
+>>>>>>> origin/dev
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -11,6 +19,7 @@ import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
 import useStore from '../../../../src/store';
+<<<<<<< HEAD
 import CreateCohort from '../../../bizcomponents/cohort/index'
 import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index'
 import Persons from '../../../bizcomponents/SearchPerson/index'
@@ -29,6 +38,13 @@ type DataItem = {
   name: string;
   state: string;
 };
+=======
+import CreateCohort from '../../../bizcomponents/cohort/index';
+import UpdateCohort from '../../../bizcomponents/cohort/UpdateCohort/index';
+import services from '@/module/person';
+import { isTemplateElement } from '@babel/types';
+
+>>>>>>> origin/dev
 /**
  * 个人信息
  * @returns
@@ -38,7 +54,10 @@ const CohortConfig: React.FC = () => {
     nameSpace: 'myCohort',
     searchApi: API.cohort.getJoinedCohorts,
     createApi: API.cohort.create,
+<<<<<<< HEAD
     updateApi: API.cohort.update
+=======
+>>>>>>> origin/dev
   });
   console.log("实体信息", PersonInfoEnty.getPerson)
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
@@ -56,6 +75,14 @@ const CohortConfig: React.FC = () => {
   useEffect(() => {
     getTableList();
   }, []);
+<<<<<<< HEAD
+=======
+
+  const divStyle: React.CSSProperties = {
+    marginTop: '55px',
+  };
+
+>>>>>>> origin/dev
   const renderOperation = (
     item: CohortConfigType.CohortConfigTeam,
   ): CohortConfigType.OperationType[] => {
@@ -81,10 +108,15 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
+<<<<<<< HEAD
 
           setItem(item)
           setOpen(true);
           console.log('按钮事件1231', 'updateCohort', item);
+=======
+          setOpen(true);
+          console.log('按钮事件123', 'updateCohort', item);
+>>>>>>> origin/dev
         },
       },
       {
@@ -162,15 +194,21 @@ const CohortConfig: React.FC = () => {
     console.log("获取值", service.List)
     for (var i = 0; i < service.List.length; i++) {
       if (service.List[i].belongId === { user }.user.workspaceId) {
-        const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team
-        chorot.belongId = service.List[i].belongId
-        chorot.thingId = service.List[i].thingId
-        resultList.push(chorot)
+        const chorot: CohortConfigType.CohortConfigTeam = service.List[i].team;
+        chorot.belongId = service.List[i].belongId;
+        chorot.thingId = service.List[i].thingId;
+        resultList.push(chorot);
       }
     }
     setList([...resultList]);
+<<<<<<< HEAD
     console.log(66, resultList, resultList.length)
     setTotal(resultList.length);
+=======
+    console.log(66, resultList, resultList.length);
+    setTotal(resultList.length);
+    console.log;
+>>>>>>> origin/dev
   };
 
   const handlePageChange = (page: number, pageSize: number) => {
@@ -178,13 +216,13 @@ const CohortConfig: React.FC = () => {
     getTableList({ page, pageSize });
   };
 
-
   const tableAlertRender = (selectedRowKeys: any[]) => {
-    console.log(selectedRowKeys)
+    console.log(selectedRowKeys);
   };
   const onChange = (key: string) => {
     console.log(key);
   };
+<<<<<<< HEAD
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -221,7 +259,10 @@ const CohortConfig: React.FC = () => {
     setFriend(person);
   };
   return (
+=======
+>>>>>>> origin/dev
 
+  return (
     <div className={cls['person-info-content-container']}>
       <div>
         <PersonInfo />
@@ -231,8 +272,9 @@ const CohortConfig: React.FC = () => {
           <Title level={2}>
             <strong>群组</strong>
           </Title>
-          <div style={{ float: "right" }}>
+          <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
+<<<<<<< HEAD
               <Modal title="邀请成员" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px'>
                 <Persons searchCallback={searchCallback} />
               </Modal>
@@ -249,6 +291,11 @@ const CohortConfig: React.FC = () => {
                 }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
               <CreateCohort service={service} getTableList={getTableList} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
+=======
+              <CreateCohort service={service} getTableList={getTableList} />
+              <UpdateCohort service={service} open={open} />
+              <Button type="link">加入群组</Button>
+>>>>>>> origin/dev
             </Space>
           </div>
         </div>
@@ -260,40 +307,40 @@ const CohortConfig: React.FC = () => {
             {
               label: `管理的`,
               key: '1',
-              children: <CardOrTable<CohortConfigType.CohortConfigTeam>
-                dataSource={list}
-                total={total}
-                page={page}
-                tableAlertRender={tableAlertRender}
-                rowSelection={{
-                  // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                  // 注释该行则默认不显示下拉选项
-                  // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                  // defaultSelectedRowKeys: [1],
-                }}
-                // defaultPageType={'table'}
-                showChangeBtn={false}
-                operation={renderOperation}
-                columns={cohortColumn as any}
-                // style={divStyle}
-                onChange={handlePageChange}
-                rowKey={'id'}
-              />,
+              children: (
+                <CardOrTable<CohortConfigType.CohortConfigTeam>
+                  dataSource={list}
+                  total={total}
+                  page={page}
+                  tableAlertRender={tableAlertRender}
+                  rowSelection={
+                    {
+                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+                      // 注释该行则默认不显示下拉选项
+                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                      // defaultSelectedRowKeys: [1],
+                    }
+                  }
+                  // defaultPageType={'table'}
+                  showChangeBtn={false}
+                  operation={renderOperation}
+                  columns={cohortColumn as any}
+                  // style={divStyle}
+                  onChange={handlePageChange}
+                  rowKey={'id'}
+                />
+              ),
             },
             {
               label: `加入的`,
               key: '2',
               children: `Content of Tab Pane 2`,
             },
-
           ]}
         />
       </Card>
-
     </div>
-
   );
-
 };
 
 export default CohortConfig;

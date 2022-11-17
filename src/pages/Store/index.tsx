@@ -12,13 +12,21 @@ import { IRouteConfig } from '@/routes/config';
 
 import StoreClassify from './Classify';
 import { MenuProps } from 'antd';
+import StoreClassServices from './_control/classify';
 
 const navItems: MenuProps[`items`] = [
   {
     type: 'group',
     label: '常用分类',
     children: [
-      { label: '应用', key: 'app', icon: <AppstoreOutlined /> }, // 菜单项务必填写 key
+      {
+        label: '应用',
+        key: 'app',
+        icon: <AppstoreOutlined />,
+        onClick: () => {
+          StoreClassServices.handleMenuClick('app');
+        },
+      }, // 菜单项务必填写 key
       { label: '文档', key: 'doc', icon: <FileTextOutlined /> },
       { label: '数据', key: 'data', icon: <FundOutlined /> },
       { label: '资源', key: 'src', icon: <DatabaseOutlined /> },

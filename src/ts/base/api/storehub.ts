@@ -149,12 +149,12 @@ export default class StoreHub implements IDisposable {
    * @param {any[]} args 参数
    * @returns {Promise<ResultType>} 异步结果
    */
-  public invoke(methodName: string, ...args: any[]): Promise<ResultType> {
+  public invoke(methodName: string, ...args: any[]): Promise<ResultType<any>> {
     return new Promise((resolve) => {
       if (this.isConnected) {
         this._connection
           .invoke(methodName, ...args)
-          .then((res: ResultType) => {
+          .then((res: ResultType<any>) => {
             resolve(res);
           })
           .catch((err) => {

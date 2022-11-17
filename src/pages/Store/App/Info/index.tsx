@@ -10,7 +10,6 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
-import { EventContext } from '../index';
 
 import { useHistory } from 'react-router-dom';
 const service = new MarketService({
@@ -25,14 +24,9 @@ interface AppInfoType {
 }
 
 const StoreAppInfo: React.FC<AppInfoType> = () => {
-  const { TestSub } = useContext(EventContext);
   const BtnsList = ['编辑应用分配'];
   const history = useHistory();
-  TestSub.useSubScription('hello2', (s: any) => {
-    console.log('监听2222', s);
-  });
   const handleBtnsClick = (item: { text: string }) => {
-    // console.log('按钮点击', item);
     switch (item.text) {
       case '编辑应用分配':
         console.log('编辑应用分配编辑应用分配');
@@ -51,7 +45,6 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         key: 'publish',
         label: '下架',
         onClick: () => {
-          TestSub.emit('hello2', { aa: '测试订阅修改' });
           console.log('按钮事件', 'publish');
         },
       },

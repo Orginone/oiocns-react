@@ -1,3 +1,4 @@
+import { kernel } from '@/ts/base';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React from 'react';

@@ -4,14 +4,17 @@ import { Row, Button, Divider, Select, Col, Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
+import provider from '@/ts/core/provider';
 
-/* 
-    审批对象
-*/
+/**
+ * @description: 审批对象
+ * @return {*}
+ */
 
 const { Option } = Select;
 
 const ApprovalNode = () => {
+  const personObj = provider.person.getJoinedCohorts();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [value, setValue] = useState(1);
   const onOk = () => {
@@ -23,6 +26,12 @@ const ApprovalNode = () => {
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
+  // 查询个人加入的群组
+  const getJoinedCohort = async () => {
+    const JoinedCohortList = await personObj;
+    console.log('444', JoinedCohortList);
+  };
+
   // 选择审批对象
   const rovalnode = (
     <div className={cls[`roval-node`]}>
@@ -36,6 +45,7 @@ const ApprovalNode = () => {
           shape="round"
           onClick={() => {
             setIsOpen(true);
+            getJoinedCohort();
           }}>
           选择身份
         </Button>

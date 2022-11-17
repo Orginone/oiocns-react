@@ -174,6 +174,12 @@ const StoreRouter: IRouteConfig[] = [
             icon: '',
             component: React.lazy(() => import('@/pages/Store/App/Manage')),
           },
+          {
+            path: '/store/app/putaway',
+            title: '应用上架',
+            icon: '',
+            component: React.lazy(() => import('@/pages/Store/App/Putaway')),
+          },
         ],
       },
 

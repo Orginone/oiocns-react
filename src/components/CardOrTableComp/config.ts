@@ -119,7 +119,6 @@ export const certificateColumn: ProColumns<any>[] = [
     title: '加入时间',
     dataIndex: 'joinDate',
   },
-
 ];
 export const cohortColumn: ProColumns<any>[] = [
   {
