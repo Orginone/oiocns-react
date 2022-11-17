@@ -32,6 +32,55 @@ const groupTitle = (name: string) => {
     </Space>
   );
 };
+// 流程信息
+const flows = {
+  title: groupTitle(`流程信息`),
+  valueType: 'formList',
+  dataIndex: 'approveList',
+  width: '100%',
+  colProps: { md: 24 },
+  fieldProps: {
+    // 新增按钮样式配置
+    creatorButtonProps: {
+      type: 'text',
+      position: 'top',
+      creatorButtonText: '',
+      block: false,
+      className: cls.addFormListBtn,
+    },
+  },
+  columns: [
+    {
+      valueType: 'group',
+      width: 'md',
+      colProps: { md: 24 },
+      columns: [
+        {
+          title: '业务信息',
+          dataIndex: 'componentName',
+          // valueType: 'select',
+          width: 'md',
+          // valueEnum,
+        },
+        {
+          title: '字段名称',
+          width: 'md',
+          dataIndex: 'componentAddress',
+        },
+        {
+          title: '字段编号',
+          width: 'md',
+          dataIndex: 'componentWidth',
+        },
+        {
+          title: '字段类型',
+          width: 'md',
+          dataIndex: 'componentHeight',
+        },
+      ],
+    },
+  ],
+};
 const columns: ProFormColumnsType<DataItem>[] = [
   {
     title: groupTitle('基础信息'),
@@ -110,66 +159,18 @@ const columns: ProFormColumnsType<DataItem>[] = [
               },
             ],
           },
+          { ...flows },
         ],
       },
     ],
   },
-  {
-    title: groupTitle(`流程信息`),
-    valueType: 'group',
-    width: 'md',
-    colProps: { md: 24 },
-    columns: [
-      {
-        // title: groupTitle(`流程信息`),
-        valueType: 'formList',
-        dataIndex: 'approveList',
-        width: '100%',
-        colProps: { md: 24 },
-        fieldProps: {
-          // 新增按钮样式配置
-          creatorButtonProps: {
-            type: 'text',
-            position: 'top',
-            creatorButtonText: '',
-            block: false,
-            className: cls.addFormListBtn,
-          },
-        },
-        columns: [
-          {
-            valueType: 'group',
-            width: 'md',
-            colProps: { md: 24 },
-            columns: [
-              {
-                title: '业务信息',
-                dataIndex: 'componentName',
-                // valueType: 'select',
-                width: 'md',
-                // valueEnum,
-              },
-              {
-                title: '字段名称',
-                width: 'md',
-                dataIndex: 'componentAddress',
-              },
-              {
-                title: '字段编号',
-                width: 'md',
-                dataIndex: 'componentWidth',
-              },
-              {
-                title: '字段类型',
-                width: 'md',
-                dataIndex: 'componentHeight',
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+  // {
+  //   title: groupTitle(`流程信息`),
+  //   valueType: 'group',
+  //   width: 'md',
+  //   colProps: { md: 24 },
+  //   columns: ,
+  // },
   {
     title: groupTitle(`应用组件`),
     valueType: 'group',
