@@ -601,7 +601,7 @@ export type XMerchandise = {
   // 出售权属
   sellAuth: string;
   // 有效期
-  days: string;
+  days: string | number;
   // 商品出售市场ID
   marketId: string;
   // 描述信息
