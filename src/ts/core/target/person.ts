@@ -53,11 +53,10 @@ export default class Person extends BaseTarget {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.queryJoinedTargetById(params);
     if (res.success) {
-      for (var i = 0; i < res.data.result.length; i++) {
+      for(var i=0;i<res.data.result.length;i++){
         const cohort = new Cohort(res.data.result[i])
         this._joinedCohorts.push(cohort);
-      }
-    }
+     }    }
     return res;
   }
 
@@ -70,12 +69,9 @@ export default class Person extends BaseTarget {
     params: model.IdReqModel
   ): Promise<model.ResultType<any>> {
     let res = await kernel.deleteTarget(params);
-    // if(res.success){
-    //   for(var i=0;i<res.data.result.length;i++){
-    //      const cohort = new Cohort(res.data.result[i])
-    //      this._joinedCohorts.push(cohort);
-    //   }
-    // }
+    if(res.success){
+      this.setCohort()
+    }
     return res;
   }
 
