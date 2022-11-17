@@ -60,29 +60,27 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
     <div>
       <div className={cls['layout-header']}>
         <Menu
-          className={cls['el-menu-demo']}
           mode="horizontal"
           defaultSelectedKeys={['processDesign']}
           items={[
             {
-              label: '流程设计',
               key: 'processDesign',
             },
           ]}></Menu>
         <div className={cls['back']}>
           <span>
-            流程名：
-            {showInput && (
-              <Input
-                style={{ width: '300px' }}
-                onBlur={() => setShowInput(false)}
-                onKeyDown={(e) => onkeydown(e)}></Input>
-            )}
-            {!showInput && (
-              <span onClick={() => setShowInput(true)}>
-                <EditOutlined />
-              </span>
-            )}
+            <span>
+              流程名：
+              {showInput && (
+                <Input
+                  style={{ width: '300px' }}
+                  onBlur={() => setShowInput(false)}
+                  onKeyDown={(e) => onkeydown(e)}></Input>
+              )}
+              {!showInput && (
+                <span onClick={() => setShowInput(true)}>{<EditOutlined />}</span>
+              )}
+            </span>
             <span>业务名：{form.formName || form.business || form.formId}</span>
             <span>
               绑定已有流程：

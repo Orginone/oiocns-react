@@ -14,7 +14,7 @@ import provider from '@/ts/core/provider';
 const { Option } = Select;
 
 const ApprovalNode = () => {
-  const personObj = provider.person.getJoinedCohorts();
+  const personObj = provider.getPerson().getJoinedCohorts();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [value, setValue] = useState(1);
   const onOk = () => {

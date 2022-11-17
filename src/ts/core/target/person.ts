@@ -126,7 +126,7 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public applyJoinCompany(_companyId: string): void {}
+  public applyJoinCompany(_companyId: string): void { }
 
   /**
    * 获取单位列表
@@ -192,6 +192,29 @@ export default class Person extends BaseTarget {
       }
     }
     return this._joinedStores;
+  }
+
+  /**
+   * 获取加入的群组
+   * @returns 
+   */
+  public async getJoinedCohorts(): Promise<Cohort[]> {
+    if (this._joinedCohorts.length > 0) {
+      return this._joinedCohorts;
+    }
+    this._joinedCohorts = []
+    if (this._joinedCohorts.length <= 0) {
+      const res = await this.getjoined({
+        joinTypeNames: TargetType.Cohort,
+        spaceId: this.target.id
+      });
+      if (res.success) {
+        res.data.result.forEach((cohort) => {
+          this._joinedCohorts.push(new Cohort(cohort));
+        });
+      }
+    }
+    return this._joinedCohorts;
   }
 
   /**

@@ -72,7 +72,7 @@ class StoreClassify {
    * @return {*}
    */
   getOwnMarket = async () => {
-    const marketTree = await Provider.person.getJoinMarkets();
+    const marketTree = await Provider.getPerson().getJoinMarkets();
     console.log('获取拥有的市场55', marketTree);
 
     let arr = marketTree.map((itemModel: AppStore, index: any) => {

@@ -9,9 +9,10 @@ import {
   Skeleton,
   Space,
   Typography,
+  Form,
+  Input,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-
 import CompanyServices from '@/module/org/company';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import PersonServices from '@/module/person';
@@ -43,7 +44,28 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
-
+  const layout = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
+  };
+  const validateMessages = {
+    required: '群组名称不能为空',
+    types: {
+      email: '${label} is not a valid email!',
+      number: '${label} is not a valid number!',
+    },
+    number: {
+      range: '${label} must be between ${min} and ${max}',
+    },
+  };
+  const onSave = async () => {
+    debugger;
+    const values = await form.validateFields();
+    debugger;
+    console.log(values); //2.表单验证并获取表单值
+    setShowFormModal(false);
+  };
+  const [form] = Form.useForm();
   // 获取工作单位列表
   const getList = async () => {
     const data = await CompanyServices.getJoinedCompany({
@@ -137,14 +159,57 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
         bodyStyle={{ padding: 0 }}
         okText="确定"
         onOk={() => {
-          console.log(`确定按钮`);
-          setShowFormModal(false);
+          // console.log(`确定按钮`);
+          onSave();
         }}
         onCancel={() => {
           console.log(`取消按钮`);
           setShowFormModal(false);
         }}>
-        <SearchCompany />
+        <Form
+          {...layout}
+          name="nest-messages"
+          labelAlign="left"
+          labelCol={{ span: 7 }}
+          wrapperCol={{ span: 20 }}
+          layout="horizontal"
+          validateMessages={validateMessages}
+          form={form}>
+          <Form.Item
+            name={['company', 'teamName']}
+            label="单位名称"
+            rules={[{ required: true, message: '单位名称不能为空' }]}>
+            <Input placeholder="请输入单位名称" />
+          </Form.Item>
+          <Form.Item
+            name={['company', 'code']}
+            label="社会信用统一代码"
+            rules={[{ required: true, message: '社会信用代码不能为空' }]}>
+            <Input placeholder="请输入社会信用统一代码" />
+          </Form.Item>
+          <Form.Item
+            name={['company', 'name']}
+            label="团队简称"
+            rules={[{ required: true, message: '团队简称不能为空' }]}>
+            <Input placeholder="请输入团队简称" />
+          </Form.Item>
+          <Form.Item
+            name={['company', 'teamCode']}
+            label="团队标识"
+            rules={[{ required: true, message: '团队标识不能为空' }]}>
+            <Input placeholder="请输入团队标识" />
+          </Form.Item>
+          <Form.Item
+            name={['company', 'teamRemark']}
+            label="团队信息备注"
+            rules={[
+              { required: true, message: '请输入团队信息备注' },
+              { message: '团队信息备注内容不能超过200字符', max: 200 },
+            ]}>
+            <Input.TextArea placeholder="请输入团队信息备注" />
+          </Form.Item>
+          <Form.Item></Form.Item>
+        </Form>
       </Modal>
       <Modal
         title="加入单位"

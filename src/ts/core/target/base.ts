@@ -1,9 +1,12 @@
+import { Identity } from '@/module/org';
 import { kernel, model, common, schema } from '../../base';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;
+  protected identitys: schema.XIdentity[];
   constructor(target: schema.XTarget) {
     this.target = target;
+    this.identitys = [];
   }
 
   /**
@@ -32,4 +35,35 @@ export default class BaseTarget {
     data.teamTypes = [this.target.typeName];
     return await kernel.pullAnyToTeam(data);
   }
+
+  /**
+   * 获取所有身份
+   * @param data 请求参数
+   * @returns 身份数组
+   */
+  public async queryTargetIdentitys(data: any): Promise<model.ResultType<schema.XIdentityArray>> {
+    data.id = this.target.id;
+    data.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_16,
+    };
+    return await kernel.queryTargetIdentitys(data);
+  }
+
+  public async getIdentitys(): Promise<schema.XIdentity[]> {
+    if (this.identitys.length > 0) {
+      return this.identitys;
+    }
+    this.identitys = []
+    const res = await this.queryTargetIdentitys({
+    });
+    if (res.success) {
+      res.data.result.forEach((identity) => {
+        this.identitys.push(identity);
+      });
+    }
+    return this.identitys;
+  }
+
 }
