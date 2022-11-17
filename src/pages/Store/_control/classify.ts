@@ -5,6 +5,7 @@ import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
 import { resetParams } from '@/utils/tools';
 import Company from '@/ts/core/target/company';
+
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}/
@@ -19,8 +20,8 @@ type footerTreeType = {
 
 class StoreClassify {
   // constructor(parameters) {}
-  static curCompoy: Company = Provider.getPerson.curCompany as Company;
-  private _curMarket: MarketTypes.MarketType; // 当前商店信息
+  static curCompoy: Company = Provider.getPerson.curCompany as Company; //当前 所在单位
+  private _curMarket: MarketTypes.MarketType; // 当前所选商店信息
   private currentMenu!: '应用'; // 当前展示菜单
   private curTreeData: any; // 当前展示树内容
   public TreeCallBack!: Function; //页面传进来的更新树形区域 钩子
@@ -118,6 +119,7 @@ class StoreClassify {
         };
       });
       this.footerTree.appTreeData = arr;
+      this.curTreeData = arr;
       this.TreeCallBack(arr);
     }
   }
