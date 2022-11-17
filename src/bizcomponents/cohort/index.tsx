@@ -103,18 +103,8 @@ const CreateCohort: React.FC<CohortServiceType> = ({ service, getTableList }) =>
             ]}>
             <Input.TextArea />
           </Form.Item>
-<<<<<<< HEAD
           <Form.Item >
           </Form.Item>
-=======
-          <Form.Item></Form.Item>
-          {/* <Button className='button-position-confirm' type="primary" htmlType="submit" size="middle" >
-              确认
-            </Button>
-            <Button className='button-position' onClick={()=>handleClick(false)}>
-              取消
-            </Button> */}
->>>>>>> origin/dev
         </Form>
       </Modal>
     </div>

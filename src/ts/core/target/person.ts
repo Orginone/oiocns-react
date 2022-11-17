@@ -6,24 +6,23 @@ import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
-import { data } from '@/components/CardOrTableComp/config';
-
+import AppStore from '../market/appstore'
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  // private _joinedStores: AppStore[];
+  private _joinedStores: AppStore[];
   constructor(target: schema.XTarget) {
     super(target);
-
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this._joinedStores = [];
     this.setCohort();
   }
   /**
-   * 初始化填入群组信息
+   * 填入群组信息
    */
   private setCohort() {
     const page: model.PageRequest = {
@@ -38,7 +37,6 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       page: page
     }
-    console.log("私有构造方法参数", params)
     this.getCohort(params)
   }
 
@@ -64,20 +62,6 @@ export default class Person extends BaseTarget {
     return res;
   }
 
-  /**
- * 删除群组
- * @param params 
- * @returns 
- */
-  public async deleteCohort(
-    params: model.IdReqModel
-  ): Promise<model.ResultType<any>> {
-    let res = await kernel.deleteTarget(params);
-    if(res.success){
-      this.setCohort()
-    }
-    return res;
-  }
 
   /** 支持的群组类型数组*/
   public get cohortTypes(): TargetType[] {

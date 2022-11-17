@@ -14,7 +14,6 @@ type DataItem = {
   state: string;
 };
 export default class Cohort extends CommonClass {
-<<<<<<< HEAD
   public PUBLIC_STORE: CohortConfigType.CohortConfig = {} as CohortConfigType.CohortConfig; 
   
 
@@ -110,10 +109,6 @@ export default class Cohort extends CommonClass {
     }
     return { data, success, code };
   }
-=======
-  public PUBLIC_STORE: CohortConfigType.CohortConfig =
-    {} as CohortConfigType.CohortConfig;
->>>>>>> origin/dev
 
   public async getPublicStore() {
     if (this.PUBLIC_STORE?.id) {

@@ -1,17 +1,9 @@
-<<<<<<< HEAD
 
 import { Button, Space, Tabs, Card, Modal, message } from 'antd';
 import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import PersonInfo from '../../../bizcomponents/PersonInfo/index'
-=======
-import { Button, Space, Tabs, Card, Modal } from 'antd';
-import { Divider, Form } from 'antd';
-import Title from 'antd/lib/typography/Title';
-import React, { useState, useEffect } from 'react';
-import Person from '../../../bizcomponents/PersonInfo/index';
->>>>>>> origin/dev
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -19,7 +11,6 @@ import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
 import useStore from '../../../../src/store';
-<<<<<<< HEAD
 import CreateCohort from '../../../bizcomponents/cohort/index'
 import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index'
 import Persons from '../../../bizcomponents/SearchPerson/index'
@@ -38,13 +29,6 @@ type DataItem = {
   name: string;
   state: string;
 };
-=======
-import CreateCohort from '../../../bizcomponents/cohort/index';
-import UpdateCohort from '../../../bizcomponents/cohort/UpdateCohort/index';
-import services from '@/module/person';
-import { isTemplateElement } from '@babel/types';
-
->>>>>>> origin/dev
 /**
  * 个人信息
  * @returns
@@ -54,10 +38,7 @@ const CohortConfig: React.FC = () => {
     nameSpace: 'myCohort',
     searchApi: API.cohort.getJoinedCohorts,
     createApi: API.cohort.create,
-<<<<<<< HEAD
     updateApi: API.cohort.update
-=======
->>>>>>> origin/dev
   });
   console.log("实体信息", PersonInfoEnty.getPerson)
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
@@ -75,14 +56,6 @@ const CohortConfig: React.FC = () => {
   useEffect(() => {
     getTableList();
   }, []);
-<<<<<<< HEAD
-=======
-
-  const divStyle: React.CSSProperties = {
-    marginTop: '55px',
-  };
-
->>>>>>> origin/dev
   const renderOperation = (
     item: CohortConfigType.CohortConfigTeam,
   ): CohortConfigType.OperationType[] => {
@@ -108,15 +81,10 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-<<<<<<< HEAD
 
           setItem(item)
           setOpen(true);
           console.log('按钮事件1231', 'updateCohort', item);
-=======
-          setOpen(true);
-          console.log('按钮事件123', 'updateCohort', item);
->>>>>>> origin/dev
         },
       },
       {
@@ -143,13 +111,18 @@ const CohortConfig: React.FC = () => {
           //   limit: 10,
           //   filter: '',
           // }
-          const params: model.IdReqModel = {
+          const params: model.TargetModel = {
             id:item.targetId,
+            name:item.name+'修改',
+            code:item.code,
             typeName:TargetType.Cohort,
-            belongId:item.belongId
+            belongId:item.belongId,
+            teamName:item.name+'修改',
+            teamCode:item.code,
+            teamRemark:item.remark
           }
-          console.log("参数",params)
-          console.log("info",PersonInfoEnty.getPerson.deleteCohort(params))
+          console.log("修改群组参数",params)
+          console.log("info",PersonInfoEnty.getPerson.UpdateCohort(params))
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },
@@ -201,14 +174,8 @@ const CohortConfig: React.FC = () => {
       }
     }
     setList([...resultList]);
-<<<<<<< HEAD
     console.log(66, resultList, resultList.length)
     setTotal(resultList.length);
-=======
-    console.log(66, resultList, resultList.length);
-    setTotal(resultList.length);
-    console.log;
->>>>>>> origin/dev
   };
 
   const handlePageChange = (page: number, pageSize: number) => {
@@ -222,7 +189,6 @@ const CohortConfig: React.FC = () => {
   const onChange = (key: string) => {
     console.log(key);
   };
-<<<<<<< HEAD
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -258,9 +224,6 @@ const CohortConfig: React.FC = () => {
   const searchCallback = (person: Person) => {
     setFriend(person);
   };
-  return (
-=======
->>>>>>> origin/dev
 
   return (
     <div className={cls['person-info-content-container']}>
@@ -274,7 +237,6 @@ const CohortConfig: React.FC = () => {
           </Title>
           <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
-<<<<<<< HEAD
               <Modal title="邀请成员" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px'>
                 <Persons searchCallback={searchCallback} />
               </Modal>
@@ -291,11 +253,6 @@ const CohortConfig: React.FC = () => {
                 }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />
               <CreateCohort service={service} getTableList={getTableList} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
-=======
-              <CreateCohort service={service} getTableList={getTableList} />
-              <UpdateCohort service={service} open={open} />
-              <Button type="link">加入群组</Button>
->>>>>>> origin/dev
             </Space>
           </div>
         </div>
