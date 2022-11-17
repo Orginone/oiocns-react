@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
-import { TargetType } from '../../enum';
+import { TargetType } from '../enum';
 // import BaseTarget from '../base';
-import Company from '../company';
-import { kernel, model, schema, common } from '../../../base';
-import University from '../university';
-import Hospital from '../hospital';
+import Company from '../target/company';
+import { kernel, model, schema, common } from '../../base';
+import University from '../target/university';
+import Hospital from '../target/hospital';
 
-import Types from '../../../../module/typings';
-import { XTarget } from '../../../base/schema';
-
+import Types from '../../../module/typings';
+import { XTarget } from '../../base/schema';
+import BaseService from './baseservice';
 
 /**
  * 我的设置里面的接口
@@ -16,17 +16,17 @@ import { XTarget } from '../../../base/schema';
  * import Provider from '@/ts/core/provider';
    import Person from '@/ts/core/target/person';   
 
-   import Userdata from '@/ts/core/target/setting/userData';
+   import Userdata from '@/ts/core/service/userdataservice';
    Userdata.getInstance().searchCompany();
  */
-export default class userdata {
+export default class userdataservice extends BaseService {
 
     // 单例
-    private static _instance: userdata;
+    private static _instance: userdataservice;
     /**单例模式 */
     public static getInstance() {
         if (this._instance == null) {
-            this._instance = new userdata();
+            this._instance = new userdataservice();
         }
         return this._instance;
     }
