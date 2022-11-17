@@ -33,12 +33,6 @@ export default class Person extends BaseTarget {
     return [TargetType.Cohort];
   }
 
-  /** 暴露 当前的单位 */
-  //TODO:至少默认 个人空间
-  public get curCompany(): Company | undefined {
-    return this._curCompany;
-  }
-
   /**
    * 创建群组
    * @param name 名称
@@ -132,7 +126,70 @@ export default class Person extends BaseTarget {
    * 申请加入单位
    * @param _companyId 单位id
    */
-  public applyJoinCompany(_companyId: string): void {}
+  public async applyJoinCompany(
+    _companyId: string,
+    _companyType: TargetType,
+  ): Promise<model.ResultType<any>> {
+    if (this.companyTypes.includes(_companyType)) {
+      return await kernel.applyJoinTeam({
+        id: _companyId,
+        targetId: this.target.id,
+        teamType: _companyType,
+        targetType: TargetType.Person,
+      });
+    }
+    return FaildResult('无法加入该类型组织!');
+  }
+
+  /**
+   * 申请加入市场
+   * @param id 市场ID
+   * @returns
+   */
+  public async applyJoinStore(id: string): Promise<model.ResultType<any>> {
+    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
+  }
+
+  /**
+   * 查询我的产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
+    // model.IDBelongReq
+    let paramData: any = {};
+    paramData.id = this.target.id;
+    paramData.page = {
+      offset: 0,
+      filter: this.target.id,
+      limit: common.Constants.MAX_UINT_8,
+    };
+    return await kernel.querySelfProduct(paramData);
+  }
+
+  /**
+   * @description: 查询我加入的群
+   * @return {*} 查询到的群组
+   */
+  public async getJoinedCohorts(): Promise<Cohort[]> {
+    if (this._joinedCohorts.length > 0) {
+      return this._joinedCohorts;
+    }
+    let res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: this.cohortTypes,
+    });
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        switch (item.typeName) {
+          case TargetType.Cohort:
+            this._joinedCohorts.push(new Cohort(item));
+            break;
+        }
+      });
+    }
+    return this._joinedCohorts;
+  }
 
   /**
    * 获取单位列表
