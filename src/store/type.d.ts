@@ -1,3 +1,5 @@
+import Person from '@/ts/core/target/person';
+
 /* eslint-disable no-unused-vars */
 interface InfoProps {
   userId: string;
@@ -48,6 +50,8 @@ export type StateProps = {
 
   /**@name 当前修改项 */
   editItem: any;
+  /**@name 当前用户的person类实例 */
+  userObj: Person | null;
 
   login: (account: string, password: string) => Promise<boolean>;
   setUser: (val: UserType) => void;

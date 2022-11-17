@@ -1,6 +1,5 @@
 import { kernel, model, common, schema } from '../../base';
 
-
 export default class BaseTarget {
   public readonly target: schema.XTarget;
   constructor(target: schema.XTarget) {
@@ -14,7 +13,7 @@ export default class BaseTarget {
    */
   public async getjoined(data: any): Promise<model.ResultType<schema.XTargetArray>> {
     data.id = this.target.id;
-    data.typeName = [this.target.typeName];
+    data.typeName = this.target.typeName;
     data.page = {
       offset: 0,
       filter: '',

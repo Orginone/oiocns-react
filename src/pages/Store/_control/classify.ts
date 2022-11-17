@@ -1,29 +1,22 @@
 import { MarketTypes } from 'typings/marketType';
 import API from '@/services';
 import StoreContent from './content';
-import { kernel } from '@/ts/base';
+import Provider from '@/ts/core/provider';
+import AppStore from '@/ts/core/market/appstore';
+import { resetParams } from '@/utils/tools';
 /**
  * @desc: 仓库模块 导航控件
- * @return {*}
+ * @return {*}/
  */
 type menyuType = 'app' | 'docx' | 'data' | 'assets';
-/**
- * @desc: 处理 翻页参数问题
- * @param {T} params
- * @return {*}
- */
-const _resetParams = (params: any) => {
-  const { page, pageSize, ...rest } = params;
-  const num = (page - 1) * pageSize;
-
-  return {
-    offset: num >= 0 ? num : 0,
-    limit: pageSize || 20,
-    ...rest,
-  };
+type footerTreeType = {
+  appTreeData: any[];
+  docxTreeData: any[];
+  dataTreeData: any[];
+  assetsTreeData: any[];
 };
+
 class StoreClassify {
-  // constructor(parameters) {}
   private _curMarket: MarketTypes.MarketType; // 当前商店实例
 
   private currentMenu!: '应用';
@@ -32,13 +25,14 @@ class StoreClassify {
 
   // 底部区域
   // 缓存 tree 展示数据
-  public footerTree: any = {
+  public footerTree: footerTreeType = {
     appTreeData: [],
     docxTreeData: [],
     dataTreeData: [],
     assetsTreeData: [],
   };
-  // 顶部区域
+
+  // 顶部菜单区域
   static SelfMenu = [
     { title: '应用', code: 'app' },
     { title: '文档', code: 'docx' },
@@ -66,7 +60,9 @@ class StoreClassify {
    */
   protected getTreeData() {
     //TODO:调用获取节点信息接口
+    // 1.获取市场
     this.getMarketList();
+    //获取文档
   }
   /**
    * @desc: 获取市场列表
@@ -76,21 +72,23 @@ class StoreClassify {
    * @return {*}
    */
   getOwnMarket = async () => {
-    const params = {
-      page: 1,
-      pageSize: 100,
-      filter: '',
-    };
+    const marketTree = await Provider.person.getJoinMarkets();
+    console.log('获取拥有的市场55', marketTree);
 
-    const { success, data } = await kernel.queryOwnMarket(_resetParams(params));
-    console.log('获取拥有的市场55', success, data);
-    if (!success) {
-      return;
-    }
-    const { result = [], total = 0 } = data;
-    console.log('获取拥有的市场', result);
+    let arr = marketTree.map((itemModel: AppStore, index: any) => {
+      const item = itemModel.selfData;
+      return {
+        title: item.name,
+        key: `0-${index}`,
+        id: item.id,
+        children: [],
+        node: item,
+      };
+    });
 
-    this.footerTree.appTreeData = result;
+    this.footerTree.appTreeData = arr;
+
+    this.TreeCallBack(arr);
   };
   /**
    * @desc: 获取市场列表
@@ -106,7 +104,7 @@ class StoreClassify {
       filter: '',
     };
     const { data, success } = await API.market.searchOwn({
-      data: _resetParams(params),
+      data: resetParams(params),
     });
     if (success) {
       const { result = [], total = 0 } = data;

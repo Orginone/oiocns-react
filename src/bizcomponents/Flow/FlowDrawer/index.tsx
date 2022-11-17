@@ -46,7 +46,7 @@ const FlowDrawer = (props: Iprops) => {
       placement="right"
       open={open}
       onClose={onClose}
-      width={500}>
+      width={600}>
       <>{Comp && Comp}</>
     </Drawer>
   );

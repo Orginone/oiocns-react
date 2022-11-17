@@ -597,6 +597,7 @@ export type XMerchandise = {
   // 产品ID
   productId: string;
   // 单价
+  price: number;
   // 出售权属
   sellAuth: string;
   // 有效期

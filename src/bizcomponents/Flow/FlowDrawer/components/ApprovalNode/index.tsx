@@ -36,13 +36,14 @@ const ApprovalNode = () => {
   const rovalnode = (
     <div className={cls[`roval-node`]}>
       <Row>
-        <SettingOutlined />
+        <SettingOutlined style={{ marginTop: '3px' }} />
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
         <Button
           type="primary"
           shape="round"
+          size="small"
           onClick={() => {
             setIsOpen(true);
             getJoinedCohort();
@@ -66,8 +67,12 @@ const ApprovalNode = () => {
         <Row>
           <Radio.Group onChange={onChange} value={value}>
             <Radio value={1}>直接结束流程</Radio>
-            <Radio value={2}>驳回到上级审批节点</Radio>
-            <Radio value={3}>驳回到指定节点</Radio>
+            <Radio value={2} disabled>
+              驳回到上级审批节点
+            </Radio>
+            <Radio value={3} disabled>
+              驳回到指定节点
+            </Radio>
           </Radio.Group>
         </Row>
       </div>
