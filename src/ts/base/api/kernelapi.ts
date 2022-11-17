@@ -687,7 +687,7 @@ export default class KernelApi {
   ): Promise<model.ResultType<any>> {
     return await this.request({
       module: 'target',
-      action: 'pullAnyToTeam',
+      action: 'PullAnyToTeam',
       params: params,
     });
   }

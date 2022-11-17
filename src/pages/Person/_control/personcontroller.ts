@@ -3,10 +3,12 @@ import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
 import UserdataService from '@/ts/core/target/user';
 import BaseController from './basecontroller';
+import Provider from '@/ts/core/provider';
+import { TargetType } from '@/ts/core/enum';
 
 /**
  * 控制器
- * import PersonController from '@/ts/ctrl/personcontroller';
+ * import PersonController from '@/pages/Person/_control/personcontroller';
    PersonController.getInstance().searchCompany();
  */
 export default class personcontroller extends BaseController {
@@ -43,8 +45,9 @@ export default class personcontroller extends BaseController {
     /**
    * 获取用户已加入的单位组织
    */
-    public getJoinedCompany() {
-
+    public async getJoinedCompanys(callback: any) {
+        const datas = Provider.getPerson.getJoinedCompanys();
+        callback(datas);
     }
 
 
@@ -61,8 +64,10 @@ export default class personcontroller extends BaseController {
      * @param id 单位ID
      * @returns
      */
-    public applyJoin(id: string) {
-
+    public async applyJoinCompany(id: string): Promise<boolean> {
+        const success =
+            await this.userDataService.applyJoinCompany(id,TargetType.Company);
+        return success;
     }
 
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
 import Company from '../target/company';
-import { kernel, model, schema, common } from '../../base';
+import { kernel, schema, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
@@ -9,6 +9,7 @@ import Provider from '../provider';
 import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
+
 
 /**
  * 我的设置里面的接口
@@ -35,7 +36,7 @@ export default class userdataservice extends BaseService {
     constructor(target: schema.XTarget) {
         super(target);
     }
-    
+
     /**
      * 搜索单位(公司) 数组里面还有target 
      * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
@@ -83,6 +84,31 @@ export default class userdataservice extends BaseService {
         }
         return pageData;
     }
+
+    /**加入公司 */
+    public async applyJoinCompany(targetId: string, applyType: TargetType): Promise<boolean> {
+        const res = await kernel.applyJoinTeam({
+            id: targetId,
+            targetId: this.target.id,
+            teamType: applyType,
+            targetType: TargetType.Person,
+        });
+        return res.success;
+    }
+
+    /**取消加入组织或个人 */
+    public async cancelJoinCompany(targetId: string, 
+            belongId: string, applyType: TargetType): Promise<boolean> {
+        const res = await kernel.cancelJoinTeam({
+            id: targetId,
+            typeName: applyType,
+            belongId: belongId,
+        });
+        return res.success;
+    }
+
+
+
 
 
 }
