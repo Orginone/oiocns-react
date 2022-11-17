@@ -109,6 +109,12 @@ export default class BaseTarget {
     });
   }
 
+  public async getTargetByName(
+    data: model.NameTypeModel,
+  ): Promise<model.ResultType<XTarget>> {
+    return await kernel.queryTargetByName(data);
+  }
+
   /**
    * 查询商店列表
    * @returns 商店列表
