@@ -47,7 +47,7 @@ const StoreClassify: React.FC = () => {
   // const history = useHistory();
   useEffect(() => {
     // getTreeList();
-    ClassServices.getOwnMarket(user?.workspaceId || '');
+    ClassServices.getOwnMarket();
     ClassServices.TreeCallBack = setList;
   }, []);
   // useEffect(() => {

@@ -2,10 +2,7 @@ import { MarketTypes } from 'typings/marketType';
 import API from '@/services';
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
-import useStore from '@/store';
-import { UserType } from '@/store/type';
-import { XMarket } from '@/ts/base/schema';
-
+import AppStore from '@/ts/core/market/appstore';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}/
@@ -33,7 +30,6 @@ const _resetParams = (params: any) => {
   };
 };
 class StoreClassify {
-  // constructor(parameters) {}
   private _curMarket: MarketTypes.MarketType; // 当前商店实例
 
   private currentMenu!: '应用';
@@ -42,13 +38,13 @@ class StoreClassify {
 
   // 底部区域
   // 缓存 tree 展示数据
-  public footerTree: any = {
+  public footerTree: footerTreeType = {
     appTreeData: [],
     docxTreeData: [],
     dataTreeData: [],
     assetsTreeData: [],
   };
-  public userObj: Person;
+
   // 顶部区域
   static SelfMenu = [
     { title: '应用', code: 'app' },
@@ -59,17 +55,6 @@ class StoreClassify {
   // 商店导航
   // static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
 
-  // 底部区域
-  // 缓存 tree 展示数据
-  public footerTree: footerTreeType = {
-    appTreeData: [],
-    docxTreeData: [],
-    dataTreeData: [],
-    assetsTreeData: [],
-  };
-  // constructor(user: any) {
-  //   this.userObj = Person.getInstance(user);
-  // }
   /**
    * @desc 处理点击顶部导航获取tree 数据
    * @param  {any}  item 单个菜单
@@ -97,26 +82,18 @@ class StoreClassify {
    * @param {string} params.filter 过滤关键字
    * @return {*}
    */
-  getOwnMarket = async (id: string) => {
-    const params = {
-      id,
-      page: 1,
-      pageSize: 100,
-      filter: '',
-    };
+  getOwnMarket = async () => {
+    const marketTree = await Provider.person.getJoinMarkets();
+    console.log('获取拥有的市场55', marketTree);
 
-    const { success, data } = await Provider.person.getMarketList(params);
-    console.log('获取拥有的市场55', success, data);
-    if (!success) {
-      return [];
-    }
-    const { result = [], total = 0 } = data;
-    let arr = result.map((item: { name: any; id: any }, index: any) => {
+    let arr = marketTree.map((itemModel: AppStore, index: any) => {
+      const item = itemModel.selfData;
       return {
         title: item.name,
         key: `0-${index}`,
         id: item.id,
         children: [],
+        node: item,
       };
     });
 
