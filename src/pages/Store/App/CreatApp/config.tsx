@@ -140,10 +140,9 @@ const valueTypeColumns: ProFormColumnsType<DataItem> = {
   title: '枚举配置',
   valueType: 'group',
   colProps: { span: 24 },
-
   columns: [
     {
-      valueInded
+      dataIndex: 'emnunList',
       valueType: 'formList',
       colProps: { span: 24 },
       fieldProps: {
