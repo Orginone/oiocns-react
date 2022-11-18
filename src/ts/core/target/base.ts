@@ -11,7 +11,7 @@ export default class BaseTarget {
     return [TargetType.Cohort];
   }
   protected get joinTargetType(): TargetType[] {
-    return [TargetType.Cohort,TargetType.Person];
+    return [TargetType.Cohort, TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
@@ -94,15 +94,61 @@ export default class BaseTarget {
    * @param data 请求参数
    * @returns 请求结果
    */
-  public async getjoined(data: any): Promise<model.ResultType<schema.XTargetArray>> {
-    data.id = this.target.id;
-    data.typeName = this.target.typeName;
-    data.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_16,
-    };
-    return await kernel.queryJoinedTargetById(data);
+  protected async getjoined(
+    data: Omit<model.IDReqJoinedModel, 'id' | 'typeName' | 'page'>,
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.queryJoinedTargetById({
+      id: this.target.id,
+      typeName: this.target.typeName,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+      ...data,
+    });
+  }
+
+  public async getTargetByName(
+    data: model.NameTypeModel,
+  ): Promise<model.ResultType<XTarget>> {
+    return await kernel.queryTargetByName(data);
+  }
+
+  /**
+   * 查询商店列表
+   * @returns 商店列表
+   */
+  public async getJoinMarkets(): Promise<AppStore[]> {
+    if (this._joinedMarkets.length > 0) {
+      return this._joinedMarkets;
+    }
+    const res = await kernel.queryOwnMarket({
+      id: this.target.id,
+      page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+    });
+    if (res.success) {
+      res.data.result.forEach((market) => {
+        this._joinedMarkets.push(new AppStore(market));
+      });
+    }
+    return this._joinedMarkets;
+  }
+
+  /**
+   * 退出市场
+   * @param appStore 退出的市场
+   * @returns
+   */
+  public async quitMarket(appStore: AppStore): Promise<model.ResultType<any>> {
+    const res = await kernel.quitMarket({
+      id: appStore.store.id,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      delete this._joinedMarkets[this._joinedMarkets.indexOf(appStore)];
+    }
+    return res;
   }
 
   /**
@@ -130,18 +176,17 @@ export default class BaseTarget {
     });
   }
 
-  public async search(name: string,TypeName:string
-    ): Promise<model.ResultType<any>> {
-      const data:model.NameTypeModel = {
-        name: name,
-        typeName: TypeName,
-        page : {
-          offset: 0,
-          filter: name,
-          limit: common.Constants.MAX_UINT_16,
-        }
-      }
-      const res = await kernel.searchTargetByName(data);
-      return res;
-    }
+  public async search(name: string, TypeName: string): Promise<model.ResultType<any>> {
+    const data: model.NameTypeModel = {
+      name: name,
+      typeName: TypeName,
+      page: {
+        offset: 0,
+        filter: name,
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.searchTargetByName(data);
+    return res;
+  }
 }
