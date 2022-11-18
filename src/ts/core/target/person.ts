@@ -63,7 +63,7 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success && res.data!=undefined && res.data.result!=undefined) {
+    if (res.success && res.data != undefined && res.data.result != undefined) {
       this._joinedCohorts = [];
       for (var i = 0; i < res.data?.result.length; i++) {
         const cohort = new Cohort(res.data?.result[i]);
@@ -115,7 +115,7 @@ export default class Person extends BaseTarget {
       code,
       remark,
     );
-    if (res.success && res.data!=undefined) {
+    if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
       this._joinedCohorts.push(cohort);
       return cohort.pullPersons([this.target.id]);
@@ -219,7 +219,7 @@ export default class Person extends BaseTarget {
     });
     console.log('好友查询结果', res);
     if (res.success) {
-      if(res.data!=undefined &&res.data.result!=undefined){
+      if (res.data != undefined && res.data.result != undefined) {
         this._friends = res.data.result;
       }
     }
@@ -260,7 +260,7 @@ export default class Person extends BaseTarget {
     }
     if (tres.data == null) {
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
-      if (res.success && res.data!=undefined) {
+      if (res.success && res.data != undefined) {
         let company;
         switch (type) {
           case TargetType.University:
@@ -287,34 +287,47 @@ export default class Person extends BaseTarget {
    * @param params
    * @returns
    */
-  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-    // model.IDBelongReq
+  public async queryMyProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
     let paramData: any = {};
     paramData.id = this.target.id;
     paramData.page = {
       offset: 0,
-      filter: this.target.id,
+      filter: '',
       limit: common.Constants.MAX_UINT_8,
     };
-    return await kernel.querySelfProduct(paramData);
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
   }
 
-  // /**
-  //  * 查询我的产品/应用
-  //  * @param params
-  //  * @returns
-  //  */
-  // public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-  //   // model.IDBelongReq
-  //   let paramData: any = {};
-  //   paramData.id = this.target.id;
-  //   paramData.page = {
-  //     offset: 0,
-  //     filter: this.target.id,
-  //     limit: common.Constants.MAX_UINT_8,
-  //   };
-  //   return await kernel.querySelfProduct(paramData);
-  // }
+  /**
+   * 查询我的个人产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMySpaceProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
+    // 判断如果是有个人空间
+    if (!this._curCompany) {
+      return resultArray;
+    }
+
+    let paramData: any = {};
+    paramData.id = this._joinedCompanys[0].target.id;
+    paramData.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_8,
+    };
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
+  }
 
   /**
    * @description: 查询我加入的群
