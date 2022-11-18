@@ -8,7 +8,7 @@ module.exports = {
   endOfLine: 'auto', //避免报错delete (cr)的错
   proseWrap: 'always',
   htmlWhitespaceSensitivity: 'ignore', // 忽略'>'下落问题
-  jsxBracketSameLine: false, // 在jsx中把'>' 不单独放一行
+  jsxBracketSameLine: true, // 在jsx中把'>' 不单独放一行
 
   // 在对象文字中打印括号之间的空格。 默认true
   bracketSpacing: true,
