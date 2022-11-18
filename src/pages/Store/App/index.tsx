@@ -14,6 +14,7 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
+import Content from '../_control/content';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -26,6 +27,7 @@ const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
@@ -71,7 +73,16 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const submitShare = () => {};
+  const onCheckeds = (checkedValus: any) => {
+    setCheckNodes(checkedValus);
+  };
+
+  // 共享确认回调
+  const submitShare = () => {
+    console.log('当前被选中的每一项', checkNodes);
+
+    setShowShareModal(false);
+  };
   const renderOperation = (
     item: MarketTypes.ProductType,
   ): MarketTypes.OperationType[] => {
@@ -176,7 +187,7 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp></ShareComp>
+        <ShareComp onCheckeds={onCheckeds} />
       </Modal>
       {/* 详情页面 /store/app/info*/}
       <Route

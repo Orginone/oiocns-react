@@ -5,61 +5,45 @@ import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/sch
 
 export default class AppStore {
   // 商店实体
-  private _store: XMarket;
+  public readonly store: XMarket;
 
   constructor(store: XMarket) {
-    this._store = store;
+    this.store = store;
   }
 
-  public get selfData() {
-    return this._store;
-  }
-  // constructor(info) {
-  //判断拥有那些功能
-  // }
-  //打开
-  openApp() {
-    console.log('打开');
-  }
-  // 获取详情
-  getInfo() {
-    console.log('获取详情');
-  }
-  // 管理
-  manageApp() {
-    console.log('管理');
-  }
-  // 上架
-  putawayApp() {
-    console.log('putawayApp');
-  }
-  // 下架
-  soldOutApp() {
-    console.log('soldOutApp');
-  }
-  //共享
-  shareApp() {
-    console.log('shareApp');
-  }
-  //分发
-  giveOutApp() {
-    console.log('giveOutApp');
-  }
-  // 购买
-  buyApp() {
-    console.log('buyApp');
-  }
-  //加购物车
-  addCart() {
-    console.log('addCart');
-  }
-  //获取订单
-  getOrderList() {
-    console.log('getOrderList');
-  }
-  //取消订单
-  cancleOrder() {
-    console.log('cancleOrder');
+  /**
+   * 更新商店信息
+   * @param name 商店名称
+   * @param code 商店编号
+   * @param samrId 监管组织/个人
+   * @param remark 备注
+   * @param ispublic 是否公开
+   * @returns
+   */
+  public async update(
+    name: string,
+    code: string,
+    samrId: string,
+    remark: string,
+    ispublic: boolean,
+  ): Promise<ResultType<any>> {
+    const res = await kernel.updateMarket({
+      id: this.store.id,
+      name,
+      code,
+      samrId,
+      remark,
+      public: ispublic,
+      belongId: this.store.belongId,
+    });
+    if (res.success) {
+      this.store.name = name;
+      this.store.code = code;
+      this.store.samrId = samrId;
+      this.store.remark = remark;
+      this.store.public = ispublic;
+    }
+    return res;
   }
 
   /**
@@ -69,7 +53,7 @@ export default class AppStore {
    */
   public async getUser(page: PageRequest): Promise<ResultType<XMarketRelationArray>> {
     return await kernel.queryMarketMember({
-      id: this._store.id,
+      id: this.store.id,
       page: page,
     });
   }
@@ -78,7 +62,14 @@ export default class AppStore {
    * 分页获取加入商店申请
    * @param page
    */
-  public async getUserApply(page: PageRequest) {}
+  public async getUserApply(
+    page: PageRequest,
+  ): Promise<ResultType<XMarketRelationArray>> {
+    return await kernel.queryJoinMarketApply({
+      id: this.store.id,
+      page,
+    });
+  }
 
   /**
    * 审批商店成员加入申请
@@ -101,7 +92,7 @@ export default class AppStore {
    */
   public async pull(targetIds: string[], typenames: string[]): Promise<ResultType<any>> {
     return await kernel.pullAnyToMarket({
-      marketId: this._store.id,
+      marketId: this.store.id,
       targetIds: targetIds,
       typeNames: typenames,
     });
@@ -124,7 +115,7 @@ export default class AppStore {
    */
   public async getMerchandise(page: PageRequest): Promise<ResultType<XMerchandiseArray>> {
     return await kernel.searchMerchandise({
-      id: this._store.id,
+      id: this.store.id,
       page: page,
     });
   }
@@ -138,7 +129,7 @@ export default class AppStore {
     page: PageRequest,
   ): Promise<ResultType<XMerchandiseArray>> {
     return await kernel.queryMerchandiesApplyByManager({
-      id: this._store.id,
+      id: this.store.id,
       page: page,
     });
   }

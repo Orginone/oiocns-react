@@ -632,7 +632,7 @@ export type SearchExtendReq = {
   // 归属ID
   spaceId: number | string;
   // TeamID
-  teamId: number | string;
+  teamId?: number | string;
 };
 
 export type MarketPullModel = {

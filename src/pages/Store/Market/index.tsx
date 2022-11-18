@@ -6,7 +6,7 @@ import { renderRoutes } from 'react-router-config';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
 
-import MarketClassify from './components/Classify';
+import MarketClassify from './Classify';
 
 interface PageType {
   route: IRouteConfig;

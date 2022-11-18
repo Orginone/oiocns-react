@@ -63,7 +63,7 @@ const CohortConfig: React.FC = () => {
         label: '修改群组',
         onClick: () => {
           setOpen(true);
-          console.log('按钮事件123', 'updateCohort', item);
+          console.log('按钮事件127777777743', 'updateCohort', item);
         },
       },
       {
