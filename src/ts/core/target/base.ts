@@ -8,10 +8,10 @@ export default class BaseTarget {
   protected _joinedMarkets: AppStore[];
 
   protected get createTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort];
   }
   protected get joinTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort,TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
@@ -169,4 +169,19 @@ export default class BaseTarget {
       page,
     });
   }
+
+  public async search(name: string,TypeName:string
+    ): Promise<model.ResultType<any>> {
+      const data:model.NameTypeModel = {
+        name: name,
+        typeName: TypeName,
+        page : {
+          offset: 0,
+          filter: name,
+          limit: common.Constants.MAX_UINT_16,
+        }
+      }
+      const res = await kernel.searchTargetByName(data);
+      return res;
+    }
 }

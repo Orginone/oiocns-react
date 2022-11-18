@@ -1,4 +1,3 @@
-
 export type ChatMsgInfo = {
   id: number;
   spaceId: number;
@@ -31,4 +30,3 @@ export type SendMsgReq = {
   msgType: string;
   msgBody: string;
 };
-

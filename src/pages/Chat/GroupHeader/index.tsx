@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Modal } from 'antd';
 import React, { useState } from 'react';
@@ -7,7 +6,7 @@ import QrCodeCustom from '@/components/qrCode';
 import useChatStore from '@/store/chat';
 import headerStyle from './index.module.less';
 
-/* 
+/*
   头部展示
 */
 
