@@ -1,4 +1,3 @@
-
 export type ApprovalReq = {
   id: number;
   status: number;
@@ -79,4 +78,3 @@ export type TargetReq = {
   teamCode?: string;
   teamRemark?: string;
 };
-
