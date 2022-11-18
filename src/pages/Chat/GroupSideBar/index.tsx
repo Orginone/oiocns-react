@@ -9,7 +9,7 @@ import { formatDate } from '@/utils/index';
 import sideStyle from './index.module.less';
 
 /**
- * @description: 会话列表、通讯录
+ * @description: 会话列表、66通讯录
  * @return {*}
  */
 
