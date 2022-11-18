@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
-import UserdataService from '@/ts/core/target/user';
+// import UserdataService from '@/ts/core/target/user';
 import BaseController from './basecontroller';
 import Provider from '@/ts/core/provider';
 import { TargetType } from '@/ts/core/enum';
@@ -24,7 +24,7 @@ export default class personcontroller extends BaseController {
     }
 
     /**用户数据service */
-    private userDataService: UserdataService = UserdataService.getInstance();
+    // private userDataService: UserdataService = UserdataService.getInstance();
 
     /**构造方法 */
     constructor() {
@@ -37,9 +37,9 @@ export default class personcontroller extends BaseController {
      * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
      */
     public async searchCompany(page: Types.Page, callback: any) {
-        const datas: Types.PageData<XTarget> =
-            await this.userDataService.searchCompany(page);
-        callback(datas);
+        // const datas: Types.PageData<XTarget> =
+        //     await this.userDataService.searchCompany(page);
+        // callback(datas);
     }
 
     /**
@@ -65,9 +65,9 @@ export default class personcontroller extends BaseController {
      * @returns
      */
     public async applyJoinCompany(id: string): Promise<boolean> {
-        const success =
-            await this.userDataService.applyJoinCompany(id, TargetType.Company);
-        return success;
+        // const success =
+        //     await this.userDataService.applyJoinCompany(id, TargetType.Company);
+        return true;
     }
 
 
