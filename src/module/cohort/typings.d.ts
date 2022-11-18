@@ -1,4 +1,3 @@
-
 export type CreateOrderByStagReq = {
   name: string;
   code?: string;
@@ -15,8 +14,3 @@ export type PayReq = {
   price: number;
   paymentType: string;
 };
-
-
-
-
-

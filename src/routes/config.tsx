@@ -175,6 +175,12 @@ const StoreRouter: IRouteConfig[] = [
             component: React.lazy(() => import('@/pages/Store/App/Manage')),
           },
           {
+            path: '/store/app/create',
+            title: '应用管理',
+            icon: '',
+            component: React.lazy(() => import('@/pages/Store/App/CreatApp')),
+          },
+          {
             path: '/store/app/putaway',
             title: '应用上架',
             icon: '',
@@ -209,7 +215,7 @@ const StoreRouter: IRouteConfig[] = [
 const MarketRouter: IRouteConfig[] = [
   {
     path: '/market',
-    component: React.lazy(() => import('@/pages/Market')),
+    component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
     icon: 'icon-guangshangcheng',
     routes: [
@@ -217,17 +223,27 @@ const MarketRouter: IRouteConfig[] = [
         path: '/market/shop',
         title: '应用市场',
         icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Market/Shop')),
+        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
       },
       {
         path: '/market/docx',
         title: '文档市场',
         icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Market/Docx')),
+        component: React.lazy(() => import('@/pages/Store/Market/Docx')),
+      },
+      {
+        path: '/market/data',
+        title: '数据市场',
+        component: React.lazy(() => import('@/pages/Store/Market/Data')),
+      },
+      {
+        path: '/market/publicProperty',
+        title: '公物仓',
+        component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
       },
       {
         path: '/market',
-        title: '市场',
+        title: '应用市场',
         render: () => <RouterRedirect to="/market/shop" />,
       },
     ],

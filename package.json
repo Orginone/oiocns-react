@@ -15,14 +15,31 @@
     "build:release": "vite build --mode release",
     "build:legacy": "vite build --mode legacy ",
     "build:deploy": "vite build --base=/vite-react-ts/",
+    "lint": "npm run lint:js && npm run lint:prettier && npm run tsc",
+    "lint-staged": "lint-staged",
+    "lint-staged:js": "eslint --ext .js,.jsx,.ts,.tsx ",
+    "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src ",
+    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
+    "lint:prettier": "prettier -c --write \"src/**/*\" --end-of-line auto",
     "deploy": "gh-pages -d dist",
     "postinstall": "husky install",
     "commitlint": "commitlint --from=master",
-    "lint:fix": "eslint --cache --ext .js,.jsx,.ts,.tsx --no-error-on-unmatched-pattern --quiet --fix ./src",
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "lint-staged": {
-    "./src/*.{js,jsx,ts,tsx}": ["npm run lint:fix","git add"]
+    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
+    "./src/*.{js,jsx,tsx,ts,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.{less,css}": [
+      "prettier --parser --write"
+    ]
   },
   "browserslist": [
     "> 1%",

@@ -406,7 +406,7 @@ export type LogModel = {
   //内容
   content: string;
 };
-
+// 市场
 export type MarketModel = {
   // 唯一ID
   id: string;
@@ -496,7 +496,7 @@ export type OrderPayModel = {
   // 支付方式
   paymentType: string;
 };
-
+// 产品基础信息
 export type ProductModel = {
   // 唯一ID
   id: string;
@@ -515,7 +515,7 @@ export type ProductModel = {
   // 资源列表
   resources: ResourceModel[];
 };
-
+// 产品资源信息
 export type ResourceModel = {
   // 唯一ID
   id: string;
@@ -632,7 +632,7 @@ export type SearchExtendReq = {
   // 归属ID
   spaceId: number | string;
   // TeamID
-  teamId: number | string;
+  teamId?: number | string;
 };
 
 export type MarketPullModel = {
