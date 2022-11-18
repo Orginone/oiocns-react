@@ -3,6 +3,8 @@ import { TargetType } from '../enum';
 import BaseTarget from './base';
 import API from '../../../services';
 import { common, kernel, model, FaildResult } from '../../base';
+import { format } from 'path/posix';
+import { formatDate } from '@/utils';
 export default class Cohort extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
@@ -17,7 +19,6 @@ export default class Cohort extends BaseTarget {
       targetType: TargetType.Person,
       targetIds: personIds,
     });
-    console.log("结果",res)
     return res.success;
   }
 
@@ -31,6 +32,15 @@ export default class Cohort extends BaseTarget {
     params: model.TargetModel
   ): Promise<model.ResultType<any>> {
     let res = await kernel.updateTarget(params);
+    if(res.success){
+      this.target.name = params.name;
+      this.target.code = params.code
+      this.target.team.name = params.name;
+      this.target.team.code = params.code;
+      this.target.team.remark = params.teamRemark;
+      this.target.updateUser = formatDate(new Date().getTime);
+      this.target.team.updateTime = formatDate(new Date().getTime);
+    }
     return res;
   }
 
