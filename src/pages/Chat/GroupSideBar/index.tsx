@@ -8,9 +8,10 @@ import useChatStore from '@/store/chat';
 import { formatDate } from '@/utils/index';
 import sideStyle from './index.module.less';
 
-/* 
-  会话列表、通讯录
-*/
+/**
+ * @description: 会话列表、通讯录
+ * @return {*}
+ */
 
 interface MousePosition {
   left: number; // 右键弹窗离左侧的位置
@@ -205,14 +206,17 @@ const GroupSideBar: React.FC = () => {
                       className={sideStyle.group_con_show}
                       onClick={() => {
                         openChangeds(child);
-                      }}>
+                      }}
+                    >
                       <div className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                         <div
-                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
+                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
+                        >
                           {child.name}
                         </div>
                         <div
-                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
+                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
+                        >
                           {handleFormatDate(child.msgTime)}
                         </div>
                       </div>
@@ -230,7 +234,8 @@ const GroupSideBar: React.FC = () => {
             className={sideStyle.group_side_bar_wrap}
             onContextMenu={(e) => {
               e.preventDefault();
-            }}>
+            }}
+          >
             {ChatStore.chats.map((item: any) => {
               return (
                 <div key={item.id}>
@@ -242,7 +247,8 @@ const GroupSideBar: React.FC = () => {
                       }`}
                       onClick={() => {
                         handleOpenSpace(item.id);
-                      }}>
+                      }}
+                    >
                       <span>
                         {item.name}({item?.chats?.length ?? 0})
                       </span>
@@ -260,11 +266,13 @@ const GroupSideBar: React.FC = () => {
                                   : ''
                               }`}
                               key={child.id}
-                              onContextMenu={(e: any) => handleContextClick(e, child)}>
+                              onContextMenu={(e: any) => handleContextClick(e, child)}
+                            >
                               <HeadImg name={child.name} label={child.label} />
                               {child.noRead > 0 ? (
                                 <div
-                                  className={`${sideStyle.group_con} ${sideStyle.dot}`}>
+                                  className={`${sideStyle.group_con} ${sideStyle.dot}`}
+                                >
                                   <span>{child.noRead}</span>
                                 </div>
                               ) : (
@@ -274,20 +282,25 @@ const GroupSideBar: React.FC = () => {
                                 className={sideStyle.group_con_show}
                                 onClick={() => {
                                   openChangeds(child);
-                                }}>
+                                }}
+                              >
                                 <div
-                                  className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
+                                  className={`${sideStyle.group_con_show} ${sideStyle.name}`}
+                                >
                                   <div
-                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
+                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
+                                  >
                                     {child.name}
                                   </div>
                                   <div
-                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
+                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
+                                  >
                                     {handleFormatDate(child.msgTime)}
                                   </div>
                                 </div>
                                 <div
-                                  className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
+                                  className={`${sideStyle.group_con_show} ${sideStyle.msg}`}
+                                >
                                   {child.showTxt}
                                 </div>
                               </div>
@@ -308,11 +321,13 @@ const GroupSideBar: React.FC = () => {
                               return (
                                 <div
                                   key={child.id + child.name}
-                                  className={`${sideStyle.con_body} ${sideStyle.open_item}`}>
+                                  className={`${sideStyle.con_body} ${sideStyle.open_item}`}
+                                >
                                   <HeadImg name={child.name} label={child.label} />
                                   {child.noRead > 0 ? (
                                     <div
-                                      className={`${sideStyle.group_con} ${sideStyle.dot}`}>
+                                      className={`${sideStyle.group_con} ${sideStyle.dot}`}
+                                    >
                                       <span>{child.noRead}</span>
                                     </div>
                                   ) : (
@@ -322,20 +337,25 @@ const GroupSideBar: React.FC = () => {
                                     className={`${sideStyle.group_con_show}`}
                                     onClick={() => {
                                       openChangeds(child);
-                                    }}>
+                                    }}
+                                  >
                                     <div
-                                      className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
+                                      className={`${sideStyle.group_con_show} ${sideStyle.name}`}
+                                    >
                                       <div
-                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
+                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
+                                      >
                                         {child.name}
                                       </div>
                                       <div
-                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
+                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
+                                      >
                                         {handleFormatDate(child.msgTime)}
                                       </div>
                                     </div>
                                     <div
-                                      className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
+                                      className={`${sideStyle.group_con_show} ${sideStyle.msg}`}
+                                    >
                                       {child.showTxt}
                                     </div>
                                   </div>
@@ -358,7 +378,8 @@ const GroupSideBar: React.FC = () => {
       {mousePosition.isShowContext ? (
         <div
           className={sideStyle.context_text_wrap}
-          style={{ left: `${mousePosition.left}px`, top: `${mousePosition.top}px` }}>
+          style={{ left: `${mousePosition.left}px`, top: `${mousePosition.top}px` }}
+        >
           {mousePosition.selectMenu?.map((item) => {
             return (
               <div
@@ -366,7 +387,8 @@ const GroupSideBar: React.FC = () => {
                 className={sideStyle.context_menu_item}
                 onClick={() => {
                   handleContextChange(item);
-                }}>
+                }}
+              >
                 {item.label}
               </div>
             );
