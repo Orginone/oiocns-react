@@ -10,14 +10,16 @@ import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
 
+
 /**
  * 我的设置里面的接口
  * const person: Person = Provider.getPerson;
  * import Provider from '@/ts/core/provider';
-   import Person from '@/ts/core/target/person';
+   import Person from '@/ts/core/target/person';   
 
    import Userdata from '@/ts/core/target/user';
    Userdata.getInstance().searchCompany();
+   querySelfProduct 我的产品，上架后才是商品
  */
 export default class userdataservice extends BaseService {
   // 单例
@@ -46,16 +48,20 @@ export default class userdataservice extends BaseService {
   }
 
   /**
-   * 获取单位列表
-   * @return 加入的单位列表
+   * 获取加入的target
+   * @return 加入的单位target
    */
-  public async getJoinedGroups(companyId: string | number): Promise<Company[]> {
+  public async getJoinedTargets(
+    companyId: string,
+    typeName: TargetType,
+  ): Promise<Company[]> {
+
+    this.target.typeName = typeName;
     let res = await this.getjoined({
-      // spaceId: companyId,
-      joinTypeNames: this.companyTypes,
-      typeName: TargetType.Group,
+      spaceId: companyId,
+      JoinTypeNames: this.companyTypes,
     });
-    console.log('222222222222', res);
+
     let _joinedCompanys: Company[] = [];
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
@@ -91,25 +97,32 @@ export default class userdataservice extends BaseService {
     teamName: string,
     teamCode: string,
     remark: string,
-    type: TargetType = TargetType.Company,
-  ): Promise<boolean> {
-    if (!this.companyTypes.includes(type)) {
-      return false;
+    targetType: TargetType = TargetType.Company,
+  ): Promise<model.ResultType<any>> {
+    if (!this.companyTypes.includes(targetType)) {
+      return {
+        success: false,
+        msg: '类型错误',
+        code: -1,
+      };
     }
+
     let data: any = {
       name,
       code,
       teamName,
       teamCode,
-      typeName: type,
+      typeName: targetType,
       teamRemark: remark,
     };
+
     const res = await this._create(data);
-    console.log(res);
+    // 创建公司 或 集团
+    console.log('创建公司 或 集团===', res);
 
     if (res.success) {
       let company;
-      switch (type) {
+      switch (targetType) {
         case TargetType.University:
           company = new University(res.data);
           break;
@@ -120,12 +133,37 @@ export default class userdataservice extends BaseService {
           company = new Company(res.data);
           break;
       }
-      //
-      return company.pullPersons(['381104941936283648', '378243413037944832']);
+
+      // 建好公司后，操作拉人。如果是集团， 加入的是公司
+      let targetTypeSend = TargetType.Person;
+      if (targetType === TargetType.Group) {
+        targetTypeSend = TargetType.Company;
+      }
+      return this.pullTargets([company.target.id], targetTypeSend);
     }
 
-    return false;
+    return {
+      success: false,
+      msg: res.msg,
+      code: -1,
+    };
   }
+
+  /**
+   * 拉人进入单位, 拉入集团等的操作
+   * @param personIds 人员id数组
+   * @returns 是否成功
+   */
+  public async pullTargets(
+    personIds: string[],
+    targetType: TargetType,
+  ): Promise<model.ResultType<any>> {
+    return await this.pull({
+      targetType: targetType,
+      targetIds: personIds,
+    });
+  }
+
   /**
    * 搜索单位(公司) 数组里面还有target
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
@@ -144,7 +182,7 @@ export default class userdataservice extends BaseService {
     let pageData: any = {};
     try {
       let res = await kernel.searchTargetByName(paramData);
-      console.log('333333333333333', res);
+      console.log('================', res);
 
       if (res.success && res.data && res.data.result) {
         // 存放返回数组
@@ -175,35 +213,35 @@ export default class userdataservice extends BaseService {
     return pageData;
   }
 
-  /**加入公司 */
+  /**加入公司或集团等内容 */
   public async applyJoinCompany(
     targetId: string,
-    applyType: TargetType,
-  ): Promise<boolean> {
+    teamType: TargetType,
+  ): Promise<model.ResultType<any>> {
+
     const res = await kernel.applyJoinTeam({
       id: targetId,
+      teamType: teamType,
       targetId: this.target.id,
-      teamType: applyType,
       targetType: TargetType.Person,
     });
-    return res.success;
+    return res;
   }
+
 
   /**取消加入组织或个人 */
   public async cancelJoinCompany(
     targetId: string,
     belongId: string,
     applyType: TargetType,
-  ): Promise<boolean> {
+  ): Promise<model.ResultType<any>> {
     const res = await kernel.cancelJoinTeam({
       id: targetId,
       typeName: applyType,
       belongId: belongId,
     });
-    return res.success;
+    return res;
   }
-
-  // querySelfProduct 我的产品，上架后才是商品
 
   /**
    * 创建对象
@@ -214,4 +252,6 @@ export default class userdataservice extends BaseService {
     data.belongId = this.target.id;
     return await kernel.createTarget(data);
   }
+
+
 }
