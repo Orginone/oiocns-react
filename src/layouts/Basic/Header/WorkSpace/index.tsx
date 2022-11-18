@@ -18,10 +18,11 @@ import CompanyServices from '@/module/org/company';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import PersonServices from '@/module/person';
 import useStore from '@/store';
-import { SpaceType } from '@/store/type';
+import { SpaceType, UserType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
+import provider from '@/ts/core/provider';
 type OrganizationalUnitsProps = {};
 
 // 菜单列表项
@@ -40,7 +41,8 @@ const OrganizationalItem = (item: SpaceType) => {
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
-  const { user, getUserInfo, setUser, userSpace } = useStore((state) => ({ ...state }));
+  // const { user, setUser, userSpace } = useStore((state) => ({ ...state }));
+  const user = Provider.getPerson();
   const [current, setCurrent] = useState<SpaceType>();
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -61,7 +63,6 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     },
   };
   const onSave = async () => {
-    debugger;
     const values = await form.validateFields();
     const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
     let res = await Provider.getPerson().createCompany(
@@ -81,32 +82,25 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     const data = (await Provider.getPerson().getJoinedCompanys()).map(
       (el: any) => el.target,
     );
-    setMenuList([...data, userSpace]); // 合并组织单位和个人空间数据
+    console.log(data);
+    setMenuList([...data, user.getWorkSpace()]); // 合并组织单位和个人空间数据
   };
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    if (!item?.id) return;
-    const { data, success } = await PersonServices.changeWorkspace({
+    user.setWorkSpace(item);
+    setCurrent({
+      name: item?.name,
       id: item?.id,
     });
-    if (success) {
-      setUser(data);
-      sessionStorage.setItem('TOKEN', data.accessToken);
-      await getUserInfo(); // 获取新的用户信息
-      setCurrent({
-        name: item?.name,
-        id: item?.id,
-      });
-      setShowMenu(false);
-    }
+    setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
     if (user) {
       getList();
       setCurrent({
-        name: user?.workspaceName,
-        id: user?.workspaceId,
+        name: user.getWorkSpace().name,
+        id: user.getWorkSpace().id,
       });
     }
   }, []);

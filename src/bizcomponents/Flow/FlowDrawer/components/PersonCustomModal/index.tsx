@@ -4,8 +4,9 @@ import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { perpleList } from './mock';
 import provider from '@/ts/core/provider';
+import { useAppwfConfig } from '@/module/flow/flow';
 /**
- * @description: 选择人员弹窗
+ * @description: 选择身份/选择岗位(内部、集团) 弹窗
  * @return {*}
  */
 
@@ -21,17 +22,39 @@ const joinedCohorts = (await provider.getPerson().getJoinedCohorts()).map(
 );
 const PersonCustomModal = (props: Iprops) => {
   const { open, title, onOk, onCancel } = props;
-
+  // debugger;
+  const [jobType, setJobType] = useState(2);
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   let [selectItem, setSelectItem] = useState<any>({});
+
   const onChange = (val: any) => {
-    console.log(val);
+    setJobType(val.target.value);
   };
   const selectItemFun = (select: any) => {
     setSelectItem({ ...select });
   };
 
   console.log(joinedCohorts);
-  const radiobutton = <Radio checked>按身份</Radio>;
+  const radiobutton = (
+    // <Radio.Group onChange={onChange} value={}>
+    //   {selectedNode.props.assignedType == 'DENTITY' && <Radio value={1}>按身份</Radio>}
+    //   {selectedNode.props.assignedType == 'JOB' && <Radio value={2}>内部岗位</Radio>}
+    //   {selectedNode.props.assignedType == 'JOB' && <Radio value={3}>集团岗位</Radio>}
+    // </Radio.Group>
+    <div>
+      {selectedNode.props.assignedType == 'DENTITY' && (
+        <Radio.Group value={1}>
+          <Radio value={1}>按身份</Radio>
+        </Radio.Group>
+      )}
+      {selectedNode.props.assignedType == 'JOB' && (
+        <Radio.Group onChange={onChange} value={jobType}>
+          <Radio value={2}>内部岗位</Radio>
+          <Radio value={3}>集团岗位</Radio>
+        </Radio.Group>
+      )}
+    </div>
+  );
   // let identitys: any[];
   // const getIdentitys =  () => {
   //

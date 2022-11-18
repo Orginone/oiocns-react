@@ -32,7 +32,7 @@ const useStore = create(
         }
         return false;
       },
-      setUser: async (data: UserType) => {
+      setUser: async (data: Partial<UserType>) => {
         set({ user: data });
       },
       setLoading: (val: boolean) => set({ loading: val }),

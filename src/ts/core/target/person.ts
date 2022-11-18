@@ -7,21 +7,22 @@ import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import { validIsSocialCreditCode } from '@/utils/tools';
+import { SpaceType } from '@/store/type';
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
-  private _curSpace: BaseTarget | undefined;
+  private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
 
 
   constructor(target: schema.XTarget) {
     super(target);
+    this.workSpace = { id: this.target.id, name: '个人空间' };
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this.getFriends();
-    this.getJoinedCompanys();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -117,7 +118,7 @@ export default class Person extends BaseTarget {
     remark: string,
     type: TargetType = TargetType.Company,
   ): Promise<model.ResultType<any>> {
-    debugger
+
     if (!this.companyTypes.includes(type)) {
       return FaildResult('您无法创建该类型单位!');
     }
@@ -133,7 +134,7 @@ export default class Person extends BaseTarget {
       return tres;
     }
     if (tres.data == null || !tres.data.id) {
-      debugger
+
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
       if (res.success) {
         let company;
@@ -149,6 +150,7 @@ export default class Person extends BaseTarget {
             break;
         }
         this._joinedCompanys.push(company);
+
         return company.pullPersons([this.target.id]);
       }
       return res;
@@ -224,6 +226,7 @@ export default class Person extends BaseTarget {
     if (this._joinedCompanys.length > 0) {
       return this._joinedCompanys;
     }
+    this._joinedCompanys = []
     let res = await this.getjoined({
       spaceId: this.target.id,
       JoinTypeNames: this.companyTypes,
@@ -296,4 +299,29 @@ export default class Person extends BaseTarget {
     }
     return res;
   }
+
+  /**
+   * 获取工作空间
+   * @returns 工作空间
+   */
+  public getWorkSpace(): SpaceType {
+    return this.workSpace
+  }
+
+  /**
+   * 切换工作空间
+   * @param workSpace 
+   */
+  public setWorkSpace(workSpace: SpaceType) {
+    this.workSpace = workSpace
+  }
+
+  /**
+   * 是否个人空间
+   * @returns 
+   */
+  public isUserSpace(): boolean {
+    return this.workSpace.id == this.target.id
+  }
+
 }

@@ -65,7 +65,7 @@ const flows: ProFormColumnsType<DataItem> = {
       tooltipText: '删除该流程',
     },
     itemRender: ({ listDom, action }: any, { record, index }: any) => {
-      // debugger;
+      //
       return (
         <ProCard
           bordered
@@ -147,7 +147,7 @@ const valueTypeColumns: ProFormColumnsType<DataItem> = {
       colProps: { span: 24 },
       fieldProps: {
         itemRender: ({ listDom, action }: any, { record, index }: any) => {
-          // debugger;
+          //
           return (
             <ProCard
               bordered

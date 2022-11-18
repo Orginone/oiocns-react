@@ -716,7 +716,7 @@ export default class KernelApi {
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
-      action: 'pullAnyToTeam',
+      action: 'PullAnyToTeam',
       params: params,
     });
   }
