@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Tabs } from 'antd';
+import { Input, Tabs, Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import { chat } from '@/module/chat/orgchat';
@@ -9,7 +9,7 @@ import { formatDate } from '@/utils/index';
 import sideStyle from './index.module.less';
 
 /**
- * @description: 会话列表、66通讯录
+ * @description: 会话列表、通讯录
  * @return {*}
  */
 
