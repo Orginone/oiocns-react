@@ -47,6 +47,18 @@ export default class KernelApi {
           .catch((err) => {
             console.log(err);
           });
+      } else {
+        // @modify 解决刷新后重连的问题
+        this._storeHub
+          .invoke('TokenAuth', sessionStorage.getItem('accessToken'))
+          .then((res: model.ResultType<any>) => {
+            if (res.success) {
+              console.debug('认证成功！');
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     });
     this._storeHub.start();
@@ -673,7 +685,7 @@ export default class KernelApi {
   ): Promise<model.ResultType<any>> {
     return await this.request({
       module: 'target',
-      action: 'pullAnyToTeam',
+      action: 'PullAnyToTeam',
       params: params,
     });
   }
@@ -1115,7 +1127,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
   public async createMarket(
-    params: model.MarketModel,
+    params: Omit<model.MarketModel, `id`>,
   ): Promise<model.ResultType<schema.XMarket>> {
     return await this.request({
       module: 'market',

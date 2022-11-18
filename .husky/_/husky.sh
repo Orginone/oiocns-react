@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
 if [ -z "$husky_skip_init" ]; then
   debug () {
     if [ "$HUSKY_DEBUG" = "1" ]; then

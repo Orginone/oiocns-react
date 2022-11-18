@@ -34,3 +34,10 @@ export enum AuthorityType {
   MarketAdmin = 'market-admin',
   ApplicationAdmin = 'application-admin',
 }
+
+/** 通用状态 */
+export enum CommonStatus {
+  ApplyStartStatus = 1,
+  ApproveStartStatus = 100,
+  RejectStartStatus = 200,
+}

@@ -4,7 +4,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
-import { Dropdown, Menu, message } from 'antd';
+import { Dropdown, Menu, message, Typography } from 'antd';
 import React from 'react';
 
 import cls from './index.module.less';
@@ -70,8 +70,15 @@ const StoreRecent: React.FC = () => {
             key={item.id}
             avatar={item.avatar}
             title={item.title}
-            description={item.description}
-            style={{ width: 260, height: 140 }}
+            description={
+              <Typography.Paragraph
+                type="secondary"
+                className={cls.decription}
+                ellipsis={{ rows: 3 }}>
+                {item.description}
+              </Typography.Paragraph>
+            }
+            style={{ width: 260, height: 120 }}
             extra={
               <Dropdown
                 placement="bottomRight"

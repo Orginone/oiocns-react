@@ -1,4 +1,4 @@
-class ShopMenuItem {
+class ShopMenuOptions {
   // 重命名
   RenameItem() {}
   // 拷贝副本
@@ -11,4 +11,6 @@ class ShopMenuItem {
   favorite() {}
   // 删除
   deleteItem() {}
+  //获取列表
+  getapps() {}
 }

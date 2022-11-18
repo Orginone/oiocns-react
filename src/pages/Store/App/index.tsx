@@ -1,18 +1,20 @@
 import { Card, Form, Modal } from 'antd';
-import React, { useState, createContext } from 'react';
+import React, { useMemo, useState } from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
-import PutawayComp from '../components/PutawayComp'; // 上架弹窗
+import PutawayComp from './Putaway';
+import ShareComp from '../components/ShareComp';
+import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import useEventEmitter from '@/hooks/useEventEmitter';
+import Content from '../_control/content';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -20,27 +22,15 @@ const service = new MarketService({
   deleteApi: API.product.delete,
   updateApi: API.product.update,
 });
-console.log(service);
-interface submitEmmit {
-  aa: string;
-}
-export const EventContext = createContext({} as { TestSub: any });
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
-  const [showModal, setShowModal] = useState<boolean>(false);
-
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
-  const [putawayForm] = Form.useForm();
-
-  const TestSub = useEventEmitter<submitEmmit>();
-  TestSub.useSubScription('hello', (data) => {
-    console.log('订阅', data);
-  });
-
   const items = [
     {
       tab: `全部`,
@@ -65,7 +55,6 @@ const StoreApp: React.FC = () => {
   ];
 
   const BtnsList = ['购买', '创建', '暂存'];
-  const openShareModal = () => {};
   const handleBtnsClick = (item: { text: string }) => {
     // console.log('按钮点击', item);
     switch (item.text) {
@@ -73,23 +62,26 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        TestSub.emit('hello', { aa: '700' });
-        // console.log('点击事件', '创建1231313');
+        history.push('/store/app/create');
         break;
       case '暂存':
         console.log('点击事件', '暂存');
-        setShowModal(true);
         break;
       default:
         console.log('点击事件未注册', item.text);
         break;
     }
   };
-  const handlePutawaySumbit = async () => {
-    const putawayParams = await putawayForm.validateFields();
-    console.log('上架信息打印', putawayParams);
 
-    setShowModal(false);
+  const onCheckeds = (checkedValus: any) => {
+    setCheckNodes(checkedValus);
+  };
+
+  // 共享确认回调
+  const submitShare = () => {
+    console.log('当前被选中的每一项', checkNodes);
+
+    setShowShareModal(false);
   };
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -120,18 +112,18 @@ const StoreApp: React.FC = () => {
         },
       },
       {
-        key: 'publish',
+        key: 'putaway',
         label: '上架',
         onClick: () => {
-          console.log('按钮事件', 'publish', item);
-          setShowModal(true);
+          console.log('按钮事件', 'putaway', item);
+          history.push({ pathname: '/store/app/putaway', state: { appId: item.id } });
         },
       },
       {
         key: 'share',
         label: '共享',
         onClick: () => {
-          openShareModal();
+          setShowShareModal(true);
         },
       },
       {
@@ -153,8 +145,9 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
-  return (
-    <>
+  // 应用首页dom
+  const AppIndex = useMemo(() => {
+    return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         {<StoreRecent />}
         <Card
@@ -164,49 +157,58 @@ const StoreApp: React.FC = () => {
           tabList={items}
           onTabChange={(key) => {
             setStatusKey(key);
-          }}
-        />
-        <div className={cls['page-content-table']}>
-          <AppShowComp
-            service={service}
-            searchParams={{ status: statusKey }}
-            columns={service.getMyappColumns()}
-            renderOperation={renderOperation}
-          />
-        </div>
-        <Modal
-          title="应用上架"
-          width={670}
-          destroyOnClose={true}
-          open={showModal}
-          okText="确定"
-          onOk={() => {
-            handlePutawaySumbit();
-          }}
-          onCancel={() => {
-            console.log(`取消按钮`);
-            setShowModal(false);
           }}>
-          <PutawayComp initialValues={{}} form={putawayForm} />
-        </Modal>
-        {/* 详情页面 /store/app/info*/}
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              service={service}
+              searchParams={{ status: statusKey }}
+              columns={service.getMyappColumns()}
+              renderOperation={renderOperation}
+            />
+          </div>
+        </Card>
       </div>
-      <EventContext.Provider value={{ TestSub }}>
-        <Route
-          exact
-          path="/store/app/info"
-          render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/publish"
-          render={() => <PublishList appId={selectAppInfo.id} />}></Route>
-        <Route
-          exact
-          path="/store/app/manage"
-          render={() => <Manage appId={selectAppInfo.id} />}></Route>
-      </EventContext.Provider>
+    );
+  }, [service]);
+
+  return (
+    <>
+      {location.pathname === '/store/app' && AppIndex}
+      <Modal
+        title="应用分享"
+        width={800}
+        destroyOnClose={true}
+        open={showShareModal}
+        okText="确定"
+        onOk={() => {
+          submitShare();
+        }}
+        onCancel={() => {
+          console.log(`取消按钮`);
+          setShowShareModal(false);
+        }}>
+        <ShareComp onCheckeds={onCheckeds} />
+      </Modal>
+      {/* 详情页面 /store/app/info*/}
+      <Route
+        exact
+        path="/store/app/info"
+        render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/publish"
+        render={() => <PublishList appId={selectAppInfo.id} />}></Route>
+      <Route
+        exact
+        path="/store/app/manage"
+        render={() => <Manage appId={selectAppInfo.id} />}></Route>
+      <Route exact path="/store/app/create" component={CreateApp}></Route>
+      <Route
+        exact
+        path="/store/app/putaway"
+        render={() => <PutawayComp appId={selectAppInfo.id} />}></Route>
     </>
   );
 };
 
-export default StoreApp;
+export default React.memo(StoreApp);

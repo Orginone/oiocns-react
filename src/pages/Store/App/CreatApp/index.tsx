@@ -1,66 +1,50 @@
-import React, { useState } from 'react';
-// import cls from './index.module.less';
+import React, { useEffect, useState } from 'react';
+import cls from './index.module.less';
+import SchemaForm from '@/components/SchemaForm';
+import { columns, DataItem } from './config';
+import { Form, Card } from 'antd';
+import { IconFont } from '@/components/IconFont';
+import { RouteComponentProps } from 'react-router-dom';
 
-import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
-import { BetaSchemaForm, ProFormSelect } from '@ant-design/pro-components';
-import { Button, Alert, DatePicker, Space } from 'antd';
-
-import { columns, DataItem, valueEnum } from './config';
-import dayjs from 'dayjs';
-interface indexType {
-  props: []; //props
-}
-const Index: React.FC<indexType> = ({ props }) => {
-  console.log('打印index', props);
-
-  const [layoutType, setLayoutType] = useState<ProFormLayoutType>('Form');
+const CreatApp: React.FC<RouteComponentProps> = (props) => {
+  const { history } = props;
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); //  是否显示创建应用窗口
+  const [createAppForm] = Form.useForm<Record<string, any>>();
+  // 提交表单数据
+  const handleCreateApp = (values: any) => {
+    // Provider.person.createProduct(values);
+    console.log(values);
+  };
   return (
-    <>
-      {/* <Space
-        style={{
-          width: '100%',
-        }}
-        direction="vertical">
-        <ProFormSelect
-          label="布局方式"
-          options={[
-            'Form',
-            'ModalForm',
-            'DrawerForm',
-            'LightFilter',
-            'QueryFilter',
-            'StepsForm',
-            'StepForm',
-            'Embed',
-          ]}
-          fieldProps={{
-            value: layoutType,
-            onChange: (e) => setLayoutType(e),
+    <Card
+      title={
+        <IconFont
+          type="icon-jiantou-left"
+          className={cls.RouterBackBtn}
+          onClick={() => {
+            history.goBack();
           }}
         />
-      </Space> */}
-      <BetaSchemaForm<DataItem>
-        trigger={<a>点击我</a>}
-        layoutType={layoutType}
-        steps={[
-          {
-            title: 'ProComponent',
-          },
-        ]}
-        rowProps={{
-          gutter: [16, 16],
-        }}
-        colProps={{
-          span: 12,
-        }}
-        grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
-        onFinish={async (values) => {
-          console.log(values);
-        }}
-        columns={(layoutType === 'StepsForm' ? [columns] : columns) as any}
-      />
-    </>
+      }>
+      <div style={{ width: 750, margin: 'auto' }}>
+        <SchemaForm<DataItem>
+          form={createAppForm}
+          layoutType="Form"
+          open={showCreateModal}
+          title="创建应用"
+          // colProps={{
+          //   span: 12,
+          // }}
+          onFinish={handleCreateApp}
+          modalProps={{
+            destroyOnClose: true,
+            onCancel: () => setShowCreateModal(false),
+          }}
+          columns={columns}
+        />
+      </div>
+    </Card>
   );
 };
 
-export default Index;
+export default CreatApp;
