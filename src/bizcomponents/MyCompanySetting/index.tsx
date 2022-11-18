@@ -43,7 +43,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     setTotal(10);
 
     props.setShowDepartment(false);
-
   }, []);
 
   const showDepartment = () => {
@@ -116,10 +115,10 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     // setList([...service.List]);
     // setTotal(service.Total);
 
-    // 从提供器里面取人员。 
-    const person: Person = Provider.getPerson;
+    // 从提供器里面取人员。
+    const person: Person = Provider.getPerson();
     const joinCompanys = await person.getJoinedCompanys();
-    console.log("===获取到的内核数据！ ", joinCompanys);
+    console.log('===获取到的内核数据！ ', joinCompanys);
 
     // const companys = await Userdata.getInstance().searchCompany({
     //   page: 1,
@@ -140,7 +139,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
       page: 1,
       pageSize: 1000,
     });
-
 
     setList(joinData);
     setTotal(joinData.length);

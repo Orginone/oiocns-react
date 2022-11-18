@@ -78,10 +78,9 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [form] = Form.useForm();
   // 获取工作单位列表
   const getList = async () => {
-    const data = await CompanyServices.getJoinedCompany({
-      page: 1,
-      pageSize: 100,
-    });
+    const data = (await Provider.getPerson().getJoinedCompanys()).map(
+      (el: any) => el.target,
+    );
     setMenuList([...data, userSpace]); // 合并组织单位和个人空间数据
   };
   // 选中组织单位后进行空间切换
