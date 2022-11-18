@@ -60,7 +60,7 @@ export default class Person extends BaseTarget {
   public async getCohort(): Promise<model.ResultType<any>> {
     const res = await this.getjoined({
       spaceId: this.target.id,
-      joinTypeNames: [TargetType.Cohort],
+      JoinTypeNames: [TargetType.Cohort],
     });
     if (res.success) {
       this._joinedCohorts = [];
