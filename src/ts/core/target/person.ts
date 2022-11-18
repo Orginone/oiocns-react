@@ -15,12 +15,14 @@ export default class Person extends BaseTarget {
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
   private _joinedStores: AppStore[];
+  private _ownProducts: Product[];
   constructor(target: schema.XTarget) {
     super(target);
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._joinedStores = [];
+    this._ownProducts = [];
     //初始化时填入信息
     this.getCohort();
     this.getFriends();
@@ -65,9 +67,11 @@ export default class Person extends BaseTarget {
     });
     if (res.success) {
       this._joinedCohorts = [];
-      for (var i = 0; i < res.data.result.length; i++) {
-        const cohort = new Cohort(res.data.result[i]);
-        this._joinedCohorts.push(cohort);
+      if (res.data.result?.length) {
+        for (var i = 0; i < res.data.result.length; i++) {
+          const cohort = new Cohort(res.data.result[i]);
+          this._joinedCohorts.push(cohort);
+        }
       }
     }
     return res;
@@ -201,7 +205,7 @@ export default class Person extends BaseTarget {
       JoinTypeNames: [TargetType.Person],
     });
     if (res.success) {
-      this._friends = res.data.result;
+      this._friends = res.data?.result || [];
     }
     return this._friends;
   }
@@ -278,7 +282,6 @@ export default class Person extends BaseTarget {
     };
     return await kernel.querySelfProduct(paramData);
   }
-
 
   // /**
   //  * 查询我的产品/应用
@@ -400,5 +403,14 @@ export default class Person extends BaseTarget {
       }
     }
     return res;
+  }
+  /**
+   * 创建应用
+   * @param  {model.ProductModel} 产品基础信息
+   */
+  public async createProduct(
+    data: model.ProductModel,
+  ): Promise<model.ResultType<schema.XProduct>> {
+    return await kernel.createProduct(data);
   }
 }
