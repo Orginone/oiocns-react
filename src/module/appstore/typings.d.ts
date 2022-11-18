@@ -1,4 +1,3 @@
-
 /**
  * 创建市场类请求体
  */
@@ -146,4 +145,3 @@ export type UpdateResourceReq = {
   flows?: string;
   components?: string;
 };
-

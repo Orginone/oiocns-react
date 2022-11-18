@@ -102,6 +102,7 @@ class StoreClassify {
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.getStore.name || '商店';
+    console.log('面包靴 应用', this.breadcrumb);
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
   /* --------------------市场功能区--------------------- */
@@ -113,6 +114,8 @@ class StoreClassify {
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.getStore.name || '商店';
+    console.log('面包靴 商店', this.breadcrumb);
+
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
   /**
