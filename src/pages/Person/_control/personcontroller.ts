@@ -3,8 +3,8 @@ import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
 import UserdataService from '@/ts/core/target/user';
 import BaseController from './basecontroller';
-import Provider from '@/ts/core/provider';
 import { TargetType } from '@/ts/core/enum';
+import { model } from '@/ts/base';
 
 /**
  * 控制器
@@ -28,6 +28,38 @@ export default class personcontroller extends BaseController {
   /**构造方法 */
   constructor() {
     super();
+
+    console.log('================ init controller');
+    // 调试代码，要删除 @modify oyj
+    this.myTest();
+  }
+
+  // 接口调试
+  public async myTest(): Promise<boolean> {
+    this.getJoinedCompanys((data: any) => {
+      console.log('我加入的公司1===', data);
+    });
+
+    let companys = await this.userDataService.getJoinedTargets(
+      this.getPerson.target.id,
+      TargetType.Person,
+    );
+    console.log('我加入的公司2===', companys);
+
+    let aa1 = await this.getPerson.queryMyProduct();
+    console.log('我的产品', aa1);
+
+    let aa2 = await this.getPerson.queryMySpaceProduct();
+    console.log('我的个人空间的产品', aa2);
+
+    // const companys = await Userdata.getInstance().searchCompany({
+    //   page: 1,
+    //   pageSize: 100,
+    //   filter: '91330304254498785G'
+    // });
+    // console.log("===获取到的内核数据2！ ", companys);
+
+    return true;
   }
 
   /**
@@ -43,7 +75,7 @@ export default class personcontroller extends BaseController {
    * 获取用户已加入的单位组织
    */
   public async getJoinedCompanys(callback: any) {
-    const datas = Provider.getPerson.getJoinedCompanys();
+    const datas = await this.getPerson.getJoinedCompanys();
     callback(datas);
   }
 
@@ -58,13 +90,8 @@ export default class personcontroller extends BaseController {
    * @param id 单位ID
    * @returns
    */
-  public async applyJoinCompany(id: string): Promise<boolean> {
-    const success = await this.userDataService.applyJoinCompany(id, TargetType.Company);
-    return success;
-  }
-
-  public async createCompany(): Promise<boolean> {
-    await this.userDataService.getJoinedGroups('381104941936283648');
-    return true;
+  public async applyJoinCompany(id: string): Promise<model.ResultType<any>> {
+    const result = await this.userDataService.applyJoinCompany(id, TargetType.Company);
+    return result;
   }
 }
