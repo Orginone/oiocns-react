@@ -8,28 +8,31 @@ import { chat } from '@/module/chat/orgchat';
 import useChatStore from '@/store/chat';
 import contentStyle from './index.module.less';
 
-/* 
-  聊天区域
-*/
+/**
+ * @description: 聊天区域
+ * @return {*}
+ */
 
 interface Iprops {
   handleReWrites: Function;
+  historyMesagesList: any;
 }
 
 const GroupContent = (props: Iprops) => {
-  const { handleReWrites } = props;
+  const { handleReWrites, historyMesagesList } = props;
   const ChatStore: any = useChatStore();
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
   const isShowTime = (index: number) => {
     if (index == 0) return true;
-    return (
-      moment(ChatStore.curMsgs[index].createTime).diff(
-        ChatStore.curMsgs[index - 1].createTime,
-        'minute',
-      ) > 3
-    );
+    // return (
+    //   moment(ChatStore.curMsgs[index].createTime).diff(
+    //     ChatStore.curMsgs[index - 1].createTime,
+    //     'minute',
+    //   ) > 3
+    // );
   };
+
   // 滚动到底部
   const scrollEvent = () => {
     if (messageNodeRef.current) {
@@ -42,7 +45,7 @@ const GroupContent = (props: Iprops) => {
   };
   useEffect(() => {
     scrollEvent();
-  }, [ChatStore.curMsgs, ChatStore.setCurrent]);
+  }, [chat.curMsgs, chat.setCurrent]);
 
   // 聊天间隔时间
   const showChatTime = (chatDate: moment.MomentInput) => {
@@ -96,7 +99,7 @@ const GroupContent = (props: Iprops) => {
 
   return (
     <div className={contentStyle.group_content_wrap}>
-      {ChatStore?.curMsgs.map((item: any, index: any) => {
+      {historyMesagesList.map((item: any, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
             {/* 聊天间隔时间3分钟则 显示时间 */}
@@ -110,14 +113,16 @@ const GroupContent = (props: Iprops) => {
             {/* 重新编辑 */}
             {item.msgType === 'recall' ? (
               <div
-                className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}>
+                className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}
+              >
                 {item.showTxt}
                 {item.allowEdit ? (
                   <span
                     className={contentStyle.reWrite}
                     onClick={() => {
                       handleReWrite(item.msgBody);
-                    }}>
+                    }}
+                  >
                     重新编辑
                   </span>
                 ) : (
@@ -152,14 +157,16 @@ const GroupContent = (props: Iprops) => {
                           danger
                           onClick={() => {
                             deleteMsg(item);
-                          }}>
+                          }}
+                        >
                           删除
                         </Button>
                       </>
                     ) : (
                       ''
                     )
-                  }>
+                  }
+                >
                   {item.msgType === 'recall' ? (
                     ''
                   ) : (
@@ -168,12 +175,14 @@ const GroupContent = (props: Iprops) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectId(item.id);
-                      }}>
+                      }}
+                    >
                       <HeadImg name={chat.getName(item.fromId)} label={''} />
                       <div className={`${contentStyle.con_content}`}>
                         {ChatStore?.curChat?.typeName !== '人员' ? (
                           <div
-                            className={`${contentStyle.con_content} ${contentStyle.name}`}>
+                            className={`${contentStyle.con_content} ${contentStyle.name}`}
+                          >
                             {ChatStore.getName(item.fromId) || ''}
                           </div>
                         ) : (
@@ -181,7 +190,8 @@ const GroupContent = (props: Iprops) => {
                         )}
                         <div
                           className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                          dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
+                          dangerouslySetInnerHTML={{ __html: item.msgBody }}
+                        ></div>
                       </div>
                     </div>
                   )}
@@ -191,7 +201,8 @@ const GroupContent = (props: Iprops) => {
               <>
                 {/* 右侧聊天内容显示 */}
                 <div
-                  className={`${contentStyle.group_content_right} ${contentStyle.con}`}>
+                  className={`${contentStyle.group_content_right} ${contentStyle.con}`}
+                >
                   <Popover
                     trigger="hover"
                     overlayClassName={contentStyle.targerBoxClass}
@@ -216,7 +227,8 @@ const GroupContent = (props: Iprops) => {
                           style={{ color: '#3e5ed8' }}
                           onClick={() => {
                             recallMsg(item);
-                          }}>
+                          }}
+                        >
                           撤回
                         </Button>
                         {canDelete(item) ? (
@@ -225,14 +237,16 @@ const GroupContent = (props: Iprops) => {
                             danger
                             onClick={() => {
                               deleteMsg(item);
-                            }}>
+                            }}
+                          >
                             删除
                           </Button>
                         ) : (
                           ''
                         )}
                       </>
-                    }>
+                    }
+                  >
                     {item.msgType === 'recall' ? (
                       ''
                     ) : (
@@ -241,11 +255,13 @@ const GroupContent = (props: Iprops) => {
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectId(item.id);
-                        }}>
+                        }}
+                      >
                         <div className={contentStyle.con_content}>
                           <div
                             className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                            dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
+                            dangerouslySetInnerHTML={{ __html: item.msgBody }}
+                          ></div>
                         </div>
                         <HeadImg name={chat.getName(item.fromId)} />
                       </div>
@@ -262,7 +278,8 @@ const GroupContent = (props: Iprops) => {
         style={{
           clear: 'both',
           width: '100%',
-        }}></div>
+        }}
+      ></div>
     </div>
   );
 };

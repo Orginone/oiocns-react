@@ -3,7 +3,7 @@ import { Modal, Radio, Card, Empty } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { perpleList } from './mock';
-import provider from '@/ts/core/provider';
+import Provider from '@/ts/core/provider';
 import { useAppwfConfig } from '@/module/flow/flow';
 /**
  * @description: 选择身份/选择岗位(内部、集团) 弹窗
@@ -17,7 +17,7 @@ interface Iprops {
   onCancel: () => void;
 }
 
-const joinedCohorts = (await provider.getPerson().getJoinedCohorts()).map(
+const joinedCohorts = (await Provider.getPerson.getJoinedCohorts()).map(
   (e: any) => e.target,
 );
 const PersonCustomModal = (props: Iprops) => {
@@ -58,7 +58,7 @@ const PersonCustomModal = (props: Iprops) => {
   // let identitys: any[];
   // const getIdentitys =  () => {
   //
-  //   identitys = await provider.getPerson().getIdentitys();
+  //   identitys = await Provider.getPerson.getIdentitys();
   // };
   // useEffect(() => {
   //   getIdentitys();

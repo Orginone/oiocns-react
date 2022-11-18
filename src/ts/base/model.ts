@@ -13,7 +13,7 @@ export type ResultType<T> = {
   // http代码
   code: number;
   // 数据体
-  data: T;
+  data?: T;
   // 消息
   msg: string;
   // 结果
@@ -170,7 +170,7 @@ export type IDReqSubModel = {
 
 export type IDReqJoinedModel = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 实体类型
   typeName: string;
   // 加入的节点类型

@@ -10,10 +10,10 @@ export default class BaseTarget {
   protected identitys: schema.XIdentity[];
   protected _joinedMarkets: AppStore[];
   protected get createTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort];
   }
   protected get joinTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort, TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
@@ -173,13 +173,14 @@ export default class BaseTarget {
       id: this.target.id,
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
-    if (res.success) {
+    if (res.success && res.data && res.data.result) {
       res.data.result.forEach((market) => {
         this._joinedMarkets.push(new AppStore(market));
       });
     }
     return this._joinedMarkets;
   }
+
 
   /**
    * 退出市场
@@ -220,4 +221,17 @@ export default class BaseTarget {
     });
   }
 
+  public async search(name: string, TypeName: string): Promise<model.ResultType<any>> {
+    const data: model.NameTypeModel = {
+      name: name,
+      typeName: TypeName,
+      page: {
+        offset: 0,
+        filter: name,
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.searchTargetByName(data);
+    return res;
+  }
 }

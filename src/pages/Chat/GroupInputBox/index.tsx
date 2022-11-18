@@ -4,16 +4,18 @@ import React, { useEffect, useState } from 'react';
 import useChatStore from '@/store/chat';
 import inputboxStyle from './index.module.less';
 
-/* 
-  输入框
-*/
+/**
+ * @description: 输入区域
+ * @return {*}
+ */
+
 interface Iprops {
   writeContent: any;
 }
 
 const Groupinputbox = (props: Iprops) => {
   const { writeContent } = props;
-  const [imgUrls, setImgUrls] = useState<Array<string>>([]);
+  const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情包
   const ChatStore: any = useChatStore();
   // 提交聊天内容
   const submit = async () => {
@@ -121,13 +123,15 @@ const Groupinputbox = (props: Iprops) => {
                       key={index}
                       onClick={() => {
                         handleImgChoosed(index);
-                      }}>
+                      }}
+                    >
                       <img className={inputboxStyle.emoji} src={`${index}`} alt="" />
                     </div>
                   );
                 })}
               </div>
-            }>
+            }
+          >
             <SmileOutlined className={inputboxStyle.icons_oneself} />
           </Popover>
         </div>
@@ -141,12 +145,14 @@ const Groupinputbox = (props: Iprops) => {
           spellCheck="false"
           //   ref="inputRef"
           placeholder="请输入内容"
-          onKeyDown={keyDown}></div>
+          onKeyDown={keyDown}
+        ></div>
         <div className={inputboxStyle.send_box}>
           <Button
             type="primary"
             style={{ backgroundColor: '#21ba45', color: '#fff', border: 'none' }}
-            onClick={() => submit()}>
+            onClick={() => submit()}
+          >
             发送
           </Button>
         </div>

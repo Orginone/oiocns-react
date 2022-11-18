@@ -7,10 +7,9 @@ import Person from './target/person';
 export default class Provider {
   private static person: Person;
 
-  public static getPerson(): Person {
-
+  public static get getPerson(): Person {
     if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+      this.person = new Person(JSON.parse(sessionStorage.getItem("_loginPerson") + ''));
     }
     return this.person;
   }

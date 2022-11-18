@@ -116,7 +116,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     // setTotal(service.Total);
 
     // 从提供器里面取人员。
-    const person: Person = Provider.getPerson();
+    const person: Person = Provider.getPerson;
     const joinCompanys = await person.getJoinedCompanys();
     console.log('===获取到的内核数据！ ', joinCompanys);
 

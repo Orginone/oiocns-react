@@ -22,7 +22,6 @@ import { SpaceType, UserType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
-import provider from '@/ts/core/provider';
 type OrganizationalUnitsProps = {};
 
 // 菜单列表项
@@ -42,7 +41,7 @@ const OrganizationalItem = (item: SpaceType) => {
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   // const { user, setUser, userSpace } = useStore((state) => ({ ...state }));
-  const user = Provider.getPerson();
+  const user = Provider.getPerson;
   const [current, setCurrent] = useState<SpaceType>();
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -65,7 +64,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const onSave = async () => {
     const values = await form.validateFields();
     const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson().createCompany(
+    let res = await Provider.getPerson.createCompany(
       name,
       code,
       teamName,
@@ -73,13 +72,13 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    Provider.getPerson().showMessage(res);
+    Provider.getPerson.showMessage(res);
     setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
   // 获取工作单位列表
   const getList = async () => {
-    const data = (await Provider.getPerson().getJoinedCompanys()).map(
+    const data = (await Provider.getPerson.getJoinedCompanys()).map(
       (el: any) => el.target,
     );
     console.log(data);

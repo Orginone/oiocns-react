@@ -4,7 +4,7 @@ import { Row, Button, Divider, Select, Col, Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
-import provider from '@/ts/core/provider';
+import Provider from '@/ts/core/provider';
 import { useAppwfConfig } from '@/module/flow/flow';
 /**
  * @description: 审批对象
@@ -14,8 +14,8 @@ import { useAppwfConfig } from '@/module/flow/flow';
 const { Option } = Select;
 
 const ApprovalNode = () => {
-  const person = provider.getPerson();
-  // const personObj = provider.getPerson().getJoinedCohorts();
+  const person = Provider.getPerson;
+  // const personObj = Provider.getPerson.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗

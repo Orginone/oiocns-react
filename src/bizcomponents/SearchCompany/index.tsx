@@ -16,7 +16,7 @@ type CompanySearchTableProps = {
 
 let tableProps: CompanySearchTableProps;
 
-/* 
+/*
   弹出框表格查询
 */
 const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
@@ -56,7 +56,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
 
   // 查询数据
   const getList = (searchKey?: string) => {
-    Provider.getPerson().searchCompany(
+    PersonController.getInstance().searchCompany(
       {
         page: 1,
         pageSize: 10,
