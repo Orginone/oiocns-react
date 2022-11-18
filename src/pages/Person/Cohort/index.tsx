@@ -159,10 +159,12 @@ const CohortConfig: React.FC = () => {
     console.log("获取值", PersonInfoEnty.getPerson.ChohortArray)
     for (var i = 0; i < data.length; i++) {
       if (data[i].target.belongId === Person.target.id) {
-        const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
-        chorot.belongId = data[i].target.belongId;
-        chorot.thingId = data[i].target.thingId;
-        resultList.push(chorot);
+        if(data[i].target.team!=undefined){
+          const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
+          chorot.belongId = data[i].target.belongId;
+          chorot.thingId = data[i].target.thingId;
+          resultList.push(chorot);
+        }
       }
     }
     setList(resultList);

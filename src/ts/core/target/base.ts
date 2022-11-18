@@ -128,9 +128,11 @@ export default class BaseTarget {
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
     if (res.success) {
+      if(res.data.result!=undefined){
       res.data.result.forEach((market) => {
         this._joinedMarkets.push(new AppStore(market));
       });
+    }
     }
     return this._joinedMarkets;
   }

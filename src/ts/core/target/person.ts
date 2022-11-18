@@ -63,10 +63,12 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success) {
+    const { success, data } = res;
+    if (success) {
+      const { result = [] } = data;
       this._joinedCohorts = [];
-      for (var i = 0; i < res.data.result.length; i++) {
-        const cohort = new Cohort(res.data.result[i]);
+      for (var i = 0; i < result.length; i++) {
+        const cohort = new Cohort(result[i]);
         this._joinedCohorts.push(cohort);
       }
     }
@@ -219,7 +221,9 @@ export default class Person extends BaseTarget {
     });
     console.log('好友查询结果', res);
     if (res.success) {
-      this._friends = res.data.result;
+      if(res.data.result!=undefined){
+        this._friends = res.data.result;
+      }
     }
     return this._friends;
   }
@@ -296,7 +300,6 @@ export default class Person extends BaseTarget {
     };
     return await kernel.querySelfProduct(paramData);
   }
-
 
   // /**
   //  * 查询我的产品/应用
