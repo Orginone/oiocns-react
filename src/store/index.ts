@@ -2,7 +2,7 @@
  * @Author: zhangqiang 1196217890@qq.com
  * @Date: 2022-11-17 13:30:54
  * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-17 13:52:03
+ * @LastEditTime: 2022-11-18 14:25:48
  * @FilePath: /oiocns-react/src/store/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,7 +12,6 @@ import create from 'zustand';
 // 数据持久化，会缓存到 storage
 import { persist } from 'zustand/middleware';
 import Person from '@/module/person';
-import $API from '@/services';
 import Provider from '@/ts/core/provider';
 
 import { StateProps, UserType } from './type';
@@ -29,7 +28,6 @@ const useStore = create(
       userObj: null,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
-        console.log('res', res);
         if (res.success) {
           set({
             user: res.data,
@@ -41,6 +39,7 @@ const useStore = create(
         }
         return false;
       },
+      
       setUser: async (data: UserType) => {
         set({ user: data });
       },
@@ -58,8 +57,10 @@ const useStore = create(
     {
       name: 'user-storage',
       getStorage: () => sessionStorage,
+      
     },
   ),
+  
 );
 
 // 暴露单一实例 useStore

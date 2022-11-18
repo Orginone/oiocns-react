@@ -133,6 +133,8 @@ export interface WorkGroup extends Org {
 export interface Cohort extends Org {
   typeName: OrgType.Cohort;
   belongId: string;
+  selectStyle: string;
+
 }
 
 /**
