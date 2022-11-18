@@ -124,18 +124,21 @@ export default class Person extends BaseTarget {
 
   /**
    * 删除群组
-   * @param params  
+   * @param params
    * @returns
-   *///
-  public async deleteCohorts( targetId:string,belongId:string): Promise<model.ResultType<any>> {
-    const params:model.IdReqModel = {
-      id:targetId,
-      typeName:TargetType.Cohort,
-      belongId:belongId
-    }
+   */ //
+  public async deleteCohorts(
+    targetId: string,
+    belongId: string,
+  ): Promise<model.ResultType<any>> {
+    const params: model.IdReqModel = {
+      id: targetId,
+      typeName: TargetType.Cohort,
+      belongId: belongId,
+    };
     let res = await kernel.deleteTarget(params);
     if (res.success) {
-      this.getCohort();
+      this._joinedCohorts.filter((obj) => (obj.target.id = targetId));
     }
     return res;
   }
@@ -148,9 +151,6 @@ export default class Person extends BaseTarget {
   public async searchCohorts(name: string): Promise<model.ResultType<any>> {
     const TypeName = TargetType.Cohort;
     const res = await this.search(name, TypeName);
-    if (res.success) {
-      this.getCohort();
-    }
     return res;
   }
 
@@ -167,20 +167,23 @@ export default class Person extends BaseTarget {
     }
     return res;
   }
-   /**
+  /**
    * 删除好友
-   * @param params  
+   * @param params
    * @returns
-   *///
-   public async deletefriend( id:string,belongId:string): Promise<model.ResultType<any>> {
-    const params:model.IdReqModel = {
-      id:id,
-      typeName:TargetType.Person,
-      belongId:belongId
-    }
+   */ //
+  public async deletefriend(
+    id: string,
+    belongId: string,
+  ): Promise<model.ResultType<any>> {
+    const params: model.IdReqModel = {
+      id: id,
+      typeName: TargetType.Person,
+      belongId: belongId,
+    };
     let res = await kernel.deleteTarget(params);
     if (res.success) {
-      this._friends.filter(obj=>obj.id=id)
+      this._friends.filter((obj) => (obj.id = id));
     }
     return res;
   }
@@ -189,7 +192,7 @@ export default class Person extends BaseTarget {
    * 获取好友列表
    * @returns 返回好友列表
    */
-   public async getFriends(): Promise<XTarget[]> {
+  public async getFriends(): Promise<XTarget[]> {
     if (this._friends.length > 0) {
       return this._friends;
     }
@@ -202,7 +205,7 @@ export default class Person extends BaseTarget {
     }
     return this._friends;
   }
-  
+
   /**
    * 设立单位
    * @param name 单位名称
@@ -243,7 +246,6 @@ export default class Person extends BaseTarget {
     }
     return res;
   }
-
 
   /**
    * 查询我的产品/应用
