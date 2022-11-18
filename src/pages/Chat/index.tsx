@@ -7,11 +7,13 @@ import GroupInputBox from './GroupInputBox';
 import GroupSideBar from './GroupSideBar';
 import charsStyle from './index.module.less';
 
-/* 
-  沟通聊天
-*/
+/**
+ * @description: 沟通聊天
+ * @return {*}
+ */
+
 const Chat: React.FC = () => {
-  const [isShowDetail, setIsShowDetail] = useState<boolean>(false);
+  const [isShowDetail, setIsShowDetail] = useState<boolean>(false); // 展开关闭详情
   const [writeContent, setWriteContent] = useState<any>(null);
   const ChatStore: any = useChatStore();
   // 展开详情页
