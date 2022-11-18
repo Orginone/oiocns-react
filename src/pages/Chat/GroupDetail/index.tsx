@@ -1,5 +1,3 @@
-/* eslint-disable no-constant-condition */
-/* eslint-disable no-unused-vars */
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Col, message, Modal, Row, Empty } from 'antd';
 import React, { useState } from 'react';
@@ -9,7 +7,7 @@ import { chat } from '@/module/chat/orgchat';
 import useChatStore from '@/store/chat';
 import detailStyle from './index.module.less';
 
-/* 
+/*
   个人、群聊详情
 */
 

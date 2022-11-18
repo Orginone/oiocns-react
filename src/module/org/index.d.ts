@@ -5,11 +5,10 @@
  * ===========================================================
  */
 
-
 /**
  * 组织分类
  */
- export enum OrgType {
+export enum OrgType {
   /* 单位、公司 */
   Company = '单位',
   /* 集团 */
@@ -72,7 +71,6 @@ export interface UserDept {
   createCompany: string;
   createCompanyId: number;
   joinDate: string;
-
 }
 
 /**
@@ -90,14 +88,13 @@ export interface AllApply {
   updateTime: string;
   team: Team;
   target: User;
-
 }
 
 /**
  * 用户
  */
 export interface User extends Person {
-  identitys: Identity[]
+  identitys: Identity[];
 }
 
 /**
@@ -126,10 +123,9 @@ export interface Dept extends Org {
 /**
  * 工作组
  */
- export interface WorkGroup extends Org {
+export interface WorkGroup extends Org {
   typeName: OrgType.WorkGroup;
 }
-
 
 /**
  * 群组
@@ -167,13 +163,13 @@ export interface Person extends Org {
  * 组织树(单位或工作组)
  */
 export interface OrgTree extends Org {
-  children?: OrgTree[]
+  children?: OrgTree[];
 }
 
 /**
  * 工作空间类型
  */
- export enum WorkSpaceType {
+export enum WorkSpaceType {
   /* 单位、公司 */
   Company = '单位',
   /* 个人 */
@@ -183,8 +179,8 @@ export interface OrgTree extends Org {
 /**
  * 工作空间
  */
-export interface WorkSpace{
+export interface WorkSpace {
   id: string;
   name: string;
-  type: WorkSpaceType.Company | WorkSpaceType.Person
+  type: WorkSpaceType.Company | WorkSpaceType.Person;
 }

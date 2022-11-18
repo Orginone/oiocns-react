@@ -8,7 +8,7 @@ import { RouteComponentProps } from 'react-router-dom';
 
 const CreatApp: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); //  是否显示创建应用窗口
   const [createAppForm] = Form.useForm<Record<string, any>>();
   // 提交表单数据
   const handleCreateApp = (values: any) => {
