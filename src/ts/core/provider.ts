@@ -8,8 +8,8 @@ export default class Provider {
   private static person: Person;
 
   public static get getPerson(): Person {
-    if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+    if(this.person==null) {
+      this.person = new Person(JSON.parse(sessionStorage.getItem("_loginPerson")+''));
     }
     return this.person;
   }

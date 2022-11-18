@@ -1,24 +1,27 @@
 import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import { model, schema, FaildResult } from '../../base';
+import { model, schema, FaildResult,kernel,common } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
+import AppStore from '../market/appstore'
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-
+  private _joinedStores: AppStore[];
   constructor(target: schema.XTarget) {
     super(target);
-
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this._joinedStores = [];
+    //初始化时填入信息
+    this.getCohort();
     this.getFriends();
   }
 
@@ -41,10 +44,32 @@ export default class Person extends BaseTarget {
       TargetType.Cohort,
     ];
   }
-
   /** 支持的单位类型数组 */
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
+  }
+
+  public get ChohortArray(): Cohort[] {
+    return this._joinedCohorts;
+  }
+  /**
+   * 获取群组列表
+   * @param params 
+   * @returns 
+   */
+  public async getCohort(): Promise<model.ResultType<any>> {
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      joinTypeNames: [TargetType.Cohort],
+    });
+    if (res.success) {
+      this._joinedCohorts = [];
+      for (var i = 0; i < res.data.result.length; i++) {
+        const cohort = new Cohort(res.data.result[i])
+        this._joinedCohorts.push(cohort);
+      }
+    }
+    return res;
   }
 
   /** 支持的群组类型数组*/
@@ -95,6 +120,43 @@ export default class Person extends BaseTarget {
       return cohort.pullPersons([this.target.id]);
     }
     return false;
+  }
+
+  /**
+   * 删除群组
+   * @param params 
+   * @returns 
+   */
+  public async deleteCohorts(
+    params: model.IdReqModel
+  ): Promise<model.ResultType<any>> {
+    let res = await kernel.deleteTarget(params);
+    if (res.success) {
+      this.getCohort();
+    }
+    return res;
+  }
+  /**
+     * 搜索群组
+     * @param params id:targetId,TypeName:枚举中取当前角色,belongId: 归属ID;
+     * @returns 
+     */
+  public async searchCohorts(name: string
+  ): Promise<model.ResultType<any>> {
+    const data:model.NameTypeModel = {
+      name: name,
+      typeName: TargetType.Cohort,
+      page : {
+        offset: 0,
+        filter: name,
+        limit: common.Constants.MAX_UINT_16,
+      }
+    }
+    const res = await kernel.searchTargetByName(data);
+    if (res.success) {
+      this.getCohort();
+    }
+    return res;
   }
 
   /**

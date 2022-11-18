@@ -8,33 +8,33 @@ export namespace CohortConfigType {
     //群组设置 数据类型
     interface CohortConfig{
       id: string;
-      name:String;
-      code:String;
-      typeName:String;
-      belongId:String;
-      thingId:String;
+      name:string;
+      code:string;
+      typeName:string;
+      belongId:string;
+      thingId:string;
       status:number;
-      createUser:String;
-      updateUser:String;
-      varsion:String;
-      createTime:String;
+      createUser:string;
+      updateUser:string;
+      varsion:string;
+      createTime:string;
       team:CohortConfigTeam[];
-      updateTime:String;
+      updateTime:string;
     }
     //群组设置 数据类型
     interface CohortConfigTeam{
       id: string;
-      name:String;
-      code:String;
-      typeName:String;
+      name:string;
+      code:string;
+      typeName?:string;
       status:number;
-      remark:String
-      targetId:String;
-      varsion:String;
-      createTime:String;
-      updateTime:String;
-      belongId:String;
-      thingId:String;
+      remark:string
+      targetId:string;
+      varsion?:string;
+      createTime:string;
+      updateTime:string;
+      belongId?:string;
+      thingId?:string;
 
     }
   }

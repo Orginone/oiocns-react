@@ -94,6 +94,17 @@ export default class BaseTarget {
    * @param data 请求参数
    * @returns 请求结果
    */
+<<<<<<< HEAD
+  public async getjoined(data: any): Promise<model.ResultType<schema.XTargetArray>> {
+    data.id = this.target.id;
+    data.typeName = this.target.typeName;
+    data.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_16,
+    };
+    return await kernel.queryJoinedTargetById(data);
+=======
   protected async getjoined(
     data: Omit<model.IDReqJoinedModel, 'id' | 'typeName' | 'page'>,
   ): Promise<model.ResultType<schema.XTargetArray>> {
@@ -143,6 +154,7 @@ export default class BaseTarget {
       delete this._joinedMarkets[this._joinedMarkets.indexOf(appStore)];
     }
     return res;
+>>>>>>> origin/dev
   }
 
   /**
@@ -155,6 +167,9 @@ export default class BaseTarget {
     data.teamTypes = [this.target.typeName];
     return await kernel.pullAnyToTeam(data);
   }
+<<<<<<< HEAD
+ 
+=======
 
   /**
    * 根据编号查询市场
@@ -169,4 +184,5 @@ export default class BaseTarget {
       page,
     });
   }
+>>>>>>> origin/dev
 }
