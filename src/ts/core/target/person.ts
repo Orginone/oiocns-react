@@ -6,6 +6,7 @@ import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
+import { validIsSocialCreditCode } from '@/utils/tools';
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
@@ -114,28 +115,43 @@ export default class Person extends BaseTarget {
     teamCode: string,
     remark: string,
     type: TargetType = TargetType.Company,
-  ): Promise<model.ResultType<XTarget>> {
+  ): Promise<model.ResultType<any>> {
     if (!this.companyTypes.includes(type)) {
       return FaildResult('您无法创建该类型单位!');
     }
-    const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
-    if (res.success) {
-      let company;
-      switch (type) {
-        case TargetType.University:
-          company = new University(res.data);
-          break;
-        case TargetType.Hospital:
-          company = new Hospital(res.data);
-          break;
-        default:
-          company = new Company(res.data);
-          break;
-      }
-      this._joinedCompanys.push(company);
-      company.pullPersons([this.target.id]);
+    if (!validIsSocialCreditCode(code)) {
+      return FaildResult('请填写正确的代码!');
     }
-    return res;
+    const tres = await this.getTargetByName({
+      name,
+      typeName: type,
+      page: { offset: 0, limit: 1, filter: code },
+    });
+    if (!tres.success) {
+      return tres;
+    }
+    if (tres.data == null) {
+      const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
+      if (res.success) {
+        let company;
+        switch (type) {
+          case TargetType.University:
+            company = new University(res.data);
+            break;
+          case TargetType.Hospital:
+            company = new Hospital(res.data);
+            break;
+          default:
+            company = new Company(res.data);
+            break;
+        }
+        this._joinedCompanys.push(company);
+        return company.pullPersons([this.target.id]);
+      }
+      return res;
+    } else {
+      return FaildResult('该单位已存在!');
+    }
   }
 
   /**
@@ -156,22 +172,22 @@ export default class Person extends BaseTarget {
     return this._friends;
   }
 
-  /**
-   * 查询我的产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-    // model.IDBelongReq
-    let paramData: any = {};
-    paramData.id = this.target.id;
-    paramData.page = {
-      offset: 0,
-      filter: this.target.id,
-      limit: common.Constants.MAX_UINT_8,
-    };
-    return await kernel.querySelfProduct(paramData);
-  }
+  // /**
+  //  * 查询我的产品/应用
+  //  * @param params
+  //  * @returns
+  //  */
+  // public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
+  //   // model.IDBelongReq
+  //   let paramData: any = {};
+  //   paramData.id = this.target.id;
+  //   paramData.page = {
+  //     offset: 0,
+  //     filter: this.target.id,
+  //     limit: common.Constants.MAX_UINT_8,
+  //   };
+  //   return await kernel.querySelfProduct(paramData);
+  // }
 
   /**
    * @description: 查询我加入的群
