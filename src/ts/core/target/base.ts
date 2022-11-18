@@ -8,10 +8,10 @@ export default class BaseTarget {
   protected _joinedMarkets: AppStore[];
 
   protected get createTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort];
   }
   protected get joinTargetType(): TargetType[] {
-    return [];
+    return [TargetType.Cohort,TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
