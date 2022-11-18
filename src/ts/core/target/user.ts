@@ -10,6 +10,18 @@ import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
 
+<<<<<<< HEAD
+=======
+type ResultObject = {
+  // http代码
+  code: number;
+  // 消息
+  msg: string;
+  // 结果
+  success: boolean;
+};
+
+>>>>>>> origin/personal/ouyangj
 /**
  * 我的设置里面的接口
  * const person: Person = Provider.getPerson;
@@ -49,11 +61,19 @@ export default class userdataservice extends BaseService {
    * 获取单位列表
    * @return 加入的单位列表
    */
+<<<<<<< HEAD
   public async getJoinedGroups(companyId: string | number): Promise<Company[]> {
     let res = await this.getjoined({
       // spaceId: companyId,
       joinTypeNames: this.companyTypes,
       typeName: TargetType.Group,
+=======
+  public async getJoinedGroups(companyId: string): Promise<Company[]> {
+    this.target.typeName = TargetType.Group;
+    let res = await this.getjoined({
+      spaceId: companyId,
+      JoinTypeNames: this.companyTypes,
+>>>>>>> origin/personal/ouyangj
     });
     console.log('222222222222', res);
     let _joinedCompanys: Company[] = [];
@@ -92,6 +112,7 @@ export default class userdataservice extends BaseService {
     teamCode: string,
     remark: string,
     type: TargetType = TargetType.Company,
+<<<<<<< HEAD
   ): Promise<boolean> {
     if (!this.companyTypes.includes(type)) {
       return false;
@@ -126,6 +147,53 @@ export default class userdataservice extends BaseService {
 
     return false;
   }
+=======
+  ): Promise<model.ResultType<any>> {
+    if (!this.companyTypes.includes(type)) {
+      return {
+        success: false,
+        msg: '类型错误',
+        code: -1,
+      };
+    }
+
+    let data: any = {
+      name,
+      code,
+      teamName,
+      teamCode,
+      typeName: type,
+      teamRemark: remark,
+    };
+
+    const res = await this._create(data);
+    console.log(res);
+
+    if (res.success) {
+      let company;
+      switch (type) {
+        case TargetType.University:
+          company = new University(res.data);
+          break;
+        case TargetType.Hospital:
+          company = new Hospital(res.data);
+          break;
+        default:
+          company = new Company(res.data);
+          break;
+      }
+      //
+      return company.pullPersons(['381104941936283648', '378243413037944832']);
+    }
+
+    return {
+      success: false,
+      msg: res.msg,
+      code: -1,
+    };
+  }
+
+>>>>>>> origin/personal/ouyangj
   /**
    * 搜索单位(公司) 数组里面还有target
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
@@ -179,13 +247,18 @@ export default class userdataservice extends BaseService {
   public async applyJoinCompany(
     targetId: string,
     applyType: TargetType,
+<<<<<<< HEAD
   ): Promise<boolean> {
+=======
+  ): Promise<model.ResultType<any>> {
+>>>>>>> origin/personal/ouyangj
     const res = await kernel.applyJoinTeam({
       id: targetId,
       targetId: this.target.id,
       teamType: applyType,
       targetType: TargetType.Person,
     });
+<<<<<<< HEAD
     return res.success;
   }
 
@@ -205,6 +278,28 @@ export default class userdataservice extends BaseService {
 
   // querySelfProduct 我的产品，上架后才是商品
 
+=======
+
+    return res;
+  }
+
+  /**取消加入组织或个人 */
+  public async cancelJoinCompany(
+    targetId: string,
+    belongId: string,
+    applyType: TargetType,
+  ): Promise<model.ResultType<any>> {
+    const res = await kernel.cancelJoinTeam({
+      id: targetId,
+      typeName: applyType,
+      belongId: belongId,
+    });
+    return res;
+  }
+
+  // querySelfProduct 我的产品，上架后才是商品
+
+>>>>>>> origin/personal/ouyangj
   /**
    * 创建对象
    * @param data 创建参数
