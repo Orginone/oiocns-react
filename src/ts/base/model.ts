@@ -362,7 +362,7 @@ export type IdentityModel = {
 
 export type TargetModel = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -599,7 +599,7 @@ export type TeamPullModel = {
   // 团队类型
   teamTypes: string[];
   // 待拉入的组织/个人ID集合
-  targetIds: number[];
+  targetIds: string[];
   // 待拉入组织/个人类型
   targetType: string;
 };

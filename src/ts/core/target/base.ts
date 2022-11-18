@@ -39,7 +39,6 @@ export default class BaseTarget {
   ): Promise<model.ResultType<XTarget>> {
     if (this.createTargetType.includes(typeName)) {
       return await kernel.createTarget({
-        id: '',
         name,
         code,
         typeName,
@@ -160,6 +159,24 @@ export default class BaseTarget {
     data.id = this.target.id;
     data.teamTypes = [this.target.typeName];
     return await kernel.pullAnyToTeam(data);
+  }
+
+  /**
+   * 拉自身进组织(创建组织的时候调用)
+   * @param id
+   * @param teamTypes
+   * @returns
+   */
+  protected async join(
+    id: string,
+    teamTypes: TargetType[],
+  ): Promise<model.ResultType<any>> {
+    return await kernel.pullAnyToTeam({
+      id,
+      teamTypes,
+      targetType: this.target.typeName,
+      targetIds: [this.target.id],
+    });
   }
 
   /**
