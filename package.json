@@ -21,13 +21,15 @@
     "lint:fix": "eslint --cache --ext .js,.jsx,.ts,.tsx --no-error-on-unmatched-pattern --quiet --fix ./src",
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
-  "lint-staged": {
-    "./src/*.{js,jsx,ts,tsx}": ["npm run lint:fix","git add"]
-  },
+
   "husky": {
     "hooks": {
+      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "lint-staged": {
+    "./src/*.{js,jsx,ts,tsx}": [ "npm run lint:fix" ]
   },
   "browserslist": [
     "> 1%",

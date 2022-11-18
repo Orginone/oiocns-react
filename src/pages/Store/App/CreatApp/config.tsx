@@ -143,7 +143,7 @@ const valueTypeColumns: ProFormColumnsType<DataItem> = {
 
   columns: [
     {
-      valueInded
+      // valueInded
       valueType: 'formList',
       colProps: { span: 24 },
       fieldProps: {
