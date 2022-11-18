@@ -1,10 +1,10 @@
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
-// import Company from '@/ts/core/target/company';
+import Company from '@/ts/core/target/company';
 /**
  * @desc: 仓库模块 导航控件
- * @return {*}/
+ * @return {*}
  */
 type menyuType = 'app' | 'docx' | 'data' | 'assets';
 type footerTreeType = {
@@ -24,10 +24,10 @@ type AppTreeType = {
 
 class StoreClassify {
   // constructor(parameters) {}
-  // static curCompoy: Company = Provider.getPerson.curCompany as Company;
-  public _curMarket: AppStore; // 当前商店信息
+  static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+  public _curMarket: AppStore | undefined = undefined; // 当前商店信息
   public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
-  private curTreeData: any; // 当前展示树内容
+  public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
   public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
   public SelectMarketCallBack: undefined | ((item: AppStore) => void) = undefined; //选择商店后 触发展示区回调
@@ -101,7 +101,7 @@ class StoreClassify {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.getStore.name || '商店';
+    this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 应用', this.breadcrumb);
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
@@ -113,7 +113,7 @@ class StoreClassify {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.getStore.name || '商店';
+    this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 商店', this.breadcrumb);
 
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
@@ -128,7 +128,7 @@ class StoreClassify {
   private async getOwnMarket() {
     const marketTree = await Provider.getPerson.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
-      const item = itemModel.getStore;
+      const item = itemModel.store;
       return {
         title: item.name,
         key: `0-${index}`,
