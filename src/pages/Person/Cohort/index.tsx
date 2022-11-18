@@ -76,7 +76,6 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-
           setItem(item)
           setOpen(true);
           console.log('按钮事件1231', 'updateCohort', item);
