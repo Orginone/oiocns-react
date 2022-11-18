@@ -180,6 +180,7 @@ export default class Person extends BaseTarget {
       joinTypeNames: this.cohortTypes,
     });
     if (res.success && res.data && res.data.result) {
+      this._joinedCohorts = [];
       res.data.result.forEach((item) => {
         switch (item.typeName) {
           case TargetType.Cohort:

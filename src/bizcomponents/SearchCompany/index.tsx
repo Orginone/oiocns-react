@@ -57,6 +57,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
 
   // 查询数据
   const getList = (searchKey?: string) => {
+    PersonController.getInstance().createCompany();
 
     PersonController.getInstance().searchCompany({
       page: 1,
