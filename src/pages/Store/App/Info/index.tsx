@@ -83,7 +83,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
           description={
             <div className="app-info-con">
               <p className="app-info-con-desc">
-                应用描述应用描述应用描述应用描述应 用描述应用描述
+                应用描述应用描述应用描述应用描述应 用 描述应用描述
               </p>
               <p className="app-info-con-txt">
                 <span className="vision">版本号 ：2.3.16</span>
