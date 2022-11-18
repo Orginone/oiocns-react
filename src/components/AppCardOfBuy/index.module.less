@@ -3,8 +3,7 @@
 .buyCard {
   background-color: transparent;
   border-color: @border-color-base !important;
-  transition: all .3s ease .1s;
-
+  transition: all 0.3s ease 0.1s;
 
   &::after {
     display: none;
@@ -30,27 +29,27 @@
       -webkit-box-orient: vertical; // 从上到下垂直排列子元素
       -webkit-line-clamp: 2; //显示的行数
     }
-
   }
 
   .operationBtn {
     font-size: 24px;
     height: max-content;
-    transition: all .3s ease .1s;
+    transition: all 0.3s ease 0.1s;
 
     &:hover {
       transform: scale(1.2);
     }
   }
 
-  .nameLabel {}
+  .nameLabel {
+  }
 
   .cardTitle {
     display: flex;
     flex-direction: column;
 
     .version {
-      color: #C0C4CC;
+      color: #c0c4cc;
       font-size: 12px;
       margin: 14px 0 0 9px;
     }
@@ -68,10 +67,10 @@
       padding: 2px 14px;
       height: max-content;
       margin-left: 10px;
-      border-color: #A1B7EF;
+      border-color: #a1b7ef;
       color: #154ad8;
       font-weight: 550;
-      transform: scale(.95);
+      transform: scale(0.95);
 
       &:hover {
         color: #fff;
@@ -82,6 +81,4 @@
       }
     }
   }
-
-
 }
