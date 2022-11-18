@@ -10,17 +10,18 @@ import { validIsSocialCreditCode } from '@/utils/tools';
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
-  private _curCompany: Company | undefined;
+  private _curSpace: BaseTarget | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
 
+
   constructor(target: schema.XTarget) {
     super(target);
-
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this.getFriends();
+    this.getJoinedCompanys();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -116,6 +117,7 @@ export default class Person extends BaseTarget {
     remark: string,
     type: TargetType = TargetType.Company,
   ): Promise<model.ResultType<any>> {
+    debugger
     if (!this.companyTypes.includes(type)) {
       return FaildResult('您无法创建该类型单位!');
     }
@@ -130,7 +132,8 @@ export default class Person extends BaseTarget {
     if (!tres.success) {
       return tres;
     }
-    if (tres.data == null) {
+    if (tres.data == null || !tres.data.id) {
+      debugger
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
       if (res.success) {
         let company;

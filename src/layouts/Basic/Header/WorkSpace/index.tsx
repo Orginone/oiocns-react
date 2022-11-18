@@ -63,8 +63,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const onSave = async () => {
     debugger;
     const values = await form.validateFields();
-    const { name, code, teamName, teamCode, teamRemark, typeName } = values;
-    let success = await Provider.getPerson().createCompany(
+    const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
+    let res = await Provider.getPerson().createCompany(
       name,
       code,
       teamName,
@@ -72,7 +72,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    setShowFormModal(!success);
+    Provider.getPerson().showMessage(res);
+    setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
   // 获取工作单位列表
@@ -195,7 +196,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
             label="单位类型"
             rules={[{ required: true, message: '单位类型不能为空' }]}>
             <Select
-              defaultValue={TargetType.Company}
+              placeholder="请选择单位类型"
               options={[
                 {
                   value: TargetType.Company,
