@@ -15,7 +15,7 @@ export default class Person extends BaseTarget {
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
   private _joinedStores: AppStore[];
-  private _ownProducts: Product[];
+  private _ownProducts: any[];
   constructor(target: schema.XTarget) {
     super(target);
     this._friends = [];
