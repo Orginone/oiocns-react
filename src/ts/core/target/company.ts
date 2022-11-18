@@ -1,4 +1,4 @@
-import { schema } from '../../base';
+import { model, schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 
@@ -22,7 +22,6 @@ export default class Company extends BaseTarget {
       // 集团
       TargetType.Group,
       // 科室
-
       TargetType.Section,
     ];
   }
@@ -32,11 +31,10 @@ export default class Company extends BaseTarget {
    * @param personIds 人员id数组
    * @returns 是否成功
    */
-  public async pullPersons(personIds: string[]): Promise<boolean> {
-    let res = await this.pull({
+  public async pullPersons(personIds: string[]): Promise<model.ResultType<any>> {
+    return await this.pull({
       targetType: TargetType.Person,
       targetIds: personIds,
     });
-    return res.success;
   }
 }

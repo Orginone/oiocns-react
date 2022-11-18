@@ -11,7 +11,7 @@ export default class BaseTarget {
     return [TargetType.Cohort];
   }
   protected get joinTargetType(): TargetType[] {
-    return [TargetType.Cohort,TargetType.Person];
+    return [TargetType.Cohort, TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
@@ -109,6 +109,12 @@ export default class BaseTarget {
     });
   }
 
+  public async getTargetByName(
+    data: model.NameTypeModel,
+  ): Promise<model.ResultType<XTarget>> {
+    return await kernel.queryTargetByName(data);
+  }
+
   /**
    * 查询商店列表
    * @returns 商店列表
@@ -170,18 +176,17 @@ export default class BaseTarget {
     });
   }
 
-  public async search(name: string,TypeName:string
-    ): Promise<model.ResultType<any>> {
-      const data:model.NameTypeModel = {
-        name: name,
-        typeName: TypeName,
-        page : {
-          offset: 0,
-          filter: name,
-          limit: common.Constants.MAX_UINT_16,
-        }
-      }
-      const res = await kernel.searchTargetByName(data);
-      return res;
-    }
+  public async search(name: string, TypeName: string): Promise<model.ResultType<any>> {
+    const data: model.NameTypeModel = {
+      name: name,
+      typeName: TypeName,
+      page: {
+        offset: 0,
+        filter: name,
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.searchTargetByName(data);
+    return res;
+  }
 }
