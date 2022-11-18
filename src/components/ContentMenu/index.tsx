@@ -158,7 +158,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         </div>
       )}
       <div className={cls.container}>
-        {props.data && (
+        {props.data && !renderMenu &&(
           <Menu
             // mode="inline"
             items={currentMenuData as MenuProps[`items`]}

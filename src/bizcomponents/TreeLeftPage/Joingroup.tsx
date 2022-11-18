@@ -1,7 +1,7 @@
-import { Tree ,Space} from 'antd';
+import { Tree ,Space,Input} from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
-import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined } from '@ant-design/icons';
+import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined,SearchOutlined} from '@ant-design/icons';
 
 import cls from './index.module.less';
 
@@ -65,10 +65,27 @@ const JoinGroup: React.FC = () => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverItem, setHoverItem] = useState<React.Key>();
+  const [searchValue, setSearchValue] = useState('');
+  
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
     setAutoExpandParent(false);
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const newExpandedKeys = dataList
+      .map(item => {
+        if (item.title.indexOf(value) > -1) {
+          return getParentKey(item.key, defaultData);
+        }
+        return null;
+      })
+      .filter((item, i, self) => item && self.indexOf(item) === i);
+    setExpandedKeys(newExpandedKeys as React.Key[]);
+    setSearchValue(value);
+    setAutoExpandParent(true);
   };
 
   const treeData: DataNode[] = [
@@ -109,6 +126,8 @@ const JoinGroup: React.FC = () => {
   return (
     <div className={cls.topMes}>
       <div className={cls.joingroup}>加入集团</div> 
+      <Input size="middle" className={cls.inputStyle} placeholder="搜索加入的集团"
+        prefix={<SearchOutlined />} onChange={ onChange } />
       <Tree
         onExpand={onExpand}
         expandedKeys={expandedKeys}

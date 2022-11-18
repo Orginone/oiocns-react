@@ -1,4 +1,4 @@
-import { Input, Tree ,Space,TreeProps} from 'antd';
+import { Input, Tree ,Space,TreeProps,Modal, Button} from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
 import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined ,SearchOutlined} from '@ant-design/icons';
@@ -73,6 +73,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const [autoExpandParent, setAutoExpandParent] = useState(true);
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
+  const [isOpen,setIsOpen] = useState<boolean>(false)
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -161,31 +162,40 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   // }, [searchValue]);
 
   return (
-    <div className={cls.topMes}>
-      <Input size="middle" className={cls.inputStyle} placeholder="搜索关键词"
-        prefix={<SearchOutlined />} onChange={ onChange } />
-      <div className={cls.joingroup}>创建集团</div> 
-      <Tree
-        onExpand={onExpand}
-        expandedKeys={expandedKeys}
-        switcherIcon={<DownOutlined />}
-        autoExpandParent={autoExpandParent}
-        treeData={treeData1}
-        onSelect={onSelect}
-        showIcon={true}
-        titleRender={(e) => { 
-          return <div className={cls.rightstyle} onMouseOver={() => {
-            setHoverItemMes(e.key);
-          }} onMouseLeave={() => {setHoverItemMes('') }}>
-            <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-            {hoverItemMes === e.key ? <Space>
-              <PlusOutlined />
-              <MoreOutlined />
-            </Space>: null }
-           
-          </div>
-        }}
-      />
+    <div>
+      <Button className={cls.creatgroup} type="primary" onClick={() => setIsOpen(true)}>创建集团</Button>
+      
+      {Array.isArray(treeData1) && treeData1.length>0 ? <div className={cls.topMes}>
+        <Input size="middle" className={cls.inputStyle} placeholder="搜索创建的集团"
+          prefix={<SearchOutlined />} onChange={ onChange } />
+        <div className={cls.joingroup}>创建集团</div> 
+        <Tree
+          onExpand={onExpand}
+          expandedKeys={expandedKeys}
+          switcherIcon={<DownOutlined />}
+          autoExpandParent={autoExpandParent}
+          treeData={treeData1}
+          onSelect={onSelect}
+          showIcon={true}
+          titleRender={(e) => { 
+            return <div className={cls.rightstyle} onMouseOver={() => {
+              setHoverItemMes(e.key);
+            }}>
+              <span style={{ paddingRight: '8px' }}>{e?.title}</span>
+              {hoverItemMes === e.key ? <Space>
+                <span onClick={() => {
+                  setIsOpen(true);
+                }}><PlusOutlined /></span>
+                <span><MoreOutlined /></span>
+              </Space>: null }
+            </div>
+          }}
+          />
+      </div>:null}
+      
+      <Modal title="新建集团" onOk={()=>{setIsOpen(false)}} onCancel={() => { setIsOpen(false)  }} open={isOpen}>
+        这里要设置集团信息
+      </Modal>
     </div>
   );
 };

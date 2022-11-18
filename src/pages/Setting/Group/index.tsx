@@ -17,7 +17,8 @@ import { RouteComponentProps } from 'react-router-dom';
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
-  
+  const { id } = props.match.params;
+  console.log(id);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
