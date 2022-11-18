@@ -48,7 +48,6 @@ const flatMenuData = (menuData: ItemType[] | any, fathKey?: string): MemuItemTyp
       if (!element.type) {
         data.push(fathKey ? { ...element, fathKey } : { ...element });
       }
-      console.log(element.key);
       data.push(...flatMenuData(element.children, element.key));
     }
   }
@@ -89,10 +88,8 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
     if (props.menuClick) {
-      console.log('________1');
       props.menuClick?.call(this, e);
     } else {
-      console.log('________2');
       props.history.push(e.key);
     }
   };

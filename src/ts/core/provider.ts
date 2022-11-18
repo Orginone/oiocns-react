@@ -25,7 +25,7 @@ export default class Provider {
     let res = await kernel.login(account, password);
     if (res.success) {
       this.person = new Person(res.data.person);
-      sessionStorage.setItem("_loginPerson",JSON.stringify(res.data.person));
+      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
     }
     return res;
   }
@@ -49,7 +49,7 @@ export default class Provider {
     let res = await kernel.register(name, motto, phone, account, password, nickName);
     if (res.success) {
       this.person = new Person(res.data.person);
-      sessionStorage.setItem("_loginPerson",JSON.stringify(res.data.person));
+      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
     }
     return res;
   }

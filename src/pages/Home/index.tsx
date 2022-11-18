@@ -29,7 +29,7 @@ getImgAssets();
  * @desc: 项目首页
  */
 const Home: React.FC = () => {
-  kernel.queryOwnMarket({ offset: 0, limit: 10, filter: '' }).then(res => {
+  kernel.queryOwnMarket({ offset: 0, limit: 10, filter: '' }).then((res) => {
     console.log(res);
   });
   useEffect(() => {}, []);

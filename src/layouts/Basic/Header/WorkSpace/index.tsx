@@ -42,6 +42,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showFormModal, setShowFormModal] = useState<boolean>(false);
 
   // 获取工作单位列表
   const getList = async () => {
@@ -105,7 +106,13 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
         <Divider className={styles.divider} />
         <Row justify="space-around">
           <Col span={12}>
-            <Button type="text" block>
+            <Button
+              type="text"
+              block
+              onClick={() => {
+                setShowMenu(false);
+                setShowFormModal(true);
+              }}>
               创建单位
             </Button>
           </Col>
@@ -122,6 +129,23 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
           </Col>
         </Row>
       </div>
+      <Modal
+        title="创建单位"
+        width={670}
+        destroyOnClose={true}
+        open={showFormModal}
+        bodyStyle={{ padding: 0 }}
+        okText="确定"
+        onOk={() => {
+          console.log(`确定按钮`);
+          setShowFormModal(false);
+        }}
+        onCancel={() => {
+          console.log(`取消按钮`);
+          setShowFormModal(false);
+        }}>
+        <SearchCompany />
+      </Modal>
       <Modal
         title="加入单位"
         width={670}

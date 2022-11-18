@@ -5,12 +5,19 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
+import StoreClassify from '../../_control/classify';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
+  const [list, setList] = useState<any[]>([]);
+  useEffect(() => {
+    StoreClassify.currentMenu = 'market';
+    StoreClassify.TreeCallBack = setList;
+    StoreClassify.getTreeData();
+  }, []);
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
@@ -28,8 +35,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
           key: '/market/docx',
           icon: <FileTextFilled />,
         },
-        { label: '数据市场', key: '/data', icon: <FundFilled /> },
-        { label: '公益仓', key: '/src', icon: <DatabaseFilled /> },
+        { label: '数据市场', key: '/market/data', icon: <FundFilled /> },
+        { label: '公益仓', key: '/market/publicProperty', icon: <DatabaseFilled /> },
       ],
     },
   ];
@@ -47,7 +54,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         defaultOpenKeys={['openMarket']}
         onClick={({ key }) => handleChange(key)}
       />
-      <MarketClassifyTree key={selectMenu} treeType={selectMenu} />
+      <MarketClassifyTree key={selectMenu} treeData={list} />
     </div>
   );
 };

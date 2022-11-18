@@ -1,5 +1,5 @@
 import { Card, Form, Modal } from 'antd';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
@@ -14,6 +14,7 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
+import Content from '../_control/content';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -25,12 +26,11 @@ const service = new MarketService({
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [statusKey, setStatusKey] = useState('merchandise');
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false); // 是否显示创建应用窗口
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
-  const [createAppForm] = Form.useForm<Record<string, any>>();
   const items = [
     {
       tab: `全部`,
@@ -62,7 +62,7 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
-        setShowCreateModal(true);
+        history.push('/store/app/create');
         break;
       case '暂存':
         console.log('点击事件', '暂存');
@@ -73,7 +73,16 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const submitShare = () => {};
+  const onCheckeds = (checkedValus: any) => {
+    setCheckNodes(checkedValus);
+  };
+
+  // 共享确认回调
+  const submitShare = () => {
+    console.log('当前被选中的每一项', checkNodes);
+
+    setShowShareModal(false);
+  };
   const renderOperation = (
     item: MarketTypes.ProductType,
   ): MarketTypes.OperationType[] => {
@@ -136,8 +145,9 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
-  return (
-    <>
+  // 应用首页dom
+  const AppIndex = useMemo(() => {
+    return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         {<StoreRecent />}
         <Card
@@ -147,46 +157,39 @@ const StoreApp: React.FC = () => {
           tabList={items}
           onTabChange={(key) => {
             setStatusKey(key);
-          }}
-        />
-        <div className={cls['page-content-table']}>
-          <AppShowComp
-            service={service}
-            searchParams={{ status: statusKey }}
-            columns={service.getMyappColumns()}
-            renderOperation={renderOperation}
-          />
-        </div>
-        {/* 创建应用 */}
-        {showCreateModal && (
-          <CreateApp
-            form={createAppForm}
-            layoutType="ModalForm"
-            open={showCreateModal}
-            title="创建应用"
-            modalProps={{
-              destroyOnClose: true,
-              onCancel: () => setShowCreateModal(false),
-            }}
-          />
-        )}
-        <Modal
-          title="应用分享"
-          width={800}
-          destroyOnClose={true}
-          open={showShareModal}
-          okText="确定"
-          onOk={() => {
-            submitShare();
-          }}
-          onCancel={() => {
-            console.log(`取消按钮`);
-            setShowShareModal(false);
           }}>
-          <ShareComp></ShareComp>
-        </Modal>
-        {/* 详情页面 /store/app/info*/}
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              service={service}
+              searchParams={{ status: statusKey }}
+              columns={service.getMyappColumns()}
+              renderOperation={renderOperation}
+            />
+          </div>
+        </Card>
       </div>
+    );
+  }, [service]);
+
+  return (
+    <>
+      {location.pathname === '/store/app' && AppIndex}
+      <Modal
+        title="应用分享"
+        width={800}
+        destroyOnClose={true}
+        open={showShareModal}
+        okText="确定"
+        onOk={() => {
+          submitShare();
+        }}
+        onCancel={() => {
+          console.log(`取消按钮`);
+          setShowShareModal(false);
+        }}>
+        <ShareComp onCheckeds={onCheckeds} />
+      </Modal>
+      {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
@@ -199,6 +202,7 @@ const StoreApp: React.FC = () => {
         exact
         path="/store/app/manage"
         render={() => <Manage appId={selectAppInfo.id} />}></Route>
+      <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
@@ -207,4 +211,4 @@ const StoreApp: React.FC = () => {
   );
 };
 
-export default StoreApp;
+export default React.memo(StoreApp);
