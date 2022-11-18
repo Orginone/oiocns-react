@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Table, Tag, Dropdown, Menu } from 'antd';
+import { Modal, Table, Tag, Dropdown } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
@@ -70,11 +70,13 @@ const columns: ColumnsType<DataType> = [
   {
     title: '操作',
     dataIndex: 'operate',
-    render: (_text, record) => (
-      <Dropdown className={cls['operation-btn']} menu={{ items }} key="key">
-        <EllipsisOutlined />
-      </Dropdown>
-    ),
+    render: () => {
+      return (
+        <Dropdown className={cls['operation-btn']} menu={{ items }} key="key">
+          <EllipsisOutlined />
+        </Dropdown>
+      );
+    },
   },
 ];
 
