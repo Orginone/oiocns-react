@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Typography } from 'antd';
 import { useAppwfConfig } from '@/module/flow/flow';
 
-/* 
-    编辑名称
-*/
+/**
+ * @description: 编辑名称
+ * @return {*}
+ */
 
 const EditTitle: React.FC = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);

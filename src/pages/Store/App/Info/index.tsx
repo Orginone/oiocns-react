@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Menu } from 'antd';
-import React, { useContext } from 'react';
+import React from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
@@ -10,7 +10,6 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
-import { EventContext } from '../index';
 
 import { useHistory } from 'react-router-dom';
 const service = new MarketService({
@@ -25,7 +24,6 @@ interface AppInfoType {
 }
 
 const StoreAppInfo: React.FC<AppInfoType> = () => {
-  const { TestSub } = useContext(EventContext);
   const BtnsList = ['编辑应用分配'];
   const history = useHistory();
   const handleBtnsClick = (item: { text: string }) => {
@@ -47,7 +45,6 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         key: 'publish',
         label: '下架',
         onClick: () => {
-          TestSub.emit('hello2', { aa: '测试订阅修改' });
           console.log('按钮事件', 'publish');
         },
       },
@@ -80,13 +77,13 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         }
         className="app-info">
         <Meta
-          avatar={<img className="appLogo" src={Appimg}></img>}
+          avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
           title="应用名称"
           description={
             <div className="app-info-con">
               <p className="app-info-con-desc">
-                应用描述应用描述应用描述应用描述应用描述应用描述
+                应用描述应用描述应用描述应用描述应 用 描述应用描述
               </p>
               <p className="app-info-con-txt">
                 <span className="vision">版本号 ：2.3.16</span>

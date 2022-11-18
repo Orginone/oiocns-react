@@ -4,14 +4,17 @@ import { Row, Button, Divider, Select, Col, Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
+import provider from '@/ts/core/provider';
 
-/* 
-    审批对象
-*/
+/**
+ * @description: 审批对象
+ * @return {*}
+ */
 
 const { Option } = Select;
 
 const ApprovalNode = () => {
+  const personObj = provider.person.getJoinedCohorts();
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [value, setValue] = useState(1);
   const onOk = () => {
@@ -23,19 +26,27 @@ const ApprovalNode = () => {
   const onChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
+  // 查询个人加入的群组
+  const getJoinedCohort = async () => {
+    const JoinedCohortList = await personObj;
+    console.log('444', JoinedCohortList);
+  };
+
   // 选择审批对象
   const rovalnode = (
     <div className={cls[`roval-node`]}>
       <Row>
-        <SettingOutlined />
+        <SettingOutlined style={{ marginTop: '3px' }} />
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
         <Button
           type="primary"
           shape="round"
+          size="small"
           onClick={() => {
             setIsOpen(true);
+            getJoinedCohort();
           }}>
           选择身份
         </Button>
@@ -56,8 +67,12 @@ const ApprovalNode = () => {
         <Row>
           <Radio.Group onChange={onChange} value={value}>
             <Radio value={1}>直接结束流程</Radio>
-            <Radio value={2}>驳回到上级审批节点</Radio>
-            <Radio value={3}>驳回到指定节点</Radio>
+            <Radio value={2} disabled>
+              驳回到上级审批节点
+            </Radio>
+            <Radio value={3} disabled>
+              驳回到指定节点
+            </Radio>
           </Radio.Group>
         </Row>
       </div>

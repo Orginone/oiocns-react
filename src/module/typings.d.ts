@@ -14,10 +14,10 @@ export type CommonResponse = {
  */
 export type PageData<P = {}> = {
   success: boolean;
-	total: number;
-	data: P[];
+  total: number;
+  data: P[];
   msg?: string;
-}
+};
 
 /**
  * 后台分页查询返回的数据
