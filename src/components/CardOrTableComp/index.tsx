@@ -100,11 +100,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         },
       },
     ];
-<<<<<<< HEAD
   }, [columns,operation]);
-=======
-  }, [columns, operation]);
->>>>>>> origin/dev
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
     return pageType === 'table' ? (
