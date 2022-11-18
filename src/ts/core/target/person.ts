@@ -63,10 +63,10 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success) {
+    if (res.success && res.data!=undefined && res.data.result!=undefined) {
       this._joinedCohorts = [];
-      for (var i = 0; i < res.data.result.length; i++) {
-        const cohort = new Cohort(res.data.result[i]);
+      for (var i = 0; i < res.data?.result.length; i++) {
+        const cohort = new Cohort(res.data?.result[i]);
         this._joinedCohorts.push(cohort);
       }
     }
@@ -115,7 +115,7 @@ export default class Person extends BaseTarget {
       code,
       remark,
     );
-    if (res.success) {
+    if (res.success && res.data!=undefined) {
       const cohort = new Cohort(res.data);
       this._joinedCohorts.push(cohort);
       return cohort.pullPersons([this.target.id]);
@@ -124,10 +124,11 @@ export default class Person extends BaseTarget {
   }
 
   /**
-   * 删除群组
-   * @param params
+   * 解散群组
+   * @param targetId 群组id
+   * @param belongId 群组归属id
    * @returns
-   */ //
+   */
   public async deleteCohorts(
     targetId: string,
     belongId: string,
@@ -144,46 +145,62 @@ export default class Person extends BaseTarget {
     return res;
   }
   /**
-   * 搜索群组
-   * @param params id:targetId,TypeName:枚举中取当前角色,belongId: 归属ID;
+   * 添加群组申请
+   * @param id 群组id
    * @returns
    */
-  public async searchCohorts(name: string): Promise<model.ResultType<any>> {
+  public async applyJoinCohort(id: string): Promise<model.ResultType<any>> {
     const TypeName = TargetType.Cohort;
-    const res = await this.search(name, TypeName);
+    const res = await this.applyJoin(id, TypeName);
     return res;
   }
 
   /**
-   * 搜索好友
-   * @param params id:targetId,TypeName:枚举中取当前角色,belongId: 归属ID;
+   * 搜索群组
+   * @param name 群组编号
+   * @returns
+   */
+  public async searchCohorts(code: string): Promise<model.ResultType<any>> {
+    const TypeName = TargetType.Cohort;
+    const res = await this.search(code, TypeName);
+    return res;
+  }
+
+  /**
+   * 搜索目标(人)
+   * @param name 名称
    * @returns
    */
   public async searchFriend(name: string): Promise<model.ResultType<any>> {
     const TypeName = TargetType.Person;
     const res = await this.search(name, TypeName);
-    if (res.success) {
-      this.getCohort();
-    }
     return res;
   }
+
   /**
-   * 删除好友
-   * @param params
+   * 添加好友申请
+   * @param id 好友id
    * @returns
-   */ //
-  public async deletefriend(
-    id: string,
-    belongId: string,
-  ): Promise<model.ResultType<any>> {
-    const params: model.IdReqModel = {
-      id: id,
-      typeName: TargetType.Person,
-      belongId: belongId,
-    };
-    let res = await kernel.deleteTarget(params);
+   */
+  public async applyJoinFriend(id: string): Promise<model.ResultType<any>> {
+    const TypeName = TargetType.Person;
+    const res = await this.applyJoin(id, TypeName);
+    return res;
+  }
+
+  /**
+   * 移除好友
+   * @param id 好友Id
+   */
+  public async removeFriend(id: string): Promise<model.ResultType<any>> {
+    const res = await this.cancelJoinTeam(id);
     if (res.success) {
-      this._friends.filter((obj) => (obj.id = id));
+      var index = this._friends.findIndex((friend) => {
+        return friend.id == id;
+      });
+      if (index > 0) {
+        delete this._friends[index];
+      }
     }
     return res;
   }
@@ -200,8 +217,11 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Person],
     });
+    console.log('好友查询结果', res);
     if (res.success) {
-      this._friends = res.data.result;
+      if(res.data!=undefined &&res.data.result!=undefined){
+        this._friends = res.data.result;
+      }
     }
     return this._friends;
   }
@@ -240,7 +260,7 @@ export default class Person extends BaseTarget {
     }
     if (tres.data == null) {
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
-      if (res.success) {
+      if (res.success && res.data!=undefined) {
         let company;
         switch (type) {
           case TargetType.University:
@@ -278,7 +298,6 @@ export default class Person extends BaseTarget {
     };
     return await kernel.querySelfProduct(paramData);
   }
-
 
   // /**
   //  * 查询我的产品/应用
@@ -349,23 +368,6 @@ export default class Person extends BaseTarget {
       });
     }
     return this._joinedCompanys;
-  }
-
-  /**
-   * 移除好友
-   * @param id 好友Id
-   */
-  public async removeFriend(id: string): Promise<model.ResultType<any>> {
-    const res = await this.cancelJoinTeam(id);
-    if (res.success) {
-      var index = this._friends.findIndex((friend) => {
-        return friend.id == id;
-      });
-      if (index > 0) {
-        delete this._friends[index];
-      }
-    }
-    return res;
   }
 
   /**

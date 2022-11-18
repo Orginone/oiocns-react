@@ -13,7 +13,7 @@ export type ResultType<T> = {
   // http代码
   code: number;
   // 数据体
-  data: T;
+  data?: T;
   // 消息
   msg: string;
   // 结果

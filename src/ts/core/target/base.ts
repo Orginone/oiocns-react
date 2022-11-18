@@ -127,13 +127,14 @@ export default class BaseTarget {
       id: this.target.id,
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
-    if (res.success) {
+    if (res.success && res.data && res.data.result) {
       res.data.result.forEach((market) => {
         this._joinedMarkets.push(new AppStore(market));
       });
     }
     return this._joinedMarkets;
   }
+  
 
   /**
    * 退出市场
