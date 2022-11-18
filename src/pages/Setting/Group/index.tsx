@@ -164,7 +164,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {/* 编辑集团 */}
       <EditCustomModal
         open={isopen}
-        title={'请编辑集团信息'}
+        title={id?'请编辑集团信息':'新建集团'}
         onOk={onOk}
         handleOk={handleOk}
       />
