@@ -8,28 +8,31 @@ import { chat } from '@/module/chat/orgchat';
 import useChatStore from '@/store/chat';
 import contentStyle from './index.module.less';
 
-/* 
-  聊天区域
-*/
+/**
+ * @description: 聊天区域
+ * @return {*}
+ */
 
 interface Iprops {
   handleReWrites: Function;
+  historyMesagesList: any;
 }
 
 const GroupContent = (props: Iprops) => {
-  const { handleReWrites } = props;
+  const { handleReWrites, historyMesagesList } = props;
   const ChatStore: any = useChatStore();
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
   const isShowTime = (index: number) => {
     if (index == 0) return true;
-    return (
-      moment(ChatStore.curMsgs[index].createTime).diff(
-        ChatStore.curMsgs[index - 1].createTime,
-        'minute',
-      ) > 3
-    );
+    // return (
+    //   moment(ChatStore.curMsgs[index].createTime).diff(
+    //     ChatStore.curMsgs[index - 1].createTime,
+    //     'minute',
+    //   ) > 3
+    // );
   };
+
   // 滚动到底部
   const scrollEvent = () => {
     if (messageNodeRef.current) {
@@ -42,7 +45,7 @@ const GroupContent = (props: Iprops) => {
   };
   useEffect(() => {
     scrollEvent();
-  }, [ChatStore.curMsgs, ChatStore.setCurrent]);
+  }, [chat.curMsgs, chat.setCurrent]);
 
   // 聊天间隔时间
   const showChatTime = (chatDate: moment.MomentInput) => {
@@ -96,7 +99,7 @@ const GroupContent = (props: Iprops) => {
 
   return (
     <div className={contentStyle.group_content_wrap}>
-      {ChatStore?.curMsgs.map((item: any, index: any) => {
+      {historyMesagesList.map((item: any, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
             {/* 聊天间隔时间3分钟则 显示时间 */}

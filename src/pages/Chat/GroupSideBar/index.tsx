@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Tabs } from 'antd';
+import { Input, Tabs, Button } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import { chat } from '@/module/chat/orgchat';
@@ -8,10 +8,10 @@ import useChatStore from '@/store/chat';
 import { formatDate } from '@/utils/index';
 import sideStyle from './index.module.less';
 
-/* 
-  会话列表、通讯录
-*/
-
+/**
+ * @description: 会话列表、通讯录
+ * @return {*}
+ */
 interface MousePosition {
   left: number; // 右键弹窗离左侧的位置
   top: number; // 右键弹窗离上面的位置
@@ -25,12 +25,17 @@ interface MenuItemType {
   label: string;
 }
 
-const GroupSideBar: React.FC = () => {
+interface Iprops {
+  setCurrent: (val: any) => void;
+  getHistoryMesages: (val: any) => void;
+}
+
+const GroupSideBar = (props: Iprops) => {
+  const { setCurrent, getHistoryMesages } = props;
   const ChatStore: any = useChatStore();
   useEffect(() => {
     ChatStore.getAddressBook();
   }, []);
-
   const [searchValue, setSearchValue] = useState<string>(''); // 搜索值
   let [openIdArr, setOpenIdArr] = useState<Array<string>>([]);
   const [isMounted, setIsMounted] = useState<boolean>(false); // 是否已加载--判断是否需要默认打开
@@ -98,13 +103,29 @@ const GroupSideBar: React.FC = () => {
     }
     return showInfoArr;
   };
+
+  /**
+   * @description: 设置当前对话框
+   * @param {ImMsgChildType} child
+   * @return {*}
+   */
   const openChangeds = async (child: ImMsgChildType) => {
-    await ChatStore.setCurrent(child);
+    // await ChatStore.setCurrent(child);
+    await chat.setCurrent(child, getHistoryMesages);
   };
+  useEffect(() => {
+    setCurrent(chat.curChat);
+  }, [chat.curChat]);
 
   useEffect(() => {
     showList();
   }, []);
+
+  /**
+   * @description: 展开收起会话列表
+   * @param {string} selectedID
+   * @return {*}
+   */
   const handleOpenSpace = (selectedID: string) => {
     const isOpen = openIdArr.includes(selectedID);
     if (isOpen) {
@@ -115,7 +136,12 @@ const GroupSideBar: React.FC = () => {
       setOpenIdArr(openIdArr);
     }
   };
-  // 时间处理
+
+  /**
+   * @description: 时间处理
+   * @param {string} timeStr
+   * @return {*}
+   */
   const handleFormatDate = (timeStr: string) => {
     const nowTime = new Date().getTime();
     const showTime = new Date(timeStr).getTime();
@@ -127,7 +153,12 @@ const GroupSideBar: React.FC = () => {
     return formatDate(timeStr, 'H:mm');
   };
 
-  // 鼠标右键事件
+  /**
+   * @description: 鼠标右键事件
+   * @param {MouseEvent} e
+   * @param {ImMsgChildType} item
+   * @return {*}
+   */
   const handleContextClick = (e: MouseEvent, item: ImMsgChildType) => {
     if (!item) {
       return;
@@ -141,7 +172,11 @@ const GroupSideBar: React.FC = () => {
     });
   };
 
-  // 右键菜单点击
+  /**
+   * @description: 右键菜单点击
+   * @param {MenuItemType} item
+   * @return {*}
+   */
   const handleContextChange = (item: MenuItemType) => {
     switch (item.value) {
       case 1:
@@ -158,7 +193,12 @@ const GroupSideBar: React.FC = () => {
         break;
     }
   };
-  // 关闭右侧点击出现的弹框;
+
+  /**
+   * @description: 关闭右侧点击出现的弹框
+   * @param {any} event
+   * @return {*}
+   */
   const _handleClick = (event: any) => {
     setMousePosition({
       isShowContext: false,
@@ -167,8 +207,12 @@ const GroupSideBar: React.FC = () => {
       selectedItem: {} as ImMsgChildType,
     });
   };
+
+  /**
+   * @description: 监听点击事件，关闭弹窗
+   * @return {*}
+   */
   useEffect(() => {
-    // 监听点击事件，关闭弹窗
     document.addEventListener('click', _handleClick);
     return () => {
       document.removeEventListener('click', _handleClick);
@@ -186,7 +230,7 @@ const GroupSideBar: React.FC = () => {
           }}
         />
       </div>
-      <Tabs defaultActiveKey="1">
+      <Tabs defaultActiveKey="2">
         <Tabs.TabPane tab="会话" key="1">
           <div className={sideStyle.group_side_bar_wrap}>
             {ChatStore.sessionChats &&
@@ -231,7 +275,8 @@ const GroupSideBar: React.FC = () => {
             onContextMenu={(e) => {
               e.preventDefault();
             }}>
-            {ChatStore.chats.map((item: any) => {
+            {/* {ChatStore.chats.map((item: any) => { */}
+            {chat.chats.map((item: any) => {
               return (
                 <div key={item.id}>
                   <div className={`${sideStyle.group_con} ${sideStyle.item}`}>

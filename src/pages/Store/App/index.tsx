@@ -1,5 +1,5 @@
 import { Card, Form, Modal } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import MarketService from '@/module/appstore/market';
@@ -14,7 +14,7 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import Content from '../_control/content';
+import StoreContent from '@/ts/controller/store/content';
 const service = new MarketService({
   nameSpace: 'myApp',
   searchApi: API.product.searchOwnProduct,
@@ -53,6 +53,10 @@ const StoreApp: React.FC = () => {
       key: '5',
     },
   ];
+
+  useEffect(() => {
+    console.log('展示', StoreContent);
+  }, []);
 
   const BtnsList = ['购买', '创建', '暂存'];
   const handleBtnsClick = (item: { text: string }) => {

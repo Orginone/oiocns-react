@@ -40,7 +40,8 @@ module.exports = {
     //解决ts中，本身是可以有空的构造函数的误判问题 START
     'no-useless-constructor': 'off',
     // '@typescript-eslint/no-useless-constructor': 'error',
-    'no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    // 'no-unused-vars': ['error', { ignoreRestSiblings: false }],
+    'no-unused-vars': ['error', { varsIgnorePattern: '.*', args: 'none' }],
     // 'no-unused-vars': [
     //   'warn',
     //   {
