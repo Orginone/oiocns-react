@@ -1,8 +1,6 @@
 import { Card, Form, Modal } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import API from '@/services';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
-import MarketService from '@/module/appstore/market';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
@@ -16,7 +14,6 @@ import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
-import usePageApi from '@/hooks/usePageApi';
 import storeContent from '@/ts/controller/store/content';
 // const service = new MarketService({
 //   nameSpace: 'myApp',

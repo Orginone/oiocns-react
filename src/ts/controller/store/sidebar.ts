@@ -98,30 +98,36 @@ class StoreClassify {
     if (this.curPageType === 'myApps') {
       //TODO:获取 自定义分类树
       this.curTreeData = this.appFooterTree.appTreeData;
-      console.log('触发变更callback', this.curPageType, this.appFooterTree.appTreeData);
+      console.log(
+        '自定义分类树-触发变更callback',
+        this.curPageType,
+        this.appFooterTree.appTreeData,
+      );
 
       this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
     } else {
-      this.curTreeData = this.marketFooterTree.appTreeData;
-      console.log(
-        '触发变更callback',
-        this.curPageType,
-        this.marketFooterTree.appTreeData,
-      );
-      this.getOwnMarket();
+      console.log('获取市场-tree');
+      if (this.marketFooterTree.appTreeData.length > 0) {
+        this.curTreeData = this.marketFooterTree.appTreeData;
+        this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
+      } else {
+        this.getOwnMarket();
+      }
     }
   }
 
   /**
-   * 页面操作--切换商店
+   * @desc: 页面操作--切换目录
+   * @param {any} treeItem
+   * @return {*}
    */
-  public handleSelectTree(market: AppStore) {
-    this._curMarket = market;
-    //修改面包屑 当前展示区域
-    this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.store.name || '商店';
+  public handleSelectTree(treeItem: any) {
+    //TODO:
+    // //修改面包屑 当前展示区域
+    this.breadcrumb[1] = '我的应用';
+    this.breadcrumb[2] = treeItem.title || '获取失败';
     console.log('面包靴 应用', this.breadcrumb);
-    this.SelectMarketCallBack && this.SelectMarketCallBack(market);
+    // this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
   /* --------------------市场功能区--------------------- */
   /**
