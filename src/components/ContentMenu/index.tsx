@@ -63,6 +63,7 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
   );
 };
 
+//侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
   const { data: menuData } = props; // 顶级主菜单
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
@@ -159,20 +160,23 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
           </Space>
         </div>
       )}
-      <div className={cls.container}>
-        {props.data && (
-          <Menu
-            // mode="inline"
-            items={currentMenuData as MenuProps[`items`]}
-            onClick={menuOnChange}
-            onOpenChange={handleChange}
-            triggerSubMenuAction="click"
-            selectedKeys={[activeMenu]}
-            openKeys={[]}
-            defaultSelectedKeys={[activeMenu]}></Menu>
-        )}
-        {props.children || renderMenu}
-      </div>
+      {
+        //sidebar
+        <div className={cls.container}>
+          {props.data && (
+            <Menu
+              // mode="inline"
+              items={currentMenuData as MenuProps[`items`]}
+              onClick={menuOnChange}
+              onOpenChange={handleChange}
+              triggerSubMenuAction="click"
+              selectedKeys={[activeMenu]}
+              openKeys={[]}
+              defaultSelectedKeys={[activeMenu]}></Menu>
+          )}
+          {props.children || renderMenu}
+        </div>
+      }
     </Sider>
   );
 };

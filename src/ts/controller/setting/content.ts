@@ -35,7 +35,6 @@ class StoreContent {
    * 切换侧边栏 触发 展示数据变化
    */
   public changeMenu(menuItem: any) {
-    debugger
     console.log('内容1u', menuItem);
 
     // 点击重复 则判定为无效

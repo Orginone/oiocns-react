@@ -108,21 +108,33 @@ export default class Person extends BaseTarget {
     name: string,
     code: string,
     remark: string,
-  ): Promise<boolean> {
-    const res = await this.createTarget(
+  ): Promise<model.ResultType<any>> {
+    const tres = await this.getTargetByName({
       name,
-      code,
-      TargetType.Cohort,
-      name,
-      code,
-      remark,
-    );
-    if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data);
-      this._joinedCohorts.push(cohort);
-      return cohort.pullPersons([this.target.id]);
+      typeName: TargetType.Cohort,
+      page: { offset: 0, limit: 1, filter: code },
+    });
+    if (!tres.success) {
+      return tres;
     }
-    return false;
+    if (tres.data == null || !tres.data.id) {
+      const res = await this.createTarget(
+        name,
+        code,
+        TargetType.Cohort,
+        name,
+        code,
+        remark,
+      );
+      if (res.success && res.data != undefined) {
+        const cohort = new Cohort(res.data);
+        this._joinedCohorts.push(cohort);
+        return cohort.pullPersons([this.target.id]);
+      }
+      return res;
+    } else {
+      return FaildResult('该单位已存在!');
+    }
   }
 
   /**

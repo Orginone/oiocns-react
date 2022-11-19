@@ -57,18 +57,18 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
 
   return (
     <Layout className={`${className}`} style={{ height: '100%' }}>
-      {/* {sider?
-        sider:
-        <ContentMenu menuClick={menuClick} data={siderMenuData}></ContentMenu>} */}
-
-      {(sider || siderMenuData) && (
-        <ContentMenu data={siderMenuData} menuClick={menuClick}>
-          {sider && sider}
-        </ContentMenu>
-      )}
+      {
+        // 左侧导航树
+        (sider || siderMenuData) && (
+          <ContentMenu data={siderMenuData} menuClick={menuClick}>
+            {sider && sider}
+          </ContentMenu>
+        )
+      }
 
       <Layout className={cls.container}>
         {(!hideBreadCrumb || contentTopRight || hideTooBar) && (
+          // 面包屑与操作区
           <Row className={cls[`content-top`]} justify="space-between">
             <Col>{!hideBreadCrumb ? <BreadCrumb /> : contentTopLeft}</Col>
             <Col>{contentTopRight}</Col>
@@ -99,12 +99,11 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
             </Col>
           </Row>
         )}
-        {/* <div className={cls.contenttop}>{contentTop}</div>
-        <div className={cls.contenttop}>
-          <div>{contentTopLeft}</div>
-          <div>{contentTopRight}</div>
-        </div> */}
-        <Content className={cls.content}>{content || children}</Content>
+
+        {
+          //页面
+          <Content className={cls.content}>{content || children}</Content>
+        }
         <RightToobar
           onClose={() => {
             setOpen(false);

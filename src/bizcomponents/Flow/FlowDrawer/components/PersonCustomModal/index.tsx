@@ -22,7 +22,6 @@ const joinedCohorts = (await Provider.getPerson.getJoinedCohorts()).map(
 );
 const PersonCustomModal = (props: Iprops) => {
   const { open, title, onOk, onCancel } = props;
-  // debugger;
   const [jobType, setJobType] = useState(2);
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   let [selectItem, setSelectItem] = useState<any>({});
@@ -36,11 +35,6 @@ const PersonCustomModal = (props: Iprops) => {
 
   console.log(joinedCohorts);
   const radiobutton = (
-    // <Radio.Group onChange={onChange} value={}>
-    //   {selectedNode.props.assignedType == 'DENTITY' && <Radio value={1}>按身份</Radio>}
-    //   {selectedNode.props.assignedType == 'JOB' && <Radio value={2}>内部岗位</Radio>}
-    //   {selectedNode.props.assignedType == 'JOB' && <Radio value={3}>集团岗位</Radio>}
-    // </Radio.Group>
     <div>
       {selectedNode.props.assignedType == 'DENTITY' && (
         <Radio.Group value={1}>
@@ -55,14 +49,6 @@ const PersonCustomModal = (props: Iprops) => {
       )}
     </div>
   );
-  // let identitys: any[];
-  // const getIdentitys =  () => {
-  //
-  //   identitys = await Provider.getPerson.getIdentitys();
-  // };
-  // useEffect(() => {
-  //   getIdentitys();
-  // }, []);
   const cardleft = () => {
     return (
       <Card style={{ width: 350 }}>

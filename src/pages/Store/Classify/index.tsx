@@ -19,6 +19,7 @@ import StoreContent from '@/ts/controller/store/content';
 // ];
 
 const menu = ['重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
+//自定义树
 const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
@@ -57,6 +58,7 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleAddShop = (item: any) => {
+    debugger;
     console.log('handleAddShop', item);
     setIsStoreOpen(true);
   };
@@ -66,6 +68,7 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
+    debugger;
     console.log('handleMenuClick55', data, key);
   };
   /*******
@@ -74,6 +77,7 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleTitleClick = (item: any) => {
+    debugger;
     // 触发内容去变化
     StoreContent.changeMenu(item);
   };
@@ -81,8 +85,10 @@ const StoreClassify: React.FC = () => {
     <>
       <div className={cls.container}>
         {router == '/store/doc' ? (
+          //文档树
           <CloudTreeComp></CloudTreeComp>
         ) : (
+          //其他树
           <StoreClassifyTree
             menu={menu}
             searchable

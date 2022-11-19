@@ -4,7 +4,7 @@ import AppStore from '@/ts/core/market/appstore';
 import Company from '@/ts/core/target/company';
 import { XMarket } from '@/ts/base/schema';
 /**
- * @desc: 仓库模块 导航控件
+ * @desc: 设置模块 导航控件
  * @return {*}
  */
 type menyuType = 'app' | 'docx' | 'data' | 'assets';
@@ -31,7 +31,7 @@ class StoreClassify {
   } as XMarket); // 当前商店信息
   public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
   public curTreeData: any; // 当前展示树内容
-  public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
+  public breadcrumb: string[] = ['设置', '我的应用']; //导航展示
   public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
   public SelectMarketCallBack: undefined | ((item: AppStore) => void) = undefined; //选择商店后 触发展示区回调
 
@@ -85,7 +85,6 @@ class StoreClassify {
    * @return {*}
    */
   public getTreeData() {
-    debugger
     // 1.获取市场
     //获取文档
 
@@ -118,7 +117,7 @@ class StoreClassify {
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.store.name || '商店';
-    console.log('面包屑 商店', this.breadcrumb);
+    console.log('面包靴 商店', this.breadcrumb);
 
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }

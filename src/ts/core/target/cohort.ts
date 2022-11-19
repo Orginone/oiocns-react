@@ -6,7 +6,7 @@ import { common, kernel, model, FaildResult } from '../../base';
 import { format } from 'path/posix';
 import { formatDate } from '@/utils';
 export default class Cohort extends BaseTarget {
-  constructor(target:schema.XTarget) {
+  constructor(target: schema.XTarget) {
     super(target);
   }
   /**
@@ -14,12 +14,12 @@ export default class Cohort extends BaseTarget {
    * @param personIds 人员id数组
    * @returns 是否成功
    */
-  public async pullPersons(personIds: string[]): Promise<boolean> {
-    let res = await this.pull({
+  public async pullPersons(personIds: string[]): Promise<model.ResultType<any>> {
+    return await this.pull({
       targetType: TargetType.Person,
       targetIds: personIds,
     });
-    return res.success;
+
   }
 
   /**
@@ -32,11 +32,11 @@ export default class Cohort extends BaseTarget {
     params: model.TargetModel
   ): Promise<model.ResultType<any>> {
     let res = await kernel.updateTarget(params);
-    if(res.success){
+    if (res.success) {
       this.target.name = params.name;
       this.target.code = params.code
       this.target.updateUser = formatDate(new Date().getTime);
-      if(this.target.team!=undefined){
+      if (this.target.team != undefined) {
         this.target.team.name = params.name;
         this.target.team.code = params.code;
         this.target.team.remark = params.teamRemark;

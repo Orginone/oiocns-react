@@ -4,15 +4,16 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import CohortService from '@/module/cohort/Cohort';
 import Person from '../../ts/core/target/person';
-
+import Provider from '@/ts/core/provider';
 /* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
   service: CohortService;
   getTableList: Function;
-  Person:Person
+  Person: Person;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableList }) => {
+const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableList }) => {
+  const person = Provider.getPerson;
   console.log(service);
   const layout = {
     labelCol: { span: 8 },
@@ -43,15 +44,14 @@ const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableLis
   const onSave = async () => {
     const values = await form.validateFields();
     console.log(values); //2.表单验证并获取表单值
-    const params = {
-      code: values.cohort.code,
-      name: values.cohort.name,
-      teamRemark: values.cohort.remark,
-    };
-    Person.createCohort(values.cohort.name,values.cohort.code,values.cohort.remark)
-    console.log('创建成功');
+    let res = await person.createCohort(
+      values.cohort.name,
+      values.cohort.code,
+      values.cohort.remark,
+    );
+    Provider.getPerson.showMessage(res);
     setIsModalOpen(false);
-    getTableList();
+    // getTableList();
   };
   return (
     <div>
@@ -106,8 +106,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableLis
             ]}>
             <Input.TextArea />
           </Form.Item>
-          <Form.Item >
-          </Form.Item>
+          <Form.Item></Form.Item>
         </Form>
       </Modal>
     </div>
