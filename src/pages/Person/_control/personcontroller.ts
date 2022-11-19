@@ -51,7 +51,7 @@ export default class personcontroller extends BaseController {
    * 获取集团下的单位
    * @returns 单位、公司列表
    */
-  public getGroupCompanies() {}
+  public getGroupCompanies() { }
 
   /**
    * 申请加入单位

@@ -35,7 +35,7 @@ const CohortConfig: React.FC = () => {
     updateApi: API.cohort.update
   });
   const Person = PersonInfoEnty.getPerson;
-  console.log("实体信息", PersonInfoEnty.getPerson)
+  console.log("实体信息", Person)
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -113,7 +113,8 @@ const CohortConfig: React.FC = () => {
             page: page
           }
           console.log("群组参数qqbbq", params)
-          console.log("info", PersonInfoEnty.getPerson.searchCohorts('apex'))
+          console.log("info", PersonInfoEnty.getPerson.removeFriend('375315801567268864'))
+          console.log("判断是否操作成功", Person)//375315801588240384
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },
@@ -158,10 +159,12 @@ const CohortConfig: React.FC = () => {
     console.log("获取值", PersonInfoEnty.getPerson.ChohortArray)
     for (var i = 0; i < data.length; i++) {
       if (data[i].target.belongId === Person.target.id) {
-        const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
-        chorot.belongId = data[i].target.belongId;
-        chorot.thingId = data[i].target.thingId;
-        resultList.push(chorot);
+        if(data[i].target.team!=undefined){
+          const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
+          chorot.belongId = data[i].target.belongId;
+          chorot.thingId = data[i].target.thingId;
+          resultList.push(chorot);
+        }
       }
     }
     setList(resultList);

@@ -352,7 +352,7 @@ export type IdentityModel = {
 
 export type TargetModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号

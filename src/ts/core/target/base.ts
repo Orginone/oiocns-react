@@ -1,12 +1,14 @@
+import { Identity } from '@/module/org';
 import { XMarketArray, XTarget } from '@/ts/base/schema';
+import { message } from 'antd';
 import { kernel, model, common, schema, FaildResult } from '../../base';
 import { TargetType } from '../enum';
 import AppStore from '../market/appstore';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;
+  protected identitys: schema.XIdentity[];
   protected _joinedMarkets: AppStore[];
-
   protected get createTargetType(): TargetType[] {
     return [TargetType.Cohort];
   }
@@ -16,7 +18,16 @@ export default class BaseTarget {
 
   constructor(target: schema.XTarget) {
     this.target = target;
+    this.identitys = [];
     this._joinedMarkets = [];
+  }
+
+  public async showMessage(response: model.ResultType<any>) {
+    if (response.success) {
+      message.success('操作成功！')
+    } else {
+      message.error('操作失败！发生错误：  ' + response.msg)
+    }
   }
 
   /**
@@ -39,7 +50,6 @@ export default class BaseTarget {
   ): Promise<model.ResultType<XTarget>> {
     if (this.createTargetType.includes(typeName)) {
       return await kernel.createTarget({
-        id: '',
         name,
         code,
         typeName,
@@ -72,14 +82,7 @@ export default class BaseTarget {
     }
   }
 
-  /**
-   * 申请加入市场
-   * @param id 市场ID
-   * @returns
-   */
-  public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
-    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
-  }
+
 
   protected async cancelJoinTeam(id: string) {
     return await kernel.cancelJoinTeam({
@@ -115,10 +118,53 @@ export default class BaseTarget {
     return await kernel.queryTargetByName(data);
   }
 
+
+
   /**
-   * 查询商店列表
-   * @returns 商店列表
+   * 拉对象加入组织
+   * @param data 拉入参数
+   * @returns 拉入结果
    */
+  public async pull(data: any): Promise<model.ResultType<any>> {
+    data.id = this.target.id;
+    data.teamTypes = [this.target.typeName];
+    return await kernel.pullAnyToTeam(data);
+  }
+
+  /**
+   * 获取所有身份
+   * @param data 请求参数
+   * @returns 身份数组
+   */
+  public async queryTargetIdentitys(data: any): Promise<model.ResultType<schema.XIdentityArray>> {
+    data.id = this.target.id;
+    data.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_16,
+    };
+    return await kernel.queryTargetIdentitys(data);
+  }
+
+  public async getIdentitys(): Promise<schema.XIdentity[]> {
+    if (this.identitys.length > 0) {
+      return this.identitys;
+    }
+    this.identitys = []
+    const res = await this.queryTargetIdentitys({
+    });
+    if (res.success) {
+      res.data.result.forEach((identity) => {
+        this.identitys.push(identity);
+      });
+    }
+    return this.identitys;
+  }
+
+  /**
+* 查询商店列表
+* @returns 商店列表
+*/
   public async getJoinMarkets(): Promise<AppStore[]> {
     if (this._joinedMarkets.length > 0) {
       return this._joinedMarkets;
@@ -127,13 +173,14 @@ export default class BaseTarget {
       id: this.target.id,
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
-    if (res.success) {
+    if (res.success && res.data && res.data.result) {
       res.data.result.forEach((market) => {
         this._joinedMarkets.push(new AppStore(market));
       });
     }
     return this._joinedMarkets;
   }
+
 
   /**
    * 退出市场
@@ -152,21 +199,19 @@ export default class BaseTarget {
   }
 
   /**
-   * 拉对象加入组织
-   * @param data 拉入参数
-   * @returns 拉入结果
-   */
-  public async pull(data: any): Promise<model.ResultType<any>> {
-    data.id = this.target.id;
-    data.teamTypes = [this.target.typeName];
-    return await kernel.pullAnyToTeam(data);
+ * 申请加入市场
+ * @param id 市场ID
+ * @returns
+ */
+  public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
+    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
   }
 
-  /**
-   * 根据编号查询市场
-   * @param page 分页参数
-   * @returns
-   */
+  /*
+ * 根据编号查询市场
+ * @param page 分页参数
+ * @returns
+ */
   public async getMarketByCode(
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketArray>> {

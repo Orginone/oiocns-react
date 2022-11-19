@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import {
   EllipsisOutlined,
   LeftCircleOutlined,
@@ -16,6 +15,7 @@ interface TreeType {
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
   menu?: string[]; //更多按钮列表 需提供 string[]
+  handleTitleClick?: (_item: any) => void;
   handleAddClick?: (_item: any) => void; //点击更多按钮事件
   handleMenuClick?: ({ data, key }: { data: any; key: string }) => void; //点击更多按钮事件
 }
@@ -56,6 +56,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   draggable = false,
   handleAddClick,
   handleMenuClick,
+  handleTitleClick,
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
@@ -162,7 +163,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         onMouseLeave={() => {
           setMouseOverItem({});
         }}>
-        <div>{node.title}</div>
+        <div onClick={() => handleTitleClick && handleTitleClick(node)}>{node.title}</div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
