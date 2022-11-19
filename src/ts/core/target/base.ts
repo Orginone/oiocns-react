@@ -115,7 +115,7 @@ export default class BaseTarget {
   }
   /**
    * 删除职权
-   * @param id
+   * @param belongId
    * @param typeName
    * @returns
    */
@@ -125,6 +125,88 @@ export default class BaseTarget {
       belongId: belongId,
       typeName: typeName,
     });
+  }
+
+  /**
+   * 删除身份
+   * @param belongId
+   * @param typeName
+   * @returns
+   */
+  protected async deleteIdentityBase(belongId: string, typeName: TargetType) {
+    return await kernel.deleteIdentity({
+      id: this.target.id,
+      belongId: belongId,
+      typeName: typeName,
+    });
+  }
+  /**
+   * 查询组织职权树
+   * @param id
+   * @returns
+   */
+  public async selectAuthorityTree(id: string): Promise<model.ResultType<any>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryAuthorityTree(params);
+    return res;
+  }
+  /**
+   * 查询加入的申请
+   * @param id
+   * @returns
+   */
+  public async queryJoinApplyBase(id: string): Promise<model.ResultType<any>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryJoinTeamApply(params);
+    return res;
+  }
+  /**
+   * 查询职权身份
+   * @param id
+   * @returns
+   */
+  public async queryAuthorityIdentityBase(id: string): Promise<model.ResultType<any>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryAuthorityIdentitys(params);
+    return res;
+  }
+  /**
+   * 查询组织职权
+   * @param id
+   * @returns
+   */
+  public async queryTargetAuthoritysBase(): Promise<model.ResultType<any>> {
+    const params = {
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryAuthorityIdentitys(params);
+    return res;
   }
 
   protected async cancelJoinTeam(id: string) {
@@ -152,6 +234,79 @@ export default class BaseTarget {
         limit: common.Constants.MAX_UINT_16,
       },
       ...data,
+    });
+  }
+  /**
+   * 查询指定身份赋予的人员
+   * @param id
+   * @param targetType
+   * @returns
+   */
+  protected async getIdentityTargetsBase(
+    id: string,
+    targetType: TargetType,
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.queryIdentityTargets({
+      id: id,
+      targetType: targetType,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+  /**
+   * 查询赋予我的身份
+   * @param id
+   * @returns
+   */
+  protected async getTargetIdentitysBase(
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
+    return await kernel.queryTargetIdentitys({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+  /**
+   * 查询职权子职权
+   * @param id
+   * @returns
+   */
+  protected async getSubAuthoritysBase(
+    id: string,
+  ): Promise<model.ResultType<schema.XAuthorityArray>> {
+    return await kernel.querySubAuthoritys({
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+  /**
+   * 获取子组织/个人
+   * @returns 返回好友列表
+   */
+  public async getsTargets(
+    id: string,
+    typeNames: TargetType[],
+    subTypeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.querySubTargetById({
+      id: id,
+      typeNames: typeNames,
+      subTypeNames: subTypeNames,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
     });
   }
   /**
@@ -283,7 +438,12 @@ export default class BaseTarget {
       page,
     });
   }
-
+/**
+ * 
+ * @param name 查询
+ * @param TypeName 查询对象类型
+ * @returns 
+ */
   public async search(name: string, TypeName: string): Promise<model.ResultType<any>> {
     const data: model.NameTypeModel = {
       name: name,
@@ -295,6 +455,16 @@ export default class BaseTarget {
       },
     };
     const res = await kernel.searchTargetByName(data);
+    return res;
+  }
+/**
+ * 查询人
+ * @param name 名称
+ * @returns 
+ */
+  public async searchFriend(name: string): Promise<model.ResultType<any>> {
+    const TypeName = TargetType.Person;
+    const res = await this.search(name, TypeName);
     return res;
   }
 }

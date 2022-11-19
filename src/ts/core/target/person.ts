@@ -173,17 +173,6 @@ export default class Person extends BaseTarget {
   }
 
   /**
-   * 搜索目标(人)
-   * @param name 名称
-   * @returns
-   */
-  public async searchFriend(name: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Person;
-    const res = await this.search(name, TypeName);
-    return res;
-  }
-
-  /**
    * 添加好友申请
    * @param id 好友id
    * @returns
@@ -202,10 +191,11 @@ export default class Person extends BaseTarget {
     if (this._friends.length > 0) {
       return this._friends;
     }
-    const res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Person],
-    });
+    const res = await this.getsTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
     console.log('好友查询结果', res);
     if (res.success) {
       if (res.data != undefined && res.data.result != undefined) {
@@ -451,41 +441,17 @@ export default class Person extends BaseTarget {
     }
     return res;
   }
+  
   /**
-   * 查询加入好友申请
-   * @param id 群组id
+   * 查询指定身份赋予的人员
+   * @param id
    * @returns
    */
-  public async queryJoinFriendApply(id: string): Promise<model.ResultType<any>> {
-    const params = {
-      id: id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    };
-    const res = await kernel.queryJoinTeamApply(params);
+  public async selectIdentityTargets(id: string): Promise<model.ResultType<any>> {
+    const res = await this.getIdentityTargetsBase(id, TargetType.Person);
     return res;
   }
 
-  /**
-   * 查询职权身份
-   * @param id 群组id
-   * @returns
-   */
-  public async queryAuthorityIdentity(id: string): Promise<model.ResultType<any>> {
-    const params = {
-      id: id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    };
-    const res = await kernel.queryAuthorityIdentitys(params);
-    return res;
-  }
   /**
    * 创建职权
    * @param name 职权名称
@@ -536,6 +502,15 @@ export default class Person extends BaseTarget {
     return res;
   }
   /**
+   * 删除身份
+   * @param belongId 当前工作空间id
+   * @returns
+   */
+  public async deleteIdentity(belongId: string): Promise<model.ResultType<any>> {
+    return await this.deleteIdentityBase(belongId, TargetType.Person);
+  }
+
+  /**
    * 删除职权
    * @param belongId 当前工作空间id
    * @returns
@@ -543,41 +518,6 @@ export default class Person extends BaseTarget {
   public async deletePostAuth(belongId: string): Promise<model.ResultType<any>> {
     return await this.deleteAuthorityBase(belongId, TargetType.Person);
   }
-  /**
-   * 查询职权身份
-   * @param id 群组id
-   * @returns
-   */
-  public async selectAuthorityTree(id: string): Promise<model.ResultType<any>> {
-    const params = {
-      id: id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    };
-    const res = await kernel.queryAuthorityTree(params);
-    return res;
-  }
-  /**
-   * 查询组织职权
-   * @param id 群组id
-   * @returns
-   */
-  public async queryTargetAuthority(id: string): Promise<model.ResultType<any>> {
-    const params = {
-      id: id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    };
-    const res = await kernel.queryTargetAuthoritys(params);
-    return res;
-  }
-
   /**
    * 获取工作空间
    * @returns 工作空间
