@@ -2,7 +2,7 @@
  * @Author: zhangqiang 1196217890@qq.com
  * @Date: 2022-11-14 16:43:05
  * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-18 11:22:17
+ * @LastEditTime: 2022-11-19 17:21:02
  * @FilePath: /oiocns-react/src/pages/Setting/Dept/components/EditCustomModal/index.tsx
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -10,22 +10,21 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import cls from './index.module.less';
 import UploadAvatar from '../UploadAvatar';
-
 /* 
   编辑
 */
-
 interface Iprops {
   title: string;
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
+  handleCancel: ()=> void;
 }
 
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk } = props;
+  const { open, title, onOk, handleOk, handleCancel } = props;
   const [form] = Form.useForm();
   useEffect(() => {
     form.setFieldsValue({
@@ -40,7 +39,8 @@ const EditCustomModal = (props: Iprops) => {
       <Modal
         title={title}
         open={open}
-        onCancel={handleOk}
+        onOk={handleOk}
+        onCancel={()=>handleCancel()}
         getContainer={false}
         footer={null}>
         <Form form={form} name="control-hooks">

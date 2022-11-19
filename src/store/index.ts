@@ -2,7 +2,7 @@
  * @Author: zhangqiang 1196217890@qq.com
  * @Date: 2022-11-17 13:30:54
  * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-18 14:25:48
+ * @LastEditTime: 2022-11-19 16:10:41
  * @FilePath: /oiocns-react/src/store/index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -52,6 +52,8 @@ const useStore = create(
           }));
         }
       },
+
+      setIsOpenBoolean: false,
     }),
     {
       name: 'user-storage',

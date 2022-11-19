@@ -2,7 +2,7 @@ import { Input, Tree ,Space,TreeProps,Modal, Button} from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
 import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined ,SearchOutlined} from '@ant-design/icons';
-
+import settingStore from '@/store/setting';
 import cls from './index.module.less';
 
 const x = 3;
@@ -63,17 +63,20 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 
 type CreateGroupPropsType = {
   onSelect?: TreeProps['onSelect'];
+  createTitle: string;
 }
 
 const Creategroup: React.FC<CreateGroupPropsType> = ({ 
   onSelect,
+  createTitle,
 }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
-
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  const [isOpen,setIsOpen] = useState<boolean>(false)
+  
+  const { setEditItem } = settingStore((state) => ({ ...state}))
+
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -163,8 +166,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
 
   return (
     <div>
-      <Button className={cls.creatgroup} type="primary" onClick={() => setIsOpen(true)}>创建集团</Button>
-      
+      {/* 要把这个值给到 group组件 */}
+      <Button className={cls.creatgroup} type="primary" onClick={() => setEditItem(true)}>{createTitle}</Button>
       {Array.isArray(treeData1) && treeData1.length>0 ? <div className={cls.topMes}>
         <Input size="middle" className={cls.inputStyle} placeholder="搜索创建的集团"
           prefix={<SearchOutlined />} onChange={ onChange } />
@@ -192,10 +195,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           }}
           />
       </div>:null}
-      
-      <Modal title="新建集团" onOk={()=>{setIsOpen(false)}} onCancel={() => { setIsOpen(false)  }} open={isOpen}>
-        这里要设置集团信息
-      </Modal>
     </div>
   );
 };
