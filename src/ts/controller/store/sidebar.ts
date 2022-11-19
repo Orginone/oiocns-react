@@ -29,7 +29,7 @@ class StoreClassify {
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
-  public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
+  public curPageType: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
   public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
@@ -76,7 +76,7 @@ class StoreClassify {
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    let data = `${this.currentMenu === 'myApps' ? 'app' : 'market'}FooterTree`;
+    let data = `${this.curPageType === 'myApps' ? 'app' : 'market'}FooterTree`;
     if (this[data][`${key}TreeData`].length > 0) {
       this.curTreeData = this[data][`${key}TreeData`];
       return;
@@ -95,17 +95,17 @@ class StoreClassify {
     // 1.获取市场
     //获取文档
 
-    if (this.currentMenu === 'myApps') {
+    if (this.curPageType === 'myApps') {
       //TODO:获取 自定义分类树
       this.curTreeData = this.appFooterTree.appTreeData;
-      console.log('触发变更callback', this.currentMenu, this.appFooterTree.appTreeData);
+      console.log('触发变更callback', this.curPageType, this.appFooterTree.appTreeData);
 
       this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
     } else {
       this.curTreeData = this.marketFooterTree.appTreeData;
       console.log(
         '触发变更callback',
-        this.currentMenu,
+        this.curPageType,
         this.marketFooterTree.appTreeData,
       );
       this.getOwnMarket();

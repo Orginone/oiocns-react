@@ -1,26 +1,29 @@
 import cls from './index.module.less';
 
-import React from 'react';
-import API from '@/services';
+import React, { useEffect, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTableWithBuy';
 import MarketService from '@/module/appstore/market';
+// import usePageApi from '@/hooks/usePageApi';
+import StoreContent from '@/ts/controller/store/content';
 
 const service = new MarketService({
   nameSpace: 'publicStore',
-  searchApi: API.appstore.merchandise,
-  createApi: API.appstore.create,
-  deleteApi: API.appstore.marketDel,
-  updateApi: API.appstore.updateMarket,
 });
-
 const Index: React.FC = () => {
+  const [data, setData] = useState([]);
+  StoreContent.marketTableCallBack = setData;
+  useEffect(() => {
+    StoreContent.getStoreProduct();
+  }, []);
+
   return (
     <>
       <AppShowComp
         headerTitle="共享仓库"
         className={cls['market-public-wrap']}
-        service={service}
+        list={data}
         columns={service.getShopappColumns()}
+        queryFun={StoreContent.getStoreProduct}
       />
     </>
   );

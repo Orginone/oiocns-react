@@ -162,7 +162,7 @@ export default class BaseTarget {
    * 查询商店列表
    * @returns 商店列表
    */
-  public async getJoinMarkets(): Promise<AppStore[]> {
+  public getJoinMarkets = async (): Promise<AppStore[]> => {
     if (this._joinedMarkets.length > 0) {
       return this._joinedMarkets;
     }
@@ -176,7 +176,7 @@ export default class BaseTarget {
       });
     }
     return this._joinedMarkets;
-  }
+  };
 
   /**
    * 退出市场
