@@ -11,8 +11,8 @@ const service = new MarketService({
 });
 const Index: React.FC = () => {
   const [data, setData] = useState([]);
-  StoreContent.marketTableCallBack = setData;
   useEffect(() => {
+    StoreContent.marketTableCallBack = setData;
     StoreContent.getStoreProduct();
   }, []);
 
