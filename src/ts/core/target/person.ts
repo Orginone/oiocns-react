@@ -195,23 +195,6 @@ export default class Person extends BaseTarget {
   }
 
   /**
-   * 移除好友
-   * @param id 好友Id
-   */
-  public async removeFriend(id: string): Promise<model.ResultType<any>> {
-    const res = await this.cancelJoinTeam(id);
-    if (res.success) {
-      var index = this._friends.findIndex((friend) => {
-        return friend.id == id;
-      });
-      if (index > 0) {
-        delete this._friends[index];
-      }
-    }
-    return res;
-  }
-
-  /**
    * 获取好友列表
    * @returns 返回好友列表
    */
@@ -261,10 +244,7 @@ export default class Person extends BaseTarget {
       typeName: type,
       page: { offset: 0, limit: 1, filter: code },
     });
-    if (!tres.success) {
-      return tres;
-    }
-    if (tres.data == null) {
+    if (!tres.data) {
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
       if (res.success && res.data != undefined) {
         let company;
@@ -379,6 +359,56 @@ export default class Person extends BaseTarget {
   }
 
   /**
+   * 申请好友
+   * @param id 目标Id
+   * @returns
+   */
+  public async applyFriend(id: string): Promise<model.ResultType<any>> {
+    const res = await kernel.pullAnyToTeam({
+      id: this.target.id,
+      teamTypes: [TargetType.Person],
+      targetIds: [id],
+      targetType: TargetType.Person,
+    });
+    if (res.success) {
+      await this.applyJoin(id, TargetType.Person);
+    }
+    return res;
+  }
+
+  public async cancelJoinApply(id: string): Promise<model.ResultType<any>> {
+    return await kernel.cancelJoinTeam({
+      id,
+      typeName: TargetType.Person,
+      belongId: this.target.id,
+    });
+  }
+
+  /**
+   * 移除好友
+   * @param id 好友Id
+   */
+  public async removeFriend(ids: string[]): Promise<model.ResultType<any>> {
+    const res = await kernel.removeAnyOfTeam({
+      id: this.target.id,
+      teamTypes: [this.target.typeName],
+      targetIds: ids,
+      targetType: TargetType.Person,
+    });
+    if (res.success) {
+      ids.forEach(async (id) => {
+        await kernel.exitAnyOfTeam({
+          id,
+          teamTypes: [TargetType.Person],
+          targetId: this.target.id,
+          targetType: TargetType.Person,
+        });
+      });
+    }
+    return res;
+  }
+
+  /**
    * 退出群组
    * @param id 群组Id
    */
@@ -400,7 +430,17 @@ export default class Person extends BaseTarget {
    * @param id 单位Id
    */
   public async quitCompany(id: string): Promise<model.ResultType<any>> {
-    const res = await this.cancelJoinTeam(id);
+    const res = await kernel.exitAnyOfTeamAndBelong({
+      id,
+      teamTypes: [
+        TargetType.JobCohort,
+        TargetType.Department,
+        TargetType.Cohort,
+        ...this.companyTypes,
+      ],
+      targetId: this.target.id,
+      targetType: TargetType.Person,
+    });
     if (res.success) {
       var index = this._joinedCompanys.findIndex((cohort) => {
         return cohort.target.id == id;

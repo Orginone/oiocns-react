@@ -9,11 +9,9 @@ import { model } from '@/ts/base';
  */
 
 class StoreContent {
-  currentMenu = 'Public'; //当前展示 菜单
-  curObject = {};
-  public_store: XMerchandise[] = [];
+  private _currentMenu = 'Public'; //当前展示 菜单
+  public public_store: XMerchandise[] = [];
   // curMarket = storeClassify._curMarket;
-  storeClassify: any;
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
@@ -37,13 +35,13 @@ class StoreContent {
    * 切换侧边栏 触发 展示数据变化
    */
   public changeMenu(menuItem: any) {
-    console.log('内容1u', menuItem);
+    console.log('changeMenu', menuItem);
 
     // 点击重复 则判定为无效
-    if (this.currentMenu === menuItem.title) {
+    if (this._currentMenu === menuItem.title) {
       return;
     }
-    this.currentMenu = menuItem.title;
+    this._currentMenu = menuItem.title;
     this.getMainData();
   }
   /**
@@ -66,8 +64,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: model.ProductModel) =>
-    appContent.createProduct(data);
+  public createProduct = async (data: any) => appContent.createProduct(data);
 }
 const storeContent = new StoreContent();
 

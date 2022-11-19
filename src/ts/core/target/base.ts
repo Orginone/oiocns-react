@@ -252,7 +252,25 @@ export default class BaseTarget {
     return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
   }
 
-  /*
+  /**
+   * 拉自身进组织(创建组织的时候调用)
+   * @param id
+   * @param teamTypes
+   * @returns
+   */
+  protected async join(
+    id: string,
+    teamTypes: TargetType[],
+  ): Promise<model.ResultType<any>> {
+    return await kernel.pullAnyToTeam({
+      id,
+      teamTypes,
+      targetType: this.target.typeName,
+      targetIds: [this.target.id],
+    });
+  }
+
+  /**
    * 根据编号查询市场
    * @param page 分页参数
    * @returns

@@ -4,7 +4,8 @@ import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem, Resources } from './config';
 import { Form, Card, Row, Col, Space, PageHeader, message } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
-import { createProduct } from '@/ts/controller/store/appContent';
+import StoreSevice from '@/ts/controller/store/content';
+import { model } from '@/ts/base';
 
 const CreatApp: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
@@ -22,7 +23,10 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
         flows: n.flows ? JSON.stringify(n.flows) : null,
       };
     });
-    const { success } = await createProduct({ ...values, resources: list });
+    const { success } = await StoreSevice.createProduct({
+      ...values,
+      resources: list,
+    });
     if (success) {
       message.success('创建应用成功');
       history.goBack();
