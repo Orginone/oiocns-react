@@ -66,8 +66,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: model.ProductModel) =>
-    appContent.createProduct(data);
+  public createProduct = async (data: any) => appContent.createProduct(data);
 }
 const storeContent = new StoreContent();
 
