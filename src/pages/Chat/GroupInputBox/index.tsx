@@ -4,16 +4,18 @@ import React, { useEffect, useState } from 'react';
 import useChatStore from '@/store/chat';
 import inputboxStyle from './index.module.less';
 
-/* 
-  输入框
-*/
+/**
+ * @description: 输入区域
+ * @return {*}
+ */
+
 interface Iprops {
   writeContent: any;
 }
 
 const Groupinputbox = (props: Iprops) => {
   const { writeContent } = props;
-  const [imgUrls, setImgUrls] = useState<Array<string>>([]);
+  const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情包
   const ChatStore: any = useChatStore();
   // 提交聊天内容
   const submit = async () => {
@@ -33,7 +35,7 @@ const Groupinputbox = (props: Iprops) => {
       ChatStore.addSessionList();
       ChatStore._cacheSession();
     }
-    document.getElementById('insterHtml').innerHTML = '';
+    document.getElementById('insterHtml')!.innerHTML = '';
   };
   // 解析聊天内容
   const reCreatChatContent = (elementChild: NodeList | any[]): Array<string> => {

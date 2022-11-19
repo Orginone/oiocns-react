@@ -1,10 +1,11 @@
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
-// import Company from '@/ts/core/target/company';
+import Company from '@/ts/core/target/company';
+import { XMarket } from '@/ts/base/schema';
 /**
  * @desc: 仓库模块 导航控件
- * @return {*}/
+ * @return {*}
  */
 type menyuType = 'app' | 'docx' | 'data' | 'assets';
 type footerTreeType = {
@@ -24,17 +25,19 @@ type AppTreeType = {
 
 class StoreClassify {
   // constructor(parameters) {}
-  // static curCompoy: Company = Provider.getPerson.curCompany as Company;
-  public _curMarket: AppStore; // 当前商店信息
+  // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+  public _curMarket: AppStore | undefined = new AppStore({
+    id: '358266491960954880',
+  } as XMarket); // 当前商店信息
   public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
-  private curTreeData: any; // 当前展示树内容
+  public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
   public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
   public SelectMarketCallBack: undefined | ((item: AppStore) => void) = undefined; //选择商店后 触发展示区回调
 
   // 底部区域
   // 缓存 所有 tree 展示数据
-  public footerTree: footerTreeType = {
+  public appFooterTree: footerTreeType = {
     appTreeData: [
       {
         title: '测试目录1',
@@ -47,6 +50,12 @@ class StoreClassify {
       },
       { title: '测试目录2', key: '1-2', id: '2', children: [] },
     ],
+    docxTreeData: [],
+    dataTreeData: [],
+    assetsTreeData: [],
+  };
+  public marketFooterTree: footerTreeType = {
+    appTreeData: [],
     docxTreeData: [],
     dataTreeData: [],
     assetsTreeData: [],
@@ -67,8 +76,9 @@ class StoreClassify {
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    if (this.footerTree[`${key}TreeData`].length > 0) {
-      this.curTreeData = this.footerTree[`${key}TreeData`];
+    let data = `${this.currentMenu === 'myApps' ? 'app' : 'market'}FooterTree`;
+    if (this[data][`${key}TreeData`].length > 0) {
+      this.curTreeData = this[data][`${key}TreeData`];
       return;
     }
     //1. 直接触发展示区 更新展示数据
@@ -87,9 +97,17 @@ class StoreClassify {
 
     if (this.currentMenu === 'myApps') {
       //TODO:获取 自定义分类树
-      this.curTreeData = this.footerTree.appTreeData;
-      this.TreeCallBack && this.TreeCallBack(this.curTreeData);
+      this.curTreeData = this.appFooterTree.appTreeData;
+      console.log('触发变更callback', this.currentMenu, this.appFooterTree.appTreeData);
+
+      this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
     } else {
+      this.curTreeData = this.marketFooterTree.appTreeData;
+      console.log(
+        '触发变更callback',
+        this.currentMenu,
+        this.marketFooterTree.appTreeData,
+      );
       this.getOwnMarket();
     }
   }
@@ -101,7 +119,7 @@ class StoreClassify {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.getStore.name || '商店';
+    this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 应用', this.breadcrumb);
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
@@ -113,7 +131,7 @@ class StoreClassify {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.getStore.name || '商店';
+    this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 商店', this.breadcrumb);
 
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
@@ -128,7 +146,7 @@ class StoreClassify {
   private async getOwnMarket() {
     const marketTree = await Provider.getPerson.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
-      const item = itemModel.getStore;
+      const item = itemModel.store;
       return {
         title: item.name,
         key: `0-${index}`,
@@ -138,7 +156,7 @@ class StoreClassify {
       };
     });
 
-    this.footerTree.appTreeData = arr;
+    this.marketFooterTree.appTreeData = arr;
 
     this.TreeCallBack && this.TreeCallBack(arr);
   }

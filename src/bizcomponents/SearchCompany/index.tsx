@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Company } from '@/module/org';
-import CompanyServices from '@/module/org/company';
-import SearchInput from '@/components/SearchInput';
-import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography, Button } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
+
+import { XTarget } from '@/ts/base/schema';
+import PersonController from '@/pages/Person/_control/personcontroller';
+
+import SearchInput from '@/components/SearchInput';
+import styles from './index.module.less';
+import Provider from '@/ts/core/provider';
 
 type CompanySearchTableProps = {
   [key: string]: any;
@@ -13,30 +16,21 @@ type CompanySearchTableProps = {
 
 let tableProps: CompanySearchTableProps;
 
-/* 
+/*
   弹出框表格查询
 */
 const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
+  type dataObject = XTarget & {
+    selectStyle: string;
+  };
+
   const [searchKey, setSearchKey] = useState<string>();
-  const [dataSource, setDataSource] = useState<Company[]>([]);
+  const [dataSource, setDataSource] = useState<XTarget[]>([]);
 
   useEffect(() => {
     tableProps = props;
   }, []);
 
-  const doSelectOne = (target: any, item: Company) => {
-    // target.preventDefault();
-    if (tableProps.setJoinKey) tableProps.setJoinKey(item.id);
-
-    // 选中的样式
-    dataSource.map((e) => {
-      if (e.id === item.id) {
-        e.selectStyle = 'company-select-type';
-      } else {
-        e.selectStyle = 'company-no-select-type';
-      }
-    });
-  };
   // 单位卡片渲染
   const companyCardList = () => {
     return (
@@ -44,15 +38,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         {dataSource.map((item) => (
           <Col span={12} key={item.id}>
             <Card
-              className={`${styles.card} ${styles[item.selectStyle]}`}
-              actions={[
-                <Button
-                  key="{item.id}+'_1'"
-                  onClick={(e) => doSelectOne(e, item)}
-                  type="primary">
-                  选中
-                </Button>,
-              ]}>
+              className={`${styles.card} ${styles[(item as dataObject).selectStyle]}`}>
               <Card.Meta
                 avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
                 title={item.name}
@@ -69,13 +55,23 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   };
 
   // 查询数据
-  const getList = async (searchKey?: string) => {
-    const { data } = await CompanyServices.searchCompany({
-      filter: searchKey, // || '91330304254498785G',
-      page: 1,
-      pageSize: 10,
-    });
-    setDataSource(data);
+  const getList = (searchKey?: string) => {
+    PersonController.getInstance().searchCompany(
+      {
+        page: 1,
+        pageSize: 10,
+        filter: searchKey, // || '91330304254498785G',
+      },
+      (data: any) => {
+        // 回调
+        if (data.success) {
+          setDataSource(data.data);
+          if (data.data.length > 0) {
+            if (tableProps.setJoinKey) tableProps.setJoinKey(data.data[0].id);
+          }
+        }
+      },
+    );
   };
 
   return (
@@ -100,4 +96,5 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
     </div>
   );
 };
+
 export default CompanySearchList;

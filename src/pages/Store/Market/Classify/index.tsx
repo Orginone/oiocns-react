@@ -9,14 +9,15 @@ import React, { useEffect, useState } from 'react';
 
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import StoreClassify from '../../_control/classify';
+import StoreSiderbar from '@/ts/controller/store/sidebar';
+import StoreContent from '@/ts/controller/store/content';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
   useEffect(() => {
-    StoreClassify.currentMenu = 'market';
-    StoreClassify.TreeCallBack = setList;
-    StoreClassify.getTreeData();
+    StoreSiderbar.currentMenu = 'market';
+    StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.getTreeData();
   }, []);
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
@@ -45,6 +46,31 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setSelectMenu(path);
     history.push(path);
   };
+  /*******
+   * @desc: 点击目录 触发事件
+   * @param {any} item
+   * @return {*}
+   */
+  const handleTitleClick = (item: any) => {
+    // 触发内容去变化
+    StoreContent.changeMenu(item);
+  };
+  /**
+   * @desc: 创建新目录
+   * @param {any} item
+   * @return {*}
+   */
+  const handleAddShop = (item: any) => {
+    console.log('handleAddShop', item);
+  };
+  /*******
+   * @desc: 目录更多操作 触发事件
+   * @param {object} param1
+   * @return {*}
+   */
+  const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
+    console.log('handleMenuClick55', data, key);
+  };
   return (
     <div className={cls.container}>
       <div className={cls.subTitle}>常用分类</div>
@@ -54,7 +80,13 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         defaultOpenKeys={['openMarket']}
         onClick={({ key }) => handleChange(key)}
       />
-      <MarketClassifyTree key={selectMenu} treeData={list} />
+      <MarketClassifyTree
+        key={selectMenu}
+        handleTitleClick={handleTitleClick}
+        handleAddClick={handleAddShop}
+        handleMenuClick={handleMenuClick}
+        treeData={list}
+      />
     </div>
   );
 };
