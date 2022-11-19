@@ -7,6 +7,7 @@ import PersonController from '@/pages/Person/_control/personcontroller';
 
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
+import Provider from '@/ts/core/provider';
 
 type CompanySearchTableProps = {
   [key: string]: any;
@@ -15,14 +16,13 @@ type CompanySearchTableProps = {
 
 let tableProps: CompanySearchTableProps;
 
-/* 
+/*
   弹出框表格查询
 */
 const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
-
   type dataObject = XTarget & {
     selectStyle: string;
-  }
+  };
 
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
@@ -31,7 +31,6 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
     tableProps = props;
   }, []);
 
-
   // 单位卡片渲染
   const companyCardList = () => {
     return (
@@ -39,7 +38,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         {dataSource.map((item) => (
           <Col span={12} key={item.id}>
             <Card
-              className={`${styles.card} ${styles[(item as dataObject).selectStyle]}`} >
+              className={`${styles.card} ${styles[(item as dataObject).selectStyle]}`}>
               <Card.Meta
                 avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
                 title={item.name}
@@ -57,23 +56,22 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
 
   // 查询数据
   const getList = (searchKey?: string) => {
-
-    PersonController.getInstance().searchCompany({
-      page: 1,
-      pageSize: 10,
-      filter: searchKey, // || '91330304254498785G',
-    }, (data: any) => {
-      // 回调
-      if (data.success) {
-        setDataSource(data.data);
-        if (data.data.length > 0) {
-          if (tableProps.setJoinKey)
-            tableProps.setJoinKey(data.data[0].id);
+    PersonController.getInstance().searchCompany(
+      {
+        page: 1,
+        pageSize: 10,
+        filter: searchKey, // || '91330304254498785G',
+      },
+      (data: any) => {
+        // 回调
+        if (data.success) {
+          setDataSource(data.data);
+          if (data.data.length > 0) {
+            if (tableProps.setJoinKey) tableProps.setJoinKey(data.data[0].id);
+          }
         }
-      }
-
-    });
-
+      },
+    );
   };
 
   return (

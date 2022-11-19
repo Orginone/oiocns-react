@@ -4,7 +4,6 @@ import create from 'zustand';
 // 数据持久化，会缓存到 storage
 import { persist } from 'zustand/middleware';
 import Person from '@/module/person';
-import $API from '@/services';
 import Provider from '@/ts/core/provider';
 
 import { StateProps, UserType } from './type';
@@ -21,6 +20,7 @@ const useStore = create(
       userObj: null,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
+
         if (res.success) {
           set({
             user: res.data,
@@ -32,7 +32,7 @@ const useStore = create(
         }
         return false;
       },
-      setUser: async (data: UserType) => {
+      setUser: async (data: Partial<UserType>) => {
         set({ user: data });
       },
       setLoading: (val: boolean) => set({ loading: val }),

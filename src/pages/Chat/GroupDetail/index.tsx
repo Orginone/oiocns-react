@@ -7,9 +7,10 @@ import { chat } from '@/module/chat/orgchat';
 import useChatStore from '@/store/chat';
 import detailStyle from './index.module.less';
 
-/*
-  个人、群聊详情
-*/
+/**
+ * @description:  个人、群聊详情
+ * @return {*}
+ */
 
 interface itemResult {
   code: string;
@@ -26,6 +27,8 @@ interface itemResult {
 }
 
 const Groupdetail: React.FC = () => {
+  console.log('个人、群聊详情', chat);
+
   const ChatStore: any = useChatStore();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
   const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
@@ -117,25 +120,25 @@ const Groupdetail: React.FC = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={ChatStore.curChat?.name} label={''} />
+        <HeadImg name={chat.curChat?.name} label={''} />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>
-          {ChatStore.curChat?.name}
-          {ChatStore.curChat?.typeName !== '人员' ? (
-            <span className={detailStyle.number}>({ChatStore.curChat?.personNum})</span>
+          {chat.curChat?.name}
+          {chat.curChat?.typeName !== '人员' ? (
+            <span className={detailStyle.number}>({chat.curChat?.personNum})</span>
           ) : (
             ''
           )}
         </h4>
-        <div className={detailStyle.base_info_desc}>{ChatStore.curChat?.remark}</div>
+        <div className={detailStyle.base_info_desc}>{chat.curChat?.remark}</div>
       </Col>
     </Row>
   );
   // 群组成员
   const grouppeoples = (
     <>
-      {ChatStore?.qunPersons.map((item: any, index: any) => {
+      {chat?.qunPersons.map((item: any) => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
             <HeadImg name={item.name} label={''} />
@@ -143,7 +146,7 @@ const Groupdetail: React.FC = () => {
           </div>
         );
       })}
-      {ChatStore.curChat?.typeName === '群组' ? (
+      {chat.curChat?.typeName === '群组' ? (
         <>
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
@@ -174,7 +177,7 @@ const Groupdetail: React.FC = () => {
         <div className={detailStyle.user_list}>
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
-            {ChatStore.curChat?.personNum > 1 ? (
+            {chat.curChat?.personNum > 1 ? (
               <span
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
                 onClick={() => {
@@ -189,15 +192,15 @@ const Groupdetail: React.FC = () => {
               ''
             )}
           </div>
-          {ChatStore.curChat?.typeName === '群组' ? (
+          {chat.curChat?.typeName === '群组' ? (
             <>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊名称</span>
-                <span className={detailStyle.con_value}>{ChatStore.curChat?.remark}</span>
+                <span className={detailStyle.con_value}>{chat.curChat?.remark}</span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊描述</span>
-                <span className={detailStyle.con_value}>{ChatStore.curChat?.remark}</span>
+                <span className={detailStyle.con_value}>{chat.curChat?.remark}</span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>我在本群的昵称</span>
@@ -212,9 +215,7 @@ const Groupdetail: React.FC = () => {
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
-            <span>
-              {ChatStore.curChat?.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}
-            </span>
+            <span>{chat.curChat?.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}</span>
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
@@ -222,7 +223,7 @@ const Groupdetail: React.FC = () => {
             <RightOutlined />
           </div>
         </div>
-        {ChatStore.curChat?.spaceId === chat.userId ? (
+        {chat.curChat?.spaceId === chat.userId ? (
           <div className={`${detailStyle.footer} ${detailStyle.group_detail_wrap}`}>
             <Button
               type="primary"
@@ -231,7 +232,7 @@ const Groupdetail: React.FC = () => {
               }}>
               清空聊天记录
             </Button>
-            {ChatStore.curChat?.typeName === '群组' ? (
+            {chat.curChat?.typeName === '群组' ? (
               <>
                 <Button type="primary" danger>
                   退出该群

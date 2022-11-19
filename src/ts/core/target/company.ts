@@ -2,7 +2,6 @@ import Group from './group';
 import { FaildResult, kernel, model, schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-
 /**
  * 公司的元操作
  */
