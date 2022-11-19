@@ -1,9 +1,8 @@
-
 import { Button, Space, Tabs, Card, Modal, message } from 'antd';
 import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import PersonInfo from '../../../bizcomponents/PersonInfo/index'
+import PersonInfo from '../../../bizcomponents/PersonInfo/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -11,18 +10,18 @@ import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
 import useStore from '../../../../src/store';
-import CreateCohort from '../../../bizcomponents/cohort/index'
-import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index'
-import Persons from '../../../bizcomponents/SearchPerson/index'
-import AddCohort from '../../../bizcomponents/SearchCohort/index'
+import CreateCohort from '../../../bizcomponents/cohort/index';
+import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index';
+import Persons from '../../../bizcomponents/SearchPerson/index';
+import AddCohort from '../../../bizcomponents/SearchCohort/index';
 import { Person } from '@/module/org';
 import { sleep } from '@/store/sleep';
 import { Cohort } from '../../../module/org/index';
-import CohortServices from '../../../ts/core/target/cohort'
+import CohortServices from '../../../ts/core/target/cohort';
 import { useHistory } from 'react-router-dom';
-import PersonInfoEnty from '../../../ts/core/provider'
-import { model,schema } from '../../../ts/base'
-import { TargetType } from '../../../ts/core/enum'
+import PersonInfoEnty from '../../../ts/core/provider';
+import { model, schema } from '../../../ts/base';
+import { TargetType } from '../../../ts/core/enum';
 /**
  * 个人信息
  * @returns
@@ -32,10 +31,10 @@ const CohortConfig: React.FC = () => {
     nameSpace: 'myCohort',
     searchApi: API.cohort.getJoinedCohorts,
     createApi: API.cohort.create,
-    updateApi: API.cohort.update
+    updateApi: API.cohort.update,
   });
   const Person = PersonInfoEnty.getPerson;
-  console.log("实体信息", Person)
+  console.log('实体信息', Person);
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -59,7 +58,7 @@ const CohortConfig: React.FC = () => {
         key: 'enterChat',
         label: '进入会话',
         onClick: () => {
-          history.push("/chat")
+          history.push('/chat');
           console.log('按钮事件', 'enterChat', item);
         },
       },
@@ -67,8 +66,8 @@ const CohortConfig: React.FC = () => {
         key: 'inviteMembers',
         label: '邀请成员',
         onClick: () => {
-          showModal()
-          setItem(item)
+          showModal();
+          setItem(item);
           console.log('按钮事件', 'inviteMembers', item);
         },
       },
@@ -76,7 +75,7 @@ const CohortConfig: React.FC = () => {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
-          setItem(item)
+          setItem(item);
           setOpen(true);
           console.log('按钮事件127777777743', 'updateCohort', item);
         },
@@ -92,8 +91,7 @@ const CohortConfig: React.FC = () => {
         key: 'identityManage',
         label: '身份管理',
         onClick: () => {
-          console.log('按钮事件', 'identityManage',
-          );
+          console.log('按钮事件', 'identityManage');
         },
       },
       {
@@ -104,7 +102,7 @@ const CohortConfig: React.FC = () => {
             offset: 0,
             limit: 10,
             filter: '',
-          }
+          };
           const params: model.IDReqJoinedModel = {
             id: PersonInfoEnty.getPerson.target.id,
             typeName: TargetType.Person,
@@ -124,10 +122,10 @@ const CohortConfig: React.FC = () => {
         label: '解散群组',
         onClick: () => {
           const param = {
-            id: item.targetId
-          }
-          newCohortServices.deleteCohort(param)
-          message.info("解散成功")
+            id: item.targetId,
+          };
+          newCohortServices.deleteCohort(param);
+          message.info('解散成功');
           getTableList();
         },
       },
@@ -155,11 +153,11 @@ const CohortConfig: React.FC = () => {
       filter: searchKey,
     };
     let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
-    const data = PersonInfoEnty.getPerson.ChohortArray
-    console.log("获取值", PersonInfoEnty.getPerson.ChohortArray)
+    const data = PersonInfoEnty.getPerson.ChohortArray;
+    console.log('获取值', PersonInfoEnty.getPerson.ChohortArray);
     for (var i = 0; i < data.length; i++) {
       if (data[i].target.belongId === Person.target.id) {
-        if(data[i].target.team!=undefined){
+        if (data[i].target.team != undefined) {
           const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
           chorot.belongId = data[i].target.belongId;
           chorot.thingId = data[i].target.thingId;
@@ -168,7 +166,7 @@ const CohortConfig: React.FC = () => {
       }
     }
     setList(resultList);
-    console.log(66, resultList, resultList.length)
+    console.log(66, resultList, resultList.length);
     setTotal(resultList.length);
   };
 
@@ -187,12 +185,11 @@ const CohortConfig: React.FC = () => {
     setIsModalOpen(true);
   };
 
-
   const handleOk = async () => {
     setIsModalOpen(false);
     const { data, code } = await service.getpullPerson({
       id: item?.id,
-      targetIds: [friend?.id]
+      targetIds: [friend?.id],
     });
     if (code === 200) {
       message.success('邀请成功');
@@ -202,14 +199,12 @@ const CohortConfig: React.FC = () => {
   };
   const cohortHandleOk = async () => {
     const param = {
-      id: cohort?.id
-    }
-    const data = await newCohortServices.ApplyJoinCohort(param)
+      id: cohort?.id,
+    };
+    const data = await newCohortServices.ApplyJoinCohort(param);
     if (!data.success) {
-      message.error(data.msg)
-    } else (
-      message.info('申请加入成功')
-    )
+      message.error(data.msg);
+    } else message.info('申请加入成功');
     setAddIsModalOpen(false);
   };
   const handleCancle = () => {
@@ -231,23 +226,48 @@ const CohortConfig: React.FC = () => {
           </Title>
           <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
-              <Modal title="邀请成员" open={isModalOpen} onOk={handleOk} onCancel={handleCancle} width='1050px'>
+              <Modal
+                title="邀请成员"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancle}
+                width="1050px">
                 <Persons searchCallback={searchCallback} />
               </Modal>
-              <Modal title="加入群组" open={addIsModalOpen} onOk={cohortHandleOk} onCancel={() => setAddIsModalOpen(false)} width='1050px' >
+              <Modal
+                title="加入群组"
+                open={addIsModalOpen}
+                onOk={cohortHandleOk}
+                onCancel={() => setAddIsModalOpen(false)}
+                width="1050px">
                 <AddCohort setCohort={setcohort} />
               </Modal>
-              {item && (<UpdateCohort
-                key={item?.id}
-                layoutType="ModalForm"
-                title="修改群组"
-                modalProps={{
-                  destroyOnClose: true,
-                  onCancel: () => setOpen(false),
-                }} service={service} open={open} columns={service.getcolumn()} setOpen={setOpen} item={item} getTableList={getTableList} />)}
-              
-              <CreateCohort Person={Person} service={service} getTableList={getTableList} />
-              <Button type="link" onClick={() => setAddIsModalOpen(true)}>加入群组</Button>
+              {item && (
+                <UpdateCohort
+                  key={item?.id}
+                  layoutType="ModalForm"
+                  title="修改群组"
+                  modalProps={{
+                    destroyOnClose: true,
+                    onCancel: () => setOpen(false),
+                  }}
+                  service={service}
+                  open={open}
+                  columns={service.getcolumn()}
+                  setOpen={setOpen}
+                  item={item}
+                  getTableList={getTableList}
+                />
+              )}
+
+              <CreateCohort
+                Person={Person}
+                service={service}
+                getTableList={getTableList}
+              />
+              <Button type="link" onClick={() => setAddIsModalOpen(true)}>
+                加入群组
+              </Button>
             </Space>
           </div>
         </div>

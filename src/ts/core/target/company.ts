@@ -1,7 +1,6 @@
 import { model, schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-
 /**
  * 公司的元操作
  */

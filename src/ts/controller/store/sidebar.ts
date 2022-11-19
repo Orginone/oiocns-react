@@ -2,6 +2,7 @@ import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
 import Company from '@/ts/core/target/company';
+import { XMarket } from '@/ts/base/schema';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}
@@ -24,8 +25,10 @@ type AppTreeType = {
 
 class StoreClassify {
   // constructor(parameters) {}
-  static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
-  public _curMarket: AppStore | undefined = undefined; // 当前商店信息
+  // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+  public _curMarket: AppStore | undefined = new AppStore({
+    id: '358266491960954880',
+  } as XMarket); // 当前商店信息
   public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示

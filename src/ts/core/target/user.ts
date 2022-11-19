@@ -10,7 +10,6 @@ import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
 
-
 /**
  * 我的设置里面的接口
  * const person: Person = Provider.getPerson;
@@ -55,7 +54,6 @@ export default class userdataservice extends BaseService {
     companyId: string,
     typeName: TargetType,
   ): Promise<Company[]> {
-
     this.target.typeName = typeName;
     let res = await this.getjoined({
       spaceId: companyId,
@@ -218,7 +216,6 @@ export default class userdataservice extends BaseService {
     targetId: string,
     teamType: TargetType,
   ): Promise<model.ResultType<any>> {
-
     const res = await kernel.applyJoinTeam({
       id: targetId,
       teamType: teamType,
@@ -227,7 +224,6 @@ export default class userdataservice extends BaseService {
     });
     return res;
   }
-
 
   /**取消加入组织或个人 */
   public async cancelJoinCompany(
@@ -252,6 +248,4 @@ export default class userdataservice extends BaseService {
     data.belongId = this.target.id;
     return await kernel.createTarget(data);
   }
-
-
 }

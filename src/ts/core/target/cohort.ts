@@ -6,7 +6,7 @@ import { common, kernel, model, FaildResult } from '../../base';
 import { format } from 'path/posix';
 import { formatDate } from '@/utils';
 export default class Cohort extends BaseTarget {
-  constructor(target:schema.XTarget) {
+  constructor(target: schema.XTarget) {
     super(target);
   }
   /**
@@ -26,17 +26,15 @@ export default class Cohort extends BaseTarget {
    * 修改群组
    * @param params id:targetId,code:修改后群组编号,TypeName:枚举中取Cohort,belongId: 归属ID,teamName:修改后名称,temcode:修改后编号
    * ,teamReamrk：修改后描述;
-   * @returns 
+   * @returns
    */
-  public async UpdateCohort(
-    params: model.TargetModel
-  ): Promise<model.ResultType<any>> {
+  public async UpdateCohort(params: model.TargetModel): Promise<model.ResultType<any>> {
     let res = await kernel.updateTarget(params);
-    if(res.success){
+    if (res.success) {
       this.target.name = params.name;
-      this.target.code = params.code
+      this.target.code = params.code;
       this.target.updateUser = formatDate(new Date().getTime);
-      if(this.target.team!=undefined){
+      if (this.target.team != undefined) {
         this.target.team.name = params.name;
         this.target.team.code = params.code;
         this.target.team.remark = params.teamRemark;
@@ -51,7 +49,7 @@ export default class Cohort extends BaseTarget {
     const { data } = await API.cohort.searchCohorts({
       data: params,
     });
-    console.log("进入调用")
+    console.log('进入调用');
 
     return { data };
   }
@@ -60,7 +58,7 @@ export default class Cohort extends BaseTarget {
     const { code, msg, success } = await API.cohort.applyJoin({
       data: params,
     });
-    console.log("进入调用")
+    console.log('进入调用');
 
     return { code, msg, success };
   }
@@ -69,7 +67,7 @@ export default class Cohort extends BaseTarget {
     const { code, msg, success } = await API.cohort.delete({
       data: params,
     });
-    console.log("进入调用")
+    console.log('进入调用');
     return { code, msg, success };
   }
   // public async deleteCohort(params: any) {
@@ -80,5 +78,4 @@ export default class Cohort extends BaseTarget {
 
   //   return {code,msg,success};
   // }
-
 }

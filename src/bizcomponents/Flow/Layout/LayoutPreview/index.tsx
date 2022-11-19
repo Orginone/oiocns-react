@@ -35,7 +35,7 @@ const LayoutPreview = (props: LayoutPreviewProps, ref: any) => {
         footer={null}
         onCancel={handleCancel}
         title={'预览'}
-        width="800px">
+        width="40%">
         <pre
           style={{
             fontFamily: 'Monaco,Menlo,Consolas,Bitstream Vera Sans Mono,monospace',

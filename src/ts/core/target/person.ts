@@ -8,20 +8,23 @@ import University from './university';
 import Hospital from './hospital';
 import AppStore from '../market/appstore';
 import { validIsSocialCreditCode } from '@/utils/tools';
+import { SpaceType } from '@/store/type';
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
-  //
-  private _curCompany: Company | undefined;
+  private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
   private _joinedStores: AppStore[];
+  private _ownProducts: any[];
   constructor(target: schema.XTarget) {
     super(target);
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this._joinedStores = [];
+    this.workSpace = { id: this.target.id, name: '个人空间' };
+    this._ownProducts = [];
     //初始化时填入信息
     this.getCohort();
     this.getFriends();
@@ -66,9 +69,11 @@ export default class Person extends BaseTarget {
     });
     if (res.success && res.data != undefined && res.data.result != undefined) {
       this._joinedCohorts = [];
-      for (var i = 0; i < res.data?.result.length; i++) {
-        const cohort = new Cohort(res.data?.result[i]);
-        this._joinedCohorts.push(cohort);
+      if (res.data.result?.length) {
+        for (var i = 0; i < res.data?.result.length; i++) {
+          const cohort = new Cohort(res.data?.result[i]);
+          this._joinedCohorts.push(cohort);
+        }
       }
     }
     return res;
@@ -275,6 +280,7 @@ export default class Person extends BaseTarget {
             break;
         }
         this._joinedCompanys.push(company);
+
         return company.pullPersons([this.target.id]);
       }
       return res;
@@ -349,6 +355,7 @@ export default class Person extends BaseTarget {
     if (this._joinedCompanys.length > 0) {
       return this._joinedCompanys;
     }
+    this._joinedCompanys = [];
     let res = await this.getjoined({
       spaceId: this.target.id,
       JoinTypeNames: this.companyTypes,
@@ -474,4 +481,47 @@ export default class Person extends BaseTarget {
         const res = await kernel.queryTargetAuthoritys(params);
         return res;
       }
+
+  /**
+   * 获取工作空间
+   * @returns 工作空间
+   */
+  public getWorkSpace(): SpaceType {
+    return this.workSpace;
+  }
+
+  /**
+   * 切换工作空间
+   * @param workSpace
+   */
+  public setWorkSpace(workSpace: SpaceType) {
+    this.workSpace = workSpace;
+  }
+
+  /**
+   * 是否个人空间
+   * @returns
+   */
+  public isUserSpace(): boolean {
+    return this.workSpace.id == this.target.id;
+  }
+
+  /**
+   * 创建应用
+   * @param  {model.ProductModel} 产品基础信息
+   */
+  public async createProduct(
+    data: Omit<model.ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
+  ): Promise<model.ResultType<schema.XProduct>> {
+    const belongId = this.target.id;
+    const thingId = '';
+    const typeName = 'webapp';
+    return await kernel.createProduct({
+      ...data,
+      belongId,
+      thingId,
+      typeName,
+      id: undefined,
+    });
+  }
 }
