@@ -95,33 +95,6 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-   * 添加群组申请
-   * @param id 群组id
-   * @returns
-   */
-  public async applyJoinCohort(id: string): Promise<model.ResultType<any>> {
-    return await this.applyJoin(id, TargetType.Cohort);
-  }
-
-  /**
-   * 搜索群组
-   * @param name 群组编号
-   * @returns
-   */
-  public async searchCohorts(code: string): Promise<model.ResultType<any>> {
-    return await this.search(code, TargetType.Cohort);
-  }
-
-  /**
-   * 搜索目标(人)
-   * @param name 名称
-   * @returns
-   */
-  public async searchFriend(name: string): Promise<model.ResultType<any>> {
-    return await this.search(name, TargetType.Person);
-  }
-
-  /**
    * 获取好友列表
    * @returns 返回好友列表
    */
@@ -129,15 +102,13 @@ export default class Person extends MarketActionTarget {
     if (this._friends.length > 0) {
       return this._friends;
     }
-    const res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Person],
-    });
-    console.log('好友查询结果', res);
-    if (res.success) {
-      if (res.data != undefined && res.data.result != undefined) {
-        this._friends = res.data.result;
-      }
+    const res = await this.getSubTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
+    if (res.success && res.data.result != undefined) {
+      this._friends = res.data.result;
     }
     return this._friends;
   }
@@ -210,11 +181,7 @@ export default class Person extends MarketActionTarget {
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
-        switch (item.typeName) {
-          case TargetType.Cohort:
-            this._joinedCohorts.push(new Cohort(item));
-            break;
-        }
+        this._joinedCohorts.push(new Cohort(item));
       });
     }
     return this._joinedCohorts;
@@ -317,7 +284,9 @@ export default class Person extends MarketActionTarget {
         return cohort.target.id == id;
       });
       if (index > 0) {
-        delete this._joinedCohorts[index];
+        this._joinedCohorts = this._joinedCohorts.filter((cohort) => {
+          return cohort.target.id != id;
+        });
       }
     }
     return res;
@@ -339,14 +308,9 @@ export default class Person extends MarketActionTarget {
       targetId: this.target.id,
       targetType: TargetType.Person,
     });
-    if (res.success) {
-      var index = this._joinedCompanys.findIndex((cohort) => {
-        return cohort.target.id == id;
-      });
-      if (index > 0) {
-        delete this._joinedCompanys[index];
-      }
-    }
+    this._joinedCompanys = this._joinedCompanys.filter((company) => {
+      return company.target.id != id;
+    });
     return res;
   }
 }

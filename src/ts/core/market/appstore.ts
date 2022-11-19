@@ -68,8 +68,7 @@ export default class AppStore {
     return await kernel.queryJoinMarketApply({
       id: this.store.id,
       page,
-    });
-  }
+    }); }
 
   /**
    * 审批商店成员加入申请
@@ -154,7 +153,7 @@ export default class AppStore {
    */
   public async unPublish(
     merchandiseId: string,
-    belongId: string,
+    belongId: number,
   ): Promise<ResultType<any>> {
     return await kernel.deleteMerchandiseByManager({
       id: merchandiseId,

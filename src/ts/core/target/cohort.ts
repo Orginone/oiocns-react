@@ -1,8 +1,6 @@
-import { schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import { kernel, model } from '../../base';
-import { formatDate } from '@/utils';
+import { kernel, model, schema } from '../../base';
 
 export default class Cohort extends BaseTarget {
   constructor(target: schema.XTarget) {
@@ -36,7 +34,6 @@ export default class Cohort extends BaseTarget {
         this.target.team.name = params.name;
         this.target.team.code = params.code;
         this.target.team.remark = params.teamRemark;
-        this.target.team.updateTime = formatDate(new Date().getTime);
       }
     }
     return res;
