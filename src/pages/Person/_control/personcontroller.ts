@@ -59,7 +59,10 @@ export default class personcontroller extends BaseController {
    * @returns
    */
   public async applyJoinCompany(id: string): Promise<boolean> {
-    const success = await this.userDataService.applyJoinCompany(id, TargetType.Company);
+    const { success } = await this.userDataService.applyJoinCompany(
+      id,
+      TargetType.Company,
+    );
     return success;
   }
 

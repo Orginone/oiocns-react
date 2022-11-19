@@ -7,6 +7,7 @@ import PersonController from '@/pages/Person/_control/personcontroller';
 
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
+import Provider from '@/ts/core/provider';
 
 type CompanySearchTableProps = {
   [key: string]: any;

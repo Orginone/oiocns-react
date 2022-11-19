@@ -1,5 +1,8 @@
 # 奥集能平台前端
 
+TS功能文档: [ts功能划分](https://docs.qq.com/sheet/DQ2JhZGtJZFlsWWln)
+
+
 ![Image text](https://user-images.githubusercontent.com/8328012/201800690-9f5e989e-4ed3-4817-85b9-b594ac89fd31.png)
 
 ## 简介

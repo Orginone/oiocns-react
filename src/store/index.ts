@@ -32,8 +32,7 @@ const useStore = create(
         }
         return false;
       },
-      
-      setUser: async (data: UserType) => {
+      setUser: async (data: Partial<UserType>) => {
         set({ user: data });
       },
       setLoading: (val: boolean) => set({ loading: val }),
@@ -50,10 +49,8 @@ const useStore = create(
     {
       name: 'user-storage',
       getStorage: () => sessionStorage,
-      
     },
   ),
-  
 );
 
 // 暴露单一实例 useStore
