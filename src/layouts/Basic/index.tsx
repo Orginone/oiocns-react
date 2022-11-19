@@ -1,12 +1,10 @@
 import { Layout } from 'antd';
 import React, { useEffect } from 'react';
 import { renderRoutes } from 'react-router-config';
-
 import { chat } from '@/module/chat/orgchat';
 import { IRouteConfig } from '@/routes/config';
 import useStore from '@/store';
 import useChatStore from '@/store/chat';
-
 import BasicHeader from './Header';
 import styles from './index.module.less';
 

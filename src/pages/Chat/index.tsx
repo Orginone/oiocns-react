@@ -52,6 +52,23 @@ const Chat: React.FC = () => {
     setHistoryMesagesList(megs);
   };
 
+  /**
+   * @description: 删除消息的回调
+   * @return {*}
+   */
+  const deleteMsgCallback = (delMegs: any) => {
+    setHistoryMesagesList(delMegs);
+  };
+
+  /**
+   * @description: 清空聊天记录的回调
+   * @param {any} clearMsgs
+   * @return {*}
+   */
+  const clearMsgCallback = (clearMsgs: any) => {
+    setHistoryMesagesList(clearMsgs);
+  };
+
   return (
     <div className={charsStyle.cohort_wrap}>
       {/* 导航栏 */}
@@ -69,6 +86,7 @@ const Chat: React.FC = () => {
               <GroupContent
                 handleReWrites={handleReWrites}
                 historyMesagesList={HistoryMesagesList}
+                deleteMsgCallback={deleteMsgCallback}
               />
             </div>
             {/* 输入区域 */}
@@ -81,7 +99,7 @@ const Chat: React.FC = () => {
         )}
       </div>
       {/* 详情 */}
-      {isShowDetail === true ? <GroupDetail /> : ''}
+      {isShowDetail === true ? <GroupDetail clearMsgCallback={clearMsgCallback} /> : ''}
     </div>
   );
 };

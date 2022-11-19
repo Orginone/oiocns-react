@@ -1,8 +1,8 @@
 import { AudioOutlined, SmileOutlined } from '@ant-design/icons';
 import { Button, message, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
-import useChatStore from '@/store/chat';
 import inputboxStyle from './index.module.less';
+import { chat } from '@/module/chat/orgchat';
 
 /**
  * @description: 输入区域
@@ -11,13 +11,18 @@ import inputboxStyle from './index.module.less';
 
 interface Iprops {
   writeContent: any;
+  // setHistoryMesagesList: Function;
+  // sendMesageCallback: (val: any) => void;
 }
 
 const Groupinputbox = (props: Iprops) => {
   const { writeContent } = props;
-  const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情包
-  const ChatStore: any = useChatStore();
-  // 提交聊天内容
+  const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
+
+  /**
+   * @description: 提交聊天内容
+   * @return {*}
+   */
   const submit = async () => {
     const inputContent: any = document.getElementById('insterHtml')?.childNodes;
     const text: any =
@@ -26,18 +31,27 @@ const Groupinputbox = (props: Iprops) => {
         : [document.getElementById('insterHtml')?.innerHTML];
     let massage = text.join('').trim();
     if (massage.length > 0) {
-      await ChatStore.sendMsg({
-        toId: ChatStore.curChat?.id,
-        spaceId: ChatStore.curChat?.spaceId,
-        msgType: 'text',
-        msgBody: massage,
-      });
-      ChatStore.addSessionList();
-      ChatStore._cacheSession();
+      await chat.sendMsg(
+        {
+          toId: chat.curChat?.id,
+          spaceId: chat.curChat?.spaceId,
+          msgType: 'text',
+          msgBody: massage,
+        },
+        // sendMesageCallback,
+        // setHistoryMesagesList(),
+      );
+      // ChatStore.addSessionList();
+      // ChatStore._cacheSession();
     }
     document.getElementById('insterHtml').innerHTML = '';
   };
-  // 解析聊天内容
+
+  /**
+   * @description: 解析聊天内容
+   * @param {NodeList} elementChild
+   * @return {*}
+   */
   const reCreatChatContent = (elementChild: NodeList | any[]): Array<string> => {
     const arrElement = Array.from(elementChild);
     // const newSpace  = document.createDocumentFragment()
@@ -56,13 +70,23 @@ const Groupinputbox = (props: Iprops) => {
     }
     // return newSpace.innerHTML
   };
-  // 创建img标签
+
+  /**
+   * @description: 创建img标签
+   * @param {string} url
+   * @return {*}
+   */
   const handleImgChoosed = (url: string) => {
     const img = document.createElement('img');
     img.src = url;
     img.className = `emoji`;
     document.getElementById('insterHtml').append(img);
   };
+
+  /**
+   * @description: 处理表情图片
+   * @return {*}
+   */
   useEffect(() => {
     let imgUrl = ``;
     let imgUrlss = [];
@@ -77,7 +101,12 @@ const Groupinputbox = (props: Iprops) => {
       document.getElementById('insterHtml').innerHTML = writeContent;
     }
   }, [writeContent]);
-  // 输入框 键盘指令
+
+  /**
+   * @description: 输入框 键盘指令
+   * @param {any} e
+   * @return {*}
+   */
   const keyDown = (e: any) => {
     if (e.ctrlKey && e.keyCode == 13) {
       //用户点击了ctrl+enter触发
@@ -99,7 +128,11 @@ const Groupinputbox = (props: Iprops) => {
       }
     }
   };
-  // 设置光标到最后
+
+  /**
+   * @description: 设置光标到最后
+   * @return {*}
+   */
   const setFocus = () => {
     let selection = window.getSelection();
     let range = document.createRange();
@@ -108,6 +141,7 @@ const Groupinputbox = (props: Iprops) => {
     selection.removeAllRanges();
     selection.addRange(range);
   };
+
   return (
     <div className={inputboxStyle.group_input_wrap}>
       <div className={inputboxStyle.icons_box}>
