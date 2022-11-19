@@ -9,9 +9,14 @@ import companyService from '@/module/org/company';
 // import { useQuery } from '@tanstack/react-query';
 import { User } from 'typings/user';
 
+import useStore from '@/store';
+import type * as schema from '@/ts/base/schema';
+
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import ApplyInfoService from './ApplyInfo';
+import Provider from '@/ts/core/provider';
+import Person from '@/ts/core/target/person';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -30,6 +35,8 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [total, setTotal] = useState<number>(0);
 
   const [joinKey, setJoinKey] = useState<string>('');
+
+  const { user } = useStore((state) => ({ ...state }));
 
   useEffect(() => {
     getTableList();
@@ -108,6 +115,18 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     // setList([...service.List]);
     // setTotal(service.Total);
 
+    // 从提供器里面取人员。
+    const person: Person = Provider.getPerson;
+    const joinCompanys = await person.getJoinedCompanys();
+    console.log('===获取到的内核数据！ ', joinCompanys);
+
+    // const companys = await Userdata.getInstance().searchCompany({
+    //   page: 1,
+    //   pageSize: 100,
+    //   filter: '91330304254498785G'
+    // });
+    // console.log("===获取到的内核数据2！ ", companys);
+
     const { data } = await companyService.searchCompany({
       page: 1,
       pageSize: 100,
@@ -120,6 +139,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
       page: 1,
       pageSize: 1000,
     });
+
     setList(joinData);
     setTotal(joinData.length);
   };

@@ -24,6 +24,7 @@ export default class KernelApi {
    */
   private constructor(url: string) {
     this._methods = {};
+    this._anystore = AnyStore.getInstance('');
     this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
@@ -39,18 +40,6 @@ export default class KernelApi {
       if (this._anystore) {
         this._storeHub
           .invoke('TokenAuth', this.anystore?.accessToken)
-          .then((res: model.ResultType<any>) => {
-            if (res.success) {
-              console.debug('认证成功！');
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        // @modify 解决刷新后重连的问题
-        this._storeHub
-          .invoke('TokenAuth', sessionStorage.getItem('accessToken'))
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               console.debug('认证成功！');
@@ -149,7 +138,7 @@ export default class KernelApi {
   }
   /**
    * 创建字典类型
-   * @param {any} params 请求参数
+   * @param {model.DictModel} params 请求参数
    * @returns {model.ResultType<schema.XDict>} 请求结果
    */
   public async createDict(
@@ -163,7 +152,7 @@ export default class KernelApi {
   }
   /**
    * 创建字典项
-   * @param {any} params 请求参数
+   * @param {model.DictItemModel} params 请求参数
    * @returns {model.ResultType<schema.XDictItem>} 请求结果
    */
   public async createDictItem(
@@ -177,10 +166,10 @@ export default class KernelApi {
   }
   /**
    * 删除字典类型
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDict(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteDict(params: model.IdReqModel): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'base',
       action: 'DeleteDict',
@@ -189,10 +178,12 @@ export default class KernelApi {
   }
   /**
    * 删除字典项
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDictItem(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteDictItem(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'base',
       action: 'DeleteDictItem',
@@ -201,7 +192,7 @@ export default class KernelApi {
   }
   /**
    * 更新字典类型
-   * @param {any} params 请求参数
+   * @param {model.DictModel} params 请求参数
    * @returns {model.ResultType<schema.XDict>} 请求结果
    */
   public async updateDict(
@@ -215,7 +206,7 @@ export default class KernelApi {
   }
   /**
    * 更新字典项
-   * @param {any} params 请求参数
+   * @param {model.DictItemModel} params 请求参数
    * @returns {model.ResultType<schema.XDictItem>} 请求结果
    */
   public async updateDictItem(
@@ -229,7 +220,7 @@ export default class KernelApi {
   }
   /**
    * 创建类别
-   * @param {any} params 请求参数
+   * @param {model.SpeciesModel} params 请求参数
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
    */
   public async createSpecies(
@@ -243,7 +234,7 @@ export default class KernelApi {
   }
   /**
    * 创建度量标准
-   * @param {any} params 请求参数
+   * @param {model.AttributeModel} params 请求参数
    * @returns {model.ResultType<schema.XAttribute>} 请求结果
    */
   public async createAttribute(
@@ -257,7 +248,7 @@ export default class KernelApi {
   }
   /**
    * 创建物
-   * @param {any} params 请求参数
+   * @param {model.ThingModel} params 请求参数
    * @returns {model.ResultType<schema.XThing>} 请求结果
    */
   public async createThing(
@@ -271,10 +262,12 @@ export default class KernelApi {
   }
   /**
    * 删除类别
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteSpecies(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteSpecies(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteSpecies',
@@ -283,10 +276,12 @@ export default class KernelApi {
   }
   /**
    * 删除度量标准
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteAttribute(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteAttribute(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteAttribute',
@@ -295,10 +290,10 @@ export default class KernelApi {
   }
   /**
    * 删除物
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteThing(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteThing(params: model.IdReqModel): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteThing',
@@ -307,7 +302,7 @@ export default class KernelApi {
   }
   /**
    * 更新类别
-   * @param {any} params 请求参数
+   * @param {model.SpeciesModel} params 请求参数
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
    */
   public async updateSpecies(
@@ -321,7 +316,7 @@ export default class KernelApi {
   }
   /**
    * 更新度量标准
-   * @param {any} params 请求参数
+   * @param {model.AttributeModel} params 请求参数
    * @returns {model.ResultType<schema.XAttribute>} 请求结果
    */
   public async updateAttribute(
@@ -335,7 +330,7 @@ export default class KernelApi {
   }
   /**
    * 更新物
-   * @param {any} params 请求参数
+   * @param {model.ThingModel} params 请求参数
    * @returns {model.ResultType<schema.XThing>} 请求结果
    */
   public async updateThing(
@@ -349,12 +344,12 @@ export default class KernelApi {
   }
   /**
    * 物添加类别
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ThingSpeciesModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async thingAddSpecies(
     params: model.ThingSpeciesModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'ThingAddSpecies',
@@ -363,12 +358,12 @@ export default class KernelApi {
   }
   /**
    * 物添加度量数据
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ThingAttrModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async thingAddAttribute(
     params: model.ThingAttrModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'ThingAddAttribute',
@@ -377,12 +372,12 @@ export default class KernelApi {
   }
   /**
    * 物移除类别
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ThingSpeciesModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async thingRemoveSpecies(
     params: model.ThingSpeciesModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'ThingRemoveSpecies',
@@ -391,12 +386,12 @@ export default class KernelApi {
   }
   /**
    * 物移除度量数据
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ThingAttrModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async thingRemoveAttribute(
     params: model.ThingAttrModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'ThingRemoveAttribute',
@@ -404,8 +399,36 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询分类树
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XSpecies>} 请求结果
+   */
+  public async querySpeciesTree(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XSpecies>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesTree',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类的度量标准
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
+   */
+  public async querySpeciesAttrs(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XAttributeArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesAttrs',
+      params: params,
+    });
+  }
+  /**
    * 物的元数据查询
-   * @param {any} params 请求参数
+   * @param {model.ThingAttrReq} params 请求参数
    * @returns {model.ResultType<schema.XThingAttrArray>} 请求结果
    */
   public async queryThingData(
@@ -419,12 +442,12 @@ export default class KernelApi {
   }
   /**
    * 物的历史元数据查询
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XThingAttrHistroyArray>} 请求结果
    */
   public async queryThingHistroyData(
     params: model.IDBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<schema.XThingAttrHistroyArray>> {
     return await this.request({
       module: 'thing',
       action: 'QueryThingHistroyData',
@@ -433,7 +456,7 @@ export default class KernelApi {
   }
   /**
    * 物的关系元数据查询
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XRelationArray>} 请求结果
    */
   public async queryThingRelationData(
@@ -447,7 +470,7 @@ export default class KernelApi {
   }
   /**
    * 创建职权
-   * @param {any} params 请求参数
+   * @param {model.AuthorityModel} params 请求参数
    * @returns {model.ResultType<schema.XAuthority>} 请求结果
    */
   public async createAuthority(
@@ -461,7 +484,7 @@ export default class KernelApi {
   }
   /**
    * 创建身份
-   * @param {any} params 请求参数
+   * @param {model.IdentityModel} params 请求参数
    * @returns {model.ResultType<schema.XIdentity>} 请求结果
    */
   public async createIdentity(
@@ -475,7 +498,7 @@ export default class KernelApi {
   }
   /**
    * 创建组织/个人
-   * @param {any} params 请求参数
+   * @param {model.TargetModel} params 请求参数
    * @returns {model.ResultType<schema.XTarget>} 请求结果
    */
   public async createTarget(
@@ -489,7 +512,7 @@ export default class KernelApi {
   }
   /**
    * 创建标准规则
-   * @param {any} params 请求参数
+   * @param {model.RuleStdModel} params 请求参数
    * @returns {model.ResultType<schema.XRuleStd>} 请求结果
    */
   public async createRuleStd(
@@ -503,10 +526,12 @@ export default class KernelApi {
   }
   /**
    * 删除职权
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteAuthority(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteAuthority(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'DeleteAuthority',
@@ -515,10 +540,12 @@ export default class KernelApi {
   }
   /**
    * 删除身份
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteIdentity(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteIdentity(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'DeleteIdentity',
@@ -527,10 +554,12 @@ export default class KernelApi {
   }
   /**
    * 删除组织/个人
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteTarget(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async deleteTarget(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'DeleteTarget',
@@ -539,10 +568,12 @@ export default class KernelApi {
   }
   /**
    * 删除标准规则
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.RuleStdModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteRuleStd(params: model.RuleStdModel): Promise<model.ResultType<any>> {
+  public async deleteRuleStd(
+    params: model.RuleStdModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'DeleteRuleStd',
@@ -551,12 +582,12 @@ export default class KernelApi {
   }
   /**
    * 递归删除组织/个人
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.RecursiveReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async recursiveDeleteTarget(
     params: model.RecursiveReqModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RecursiveDeleteTarget',
@@ -565,7 +596,7 @@ export default class KernelApi {
   }
   /**
    * 更新职权
-   * @param {any} params 请求参数
+   * @param {model.AuthorityModel} params 请求参数
    * @returns {model.ResultType<schema.XAuthority>} 请求结果
    */
   public async updateAuthority(
@@ -579,7 +610,7 @@ export default class KernelApi {
   }
   /**
    * 更新身份
-   * @param {any} params 请求参数
+   * @param {model.IdentityModel} params 请求参数
    * @returns {model.ResultType<schema.XIdentity>} 请求结果
    */
   public async updateIdentity(
@@ -593,7 +624,7 @@ export default class KernelApi {
   }
   /**
    * 更新组织/个人
-   * @param {any} params 请求参数
+   * @param {model.TargetModel} params 请求参数
    * @returns {model.ResultType<schema.XTarget>} 请求结果
    */
   public async updateTarget(
@@ -607,7 +638,7 @@ export default class KernelApi {
   }
   /**
    * 更新标准规则
-   * @param {any} params 请求参数
+   * @param {model.RuleStdModel} params 请求参数
    * @returns {model.ResultType<schema.XRuleStd>} 请求结果
    */
   public async updateRuleStd(
@@ -621,12 +652,12 @@ export default class KernelApi {
   }
   /**
    * 分配身份
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.GiveIdentityModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async giveIdentity(
     params: model.GiveIdentityModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'GiveIdentity',
@@ -635,12 +666,12 @@ export default class KernelApi {
   }
   /**
    * 移除身份
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.GiveIdentityModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async removeIdentity(
     params: model.GiveIdentityModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RemoveIdentity',
@@ -649,12 +680,12 @@ export default class KernelApi {
   }
   /**
    * 申请加入组织/个人
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.JoinTeamModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async applyJoinTeam(
     params: model.JoinTeamModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'ApplyJoinTeam',
@@ -663,7 +694,7 @@ export default class KernelApi {
   }
   /**
    * 加入组织/个人申请审批
-   * @param {any} params 请求参数
+   * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<schema.XRelation>} 请求结果
    */
   public async joinTeamApproval(
@@ -677,24 +708,26 @@ export default class KernelApi {
   }
   /**
    * 拉组织/个人加入组织/个人的团队
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.TeamPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async pullAnyToTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
-      action: 'pullAnyToTeam',
+      action: 'PullAnyToTeam',
       params: params,
     });
   }
   /**
    * 取消申请加入组织/个人
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async cancelJoinTeam(params: model.IdReqModel): Promise<model.ResultType<any>> {
+  public async cancelJoinTeam(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'CancelJoinTeam',
@@ -703,12 +736,12 @@ export default class KernelApi {
   }
   /**
    * 从组织/个人移除组织/个人的团队
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.TeamPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async removeAnyOfTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RemoveAnyOfTeam',
@@ -717,12 +750,12 @@ export default class KernelApi {
   }
   /**
    * 递归从组织及子组织/个人移除组织/个人的团队
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.TeamPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async recursiveRemoveAnyOfTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RecursiveRemoveAnyOfTeam',
@@ -731,12 +764,12 @@ export default class KernelApi {
   }
   /**
    * 从组织/个人及归属组织移除组织/个人的团队
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.TeamPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async removeAnyOfTeamAndBelong(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RemoveAnyOfTeamAndBelong',
@@ -745,12 +778,12 @@ export default class KernelApi {
   }
   /**
    * 退出组织
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ExitTeamModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async exitAnyOfTeam(
     params: model.ExitTeamModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'ExitAnyOfTeam',
@@ -759,12 +792,12 @@ export default class KernelApi {
   }
   /**
    * 递归退出组织
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ExitTeamModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async recursiveExitAnyOfTeam(
     params: model.ExitTeamModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'RecursiveExitAnyOfTeam',
@@ -773,12 +806,12 @@ export default class KernelApi {
   }
   /**
    * 退出组织及退出组织归属的组织
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ExitTeamModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async exitAnyOfTeamAndBelong(
     params: model.ExitTeamModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'ExitAnyOfTeamAndBelong',
@@ -787,7 +820,7 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询组织/个人信息
-   * @param {any} params 请求参数
+   * @param {model.IdArrayReq} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryTargetById(
@@ -801,7 +834,7 @@ export default class KernelApi {
   }
   /**
    * 查询加入关系
-   * @param {any} params 请求参数
+   * @param {model.RelationReq} params 请求参数
    * @returns {model.ResultType<schema.XRelationArray>} 请求结果
    */
   public async queryRelationById(
@@ -815,7 +848,7 @@ export default class KernelApi {
   }
   /**
    * 根据名称和类型查询组织/个人
-   * @param {any} params 请求参数
+   * @param {model.NameTypeModel} params 请求参数
    * @returns {model.ResultType<schema.XTarget>} 请求结果
    */
   public async queryTargetByName(
@@ -829,7 +862,7 @@ export default class KernelApi {
   }
   /**
    * 模糊查找组织/个人根据名称和类型
-   * @param {any} params 请求参数
+   * @param {model.NameTypeModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async searchTargetByName(
@@ -843,7 +876,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织制定的标准
-   * @param {any} params 请求参数
+   * @param {model.IDBelongTargetReq} params 请求参数
    * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
    */
   public async queryTeamRuleAttrs(
@@ -857,7 +890,7 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询子组织/个人
-   * @param {any} params 请求参数
+   * @param {model.IDReqSubModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async querySubTargetById(
@@ -871,7 +904,7 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询归属的组织/个人
-   * @param {any} params 请求参数
+   * @param {model.IDReqSubModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryBelongTargetById(
@@ -885,7 +918,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织/个人加入的组织/个人
-   * @param {any} params 请求参数
+   * @param {model.IDReqJoinedModel} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryJoinedTargetById(
@@ -899,7 +932,7 @@ export default class KernelApi {
   }
   /**
    * 查询加入组织/个人申请
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XRelationArray>} 请求结果
    */
   public async queryJoinTeamApply(
@@ -913,7 +946,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织/个人加入审批
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XRelationArray>} 请求结果
    */
   public async queryTeamJoinApproval(
@@ -927,7 +960,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织职权树
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XAuthority>} 请求结果
    */
   public async queryAuthorityTree(
@@ -941,7 +974,7 @@ export default class KernelApi {
   }
   /**
    * 查询职权子职权
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XAuthorityArray>} 请求结果
    */
   public async querySubAuthoritys(
@@ -955,7 +988,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织职权
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XAuthorityArray>} 请求结果
    */
   public async queryTargetAuthoritys(
@@ -969,7 +1002,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织身份
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryTargetIdentitys(
@@ -983,7 +1016,7 @@ export default class KernelApi {
   }
   /**
    * 查询职权身份
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryAuthorityIdentitys(
@@ -997,7 +1030,7 @@ export default class KernelApi {
   }
   /**
    * 查询赋予身份的组织/个人
-   * @param {any} params 请求参数
+   * @param {model.IDBelongTargetReq} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryIdentityTargets(
@@ -1011,7 +1044,7 @@ export default class KernelApi {
   }
   /**
    * 查询在当前空间拥有角色的组织
-   * @param {any} params 请求参数
+   * @param {model.SpaceAuthReq} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
    */
   public async queryTargetsByAuthority(
@@ -1025,7 +1058,7 @@ export default class KernelApi {
   }
   /**
    * 查询在当前空间拥有的身份
-   * @param {any} params 请求参数
+   * @param {model.IdReq} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async querySpaceIdentitys(
@@ -1039,7 +1072,7 @@ export default class KernelApi {
   }
   /**
    * 创建即使消息
-   * @param {any} params 请求参数
+   * @param {model.ImMsgModel} params 请求参数
    * @returns {model.ResultType<schema.XImMsg>} 请求结果
    */
   public async createImMsg(
@@ -1053,7 +1086,7 @@ export default class KernelApi {
   }
   /**
    * 消息撤回
-   * @param {any} params 请求参数
+   * @param {schema.XImMsg} params 请求参数
    * @returns {model.ResultType<schema.XImMsg>} 请求结果
    */
   public async recallImMsg(
@@ -1067,8 +1100,8 @@ export default class KernelApi {
   }
   /**
    * 查询聊天会话
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<schema.ChatResponse>} 请求结果
+   * @param {model.ChatsReqModel} params 请求参数
+   * @returns {model.ResultType<model.ChatResponse>} 请求结果
    */
   public async queryImChats(
     params: model.ChatsReqModel,
@@ -1081,7 +1114,7 @@ export default class KernelApi {
   }
   /**
    * 查询群历史消息
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XImMsgArray>} 请求结果
    */
   public async queryCohortImMsgs(
@@ -1095,7 +1128,7 @@ export default class KernelApi {
   }
   /**
    * 查询好友聊天消息
-   * @param {any} params 请求参数
+   * @param {model.IdSpaceReq} params 请求参数
    * @returns {model.ResultType<schema.XImMsgArray>} 请求结果
    */
   public async queryFriendImMsgs(
@@ -1109,8 +1142,8 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询名称
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<schema.NameModel>} 请求结果
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<model.NameModel>} 请求结果
    */
   public async queryNameBySnowId(
     params: model.IdReq,
@@ -1123,11 +1156,11 @@ export default class KernelApi {
   }
   /**
    * 创建市场
-   * @param {any} params 请求参数
+   * @param {model.MarketModel} params 请求参数
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
   public async createMarket(
-    params: Omit<model.MarketModel, `id`>,
+    params: model.MarketModel,
   ): Promise<model.ResultType<schema.XMarket>> {
     return await this.request({
       module: 'market',
@@ -1137,7 +1170,7 @@ export default class KernelApi {
   }
   /**
    * 产品上架:产品所有者
-   * @param {any} params 请求参数
+   * @param {model.MerchandiseModel} params 请求参数
    * @returns {model.ResultType<schema.XMerchandise>} 请求结果
    */
   public async createMerchandise(
@@ -1151,7 +1184,7 @@ export default class KernelApi {
   }
   /**
    * 创建产品
-   * @param {any} params 请求参数
+   * @param {model.ProductModel} params 请求参数
    * @returns {model.ResultType<schema.XProduct>} 请求结果
    */
   public async createProduct(
@@ -1165,7 +1198,7 @@ export default class KernelApi {
   }
   /**
    * 创建产品资源
-   * @param {any} params 请求参数
+   * @param {model.ResourceModel} params 请求参数
    * @returns {model.ResultType<schema.XResource>} 请求结果
    */
   public async createProductResource(
@@ -1179,7 +1212,7 @@ export default class KernelApi {
   }
   /**
    * 商品加入暂存区
-   * @param {any} params 请求参数
+   * @param {model.StagingModel} params 请求参数
    * @returns {model.ResultType<schema.XStaging>} 请求结果
    */
   public async createStaging(
@@ -1193,7 +1226,7 @@ export default class KernelApi {
   }
   /**
    * 创建订单:商品直接购买
-   * @param {any} params 请求参数
+   * @param {model.OrderModel} params 请求参数
    * @returns {model.ResultType<schema.XOrder>} 请求结果
    */
   public async createOrder(
@@ -1207,7 +1240,7 @@ export default class KernelApi {
   }
   /**
    * 创建订单:暂存区下单
-   * @param {any} params 请求参数
+   * @param {model.OrderModelByStags} params 请求参数
    * @returns {model.ResultType<schema.XOrder>} 请求结果
    */
   public async createOrderByStags(
@@ -1221,7 +1254,7 @@ export default class KernelApi {
   }
   /**
    * 创建订单支付
-   * @param {any} params 请求参数
+   * @param {model.OrderPayModel} params 请求参数
    * @returns {model.ResultType<schema.XOrderPay>} 请求结果
    */
   public async createOrderPay(
@@ -1235,12 +1268,12 @@ export default class KernelApi {
   }
   /**
    * 创建对象拓展操作
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.SourceExtendModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async createSourceExtend(
     params: model.SourceExtendModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'CreateSourceExtend',
@@ -1249,12 +1282,12 @@ export default class KernelApi {
   }
   /**
    * 删除市场
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteMarket(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteMarket',
@@ -1263,12 +1296,12 @@ export default class KernelApi {
   }
   /**
    * 下架商品:商品所有者
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteMerchandise(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteMerchandise',
@@ -1277,12 +1310,12 @@ export default class KernelApi {
   }
   /**
    * 下架商品:市场管理员
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteMerchandiseByManager(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteMerchandiseByManager',
@@ -1291,12 +1324,12 @@ export default class KernelApi {
   }
   /**
    * 删除产品
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteProduct(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteProduct',
@@ -1305,12 +1338,12 @@ export default class KernelApi {
   }
   /**
    * 删除产品资源(产品所属者可以操作)
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteProductResource(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteProductResource',
@@ -1319,12 +1352,12 @@ export default class KernelApi {
   }
   /**
    * 移除暂存区商品
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteStaging(
     params: model.IDWithBelongReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteStaging',
@@ -1333,12 +1366,12 @@ export default class KernelApi {
   }
   /**
    * 创建对象拓展操作
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.SourceExtendModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteSourceExtend(
     params: model.SourceExtendModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeleteSourceExtend',
@@ -1347,7 +1380,7 @@ export default class KernelApi {
   }
   /**
    * 根据Code查询市场
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketArray>} 请求结果
    */
   public async queryMarketByCode(
@@ -1361,7 +1394,7 @@ export default class KernelApi {
   }
   /**
    * 查询拥有的市场
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketArray>} 请求结果
    */
   public async queryOwnMarket(
@@ -1375,7 +1408,6 @@ export default class KernelApi {
   }
   /**
    * 查询软件共享仓库的市场
-   * @param {any} params 请求参数
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
   public async getPublicMarket(): Promise<model.ResultType<schema.XMarket>> {
@@ -1387,7 +1419,7 @@ export default class KernelApi {
   }
   /**
    * 查询市场成员集合
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketRelationArray>} 请求结果
    */
   public async queryMarketMember(
@@ -1401,7 +1433,7 @@ export default class KernelApi {
   }
   /**
    * 查询市场对应的暂存区
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XStagingArray>} 请求结果
    */
   public async queryStaging(
@@ -1415,7 +1447,7 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询订单信息
-   * @param {any} params 请求参数
+   * @param {model.IdReq} params 请求参数
    * @returns {model.ResultType<schema.XOrder>} 请求结果
    */
   public async getOrderInfo(
@@ -1429,7 +1461,7 @@ export default class KernelApi {
   }
   /**
    * 根据ID查询订单详情项
-   * @param {any} params 请求参数
+   * @param {model.IDWithBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XOrderDetail>} 请求结果
    */
   public async getOrderDetailById(
@@ -1443,7 +1475,7 @@ export default class KernelApi {
   }
   /**
    * 卖方:查询出售商品的订单列表
-   * @param {any} params 请求参数
+   * @param {model.IDStatusPageReq} params 请求参数
    * @returns {model.ResultType<schema.XOrderDetailArray>} 请求结果
    */
   public async querySellOrderList(
@@ -1457,7 +1489,7 @@ export default class KernelApi {
   }
   /**
    * 卖方:查询指定商品的订单列表
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XOrderDetailArray>} 请求结果
    */
   public async querySellOrderListByMerchandise(
@@ -1471,7 +1503,7 @@ export default class KernelApi {
   }
   /**
    * 买方:查询购买订单列表
-   * @param {any} params 请求参数
+   * @param {model.IDStatusPageReq} params 请求参数
    * @returns {model.ResultType<schema.XOrderArray>} 请求结果
    */
   public async queryBuyOrderList(
@@ -1485,7 +1517,7 @@ export default class KernelApi {
   }
   /**
    * 查询订单支付信息
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XOrderPayArray>} 请求结果
    */
   public async queryPayList(
@@ -1499,7 +1531,7 @@ export default class KernelApi {
   }
   /**
    * 申请者:查询加入市场申请
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketRelationArray>} 请求结果
    */
   public async queryJoinMarketApply(
@@ -1513,7 +1545,7 @@ export default class KernelApi {
   }
   /**
    * 管理者:查询加入市场申请
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketRelationArray>} 请求结果
    */
   public async queryJoinMarketApplyByManager(
@@ -1527,7 +1559,7 @@ export default class KernelApi {
   }
   /**
    * 申请者:查询商品上架申请
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMerchandiseArray>} 请求结果
    */
   public async queryMerchandiseApply(
@@ -1541,7 +1573,7 @@ export default class KernelApi {
   }
   /**
    * 市场:查询商品上架申请
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMerchandiseArray>} 请求结果
    */
   public async queryMerchandiesApplyByManager(
@@ -1555,7 +1587,7 @@ export default class KernelApi {
   }
   /**
    * 查询市场中所有商品
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMerchandiseArray>} 请求结果
    */
   public async searchMerchandise(
@@ -1569,7 +1601,7 @@ export default class KernelApi {
   }
   /**
    * 查询产品详细信息
-   * @param {any} params 请求参数
+   * @param {model.IDWithBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XProduct>} 请求结果
    */
   public async getProductInfo(
@@ -1583,7 +1615,7 @@ export default class KernelApi {
   }
   /**
    * 查询产品资源列表
-   * @param {any} params 请求参数
+   * @param {model.IDWithBelongPageReq} params 请求参数
    * @returns {model.ResultType<schema.XResourceArray>} 请求结果
    */
   public async queryProductResource(
@@ -1597,7 +1629,7 @@ export default class KernelApi {
   }
   /**
    * 查询组织/个人产品
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XProductArray>} 请求结果
    */
   public async querySelfProduct(
@@ -1611,7 +1643,7 @@ export default class KernelApi {
   }
   /**
    * 根据产品查询商品上架信息
-   * @param {any} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMerchandiseArray>} 请求结果
    */
   public async queryMerchandiseListByProduct(
@@ -1625,8 +1657,8 @@ export default class KernelApi {
   }
   /**
    * 查询指定产品/资源的拓展信息
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<schema.IdNameArray>} 请求结果
+   * @param {model.SearchExtendReq} params 请求参数
+   * @returns {model.ResultType<model.IdNameArray>} 请求结果
    */
   public async queryExtendBySource(
     params: model.SearchExtendReq,
@@ -1639,7 +1671,7 @@ export default class KernelApi {
   }
   /**
    * 查询可用产品
-   * @param {any} params 请求参数
+   * @param {model.UsefulProductReq} params 请求参数
    * @returns {model.ResultType<schema.XProductArray>} 请求结果
    */
   public async queryUsefulProduct(
@@ -1653,7 +1685,7 @@ export default class KernelApi {
   }
   /**
    * 查询可用资源列表
-   * @param {any} params 请求参数
+   * @param {model.UsefulResourceReq} params 请求参数
    * @returns {model.ResultType<schema.XResourceArray>} 请求结果
    */
   public async queryUsefulResource(
@@ -1667,7 +1699,7 @@ export default class KernelApi {
   }
   /**
    * 更新市场
-   * @param {any} params 请求参数
+   * @param {model.MarketModel} params 请求参数
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
   public async updateMarket(
@@ -1681,7 +1713,7 @@ export default class KernelApi {
   }
   /**
    * 更新商品信息
-   * @param {any} params 请求参数
+   * @param {model.MerchandiseModel} params 请求参数
    * @returns {model.ResultType<schema.XMerchandise>} 请求结果
    */
   public async updateMerchandise(
@@ -1695,7 +1727,7 @@ export default class KernelApi {
   }
   /**
    * 更新产品
-   * @param {any} params 请求参数
+   * @param {model.ProductModel} params 请求参数
    * @returns {model.ResultType<schema.XProduct>} 请求结果
    */
   public async updateProduct(
@@ -1709,7 +1741,7 @@ export default class KernelApi {
   }
   /**
    * 更新产品资源
-   * @param {any} params 请求参数
+   * @param {model.ResourceModel} params 请求参数
    * @returns {model.ResultType<schema.XResource>} 请求结果
    */
   public async updateProductResource(
@@ -1723,7 +1755,7 @@ export default class KernelApi {
   }
   /**
    * 更新订单
-   * @param {any} params 请求参数
+   * @param {model.OrderModel} params 请求参数
    * @returns {model.ResultType<schema.XOrder>} 请求结果
    */
   public async updateOrder(
@@ -1737,7 +1769,7 @@ export default class KernelApi {
   }
   /**
    * 更新订单项
-   * @param {any} params 请求参数
+   * @param {model.OrderDetailModel} params 请求参数
    * @returns {model.ResultType<schema.XOrderDetail>} 请求结果
    */
   public async updateOrderDetail(
@@ -1751,10 +1783,12 @@ export default class KernelApi {
   }
   /**
    * 退出市场
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IDWithBelongReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async quitMarket(params: model.IDWithBelongReq): Promise<model.ResultType<any>> {
+  public async quitMarket(
+    params: model.IDWithBelongReq,
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'QuitMarket',
@@ -1763,7 +1797,7 @@ export default class KernelApi {
   }
   /**
    * 申请加入市场
-   * @param {any} params 请求参数
+   * @param {model.IDWithBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XMarketRelation>} 请求结果
    */
   public async applyJoinMarket(
@@ -1777,12 +1811,12 @@ export default class KernelApi {
   }
   /**
    * 拉组织/个人加入市场
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.MarketPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async pullAnyToMarket(
     params: model.MarketPullModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'PullAnyToMarket',
@@ -1791,12 +1825,12 @@ export default class KernelApi {
   }
   /**
    * 取消加入市场
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async cancelJoinMarket(
     params: model.IdReqModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'CancelJoinMarket',
@@ -1805,12 +1839,12 @@ export default class KernelApi {
   }
   /**
    * 取消订单详情
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async cancelOrderDetail(
     params: model.ApprovalModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'CancelOrderDetail',
@@ -1819,12 +1853,12 @@ export default class KernelApi {
   }
   /**
    * 移除市场成员
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async removeMarketMember(
     params: model.IdReqModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'RemoveMarketMember',
@@ -1833,12 +1867,12 @@ export default class KernelApi {
   }
   /**
    * 审核加入市场申请
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async approvalJoinApply(
     params: model.ApprovalModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'ApprovalJoinApply',
@@ -1847,12 +1881,12 @@ export default class KernelApi {
   }
   /**
    * 交付订单详情中的商品
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deliverMerchandise(
     params: model.ApprovalModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'DeliverMerchandise',
@@ -1861,12 +1895,12 @@ export default class KernelApi {
   }
   /**
    * 退还商品
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async rejectMerchandise(
     params: model.ApprovalModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'RejectMerchandise',
@@ -1875,12 +1909,12 @@ export default class KernelApi {
   }
   /**
    * 商品上架审核
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async approvalMerchandise(
     params: model.ApprovalModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
       action: 'ApprovalMerchandise',
@@ -1889,7 +1923,7 @@ export default class KernelApi {
   }
   /**
    * 产品上架:市场拥有者
-   * @param {any} params 请求参数
+   * @param {model.MerchandiseModel} params 请求参数
    * @returns {model.ResultType<schema.XMerchandise>} 请求结果
    */
   public async pullProductToMarket(
@@ -1903,7 +1937,7 @@ export default class KernelApi {
   }
   /**
    * 创建流程定义
-   * @param {any} params 请求参数
+   * @param {schema.XFlowDefine} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
    */
   public async createDefine(
@@ -1917,7 +1951,7 @@ export default class KernelApi {
   }
   /**
    * 创建流程实例(启动流程)
-   * @param {any} params 请求参数
+   * @param {model.FlowInstanceModel} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstance>} 请求结果
    */
   public async createInstance(
@@ -1931,7 +1965,7 @@ export default class KernelApi {
   }
   /**
    * 创建流程绑定
-   * @param {any} params 请求参数
+   * @param {model.FlowRelationModel} params 请求参数
    * @returns {model.ResultType<schema.XFlowRelation>} 请求结果
    */
   public async createFlowRelation(
@@ -1945,10 +1979,10 @@ export default class KernelApi {
   }
   /**
    * 删除流程定义
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDefine(params: model.IdReq): Promise<model.ResultType<any>> {
+  public async deleteDefine(params: model.IdReq): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'DeleteDefine',
@@ -1957,10 +1991,10 @@ export default class KernelApi {
   }
   /**
    * 删除流程实例(发起人撤回)
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteInstance(params: model.IdReq): Promise<model.ResultType<any>> {
+  public async deleteInstance(params: model.IdReq): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'DeleteInstance',
@@ -1969,12 +2003,12 @@ export default class KernelApi {
   }
   /**
    * 删除流程绑定
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.FlowRelationModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteFlowRelation(
     params: model.FlowRelationModel,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'DeleteFlowRelation',
@@ -1983,7 +2017,7 @@ export default class KernelApi {
   }
   /**
    * 查询流程定义
-   * @param {any} params 请求参数
+   * @param {model.IdReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
    */
   public async queryDefine(
@@ -1997,7 +2031,7 @@ export default class KernelApi {
   }
   /**
    * 查询发起的流程实例
-   * @param {any} params 请求参数
+   * @param {model.FlowReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstanceArray>} 请求结果
    */
   public async queryInstance(
@@ -2011,7 +2045,6 @@ export default class KernelApi {
   }
   /**
    * 查询待审批任务
-   * @param {any} params 请求参数
    * @returns {model.ResultType<schema.XFlowTaskArray>} 请求结果
    */
   public async queryApproveTask(): Promise<model.ResultType<schema.XFlowTaskArray>> {
@@ -2023,7 +2056,6 @@ export default class KernelApi {
   }
   /**
    * 查询待审阅抄送
-   * @param {any} params 请求参数
    * @returns {model.ResultType<schema.XFlowTaskHistoryArray>} 请求结果
    */
   public async queryNoticeTask(): Promise<
@@ -2037,7 +2069,7 @@ export default class KernelApi {
   }
   /**
    * 查询审批记录
-   * @param {any} params 请求参数
+   * @param {model.IdSpaceReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowTaskHistoryArray>} 请求结果
    */
   public async queryRecord(
@@ -2051,12 +2083,12 @@ export default class KernelApi {
   }
   /**
    * 流程节点审批
-   * @param {any} params 请求参数
-   * @returns {model.ResultType<any>} 请求结果
+   * @param {model.ApprovalTaskReq} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
   public async approvalTask(
     params: model.ApprovalTaskReq,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'ApprovalTask',
@@ -2065,7 +2097,7 @@ export default class KernelApi {
   }
   /**
    * 重置流程定义
-   * @param {any} params 请求参数
+   * @param {schema.XFlowDefine} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
    */
   public async resetDefine(

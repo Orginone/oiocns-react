@@ -44,7 +44,7 @@ const Groupinputbox = (props: Iprops) => {
       // ChatStore.addSessionList();
       // ChatStore._cacheSession();
     }
-    document.getElementById('insterHtml').innerHTML = '';
+    document.getElementById('insterHtml')!.innerHTML = '';
   };
 
   /**
@@ -157,15 +157,13 @@ const Groupinputbox = (props: Iprops) => {
                       key={index}
                       onClick={() => {
                         handleImgChoosed(index);
-                      }}
-                    >
+                      }}>
                       <img className={inputboxStyle.emoji} src={`${index}`} alt="" />
                     </div>
                   );
                 })}
               </div>
-            }
-          >
+            }>
             <SmileOutlined className={inputboxStyle.icons_oneself} />
           </Popover>
         </div>
@@ -179,14 +177,12 @@ const Groupinputbox = (props: Iprops) => {
           spellCheck="false"
           //   ref="inputRef"
           placeholder="请输入内容"
-          onKeyDown={keyDown}
-        ></div>
+          onKeyDown={keyDown}></div>
         <div className={inputboxStyle.send_box}>
           <Button
             type="primary"
             style={{ backgroundColor: '#21ba45', color: '#fff', border: 'none' }}
-            onClick={() => submit()}
-          >
+            onClick={() => submit()}>
             发送
           </Button>
         </div>

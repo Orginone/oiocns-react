@@ -89,8 +89,7 @@ const Groupheader = (props: Iprops) => {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        getContainer={false}
-      >
+        getContainer={false}>
         <div>方式一：共享二维码，邀请好友</div>
         <div className="QrDiv" key={chat.curChat?.id}>
           <QrCodeCustom qrText={chat.curChat?.name} />

@@ -12,7 +12,7 @@ import { IRouteConfig } from '@/routes/config';
 
 import StoreClassify from './Classify';
 import { MenuProps } from 'antd';
-import StoreClassServices from './_control/classify';
+import StoreSiderbar from '@/ts/controller/store/sidebar';
 
 const navItems: MenuProps[`items`] = [
   {
@@ -24,12 +24,33 @@ const navItems: MenuProps[`items`] = [
         key: 'app',
         icon: <AppstoreOutlined />,
         onClick: () => {
-          StoreClassServices.handleMenuClick('app');
+          StoreSiderbar.handleMenuClick('app');
         },
       }, // 菜单项务必填写 key
-      { label: '文档', key: 'doc', icon: <FileTextOutlined /> },
-      { label: '数据', key: 'data', icon: <FundOutlined /> },
-      { label: '资源', key: 'src', icon: <DatabaseOutlined /> },
+      {
+        label: '文档',
+        key: 'doc',
+        icon: <FileTextOutlined />,
+        onClick: () => {
+          StoreSiderbar.handleMenuClick('docx');
+        },
+      },
+      {
+        label: '数据',
+        key: 'data',
+        icon: <FundOutlined />,
+        onClick: () => {
+          StoreSiderbar.handleMenuClick('data');
+        },
+      },
+      {
+        label: '资源',
+        key: 'assets',
+        icon: <DatabaseOutlined />,
+        onClick: () => {
+          StoreSiderbar.handleMenuClick('assets');
+        },
+      },
     ].map((n) => ({ ...n, key: '/store/' + n.key })),
   },
 ];

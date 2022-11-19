@@ -4,8 +4,8 @@ import { Row, Button, Divider, Select, Col, Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
-import provider from '@/ts/core/provider';
-
+import Provider from '@/ts/core/provider';
+import { useAppwfConfig } from '@/module/flow/flow';
 /**
  * @description: 审批对象
  * @return {*}
@@ -14,8 +14,12 @@ import provider from '@/ts/core/provider';
 const { Option } = Select;
 
 const ApprovalNode = () => {
-  const personObj = provider.person.getJoinedCohorts();
+  const person = Provider.getPerson;
+  // const personObj = Provider.getPerson.getJoinedCohorts();
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
+  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
+  const [type, setType] = useState('job');
   const [value, setValue] = useState(1);
   const onOk = () => {
     setIsOpen(false);
@@ -27,10 +31,10 @@ const ApprovalNode = () => {
     setValue(e.target.value);
   };
   // 查询个人加入的群组
-  const getJoinedCohort = async () => {
-    const JoinedCohortList = await personObj;
-    console.log('444', JoinedCohortList);
-  };
+  // const getJoinedCohort = async () => {
+  //   const JoinedCohortList = await personObj;
+  //   console.log('444', JoinedCohortList);
+  // };
 
   // 选择审批对象
   const rovalnode = (
@@ -40,16 +44,34 @@ const ApprovalNode = () => {
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
-        <Button
-          type="primary"
-          shape="round"
-          size="small"
-          onClick={() => {
-            setIsOpen(true);
-            getJoinedCohort();
-          }}>
-          选择身份
-        </Button>
+        {person.isUserSpace() && (
+          <Button
+            type="primary"
+            shape="round"
+            size="small"
+            onClick={() => {
+              selectedNode.props.assignedType = 'DENTITY';
+              setSelectedNode(selectedNode);
+              setIsOpen(true);
+              // getJoinedCohort();
+            }}>
+            选择身份
+          </Button>
+        )}
+        {!person.isUserSpace() && (
+          <Button
+            type="primary"
+            shape="round"
+            size="small"
+            onClick={() => {
+              selectedNode.props.assignedType = 'JOB';
+              setSelectedNode(selectedNode);
+              setIsOpen(true);
+              // getJoinedCohort();
+            }}>
+            选择岗位
+          </Button>
+        )}
       </Row>
       <Divider />
       <div className={cls['roval-node-select']}>

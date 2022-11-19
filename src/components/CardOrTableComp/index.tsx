@@ -72,7 +72,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   const menu = (item: any) => {
     return <Menu items={operation && operation(item)} />;
   };
-
   /**
    * @desc: 渲染表格主体
    * @return {表格主体头部数组}

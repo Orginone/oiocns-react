@@ -10,8 +10,8 @@ interface InfoProps {
 
 // 用户
 interface UserType {
-  accessToken: string;
-  account: string;
+  accessToken?: string;
+  account?: string;
   authority: string;
   expiresIn: number;
   license: string;
@@ -54,6 +54,6 @@ export type StateProps = {
   userObj: Person | null;
 
   login: (account: string, password: string) => Promise<boolean>;
-  setUser: (val: UserType) => void;
+  setUser: (val: Partial<UserType>) => void;
   getUserInfo: () => void;
 };
