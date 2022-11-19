@@ -82,6 +82,51 @@ export default class BaseTarget {
     }
   }
 
+  /**
+   * 创建职权
+   * @param data
+   * @returns
+   */
+  public async createAuthorityBase(data: any) {
+    return await kernel.createAuthority({
+      id: this.target.id,
+      name: data.name,
+      code: data.code,
+      public: data.dPublic,
+      parentId: data.parentId,
+      belongId: this.target.id,
+      remark: data.remark,
+    });
+  }
+  /**
+   * 创建身份
+   * @param data
+   * @returns
+   */
+  public async createIdentityBase(data: any) {
+    return await kernel.createIdentity({
+      id: this.target.id,
+      name: data.name,
+      code: data.code,
+      authId: data.authId,
+      belongId: this.target.id,
+      remark: data.remark,
+    });
+  }
+  /**
+   * 删除职权
+   * @param id
+   * @param typeName
+   * @returns
+   */
+  protected async deleteAuthorityBase(belongId: string, typeName: TargetType) {
+    return await kernel.deleteAuthority({
+      id: this.target.id,
+      belongId: belongId,
+      typeName: typeName,
+    });
+  }
+
   protected async cancelJoinTeam(id: string) {
     return await kernel.cancelJoinTeam({
       id,
@@ -109,7 +154,11 @@ export default class BaseTarget {
       ...data,
     });
   }
-
+  /**
+   * 查询组织或个人
+   * @param data
+   * @returns
+   */
   public async getTargetByName(
     data: model.NameTypeModel,
   ): Promise<model.ResultType<XTarget>> {
