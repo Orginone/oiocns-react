@@ -110,7 +110,6 @@ const GroupSideBar = (props: Iprops) => {
    * @return {*}
    */
   const openChangeds = async (child: ImMsgChildType) => {
-    // await ChatStore.setCurrent(child);
     await chat.setCurrent(child, getHistoryMesages);
   };
   useEffect(() => {
@@ -233,8 +232,8 @@ const GroupSideBar = (props: Iprops) => {
       <Tabs defaultActiveKey="2">
         <Tabs.TabPane tab="会话" key="1">
           <div className={sideStyle.group_side_bar_wrap}>
-            {ChatStore.sessionChats &&
-              ChatStore.sessionChats?.map((child: any) => {
+            {/* {chat.sessionChats &&
+              chat.sessionChats?.map((child: any) => {
                 return (
                   <div className={sideStyle.con_body_session} key={child.id}>
                     <HeadImg name={child.name} label={child.label} />
@@ -266,7 +265,7 @@ const GroupSideBar = (props: Iprops) => {
                     </div>
                   </div>
                 );
-              })}
+              })} */}
           </div>
         </Tabs.TabPane>
         <Tabs.TabPane tab="通讯录" key="2">
@@ -275,7 +274,6 @@ const GroupSideBar = (props: Iprops) => {
             onContextMenu={(e) => {
               e.preventDefault();
             }}>
-            {/* {ChatStore.chats.map((item: any) => { */}
             {chat.chats.map((item: any) => {
               return (
                 <div key={item.id}>
@@ -299,8 +297,8 @@ const GroupSideBar = (props: Iprops) => {
                           return (
                             <div
                               className={`${sideStyle.con_body} ${
-                                ChatStore.curChat?.spaceId === item.id &&
-                                ChatStore.curChat?.id === child.id
+                                chat.curChat?.spaceId === item.id &&
+                                chat.curChat?.id === child.id
                                   ? sideStyle.active
                                   : ''
                               }`}

@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import HeadImg from '@/components/headImg/headImg';
 import { chat } from '@/module/chat/orgchat';
-import useChatStore from '@/store/chat';
 import contentStyle from './index.module.less';
 
 /**
@@ -16,24 +15,27 @@ import contentStyle from './index.module.less';
 interface Iprops {
   handleReWrites: Function;
   historyMesagesList: any;
+  deleteMsgCallback: (val: any) => void;
 }
 
 const GroupContent = (props: Iprops) => {
-  const { handleReWrites, historyMesagesList } = props;
-  const ChatStore: any = useChatStore();
+  const { handleReWrites, historyMesagesList, deleteMsgCallback } = props;
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
   const isShowTime = (index: number) => {
     if (index == 0) return true;
     // return (
-    //   moment(ChatStore.curMsgs[index].createTime).diff(
-    //     ChatStore.curMsgs[index - 1].createTime,
+    //   moment(chat.curMsgs[index].createTime).diff(
+    //     chat.curMsgs[index - 1].createTime,
     //     'minute',
     //   ) > 3
     // );
   };
 
-  // 滚动到底部
+  /**
+   * @description: 滚动到底部
+   * @return {*}
+   */
   const scrollEvent = () => {
     if (messageNodeRef.current) {
       messageNodeRef.current.scrollIntoView({
@@ -47,7 +49,11 @@ const GroupContent = (props: Iprops) => {
     scrollEvent();
   }, [chat.curMsgs, chat.setCurrent]);
 
-  // 聊天间隔时间
+  /**
+   * @description: 聊天间隔时间
+   * @param {moment} chatDate
+   * @return {*}
+   */
   const showChatTime = (chatDate: moment.MomentInput) => {
     const cdate = moment(chatDate);
     const days = moment().diff(cdate, 'day');
@@ -66,14 +72,23 @@ const GroupContent = (props: Iprops) => {
     return cdate.format('yy年 M月D日 H:mm');
   };
 
-  // 重新编辑
+  /**
+   * @description: 重新编辑
+   * @param {string} txt
+   * @return {*}
+   */
   const handleReWrite = (txt: string) => {
     handleReWrites(txt);
   };
-  // 删除消息
+
+  /**
+   * @description: 删除消息
+   * @param {any} item
+   * @return {*}
+   */
   const deleteMsg = (item: any) => {
     item.edit = false;
-    ChatStore.deleteMsg(item);
+    chat.deleteMsg(item, deleteMsgCallback);
   };
   const canDelete = (item: any) => {
     if (item.chatId) {
@@ -81,7 +96,12 @@ const GroupContent = (props: Iprops) => {
     }
     return item.spaceId === chat.userId;
   };
-  // 消息撤回
+
+  /**
+   * @description: 消息撤回
+   * @param {any} item
+   * @return {*}
+   */
   const recallMsg = (item: any) => {
     item.edit = false;
     if (item.chatId) {
@@ -89,7 +109,7 @@ const GroupContent = (props: Iprops) => {
       delete item.chatId;
       delete item.sessionId;
     }
-    ChatStore.recallMsgs(item);
+    chat.recallMsg(item);
     // ChatStore.recallMsgs(item).then((res: ResultType) => {
     //   if (res.data != 1) {
     //     message.warning('只能撤回2分钟内发送的消息');
@@ -99,7 +119,7 @@ const GroupContent = (props: Iprops) => {
 
   return (
     <div className={contentStyle.group_content_wrap}>
-      {historyMesagesList.map((item: any, index: any) => {
+      {historyMesagesList?.map((item: any, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
             {/* 聊天间隔时间3分钟则 显示时间 */}
@@ -174,10 +194,10 @@ const GroupContent = (props: Iprops) => {
                       }}>
                       <HeadImg name={chat.getName(item.fromId)} label={''} />
                       <div className={`${contentStyle.con_content}`}>
-                        {ChatStore?.curChat?.typeName !== '人员' ? (
+                        {chat?.curChat?.typeName !== '人员' ? (
                           <div
                             className={`${contentStyle.con_content} ${contentStyle.name}`}>
-                            {ChatStore.getName(item.fromId) || ''}
+                            {chat.getName(item.fromId) || ''}
                           </div>
                         ) : (
                           ''

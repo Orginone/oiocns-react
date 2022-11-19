@@ -37,7 +37,7 @@ export default class OrgChat extends Object {
   private openChats: ImMsgChildType[];
   public curChat: ImMsgChildType; // 双向绑定数据
   private messageCallback: (data: any) => void;
-  private connection: signalR.HubConnection;
+  public connection: signalR.HubConnection;
   private nameMap: Record<string, string>; // 双向绑定数据
   private static orgChat: OrgChat = null;
   /**
@@ -68,6 +68,7 @@ export default class OrgChat extends Object {
       this.reconnect('disconnected from orgchat, await 5s reconnect.');
     });
     this.connection.on('RecvMsg', (data) => {
+      console.log('执行了接收消息');
       this._recvMsg(data);
     });
     this.connection.on('ChatRefresh', async () => {
@@ -216,7 +217,7 @@ export default class OrgChat extends Object {
    * 删除消息
    * @param msg 要删除的消息
    */
-  public deleteMsg(msg: any) {
+  public deleteMsg(msg: any, callback: Function) {
     if (!msg.chatId) {
       msg.chatId = msg.id;
     }
@@ -233,13 +234,14 @@ export default class OrgChat extends Object {
           this.curMsgs = this.curMsgs.filter((item: any) => {
             return item.chatId != msg.chatId;
           });
+          callback && callback(this.curMsgs);
         }
       });
   }
   /**
    * 清空会话历史消息
    */
-  public async clearMsg() {
+  public async clearMsg(callback: Function) {
     if (this.curChat) {
       this.anyStore
         .remove(
@@ -253,6 +255,7 @@ export default class OrgChat extends Object {
           if (res.data > 0 && this.curMsgs.length > 0) {
             this.curMsgs = [];
           }
+          callback && callback(this.curMsgs);
         });
     }
   }
@@ -260,7 +263,7 @@ export default class OrgChat extends Object {
    * 设置当前会话
    * @param {ImMsgChildType} chat 当前会话
    */
-  public async setCurrent(chat: ImMsgChildType, callback: Function) {
+  public async setCurrent(chat: ImMsgChildType, callback?: Function) {
     if (this.authed) {
       if (this.curChat) {
         this.openChats = this.openChats.filter((item) => {
