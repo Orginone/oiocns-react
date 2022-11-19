@@ -26,10 +26,12 @@ interface itemResult {
   version: string;
 }
 
-const Groupdetail: React.FC = () => {
-  console.log('个人、群聊详情', chat);
+interface Iprops {
+  clearMsgCallback: (clearMsgs: any) => void;
+}
 
-  const ChatStore: any = useChatStore();
+const Groupdetail = (props: Iprops) => {
+  const { clearMsgCallback } = props;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
   const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
   const [state, setState] = useState<any>({
@@ -53,7 +55,7 @@ const Groupdetail: React.FC = () => {
         state.friendsData = item.chats.filter((c: any) => {
           if (c.typeName === '人员') {
             let exist = false;
-            ChatStore.qunPersons.forEach((p: any) => {
+            chat.qunPersons.forEach((p: any) => {
               if (c.id === p.id) {
                 exist = true;
               }
@@ -228,7 +230,7 @@ const Groupdetail: React.FC = () => {
             <Button
               type="primary"
               onClick={() => {
-                ChatStore.clearMsg();
+                chat.clearMsg(clearMsgCallback);
               }}>
               清空聊天记录
             </Button>
@@ -294,7 +296,7 @@ const Groupdetail: React.FC = () => {
       <Modal>
         <div className={detailStyle.invitateBox}>
           <>
-            {ChatStore.qunPersons?.map((item: any, index: any) => {
+            {chat.qunPersons?.map((item: any, index: any) => {
               return (
                 <div
                   key={item.id}
