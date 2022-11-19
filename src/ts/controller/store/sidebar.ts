@@ -85,7 +85,7 @@ class StoreClassify {
    * @return {*}
    */
   public getTreeData() {
-    debugger
+
     // 1.获取市场
     //获取文档
 

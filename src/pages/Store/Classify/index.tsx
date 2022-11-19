@@ -58,7 +58,6 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleAddShop = (item: any) => {
-    debugger;
     console.log('handleAddShop', item);
     setIsStoreOpen(true);
   };
@@ -68,7 +67,6 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
-    debugger;
     console.log('handleMenuClick55', data, key);
   };
   /*******
@@ -77,7 +75,6 @@ const StoreClassify: React.FC = () => {
    * @return {*}
    */
   const handleTitleClick = (item: any) => {
-    debugger;
     // 触发内容去变化
     StoreContent.changeMenu(item);
   };
