@@ -11,6 +11,7 @@ import { validIsSocialCreditCode } from '@/utils/tools';
 
 export default class Person extends BaseTarget {
   private _friends: schema.XTarget[];
+  //
   private _curCompany: Company | undefined;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
@@ -63,7 +64,7 @@ export default class Person extends BaseTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success && res.data!=undefined && res.data.result!=undefined) {
+    if (res.success && res.data != undefined && res.data.result != undefined) {
       this._joinedCohorts = [];
       for (var i = 0; i < res.data?.result.length; i++) {
         const cohort = new Cohort(res.data?.result[i]);
@@ -115,7 +116,7 @@ export default class Person extends BaseTarget {
       code,
       remark,
     );
-    if (res.success && res.data!=undefined) {
+    if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
       this._joinedCohorts.push(cohort);
       return cohort.pullPersons([this.target.id]);
@@ -219,7 +220,7 @@ export default class Person extends BaseTarget {
     });
     console.log('好友查询结果', res);
     if (res.success) {
-      if(res.data!=undefined &&res.data.result!=undefined){
+      if (res.data != undefined && res.data.result != undefined) {
         this._friends = res.data.result;
       }
     }
@@ -260,7 +261,7 @@ export default class Person extends BaseTarget {
     }
     if (tres.data == null) {
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
-      if (res.success && res.data!=undefined) {
+      if (res.success && res.data != undefined) {
         let company;
         switch (type) {
           case TargetType.University:
@@ -403,4 +404,74 @@ export default class Person extends BaseTarget {
     }
     return res;
   }
+  /**
+   * 查询加入好友申请
+   * @param id 群组id
+   * @returns
+   */
+  public async queryJoinFriendApply(id: string): Promise<model.ResultType<any>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryJoinTeamApply(params);
+    return res;
+  }
+
+  /**
+   * 查询职权身份
+   * @param id 群组id
+   * @returns
+   */
+  public async queryAuthorityIdentity(id: string): Promise<model.ResultType<any>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryAuthorityIdentitys(params);
+    return res;
+  }
+
+   /**
+   * 查询职权身份
+   * @param id 群组id
+   * @returns
+   */
+    public async selectAuthorityTree(id: string): Promise<model.ResultType<any>> {
+      const params = {
+        id: id,
+        page: {
+          offset: 0,
+          filter: '',
+          limit: common.Constants.MAX_UINT_16,
+        },
+      };
+      const res = await kernel.queryAuthorityTree(params);
+      return res;
+    }
+     /**
+   * 查询组织职权
+   * @param id 群组id
+   * @returns
+   */
+      public async queryTargetAuthority(id: string): Promise<model.ResultType<any>> {
+        const params = {
+          id: id,
+          page: {
+            offset: 0,
+            filter: '',
+            limit: common.Constants.MAX_UINT_16,
+          },
+        };
+        const res = await kernel.queryTargetAuthoritys(params);
+        return res;
+      }
 }
