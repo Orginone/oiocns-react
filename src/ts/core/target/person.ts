@@ -1,6 +1,6 @@
 import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
-import BaseTarget from './base';
+import MarketActionTarget from './mbase';
 import { model, schema, FaildResult, kernel, common } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
@@ -10,21 +10,18 @@ import AppStore from '../market/appstore';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { SpaceType } from '@/store/type';
 
-export default class Person extends BaseTarget {
+export default class Person extends MarketActionTarget {
   private _friends: schema.XTarget[];
   private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  private _joinedStores: AppStore[];
-  private _ownProducts: any[];
+
   constructor(target: schema.XTarget) {
     super(target);
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this._joinedStores = [];
     this.workSpace = { id: this.target.id, name: '个人空间' };
-    this._ownProducts = [];
     //初始化时填入信息
     this.getCohort();
     this.getFriends();
@@ -82,23 +79,6 @@ export default class Person extends BaseTarget {
   /** 支持的群组类型数组*/
   public get cohortTypes(): TargetType[] {
     return [TargetType.Cohort];
-  }
-
-  // 购买
-  buyApp() {
-    console.log('buyApp');
-  }
-  //加购物车
-  addCart() {
-    console.log('addCart');
-  }
-  //获取订单
-  getOrderList() {
-    console.log('getOrderList');
-  }
-  //取消订单
-  cancleOrder() {
-    console.log('cancleOrder');
   }
 
   /**
@@ -268,40 +248,6 @@ export default class Person extends BaseTarget {
       return FaildResult('该单位已存在!');
     }
   }
-
-  /**
-   * 查询我的产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-    // model.IDBelongReq
-    let paramData: any = {};
-    paramData.id = this.target.id;
-    paramData.page = {
-      offset: 0,
-      filter: this.target.id,
-      limit: common.Constants.MAX_UINT_8,
-    };
-    return await kernel.querySelfProduct(paramData);
-  }
-
-  // /**
-  //  * 查询我的产品/应用
-  //  * @param params
-  //  * @returns
-  //  */
-  // public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-  //   // model.IDBelongReq
-  //   let paramData: any = {};
-  //   paramData.id = this.target.id;
-  //   paramData.page = {
-  //     offset: 0,
-  //     filter: this.target.id,
-  //     limit: common.Constants.MAX_UINT_8,
-  //   };
-  //   return await kernel.querySelfProduct(paramData);
-  // }
 
   /**
    * @description: 查询我加入的群
@@ -474,24 +420,5 @@ export default class Person extends BaseTarget {
    */
   public isUserSpace(): boolean {
     return this.workSpace.id == this.target.id;
-  }
-
-  /**
-   * 创建应用
-   * @param  {model.ProductModel} 产品基础信息
-   */
-  public async createProduct(
-    data: Omit<model.ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
-  ): Promise<model.ResultType<schema.XProduct>> {
-    const belongId = this.target.id;
-    const thingId = '';
-    const typeName = 'webapp';
-    return await kernel.createProduct({
-      ...data,
-      belongId,
-      thingId,
-      typeName,
-      id: undefined,
-    });
   }
 }
