@@ -9,7 +9,7 @@ export default class Provider {
 
   public static get getPerson(): Person {
     if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem("_loginPerson") + ''));
+      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
     }
     return this.person;
   }

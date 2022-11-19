@@ -249,17 +249,14 @@ const GroupSideBar = (props: Iprops) => {
                       className={sideStyle.group_con_show}
                       onClick={() => {
                         openChangeds(child);
-                      }}
-                    >
+                      }}>
                       <div className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                         <div
-                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
-                        >
+                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
                           {child.name}
                         </div>
                         <div
-                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
-                        >
+                          className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
                           {handleFormatDate(child.msgTime)}
                         </div>
                       </div>
@@ -277,8 +274,7 @@ const GroupSideBar = (props: Iprops) => {
             className={sideStyle.group_side_bar_wrap}
             onContextMenu={(e) => {
               e.preventDefault();
-            }}
-          >
+            }}>
             {/* {ChatStore.chats.map((item: any) => { */}
             {chat.chats.map((item: any) => {
               return (
@@ -291,8 +287,7 @@ const GroupSideBar = (props: Iprops) => {
                       }`}
                       onClick={() => {
                         handleOpenSpace(item.id);
-                      }}
-                    >
+                      }}>
                       <span>
                         {item.name}({item?.chats?.length ?? 0})
                       </span>
@@ -310,13 +305,11 @@ const GroupSideBar = (props: Iprops) => {
                                   : ''
                               }`}
                               key={child.id}
-                              onContextMenu={(e: any) => handleContextClick(e, child)}
-                            >
+                              onContextMenu={(e: any) => handleContextClick(e, child)}>
                               <HeadImg name={child.name} label={child.label} />
                               {child.noRead > 0 ? (
                                 <div
-                                  className={`${sideStyle.group_con} ${sideStyle.dot}`}
-                                >
+                                  className={`${sideStyle.group_con} ${sideStyle.dot}`}>
                                   <span>{child.noRead}</span>
                                 </div>
                               ) : (
@@ -326,25 +319,20 @@ const GroupSideBar = (props: Iprops) => {
                                 className={sideStyle.group_con_show}
                                 onClick={() => {
                                   openChangeds(child);
-                                }}
-                              >
+                                }}>
                                 <div
-                                  className={`${sideStyle.group_con_show} ${sideStyle.name}`}
-                                >
+                                  className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                                   <div
-                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
-                                  >
+                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
                                     {child.name}
                                   </div>
                                   <div
-                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
-                                  >
+                                    className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
                                     {handleFormatDate(child.msgTime)}
                                   </div>
                                 </div>
                                 <div
-                                  className={`${sideStyle.group_con_show} ${sideStyle.msg}`}
-                                >
+                                  className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
                                   {child.showTxt}
                                 </div>
                               </div>
@@ -365,13 +353,11 @@ const GroupSideBar = (props: Iprops) => {
                               return (
                                 <div
                                   key={child.id + child.name}
-                                  className={`${sideStyle.con_body} ${sideStyle.open_item}`}
-                                >
+                                  className={`${sideStyle.con_body} ${sideStyle.open_item}`}>
                                   <HeadImg name={child.name} label={child.label} />
                                   {child.noRead > 0 ? (
                                     <div
-                                      className={`${sideStyle.group_con} ${sideStyle.dot}`}
-                                    >
+                                      className={`${sideStyle.group_con} ${sideStyle.dot}`}>
                                       <span>{child.noRead}</span>
                                     </div>
                                   ) : (
@@ -381,25 +367,20 @@ const GroupSideBar = (props: Iprops) => {
                                     className={`${sideStyle.group_con_show}`}
                                     onClick={() => {
                                       openChangeds(child);
-                                    }}
-                                  >
+                                    }}>
                                     <div
-                                      className={`${sideStyle.group_con_show} ${sideStyle.name}`}
-                                    >
+                                      className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                                       <div
-                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}
-                                      >
+                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
                                         {child.name}
                                       </div>
                                       <div
-                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}
-                                      >
+                                        className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
                                         {handleFormatDate(child.msgTime)}
                                       </div>
                                     </div>
                                     <div
-                                      className={`${sideStyle.group_con_show} ${sideStyle.msg}`}
-                                    >
+                                      className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
                                       {child.showTxt}
                                     </div>
                                   </div>
@@ -422,8 +403,7 @@ const GroupSideBar = (props: Iprops) => {
       {mousePosition.isShowContext ? (
         <div
           className={sideStyle.context_text_wrap}
-          style={{ left: `${mousePosition.left}px`, top: `${mousePosition.top}px` }}
-        >
+          style={{ left: `${mousePosition.left}px`, top: `${mousePosition.top}px` }}>
           {mousePosition.selectMenu?.map((item) => {
             return (
               <div
@@ -431,8 +411,7 @@ const GroupSideBar = (props: Iprops) => {
                 className={sideStyle.context_menu_item}
                 onClick={() => {
                   handleContextChange(item);
-                }}
-              >
+                }}>
                 {item.label}
               </div>
             );

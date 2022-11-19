@@ -24,9 +24,9 @@ export default class BaseTarget {
 
   public async showMessage(response: model.ResultType<any>) {
     if (response.success) {
-      message.success('操作成功！')
+      message.success('操作成功！');
     } else {
-      message.error('操作失败！发生错误：  ' + response.msg)
+      message.error('操作失败！发生错误：  ' + response.msg);
     }
   }
 
@@ -82,8 +82,6 @@ export default class BaseTarget {
     }
   }
 
-
-
   protected async cancelJoinTeam(id: string) {
     return await kernel.cancelJoinTeam({
       id,
@@ -118,8 +116,6 @@ export default class BaseTarget {
     return await kernel.queryTargetByName(data);
   }
 
-
-
   /**
    * 拉对象加入组织
    * @param data 拉入参数
@@ -136,7 +132,9 @@ export default class BaseTarget {
    * @param data 请求参数
    * @returns 身份数组
    */
-  public async queryTargetIdentitys(data: any): Promise<model.ResultType<schema.XIdentityArray>> {
+  public async queryTargetIdentitys(
+    data: any,
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
     data.id = this.target.id;
     data.page = {
       offset: 0,
@@ -150,9 +148,8 @@ export default class BaseTarget {
     if (this.identitys.length > 0) {
       return this.identitys;
     }
-    this.identitys = []
-    const res = await this.queryTargetIdentitys({
-    });
+    this.identitys = [];
+    const res = await this.queryTargetIdentitys({});
     if (res.success) {
       res.data.result.forEach((identity) => {
         this.identitys.push(identity);
@@ -162,9 +159,9 @@ export default class BaseTarget {
   }
 
   /**
-* 查询商店列表
-* @returns 商店列表
-*/
+   * 查询商店列表
+   * @returns 商店列表
+   */
   public async getJoinMarkets(): Promise<AppStore[]> {
     if (this._joinedMarkets.length > 0) {
       return this._joinedMarkets;
@@ -180,7 +177,6 @@ export default class BaseTarget {
     }
     return this._joinedMarkets;
   }
-
 
   /**
    * 退出市场
@@ -199,19 +195,19 @@ export default class BaseTarget {
   }
 
   /**
- * 申请加入市场
- * @param id 市场ID
- * @returns
- */
+   * 申请加入市场
+   * @param id 市场ID
+   * @returns
+   */
   public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
     return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
   }
 
   /*
- * 根据编号查询市场
- * @param page 分页参数
- * @returns
- */
+   * 根据编号查询市场
+   * @param page 分页参数
+   * @returns
+   */
   public async getMarketByCode(
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketArray>> {

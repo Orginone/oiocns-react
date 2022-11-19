@@ -1,6 +1,8 @@
 import { XMarket, XMerchandise } from '@/ts/base/schema';
 import AppStore from '@/ts/core/market/appstore';
-// import StoreSiderbar from './sidebar';
+import StoreSiderbar from './sidebar';
+import appContent from './appContent';
+import { model } from '@/ts/base';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -58,6 +60,12 @@ class StoreContent {
       this.public_store = [...result];
     }
   }
+  /**
+   * @desc 创建应用
+   * @params
+   */
+  public createProduct = async (data: model.ProductModel) =>
+    appContent.createProduct(data);
 }
 const storeContent = new StoreContent();
 

@@ -152,8 +152,7 @@ const Groupdetail: React.FC = () => {
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
               openDialogAdd();
-            }}
-          >
+            }}>
             +
           </div>
           <div
@@ -161,8 +160,7 @@ const Groupdetail: React.FC = () => {
             onClick={() => {
               // openDialogDel();
               setIsShiftUp(true);
-            }}
-          >
+            }}>
             -
           </div>
         </>
@@ -184,8 +182,7 @@ const Groupdetail: React.FC = () => {
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
                 onClick={() => {
                   chat.getPersons(false);
-                }}
-              >
+                }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>
                   <DownOutlined />
@@ -232,8 +229,7 @@ const Groupdetail: React.FC = () => {
               type="primary"
               onClick={() => {
                 ChatStore.clearMsg();
-              }}
-            >
+              }}>
               清空聊天记录
             </Button>
             {chat.curChat?.typeName === '群组' ? (
@@ -265,8 +261,7 @@ const Groupdetail: React.FC = () => {
                     className={`${detailStyle.invitateBox} ${detailStyle.box}`}
                     onClick={() => {
                       onClickBox(item, index);
-                    }}
-                  >
+                    }}>
                     <div className={`${detailStyle.invitateBox} ${detailStyle.flex}`}>
                       <HeadImg name={item?.name} label={''} />
                       <div className={`${detailStyle.invitateBox} ${detailStyle.name}`}>
@@ -279,12 +274,10 @@ const Groupdetail: React.FC = () => {
                         backgroundColor: `${
                           state?.ids.includes(item.id) ? '#466DFF' : ''
                         }`,
-                      }}
-                    >
+                      }}>
                       {state?.ids.includes(item.id) ? (
                         <div
-                          className={`${detailStyle.invitateBox} ${detailStyle.btn} ${detailStyle.in}`}
-                        ></div>
+                          className={`${detailStyle.invitateBox} ${detailStyle.btn} ${detailStyle.in}`}></div>
                       ) : (
                         ''
                       )}
@@ -308,8 +301,7 @@ const Groupdetail: React.FC = () => {
                   className={`${detailStyle.invitateBox} ${detailStyle.box}`}
                   onClick={() => {
                     onClickBoxDel(item, index);
-                  }}
-                >
+                  }}>
                   <div className={`${detailStyle.invitateBox} ${detailStyle.flex}`}>
                     <HeadImg name={item?.name} label={''} />
                     <div className={`${detailStyle.invitateBox} ${detailStyle.name}`}>
@@ -322,12 +314,10 @@ const Groupdetail: React.FC = () => {
                       backgroundColor: `${
                         state?.delids.includes(item.id) ? '#466DFF' : ''
                       }`,
-                    }}
-                  >
+                    }}>
                     {state?.delids.includes(item.id) ? (
                       <div
-                        className={`${detailStyle.invitateBox} ${detailStyle.btn} ${detailStyle.in}`}
-                      ></div>
+                        className={`${detailStyle.invitateBox} ${detailStyle.btn} ${detailStyle.in}`}></div>
                     ) : (
                       ''
                     )}
