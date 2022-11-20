@@ -476,6 +476,9 @@ export default class Person extends BaseTarget {
     return this.workSpace.id == this.target.id;
   }
 
+  public get spaceId(): string {
+    return this.workSpace.id ?? '';
+  }
   /**
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息

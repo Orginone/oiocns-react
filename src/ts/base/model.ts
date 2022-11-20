@@ -709,12 +709,12 @@ export type GroupChatModel = {
   // 名称
   name: string;
   // 会话
-  chats: ChatModel[] | undefined;
+  chats: ChatModel[];
 };
 
 export type ChatModel = {
   // 会话ID
-  id: string | undefined;
+  id: string;
   // 名称
   name: string;
   // 头像
@@ -731,6 +731,10 @@ export type ChatModel = {
   msgBody: string;
   // 消息时间
   msgTime: string;
+  // 显示文本
+  showTxt?: string;
+  // 未读数量
+  noRead: number;
 };
 
 export type FlowInstanceModel = {
