@@ -32,7 +32,6 @@ const GroupSideBar = () => {
   //   ChatStore.getAddressBook();
   // }, []);
   const [index, setIndex] = useState('1');
-  const [chat, setChat] = useState(chatCtrl.chat);
   const [groups, setGroups] = useState(chatCtrl.groups);
   const [chats, setChats] = useState(chatCtrl.chats);
   const [searchValue, setSearchValue] = useState<string>(''); // 搜索值
@@ -175,7 +174,6 @@ const GroupSideBar = () => {
   // 刷新页面
   const refreshUI = () => {
     setIndex(chatCtrl.tabIndex);
-    setChat(deepClone(chatCtrl.chat));
     setChats(deepClone(chatCtrl.chats));
     setGroups(deepClone(chatCtrl.groups));
   };
@@ -214,15 +212,13 @@ const GroupSideBar = () => {
               return (
                 <div
                   className={`${sideStyle.con_body_session} ${
-                    chat?.spaceId === child.spaceId && chat?.chatId === child.chatId
-                      ? sideStyle.active
-                      : ''
+                    chatCtrl.isCurrent(child) ? sideStyle.active : ''
                   }`}
                   key={child.chatId}>
                   <HeadImg name={child.target.name} label={child.target.label} />
-                  {child.target.noRead > 0 ? (
+                  {child.noReadCount > 0 ? (
                     <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>
-                      <span>{child.target.noRead}</span>
+                      <span>{child.noReadCount}</span>
                     </div>
                   ) : (
                     ''
@@ -239,11 +235,13 @@ const GroupSideBar = () => {
                       </div>
                       <div
                         className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
-                        {handleFormatDate(child.target.msgTime)}
+                        {handleFormatDate(
+                          child.lastMessage?.createTime || child.target.msgTime,
+                        )}
                       </div>
                     </div>
                     <div className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
-                      {child.target.showTxt}
+                      {child.lastMessage?.msgBody}
                     </div>
                   </div>
                 </div>
@@ -277,22 +275,23 @@ const GroupSideBar = () => {
                     {item.isOpened ? (
                       <>
                         {item.chats.map((child) => {
-                          const target = child.target;
                           return (
                             <div
                               className={`${sideStyle.con_body} ${
-                                chat?.spaceId === item.spaceId &&
-                                chat?.target.id === target.id
-                                  ? sideStyle.active
-                                  : ''
+                                chatCtrl.isCurrent(child) ? sideStyle.active : ''
                               }`}
-                              key={target.id}
-                              onContextMenu={(e: any) => handleContextClick(e, target)}>
-                              <HeadImg name={target.name} label={target.label} />
-                              {target.noRead > 0 ? (
+                              key={child.spaceId + child.chatId}
+                              onContextMenu={(e: any) =>
+                                handleContextClick(e, child.target)
+                              }>
+                              <HeadImg
+                                name={child.target.name}
+                                label={child.target.label}
+                              />
+                              {child.noReadCount > 0 ? (
                                 <div
                                   className={`${sideStyle.group_con} ${sideStyle.dot}`}>
-                                  <span>{target.noRead}</span>
+                                  <span>{child.noReadCount}</span>
                                 </div>
                               ) : (
                                 ''
@@ -306,16 +305,19 @@ const GroupSideBar = () => {
                                   className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                                   <div
                                     className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
-                                    {target.name}
+                                    {child.target.name}
                                   </div>
                                   <div
                                     className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
-                                    {handleFormatDate(target.msgTime)}
+                                    {handleFormatDate(
+                                      child.lastMessage?.createTime ||
+                                        child.target.msgTime,
+                                    )}
                                   </div>
                                 </div>
                                 <div
                                   className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
-                                  {target.showTxt}
+                                  {child.lastMessage?.msgBody}
                                 </div>
                               </div>
                             </div>
@@ -330,17 +332,20 @@ const GroupSideBar = () => {
                       {!item.isOpened ? (
                         <>
                           {item.chats
-                            .filter((v: any) => v.noRead > 0)
-                            .map((child: any) => {
+                            .filter((v) => v.noReadCount > 0)
+                            .map((child) => {
                               return (
                                 <div
-                                  key={child.id + child.name}
+                                  key={child.spaceId + child.chatId}
                                   className={`${sideStyle.con_body} ${sideStyle.open_item}`}>
-                                  <HeadImg name={child.name} label={child.label} />
-                                  {child.noRead > 0 ? (
+                                  <HeadImg
+                                    name={child.target.name}
+                                    label={child.target.label}
+                                  />
+                                  {child.noReadCount > 0 ? (
                                     <div
                                       className={`${sideStyle.group_con} ${sideStyle.dot}`}>
-                                      <span>{child.noRead}</span>
+                                      <span>{child.noReadCount}</span>
                                     </div>
                                   ) : (
                                     ''
@@ -354,16 +359,19 @@ const GroupSideBar = () => {
                                       className={`${sideStyle.group_con_show} ${sideStyle.name}`}>
                                       <div
                                         className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
-                                        {child.name}
+                                        {child.target.name}
                                       </div>
                                       <div
                                         className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
-                                        {handleFormatDate(child.msgTime)}
+                                        {handleFormatDate(
+                                          child.lastMessage?.createTime ||
+                                            child.target.msgTime,
+                                        )}
                                       </div>
                                     </div>
                                     <div
                                       className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
-                                      {child.showTxt}
+                                      {child.lastMessage?.msgBody}
                                     </div>
                                   </div>
                                 </div>

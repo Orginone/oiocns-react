@@ -731,10 +731,6 @@ export type ChatModel = {
   msgBody: string;
   // 消息时间
   msgTime: string;
-  // 显示文本
-  showTxt?: string;
-  // 未读数量
-  noRead: number;
 };
 
 export type FlowInstanceModel = {

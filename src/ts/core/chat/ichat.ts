@@ -10,6 +10,8 @@ export interface IChat {
   spaceId: string;
   /** 所在空间名称 */
   spaceName: string;
+  /** 未读消息数量 */
+  noReadCount: number;
   /** 群成员总数 */
   personCount: number;
   /** 会话对应的目标 */
@@ -18,6 +20,8 @@ export interface IChat {
   messages: schema.XImMsg[];
   /** 群成员 */
   persons: schema.XTarget[];
+  /** 最后一条消息 */
+  lastMessage: schema.XImMsg | undefined;
   /**
    * 加载更多历史消息
    * @param filter 过滤条件

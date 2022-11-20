@@ -19,6 +19,8 @@ class BaseChat implements IChat {
   messages: schema.XImMsg[];
   persons: schema.XTarget[];
   personCount: number;
+  noReadCount: number;
+  lastMessage: schema.XImMsg | undefined;
   constructor(id: string, name: string, m: model.ChatModel) {
     this.spaceId = id;
     this.spaceName = name;
@@ -27,6 +29,7 @@ class BaseChat implements IChat {
     this.persons = [];
     this.personCount = 0;
     this.chatId = m.id;
+    this.noReadCount = 0;
   }
   clearMessage(): void {
     throw new Error('Method not implemented.');
@@ -58,9 +61,11 @@ class BaseChat implements IChat {
     return res.success;
   }
   receiveMessage(msg: schema.XImMsg) {
-    this.target.noRead += 1;
-    this.target.showTxt = msg.msgBody;
-    this.messages.push(msg);
+    if (msg.id !== this.lastMessage?.id) {
+      this.noReadCount += 1;
+      this.lastMessage = msg;
+      this.messages.push(msg);
+    }
   }
 }
 

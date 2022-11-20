@@ -5,7 +5,7 @@ import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import Provider from '@/ts/core/provider';
 import { LoadChats } from '../../core/chat';
-const chatsObjectName = 'chats';
+const chatsObjectName = 'userchat';
 /**
  * 会话控制器
  */
@@ -64,11 +64,28 @@ class ChatController {
   public async setCurrent(chat: IChat | undefined): Promise<void> {
     this._tabIndex = '1';
     this._curChat = this.refChat(chat);
-    await this._curChat?.moreMessage('');
-    await this._curChat?.morePerson('');
-    this._appendChats(this._curChat, true);
+    if (this._curChat) {
+      this._curChat.noReadCount = 0;
+      await this._curChat.moreMessage('');
+      await this._curChat.morePerson('');
+      this._appendChats(this._curChat);
+      this._cacheChats();
+    }
     this._callback();
   }
+  /**
+   * 是否为当前会话
+   * @param chat 会话
+   */
+  public isCurrent(chat: IChat): boolean {
+    return (
+      this._curChat?.chatId === chat.chatId && this._curChat?.spaceId === chat.spaceId
+    );
+  }
+  /**
+   * 激活通讯录
+   * @param item 激活的通讯录
+   */
   public setGroupActive(item: IChatGroup): void {
     this._tabIndex = '2';
     for (const group of this._groups) {
@@ -108,7 +125,6 @@ class ChatController {
       for (const item of this._groups) {
         for (const c of item.chats) {
           if (c.chatId === chat.chatId && c.spaceId === chat.spaceId) {
-            c.target = chat.target;
             return c;
           }
         }
@@ -119,12 +135,17 @@ class ChatController {
   /** 初始化 */
   private _initialization(): void {
     kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
+      this._recvMessage(data, true);
     });
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if (data && data.chats && data.chats.length > 0) {
         for (let item of data.chats) {
-          this._appendChats(this.refChat(item));
+          let lchat = this.refChat(item);
+          if (lchat) {
+            lchat.noReadCount = item.noReadCount;
+            lchat.lastMessage = item.lastMessage;
+            this._appendChats(lchat);
+          }
         }
         this._callback();
       }
@@ -139,8 +160,9 @@ class ChatController {
   /**
    * 接收到新信息
    * @param data 新消息
+   * @param cache 是否缓存
    */
-  private _recvMessage(data: XImMsg): void {
+  private _recvMessage(data: XImMsg, cache: boolean = false): void {
     let sessionId = data.toId;
     if (data.toId === this.userId) {
       sessionId = data.fromId;
@@ -153,7 +175,8 @@ class ChatController {
         }
         if (isMatch) {
           c.receiveMessage(data);
-          this._appendChats(c, true);
+          this._appendChats(c);
+          this._cacheChats();
           this._callback();
           return;
         }
@@ -165,29 +188,40 @@ class ChatController {
    * @param chat 新会话
    * @param cache 是否缓存
    */
-  private _appendChats(chat: IChat | undefined, cache: boolean = false): void {
-    if (chat) {
-      var index = this.chats.findIndex((item) => {
-        return item.chatId === chat.chatId && item.spaceId === chat.spaceId;
-      });
-      if (index > -1) {
-        this.chats[index] = chat;
-      } else {
-        this._chats.unshift(chat);
-      }
-      if (cache) {
-        kernel.anystore.set(
-          chatsObjectName,
-          {
-            operation: 'replaceAll',
-            data: {
-              chats: this.chats,
-            },
-          },
-          'user',
-        );
-      }
+  private _appendChats(chat: IChat): void {
+    var index = this.chats.findIndex((item) => {
+      return item.chatId === chat.chatId && item.spaceId === chat.spaceId;
+    });
+    if (index > -1) {
+      this.chats[index] = chat;
+    } else {
+      this._chats.unshift(chat);
     }
+  }
+  /**
+   * 缓存会话
+   * @param message 新消息，无则为空
+   */
+  private _cacheChats(): void {
+    kernel.anystore.set(
+      chatsObjectName,
+      {
+        operation: 'replaceAll',
+        data: {
+          chats: this.chats
+            .map((item) => {
+              return {
+                chatId: item.chatId,
+                spaceId: item.spaceId,
+                lastMessage: item.lastMessage,
+                noReadCount: item.noReadCount,
+              };
+            })
+            .reverse(),
+        },
+      },
+      'user',
+    );
   }
 }
 
