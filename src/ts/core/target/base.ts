@@ -1,6 +1,7 @@
-import { PageRequest } from './../../base/model';
+import { PageRequest } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import { kernel, model, common, schema, FaildResult } from '../../base';
+import consts from '../consts';
+import { kernel, model, common, schema, faildResult } from '../../base';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;
@@ -13,7 +14,12 @@ export default class BaseTarget {
   protected get createTargetType(): TargetType[] {
     return [TargetType.Cohort];
   }
+
   protected get joinTargetType(): TargetType[] {
+    return [TargetType.Cohort, TargetType.Person];
+  }
+
+  protected get searchTargetType(): TargetType[] {
     return [TargetType.Cohort, TargetType.Person];
   }
 
@@ -27,28 +33,31 @@ export default class BaseTarget {
 
   /**
    * 根据名称查询组织/个人
-   * @param name
-   * @param TypeName
+   * @param name 名称
+   * @param TypeName 类型
    * @returns
    */
   public async searchTargetByName(
     name: string,
-    TypeName: string,
+    typeName: TargetType,
   ): Promise<model.ResultType<any>> {
-    const data: model.NameTypeModel = {
-      name: name,
-      typeName: TypeName,
-      page: {
-        offset: 0,
-        filter: name,
-        limit: common.Constants.MAX_UINT_16,
-      },
-    };
-    return await kernel.searchTargetByName(data);
+    if (this.searchTargetType.includes(typeName)) {
+      const data: model.NameTypeModel = {
+        name: name,
+        typeName: typeName,
+        page: {
+          offset: 0,
+          filter: name,
+          limit: common.Constants.MAX_UINT_16,
+        },
+      };
+      return await kernel.searchTargetByName(data);
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
-   * 申请加入组织/个人
+   * 申请加入组织/个人 (好友申请除外)
    * @param destId 加入的组织/个人id
    * @param typeName 对象
    * @returns
@@ -64,27 +73,8 @@ export default class BaseTarget {
         teamType: typeName,
         targetType: this.target.typeName,
       });
-    } else {
-      return FaildResult('您无法创建该类型对象!');
     }
-  }
-
-  /**
-   * 拉自身进组织(创建组织的时候调用)
-   * @param id
-   * @param teamTypes
-   * @returns
-   */
-  protected async join(
-    id: string,
-    teamTypes: TargetType[],
-  ): Promise<model.ResultType<any>> {
-    return await kernel.pullAnyToTeam({
-      id,
-      teamTypes,
-      targetType: this.target.typeName,
-      targetIds: [this.target.id],
-    });
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -116,7 +106,7 @@ export default class BaseTarget {
         belongId: this.target.id,
       });
     } else {
-      return FaildResult('您无法创建该类型对象!');
+      return faildResult(consts.UnauthorizedError);
     }
   }
 
@@ -154,7 +144,7 @@ export default class BaseTarget {
       }
       return res;
     }
-    return FaildResult('父职权不存在!');
+    return faildResult('父职权不存在!');
   }
 
   /**
@@ -187,7 +177,7 @@ export default class BaseTarget {
         this._ownIdentitys.push(res.data);
       }
     }
-    return FaildResult('您未拥有该职权!');
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -195,7 +185,7 @@ export default class BaseTarget {
    * @param id 职权Id
    * @returns
    */
-  protected async deleteAuthority(id: string): Promise<model.ResultType<any>> {
+  public async deleteAuthority(id: string): Promise<model.ResultType<any>> {
     const index = this._ownAuthoritys.findIndex((auth) => {
       return auth.id == id;
     });
@@ -210,7 +200,7 @@ export default class BaseTarget {
       }
       return res;
     }
-    return FaildResult('您未拥有该职权!');
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -218,7 +208,7 @@ export default class BaseTarget {
    * @param id 身份Id
    * @returns
    */
-  protected async deleteIdentity(id: string): Promise<model.ResultType<any>> {
+  public async deleteIdentity(id: string): Promise<model.ResultType<any>> {
     const index = this._ownIdentitys.findIndex((identity) => {
       return identity.id == id;
     });
@@ -233,7 +223,126 @@ export default class BaseTarget {
       }
       return res;
     }
-    return FaildResult('您未拥有该身份!');
+    return faildResult('您未拥有该身份!');
+  }
+
+  /**
+   * 更新职权
+   * @param id 唯一ID
+   * @param name 名称
+   * @param code 编号
+   * @param ispublic 公开的
+   * @param remark 备注
+   * @returns
+   */
+  public async updateAuthority(
+    id: string,
+    name: string,
+    code: string,
+    ispublic: boolean,
+    remark: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
+    let auth = this._allAuthoritys.find((authority) => {
+      return authority.id == id;
+    });
+    if (auth != undefined) {
+      const res = await kernel.updateAuthority({
+        name,
+        code,
+        remark,
+        id: auth.id,
+        public: ispublic,
+        belongId: auth.belongId,
+        parentId: auth.parentId,
+      });
+      if (res.success) {
+        auth.name = name;
+        auth.code = code;
+        auth.public = ispublic;
+        auth.remark = remark;
+        auth.updateTime = res.data?.updateTime;
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 更新身份
+   * @param id 唯一ID
+   * @param name 名称
+   * @param code 编号
+   * @param remark 备注
+   * @returns
+   */
+  public async updateIdentity(
+    id: string,
+    name: string,
+    code: string,
+    remark: string,
+  ): Promise<model.ResultType<schema.XIdentity>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      const res = await kernel.updateIdentity({
+        name,
+        code,
+        remark,
+        id: iden.id,
+        authId: iden.authId,
+        belongId: iden.belongId,
+      });
+      if (res.success) {
+        iden.name = name;
+        iden.code = code;
+        iden.remark = remark;
+        iden.updateTime = res.data?.updateTime;
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 赋予组织个人身份
+   * @param id 身份Id
+   * @param targetIds 组织/个人Id集合
+   * @returns
+   */
+  public async giveIdentity(
+    id: string,
+    targetIds: string[],
+  ): Promise<model.ResultType<any>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      return await kernel.giveIdentity({ id, targetIds });
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 移除赋予给组织/个人的身份
+   * @param id 身份Id
+   * @param targetIds 组织/个人Id集合
+   * @returns
+   */
+  public async removeIdentity(
+    id: string,
+    targetIds: string[],
+  ): Promise<model.ResultType<any>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      return await kernel.removeIdentity({
+        id,
+        targetIds,
+      });
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -241,7 +350,9 @@ export default class BaseTarget {
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(id: string): Promise<model.ResultType<any>> {
+  public async selectAuthorityTree(
+    id: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
     const params = {
       id: id,
       page: {
@@ -255,31 +366,43 @@ export default class BaseTarget {
   }
 
   /**
-   * 查询发起的加入申请
-   * @param id
+   * 查询我的申请
    * @returns
    */
-  public async queryJoinApplyBase(): Promise<model.ResultType<any>> {
-    const params = {
+  public async queryJoinApply(): Promise<model.ResultType<schema.XRelationArray>> {
+    return await kernel.queryJoinTeamApply({
       id: this.target.id,
       page: {
         offset: 0,
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
-    };
-    const res = await kernel.queryJoinTeamApply(params);
-    return res;
+    });
   }
 
   /**
-   * 根据职权查询身份
+   * 查询我的审批
+   * @returns
+   */
+  public async queryjoinApproval() {
+    return kernel.queryTeamJoinApproval({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询指定职权下的身份列表
    * @param id
    * @returns
    */
   public async queryAuthorityIdentity(
     id: string,
-  ): Promise<model.ResultType<XIdentityArray>> {
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await kernel.queryAuthorityIdentitys({
       id: id,
       page: {
@@ -413,7 +536,7 @@ export default class BaseTarget {
    * 获取子组织/个人
    * @returns 返回好友列表
    */
-  public async getSubTargets(
+  protected async getSubTargets(
     id: string,
     typeNames: TargetType[],
     subTypeNames: TargetType[],
@@ -442,7 +565,7 @@ export default class BaseTarget {
   }
 
   /**
-   * 拉对象加入组织
+   * 拉对象加入自身
    * @param data 拉入参数
    * @returns 拉入结果
    */
@@ -451,6 +574,24 @@ export default class BaseTarget {
       id: this.target.id,
       teamTypes: [this.target.typeName],
       ...data,
+    });
+  }
+
+  /**
+   * 拉自身进组织(创建组织的时候调用)
+   * @param id
+   * @param teamTypes
+   * @returns
+   */
+  protected async join(
+    id: string,
+    teamTypes: TargetType[],
+  ): Promise<model.ResultType<any>> {
+    return await kernel.pullAnyToTeam({
+      id,
+      teamTypes,
+      targetType: this.target.typeName,
+      targetIds: [this.target.id],
     });
   }
 

@@ -1,7 +1,7 @@
-import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
 import MarketActionTarget from './mbase';
-import { model, schema, FaildResult, kernel } from '../../base';
+import consts from '../consts';
+import { model, schema, faildResult, kernel } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
@@ -38,11 +38,6 @@ export default class Person extends MarketActionTarget {
       TargetType.University,
       TargetType.Cohort,
     ];
-  }
-
-  /** 支持的单位类型数组 */
-  public get companyTypes(): TargetType[] {
-    return [TargetType.Company, TargetType.University, TargetType.Hospital];
   }
 
   /**
@@ -98,7 +93,7 @@ export default class Person extends MarketActionTarget {
    * 获取好友列表
    * @returns 返回好友列表
    */
-  public async getFriends(): Promise<XTarget[]> {
+  public async getFriends(): Promise<schema.XTarget[]> {
     if (this._friends.length > 0) {
       return this._friends;
     }
@@ -131,11 +126,11 @@ export default class Person extends MarketActionTarget {
     remark: string,
     type: TargetType = TargetType.Company,
   ): Promise<model.ResultType<any>> {
-    if (!this.companyTypes.includes(type)) {
-      return FaildResult('您无法创建该类型单位!');
+    if (!consts.CompanyTypes.includes(type)) {
+      return faildResult('您无法创建该类型单位!');
     }
     if (!validIsSocialCreditCode(code)) {
-      return FaildResult('请填写正确的代码!');
+      return faildResult('请填写正确的代码!');
     }
     const tres = await this.getTargetByName({
       name,
@@ -163,7 +158,7 @@ export default class Person extends MarketActionTarget {
       }
       return res;
     } else {
-      return FaildResult('该单位已存在!');
+      return faildResult('该单位已存在!');
     }
   }
 
@@ -179,8 +174,8 @@ export default class Person extends MarketActionTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
+    if (res.success) {
+      res.data?.result?.forEach((item) => {
         this._joinedCohorts.push(new Cohort(item));
       });
     }
@@ -198,7 +193,7 @@ export default class Person extends MarketActionTarget {
     this._joinedCompanys = [];
     let res = await this.getjoined({
       spaceId: this.target.id,
-      JoinTypeNames: this.companyTypes,
+      JoinTypeNames: consts.CompanyTypes,
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
@@ -303,7 +298,7 @@ export default class Person extends MarketActionTarget {
         TargetType.JobCohort,
         TargetType.Department,
         TargetType.Cohort,
-        ...this.companyTypes,
+        ...consts.CompanyTypes,
       ],
       targetId: this.target.id,
       targetType: TargetType.Person,
