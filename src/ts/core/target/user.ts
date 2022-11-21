@@ -53,11 +53,12 @@ export default class userdataservice extends BaseService {
   public async getJoinedTargets(
     companyId: string,
     typeName: TargetType,
+    joinTypes: TargetType[],
   ): Promise<Company[]> {
     this.target.typeName = typeName;
     let res = await this.getjoined({
       spaceId: companyId,
-      JoinTypeNames: this.companyTypes,
+      JoinTypeNames: joinTypes,
     });
 
     let _joinedCompanys: Company[] = [];
