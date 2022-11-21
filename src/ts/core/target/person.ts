@@ -110,7 +110,7 @@ export default class Person extends MarketActionTarget {
       [TargetType.Person],
       [TargetType.Person],
     );
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       this._friends = res.data.result;
     }
     return this._friends;
