@@ -5,13 +5,13 @@ import TableItemCard from '../components/TableItemCard';
 import { TeamApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
 import { Button, message, Space, Tag } from 'antd';
-import todoService, { tabStatus } from '@/module/todo';
+import friendService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { IdPage } from '@/module/typings';
 import { SettingFilled } from '@ant-design/icons';
 // import styles from './index.module.less';
 
-const friendService = new todoService('friend');
+// const friendService = new todoService('friend');
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
@@ -101,6 +101,7 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   const [pageData, setPageData] = useState<TeamApprovalType[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [newColumns, setNewColumns] = useState<ProColumns<TeamApprovalType>[]>();
+
   const columns: ProColumns<TeamApprovalType>[] = [
     {
       title: '序号',

@@ -4,13 +4,13 @@ import TableItemCard from '../components/TableItemCard';
 import { ProductApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
 import { Button, message, Space, Tag } from 'antd';
-import todoService, { tabStatus } from '@/module/todo';
+import appService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
-import { Page } from '@/module/typings';
+// import { Page } from '@/module/typings';
 
 // import styles from './index.module.less';
+// appService.currentModel = 'app';
 
-const appService = new todoService('app');
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
@@ -162,7 +162,10 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
   ];
   // 获取申请/审核列表
   const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await appService.getList<ProductApprovalType, Page>({
+    const { data = [], total } = await appService.getList<
+      ProductApprovalType,
+      PageParams
+    >({
       filter: '',
       page: page,
       pageSize: pageSize,

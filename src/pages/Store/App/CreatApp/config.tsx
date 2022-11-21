@@ -62,7 +62,7 @@ const valueEnumType = {
 
 type DataItem = {
   name: string;
-  state: string;
+  // state: string;
   code: string;
   resources: Resources[];
 };
@@ -213,8 +213,8 @@ const flows: ProFormColumnsType<Flows> = {
             {
               valueType: 'dependency',
               name: ['type'],
-              columns: ({ type }) => {
-                return type === '1' ? [valueTypeColumns] : [];
+              columns: ({ type }: { type: string }) => {
+                return (type === '1' ? [valueTypeColumns] : []) as any;
               },
             },
           ],

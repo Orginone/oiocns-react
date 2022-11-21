@@ -23,7 +23,7 @@ export default class Test {
 
   /**构造方法 */
   constructor(target: schema.XTarget) {
-    super(target);
+    // super(target);
   }
 
   /** 支持的单位类型数组 */
