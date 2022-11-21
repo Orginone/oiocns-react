@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Tabs, Button } from 'antd';
+import { Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import { formatDate } from '@/utils/index';
@@ -26,11 +25,6 @@ interface MenuItemType {
 }
 
 const GroupSideBar = () => {
-  // const { setCurrent, getHistoryMesages } = props;
-  // const ChatStore: any = useChatStore();
-  // useEffect(() => {
-  //   ChatStore.getAddressBook();
-  // }, []);
   const [index, setIndex] = useState('1');
   const [groups, setGroups] = useState(chatCtrl.groups);
   const [chats, setChats] = useState(chatCtrl.chats);
@@ -171,12 +165,17 @@ const GroupSideBar = () => {
       selectedItem: {} as ImMsgChildType,
     });
   };
-  // 刷新页面
+
+  /**
+   * @description: 刷新页面
+   * @return {*}
+   */
   const refreshUI = () => {
     setIndex(chatCtrl.tabIndex);
     setChats(deepClone(chatCtrl.chats));
     setGroups(deepClone(chatCtrl.groups));
   };
+
   /**
    * @description: 监听点击事件，关闭弹窗
    * @return {*}

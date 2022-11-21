@@ -37,12 +37,14 @@ class BaseChat implements IChat {
   deleteMessage(id: string): void {
     throw new Error('Method not implemented.');
   }
-  reCallMessage(id: string) {
-    this.messages.forEach((item) => {
+  async reCallMessage(id: string): Promise<boolean> {
+    for (const item of this.messages) {
       if (item.id === id) {
-        kernel.recallImMsg(item);
+        const res = await kernel.recallImMsg(item);
+        return res.success;
       }
-    });
+    }
+    return false;
   }
   async morePerson(filter: string): Promise<void> {
     await sleep(0);
@@ -164,7 +166,7 @@ class CohortChat extends BaseChat {
       subTypeNames: [TargetType.Person],
       page: {
         offset: this.persons.length,
-        limit: 30,
+        limit: 13,
         filter: filter,
       },
     });

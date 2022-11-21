@@ -58,6 +58,7 @@ const GroupContent = (props: Iprops) => {
       3
     );
   };
+
   /**
    * @description: 重新编辑
    * @param {string} txt
@@ -187,8 +188,9 @@ const GroupContent = (props: Iprops) => {
                         <Button
                           type="text"
                           style={{ color: '#3e5ed8' }}
-                          onClick={() => {
-                            chatCtrl.chat?.reCallMessage(item.id);
+                          onClick={async () => {
+                            await chatCtrl.chat?.reCallMessage(item.id);
+                            refreshUI();
                           }}>
                           撤回
                         </Button>
