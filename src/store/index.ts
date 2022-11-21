@@ -58,10 +58,8 @@ const useStore = create(
     {
       name: 'user-storage',
       getStorage: () => sessionStorage,
-
     },
   ),
-
 );
 
 // 暴露单一实例 useStore
