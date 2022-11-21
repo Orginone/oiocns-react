@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangqiang 1196217890@qq.com
+ * @Date: 2022-11-17 13:30:54
+ * @LastEditors: zhangqiang 1196217890@qq.com
+ * @LastEditTime: 2022-11-19 16:10:41
+ * @FilePath: /oiocns-react/src/store/index.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 // zustand 采用观察者模式，对组件进行订阅更新，
 // 因此不需要在最外层提供一个类似redux的Provider包裹层
 import create from 'zustand';
@@ -20,7 +28,6 @@ const useStore = create(
       userObj: null,
       login: async (account: string, password: string) => {
         const res = await Provider.login(account, password);
-
         if (res.success) {
           set({
             user: res.data,
@@ -45,6 +52,8 @@ const useStore = create(
           }));
         }
       },
+
+      setIsOpenBoolean: false,
     }),
     {
       name: 'user-storage',

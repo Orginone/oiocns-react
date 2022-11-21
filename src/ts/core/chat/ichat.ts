@@ -51,7 +51,7 @@ export interface IChat {
    * 撤回消息
    * @param id 消息ID
    */
-  reCallMessage(id: string): void;
+  reCallMessage(id: string): Promise<boolean>;
   /**
    * 删除消息
    * @param id 删除消息

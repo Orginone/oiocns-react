@@ -1,5 +1,7 @@
+import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
+import { PageData } from 'typings/globelType';
 
 const showMessage = (response: any) => {
   if (response.success) {
@@ -8,6 +10,7 @@ const showMessage = (response: any) => {
     message.error('操作失败！发生错误：  ' + response.msg);
   }
 }
+
 
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
@@ -36,6 +39,27 @@ const resetParams = (params: any) => {
     ...rest,
   };
 };
+
+/**
+ * 后台响应 => 前端业务结果(分页)
+ * @param res 后台分页响应
+ * @returns
+ */
+export function toPageData<T extends { result: any; total: number }>(
+  res: model.ResultType<T>,
+): PageData<T> {
+  if (res.success) {
+    return {
+      success: true,
+      data: res.data?.result || [],
+      total: res.data?.total || 0,
+      msg: res.msg,
+    };
+  } else {
+    console.error(res?.msg);
+    return { success: false, data: [], total: 0, msg: res.msg };
+  }
+}
 
 // m--n 之间的数字
 const renderNum = (m: number, n: number) => {

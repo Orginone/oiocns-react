@@ -12,13 +12,11 @@ import {
   Form,
   Input,
   Select,
+  message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import CompanyServices from '@/module/org/company';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import PersonServices from '@/module/person';
-import useStore from '@/store';
-import { SpaceType, UserType } from '@/store/type';
+import { SpaceType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
@@ -73,7 +71,12 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    showMessage(res);
+
+    if (res.success) {
+      message.info('申请加入单位成功');
+    } else {
+      message.error('申请加入单位失败：' + res.msg);
+    }
     setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
