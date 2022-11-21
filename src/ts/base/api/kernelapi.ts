@@ -40,7 +40,7 @@ export default class KernelApi {
       if (this._anystore.accessToken.length > 0) {
         this._storeHub
           .invoke('TokenAuth', this._anystore.accessToken)
-          .then((res: model.ResultType<any>) => {
+          .then((res:model.ResultType<any>) => {
             if (res.success) {
               console.debug('认证成功！');
             }
@@ -84,7 +84,7 @@ export default class KernelApi {
    * @returns {Promise<model.ResultType<any>>} 异步登录结果
    */
   public async login(userName: string, password: string): Promise<model.ResultType<any>> {
-    var res: model.ResultType<any>;
+    var res:model.ResultType<any>;
     var req = {
       account: userName,
       pwd: password,
@@ -117,7 +117,7 @@ export default class KernelApi {
     password: string,
     nickName: string,
   ): Promise<model.ResultType<any>> {
-    var res: model.ResultType<any>;
+    var res:model.ResultType<any>;
     var req = {
       name,
       motto,
@@ -2059,7 +2059,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XFlowTaskHistoryArray>} 请求结果
    */
   public async queryNoticeTask(): Promise<
-    model.ResultType<schema.XFlowTaskHistoryArray>
+   model.ResultType<schema.XFlowTaskHistoryArray>
   > {
     return await this.request({
       module: 'flow',
@@ -2173,8 +2173,8 @@ export default class KernelApi {
       },
       data: args,
     });
-    if (res.data && (res.data as model.ResultType<any>)) {
-      return res.data as model.ResultType<any>;
+    if (res.data && (res.data asmodel.ResultType<any>)) {
+      return res.data asmodel.ResultType<any>;
     }
     return { success: false, data: {}, code: 400, msg: '' };
   }

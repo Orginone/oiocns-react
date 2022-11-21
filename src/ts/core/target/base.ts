@@ -1,10 +1,10 @@
 import { PageRequest } from '@/ts/base/model';
 import { TargetType } from '../enum';
 import consts from '../consts';
+import SpaceTarget from './sbase';
 import { kernel, model, common, schema, faildResult } from '../../base';
 
-export default class BaseTarget {
-  public readonly target: schema.XTarget;
+export default class BaseTarget extends SpaceTarget {
   // 拥有的身份
   public _ownIdentitys: schema.XIdentity[];
   public _allIdentitys: schema.XIdentity[];
@@ -24,7 +24,7 @@ export default class BaseTarget {
   }
 
   constructor(target: schema.XTarget) {
-    this.target = target;
+    super(target);
     this._ownIdentitys = [];
     this._allIdentitys = [];
     this._ownAuthoritys = [];
@@ -37,10 +37,10 @@ export default class BaseTarget {
    * @param TypeName 类型
    * @returns
    */
-  public async searchTargetByName(
+  searchTargetByName = async (
     name: string,
     typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<any>> => {
     if (this.searchTargetType.includes(typeName)) {
       const data: model.NameTypeModel = {
         name: name,
@@ -51,10 +51,10 @@ export default class BaseTarget {
           limit: common.Constants.MAX_UINT_16,
         },
       };
-      return await kernel.searchTargetByName(data);
+      return kernel.searchTargetByName(data);
     }
     return faildResult(consts.UnauthorizedError);
-  }
+  };
 
   /**
    * 申请加入组织/个人 (好友申请除外)
@@ -405,7 +405,7 @@ export default class BaseTarget {
    * 查询我的审批
    * @returns
    */
-  public async queryjoinApproval() {
+  public async queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
     return kernel.queryTeamJoinApproval({
       id: this.target.id,
       page: {
@@ -422,7 +422,10 @@ export default class BaseTarget {
    * @param status
    * @returns
    */
-  public async approvalJoinApply(id: string, status: number) {
+  public async approvalJoinApply(
+    id: string,
+    status: number,
+  ): Promise<model.ResultType<any>> {
     return await kernel.approvalJoinApply({
       id,
       status,
@@ -489,7 +492,14 @@ export default class BaseTarget {
     if (this._allIdentitys.length > 0) {
       return this._allIdentitys;
     }
-    const res = await this.queryTargetIdentitys();
+    const res = await kernel.queryTargetIdentitys({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
     if (res.success && res?.data?.result != undefined) {
       this._allIdentitys = res.data.result;
     }
@@ -530,7 +540,7 @@ export default class BaseTarget {
    * @param targetType
    * @returns
    */
-  protected async getIdentityTargets(
+  public async getIdentityTargets(
     id: string,
     targetType: TargetType,
   ): Promise<model.ResultType<schema.XTargetArray>> {
@@ -549,7 +559,7 @@ export default class BaseTarget {
    * 查询当前空间下拥有的身份
    * @returns
    */
-  protected async getOwnIdentitys(): Promise<schema.XIdentity[]> {
+  public async getOwnIdentitys(): Promise<schema.XIdentity[]> {
     if (this._ownIdentitys.length > 0) {
       return this._ownIdentitys;
     }
@@ -565,7 +575,7 @@ export default class BaseTarget {
    * @param id
    * @returns
    */
-  protected async getSubAuthoritys(
+  public async getSubAuthoritys(
     id: string,
     page: PageRequest,
   ): Promise<model.ResultType<schema.XAuthorityArray>> {
@@ -597,24 +607,14 @@ export default class BaseTarget {
   }
 
   /**
-   * 查询组织或个人
-   * @param data
-   * @returns
-   */
-  public async getTargetByName(
-    data: model.NameTypeModel,
-  ): Promise<model.ResultType<schema.XTarget>> {
-    return await kernel.queryTargetByName(data);
-  }
-
-  /**
    * 拉对象加入自身
-   * @param data 拉入参数
+   * @param targetIds 拉入对象Id集合
+   * @param targetType 拉入对象类型
    * @returns 拉入结果
    */
   protected pull = async (
     targetIds: string[],
-    targetType: string,
+    targetType: TargetType,
   ): Promise<model.ResultType<any>> => {
     return await kernel.pullAnyToTeam({
       id: this.target.id,
@@ -641,20 +641,4 @@ export default class BaseTarget {
       targetIds: [this.target.id],
     });
   };
-
-  /**
-   * 获取所有身份
-   * @param data 请求参数
-   * @returns 身份数组
-   */
-  public async queryTargetIdentitys(): Promise<model.ResultType<schema.XIdentityArray>> {
-    return await kernel.queryTargetIdentitys({
-      id: this.target.id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    });
-  }
 }

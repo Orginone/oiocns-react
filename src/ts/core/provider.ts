@@ -1,5 +1,5 @@
 import { kernel, model } from '../base';
-import MarketActionTarget from './target/mbase';
+import spaceTarget from './target/sbase';
 import Person from './target/person';
 
 /**
@@ -7,7 +7,7 @@ import Person from './target/person';
  */
 export default class Provider {
   private static person: Person;
-  private static _workSpace: MarketActionTarget | undefined;
+  private static _workSpace: spaceTarget | undefined;
 
   public static get userId() {
     return this.person.target.id;
@@ -29,7 +29,7 @@ export default class Provider {
    * 获取当前工作空间
    * @returns 工作当前空间
    */
-  public static async getWorkSpace(): Promise<MarketActionTarget | undefined> {
+  public static async getWorkSpace(): Promise<spaceTarget | undefined> {
     if (this._workSpace == null) {
       var id = sessionStorage.getItem('_workSpaceId') + '';
       if (this.person.target.id == id) {

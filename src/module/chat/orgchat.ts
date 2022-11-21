@@ -192,7 +192,7 @@ export default class OrgChat extends Object {
   /**
    * 发送消息
    * @param data 消息数据
-   * @returns {ResultType} 发送结果
+   * @returns {model.ResultType} 发送结果
    */
   public async sendMsg(data: any) {
     if (this.authed && data) {
@@ -204,7 +204,7 @@ export default class OrgChat extends Object {
   /**
    * 撤回消息
    * @param msg 要撤回的消息
-   * @returns {ResultType} 撤回结果
+   * @returns {model.ResultType} 撤回结果
    */
   public async recallMsg(msg: any) {
     if (this.authed && msg) {
@@ -228,7 +228,7 @@ export default class OrgChat extends Object {
         },
         'user',
       )
-      .then((res: ResultType) => {
+      .then((res: model.ResultType) => {
         if (res.data === 1 && this.curMsgs.length > 0) {
           this.curMsgs = this.curMsgs.filter((item: any) => {
             return item.chatId != msg.chatId;
@@ -249,7 +249,7 @@ export default class OrgChat extends Object {
           },
           'user',
         )
-        .then((res: ResultType) => {
+        .then((res: model.ResultType) => {
           if (res.data > 0 && this.curMsgs.length > 0) {
             this.curMsgs = [];
           }
@@ -388,7 +388,7 @@ export default class OrgChat extends Object {
   }
   /**
    * 从关系中查询会话
-   * @returns {ResultType} 会话结果
+   * @returns {model.ResultType} 会话结果
    */
   public async getChats() {
     if (this.authed) {
