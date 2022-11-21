@@ -32,8 +32,8 @@ class StoreClassify {
   public curPageType: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
-  public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
-  public SelectMarketCallBack: undefined | ((item: AppStore) => void) = undefined; //选择商店后 触发展示区回调
+  public TreeCallBack!: (data: any[]) => void; //页面传进来的更新树形区域 钩子
+  public SelectMarketCallBack!: (item: AppStore) => void; //选择商店后 触发展示区回调
 
   // 底部区域
   // 缓存 所有 tree 展示数据
@@ -104,12 +104,12 @@ class StoreClassify {
         this.appFooterTree.appTreeData,
       );
 
-      this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
+      this.TreeCallBack([...this.curTreeData]);
     } else {
       console.log('获取市场-tree');
       if (this.marketFooterTree.appTreeData.length > 0) {
         this.curTreeData = this.marketFooterTree.appTreeData;
-        this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
+        this.TreeCallBack([...this.curTreeData]);
       } else {
         this.getOwnMarket();
       }
@@ -127,7 +127,7 @@ class StoreClassify {
     this.breadcrumb[1] = '我的应用';
     this.breadcrumb[2] = treeItem.title || '获取失败';
     console.log('面包靴 应用', this.breadcrumb);
-    // this.SelectMarketCallBack && this.SelectMarketCallBack(market);
+    // this.SelectMarketCallBack(market);
   }
   /* --------------------市场功能区--------------------- */
   /**
@@ -140,7 +140,7 @@ class StoreClassify {
     this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 商店', this.breadcrumb);
 
-    this.SelectMarketCallBack && this.SelectMarketCallBack(market);
+    this.SelectMarketCallBack(market);
   }
   /**
    * @desc: 获取市场列表
