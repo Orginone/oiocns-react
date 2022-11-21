@@ -8,6 +8,8 @@ export interface IChat {
   fullId: string;
   /** 会话Id */
   chatId: string;
+  /** 是否置顶 */
+  isToping: boolean;
   /** 所在空间ID */
   spaceId: string;
   /** 所在空间名称 */
@@ -90,6 +92,8 @@ export type ChatCache = {
   chatId: string;
   /** 会话所在空间ID */
   spaceId: string;
+  /** 是否置顶 */
+  isToping: boolean;
   /** 会话未读消息数量 */
   noReadCount: number;
   /** 最新消息 */

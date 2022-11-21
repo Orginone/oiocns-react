@@ -23,6 +23,15 @@ export default class Provider {
     }
     throw new Error('未登录');
   }
+  /**
+   * 当前空间ID
+   */
+  public static get spaceId(): string {
+    if (this.getPerson && this._workSpace && this._workSpace.id) {
+      return this._workSpace.id;
+    }
+    throw new Error('未登录');
+  }
 
   /**
    * 获取工作空间
