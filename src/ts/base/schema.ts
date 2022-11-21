@@ -46,7 +46,7 @@ export type XAttribute = {
 
 //度量特性定义查询返回集合
 export type XAttributeArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -94,7 +94,7 @@ export type XAuthority = {
 
 //职权定义查询返回集合
 export type XAuthorityArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -264,7 +264,7 @@ export type XFlowDefine = {
 
 //流程定义查询返回集合
 export type XFlowDefineArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -310,7 +310,7 @@ export type XFlowInstance = {
 
 //流程实例查询返回集合
 export type XFlowInstanceArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -430,7 +430,7 @@ export type XFlowTask = {
 
 //流程任务查询返回集合
 export type XFlowTaskArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -472,7 +472,7 @@ export type XFlowTaskHistory = {
 
 //流程任务查询返回集合
 export type XFlowTaskHistoryArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -518,7 +518,7 @@ export type XIdentity = {
 
 //身份查询返回集合
 export type XIdentityArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -554,11 +554,15 @@ export type XImMsg = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 显示文本
+  showTxt: string;
+  // 允许编辑
+  allowEdit: boolean;
 };
 
 //及时通讯查询返回集合
 export type XImMsgArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -638,7 +642,7 @@ export type XMarket = {
 
 //交易市场查询返回集合
 export type XMarketArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -674,7 +678,7 @@ export type XMarketRelation = {
 
 //组织/个人与市场关系查询返回集合
 export type XMarketRelationArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -718,7 +722,7 @@ export type XMerchandise = {
 
 //商品信息查询返回集合
 export type XMerchandiseArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -758,7 +762,7 @@ export type XOrder = {
 
 //采购订单查询返回集合
 export type XOrderArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -804,7 +808,7 @@ export type XOrderDetail = {
 
 //订单详情查询返回集合
 export type XOrderDetailArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -842,7 +846,7 @@ export type XOrderPay = {
 
 //支付详情查询返回集合
 export type XOrderPayArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -898,7 +902,7 @@ export type XProduct = {
 
 //产品信息查询返回集合
 export type XProductArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -938,7 +942,7 @@ export type XRelation = {
 
 //组织/个人关系查询返回集合
 export type XRelationArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -984,7 +988,7 @@ export type XResource = {
 
 //应用资源查询返回集合
 export type XResourceArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1164,7 +1168,7 @@ export type XStaging = {
 
 //商品暂存查询返回集合
 export type XStagingArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1212,7 +1216,7 @@ export type XTarget = {
 
 //组织/个人查询返回集合
 export type XTargetArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1252,7 +1256,7 @@ export type XTeam = {
 
 //虚拟组织查询返回集合
 export type XTeamArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1304,7 +1308,7 @@ export type XThing = {
 
 //(物/存在)查询返回集合
 export type XThingArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1350,7 +1354,7 @@ export type XThingAttr = {
 
 //物的度量特性查询返回集合
 export type XThingAttrArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;
@@ -1388,7 +1392,7 @@ export type XThingAttrHistroy = {
 
 //物的度量特性历史查询返回集合
 export type XThingAttrHistroyArray = {
-  // 便宜量
+  // 偏移量
   offset: number;
   // 最大数量
   limit: number;

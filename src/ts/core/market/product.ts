@@ -1,6 +1,6 @@
 import { kernel, model } from '../../base';
 import { XMerchandise, XProduct, XResource } from '../../base/schema';
-import { ResultType, ResourceModel, IdNameArray } from '../../base/model';
+import { ResultType, IdNameArray } from '../../base/model';
 
 export default class Product {
   // 应用实体
@@ -9,9 +9,14 @@ export default class Product {
   // 应用对应的商品列表
   private _merchandise: XMerchandise[];
 
-  constructor(prod: XProduct, resources: XResource[]) {
+  constructor(prod: XProduct) {
     this.prod = prod;
-    this._resource = resources;
+    this._merchandise = [];
+    if (prod.resource != undefined) {
+      this._resource = prod.resource;
+    } else {
+      this._resource = [];
+    }
   }
 
   /**

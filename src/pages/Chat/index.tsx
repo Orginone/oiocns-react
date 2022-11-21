@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import useChatStore from '@/store/chat';
+import { deepClone } from '@/ts/base/common';
+import { chatCtrl } from '@/ts/controller/chat';
+import React, { useEffect, useState } from 'react';
 import GroupContent from './GroupContent';
 import GroupDetail from './GroupDetail';
 import GroupHeader from './GroupHeader';
@@ -7,18 +8,42 @@ import GroupInputBox from './GroupInputBox';
 import GroupSideBar from './GroupSideBar';
 import charsStyle from './index.module.less';
 
-/* 
-  沟通聊天
-*/
+/**
+ * @description: 沟通聊天
+ * @return {*}
+ */
+
 const Chat: React.FC = () => {
-  const [isShowDetail, setIsShowDetail] = useState<boolean>(false);
-  const [writeContent, setWriteContent] = useState<any>(null);
-  const ChatStore: any = useChatStore();
-  // 展开详情页
+  const [isShowDetail, setIsShowDetail] = useState<boolean>(false); // 展开关闭详情
+  const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
+  const [chat, setChat] = useState(chatCtrl.chat); // 当前会话
+
+  // 刷新页面
+  const refreshUI = () => {
+    setChat(deepClone(chatCtrl.chat));
+  };
+  /**
+   * @description: 监听点击事件，关闭弹窗
+   * @return {*}
+   */
+  useEffect(() => {
+    const id = chatCtrl.subscribe(refreshUI);
+    return () => {
+      chatCtrl.unsubscribe(id);
+    };
+  }, []);
+  /**
+   * @description: 展开详情页
+   * @return {*}
+   */
   const handleViewDetail = () => {
     setIsShowDetail(!isShowDetail);
   };
-  // 重新编辑
+  /**
+   * @description: 重新编辑
+   * @param {string} write
+   * @return {*}
+   */
   const handleReWrites = (write: string) => {
     setWriteContent(write);
   };
@@ -30,26 +55,24 @@ const Chat: React.FC = () => {
         <GroupSideBar />
       </div>
       {/* 主体 */}
-      <div className={charsStyle.chart_page}>
-        {ChatStore.curChat !== null ? (
-          <>
-            {/* 头部 */}
-            <GroupHeader handleViewDetail={handleViewDetail} />
-            {/* 聊天区域 */}
-            <div className={charsStyle.chart_content}>
-              <GroupContent handleReWrites={handleReWrites} />
-            </div>
-            {/* 输入区域 */}
-            <div className={charsStyle.chart_input}>
-              <GroupInputBox writeContent={writeContent} />
-            </div>
-          </>
-        ) : (
-          ''
-        )}
-      </div>
+      {chat ? (
+        <div className={charsStyle.chart_page}>
+          {/* 头部 */}
+          <GroupHeader handleViewDetail={handleViewDetail} />
+          {/* 聊天区域 */}
+          <div className={charsStyle.chart_content}>
+            <GroupContent handleReWrites={handleReWrites} />
+          </div>
+          {/* 输入区域 */}
+          <div className={charsStyle.chart_input}>
+            <GroupInputBox writeContent={writeContent} />
+          </div>
+        </div>
+      ) : (
+        ''
+      )}
       {/* 详情 */}
-      {isShowDetail === true ? <GroupDetail /> : ''}
+      {isShowDetail ? <GroupDetail /> : ''}
     </div>
   );
 };

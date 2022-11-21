@@ -5,17 +5,13 @@ import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import CloudTreeComp from '@/components/CloudTreeComp';
-import API from '@/services';
-// import { MarketTypes } from 'typings/marketType';
-import CommonClass from '@/module/commonClass/BaseServiceClass';
 import NewStoreModal from '@/components/NewStoreModal'; // 新建商店
 import AppDetail from '@/components/AppDetail'; // 新建商店
 
-// import JsonFrom from '@/bizcomponents/JsonFrom';
 import { useLocation } from 'react-router-dom';
-import useStore from '@/store';
-import ClassServices from '../_control/classify';
-
+// import useStore from '@/store';
+import StoreSiderbar from '@/ts/controller/store/sidebar';
+import StoreContent from '@/ts/controller/store/content';
 // const items = [
 //   { label: '应用', key: 'app', icon: <AppstoreOutlined /> }, // 菜单项务必填写 key
 //   { label: '文档', key: 'doc', icon: <FileTextOutlined /> },
@@ -32,14 +28,16 @@ const StoreClassify: React.FC = () => {
   const [list, setList] = useState<any[]>([]);
   const location = useLocation();
   const router = `${location.pathname}${location.search}`;
-  const { user } = useStore((state) => ({ ...state })); // 用户信息
+  // const { user } = useStore((state) => ({ ...state })); // 用户信息
 
   // const [total, setTotal] = useState<number>(0);
   // const history = useHistory();
   useEffect(() => {
-    ClassServices.currentMenu = 'myApps';
-    ClassServices.TreeCallBack = setList;
-    ClassServices.getTreeData();
+    console.log('初始化', 'APP頁面');
+
+    StoreSiderbar.currentMenu = 'myApps';
+    StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.getTreeData();
   }, []);
 
   const onOk = async (data: any) => {
@@ -56,24 +54,35 @@ const StoreClassify: React.FC = () => {
     setisAppDetailOpen(false)
   };
 
-  //菜单跳转
-  // const goPage = (e: any) => {
-  //   history.push(`/store/${e.key}`);
-  // };
+  /**
+   * @desc: 创建新目录
+   * @param {any} item
+   * @return {*}
+   */
   const handleAddShop = (item: any) => {
     console.log('handleAddShop', item);
     setIsStoreOpen(true);
   };
+  /*******
+   * @desc: 目录更多操作 触发事件
+   * @param {object} param1
+   * @return {*}
+   */
   const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
-    console.log('handleMenuClick', data, key);
+    console.log('handleMenuClick55', data, key);
   };
-
+  /*******
+   * @desc: 点击目录 触发事件
+   * @param {any} item
+   * @return {*}
+   */
+  const handleTitleClick = (item: any) => {
+    // 触发内容去变化
+    StoreContent.changeMenu(item);
+  };
   return (
     <>
       <div className={cls.container}>
-        {/* <div> */}
-        {/* <div className={cls.subTitle}>常用分类</div>
-          <Menu items={items} onClick={goPage} /> */}
         {router == '/store/doc' ? (
           <CloudTreeComp></CloudTreeComp>
         ) : (
@@ -82,11 +91,11 @@ const StoreClassify: React.FC = () => {
             searchable
             draggable
             treeData={list}
+            handleTitleClick={handleTitleClick}
             handleAddClick={handleAddShop}
             handleMenuClick={handleMenuClick}
           />
         )}
-        {/* </div> */}
       </div>
       <Modal
         title="搜索商店"
@@ -105,7 +114,6 @@ const StoreClassify: React.FC = () => {
         }}>
         <SearchSjopComp />
       </Modal>
-      {/* <JsonFrom open={open} setOpen={setOpen} JsonColumns={[]} /> */}
       {/* 新建商店 */}
       <NewStoreModal
         title={'新建商店'}

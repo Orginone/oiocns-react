@@ -1,15 +1,16 @@
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Col, message, Modal, Row, Empty } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
-import CohortServers from '@/module/chat/cohortchat';
-import { chat } from '@/module/chat/orgchat';
-import useChatStore from '@/store/chat';
+// import CohortServers from '@/module/chat/cohortchat';
 import detailStyle from './index.module.less';
+import { chatCtrl } from '@/ts/controller/chat';
+import { deepClone } from '@/ts/base/common';
 
-/*
-  个人、群聊详情
-*/
+/**
+ * @description:  个人、群聊详情
+ * @return {*}
+ */
 
 interface itemResult {
   code: string;
@@ -25,8 +26,19 @@ interface itemResult {
   version: string;
 }
 
-const Groupdetail: React.FC = () => {
-  const ChatStore: any = useChatStore();
+const Groupdetail = () => {
+  const [chat, setChat] = useState(chatCtrl.chat);
+  const refreshUI = () => {
+    setChat(deepClone(chatCtrl.chat));
+  };
+
+  useEffect(() => {
+    const id = chatCtrl.subscribe(refreshUI);
+    return () => {
+      chatCtrl.unsubscribe(id);
+    };
+  }, []);
+  // const { clearMsgCallback } = props;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
   const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
   const [state, setState] = useState<any>({
@@ -50,7 +62,7 @@ const Groupdetail: React.FC = () => {
         state.friendsData = item.chats.filter((c: any) => {
           if (c.typeName === '人员') {
             let exist = false;
-            ChatStore.qunPersons.forEach((p: any) => {
+            chat.qunPersons.forEach((p: any) => {
               if (c.id === p.id) {
                 exist = true;
               }
@@ -117,25 +129,25 @@ const Groupdetail: React.FC = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={ChatStore.curChat?.name} label={''} />
+        <HeadImg name={chat?.target.name} label={''} />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>
-          {ChatStore.curChat?.name}
-          {ChatStore.curChat?.typeName !== '人员' ? (
-            <span className={detailStyle.number}>({ChatStore.curChat?.personNum})</span>
+          {chat?.target.name}
+          {chat?.target.typeName !== '人员' ? (
+            <span className={detailStyle.number}>({chat?.personCount})</span>
           ) : (
             ''
           )}
         </h4>
-        <div className={detailStyle.base_info_desc}>{ChatStore.curChat?.remark}</div>
+        <div className={detailStyle.base_info_desc}>{chat?.target.remark}</div>
       </Col>
     </Row>
   );
   // 群组成员
   const grouppeoples = (
     <>
-      {ChatStore?.qunPersons.map((item: any, index: any) => {
+      {chat?.persons.map((item: any) => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
             <HeadImg name={item.name} label={''} />
@@ -143,12 +155,12 @@ const Groupdetail: React.FC = () => {
           </div>
         );
       })}
-      {ChatStore.curChat?.typeName === '群组' ? (
+      {chat?.target.typeName === '群组' ? (
         <>
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
-              openDialogAdd();
+              // openDialogAdd();
             }}>
             +
           </div>
@@ -156,7 +168,7 @@ const Groupdetail: React.FC = () => {
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
               // openDialogDel();
-              setIsShiftUp(true);
+              // setIsShiftUp(true);
             }}>
             -
           </div>
@@ -174,11 +186,11 @@ const Groupdetail: React.FC = () => {
         <div className={detailStyle.user_list}>
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
-            {ChatStore.curChat?.personNum > 1 ? (
+            {chat?.personCount ?? 0 > 1 ? (
               <span
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
                 onClick={() => {
-                  chat.getPersons(false);
+                  chatCtrl.refChat(chat)?.deleteMessage('');
                 }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>
@@ -189,15 +201,15 @@ const Groupdetail: React.FC = () => {
               ''
             )}
           </div>
-          {ChatStore.curChat?.typeName === '群组' ? (
+          {chat?.target.typeName === '群组' ? (
             <>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊名称</span>
-                <span className={detailStyle.con_value}>{ChatStore.curChat?.remark}</span>
+                <span className={detailStyle.con_value}>{chat?.target.remark}</span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊描述</span>
-                <span className={detailStyle.con_value}>{ChatStore.curChat?.remark}</span>
+                <span className={detailStyle.con_value}>{chat?.target.remark}</span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>我在本群的昵称</span>
@@ -212,9 +224,7 @@ const Groupdetail: React.FC = () => {
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
-            <span>
-              {ChatStore.curChat?.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}
-            </span>
+            <span>{chat?.target.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}</span>
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
@@ -222,16 +232,16 @@ const Groupdetail: React.FC = () => {
             <RightOutlined />
           </div>
         </div>
-        {ChatStore.curChat?.spaceId === chat.userId ? (
+        {chat?.spaceId === chatCtrl.userId ? (
           <div className={`${detailStyle.footer} ${detailStyle.group_detail_wrap}`}>
             <Button
               type="primary"
               onClick={() => {
-                ChatStore.clearMsg();
+                chatCtrl.refChat(chat)?.clearMessage();
               }}>
               清空聊天记录
             </Button>
-            {ChatStore.curChat?.typeName === '群组' ? (
+            {chat?.target.typeName === '群组' ? (
               <>
                 <Button type="primary" danger>
                   退出该群
@@ -293,7 +303,7 @@ const Groupdetail: React.FC = () => {
       <Modal>
         <div className={detailStyle.invitateBox}>
           <>
-            {ChatStore.qunPersons?.map((item: any, index: any) => {
+            {chat?.persons.map((item: any, index: any) => {
               return (
                 <div
                   key={item.id}
