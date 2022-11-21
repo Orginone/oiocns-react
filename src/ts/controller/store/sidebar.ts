@@ -26,14 +26,28 @@ type AppTreeType = {
 class StoreClassify {
   // constructor(parameters) {}
   // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+
+  // 顶部菜单区域
+  public static SelfMenu = [
+    { title: '应用', code: 'app' },
+    { title: '文档', code: 'docx' },
+    { title: '数据', code: 'data' },
+    { title: '资源', code: 'assets' },
+  ];
+  // 商店导航
+  static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
-  public curPageType: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
+  public curPageType: 'app' | 'market' = 'app'; // 当前功能页面 app-我的应用页面  market-市场页面
+  public curMenu: string = 'app'; // 当前所选菜单
+  public curMenuData: any[] = StoreClassify.SelfMenu; // 当前展示菜单数据
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
   public TreeCallBack!: (data: any[]) => void; //页面传进来的更新树形区域 钩子
   public SelectMarketCallBack!: (item: AppStore) => void; //选择商店后 触发展示区回调
+  // 记录
+  recordPageType = { app: 'app', market: 'app' };
 
   // 底部区域
   // 缓存 所有 tree 展示数据
@@ -61,23 +75,21 @@ class StoreClassify {
     assetsTreeData: [],
   };
 
-  // 顶部菜单区域
-  public static SelfMenu = [
-    { title: '应用', code: 'app' },
-    { title: '文档', code: 'docx' },
-    { title: '数据', code: 'data' },
-    { title: '资源', code: 'assets' },
-  ];
-  // 商店导航
-  // static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
+  changePageType(type: 'app' | 'market') {
+    this.curPageType = type;
+    console.log('sss', type, this[`${type}FooterTree`], this.curMenu);
 
+    this.curTreeData = this[`${type}FooterTree`][`${this.curMenu}Treedata`] || [];
+  }
   /**
    * @desc 处理点击顶部导航获取tree 数据
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    let data = `${this.curPageType === 'myApps' ? 'app' : 'market'}FooterTree`;
-    if (this[data][`${key}TreeData`].length > 0) {
+    console.log('gggg', key);
+    let data = `${this.curPageType === 'app' ? 'app' : 'market'}FooterTree`;
+    this.curMenu = key;
+    if (this.curTreeData.length > 0) {
       this.curTreeData = this[data][`${key}TreeData`];
       return;
     }
@@ -94,16 +106,11 @@ class StoreClassify {
   public getTreeData() {
     // 1.获取市场
     //获取文档
+    console.log('哈哈哈哈', this.curPageType);
 
-    if (this.curPageType === 'myApps') {
+    if (this.curPageType === 'app') {
       //TODO:获取 自定义分类树
       this.curTreeData = this.appFooterTree.appTreeData;
-      console.log(
-        '自定义分类树-触发变更callback',
-        this.curPageType,
-        this.appFooterTree.appTreeData,
-      );
-
       this.TreeCallBack([...this.curTreeData]);
     } else {
       console.log('获取市场-tree');

@@ -33,7 +33,7 @@ const StoreClassify: React.FC = () => {
   useEffect(() => {
     console.log('初始化', 'APP頁面');
 
-    StoreSiderbar.currentMenu = 'myApps';
+    StoreSiderbar.changePageType('app');
     StoreSiderbar.TreeCallBack = setList;
     StoreSiderbar.getTreeData();
   }, []);

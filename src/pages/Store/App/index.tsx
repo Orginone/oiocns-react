@@ -14,7 +14,7 @@ import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
-import storeContent from '@/ts/controller/store/content';
+import StoreSidebar from '@/ts/controller/store/sidebar';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -57,9 +57,9 @@ const StoreApp: React.FC = () => {
   ];
 
   useEffect(() => {
-    storeContent.curPageType = 'myApps';
-    storeContent.marketTableCallBack = setData;
-    storeContent.getStoreProduct();
+    // storeContent.curPageType = 'myApps';
+    StoreContent.marketTableCallBack = setData;
+    StoreContent.getStoreProduct();
   }, []);
 
   const BtnsList = ['购买', '创建', '暂存'];
@@ -67,6 +67,8 @@ const StoreApp: React.FC = () => {
     // console.log('按钮点击', item);
     switch (item.text) {
       case '购买':
+        StoreSidebar.changePageType('market');
+        // StoreSidebar.getTreeData();
         history.push('/market/shop');
         break;
       case '创建':
@@ -167,13 +169,13 @@ const StoreApp: React.FC = () => {
             setStatusKey(key);
           }}>
           <div className={cls['page-content-table']}>
-            <AppShowComp
-              queryFun={Provider.getPerson.queryMyProduct}
+            {/* <AppShowComp
+              queryFun={Provider.getPerson.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={StoreContent.getColumns()}
               renderOperation={renderOperation}
-            />
+            /> */}
           </div>
         </Card>
       </div>

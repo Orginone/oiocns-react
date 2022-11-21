@@ -11,7 +11,7 @@ import { myColumns } from './config';
 class StoreContent {
   private _currentMenu = 'Public'; //当前展示 菜单
   // public public_store: XMerchandise[] = [];
-  public curPageType: 'myApps' | 'market' = 'market'; // 判断当前所处页面类型,调用不同请求
+  public curPageType: 'app' | 'market' = 'market'; // 判断当前所处页面类型,调用不同请求
   // public myAppList: XProduct[] = [];
   public Person = Provider.getPerson; // 获取当前 个人实例
   public marketTableCallBack!: (data: any) => void; //触发页面渲染 callback
@@ -55,8 +55,8 @@ class StoreContent {
    */
   public async getStoreProduct(params?: any) {
     let Fun!: Function;
-    if (this.curPageType === 'myApps') {
-      Fun = this.Person!.queryMyProduct;
+    if (this.curPageType === 'app') {
+      Fun = this.Person!.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
@@ -66,7 +66,7 @@ class StoreContent {
     const { success, data = { result: [] } } = await Fun(params);
 
     if (success) {
-      const { result } = data;
+      const { result = [] } = data;
       this.marketTableCallBack([...result]);
     }
   }
