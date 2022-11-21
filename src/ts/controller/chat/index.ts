@@ -175,7 +175,7 @@ class ChatController {
           isMatch = data.spaceId == c.spaceId;
         }
         if (isMatch) {
-          c.receiveMessage(data);
+          c.receiveMessage(data, !this.isCurrent(c));
           this._appendChats(c);
           this._cacheChats();
           this._callback();

@@ -72,9 +72,9 @@ class BaseChat implements IChat {
     });
     return res.success;
   }
-  receiveMessage(msg: schema.XImMsg) {
+  receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
     if (msg.id !== this.lastMessage?.id) {
-      this.noReadCount += 1;
+      this.noReadCount += noread ? 1 : 0;
       this.lastMessage = msg;
       this.messages.push(msg);
     }

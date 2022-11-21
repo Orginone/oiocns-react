@@ -65,7 +65,7 @@ export interface IChat {
    * 会话接收到消息
    * @param msg 消息
    */
-  receiveMessage(msg: schema.XImMsg): void;
+  receiveMessage(msg: schema.XImMsg, noread: boolean): void;
 }
 /**
  * 分组会话接口
