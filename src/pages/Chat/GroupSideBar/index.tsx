@@ -6,6 +6,7 @@ import { formatDate } from '@/utils/index';
 import sideStyle from './index.module.less';
 import { chatCtrl } from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
+import { IChat } from '@/ts/core/chat/ichat';
 
 /**
  * @description: 会话列表、通讯录
@@ -26,10 +27,9 @@ interface MenuItemType {
 
 const GroupSideBar = () => {
   const [index, setIndex] = useState('1');
-  const [groups, setGroups] = useState(chatCtrl.groups);
   const [chats, setChats] = useState(chatCtrl.chats);
+  const [groups, setGroups] = useState(chatCtrl.groups);
   const [searchValue, setSearchValue] = useState<string>(''); // 搜索值
-  const [isMounted, setIsMounted] = useState<boolean>(false); // 是否已加载--判断是否需要默认打开
   const [mousePosition, setMousePosition] = useState<MousePosition>({
     left: 0,
     top: 0,
@@ -42,58 +42,17 @@ const GroupSideBar = () => {
     { value: 3, label: '取消置顶' },
   ]);
 
-  const onChange = (values: string) => {
-    setSearchValue(values);
+  /** 会话过滤功能 */
+  const filterChats = (chats: IChat[]): IChat[] => {
+    return chats.filter((item) => {
+      return (
+        item.target.name.includes(searchValue) ||
+        item.target.typeName.includes(searchValue) ||
+        item.spaceName.includes(searchValue) ||
+        (item.lastMessage && item.lastMessage.msgBody.includes(searchValue))
+      );
+    });
   };
-
-  //根据搜索条件-输出展示列表
-  // const showList = (): ImMsgType[] => {
-  //   let topGroup: any = {
-  //     id: 'toping',
-  //     name: '置顶会话',
-  //   };
-  //   topGroup.chats = [];
-  //   let showInfoArr = chat.chats;
-  //   showInfoArr = showInfoArr.map((child: ImMsgType) => {
-  //     let chats = child.chats.filter((item: ImMsgChildType) => {
-  //       let matched =
-  //         !searchValue ||
-  //         item.name?.includes(searchValue) ||
-  //         item.msgBody?.includes(searchValue);
-  //       if (matched && item.isTop) {
-  //         topGroup.chats.push(item);
-  //       }
-  //       return matched && !item.isTop;
-  //     });
-  //     return {
-  //       id: child.id,
-  //       name: child.name,
-  //       chats: chats,
-  //     };
-  //   });
-  //   // 首次进入页面默认打开第一个分组
-  //   if (!isMounted && openIdArr.length === 0 && showInfoArr.length > 0) {
-  //     // // 当从关系-群组 进入会话携带id 则进入对应聊天室
-  //     // if (routerParams.defaultOpenID) {
-  //     //   openIdArr.push(routerParams.spaceId as string);
-  //     //   const aimItem = showInfoArr
-  //     //     .find((item) => item.id == routerParams.spaceId)
-  //     //     ?.chats.find((item) => item.id == routerParams.defaultOpenID);
-  //     //   aimItem && openChanged(aimItem);
-  //     // } else {
-  //     if (topGroup.chats.length < 1) {
-  //       openIdArr.push(showInfoArr[0].id);
-  //     } else {
-  //       openIdArr.push('toping');
-  //     }
-  //     // }
-  //     setIsMounted(true);
-  //   }
-  //   if (topGroup.chats.length > 0) {
-  //     return [topGroup, ...showInfoArr];
-  //   }
-  //   return showInfoArr;
-  // };
 
   /**
    * @description: 时间处理
@@ -196,7 +155,7 @@ const GroupSideBar = () => {
           placeholder="搜索"
           prefix={<SearchOutlined />}
           onChange={(e) => {
-            onChange(e.target.value);
+            setSearchValue(e.target.value);
           }}
         />
       </div>
@@ -207,13 +166,13 @@ const GroupSideBar = () => {
         }}>
         <Tabs.TabPane tab="会话" key="1">
           <div className={sideStyle.group_side_bar_wrap}>
-            {chats.map((child) => {
+            {filterChats(chats).map((child) => {
               return (
                 <div
                   className={`${sideStyle.con_body_session} ${
                     chatCtrl.isCurrent(child) ? sideStyle.active : ''
                   }`}
-                  key={child.chatId}>
+                  key={child.fullId}>
                   <HeadImg name={child.target.name} label={child.target.label} />
                   {child.noReadCount > 0 ? (
                     <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>
@@ -267,19 +226,19 @@ const GroupSideBar = () => {
                         chatCtrl.setGroupActive(item);
                       }}>
                       <span>
-                        {item.spaceName}({item?.chats?.length ?? 0})
+                        {item.spaceName}({filterChats(item.chats).length})
                       </span>
                     </div>
                     {/* 展开的分组下的人员 */}
                     {item.isOpened ? (
                       <>
-                        {item.chats.map((child) => {
+                        {filterChats(item.chats).map((child) => {
                           return (
                             <div
                               className={`${sideStyle.con_body} ${
                                 chatCtrl.isCurrent(child) ? sideStyle.active : ''
                               }`}
-                              key={child.spaceId + child.chatId}
+                              key={child.fullId}
                               onContextMenu={(e: any) =>
                                 handleContextClick(e, child.target)
                               }>
@@ -330,7 +289,7 @@ const GroupSideBar = () => {
                     <>
                       {!item.isOpened ? (
                         <>
-                          {item.chats
+                          {filterChats(item.chats)
                             .filter((v) => v.noReadCount > 0)
                             .map((child) => {
                               return (

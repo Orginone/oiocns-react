@@ -12,6 +12,7 @@ const hisMsgCollName = 'chat-message';
  * @abstract
  */
 class BaseChat implements IChat {
+  fullId: string;
   chatId: string;
   spaceId: string;
   spaceName: string;
@@ -30,6 +31,7 @@ class BaseChat implements IChat {
     this.personCount = 0;
     this.chatId = m.id;
     this.noReadCount = 0;
+    this.fullId = this.spaceId + '-' + this.chatId;
   }
   getCache(): ChatCache {
     return {
@@ -58,6 +60,7 @@ class BaseChat implements IChat {
     for (const item of this.messages) {
       if (item.id === id) {
         const res = await kernel.recallImMsg(item);
+        console.log(res);
         return res.success;
       }
     }
