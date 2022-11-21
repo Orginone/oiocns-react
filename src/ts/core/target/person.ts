@@ -123,30 +123,6 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-<<<<<<< HEAD
-   * 获取好友列表
-   * @returns 返回好友列表
-   */
-  public async getFriends(): Promise<XTarget[]> {
-    if (this._friends.length > 0) {
-      return this._friends;
-    }
-    const res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Person],
-    });
-    console.log('好友查询结果', res);
-    if (res.success) {
-      if (res.data != undefined && res.data.result != undefined) {
-        this._friends = res.data.result;
-      }
-    }
-    return this._friends;
-  }
-
-  /**
-=======
->>>>>>> dev
    * 设立单位
    * @param name 单位名称
    * @param code 单位信用代码
@@ -201,54 +177,6 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-<<<<<<< HEAD
-   * 查询我的产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMyProduct(): Promise<schema.XProductArray> {
-    let resultArray: any = [];
-    let paramData: any = {};
-    paramData.id = this.target.id;
-    paramData.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_8,
-    };
-    let res = await kernel.querySelfProduct(paramData);
-    if (res.success && res.data && res.data.result) {
-      resultArray = res.data.result;
-    }
-    return resultArray;
-  }
-
-  /**
-   * 查询我的个人产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMySpaceProduct(): Promise<schema.XProductArray> {
-    let resultArray: any = [];
-    // 判断如果是有个人空间
-    if (!this._curCompany) {
-      return resultArray;
-    }
-
-    let paramData: any = {};
-    paramData.id = this._joinedCompanys[0].target.id;
-    paramData.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_8,
-    };
-    let res = await kernel.querySelfProduct(paramData);
-    if (res.success && res.data && res.data.result) {
-      resultArray = res.data.result;
-    }
-    return resultArray;
-  }
-
-=======
    * 获取好友列表
    * @returns 返回好友列表
    */
@@ -266,7 +194,6 @@ export default class Person extends MarketActionTarget {
     }
     return this._friends;
   }
->>>>>>> dev
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
