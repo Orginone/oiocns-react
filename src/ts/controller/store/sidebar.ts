@@ -37,7 +37,7 @@ class StoreClassify {
 
   // 底部区域
   // 缓存 所有 tree 展示数据
-  public footerTree: footerTreeType = {
+  public appFooterTree: footerTreeType = {
     appTreeData: [
       {
         title: '测试目录1',
@@ -50,6 +50,12 @@ class StoreClassify {
       },
       { title: '测试目录2', key: '1-2', id: '2', children: [] },
     ],
+    docxTreeData: [],
+    dataTreeData: [],
+    assetsTreeData: [],
+  };
+  public marketFooterTree: footerTreeType = {
+    appTreeData: [],
     docxTreeData: [],
     dataTreeData: [],
     assetsTreeData: [],
@@ -70,8 +76,9 @@ class StoreClassify {
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    if (this.footerTree[`${key}TreeData`].length > 0) {
-      this.curTreeData = this.footerTree[`${key}TreeData`];
+    let data = `${this.currentMenu === 'myApps' ? 'app' : 'market'}FooterTree`;
+    if (this[data][`${key}TreeData`].length > 0) {
+      this.curTreeData = this[data][`${key}TreeData`];
       return;
     }
     //1. 直接触发展示区 更新展示数据
@@ -91,9 +98,17 @@ class StoreClassify {
 
     if (this.currentMenu === 'myApps') {
       //TODO:获取 自定义分类树
-      this.curTreeData = this.footerTree.appTreeData;
-      this.TreeCallBack && this.TreeCallBack(this.curTreeData);
+      this.curTreeData = this.appFooterTree.appTreeData;
+      console.log('触发变更callback', this.currentMenu, this.appFooterTree.appTreeData);
+
+      this.TreeCallBack && this.TreeCallBack([...this.curTreeData]);
     } else {
+      this.curTreeData = this.marketFooterTree.appTreeData;
+      console.log(
+        '触发变更callback',
+        this.currentMenu,
+        this.marketFooterTree.appTreeData,
+      );
       this.getOwnMarket();
     }
   }
@@ -142,7 +157,7 @@ class StoreClassify {
       };
     });
 
-    this.footerTree.appTreeData = arr;
+    this.marketFooterTree.appTreeData = arr;
 
     this.TreeCallBack && this.TreeCallBack(arr);
   }

@@ -4,9 +4,10 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import HeadImg from '@/components/headImg/headImg';
-import { chat } from '@/module/chat/orgchat';
-import useChatStore from '@/store/chat';
 import contentStyle from './index.module.less';
+import { chatCtrl } from '@/ts/controller/chat';
+import { showChatTime } from '@/utils/tools';
+import { deepClone } from '@/ts/base/common';
 
 /**
  * @description: 聊天区域
@@ -15,25 +16,21 @@ import contentStyle from './index.module.less';
 
 interface Iprops {
   handleReWrites: Function;
-  historyMesagesList: any;
 }
 
 const GroupContent = (props: Iprops) => {
-  const { handleReWrites, historyMesagesList } = props;
-  const ChatStore: any = useChatStore();
+  const [messages, setMessages] = useState(chatCtrl.chat?.messages ?? []);
+  const { handleReWrites } = props;
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
-  const isShowTime = (index: number) => {
-    if (index == 0) return true;
-    // return (
-    //   moment(ChatStore.curMsgs[index].createTime).diff(
-    //     ChatStore.curMsgs[index - 1].createTime,
-    //     'minute',
-    //   ) > 3
-    // );
+  const refreshUI = async () => {
+    setMessages(deepClone(chatCtrl.chat?.messages ?? []));
   };
 
-  // 滚动到底部
+  /**
+   * @description: 滚动到底部
+   * @return {*}
+   */
   const scrollEvent = () => {
     if (messageNodeRef.current) {
       messageNodeRef.current.scrollIntoView({
@@ -45,61 +42,34 @@ const GroupContent = (props: Iprops) => {
   };
   useEffect(() => {
     scrollEvent();
-  }, [chat.curMsgs, chat.setCurrent]);
+  }, [messages]);
 
-  // 聊天间隔时间
-  const showChatTime = (chatDate: moment.MomentInput) => {
-    const cdate = moment(chatDate);
-    const days = moment().diff(cdate, 'day');
-    switch (days) {
-      case 0:
-        return cdate.format('H:mm');
-      case 1:
-        return '昨天 ' + cdate.format('H:mm');
-      case 2:
-        return '前天 ' + cdate.format('H:mm');
-    }
-    const year = moment().diff(cdate, 'year');
-    if (year == 0) {
-      return cdate.format('M月D日 H:mm');
-    }
-    return cdate.format('yy年 M月D日 H:mm');
+  useEffect(() => {
+    const id = chatCtrl.subscribe(refreshUI);
+    return () => {
+      chatCtrl.unsubscribe(id);
+    };
+  }, []);
+
+  const isShowTime = (index: number) => {
+    if (index == 0 && messages) return true;
+    return (
+      moment(messages[index].createTime).diff(messages[index - 1].createTime, 'minute') >
+      3
+    );
   };
-
-  // 重新编辑
+  /**
+   * @description: 重新编辑
+   * @param {string} txt
+   * @return {*}
+   */
   const handleReWrite = (txt: string) => {
     handleReWrites(txt);
-  };
-  // 删除消息
-  const deleteMsg = (item: any) => {
-    item.edit = false;
-    ChatStore.deleteMsg(item);
-  };
-  const canDelete = (item: any) => {
-    if (item.chatId) {
-      return true;
-    }
-    return item.spaceId === chat.userId;
-  };
-  // 消息撤回
-  const recallMsg = (item: any) => {
-    item.edit = false;
-    if (item.chatId) {
-      item.id = item.chatId;
-      delete item.chatId;
-      delete item.sessionId;
-    }
-    ChatStore.recallMsgs(item);
-    // ChatStore.recallMsgs(item).then((res: ResultType) => {
-    //   if (res.data != 1) {
-    //     message.warning('只能撤回2分钟内发送的消息');
-    //   }
-    // });
   };
 
   return (
     <div className={contentStyle.group_content_wrap}>
-      {historyMesagesList.map((item: any, index: any) => {
+      {messages.map((item, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
             {/* 聊天间隔时间3分钟则 显示时间 */}
@@ -113,16 +83,14 @@ const GroupContent = (props: Iprops) => {
             {/* 重新编辑 */}
             {item.msgType === 'recall' ? (
               <div
-                className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}
-              >
+                className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}>
                 {item.showTxt}
                 {item.allowEdit ? (
                   <span
                     className={contentStyle.reWrite}
                     onClick={() => {
                       handleReWrite(item.msgBody);
-                    }}
-                  >
+                    }}>
                     重新编辑
                   </span>
                 ) : (
@@ -133,19 +101,19 @@ const GroupContent = (props: Iprops) => {
               ''
             )}
             {/* 左侧聊天内容显示 */}
-            {item.fromId !== chat.userId ? (
+            {item.fromId !== chatCtrl.userId ? (
               <div className={`${contentStyle.group_content_left} ${contentStyle.con}`}>
                 <Popover
                   trigger="hover"
                   overlayClassName={contentStyle.targerBoxClass}
                   open={selectId == item.id}
-                  key={item.chatId}
+                  key={item.id}
                   placement="bottom"
                   onOpenChange={() => {
                     setSelectId('');
                   }}
                   content={
-                    canDelete(item) ? (
+                    chatCtrl.chat?.spaceId === item.spaceId ? (
                       <>
                         <CopyToClipboard text={item.msgBody}>
                           <Button type="text" style={{ color: '#3e5ed8' }}>
@@ -156,17 +124,15 @@ const GroupContent = (props: Iprops) => {
                           type="text"
                           danger
                           onClick={() => {
-                            deleteMsg(item);
-                          }}
-                        >
+                            chatCtrl.chat?.deleteMessage(item.id);
+                          }}>
                           删除
                         </Button>
                       </>
                     ) : (
                       ''
                     )
-                  }
-                >
+                  }>
                   {item.msgType === 'recall' ? (
                     ''
                   ) : (
@@ -175,23 +141,20 @@ const GroupContent = (props: Iprops) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectId(item.id);
-                      }}
-                    >
-                      <HeadImg name={chat.getName(item.fromId)} label={''} />
+                      }}>
+                      <HeadImg name={chatCtrl.getName(item.fromId)} label={''} />
                       <div className={`${contentStyle.con_content}`}>
-                        {ChatStore?.curChat?.typeName !== '人员' ? (
+                        {chatCtrl.chat?.target.typeName !== '人员' ? (
                           <div
-                            className={`${contentStyle.con_content} ${contentStyle.name}`}
-                          >
-                            {ChatStore.getName(item.fromId) || ''}
+                            className={`${contentStyle.con_content} ${contentStyle.name}`}>
+                            {chatCtrl.getName(item.fromId) || ''}
                           </div>
                         ) : (
                           ''
                         )}
                         <div
                           className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                          dangerouslySetInnerHTML={{ __html: item.msgBody }}
-                        ></div>
+                          dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
                       </div>
                     </div>
                   )}
@@ -201,8 +164,7 @@ const GroupContent = (props: Iprops) => {
               <>
                 {/* 右侧聊天内容显示 */}
                 <div
-                  className={`${contentStyle.group_content_right} ${contentStyle.con}`}
-                >
+                  className={`${contentStyle.group_content_right} ${contentStyle.con}`}>
                   <Popover
                     trigger="hover"
                     overlayClassName={contentStyle.targerBoxClass}
@@ -226,27 +188,24 @@ const GroupContent = (props: Iprops) => {
                           type="text"
                           style={{ color: '#3e5ed8' }}
                           onClick={() => {
-                            recallMsg(item);
-                          }}
-                        >
+                            chatCtrl.chat?.reCallMessage(item.id);
+                          }}>
                           撤回
                         </Button>
-                        {canDelete(item) ? (
+                        {item.spaceId === chatCtrl.chat?.spaceId ? (
                           <Button
                             type="text"
                             danger
                             onClick={() => {
-                              deleteMsg(item);
-                            }}
-                          >
+                              chatCtrl.chat?.deleteMessage(item.id);
+                            }}>
                             删除
                           </Button>
                         ) : (
                           ''
                         )}
                       </>
-                    }
-                  >
+                    }>
                     {item.msgType === 'recall' ? (
                       ''
                     ) : (
@@ -255,15 +214,13 @@ const GroupContent = (props: Iprops) => {
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectId(item.id);
-                        }}
-                      >
+                        }}>
                         <div className={contentStyle.con_content}>
                           <div
                             className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                            dangerouslySetInnerHTML={{ __html: item.msgBody }}
-                          ></div>
+                            dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
                         </div>
-                        <HeadImg name={chat.getName(item.fromId)} />
+                        <HeadImg name={chatCtrl.getName(item.fromId)} />
                       </div>
                     )}
                   </Popover>
@@ -278,8 +235,7 @@ const GroupContent = (props: Iprops) => {
         style={{
           clear: 'both',
           width: '100%',
-        }}
-      ></div>
+        }}></div>
     </div>
   );
 };

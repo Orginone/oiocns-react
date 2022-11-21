@@ -1,33 +1,80 @@
-import { Identity } from '@/module/org';
-import { XMarketArray, XTarget } from '@/ts/base/schema';
-import { message } from 'antd';
-import { kernel, model, common, schema, FaildResult } from '../../base';
+import { PageRequest } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import AppStore from '../market/appstore';
+import consts from '../consts';
+import { kernel, model, common, schema, faildResult } from '../../base';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;
-  protected identitys: schema.XIdentity[];
-  protected _joinedMarkets: AppStore[];
+  // 拥有的身份
+  public _ownIdentitys: schema.XIdentity[];
+  public _allIdentitys: schema.XIdentity[];
+  public _ownAuthoritys: schema.XAuthority[];
+  public _allAuthoritys: schema.XAuthority[];
+
   protected get createTargetType(): TargetType[] {
     return [TargetType.Cohort];
   }
+
   protected get joinTargetType(): TargetType[] {
+    return [TargetType.Cohort, TargetType.Person];
+  }
+
+  protected get searchTargetType(): TargetType[] {
     return [TargetType.Cohort, TargetType.Person];
   }
 
   constructor(target: schema.XTarget) {
     this.target = target;
-    this.identitys = [];
-    this._joinedMarkets = [];
+    this._ownIdentitys = [];
+    this._allIdentitys = [];
+    this._ownAuthoritys = [];
+    this._allAuthoritys = [];
   }
 
-  public async showMessage(response: model.ResultType<any>) {
-    if (response.success) {
-      message.success('操作成功！')
-    } else {
-      message.error('操作失败！发生错误：  ' + response.msg)
+  /**
+   * 根据名称查询组织/个人
+   * @param name 名称
+   * @param TypeName 类型
+   * @returns
+   */
+  public async searchTargetByName(
+    name: string,
+    typeName: TargetType,
+  ): Promise<model.ResultType<any>> {
+    if (this.searchTargetType.includes(typeName)) {
+      const data: model.NameTypeModel = {
+        name: name,
+        typeName: typeName,
+        page: {
+          offset: 0,
+          filter: name,
+          limit: common.Constants.MAX_UINT_16,
+        },
+      };
+      return await kernel.searchTargetByName(data);
     }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 申请加入组织/个人 (好友申请除外)
+   * @param destId 加入的组织/个人id
+   * @param typeName 对象
+   * @returns
+   */
+  public async applyJoin(
+    destId: string,
+    typeName: TargetType,
+  ): Promise<model.ResultType<any>> {
+    if (this.joinTargetType.includes(typeName)) {
+      return await kernel.applyJoinTeam({
+        id: destId,
+        targetId: this.target.id,
+        teamType: typeName,
+        targetType: this.target.typeName,
+      });
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -47,7 +94,7 @@ export default class BaseTarget {
     teamName: string,
     teamCode: string,
     teamRemark: string,
-  ): Promise<model.ResultType<XTarget>> {
+  ): Promise<model.ResultType<schema.XTarget>> {
     if (this.createTargetType.includes(typeName)) {
       return await kernel.createTarget({
         name,
@@ -59,30 +106,370 @@ export default class BaseTarget {
         belongId: this.target.id,
       });
     } else {
-      return FaildResult('您无法创建该类型对象!');
+      return faildResult(consts.UnauthorizedError);
     }
   }
 
   /**
-   * 申请加入组织/个人
-   * @param destId 加入的组织/个人id
-   * @param typeName 对象
+   * 删除对象
+   * @param id 对象Id
+   * @param typeName 对象类型
    * @returns
    */
-  public async applyJoin(destId: string, typeName: TargetType) {
-    if (this.joinTargetType.includes(typeName)) {
-      return await kernel.applyJoinTeam({
-        id: destId,
-        targetId: this.target.id,
-        teamType: typeName,
-        targetType: this.target.typeName,
+  protected async deleteTarget(
+    id: string,
+    typeName: TargetType,
+  ): Promise<model.ResultType<any>> {
+    if (this.createTargetType.includes(typeName)) {
+      return await kernel.deleteTarget({
+        id,
+        typeName,
+        belongId: this.target.id,
       });
     } else {
-      return FaildResult('您无法创建该类型对象!');
+      return faildResult(consts.UnauthorizedError);
     }
   }
 
+  /**
+   * 创建职权
+   * @param name 名称
+   * @param code 编号
+   * @param ispublic 是否公开
+   * @param parentId 父类别ID
+   * @param remark 备注
+   * @returns
+   */
+  public async createAuthority(
+    name: string,
+    code: string,
+    ispublic: boolean,
+    parentId: string,
+    remark: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
+    let parent = this._ownAuthoritys.find((auth) => {
+      return auth.id == parentId;
+    });
+    if (parent != undefined) {
+      const res = await kernel.createAuthority({
+        id: undefined,
+        name,
+        code,
+        parentId,
+        remark,
+        public: ispublic,
+        belongId: this.target.id,
+      });
+      if (res.success && res.data != undefined) {
+        this._ownAuthoritys.push(res.data);
+      }
+      return res;
+    }
+    return faildResult('父职权不存在!');
+  }
 
+  /**
+   * 创建身份
+   * @param name 名称
+   * @param code 编号
+   * @param authId 职权Id
+   * @param remark 备注
+   * @returns
+   */
+  public async createIdentity(
+    name: string,
+    code: string,
+    authId: string,
+    remark: string,
+  ): Promise<model.ResultType<schema.XIdentity>> {
+    const auth = this._ownIdentitys.find((auth) => {
+      return auth.id == authId;
+    });
+    if (auth != undefined) {
+      const res = await kernel.createIdentity({
+        name,
+        code,
+        authId,
+        remark,
+        id: undefined,
+        belongId: this.target.id,
+      });
+      if (res.success && res.data != undefined) {
+        this._ownIdentitys.push(res.data);
+      }
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 删除职权
+   * @param id 职权Id
+   * @returns
+   */
+  public async deleteAuthority(id: string): Promise<model.ResultType<any>> {
+    const index = this._ownAuthoritys.findIndex((auth) => {
+      return auth.id == id;
+    });
+    if (index > 0) {
+      const res = await kernel.deleteAuthority({
+        id,
+        belongId: this.target.id,
+        typeName: '',
+      });
+      if (res.success) {
+        delete this._ownAuthoritys[index];
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 删除身份
+   * @param id 身份Id
+   * @returns
+   */
+  public async deleteIdentity(id: string): Promise<model.ResultType<any>> {
+    const index = this._ownIdentitys.findIndex((identity) => {
+      return identity.id == id;
+    });
+    if (index > 0) {
+      const res = await kernel.deleteIdentity({
+        id,
+        belongId: this.target.id,
+        typeName: '',
+      });
+      if (res.success) {
+        delete this._ownIdentitys[index];
+      }
+      return res;
+    }
+    return faildResult('您未拥有该身份!');
+  }
+
+  /**
+   * 更新职权
+   * @param id 唯一ID
+   * @param name 名称
+   * @param code 编号
+   * @param ispublic 公开的
+   * @param remark 备注
+   * @returns
+   */
+  public async updateAuthority(
+    id: string,
+    name: string,
+    code: string,
+    ispublic: boolean,
+    remark: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
+    let auth = this._allAuthoritys.find((authority) => {
+      return authority.id == id;
+    });
+    if (auth != undefined) {
+      const res = await kernel.updateAuthority({
+        name,
+        code,
+        remark,
+        id: auth.id,
+        public: ispublic,
+        belongId: auth.belongId,
+        parentId: auth.parentId,
+      });
+      if (res.success) {
+        auth.name = name;
+        auth.code = code;
+        auth.public = ispublic;
+        auth.remark = remark;
+        auth.updateTime = res.data?.updateTime;
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 更新身份
+   * @param id 唯一ID
+   * @param name 名称
+   * @param code 编号
+   * @param remark 备注
+   * @returns
+   */
+  public async updateIdentity(
+    id: string,
+    name: string,
+    code: string,
+    remark: string,
+  ): Promise<model.ResultType<schema.XIdentity>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      const res = await kernel.updateIdentity({
+        name,
+        code,
+        remark,
+        id: iden.id,
+        authId: iden.authId,
+        belongId: iden.belongId,
+      });
+      if (res.success) {
+        iden.name = name;
+        iden.code = code;
+        iden.remark = remark;
+        iden.updateTime = res.data?.updateTime;
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 赋予组织个人身份
+   * @param id 身份Id
+   * @param targetIds 组织/个人Id集合
+   * @returns
+   */
+  public async giveIdentity(
+    id: string,
+    targetIds: string[],
+  ): Promise<model.ResultType<any>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      return await kernel.giveIdentity({ id, targetIds });
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 移除赋予给组织/个人的身份
+   * @param id 身份Id
+   * @param targetIds 组织/个人Id集合
+   * @returns
+   */
+  public async removeIdentity(
+    id: string,
+    targetIds: string[],
+  ): Promise<model.ResultType<any>> {
+    let iden = this._allIdentitys.find((identity) => {
+      return identity.id == id;
+    });
+    if (iden != undefined) {
+      return await kernel.removeIdentity({
+        id,
+        targetIds,
+      });
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 查询组织职权树
+   * @param id
+   * @returns
+   */
+  public async selectAuthorityTree(
+    id: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
+    const params = {
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    };
+    const res = await kernel.queryAuthorityTree(params);
+    return res;
+  }
+
+  /**
+   * 查询我的申请
+   * @returns
+   */
+  public async queryJoinApply(): Promise<model.ResultType<schema.XRelationArray>> {
+    return await kernel.queryJoinTeamApply({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询我的审批
+   * @returns
+   */
+  public async queryjoinApproval() {
+    return kernel.queryTeamJoinApproval({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询指定职权下的身份列表
+   * @param id
+   * @returns
+   */
+  public async queryAuthorityIdentity(
+    id: string,
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
+    return await kernel.queryAuthorityIdentitys({
+      id: id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询组织所有职权
+   * @returns
+   */
+  public async getAllAuthoritys(): Promise<schema.XAuthority[]> {
+    if (this._allAuthoritys.length > 0) {
+      return this._allAuthoritys;
+    }
+    const res = await kernel.queryTargetAuthoritys({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+    if (res.success && res?.data?.result != undefined) {
+      this._allAuthoritys = res.data.result;
+    }
+    return this._allAuthoritys;
+  }
+
+  /**
+   * 查询组织所有身份
+   * @returns
+   */
+  public async getAllIdentitys(): Promise<schema.XIdentity[]> {
+    if (this._allIdentitys.length > 0) {
+      return this._allIdentitys;
+    }
+    const res = await this.queryTargetIdentitys();
+    if (res.success && res?.data?.result != undefined) {
+      this._allIdentitys = res.data.result;
+    }
+    return this._allIdentitys;
+  }
 
   protected async cancelJoinTeam(id: string) {
     return await kernel.cancelJoinTeam({
@@ -112,23 +499,121 @@ export default class BaseTarget {
     });
   }
 
+  /**
+   * 查询指定身份赋予的组织/人员
+   * @param id
+   * @param targetType
+   * @returns
+   */
+  protected async getIdentityTargets(
+    id: string,
+    targetType: TargetType,
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.queryIdentityTargets({
+      id: id,
+      targetType: targetType,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询拥有的身份
+   * @returns
+   */
+  protected async getOwnIdentitys(): Promise<schema.XIdentity[]> {
+    //TODO
+    return [];
+  }
+
+  /**
+   * 查询拥有的身份
+   * @returns
+   */
+  protected async getOwnAuthoritys(): Promise<schema.XIdentity[]> {
+    //TODO
+    return [];
+  }
+
+  /**
+   * 查询职权子职权
+   * @param id
+   * @returns
+   */
+  protected async getSubAuthoritys(
+    id: string,
+    page: PageRequest,
+  ): Promise<model.ResultType<schema.XAuthorityArray>> {
+    return await kernel.querySubAuthoritys({
+      id: id,
+      page,
+    });
+  }
+
+  /**
+   * 获取子组织/个人
+   * @returns 返回好友列表
+   */
+  protected async getSubTargets(
+    id: string,
+    typeNames: TargetType[],
+    subTypeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.querySubTargetById({
+      id: id,
+      typeNames: typeNames,
+      subTypeNames: subTypeNames,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 查询组织或个人
+   * @param data
+   * @returns
+   */
   public async getTargetByName(
     data: model.NameTypeModel,
-  ): Promise<model.ResultType<XTarget>> {
+  ): Promise<model.ResultType<schema.XTarget>> {
     return await kernel.queryTargetByName(data);
   }
 
-
-
   /**
-   * 拉对象加入组织
+   * 拉对象加入自身
    * @param data 拉入参数
    * @returns 拉入结果
    */
   public async pull(data: any): Promise<model.ResultType<any>> {
-    data.id = this.target.id;
-    data.teamTypes = [this.target.typeName];
-    return await kernel.pullAnyToTeam(data);
+    return await kernel.pullAnyToTeam({
+      id: this.target.id,
+      teamTypes: [this.target.typeName],
+      ...data,
+    });
+  }
+
+  /**
+   * 拉自身进组织(创建组织的时候调用)
+   * @param id
+   * @param teamTypes
+   * @returns
+   */
+  protected async join(
+    id: string,
+    teamTypes: TargetType[],
+  ): Promise<model.ResultType<any>> {
+    return await kernel.pullAnyToTeam({
+      id,
+      teamTypes,
+      targetType: this.target.typeName,
+      targetIds: [this.target.id],
+    });
   }
 
   /**
@@ -136,102 +621,14 @@ export default class BaseTarget {
    * @param data 请求参数
    * @returns 身份数组
    */
-  public async queryTargetIdentitys(data: any): Promise<model.ResultType<schema.XIdentityArray>> {
-    data.id = this.target.id;
-    data.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_16,
-    };
-    return await kernel.queryTargetIdentitys(data);
-  }
-
-  public async getIdentitys(): Promise<schema.XIdentity[]> {
-    if (this.identitys.length > 0) {
-      return this.identitys;
-    }
-    this.identitys = []
-    const res = await this.queryTargetIdentitys({
-    });
-    if (res.success) {
-      res.data.result.forEach((identity) => {
-        this.identitys.push(identity);
-      });
-    }
-    return this.identitys;
-  }
-
-  /**
-* 查询商店列表
-* @returns 商店列表
-*/
-  public async getJoinMarkets(): Promise<AppStore[]> {
-    if (this._joinedMarkets.length > 0) {
-      return this._joinedMarkets;
-    }
-    const res = await kernel.queryOwnMarket({
+  public async queryTargetIdentitys(): Promise<model.ResultType<schema.XIdentityArray>> {
+    return await kernel.queryTargetIdentitys({
       id: this.target.id,
-      page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
-    });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((market) => {
-        this._joinedMarkets.push(new AppStore(market));
-      });
-    }
-    return this._joinedMarkets;
-  }
-
-
-  /**
-   * 退出市场
-   * @param appStore 退出的市场
-   * @returns
-   */
-  public async quitMarket(appStore: AppStore): Promise<model.ResultType<any>> {
-    const res = await kernel.quitMarket({
-      id: appStore.store.id,
-      belongId: this.target.id,
-    });
-    if (res.success) {
-      delete this._joinedMarkets[this._joinedMarkets.indexOf(appStore)];
-    }
-    return res;
-  }
-
-  /**
- * 申请加入市场
- * @param id 市场ID
- * @returns
- */
-  public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
-    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
-  }
-
-  /*
- * 根据编号查询市场
- * @param page 分页参数
- * @returns
- */
-  public async getMarketByCode(
-    page: model.PageRequest,
-  ): Promise<model.ResultType<XMarketArray>> {
-    return await kernel.queryMarketByCode({
-      id: '',
-      page,
-    });
-  }
-
-  public async search(name: string, TypeName: string): Promise<model.ResultType<any>> {
-    const data: model.NameTypeModel = {
-      name: name,
-      typeName: TypeName,
       page: {
         offset: 0,
-        filter: name,
+        filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
-    };
-    const res = await kernel.searchTargetByName(data);
-    return res;
+    });
   }
 }

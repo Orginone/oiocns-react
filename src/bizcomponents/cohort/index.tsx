@@ -13,7 +13,6 @@ interface CohortServiceType {
 }
 
 const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableList }) => {
-  const person = Provider.getPerson;
   console.log(service);
   const layout = {
     labelCol: { span: 8 },
@@ -44,12 +43,13 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableLi
   const onSave = async () => {
     const values = await form.validateFields();
     console.log(values); //2.表单验证并获取表单值
-    let res = await person.createCohort(
-      values.cohort.name,
-      values.cohort.code,
-      values.cohort.remark,
-    );
-    Provider.getPerson.showMessage(res);
+    const params = {
+      code: values.cohort.code,
+      name: values.cohort.name,
+      teamRemark: values.cohort.remark,
+    };
+    Person.createCohort(values.cohort.name, values.cohort.code, values.cohort.remark);
+    console.log('创建成功');
     setIsModalOpen(false);
     // getTableList();
   };

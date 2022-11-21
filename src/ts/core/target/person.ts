@@ -1,100 +1,31 @@
-import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
-import BaseTarget from './base';
-import { model, schema, FaildResult, kernel, common } from '../../base';
+import MarketActionTarget from './mbase';
+import consts from '../consts';
+import { model, schema, faildResult, kernel } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
-import AppStore from '../market/appstore';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { SpaceType } from '@/store/type';
 
-export default class Person extends BaseTarget {
+export default class Person extends MarketActionTarget {
   private _friends: schema.XTarget[];
-  private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
-  private _joinedStores: AppStore[];
+
   constructor(target: schema.XTarget) {
     super(target);
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this._joinedStores = [];
-    this.workSpace = { id: this.target.id, name: '个人空间' };
-    //初始化时填入信息
-    this.getCohort();
-    this.getFriends();
   }
 
   protected override get createTargetType(): TargetType[] {
-    return [
-      TargetType.Group,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
+    return [TargetType.Cohort, ...consts.CompanyTypes];
   }
 
   protected override get joinTargetType(): TargetType[] {
-    return [
-      TargetType.Person,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
-  }
-  /** 支持的单位类型数组 */
-  public get companyTypes(): TargetType[] {
-    return [TargetType.Company, TargetType.University, TargetType.Hospital];
-  }
-
-  public get ChohortArray(): Cohort[] {
-    return this._joinedCohorts;
-  }
-  /**
-   * 获取群组列表
-   * @param params
-   * @returns
-   */
-  public async getCohort(): Promise<model.ResultType<any>> {
-    const res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
-    });
-    if (res.success && res.data != undefined && res.data.result != undefined) {
-      this._joinedCohorts = [];
-      for (var i = 0; i < res.data?.result.length; i++) {
-        const cohort = new Cohort(res.data?.result[i]);
-        this._joinedCohorts.push(cohort);
-      }
-    }
-    return res;
-  }
-
-  /** 支持的群组类型数组*/
-  public get cohortTypes(): TargetType[] {
-    return [TargetType.Cohort];
-  }
-
-  // 购买
-  buyApp() {
-    console.log('buyApp');
-  }
-  //加购物车
-  addCart() {
-    console.log('addCart');
-  }
-  //获取订单
-  getOrderList() {
-    console.log('getOrderList');
-  }
-  //取消订单
-  cancleOrder() {
-    console.log('cancleOrder');
+    return [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
   }
 
   /**
@@ -139,105 +70,23 @@ export default class Person extends BaseTarget {
 
   /**
    * 解散群组
-   * @param targetId 群组id
+   * @param id 群组id
    * @param belongId 群组归属id
    * @returns
    */
   public async deleteCohorts(
-    targetId: string,
+    id: string,
     belongId: string,
   ): Promise<model.ResultType<any>> {
-    const params: model.IdReqModel = {
-      id: targetId,
+    let res = await kernel.deleteTarget({
+      id: id,
       typeName: TargetType.Cohort,
       belongId: belongId,
-    };
-    let res = await kernel.deleteTarget(params);
-    if (res.success) {
-      this._joinedCohorts.filter((obj) => (obj.target.id = targetId));
-    }
-    return res;
-  }
-  /**
-   * 添加群组申请
-   * @param id 群组id
-   * @returns
-   */
-  public async applyJoinCohort(id: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Cohort;
-    const res = await this.applyJoin(id, TypeName);
-    return res;
-  }
-
-  /**
-   * 搜索群组
-   * @param name 群组编号
-   * @returns
-   */
-  public async searchCohorts(code: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Cohort;
-    const res = await this.search(code, TypeName);
-    return res;
-  }
-
-  /**
-   * 搜索目标(人)
-   * @param name 名称
-   * @returns
-   */
-  public async searchFriend(name: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Person;
-    const res = await this.search(name, TypeName);
-    return res;
-  }
-
-  /**
-   * 添加好友申请
-   * @param id 好友id
-   * @returns
-   */
-  public async applyJoinFriend(id: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Person;
-    const res = await this.applyJoin(id, TypeName);
-    return res;
-  }
-
-  /**
-   * 移除好友
-   * @param id 好友Id
-   */
-  public async removeFriend(id: string): Promise<model.ResultType<any>> {
-    const res = await this.cancelJoinTeam(id);
-    if (res.success) {
-      var index = this._friends.findIndex((friend) => {
-        return friend.id == id;
-      });
-      if (index > 0) {
-        delete this._friends[index];
-      }
-    }
-    return res;
-  }
-
-  /**
-   * 获取好友列表
-   * @returns 返回好友列表
-   */
-  public async getFriends(): Promise<XTarget[]> {
-    if (this._friends.length > 0) {
-      return this._friends;
-    }
-    const res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Person],
     });
-    console.log('好友查询结果', res);
     if (res.success) {
-      if (res.data != undefined && res.data.result != undefined) {
-        this._friends = res.data.result;
-      }
+      this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
     }
-    return this._friends;
+    return res;
   }
 
   /**
@@ -258,23 +107,18 @@ export default class Person extends BaseTarget {
     remark: string,
     type: TargetType = TargetType.Company,
   ): Promise<model.ResultType<any>> {
-
-    if (!this.companyTypes.includes(type)) {
-      return FaildResult('您无法创建该类型单位!');
+    if (!consts.CompanyTypes.includes(type)) {
+      return faildResult('您无法创建该类型单位!');
     }
     if (!validIsSocialCreditCode(code)) {
-      return FaildResult('请填写正确的代码!');
+      return faildResult('请填写正确的代码!');
     }
     const tres = await this.getTargetByName({
       name,
       typeName: type,
       page: { offset: 0, limit: 1, filter: code },
     });
-    if (!tres.success) {
-      return tres;
-    }
-    if (tres.data == null || !tres.data.id) {
-
+    if (!tres.data) {
       const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
       if (res.success && res.data != undefined) {
         let company;
@@ -295,44 +139,28 @@ export default class Person extends BaseTarget {
       }
       return res;
     } else {
-      return FaildResult('该单位已存在!');
+      return faildResult('该单位已存在!');
     }
   }
 
   /**
-   * 查询我的产品/应用
-   * @param params
-   * @returns
+   * 获取好友列表
+   * @returns 返回好友列表
    */
-  public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-    // model.IDBelongReq
-    let paramData: any = {};
-    paramData.id = this.target.id;
-    paramData.page = {
-      offset: 0,
-      filter: this.target.id,
-      limit: common.Constants.MAX_UINT_8,
-    };
-    return await kernel.querySelfProduct(paramData);
+  public async getFriends(): Promise<schema.XTarget[]> {
+    if (this._friends.length > 0) {
+      return this._friends;
+    }
+    const res = await this.getSubTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
+    if (res.success && res?.data?.result != undefined) {
+      this._friends = res.data.result;
+    }
+    return this._friends;
   }
-
-  // /**
-  //  * 查询我的产品/应用
-  //  * @param params
-  //  * @returns
-  //  */
-  // public async queryMyProduct(): Promise<model.ResultType<schema.XProductArray>> {
-  //   // model.IDBelongReq
-  //   let paramData: any = {};
-  //   paramData.id = this.target.id;
-  //   paramData.page = {
-  //     offset: 0,
-  //     filter: this.target.id,
-  //     limit: common.Constants.MAX_UINT_8,
-  //   };
-  //   return await kernel.querySelfProduct(paramData);
-  // }
-
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
@@ -343,15 +171,11 @@ export default class Person extends BaseTarget {
     }
     let res = await this.getjoined({
       spaceId: this.target.id,
-      JoinTypeNames: this.cohortTypes,
+      JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
-        switch (item.typeName) {
-          case TargetType.Cohort:
-            this._joinedCohorts.push(new Cohort(item));
-            break;
-        }
+    if (res.success) {
+      res.data?.result?.forEach((item) => {
+        this._joinedCohorts.push(new Cohort(item));
       });
     }
     return this._joinedCohorts;
@@ -365,10 +189,10 @@ export default class Person extends BaseTarget {
     if (this._joinedCompanys.length > 0) {
       return this._joinedCompanys;
     }
-    this._joinedCompanys = []
+    this._joinedCompanys = [];
     let res = await this.getjoined({
       spaceId: this.target.id,
-      JoinTypeNames: this.companyTypes,
+      JoinTypeNames: consts.CompanyTypes,
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
@@ -389,6 +213,61 @@ export default class Person extends BaseTarget {
   }
 
   /**
+   * 申请好友
+   * @param id 目标Id
+   * @returns
+   */
+  public async applyFriend(id: string): Promise<model.ResultType<any>> {
+    const res = await kernel.pullAnyToTeam({
+      id: this.target.id,
+      teamTypes: [TargetType.Person],
+      targetIds: [id],
+      targetType: TargetType.Person,
+    });
+    if (res.success) {
+      await this.applyJoin(id, TargetType.Person);
+    }
+    return res;
+  }
+
+  /**
+   * 取消好友申请
+   * @param id 好友Id
+   * @returns
+   */
+  public async cancelJoinApply(id: string): Promise<model.ResultType<any>> {
+    return await kernel.cancelJoinTeam({
+      id,
+      typeName: TargetType.Person,
+      belongId: this.target.id,
+    });
+  }
+
+  /**
+   * 移除好友
+   * @param id 好友Id
+   */
+  public async removeFriend(ids: string[]): Promise<model.ResultType<any>> {
+    const res = await kernel.removeAnyOfTeam({
+      id: this.target.id,
+      teamTypes: [this.target.typeName],
+      targetIds: ids,
+      targetType: TargetType.Person,
+    });
+    if (res.success) {
+      ids.forEach(async (id) => {
+        await kernel.exitAnyOfTeam({
+          id,
+          teamTypes: [TargetType.Person],
+          targetId: this.target.id,
+          targetType: TargetType.Person,
+        });
+      });
+    }
+    return res;
+  }
+
+  /**
    * 退出群组
    * @param id 群组Id
    */
@@ -399,7 +278,9 @@ export default class Person extends BaseTarget {
         return cohort.target.id == id;
       });
       if (index > 0) {
-        delete this._joinedCohorts[index];
+        this._joinedCohorts = this._joinedCohorts.filter((cohort) => {
+          return cohort.target.id != id;
+        });
       }
     }
     return res;
@@ -410,40 +291,20 @@ export default class Person extends BaseTarget {
    * @param id 单位Id
    */
   public async quitCompany(id: string): Promise<model.ResultType<any>> {
-    const res = await this.cancelJoinTeam(id);
-    if (res.success) {
-      var index = this._joinedCompanys.findIndex((cohort) => {
-        return cohort.target.id == id;
-      });
-      if (index > 0) {
-        delete this._joinedCompanys[index];
-      }
-    }
+    const res = await kernel.exitAnyOfTeamAndBelong({
+      id,
+      teamTypes: [
+        TargetType.JobCohort,
+        TargetType.Department,
+        TargetType.Cohort,
+        ...consts.CompanyTypes,
+      ],
+      targetId: this.target.id,
+      targetType: TargetType.Person,
+    });
+    this._joinedCompanys = this._joinedCompanys.filter((company) => {
+      return company.target.id != id;
+    });
     return res;
   }
-
-  /**
-   * 获取工作空间
-   * @returns 工作空间
-   */
-  public getWorkSpace(): SpaceType {
-    return this.workSpace
-  }
-
-  /**
-   * 切换工作空间
-   * @param workSpace 
-   */
-  public setWorkSpace(workSpace: SpaceType) {
-    this.workSpace = workSpace
-  }
-
-  /**
-   * 是否个人空间
-   * @returns 
-   */
-  public isUserSpace(): boolean {
-    return this.workSpace.id == this.target.id
-  }
-
 }
