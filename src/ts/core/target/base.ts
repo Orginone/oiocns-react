@@ -159,6 +159,24 @@ export default class BaseTarget {
   }
 
   /**
+  // /**
+  //  * 更新职权
+  //  * @param data
+  //  * @returns
+  //  */
+  //  public async UpdateAuthorityBase(data: any) {
+  //   return await kernel.createAuthority({
+  //     id: this.target.id,
+  //     name: data.name,
+  //     code: data.code,
+  //     public: data.dPublic,
+  //     parentId: data.parentId,
+  //     belongId: this.target.id,
+  //     remark: data.remark,
+  //   });
+  // }
+
+  /**
    * 创建身份
    * @param name 名称
    * @param code 编号
@@ -280,7 +298,7 @@ export default class BaseTarget {
    */
   public async queryAuthorityIdentity(
     id: string,
-  ): Promise<model.ResultType<XIdentityArray>> {
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await kernel.queryAuthorityIdentitys({
       id: id,
       page: {
