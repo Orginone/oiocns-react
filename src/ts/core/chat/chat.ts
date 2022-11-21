@@ -40,6 +40,11 @@ class BaseChat implements IChat {
     };
   }
   loadCache(cache: ChatCache): void {
+    if (cache.lastMessage?.id != this.lastMessage?.id) {
+      if (cache.lastMessage) {
+        this.messages.push(cache.lastMessage);
+      }
+    }
     this.noReadCount = cache.noReadCount;
     this.lastMessage = cache.lastMessage;
   }
