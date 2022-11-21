@@ -72,7 +72,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    Provider.getPerson.showMessage(res);
+    // Provider.getPerson.showMessage(res);
     setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
