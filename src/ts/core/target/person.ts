@@ -446,12 +446,14 @@ export default class Person extends BaseTarget {
     const belongId = this.target.id;
     const thingId = '';
     const typeName = 'webapp';
-    return await kernel.createProduct({
+    const reslut = await kernel.createProduct({
       ...data,
       belongId,
       thingId,
       typeName,
       id: undefined,
     });
+    console.log(`createProduct`, reslut);
+    return reslut;
   }
 }

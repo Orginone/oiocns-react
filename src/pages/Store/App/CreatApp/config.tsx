@@ -62,7 +62,7 @@ const valueEnumType = {
 
 type DataItem = {
   name: string;
-  state: string;
+  // state: string;
   code: string;
   resources: Resources[];
 };
