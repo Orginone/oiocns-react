@@ -98,6 +98,22 @@ export default class BaseTarget {
       remark: data.remark,
     });
   }
+  // /**
+  //  * 更新职权
+  //  * @param data
+  //  * @returns
+  //  */
+  //  public async UpdateAuthorityBase(data: any) {
+  //   return await kernel.createAuthority({
+  //     id: this.target.id,
+  //     name: data.name,
+  //     code: data.code,
+  //     public: data.dPublic,
+  //     parentId: data.parentId,
+  //     belongId: this.target.id,
+  //     remark: data.remark,
+  //   });
+  // }
   /**
    * 创建身份
    * @param data
