@@ -114,8 +114,7 @@ export default class Hospital extends Company {
   public async deleteIdentity(belongId: string): Promise<model.ResultType<any>> {
     return await this.deleteIdentityBase(belongId, TargetType.University);
   }
-  
-  
+
   /**
    * 查询指定身份赋予的人员
    * @param id
@@ -125,5 +124,4 @@ export default class Hospital extends Company {
     const res = await this.getIdentityTargetsBase(id, TargetType.Hospital);
     return res;
   }
-  
 }

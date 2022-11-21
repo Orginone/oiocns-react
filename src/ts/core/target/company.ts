@@ -87,5 +87,4 @@ export default class Company extends MarketActionTarget {
   public async selectIdentityTargets(id: string): Promise<model.ResultType<any>> {
     return await this.getIdentityTargets(id, TargetType.Company);
   }
-  
 }

@@ -110,7 +110,7 @@ export default class Person extends MarketActionTarget {
       [TargetType.Person],
       [TargetType.Person],
     );
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       this._friends = res.data.result;
     }
     return this._friends;
@@ -341,7 +341,27 @@ export default class Person extends MarketActionTarget {
     return this.workSpace.id == this.target.id;
   }
 
-  public get spaceId(): string {
-    return this.workSpace.id ?? '';
-  }
+  // public get spaceId(): string {
+  //   return this.workSpace.id ?? '';
+  // }
+  // /**
+  //  * 创建应用
+  //  * @param  {model.ProductModel} 产品基础信息
+  //  */
+  // public async createProduct(
+  //   data: Omit<model.ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
+  // ): Promise<model.ResultType<schema.XProduct>> {
+  //   const belongId = this.target.id;
+  //   const thingId = '';
+  //   const typeName = 'webapp';
+  //   const reslut = await kernel.createProduct({
+  //     ...data,
+  //     belongId,
+  //     thingId,
+  //     typeName,
+  //     id: undefined,
+  //   });
+  // console.log(`createProduct`, reslut);
+  // return reslut;
+  // }
 }

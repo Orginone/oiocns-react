@@ -51,17 +51,14 @@ export default class Group extends BaseTarget {
       return FaildResult('该集团已存在!');
     }
   }
-  
+
   /**
    * 查询加入集团申请
-   * @param id 
+   * @param id
    * @returns
    */
-   public async queryJoinCompanyApply(): Promise<model.ResultType<any>> {
+  public async queryJoinCompanyApply(): Promise<model.ResultType<any>> {
     const res = await this.queryJoinApplyBase();
     return res;
   }
-
-
-
 }

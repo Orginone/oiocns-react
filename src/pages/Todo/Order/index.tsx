@@ -1,7 +1,7 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import TodoService, { tabStatus } from '@/module/todo';
+import todoService, { tabStatus } from '@/ts/controller/todo';
 import { OderDetailType } from '@/module/todo/typings';
-import { Dropdown, Menu, MenuProps, message, Tag } from 'antd';
+import { Dropdown, Menu, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';
 
@@ -10,7 +10,7 @@ import { StatusPage } from '@/module/typings';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { chat } from '@/module/chat/orgchat';
 
-const todoService = new TodoService('order');
+// todoService.currentModel = 'order';
 const orderTypeTabs = [
   { tab: '销售订单', key: '1' },
   { tab: '采购订单', key: '2' },

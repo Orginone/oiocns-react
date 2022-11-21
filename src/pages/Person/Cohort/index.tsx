@@ -108,11 +108,14 @@ const CohortConfig: React.FC = () => {
             typeName: TargetType.Person,
             JoinTypeNames: [TargetType.Person],
             spaceId: PersonInfoEnty.getPerson.target.id,
-            page: page
-          }
-          console.log("群组参数qqbbq", params)
-          console.log("info", PersonInfoEnty.getPerson.selectAuthorityTree("358229469208645632"))
-          console.log("判断是否操作成功", Person)//375315801588240384
+            page: page,
+          };
+          console.log('群组参数qqbbq', params);
+          console.log(
+            'info',
+            PersonInfoEnty.getPerson.selectAuthorityTree('358229469208645632'),
+          );
+          console.log('判断是否操作成功', Person); //375315801588240384
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
         },

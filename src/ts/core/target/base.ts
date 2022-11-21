@@ -325,7 +325,7 @@ export default class BaseTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       this._allAuthoritys = res.data.result;
     }
     return this._allAuthoritys;
@@ -340,7 +340,7 @@ export default class BaseTarget {
       return this._allIdentitys;
     }
     const res = await this.queryTargetIdentitys();
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       this._allIdentitys = res.data.result;
     }
     return this._allIdentitys;
