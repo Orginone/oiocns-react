@@ -7,18 +7,24 @@ export default class Cohort extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
   }
+
   /**
    * 拉人进入群组
    * @param personIds 人员id数组
    * @returns 是否成功
    */
-  public async pullPersons(personIds: string[]): Promise<boolean> {
-    let res = await this.pull({
-      targetType: TargetType.Person,
-      targetIds: personIds,
-    });
-    return res.success;
-  }
+  public pullPerson = async (personIds: string[]): Promise<model.ResultType<any>> => {
+    return await this.pull(personIds, TargetType.Person);
+  };
+
+  /**
+   * 拉单位进入群组
+   * @param companyIds 单位Id集合
+   * @returns 是否成功
+   */
+  public pullCompanys = async (companyIds: string[]): Promise<model.ResultType<any>> => {
+    return await this.pull(companyIds, TargetType.Company);
+  };
 
   /**
    * 修改群组

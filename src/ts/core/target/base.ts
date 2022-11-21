@@ -417,6 +417,19 @@ export default class BaseTarget {
   }
 
   /**
+   * 审批我的申请
+   * @param id
+   * @param status
+   * @returns
+   */
+  public async approvalJoinApply(id: string, status: number) {
+    return await kernel.approvalJoinApply({
+      id,
+      status,
+    });
+  }
+
+  /**
    * 查询指定职权下的身份列表
    * @param id
    * @returns
@@ -431,6 +444,18 @@ export default class BaseTarget {
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
+    });
+  }
+
+  /**
+   * 查询当前空间赋予我该角色的组织
+   * @param id
+   * @returns
+   */
+  public async queryTargetsByAuthority(id: string) {
+    return await kernel.queryTargetsByAuthority({
+      spaceId: this.target.id,
+      authId: id,
     });
   }
 
@@ -521,21 +546,18 @@ export default class BaseTarget {
   }
 
   /**
-   * 查询拥有的身份
+   * 查询当前空间下拥有的身份
    * @returns
    */
   protected async getOwnIdentitys(): Promise<schema.XIdentity[]> {
-    //TODO
-    return [];
-  }
-
-  /**
-   * 查询拥有的身份
-   * @returns
-   */
-  protected async getOwnAuthoritys(): Promise<schema.XIdentity[]> {
-    //TODO
-    return [];
+    if (this._ownIdentitys.length > 0) {
+      return this._ownIdentitys;
+    }
+    const res = await kernel.querySpaceIdentitys({ id: this.target.id });
+    if (res.success && res.data.result != undefined) {
+      this._ownIdentitys = res.data.result;
+    }
+    return this._ownIdentitys;
   }
 
   /**
@@ -590,13 +612,17 @@ export default class BaseTarget {
    * @param data 拉入参数
    * @returns 拉入结果
    */
-  public async pull(data: any): Promise<model.ResultType<any>> {
+  protected pull = async (
+    targetIds: string[],
+    targetType: string,
+  ): Promise<model.ResultType<any>> => {
     return await kernel.pullAnyToTeam({
       id: this.target.id,
       teamTypes: [this.target.typeName],
-      ...data,
+      targetIds,
+      targetType,
     });
-  }
+  };
 
   /**
    * 拉自身进组织(创建组织的时候调用)
@@ -604,17 +630,17 @@ export default class BaseTarget {
    * @param teamTypes
    * @returns
    */
-  protected async join(
+  protected join = async (
     id: string,
     teamTypes: TargetType[],
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<any>> => {
     return await kernel.pullAnyToTeam({
       id,
       teamTypes,
       targetType: this.target.typeName,
       targetIds: [this.target.id],
     });
-  }
+  };
 
   /**
    * 获取所有身份

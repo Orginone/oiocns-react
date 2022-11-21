@@ -1,4 +1,4 @@
-import { TargetType } from '../enum';
+import { CommonStatus, TargetType } from '../enum';
 import MarketActionTarget from './mbase';
 import consts from '../consts';
 import { model, schema, faildResult, kernel } from '../../base';
@@ -7,6 +7,7 @@ import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import { validIsSocialCreditCode } from '@/utils/tools';
+import { XRelation } from '@/ts/base/schema';
 
 export default class Person extends MarketActionTarget {
   private _friends: schema.XTarget[];
@@ -39,7 +40,7 @@ export default class Person extends MarketActionTarget {
     name: string,
     code: string,
     remark: string,
-  ): Promise<boolean> {
+  ): Promise<model.ResultType<any>> {
     const res = await this.createTarget(
       name,
       code,
@@ -51,9 +52,9 @@ export default class Person extends MarketActionTarget {
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
       this._joinedCohorts.push(cohort);
-      return cohort.pullPersons([this.target.id]);
+      return cohort.pullPerson([this.target.id]);
     }
-    return false;
+    return res;
   }
 
   /**
@@ -62,14 +63,11 @@ export default class Person extends MarketActionTarget {
    * @param belongId 群组归属id
    * @returns
    */
-  public async deleteCohorts(
-    id: string,
-    belongId: string,
-  ): Promise<model.ResultType<any>> {
+  public async deleteCohort(id: string): Promise<model.ResultType<any>> {
     let res = await kernel.deleteTarget({
       id: id,
       typeName: TargetType.Cohort,
-      belongId: belongId,
+      belongId: this.target.id,
     });
     if (res.success) {
       this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
@@ -122,8 +120,7 @@ export default class Person extends MarketActionTarget {
             break;
         }
         this._joinedCompanys.push(company);
-
-        return company.pullPersons([this.target.id]);
+        return company.pullPerson([this.target.id]);
       }
       return res;
     } else {
@@ -132,23 +129,22 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-   * 获取好友列表
-   * @returns 返回好友列表
+   * 删除单位
+   * @param id 单位Id
+   * @returns
    */
-  public async getFriends(): Promise<schema.XTarget[]> {
-    if (this._friends.length > 0) {
-      return this._friends;
+  public async deleteCompany(id: string): Promise<model.ResultType<any>> {
+    let res = await kernel.deleteTarget({
+      id: id,
+      typeName: TargetType.Company,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      this._joinedCompanys = this._joinedCompanys.filter((obj) => obj.target.id != id);
     }
-    const res = await this.getSubTargets(
-      this.target.id,
-      [TargetType.Person],
-      [TargetType.Person],
-    );
-    if (res.success && res?.data?.result != undefined) {
-      this._friends = res.data.result;
-    }
-    return this._friends;
+    return res;
   }
+
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
@@ -201,11 +197,63 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-   * 申请好友
+   * 获取好友列表
+   * @returns 返回好友列表
+   */
+  public async getFriends(): Promise<schema.XTarget[]> {
+    if (this._friends.length > 0) {
+      return this._friends;
+    }
+    const res = await this.getSubTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
+    if (res.success && res?.data?.result != undefined) {
+      this._friends = res.data.result;
+    }
+    return this._friends;
+  }
+
+  /**
+   * 申请加入单位
    * @param id 目标Id
    * @returns
    */
-  public async applyFriend(id: string): Promise<model.ResultType<any>> {
+  public applyJoinCompany = async (
+    id: string,
+    typeName: TargetType,
+  ): Promise<model.ResultType<any>> => {
+    const company = this._joinedCompanys.find((company) => {
+      return company.target.id == id;
+    });
+    if (company != undefined) {
+      return faildResult(consts.IsJoinedError);
+    }
+    return await this.applyJoin(id, typeName);
+  };
+
+  /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  public applyJoinCohort = async (id: string): Promise<model.ResultType<any>> => {
+    const cohort = this._joinedCohorts.find((cohort) => {
+      return cohort.target.id == id;
+    });
+    if (cohort != undefined) {
+      return faildResult(consts.IsJoinedError);
+    }
+    return await this.applyJoin(id, TargetType.Cohort);
+  };
+
+  /**
+   * 申请添加好友
+   * @param id 目标Id
+   * @returns
+   */
+  public applyFriend = async (id: string): Promise<model.ResultType<any>> => {
     const res = await kernel.pullAnyToTeam({
       id: this.target.id,
       teamTypes: [TargetType.Person],
@@ -214,6 +262,23 @@ export default class Person extends MarketActionTarget {
     });
     if (res.success) {
       await this.applyJoin(id, TargetType.Person);
+    }
+    return res;
+  };
+
+  /**
+   * 审批我的好友申请
+   * @param relation 申请
+   * @param status 状态
+   * @returns
+   */
+  public async approvalFriendApply(
+    relation: XRelation,
+    status: number = CommonStatus.ApproveStartStatus,
+  ) {
+    const res = await super.ApprovalJoinApply(relation.id, status);
+    if (res.success && relation.target != undefined) {
+      this._friends.push(relation.target);
     }
     return res;
   }
