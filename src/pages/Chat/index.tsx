@@ -18,10 +18,14 @@ const Chat: React.FC = () => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
   const [chat, setChat] = useState(chatCtrl.chat); // 当前会话
 
-  // 刷新页面
+  /**
+   * @description: 刷新页面
+   * @return {*}
+   */
   const refreshUI = () => {
     setChat(deepClone(chatCtrl.chat));
   };
+
   /**
    * @description: 监听点击事件，关闭弹窗
    * @return {*}
@@ -32,6 +36,7 @@ const Chat: React.FC = () => {
       chatCtrl.unsubscribe(id);
     };
   }, []);
+
   /**
    * @description: 展开详情页
    * @return {*}
@@ -39,6 +44,7 @@ const Chat: React.FC = () => {
   const handleViewDetail = () => {
     setIsShowDetail(!isShowDetail);
   };
+
   /**
    * @description: 重新编辑
    * @param {string} write

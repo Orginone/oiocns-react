@@ -36,3 +36,13 @@ interface CommonClassData {
   joinTargetApi?: Function; // 向...加入
   quitTargetApi?: Function; // 从...退出
 }
+
+/**
+ * 前端业务分页结果的数据类型
+ */
+export type PageData<P = {}> = {
+  success: boolean;
+  total: number;
+  data: P[];
+  msg?: string;
+};

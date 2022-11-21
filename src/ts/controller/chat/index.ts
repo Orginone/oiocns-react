@@ -69,7 +69,9 @@ class ChatController {
     if (this._curChat) {
       this._curChat.noReadCount = 0;
       await this._curChat.moreMessage('');
-      await this._curChat.morePerson('');
+      if (this._curChat.persons.length === 0) {
+        await this._curChat.morePerson('');
+      }
       this._appendChats(this._curChat);
       this._cacheChats();
     }
@@ -219,6 +221,15 @@ class ChatController {
       'user',
     );
   }
+
+  /**
+   * @description: 加载更多
+   * @return {*}
+   */
+  handleGetPerson = async () => {
+    await this._curChat?.morePerson('');
+    this._callback();
+  };
 }
 
 export const chatCtrl = new ChatController(await LoadChats());
