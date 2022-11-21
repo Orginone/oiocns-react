@@ -23,6 +23,11 @@ interface UserType {
   [key: string]: any;
 }
 
+// 个人空间
+type SpaceType = {
+  name?: string;
+  id?: string;
+};
 interface MenuProps {
   id: string;
   path: string;
