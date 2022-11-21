@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
   let that = this;
@@ -49,4 +51,27 @@ const validIsSocialCreditCode = (code: string) => {
   return numUpChar.indexOf(code[17]) == ret;
 };
 
-export { debounce, renderNum, resetParams, validIsSocialCreditCode };
+/**
+ * @description: 聊天间隔时间
+ * @param {moment} chatDate
+ * @return {*}
+ */
+const showChatTime = (chatDate: moment.MomentInput) => {
+  const cdate = moment(chatDate);
+  const days = moment().diff(cdate, 'day');
+  switch (days) {
+    case 0:
+      return cdate.format('H:mm');
+    case 1:
+      return '昨天 ' + cdate.format('H:mm');
+    case 2:
+      return '前天 ' + cdate.format('H:mm');
+  }
+  const year = moment().diff(cdate, 'year');
+  if (year == 0) {
+    return cdate.format('M月D日 H:mm');
+  }
+  return cdate.format('yy年 M月D日 H:mm');
+};
+
+export { debounce, renderNum, resetParams, showChatTime, validIsSocialCreditCode };

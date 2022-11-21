@@ -709,12 +709,12 @@ export type GroupChatModel = {
   // 名称
   name: string;
   // 会话
-  chats: ChatModel[] | undefined;
+  chats: ChatModel[];
 };
 
 export type ChatModel = {
   // 会话ID
-  id: string | undefined;
+  id: string;
   // 名称
   name: string;
   // 头像

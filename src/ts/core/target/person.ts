@@ -313,4 +313,50 @@ export default class Person extends MarketActionTarget {
     });
     return res;
   }
+
+  // /**
+  //  * 获取工作空间
+  //  * @returns 工作空间
+  //  */
+  // public getWorkSpace(): SpaceType {
+  //   return this.workSpace;
+  // }
+
+  // /**
+  //  * 切换工作空间
+  //  * @param workSpace
+  //  */
+  // public setWorkSpace(workSpace: SpaceType) {
+  //   this.workSpace = workSpace;
+  // }
+
+  // /**
+  //  * 是否个人空间
+  //  * @returns
+  //  */
+  // public isUserSpace(): boolean {
+  //   return this.workSpace.id == this.target.id;
+  // }
+
+  // public get spaceId(): string {
+  //   return this.workSpace.id ?? '';
+  // }
+  // /**
+  //  * 创建应用
+  //  * @param  {model.ProductModel} 产品基础信息
+  //  */
+  // public async createProduct(
+  //   data: Omit<model.ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
+  // ): Promise<model.ResultType<schema.XProduct>> {
+  //   const belongId = this.target.id;
+  //   const thingId = '';
+  //   const typeName = 'webapp';
+  //   return await kernel.createProduct({
+  //     ...data,
+  //     belongId,
+  //     thingId,
+  //     typeName,
+  //     id: undefined,
+  //   });
+  // }
 }
