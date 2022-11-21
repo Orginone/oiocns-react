@@ -12,13 +12,11 @@ import {
   Form,
   Input,
   Select,
+  message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import CompanyServices from '@/module/org/company';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import PersonServices from '@/module/person';
-import useStore from '@/store';
-import { SpaceType, UserType } from '@/store/type';
+import { SpaceType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
@@ -72,7 +70,12 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    Provider.getPerson.showMessage(res);
+
+    if (res.success) {
+      message.info('申请加入单位成功');
+    } else {
+      message.error('申请加入单位失败：' + res.msg);
+    }
     setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
@@ -82,11 +85,11 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       (el: any) => el.target,
     );
     console.log(data);
-    setMenuList([...data, user.getWorkSpace()]); // 合并组织单位和个人空间数据
+    setMenuList([...data, Provider.getWorkSpace()]); // 合并组织单位和个人空间数据
   };
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    user.setWorkSpace(item);
+    Provider.setWorkSpace(item);
     setCurrent({
       name: item?.name,
       id: item?.id,
@@ -98,8 +101,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     if (user) {
       getList();
       setCurrent({
-        name: user.getWorkSpace().name,
-        id: user.getWorkSpace().id,
+        name: Provider.getWorkSpace().name,
+        id: Provider.getWorkSpace().id,
       });
     }
   }, []);

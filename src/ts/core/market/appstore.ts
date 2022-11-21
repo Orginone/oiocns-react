@@ -68,7 +68,8 @@ export default class AppStore {
     return await kernel.queryJoinMarketApply({
       id: this.store.id,
       page,
-    }); }
+    });
+  }
 
   /**
    * 审批商店成员加入申请

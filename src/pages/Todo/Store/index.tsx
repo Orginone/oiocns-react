@@ -4,13 +4,13 @@ import TableItemCard from '../components/TableItemCard';
 import { MarketApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
 import { Button, message, Space, Tag, Typography } from 'antd';
-import todoService, { tabStatus } from '@/module/todo';
+import storeService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { Page } from '@/module/typings';
 
 // import styles from './index.module.less';
 
-const storeService = new todoService('market');
+// const storeService = new todoService('market');
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组

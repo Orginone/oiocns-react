@@ -53,11 +53,12 @@ export default class userdataservice extends BaseService {
   public async getJoinedTargets(
     companyId: string,
     typeName: TargetType,
+    joinTypes: TargetType[],
   ): Promise<Company[]> {
     this.target.typeName = typeName;
     let res = await this.getjoined({
       spaceId: companyId,
-      JoinTypeNames: this.companyTypes,
+      JoinTypeNames: joinTypes,
     });
 
     let _joinedCompanys: Company[] = [];
@@ -170,18 +171,17 @@ export default class userdataservice extends BaseService {
     // 入参
     let paramData: any = {};
     paramData.name = page.filter;
-    paramData.typeName = TargetType.Group;
+    paramData.typeName = TargetType.Company;
     paramData.page = {
       offset: 0,
       filter: page.filter,
       limit: common.Constants.MAX_UINT_8,
     };
+
     // 结果集
     let pageData: any = {};
     try {
       let res = await kernel.searchTargetByName(paramData);
-      console.log('================', res);
-
       if (res.success && res.data && res.data.result) {
         // 存放返回数组
         let list: XTarget[] = [];

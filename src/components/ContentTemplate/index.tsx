@@ -44,11 +44,11 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
     siderMenuData,
     menuClick,
     // contentTop,
+    children,
     contentTopLeft,
     contentTopRight,
     hideBreadCrumb = false,
     hideTooBar = false,
-    children,
   } = props;
   // TODO 布局样式、侧边展开和收缩 侧边栏顶部([icon/名称] 需传入展示)
 
@@ -57,10 +57,6 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
 
   return (
     <Layout className={`${className}`} style={{ height: '100%' }}>
-      {/* {sider?
-        sider:
-        <ContentMenu menuClick={menuClick} data={siderMenuData}></ContentMenu>} */}
-
       {(sider || siderMenuData) && (
         <ContentMenu data={siderMenuData} menuClick={menuClick}>
           {sider && sider}
@@ -99,11 +95,6 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
             </Col>
           </Row>
         )}
-        {/* <div className={cls.contenttop}>{contentTop}</div>
-        <div className={cls.contenttop}>
-          <div>{contentTopLeft}</div>
-          <div>{contentTopRight}</div>
-        </div> */}
         <Content className={cls.content}>{content || children}</Content>
         <RightToobar
           onClose={() => {
