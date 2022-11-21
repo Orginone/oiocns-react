@@ -31,7 +31,6 @@ const PersonCustomModal = (props: Iprops) => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   let [selectItem, setSelectItem] = useState<any>({});
   const [joineds, setJoineds] = useState<any>([]);
-  let joinedGroupJob: any[] = [];
   const onChange = (val: any) => {
     setJobType(val.target.value);
     switch (val.target.value) {
@@ -48,12 +47,13 @@ const PersonCustomModal = (props: Iprops) => {
     setSelectItem({ ...select });
   };
   useEffect(() => {
+    debugger;
     if (selectedNode.props.assignedType == 'DENTITY') {
       setJoineds(joinedCohorts);
     } else if (selectedNode.props.assignedType == 'JOB') {
       setJoineds(joinedInnerJob);
     }
-  }, []);
+  }, [selectedNode.props.assignedType]);
 
   const radiobutton = (
     <div>

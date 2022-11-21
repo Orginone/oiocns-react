@@ -39,7 +39,6 @@ export default class Provider {
    * @returns
    */
   public static isUserSpace(): boolean {
-    debugger
     return Provider._workSpace.id == Provider.person.target.id;
   }
 
