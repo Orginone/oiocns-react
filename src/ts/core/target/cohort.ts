@@ -1,10 +1,7 @@
-import { schema } from '../../base';
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import API from '../../../services';
-import { common, kernel, model, FaildResult } from '../../base';
-import { format } from 'path/posix';
-import { formatDate } from '@/utils';
+import { kernel, model, schema } from '../../base';
+
 export default class Cohort extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
@@ -33,125 +30,12 @@ export default class Cohort extends BaseTarget {
     if (res.success) {
       this.target.name = params.name;
       this.target.code = params.code;
-      this.target.updateUser = formatDate(new Date().getTime);
       if (this.target.team != undefined) {
         this.target.team.name = params.name;
         this.target.team.code = params.code;
         this.target.team.remark = params.teamRemark;
-        this.target.team.updateTime = formatDate(new Date().getTime);
       }
     }
     return res;
   }
-  /**
-   * 创建职权
-   * @param name 职权名称
-   * @param code 职权编号
-   * @param dPublic 是否公开
-   * @param parentId 父级id
-   * @param remark 备注信息
-   * @returns
-   */
-  public async createpostAuth(
-    name: string,
-    code: string,
-    dPublic: boolean,
-    parentId: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    const params = {
-      name: name,
-      code: code,
-      dPublic: dPublic,
-      parentId: parentId,
-      remark: remark,
-    };
-    const res = await this.createAuthorityBase(params);
-    return res;
-  }
-  /**
-   * 删除职权
-   * @param belongId 当前工作空间id
-   * @returns
-   */
-  public async deletePostAuth(belongId: string): Promise<model.ResultType<any>> {
-    return await this.deleteAuthorityBase(belongId, TargetType.Cohort);
-  }
-  /**
-   * 创建身份
-   * @param name 名称
-   * @param code 编号
-   * @param authId 权限ID
-   * @param remark 备注
-   * @returns
-   */
-  public async createIdentity(
-    name: string,
-    code: string,
-    authId: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    const params = {
-      name: name,
-      code: code,
-      authId: authId,
-      remark: remark,
-    };
-    const res = await this.createIdentityBase(params);
-    return res;
-  }
-  /**
-   * 删除身份
-   * @param belongId 当前工作空间id
-   * @returns
-   */
-  public async deleteIdentity(belongId: string): Promise<model.ResultType<any>> {
-    return await this.deleteIdentityBase(belongId, TargetType.Cohort);
-  }
-  
-
-  /**
-   * 查询指定身份赋予的人员
-   * @param id
-   * @returns
-   */
-  public async selectIdentityTargets(id: string): Promise<model.ResultType<any>> {
-    const res = await this.getIdentityTargetsBase(id, TargetType.Cohort);
-    return res;
-  }
-  
-  /*----------------------------------------------------旧接口内容-----------------------------------------------------------*/
-  public async SearchCohort(params: any) {
-    const { data } = await API.cohort.searchCohorts({
-      data: params,
-    });
-    console.log('进入调用');
-
-    return { data };
-  }
-
-  public async ApplyJoinCohort(params: any) {
-    const { code, msg, success } = await API.cohort.applyJoin({
-      data: params,
-    });
-    console.log('进入调用');
-
-    return { code, msg, success };
-  }
-
-  public async deleteCohort(params: any) {
-    const { code, msg, success } = await API.cohort.delete({
-      data: params,
-    });
-    console.log('进入调用');
-    return { code, msg, success };
-  }
-  // public async deleteCohort(params: any) {
-  //   const {code,msg,success} = await API.cohort.applyJoin({
-  //     data: params,
-  //   });
-  //   console.log("进入调用")
-
-  //   return {code,msg,success};
-  // }
 }

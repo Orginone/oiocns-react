@@ -1,12 +1,11 @@
 import Group from './group';
-import { FaildResult, kernel, model, schema, common } from '../../base';
 import { TargetType } from '../enum';
-import BaseTarget from './base';
-
+import MarketActionTarget from './mbase';
+import { FaildResult, model, schema } from '../../base';
 /**
  * 公司的元操作
  */
-export default class Company extends BaseTarget {
+export default class Company extends MarketActionTarget {
   private _joinedGroups: Group[];
   constructor(target: schema.XTarget) {
     super(target);
@@ -82,87 +81,23 @@ export default class Company extends BaseTarget {
   }
 
   /**
-   * 创建职权
-   * @param name 职权名称
-   * @param code 职权编号
-   * @param dPublic 是否公开
-   * @param parentId 父级id
-   * @param remark 备注信息
-   * @returns
-   */
-  public async createpostAuth(
-    name: string,
-    code: string,
-    dPublic: boolean,
-    parentId: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    const params = {
-      name: name,
-      code: code,
-      dPublic: dPublic,
-      parentId: parentId,
-      remark: remark,
-    };
-    const res = await this.createAuthorityBase(params);
-    return res;
-  }
-  /**
-   * 删除职权
-   * @param belongId 当前工作空间id
-   * @returns
-   */
-  public async deletePostAuth(belongId: string): Promise<model.ResultType<any>> {
-    return await this.deleteAuthorityBase(belongId, TargetType.Company);
-  }
-  /**
-   * 创建身份
-   * @param name 名称
-   * @param code 编号
-   * @param authId 权限ID
-   * @param remark 备注
-   * @returns
-   */
-  public async createIdentity(
-    name: string,
-    code: string,
-    authId: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    const params = {
-      name: name,
-      code: code,
-      authId: authId,
-      remark: remark,
-    };
-    const res = await this.createIdentityBase(params);
-    return res;
-  }
-  /**
-   * 删除身份
-   * @param belongId 当前工作空间id
-   * @returns
-   */
-  public async deleteIdentity(belongId: string): Promise<model.ResultType<any>> {
-    return await this.deleteIdentityBase(belongId, TargetType.Cohort);
-  }
-  /**
    * 获取单位下的工作组
    * @returns 返回好友列表
    */
   public async getWorkings(): Promise<model.ResultType<any>> {
-    return await this.getsTargets(
+    return await this.getSubTargets(
       this.target.id,
       [TargetType.Company],
       [TargetType.Working],
     );
   }
+
   /**
    * 获取单位下的人员
    * @returns 返回好友列表
    */
   public async getPersons(): Promise<model.ResultType<any>> {
-    return await this.getsTargets(
+    return await this.getSubTargets(
       this.target.id,
       [TargetType.Company],
       [TargetType.Person],
@@ -175,18 +110,6 @@ export default class Company extends BaseTarget {
    * @returns
    */
   public async selectIdentityTargets(id: string): Promise<model.ResultType<any>> {
-    const res = await this.getIdentityTargetsBase(id, TargetType.Group);
-    return res;
-  }
-
-  /**
-   * 查找公司
-   * @param name 名称
-   * @returns
-   */
-  public async searchCompany(name: string): Promise<model.ResultType<any>> {
-    const TypeName = TargetType.Company;
-    const res = await this.search(name, TypeName);
-    return res;
+    return await this.getIdentityTargets(id, TargetType.Company);
   }
 }

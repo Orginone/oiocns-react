@@ -13,7 +13,7 @@ export type ResultType<T> = {
   // http代码
   code: number;
   // 数据体
-  data?: T;
+  data: T;
   // 消息
   msg: string;
   // 结果
@@ -496,7 +496,7 @@ export type ProductModel = {
   // 编号
   code: string;
   // 元数据Id
-  thingId: string;
+  thingId?: string;
   // 产品类型名
   typeName: string;
   // 备注
