@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangqiang 1196217890@qq.com
+ * @Date: 2022-11-17 14:10:31
+ * @LastEditors: zhangqiang 1196217890@qq.com
+ * @LastEditTime: 2022-11-18 10:47:59
+ * @FilePath: /oiocns-react/src/bizcomponents/RightToobar/index.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import React from 'react';
 import { Drawer } from 'antd';
 import Comment from './Comment';
@@ -23,7 +31,7 @@ const toobarComponentMaps: Record<TOOBAR_TYPE, JSX.Element> = {
 const ShareDrawForm: React.FC<ShareDrawFormType> = (props) => {
   const { onClose, open, title, placement = 'right', type } = props;
   return (
-    <Drawer title={title} width={460} placement={placement} onClose={onClose} open={open}>
+    <Drawer  title={title} width={460} placement={placement} onClose={onClose} open={open}>
       {toobarComponentMaps[type]}
     </Drawer>
   );
