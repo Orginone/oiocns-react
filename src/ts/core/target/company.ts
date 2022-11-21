@@ -236,4 +236,10 @@ export default class Company extends MarketActionTarget {
     }
     return this._joinedCohorts;
   }
+
+
+  public async getCompanyTree(): Promise<any[]> {
+
+    return []
+  }
 }

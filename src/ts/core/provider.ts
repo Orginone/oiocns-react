@@ -34,12 +34,14 @@ export default class Provider {
    * @returns
    */
   public static isUserSpace(): boolean {
+    debugger
     return Provider._workSpace.id == Provider.person.target.id;
   }
 
   public static get getPerson(): Person {
     if (this.person == null) {
       this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+      this._workSpace = this._workSpace || { id: this.person.target.id, name: '个人空间' };
     }
     return this.person;
   }
@@ -80,6 +82,7 @@ export default class Provider {
     let res = await kernel.register(name, motto, phone, account, password, nickName);
     if (res.success) {
       this.person = new Person(res.data.person);
+      this._workSpace = { id: this.person.target.id, name: '个人空间' };
       sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
     }
     return res;

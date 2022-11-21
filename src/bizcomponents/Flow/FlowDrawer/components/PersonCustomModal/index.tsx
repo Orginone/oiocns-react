@@ -16,8 +16,13 @@ interface Iprops {
   onOk: () => void;
   onCancel: () => void;
 }
-
 const joinedCohorts = (await Provider.getPerson.getJoinedCohorts()).map(
+  (e: any) => e.target,
+);
+const joinedInnerJob = (await Provider.getPerson.getJoinedCohorts()).map(
+  (e: any) => e.target,
+);
+const joinedGroupJob = (await Provider.getPerson.getJoinedCohorts()).map(
   (e: any) => e.target,
 );
 const PersonCustomModal = (props: Iprops) => {
@@ -25,15 +30,31 @@ const PersonCustomModal = (props: Iprops) => {
   const [jobType, setJobType] = useState(2);
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   let [selectItem, setSelectItem] = useState<any>({});
-
+  const [joineds, setJoineds] = useState<any>([]);
+  let joinedGroupJob: any[] = [];
   const onChange = (val: any) => {
     setJobType(val.target.value);
+    switch (val.target.value) {
+      case 2:
+        setJoineds(joinedInnerJob);
+        break;
+      case 3:
+        setJoineds(joinedGroupJob);
+        break;
+    }
   };
+
   const selectItemFun = (select: any) => {
     setSelectItem({ ...select });
   };
+  useEffect(() => {
+    if (selectedNode.props.assignedType == 'DENTITY') {
+      setJoineds(joinedCohorts);
+    } else if (selectedNode.props.assignedType == 'JOB') {
+      setJoineds(joinedInnerJob);
+    }
+  }, []);
 
-  console.log(joinedCohorts);
   const radiobutton = (
     <div>
       {selectedNode.props.assignedType == 'DENTITY' && (
@@ -54,8 +75,8 @@ const PersonCustomModal = (props: Iprops) => {
       <Card style={{ width: 350 }}>
         <SearchInput onChange={onChange} />
         <div className={cls[`person-card-left`]}>
-          {joinedCohorts.length > 0 &&
-            joinedCohorts.map((item) => {
+          {joineds.length > 0 &&
+            joineds.map((item: any) => {
               return (
                 <div
                   key={item.id}
@@ -69,7 +90,7 @@ const PersonCustomModal = (props: Iprops) => {
                 </div>
               );
             })}
-          {joinedCohorts.length <= 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+          {joineds.length <= 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
         </div>
       </Card>
     );

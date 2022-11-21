@@ -96,7 +96,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (user) {
+    if (Provider.getWorkSpace()) {
       getList();
       setCurrent({
         name: Provider.getWorkSpace().name,
