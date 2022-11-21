@@ -1,3 +1,11 @@
+/*
+ * @Author: zhangqiang 1196217890@qq.com
+ * @Date: 2022-11-16 17:46:20
+ * @LastEditors: zhangqiang 1196217890@qq.com
+ * @LastEditTime: 2022-11-19 16:21:11
+ * @FilePath: /oiocns-react/src/pages/Setting/index.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import React, { useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import {
@@ -9,13 +17,15 @@ import {
   InfoCircleOutlined,
   SettingOutlined,
   SmileOutlined,
-  ShopOutlined,
 } from '@ant-design/icons';
 import BreadCrumb from '@/components/BreadCrumb';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
+import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
+import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
 
 import { MenuProps } from 'antd';
+
 
 /* 信息中心菜单 */
 const infoMenuItems = [
@@ -25,21 +35,14 @@ const infoMenuItems = [
     key: 'dept',
     icon: <ApartmentOutlined />,
     children: [],
-    render: <div>自定义子菜单ß</div>,
+    render: <TreeLeftDeptPage />,
   },
   {
     label: '集团设置',
     key: 'group',
     icon: <FundOutlined />,
-    children: [
-      {
-        label: '集团结构',
-        key: '/setting/jiegou',
-        icon: <ShopOutlined />,
-        children: [],
-        render: <div>自定义子菜单ß</div>,
-      },
-    ],
+    children: [],
+    render: <TreeLeftGroupPage />,
   },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
 ];
@@ -67,30 +70,17 @@ const muneItems: MenuProps[`items`] = [
 ];
 
 const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
-  // const sider = <SettingMenu></SettingMenu>;
-  const contentTopLeft = <BreadCrumb></BreadCrumb>;
-  const content = <>{renderRoutes(route.routes)}</>;
-
-  const siderDom = (
-    <>
-      <div>11111</div>
-    </>
-  );
+ 
 
   const toNext = (e: any) => {
     history.push(`${e.key}`);
-    setMuneItems([]);
-    setUpdataDom(siderDom);
   };
-
-  const [updataDom, setUpdataDom] = useState<React.ReactDOM | JSX.Element>();
-  const [muneItemsData, setMuneItems] = useState(muneItems);
 
   return (
     <ContentTemplate
-      siderMenuData={muneItemsData}
+      siderMenuData={muneItems}
       menuClick={toNext}
-      sider={updataDom}
+      // sider={updataDom}
       // contentTopLeft={contentTopLeft}
     >
       {renderRoutes(route.routes)}
