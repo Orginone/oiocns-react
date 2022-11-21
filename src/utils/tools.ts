@@ -1,4 +1,13 @@
 import moment from 'moment';
+import { message } from 'antd';
+
+const showMessage = (response: any) => {
+  if (response.success) {
+    message.success('操作成功！');
+  } else {
+    message.error('操作失败！发生错误：  ' + response.msg);
+  }
+}
 
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
@@ -74,4 +83,4 @@ const showChatTime = (chatDate: moment.MomentInput) => {
   return cdate.format('yy年 M月D日 H:mm');
 };
 
-export { debounce, renderNum, resetParams, showChatTime, validIsSocialCreditCode };
+export { debounce, renderNum, resetParams, showChatTime, validIsSocialCreditCode, showMessage };

@@ -22,6 +22,7 @@ import { SpaceType, UserType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
+import { showMessage } from '@/utils/tools';
 type OrganizationalUnitsProps = {};
 
 // 菜单列表项
@@ -72,7 +73,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    Provider.getPerson.showMessage(res);
+    showMessage(res);
     setShowFormModal(!res.success);
   };
   const [form] = Form.useForm();
@@ -82,11 +83,11 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       (el: any) => el.target,
     );
     console.log(data);
-    setMenuList([...data, user.getWorkSpace()]); // 合并组织单位和个人空间数据
+    setMenuList([...data, Provider.getWorkSpace()]); // 合并组织单位和个人空间数据
   };
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    user.setWorkSpace(item);
+    Provider.setWorkSpace(item);
     setCurrent({
       name: item?.name,
       id: item?.id,
@@ -98,8 +99,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     if (user) {
       getList();
       setCurrent({
-        name: user.getWorkSpace().name,
-        id: user.getWorkSpace().id,
+        name: Provider.getWorkSpace().name,
+        id: Provider.getWorkSpace().id,
       });
     }
   }, []);

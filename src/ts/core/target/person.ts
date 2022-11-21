@@ -64,7 +64,7 @@ export default class Person extends MarketActionTarget {
       }
       return res;
     } else {
-      return faildResult('该单位已存在!');
+      return faildResult('该群组已存在!');
     }
   }
 
