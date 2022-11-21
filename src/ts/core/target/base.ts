@@ -174,6 +174,7 @@ export default class BaseTarget {
   //     remark: data.remark,
   //   });
   // }
+
   /**
    * 创建身份
    * @param name 名称
@@ -296,7 +297,7 @@ export default class BaseTarget {
    */
   public async queryAuthorityIdentity(
     id: string,
-  ): Promise<model.ResultType<XIdentityArray>> {
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await kernel.queryAuthorityIdentitys({
       id: id,
       page: {

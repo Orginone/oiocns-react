@@ -79,31 +79,6 @@ export default class Company extends MarketActionTarget {
       targetIds: personIds,
     });
   }
-
-  /**
-   * 获取单位下的工作组
-   * @returns 返回好友列表
-   */
-  public async getWorkings(): Promise<model.ResultType<any>> {
-    return await this.getSubTargets(
-      this.target.id,
-      [TargetType.Company],
-      [TargetType.Working],
-    );
-  }
-
-  /**
-   * 获取单位下的人员
-   * @returns 返回好友列表
-   */
-  public async getPersons(): Promise<model.ResultType<any>> {
-    return await this.getSubTargets(
-      this.target.id,
-      [TargetType.Company],
-      [TargetType.Person],
-    );
-  }
-
   /**
    * 查询指定身份赋予的人员
    * @param id
@@ -112,4 +87,5 @@ export default class Company extends MarketActionTarget {
   public async selectIdentityTargets(id: string): Promise<model.ResultType<any>> {
     return await this.getIdentityTargets(id, TargetType.Company);
   }
+  
 }
