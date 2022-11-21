@@ -96,7 +96,7 @@ export default class userdataservice extends BaseService {
     teamCode: string,
     remark: string,
     targetType: TargetType = TargetType.Company,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<Omit<model.ResultType<any>, 'data'>> {
     if (!this.companyTypes.includes(targetType)) {
       return {
         success: false,
