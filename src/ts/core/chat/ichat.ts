@@ -23,6 +23,15 @@ export interface IChat {
   /** 最后一条消息 */
   lastMessage: schema.XImMsg | undefined;
   /**
+   * 获取会话缓存
+   */
+  getCache(): ChatCache;
+  /**
+   * 加载缓存
+   * @param cache 缓存数据
+   */
+  loadCache(cache: ChatCache): void;
+  /**
    * 加载更多历史消息
    * @param filter 过滤条件
    */
@@ -62,12 +71,25 @@ export interface IChat {
  * 分组会话接口
  */
 export interface IChatGroup {
-  // 所在空间ID
+  /** 所在空间ID */
   spaceId: string;
-  // 所在空间名称
+  /** 所在空间名称 */
   spaceName: string;
-  // 是否处于打开状态
+  /** 是否处于打开状态 */
   isOpened: boolean;
-  // 空间会话
+  /** 空间会话 */
   chats: IChat[];
 }
+/**
+ * 会话缓存
+ */
+export type ChatCache = {
+  /** 会话ID */
+  chatId: string;
+  /** 会话所在空间ID */
+  spaceId: string;
+  /** 会话未读消息数量 */
+  noReadCount: number;
+  /** 最新消息 */
+  lastMessage: schema.XImMsg | undefined;
+};
