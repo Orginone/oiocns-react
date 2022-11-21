@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
 import { BetaSchemaForm, ProFormSelect } from '@ant-design/pro-components';
-import { Button, Alert, DatePicker, Space,message } from 'antd';
+import { Button, Alert, DatePicker, Space, message } from 'antd';
 import { CohortConfigType } from 'typings/Cohort';
 import CohortService from '@/module/cohort/Cohort';
 import dayjs from 'dayjs';
@@ -15,14 +15,22 @@ interface indexType {
   layoutType: ProFormLayoutType; //props
   open: boolean;
   [key: string]: any;
-  service:CohortService,
-  setOpen:Function,
-  item:CohortConfigType.CohortConfigTeam,
-  getTableList:Function
-  columns:ProFormColumnsType<DataItem>[]
+  service: CohortService;
+  setOpen: Function;
+  item: CohortConfigType.CohortConfigTeam;
+  getTableList: Function;
+  columns: ProFormColumnsType<DataItem>[];
 }
-const CreateCohort: React.FC<indexType> = ({ service,layoutType,item,setOpen,getTableList, columns,open, ...otherConfig }) => {
-
+const CreateCohort: React.FC<indexType> = ({
+  service,
+  layoutType,
+  item,
+  setOpen,
+  getTableList,
+  columns,
+  open,
+  ...otherConfig
+}) => {
   // const [layoutType, setLayoutType] = useState<ProFormLayoutType>('Form');
   return (
     <>
@@ -61,27 +69,27 @@ const CreateCohort: React.FC<indexType> = ({ service,layoutType,item,setOpen,get
         // rowProps={{
         //   gutter: 16,
         // }}
-        initialValues = {item}
+        initialValues={item}
         colProps={{
           span: 12,
         }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
-        onFinish={async (values:CohortConfigType.CohortConfigTeam) => {
+        onFinish={async (values: CohortConfigType.CohortConfigTeam) => {
           console.log(values);
           const param = {
-            belongId:item.belongId,
-            code:values.code,
-            id:item.targetId,
-            name:values.name,
-            teamCode:values.code,
-            teamName:values.name,
-            teamRemark:values.remark,
-            thingId:item.thingId
-          }
-          console.log(param)
-          service.updateItem(param)
+            belongId: item.belongId,
+            code: values.code,
+            id: item.targetId,
+            name: values.name,
+            teamCode: values.code,
+            teamName: values.name,
+            teamRemark: values.remark,
+            thingId: item.thingId,
+          };
+          console.log(param);
+          service.updateItem(param);
           console.log(values);
-          setOpen(false)
+          setOpen(false);
           getTableList();
           message.success('修改成功');
         }}
