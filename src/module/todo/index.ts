@@ -5,7 +5,8 @@ import { IdStatusReq, Page } from '../typings';
 
 // type OrgType = '人员' | 'other';
 
-/** tabs 状态选项
+/**
+ * tabs 状态选项
  *  tab,key 待办：1  我发起的：2
  */
 type statusItem = {

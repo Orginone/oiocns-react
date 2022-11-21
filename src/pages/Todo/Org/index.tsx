@@ -1,5 +1,4 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import TodoService, { tabStatus } from '@/module/todo';
 import { TeamApprovalType } from '@/module/todo/typings';
 import { Button, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -7,9 +6,10 @@ import PageCard from '../components/PageCard';
 
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
-import { IdPage } from '@/module/typings';
+import todoService, { tabStatus } from '@/ts/controller/todo';
+// import { IdPage } from '@/module/typings';
 
-const todoService = new TodoService('org');
+// todoService.currentModel = `org`;
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: TeamApprovalType) => {

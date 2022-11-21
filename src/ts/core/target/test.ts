@@ -1,3 +1,4 @@
+import API from '../../../services';
 /* eslint-disable no-unused-vars */
 import { TargetType } from '../enum';
 import Company from '../target/company';
@@ -9,31 +10,20 @@ import Provider from '../provider';
 import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
-
-/**
- * 我的设置里面的接口
- * const person: Person = Provider.getPerson;
- * import Provider from '@/ts/core/provider';
-   import Person from '@/ts/core/target/person';   
-
-   import Userdata from '@/ts/core/target/user';
-   Userdata.getInstance().searchCompany();
-   querySelfProduct 我的产品，上架后才是商品
- */
-export default class userdataservice extends BaseService {
+export default class Test {
   // 单例
-  private static _instance: userdataservice;
+  private static _instance: Test;
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(Provider.getPerson.target);
+      this._instance = new Test(Provider.getPerson.target);
     }
     return this._instance;
   }
 
   /**构造方法 */
   constructor(target: schema.XTarget) {
-    super(target);
+    // super(target);
   }
 
   /** 支持的单位类型数组 */
@@ -96,7 +86,7 @@ export default class userdataservice extends BaseService {
     teamCode: string,
     remark: string,
     targetType: TargetType = TargetType.Company,
-  ): Promise<Omit<model.ResultType<any>, 'data'>> {
+  ): Promise<model.ResultType<any>> {
     if (!this.companyTypes.includes(targetType)) {
       return {
         success: false,
@@ -248,4 +238,37 @@ export default class userdataservice extends BaseService {
     data.belongId = this.target.id;
     return await kernel.createTarget(data);
   }
+  public async SearchCohort(params: any) {
+    const { data } = await API.cohort.searchCohorts({
+      data: params,
+    });
+    console.log('进入调用');
+
+    return { data };
+  }
+
+  public async ApplyJoinCohort(params: any) {
+    const { code, msg, success } = await API.cohort.applyJoin({
+      data: params,
+    });
+    console.log('进入调用');
+
+    return { code, msg, success };
+  }
+
+  public async deleteCohort(params: any) {
+    const { code, msg, success } = await API.cohort.delete({
+      data: params,
+    });
+    console.log('进入调用');
+    return { code, msg, success };
+  }
+  // public async deleteCohort(params: any) {
+  //   const {code,msg,success} = await API.cohort.applyJoin({
+  //     data: params,
+  //   });
+  //   console.log("进入调用")
+
+  //   return {code,msg,success};
+  // }
 }

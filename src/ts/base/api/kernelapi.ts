@@ -15,7 +15,7 @@ export default class KernelApi {
   // 单例
   private static _instance: KernelApi;
   // 任意数据存储对象
-  private _anystore: AnyStore | undefined;
+  private _anystore: AnyStore;
   // 订阅方法
   private _methods: { [name: string]: ((...args: any[]) => void)[] };
   /**
@@ -24,22 +24,22 @@ export default class KernelApi {
    */
   private constructor(url: string) {
     this._methods = {};
-    this._anystore = AnyStore.getInstance('');
-    this._storeHub = new StoreHub(url, 'txt');
+    this._anystore = AnyStore.getInstance();
+    this._storeHub = new StoreHub(url, 'json');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
       if (methods) {
         try {
-          methods.forEach((m) => m.apply(this, res.data));
+          methods.forEach((m) => m.apply(this, [res.data]));
         } catch (e) {
           console.log(e);
         }
       }
     });
     this._storeHub.onConnected(() => {
-      if (this._anystore) {
+      if (this._anystore.accessToken.length > 0) {
         this._storeHub
-          .invoke('TokenAuth', this.anystore?.accessToken)
+          .invoke('TokenAuth', this._anystore.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
               console.debug('认证成功！');
@@ -67,7 +67,7 @@ export default class KernelApi {
    * 任意数据存储对象
    * @returns {AnyStore | undefined} 可能为空的存储对象
    */
-  public get anystore(): AnyStore | undefined {
+  public get anystore(): AnyStore {
     return this._anystore;
   }
   /**
@@ -95,7 +95,7 @@ export default class KernelApi {
       res = await this._restRequest('login', req);
     }
     if (res.success) {
-      this._anystore = AnyStore.getInstance(res.data.accessToken);
+      this._anystore.updateToken(res.data.accessToken);
     }
     return res;
   }
@@ -132,7 +132,7 @@ export default class KernelApi {
       res = await this._restRequest('Register', req);
     }
     if (res.success) {
-      this._anystore = AnyStore.getInstance(res.data.accessToken);
+      this._anystore.updateToken(res.data.accessToken);
     }
     return res;
   }
@@ -2169,7 +2169,7 @@ export default class KernelApi {
       timeout: 2 * 1000,
       url: '/orginone/kernel/rest/' + methodName,
       headers: {
-        Authorization: this._anystore?.accessToken,
+        Authorization: this._anystore.accessToken,
       },
       data: args,
     });

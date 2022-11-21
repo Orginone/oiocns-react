@@ -157,7 +157,7 @@ export default class AppStore {
    */
   public async unPublish(
     merchandiseId: string,
-    belongId: string,
+    belongId: number,
   ): Promise<ResultType<any>> {
     return await kernel.deleteMerchandiseByManager({
       id: merchandiseId,
