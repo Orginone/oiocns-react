@@ -21,23 +21,11 @@ export default class Person extends MarketActionTarget {
   }
 
   protected override get createTargetType(): TargetType[] {
-    return [
-      TargetType.Group,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
+    return [TargetType.Cohort, ...consts.CompanyTypes];
   }
 
   protected override get joinTargetType(): TargetType[] {
-    return [
-      TargetType.Person,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
+    return [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
   }
 
   /**
@@ -87,25 +75,6 @@ export default class Person extends MarketActionTarget {
       this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
     }
     return res;
-  }
-
-  /**
-   * 获取好友列表
-   * @returns 返回好友列表
-   */
-  public async getFriends(): Promise<schema.XTarget[]> {
-    if (this._friends.length > 0) {
-      return this._friends;
-    }
-    const res = await this.getSubTargets(
-      this.target.id,
-      [TargetType.Person],
-      [TargetType.Person],
-    );
-    if (res.success && res.data.result != undefined) {
-      this._friends = res.data.result;
-    }
-    return this._friends;
   }
 
   /**
@@ -162,6 +131,24 @@ export default class Person extends MarketActionTarget {
     }
   }
 
+  /**
+   * 获取好友列表
+   * @returns 返回好友列表
+   */
+  public async getFriends(): Promise<schema.XTarget[]> {
+    if (this._friends.length > 0) {
+      return this._friends;
+    }
+    const res = await this.getSubTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
+    if (res.success && res?.data?.result != undefined) {
+      this._friends = res.data.result;
+    }
+    return this._friends;
+  }
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组

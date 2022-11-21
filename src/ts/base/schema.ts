@@ -554,6 +554,10 @@ export type XImMsg = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 显示文本
+  showTxt: string;
+  // 允许编辑
+  allowEdit: boolean;
 };
 
 //及时通讯查询返回集合

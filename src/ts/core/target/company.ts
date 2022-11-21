@@ -1,9 +1,9 @@
 import Group from './group';
 import Cohort from './cohort';
+import consts from '../consts';
 import { TargetType } from '../enum';
 import MarketActionTarget from './mbase';
 import { faildResult, model, schema, kernel } from '../../base';
-import consts from '../consts';
 /**
  * 公司的元操作
  */
@@ -77,6 +77,48 @@ export default class Company extends MarketActionTarget {
   }
 
   /**
+   * 创建群组
+   * @param name 名称
+   * @param code 编号
+   * @param remark 备注
+   * @returns 是否创建成功
+   */
+  public async createCohort(
+    name: string,
+    code: string,
+    remark: string,
+  ): Promise<boolean> {
+    const res = await this.createTarget(
+      name,
+      code,
+      TargetType.Cohort,
+      name,
+      code,
+      remark,
+    );
+    if (res.success && res.data != undefined) {
+      const cohort = new Cohort(res.data);
+      this._joinedCohorts.push(cohort);
+      return cohort.pullPersons([this.target.id]);
+    }
+    return false;
+  }
+
+  /**
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
+   */
+  public async deleteCohorts(id: string): Promise<model.ResultType<any>> {
+    let res = await super.deleteTarget(id, TargetType.Cohort);
+    if (res.success) {
+      this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
+    }
+    return res;
+  }
+
+  /**
    * 创建部门/工作组
    * @param name 名称
    * @param code 编号
@@ -132,7 +174,7 @@ export default class Company extends MarketActionTarget {
 
   /**
    * 获取组织下的工作组（单位、部门、工作组）
-   * @param id 组织Id 默认为单位
+   * @param id 组织Id 默认为当前单位
    * @returns 返回好友列表
    */
   public async getWorkings(id: string = '0'): Promise<model.ResultType<any>> {
@@ -145,7 +187,7 @@ export default class Company extends MarketActionTarget {
 
   /**
    * 获取组织下的人员（单位、部门、工作组）
-   * @param id 组织Id 默认为单位
+   * @param id 组织Id 默认为当前单位
    * @returns
    */
   public async getPersons(id: string = '0'): Promise<model.ResultType<any>> {
@@ -161,7 +203,7 @@ export default class Company extends MarketActionTarget {
 
   /**
    * 获取组织下的部门（单位、部门）
-   * @param id 组织Id 默认为单位
+   * @param id 组织Id 默认为当前单位
    * @returns
    */
   public async getDepartments(id: string = '0'): Promise<model.ResultType<any>> {

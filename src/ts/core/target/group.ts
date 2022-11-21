@@ -11,7 +11,7 @@ export default class Group extends BaseTarget {
   }
 
   protected get searchTargetType(): TargetType[] {
-    return [TargetType.Company, TargetType.University, TargetType.Hospital];
+    return [...consts.CompanyTypes];
   }
 
   /**
@@ -60,8 +60,8 @@ export default class Group extends BaseTarget {
   }
 
   /**
-   * 获取组织下的人员（单位、集团）
-   * @param id 组织Id 默认为集团
+   * 获取集团下的人员（单位、集团）
+   * @param id 组织Id 默认为当前集团
    * @returns
    */
   public async getPersons(
@@ -78,8 +78,8 @@ export default class Group extends BaseTarget {
   }
 
   /**
-   * 获取组织下的单位(集团）
-   * @param id 组织Id 默认为集团
+   * 获取集团下的单位
+   * @param id 组织Id 默认为当前集团
    * @returns
    */
   public async getCompanys(
@@ -96,8 +96,8 @@ export default class Group extends BaseTarget {
   }
 
   /**
-   * 获取组织下的单位(集团）
-   * @param id 组织Id 默认为集团
+   * 获取集团下的集团
+   * @param id 组织Id 默认为当前集团
    * @returns
    */
   public async getGroups(

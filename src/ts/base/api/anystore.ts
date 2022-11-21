@@ -25,26 +25,27 @@ export default class AnyStore {
    * @param {string} accessToken 远端地址
    * @param {string} url 远端地址
    */
-  private constructor(accessToken: string, url: string) {
-    this.accessToken = accessToken;
+  private constructor(url: string) {
     this._subscribeCallbacks = {};
     this._storeHub = new StoreHub(url);
     this._storeHub.on('updated', (key: string, domain: string, data: any) => {
       this._updated(key, domain, data);
     });
     this._storeHub.onConnected(() => {
-      this._storeHub
-        .invoke('TokenAuth', this.accessToken, 'user')
-        .then(() => {
-          Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
-            const key = fullKey.split('|')[0];
-            const domain = fullKey.split('|')[1];
-            this.subscribed(key, domain, this._subscribeCallbacks[fullKey]);
+      if (this.accessToken.length > 0) {
+        this._storeHub
+          .invoke('TokenAuth', this.accessToken, 'user')
+          .then(() => {
+            Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
+              const key = fullKey.split('|')[0];
+              const domain = fullKey.split('|')[1];
+              this.subscribed(key, domain, this._subscribeCallbacks[fullKey]);
+            });
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      }
     });
     this._storeHub.on('Updated', (key, domain, data) => {
       this._updated(key, domain, data);
@@ -57,21 +58,9 @@ export default class AnyStore {
    * @param {string} url 远端地址,默认为 "/orginone/anydata/hub"
    * @returns {AnyStore} 数据存储单例
    */
-  public static getInstance(
-    accessToken: string,
-    url: string = '/orginone/anydata/hub',
-  ): AnyStore | undefined {
+  public static getInstance(url: string = '/orginone/anydata/hub'): AnyStore {
     if (this._instance == null) {
-      if (accessToken === '') {
-        accessToken = sessionStorage.getItem('accessToken') || '';
-      }
-      if (accessToken != '') {
-        this._instance = new AnyStore(accessToken, url);
-      } else {
-        return undefined;
-      }
-    } else {
-      this._instance.updateToken(accessToken);
+      this._instance = new AnyStore(url);
     }
     return this._instance;
   }
@@ -108,7 +97,7 @@ export default class AnyStore {
         this._storeHub
           .invoke('Subscribed', key, domain)
           .then((res: ResultType<T>) => {
-            if (res.success) {
+            if (res.success && res.data) {
               callback.apply(this, [res.data]);
             }
           })

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cohort } from '../../module/org/index';
-import CohortServices from '../../ts/core/target/cohort'
+import CohortServices from '../../ts/core/target/cohort';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography, Button } from 'antd';
@@ -8,12 +8,10 @@ import { MonitorOutlined } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
 import { UserOutlined } from '@ant-design/icons';
 
-
-
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
-  setCohort:Function;
+  setCohort: Function;
 };
 
 let tableProps: CohortSearchTableProps;
@@ -31,28 +29,31 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
 
   // 单位卡片渲染
   const companyCardList = () => {
-    console.log("开始渲染")
+    console.log('开始渲染');
     return (
-
       <CheckCard.Group
         onChange={(value) => {
-          props.setCohort(value)
+          props.setCohort(value);
           console.log('value', value);
         }}
-        style={{ width: '100%', marginTop: '50px'}}
-        size='large'
-        defaultValue={['A']}
-      >
+        style={{ width: '100%', marginTop: '50px' }}
+        size="large"
+        defaultValue={['A']}>
         <Row gutter={16}>
           {dataSource.map((item) => (
-            <Col span={12}>
+            <Col span={12} key={item.id}>
               <CheckCard
-              style={{ marginInlineEnd: 8, marginInlineStart: 55 ,width:'300px'}}
+                style={{ marginInlineEnd: 8, marginInlineStart: 55, width: '300px' }}
                 title={item.name}
-                avatar={<Avatar style={{ backgroundColor: '#7265e6' }} icon={<UserOutlined />} size="default" />}
-                value = {item}
-                description = {item.team.remark}
-                
+                avatar={
+                  <Avatar
+                    style={{ backgroundColor: '#7265e6' }}
+                    icon={<UserOutlined />}
+                    size="default"
+                  />
+                }
+                value={item}
+                description={item.team.remark}
               />
             </Col>
           ))}
@@ -68,13 +69,11 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
       filter: searchKey, // || '91330304254498785G',
       limit: 20,
       offset: 0,
-
     });
-    console.log(data.result)
+    console.log(data.result);
     setDataSource(data?.result || []);
-    console.log("输出值", dataSource)
+    console.log('输出值', dataSource);
   };
-
 
   return (
     <div className={styles[`search-card`]}>

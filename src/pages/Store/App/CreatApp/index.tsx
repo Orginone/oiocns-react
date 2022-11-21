@@ -23,11 +23,12 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
         flows: n.flows ? JSON.stringify(n.flows) : null,
       };
     });
-    const { success } = await StoreSevice.createProduct({
+    const res = await StoreSevice.createProduct({
       ...values,
       resources: list,
     });
-    if (success) {
+
+    if (res.success) {
       message.success('创建应用成功');
       history.goBack();
     }
@@ -53,7 +54,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
           }}
           columns={columns}
           submitter={{
-            render: (props, doms) => {
+            render: (_, doms) => {
               return (
                 <Row>
                   <Col span={20}></Col>

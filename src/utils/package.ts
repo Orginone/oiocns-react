@@ -1,8 +1,6 @@
 import pako from 'pako';
 
 export class StringPako {
-  private static decoder: TextDecoder = new TextDecoder();
-  private static encoder: TextEncoder = new TextEncoder();
   /**
    * 解压缩
    * @param input 输入字符串（明文）

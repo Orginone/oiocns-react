@@ -1,3 +1,4 @@
+import { SpaceType } from '@/store/type';
 import { kernel, model } from '../base';
 import Person from './target/person';
 
@@ -6,6 +7,35 @@ import Person from './target/person';
  */
 export default class Provider {
   private static person: Person;
+  private static _workSpace: SpaceType;
+
+  public static get userId() {
+    return Provider.person.target.id;
+  }
+
+  /**
+   * 获取工作空间
+   * @returns 工作空间
+   */
+  public static getWorkSpace(): SpaceType {
+    return Provider._workSpace;
+  }
+
+  /**
+   * 切换工作空间
+   * @param workSpace
+   */
+  public static setWorkSpace(workSpace: SpaceType) {
+    Provider._workSpace = workSpace;
+  }
+
+  /**
+   * 是否个人空间
+   * @returns
+   */
+  public static isUserSpace(): boolean {
+    return Provider._workSpace.id == Provider.person.target.id;
+  }
 
   public static get getPerson(): Person {
     if (this.person == null) {
@@ -25,6 +55,7 @@ export default class Provider {
     let res = await kernel.login(account, password);
     if (res.success) {
       this.person = new Person(res.data.person);
+      this._workSpace = { id: this.person.target.id, name: '个人空间' };
       sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
     }
     return res;

@@ -9,10 +9,10 @@ import Person from '../../ts/core/target/person';
 interface CohortServiceType {
   service: CohortService;
   getTableList: Function;
-  Person:Person
+  Person: Person;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableList }) => {
+const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableList }) => {
   console.log(service);
   const layout = {
     labelCol: { span: 8 },
@@ -48,7 +48,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableLis
       name: values.cohort.name,
       teamRemark: values.cohort.remark,
     };
-    Person.createCohort(values.cohort.name,values.cohort.code,values.cohort.remark)
+    Person.createCohort(values.cohort.name, values.cohort.code, values.cohort.remark);
     console.log('创建成功');
     setIsModalOpen(false);
     getTableList();
@@ -106,8 +106,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({Person, service, getTableLis
             ]}>
             <Input.TextArea />
           </Form.Item>
-          <Form.Item >
-          </Form.Item>
+          <Form.Item></Form.Item>
         </Form>
       </Modal>
     </div>

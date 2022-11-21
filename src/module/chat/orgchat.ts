@@ -37,8 +37,8 @@ export default class OrgChat extends Object {
   private openChats: ImMsgChildType[];
   public curChat: ImMsgChildType; // 双向绑定数据
   private messageCallback: (data: any) => void;
-  public connection: signalR.HubConnection;
-  private nameMap: Record<string, string>; // 双向绑定数据
+  private connection: signalR.HubConnection;
+  private _nameMap: Record<string, string>; // 双向绑定数据
   private static orgChat: OrgChat = null;
   /**
    * 私有构造方法，禁止外部实例化
@@ -53,7 +53,7 @@ export default class OrgChat extends Object {
     this.userId = ''; // 双向绑定数据
     this.spaceId = ''; // 双向绑定数据
     this.curMsgs = []; // 双向绑定数据
-    this.nameMap = {}; // 双向绑定数据
+    this._nameMap = {}; // 双向绑定数据
     this.curChat = null; // 双向绑定数据
     this.authed = false; // 双向绑定数据
     this.isconnecting = false;
@@ -68,7 +68,6 @@ export default class OrgChat extends Object {
       this.reconnect('disconnected from orgchat, await 5s reconnect.');
     });
     this.connection.on('RecvMsg', (data) => {
-      console.log('执行了接收消息');
       this._recvMsg(data);
     });
     this.connection.on('ChatRefresh', async () => {
@@ -167,11 +166,11 @@ export default class OrgChat extends Object {
    * @returns {string} id对应的名称
    */
   public getName(id: string) {
-    let name = this.nameMap.value[id] || '';
+    let name = this._nameMap.value[id] || '';
     if (name === '' && this.authed) {
       this.connection.invoke('GetName', id).then((res) => {
         if (res.success) {
-          this.nameMap.value[id] = res.data;
+          this._nameMap.value[id] = res.data;
           if (this.chats.length > 0) {
             this._cacheChats();
           }
@@ -217,7 +216,7 @@ export default class OrgChat extends Object {
    * 删除消息
    * @param msg 要删除的消息
    */
-  public deleteMsg(msg: any, callback: Function) {
+  public deleteMsg(msg: any) {
     if (!msg.chatId) {
       msg.chatId = msg.id;
     }
@@ -234,14 +233,13 @@ export default class OrgChat extends Object {
           this.curMsgs = this.curMsgs.filter((item: any) => {
             return item.chatId != msg.chatId;
           });
-          callback && callback(this.curMsgs);
         }
       });
   }
   /**
    * 清空会话历史消息
    */
-  public async clearMsg(callback: Function) {
+  public async clearMsg() {
     if (this.curChat) {
       this.anyStore
         .remove(
@@ -255,7 +253,6 @@ export default class OrgChat extends Object {
           if (res.data > 0 && this.curMsgs.length > 0) {
             this.curMsgs = [];
           }
-          callback && callback(this.curMsgs);
         });
     }
   }
@@ -263,7 +260,7 @@ export default class OrgChat extends Object {
    * 设置当前会话
    * @param {ImMsgChildType} chat 当前会话
    */
-  public async setCurrent(chat: ImMsgChildType, callback?: Function) {
+  public async setCurrent(chat: ImMsgChildType, callback: Function) {
     if (this.authed) {
       if (this.curChat) {
         this.openChats = this.openChats.filter((item) => {
@@ -323,7 +320,7 @@ export default class OrgChat extends Object {
               item.name = item.team.name;
               let typeName =
                 item.typeName == TargetType.Person ? '' : `[${item.typeName}]`;
-              this.nameMap.value[item.id] = `${item.name}${typeName}`;
+              this._nameMap[item.id] = `${item.name}${typeName}`;
             }
             this.qunPersons.push(item);
           });
@@ -413,7 +410,7 @@ export default class OrgChat extends Object {
               });
             });
             let typeName = chat.typeName == TargetType.Person ? '' : `[${chat.typeName}]`;
-            this.nameMap.value[chat.id] = `${chat.name}${typeName}`;
+            this._nameMap.value[chat.id] = `${chat.name}${typeName}`;
             chat.spaceId = group.id;
             return chat;
           });
@@ -428,6 +425,10 @@ export default class OrgChat extends Object {
       return res;
     }
     return BadRequst;
+  }
+  /** 获取namemap键值对 */
+  get nameMap() {
+    return this._nameMap;
   }
   private _recvMsg(data: any) {
     data = this._handlerMsg(data);
@@ -474,7 +475,7 @@ export default class OrgChat extends Object {
               chat.showTxt = data.showTxt;
             }
             if (chat.typeName !== TargetType.Person) {
-              chat.showTxt = this.nameMap.value[data.fromId] + ': ' + chat.showTxt;
+              chat.showTxt = this._nameMap.value[data.fromId] + ': ' + chat.showTxt;
             }
             data.showTxt = chat.showTxt;
             if (
@@ -539,7 +540,7 @@ export default class OrgChat extends Object {
         }
       });
     }
-    this.nameMap.value = data.nameMap || this.nameMap.value;
+    this._nameMap.value = data.nameMap || this._nameMap.value;
     this.openChats = data.openChats || data.openChats;
     let lastMsg = data.lastMsg;
     if (
@@ -573,7 +574,7 @@ export default class OrgChat extends Object {
         data: {
           name: '我的消息',
           chats: this.chats,
-          nameMap: this.nameMap.value,
+          nameMap: this._nameMap.value,
           openChats: this.openChats,
           lastMsg: this.lastMsg,
         },
