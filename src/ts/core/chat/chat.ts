@@ -1,9 +1,9 @@
 import { schema, kernel, model } from '../../base';
 import { TargetType, MessageType } from '../enum';
 import Provider from '../provider';
-import { StringPako } from '../../../utils/package';
+import { StringPako } from '@/utils/package';
 import { sleep } from '@/store/sleep';
-import { IChat } from './ichat';
+import { ChatCache, IChat } from './ichat';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -30,6 +30,18 @@ class BaseChat implements IChat {
     this.personCount = 0;
     this.chatId = m.id;
     this.noReadCount = 0;
+  }
+  getCache(): ChatCache {
+    return {
+      chatId: this.chatId,
+      spaceId: this.spaceId,
+      lastMessage: this.lastMessage,
+      noReadCount: this.noReadCount,
+    };
+  }
+  loadCache(cache: ChatCache): void {
+    this.noReadCount = cache.noReadCount;
+    this.lastMessage = cache.lastMessage;
   }
   clearMessage(): void {
     throw new Error('Method not implemented.');
@@ -62,9 +74,9 @@ class BaseChat implements IChat {
     });
     return res.success;
   }
-  receiveMessage(msg: schema.XImMsg) {
+  receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
     if (msg.id !== this.lastMessage?.id) {
-      this.noReadCount += 1;
+      this.noReadCount += noread ? 1 : 0;
       this.lastMessage = msg;
       this.messages.push(msg);
     }
