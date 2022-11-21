@@ -1,8 +1,9 @@
+import { chatCtrl } from '@/ts/controller/chat';
+import { MessageType } from '@/ts/core/enum';
 import { AudioOutlined, SmileOutlined } from '@ant-design/icons';
 import { Button, message, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
-import { chat } from '@/module/chat/orgchat';
 
 /**
  * @description: 输入区域
@@ -11,8 +12,6 @@ import { chat } from '@/module/chat/orgchat';
 
 interface Iprops {
   writeContent: any;
-  // setHistoryMesagesList: Function;
-  // sendMesageCallback: (val: any) => void;
 }
 
 const Groupinputbox = (props: Iprops) => {
@@ -27,22 +26,11 @@ const Groupinputbox = (props: Iprops) => {
     const inputContent: any = document.getElementById('insterHtml')?.childNodes;
     const text: any =
       inputContent?.length > 0
-        ? reCreatChatContent(document.getElementById('insterHtml')?.childNodes)
+        ? reCreatChatContent(document.getElementById('insterHtml')?.childNodes ?? [])
         : [document.getElementById('insterHtml')?.innerHTML];
     let massage = text.join('').trim();
     if (massage.length > 0) {
-      await chat.sendMsg(
-        {
-          toId: chat.curChat?.id,
-          spaceId: chat.curChat?.spaceId,
-          msgType: 'text',
-          msgBody: massage,
-        },
-        // sendMesageCallback,
-        // setHistoryMesagesList(),
-      );
-      // ChatStore.addSessionList();
-      // ChatStore._cacheSession();
+      await chatCtrl.chat?.sendMessage(MessageType.Text, massage);
     }
     document.getElementById('insterHtml')!.innerHTML = '';
   };
@@ -54,7 +42,6 @@ const Groupinputbox = (props: Iprops) => {
    */
   const reCreatChatContent = (elementChild: NodeList | any[]): Array<string> => {
     const arrElement = Array.from(elementChild);
-    // const newSpace  = document.createDocumentFragment()
     if (arrElement.length > 0) {
       return arrElement.map((n) => {
         if (n.nodeName == '#text') {
@@ -68,7 +55,7 @@ const Groupinputbox = (props: Iprops) => {
         return n?.outerHTML;
       });
     }
-    // return newSpace.innerHTML
+    return [];
   };
 
   /**
@@ -80,7 +67,7 @@ const Groupinputbox = (props: Iprops) => {
     const img = document.createElement('img');
     img.src = url;
     img.className = `emoji`;
-    document.getElementById('insterHtml').append(img);
+    document.getElementById('insterHtml')?.append(img);
   };
 
   /**
@@ -97,8 +84,9 @@ const Groupinputbox = (props: Iprops) => {
     setImgUrls(imgUrlss);
   }, []);
   useEffect(() => {
-    if (writeContent !== null) {
-      document.getElementById('insterHtml').innerHTML = writeContent;
+    let doc = document.getElementById('insterHtml');
+    if (writeContent !== null && doc) {
+      doc.innerHTML = writeContent;
     }
   }, [writeContent]);
 
@@ -108,19 +96,19 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const keyDown = (e: any) => {
+    let doc = document.getElementById('insterHtml');
+    if (!doc) return;
     if (e.ctrlKey && e.keyCode == 13) {
       //用户点击了ctrl+enter触发
-      const value = document.getElementById('insterHtml')?.innerHTML;
+      const value = doc.innerHTML;
       if (!value?.includes('<div><br></div>')) {
-        document.getElementById('insterHtml').innerHTML += '<div><br></div>';
+        doc.innerHTML += '<div><br></div>';
       }
       setFocus();
     } else if (e.keyCode == 13) {
       //用户点击了enter触发
       e.preventDefault(); // 阻止浏览器默认换行操作
-      const value = document
-        .getElementById('insterHtml')
-        .innerHTML.replaceAll('<div><br></div>', '');
+      const value = doc.innerHTML.replaceAll('<div><br></div>', '');
       if (value) {
         submit();
       } else {
@@ -134,12 +122,12 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const setFocus = () => {
-    let selection = window.getSelection();
-    let range = document.createRange();
-    range.selectNodeContents(inputRef.value);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    // let selection = window.getSelection();
+    // let range = document.createRange();
+    // range.selectNodeContents(inputRef.value);
+    // range.collapse(false);
+    // selection.removeAllRanges();
+    // selection.addRange(range);
   };
 
   return (

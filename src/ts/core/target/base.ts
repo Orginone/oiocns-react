@@ -1,6 +1,7 @@
 import { PageRequest } from './../../base/model';
 import { TargetType } from '../enum';
 import { kernel, model, common, schema, FaildResult } from '../../base';
+import { XIdentityArray } from '../../base/schema';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;

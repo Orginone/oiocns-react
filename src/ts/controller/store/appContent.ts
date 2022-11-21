@@ -1,5 +1,5 @@
 import { ProductModel } from '@/ts/base/model';
-import provider from '../../core/provider';
+import provider from '@/ts/core/provider';
 
 function createProduct(
   values: Omit<ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
