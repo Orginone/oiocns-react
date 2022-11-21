@@ -7,9 +7,11 @@ import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import { validIsSocialCreditCode } from '@/utils/tools';
+import { SpaceType } from '@/store/type';
 
 export default class Person extends MarketActionTarget {
   private _friends: schema.XTarget[];
+  private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
 
@@ -18,6 +20,7 @@ export default class Person extends MarketActionTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this.workSpace = { id: this.target.id, name: '个人空间' };
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -314,29 +317,29 @@ export default class Person extends MarketActionTarget {
     return res;
   }
 
-  // /**
-  //  * 获取工作空间
-  //  * @returns 工作空间
-  //  */
-  // public getWorkSpace(): SpaceType {
-  //   return this.workSpace;
-  // }
+  /**
+   * 获取工作空间
+   * @returns 工作空间
+   */
+  public getWorkSpace(): SpaceType {
+    return this.workSpace;
+  }
 
-  // /**
-  //  * 切换工作空间
-  //  * @param workSpace
-  //  */
-  // public setWorkSpace(workSpace: SpaceType) {
-  //   this.workSpace = workSpace;
-  // }
+  /**
+   * 切换工作空间
+   * @param workSpace
+   */
+  public setWorkSpace(workSpace: SpaceType) {
+    this.workSpace = workSpace;
+  }
 
-  // /**
-  //  * 是否个人空间
-  //  * @returns
-  //  */
-  // public isUserSpace(): boolean {
-  //   return this.workSpace.id == this.target.id;
-  // }
+  /**
+   * 是否个人空间
+   * @returns
+   */
+  public isUserSpace(): boolean {
+    return this.workSpace.id == this.target.id;
+  }
 
   // public get spaceId(): string {
   //   return this.workSpace.id ?? '';
