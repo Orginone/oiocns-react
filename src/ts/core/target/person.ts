@@ -48,6 +48,51 @@ export default class Person extends MarketActionTarget {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
   }
 
+  public get ChohortArray(): Cohort[] {
+    return this._joinedCohorts;
+  }
+  /**
+   * 获取群组列表
+   * @param params
+   * @returns
+   */
+  public async getCohort(): Promise<model.ResultType<any>> {
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Cohort],
+    });
+    if (res.success && res.data != undefined && res.data.result != undefined) {
+      this._joinedCohorts = [];
+      for (var i = 0; i < res.data?.result.length; i++) {
+        const cohort = new Cohort(res.data?.result[i]);
+        this._joinedCohorts.push(cohort);
+      }
+    }
+    return res;
+  }
+
+  /** 支持的群组类型数组*/
+  public get cohortTypes(): TargetType[] {
+    return [TargetType.Cohort];
+  }
+
+  // 购买
+  buyApp() {
+    console.log('buyApp');
+  }
+  //加购物车
+  addCart() {
+    console.log('addCart');
+  }
+  //获取订单
+  getOrderList() {
+    console.log('getOrderList');
+  }
+  //取消订单
+  cancleOrder() {
+    console.log('cancleOrder');
+  }
+
   /**
    * 创建群组
    * @param name 名称
@@ -105,13 +150,15 @@ export default class Person extends MarketActionTarget {
     if (this._friends.length > 0) {
       return this._friends;
     }
-    const res = await this.getSubTargets(
-      this.target.id,
-      [TargetType.Person],
-      [TargetType.Person],
-    );
-    if (res.success && res?.data?.result != undefined) {
-      this._friends = res.data.result;
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Person],
+    });
+    console.log('好友查询结果', res);
+    if (res.success) {
+      if (res.data != undefined && res.data.result != undefined) {
+        this._friends = res.data.result;
+      }
     }
     return this._friends;
   }
@@ -168,6 +215,53 @@ export default class Person extends MarketActionTarget {
     } else {
       return FaildResult('该单位已存在!');
     }
+  }
+
+  /**
+   * 查询我的产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMyProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
+    let paramData: any = {};
+    paramData.id = this.target.id;
+    paramData.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_8,
+    };
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
+  }
+
+  /**
+   * 查询我的个人产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMySpaceProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
+    // 判断如果是有个人空间
+    if (!this._curCompany) {
+      return resultArray;
+    }
+
+    let paramData: any = {};
+    paramData.id = this._joinedCompanys[0].target.id;
+    paramData.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_8,
+    };
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
   }
 
   /**
