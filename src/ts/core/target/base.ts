@@ -417,7 +417,7 @@ export default class BaseTarget extends SpaceTarget {
   }
 
   /**
-   * 审批我的申请
+   * 审批我的加入组织/个人申请
    * @param id
    * @param status
    * @returns
@@ -426,7 +426,7 @@ export default class BaseTarget extends SpaceTarget {
     id: string,
     status: number,
   ): Promise<model.ResultType<any>> {
-    return await kernel.approvalJoinApply({
+    return await kernel.joinTeamApproval({
       id,
       status,
     });

@@ -449,7 +449,7 @@ export default class Person extends MarketTarget {
     relation: XRelation,
     status: number = CommonStatus.ApproveStartStatus,
   ): Promise<model.ResultType<any>> => {
-    const res = await super.ApprovalJoinApply(relation.id, status);
+    const res = await super.approvalJoinApply(relation.id, status);
     if (res.success && relation.target != undefined) {
       this._friends.push(relation.target);
     }

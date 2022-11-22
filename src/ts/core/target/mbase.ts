@@ -165,13 +165,25 @@ export default class MarketActionTarget extends BaseTarget {
    * @param status 审批状态
    * @returns
    */
-  ApprovalJoinApply = async (
+  approvalJoinMarketApply = async (
     id: string,
     status: number,
   ): Promise<model.ResultType<boolean>> => {
     return kernel.approvalJoinApply({ id, status });
   };
 
+  /**
+   * 审批商品上架申请
+   * @param id 申请ID
+   * @param status 审批结果
+   * @returns 是否成功
+   */
+  public async approvalPublishApply(
+    id: string,
+    status: number,
+  ): Promise<model.ResultType<any>> {
+    return await kernel.approvalMerchandise({ id, status });
+  }
   /**
    * 创建市场
    * @param  {model.MarketModel} 市场基础信息

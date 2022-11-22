@@ -4,7 +4,6 @@ import { TargetType } from '../enum';
 import consts from '../consts';
 import Cohort from './cohort';
 import Company from './company';
-import { XRelation } from '../../base/schema';
 
 /**
  * 组织接口
@@ -155,7 +154,7 @@ export default abstract class SpaceTarget {
   abstract queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>>;
 
   /**
-   * 审批我的申请
+   * 审批我的加入组织/个人申请
    * @param id
    * @param status
    * @returns
@@ -327,12 +326,27 @@ export default abstract class SpaceTarget {
   };
 
   /**
+   * 查询加入市场的审批
+   * @returns
+   */
+  getJoinApproval = async (): Promise<model.ResultType<schema.XMarketRelationArray>> => {
+    throw consts.FunctionNotFoundError;
+  };
+
+  /**
+   * 查询应用上架的审批
+   * @returns
+   */
+  getPublicApproval = async (): Promise<model.ResultType<schema.XMerchandiseArray>> => {
+    throw consts.FunctionNotFoundError;
+  };
+  /**
    * 审批加入市场申请
    * @param _id 申请id
    * @param _status 审批状态
    * @returns
    */
-  ApprovalJoinApply = async (
+  approvalJoinMarketApply = async (
     _id: string,
     _status: number,
   ): Promise<model.ResultType<boolean>> => {
@@ -494,7 +508,7 @@ export default abstract class SpaceTarget {
    * @returns
    */
   approvalFriendApply = (
-    _relation: XRelation,
+    _relation: schema.XRelation,
     _status: number,
   ): Promise<model.ResultType<any>> => {
     throw consts.FunctionNotFoundError;
