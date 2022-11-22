@@ -315,6 +315,33 @@ export default class Company extends MarketTarget {
   };
 
   /**
+   * 移除工作组人员
+   * @param ids 人员Id集合
+   * @returns
+   */
+  removeWorkingPerson = async (ids: string[]) => {
+    return await kernel.removeAnyOfTeam({
+      id: this.target.id,
+      teamTypes: [TargetType.Working],
+      targetIds: ids,
+      targetType: TargetType.Person,
+    });
+  };
+  /**
+   * 移除部门人员
+   * @param ids 人员Id集合
+   * @returns
+   */
+  removeDepartmentPerson = async (ids: string[]) => {
+    return await kernel.removeAnyOfTeam({
+      id: this.target.id,
+      teamTypes: [TargetType.Department],
+      targetIds: ids,
+      targetType: TargetType.Person,
+    });
+  };
+
+  /**
    * 获取组织下的工作组（单位、部门、工作组）
    * @param id 组织Id 默认为当前单位
    * @returns 返回好友列表

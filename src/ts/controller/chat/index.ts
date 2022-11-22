@@ -107,7 +107,7 @@ class ChatController {
   public subscribe(callback: () => void): string {
     const id = generateUuid();
     if (callback) {
-      callback();
+      callback.apply(this, []);
       this._refreshCallback[id] = callback;
     }
     return id;

@@ -1,10 +1,10 @@
-import { PageRequest } from '@/ts/base/model';
-import { TargetType } from '../enum';
 import consts from '../consts';
-import SpaceTarget from './sbase';
+import { TargetType } from '../enum';
+import { PageRequest } from '@/ts/base/model';
 import { kernel, model, common, schema, faildResult } from '../../base';
 
-export default class BaseTarget extends SpaceTarget {
+export default class BaseTarget {
+  public target: schema.XTarget;
   // 拥有的身份
   public _ownIdentitys: schema.XIdentity[];
   public _allIdentitys: schema.XIdentity[];
@@ -24,7 +24,7 @@ export default class BaseTarget extends SpaceTarget {
   }
 
   constructor(target: schema.XTarget) {
-    super(target);
+    this.target = target;
     this._ownIdentitys = [];
     this._allIdentitys = [];
     this._ownAuthoritys = [];
@@ -258,7 +258,9 @@ export default class BaseTarget extends SpaceTarget {
         typeName: '',
       });
       if (res.success) {
-        delete this._ownAuthoritys[index];
+        this._ownAuthoritys = this._ownAuthoritys.filter((auth) => {
+          return auth.id != id;
+        });
       }
       return res;
     }

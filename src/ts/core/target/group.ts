@@ -45,10 +45,6 @@ export default class Group extends BaseTarget {
     return await this.applyJoin(id, TargetType.Group);
   };
 
-  querySubGroup=async(){
-
-  }
-
   /**
    * 设立子集团
    * @param name 子集团名称

@@ -43,4 +43,19 @@ export default class Cohort extends BaseTarget {
       [TargetType.Person, ...consts.CompanyTypes],
     );
   };
+
+  /**
+   * 移除群组成员
+   * @param ids 成员Id集合
+   * @param typeName 成员类型
+   * @returns
+   */
+  public removePerson = async (ids: string[], typeName: TargetType) => {
+    return kernel.removeAnyOfTeam({
+      id: this.target.id,
+      teamTypes: [TargetType.Cohort],
+      targetIds: ids,
+      targetType: typeName,
+    });
+  };
 }

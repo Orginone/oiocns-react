@@ -91,13 +91,12 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     if (Provider.getPerson) {
       Provider.getAllWorkSpaces().then((allWorkSpaces) => {
         setMenuList(allWorkSpaces);
-        Provider.getWorkSpace().then((curspace) => {
-          setCurrent(
-            allWorkSpaces.find((space) => {
-              return space.id == curspace?.target.id;
-            }),
-          );
-        });
+        const curspace = Provider.getWorkSpace();
+        setCurrent(
+          allWorkSpaces.find((space) => {
+            return space.id == curspace?.target.id;
+          }),
+        );
       });
     }
   }, []);

@@ -9,6 +9,7 @@ import siderBar from '@/ts/controller/todo/sidebar';
 // import TodoMenu, { muneItems } from './Menu';
 import './index.less';
 import { MenuProps } from 'antd';
+import Provider from '@/ts/core/provider';
 
 // const appService = new todoService('app');
 
