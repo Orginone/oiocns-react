@@ -62,6 +62,9 @@ class SettingController {
   isOpenModal: boolean = false;
   // 当前操作的部门
   selectId: string = '';
+  // 工作空间的操作
+  currentWorkSpaceId: string;
+  currentIsUserWorkSpace: boolean;
 
   // 查询接口, 把公司底下的部门返回到这底下
   allCompanyDepts: Map<string, Array<spaceObjs>> = new Map();
@@ -70,6 +73,7 @@ class SettingController {
 
   // 切换空间的时候重新初始化，所以需要new
   constructor() {
+    Provider.getWorkSpace();
     // 如果是一个公司的工作空间，需要初始化一个部门数组
     // 切换工作空间的时候 初始化控制器。
     if (!Provider.isUserSpace()) {
@@ -89,8 +93,11 @@ class SettingController {
       teamCode: 'BMtwo',
       remark: '部门二',
     };
-    console.log(await this.createDepartment(params));
-    await this.flushDepartments();
+    // 调试 ID
+    //console.log(await this.createDepartment(params));
+    let arrays!: spaceObjs[];
+    await this.flushDepartments('0', arrays);
+    console.log(arrays);
     console.log(this.allCompanyDepts);
   }
 
@@ -111,29 +118,37 @@ class SettingController {
    * @param parentId
    * @returns
    */
-  public async flushDepartments(parentId?: string) {
-    if (Provider.isUserSpace()) {
-      return;
+  public async flushDepartments(parentId: string, arrays: spaceObjs[]) {
+    let compid = parentId;
+    if (parentId === '0') {
+      compid = Provider.getWorkSpace().id;
     }
-
-    const compid = Provider.getWorkSpace().id;
 
     const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
       TargetType.Department,
     );
     if (companys.length > 0) {
-      this.allCompanyDepts.set(compid, new Array());
-      companys.map((e) => {
+      companys.map(async (e) => {
+        // 查找是否有children
+        let arrayChild: spaceObjs[] = [];
+        const company2s: Company[] = await this.userDataService.getBelongTargets(
+          e.target.id,
+          TargetType.Department,
+        );
+        if (company2s.length > 0) {
+          this.flushDepartments(e.target.id, arrayChild);
+        }
+
         const spaceObj: spaceObjs = {
           id: e.target.id,
           key: e.target.id,
           title: e.target.name,
-          parentId: compid,
-          companyId: compid,
-          children: [],
+          parentId: compid!,
+          companyId: compid!,
+          children: arrayChild,
         };
-        this.allCompanyDepts.get(compid)?.push(spaceObj);
+        arrays.push(spaceObj);
       });
     }
   }
