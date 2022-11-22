@@ -36,7 +36,6 @@ class StoreContent {
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-
     this.getStoreProduct();
   }
 
@@ -56,7 +55,7 @@ class StoreContent {
   public async getStoreProduct(params?: any) {
     let Fun!: Function;
     if (this.curPageType === 'app') {
-      Fun = this.Person!.getOwnProducts;
+      Fun = Provider.getPerson.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
@@ -64,7 +63,6 @@ class StoreContent {
     }
 
     const { success, data = { result: [] } } = await Fun(params);
-
     if (success) {
       const { result = [] } = data;
       this.marketTableCallBack([...result]);

@@ -2,7 +2,7 @@ import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
 import Company from '@/ts/core/target/company';
-import { XMarket } from '@/ts/base/schema';
+import { XMarket, XProduct } from '@/ts/base/schema';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}
@@ -44,8 +44,8 @@ class StoreClassify {
   public curMenuData: any[] = StoreClassify.SelfMenu; // 当前展示菜单数据
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['仓库', '我的应用']; //导航展示
-  public TreeCallBack!: (data: any[]) => void; //页面传进来的更新树形区域 钩子
-  public SelectMarketCallBack!: (item: AppStore) => void; //选择商店后 触发展示区回调
+  public TreeCallBack!: (data: XProduct[] | AppStore) => void; //页面传进来的更新树形区域 钩子
+  //选择商店后 触发展示区回调
   // 记录
   recordPageType = { app: 'app', market: 'app' };
 
@@ -75,10 +75,13 @@ class StoreClassify {
     assetsTreeData: [],
   };
 
+  /**
+   * @desc: 控制层对应操作页面变化展示数据
+   * @param {'app' | 'market'} type
+   * @return {*}
+   */
   changePageType(type: 'app' | 'market') {
     this.curPageType = type;
-    console.log('sss', type, this[`${type}FooterTree`], this.curMenu);
-
     this.curTreeData = this[`${type}FooterTree`][`${this.curMenu}Treedata`] || [];
   }
   /**
@@ -86,11 +89,12 @@ class StoreClassify {
    * @param  {any}  item 单个菜单
    */
   public handleMenuClick(key: menyuType) {
-    console.log('gggg', key);
-    let data = `${this.curPageType === 'app' ? 'app' : 'market'}FooterTree`;
+    let targetStr = `${this.curPageType === 'app' ? 'app' : 'market'}FooterTree`;
     this.curMenu = key;
-    if (this.curTreeData.length > 0) {
-      this.curTreeData = this[data][`${key}TreeData`];
+    const targetData = this[targetStr][`${key}TreeData`];
+    if (targetData?.length > 0) {
+      this.curTreeData = targetData;
+      this.TreeCallBack(targetData);
       return;
     }
     //1. 直接触发展示区 更新展示数据
@@ -106,20 +110,21 @@ class StoreClassify {
   public getTreeData() {
     // 1.获取市场
     //获取文档
-    console.log('哈哈哈哈', this.curPageType);
+    const data = this[`${this.curPageType}FooterTree`][`${this.curMenu}TreeData`] || [];
+    console.log('获取treeData', this.curPageType, this.curMenu, data);
 
-    if (this.curPageType === 'app') {
-      //TODO:获取 自定义分类树
-      this.curTreeData = this.appFooterTree.appTreeData;
+    //TODO: 临时处理数据与 资源导航展示
+    if (this.curMenu == 'data' || this.curMenu == 'assets') {
+      this.TreeCallBack([]);
+      return;
+    }
+    if (data.length > 0) {
+      this.curTreeData = data;
       this.TreeCallBack([...this.curTreeData]);
     } else {
-      console.log('获取市场-tree');
-      if (this.marketFooterTree.appTreeData.length > 0) {
-        this.curTreeData = this.marketFooterTree.appTreeData;
-        this.TreeCallBack([...this.curTreeData]);
-      } else {
-        this.getOwnMarket();
-      }
+      console.log('获取-tree');
+
+      this.getOwnMarket();
     }
   }
 
@@ -134,7 +139,7 @@ class StoreClassify {
     this.breadcrumb[1] = '我的应用';
     this.breadcrumb[2] = treeItem.title || '获取失败';
     console.log('面包靴 应用', this.breadcrumb);
-    // this.SelectMarketCallBack(market);
+    // this.TreeCallBack(market);
   }
   /* --------------------市场功能区--------------------- */
   /**
@@ -147,7 +152,7 @@ class StoreClassify {
     this.breadcrumb[3] = market.store.name || '商店';
     console.log('面包靴 商店', this.breadcrumb);
 
-    this.SelectMarketCallBack(market);
+    this.TreeCallBack(market);
   }
   /**
    * @desc: 获取市场列表
