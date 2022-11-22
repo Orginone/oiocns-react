@@ -9,7 +9,6 @@ import React, { useState, useEffect } from 'react';
 // import { Page } from '@/module/typings';
 
 // import styles from './index.module.less';
-// appService.currentModel = 'app';
 
 /**
  * 批量同意
