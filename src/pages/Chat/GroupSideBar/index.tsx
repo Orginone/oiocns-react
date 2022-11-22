@@ -6,6 +6,7 @@ import sideStyle from './index.module.less';
 import { chatCtrl } from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 import { IChat } from '@/ts/core/chat/ichat';
+import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
 
 /**
@@ -213,22 +214,26 @@ const GroupSideBar: React.FC = () => {
   ];
   return (
     <div className={sideStyle.chart_side_wrap}>
-      <div className={sideStyle.group_side_bar_search}>
-        <Input
-          placeholder="搜索"
-          prefix={<SearchOutlined />}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
+      <ContentMenu width={280}>
+        <div className={sideStyle.group_side_bar_search}>
+          <Input
+            placeholder="搜索"
+            prefix={<SearchOutlined />}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+            }}
+          />
+        </div>
+        <Tabs
+          centered
+          activeKey={index}
+          onTabClick={(k) => {
+            setIndex(k);
           }}
+          items={items}
         />
-      </div>
-      <Tabs
-        centered
-        activeKey={index}
-        onTabClick={(k) => {
-          setIndex(k);
-        }}
-        items={items}></Tabs>
+      </ContentMenu>
+
       {/* 鼠标右键 */}
       {mousePosition.isShowContext ? (
         <div

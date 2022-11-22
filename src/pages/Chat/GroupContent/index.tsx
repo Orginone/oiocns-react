@@ -85,7 +85,8 @@ const GroupContent = (props: Iprops) => {
             {item.msgType === 'recall' ? (
               <div
                 className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}>
-                {item.showTxt}
+                {/* {item.showTxt} */}
+                撤回了一条消息
                 {item.allowEdit ? (
                   <span
                     className={contentStyle.reWrite}
@@ -143,16 +144,12 @@ const GroupContent = (props: Iprops) => {
                         e.stopPropagation();
                         setSelectId(item.id);
                       }}>
-                      <HeadImg name={chatCtrl.getName(item.fromId)} label={''} />
+                      <HeadImg
+                        name={chatCtrl.getName(item.fromId)}
+                        label={''}
+                        isSquare={false}
+                      />
                       <div className={`${contentStyle.con_content}`}>
-                        {chatCtrl.chat?.target.typeName !== '人员' ? (
-                          <div
-                            className={`${contentStyle.con_content} ${contentStyle.name}`}>
-                            {chatCtrl.getName(item.fromId) || ''}
-                          </div>
-                        ) : (
-                          ''
-                        )}
                         <div
                           className={`${contentStyle.con_content} ${contentStyle.txt}`}
                           dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
@@ -222,7 +219,7 @@ const GroupContent = (props: Iprops) => {
                             className={`${contentStyle.con_content} ${contentStyle.txt}`}
                             dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
                         </div>
-                        <HeadImg name={chatCtrl.getName(item.fromId)} />
+                        <HeadImg name={chatCtrl.getName(item.fromId)} isSquare={false} />
                       </div>
                     )}
                   </Popover>
