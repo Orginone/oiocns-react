@@ -1,11 +1,12 @@
 import { kernel, model } from '../base';
 import Person from './target/person';
-export interface SpaceType {
+/** 空间类型申明 */
+export type SpaceType = {
   /** 空间标识 */
   id: string;
   /** 空间名称 */
   name: string;
-}
+};
 const sessionStorageName = 'sessionPerson';
 export default class Provider {
   private static _person: Person | undefined;
