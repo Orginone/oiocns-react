@@ -6,8 +6,11 @@
  * @FilePath: /oiocns-react/src/ts/controller/setting/content.ts
  * @Description: 控制器 实例化要调用的接口基类 提供ui层数据
  */
-class SettingController  { 
+
+class SettingContent {
 
 }
 
-export const settingCtrl = new SettingController();
+const settingContent = new SettingContent();
+
+export default settingContent;

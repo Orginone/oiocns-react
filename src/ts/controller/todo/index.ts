@@ -4,6 +4,7 @@ import { message } from 'antd';
 import { resetParams } from '@/utils/tools';
 // import { IdStatusReq, Page } from '@/typings/requestType';
 import { kernel } from '@/ts/base';
+import Provider from '@/ts/core/provider';
 
 // type OrgType = '人员' | 'other';
 
@@ -16,24 +17,25 @@ type statusItem = {
   tab: string;
 };
 /**页面模块类型*/
-type pageModel = 'friend' | 'org' | 'order' | 'market' | 'app';
+type pageModel = 'friend' | 'org' | 'order' | 'store' | 'app';
 
 /**待办：1  我发起的：2*/
 export type tabStatus = '1' | '2' | '3' | '4' | '5' | '6';
 enum tabStatusFunction {
-  '待办' = `1`,
-  '我发起的' = `2`,
-  '已办' = `3`,
-  '已完成' = `4`,
-  '销售订单' = `5`,
-  '采购订单' = `6`,
+  '待办' = 1,
+  '我发起的' = 2,
+  '已办' = 3,
+  '已完成' = 4,
+  '销售订单' = 5,
+  '采购订单' = 6,
 }
 /**
  * 待办接口声明
  */
 interface TodoServiceProps {
   statusList: statusItem[];
-  apiPaths: Record<pageModel, { [key: string]: string }> /**各业务请求api地址*/;
+  /**各业务请求api地址*/
+  apiPaths: Record<pageModel, { [key: string]: string }>;
   currentModel: pageModel; // 当前模块
   currentActiveStatus: tabStatus; // 当前选中的状态
 }
@@ -42,15 +44,15 @@ class TodoService implements TodoServiceProps {
   /**各业务请求api地址*/
   apiPaths: Record<pageModel, { [key: string]: string }> = {
     friend: {
-      [tabStatusFunction.待办]: `queryTeamJoinApproval`,
-      [tabStatusFunction.我发起的]: `queryJoinTeamApply`,
+      [tabStatusFunction.待办]: `queryjoinApproval`,
+      [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
       approve: `joinTeamApproval`,
       refuse: `joinTeamApproval`,
     },
     org: {
-      [tabStatusFunction.待办]: `queryTeamJoinApproval`,
-      [tabStatusFunction.我发起的]: `queryJoinTeamApply`,
+      [tabStatusFunction.待办]: `queryjoinApproval`,
+      [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
       approve: `joinTeamApproval`,
       refuse: `joinTeamApproval`,
@@ -62,8 +64,8 @@ class TodoService implements TodoServiceProps {
       deliver: `DeliverMerchandise`, // 确认交付
       reject: `RejectMerchandise`, // 退货退款
     },
-    market: {
-      [tabStatusFunction.待办]: `QueryJoinMarketApply`, // 加入市场审批列表
+    store: {
+      [tabStatusFunction.待办]: `getUserApply`, // 加入市场审批列表
       [tabStatusFunction.我发起的]: `QueryJoinMarketApply`, // 加入市场申请列表
       retract: `CancelJoinMarket`, // 取消市场
       approve: `ApprovalJoinApply`, // 审批加入市场申请 "id": 0, "status": 0
@@ -97,11 +99,10 @@ class TodoService implements TodoServiceProps {
   };
   /**当前页面模块名称 */
   currentModel: pageModel = 'friend';
-  /** 当前数据状态*/
+
+  /** 当前tab数据状态*/
   currentActiveStatus: tabStatus = '1';
-  // constructor(modelName: pageModel) {
-  //   this.currentModel = modelName;
-  // }
+
   /**设置当前状态 */
   set activeStatus(value: tabStatus) {
     this.currentActiveStatus = value;
@@ -110,7 +111,10 @@ class TodoService implements TodoServiceProps {
   get activeStatus() {
     return this.currentActiveStatus;
   }
-
+  /**当前api对象 */
+  get currentApi() {
+    return this.apiPaths[this.currentModel];
+  }
   /** 操作类方法回调 */
   private opretionFn = async (fn: string, params: Partial<IdStatusPage>) => {
     const { msg, success } = await kernel[fn]({ data: params }); //  fn.call(fn, { data: params });
@@ -123,14 +127,12 @@ class TodoService implements TodoServiceProps {
   /*获取列表*/
   public async getList<T extends DataType, U extends PageParams>(params: U) {
     // 根据当前查询状态判断选择什么接口
-    // console.log(this.currentModel);
-    // const statusApi = { '1': 'approveList', 2: 'applyList' };
-    const currentApi = tabStatusFunction[this.currentActiveStatus];
-    console.log(this.apiPaths[this.currentModel][currentApi]);
-    if (currentApi) {
-      const fn: Function = kernel[this.apiPaths[this.currentModel][currentApi]]; // this.apiPaths[this.currentModel][currentApi];
+    const currentFn = this.currentApi[Number(this.currentActiveStatus)];
+    if (currentFn) {
+      const fn: Function = Provider.getPerson[currentFn]; // this.currentApi[currentApi];
       if (fn) {
         const data = await fn.call(fn, { data: resetParams(params) });
+        console.log('请求', currentFn, data);
         return data; // toPageData<T>(data);
       }
     }
@@ -140,7 +142,7 @@ class TodoService implements TodoServiceProps {
   /** 拒绝*/
   public refuse = async (id: string, status?: string | number) => {
     return await this.opretionFn(
-      this.apiPaths[this.currentModel].refuse,
+      this.currentApi.refuse,
       status
         ? {
             id,
@@ -152,7 +154,7 @@ class TodoService implements TodoServiceProps {
   /* 同意*/
   public approve = async (id: string, status?: string | number) => {
     return await this.opretionFn(
-      this.apiPaths[this.currentModel].approve,
+      this.currentApi.approve,
       status
         ? {
             id,
@@ -164,7 +166,7 @@ class TodoService implements TodoServiceProps {
   /**取消申请 */
   public retractApply = async (id: string, status?: string | number) => {
     return await this.opretionFn(
-      this.apiPaths[this.currentModel].retract,
+      this.currentApi.retract,
       status
         ? {
             id,

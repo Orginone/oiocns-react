@@ -33,7 +33,7 @@ pageApiType) => {
   const queryLastTime: number = 0;
   let nameSpaceStr = [...nameSpace];
   nameSpaceStr[0] = nameSpaceStr[0].toUpperCase();
-  const resNameSpaceStr = nameSpaceStr.join('');
+  // const resNameSpaceStr = nameSpaceStr.join('');
   /**
    * @desc: 处理 翻页参数问题
    * @param {T} params
@@ -77,28 +77,46 @@ pageApiType) => {
    * @param {*} isRefresh
    * @return {*}
    */
-  async function queryData(params: T, isRefresh = false): Promise<void> {
+  const queryData: Function = async (params: T, isRefresh = false): Promise<void> => {
     if (!searchApi) return;
 
-    const reslutParams: resultParams = _resetParams(params);
-    if (!isRefresh || _canRefreshData(reslutParams)) {
-      return;
-    }
+    // const reslutParams: resultParams = _resetParams(params);
+    // if (!isRefresh || _canRefreshData(reslutParams)) {
+    //   return;
+    // }
 
-    const { data, success } = await searchApi({
-      data: reslutParams,
-    });
-    if (success) {
-      const { result = [], total = 0 } = data;
-      setList([...result]);
-      setTotal(total);
-      //记录搜索条件
-      setqueryParams({ ...params });
-    } else {
-      setList([]);
-      setTotal(0);
+    // const { data, success } = await searchApi({
+    //   data: reslutParams,
+    // });
+    // if (success) {
+    //   const { result = [], total = 0 } = data;
+    //   setList([...result]);
+    //   setTotal(total);
+    //   //记录搜索条件
+    //   setqueryParams({ ...params });
+    // } else {
+    //   setList([]);
+    //   setTotal(0);
+    // }
+    let data = await searchApi();
+    console.log('请求结果', data);
+    if (data?.code) {
+      data = data.data.result;
     }
-  }
+    console.log('请求结果222', data);
+
+    const result = data.map((item: any) => {
+      if (item?.store) {
+        return {
+          ...item.store,
+          node: item,
+        };
+      }
+      return item;
+    });
+
+    setList([...result]);
+  };
 
   /**
    * @desc: 创建

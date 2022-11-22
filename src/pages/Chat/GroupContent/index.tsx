@@ -58,6 +58,7 @@ const GroupContent = (props: Iprops) => {
       3
     );
   };
+
   /**
    * @description: 重新编辑
    * @param {string} txt
@@ -89,7 +90,7 @@ const GroupContent = (props: Iprops) => {
                   <span
                     className={contentStyle.reWrite}
                     onClick={() => {
-                      handleReWrite(item.msgBody);
+                      handleReWrite(item.showTxt);
                     }}>
                     重新编辑
                   </span>
@@ -115,7 +116,7 @@ const GroupContent = (props: Iprops) => {
                   content={
                     chatCtrl.chat?.spaceId === item.spaceId ? (
                       <>
-                        <CopyToClipboard text={item.msgBody}>
+                        <CopyToClipboard text={item.showTxt}>
                           <Button type="text" style={{ color: '#3e5ed8' }}>
                             复制
                           </Button>
@@ -154,7 +155,7 @@ const GroupContent = (props: Iprops) => {
                         )}
                         <div
                           className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                          dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
+                          dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
                       </div>
                     </div>
                   )}
@@ -176,7 +177,7 @@ const GroupContent = (props: Iprops) => {
                     }}
                     content={
                       <>
-                        <CopyToClipboard text={item.msgBody}>
+                        <CopyToClipboard text={item.showTxt}>
                           <Button type="text" style={{ color: '#3e5ed8' }}>
                             复制
                           </Button>
@@ -187,8 +188,9 @@ const GroupContent = (props: Iprops) => {
                         <Button
                           type="text"
                           style={{ color: '#3e5ed8' }}
-                          onClick={() => {
-                            chatCtrl.chat?.reCallMessage(item.id);
+                          onClick={async () => {
+                            await chatCtrl.chat?.reCallMessage(item.id);
+                            refreshUI();
                           }}>
                           撤回
                         </Button>
@@ -218,7 +220,7 @@ const GroupContent = (props: Iprops) => {
                         <div className={contentStyle.con_content}>
                           <div
                             className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                            dangerouslySetInnerHTML={{ __html: item.msgBody }}></div>
+                            dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
                         </div>
                         <HeadImg name={chatCtrl.getName(item.fromId)} />
                       </div>
