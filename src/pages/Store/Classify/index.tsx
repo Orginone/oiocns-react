@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { MenuProps, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import { useHistory } from 'react-router-dom';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
@@ -11,11 +11,12 @@ import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
 import StoreContent from '@/ts/controller/store/content';
+import { XProduct } from '@/ts/base/schema';
 // const items = [
-//   { label: '应用', key: 'app', icon: <AppstoreOutlined /> }, // 菜单项务必填写 key
-//   { label: '文档', key: 'doc', icon: <FileTextOutlined /> },
-//   { label: '数据', key: 'data', icon: <FundOutlined /> },
-//   { label: '资源', key: 'src', icon: <DatabaseOutlined /> },
+//   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
+//   { label: '文档', key: 'doc', icon: 'FileTextOutlined' },
+//   { label: '数据', key: 'data', icon: 'FundOutlined' },
+//   { label: '资源', key: 'src', icon: 'DatabaseOutlined'},
 // ];
 
 const menu = ['重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
@@ -23,7 +24,7 @@ const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<XProduct[]>([]);
   const location = useLocation();
   const router = `${location.pathname}${location.search}`;
   // const { user } = useStore((state) => ({ ...state })); // 用户信息
@@ -32,9 +33,8 @@ const StoreClassify: React.FC = () => {
   // const history = useHistory();
   useEffect(() => {
     console.log('初始化', 'APP頁面');
-
-    StoreSiderbar.changePageType('app');
     StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.changePageType('app');
     StoreSiderbar.getTreeData();
   }, []);
 
@@ -65,8 +65,8 @@ const StoreClassify: React.FC = () => {
    * @param {object} param1
    * @return {*}
    */
-  const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
-    console.log('handleMenuClick55', data, key);
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    console.log('目录更多操作', key);
   };
   /*******
    * @desc: 点击目录 触发事件

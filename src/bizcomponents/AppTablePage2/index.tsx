@@ -5,17 +5,18 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
-import useDebounce from '@/hooks/useDebounce';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
-  searchParams: {};
+  searchParams: { status: ststusTypes };
   columns: ProColumns<any>[];
   toolBarRender?: () => React.ReactNode;
   renderOperation?: any; //渲染操作按钮
   headerTitle?: string; //表格头部文字
   style?: React.CSSProperties;
 }
+type ststusTypes = 'all' | 'created' | 'purchased' | 'shared' | 'allotted';
+
 const AppShowComp: React.FC<AppShowCompType> = ({
   queryFun,
   list,
@@ -28,10 +29,20 @@ const AppShowComp: React.FC<AppShowCompType> = ({
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const [status, setStatus] = useState<ststusTypes>('all');
 
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
+    console.log('变化', searchParams);
+
+    if (searchParams.status === status) {
+      return;
+    }
+    setStatus(searchParams.status);
+    list.map((item) => {
+      console.log('item', item);
+    });
     //TODO: 其他条件 发出请求
     // if (Object.keys(searchParams).length == 0) {
     //   return;
@@ -80,7 +91,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={'id'}
+        rowKey={(record: any) => record.prod.id}
         toolBarRender={toolBarRender}
       />
     </div>

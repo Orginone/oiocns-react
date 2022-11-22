@@ -22,39 +22,51 @@ import StoreSidebar from '@/ts/controller/store/sidebar';
 //   deleteApi: API.product.delete,
 //   updateApi: API.product.update,
 // });
+type ststusTypes = 'all' | 'created' | 'purchased' | 'shared' | 'allotted';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState([]);
-  const [statusKey, setStatusKey] = useState('merchandise');
+  const [statusKey, setStatusKey] = useState<ststusTypes>('all');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
+  const items = useMemo(() =>
+    // [
+    //   {
+    //     tab: `全部`,
+    //     key: 'all',
+    //   },
+    //   {
+    //     tab: `创建的`,
+    //     key: 'created',
+    //   },
+    //   {
+    //     tab: `购买的`,
+    //     key: 'purchased',
+    //   },
+    //   {
+    //     tab: `共享的`,
+    //     key: 'shared',
+    //   },
+    //   {
+    //     tab: `分配的`,
+    //     key: 'allotted',
+    //   },
+    // ]
+    {
+      let typeSet = new Set(['全部']);
+      data.forEach((v: any) => {
+        typeSet.add(v.prod.source);
+      });
+      console.log('sssss', Array.from(typeSet));
 
-  const items = [
-    {
-      tab: `全部`,
-      key: '1',
-    },
-    {
-      tab: `创建的`,
-      key: '2',
-    },
-    {
-      tab: `购买的`,
-      key: '3',
-    },
-    {
-      tab: `共享的`,
-      key: '4',
-    },
-    {
-      tab: `分配的`,
-      key: '5',
-    },
-  ];
+      return Array.from(typeSet).map((k) => {
+        return { tab: k, key: k };
+      });
+    }, [data]);
 
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
@@ -166,21 +178,21 @@ const StoreApp: React.FC = () => {
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
           onTabChange={(key) => {
-            setStatusKey(key);
+            setStatusKey(key as ststusTypes);
           }}>
           <div className={cls['page-content-table']}>
-            {/* <AppShowComp
-              queryFun={Provider.getPerson.getOwnProducts}
+            <AppShowComp
+              queryFun={Provider.getPerson!.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={StoreContent.getColumns()}
               renderOperation={renderOperation}
-            /> */}
+            />
           </div>
         </Card>
       </div>
     );
-  }, [data]);
+  }, [data, statusKey]);
 
   return (
     <>

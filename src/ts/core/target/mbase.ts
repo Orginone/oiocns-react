@@ -105,10 +105,12 @@ export default class MarketActionTarget extends BaseTarget {
       id: this.target.id,
       page: {
         offset: 0,
-        filter: this.target.id,
+        filter: '',
         limit: common.Constants.MAX_UINT_8,
       },
     });
+    console.log('我的应用', res);
+
     if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
         this._owdProducts.push(new Product(product));
