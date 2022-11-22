@@ -33,7 +33,6 @@ const useStore = create(
             user: res.data,
             userSpace: { name: res.data.workspaceName, id: res.data.workspaceId },
           });
-          sessionStorage.setItem('Token', res.data.accessToken);
           get().getUserInfo();
           return true;
         }
