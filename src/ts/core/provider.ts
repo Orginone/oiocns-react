@@ -41,16 +41,14 @@ export default class Provider {
    */
   public static async getWorkSpace(): Promise<spaceTarget | undefined> {
     if (this._workSpace == null) {
-      var id = sessionStorage.getItem('_workSpaceId') + '';
-      if (this._person.target.id == id) {
-        return this._person;
-      } else {
-        const companys = await this._person.getJoinedCompanys();
-        return companys.find((company) => {
-          return company.target.id == id;
-        });
-      }
+      let id = sessionStorage.getItem('_workSpaceId') + '';
+      const companys = await this._person.getJoinedCompanys();
+      let company = companys.find((company) => {
+        return company.target.id == id;
+      });
+      this._workSpace = company ? company : this._person;
     }
+    return this._workSpace;
   }
 
   /**
@@ -110,7 +108,10 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
+      debugger;
       this.setPerson(res.data.person);
+      var workspace = await Provider.getWorkSpace();
+      workspace?.queryjoinApproval();
     }
     return res;
   }
