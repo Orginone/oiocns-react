@@ -341,10 +341,10 @@ export default abstract class SpaceTarget {
 
   /**
    * 退出市场
-   * @param _appStore 退出的市场
+   * @param _id 退出的市场Id
    * @returns
    */
-  quitMarket = async (_appStore: AppStore): Promise<model.ResultType<any>> => {
+  quitMarket = async (_id: string): Promise<model.ResultType<any>> => {
     throw consts.FunctionNotFoundError;
   };
 

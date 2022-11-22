@@ -3,7 +3,7 @@ import { common, kernel, model, schema } from '../../base';
 import { AppStore, Product } from '../market';
 import { PageRequest } from '@/ts/base/model';
 
-export default class MarketTarget extends BaseTarget {
+export default class MarketActionTarget extends BaseTarget {
   protected _joinMarketApplys: schema.XMarketRelation[];
   protected _joinedMarkets: AppStore[];
   protected _owdProducts: Product[];
@@ -106,7 +106,7 @@ export default class MarketTarget extends BaseTarget {
       id: this.target.id,
       page: {
         offset: 0,
-        filter: this.target.id,
+        filter: '',
         limit: common.Constants.MAX_UINT_8,
       },
     });
@@ -142,16 +142,18 @@ export default class MarketTarget extends BaseTarget {
 
   /**
    * 退出市场
-   * @param appStore 退出的市场
+   * @param id 退出的市场Id
    * @returns
    */
-  quitMarket = async (appStore: AppStore): Promise<model.ResultType<any>> => {
+  quitMarket = async (id: string): Promise<model.ResultType<any>> => {
     const res = await kernel.quitMarket({
-      id: appStore.store.id,
+      id,
       belongId: this.target.id,
     });
     if (res.success) {
-      delete this._joinedMarkets[this._joinedMarkets.indexOf(appStore)];
+      this._joinedMarkets = this._joinedMarkets.filter((market) => {
+        return market.store.id != id;
+      });
     }
     return res;
   };
