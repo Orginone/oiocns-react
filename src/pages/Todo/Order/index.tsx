@@ -8,12 +8,12 @@ import PageCard from '../components/PageCard';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { StatusPage } from '@/module/typings';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { chat } from '@/module/chat/orgchat';
+// import { chat } from '@/module/chat/orgchat';
 
 // todoService.currentModel = 'order';
 const orderTypeTabs = [
-  { tab: '销售订单', key: '1' },
-  { tab: '采购订单', key: '2' },
+  { tab: '销售订单', key: '5' },
+  { tab: '采购订单', key: '6' },
 ];
 const statusoptions = {
   1: { text: '待交付', status: 'Processing' },
@@ -42,15 +42,15 @@ const expandedRowRender = (
           title: '市场名称',
           dataIndex: ['merchandise', 'marketId'],
           key: 'marketId',
-          valueType: 'radio',
-          valueEnum: chat.nameMap,
+          // valueType: 'radio',
+          // valueEnum: chat.nameMap,
         },
         {
           title: '卖家',
           dataIndex: 'sellerId',
           key: 'sellerId',
-          valueType: 'radio',
-          valueEnum: chat.nameMap,
+          // valueType: 'radio',
+          // valueEnum: chat.nameMap,
         },
         { title: '状态', dataIndex: 'status', key: 'status', valueEnum: statusoptions },
         {
@@ -102,7 +102,7 @@ const expandedRowRender = (
 const tableOperation = (activeKey: string, item: OderDetailType, callback: Function) => {
   // 是否是待发货的订单状态
   const allowToCancel =
-    activeKey == `2` && item.details
+    activeKey == `6` && item.details
       ? item.details.find((n: OderDetailType) => n.status < 102)
       : item.status < 102;
   const menu = [];
@@ -116,7 +116,7 @@ const tableOperation = (activeKey: string, item: OderDetailType, callback: Funct
             item.details
               ? (item.details.map((n: any) => n.id) || []).toString()
               : item.id,
-            activeKey == '1' ? 221 : 220,
+            activeKey == '5' ? 221 : 220,
           )
           .then(({ success }) => {
             if (success) {
@@ -159,8 +159,11 @@ const tableOperation = (activeKey: string, item: OderDetailType, callback: Funct
  * @returns
  */
 const TodoOrg: React.FC = () => {
-  const [activeKey, setActiveKey] = useState<string>('1');
-  const [pageData, setPageData] = useState<Record<string, OderDetailType[]>>();
+  const [activeKey, setActiveKey] = useState<string>('5');
+  const [pageData, setPageData] = useState<Record<string, OderDetailType[]>>({
+    '5': [],
+    '6': [],
+  });
   const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const buyColumns: ProColumns<OderDetailType>[] = [
@@ -203,14 +206,14 @@ const TodoOrg: React.FC = () => {
     {
       title: '市场名称',
       dataIndex: ['merchandise', 'marketId'],
-      valueType: 'radio',
-      valueEnum: chat.nameMap,
+      // valueType: 'radio',
+      // valueEnum: chat.nameMap,
     },
     {
       title: '买家',
       dataIndex: ['order', 'belongId'],
-      valueType: 'radio',
-      valueEnum: chat.nameMap,
+      // valueType: 'radio',
+      // valueEnum: chat.nameMap,
     },
     {
       title: '售卖权属',
@@ -243,7 +246,7 @@ const TodoOrg: React.FC = () => {
       },
     },
   ];
-  // 获取申请/审核列表
+  // 获取申请 / 审核列表;
   const handlePageChange = async (page: number, pageSize: number) => {
     if (!pageData || !pageData[activeKey] || needReload) {
       // 如果已经加载过
@@ -263,11 +266,13 @@ const TodoOrg: React.FC = () => {
       setPageTotal(pageData[activeKey].length);
     }
   };
+
   useEffect(() => {
-    // setPageData({ ...pageData, [activeKey]: [] });
+    setPageData({ ...pageData, [activeKey]: [] });
     todoService.activeStatus = activeKey as tabStatus;
     handlePageChange(1, 12);
   }, ['', activeKey, needReload]);
+
   return (
     <PageCard
       tabList={orderTypeTabs}
@@ -280,10 +285,10 @@ const TodoOrg: React.FC = () => {
           showChangeBtn={false}
           rowKey={'id'}
           bordered={false}
-          columns={activeKey == '1' ? saleColumns : buyColumns}
+          columns={activeKey == '5' ? saleColumns : buyColumns}
           dataSource={pageData[activeKey]}
           expandable={
-            activeKey == '2'
+            activeKey == '6'
               ? {
                   expandedRowRender: (record: any) =>
                     expandedRowRender(record, setNeedReload),

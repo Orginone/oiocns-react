@@ -46,7 +46,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableLi
     console.log(values); //2.表单验证并获取表单值
     CohortController.createCohort(Person,values.cohort.name, values.cohort.code, values.cohort.remark);
     setIsModalOpen(false);
-    message.info("创建成功")
+    // getTableList();
   };
   return (
     <div>

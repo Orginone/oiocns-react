@@ -2,8 +2,8 @@ import { Layout, Menu, Space } from 'antd';
 import type { MenuProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-
 import { businessRouteList } from '@/routes/utils';
+import settingStore from '@/store/setting';
 
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
@@ -63,16 +63,17 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
   );
 };
 
+//侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
   const { data: menuData } = props; // 顶级主菜单
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
+  const { setSelectId } = settingStore((state) => ({ ...state }));
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
-
   const menuFlat = menuData ? flatMenuData(menuData) : [];
 
   /**当页面路径改变时，重新绘制相关的菜单*/
@@ -82,7 +83,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (menuData) {
       listenPrev(current);
     }
-    // console.log('location.pathname',location.pathname)
   }, [location.pathname]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
@@ -95,7 +95,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   };
   /** 监听路由改变或菜单被点击时，当前菜单数据和上级菜单数据*/
   const listenPrev = (current: MemuItemType | null) => {
-    console.log('current', current);
     if (!current) {
       // 说明当前为主菜单
       setPrevMenuData([]);
@@ -129,6 +128,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     } else {
       if (current!.render) {
         listenPrev(current!);
+        console.log('current!.key', current!.key);
         current!.key && props.history.push(current!.key);
         // listenPrev({ fathKey: location.pathname });
       }
@@ -144,6 +144,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
               className={cls.backicon}
               onClick={() => {
                 if (prevMenuData.length > 0) {
+                  setSelectId('');
                   setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
                   setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
                 }
@@ -160,7 +161,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         </div>
       )}
       <div className={cls.container}>
-        {props.data && (
+        {props.data && !renderMenu && (
           <Menu
             // mode="inline"
             items={currentMenuData as MenuProps[`items`]}

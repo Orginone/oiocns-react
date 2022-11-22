@@ -8,7 +8,7 @@ const LoadToken = (options: any, loadToken: boolean) => {
   options = options || {};
   if (loadToken) {
     options.headers = options.headers || {};
-    const TOKEN = sessionStorage.Token;
+    const TOKEN = sessionStorage.getItem('accessToken');
     if (TOKEN !== '' && !options.headers.Authorization) {
       options.headers.Authorization = TOKEN;
     }

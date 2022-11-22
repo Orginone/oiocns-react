@@ -4,11 +4,10 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Input, Menu, Tree } from 'antd';
+import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState } from 'react';
 import cls from './index.module.less';
-import { renderNum } from '@/utils/tools';
 
 interface TreeType {
   treeData?: any[];
@@ -17,37 +16,8 @@ interface TreeType {
   menu?: string[]; //更多按钮列表 需提供 string[]
   handleTitleClick?: (_item: any) => void;
   handleAddClick?: (_item: any) => void; //点击更多按钮事件
-  handleMenuClick?: ({ data, key }: { data: any; key: string }) => void; //点击更多按钮事件
+  handleMenuClick?: MenuProps['onClick']; //点击更多按钮事件
 }
-
-const x = 2;
-const y = 2;
-const z = 1;
-const defaultData: DataNode[] = [];
-
-const nameArr = '擦传递火炬方法合并VS阿我认为有任务和感受到风清热'.split('');
-const generateData = (_level: number, _preKey?: React.Key, _tns?: DataNode[]) => {
-  const preKey = _preKey || '0';
-  const tns = _tns || defaultData;
-
-  const children = [];
-  for (let i = 0; i < x; i++) {
-    const key = `${preKey}-${i}`;
-    tns.push({ title: nameArr[renderNum(1, 15)] + nameArr[renderNum(1, 15)], key });
-    if (i < y) {
-      children.push(key);
-    }
-  }
-  if (_level < 0) {
-    return tns;
-  }
-  const level = _level - 1;
-  children.forEach((key, index) => {
-    tns[index].children = [];
-    return generateData(level, key, tns[index].children);
-  });
-};
-generateData(z);
 
 const StoreClassifyTree: React.FC<TreeType> = ({
   treeData,
@@ -60,26 +30,21 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
-  const renderMenu = (data: any) => {
+  const renderMenu: () => MenuProps['items'] = () => {
     if (!menu) {
-      return <></>;
+      return [];
     }
-    return (
-      <Menu
-        onClick={({ key }) => handleMenuClick && handleMenuClick({ data, key })}
-        items={menu.map((item) => {
-          return {
-            key: item,
-            label: item,
-          };
-        })}
-      />
-    );
+    return menu.map((item) => {
+      return {
+        key: item,
+        label: item,
+      };
+    });
   };
   //TODO: 树形数据需要切换
   // console.log('树形数据需要切换', treeData);
 
-  const [gData, setGData] = useState(defaultData);
+  const [gData, setGData] = useState([]);
   const [expandedKeys] = useState(['0-0', '0-0-0']);
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
@@ -171,7 +136,10 @@ const StoreClassifyTree: React.FC<TreeType> = ({
                 className={cls.titleIcon}
                 onClick={() => handleAddClick && handleAddClick(node)}
               />
-              <Dropdown overlay={renderMenu(node)} placement="bottom" trigger={['click']}>
+              <Dropdown
+                menu={{ items: renderMenu(), onClick: handleMenuClick }}
+                placement="bottom"
+                trigger={['click']}>
                 <EllipsisOutlined className={cls.titleIcon} rotate={90} />
               </Dropdown>
             </>

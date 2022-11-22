@@ -4,7 +4,7 @@ import Provider from '../provider';
 import { CreateChat } from './chat';
 import { IChatGroup } from './ichat';
 /**
- * 加载会话
+ * 加载通讯录会话
  * @returns 会话接口数组
  */
 export const LoadChats = async (): Promise<IChatGroup[]> => {

@@ -12,17 +12,15 @@ import {
   Form,
   Input,
   Select,
+  message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import CompanyServices from '@/module/org/company';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import PersonServices from '@/module/person';
-import useStore from '@/store';
-import { SpaceType, UserType } from '@/store/type';
 import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
+type SpaceType = { id: string; name: string };
 
 // 菜单列表项
 const OrganizationalItem = (item: SpaceType) => {
@@ -40,8 +38,6 @@ const OrganizationalItem = (item: SpaceType) => {
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
-  // const { user, setUser, userSpace } = useStore((state) => ({ ...state }));
-  const user = Provider.getPerson;
   const [current, setCurrent] = useState<SpaceType>();
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -64,7 +60,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const onSave = async () => {
     const values = await form.validateFields();
     const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson.createCompany(
+    let res = await Provider.getPerson?.createCompany(
       name,
       code,
       teamName,
@@ -72,39 +68,41 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       teamRemark,
       typeName,
     );
-    Provider.getPerson.showMessage(res);
-    setShowFormModal(!res.success);
+
+    if (res?.success) {
+      message.info('申请加入单位成功');
+    } else {
+      message.error('申请加入单位失败：' + res?.msg);
+    }
+    setShowFormModal(!res?.success);
   };
   const [form] = Form.useForm();
-  // 获取工作单位列表
-  const getList = async () => {
-    const data = (await Provider.getPerson.getJoinedCompanys()).map(
-      (el: any) => el.target,
-    );
-    console.log(data);
-    setMenuList([...data, user.getWorkSpace()]); // 合并组织单位和个人空间数据
-  };
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    user.setWorkSpace(item);
+    Provider.setWorkSpace(item.id);
     setCurrent({
-      name: item?.name,
-      id: item?.id,
+      name: item.name,
+      id: item.id,
     });
     setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (user) {
-      getList();
-      setCurrent({
-        name: user.getWorkSpace().name,
-        id: user.getWorkSpace().id,
+    if (Provider.getPerson) {
+      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
+        setMenuList(allWorkSpaces);
+        Provider.getWorkSpace().then((curspace) => {
+          setCurrent(
+            allWorkSpaces.find((space) => {
+              return space.id == curspace?.target.id;
+            }),
+          );
+        });
       });
     }
   }, []);
 
-  return user ? (
+  return Provider.getPerson ? (
     <div className={styles.menu} onMouseLeave={() => setShowMenu(false)}>
       <Space onClick={() => setShowMenu(!showMenu)} className={styles['current-item']}>
         {current ? OrganizationalItem(current) : <Skeleton active />}

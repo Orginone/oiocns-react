@@ -1,8 +1,6 @@
 import { Card, Form, Modal } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import API from '@/services';
-import AppShowComp from '@/bizcomponents/AppTablePage';
-import MarketService from '@/module/appstore/market';
+import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/CommonComp';
@@ -15,47 +13,65 @@ import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
-const service = new MarketService({
-  nameSpace: 'myApp',
-  searchApi: API.product.searchOwnProduct,
-  createApi: API.product.register,
-  deleteApi: API.product.delete,
-  updateApi: API.product.update,
-});
+import Provider from '@/ts/core/provider';
+import StoreSidebar from '@/ts/controller/store/sidebar';
+// const service = new MarketService({
+//   nameSpace: 'myApp',
+//   searchApi: Provider.getPerson.getJoinMarkets,
+//   createApi: API.product.register,
+//   deleteApi: API.product.delete,
+//   updateApi: API.product.update,
+// });
+type ststusTypes = 'all' | 'created' | 'purchased' | 'shared' | 'allotted';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
-  const [statusKey, setStatusKey] = useState('merchandise');
+  const [data, setData] = useState([]);
+  const [statusKey, setStatusKey] = useState<ststusTypes>('all');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
     {} as MarketTypes.ProductType,
   );
-  const items = [
+  const items = useMemo(() =>
+    // [
+    //   {
+    //     tab: `全部`,
+    //     key: 'all',
+    //   },
+    //   {
+    //     tab: `创建的`,
+    //     key: 'created',
+    //   },
+    //   {
+    //     tab: `购买的`,
+    //     key: 'purchased',
+    //   },
+    //   {
+    //     tab: `共享的`,
+    //     key: 'shared',
+    //   },
+    //   {
+    //     tab: `分配的`,
+    //     key: 'allotted',
+    //   },
+    // ]
     {
-      tab: `全部`,
-      key: '1',
-    },
-    {
-      tab: `创建的`,
-      key: '2',
-    },
-    {
-      tab: `购买的`,
-      key: '3',
-    },
-    {
-      tab: `共享的`,
-      key: '4',
-    },
-    {
-      tab: `分配的`,
-      key: '5',
-    },
-  ];
+      let typeSet = new Set(['全部']);
+      data.forEach((v: any) => {
+        typeSet.add(v.prod.source);
+      });
+      console.log('sssss', Array.from(typeSet));
+
+      return Array.from(typeSet).map((k) => {
+        return { tab: k, key: k };
+      });
+    }, [data]);
 
   useEffect(() => {
-    console.log('展示', StoreContent);
+    // storeContent.curPageType = 'myApps';
+    StoreContent.marketTableCallBack = setData;
+    StoreContent.getStoreProduct();
   }, []);
 
   const BtnsList = ['购买', '创建', '暂存'];
@@ -63,6 +79,8 @@ const StoreApp: React.FC = () => {
     // console.log('按钮点击', item);
     switch (item.text) {
       case '购买':
+        StoreSidebar.changePageType('market');
+        // StoreSidebar.getTreeData();
         history.push('/market/shop');
         break;
       case '创建':
@@ -160,20 +178,21 @@ const StoreApp: React.FC = () => {
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
           onTabChange={(key) => {
-            setStatusKey(key);
+            setStatusKey(key as ststusTypes);
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              service={service}
+              queryFun={Provider.getPerson!.getOwnProducts}
+              list={data}
               searchParams={{ status: statusKey }}
-              columns={service.getMyappColumns()}
+              columns={StoreContent.getColumns()}
               renderOperation={renderOperation}
             />
           </div>
         </Card>
       </div>
     );
-  }, [service]);
+  }, [data, statusKey]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { schema, model } from '../../base';
+import { schema } from '../../base';
 import { TargetType } from '../enum';
 import Company from './company';
 
@@ -18,16 +18,4 @@ export default class Hospital extends Company {
       TargetType.Laboratory,
     ];
   }
-  /**
-   * 查询加入医院申请
-   * @param id
-   * @returns
-   */
-  public async queryJoinCompanyApply(): Promise<model.ResultType<any>> {
-    const res = await this.queryJoinApplyBase();
-    return res;
-  }
-  
-  
-  
 }
