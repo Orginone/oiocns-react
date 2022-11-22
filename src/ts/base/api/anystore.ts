@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { ResultType } from '../model';
+import { model } from '../../base';
 import StoreHub from './storehub';
 
 /**
@@ -96,7 +95,7 @@ export default class AnyStore {
       if (this._storeHub.isConnected) {
         this._storeHub
           .invoke('Subscribed', key, domain)
-          .then((res: ResultType<T>) => {
+          .then((res: model.ResultType<T>) => {
             if (res.success && res.data) {
               callback.apply(this, [res.data]);
             }
@@ -131,9 +130,9 @@ export default class AnyStore {
    * 查询对象
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 对象异步结果
+   * @returns {model.ResultType} 对象异步结果
    */
-  public async get<T>(key: string, domain: string): Promise<ResultType<T>> {
+  public async get<T>(key: string, domain: string): Promise<model.ResultType<T>> {
     return await this._storeHub.invoke('Get', key, domain);
   }
   /**
@@ -141,18 +140,22 @@ export default class AnyStore {
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @param {any} setData 对象新的值
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 变更异步结果
+   * @returns {model.ResultType} 变更异步结果
    */
-  public async set(key: string, setData: any, domain: string): Promise<ResultType<any>> {
+  public async set(
+    key: string,
+    setData: any,
+    domain: string,
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Set', key, setData, domain);
   }
   /**
    * 删除对象
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 删除异步结果
+   * @returns {model.ResultType} 删除异步结果
    */
-  public async delete(key: string, domain: string): Promise<ResultType<any>> {
+  public async delete(key: string, domain: string): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Delete', key, domain);
   }
   /**
@@ -160,13 +163,13 @@ export default class AnyStore {
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} data 要添加的数据，对象/数组
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 添加异步结果
+   * @returns {model.ResultType} 添加异步结果
    */
   public async insert(
     collName: string,
     data: any,
     domain: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Insert', collName, data, domain);
   }
   /**
@@ -174,13 +177,13 @@ export default class AnyStore {
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} update 更新操作（match匹配，update变更,options参数）
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 更新异步结果
+   * @returns {model.ResultType} 更新异步结果
    */
   public async update(
     collName: string,
     update: any,
     domain: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Update', collName, update, domain);
   }
   /**
@@ -188,13 +191,13 @@ export default class AnyStore {
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} match 匹配信息
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 移除异步结果
+   * @returns {model.ResultType} 移除异步结果
    */
   public async remove(
     collName: string,
     match: any,
     domain: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Remove', collName, match, domain);
   }
   /**
@@ -202,13 +205,13 @@ export default class AnyStore {
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
-   * @returns {ResultType} 移除异步结果
+   * @returns {model.ResultType} 移除异步结果
    */
   public async aggregate(
     collName: string,
     options: any,
     domain: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Aggregate', collName, options, domain);
   }
   /**

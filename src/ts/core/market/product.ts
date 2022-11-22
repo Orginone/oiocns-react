@@ -1,11 +1,10 @@
 import { kernel, model } from '../../base';
 import { XMerchandise, XProduct, XResource } from '../../base/schema';
-import { ResultType, IdNameArray } from '../../base/model';
 
 export default class Product {
   // 应用实体
   public readonly prod: XProduct;
-  private _resource: XResource[];
+  private _resource: XResource[] | undefined;
   // 应用对应的商品列表
   private _merchandise: XMerchandise[];
 
@@ -36,7 +35,7 @@ export default class Product {
     teamId: string,
     destIds: string[],
     destType: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await kernel.createSourceExtend({
       sourceId,
       sourceType,
@@ -62,7 +61,7 @@ export default class Product {
     spaceId: string,
     destType: string,
     teamId?: string,
-  ): Promise<ResultType<IdNameArray>> {
+  ): Promise<model.ResultType<model.IdNameArray>> {
     return await kernel.queryExtendBySource({
       sourceId,
       sourceType,
@@ -88,8 +87,8 @@ export default class Product {
     sellAuth: '所属权' | '使用权',
     information: string,
     price: number = 0,
-    days: number = 0,
-  ): Promise<ResultType<any>> {
+    days: string = '0',
+  ): Promise<model.ResultType<any>> {
     const res = await kernel.createMerchandise({
       id: '',
       caption,
@@ -114,7 +113,7 @@ export default class Product {
   public async unPublish(
     merchandiseId: string,
     belongId: string,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     const res = await kernel.deleteMerchandise({
       belongId: belongId,
       id: merchandiseId,
@@ -135,7 +134,7 @@ export default class Product {
     typeName: string,
     remark: string,
     resources: model.ResourceModel[],
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     const res = await kernel.updateProduct({
       id: this.prod.id,
       name,

@@ -16,11 +16,11 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import Provider, { SpaceType } from '@/ts/core/provider';
+import Provider from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
-import { showMessage } from '@/utils/tools';
 type OrganizationalUnitsProps = {};
+type SpaceType = { id: string; name: string };
 
 // 菜单列表项
 const OrganizationalItem = (item: SpaceType) => {
@@ -77,31 +77,27 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     setShowFormModal(!res?.success);
   };
   const [form] = Form.useForm();
-  // 获取工作单位列表
-  const getList = async () => {
-    if (!Provider.getPerson) return;
-    const data = (await Provider.getPerson.getJoinedCompanys()).map(
-      (el: any) => el.target,
-    );
-    console.log(data);
-    setMenuList([...data, Provider.getWorkSpace()]); // 合并组织单位和个人空间数据
-  };
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    Provider.setWorkSpace(item);
+    Provider.setWorkSpace(item.id);
     setCurrent({
-      name: item?.name,
-      id: item?.id,
+      name: item.name,
+      id: item.id,
     });
     setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
     if (Provider.getPerson) {
-      getList();
-      setCurrent({
-        name: Provider.getWorkSpace().name,
-        id: Provider.getWorkSpace().id,
+      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
+        setMenuList(allWorkSpaces);
+        Provider.getWorkSpace().then((curspace) => {
+          setCurrent(
+            allWorkSpaces.find((space) => {
+              return space.id == curspace?.target.id;
+            }),
+          );
+        });
       });
     }
   }, []);

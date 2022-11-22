@@ -17,7 +17,7 @@ type PaginationProps = {
   layout: string;
 };
 
-interface ResultType {
+interface model.ResultType {
   code: number;
   data: any;
   msg: string;
