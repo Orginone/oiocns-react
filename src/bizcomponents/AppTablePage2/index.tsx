@@ -5,17 +5,18 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
-import useDebounce from '@/hooks/useDebounce';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
-  searchParams: {};
+  searchParams?: any | { status: ststusTypes };
   columns: ProColumns<any>[];
   toolBarRender?: () => React.ReactNode;
   renderOperation?: any; //渲染操作按钮
   headerTitle?: string; //表格头部文字
   style?: React.CSSProperties;
 }
+type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
+
 const AppShowComp: React.FC<AppShowCompType> = ({
   queryFun,
   list,
@@ -28,10 +29,26 @@ const AppShowComp: React.FC<AppShowCompType> = ({
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
+    console.log('数据过滤', searchParams);
+    if (!searchParams) {
+      return;
+    }
+
+    if (searchParams.status === '全部') {
+      setTotal(list.length);
+      setSataSource(list);
+    } else {
+      const result = list.filter((item) => {
+        return item.prod.source === searchParams.status;
+      });
+      setTotal(result.length);
+      setSataSource(result);
+    }
     //TODO: 其他条件 发出请求
     // if (Object.keys(searchParams).length == 0) {
     //   return;
@@ -70,7 +87,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
       <CardOrTable<MarketTypes.ProductType>
-        dataSource={list}
+        dataSource={dataSource}
         total={total}
         page={page}
         stripe
@@ -80,7 +97,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={'id'}
+        rowKey={(record: any) => record.prod.id}
         toolBarRender={toolBarRender}
       />
     </div>

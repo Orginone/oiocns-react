@@ -1,5 +1,6 @@
-import { XMarket, XMerchandise, XProduct } from '@/ts/base/schema';
+import { XMarket } from '@/ts/base/schema';
 import AppStore from '@/ts/core/market/appstore';
+import Product from '@/ts/core/market/product';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
 import { myColumns } from './config';
@@ -19,6 +20,8 @@ class StoreContent {
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
+
+  private _curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -36,33 +39,48 @@ class StoreContent {
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-    this.getStoreProduct();
+    console.log('当前页面', this.curPageType);
+
+    this.getStoreProduct(this.curPageType);
   }
 
   /**
    * @desc: 获取表格头部展示数据
    * @return {*}
    */
-  public getColumns() {
+  public getColumns(pageKey?: string) {
+    switch (pageKey) {
+      case 'appInfo':
+      case 'myApp':
+        return myColumns;
+      default:
+        return [];
+    }
     //TODO:待完善
-    return myColumns;
   }
 
   /** 获取我的应用列表/商店-商品列表
    * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
    * @return {*}
    */
-  public async getStoreProduct(params?: any) {
+  public async getStoreProduct(type = 'app', params?: any) {
     let Fun!: Function;
-    if (this.curPageType === 'app') {
-      Fun = Provider.getPerson.getOwnProducts;
+    if (type === 'app') {
+      Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
 
-    const { success, data = { result: [] } } = await Fun(params);
+    const res = await Fun(params);
+    if (Array.isArray(res)) {
+      this.marketTableCallBack([...res]);
+      return;
+    }
+    console.log('获取数据', res);
+    const { success, data } = res;
+
     if (success) {
       const { result = [] } = data;
       this.marketTableCallBack([...result]);
@@ -74,6 +92,15 @@ class StoreContent {
    * @params
    */
   public createProduct = async (data: any) => appContent.createProduct(data);
+
+  /**
+   * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
+   * @param {Product} item
+   */
+  public selectedProduct(item: Product) {
+    // 判断当前操作对象是否为已选产品 不是则 修改选中
+    item.prod.id !== this._curProduct?.prod.id && (this._curProduct = item);
+  }
 }
 const storeContent = new StoreContent();
 

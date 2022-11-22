@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 /* eslint-disable no-unused-vars */
 import * as signalR from '@microsoft/signalr';
 import { IDisposable } from '../common/lifecycle';

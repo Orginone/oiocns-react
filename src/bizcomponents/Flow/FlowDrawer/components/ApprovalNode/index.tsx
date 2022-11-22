@@ -44,7 +44,7 @@ const ApprovalNode = () => {
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
-        {person.isUserSpace() && (
+        {Provider.isUserSpace() && (
           <Button
             type="primary"
             shape="round"
@@ -58,7 +58,7 @@ const ApprovalNode = () => {
             选择身份
           </Button>
         )}
-        {!person.isUserSpace() && (
+        {!Provider.isUserSpace() && (
           <Button
             type="primary"
             shape="round"

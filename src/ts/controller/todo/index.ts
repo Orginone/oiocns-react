@@ -4,7 +4,6 @@ import { message } from 'antd';
 import { resetParams, toPageData } from '@/utils/tools';
 // import { IdStatusReq, Page } from '@/typings/requestType';
 import { kernel } from '@/ts/base';
-import { AppStore } from '@/ts/core/market';
 import Provider from '@/ts/core/provider';
 import { TargetType } from '@/ts/core/enum';
 import { format } from 'path';
