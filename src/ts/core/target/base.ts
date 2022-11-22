@@ -406,8 +406,8 @@ export default class BaseTarget extends SpaceTarget {
    * @returns
    */
   public async queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
-    return kernel.queryTeamJoinApproval({
-      id: this.target.id,
+    return await kernel.queryTeamJoinApproval({
+      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
         offset: 0,
         filter: '',
@@ -455,12 +455,12 @@ export default class BaseTarget extends SpaceTarget {
    * @param id
    * @returns
    */
-  public async queryTargetsByAuthority(id: string) {
+  public queryTargetsByAuthority = async (id: string) => {
     return await kernel.queryTargetsByAuthority({
       spaceId: this.target.id,
       authId: id,
     });
-  }
+  };
 
   /**
    * 查询组织所有职权
