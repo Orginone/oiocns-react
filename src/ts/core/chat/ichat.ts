@@ -4,8 +4,12 @@ import { MessageType } from '../enum';
  * 会话接口
  */
 export interface IChat {
+  /** 唯一标识 */
+  fullId: string;
   /** 会话Id */
   chatId: string;
+  /** 是否置顶 */
+  isToping: boolean;
   /** 所在空间ID */
   spaceId: string;
   /** 所在空间名称 */
@@ -22,6 +26,15 @@ export interface IChat {
   persons: schema.XTarget[];
   /** 最后一条消息 */
   lastMessage: schema.XImMsg | undefined;
+  /**
+   * 获取会话缓存
+   */
+  getCache(): ChatCache;
+  /**
+   * 加载缓存
+   * @param cache 缓存数据
+   */
+  loadCache(cache: ChatCache): void;
   /**
    * 加载更多历史消息
    * @param filter 过滤条件
@@ -42,7 +55,7 @@ export interface IChat {
    * 撤回消息
    * @param id 消息ID
    */
-  reCallMessage(id: string): void;
+  reCallMessage(id: string): Promise<boolean>;
   /**
    * 删除消息
    * @param id 删除消息
@@ -56,18 +69,33 @@ export interface IChat {
    * 会话接收到消息
    * @param msg 消息
    */
-  receiveMessage(msg: schema.XImMsg): void;
+  receiveMessage(msg: schema.XImMsg, noread: boolean): void;
 }
 /**
  * 分组会话接口
  */
 export interface IChatGroup {
-  // 所在空间ID
+  /** 所在空间ID */
   spaceId: string;
-  // 所在空间名称
+  /** 所在空间名称 */
   spaceName: string;
-  // 是否处于打开状态
+  /** 是否处于打开状态 */
   isOpened: boolean;
-  // 空间会话
+  /** 空间会话 */
   chats: IChat[];
 }
+/**
+ * 会话缓存
+ */
+export type ChatCache = {
+  /** 会话ID */
+  chatId: string;
+  /** 会话所在空间ID */
+  spaceId: string;
+  /** 是否置顶 */
+  isToping: boolean;
+  /** 会话未读消息数量 */
+  noReadCount: number;
+  /** 最新消息 */
+  lastMessage: schema.XImMsg | undefined;
+};

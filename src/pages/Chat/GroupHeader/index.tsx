@@ -31,6 +31,7 @@ const Groupheader = (props: Iprops) => {
       chatCtrl.unsubscribe(id);
     };
   }, []);
+
   /**
    * @description: 打开邀请好友弹窗
    * @return {*}

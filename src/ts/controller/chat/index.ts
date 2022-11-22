@@ -4,7 +4,9 @@ import { generateUuid } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import Provider from '@/ts/core/provider';
-import { LoadChats } from '../../core/chat';
+import { LoadChats } from '@/ts/core/chat';
+
+// 会话缓存对象名称
 const chatsObjectName = 'userchat';
 /**
  * 会话控制器
@@ -67,7 +69,9 @@ class ChatController {
     if (this._curChat) {
       this._curChat.noReadCount = 0;
       await this._curChat.moreMessage('');
-      await this._curChat.morePerson('');
+      if (this._curChat.persons.length === 0) {
+        await this._curChat.morePerson('');
+      }
       this._appendChats(this._curChat);
       this._cacheChats();
     }
@@ -135,15 +139,14 @@ class ChatController {
   /** 初始化 */
   private _initialization(): void {
     kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data, true);
+      this._recvMessage(data);
     });
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if (data && data.chats && data.chats.length > 0) {
         for (let item of data.chats) {
           let lchat = this.refChat(item);
           if (lchat) {
-            lchat.noReadCount = item.noReadCount;
-            lchat.lastMessage = item.lastMessage;
+            lchat.loadCache(item);
             this._appendChats(lchat);
           }
         }
@@ -162,7 +165,7 @@ class ChatController {
    * @param data 新消息
    * @param cache 是否缓存
    */
-  private _recvMessage(data: XImMsg, cache: boolean = false): void {
+  private _recvMessage(data: XImMsg): void {
     let sessionId = data.toId;
     if (data.toId === this.userId) {
       sessionId = data.fromId;
@@ -174,7 +177,7 @@ class ChatController {
           isMatch = data.spaceId == c.spaceId;
         }
         if (isMatch) {
-          c.receiveMessage(data);
+          c.receiveMessage(data, !this.isCurrent(c));
           this._appendChats(c);
           this._cacheChats();
           this._callback();
@@ -210,12 +213,7 @@ class ChatController {
         data: {
           chats: this.chats
             .map((item) => {
-              return {
-                chatId: item.chatId,
-                spaceId: item.spaceId,
-                lastMessage: item.lastMessage,
-                noReadCount: item.noReadCount,
-              };
+              return item.getCache();
             })
             .reverse(),
         },
@@ -223,6 +221,15 @@ class ChatController {
       'user',
     );
   }
+
+  /**
+   * @description: 加载更多
+   * @return {*}
+   */
+  handleGetPerson = async () => {
+    await this._curChat?.morePerson('');
+    this._callback();
+  };
 }
 
 export const chatCtrl = new ChatController(await LoadChats());

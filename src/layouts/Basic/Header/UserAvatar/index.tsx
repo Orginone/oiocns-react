@@ -22,7 +22,6 @@ const UserAvatar: React.FC = () => {
    *  2. 清空用户信息
    */
   const logout = () => {
-    localStorage.removeItem('Token');
     sessionStorage.clear();
     history.push('/passport/login');
   };
