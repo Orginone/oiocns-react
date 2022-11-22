@@ -32,16 +32,15 @@ export default class Provider {
    * 获取当前工作空间
    * @returns 工作当前空间
    */
-  public static getWorkSpace(): spaceTarget | undefined {
+  public static async getWorkSpace(): Promise<spaceTarget | undefined> {
     if (this._workSpace == null) {
       var id = sessionStorage.getItem('_workSpaceId') + '';
       if (this._person.target.id == id) {
         return this._person;
       } else {
-        this._person.getJoinedCompanys().then((companys) => {
-          return companys.find((company) => {
-            return company.target.id == id;
-          });
+        const companys = await this._person.getJoinedCompanys();
+        return companys.find((company) => {
+          return company.target.id == id;
         });
       }
     }

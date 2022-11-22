@@ -87,6 +87,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     setShowMenu(false);
   };
   useEffect(() => {
+    debugger;
     // 获取用户加入的单位组织
     if (Provider.getPerson) {
       Provider.getAllWorkSpaces().then((allWorkSpaces) => {
