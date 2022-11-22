@@ -16,6 +16,7 @@ type ContentMenuProps = {
   location: any;
   data?: MenuProps[`items`];
   menuClick?: MenuProps[`onClick`];
+  menuSelect?: MenuProps[`onSelect`];
 };
 interface MemuItemType {
   children?: ItemType[];
@@ -69,7 +70,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
-  const {setSelectId } = settingStore((state) => ({...state}))
+  const { setSelectId } = settingStore((state) => ({ ...state }));
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
@@ -127,7 +128,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     } else {
       if (current!.render) {
         listenPrev(current!);
-        console.log('current!.key',current!.key);
+        console.log('current!.key', current!.key);
         current!.key && props.history.push(current!.key);
         // listenPrev({ fathKey: location.pathname });
       }
@@ -160,7 +161,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         </div>
       )}
       <div className={cls.container}>
-        {props.data && !renderMenu &&(
+        {props.data && !renderMenu && (
           <Menu
             // mode="inline"
             items={currentMenuData as MenuProps[`items`]}

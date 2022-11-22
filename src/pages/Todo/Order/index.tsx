@@ -10,7 +10,6 @@ import { StatusPage } from '@/module/typings';
 import { EllipsisOutlined } from '@ant-design/icons';
 // import { chat } from '@/module/chat/orgchat';
 
-// todoService.currentModel = 'order';
 const orderTypeTabs = [
   { tab: '销售订单', key: '5' },
   { tab: '采购订单', key: '6' },
