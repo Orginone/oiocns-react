@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import * as signalR from '@microsoft/signalr';
 import { IDisposable } from '../common/lifecycle';
-import { model.ResultType } from '../model';
+import { model } from '../../base';
 import { TxtHubProtocol } from '../protocol';
 /**
  * 存储层Hub

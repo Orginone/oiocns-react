@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { model.ResultType } from '../model';
+import { model } from '../../base';
 import StoreHub from './storehub';
 
 /**
@@ -143,7 +142,11 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {model.ResultType} 变更异步结果
    */
-  public async set(key: string, setData: any, domain: string): Promise<model.ResultType<any>> {
+  public async set(
+    key: string,
+    setData: any,
+    domain: string,
+  ): Promise<model.ResultType<any>> {
     return await this._storeHub.invoke('Set', key, setData, domain);
   }
   /**

@@ -1,5 +1,4 @@
-import { common, kernel } from '../../base';
-import { model.ResultType, PageRequest } from '../../base/model';
+import { common, kernel, model } from '../../base';
 import { XMerchandise, XOrderDetailArray } from '../../base/schema';
 import { CommonStatus } from '../enum';
 
@@ -21,7 +20,7 @@ export default class Merchandise {
     price: number,
     sellAuth: '使用权' | '所属权',
     information: string,
-    days: number,
+    days: string,
   ): Promise<boolean> {
     const res = await kernel.updateMerchandise({
       caption,
@@ -48,7 +47,9 @@ export default class Merchandise {
    * @param page 分页参数
    * @returns 交易情况
    */
-  public async getOrder(page: PageRequest): Promise<model.ResultType<XOrderDetailArray>> {
+  public async getOrder(
+    page: model.PageRequest,
+  ): Promise<model.ResultType<XOrderDetailArray>> {
     return await kernel.querySellOrderListByMerchandise({
       id: this.merchandise.id,
       page: page,

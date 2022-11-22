@@ -1,11 +1,10 @@
 import { kernel, model } from '../../base';
 import { XMerchandise, XProduct, XResource } from '../../base/schema';
-import { model.ResultType, IdNameArray } from '../../base/model';
 
 export default class Product {
   // 应用实体
   public readonly prod: XProduct;
-  private _resource: XResource[];
+  private _resource: XResource[] | undefined;
   // 应用对应的商品列表
   private _merchandise: XMerchandise[];
 
@@ -62,7 +61,7 @@ export default class Product {
     spaceId: string,
     destType: string,
     teamId?: string,
-  ): Promise<model.ResultType<IdNameArray>> {
+  ): Promise<model.ResultType<model.IdNameArray>> {
     return await kernel.queryExtendBySource({
       sourceId,
       sourceType,
@@ -88,7 +87,7 @@ export default class Product {
     sellAuth: '所属权' | '使用权',
     information: string,
     price: number = 0,
-    days: number = 0,
+    days: string = '0',
   ): Promise<model.ResultType<any>> {
     const res = await kernel.createMerchandise({
       id: '',
