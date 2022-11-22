@@ -6,10 +6,6 @@
  * @FilePath: /oiocns-react/src/ts/controller/setting/content.ts
  * @Description: 控制器 实例化要调用的接口基类 提供ui层数据
  */
-<<<<<<< HEAD
-
-class SettingContent {
-=======
 import Company from '../../core/target/company';
 // import Person from '../../core/target/person';
 import Provider from '../../core/provider';
@@ -17,7 +13,6 @@ import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
 import Types from '@/module/typings';
->>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
 
 // 新建一个对象 ，避免代码冲突
 export interface spaceObjs {
