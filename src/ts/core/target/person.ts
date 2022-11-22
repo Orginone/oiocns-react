@@ -141,71 +141,6 @@ export default class Person extends MarketTarget {
   };
 
   /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort = async (id: string): Promise<model.ResultType<any>> => {
-    const cohort = this._joinedCohorts.find((cohort) => {
-      return cohort.target.id == id;
-    });
-    if (cohort != undefined) {
-      return faildResult(consts.IsJoinedError);
-    }
-    return await this.applyJoin(id, TargetType.Cohort);
-  };
-
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts = async (id: string): Promise<model.ResultType<any>> => {
-    const res = await this.cancelJoinTeam(id);
-    if (res.success) {
-      var index = this._joinedCohorts.findIndex((cohort) => {
-        return cohort.target.id == id;
-      });
-      if (index > 0) {
-        this._joinedCohorts = this._joinedCohorts.filter((cohort) => {
-          return cohort.target.id != id;
-        });
-      }
-    }
-    return res;
-  };
-
-  /**
-   * 获取单位列表
-   * @return 加入的单位列表
-   */
-  getJoinedCompanys = async (): Promise<Company[]> => {
-    if (this._joinedCompanys.length > 0) {
-      return this._joinedCompanys;
-    }
-    this._joinedCompanys = [];
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: consts.CompanyTypes,
-    });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
-        switch (item.typeName) {
-          case TargetType.University:
-            this._joinedCompanys.push(new University(item));
-            break;
-          case TargetType.Hospital:
-            this._joinedCompanys.push(new Hospital(item));
-            break;
-          default:
-            this._joinedCompanys.push(new Company(item));
-            break;
-        }
-      });
-    }
-    return this._joinedCompanys;
-  };
-
-  /**
    * 设立单位
    * @param name 单位名称
    * @param code 单位信用代码
@@ -312,53 +247,6 @@ export default class Person extends MarketTarget {
   };
 
   /**
-   * 查询我的产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMyProduct(): Promise<schema.XProductArray> {
-    let resultArray: any = [];
-    let paramData: any = {};
-    paramData.id = this.target.id;
-    paramData.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_8,
-    };
-    let res = await kernel.querySelfProduct(paramData);
-    if (res.success && res.data && res.data.result) {
-      resultArray = res.data.result;
-    }
-    return resultArray;
-  }
-
-  /**
-   * 查询我的个人产品/应用
-   * @param params
-   * @returns
-   */
-  public async queryMySpaceProduct(): Promise<schema.XProductArray> {
-    let resultArray: any = [];
-    // 判断如果是有个人空间
-    if (!this._curCompany) {
-      return resultArray;
-    }
-
-    let paramData: any = {};
-    paramData.id = this._joinedCompanys[0].target.id;
-    paramData.page = {
-      offset: 0,
-      filter: '',
-      limit: common.Constants.MAX_UINT_8,
-    };
-    let res = await kernel.querySelfProduct(paramData);
-    if (res.success && res.data && res.data.result) {
-      resultArray = res.data.result;
-    }
-    return resultArray;
-  }
-
-  /*
    * 获取好友列表
    * @returns 返回好友列表
    */
@@ -376,6 +264,7 @@ export default class Person extends MarketTarget {
     }
     return this._friends;
   }
+
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
@@ -448,7 +337,7 @@ export default class Person extends MarketTarget {
     relation: XRelation,
     status: number = CommonStatus.ApproveStartStatus,
   ): Promise<model.ResultType<any>> => {
-    const res = await super.ApprovalJoinApply(relation.id, status);
+    const res = await super.approvalJoinApply(relation.id, status);
     if (res.success && relation.target != undefined) {
       this._friends.push(relation.target);
     }

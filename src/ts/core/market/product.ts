@@ -150,7 +150,7 @@ export default class Product {
       this.prod.code = code;
       this.prod.typeName = typeName;
       this.prod.remark = remark;
-      this._resource = res.data.resource;
+      this._resource = res.data!.resource ?? [];
     }
     return res;
   }

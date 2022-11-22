@@ -2,6 +2,8 @@ import BaseTarget from './base';
 import { common, kernel, model, schema } from '../../base';
 import { AppStore, Product } from '../market';
 import { PageRequest } from '@/ts/base/model';
+import { XMarketRelationArray, XMerchandiseArray } from '@/ts/base/schema';
+import { TargetType } from '../enum';
 
 export default class MarketActionTarget extends BaseTarget {
   protected _joinMarketApplys: schema.XMarketRelation[];
@@ -110,6 +112,8 @@ export default class MarketActionTarget extends BaseTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
+    console.log('我的应用', res);
+
     if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
         this._owdProducts.push(new Product(product));
@@ -128,12 +132,42 @@ export default class MarketActionTarget extends BaseTarget {
   };
 
   /**
+   * 查询加入市场的审批
+   * @returns
+   */
+  getJoinApproval = async (): Promise<model.ResultType<XMarketRelationArray>> => {
+    return await kernel.queryJoinApproval({
+      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
+    });
+  };
+
+  /**
+   * 查询应用上架的审批
+   * @returns
+   */
+  getPublicApproval = async (): Promise<model.ResultType<XMerchandiseArray>> => {
+    return await kernel.queryPublicApproval({
+      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
+    });
+  };
+
+  /**
    * 审批加入市场申请
    * @param id 申请id
    * @param status 审批状态
    * @returns
    */
-  ApprovalJoinApply = async (
+  approvalJoinMarketApply = async (
     id: string,
     status: number,
   ): Promise<model.ResultType<boolean>> => {
@@ -141,23 +175,17 @@ export default class MarketActionTarget extends BaseTarget {
   };
 
   /**
-   * 退出市场
-   * @param id 退出的市场Id
-   * @returns
+   * 审批商品上架申请
+   * @param id 申请ID
+   * @param status 审批结果
+   * @returns 是否成功
    */
-  quitMarket = async (id: string): Promise<model.ResultType<any>> => {
-    const res = await kernel.quitMarket({
-      id,
-      belongId: this.target.id,
-    });
-    if (res.success) {
-      this._joinedMarkets = this._joinedMarkets.filter((market) => {
-        return market.store.id != id;
-      });
-    }
-    return res;
-  };
-
+  public async approvalPublishApply(
+    id: string,
+    status: number,
+  ): Promise<model.ResultType<any>> {
+    return await kernel.approvalMerchandise({ id, status });
+  }
   /**
    * 创建市场
    * @param  {model.MarketModel} 市场基础信息
@@ -254,6 +282,24 @@ export default class MarketActionTarget extends BaseTarget {
     });
     if (res.success) {
       delete this._owdProducts[index];
+    }
+    return res;
+  };
+
+  /**
+   * 退出市场
+   * @param id 退出的市场Id
+   * @returns
+   */
+  quitMarket = async (id: string): Promise<model.ResultType<any>> => {
+    const res = await kernel.quitMarket({
+      id,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      this._joinedMarkets = this._joinedMarkets.filter((market) => {
+        return market.store.id != id;
+      });
     }
     return res;
   };

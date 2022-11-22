@@ -36,7 +36,9 @@ class StoreContent {
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-    this.getStoreProduct();
+    console.log('当前页面', this.curPageType);
+
+    this.getStoreProduct(this.curPageType);
   }
 
   /**
@@ -52,17 +54,24 @@ class StoreContent {
    * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
    * @return {*}
    */
-  public async getStoreProduct(params?: any) {
+  public async getStoreProduct(type = 'app', params?: any) {
     let Fun!: Function;
-    if (this.curPageType === 'app') {
-      Fun = Provider.getPerson.getOwnProducts;
+    if (type === 'app') {
+      Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
 
-    const { success, data = { result: [] } } = await Fun(params);
+    const res = await Fun(params);
+    if (Array.isArray(res)) {
+      this.marketTableCallBack([...res]);
+      return;
+    }
+    console.log('获取数据', res);
+    const { success, data } = res;
+
     if (success) {
       const { result = [] } = data;
       this.marketTableCallBack([...result]);
