@@ -108,7 +108,6 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
-      debugger;
       this.setPerson(res.data.person);
       var workspace = await Provider.getWorkSpace();
       workspace?.queryjoinApproval();

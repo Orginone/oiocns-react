@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 import { Encoder, Decoder } from '@msgpack/msgpack';
 /** @private */
 export class TxtMessageFormat {
