@@ -41,7 +41,7 @@ export default class MarketActionTarget extends BaseTarget {
       id: this.target.id,
       page,
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data?.result != undefined) {
       this._joinMarketApplys = res.data.result;
     }
     return this._joinMarketApplys;
@@ -97,7 +97,7 @@ export default class MarketActionTarget extends BaseTarget {
    * @param params
    * @returns
    */
-  public async getOwnProducts(): Promise<Product[]> {
+  public getOwnProducts = async (): Promise<Product[]> => {
     if (this._owdProducts.length > 0) {
       return this._owdProducts;
     }
@@ -109,13 +109,13 @@ export default class MarketActionTarget extends BaseTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
         this._owdProducts.push(new Product(product));
       });
     }
     return this._owdProducts;
-  }
+  };
 
   /**
    * 申请加入市场
@@ -182,7 +182,7 @@ export default class MarketActionTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets.push(new AppStore(res.data));
+      this._joinedMarkets.push(new AppStore(res.data!));
     }
     return res;
   }
@@ -216,7 +216,7 @@ export default class MarketActionTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._owdProducts.push(new Product(res.data));
+      this._owdProducts.push(new Product(res.data!));
     }
     return res;
   }

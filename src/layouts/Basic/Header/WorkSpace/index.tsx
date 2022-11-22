@@ -16,8 +16,7 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import { SpaceType } from '@/store/type';
-import Provider from '@/ts/core/provider';
+import Provider, { SpaceType } from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 import { showMessage } from '@/utils/tools';
@@ -39,8 +38,6 @@ const OrganizationalItem = (item: SpaceType) => {
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
-  // const { user, setUser, userSpace } = useStore((state) => ({ ...state }));
-  const user = Provider.getPerson;
   const [current, setCurrent] = useState<SpaceType>();
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -63,7 +60,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const onSave = async () => {
     const values = await form.validateFields();
     const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson.createCompany(
+    let res = await Provider.getPerson?.createCompany(
       name,
       code,
       teamName,
@@ -72,16 +69,17 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
       typeName,
     );
 
-    if (res.success) {
+    if (res?.success) {
       message.info('申请加入单位成功');
     } else {
-      message.error('申请加入单位失败：' + res.msg);
+      message.error('申请加入单位失败：' + res?.msg);
     }
-    setShowFormModal(!res.success);
+    setShowFormModal(!res?.success);
   };
   const [form] = Form.useForm();
   // 获取工作单位列表
   const getList = async () => {
+    if (!Provider.getPerson) return;
     const data = (await Provider.getPerson.getJoinedCompanys()).map(
       (el: any) => el.target,
     );
@@ -99,7 +97,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (Provider.getWorkSpace()) {
+    if (Provider.getPerson) {
       getList();
       setCurrent({
         name: Provider.getWorkSpace().name,
@@ -108,7 +106,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
     }
   }, []);
 
-  return user ? (
+  return Provider.getPerson ? (
     <div className={styles.menu} onMouseLeave={() => setShowMenu(false)}>
       <Space onClick={() => setShowMenu(!showMenu)} className={styles['current-item']}>
         {current ? OrganizationalItem(current) : <Skeleton active />}

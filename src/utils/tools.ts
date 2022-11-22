@@ -1,6 +1,7 @@
 import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
+import { formatDate } from '@/utils/index';
 import { PageData } from 'typings/globelType';
 
 const showMessage = (response: any) => {
@@ -107,4 +108,27 @@ const showChatTime = (chatDate: moment.MomentInput) => {
   return cdate.format('yy年 M月D日 H:mm');
 };
 
-export { debounce, renderNum, resetParams, showChatTime, validIsSocialCreditCode, showMessage };
+/**
+ * @description: 时间处理
+ * @param {string} timeStr
+ * @return {*}
+ */
+const handleFormatDate = (timeStr: string) => {
+  const nowTime = new Date().getTime();
+  const showTime = new Date(timeStr).getTime();
+  // 超过一天 展示 月/日
+  if (nowTime - showTime > 3600 * 24 * 1000) {
+    return formatDate(timeStr, 'M月d日');
+  }
+  // 不超过一天 展示 时/分
+  return formatDate(timeStr, 'H:mm');
+};
+export {
+  debounce,
+  handleFormatDate,
+  renderNum,
+  resetParams,
+  showChatTime,
+  validIsSocialCreditCode,
+  showMessage
+};

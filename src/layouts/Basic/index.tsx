@@ -13,15 +13,13 @@ type BasicLayoutProps = {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
-  // const token: any = sessionStorage.getItem('Token');
   const { route, history } = props;
-  const user = Provider.getPerson; // 判断是否存在person实例
   const { getUserInfo } = useStore((state) => ({ ...state }));
   useEffect(() => {
-    if (!user) {
-      history.push('/passport/login');
-    } else {
+    if (Provider.getPerson) {
       getUserInfo();
+    } else {
+      history.push('/passport/login');
     }
   }, []);
 

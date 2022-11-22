@@ -151,6 +151,12 @@ const StoreRouter: IRouteConfig[] = [
     component: React.lazy(() => import('@/pages/Store')),
     routes: [
       {
+        path: '/store/market/shop',
+        title: '应用市场',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
+      },
+      {
         path: '/store/app',
         title: '应用',
         icon: <AppstoreOutlined />,
