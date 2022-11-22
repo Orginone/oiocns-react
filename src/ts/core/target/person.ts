@@ -141,6 +141,7 @@ export default class Person extends MarketTarget {
   };
 
   /**
+<<<<<<< HEAD
    * 申请加入群组
    * @param id 目标Id
    * @returns
@@ -206,6 +207,8 @@ export default class Person extends MarketTarget {
   };
 
   /**
+=======
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
    * 设立单位
    * @param name 单位名称
    * @param code 单位信用代码
@@ -312,6 +315,7 @@ export default class Person extends MarketTarget {
   };
 
   /**
+<<<<<<< HEAD
    * 查询我的产品/应用
    * @param params
    * @returns
@@ -359,6 +363,8 @@ export default class Person extends MarketTarget {
   }
 
   /*
+=======
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
    * 获取好友列表
    * @returns 返回好友列表
    */
@@ -376,7 +382,10 @@ export default class Person extends MarketTarget {
     }
     return this._friends;
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组

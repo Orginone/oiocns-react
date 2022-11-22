@@ -29,7 +29,7 @@ const OrganizationalItem = (item: SpaceType) => {
       <Avatar className={styles.avatar} size={32}>
         {item?.name.substring(0, 1)}
       </Avatar>
-      <Typography.Text>{item?.name}</Typography.Text>
+      <Typography.Text className={styles['space-list']}>{item?.name}</Typography.Text>
     </Space>
   ) : (
     ''

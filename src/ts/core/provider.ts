@@ -1,4 +1,5 @@
 import { kernel, model } from '../base';
+<<<<<<< HEAD
 import spaceTarget from './target/sbase';
 import Person from './target/person';
 /** 空间类型申明 */
@@ -33,12 +34,24 @@ export default class Provider {
       });
     }
     return workSpaces;
+=======
+import Person from './target/person';
+import { SpaceType } from '@/store/type';
+
+export default class Provider {
+  private static person: Person;
+  private static _workSpace: SpaceType;
+
+  public static get userId() {
+    return Provider.person.target.id;
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
   }
 
   /**
-   * 获取当前工作空间
-   * @returns 工作当前空间
+   * 获取工作空间
+   * @returns 工作空间
    */
+<<<<<<< HEAD
   public static async getWorkSpace(): Promise<spaceTarget | undefined> {
     if (this._workSpace == null) {
       let id = sessionStorage.getItem('_workSpaceId') + '';
@@ -49,12 +62,17 @@ export default class Provider {
       this._workSpace = company ? company : this._person;
     }
     return this._workSpace;
+=======
+  public static getWorkSpace(): SpaceType {
+    return Provider._workSpace;
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
   }
 
   /**
    * 切换工作空间
    * @param workSpace
    */
+<<<<<<< HEAD
   public static async setWorkSpace(id: string) {
     sessionStorage.setItem('_workSpaceId', id);
     if (this._person.target.id == id) {
@@ -65,6 +83,10 @@ export default class Provider {
         return company.target.id == id;
       });
     }
+=======
+  public static setWorkSpace(workSpace: SpaceType) {
+    Provider._workSpace = workSpace;
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
   }
 
   /**
@@ -72,7 +94,11 @@ export default class Provider {
    * @returns
    */
   public static isUserSpace(): boolean {
+<<<<<<< HEAD
     return this._workSpace?.target.id == this._person?.target.id;
+=======
+    return Provider._workSpace.id == Provider.person.target.id;
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
   }
 
   /**
@@ -108,9 +134,15 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
+<<<<<<< HEAD
       this.setPerson(res.data.person);
       var workspace = await Provider.getWorkSpace();
       workspace?.queryjoinApproval();
+=======
+      this.person = new Person(res.data.person);
+      this._workSpace = { id: this.person.target.id, name: '个人空间' };
+      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+>>>>>>> 7e9c3588492b99929d9d4783190142669762ddac
     }
     return res;
   }
