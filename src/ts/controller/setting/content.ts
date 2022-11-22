@@ -167,7 +167,7 @@ class SettingController {
     // 获取当前单位
     //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
     // 判断是否重复 TODO
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchCompany(
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
       {
         page: 0,
         pageSize: 100,
@@ -213,6 +213,6 @@ class SettingController {
   }
 }
 
-const settingContent = new SettingContent();
+const settingController = new SettingController();
 
-export default settingContent;
+export default settingController;
