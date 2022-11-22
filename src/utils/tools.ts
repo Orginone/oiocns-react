@@ -1,7 +1,17 @@
 import { model } from '@/ts/base';
 import moment from 'moment';
+import { message } from 'antd';
 import { formatDate } from '@/utils/index';
 import { PageData } from 'typings/globelType';
+
+const showMessage = (response: any) => {
+  if (response.success) {
+    message.success('操作成功！');
+  } else {
+    message.error('操作失败！发生错误：  ' + response.msg);
+  }
+}
+
 
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
@@ -120,4 +130,5 @@ export {
   resetParams,
   showChatTime,
   validIsSocialCreditCode,
+  showMessage
 };

@@ -64,6 +64,7 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
   );
 };
 
+//侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
   const { data: menuData, width } = props; // 顶级主菜单
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单

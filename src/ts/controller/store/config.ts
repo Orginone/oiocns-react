@@ -10,33 +10,33 @@ export const myColumns: any = [
   },
   {
     title: '应用图标',
-    dataIndex: 'icon',
+    dataIndex: ['prod', 'id'],
   },
   {
     title: '应用名称',
-    dataIndex: 'name',
+    dataIndex: ['prod', 'name'],
   },
   {
     title: '版本号',
-    dataIndex: 'version',
+    dataIndex: ['prod', 'version'],
   },
   {
     title: '应用类型',
-    dataIndex: 'typeName',
+    dataIndex: ['prod', 'typeName'],
   },
   {
     title: '应用来源',
     ellipsis: true,
-    dataIndex: 'belongId',
+    dataIndex: ['prod', 'source'],
   },
   {
     title: '创建时间',
     width: 200,
-    dataIndex: 'createTime',
+    dataIndex: ['prod', 'createTime'],
   },
   {
     title: '备注',
     ellipsis: true,
-    dataIndex: 'remark',
+    dataIndex: ['prod', 'remark'],
   },
 ];

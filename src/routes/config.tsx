@@ -182,7 +182,7 @@ const StoreRouter: IRouteConfig[] = [
           },
           {
             path: '/store/app/create',
-            title: '应用管理',
+            title: '应用注册',
             icon: '',
             component: React.lazy(() => import('@/pages/Store/App/CreatApp')),
           },

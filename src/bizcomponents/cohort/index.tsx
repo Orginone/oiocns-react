@@ -4,7 +4,7 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import CohortService from '@/module/cohort/Cohort';
 import Person from '../../ts/core/target/person';
-
+import Provider from '@/ts/core/provider';
 /* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
   service: CohortService;
@@ -51,7 +51,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableLi
     Person.createCohort(values.cohort.name, values.cohort.code, values.cohort.remark);
     console.log('创建成功');
     setIsModalOpen(false);
-    getTableList();
+    // getTableList();
   };
   return (
     <div>
