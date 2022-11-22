@@ -16,15 +16,13 @@ export default class Provider {
     throw new Error('未登录');
   }
 
-  public static getAllWorkSpaces(): { id: string; name: string }[] {
+  public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
     var workSpaces: { id: string; name: string }[] = [];
     if (this._person != null) {
       workSpaces.push({ id: this._person.target.id, name: '个人空间' });
-      this._person.getJoinedCompanys().then((companys) => {
-        companys.forEach((element) => {
-          workSpaces.push({ id: element.target.id, name: element.target.name });
-        });
-        return workSpaces;
+      const companys = await this._person.getJoinedCompanys();
+      companys.forEach((element) => {
+        workSpaces.push({ id: element.target.id, name: element.target.name });
       });
     }
     return workSpaces;

@@ -89,14 +89,15 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   useEffect(() => {
     // 获取用户加入的单位组织
     if (Provider.getPerson) {
-      const allWorkSpaces = Provider.getAllWorkSpaces();
-      setMenuList(allWorkSpaces);
-      const curspace = Provider.getWorkSpace();
-      setCurrent(
-        allWorkSpaces.find((space) => {
-          return space.id == curspace?.target.id;
-        }),
-      );
+      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
+        setMenuList(allWorkSpaces);
+        const curspace = Provider.getWorkSpace();
+        setCurrent(
+          allWorkSpaces.find((space) => {
+            return space.id == curspace?.target.id;
+          }),
+        );
+      });
     }
   }, []);
 
