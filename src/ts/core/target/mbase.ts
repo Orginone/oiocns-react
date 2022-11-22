@@ -41,7 +41,7 @@ export default class MarketTarget extends BaseTarget {
       id: this.target.id,
       page,
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data?.result != undefined) {
       this._joinMarketApplys = res.data.result;
     }
     return this._joinMarketApplys;
@@ -110,7 +110,7 @@ export default class MarketTarget extends BaseTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
         this._owdProducts.push(new Product(product));
       });
@@ -183,7 +183,7 @@ export default class MarketTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets.push(new AppStore(res.data));
+      this._joinedMarkets.push(new AppStore(res.data!));
     }
     return res;
   };
@@ -217,7 +217,7 @@ export default class MarketTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._owdProducts.push(new Product(res.data));
+      this._owdProducts.push(new Product(res.data!));
     }
     return res;
   };

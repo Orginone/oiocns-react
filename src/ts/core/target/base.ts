@@ -390,7 +390,7 @@ export default class BaseTarget extends SpaceTarget {
    * 查询我的申请
    * @returns
    */
-  public async queryJoinApply(): Promise<model.ResultType<schema.XRelationArray>> {
+  public queryJoinApply = async () => {
     return await kernel.queryJoinTeamApply({
       id: this.target.id,
       page: {
@@ -399,7 +399,7 @@ export default class BaseTarget extends SpaceTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
+  };
 
   /**
    * 查询我的审批

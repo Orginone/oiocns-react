@@ -151,6 +151,12 @@ const StoreRouter: IRouteConfig[] = [
     component: React.lazy(() => import('@/pages/Store')),
     routes: [
       {
+        path: '/store/market/shop',
+        title: '应用市场',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
+      },
+      {
         path: '/store/app',
         title: '应用',
         icon: <AppstoreOutlined />,
@@ -265,10 +271,22 @@ const SettingRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Setting/Info')),
       },
       {
+        path: '/setting/dept/:id',
+        title: '部门设置',
+        icon: <ApartmentOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Dept')),
+      },
+      {
         path: '/setting/dept',
         title: '部门设置',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
+      },
+      {
+        path: '/setting/group/:id',
+        title: '集团设置',
+        icon: 'icon-setting',
+        component: React.lazy(() => import('@/pages/Setting/Group')),
       },
       {
         path: '/setting/group',

@@ -192,7 +192,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   };
 
   const getCheckboxProps = (record: any) => {
-    console.log(record);
+    // console.log(record);
   };
 
   return (

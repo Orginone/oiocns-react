@@ -1,25 +1,30 @@
 import { kernel, model } from '../base';
 import spaceTarget from './target/sbase';
 import Person from './target/person';
-
-/**
- * 提供层
- */
+const sessionStorageName = 'sessionPerson';
 export default class Provider {
-  private static person: Person;
+  private static _person: Person;
   private static _workSpace: spaceTarget | undefined;
 
-  public static get userId() {
-    return this.person.target.id;
+  /**
+   * 当前用户ID
+   */
+  public static get userId(): string {
+    if (this.getPerson) {
+      return this.getPerson.target.id;
+    }
+    throw new Error('未登录');
   }
 
-  public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
-    var workSpaces = [];
-    if (this.person != null) {
-      workSpaces.push({ id: this.person.target.id, name: '个人空间' });
-      const companys = await this.person.getJoinedCompanys();
-      companys.forEach((element) => {
-        workSpaces.push({ id: element.target.id, name: element.target.name });
+  public static getAllWorkSpaces(): { id: string; name: string }[] {
+    var workSpaces: { id: string; name: string }[] = [];
+    if (this._person != null) {
+      workSpaces.push({ id: this._person.target.id, name: '个人空间' });
+      this._person.getJoinedCompanys().then((companys) => {
+        companys.forEach((element) => {
+          workSpaces.push({ id: element.target.id, name: element.target.name });
+        });
+        return workSpaces;
       });
     }
     return workSpaces;
@@ -29,19 +34,19 @@ export default class Provider {
    * 获取当前工作空间
    * @returns 工作当前空间
    */
-  public static async getWorkSpace(): Promise<spaceTarget | undefined> {
+  public static getWorkSpace(): spaceTarget | undefined {
     if (this._workSpace == null) {
       var id = sessionStorage.getItem('_workSpaceId') + '';
-      if (this.person.target.id == id) {
-        return this.person;
+      if (this._person.target.id == id) {
+        return this._person;
       } else {
-        const companys = await this.person.getJoinedCompanys();
-        return companys.find((company) => {
-          return company.target.id == id;
+        this._person.getJoinedCompanys().then((companys) => {
+          return companys.find((company) => {
+            return company.target.id == id;
+          });
         });
       }
     }
-    return this._workSpace;
   }
 
   /**
@@ -50,10 +55,10 @@ export default class Provider {
    */
   public static async setWorkSpace(id: string) {
     sessionStorage.setItem('_workSpaceId', id);
-    if (this.person.target.id == id) {
-      this._workSpace = this.person;
+    if (this._person.target.id == id) {
+      this._workSpace = this._person;
     } else {
-      const companys = await this.person.getJoinedCompanys();
+      const companys = await this._person.getJoinedCompanys();
       this._workSpace = companys.find((company) => {
         return company.target.id == id;
       });
@@ -65,14 +70,30 @@ export default class Provider {
    * @returns
    */
   public static isUserSpace(): boolean {
-    return this._workSpace?.target.id == this.person.target.id;
+    return this._workSpace?.target.id == this._person?.target.id;
   }
 
-  public static get getPerson(): Person {
-    if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+  /**
+   * 当前用户
+   */
+  public static get getPerson(): Person | undefined {
+    if (this._person === undefined) {
+      const sp = sessionStorage.getItem(sessionStorageName);
+      if (sp && sp.length > 0) {
+        this.setPerson(JSON.parse(sp));
+      }
     }
-    return this.person;
+    return this._person;
+  }
+
+  /**
+   * 设置当前用户
+   * @param data 数据
+   */
+  private static setPerson(data: any) {
+    this._person = new Person(data);
+    this.setWorkSpace(this._person.target.id);
+    sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
   }
   /**
    * 登录
@@ -85,9 +106,7 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
-      this.person = new Person(res.data.person);
-      this.setWorkSpace(this.person.target.id);
-      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+      this.setPerson(res.data.person);
     }
     return res;
   }
@@ -110,8 +129,7 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.register(name, motto, phone, account, password, nickName);
     if (res.success) {
-      this.person = new Person(res.data.person);
-      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+      this.setPerson(res.data.person);
     }
     return res;
   }
