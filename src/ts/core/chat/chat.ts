@@ -64,7 +64,6 @@ class BaseChat implements IChat {
     for (const item of this.messages) {
       if (item.id === id) {
         const res = await kernel.recallImMsg(item);
-        console.log(res);
         return res.success;
       }
     }
@@ -87,11 +86,21 @@ class BaseChat implements IChat {
     return res.success;
   }
   receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
-    if (msg && msg.id !== this.lastMessage?.id) {
-      msg.showTxt = StringPako.inflate(msg.msgBody);
+    if (msg) {
+      if (msg.msgType === 'recall') {
+        msg.showTxt = '撤回一条消息';
+        const index = this.messages.findIndex((m) => {
+          return m.id === msg.id;
+        });
+        if (index > -1) {
+          this.messages[index] = msg;
+        }
+      } else {
+        msg.showTxt = StringPako.inflate(msg.msgBody);
+        this.messages.push(msg);
+      }
       this.noReadCount += noread ? 1 : 0;
       this.lastMessage = msg;
-      this.messages.push(msg);
     }
   }
   protected loadMessages(msgs: schema.XImMsg[]): void {

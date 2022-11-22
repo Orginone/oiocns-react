@@ -27,13 +27,13 @@ import React from 'react';
 import { RouteConfig } from 'react-router-config';
 import { Redirect as RouterRedirect } from 'react-router-dom';
 
-import BasicLayout from '@/layouts/Basic';
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLock from '@/pages/Passport/Lock';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
+import BasicLayout from '@/layouts/Basic';
 
 export interface IRouteConfig extends RouteConfig {
   // 路由路径
