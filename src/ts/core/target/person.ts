@@ -21,6 +21,7 @@ export default class Person extends MarketActionTarget {
     this._joinedCohorts = [];
     this._joinedCompanys = [];
     this.workSpace = { id: this.target.id, name: '个人空间' };
+    this.getJoinedCohorts();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -47,7 +48,10 @@ export default class Person extends MarketActionTarget {
   public get companyTypes(): TargetType[] {
     return [TargetType.Company, TargetType.University, TargetType.Hospital];
   }
-
+  /**返回我的群组数据 */
+  public get getCohorts(): Cohort[] {
+    return this._joinedCohorts;
+  }
   /**
    * 创建群组
    * @param name 名称
