@@ -42,6 +42,9 @@ module.exports = {
     // '@typescript-eslint/no-useless-constructor': 'error',
     // 'no-unused-vars': ['error', { ignoreRestSiblings: false }],
     'no-unused-vars': ['error', { argsIgnorePattern: 'slick', args: 'none' }],
+    'no-constant-condition': 'error', //禁止在条件中使用常量表达式
+    'no-dupe-args': 'error', //禁止 function 定义中出现重名参数
+    'no-dupe-keys': 'error', //禁止对象字面量中出现重复的 key
     // 'no-unused-vars': [
     //   'warn',
     //   {
