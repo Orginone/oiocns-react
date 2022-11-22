@@ -5,6 +5,7 @@ import { IRouteConfig } from '@/routes/config';
 import useStore from '@/store';
 import BasicHeader from './Header';
 import styles from './index.module.less';
+import Provider from '@/ts/core/provider';
 
 type BasicLayoutProps = {
   route: IRouteConfig;
@@ -12,14 +13,13 @@ type BasicLayoutProps = {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
-  const token: any = sessionStorage.getItem('Token');
   const { route, history } = props;
   const { getUserInfo } = useStore((state) => ({ ...state }));
   useEffect(() => {
-    if (!token) {
-      history.push('/passport/login');
-    } else {
+    if (Provider.getPerson) {
       getUserInfo();
+    } else {
+      history.push('/passport/login');
     }
   }, []);
 

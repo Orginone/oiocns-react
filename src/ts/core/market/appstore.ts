@@ -1,6 +1,6 @@
 import { kernel } from '../../base';
 import { CommonStatus, TargetType } from '../enum';
-import { PageRequest, ResultType } from '../../base/model';
+import { model } from '../../base';
 import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 
 export default class AppStore {
@@ -26,7 +26,7 @@ export default class AppStore {
     samrId: string,
     remark: string,
     ispublic: boolean,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     const res = await kernel.updateMarket({
       id: this.store.id,
       name,
@@ -51,7 +51,9 @@ export default class AppStore {
    * @param page 分页参数
    * @returns 加入的商店成员
    */
-  public async getUser(page: PageRequest): Promise<ResultType<XMarketRelationArray>> {
+  public async getUser(
+    page: model.PageRequest,
+  ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryMarketMember({
       id: this.store.id,
       page: page,
@@ -63,8 +65,8 @@ export default class AppStore {
    * @param page
    */
   public async getUserApply(
-    page: PageRequest,
-  ): Promise<ResultType<XMarketRelationArray>> {
+    page: model.PageRequest,
+  ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryJoinMarketApply({
       id: this.store.id,
       page,
@@ -80,7 +82,7 @@ export default class AppStore {
   public async approvalJoinApply(
     id: string,
     status: number = CommonStatus.RejectStartStatus,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await kernel.approvalJoinApply({ id, status });
   }
 
@@ -90,7 +92,10 @@ export default class AppStore {
    * @param typenames 对象类型
    * @returns 是否成功
    */
-  public async pull(targetIds: string[], typenames: string[]): Promise<ResultType<any>> {
+  public async pull(
+    targetIds: string[],
+    typenames: string[],
+  ): Promise<model.ResultType<any>> {
     return await kernel.pullAnyToMarket({
       marketId: this.store.id,
       targetIds: targetIds,
@@ -104,7 +109,10 @@ export default class AppStore {
    * @param typename 成员类型
    * @return 移除人员结果
    */
-  public async removeMember(id: string, typename: TargetType): Promise<ResultType<any>> {
+  public async removeMember(
+    id: string,
+    typename: TargetType,
+  ): Promise<model.ResultType<any>> {
     return await kernel.removeMarketMember({ id: id, belongId: '', typeName: typename });
   }
 
@@ -113,7 +121,9 @@ export default class AppStore {
    * @param page 分页参数
    * @returns 返回商店商品列表
    */
-  public async getMerchandise(page: PageRequest): Promise<ResultType<XMerchandiseArray>> {
+  public async getMerchandise(
+    page: model.PageRequest,
+  ): Promise<model.ResultType<XMerchandiseArray>> {
     return await kernel.searchMerchandise({
       id: this.store.id,
       page: page,
@@ -126,8 +136,8 @@ export default class AppStore {
    * @returns 返回商品上架申请列表
    */
   public async getMerchandiseApply(
-    page: PageRequest,
-  ): Promise<ResultType<XMerchandiseArray>> {
+    page: model.PageRequest,
+  ): Promise<model.ResultType<XMerchandiseArray>> {
     return await kernel.queryMerchandiesApplyByManager({
       id: this.store.id,
       page: page,
@@ -143,7 +153,7 @@ export default class AppStore {
   public async approvalPublishApply(
     id: string,
     status: number = CommonStatus.RejectStartStatus,
-  ): Promise<ResultType<any>> {
+  ): Promise<model.ResultType<any>> {
     return await kernel.approvalMerchandise({ id, status });
   }
 
@@ -154,8 +164,8 @@ export default class AppStore {
    */
   public async unPublish(
     merchandiseId: string,
-    belongId: number,
-  ): Promise<ResultType<any>> {
+    belongId: string,
+  ): Promise<model.ResultType<any>> {
     return await kernel.deleteMerchandiseByManager({
       id: merchandiseId,
       belongId: belongId,
