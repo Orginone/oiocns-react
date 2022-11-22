@@ -240,6 +240,53 @@ export default class userdataservice extends BaseService {
   }
 
   /**
+   * 创建部门
+   * @param name 名称
+   * @param code 编号
+   * @param teamName 团队名称
+   * @param teamCode 团队编号
+   * @param remark 简介
+   * @param parentId 上级组织Id 默认公司 公司、部门
+   * @returns 成功返回的里面 包含一个target
+   */
+  public async createDepart(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+    parentId: string,
+    // 如果是第一层部门，就是公司，如果是第二层部门，就是部门
+    isTop: boolean,
+    belongId: string,
+  ) {
+    const targetType = TargetType.Department;
+    // 创建部门
+    const res = await kernel.createTarget({
+      name,
+      code,
+      typeName: targetType,
+      belongId,
+      teamName,
+      teamCode,
+      teamRemark: remark,
+    });
+    if (res.success) {
+      // 把部门加入单位
+      const res2 = await kernel.pullAnyToTeam({
+        id: parentId,
+        teamTypes: [isTop ? TargetType.Company : TargetType.Department],
+        targetIds: [res.data?.id],
+        targetType: targetType,
+      });
+      if (!res2.success) {
+        return res2;
+      }
+    }
+    return res;
+  }
+
+  /**
    * 创建对象
    * @param data 创建参数
    * @returns 创建结果
