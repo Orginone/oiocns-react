@@ -12,6 +12,7 @@ import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
+import Types from '@/module/typings';
 
 // 新建一个对象 ，避免代码冲突
 export interface spaceObjs {
@@ -86,8 +87,8 @@ class SettingController {
       teamCode: 'BMtwo',
       remark: '部门二',
     };
-    // console.log(await this.createDepartment(params));
-    this.flushDepartments();
+    console.log(await this.createDepartment(params));
+    await this.flushDepartments();
     console.log(this.allCompanyDepts);
   }
 
@@ -103,22 +104,29 @@ class SettingController {
 
   // 需要递归查询并缓存当前单位底下的所有部门底下的子部门
   public async flushDepartments(parentId?: string) {
+    if (Provider.isUserSpace()) {
+      return;
+    }
+
     const compid = Provider.getWorkSpace().id;
-    const companys: Company[] = await this.userDataService.getJoinedTargets(
+
+    const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
       TargetType.Department,
-      [TargetType.Company, TargetType.Department],
     );
-    companys.map((e) => {
-      const spaceObj: spaceObjs = {
-        id: e.target.id,
-        title: e.target.name,
-        parentId: compid,
-        companyId: compid,
-        children: [],
-      };
-      this.allCompanyDepts.get(compid)?.push(spaceObj);
-    });
+    if (companys.length > 0) {
+      this.allCompanyDepts.set(compid, new Array());
+      companys.map((e) => {
+        const spaceObj: spaceObjs = {
+          id: e.target.id,
+          title: e.target.name,
+          parentId: compid,
+          companyId: compid,
+          children: [],
+        };
+        this.allCompanyDepts.get(compid)?.push(spaceObj);
+      });
+    }
   }
 
   // 创建二级以下的部门
@@ -142,6 +150,7 @@ class SettingController {
         success: false,
       };
     }
+
     const compid = Provider.getWorkSpace()!.id;
     // 判断是否有公司数据
 
@@ -149,6 +158,22 @@ class SettingController {
     // 获取当前单位
     //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
     // 判断是否重复 TODO
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchCompany(
+      {
+        page: 0,
+        pageSize: 100,
+        filter: param.code,
+      },
+      TargetType.Department,
+    );
+
+    if (datas.data && datas.data?.length > 0) {
+      return {
+        msg: '重复创建',
+        success: false,
+      };
+    }
+
     const res = await this.userDataService.createDepart(
       param.name,
       param.code,
