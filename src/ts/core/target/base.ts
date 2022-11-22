@@ -2,6 +2,7 @@ import { PageRequest } from '@/ts/base/model';
 import { TargetType } from '../enum';
 import consts from '../consts';
 import { kernel, model, common, schema, faildResult } from '../../base';
+import { toPageData } from '@/utils/tools';
 
 export default class BaseTarget {
   public readonly target: schema.XTarget;
@@ -390,8 +391,8 @@ export default class BaseTarget {
    * 查询我的申请
    * @returns
    */
-  public async queryJoinApply(): Promise<model.ResultType<schema.XRelationArray>> {
-    return await kernel.queryJoinTeamApply({
+  public queryJoinApply = async () => {
+    const data = await kernel.queryJoinTeamApply({
       id: this.target.id,
       page: {
         offset: 0,
@@ -399,14 +400,15 @@ export default class BaseTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
+    return toPageData<schema.XRelationArray>(data);
+  };
 
   /**
    * 查询我的审批
    * @returns
    */
-  public async queryjoinApproval() {
-    return kernel.queryTeamJoinApproval({
+  public queryjoinApproval = async () => {
+    const data = await kernel.queryTeamJoinApproval({
       id: this.target.id,
       page: {
         offset: 0,
@@ -414,7 +416,8 @@ export default class BaseTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
+    return toPageData<schema.XRelationArray>(data);
+  };
 
   /**
    * 查询指定职权下的身份列表
