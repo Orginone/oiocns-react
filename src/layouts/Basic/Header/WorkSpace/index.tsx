@@ -16,8 +16,7 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import { SpaceType } from '@/store/type';
-import Provider from '@/ts/core/provider';
+import Provider, { SpaceType } from '@/ts/core/provider';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};

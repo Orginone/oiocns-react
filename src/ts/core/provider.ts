@@ -1,7 +1,11 @@
-import { SpaceType } from '@/store/type';
 import { kernel, model } from '../base';
-import MarketActionTarget from './target/mbase';
 import Person from './target/person';
+export interface SpaceType {
+  /** 空间标识 */
+  id: string;
+  /** 空间名称 */
+  name: string;
+}
 const sessionStorageName = 'sessionPerson';
 export default class Provider {
   private static _person: Person | undefined;
