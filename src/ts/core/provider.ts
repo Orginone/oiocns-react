@@ -1,11 +1,3 @@
-/*
- * @Author: SEN
- * @Date: 2022-11-17 13:30:54
- * @LastEditors: SEN
- * @LastEditTime: 2022-11-22 09:54:00
- * @FilePath: /oiocns-react/src/ts/core/provider.ts
- * @Description: 登录和注册的接口提供层
- */
 import { SpaceType } from '@/store/type';
 import { kernel, model } from '../base';
 import MarketActionTarget from './target/mbase';

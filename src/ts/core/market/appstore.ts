@@ -2,6 +2,7 @@ import { kernel } from '../../base';
 import { CommonStatus, TargetType } from '../enum';
 import { PageRequest, ResultType } from '../../base/model';
 import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
+import Merchandise from './merchandise';
 
 export default class AppStore {
   // 商店实体
@@ -113,12 +114,14 @@ export default class AppStore {
    * @param page 分页参数
    * @returns 返回商店商品列表
    */
-  public async getMerchandise(page: PageRequest): Promise<ResultType<XMerchandiseArray>> {
+  public getMerchandise = async (
+    page: PageRequest,
+  ): Promise<ResultType<XMerchandiseArray>> => {
     return await kernel.searchMerchandise({
       id: this.store.id,
       page: page,
     });
-  }
+  };
 
   /**
    * 获取商品上架申请列表
