@@ -31,8 +31,9 @@ const CohortConfig: React.FC = () => {
     createApi: API.cohort.create,
     updateApi: API.cohort.update,
   });
-  const Person = PersonInfoEnty.getPerson;
+  const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
+  console.log("workSpaceId",PersonInfoEnty.getWorkSpace())
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);

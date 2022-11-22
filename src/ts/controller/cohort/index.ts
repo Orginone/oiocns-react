@@ -23,7 +23,7 @@ import provider from '../../core/provider'
   // this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
 
   public get getMyCohort():Cohort[]{
-    let data = this._cohorts.filter((obj) => provider.getPerson.getWorkSpace().id == obj.target.belongId);
+    let data = this._cohorts.filter((obj) => provider.getWorkSpace(). == obj.target.belongId);
     console.log("我的群组",data)
     return data;
   }
@@ -55,7 +55,7 @@ import provider from '../../core/provider'
  */
    public async createCohort (obj:Person,name:string,code:string,remark:string):Promise<any>{
     const res = await obj.createCohort(name,code,remark)
-    this._cohorts = provider.getPerson.getCohorts;
+    this._cohorts = provider.getPerson!.ChohortArray;
     this.callBack([... this.getMyCohort])
     return res
  }
@@ -120,4 +120,4 @@ public async joinCohort (obj:Person,destId:string):Promise<model.ResultType<any>
 
 
 
-export default new CohortController(provider.getPerson.getCohorts)
+export default new CohortController(provider.getPerson!.ChohortArray)
