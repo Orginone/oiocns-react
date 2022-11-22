@@ -8,14 +8,14 @@ import type { ProColumns } from '@ant-design/pro-components';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
-  searchParams: { status: ststusTypes };
+  searchParams?: any | { status: ststusTypes };
   columns: ProColumns<any>[];
   toolBarRender?: () => React.ReactNode;
   renderOperation?: any; //渲染操作按钮
   headerTitle?: string; //表格头部文字
   style?: React.CSSProperties;
 }
-type ststusTypes = 'all' | 'created' | 'purchased' | 'shared' | 'allotted';
+type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const AppShowComp: React.FC<AppShowCompType> = ({
   queryFun,
@@ -29,20 +29,26 @@ const AppShowComp: React.FC<AppShowCompType> = ({
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [status, setStatus] = useState<ststusTypes>('all');
+  const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
-    console.log('变化', searchParams);
-
-    if (searchParams.status === status) {
+    console.log('数据过滤', searchParams);
+    if (!searchParams) {
       return;
     }
-    setStatus(searchParams.status);
-    list.map((item) => {
-      console.log('item', item);
-    });
+
+    if (searchParams.status === '全部') {
+      setTotal(list.length);
+      setSataSource(list);
+    } else {
+      const result = list.filter((item) => {
+        return item.prod.source === searchParams.status;
+      });
+      setTotal(result.length);
+      setSataSource(result);
+    }
     //TODO: 其他条件 发出请求
     // if (Object.keys(searchParams).length == 0) {
     //   return;
@@ -81,7 +87,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
       <CardOrTable<MarketTypes.ProductType>
-        dataSource={list}
+        dataSource={dataSource}
         total={total}
         page={page}
         stripe

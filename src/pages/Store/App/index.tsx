@@ -1,4 +1,4 @@
-import { Card, Form, Modal } from 'antd';
+import { Card, Modal } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
@@ -22,12 +22,12 @@ import StoreSidebar from '@/ts/controller/store/sidebar';
 //   deleteApi: API.product.delete,
 //   updateApi: API.product.update,
 // });
-type ststusTypes = 'all' | 'created' | 'purchased' | 'shared' | 'allotted';
+type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState([]);
-  const [statusKey, setStatusKey] = useState<ststusTypes>('all');
+  const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
   const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
@@ -185,7 +185,7 @@ const StoreApp: React.FC = () => {
               queryFun={Provider.getPerson!.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
-              columns={StoreContent.getColumns()}
+              columns={StoreContent.getColumns('myApp')}
               renderOperation={renderOperation}
             />
           </div>
