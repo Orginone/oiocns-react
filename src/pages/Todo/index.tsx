@@ -3,7 +3,7 @@ import { renderRoutes } from 'react-router-config';
 import * as Icon from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-import todoService, { pageModel, tabStatus } from '@/ts/controller/todo';
+import todoService, { pageModel } from '@/ts/controller/todo';
 import siderBar from '@/ts/controller/todo/sidebar';
 
 // import TodoMenu, { muneItems } from './Menu';
@@ -52,7 +52,6 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     const splitKey = e.key.split('/');
     todoService.currentModel = splitKey[splitKey.length - 1]; // 设置当前模块
     history.push(`${e.key}`);
-
     siderBar.handleClickMenu(e.label, e.item?.props?.node); // 出发控制器事件 生成面包屑数据
   };
 
@@ -61,7 +60,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
       siderMenuData={todoMenu}
       menuClick={toNext}
       contentTopLeft={siderBar.curentBread.map((n) => (
-        <Breadcrumb.Item key={n.key}>{n}</Breadcrumb.Item>
+        <Breadcrumb.Item key={n}>{n}</Breadcrumb.Item>
       ))}>
       {renderRoutes(route.routes)}
     </ContentTemplate>

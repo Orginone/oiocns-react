@@ -58,11 +58,11 @@ class SideBar {
   }
   /**点击左侧菜单 */
   public handleClickMenu = (name: string, productInstans: Product) => {
-    console.log('左侧菜单点击应用对象', productInstans.prod);
+    // console.log('左侧菜单点击应用对象', productInstans.prod);
     if (productInstans) {
       this._currentBread = ['应用待办', productInstans.prod.name];
     } else {
-      this._currentBread = ['平台待办', name];
+      this._currentBread = [];
     }
   };
 
