@@ -44,14 +44,14 @@ class TodoService implements TodoServiceProps {
   /**各业务请求api地址*/
   apiPaths: Record<pageModel, { [key: string]: string }> = {
     friend: {
-      [tabStatusFunction.待办]: `queryjoinApproval`,
+      [tabStatusFunction.待办]: `queryJoinApproval`,
       [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
       approve: `joinTeamApproval`,
       refuse: `joinTeamApproval`,
     },
     org: {
-      [tabStatusFunction.待办]: `queryjoinApproval`,
+      [tabStatusFunction.待办]: `queryJoinApproval`,
       [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
       approve: `joinTeamApproval`,

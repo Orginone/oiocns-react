@@ -133,7 +133,7 @@ export default class MarketActionTarget extends BaseTarget {
    * 查询加入市场的审批
    * @returns
    */
-  getJoinApproval = async (): Promise<model.ResultType<XMarketRelationArray>> => {
+  queryJoinMarketApproval = async (): Promise<model.ResultType<XMarketRelationArray>> => {
     return await kernel.queryJoinApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
@@ -148,7 +148,7 @@ export default class MarketActionTarget extends BaseTarget {
    * 查询应用上架的审批
    * @returns
    */
-  getPublicApproval = async (): Promise<model.ResultType<XMerchandiseArray>> => {
+  queryPublicApproval = async (): Promise<model.ResultType<XMerchandiseArray>> => {
     return await kernel.queryPublicApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
@@ -178,12 +178,12 @@ export default class MarketActionTarget extends BaseTarget {
    * @param status 审批结果
    * @returns 是否成功
    */
-  public async approvalPublishApply(
+  approvalPublishApply = async (
     id: string,
     status: number,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<any>> => {
     return await kernel.approvalMerchandise({ id, status });
-  }
+  };
   /**
    * 创建市场
    * @param  {model.MarketModel} 市场基础信息

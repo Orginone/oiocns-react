@@ -111,6 +111,47 @@ export default class BaseTarget extends SpaceTarget {
   }
 
   /**
+   * 更新组织、对象
+   * @param name 名称
+   * @param code 编号
+   * @param typeName 类型
+   * @param teamName team名称
+   * @param teamCode team编号
+   * @param teamRemark team备注
+   * @returns
+   */
+  updateTarget = async (
+    name: string,
+    code: string,
+    teamName: string = '',
+    teamCode: string = '',
+    teamRemark: string,
+  ): Promise<model.ResultType<schema.XTarget>> => {
+    teamCode = teamCode == '' ? code : teamCode;
+    teamName = teamName == '' ? code : teamName;
+    let res = await kernel.updateTarget({
+      name,
+      code,
+      teamCode,
+      teamName,
+      teamRemark,
+      id: this.target.id,
+      belongId: this.target.belongId,
+      typeName: this.target.typeName,
+    });
+    if (res.success) {
+      this.target.name = name;
+      this.target.code = code;
+      if (this.target.team != undefined) {
+        this.target.team.name = name;
+        this.target.team.code = code;
+        this.target.team.remark = teamRemark;
+      }
+    }
+    return res;
+  };
+
+  /**
    * 删除对象
    * @param id 对象Id
    * @param typeName 对象类型
@@ -405,7 +446,7 @@ export default class BaseTarget extends SpaceTarget {
    * 查询我的审批
    * @returns
    */
-  public async queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
+  public async queryJoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
     return await kernel.queryTeamJoinApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {

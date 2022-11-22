@@ -210,6 +210,56 @@ export default class Person extends MarketTarget {
   };
 
   /**
+   * 更新单位
+   * @param id 单位Id
+   * @param name 单位名称
+   * @param code 单位信用代码
+   * @param teamName 团队名称
+   * @param teamCode 团队代码
+   * @param remark 单位简介
+   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @returns 是否成功
+   */
+  updateCompany = async (
+    id: string,
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+  ): Promise<model.ResultType<any>> => {
+    if (!validIsSocialCreditCode(code)) {
+      return faildResult('请填写正确的代码!');
+    }
+    let company = this._joinedCompanys.find((company) => {
+      return company.target.id == id;
+    });
+    if (company != undefined) {
+      let res = await kernel.updateTarget({
+        id,
+        name,
+        code,
+        teamCode,
+        teamName,
+        teamRemark: remark,
+        belongId: company.target.belongId,
+        typeName: company.target.typeName,
+      });
+      if (res.success) {
+        company.target.name = name;
+        company.target.code = code;
+        if (company.target.team != undefined) {
+          company.target.team.name = name;
+          company.target.team.code = code;
+          company.target.team.remark = remark;
+        }
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  };
+
+  /**
    * 删除单位
    * @param id 单位Id
    * @returns

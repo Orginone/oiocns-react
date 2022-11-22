@@ -4,6 +4,7 @@ import { TargetType } from '../enum';
 import consts from '../consts';
 import Cohort from './cohort';
 import Company from './company';
+import Group from './group';
 
 /**
  * 组织接口
@@ -151,7 +152,7 @@ export default abstract class SpaceTarget {
    * 查询我的审批
    * @returns
    */
-  abstract queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>>;
+  abstract queryJoinApproval(): Promise<model.ResultType<schema.XRelationArray>>;
 
   /**
    * 审批我的加入组织/个人申请
@@ -216,7 +217,26 @@ export default abstract class SpaceTarget {
     page: model.PageRequest,
   ): Promise<model.ResultType<schema.XAuthorityArray>>;
 
-  /**---------------------------------------------市场---------------------------------------------------- */
+  /**
+   * 更新组织、对象
+   * @param name 名称
+   * @param code 编号
+   * @param typeName 类型
+   * @param teamName team名称
+   * @param teamCode team编号
+   * @param teamRemark team备注
+   * @returns
+   */
+  abstract updateTarget(
+    name: string,
+    code: string,
+    typeName: TargetType,
+    teamName: string,
+    teamCode: string,
+    teamRemark: string,
+  ): Promise<model.ResultType<schema.XTarget>>;
+
+  /**---------------------------------------------群组---------------------------------------------------- */
 
   /**
    * 创建群组
@@ -329,7 +349,9 @@ export default abstract class SpaceTarget {
    * 查询加入市场的审批
    * @returns
    */
-  getJoinApproval = async (): Promise<model.ResultType<schema.XMarketRelationArray>> => {
+  queryJoinMarketApproval = async (): Promise<
+    model.ResultType<schema.XMarketRelationArray>
+  > => {
     throw consts.FunctionNotFoundError;
   };
 
@@ -337,7 +359,7 @@ export default abstract class SpaceTarget {
    * 查询应用上架的审批
    * @returns
    */
-  getPublicApproval = async (): Promise<model.ResultType<schema.XMerchandiseArray>> => {
+  queryPublicApproval = async (): Promise<model.ResultType<schema.XMerchandiseArray>> => {
     throw consts.FunctionNotFoundError;
   };
   /**
@@ -353,6 +375,18 @@ export default abstract class SpaceTarget {
     throw consts.FunctionNotFoundError;
   };
 
+  /**
+   * 审批商品上架申请
+   * @param _id 申请ID
+   * @param _status 审批结果
+   * @returns 是否成功
+   */
+  public approvalPublishApply = async (
+    _id: string,
+    _status: number,
+  ): Promise<model.ResultType<any>> => {
+    throw consts.FunctionNotFoundError;
+  };
   /**
    * 退出市场
    * @param _id 退出的市场Id
@@ -439,6 +473,26 @@ export default abstract class SpaceTarget {
     throw consts.FunctionNotFoundError;
   }
 
+  /**
+   * 更新单位
+   * @param _name 单位名称
+   * @param _code 单位信用代码
+   * @param _teamName 团队名称
+   * @param _teamCode 团队代码
+   * @param _remark 单位简介
+   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @returns 是否成功
+   */
+  updateCompany = async (
+    _id: string,
+    _name: string,
+    _code: string,
+    _teamName: string,
+    _teamCode: string,
+    _remark: string,
+  ): Promise<model.ResultType<any>> => {
+    throw consts.FunctionNotFoundError;
+  };
   /**
    * 删除单位
    * @param _id 单位Id
@@ -534,6 +588,33 @@ export default abstract class SpaceTarget {
   /**---------------------------------------------单位空间---------------------------------------------------- */
 
   /**
+   * @description: 查询我加入的集团
+   * @return {*} 查询到的群组
+   */
+  getJoinedGroups = async (): Promise<Group[]> => {
+    throw consts.FunctionNotFoundError;
+  };
+
+  /**
+   * @description: 查询我加入的部门
+   * @return {*} 查询到的群组
+   */
+  getJoinedDepartments = async (
+    _personId: string,
+  ): Promise<model.ResultType<schema.XTargetArray>> => {
+    throw consts.FunctionNotFoundError;
+  };
+  /**
+   * @description: 查询我加入的工作组
+   * @return {*} 查询到的群组
+   */
+  getJoinedWorkings = async (
+    _personId: string,
+  ): Promise<model.ResultType<schema.XTargetArray>> => {
+    throw consts.FunctionNotFoundError;
+  };
+
+  /**
    * 创建集团
    * @param _name 集团名称
    * @param _code 集团代码
@@ -583,6 +664,28 @@ export default abstract class SpaceTarget {
     throw consts.FunctionNotFoundError;
   };
 
+  /**
+   * 更新部门、工作组
+   * @param _id 部门、工作组Id
+   * @param _name 部门、工作组名称
+   * @param _code 部门、工作组编码
+   * @param _teamName 团队名称
+   * @param _teamCode 团队代码
+   * @param _remark 部门、工作组简介
+   * @param type 部门、工作组类型
+   * @returns 是否成功
+   */
+  updateDepartmentOrWorking = async (
+    _id: string,
+    _name: string,
+    _code: string,
+    _teamName: string,
+    _teamCode: string,
+    _typeName: TargetType,
+    _remark: string,
+  ): Promise<model.ResultType<any>> => {
+    throw consts.FunctionNotFoundError;
+  };
   /**
    * 删除工作组
    * @param _id 工作组Id

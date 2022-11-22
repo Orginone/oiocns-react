@@ -39,7 +39,7 @@ export default class Provider {
    * 获取当前工作空间
    * @returns 工作当前空间
    */
-  public static async getWorkSpace(): Promise<spaceTarget | undefined> {
+  public static getWorkSpace(): spaceTarget {
     if (this._workSpace == null) {
       let id = sessionStorage.getItem('_workSpaceId') + '';
       const companys = await this._person.getJoinedCompanys();
@@ -108,10 +108,7 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
-      debugger;
       this.setPerson(res.data.person);
-      var workspace = await Provider.getWorkSpace();
-      workspace?.queryjoinApproval();
     }
     return res;
   }

@@ -3,7 +3,8 @@ import Cohort from './cohort';
 import consts from '../consts';
 import { TargetType } from '../enum';
 import MarketTarget from './mbase';
-import { faildResult, model, schema, kernel } from '../../base';
+import { faildResult, model, schema, kernel, common } from '../../base';
+import { validIsSocialCreditCode } from '@/utils/tools';
 /**
  * 公司的元操作
  */
@@ -15,6 +16,65 @@ export default class Company extends MarketTarget {
     this._joinedGroups = [];
     this._joinedCohorts = [];
   }
+
+  /**
+   * 更新单位
+   * @param name 单位名称
+   * @param code 单位信用代码
+   * @param teamName 团队名称
+   * @param teamCode 团队代码
+   * @param remark 单位简介
+   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @returns 是否成功
+   */
+  updateCompany = async (
+    id: string = '',
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+  ): Promise<model.ResultType<any>> => {
+    if (id != '0') {
+      return faildResult(consts.UnauthorizedError);
+    }
+    if (!validIsSocialCreditCode(code)) {
+      return faildResult('请填写正确的代码!');
+    }
+    return await this.updateTarget(name, code, teamName, teamCode, remark);
+  };
+
+  /**
+   * 更新部门、工作组
+   * @param id 部门、工作组Id
+   * @param name 部门、工作组名称
+   * @param code 部门、工作组编码
+   * @param teamName 团队名称
+   * @param teamCode 团队代码
+   * @param remark 部门、工作组简介
+   * @param type 部门、工作组类型
+   * @returns 是否成功
+   */
+  updateDepartmentOrWorking = async (
+    id: string,
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    typeName: TargetType,
+    remark: string,
+  ): Promise<model.ResultType<any>> => {
+    return await kernel.updateTarget({
+      id,
+      name,
+      code,
+      teamCode,
+      teamName,
+      teamRemark: remark,
+      belongId: this.target.belongId,
+      typeName: typeName,
+    });
+  };
 
   /** 可以创建的子类型 enum.ts */
   get subTypes(): TargetType[] {
@@ -303,7 +363,7 @@ export default class Company extends MarketTarget {
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
-  getJoinedCohort = async (): Promise<Cohort[]> => {
+  getJoinedCohorts = async (): Promise<Cohort[]> => {
     if (this._joinedCohorts.length > 0) {
       return this._joinedCohorts;
     }
@@ -317,6 +377,66 @@ export default class Company extends MarketTarget {
       });
     }
     return this._joinedCohorts;
+  };
+
+  /**
+   * @description: 查询我加入的部门
+   * @return {*} 查询到的群组
+   */
+  getJoinedDepartments = async (
+    personId: string,
+  ): Promise<model.ResultType<schema.XTargetArray>> => {
+    return await kernel.queryJoinedTargetById({
+      id: personId,
+      typeName: this.target.typeName,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Cohort],
+    });
+  };
+
+  /**
+   * @description: 查询我加入的工作组
+   * @return {*} 查询到的群组
+   */
+  getJoinedWorkings = async (
+    personId: string,
+  ): Promise<model.ResultType<schema.XTargetArray>> => {
+    return await kernel.queryJoinedTargetById({
+      id: personId,
+      typeName: this.target.typeName,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Cohort],
+    });
+  };
+
+  /**
+   * @description: 查询我加入的集团
+   * @return {*} 查询到的群组
+   */
+  getJoinedGroups = async (): Promise<Group[]> => {
+    if (this._joinedGroups.length > 0) {
+      return this._joinedGroups;
+    }
+    let res = await this.getjoined({
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Group],
+    });
+    if (res.success) {
+      res.data?.result?.forEach((item) => {
+        this._joinedGroups.push(new Group(item));
+      });
+    }
+    return this._joinedGroups;
   };
 
   /**
