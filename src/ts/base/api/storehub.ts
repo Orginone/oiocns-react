@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import * as signalR from '@microsoft/signalr';
 import { IDisposable } from '../common/lifecycle';
-import { model } from '../../base';
+import { ResultType } from '../model';
 import { TxtHubProtocol } from '../protocol';
 /**
  * 存储层Hub
@@ -147,14 +147,14 @@ export default class StoreHub implements IDisposable {
    * 请求服务端方法
    * @param {string} methodName 方法名
    * @param {any[]} args 参数
-   * @returns {Promise<model.ResultType>} 异步结果
+   * @returns {Promise<ResultType>} 异步结果
    */
-  public invoke(methodName: string, ...args: any[]): Promise<model.ResultType<any>> {
+  public invoke(methodName: string, ...args: any[]): Promise<ResultType<any>> {
     return new Promise((resolve) => {
       if (this.isConnected) {
         this._connection
           .invoke(methodName, ...args)
-          .then((res: model.ResultType<any>) => {
+          .then((res: ResultType<any>) => {
             resolve(res);
           })
           .catch((err) => {
