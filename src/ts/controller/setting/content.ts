@@ -18,11 +18,12 @@ import Types from '@/module/typings';
 export interface spaceObjs {
   id: string;
   title: string;
+  key: string;
+  children: Array<spaceObjs>;
   // 上级部门的ID
   parentId: string;
   // 对应公司的ID
   companyId: string;
-  children: Array<spaceObjs>;
 }
 
 // 创建部门的入参
@@ -61,6 +62,7 @@ class SettingController {
   isOpenModal: boolean = false;
   // 当前操作的部门
   selectId: string = '';
+
   // 查询接口, 把公司底下的部门返回到这底下
   allCompanyDepts: Map<string, Array<spaceObjs>> = new Map();
 
@@ -76,9 +78,9 @@ class SettingController {
         this.allCompanyDepts.set(compid, new Array());
       }
     }
-    this.test();
   }
 
+  // 调试代码
   public async test() {
     const params: deptParams = {
       name: '部门二',
@@ -92,17 +94,23 @@ class SettingController {
     console.log(this.allCompanyDepts);
   }
 
-  // 获取缓存里面的子部门。
+  /**
+   * 获取控制器里面的子部门
+   */
   public getDepartments(): Array<spaceObjs> {
     // 要选中公司的工作区
-    if (!Provider.getWorkSpace()) {
+    if (Provider.isUserSpace()) {
       return [];
     }
     const compid: any = Provider.getWorkSpace().id;
     return this.allCompanyDepts.get(compid) ?? [];
   }
 
-  // 需要递归查询并缓存当前单位底下的所有部门底下的子部门
+  /**
+   * 需要递归查询并缓存当前单位底下的所有部门底下的子部门
+   * @param parentId
+   * @returns
+   */
   public async flushDepartments(parentId?: string) {
     if (Provider.isUserSpace()) {
       return;
@@ -119,6 +127,7 @@ class SettingController {
       companys.map((e) => {
         const spaceObj: spaceObjs = {
           id: e.target.id,
+          key: e.target.id,
           title: e.target.name,
           parentId: compid,
           companyId: compid,
@@ -189,6 +198,7 @@ class SettingController {
       // 部门创建成功， 就加入到列表里面
       const spaceObj: spaceObjs = {
         id: xtarget.id,
+        key: xtarget.id,
         title: xtarget.name,
         parentId: compid,
         companyId: compid,
