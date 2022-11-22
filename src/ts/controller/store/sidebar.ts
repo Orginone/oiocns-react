@@ -110,6 +110,7 @@ class StoreClassify {
    * @return {*}
    */
   public getTreeData() {
+
     // 1.获取市场
     //获取文档
     const data =
@@ -158,7 +159,7 @@ class StoreClassify {
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.store.name || '商店';
-    console.log('面包靴 商店', this.breadcrumb);
+    console.log('面包屑 商店', this.breadcrumb);
 
     this.TreeCallBack(market);
   }

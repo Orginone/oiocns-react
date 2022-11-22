@@ -20,6 +20,7 @@ import { XProduct } from '@/ts/base/schema';
 // ];
 
 const menu = ['重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
+//自定义树
 const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
@@ -81,8 +82,10 @@ const StoreClassify: React.FC = () => {
     <>
       <div className={cls.container}>
         {router == '/store/doc' ? (
+          //文档树
           <CloudTreeComp></CloudTreeComp>
         ) : (
+          //其他树
           <StoreClassifyTree
             menu={menu}
             searchable
