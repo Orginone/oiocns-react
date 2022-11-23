@@ -15,7 +15,7 @@ import StoreContent from '@/ts/controller/store/content';
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
   useEffect(() => {
-    StoreSiderbar.currentMenu = 'market';
+    StoreSiderbar.curPageType = 'market';
     StoreSiderbar.TreeCallBack = setList;
     StoreSiderbar.getTreeData();
   }, []);

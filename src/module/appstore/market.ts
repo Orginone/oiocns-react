@@ -88,53 +88,6 @@ export default class MarketService extends CommonClass {
     this.ShopAppColumns = [...data];
     return data;
   }
-  /* 获取我的应用列表 表头 */
-  public getMyappColumns(): ProColumns<any>[] {
-    if (this.MyAppColumns.length > 1) {
-      return this.MyAppColumns;
-    }
-    const data: any = [
-      {
-        title: '序号',
-        dataIndex: 'index',
-        width: 50,
-        render: (_key: any, _record: any, index: number) => {
-          return index + 1;
-        },
-      },
-      {
-        title: '应用图标',
-        dataIndex: 'icon',
-      },
-      {
-        title: '应用名称',
-        dataIndex: 'name',
-      },
-      {
-        title: '版本号',
-        dataIndex: 'version',
-      },
-      {
-        title: '应用类型',
-        dataIndex: 'typeName',
-      },
-      {
-        title: '应用来源',
-        dataIndex: 'belongId',
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-      },
-      {
-        title: '备注',
-        ellipsis: true,
-        dataIndex: 'remark',
-      },
-    ];
-    this.MyAppColumns = [...data];
-    return data;
-  }
 
   /* 获取我的应用列表 表头 */
   public getPublishColumns(): ProColumns<any>[] {

@@ -1,11 +1,3 @@
-/*
- * @Author: SEN
- * @Date: 2022-11-17 13:30:54
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-17 13:55:49
- * @FilePath: /oiocns-react/src/ts/core/provider.ts
- * @Description: 登录和注册的接口提供层
- */
 import { kernel, model } from '../base';
 import Person from './target/person';
 import { SpaceType } from '@/store/type';
@@ -42,11 +34,27 @@ export default class Provider {
     return Provider._workSpace.id == Provider.person.target.id;
   }
 
-  public static get getPerson(): Person {
-    if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+  /**
+   * 当前用户
+   */
+  public static get getPerson(): Person | undefined {
+    if (this._person === undefined) {
+      const sp = sessionStorage.getItem(sessionStorageName);
+      if (sp && sp.length > 0) {
+        this.setPerson(JSON.parse(sp));
+      }
     }
-    return this.person;
+    return this._person;
+  }
+
+  /**
+   * 设置当前用户
+   * @param data 数据
+   */
+  private static setPerson(data: any) {
+    this._person = new Person(data);
+    this.setWorkSpace(this._person.target.id);
+    sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
   }
   /**
    * 登录
@@ -84,8 +92,7 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.register(name, motto, phone, account, password, nickName);
     if (res.success) {
-      this.person = new Person(res.data.person);
-      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+      this.setPerson(res.data.person);
     }
     return res;
   }

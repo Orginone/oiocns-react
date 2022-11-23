@@ -12,13 +12,6 @@ import BaseService from './base';
 
 /**
  * 我的设置里面的接口
- * const person: Person = Provider.getPerson;
- * import Provider from '@/ts/core/provider';
-   import Person from '@/ts/core/target/person';   
-
-   import Userdata from '@/ts/core/target/user';
-   Userdata.getInstance().searchCompany();
-   querySelfProduct 我的产品，上架后才是商品
  */
 export default class userdataservice extends BaseService {
   // 单例
@@ -26,7 +19,7 @@ export default class userdataservice extends BaseService {
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(Provider.getPerson.target);
+      this._instance = new userdataservice(Provider.getPerson!.target);
     }
     return this._instance;
   }
@@ -43,6 +36,7 @@ export default class userdataservice extends BaseService {
       TargetType.University,
       TargetType.Group,
       TargetType.Hospital,
+      TargetType.Department,
     ];
   }
 
@@ -116,7 +110,7 @@ export default class userdataservice extends BaseService {
   ): Promise<Company[]> {
     this.target.typeName = typeName;
     this.target.id = companyId;
-    let res = await this.getSubDepts();
+    let res = await this.getSpaceSubDepts();
 
     let _joinedCompanys: Company[] = [];
     if (res.success && res.data && res.data.result) {
@@ -137,7 +131,7 @@ export default class userdataservice extends BaseService {
    * @param type 单位类型,默认'单位', 可选:'大学','医院','单位'
    * @returns 是否成功
    */
-  public async createCompany(
+  public async createMyCompany(
     name: string,
     code: string,
     teamName: string,
@@ -202,17 +196,14 @@ export default class userdataservice extends BaseService {
     personIds: string[],
     targetType: TargetType,
   ): Promise<model.ResultType<any>> {
-    return await this.pull({
-      targetType: targetType,
-      targetIds: personIds,
-    });
+    return await this.pull(personIds, targetType);
   }
 
   /**
    * 搜索单位(公司) 数组里面还有target
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
    */
-  public async searchCompany(
+  public async searchMyCompany(
     page: Types.Page,
     typeName?: TargetType,
   ): Promise<Types.PageData<XTarget>> {
@@ -263,7 +254,7 @@ export default class userdataservice extends BaseService {
   }
 
   /**加入公司或集团等内容 */
-  public async applyJoinCompany(
+  public async applyJoinMyCompany(
     targetId: string,
     teamType: TargetType,
   ): Promise<model.ResultType<any>> {
@@ -277,7 +268,7 @@ export default class userdataservice extends BaseService {
   }
 
   /**取消加入组织或个人 */
-  public async cancelJoinCompany(
+  public async cancelJoinMyCompany(
     targetId: string,
     belongId: string,
     applyType: TargetType,
@@ -290,7 +281,7 @@ export default class userdataservice extends BaseService {
     return res;
   }
 
-  protected async getSubDepts(): Promise<model.ResultType<schema.XTargetArray>> {
+  protected async getSpaceSubDepts(): Promise<model.ResultType<schema.XTargetArray>> {
     return await kernel.queryBelongTargetById({
       id: this.target.id,
       typeNames: [TargetType.Company, TargetType.Department],

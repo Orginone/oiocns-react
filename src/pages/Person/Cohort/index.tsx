@@ -155,16 +155,16 @@ const CohortConfig: React.FC = () => {
       pageSize: 10,
       filter: searchKey,
     };
-    let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
-    const data = PersonInfoEnty.getPerson.ChohortArray;
-    console.log('获取值', PersonInfoEnty.getPerson.ChohortArray);
+    let resultList: Array<any> = [];
+    const data = await PersonInfoEnty.getPerson.getJoinedCohorts();
+    // console.log('获取值', PersonInfoEnty.getPerson.getJoinedCohorts());
     for (var i = 0; i < data.length; i++) {
       if (data[i].target.belongId === Person.target.id) {
         if (data[i].target.team != undefined) {
-          const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
-          chorot.belongId = data[i].target.belongId;
-          chorot.thingId = data[i].target.thingId;
-          resultList.push(chorot);
+          // const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
+          // chorot.belongId = data[i].target.belongId;
+          // chorot.thingId = data[i].target.thingId;
+          resultList.push(data[i].target);
         }
       }
     }
