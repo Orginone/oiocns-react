@@ -30,7 +30,7 @@ export default class Cohort extends CommonClass {
             // initialValue : {item}.item?{item}.item?.name:null,
             // tooltip="最长为 24 位"
             title: '群组名称',
-            dataIndex: 'name',
+            dataIndex: ['target','name'],
             formItemProps: {
               rules: [
                 {
@@ -56,7 +56,7 @@ export default class Cohort extends CommonClass {
             // tooltip="最长为 24 位"
             title: '群组编号',
             // initialValue : {item}.item?{item}.item?.code:null,
-            dataIndex: 'code',
+            dataIndex: ['target','code'],
             formItemProps: {
               rules: [
                 {
@@ -84,7 +84,7 @@ export default class Cohort extends CommonClass {
             // initialValue : {item}.item?{item}.item?.remark:null,
             // tooltip="最长为 24 位"
             title: '群组简介',
-            dataIndex: 'remark',
+            dataIndex: ['target','team','remark'],
             formItemProps: {
               rules: [
                 { required: true, message: '请输入群组简介' },

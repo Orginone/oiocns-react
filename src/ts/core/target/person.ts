@@ -19,6 +19,7 @@ export default class Person extends MarketTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this.getCohort();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -32,6 +33,7 @@ export default class Person extends MarketTarget {
   public get ChohortArray(): Cohort[] {
     return this._joinedCohorts;
   }
+ 
   /**
    * 获取群组列表
    * @param params
@@ -375,7 +377,9 @@ export default class Person extends MarketTarget {
       this._friends = res.data.result;
     }
     return this._friends;
-  };
+  }
+
+  
 
   /**
    * 申请添加好友
