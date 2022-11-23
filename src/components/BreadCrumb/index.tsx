@@ -1,5 +1,5 @@
-import { Breadcrumb, Menu, Space, Typography } from 'antd';
-import React, { ReactNode } from 'react';
+import { Breadcrumb, MenuProps, Space, Typography } from 'antd';
+import React, { ReactNode, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import routes, { IRouteConfig } from '../../routes/config';
@@ -34,8 +34,8 @@ const createIcon = (icon?: string | React.Component | ReactNode) => {
  * 全局面包屑
  * @returns
  */
-const BreadCrumb: React.FC = () => {
-  initMap(routes);
+const BreadCrumb: React.FC = (props) => {
+  useMemo(() => initMap(routes), []);
 
   const location = useLocation();
   const history = useHistory();
@@ -44,33 +44,53 @@ const BreadCrumb: React.FC = () => {
   // TODO 面包屑下拉菜单
   const items = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-    let menu = undefined;
+    let menuItems: MenuProps[`items`] = undefined;
     if (breadcrumbNameMap[url]?.routes) {
-      const items = breadcrumbNameMap[url].routes?.map((r) => {
-        return {
-          key: r.path,
-          label: (
-            <Space onClick={() => history.push(r.path)}>
-              {/* <Link to={r.path}> */}
-              {createIcon(r.icon)}
-              {r.title}
-              {/* </Link> */}
-            </Space>
-          ),
-        };
-      });
-      menu = <Menu items={items}></Menu>;
+      menuItems = breadcrumbNameMap[url].routes
+        ?.filter((n: any) => !n.hideInMenu)
+        .map((r) => {
+          return {
+            key: r.path,
+            label: (
+              <Space onClick={() => !r.routes && history.push(r.path)}>
+                {createIcon(r.icon)}
+                {r.title}
+              </Space>
+            ),
+            children: r.routes
+              ? r.routes.map((m) => ({
+                  key: m.path,
+                  label: (
+                    <Space onClick={() => history.push(m.path)}>
+                      {createIcon(m.icon)}
+                      {m.title}
+                    </Space>
+                  ),
+                }))
+              : null,
+          };
+        });
+      // console.log(breadcrumbNameMap[url]?.title, menuItems);
+      // menu = <Menu ite ms={items}></Menu>;
     }
     return (
-      <Breadcrumb.Item key={url} className={cls['comp-breadcrumb']} overlay={menu}>
-        {location.pathname === url && createIcon(breadcrumbNameMap[url]?.icon)}
-        <Typography.Text>{breadcrumbNameMap[url]?.title}</Typography.Text>
-      </Breadcrumb.Item>
+      breadcrumbNameMap[url]?.title && (
+        <Breadcrumb.Item
+          key={url}
+          className={cls['comp-breadcrumb']}
+          menu={menuItems ? { items: menuItems } : undefined}>
+          {location.pathname === url && createIcon(breadcrumbNameMap[url]?.icon)}
+          <Typography.Text>{breadcrumbNameMap[url]?.title}</Typography.Text>
+        </Breadcrumb.Item>
+      )
     );
   });
   return (
     <div className={cls['comp-breadcrumb-comtainer']}>
-      <Breadcrumb>{items}</Breadcrumb>
+      <Breadcrumb>
+        {items}
+        {props?.children}
+      </Breadcrumb>
     </div>
   );
 };

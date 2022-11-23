@@ -9,6 +9,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';
+import { PageShowType } from 'typings/globelType';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源

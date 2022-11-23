@@ -90,7 +90,7 @@ const GroupContent = (props: Iprops) => {
                   <span
                     className={contentStyle.reWrite}
                     onClick={() => {
-                      handleReWrite(item.showTxt);
+                      handleReWrite(item.msgBody);
                     }}>
                     重新编辑
                   </span>
@@ -124,8 +124,10 @@ const GroupContent = (props: Iprops) => {
                         <Button
                           type="text"
                           danger
-                          onClick={() => {
-                            chatCtrl.chat?.deleteMessage(item.id);
+                          onClick={async () => {
+                            if (await chatCtrl.chat?.deleteMessage(item.id)) {
+                              refreshUI();
+                            }
                           }}>
                           删除
                         </Button>
@@ -190,7 +192,6 @@ const GroupContent = (props: Iprops) => {
                           style={{ color: '#3e5ed8' }}
                           onClick={async () => {
                             await chatCtrl.chat?.reCallMessage(item.id);
-                            refreshUI();
                           }}>
                           撤回
                         </Button>
@@ -198,8 +199,10 @@ const GroupContent = (props: Iprops) => {
                           <Button
                             type="text"
                             danger
-                            onClick={() => {
-                              chatCtrl.chat?.deleteMessage(item.id);
+                            onClick={async () => {
+                              if (await chatCtrl.chat?.deleteMessage(item.id)) {
+                                refreshUI();
+                              }
                             }}>
                             删除
                           </Button>

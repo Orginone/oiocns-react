@@ -1,8 +1,7 @@
-import { schema, kernel, model } from '../../base';
+import { schema, kernel, model, common } from '../../base';
 import { TargetType, MessageType } from '../enum';
 import Provider from '../provider';
 import { StringPako } from '@/utils/package';
-import { sleep } from '@/store/sleep';
 import { ChatCache, IChat } from './ichat';
 
 // 历史会话存储集合名称
@@ -54,24 +53,55 @@ class BaseChat implements IChat {
     this.noReadCount = cache.noReadCount;
     this.lastMessage = cache.lastMessage;
   }
-  clearMessage(): void {
-    throw new Error('Method not implemented.');
+  async clearMessage(): Promise<boolean> {
+    if (this.spaceId === Provider.userId) {
+      const res = await kernel.anystore.remove(
+        hisMsgCollName,
+        {
+          sessionId: this.target.id,
+          spaceId: this.spaceId,
+        },
+        'user',
+      );
+      if (res.success) {
+        this.messages = [];
+        return true;
+      }
+    }
+    return false;
   }
-  deleteMessage(id: string): void {
-    throw new Error('Method not implemented.');
+  async deleteMessage(id: string): Promise<boolean> {
+    if (this.spaceId === Provider.userId) {
+      const res = await kernel.anystore.remove(
+        hisMsgCollName,
+        {
+          chatId: id,
+        },
+        'user',
+      );
+      if (res.success && res.data > 0) {
+        const index = this.messages.findIndex((i) => {
+          return i.id === id;
+        });
+        if (index > -1) {
+          this.messages.splice(index, 1);
+        }
+        return true;
+      }
+    }
+    return false;
   }
   async reCallMessage(id: string): Promise<boolean> {
     for (const item of this.messages) {
       if (item.id === id) {
         const res = await kernel.recallImMsg(item);
-        console.log(res);
         return res.success;
       }
     }
     return false;
   }
   async morePerson(filter: string): Promise<void> {
-    await sleep(0);
+    await common.sleep(0);
   }
   moreMessage(filter: string): Promise<void> {
     throw new Error('Method not implemented.');
@@ -87,11 +117,23 @@ class BaseChat implements IChat {
     return res.success;
   }
   receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
-    if (msg && msg.id !== this.lastMessage?.id) {
-      msg.showTxt = StringPako.inflate(msg.msgBody);
+    if (msg) {
+      if (msg.msgType === 'recall') {
+        msg.showTxt = '撤回一条消息';
+        msg.allowEdit = true;
+        msg.msgBody = StringPako.inflate(msg.msgBody);
+        const index = this.messages.findIndex((m) => {
+          return m.id === msg.id;
+        });
+        if (index > -1) {
+          this.messages[index] = msg;
+        }
+      } else {
+        msg.showTxt = StringPako.inflate(msg.msgBody);
+        this.messages.push(msg);
+      }
       this.noReadCount += noread ? 1 : 0;
       this.lastMessage = msg;
-      this.messages.push(msg);
     }
   }
   protected loadMessages(msgs: schema.XImMsg[]): void {
@@ -103,6 +145,26 @@ class BaseChat implements IChat {
       this.messages.unshift(item);
     });
   }
+  protected async loadCacheMessages(): Promise<void> {
+    const res = await kernel.anystore.aggregate(
+      hisMsgCollName,
+      {
+        match: {
+          sessionId: this.target.id,
+          spaceId: this.spaceId,
+        },
+        sort: {
+          createTime: -1,
+        },
+        skip: this.messages.length,
+        limit: 30,
+      },
+      'user',
+    );
+    if (res && res.success && Array.isArray(res.data)) {
+      this.loadMessages(res.data);
+    }
+  }
 }
 
 /**
@@ -113,25 +175,10 @@ class PersonChat extends BaseChat {
     super(id, name, m);
   }
   override async moreMessage(filter: string): Promise<void> {
-    let res;
     if (this.spaceId === Provider.userId) {
-      res = await kernel.anystore?.aggregate(
-        hisMsgCollName,
-        {
-          match: {
-            sessionId: this.target.id,
-            spaceId: this.spaceId,
-          },
-          sort: {
-            createTime: -1,
-          },
-          skip: this.messages.length,
-          limit: 30,
-        },
-        'user',
-      );
+      await this.loadCacheMessages();
     } else {
-      res = await kernel.queryFriendImMsgs({
+      let res = await kernel.queryFriendImMsgs({
         id: this.target.id,
         spaceId: this.spaceId,
         page: {
@@ -140,9 +187,9 @@ class PersonChat extends BaseChat {
           filter: filter,
         },
       });
-    }
-    if (res?.success && Array.isArray(res?.data)) {
-      this.loadMessages(res.data);
+      if (res && res.success && Array.isArray(res.data)) {
+        this.loadMessages(res.data);
+      }
     }
   }
 }
@@ -155,24 +202,10 @@ class CohortChat extends BaseChat {
     super(id, name, m);
   }
   override async moreMessage(filter: string): Promise<void> {
-    let res;
     if (this.spaceId === Provider.userId) {
-      res = await kernel.anystore?.aggregate(
-        hisMsgCollName,
-        {
-          match: {
-            sessionId: this.target.id,
-          },
-          sort: {
-            createTime: -1,
-          },
-          skip: this.messages.length,
-          limit: 30,
-        },
-        'user',
-      );
+      await this.loadCacheMessages();
     } else {
-      res = await kernel.queryCohortImMsgs({
+      const res = await kernel.queryCohortImMsgs({
         id: this.target.id,
         page: {
           limit: 30,
@@ -180,9 +213,9 @@ class CohortChat extends BaseChat {
           filter: filter,
         },
       });
-    }
-    if (res?.success && Array.isArray(res?.data)) {
-      this.loadMessages(res.data);
+      if (res && res.success && Array.isArray(res.data)) {
+        this.loadMessages(res.data);
+      }
     }
   }
   override async morePerson(filter: string): Promise<void> {

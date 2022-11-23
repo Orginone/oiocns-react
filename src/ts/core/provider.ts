@@ -3,11 +3,47 @@ import Person from './target/person';
 import { SpaceType } from '@/store/type';
 
 export default class Provider {
-  private static person: Person;
-  private static _workSpace: SpaceType;
+  private static _callbacks: (() => void)[] = [];
+  private static _person: Person;
+  private static _workSpace: spaceTarget | undefined;
 
-  public static get userId() {
-    return Provider.person.target.id;
+  /**
+   * 当前用户ID
+   */
+  public static get userId(): string {
+    if (this.getPerson) {
+      return this.getPerson.target.id;
+    }
+    throw new Error('未登录');
+  }
+
+  /**
+   * 当前空间ID
+   */
+  public static get spaceId(): string {
+    if (this.getPerson && this._workSpace) {
+      return this._workSpace.target.id;
+    }
+    throw new Error('未登录');
+  }
+
+  /** 设置人员回调 */
+  public static onSetPerson(callback: () => void): void {
+    if (callback) {
+      this._callbacks.push(callback);
+    }
+  }
+
+  public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
+    var workSpaces: { id: string; name: string }[] = [];
+    if (this._person != null) {
+      workSpaces.push({ id: this._person.target.id, name: '个人空间' });
+      const companys = await this._person.getJoinedCompanys();
+      companys.forEach((element) => {
+        workSpaces.push({ id: element.target.id, name: element.target.name });
+      });
+    }
+    return workSpaces;
   }
 
   /**
@@ -55,6 +91,9 @@ export default class Provider {
     this._person = new Person(data);
     this.setWorkSpace(this._person.target.id);
     sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
+    this._callbacks.forEach((c) => {
+      c.apply(this, []);
+    });
   }
   /**
    * 登录

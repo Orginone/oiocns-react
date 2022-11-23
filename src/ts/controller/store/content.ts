@@ -1,5 +1,6 @@
-import { XMarket, XMerchandise, XProduct } from '@/ts/base/schema';
+import { XMarket } from '@/ts/base/schema';
 import AppStore from '@/ts/core/market/appstore';
+import Product from '@/ts/core/market/product';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
 import { myColumns } from './config';
@@ -19,6 +20,8 @@ class StoreContent {
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
+
+  private _curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -45,9 +48,15 @@ class StoreContent {
    * @desc: 获取表格头部展示数据
    * @return {*}
    */
-  public getColumns() {
+  public getColumns(pageKey?: string) {
+    switch (pageKey) {
+      case 'appInfo':
+      case 'myApp':
+        return myColumns;
+      default:
+        return [];
+    }
     //TODO:待完善
-    return myColumns;
   }
 
   /** 获取我的应用列表/商店-商品列表
@@ -83,6 +92,15 @@ class StoreContent {
    * @params
    */
   public createProduct = async (data: any) => appContent.createProduct(data);
+
+  /**
+   * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
+   * @param {Product} item
+   */
+  public selectedProduct(item: Product) {
+    // 判断当前操作对象是否为已选产品 不是则 修改选中
+    item.prod.id !== this._curProduct?.prod.id && (this._curProduct = item);
+  }
 }
 const storeContent = new StoreContent();
 

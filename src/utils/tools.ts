@@ -2,7 +2,7 @@ import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
 import { formatDate } from '@/utils/index';
-import { PageData } from 'typings/globelType';
+import { DataType, PageData } from 'typings/globelType';
 
 const showMessage = (response: any) => {
   if (response.success) {
@@ -46,9 +46,7 @@ const resetParams = (params: any) => {
  * @param res 后台分页响应
  * @returns
  */
-export function toPageData<T extends { result: any; total: number }>(
-  res: model.ResultType<T>,
-): PageData<T> {
+export function toPageData<T extends DataType>(res: model.ResultType<T>): PageData<T> {
   if (res.success) {
     return {
       success: true,

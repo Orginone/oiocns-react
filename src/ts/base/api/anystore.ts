@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { ResultType } from '../model';
+import { FileItemModel, ResultType } from '../model';
 import StoreHub from './storehub';
 
 /**
@@ -210,6 +210,83 @@ export default class AnyStore {
     domain: string,
   ): Promise<ResultType<any>> {
     return await this._storeHub.invoke('Aggregate', collName, options, domain);
+  }
+  /**
+   * 查询文件系统子项
+   * @param {string} key 完整路径
+   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType<FileItemModel[]>} 移除异步结果
+   */
+  public async objects(
+    key: string,
+    domain: string,
+  ): Promise<ResultType<FileItemModel[]>> {
+    return await this._storeHub.invoke('Objects', key, domain);
+  }
+  /**
+   * 创建文件系统项
+   * @param {string} key 完整路径
+   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType<FileItemModel>} 移除异步结果
+   */
+  public async objectCreate(
+    key: string,
+    domain: string,
+  ): Promise<ResultType<FileItemModel>> {
+    return await this._storeHub.invoke('objectCreate', key, domain);
+  }
+  /**
+   * 移动文件系统项
+   * @param {string} key 完整路径
+   * @param {string} destination 目标路径
+   * @param {boolean} isDirectory 是否为目录
+   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType<boolean>} 移除异步结果
+   */
+  public async objectMove(
+    key: string,
+    destination: string,
+    isDirectory: boolean,
+    domain: string,
+  ): Promise<ResultType<any>> {
+    return await this._storeHub.invoke(
+      'objectMove',
+      key,
+      destination,
+      isDirectory,
+      domain,
+    );
+  }
+  /**
+   * 拷贝文件系统项
+   * @param {string} key 完整路径
+   * @param {string} destination 目标路径
+   * @param {boolean} isDirectory 是否为目录
+   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType<boolean>} 移除异步结果
+   */
+  public async objectCopy(
+    key: string,
+    destination: string,
+    isDirectory: boolean,
+    domain: string,
+  ): Promise<ResultType<any>> {
+    return await this._storeHub.invoke(
+      'objectCopy',
+      key,
+      destination,
+      isDirectory,
+      domain,
+    );
+  }
+  /**
+   * 删除文件系统项
+   * @param {string} key 完整路径
+   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @returns {ResultType<boolean>} 移除异步结果
+   */
+  public async objectDelete(key: string, domain: string): Promise<ResultType<any>> {
+    return await this._storeHub.invoke('ObjectDelete', key, domain);
   }
   /**
    * 对象变更通知

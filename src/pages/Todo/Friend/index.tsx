@@ -9,9 +9,9 @@ import friendService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { IdPage } from '@/module/typings';
 import { SettingFilled } from '@ant-design/icons';
+import { DataType } from 'typings/globelType';
 // import styles from './index.module.less';
 
-// const friendService = new todoService('friend');
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
@@ -101,7 +101,7 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   const [pageData, setPageData] = useState<TeamApprovalType[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [newColumns, setNewColumns] = useState<ProColumns<TeamApprovalType>[]>();
-
+  console.log('friend');
   const columns: ProColumns<TeamApprovalType>[] = [
     {
       title: '序号',
@@ -145,8 +145,10 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   ];
   // 获取申请/审核列表
   const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await friendService.getList<TeamApprovalType, IdPage>({
-      id: '0',
+    const { data = [], total } = await friendService.getList<
+      TeamApprovalType,
+      PageParams
+    >({
       page: page,
       pageSize: pageSize,
     });
