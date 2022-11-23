@@ -1,29 +1,72 @@
 import { model, schema } from '../../base';
 import { TargetType } from '../enum';
-import { IIdentity } from './authority/iidentity';
 import { IAuthority } from './authority/iauthority';
 import { AppStore, Product } from '../market';
 
 export interface ITarget {
+  /** 当前组织/个人实体对象 */
+  target: schema.XTarget;
+  /** 组织职权树 */
+  authorityTree: IAuthority | undefined;
+  /** 可以创建的子类类型 */
+  subTypes: TargetType[];
+  /** 可以通过拉取加入的子类类型 */
+  pullTypes: TargetType[];
+  /** 子组织集合 */
+  subTargets: Map<TargetType, ITarget>;
+  /** 父组织集合 */
+  parentTargets: ITarget[];
   /** 可以创建的组织类型 */
   createTargetType: TargetType[];
   /** 可以加入的组织类型 */
   joinTargetType: TargetType[];
   /** 可以查询的组织类型 */
   searchTargetType: TargetType[];
-  /** 当前组织/个人实体对象 */
-  target: schema.XTarget;
-  /** 拥有的身份 */
-  ownIdentitys: IIdentity[];
-  /** 所有的身份 */
-  allIdentitys: IIdentity[];
-  /** 拥有的职权 */
-  ownAuthoritys: IAuthority[];
-  /** 所有的职权 */
-  allAuthoritys: IAuthority[];
-  /** 组织职权树 */
-  authorityTree: IAuthority | undefined;
-
+  /**
+   * 更新组织、对象
+   * @param name 名称
+   * @param code 编号
+   * @param typeName 类型
+   * @param teamName team名称
+   * @param teamCode team编号
+   * @param teamRemark team备注
+   * @returns
+   */
+  updateTarget(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    teamRemark: string,
+  ): Promise<model.ResultType<schema.XTarget>>;
+  /**
+   * 创建子组织
+   * @param name 名称
+   * @param code 编号
+   * @param teamName 团队名称
+   * @param teamCode 团队编号
+   * @param remark 简介
+   * @returns
+   */
+  createSubTarget(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+    targetType: TargetType,
+  ): Promise<model.ResultType<any>>;
+  /**
+   * 删除子组织
+   * @param id 子组织Id
+   * @returns
+   */
+  deleteSubTarget(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 获取子组织/个人
+   * @returns
+   */
+  getSubTargets(subTypeNames: string[]): Promise<model.ResultType<schema.XTargetArray>>;
   /**
    * 根据名称查询组织/个人
    * @param name 名称
@@ -32,78 +75,11 @@ export interface ITarget {
    */
   searchTargetByName(name: string, typeName: TargetType): Promise<model.ResultType<any>>;
   /**
-   * 创建职权
-   * @param name 名称
-   * @param code 编号
-   * @param ispublic 是否公开
-   * @param parentId 父类别ID
-   * @param remark 备注
-   * @returns
-   */
-  createAuthority(
-    name: string,
-    code: string,
-    ispublic: boolean,
-    parentId: string,
-    remark: string,
-  ): Promise<model.ResultType<schema.XAuthority>>;
-  /**
-   * 创建身份
-   * @param name 名称
-   * @param code 编号
-   * @param authId 职权Id
-   * @param remark 备注
-   * @returns
-   */
-  createIdentity(
-    name: string,
-    code: string,
-    authId: string,
-    remark: string,
-  ): Promise<model.ResultType<schema.XIdentity>>;
-  /**
-   * 删除职权
-   * @param id 职权Id
-   * @returns
-   */
-  deleteAuthority(id: string): Promise<model.ResultType<any>>;
-  /**
-   * 删除身份
-   * @param id 身份Id
-   * @returns
-   */
-  deleteIdentity(id: string): Promise<model.ResultType<any>>;
-  /**
    * 查询组织职权树
    * @param id
    * @returns
    */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
-  /**
-   * 查询当前空间赋予我该角色的组织
-   * @param id
-   * @returns
-   */
-  queryTargetsByAuthority(id: string): Promise<model.ResultType<schema.XTargetArray>>;
-  /**
-   * 查询组织所有职权
-   * @returns
-   */
-  getAllAuthoritys(): Promise<IAuthority[]>;
-  /**
-   * 查询组织所有身份
-   * @returns
-   */
-  getAllIdentitys(): Promise<IIdentity[]>;
-  /**
-   * 查询当前空间下拥有的身份
-   * @returns
-   */
-  getOwnIdentitys(): Promise<IIdentity[]>;
-}
-
-/** 群组 */
-export interface ICohort extends ITarget {
   /**
    * 拉成员加入组织
    * @param ids
@@ -118,15 +94,10 @@ export interface ICohort extends ITarget {
    * @returns
    */
   removeMember(ids: string[], typeName: TargetType): Promise<model.ResultType<any>>;
-  /**
-   * 获得成员列表
-   * @returns
-   */
-  getMember(): Promise<model.ResultType<schema.XTargetArray>>;
 }
 
 /** 市场相关操作方法 */
-export interface IMTarget extends ICohort {
+export interface IMTarget {
   /** 我的加入市场申请 */
   joinMarketApplys: schema.XMarketRelation[];
   /** 加入的市场 */
@@ -253,12 +224,12 @@ export interface IMTarget extends ICohort {
 }
 
 /** 人员操作 */
-export interface IPerson extends IMTarget {
+export interface IPerson extends ITarget {
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(): Promise<ICohort[]>;
+  getJoinedCohorts(): Promise<ITarget[]>;
   /**
    * 创建群组
    * @param name 名称
@@ -381,39 +352,6 @@ export interface IPerson extends IMTarget {
    * @returns
    */
   cancelJoinApply(id: string): Promise<model.ResultType<any>>;
-}
-
-/** 拥有对子组织操作 */
-export interface ISubTarget extends ICohort {
-  /** 可以创建的子类类型 */
-  subTypes: TargetType[];
-  /** 子组织集合 */
-  subTargets: ISubTarget[];
-  /** 父组织集合 */
-  parentTargets: ISubTarget[];
-  /**
-   * 创建子组织
-   * @param name 名称
-   * @param code 编号
-   * @param teamName 团队名称
-   * @param teamCode 团队编号
-   * @param remark 简介
-   * @returns
-   */
-  createSubTarget(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-    targetType: TargetType,
-  ): Promise<model.ResultType<any>>;
-  /**
-   * 删除子组织
-   * @param id 子组织Id
-   * @returns
-   */
-  deleteSubTarget(id: string): Promise<model.ResultType<any>>;
 }
 
 export interface ICompany extends IMTarget {}

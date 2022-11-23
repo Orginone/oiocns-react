@@ -1,68 +1,13 @@
 import { TargetType } from '../enum';
 import BaseTarget from './base';
-import { kernel, model, schema } from '../../base';
+import { model, schema } from '../../base';
 import consts from '../consts';
-import { ICohort } from './itarget';
 
-export default class Cohort extends BaseTarget implements ICohort {
+export default class Cohort extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
-  }
-
-  // 可以查询的组织类型
-  public get searchTargetType(): TargetType[] {
-    return [TargetType.Person, ...consts.CompanyTypes];
-  }
-
-  // 可以拉入的成员类型
-  public get memberTypes(): TargetType[] {
-    return [TargetType.Person, ...consts.CompanyTypes];
-  }
-
-  /**
-   * 拉成员加入组织
-   * @param ids
-   * @param typeName
-   * @returns
-   */
-  public async pullMember(
-    ids: string[],
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.memberTypes.includes(typeName)) {
-      return await this.pull(ids, typeName);
-    }
-    throw new Error(consts.UnauthorizedError);
-  }
-
-  /**
-   * 移除群组成员
-   * @param ids 成员Id集合
-   * @param typeName 成员类型
-   * @returns
-   */
-  public async removeMember(
-    ids: string[],
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.removeAnyOfTeam({
-      id: this.target.id,
-      teamTypes: [this.target.typeName],
-      targetIds: ids,
-      targetType: typeName,
-    });
-  }
-
-  /**
-   * 获得成员列表
-   * @returns
-   */
-  public async getMember(): Promise<model.ResultType<schema.XTargetArray>> {
-    return await this.getSubTargets(
-      this.target.id,
-      [this.target.typeName],
-      this.memberTypes,
-    );
+    this.subTypes = [TargetType.Person, ...consts.CompanyTypes];
+    this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
   }
 
   /**----------------------------------------------弃用方法------------------------------------------------------- */
@@ -96,7 +41,7 @@ export default class Cohort extends BaseTarget implements ICohort {
    * @returns
    */
   public async getPersons(): Promise<model.ResultType<schema.XTargetArray>> {
-    return await this.getMember();
+    return await this.getSubTargets(this.subTypes);
   }
 
   /**

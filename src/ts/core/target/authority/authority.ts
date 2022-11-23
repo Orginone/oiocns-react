@@ -1,35 +1,56 @@
-import { common, faildResult, kernel, model, schema } from '../../../base';
+import { common, faildResult, kernel, model, schema } from '@/ts/base';
 import { IAuthority } from './iauthority';
-import Provider from '../../provider';
+import { AuthorityType } from '../../enum';
+import Provider from '@/ts/core/provider';
+import consts from '@/ts/core/consts';
 import Identity from './identity';
-import consts from '../../consts';
 
 export default class Authority implements IAuthority {
+  private readonly _authority: schema.XAuthority;
+  public children: Authority[];
+  public identitys: Identity[];
+  private get existAuthority(): string[] {
+    return [
+      AuthorityType.ApplicationAdmin,
+      AuthorityType.SuperAdmin,
+      AuthorityType.MarketAdmin,
+      AuthorityType.RelationAdmin,
+      AuthorityType.ThingAdmin,
+    ];
+  }
   public get id(): string {
     return this._authority.id;
   }
-  public children: Authority[];
-  public identitys: Identity[];
 
-  private readonly _authority: schema.XAuthority;
+  public get name(): string {
+    return this._authority.name;
+  }
+
+  public get code(): string {
+    return this._authority.code;
+  }
+
+  public get belongId(): string {
+    return this._authority.belongId;
+  }
 
   constructor(auth: schema.XAuthority) {
     this._authority = auth;
     this.children = [];
     this.identitys = [];
   }
+
   public async createIdentity(
     name: string,
     code: string,
-    authId: string,
     remark: string,
   ): Promise<model.ResultType<schema.XIdentity>> {
     const res = await kernel.createIdentity({
       name,
       code,
-      authId,
       remark,
       id: undefined,
+      authId: this.id,
       belongId: Provider.spaceId,
     });
     if (res.success && res.data != undefined) {
@@ -37,6 +58,7 @@ export default class Authority implements IAuthority {
     }
     return res;
   }
+
   public async deleteIdentity(id: string): Promise<model.ResultType<any>> {
     const index = this.identitys.findIndex((identity) => {
       return identity.id == id;
@@ -56,6 +78,51 @@ export default class Authority implements IAuthority {
     }
     return faildResult(consts.NotFoundError);
   }
+
+  public async createSubAuthority(
+    name: string,
+    code: string,
+    ispublic: boolean,
+    remark: string,
+  ): Promise<model.ResultType<schema.XAuthority>> {
+    if (this.existAuthority.includes(code)) {
+      throw new Error(consts.UnauthorizedError);
+    }
+    const res = await kernel.createAuthority({
+      id: undefined,
+      name,
+      code,
+      remark,
+      public: ispublic,
+      parentId: this.id,
+      belongId: Provider.spaceId,
+    });
+    if (res.success && res.data != undefined) {
+      this.children.push(new Authority(res.data));
+    }
+    return res;
+  }
+
+  public async deleteSubAuthority(id: string): Promise<model.ResultType<any>> {
+    const index = this.children.findIndex((auth) => {
+      return auth.id == id;
+    });
+    if (index > 0) {
+      const res = await kernel.deleteAuthority({
+        id,
+        belongId: Provider.spaceId,
+        typeName: '',
+      });
+      if (res.success) {
+        this.children = this.children.filter((auth) => {
+          return auth.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+
   public async updateAuthority(
     name: string,
     code: string,

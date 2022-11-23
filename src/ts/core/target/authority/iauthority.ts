@@ -2,8 +2,14 @@ import { IIdentity } from './iidentity';
 import { model, schema } from '../../../base';
 
 export interface IAuthority {
-  /** 当前职权Id */
+  /** 职权Id */
   id: string;
+  /** 职权名称 */
+  name: string;
+  /** 职权编号 */
+  code: string;
+  /** 职权归属ID */
+  belongId: string;
   /** 子职权 */
   children: IAuthority[];
   /** 职权下的身份 */
@@ -19,7 +25,6 @@ export interface IAuthority {
   createIdentity(
     name: string,
     code: string,
-    authId: string,
     remark: string,
   ): Promise<model.ResultType<schema.XIdentity>>;
   /**
@@ -28,6 +33,26 @@ export interface IAuthority {
    * @returns
    */
   deleteIdentity(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 创建子职权
+   * @param name 名称
+   * @param code 编号
+   * @param ispublic 是否公开
+   * @param remark 备注
+   * @returns
+   */
+  createSubAuthority(
+    name: string,
+    code: string,
+    ispublic: boolean,
+    remark: string,
+  ): Promise<model.ResultType<schema.XAuthority>>;
+  /**
+   * 删除子职权
+   * @param id 子职权Id
+   * @returns
+   */
+  deleteSubAuthority(id: string): Promise<model.ResultType<any>>;
   /**
    * 更新职权
    * @param id 唯一ID

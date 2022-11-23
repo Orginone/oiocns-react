@@ -15,16 +15,7 @@ export default class Company extends MarketTarget {
     super(target);
     this._joinedGroups = [];
     this._joinedCohorts = [];
-  }
-
-  // 可以查询的组织类型
-  get searchTargetType(): TargetType[] {
-    return [TargetType.Person, TargetType.Group];
-  }
-
-  /** 可以创建的子类型 enum.ts */
-  get subTypes(): TargetType[] {
-    return [
+    this.subTypes = [
       // 工作群
       TargetType.JobCohort,
       // 工作组
@@ -36,6 +27,7 @@ export default class Company extends MarketTarget {
       // 科室
       TargetType.Section,
     ];
+    this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
 
   // 可以拉入的成员类型
@@ -269,15 +261,6 @@ export default class Company extends MarketTarget {
       subNodeTypeNames: [TargetType.Department, TargetType.Working],
     });
     return res;
-  }
-
-  /**
-   * 拉人进入单位
-   * @param personIds 人员id数组
-   * @returns 是否成功
-   */
-  public async pullPerson(personIds: string[]): Promise<model.ResultType<any>> {
-    return await this.pull(personIds, TargetType.Person);
   }
 
   /**

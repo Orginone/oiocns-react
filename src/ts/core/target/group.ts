@@ -1,21 +1,15 @@
+import BaseTarget from '@/ts/core/target/base';
 import { faildResult, kernel, model, schema } from '../../base';
 import { TargetType } from '../enum';
 import consts from '../consts';
-import Department from './department';
 
-export default class Group extends Department {
-  get subTypes(): TargetType[] {
-    return [TargetType.Group];
-  }
-  get joinTargetType(): TargetType[] {
-    return [TargetType.Group];
-  }
-  get searchTargetType(): TargetType[] {
-    return [...consts.CompanyTypes, TargetType.Group];
-  }
-
+export default class Group extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
+    this.subTypes = [TargetType.Group];
+    this.joinTargetType = [TargetType.Group];
+    this.pullTypes = consts.CompanyTypes;
+    this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
   }
 
   /**
@@ -48,50 +42,12 @@ export default class Group extends Department {
   };
 
   /**
-   * 设立子集团
-   * @param name 子集团名称
-   * @param code 子集团代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 子集团简介
-   * @returns 是否成功
-   */
-  createSubGroup = async (
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> => {
-    const tres = await this.searchTargetByName(name, TargetType.Group);
-    if (tres.success) {
-      if (!tres.data) {
-        const res = await this.createTarget(
-          name,
-          code,
-          TargetType.Group,
-          teamName,
-          teamCode,
-          remark,
-        );
-        if (res.success) {
-          this.subGroups.push(new Group(res.data));
-          return this.pull([res.data.id], TargetType.Group);
-        }
-        return res;
-      }
-      return faildResult(consts.IsExistError);
-    }
-    return tres;
-  };
-
-  /**
    * 删除集团
    * @param id 集团Id
    * @returns
    */
-  deleteSubGroup = async (id: string): Promise<model.ResultType<any>> => {
-    const group = this.subGroups.find((group) => {
+  deleteSubTarget = async (id: string): Promise<model.ResultType<any>> => {
+    const group = this.subTargets.find((group) => {
       return group.target.id == id;
     });
     if (group != undefined) {
@@ -101,7 +57,7 @@ export default class Group extends Department {
         subNodeTypeNames: [TargetType.Group],
       });
       if (res.success) {
-        this.subGroups = this.subGroups.filter((group) => {
+        this.subTargets = this.subTargets.filter((group) => {
           return group.target.id != id;
         });
       }
