@@ -187,7 +187,6 @@ const GroupContent = (props: Iprops) => {
                           style={{ color: '#3e5ed8' }}
                           onClick={async () => {
                             await chatCtrl.chat?.reCallMessage(item.id);
-                            refreshUI();
                           }}>
                           撤回
                         </Button>

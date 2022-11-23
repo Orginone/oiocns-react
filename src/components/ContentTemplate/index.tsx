@@ -28,6 +28,7 @@ type ContentTemplateType = {
   route?: IRouteConfig; // 路由
   siderMenuData?: MenuProps[`items`];
   menuClick?: MenuClickEventHandler;
+  menuSelect?: MenuProps[`onSelect`];
 };
 
 /**
@@ -43,7 +44,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
     sider,
     siderMenuData,
     menuClick,
-    // contentTop,
+    menuSelect,
     children,
     contentTopLeft,
     contentTopRight,
@@ -58,7 +59,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
   return (
     <Layout className={`${className}`} style={{ height: '100%' }}>
       {(sider || siderMenuData) && (
-        <ContentMenu data={siderMenuData} menuClick={menuClick}>
+        <ContentMenu data={siderMenuData} menuClick={menuClick} menuSelect={menuSelect}>
           {sider && sider}
         </ContentMenu>
       )}
@@ -67,7 +68,11 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
         {(!hideBreadCrumb || contentTopRight || hideTooBar) && (
           // 面包屑与操作区
           <Row className={cls[`content-top`]} justify="space-between">
-            <Col>{!hideBreadCrumb ? <BreadCrumb /> : contentTopLeft}</Col>
+            {!hideBreadCrumb ? (
+              <Col>{<BreadCrumb>{contentTopLeft}</BreadCrumb>}</Col>
+            ) : (
+              <Col>{contentTopLeft}</Col>
+            )}
             <Col>{contentTopRight}</Col>
             <Col className={cls.rightstyle}>
               <Space>

@@ -17,6 +17,7 @@ type ContentMenuProps = {
   data?: MenuProps[`items`];
   menuClick?: MenuProps[`onClick`];
   width?: number;
+  menuSelect?: MenuProps[`onSelect`];
 };
 interface MemuItemType {
   children?: ItemType[];

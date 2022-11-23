@@ -224,8 +224,9 @@ const Groupdetail = () => {
             {chat?.personCount ?? 0 > 1 ? (
               <span
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
-                onClick={() => {
-                  chatCtrl.handleGetPerson();
+                onClick={async () => {
+                  await chatCtrl.chat?.morePerson('');
+                  refreshUI();
                 }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>
