@@ -4,16 +4,35 @@ import {
   FileTextFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Menu } from 'antd';
+import { Menu, Button, Row, Col } from 'antd';
 import React, { useEffect, useState } from 'react';
-
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
 import StoreContent from '@/ts/controller/store/content';
+import NewStoreModal from '@/components/NewStoreModal';
+import DeleteCustomModal from '@/components/DeleteCustomModal';
+import DetailDrawer from './DetailDrawer';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
+  const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
+
+  const menu = ['删除商店', '基础详情', '用户管理'];
+  const onOk = () => {
+    setIsAddOpen(false);
+    setIsDeleteOpen(false);
+  };
+  const onCancel = () => {
+    setIsAddOpen(false);
+    setIsDeleteOpen(false);
+  };
+
+  const onClose = () => {
+    setIsDetailOpen(false);
+  };
   useEffect(() => {
     StoreSiderbar.curPageType = 'market';
     StoreSiderbar.TreeCallBack = setList;
@@ -46,6 +65,27 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setSelectMenu(path);
     history.push(path);
   };
+
+  /**
+   * @description: 树表头展示
+   * @return {*}
+   */
+  const ClickBtn = (
+    <>
+      <Row>
+        <Col>商店分类</Col>
+      </Row>
+      <Button
+        type="link"
+        onClick={() => {
+          setIsAddOpen(true);
+        }}>
+        创建商店
+      </Button>
+      <Button type="link">加入商店</Button>
+    </>
+  );
+
   /*******
    * @desc: 点击目录 触发事件
    * @param {any} item
@@ -55,6 +95,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     // 触发内容去变化
     StoreContent.changeMenu(item);
   };
+
   /**
    * @desc: 创建新目录
    * @param {any} item
@@ -63,6 +104,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleAddShop = (item: any) => {
     console.log('handleAddShop', item);
   };
+
   /*******
    * @desc: 目录更多操作 触发事件
    * @param {object} param1
@@ -70,7 +112,18 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
     console.log('handleMenuClick55', data, key);
+    switch (key) {
+      case '删除商店':
+        setIsDeleteOpen(true);
+        break;
+      case '基础详情':
+        setIsDetailOpen(true);
+        break;
+      default:
+        break;
+    }
   };
+
   return (
     <div className={cls.container}>
       <div className={cls.subTitle}>常用分类</div>
@@ -86,7 +139,19 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={list}
+        menu={menu}
+        type="myshop"
+        clickBtn={ClickBtn}
       />
+      <NewStoreModal title="创建商店" open={isAddOpen} onOk={onOk} onCancel={onCancel} />
+      <DeleteCustomModal
+        title="提示"
+        open={isDeleteOpen}
+        onOk={onOk}
+        onCancel={onCancel}
+        content={selectMenu}
+      />
+      <DetailDrawer title={'神马商店'} open={isDetailOpen} onClose={onClose} />
     </div>
   );
 };
