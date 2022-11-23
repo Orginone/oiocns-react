@@ -73,18 +73,20 @@ const GroupSideBar: React.FC = () => {
    * @param {MenuItemType} item
    * @return {*}
    */
-  const handleContextChange = (item: MenuItemType) => {
+  const handleContextChange = async (item: MenuItemType) => {
     let refChat = chatCtrl.refChat(mousePosition.selectedItem);
     if (refChat) {
       switch (item.value) {
         case 1:
           refChat.isToping = !refChat.isToping;
+          refreshUI();
           break;
         case 2:
-          refChat.clearMessage();
+          if (await refChat.clearMessage()) {
+            chatCtrl.changCallback();
+          }
           break;
       }
-      refreshUI();
     }
   };
 

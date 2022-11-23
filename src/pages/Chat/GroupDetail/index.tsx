@@ -39,7 +39,7 @@ const Groupdetail = () => {
     };
   }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
+  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
   // const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
   const [state, setState] = useState<any>({
     userList: [], //群成员
@@ -272,8 +272,10 @@ const Groupdetail = () => {
           <div className={`${detailStyle.footer} ${detailStyle.group_detail_wrap}`}>
             <Button
               type="primary"
-              onClick={() => {
-                chatCtrl.refChat(chat)?.clearMessage();
+              onClick={async () => {
+                if (await chatCtrl.refChat(chat)?.clearMessage()) {
+                  chatCtrl.changCallback();
+                }
               }}>
               清空聊天记录
             </Button>

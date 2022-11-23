@@ -84,7 +84,7 @@ class ChatController {
       this._appendChats(this._curChat);
       this._cacheChats();
     }
-    this._callback();
+    this.changCallback();
   }
   /**
    * 是否为当前会话
@@ -106,7 +106,7 @@ class ChatController {
         group.isOpened = !group.isOpened;
       }
     }
-    this._callback();
+    this.changCallback();
   }
   /**
    * 订阅变更
@@ -157,7 +157,7 @@ class ChatController {
             this._appendChats(lchat);
           }
         }
-        this._callback();
+        this.changCallback();
       }
     });
     kernel.on('RecvMsg', (data) => {
@@ -165,7 +165,7 @@ class ChatController {
     });
   }
   /** 变更回调 */
-  private _callback() {
+  public changCallback() {
     Object.keys(this._refreshCallback).forEach((id) => {
       this._refreshCallback[id].apply(this, []);
     });
@@ -190,7 +190,7 @@ class ChatController {
           c.receiveMessage(data, !this.isCurrent(c));
           this._appendChats(c);
           this._cacheChats();
-          this._callback();
+          this.changCallback();
           return;
         }
       }
