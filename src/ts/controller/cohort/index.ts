@@ -18,16 +18,27 @@ import provider from '../../core/provider'
   
   public get getCohorts(): Cohort[] {
     return this._cohorts;
+
   }
   
   // this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
 
   public get getMyCohort():Cohort[]{
-    let data = this._cohorts.filter((obj) => provider.getWorkSpace(). == obj.target.belongId);
+    // const id = provider.getWorkSpace().then(workerData=>{
+    //   return workerData?.target.id
+    // })
+    // let data = this._cohorts.filter((obj) => id == obj.target.belongId);
+    let data = this._cohorts.filter((obj) => provider.getWorkSpace().then(workerData=>{
+       workerData?.target.id == obj.target.belongId
+    }));
+   const a =  provider.getWorkSpace().then(async workerData=>{
+       return await workerData?.getJoinApproval()
+   })
     console.log("我的群组",data)
     return data;
   }
 
+  
   public setCallBack(fun:Function){
     this.callBack = fun;
   }
