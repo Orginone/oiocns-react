@@ -59,6 +59,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['AppPutaway-wrap']}`}>
       <Card
+        className="app-info"
         title={
           <IconFont
             type="icon-jiantou-left"
@@ -68,7 +69,6 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             }}
           />
         }
-        className="app-info"
       >
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}

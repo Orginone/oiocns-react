@@ -3,7 +3,7 @@ import AppStore from '@/ts/core/market/appstore';
 import Product from '@/ts/core/market/product';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
-import { myColumns } from './config';
+import { myColumns, marketColumns } from './config';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -53,6 +53,8 @@ class StoreContent {
       case 'appInfo':
       case 'myApp':
         return myColumns;
+      case 'market':
+        return marketColumns;
       default:
         return [];
     }
@@ -69,6 +71,7 @@ class StoreContent {
       Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
+      console.log('shan店数据');
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
