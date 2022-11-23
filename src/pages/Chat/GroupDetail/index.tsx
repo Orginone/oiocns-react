@@ -272,8 +272,10 @@ const Groupdetail = () => {
           <div className={`${detailStyle.footer} ${detailStyle.group_detail_wrap}`}>
             <Button
               type="primary"
-              onClick={() => {
-                chatCtrl.refChat(chat)?.clearMessage();
+              onClick={async () => {
+                if (await chatCtrl.refChat(chat)?.clearMessage()) {
+                  chatCtrl.changCallback();
+                }
               }}>
               清空聊天记录
             </Button>

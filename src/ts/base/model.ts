@@ -782,3 +782,20 @@ export type ApprovalTaskReq = {
   // 评论
   comment: string;
 };
+/**
+ * 文件系统项数据模型
+ */
+export type FileItemModel = {
+  /** 名称 */
+  name: string;
+  /** 完整路径 */
+  key: string;
+  /** 创建时间 */
+  dateCreated: string;
+  /** 修改时间 */
+  dateModified: string;
+  /** 是否是目录 */
+  isDirectory: boolean;
+  /** 是否包含子目录 */
+  hasSubDirectories: boolean;
+};
