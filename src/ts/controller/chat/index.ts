@@ -63,8 +63,10 @@ class ChatController {
    */
   public getNoReadCount(): number {
     let sum = 0;
-    this._chats.forEach((i) => {
-      sum += i.noReadCount;
+    this._groups.forEach((g) => {
+      g.chats.forEach((i) => {
+        sum += i.noReadCount;
+      });
     });
     return sum;
   }
@@ -145,6 +147,26 @@ class ChatController {
     }
     return chat;
   }
+  /** 变更回调 */
+  public changCallback() {
+    Object.keys(this._refreshCallback).forEach((id) => {
+      this._refreshCallback[id].apply(this, []);
+    });
+  }
+  /**
+   * 删除会话
+   * @param chat 会话
+   */
+  public deleteChat(chat: IChat): void {
+    const index = this._chats.findIndex((i) => {
+      return i.fullId === chat.fullId;
+    });
+    if (index > -1) {
+      this._chats.splice(index, 1);
+      this._cacheChats();
+      this.changCallback();
+    }
+  }
   /** 初始化 */
   private async _initialization(): Promise<void> {
     this._groups = await LoadChats();
@@ -162,12 +184,6 @@ class ChatController {
     });
     kernel.on('RecvMsg', (data) => {
       this._recvMessage(data);
-    });
-  }
-  /** 变更回调 */
-  public changCallback() {
-    Object.keys(this._refreshCallback).forEach((id) => {
-      this._refreshCallback[id].apply(this, []);
     });
   }
   /**

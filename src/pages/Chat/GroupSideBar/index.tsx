@@ -64,6 +64,7 @@ const GroupSideBar: React.FC = () => {
       selectMenu: [
         { value: 1, label: item.isToping ? '取消置顶' : '置顶会话' },
         { value: 2, label: '清空信息' },
+        { value: 3, label: '删除会话' },
       ],
     });
   };
@@ -85,6 +86,9 @@ const GroupSideBar: React.FC = () => {
           if (await refChat.clearMessage()) {
             chatCtrl.changCallback();
           }
+          break;
+        case 3:
+          chatCtrl.deleteChat(refChat);
           break;
       }
     }
