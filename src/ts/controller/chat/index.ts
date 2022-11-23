@@ -137,6 +137,9 @@ class ChatController extends BaseController {
     });
     if (index > -1) {
       this._chats.splice(index, 1);
+      if (chat.fullId === this._curChat?.fullId) {
+        this._curChat = undefined;
+      }
       this._cacheChats();
       this.changCallback();
     }
