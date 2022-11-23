@@ -9,8 +9,8 @@ import { cohortColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
-import CreateCohort from '../../../bizcomponents/cohort/index';
-import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index';
+import CreateCohort from '../../../bizcomponents/Cohort/index';
+import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from '../../../bizcomponents/SearchCohort/index';
 import { Person } from '@/module/org';
@@ -82,6 +82,7 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: () => {
+          history.push('/person/Role')
           console.log('按钮事件', 'roleManage', item);
         },
       },
