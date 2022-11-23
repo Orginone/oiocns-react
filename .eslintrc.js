@@ -57,7 +57,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['off'],
     'no-empty-function': 'off',
     //解决导出类型时，no-undef报错问题
-    'no-undef': 2,
+    'no-undef': 'off',
     'import/prefer-default-export': 'off',
     'no-import-assign': 'error',
   },
