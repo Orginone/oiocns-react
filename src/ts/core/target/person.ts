@@ -1,17 +1,15 @@
-import { XTarget } from './../../base/schema';
 import { TargetType } from '../enum';
 import MarketActionTarget from './mbase';
-import { model, schema, FaildResult, kernel } from '../../base';
+import consts from '../consts';
+import { model, schema, faildResult, kernel } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
 import Hospital from './hospital';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { SpaceType } from '@/store/type';
 
 export default class Person extends MarketActionTarget {
   private _friends: schema.XTarget[];
-  private workSpace: SpaceType;
   private _joinedCompanys: Company[];
   private _joinedCohorts: Cohort[];
 
@@ -20,32 +18,59 @@ export default class Person extends MarketActionTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this.workSpace = { id: this.target.id, name: '个人空间' };
   }
 
   protected override get createTargetType(): TargetType[] {
-    return [
-      TargetType.Group,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
+    return [TargetType.Cohort, ...consts.CompanyTypes];
   }
 
   protected override get joinTargetType(): TargetType[] {
-    return [
-      TargetType.Person,
-      TargetType.Company,
-      TargetType.Hospital,
-      TargetType.University,
-      TargetType.Cohort,
-    ];
+    return [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
   }
 
-  /** 支持的单位类型数组 */
-  public get companyTypes(): TargetType[] {
-    return [TargetType.Company, TargetType.University, TargetType.Hospital];
+  public get ChohortArray(): Cohort[] {
+    return this._joinedCohorts;
+  }
+  /**
+   * 获取群组列表
+   * @param params
+   * @returns
+   */
+  public async getCohort(): Promise<model.ResultType<any>> {
+    const res = await this.getjoined({
+      spaceId: this.target.id,
+      JoinTypeNames: [TargetType.Cohort],
+    });
+    if (res.success && res.data != undefined && res.data.result != undefined) {
+      this._joinedCohorts = [];
+      for (var i = 0; i < res.data?.result.length; i++) {
+        const cohort = new Cohort(res.data?.result[i]);
+        this._joinedCohorts.push(cohort);
+      }
+    }
+    return res;
+  }
+
+  /** 支持的群组类型数组*/
+  public get cohortTypes(): TargetType[] {
+    return [TargetType.Cohort];
+  }
+
+  // 购买
+  buyApp() {
+    console.log('buyApp');
+  }
+  //加购物车
+  addCart() {
+    console.log('addCart');
+  }
+  //获取订单
+  getOrderList() {
+    console.log('getOrderList');
+  }
+  //取消订单
+  cancleOrder() {
+    console.log('cancleOrder');
   }
 
   /**
@@ -98,25 +123,6 @@ export default class Person extends MarketActionTarget {
   }
 
   /**
-   * 获取好友列表
-   * @returns 返回好友列表
-   */
-  public async getFriends(): Promise<XTarget[]> {
-    if (this._friends.length > 0) {
-      return this._friends;
-    }
-    const res = await this.getSubTargets(
-      this.target.id,
-      [TargetType.Person],
-      [TargetType.Person],
-    );
-    if (res.success && res?.data?.result != undefined) {
-      this._friends = res.data.result;
-    }
-    return this._friends;
-  }
-
-  /**
    * 设立单位
    * @param name 单位名称
    * @param code 单位信用代码
@@ -134,11 +140,11 @@ export default class Person extends MarketActionTarget {
     remark: string,
     type: TargetType = TargetType.Company,
   ): Promise<model.ResultType<any>> {
-    if (!this.companyTypes.includes(type)) {
-      return FaildResult('您无法创建该类型单位!');
+    if (!consts.CompanyTypes.includes(type)) {
+      return faildResult('您无法创建该类型单位!');
     }
     if (!validIsSocialCreditCode(code)) {
-      return FaildResult('请填写正确的代码!');
+      return faildResult('请填写正确的代码!');
     }
     const tres = await this.getTargetByName({
       name,
@@ -166,10 +172,74 @@ export default class Person extends MarketActionTarget {
       }
       return res;
     } else {
-      return FaildResult('该单位已存在!');
+      return faildResult('该单位已存在!');
     }
   }
 
+  /**
+   * 查询我的产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMyProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
+    let paramData: any = {};
+    paramData.id = this.target.id;
+    paramData.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_8,
+    };
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
+  }
+
+  /**
+   * 查询我的个人产品/应用
+   * @param params
+   * @returns
+   */
+  public async queryMySpaceProduct(): Promise<schema.XProductArray> {
+    let resultArray: any = [];
+    // 判断如果是有个人空间
+    if (!this._curCompany) {
+      return resultArray;
+    }
+
+    let paramData: any = {};
+    paramData.id = this._joinedCompanys[0].target.id;
+    paramData.page = {
+      offset: 0,
+      filter: '',
+      limit: common.Constants.MAX_UINT_8,
+    };
+    let res = await kernel.querySelfProduct(paramData);
+    if (res.success && res.data && res.data.result) {
+      resultArray = res.data.result;
+    }
+    return resultArray;
+  }
+
+  /* 获取好友列表
+   * @returns 返回好友列表
+   */
+  public async getFriends(): Promise<schema.XTarget[]> {
+    if (this._friends.length > 0) {
+      return this._friends;
+    }
+    const res = await this.getSubTargets(
+      this.target.id,
+      [TargetType.Person],
+      [TargetType.Person],
+    );
+    if (res.success && res?.data?.result != undefined) {
+      this._friends = res.data.result;
+    }
+    return this._friends;
+  }
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
@@ -182,8 +252,8 @@ export default class Person extends MarketActionTarget {
       spaceId: this.target.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((item) => {
+    if (res.success) {
+      res.data?.result?.forEach((item) => {
         this._joinedCohorts.push(new Cohort(item));
       });
     }
@@ -201,7 +271,7 @@ export default class Person extends MarketActionTarget {
     this._joinedCompanys = [];
     let res = await this.getjoined({
       spaceId: this.target.id,
-      JoinTypeNames: this.companyTypes,
+      JoinTypeNames: consts.CompanyTypes,
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((item) => {
@@ -306,7 +376,7 @@ export default class Person extends MarketActionTarget {
         TargetType.JobCohort,
         TargetType.Department,
         TargetType.Cohort,
-        ...this.companyTypes,
+        ...consts.CompanyTypes,
       ],
       targetId: this.target.id,
       targetType: TargetType.Person,
@@ -316,52 +386,4 @@ export default class Person extends MarketActionTarget {
     });
     return res;
   }
-
-  /**
-   * 获取工作空间
-   * @returns 工作空间
-   */
-  public getWorkSpace(): SpaceType {
-    return this.workSpace;
-  }
-
-  /**
-   * 切换工作空间
-   * @param workSpace
-   */
-  public setWorkSpace(workSpace: SpaceType) {
-    this.workSpace = workSpace;
-  }
-
-  /**
-   * 是否个人空间
-   * @returns
-   */
-  public isUserSpace(): boolean {
-    return this.workSpace.id == this.target.id;
-  }
-
-  // public get spaceId(): string {
-  //   return this.workSpace.id ?? '';
-  // }
-  // /**
-  //  * 创建应用
-  //  * @param  {model.ProductModel} 产品基础信息
-  //  */
-  // public async createProduct(
-  //   data: Omit<model.ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
-  // ): Promise<model.ResultType<schema.XProduct>> {
-  //   const belongId = this.target.id;
-  //   const thingId = '';
-  //   const typeName = 'webapp';
-  //   const reslut = await kernel.createProduct({
-  //     ...data,
-  //     belongId,
-  //     thingId,
-  //     typeName,
-  //     id: undefined,
-  //   });
-  // console.log(`createProduct`, reslut);
-  // return reslut;
-  // }
 }

@@ -1,5 +1,6 @@
-import { FaildResult, model, schema } from '../../base';
+import { faildResult, model, schema } from '../../base';
 import { TargetType } from '../enum';
+import consts from '../consts';
 import BaseTarget from './base';
 
 export default class Group extends BaseTarget {
@@ -7,6 +8,10 @@ export default class Group extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
     this._subGroups = [];
+  }
+
+  protected get searchTargetType(): TargetType[] {
+    return [...consts.CompanyTypes];
   }
 
   /**
@@ -30,35 +35,77 @@ export default class Group extends BaseTarget {
       typeName: TargetType.Group,
       page: { offset: 0, limit: 1, filter: code },
     });
-    if (!tres.data) {
-      const res = await this.createTarget(
-        name,
-        code,
-        TargetType.Group,
-        teamName,
-        teamCode,
-        remark,
-      );
-      if (res.success) {
-        this._subGroups.push(new Group(res.data));
-        return this.pull({
-          targetType: TargetType.Group,
-          targetIds: [res.data.id],
-        });
+    if (tres.success) {
+      if (!tres.data) {
+        const res = await this.createTarget(
+          name,
+          code,
+          TargetType.Group,
+          teamName,
+          teamCode,
+          remark,
+        );
+        if (res.success) {
+          this._subGroups.push(new Group(res.data));
+          return this.pull({
+            targetType: TargetType.Group,
+            targetIds: [res.data.id],
+          });
+        }
+        return res;
       }
-      return res;
-    } else {
-      return FaildResult('该集团已存在!');
+      return faildResult(consts.IsExistError);
     }
+    return tres;
   }
 
   /**
-   * 查询加入集团申请
-   * @param id
+   * 获取集团下的人员（单位、集团）
+   * @param id 组织Id 默认为当前集团
    * @returns
    */
-  public async queryJoinCompanyApply(): Promise<model.ResultType<any>> {
-    const res = await this.queryJoinApplyBase();
-    return res;
+  public async getPersons(
+    id: string = '0',
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    if (id == '0') {
+      id = this.target.id;
+    }
+    return await this.getSubTargets(
+      id,
+      [...consts.CompanyTypes, TargetType.Group],
+      [TargetType.Person],
+    );
+  }
+
+  /**
+   * 获取集团下的单位
+   * @param id 组织Id 默认为当前集团
+   * @returns
+   */
+  public async getCompanys(
+    id: string = '0',
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    if (id == '0') {
+      id = this.target.id;
+    }
+    return await this.getSubTargets(
+      id,
+      [...consts.CompanyTypes, TargetType.Group],
+      [...consts.CompanyTypes],
+    );
+  }
+
+  /**
+   * 获取集团下的集团
+   * @param id 组织Id 默认为当前集团
+   * @returns
+   */
+  public async getGroups(
+    id: string = '0',
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    if (id == '0') {
+      id = this.target.id;
+    }
+    return await this.getSubTargets(id, [TargetType.Group], [TargetType.Group]);
   }
 }

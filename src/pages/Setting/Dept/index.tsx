@@ -11,17 +11,21 @@ import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
-import LookApply from "./components/LookApply";
+import LookApply from './components/LookApply';
+import settingStore from '@/store/setting';
 /**
  * 部门设置
  * @returns
  */
 const SettingDept: React.FC = () => {
+  const { isOpenModal, setEditItem, selectId } = settingStore((state) => ({
+    ...state,
+  }));
+  console.log('selectId', selectId);
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
-  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false);//查看申请
+  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
 
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
@@ -77,18 +81,18 @@ const SettingDept: React.FC = () => {
     ];
   };
   const onOk = () => {
-    setIsOpen(false);
     setIsAddOpen(false);
     setIsSetPost(false);
     setTransfer(false);
     setLookApplyOpen(false);
+    setEditItem(false);
   };
   const handleOk = () => {
-    setIsOpen(false);
     setIsAddOpen(false);
     setIsSetPost(false);
     setTransfer(false);
     setLookApplyOpen(false);
+    setEditItem(false);
   };
   // 标题tabs页
   const TitleItems = [
@@ -126,7 +130,7 @@ const SettingDept: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            setIsOpen(true);
+            setEditItem(true);
           }}>
           编辑
         </Button>
@@ -166,11 +170,13 @@ const SettingDept: React.FC = () => {
           }}>
           添加成员
         </Button>
-        <Button type="link" 
-        onClick={() => {
+        <Button
+          type="link"
+          onClick={() => {
             setLookApplyOpen(true);
-          }}
-          >查看申请</Button>
+          }}>
+          查看申请
+        </Button>
       </Space>
     );
   };
@@ -207,7 +213,15 @@ const SettingDept: React.FC = () => {
       {content}
       {deptCount}
       {/* 编辑单位 */}
-      <EditCustomModal open={isopen} title={'编辑'} onOk={onOk} handleOk={handleOk} />
+      <EditCustomModal
+        handleCancel={() => {
+          setEditItem(false);
+        }}
+        open={isOpenModal}
+        title={selectId ? '编辑' : '新增'}
+        onOk={onOk}
+        handleOk={handleOk}
+      />
       {/* 添加成员 */}
       <AddPersonModal
         title={'添加成员'}

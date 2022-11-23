@@ -1,4 +1,5 @@
 import { TargetType } from '../enum';
+import consts from '../consts';
 import BaseTarget from './base';
 import { kernel, model, schema } from '../../base';
 
@@ -37,5 +38,33 @@ export default class Cohort extends BaseTarget {
       }
     }
     return res;
+  }
+
+  /**
+   * 获取群组下的人员（群组）
+   * @param id 组织Id 默认为群组
+   * @returns
+   */
+  public async getPersons(
+    id: string = '0',
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    if (id == '0') {
+      id = this.target.id;
+    }
+    return await this.getSubTargets(id, [TargetType.Cohort], [TargetType.Person]);
+  }
+
+  /**
+   * 获取群组下的单位（群组）
+   * @param id 组织Id 默认为群组
+   * @returns
+   */
+  public async getCompanys(
+    id: string = '0',
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    if (id == '0') {
+      id = this.target.id;
+    }
+    return await this.getSubTargets(id, [TargetType.Cohort], consts.CompanyTypes);
   }
 }

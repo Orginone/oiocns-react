@@ -1,18 +1,76 @@
+/*
+ * @Author: SEN
+ * @Date: 2022-11-17 13:30:54
+ * @LastEditors: zhangqiang 1196217890@qq.com
+ * @LastEditTime: 2022-11-17 13:55:49
+ * @FilePath: /oiocns-react/src/ts/core/provider.ts
+ * @Description: 登录和注册的接口提供层
+ */
 import { kernel, model } from '../base';
+import MarketActionTarget from './target/mbase';
 import Person from './target/person';
 
-/**
- * 提供层
- */
 export default class Provider {
   private static person: Person;
+  private static _workSpace: MarketActionTarget | undefined;
 
   public static get userId() {
     return this.person.target.id;
   }
 
-  public static get spaceId() {
-    return this.person.spaceId;
+  public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
+    var workSpaces = [];
+    if (this.person != null) {
+      workSpaces.push({ id: this.person.target.id, name: '个人空间' });
+      const companys = await this.person.getJoinedCompanys();
+      companys.forEach((element) => {
+        workSpaces.push({ id: element.target.id, name: element.target.name });
+      });
+    }
+    return workSpaces;
+  }
+
+  /**
+   * 获取当前工作空间
+   * @returns 工作当前空间
+   */
+  public static async getWorkSpace(): Promise<MarketActionTarget | undefined> {
+    if (this._workSpace == null) {
+      var id = sessionStorage.getItem('_workSpaceId') + '';
+      if (this.person.target.id == id) {
+        return this.person;
+      } else {
+        const companys = await this.person.getJoinedCompanys();
+        return companys.find((company) => {
+          return company.target.id == id;
+        });
+      }
+    }
+    return this._workSpace;
+  }
+
+  /**
+   * 切换工作空间
+   * @param workSpace
+   */
+  public static async setWorkSpace(id: string) {
+    sessionStorage.setItem('_workSpaceId', id);
+    if (this.person.target.id == id) {
+      this._workSpace = this.person;
+    } else {
+      const companys = await this.person.getJoinedCompanys();
+      this._workSpace = companys.find((company) => {
+        return company.target.id == id;
+      });
+    }
+  }
+
+  /**
+   * 是否个人空间
+   * @returns
+   */
+  public static isUserSpace(): boolean {
+    return this._workSpace?.target.id == this.person.target.id;
   }
 
   public static get getPerson(): Person {
@@ -33,6 +91,7 @@ export default class Provider {
     let res = await kernel.login(account, password);
     if (res.success) {
       this.person = new Person(res.data.person);
+      this.setWorkSpace(this.person.target.id);
       sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
     }
     return res;
