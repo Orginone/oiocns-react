@@ -7,7 +7,6 @@
  * @Description: 控制器 实例化要调用的接口基类 提供ui层数据
  */
 import Company from '../../core/target/company';
-// import Person from '../../core/target/person';
 import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
@@ -62,13 +61,10 @@ class SettingController {
   isOpenModal: boolean = false;
   // 当前操作的部门
   selectId: string = '';
-  // 工作空间的操作
-  currentWorkSpaceId: string;
-  currentIsUserWorkSpace: boolean;
+  // 测试的时候先写死， 到时候切换成 当前工作空间ID
+  companyID: string = '381107910723375104';
 
-  // 查询接口, 把公司底下的部门返回到这底下
-  allCompanyDepts: Map<string, Array<spaceObjs>> = new Map();
-
+  // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
 
   // 切换空间的时候重新初始化，所以需要new
@@ -76,52 +72,18 @@ class SettingController {
     Provider.getWorkSpace();
     // 如果是一个公司的工作空间，需要初始化一个部门数组
     // 切换工作空间的时候 初始化控制器。
-    if (!Provider.isUserSpace()) {
-      const compid: any = Provider.getWorkSpace().id;
-      if (!this.allCompanyDepts.get(compid)) {
-        this.allCompanyDepts.set(compid, new Array());
-      }
-    }
-  }
-
-  // 调试代码
-  public async test() {
-    const params: deptParams = {
-      name: '部门二',
-      code: 'BMtwo',
-      teamName: '部门二',
-      teamCode: 'BMtwo',
-      remark: '部门二',
-    };
-    // 调试 ID
-    //console.log(await this.createDepartment(params));
-    let arrays!: spaceObjs[];
-    await this.flushDepartments('0', arrays);
-    console.log(arrays);
-    console.log(this.allCompanyDepts);
   }
 
   /**
-   * 获取控制器里面的子部门
-   */
-  public getDepartments(): Array<spaceObjs> {
-    // 要选中公司的工作区
-    if (Provider.isUserSpace()) {
-      return [];
-    }
-    const compid: any = Provider.getWorkSpace().id;
-    return this.allCompanyDepts.get(compid) ?? [];
-  }
-
-  /**
-   * 需要递归查询并缓存当前单位底下的所有部门底下的子部门
+   * 递归查询前单位底下的所有部门底下的子部门
    * @param parentId
    * @returns
    */
-  public async flushDepartments(parentId: string, arrays: spaceObjs[]) {
+  public async getDepartments(parentId: string): Promise<spaceObjs[]> {
+    let arrays: spaceObjs[] = [];
     let compid = parentId;
     if (parentId === '0') {
-      compid = Provider.getWorkSpace().id;
+      compid = this.companyID;
     }
 
     const companys: Company[] = await this.userDataService.getBelongTargets(
@@ -129,7 +91,7 @@ class SettingController {
       TargetType.Department,
     );
     if (companys.length > 0) {
-      companys.map(async (e) => {
+      companys.forEach(async (e) => {
         // 查找是否有children
         let arrayChild: spaceObjs[] = [];
         const company2s: Company[] = await this.userDataService.getBelongTargets(
@@ -137,7 +99,7 @@ class SettingController {
           TargetType.Department,
         );
         if (company2s.length > 0) {
-          this.flushDepartments(e.target.id, arrayChild);
+          arrayChild = await this.getDepartments(e.target.id);
         }
 
         const spaceObj: spaceObjs = {
@@ -151,13 +113,45 @@ class SettingController {
         arrays.push(spaceObj);
       });
     }
+    return arrays;
   }
 
   // 创建二级以下的部门
-  public async createSecondDepartment(param: deptParams): Promise<ObjType> {
+  public async createSecondDepartment(
+    param: deptParams,
+    deptId: string,
+  ): Promise<ObjType> {
+    const compid = this.companyID;
+
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+      {
+        page: 0,
+        pageSize: 100,
+        filter: param.code,
+      },
+      TargetType.Department,
+    );
+    if (datas.data && datas.data?.length > 0) {
+      return {
+        msg: '重复创建',
+        success: false,
+      };
+    }
+    const res = await this.userDataService.createDepart(
+      param.name,
+      param.code,
+      param.teamName,
+      param.teamCode,
+      param.remark,
+      compid, // 团队ID
+      false,
+      deptId, // 属于哪个部门的ID
+    );
+
+    // 加入到 公司部门底下的缓存
     return {
-      msg: '您还未选中工作空间！',
-      success: false,
+      msg: res.msg,
+      success: res.success,
     };
   }
 
@@ -168,14 +162,8 @@ class SettingController {
    */
   public async createDepartment(param: deptParams): Promise<ObjType> {
     // 要选中公司的工作区
-    if (Provider.isUserSpace()) {
-      return {
-        msg: '您还未选中单位空间！',
-        success: false,
-      };
-    }
-
-    const compid = Provider.getWorkSpace()!.id;
+    const compid = this.companyID;
+    // Provider.getWorkSpace()!.id;
     // 判断是否有公司数据
 
     //let curCompanys: Company[] = await Provider.getPerson.getJoinedCompanys();
@@ -185,7 +173,7 @@ class SettingController {
     const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
       {
         page: 0,
-        pageSize: 100,
+        pageSize: 10,
         filter: param.code,
       },
       TargetType.Department,
@@ -208,19 +196,6 @@ class SettingController {
       true,
       compid, // 属于哪个公司的ID
     );
-    if (res.success && res.data) {
-      const xtarget = res.data as XTarget;
-      // 部门创建成功， 就加入到列表里面
-      const spaceObj: spaceObjs = {
-        id: xtarget.id,
-        key: xtarget.id,
-        title: xtarget.name,
-        parentId: compid,
-        companyId: compid,
-        children: [],
-      };
-      this.allCompanyDepts.get(compid)?.push(spaceObj);
-    }
     return {
       msg: res.msg,
       success: res.success,
