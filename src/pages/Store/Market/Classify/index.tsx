@@ -14,6 +14,7 @@ import StoreContent from '@/ts/controller/store/content';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
+  const menu = ['删除商店', '基础详情', '用户管理'];
   useEffect(() => {
     StoreSiderbar.curPageType = 'market';
     StoreSiderbar.TreeCallBack = setList;
@@ -86,6 +87,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={list}
+        menu={menu}
       />
     </div>
   );
