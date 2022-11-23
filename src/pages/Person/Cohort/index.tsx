@@ -27,9 +27,6 @@ import CohortController from '../../../ts/controller/cohort/index';
 const CohortConfig: React.FC = () => {
   const service = new CohortService({
     nameSpace: 'myCohort',
-    searchApi: API.cohort.getJoinedCohorts,
-    createApi: API.cohort.create,
-    updateApi: API.cohort.update,
   });
   const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
@@ -82,7 +79,8 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: () => {
-          history.push('/person/Role')
+          
+          history.push({pathname:'/person/Role',state:{"cohortId":item.target.id}})
           console.log('按钮事件', 'roleManage', item);
         },
       },
@@ -105,7 +103,7 @@ const CohortConfig: React.FC = () => {
         label: '解散群组',
         onClick: () => {
           console.log(
-            CohortController.deleteCohort(Person, item.target.id, item.target.belongId),
+            CohortController.deleteCohort(Person, item.target.id),
           );
           // newCohortServices.deleteCohort(param);
           message.info('解散成功');
@@ -135,8 +133,12 @@ const CohortConfig: React.FC = () => {
   const handleOk = async () => {
     setIsModalOpen(false);
     const res = CohortController.pullCohort(item!, [friend?.id!]);
+    if((await res).success){
     console.log(res);
     message.success('邀请成功');
+    }else{
+    message.error((await res).msg);
+    }
   };
   //申请加入群组确认事件
   const cohortHandleOk = async () => {
