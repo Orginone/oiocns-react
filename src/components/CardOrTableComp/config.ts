@@ -1,5 +1,5 @@
 interface DataType {
-  key: React.Key;
+  key: string | ((record: any) => string);
   name: string;
   size: number;
   desc: string;
