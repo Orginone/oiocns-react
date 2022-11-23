@@ -64,6 +64,7 @@ const GroupSideBar: React.FC = () => {
       selectMenu: [
         { value: 1, label: item.isToping ? '取消置顶' : '置顶会话' },
         { value: 2, label: '清空信息' },
+        { value: 3, label: '删除会话' },
       ],
     });
   };
@@ -73,18 +74,23 @@ const GroupSideBar: React.FC = () => {
    * @param {MenuItemType} item
    * @return {*}
    */
-  const handleContextChange = (item: MenuItemType) => {
+  const handleContextChange = async (item: MenuItemType) => {
     let refChat = chatCtrl.refChat(mousePosition.selectedItem);
     if (refChat) {
       switch (item.value) {
         case 1:
           refChat.isToping = !refChat.isToping;
+          refreshUI();
           break;
         case 2:
-          refChat.clearMessage();
+          if (await refChat.clearMessage()) {
+            chatCtrl.changCallback();
+          }
+          break;
+        case 3:
+          chatCtrl.deleteChat(refChat);
           break;
       }
-      refreshUI();
     }
   };
 

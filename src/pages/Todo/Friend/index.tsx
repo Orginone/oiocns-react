@@ -7,7 +7,7 @@ import { ProColumns } from '@ant-design/pro-table';
 import { Button, message, Space, Tag } from 'antd';
 import friendService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
-import { IdPage } from '@/module/typings';
+// import { IdPage } from '@/module/typings';
 import { SettingFilled } from '@ant-design/icons';
 import { DataType } from 'typings/globelType';
 // import styles from './index.module.less';

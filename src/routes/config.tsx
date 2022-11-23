@@ -248,6 +248,11 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
+    path: '/market/ShoppingCart',
+    title: '购物车',
+    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart')),
+  },
+  {
     path: '/market',
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',

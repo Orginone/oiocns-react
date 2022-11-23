@@ -12,7 +12,7 @@ import { IRouteConfig } from '@/routes/config';
 
 import StoreClassify from './Classify';
 import { MenuProps } from 'antd';
-import StoreSiderbar from '@/ts/controller/store/sidebar';
+// import StoreSiderbar from '@/ts/controller/store/sidebar';
 
 const navItems: MenuProps[`items`] = [
   {

@@ -198,11 +198,11 @@ const CohortConfig: React.FC = () => {
                 />
               )}
 
-              <CreateCohort
+              {/* <CreateCohort
                 Person={Person}
                 service={service}
                 getTableList={getTableList}
-              />
+              /> */}
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>

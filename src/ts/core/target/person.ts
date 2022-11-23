@@ -1,7 +1,7 @@
 import { CommonStatus, TargetType } from '../enum';
 import MarketTarget from './mbase';
 import consts from '../consts';
-import { model, schema, faildResult, kernel } from '../../base';
+import { model, schema, faildResult, kernel, common } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
@@ -342,9 +342,9 @@ export default class Person extends MarketTarget {
   public async queryMySpaceProduct(): Promise<schema.XProductArray> {
     let resultArray: any = [];
     // 判断如果是有个人空间
-    if (!this._curCompany) {
-      return resultArray;
-    }
+    // if (!this._curCompany) {
+    //   return resultArray;
+    // }
 
     let paramData: any = {};
     paramData.id = this._joinedCompanys[0].target.id;

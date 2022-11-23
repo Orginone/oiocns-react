@@ -17,13 +17,6 @@ type PaginationProps = {
   layout: string;
 };
 
-interface model.ResultType {
-  code: number;
-  data: any;
-  msg: string;
-  success: boolean;
-}
-
 /**
  * 分页查询
  * 请求体
