@@ -21,7 +21,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  private _curProduct: Product | null = null;
+  public _curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -99,7 +99,10 @@ class StoreContent {
    */
   public selectedProduct(item: Product) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    item.prod.id !== this._curProduct?.prod.id && (this._curProduct = item);
+    // item.prod.id !== this._curProduct?.prod.id &&
+    console.log('修改选中');
+
+    this._curProduct = item;
   }
 }
 const storeContent = new StoreContent();

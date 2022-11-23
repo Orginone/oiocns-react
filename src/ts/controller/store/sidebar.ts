@@ -1,8 +1,8 @@
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
 import AppStore from '@/ts/core/market/appstore';
-import Company from '@/ts/core/target/company';
-import { XMarket, XProduct } from '@/ts/base/schema';
+// import Company from '@/ts/core/target/company';
+import { XMarket } from '@/ts/base/schema';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}
@@ -35,7 +35,7 @@ class StoreClassify {
     { label: '资源', key: 'assets', icon: 'DatabaseOutlined' },
   ];
   // 商店导航
-  static ShopMenu = [{ title: '开放市场', children: this.SelfMenu }];
+  static ShopMenu = [{ title: '开放市场', onclick: {}, children: this.SelfMenu }];
   public _curMarket: AppStore | undefined = new AppStore({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
@@ -74,6 +74,9 @@ class StoreClassify {
     dataTreeData: [],
     assetsTreeData: [],
   };
+  public get getMarketData() {
+    return this.marketFooterTree.appTreeData;
+  }
 
   /**
    * @desc: 控制层对应操作页面变化展示数据
@@ -110,7 +113,6 @@ class StoreClassify {
    * @return {*}
    */
   public getTreeData() {
-
     // 1.获取市场
     //获取文档
     const data =
@@ -170,7 +172,7 @@ class StoreClassify {
    * @param {string} params.filter 过滤关键字
    * @return {*}
    */
-  private async getOwnMarket() {
+  private async getOwnMarket(isCaback = true) {
     const marketTree = await Provider.getPerson!.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
       const item = itemModel.store;
@@ -185,7 +187,7 @@ class StoreClassify {
 
     this.marketFooterTree.appTreeData = arr;
 
-    this.TreeCallBack && this.TreeCallBack(arr);
+    isCaback && this.TreeCallBack(arr);
   }
 }
 

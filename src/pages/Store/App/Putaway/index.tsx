@@ -1,4 +1,4 @@
-import { Button, Card, Dropdown, Form, Menu, Input, Radio, Select } from 'antd';
+import { Button, Card, Dropdown, Form, Input, Radio, Select } from 'antd';
 import cls from './index.module.less';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
@@ -6,20 +6,22 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect } from 'react';
+import StoreContent from '@/ts/controller/store/content';
+import StoreSidebar from '@/ts/controller/store/sidebar';
 interface AppInfoType {
   appId: string;
 }
 
+/*******
+ * @desc: 应用上架
+ */
 const AppPutaway: React.FC<AppInfoType> = () => {
   const history = useHistory();
+  useEffect(() => {
+    StoreSidebar.getOwnMarket();
+  }, []);
 
-  const menu = (
-    <Menu>
-      <Menu.Item>退订</Menu.Item>
-      <Menu.Item>菜单项二</Menu.Item>
-    </Menu>
-  );
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['AppPutaway-wrap']}`}>
       <Card
@@ -32,19 +34,22 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             }}
           />
         }
-        className="app-info">
+        className="app-info"
+      >
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title="应用名称"
+          title={StoreContent._curProduct?.prod.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">
-                应用描述应用描述应用描述应用描述应用描述应用描述
-              </p>
+              <p className="app-info-con-desc">{StoreContent._curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：2.3.16</span>
-                <span className="lastTime">订阅到期时间 ：2025-12-12</span>
+                <span className="vision">
+                  版本号 ：{StoreContent._curProduct?.prod.version}
+                </span>
+                <span className="lastTime">
+                  订阅到期时间 ：{StoreContent._curProduct?.prod.createTime}
+                </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
@@ -54,7 +59,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           <Button className="btn" type="primary" shape="round">
             上架
           </Button>
-          <Dropdown overlay={menu} placement="bottom">
+          <Dropdown menu={{ items: [{ key: 'more', label: '操作' }] }} placement="bottom">
             <EllipsisOutlined
               style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
               rotate={90}
@@ -68,11 +73,13 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           wrapperCol={{ span: 14 }}
           layout="horizontal"
           initialValues={{ sellAuth: '使用权' }}
-          autoComplete="off">
+          autoComplete="off"
+        >
           <Form.Item
             label="上架平台"
             name="marketId"
-            rules={[{ required: true, message: '请选择上架平台' }]}>
+            rules={[{ required: true, message: '请选择上架平台' }]}
+          >
             <Select>
               <Select.Option value="demo">Demo</Select.Option>
             </Select>
