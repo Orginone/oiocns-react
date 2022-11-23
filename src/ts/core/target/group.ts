@@ -1,19 +1,21 @@
 import { faildResult, kernel, model, schema } from '../../base';
 import { TargetType } from '../enum';
 import consts from '../consts';
-import BaseTarget from './base';
+import Department from './department';
 
-export default class Group extends BaseTarget {
-  private _joinedGroups: Group[];
-  subGroups: Group[];
-  constructor(target: schema.XTarget) {
-    super(target);
-    this.subGroups = [];
-    this._joinedGroups = [];
+export default class Group extends Department {
+  get subTypes(): TargetType[] {
+    return [TargetType.Group];
+  }
+  get joinTargetType(): TargetType[] {
+    return [TargetType.Group];
+  }
+  get searchTargetType(): TargetType[] {
+    return [...consts.CompanyTypes, TargetType.Group];
   }
 
-  protected get searchTargetType(): TargetType[] {
-    return [...consts.CompanyTypes];
+  constructor(target: schema.XTarget) {
+    super(target);
   }
 
   /**
