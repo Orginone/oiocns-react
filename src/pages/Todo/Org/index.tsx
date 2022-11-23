@@ -7,9 +7,10 @@ import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
 import todoService, { tabStatus } from '@/ts/controller/todo';
+import { PageParams } from 'typings/requestType';
 // import { IdPage } from '@/module/typings';
 
-// todoService.currentModel = `org`;
+todoService.currentModel = `org`;
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: TeamApprovalType) => {
@@ -116,8 +117,10 @@ const TodoOrg: React.FC = () => {
   ];
   // 获取申请/审核列表
   const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total = 0 } = await todoService.getList<TeamApprovalType, IdPage>({
-      id: '0',
+    const { data = [], total = 0 } = await todoService.getList<
+      TeamApprovalType,
+      PageParams
+    >({
       page: page,
       pageSize: pageSize,
     });

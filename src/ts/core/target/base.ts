@@ -405,7 +405,7 @@ export default class BaseTarget extends SpaceTarget {
    * 查询我的审批
    * @returns
    */
-  public async queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
+  public queryjoinApproval = async () => {
     return await kernel.queryTeamJoinApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
@@ -414,7 +414,7 @@ export default class BaseTarget extends SpaceTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
+  };
 
   /**
    * 审批我的加入组织/个人申请
