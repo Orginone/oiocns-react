@@ -12,17 +12,15 @@ const chatsObjectName = 'userchat';
  * 会话控制器
  */
 class ChatController {
-  private _tabIndex: string;
-  private _refreshCallback: { [name: string]: () => void };
-  private _groups: IChatGroup[];
-  private _chats: IChat[];
+  private _tabIndex: string = '1';
+  private _refreshCallback: { [name: string]: () => void } = {};
+  private _groups: IChatGroup[] = [];
+  private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
-  constructor(groups: IChatGroup[]) {
-    this._groups = groups;
-    this._chats = [];
-    this._tabIndex = '1';
-    this._refreshCallback = {};
-    this._initialization();
+  constructor() {
+    Provider.onSetPerson(async () => {
+      await this._initialization();
+    });
   }
   /** 通讯录 */
   public get groups() {
@@ -58,6 +56,17 @@ class ChatController {
       }
     }
     return '未知';
+  }
+  /**
+   * 获取未读数量
+   * @returns 未读数量
+   */
+  public getNoReadCount(): number {
+    let sum = 0;
+    this._chats.forEach((i) => {
+      sum += i.noReadCount;
+    });
+    return sum;
   }
   /**
    * 设置当前会话
@@ -137,12 +146,10 @@ class ChatController {
     return chat;
   }
   /** 初始化 */
-  private _initialization(): void {
-    kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
-    });
+  private async _initialization(): Promise<void> {
+    this._groups = await LoadChats();
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
-      if (data && data.chats && data.chats.length > 0) {
+      if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
           let lchat = this.refChat(item);
           if (lchat) {
@@ -152,6 +159,9 @@ class ChatController {
         }
         this._callback();
       }
+    });
+    kernel.on('RecvMsg', (data) => {
+      this._recvMessage(data);
     });
   }
   /** 变更回调 */
@@ -221,15 +231,6 @@ class ChatController {
       'user',
     );
   }
-
-  /**
-   * @description: 加载更多
-   * @return {*}
-   */
-  handleGetPerson = async () => {
-    await this._curChat?.morePerson('');
-    this._callback();
-  };
 }
 
-export const chatCtrl = new ChatController(await LoadChats());
+export const chatCtrl = new ChatController();

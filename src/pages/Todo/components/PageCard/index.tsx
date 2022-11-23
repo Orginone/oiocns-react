@@ -7,8 +7,8 @@ const PageCard: React.FC<CardProps> = (props: CardProps) => {
     children,
     className = '',
     tabList = [
-      { tab: '待办', key: '1' },
-      { tab: '我的发起', key: '2' },
+      // { tab: '待办', key: '1' },
+      // { tab: '我的发起', key: '2' },
     ],
     // tabBarExtraContent = (
     //   <Space>

@@ -10,6 +10,7 @@ export type SpaceType = {
 };
 const sessionStorageName = 'sessionPerson';
 export default class Provider {
+  private static _callbacks: (() => void)[] = [];
   private static _person: Person;
   private static _workSpace: spaceTarget | undefined;
 
@@ -21,6 +22,23 @@ export default class Provider {
       return this.getPerson.target.id;
     }
     throw new Error('未登录');
+  }
+
+  /**
+   * 当前空间ID
+   */
+  public static get spaceId(): string {
+    if (this.getPerson && this._workSpace) {
+      return this._workSpace.target.id;
+    }
+    throw new Error('未登录');
+  }
+
+  /** 设置人员回调 */
+  public static onSetPerson(callback: () => void): void {
+    if (callback) {
+      this._callbacks.push(callback);
+    }
   }
 
   public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
@@ -96,6 +114,9 @@ export default class Provider {
     this._person = new Person(data);
     this.setWorkSpace(this._person.target.id);
     sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
+    this._callbacks.forEach((c) => {
+      c.apply(this, []);
+    });
   }
   /**
    * 登录

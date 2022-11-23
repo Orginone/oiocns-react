@@ -1,10 +1,13 @@
 // import API from '@/services';
 import { message } from 'antd';
 // import { toPageData } from '../index';
-import { resetParams } from '@/utils/tools';
+import { resetParams, toPageData } from '@/utils/tools';
 // import { IdStatusReq, Page } from '@/typings/requestType';
 import { kernel } from '@/ts/base';
 import Provider from '@/ts/core/provider';
+import { TargetType } from '@/ts/core/enum';
+import { format } from 'path';
+import { DataType } from 'typings/globelType';
 
 // type OrgType = '人员' | 'other';
 
@@ -17,10 +20,15 @@ type statusItem = {
   tab: string;
 };
 /**页面模块类型*/
-type pageModel = 'friend' | 'org' | 'order' | 'store' | 'app';
+export type pageModel = 'friend' | 'org' | 'order' | 'store' | 'product' | 'application';
+/**筛选字段和模块对应的枚举 */
+enum pageModelTagName {
+  friend = TargetType.Person,
+}
 
 /**待办：1  我发起的：2*/
 export type tabStatus = '1' | '2' | '3' | '4' | '5' | '6';
+/** tabs 项的枚举 */
 enum tabStatusFunction {
   '待办' = 1,
   '我发起的' = 2,
@@ -28,6 +36,15 @@ enum tabStatusFunction {
   '已完成' = 4,
   '销售订单' = 5,
   '采购订单' = 6,
+}
+/**操作枚举 */
+enum AproveOpration {
+  '取消申请' = 'retract',
+  '拒绝' = 'refuse',
+  '同意' = 'approve',
+  '退货退款' = 'reject',
+  '确认交付' = 'deliver',
+  '取消订单' = 'cancel',
 }
 /**
  * 待办接口声明
@@ -47,14 +64,14 @@ class TodoService implements TodoServiceProps {
       [tabStatusFunction.待办]: `queryjoinApproval`,
       [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
-      approve: `joinTeamApproval`,
+      approve: `approvalJoinApply`,
       refuse: `joinTeamApproval`,
     },
     org: {
       [tabStatusFunction.待办]: `queryjoinApproval`,
       [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
-      approve: `joinTeamApproval`,
+      approve: `approvalJoinApply`,
       refuse: `joinTeamApproval`,
     },
     order: {
@@ -65,18 +82,20 @@ class TodoService implements TodoServiceProps {
       reject: `RejectMerchandise`, // 退货退款
     },
     store: {
-      [tabStatusFunction.待办]: `getUserApply`, // 加入市场审批列表
-      [tabStatusFunction.我发起的]: `QueryJoinMarketApply`, // 加入市场申请列表
-      retract: `CancelJoinMarket`, // 取消市场
+      [tabStatusFunction.待办]: `getJoinApproval`, // 加入市场审批列表
+      [tabStatusFunction.我发起的]: `getJoinMarketApplys`, // 加入市场申请列表
+      retract: `cancelJoinMarketApply`, // 取消加入市场
       approve: `ApprovalJoinApply`, // 审批加入市场申请 "id": 0, "status": 0
     },
-    app: {
-      [tabStatusFunction.待办]: `QueryMerchandiesApplyByManager`, // 查询产品上架审批
+    product: {
+      [tabStatusFunction.待办]: `getPublicApproval`, // 查询产品上架审批
       [tabStatusFunction.我发起的]: `QueryMerchandiseApply`, // 产品上架申请列表
       // retract: API.appstore.cancelJoin, // 没有取消应用上架
       approve: `approvalMerchandise`, // 审批加入市场申请 "id": 0, "status": 0
     },
+    application: {},
   };
+  /** tabs项 */
   statusList: statusItem[] = [
     { tab: '待办', key: '1' },
     { tab: '已办', key: '3' },
@@ -115,6 +134,10 @@ class TodoService implements TodoServiceProps {
   get currentApi() {
     return this.apiPaths[this.currentModel];
   }
+  /**当前需要过滤的typeName */
+  private get currentTypeName() {
+    return pageModelTagName[this.currentModel];
+  }
   /** 操作类方法回调 */
   private opretionFn = async (fn: string, params: Partial<IdStatusPage>) => {
     const { msg, success } = await kernel[fn]({ data: params }); //  fn.call(fn, { data: params });
@@ -128,17 +151,32 @@ class TodoService implements TodoServiceProps {
   public async getList<T extends DataType, U extends PageParams>(params: U) {
     // 根据当前查询状态判断选择什么接口
     const currentFn = this.currentApi[Number(this.currentActiveStatus)];
-    if (currentFn) {
-      const fn: Function = Provider.getPerson[currentFn]; // this.currentApi[currentApi];
+    if (currentFn && Provider?.getPerson) {
+      const fn: Function = Provider?.getPerson[currentFn]; // this.currentApi[currentApi];
       if (fn) {
         const data = await fn.call(fn, { data: resetParams(params) });
         console.log('请求', currentFn, data);
-        return data; // toPageData<T>(data);
+        let formatData = toPageData<T>(data);
+        if (formatData.data.length > 0 && this.currentTypeName) {
+          formatData = {
+            ...formatData,
+            data: await this.filterByTagName(formatData.data, this.currentTypeName),
+          };
+        }
+        return formatData;
       }
     }
+
     return { data: [], total: 0 };
   }
-
+  /**
+   * 根据组织类型筛选审核、申请列表数据
+   */
+  private filterByTagName = async (list: any[], typeName: string) => {
+    return list.filter((n) => {
+      return n.team.typeName === typeName;
+    });
+  };
   /** 拒绝*/
   public refuse = async (id: string, status?: string | number) => {
     return await this.opretionFn(

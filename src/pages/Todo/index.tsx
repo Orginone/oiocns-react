@@ -3,16 +3,15 @@ import { renderRoutes } from 'react-router-config';
 import * as Icon from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-import todoService, { tabStatus } from '@/ts/controller/todo';
+import todoService, { pageModel } from '@/ts/controller/todo';
 import siderBar from '@/ts/controller/todo/sidebar';
 
 // import TodoMenu, { muneItems } from './Menu';
 import './index.less';
-import { MenuProps } from 'antd';
-
-// const appService = new todoService('app');
+import { Breadcrumb, MenuProps } from 'antd';
 
 const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
+  // const [breadcrumb, setBreadcrumb] = useState<MenuProps[`items`]>();
   const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>();
   const renderMenu = (menu: any[]) => {
     return menu.map((m) => {
@@ -32,7 +31,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
 
   useEffect(() => {
     const data = siderBar.menuItems.map((n) => {
-      if (n.type) {
+      if (n.type && n.children) {
         const menuChildren = renderMenu(n.children);
         n = {
           ...n,
@@ -43,21 +42,27 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     });
     setTodoMenu(data as MenuProps[`items`]);
   }, []);
-
+  useEffect(() => {
+    const splitKey = location.pathname.split('/');
+    todoService.activeStatus = '1';
+    todoService.currentModel = splitKey[splitKey.length - 1] as pageModel; // 设置当前模块
+  }, [todoService, location.pathname]);
   // 菜单跳转
   const toNext = (e: any) => {
-    console.log(e);
     const splitKey = e.key.split('/');
     todoService.currentModel = splitKey[splitKey.length - 1]; // 设置当前模块
     history.push(`${e.key}`);
-    // console.log(menukeys);
+    siderBar.handleClickMenu(e.label, e.item?.props?.node); // 出发控制器事件 生成面包屑数据
   };
+
   return (
     <ContentTemplate
-      // sider={sider}
       siderMenuData={todoMenu}
-      menuClick={toNext}>
-      {renderRoutes(route.routes, { state: 'hahhh' })}
+      menuClick={toNext}
+      contentTopLeft={siderBar.curentBread.map((n) => (
+        <Breadcrumb.Item key={n}>{n}</Breadcrumb.Item>
+      ))}>
+      {renderRoutes(route.routes)}
     </ContentTemplate>
   );
 };
