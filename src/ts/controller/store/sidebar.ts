@@ -172,7 +172,7 @@ class StoreClassify {
    * @param {string} params.filter 过滤关键字
    * @return {*}
    */
-  private async getOwnMarket(isCaback = true) {
+  public async getOwnMarket(isCaback = true) {
     const marketTree = await Provider.getPerson!.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
       const item = itemModel.store;
@@ -180,13 +180,15 @@ class StoreClassify {
         title: item.name,
         key: `0-${index}`,
         id: item.id,
-        node: item,
+        node: itemModel,
         children: [],
       };
     });
 
     this.marketFooterTree.appTreeData = arr;
-
+    if (!isCaback) {
+      return marketTree;
+    }
     isCaback && this.TreeCallBack(arr);
   }
 }
