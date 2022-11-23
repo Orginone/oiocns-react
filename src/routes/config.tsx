@@ -27,13 +27,13 @@ import React from 'react';
 import { RouteConfig } from 'react-router-config';
 import { Redirect as RouterRedirect } from 'react-router-dom';
 
-import BasicLayout from '@/layouts/Basic';
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLock from '@/pages/Passport/Lock';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
+import BasicLayout from '@/layouts/Basic';
 
 export interface IRouteConfig extends RouteConfig {
   // 路由路径
@@ -120,23 +120,51 @@ const TodoRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Todo/Org')),
       },
       {
+        path: '/todo/appAndStore',
+        title: '商店审核',
+        icon: <ShopOutlined />,
+        // render: () => <div></div>,
+        routes: [
+          {
+            path: '/todo/product',
+            title: '应用上架',
+            icon: <ShopOutlined />,
+            component: React.lazy(() => import('@/pages/Todo/Product')),
+          },
+          {
+            path: '/todo/store',
+            title: '加入市场',
+            icon: <ShopOutlined />,
+            component: React.lazy(() => import('@/pages/Todo/Store')),
+          },
+        ],
+      },
+      {
         path: '/todo/app',
         title: '应用上架',
         icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Product')),
       },
       {
         path: '/todo/store',
         title: '加入市场',
         icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Store')),
       },
-
       {
         path: '/todo/order',
         title: '订单管理',
         icon: <UnorderedListOutlined />,
         component: React.lazy(() => import('@/pages/Todo/Order')),
+      },
+      {
+        path: '/todo/:id',
+        title: '应用待办',
+        icon: <UnorderedListOutlined />,
+        hideInMenu: true,
+        component: React.lazy(() => import('@/pages/Todo/App')),
       },
     ],
   },
