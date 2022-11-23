@@ -1,8 +1,7 @@
-import { schema, kernel, model } from '../../base';
+import { schema, kernel, model, common } from '../../base';
 import { TargetType, MessageType } from '../enum';
 import Provider from '../provider';
 import { StringPako } from '@/utils/package';
-import { sleep } from '@/store/sleep';
 import { ChatCache, IChat } from './ichat';
 
 // 历史会话存储集合名称
@@ -102,7 +101,7 @@ class BaseChat implements IChat {
     return false;
   }
   async morePerson(filter: string): Promise<void> {
-    await sleep(0);
+    await common.sleep(0);
   }
   moreMessage(filter: string): Promise<void> {
     throw new Error('Method not implemented.');
