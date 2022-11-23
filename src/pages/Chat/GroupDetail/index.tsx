@@ -1,8 +1,7 @@
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Col, message, Modal, Row, Empty } from 'antd';
+import { Button, Checkbox, Col, Modal, Row, Empty, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
-// import CohortServers from '@/module/chat/cohortchat';
 import detailStyle from './index.module.less';
 import { chatCtrl } from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
@@ -31,6 +30,7 @@ const Groupdetail = () => {
   const refreshUI = () => {
     setChat(deepClone(chatCtrl.chat));
   };
+  const { Text } = Typography;
 
   useEffect(() => {
     const id = chatCtrl.subscribe(refreshUI);
@@ -38,9 +38,9 @@ const Groupdetail = () => {
       chatCtrl.unsubscribe(id);
     };
   }, []);
-  // const { clearMsgCallback } = props;
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
-  const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
+
+  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
+  // const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
   const [state, setState] = useState<any>({
     userList: [], //群成员
     total: 0, //总数
@@ -54,61 +54,81 @@ const Groupdetail = () => {
     delids: [], // 所选择到的好友id列表 移出
   });
 
-  // 邀请入群
-  const openDialogAdd = () => {
-    setIsModalOpen(true);
-    chat.chats.forEach((item: any) => {
-      if (item.id === chat.userId) {
-        state.friendsData = item.chats.filter((c: any) => {
-          if (c.typeName === '人员') {
-            let exist = false;
-            chat.qunPersons.forEach((p: any) => {
-              if (c.id === p.id) {
-                exist = true;
-              }
-            });
-            return !exist;
-          }
-          return false;
-        });
-      }
-    });
-  };
+  /**
+   * @description: 邀请入群
+   * @return {*}
+   */
+  // const openDialogAdd = () => {
+  //   setIsModalOpen(true);
+  //   chat.chats.forEach((item: any) => {
+  //     if (item.id === chat.userId) {
+  //       state.friendsData = item.chats.filter((c: any) => {
+  //         if (c.typeName === '人员') {
+  //           let exist = false;
+  //           chat.qunPersons.forEach((p: any) => {
+  //             if (c.id === p.id) {
+  //               exist = true;
+  //             }
+  //           });
+  //           return !exist;
+  //         }
+  //         return false;
+  //       });
+  //     }
+  //   });
+  // };
 
-  // 邀请确认
-  const handleOk = async () => {
-    setIsModalOpen(false);
-    const { data, code } = await CohortServers.getpullPerson({
-      id: chat.curChat?.id,
-      targetIds: state.ids,
-    });
-    if (code === 200) {
-      message.success('邀请成功');
-      chat.getPersons(true);
-    } else {
-      message.warning('您不是群管理员');
-    }
-  };
-  // 移出确认
-  const handleMoveOk = async () => {
-    setIsShiftUp(false);
-    const { data, code } = await CohortServers.getremovePerson({
-      id: chat.curChat?.id,
-      targetIds: state.delids,
-    });
-    if (code === 200) {
-      message.success('移出成功');
-      chat.getPersons(true);
-    } else {
-      message.warning('您不是群管理员');
-    }
-  };
-  // 取消
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setIsShiftUp(false);
-  };
-  // 添加选择人员事件
+  /**
+   * @description: 邀请确认
+   * @return {*}
+   */
+  // const handleOk = async () => {
+  //   setIsModalOpen(false);
+  //   const { data, code } = await CohortServers.getpullPerson({
+  //     id: chat.curChat?.id,
+  //     targetIds: state.ids,
+  //   });
+  //   if (code === 200) {
+  //     message.success('邀请成功');
+  //     chat.getPersons(true);
+  //   } else {
+  //     message.warning('您不是群管理员');
+  //   }
+  // };
+
+  /**
+   * @description: 移出确认
+   * @return {*}
+   */
+  // const handleMoveOk = async () => {
+  //   setIsShiftUp(false);
+  //   const { data, code } = await CohortServers.getremovePerson({
+  //     id: chat.curChat?.id,
+  //     targetIds: state.delids,
+  //   });
+  //   if (code === 200) {
+  //     message.success('移出成功');
+  //     chat.getPersons(true);
+  //   } else {
+  //     message.warning('您不是群管理员');
+  //   }
+  // };
+
+  /**
+   * @description: 取消
+   * @return {*}
+   */
+  // const handleCancel = () => {
+  //   setIsModalOpen(false);
+  //   setIsShiftUp(false);
+  // };
+
+  /**
+   * @description: 添加选择人员事件
+   * @param {itemResult} item
+   * @param {number} index
+   * @return {*}
+   */
   const onClickBox = (item: itemResult, index: number) => {
     if (state?.ids.indexOf(item.id) !== -1) {
       setState({ ...state, ids: state?.ids.filter((v: any) => v.id === item.id) });
@@ -117,7 +137,12 @@ const Groupdetail = () => {
     }
   };
 
-  // 移出选择人员事件
+  /**
+   * @description: 移出选择人员事件
+   * @param {itemResult} item
+   * @param {number} index
+   * @return {*}
+   */
   const onClickBoxDel = (item: itemResult, index: number) => {
     if (state.delids.indexOf(item.id) !== -1) {
       setState({ ...state, delids: state?.delids.filter((v: any) => v.id === item.id) });
@@ -125,7 +150,11 @@ const Groupdetail = () => {
       setState({ ...state, delids: [...state.delids, item.id] });
     }
   };
-  // 头像
+
+  /**
+   * @description: 头像
+   * @return {*}
+   */
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
@@ -144,14 +173,20 @@ const Groupdetail = () => {
       </Col>
     </Row>
   );
-  // 群组成员
+
+  /**
+   * @description: 群组成员
+   * @return {*}
+   */
   const grouppeoples = (
     <>
       {chat?.persons.map((item: any) => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
             <HeadImg name={item.name} label={''} />
-            <span className={detailStyle.img_list_con_name}>{item.name}</span>
+            <Text className={detailStyle.img_list_con_name} ellipsis={true}>
+              {item.name}
+            </Text>
           </div>
         );
       })}
@@ -189,8 +224,9 @@ const Groupdetail = () => {
             {chat?.personCount ?? 0 > 1 ? (
               <span
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
-                onClick={() => {
-                  chatCtrl.refChat(chat)?.deleteMessage('');
+                onClick={async () => {
+                  await chatCtrl.chat?.morePerson('');
+                  refreshUI();
                 }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>

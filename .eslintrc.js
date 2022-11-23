@@ -41,7 +41,7 @@ module.exports = {
     'no-useless-constructor': 'off',
     // '@typescript-eslint/no-useless-constructor': 'error',
     // 'no-unused-vars': ['error', { ignoreRestSiblings: false }],
-    'no-unused-vars': ['error', { varsIgnorePattern: '.*', args: 'none' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: 'slick', args: 'none' }],
     // 'no-unused-vars': [
     //   'warn',
     //   {
@@ -56,6 +56,6 @@ module.exports = {
     //解决导出类型时，no-undef报错问题
     'no-undef': 'off',
     'import/prefer-default-export': 'off',
-    'no-import-assign': 'off',
+    'no-import-assign': 'error',
   },
 };

@@ -9,10 +9,11 @@ import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';
+import { PageShowType } from 'typings/globelType';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string; //唯一key
+  rowKey: string | ((record: T) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -59,9 +60,10 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       if (parentRef?.current) {
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
+        // console.log('高度', _height);
         setDefaultHeight(_height > 100 ? _height - (headerTitle ? 164 : 116) : 100);
       }
-    }, 10);
+    }, 50);
   }, [parentRef]);
 
   /**

@@ -25,7 +25,7 @@ export default class KernelApi {
   private constructor(url: string) {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
-    this._storeHub = new StoreHub(url, 'json');
+    this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
       if (methods) {
@@ -1866,20 +1866,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 审核加入市场申请
-   * @param {model.ApprovalModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async approvalJoinApply(
-    params: model.ApprovalModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'market',
-      action: 'ApprovalJoinApply',
-      params: params,
-    });
-  }
-  /**
    * 交付订单详情中的商品
    * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -1908,7 +1894,49 @@ export default class KernelApi {
     });
   }
   /**
-   * 商品上架审核
+   * 查询我的加入商店审批
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XMarketRelationArray>} 请求结果
+   */
+  public async queryJoinApproval(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XMarketRelationArray>> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryJoinApproval',
+      params: params,
+    });
+  }
+  /**
+   * 查询我的商品上架审批
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XMerchandiseArray>} 请求结果
+   */
+  public async queryPublicApproval(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XMerchandiseArray>> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryPublicApproval',
+      params: params,
+    });
+  }
+  /**
+   * 审核加入市场申请
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async approvalJoinApply(
+    params: model.ApprovalModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'market',
+      action: 'ApprovalJoinApply',
+      params: params,
+    });
+  }
+  /**
+   * 审核商品上架申请
    * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */

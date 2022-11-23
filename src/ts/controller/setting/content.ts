@@ -1,3 +1,5 @@
-class SettingController {}
+class SettingContent {}
 
-export const settingCtrl = new SettingController();
+const settingContent = new SettingContent();
+
+export default settingContent;

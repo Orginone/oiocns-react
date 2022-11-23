@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LeftOutlined, CheckCircleFilled } from '@ant-design/icons';
 import cls from './index.module.less';
-import { Pagination, Checkbox, Modal } from 'antd';
+import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 
@@ -14,12 +14,14 @@ const ShoppingCart: React.FC<any> = (props) => {
   const v: any[] = [];
   for (let i in fls) {
     //处理立即购买显示隐藏
+    console.log(i);
+
     v.push(false);
   }
   const [flag, setflag] = useState(v); //处理立即购买显示隐藏
-
-  const showConfirm = (item: any) => {
-    //弹窗
+  const [checkval, setcheckval] = useState([]); //勾选的数组
+  const showConfirm = (item?: any) => {
+    //立即购买弹窗
     return () => {
       confirm({
         title: '确认订单',
@@ -32,6 +34,45 @@ const ShoppingCart: React.FC<any> = (props) => {
           console.log('Cancel');
         },
       });
+    };
+  };
+
+  const showConfirms = (type: string) => {
+    //弹窗
+    return () => {
+      if (checkval.length == 0) {
+        message.warning('请先勾选一个应用');
+        console.log('没有勾选');
+        return;
+      } else if (type == 'add') {
+        //购买
+        confirm({
+          title: '确认订单',
+          icon: <CheckCircleFilled className={cls['icon1']} />,
+          content: '此操作将生成交易勾选订单。是否确认?',
+          onOk() {
+            console.log('OK');
+            setcheckval([]);
+          },
+          onCancel() {
+            console.log('Cancel');
+          },
+        });
+      } else if (type == 'rm') {
+        //删除
+        confirm({
+          title: '确认订单',
+          icon: <CheckCircleFilled className={cls['icon1']} />,
+          content: '此操作将生成交易订单。是否确认?',
+          onOk() {
+            console.log('OK');
+            setcheckval([]);
+          },
+          onCancel() {
+            console.log('Cancel');
+          },
+        });
+      }
     };
   };
   return (
@@ -51,14 +92,20 @@ const ShoppingCart: React.FC<any> = (props) => {
             <div className={cls['title']}>{props.route.title}</div>
           </div>
           <div className={cls['right']}>
-            <div className={cls['buy']}>删除</div>
-            <div className={cls['buy']}>购买</div>
+            <div className={cls['buy']} onClick={showConfirms('rm')}>
+              删除
+            </div>
+            <div className={cls['buy']} onClick={showConfirms('add')}>
+              购买
+            </div>
           </div>
         </div>
         <div className={cls['content']}>
           <Checkbox.Group
-            onChange={(checkedValues) => {
+            value={checkval}
+            onChange={(checkedValues: any) => {
               console.log('checked = ', checkedValues);
+              setcheckval(checkedValues);
             }}>
             {fls.map((item, i) => {
               return (

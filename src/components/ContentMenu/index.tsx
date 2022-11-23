@@ -16,6 +16,7 @@ type ContentMenuProps = {
   location: any;
   data?: MenuProps[`items`];
   menuClick?: MenuProps[`onClick`];
+  menuSelect?: MenuProps[`onSelect`];
 };
 interface MemuItemType {
   children?: ItemType[];
@@ -63,6 +64,7 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
   );
 };
 
+//侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
   const { data: menuData } = props; // 顶级主菜单
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单

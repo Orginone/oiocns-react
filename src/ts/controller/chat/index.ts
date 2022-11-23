@@ -4,23 +4,23 @@ import { generateUuid } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import Provider from '@/ts/core/provider';
-import { LoadChats } from '../../core/chat';
+import { LoadChats } from '@/ts/core/chat';
+
+// 会话缓存对象名称
 const chatsObjectName = 'userchat';
 /**
  * 会话控制器
  */
 class ChatController {
-  private _tabIndex: string;
-  private _refreshCallback: { [name: string]: () => void };
-  private _groups: IChatGroup[];
-  private _chats: IChat[];
+  private _tabIndex: string = '1';
+  private _refreshCallback: { [name: string]: () => void } = {};
+  private _groups: IChatGroup[] = [];
+  private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
-  constructor(groups: IChatGroup[]) {
-    this._groups = groups;
-    this._chats = [];
-    this._tabIndex = '1';
-    this._refreshCallback = {};
-    this._initialization();
+  constructor() {
+    Provider.onSetPerson(async () => {
+      await this._initialization();
+    });
   }
   /** 通讯录 */
   public get groups() {
@@ -58,6 +58,17 @@ class ChatController {
     return '未知';
   }
   /**
+   * 获取未读数量
+   * @returns 未读数量
+   */
+  public getNoReadCount(): number {
+    let sum = 0;
+    this._chats.forEach((i) => {
+      sum += i.noReadCount;
+    });
+    return sum;
+  }
+  /**
    * 设置当前会话
    * @param chat 会话
    */
@@ -67,7 +78,9 @@ class ChatController {
     if (this._curChat) {
       this._curChat.noReadCount = 0;
       await this._curChat.moreMessage('');
-      await this._curChat.morePerson('');
+      if (this._curChat.persons.length === 0) {
+        await this._curChat.morePerson('');
+      }
       this._appendChats(this._curChat);
       this._cacheChats();
     }
@@ -133,22 +146,22 @@ class ChatController {
     return chat;
   }
   /** 初始化 */
-  private _initialization(): void {
-    kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data, true);
-    });
+  private async _initialization(): Promise<void> {
+    this._groups = await LoadChats();
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
-      if (data && data.chats && data.chats.length > 0) {
+      if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
           let lchat = this.refChat(item);
           if (lchat) {
-            lchat.noReadCount = item.noReadCount;
-            lchat.lastMessage = item.lastMessage;
+            lchat.loadCache(item);
             this._appendChats(lchat);
           }
         }
         this._callback();
       }
+    });
+    kernel.on('RecvMsg', (data) => {
+      this._recvMessage(data);
     });
   }
   /** 变更回调 */
@@ -162,7 +175,7 @@ class ChatController {
    * @param data 新消息
    * @param cache 是否缓存
    */
-  private _recvMessage(data: XImMsg, cache: boolean = false): void {
+  private _recvMessage(data: XImMsg): void {
     let sessionId = data.toId;
     if (data.toId === this.userId) {
       sessionId = data.fromId;
@@ -174,7 +187,7 @@ class ChatController {
           isMatch = data.spaceId == c.spaceId;
         }
         if (isMatch) {
-          c.receiveMessage(data);
+          c.receiveMessage(data, !this.isCurrent(c));
           this._appendChats(c);
           this._cacheChats();
           this._callback();
@@ -210,12 +223,7 @@ class ChatController {
         data: {
           chats: this.chats
             .map((item) => {
-              return {
-                chatId: item.chatId,
-                spaceId: item.spaceId,
-                lastMessage: item.lastMessage,
-                noReadCount: item.noReadCount,
-              };
+              return item.getCache();
             })
             .reverse(),
         },
@@ -225,4 +233,4 @@ class ChatController {
   }
 }
 
-export const chatCtrl = new ChatController(await LoadChats());
+export const chatCtrl = new ChatController();

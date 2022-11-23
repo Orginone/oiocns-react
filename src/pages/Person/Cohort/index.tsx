@@ -9,19 +9,19 @@ import { cohortColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import API from '@/services';
-import useStore from '../../../../src/store';
-import CreateCohort from '../../../bizcomponents/cohort/index';
+// import useStore from '../../../../src/store';
+// import CreateCohort from '../../../bizcomponents/cohort/index';
 import UpdateCohort from '@/bizcomponents/cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from '../../../bizcomponents/SearchCohort/index';
 import { Person } from '@/module/org';
 import { sleep } from '@/store/sleep';
 import { Cohort } from '../../../module/org/index';
-import CohortServices from '../../../ts/core/target/cohort';
+// import CohortServices from '../../../ts/core/target/cohort';
 import { useHistory } from 'react-router-dom';
 import PersonInfoEnty from '../../../ts/core/provider';
-import { model, schema } from '../../../ts/base';
-import { TargetType } from '../../../ts/core/enum';
+// import { model, schema } from '../../../ts/base';
+// import { TargetType } from '../../../ts/core/enum';
 /**
  * 个人信息
  * @returns
@@ -38,7 +38,7 @@ const CohortConfig: React.FC = () => {
   const [list, setList] = useState<CohortConfigType.CohortConfigTeam[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const { user } = useStore((state) => ({ ...state }));
+  // const { user } = useStore((state) => ({ ...state }));
   const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<CohortConfigType.CohortConfigTeam>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +46,9 @@ const CohortConfig: React.FC = () => {
   const history = useHistory();
   const [friend, setFriend] = useState<Person>();
   const [cohort, setcohort] = useState<Cohort>();
-  const newCohortServices = new CohortServices({} as schema.XTarget);
+  console.log(cohort);
+
+  // const newCohortServices = new CohortServices({} as schema.XTarget);
   useEffect(() => {
     getTableList();
   }, []);
@@ -98,23 +100,23 @@ const CohortConfig: React.FC = () => {
         key: 'changePermission',
         label: '转移权限',
         onClick: () => {
-          const page: model.PageRequest = {
-            offset: 0,
-            limit: 10,
-            filter: '',
-          };
-          const params: model.IDReqJoinedModel = {
-            id: PersonInfoEnty.getPerson.target.id,
-            typeName: TargetType.Person,
-            JoinTypeNames: [TargetType.Person],
-            spaceId: PersonInfoEnty.getPerson.target.id,
-            page: page,
-          };
-          console.log('群组参数qqbbq', params);
-          console.log(
-            'info',
-            PersonInfoEnty.getPerson.selectAuthorityTree('358229469208645632'),
-          );
+          // const page: model.PageRequest = {
+          //   offset: 0,
+          //   limit: 10,
+          //   filter: '',
+          // };
+          // const params: model.IDReqJoinedModel = {
+          //   id: PersonInfoEnty.getPerson.target.id,
+          //   typeName: TargetType.Person,
+          //   JoinTypeNames: [TargetType.Person],
+          //   spaceId: PersonInfoEnty.getPerson.target.id,
+          //   page: page,
+          // };
+          // console.log('群组参数qqbbq', params);
+          // console.log(
+          //   'info',
+          //   PersonInfoEnty.getPerson.selectAuthorityTree('358229469208645632'),
+          // );
           console.log('判断是否操作成功', Person); //375315801588240384
           // console.log("输出群组",personEnty)
           console.log('按钮事件', 'changePermission', item);
@@ -124,10 +126,10 @@ const CohortConfig: React.FC = () => {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          const param = {
-            id: item.targetId,
-          };
-          newCohortServices.deleteCohort(param);
+          // const param = {
+          //   id: item.targetId,
+          // };
+          // newCohortServices.deleteCohort(param);
           message.info('解散成功');
           getTableList();
         },
@@ -149,25 +151,25 @@ const CohortConfig: React.FC = () => {
       await sleep(100);
     }
 
-    const params = {
-      id: service.PUBLIC_STORE.id,
-      page: isGofirst ? 1 : page,
-      pageSize: 10,
-      filter: searchKey,
-    };
-    let resultList: Array<CohortConfigType.CohortConfigTeam> = [];
-    const data = PersonInfoEnty.getPerson.ChohortArray;
-    console.log('获取值', PersonInfoEnty.getPerson.ChohortArray);
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].target.belongId === Person.target.id) {
-        if (data[i].target.team != undefined) {
-          const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
-          chorot.belongId = data[i].target.belongId;
-          chorot.thingId = data[i].target.thingId;
-          resultList.push(chorot);
-        }
-      }
-    }
+    // const params = {
+    //   id: service.PUBLIC_STORE.id,
+    //   page: isGofirst ? 1 : page,
+    //   pageSize: 10,
+    //   filter: searchKey,
+    // };
+    let resultList: Array<any> = [];
+    // const data = await PersonInfoEnty.getPerson.getJoinedCohorts();
+    // // console.log('获取值', PersonInfoEnty.getPerson.getJoinedCohorts());
+    // for (var i = 0; i < data.length; i++) {
+    //   if (data[i].target.belongId === Person.target.id) {
+    //     if (data[i].target.team != undefined) {
+    //       // const chorot: CohortConfigType.CohortConfigTeam = data[i].target.team;
+    //       // chorot.belongId = data[i].target.belongId;
+    //       // chorot.thingId = data[i].target.thingId;
+    //       resultList.push(data[i].target);
+    //     }
+    //   }
+    // }
     setList(resultList);
     console.log(66, resultList, resultList.length);
     setTotal(resultList.length);
@@ -190,7 +192,7 @@ const CohortConfig: React.FC = () => {
 
   const handleOk = async () => {
     setIsModalOpen(false);
-    const { data, code } = await service.getpullPerson({
+    const { /*data,*/ code } = await service.getpullPerson({
       id: item?.id,
       targetIds: [friend?.id],
     });
@@ -201,14 +203,14 @@ const CohortConfig: React.FC = () => {
     }
   };
   const cohortHandleOk = async () => {
-    const param = {
-      id: cohort?.id,
-    };
-    const data = await newCohortServices.ApplyJoinCohort(param);
-    if (!data.success) {
-      message.error(data.msg);
-    } else message.info('申请加入成功');
-    setAddIsModalOpen(false);
+    // const param = {
+    //   id: cohort?.id,
+    // };
+    // const data = await newCohortServices.ApplyJoinCohort(param);
+    // if (!data.success) {
+    //   message.error(data.msg);
+    // } else message.info('申请加入成功');
+    // setAddIsModalOpen(false);
   };
   const handleCancle = () => {
     setIsModalOpen(false);
@@ -263,11 +265,11 @@ const CohortConfig: React.FC = () => {
                 />
               )}
 
-              <CreateCohort
+              {/* <CreateCohort
                 Person={Person}
                 service={service}
                 getTableList={getTableList}
-              />
+              /> */}
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>

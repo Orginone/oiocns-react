@@ -10,9 +10,9 @@ import CommonClass from '../commonClass/BaseServiceClass';
 // readonly： 表示'只读',用来防止在构造函数之外对属性进行赋值
 // static 静态数据
 
-export interface MarketServiceType extends CommonClassType<MarketTypes.ProductType> {
-  PUBLIC_STORE: MarketTypes.MarketType; //共享仓库信息,用于获取共享仓库应用列表
-}
+// export interface MarketServiceType extends CommonClassType<MarketTypes.ProductType> {
+//   PUBLIC_STORE: MarketTypes.MarketType; //共享仓库信息,用于获取共享仓库应用列表
+// }
 
 export default class MarketService extends CommonClass {
   public PUBLIC_STORE: MarketTypes.MarketType = {} as MarketTypes.MarketType; //共享仓库信息
@@ -20,7 +20,7 @@ export default class MarketService extends CommonClass {
   public MyAppColumns: ProColumns<any>[] = []; //我的应用 表格头部展示数据
   public PublishColumns: ProColumns<any>[] = []; //应用上架 表格头部展示数据
 
-  constructor(data: CommonClassData) {
+  constructor(data: any) {
     super(data);
     // 获取共享仓库信息
     this.getPublicStore();
@@ -86,53 +86,6 @@ export default class MarketService extends CommonClass {
       },
     ];
     this.ShopAppColumns = [...data];
-    return data;
-  }
-  /* 获取我的应用列表 表头 */
-  public getMyappColumns(): ProColumns<any>[] {
-    if (this.MyAppColumns.length > 1) {
-      return this.MyAppColumns;
-    }
-    const data: any = [
-      {
-        title: '序号',
-        dataIndex: 'index',
-        width: 50,
-        render: (_key: any, _record: any, index: number) => {
-          return index + 1;
-        },
-      },
-      {
-        title: '应用图标',
-        dataIndex: 'icon',
-      },
-      {
-        title: '应用名称',
-        dataIndex: 'name',
-      },
-      {
-        title: '版本号',
-        dataIndex: 'version',
-      },
-      {
-        title: '应用类型',
-        dataIndex: 'typeName',
-      },
-      {
-        title: '应用来源',
-        dataIndex: 'belongId',
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-      },
-      {
-        title: '备注',
-        ellipsis: true,
-        dataIndex: 'remark',
-      },
-    ];
-    this.MyAppColumns = [...data];
     return data;
   }
 

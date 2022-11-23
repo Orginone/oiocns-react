@@ -14,12 +14,10 @@ import { useAppwfConfig } from '@/module/flow/flow';
 const { Option } = Select;
 
 const ApprovalNode = () => {
-  const person = Provider.getPerson;
   // const personObj = Provider.getPerson.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-  const [type, setType] = useState('job');
   const [value, setValue] = useState(1);
   const onOk = () => {
     setIsOpen(false);
@@ -44,7 +42,7 @@ const ApprovalNode = () => {
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
-        {person.isUserSpace() && (
+        {Provider.isUserSpace() && (
           <Button
             type="primary"
             shape="round"
@@ -58,7 +56,7 @@ const ApprovalNode = () => {
             选择身份
           </Button>
         )}
-        {!person.isUserSpace() && (
+        {!Provider.isUserSpace() && (
           <Button
             type="primary"
             shape="round"

@@ -1,28 +1,51 @@
-/*
- * @Author: SEN
- * @Date: 2022-11-17 13:30:54
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-17 13:55:49
- * @FilePath: /oiocns-react/src/ts/core/provider.ts
- * @Description: 登录和注册的接口提供层
- */
 import { kernel, model } from '../base';
-import MarketActionTarget from './target/mbase';
+import spaceTarget from './target/sbase';
 import Person from './target/person';
-
+/** 空间类型申明 */
+export type SpaceType = {
+  /** 空间标识 */
+  id: string;
+  /** 空间名称 */
+  name: string;
+};
+const sessionStorageName = 'sessionPerson';
 export default class Provider {
-  private static person: Person;
-  private static _workSpace: MarketActionTarget | undefined;
+  private static _callbacks: (() => void)[] = [];
+  private static _person: Person;
+  private static _workSpace: spaceTarget | undefined;
 
-  public static get userId() {
-    return this.person.target.id;
+  /**
+   * 当前用户ID
+   */
+  public static get userId(): string {
+    if (this.getPerson) {
+      return this.getPerson.target.id;
+    }
+    throw new Error('未登录');
+  }
+
+  /**
+   * 当前空间ID
+   */
+  public static get spaceId(): string {
+    if (this.getPerson && this._workSpace) {
+      return this._workSpace.target.id;
+    }
+    throw new Error('未登录');
+  }
+
+  /** 设置人员回调 */
+  public static onSetPerson(callback: () => void): void {
+    if (callback) {
+      this._callbacks.push(callback);
+    }
   }
 
   public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
-    var workSpaces = [];
-    if (this.person != null) {
-      workSpaces.push({ id: this.person.target.id, name: '个人空间' });
-      const companys = await this.person.getJoinedCompanys();
+    var workSpaces: { id: string; name: string }[] = [];
+    if (this._person != null) {
+      workSpaces.push({ id: this._person.target.id, name: '个人空间' });
+      const companys = await this._person.getJoinedCompanys();
       companys.forEach((element) => {
         workSpaces.push({ id: element.target.id, name: element.target.name });
       });
@@ -34,17 +57,14 @@ export default class Provider {
    * 获取当前工作空间
    * @returns 工作当前空间
    */
-  public static async getWorkSpace(): Promise<MarketActionTarget | undefined> {
+  public static async getWorkSpace(): Promise<spaceTarget | undefined> {
     if (this._workSpace == null) {
-      var id = sessionStorage.getItem('_workSpaceId') + '';
-      if (this.person.target.id == id) {
-        return this.person;
-      } else {
-        const companys = await this.person.getJoinedCompanys();
-        return companys.find((company) => {
-          return company.target.id == id;
-        });
-      }
+      let id = sessionStorage.getItem('_workSpaceId') + '';
+      const companys = await this._person.getJoinedCompanys();
+      let company = companys.find((company) => {
+        return company.target.id == id;
+      });
+      this._workSpace = company ? company : this._person;
     }
     return this._workSpace;
   }
@@ -55,10 +75,10 @@ export default class Provider {
    */
   public static async setWorkSpace(id: string) {
     sessionStorage.setItem('_workSpaceId', id);
-    if (this.person.target.id == id) {
-      this._workSpace = this.person;
+    if (this._person.target.id == id) {
+      this._workSpace = this._person;
     } else {
-      const companys = await this.person.getJoinedCompanys();
+      const companys = await this._person.getJoinedCompanys();
       this._workSpace = companys.find((company) => {
         return company.target.id == id;
       });
@@ -70,14 +90,33 @@ export default class Provider {
    * @returns
    */
   public static isUserSpace(): boolean {
-    return this._workSpace?.target.id == this.person.target.id;
+    return this._workSpace?.target.id == this._person?.target.id;
   }
 
-  public static get getPerson(): Person {
-    if (this.person == null) {
-      this.person = new Person(JSON.parse(sessionStorage.getItem('_loginPerson') + ''));
+  /**
+   * 当前用户
+   */
+  public static get getPerson(): Person | undefined {
+    if (this._person === undefined) {
+      const sp = sessionStorage.getItem(sessionStorageName);
+      if (sp && sp.length > 0) {
+        this.setPerson(JSON.parse(sp));
+      }
     }
-    return this.person;
+    return this._person;
+  }
+
+  /**
+   * 设置当前用户
+   * @param data 数据
+   */
+  private static setPerson(data: any) {
+    this._person = new Person(data);
+    this.setWorkSpace(this._person.target.id);
+    sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
+    this._callbacks.forEach((c) => {
+      c.apply(this, []);
+    });
   }
   /**
    * 登录
@@ -90,9 +129,9 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
-      this.person = new Person(res.data.person);
-      this.setWorkSpace(this.person.target.id);
-      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+      this.setPerson(res.data.person);
+      var workspace = await Provider.getWorkSpace();
+      workspace?.queryjoinApproval();
     }
     return res;
   }
@@ -115,8 +154,7 @@ export default class Provider {
   ): Promise<model.ResultType<any>> {
     let res = await kernel.register(name, motto, phone, account, password, nickName);
     if (res.success) {
-      this.person = new Person(res.data.person);
-      sessionStorage.setItem('_loginPerson', JSON.stringify(res.data.person));
+      this.setPerson(res.data.person);
     }
     return res;
   }
