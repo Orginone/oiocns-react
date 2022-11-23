@@ -1,9 +1,9 @@
-import { deptTree } from './isetting';
+import { ISetting } from './isetting';
 /**
  * 设置的基类
  * */ 
 
-class baseSetting implements deptTree { 
+class baseSetting implements ISetting { 
 
 }
 /**
