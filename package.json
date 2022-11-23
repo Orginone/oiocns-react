@@ -33,7 +33,8 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,tsx,ts,less,md,json}": [
+    "./src/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
+    "./src/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ],
     "*.{less,css}": [

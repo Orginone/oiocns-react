@@ -9,6 +9,7 @@ import { columns } from './config';
 import { dataSource } from './datamock';
 import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
+import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
 import settingStore from '@/store/setting';
 
@@ -18,28 +19,32 @@ import settingStore from '@/store/setting';
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { id } = props.match.params;
-  
-  const {isOpenModal,setEditItem} = settingStore((state) => ({
-     ...state
-  }))
-  
+
+  const { isOpenModal, setEditItem } = settingStore((state) => ({
+    ...state,
+  }));
+
   console.log('isOpenModal', isOpenModal);
-  
+
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
+  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
   /**
    * 假如说我现在要调用接口，获取集团的基本信息
-   *  */ 
+   *  */
 
-  useEffect(() => { 
-    // settingController.getInstance().getGroupCompanies({}, data => { 
+  useEffect(() => {
+    // settingController.getInstance().getGroupCompanies({}, data => {
     //   console.log(data);
     // })
-  }, [])
-  
+  }, []);
+
   const onOk = () => {
+    setIsOpen(false);
+    setIsAddOpen(false);
+    setLookApplyOpen(false);
     // setIsOpen(false);
     // setIsAddOpen(false);
     setEditItem(false);
@@ -47,6 +52,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const handleOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
+    setLookApplyOpen(false);
     setEditItem(false);
   };
   // 操作内容渲染函数
@@ -134,7 +140,13 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }}>
           添加单位
         </Button>
-        <Button type="link">查看申请</Button>
+        <Button
+          type="link"
+          onClick={() => {
+            setLookApplyOpen(true);
+          }}>
+          查看申请
+        </Button>
       </Space>
     );
   };
@@ -172,7 +184,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {/* 编辑集团 */}
       <EditCustomModal
         open={isOpenModal}
-        title={id?'请编辑集团信息':'新建集团'}
+        title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
         handleCancel={handleOk}
         handleOk={handleOk}
@@ -184,6 +196,12 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         onOk={onOk}
         handleOk={handleOk}
         columns={columns}
+      />
+      <LookApply
+        title={'查看申请'}
+        open={isLookApplyOpen}
+        onOk={onOk}
+        handleOk={handleOk}
       />
     </div>
   );

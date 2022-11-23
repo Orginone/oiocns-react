@@ -6,6 +6,7 @@ import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import CloudTreeComp from '@/components/CloudTreeComp';
 import NewStoreModal from '@/components/NewStoreModal'; // 新建商店
+import AppDetail from '@/components/AppDetail'; // 新建商店
 
 import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
@@ -25,6 +26,7 @@ const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
+  const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [list, setList] = useState<XProduct[]>([]);
   const location = useLocation();
   const router = `${location.pathname}${location.search}`;
@@ -40,7 +42,7 @@ const StoreClassify: React.FC = () => {
   }, []);
 
   const onOk = async (data: any) => {
-    setIsStoreOpen(false);
+    setisAppDetailOpen(false);
     console.log('form数据', data);
     // await Service.creatItem({
     //   ...data,
@@ -50,6 +52,7 @@ const StoreClassify: React.FC = () => {
   };
   const onCancel = () => {
     setIsStoreOpen(false);
+    setisAppDetailOpen(false);
   };
 
   /**
@@ -121,6 +124,11 @@ const StoreClassify: React.FC = () => {
         onOk={onOk}
         onCancel={onCancel}
       />
+      <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
+      {/* <button onClick={(e)=>{
+        console.log(e);
+        setisAppDetailOpen(true)
+      }}>123</button> */}
     </>
   );
 };

@@ -1,7 +1,13 @@
-import { Input, Tree ,Space,TreeProps,Modal, Button} from 'antd';
+import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
-import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined ,SearchOutlined} from '@ant-design/icons';
+import {
+  DownOutlined,
+  ApartmentOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import settingStore from '@/store/setting';
 import cls from './index.module.less';
 
@@ -51,7 +57,7 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
     if (node.children) {
-      if (node.children.some(item => item.key === key)) {
+      if (node.children.some((item) => item.key === key)) {
         parentKey = node.key;
       } else if (getParentKey(key, node.children)) {
         parentKey = getParentKey(key, node.children);
@@ -64,19 +70,15 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 type CreateGroupPropsType = {
   onSelect?: TreeProps['onSelect'];
   createTitle: string;
-}
+};
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ 
-  onSelect,
-  createTitle,
-}) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  
-  const { setEditItem } = settingStore((state) => ({ ...state}))
 
+  const { setEditItem } = settingStore((state) => ({ ...state }));
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -86,7 +88,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const newExpandedKeys = dataList
-      .map(item => {
+      .map((item) => {
         if (item.title.indexOf(value) > -1) {
           return getParentKey(item.key, defaultData);
         }
@@ -97,7 +99,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     setSearchValue(value);
     setAutoExpandParent(true);
   };
-
 
   const treeData1: DataNode[] = [
     {
@@ -167,34 +168,54 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   return (
     <div>
       {/* 要把这个值给到 group组件 */}
-      <Button className={cls.creatgroup} type="primary" onClick={() => setEditItem(true)}>{createTitle}</Button>
-      {Array.isArray(treeData1) && treeData1.length>0 ? <div className={cls.topMes}>
-        <Input size="middle" className={cls.inputStyle} placeholder="搜索创建的集团"
-          prefix={<SearchOutlined />} onChange={ onChange } />
-        <div className={cls.joingroup}>创建集团</div> 
-        <Tree
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          switcherIcon={<DownOutlined />}
-          autoExpandParent={autoExpandParent}
-          treeData={treeData1}
-          onSelect={onSelect}
-          showIcon={true}
-          titleRender={(e) => { 
-            return <div className={cls.rightstyle} onMouseOver={() => {
-              setHoverItemMes(e.key);
-            }}>
-              <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-              {hoverItemMes === e.key ? <Space>
-                <span onClick={() => {
-                  setIsOpen(true);
-                }}><PlusOutlined /></span>
-                <span><MoreOutlined /></span>
-              </Space>: null }
-            </div>
-          }}
+      <Button className={cls.creatgroup} type="primary" onClick={() => setEditItem(true)}>
+        {createTitle}
+      </Button>
+      {Array.isArray(treeData1) && treeData1.length > 0 ? (
+        <div className={cls.topMes}>
+          <Input
+            size="middle"
+            className={cls.inputStyle}
+            placeholder="搜索创建的集团"
+            prefix={<SearchOutlined />}
+            onChange={onChange}
           />
-      </div>:null}
+          <div className={cls.joingroup}>创建集团</div>
+          <Tree
+            onExpand={onExpand}
+            expandedKeys={expandedKeys}
+            switcherIcon={<DownOutlined />}
+            autoExpandParent={autoExpandParent}
+            treeData={treeData1}
+            onSelect={onSelect}
+            showIcon={true}
+            titleRender={(e) => {
+              return (
+                <div
+                  className={cls.rightstyle}
+                  onMouseOver={() => {
+                    setHoverItemMes(e.key);
+                  }}>
+                  <span style={{ paddingRight: '8px' }}>{e?.title}</span>
+                  {hoverItemMes === e.key ? (
+                    <Space>
+                      <span
+                        onClick={() => {
+                          setIsOpen(true);
+                        }}>
+                        <PlusOutlined />
+                      </span>
+                      <span>
+                        <MoreOutlined />
+                      </span>
+                    </Space>
+                  ) : null}
+                </div>
+              );
+            }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };
