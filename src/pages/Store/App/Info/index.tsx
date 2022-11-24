@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown } from 'antd';
-import React from 'react';
+import React, { useEffect } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -17,6 +17,10 @@ interface AppInfoType {
 
 const StoreAppInfo: React.FC<AppInfoType> = () => {
   // const BtnsList = ['编辑应用分配'];
+  useEffect(() => {
+    console.log('{StoreContent._curProduct?.prod.version}', StoreContent._curProduct);
+  }, []);
+
   const history = useHistory();
   // const handleBtnsClick = (item: { text: string }) => {
   //   switch (item.text) {
@@ -62,19 +66,22 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
             }}
           />
         }
-        className="app-info">
+        className="app-info"
+      >
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title="应用名称"
+          title={StoreContent._curProduct?.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">
-                应用描述应用描述应用描述应用描述应 用 描述应用描述
-              </p>
+              <p className="app-info-con-desc">{StoreContent._curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：2.3.16</span>
-                <span className="lastTime">订阅到期时间 ：2025-12-12</span>
+                <span className="vision">
+                  版本号 ：{StoreContent._curProduct?.prod.version}
+                </span>
+                <span className="lastTime">
+                  订阅到期时间 ：{StoreContent._curProduct?.prod.createTime}
+                </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>

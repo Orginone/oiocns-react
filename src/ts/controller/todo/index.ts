@@ -6,8 +6,8 @@ import { resetParams, toPageData } from '@/utils/tools';
 import { kernel } from '@/ts/base';
 import Provider from '@/ts/core/provider';
 import { TargetType } from '@/ts/core/enum';
-import { format } from 'path';
 import { DataType } from 'typings/globelType';
+import { IdStatusPage, PageParams } from 'typings/requestType';
 
 // type OrgType = '人员' | 'other';
 
@@ -64,7 +64,7 @@ class TodoService implements TodoServiceProps {
       [tabStatusFunction.待办]: `queryjoinApproval`,
       [tabStatusFunction.我发起的]: `queryJoinApply`,
       retract: `cancelJoinTeam`, // 没有撤销申请接口
-      approve: `approvalJoinApply`,
+      approve: `approvalFriendApply`,
       refuse: `joinTeamApproval`,
     },
     org: {
@@ -82,16 +82,16 @@ class TodoService implements TodoServiceProps {
       reject: `RejectMerchandise`, // 退货退款
     },
     store: {
-      [tabStatusFunction.待办]: `getJoinApproval`, // 加入市场审批列表
+      [tabStatusFunction.待办]: `queryJoinMarketApproval`, // 加入市场审批列表
       [tabStatusFunction.我发起的]: `getJoinMarketApplys`, // 加入市场申请列表
       retract: `cancelJoinMarketApply`, // 取消加入市场
-      approve: `ApprovalJoinApply`, // 审批加入市场申请 "id": 0, "status": 0
+      approve: `approvalJoinMarketApply`, // 审批加入市场申请 "id": 0, "status": 0
     },
     product: {
-      [tabStatusFunction.待办]: `getPublicApproval`, // 查询产品上架审批
+      [tabStatusFunction.待办]: `queryPublicApproval`, // 查询产品上架审批
       [tabStatusFunction.我发起的]: `QueryMerchandiseApply`, // 产品上架申请列表
       // retract: API.appstore.cancelJoin, // 没有取消应用上架
-      approve: `approvalMerchandise`, // 审批加入市场申请 "id": 0, "status": 0
+      approve: `approvalPublishApply`, // 审批加入市场申请 "id": 0, "status": 0
     },
     application: {},
   };
@@ -102,6 +102,7 @@ class TodoService implements TodoServiceProps {
     { tab: '已完成', key: '4' },
     { tab: '我的发起', key: '2' },
   ];
+  /**数据状态枚举 */
   statusMap = {
     1: {
       color: 'blue',
@@ -116,6 +117,46 @@ class TodoService implements TodoServiceProps {
       text: '已拒绝',
     },
   };
+  /**操作 申请*/
+  applyOperation = [
+    {
+      key: 'retractApply',
+      label: '取消申请',
+    },
+  ];
+  /**操作 审批*/
+  approveOpt = [
+    {
+      key: 'approve',
+      label: '同意',
+    },
+    {
+      key: 'refuse',
+      label: '拒绝',
+    },
+  ];
+  /**操作 采购单*/
+  buyOrder = [
+    {
+      key: 'approve',
+      label: '同意',
+    },
+    {
+      key: 'refuse',
+      label: '取消订单',
+    },
+  ];
+  /**操作 销售单*/
+  saleOrder = [
+    {
+      key: 'approve',
+      label: '同意',
+    },
+    {
+      key: 'refuse',
+      label: '拒绝',
+    },
+  ];
   /**当前页面模块名称 */
   currentModel: pageModel = 'friend';
 
@@ -150,6 +191,7 @@ class TodoService implements TodoServiceProps {
   /*获取列表*/
   public async getList<T extends DataType, U extends PageParams>(params: U) {
     // 根据当前查询状态判断选择什么接口
+
     const currentFn = this.currentApi[Number(this.currentActiveStatus)];
     if (currentFn && Provider?.getPerson) {
       const fn: Function = Provider?.getPerson[currentFn]; // this.currentApi[currentApi];

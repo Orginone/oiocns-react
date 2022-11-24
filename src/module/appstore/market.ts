@@ -55,34 +55,34 @@ export default class MarketService extends CommonClass {
       },
       {
         title: '应用名称',
-        dataIndex: 'caption',
+        dataIndex: ['prod', 'caption'],
       },
       {
         title: '来源',
-        dataIndex: 'marketId',
+        dataIndex: ['prod', 'marketId'],
       },
       {
         title: '应用类型',
-        dataIndex: 'typeName',
+        dataIndex: ['prod', 'typeName'],
       },
       {
         title: '售卖权限',
-        dataIndex: 'sellAuth',
+        dataIndex: ['prod', 'sellAuth'],
       },
       {
         title: '价格',
-        dataIndex: 'price',
+        dataIndex: ['prod', 'price'],
       },
 
       {
         title: '创建时间',
-        dataIndex: 'createTime',
+        dataIndex: ['prod', 'createTime'],
       },
 
       {
         title: '备注',
         ellipsis: true,
-        dataIndex: 'remark',
+        dataIndex: ['prod', 'remark'],
       },
     ];
     this.ShopAppColumns = [...data];
