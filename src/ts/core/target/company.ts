@@ -2,19 +2,18 @@ import Group from './group';
 import Cohort from './cohort';
 import consts from '../consts';
 import { TargetType } from '../enum';
-import MarketTarget from './mbase';
-import { faildResult, model, schema, kernel, common } from '@/ts/base';
+import { faildResult, model, schema, kernel } from '@/ts/base';
 import { validIsSocialCreditCode } from '@/utils/tools';
+import BaseTarget from './base';
+import Working from './working';
+import Department from './department';
+import MarketTarget from './mbase';
 /**
  * 公司的元操作
  */
 export default class Company extends MarketTarget {
-  private _joinedGroups: Group[];
-  private _joinedCohorts: Cohort[];
   constructor(target: schema.XTarget) {
     super(target);
-    this._joinedGroups = [];
-    this._joinedCohorts = [];
     this.subTypes = [
       // 工作群
       TargetType.JobCohort,
@@ -27,67 +26,10 @@ export default class Company extends MarketTarget {
       // 科室
       TargetType.Section,
     ];
-    this.searchTargetType = [TargetType.Person, TargetType.Group];
-  }
-
-  // 可以拉入的成员类型
-  get memberTypes(): TargetType[] {
-    return [TargetType.Person];
-  }
-
-  /**
-   * 更新单位
-   * @param name 单位名称
-   * @param code 单位信用代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 单位简介
-   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
-   * @returns 是否成功
-   */
-  public async updateCompany(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    if (!validIsSocialCreditCode(code)) {
-      return faildResult('请填写正确的代码!');
-    }
-    return await this.updateTarget(name, code, teamName, teamCode, remark);
-  }
-
-  /**
-   * 更新部门、工作组
-   * @param id 部门、工作组Id
-   * @param name 部门、工作组名称
-   * @param code 部门、工作组编码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 部门、工作组简介
-   * @param type 部门、工作组类型
-   * @returns 是否成功
-   */
-  public async updateDepartmentOrWorking(
-    id: string,
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    typeName: TargetType,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.updateTarget({
-      id,
-      name,
-      code,
-      teamCode,
-      teamName,
-      teamRemark: remark,
-      belongId: this.target.belongId,
-      typeName: typeName,
-    });
+    this.pullTypes = [TargetType.Person];
+    this.joinTargetType = [TargetType.Group, TargetType.Cohort];
+    this.createTargetType = [TargetType.Cohort, TargetType.Group];
+    this.searchTargetType = [TargetType.Person, TargetType.Cohort, TargetType.Group];
   }
 
   /**
@@ -117,38 +59,14 @@ export default class Company extends MarketTarget {
         remark,
       );
       if (res.success) {
-        this._joinedGroups.push(new Group(res.data));
-        return await this.join(res.data.id, [TargetType.Group]);
+        const group = new Group(res.data);
+        this.joinTargets.push(group);
+        return await this.pullMember([this.target]);
       }
       return res;
     } else {
       return faildResult('该集团已存在!');
     }
-  }
-
-  /**
-   * 删除集团
-   * @param id 集团Id
-   * @returns
-   */
-  public async deleteGroup(id: string): Promise<model.ResultType<any>> {
-    const group = this._joinedGroups.find((group) => {
-      return group.target.id == id;
-    });
-    if (group != undefined) {
-      let res = await kernel.recursiveDeleteTarget({
-        id: id,
-        typeName: TargetType.Group,
-        subNodeTypeNames: [TargetType.Group],
-      });
-      if (res.success) {
-        this._joinedGroups = this._joinedGroups.filter((group) => {
-          return group.target.id != id;
-        });
-      }
-      return res;
-    }
-    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -173,10 +91,35 @@ export default class Company extends MarketTarget {
     );
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
-      this._joinedCohorts.push(cohort);
-      return cohort.pullMember([this.target.id], <TargetType>this.target.typeName);
+      this.joinTargets.push(cohort);
+      return cohort.pullMember([this.target]);
     }
     return res;
+  }
+
+  /**
+   * 删除集团
+   * @param id 集团Id
+   * @returns
+   */
+  public async deleteGroup(id: string): Promise<model.ResultType<any>> {
+    const group = this.joinTargets.find((group) => {
+      return group.target.id == id;
+    });
+    if (group != undefined) {
+      let res = await kernel.recursiveDeleteTarget({
+        id: id,
+        typeName: TargetType.Group,
+        subNodeTypeNames: [TargetType.Group],
+      });
+      if (res.success) {
+        this.joinTargets = this.joinTargets.filter((group) => {
+          return group.target.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -186,143 +129,78 @@ export default class Company extends MarketTarget {
    * @returns
    */
   public async deleteCohort(id: string): Promise<model.ResultType<any>> {
-    let res = await super.deleteTarget(id, TargetType.Cohort);
+    let res = await kernel.deleteTarget({
+      id: id,
+      typeName: TargetType.Cohort,
+      belongId: this.target.id,
+    });
     if (res.success) {
-      this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
+      this.joinTargets = this.joinTargets.filter((obj) => obj.target.id != id);
     }
     return res;
   }
 
   /**
-   * 创建部门/工作组
-   * @param name 名称
-   * @param code 编号
-   * @param teamName 团队名称
-   * @param teamCode 团队编号
-   * @param remark 简介
-   * @param parentId 上级组织Id 默认公司 公司、部门
-   * @returns
+   * 退出群组
+   * @param id 群组Id
    */
-  public async createDepartmentOrWoking(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-    parentId: string = '0',
-    targetType: TargetType.Working | TargetType.Department,
-  ): Promise<model.ResultType<any>> {
-    const res = await this.createTarget(
-      name,
-      code,
-      targetType,
-      teamName,
-      teamCode,
-      remark,
-    );
+  public async quitCohorts(id: string): Promise<model.ResultType<any>> {
+    const res = await this.cancelJoinTeam(id);
     if (res.success) {
-      if (parentId == '0') {
-        parentId = this.target.id;
-      }
-      this._joinedGroups.push(new Group(res.data));
-      return await kernel.pullAnyToTeam({
-        id: parentId,
-        teamTypes: [TargetType.Department, this.target.typeName],
-        targetIds: [res.data?.id],
-        targetType: targetType,
+      this.joinTargets = this.joinTargets.filter((cohort) => {
+        return cohort.target.id != id;
       });
     }
     return res;
   }
 
   /**
-   * 删除工作组
-   * @param id 工作组Id
+   *  退出集团
+   * @param id 集团Id
    * @returns
    */
-  public async deleteWoking(id: string): Promise<model.ResultType<any>> {
-    let res = await kernel.deleteTarget({
-      id: id,
-      typeName: TargetType.Working,
-      belongId: this.target.id,
+  public async quitGroup(id: string): Promise<model.ResultType<any>> {
+    const group = await this.joinTargets.find((a) => {
+      return a.target.id == id;
     });
-    return res;
+    if (group != undefined) {
+      const res = await kernel.recursiveExitAnyOfTeam({
+        id,
+        teamTypes: [TargetType.Group],
+        targetId: this.target.id,
+        targetType: this.target.typeName,
+      });
+      if (res.success) {
+        this.joinTargets = this.joinTargets.filter((a) => {
+          return a.target.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
-   * 删除部门
-   * @param id 部门Id
+   * 获取组织下的人员（单位、部门、工作组）
+   * @param id 组织Id 默认为当前单位
    * @returns
    */
-  public async deleteDepartment(id: string): Promise<model.ResultType<any>> {
-    let res = await kernel.recursiveDeleteTarget({
-      id: id,
-      typeName: TargetType.Department,
-      subNodeTypeNames: [TargetType.Department, TargetType.Working],
-    });
-    return res;
-  }
-
-  /**
-   * 拉人进入部门
-   * @param id 部门Id
-   * @param personIds 人员id数组
-   * @returns 是否成功
-   */
-  public async pullPersonInDepartment(
-    id: string,
-    personIds: string[],
-  ): Promise<model.ResultType<any>> {
-    return await kernel.pullAnyToTeam({
-      id,
-      teamTypes: [TargetType.Department],
-      targetIds: personIds,
-      targetType: TargetType.Person,
+  public async getPersons(): Promise<BaseTarget[]> {
+    await this.getSubTargets();
+    return <BaseTarget[]>this.subTargets.filter((a) => {
+      return a.target.typeName == TargetType.Person;
     });
   }
 
   /**
-   * 拉人进入工作组
-   * @param id 工作组Id
-   * @param personIds 人员id数组
-   * @returns 是否成功
-   */
-  public async pullPersonInWorking(
-    id: string,
-    personIds: string[],
-  ): Promise<model.ResultType<any>> {
-    return await kernel.pullAnyToTeam({
-      id,
-      teamTypes: [TargetType.Working],
-      targetIds: personIds,
-      targetType: TargetType.Person,
-    });
-  }
-
-  /**
-   * 移除工作组人员
-   * @param ids 人员Id集合
+   * 获取组织下的部门（单位、部门）
+   * @param id 组织Id 默认为当前单位
    * @returns
    */
-  public async removeWorkingPerson(ids: string[]) {
-    return await kernel.removeAnyOfTeam({
-      id: this.target.id,
-      teamTypes: [TargetType.Working],
-      targetIds: ids,
-      targetType: TargetType.Person,
-    });
-  }
-  /**
-   * 移除部门人员
-   * @param ids 人员Id集合
-   * @returns
-   */
-  public async removeDepartmentPerson(ids: string[]) {
-    return await kernel.removeAnyOfTeam({
-      id: this.target.id,
-      teamTypes: [TargetType.Department],
-      targetIds: ids,
-      targetType: TargetType.Person,
+  public async getDepartments(): Promise<Department[]> {
+    await this.getSubTargets();
+    return <Department[]>this.subTargets.filter((a) => {
+      return a.target.typeName == TargetType.Department;
     });
   }
 
@@ -331,44 +209,11 @@ export default class Company extends MarketTarget {
    * @param id 组织Id 默认为当前单位
    * @returns 返回好友列表
    */
-  public async getWorkings(id: string = '0'): Promise<model.ResultType<any>> {
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Department],
-      [TargetType.Working],
-    );
-  }
-
-  /**
-   * 获取组织下的人员（单位、部门、工作组）
-   * @param id 组织Id 默认为当前单位
-   * @returns
-   */
-  public async getPersons(id: string = '0'): Promise<model.ResultType<any>> {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Department, TargetType.Working],
-      [TargetType.Person],
-    );
-  }
-
-  /**
-   * 获取组织下的部门（单位、部门）
-   * @param id 组织Id 默认为当前单位
-   * @returns
-   */
-  public async getDepartments(id: string = '0'): Promise<model.ResultType<any>> {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Department],
-      [TargetType.Person],
-    );
+  public async getWorkings(): Promise<Working[]> {
+    await this.getSubTargets();
+    return <Working[]>this.subTargets.filter((a) => {
+      return a.target.typeName == TargetType.Working;
+    });
   }
 
   /**
@@ -376,58 +221,9 @@ export default class Company extends MarketTarget {
    * @return {*} 查询到的群组
    */
   public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._joinedCohorts.length > 0) {
-      return this._joinedCohorts;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
-    });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
-        this._joinedCohorts.push(new Cohort(item));
-      });
-    }
-    return this._joinedCohorts;
-  }
-
-  /**
-   * @description: 查询我加入的部门
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedDepartments(
-    personId: string,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await kernel.queryJoinedTargetById({
-      id: personId,
-      typeName: this.target.typeName,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
-    });
-  }
-
-  /**
-   * @description: 查询我加入的工作组
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedWorkings(
-    personId: string,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await kernel.queryJoinedTargetById({
-      id: personId,
-      typeName: this.target.typeName,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
+    await this.getjoinedTargets();
+    return <Cohort[]>this.joinTargets.filter((a) => {
+      return a.target.typeName == TargetType.Cohort;
     });
   }
 
@@ -436,19 +232,33 @@ export default class Company extends MarketTarget {
    * @return {*} 查询到的群组
    */
   public async getJoinedGroups(): Promise<Group[]> {
-    if (this._joinedGroups.length > 0) {
-      return this._joinedGroups;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Group],
+    await this.getjoinedTargets();
+    return <Group[]>this.joinTargets.filter((a) => {
+      return a.target.typeName == TargetType.Group;
     });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
-        this._joinedGroups.push(new Group(item));
-      });
+  }
+
+  /**
+   * 更新单位
+   * @param name 单位名称
+   * @param code 单位信用代码
+   * @param teamName 团队名称
+   * @param teamCode 团队代码
+   * @param remark 单位简介
+   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @returns 是否成功
+   */
+  public async updateTarget(
+    name: string,
+    code: string,
+    teamName: string = '',
+    teamCode: string = '',
+    remark: string,
+  ): Promise<model.ResultType<schema.XTarget>> {
+    if (!validIsSocialCreditCode(code)) {
+      return faildResult('请填写正确的代码!');
     }
-    return this._joinedGroups;
+    return await super.updateTarget(name, code, teamName, teamCode, remark);
   }
 
   /**
@@ -457,7 +267,7 @@ export default class Company extends MarketTarget {
    * @returns
    */
   public async applyJoinCohort(id: string): Promise<model.ResultType<any>> {
-    const cohort = this._joinedCohorts.find((cohort) => {
+    const cohort = this.joinTargets.find((cohort) => {
       return cohort.target.id == id;
     });
     if (cohort != undefined) {
@@ -472,26 +282,12 @@ export default class Company extends MarketTarget {
    * @returns
    */
   public async applyJoinGroup(id: string): Promise<model.ResultType<any>> {
-    const group = this._joinedGroups.find((group) => {
+    const group = this.joinTargets.find((group) => {
       return group.target.id == id;
     });
     if (group != undefined) {
       return faildResult(consts.IsJoinedError);
     }
     return await this.applyJoin(id, TargetType.Group);
-  }
-
-  /**
-   *  退出集团
-   * @param id 集团Id
-   * @returns
-   */
-  public async quitGroup(id: string): Promise<model.ResultType<any>> {
-    return await kernel.recursiveExitAnyOfTeam({
-      id,
-      teamTypes: [TargetType.Group],
-      targetId: this.target.id,
-      targetType: this.target.typeName,
-    });
   }
 }

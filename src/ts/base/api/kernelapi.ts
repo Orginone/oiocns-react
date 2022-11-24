@@ -713,7 +713,7 @@ export default class KernelApi {
    */
   public async pullAnyToTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<boolean>> {
+  ): Promise<model.ResultType<schema.XRelationArray>> {
     return await this.request({
       module: 'target',
       action: 'PullAnyToTeam',

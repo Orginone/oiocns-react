@@ -6,13 +6,17 @@ import Authority from './authority/authority';
 import Department from './department';
 import Working from './working';
 import Provider from '../provider';
+import Group from './group';
+import Company from './company';
+import Hospital from './hospital';
+import University from './university';
 
 export default class BaseTarget implements ITarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
   public pullTypes: TargetType[];
-  public subTargets: Map<TargetType, ITarget[]>;
-  public parentTargets: ITarget[];
+  public subTargets: ITarget[];
+  public joinTargets: ITarget[];
   public authorityTree: Authority | undefined;
 
   public createTargetType: TargetType[];
@@ -23,8 +27,8 @@ export default class BaseTarget implements ITarget {
     this.target = target;
     this.subTypes = [];
     this.pullTypes = [];
-    this.subTargets = new Map<TargetType, ITarget>();
-    this.parentTargets = [];
+    this.subTargets = [];
+    this.joinTargets = [];
     this.createTargetType = [];
     this.joinTargetType = [];
     this.searchTargetType = [];
@@ -39,43 +43,32 @@ export default class BaseTarget implements ITarget {
     targetType: TargetType,
   ): Promise<model.ResultType<any>> {
     if (this.subTypes.includes(targetType)) {
-      if (this.subTypes.includes(targetType)) {
-        const res = await this.createTarget(
-          name,
-          code,
-          targetType,
-          teamName,
-          teamCode,
-          remark,
-        );
-        if (res.success) {
-          switch (targetType) {
-            case TargetType.Department:
-              this.subTargets.push(new Department(res.data));
-              break;
-            case TargetType.Working:
-              this.subTargets.push(new Working(res.data));
-              break;
-            case TargetType.Group:
-              this.subTargets.push(new Group(res.data));
-            default:
-              break;
-          }
-          return await kernel.pullAnyToTeam({
-            id: this.target.id,
-            teamTypes: [this.target.typeName],
-            targetIds: [res.data?.id],
-            targetType: targetType,
-          });
-        }
+      const res = await this.createTarget(
+        name,
+        code,
+        targetType,
+        teamName,
+        teamCode,
+        remark,
+      );
+      if (res.success) {
+        this.subTargets.push(this.dealTarget(res.data));
+        return await kernel.pullAnyToTeam({
+          id: this.target.id,
+          teamTypes: [this.target.typeName],
+          targetIds: [res.data?.id],
+          targetType: targetType,
+        });
       }
     }
-    throw new Error('Method not implemented.');
+    return faildResult(consts.UnauthorizedError);
   }
 
   public async deleteSubTarget(id: string): Promise<model.ResultType<any>> {
     const sub = this.subTargets.find((sub) => {
-      return sub.target.id == id;
+      return (
+        sub.target.id == id && this.subTypes.includes(<TargetType>sub.target.typeName)
+      );
     });
     if (sub != undefined) {
       let res = await kernel.deleteTarget({
@@ -92,32 +85,69 @@ export default class BaseTarget implements ITarget {
     return faildResult(consts.UnauthorizedError);
   }
 
-  public async pullMember(
-    ids: string[],
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.pullTypes.includes(typeName)) {
-      return await this.pull(ids, typeName);
+  protected dealTarget(target: schema.XTarget): ITarget {
+    switch (<TargetType>target.typeName) {
+      case TargetType.Company:
+        return new Company(target);
+      case TargetType.Hospital:
+        return new Hospital(target);
+      case TargetType.University:
+        return new University(target);
+      case TargetType.Department:
+        return new Department(target);
+      case TargetType.Working:
+        return new Working(target);
+      case TargetType.Group:
+        return new Group(target);
+      default:
+        return new BaseTarget(target);
     }
-    throw new Error(consts.UnauthorizedError);
+  }
+
+  public async pullMember(targets: schema.XTarget[]): Promise<model.ResultType<any>> {
+    targets = targets.filter((a) => {
+      return this.pullTypes.includes(<TargetType>a.typeName);
+    });
+    const res = await kernel.pullAnyToTeam({
+      id: this.target.id,
+      teamTypes: [this.target.typeName],
+      targetIds: targets.map((a) => {
+        return a.id;
+      }),
+      targetType: <TargetType>targets[0].typeName,
+    });
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        const target = targets.find((s) => {
+          return s.id == a.targetId;
+        });
+        if (target != undefined) {
+          this.subTargets.push(this.dealTarget(target));
+        }
+      });
+    }
+    return res;
   }
 
   public async removeMember(
     ids: string[],
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
-    const res = await kernel.removeAnyOfTeam({
-      id: this.target.id,
-      teamTypes: [this.target.typeName],
-      targetIds: ids,
-      targetType: typeName,
-    });
-    if (res.success) {
-      this.subTargets = this.subTargets.filter((target) => {
-        return !ids.includes(target.target.id);
+    if (this.pullTypes.includes(typeName)) {
+      const res = await kernel.removeAnyOfTeam({
+        id: this.target.id,
+        teamTypes: [this.target.typeName],
+        targetIds: ids,
+        targetType: typeName,
       });
+      if (res.success) {
+        this.subTargets = this.subTargets.filter((target) => {
+          return !ids.includes(target.target.id);
+        });
+      }
+      return res;
     }
-    return res;
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -131,7 +161,7 @@ export default class BaseTarget implements ITarget {
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
     if (this.searchTargetType.includes(typeName)) {
-      const data: model.NameTypeModel = {
+      return await kernel.searchTargetByName({
         name: name,
         typeName: typeName,
         page: {
@@ -139,8 +169,7 @@ export default class BaseTarget implements ITarget {
           filter: name,
           limit: common.Constants.MAX_UINT_16,
         },
-      };
-      return await kernel.searchTargetByName(data);
+      });
     }
     return faildResult(consts.UnauthorizedError);
   }
@@ -164,6 +193,19 @@ export default class BaseTarget implements ITarget {
       });
     }
     return faildResult(consts.UnauthorizedError);
+  }
+
+  /**
+   * 取消加入组织/个人
+   * @param id 申请Id/目标Id
+   * @returns
+   */
+  protected async cancelJoinTeam(id: string): Promise<model.ResultType<any>> {
+    return await kernel.cancelJoinTeam({
+      id,
+      belongId: this.target.id,
+      typeName: this.target.typeName,
+    });
   }
 
   /**
@@ -213,27 +255,15 @@ export default class BaseTarget implements ITarget {
   }
 
   /**
-   * 取消加入组织/个人
-   * @param id 申请Id/目标Id
-   * @returns
-   */
-  protected async cancelJoinTeam(id: string): Promise<model.ResultType<any>> {
-    return await kernel.cancelJoinTeam({
-      id,
-      belongId: this.target.id,
-      typeName: this.target.typeName,
-    });
-  }
-
-  /**
    * 获取加入的组织
    * @param data 请求参数
    * @returns 请求结果
    */
-  protected async getjoined(
-    data: Omit<model.IDReqJoinedModel, 'id' | 'typeName' | 'page'>,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await kernel.queryJoinedTargetById({
+  public async getjoinedTargets(forceFlash: boolean = false): Promise<ITarget[]> {
+    if (!forceFlash && this.joinTargets.length > 0) {
+      return this.joinTargets;
+    }
+    const res = await kernel.queryJoinedTargetById({
       id: this.target.id,
       typeName: this.target.typeName,
       page: {
@@ -241,45 +271,41 @@ export default class BaseTarget implements ITarget {
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
-      ...data,
+      spaceId: Provider.spaceId,
+      JoinTypeNames: this.joinTargetType,
     });
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.joinTargets.push(this.dealTarget(a));
+      });
+    }
+    return this.joinTargets;
   }
 
   /**
    * 获取子组织/个人
    * @returns 返回好友列表
    */
-  public async getSubTargets(
-    subTypeNames: string[],
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await kernel.querySubTargetById({
+  public async getSubTargets(forceFlash: boolean = false): Promise<ITarget[]> {
+    if (!forceFlash && this.subTargets.length > 0) {
+      return this.subTargets;
+    }
+    const res = await kernel.querySubTargetById({
       id: this.target.id,
       typeNames: [this.target.typeName],
-      subTypeNames: subTypeNames,
+      subTypeNames: this.subTypes,
       page: {
         offset: 0,
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
-
-  /**
-   * 拉对象加入自身
-   * @param targetIds 拉入对象Id集合
-   * @param targetType 拉入对象类型
-   * @returns 拉入结果
-   */
-  protected async pull(
-    targetIds: string[],
-    targetType: TargetType,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.pullAnyToTeam({
-      id: this.target.id,
-      teamTypes: [this.target.typeName],
-      targetIds,
-      targetType,
-    });
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.subTargets.push(this.dealTarget(a));
+      });
+    }
+    return this.subTargets;
   }
 
   /**
@@ -288,16 +314,19 @@ export default class BaseTarget implements ITarget {
    * @param teamTypes
    * @returns
    */
-  protected async join(
-    id: string,
-    teamTypes: TargetType[],
-  ): Promise<model.ResultType<any>> {
-    return await kernel.pullAnyToTeam({
-      id,
-      teamTypes,
-      targetType: this.target.typeName,
-      targetIds: [this.target.id],
-    });
+  protected async join(target: schema.XTarget): Promise<model.ResultType<any>> {
+    if (this.joinTargetType.includes(<TargetType>target.typeName)) {
+      const res = await kernel.pullAnyToTeam({
+        id: this.target.id,
+        teamTypes: [target.typeName],
+        targetType: this.target.typeName,
+        targetIds: [this.target.id],
+      });
+      if (res.success) {
+        this.joinTargets.push(this.dealTarget(target));
+      }
+    }
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
@@ -372,27 +401,6 @@ export default class BaseTarget implements ITarget {
       }
     }
     return res;
-  }
-
-  /**
-   * 删除对象
-   * @param id 对象Id
-   * @param typeName 对象类型
-   * @returns
-   */
-  protected async deleteTarget(
-    id: string,
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.createTargetType.includes(typeName)) {
-      return await kernel.deleteTarget({
-        id,
-        typeName,
-        belongId: this.target.id,
-      });
-    } else {
-      return faildResult(consts.UnauthorizedError);
-    }
   }
 
   /**

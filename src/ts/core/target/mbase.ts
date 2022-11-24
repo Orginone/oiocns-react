@@ -1,10 +1,10 @@
-import { common, kernel, model, schema } from '@/ts/base';
+import { common, kernel, model, schema } from '../../base';
 import { AppStore, Product } from '../market';
 import { TargetType } from '../enum';
-import Cohort from './cohort';
 import { IMTarget } from './itarget';
+import BaseTarget from './base';
 
-export default class MarketTarget extends Cohort implements IMTarget {
+export default class MarketTarget extends BaseTarget implements IMTarget {
   public joinMarketApplys: schema.XMarketRelation[];
   public joinedMarkets: AppStore[];
   public owdProducts: Product[];

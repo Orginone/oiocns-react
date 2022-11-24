@@ -2,6 +2,11 @@ import { model, schema } from '../../base';
 import { TargetType } from '../enum';
 import { IAuthority } from './authority/iauthority';
 import { AppStore, Product } from '../market';
+import Company from './company';
+import Cohort from './cohort';
+import Department from './department';
+import Working from './working';
+import Group from './group';
 
 export interface ITarget {
   /** 当前组织/个人实体对象 */
@@ -13,9 +18,9 @@ export interface ITarget {
   /** 可以通过拉取加入的子类类型 */
   pullTypes: TargetType[];
   /** 子组织集合 */
-  subTargets: Map<TargetType, ITarget>;
+  subTargets: ITarget[];
   /** 父组织集合 */
-  parentTargets: ITarget[];
+  joinTargets: ITarget[];
   /** 可以创建的组织类型 */
   createTargetType: TargetType[];
   /** 可以加入的组织类型 */
@@ -66,7 +71,7 @@ export interface ITarget {
    * 获取子组织/个人
    * @returns
    */
-  getSubTargets(subTypeNames: string[]): Promise<model.ResultType<schema.XTargetArray>>;
+  getSubTargets(): Promise<ITarget[]>;
   /**
    * 根据名称查询组织/个人
    * @param name 名称
@@ -74,6 +79,12 @@ export interface ITarget {
    * @returns
    */
   searchTargetByName(name: string, typeName: TargetType): Promise<model.ResultType<any>>;
+  /**
+   * 获取加入的组织
+   * @param data 请求参数
+   * @returns 请求结果
+   */
+  getjoinedTargets(): Promise<ITarget[]>;
   /**
    * 查询组织职权树
    * @param id
@@ -86,7 +97,7 @@ export interface ITarget {
    * @param typeName
    * @returns
    */
-  pullMember(ids: string[], typeName: TargetType): Promise<model.ResultType<any>>;
+  pullMember(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
   /**
    * 移除群组成员
    * @param ids 成员Id集合
@@ -229,7 +240,12 @@ export interface IPerson extends ITarget {
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(): Promise<ITarget[]>;
+  getJoinedCohorts(): Promise<Cohort[]>;
+  /**
+   * 获取单位列表
+   * @return 加入的单位列表
+   */
+  getJoinedCompanys(): Promise<Company[]>;
   /**
    * 创建群组
    * @param name 名称
@@ -242,29 +258,6 @@ export interface IPerson extends ITarget {
     code: string,
     remark: string,
   ): Promise<model.ResultType<any>>;
-  /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<model.ResultType<any>>;
-  /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<model.ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<model.ResultType<any>>;
-  /**
-   * 获取单位列表
-   * @return 加入的单位列表
-   */
-  getJoinedCompanys(): Promise<ICompany[]>;
   /**
    * 设立单位
    * @param name 单位名称
@@ -284,25 +277,12 @@ export interface IPerson extends ITarget {
     type: TargetType,
   ): Promise<model.ResultType<any>>;
   /**
-   * 更新单位
-   * @deprecated 该方法已弃用
-   * @param id 单位Id
-   * @param name 单位名称
-   * @param code 单位信用代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 单位简介
-   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
-   * @returns 是否成功
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
    */
-  updateCompany(
-    id: string,
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<model.ResultType<any>>;
+  deleteCohort(id: string): Promise<model.ResultType<any>>;
   /**
    * 删除单位
    * @param id 单位Id
@@ -310,11 +290,22 @@ export interface IPerson extends ITarget {
    */
   deleteCompany(id: string): Promise<model.ResultType<any>>;
   /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinCohort(id: string): Promise<model.ResultType<any>>;
+  /**
    * 申请加入单位
    * @param id 目标Id
    * @returns
    */
   applyJoinCompany(id: string, typeName: TargetType): Promise<model.ResultType<any>>;
+  /**
+   * 退出群组
+   * @param id 群组Id
+   */
+  quitCohorts(id: string): Promise<model.ResultType<any>>;
   /**
    * 退出单位
    * @param id 单位Id
@@ -324,13 +315,13 @@ export interface IPerson extends ITarget {
    * 获取好友列表
    * @returns 返回好友列表
    */
-  getFriends(): Promise<schema.XTarget[]>;
+  getFriends(): Promise<ITarget[]>;
   /**
    * 申请添加好友
-   * @param id 目标Id
+   * @param target 目标
    * @returns
    */
-  applyFriend(id: string): Promise<model.ResultType<any>>;
+  applyFriend(target: schema.XTarget): Promise<model.ResultType<any>>;
   /**
    * 移除好友
    * @param id 好友Id
@@ -354,4 +345,95 @@ export interface IPerson extends ITarget {
   cancelJoinApply(id: string): Promise<model.ResultType<any>>;
 }
 
-export interface ICompany extends IMTarget {}
+export interface ICompany extends ITarget {
+  /**
+   * 创建集团
+   * @param name 集团名称
+   * @param code 集团代码
+   * @param teamName 团队名称
+   * @param teamCode 团队代码
+   * @param remark 集团简介
+   * @returns 是否成功
+   */
+  createGroup(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+  ): Promise<model.ResultType<any>>;
+  /**
+   * 创建群组
+   * @param name 名称
+   * @param code 编号
+   * @param remark 备注
+   * @returns 是否创建成功
+   */
+  createCohort(
+    name: string,
+    code: string,
+    remark: string,
+  ): Promise<model.ResultType<any>>;
+  /**
+   * 删除集团
+   * @param id 集团Id
+   * @returns
+   */
+  deleteGroup(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
+   */
+  deleteCohort(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 退出群组
+   * @param id 群组Id
+   */
+  quitCohorts(id: string): Promise<model.ResultType<any>>;
+  /**
+   *  退出集团
+   * @param id 集团Id
+   * @returns
+   */
+  quitGroup(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 获取单位下的人员
+   * @returns
+   */
+  getPersons(): Promise<ITarget[]>;
+  /**
+   * 获取单位下的部门（单位、部门）
+   * @returns
+   */
+  getDepartments(): Promise<Department[]>;
+  /**
+   * 获取组织下的工作组（单位、部门、工作组）
+   * @param id 组织Id 默认为当前单位
+   * @returns 返回好友列表
+   */
+  getWorkings(): Promise<Working[]>;
+  /**
+   * @description: 查询我加入的群
+   * @return {*} 查询到的群组
+   */
+  getJoinedCohorts(): Promise<Cohort[]>;
+  /**
+   * @description: 查询我加入的集团
+   * @return {*} 查询到的群组
+   */
+  getJoinedGroups(): Promise<Group[]>;
+  /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinCohort(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 申请加入集团
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinGroup(id: string): Promise<model.ResultType<any>>;
+}
