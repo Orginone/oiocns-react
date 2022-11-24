@@ -1,15 +1,15 @@
 import Provider from '../../core/provider';
 import { FileSystemItem } from '../../core/store/filesys';
-import { IFileSystemItem } from '../../core/store/ifilesys';
+import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 import BaseController from '../baseCtrl';
-
-export type IObjectItem = IFileSystemItem | undefined;
+const homeName = '主目录';
 /**
  * 文档控制器
  */
 class DocsController extends BaseController {
-  _curKey: string;
-  _root: IFileSystemItem;
+  private _curKey: string;
+  private _home: IObjectItem;
+  private _root: IFileSystemItem;
   constructor() {
     super();
     this._root = new FileSystemItem(
@@ -18,19 +18,29 @@ class DocsController extends BaseController {
         name: '根目录',
         isDirectory: true,
         hasSubDirectories: true,
-        dateCreated: '',
-        dateModified: '',
+        dateCreated: new Date(),
+        dateModified: new Date(),
       },
       undefined,
     );
     this._curKey = this._root.key;
     Provider.onSetPerson(async () => {
-      await this.current?.loadChildren(true);
+      await this._root.loadChildren(true);
+      this._home = this._root.findByName(homeName);
+      if (!this._home) {
+        await this._root.create(homeName);
+        this._home = this._root.findByName(homeName);
+      }
+      this.changCallback();
     });
   }
   /** 根目录 */
   public get root(): IFileSystemItem {
     return this._root;
+  }
+  /** 主目录 */
+  public get home(): IObjectItem {
+    return this._home;
   }
   /** 当前目录 */
   public get current(): IObjectItem {
@@ -42,6 +52,24 @@ class DocsController extends BaseController {
    */
   public refItem(key: string): IObjectItem {
     return this._search(this._root, key);
+  }
+  /** 返回上一级 */
+  public backup() {
+    if (this.current && this.current.parent) {
+      this._curKey = this.current.parent.key;
+      this.changCallback();
+    }
+  }
+  /** 打开文件系统项 */
+  public async open(key: string) {
+    const item = this.refItem(key);
+    if (item) {
+      if (item.target.isDirectory) {
+        await item.loadChildren(false);
+        this._curKey = item.key;
+        this.changCallback();
+      }
+    }
   }
   /**
    * 树结构搜多

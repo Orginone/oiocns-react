@@ -217,11 +217,11 @@ export default class AnyStore {
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType<FileItemModel[]>} 移除异步结果
    */
-  public async objects(
+  public async objectList(
     key: string,
     domain: string,
   ): Promise<ResultType<FileItemModel[]>> {
-    return await this._storeHub.invoke('Objects', key, domain);
+    return await this._storeHub.invoke('ObjectList', key, domain);
   }
   /**
    * 创建文件系统项

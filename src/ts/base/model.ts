@@ -791,9 +791,9 @@ export type FileItemModel = {
   /** 完整路径 */
   key: string;
   /** 创建时间 */
-  dateCreated: string;
+  dateCreated: Date;
   /** 修改时间 */
-  dateModified: string;
+  dateModified: Date;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */
