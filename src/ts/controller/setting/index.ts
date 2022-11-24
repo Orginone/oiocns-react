@@ -2,6 +2,8 @@ import BaseController from './SingletonPublish';
 import UserdataService from '../../core/target/user';
 import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
+import React from 'react';
+import * as Icon from '@ant-design/icons';
 export interface spaceObjs {
   id: string;
   title: string;
@@ -54,7 +56,10 @@ class SettingController extends BaseController {
             TargetType.Department,
           );
           if (company2s.length > 0) {
-            arrayChild = await this.getDepartments(comp.target.id);
+           const getValue = await this.getDepartments(comp.target.id);
+           arrayChild = getValue.map((item) => {
+             return {...item, icon:React.createElement(Icon['ApartmentOutlined'])}
+           })
           }
           const spaceObj: spaceObjs = {
             id: comp.target.id,
@@ -66,7 +71,6 @@ class SettingController extends BaseController {
           };
           arrays.push(spaceObj);
         }
-        // companys.forEach(async (e) => {});
       }
       return arrays;
     }

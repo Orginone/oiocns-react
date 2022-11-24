@@ -1,6 +1,5 @@
 import React from 'react';
 import Creategroup from './Creategroup';
-import settingStore from '@/store/setting';
 
 import cls from './index.module.less';
 

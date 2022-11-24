@@ -36,13 +36,15 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   useEffect(() => {
     settingController.addListen('isOpenModal', () => { 
       setIsOpen(true);
-      
     })
     return settingController.remove('isOpenModal', () => { 
       setIsOpen(false);
     })
   }, []);
 
+  /**
+   * 监听集团id发生变化，改变右侧数据
+   * */ 
   useEffect(() => {
     settingController.addListen('createGroup', (e) => {
       console.log('1111', e);     
