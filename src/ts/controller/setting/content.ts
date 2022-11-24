@@ -74,6 +74,25 @@ class SettingController {
     // 切换工作空间的时候 初始化控制器。
   }
 
+  // 测试代码不使用
+  public async test() {
+    const params: deptParams = {
+      name: '部门六一一',
+      code: 'BMSixONE',
+      teamName: '部门六一一',
+      teamCode: 'BMSixONE',
+      remark: '部门六一一',
+    };
+    console.log(params);
+
+    // const compid = '383264515724283904';
+    // const deptid = '381107910723375104';
+    // 381107910723375104
+    // console.log(await this.createSecondDepartment(params));
+    let arrays: spaceObjs[] = await this.getDepartments('0');
+    console.log('-------', arrays);
+  }
+
   /**
    * 递归查询前单位底下的所有部门底下的子部门
    * @param parentId
@@ -85,33 +104,32 @@ class SettingController {
     if (parentId === '0') {
       compid = this.companyID;
     }
-
     const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
       TargetType.Department,
     );
     if (companys.length > 0) {
-      companys.forEach(async (e) => {
+      for (const comp of companys) {
         // 查找是否有children
         let arrayChild: spaceObjs[] = [];
         const company2s: Company[] = await this.userDataService.getBelongTargets(
-          e.target.id,
+          comp.target.id,
           TargetType.Department,
         );
         if (company2s.length > 0) {
-          arrayChild = await this.getDepartments(e.target.id);
+          arrayChild = await this.getDepartments(comp.target.id);
         }
-
         const spaceObj: spaceObjs = {
-          id: e.target.id,
-          key: e.target.id,
-          title: e.target.name,
+          id: comp.target.id,
+          key: comp.target.id,
+          title: comp.target.name,
           parentId: compid!,
           companyId: compid!,
           children: arrayChild,
         };
         arrays.push(spaceObj);
-      });
+      }
+      // companys.forEach(async (e) => {});
     }
     return arrays;
   }
