@@ -1,4 +1,4 @@
-import { Card, Avatar, Space, Typography, Dropdown, MenuProps, Menu } from 'antd';
+import { Card, Avatar, Space, Typography, Dropdown, MenuProps } from 'antd';
 import React from 'react';
 import { ApprovalType } from '@/module/todo/typings';
 import styles from './index.module.less';
@@ -43,7 +43,7 @@ const TableItemCard = <T extends ApprovalType>(props: TableItemCardProps<T>) => 
                   {operation && (
                     <Dropdown.Button
                       type="text"
-                      overlay={<Menu items={operation(item)}></Menu>}
+                      menu={{ items: operation(item) }}
                       className={styles['drop-down']}
                     />
                   )}

@@ -1,4 +1,4 @@
-import { Button, Card, Dropdown, Form, Menu, Input, Radio, Select } from 'antd';
+import { Button, Card, Dropdown, Form, Input, message, Radio, Select } from 'antd';
 import cls from './index.module.less';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
@@ -6,23 +6,60 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import StoreContent from '@/ts/controller/store/content';
+import StoreSidebar from '@/ts/controller/store/sidebar';
 interface AppInfoType {
   appId: string;
 }
 
+/*******
+ * @desc: 应用上架
+ */
 const AppPutaway: React.FC<AppInfoType> = () => {
   const history = useHistory();
+  const [marketData, setMarketData] = useState<any[]>([]);
+  const [form] = Form.useForm();
+  const AppInfo = StoreContent._curProduct;
+  useEffect(() => {
+    StoreSidebar.getOwnMarket(false).then(() => {
+      setMarketData(StoreSidebar.marketFooterTree.appTreeData);
+    });
+  }, []);
 
-  const menu = (
-    <Menu>
-      <Menu.Item>退订</Menu.Item>
-      <Menu.Item>菜单项二</Menu.Item>
-    </Menu>
-  );
+  const handleSubmit = async () => {
+    const values = await form.validateFields();
+
+    //publish
+    delete values.typeName;
+    const params = {
+      caption: values.caption,
+      marketId: values.marketId,
+      sellAuth: values.sellAuth,
+      information: values.information || '',
+      price: values.price - 0 || 0,
+      days: values.days || '0',
+    };
+    const res = await AppInfo?.publish(params);
+    if (res?.success) {
+      message.success('应用上架成功');
+      history.goBack();
+    } else {
+      message.error('应用上架失败,请稍后重试');
+    }
+
+    // caption: string,
+    // marketId: string,
+    // sellAuth: '所属权' | '使用权',
+    // information: string,
+    // price: number = 0,
+    // days: string = '0',
+  };
+
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['AppPutaway-wrap']}`}>
       <Card
+        className="app-info"
         title={
           <IconFont
             type="icon-jiantou-left"
@@ -32,29 +69,29 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             }}
           />
         }
-        className="app-info">
+      >
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title="应用名称"
+          title={AppInfo?.prod.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">
-                应用描述应用描述应用描述应用描述应用描述应用描述
-              </p>
+              <p className="app-info-con-desc">{AppInfo?.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：2.3.16</span>
-                <span className="lastTime">订阅到期时间 ：2025-12-12</span>
+                <span className="vision">版本号 ：{AppInfo?.prod.version}</span>
+                <span className="lastTime">
+                  订阅到期时间 ：{AppInfo?.prod.createTime}
+                </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
           }
         />
         <div className="btns">
-          <Button className="btn" type="primary" shape="round">
+          <Button className="btn" type="primary" shape="round" onClick={handleSubmit}>
             上架
           </Button>
-          <Dropdown overlay={menu} placement="bottom">
+          <Dropdown menu={{ items: [{ key: 'more', label: '操作' }] }} placement="bottom">
             <EllipsisOutlined
               style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
               rotate={90}
@@ -67,17 +104,30 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
-          initialValues={{ sellAuth: '使用权' }}
-          autoComplete="off">
+          initialValues={{
+            sellAuth: '使用权',
+            caption: AppInfo?.prod.name,
+            typeName: AppInfo?.prod.typeName,
+          }}
+          form={form}
+          autoComplete="off"
+        >
           <Form.Item
             label="上架平台"
             name="marketId"
-            rules={[{ required: true, message: '请选择上架平台' }]}>
+            rules={[{ required: true, message: '请选择上架平台' }]}
+          >
             <Select>
-              <Select.Option value="demo">Demo</Select.Option>
+              {marketData.map((item) => {
+                return (
+                  <Select.Option value={item.id} key={item.id}>
+                    {item.title}
+                  </Select.Option>
+                );
+              })}
             </Select>
           </Form.Item>
-          <Form.Item label="上架应用" name="name">
+          <Form.Item label="上架应用" name="caption">
             <Input />
           </Form.Item>
           <Form.Item label="应用类型" name="typeName">
@@ -90,10 +140,10 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             </Radio.Group>
           </Form.Item>
           <Form.Item label="使用费用" name="price">
-            <Input />
+            <Input type="number" />
           </Form.Item>
           <Form.Item label="使用周期" name="days">
-            <Input />
+            <Input type="number" />
           </Form.Item>
           <Form.Item label="应用信息" name="information">
             <TextArea rows={4} />

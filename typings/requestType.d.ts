@@ -21,7 +21,7 @@ type PaginationProps = {
  * 分页查询
  * 请求体
  */
-interface PageParams {
+export interface PageParams {
   page: number;
   pageSize: number;
   filter?: string;

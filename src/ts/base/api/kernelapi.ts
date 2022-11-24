@@ -2073,26 +2073,29 @@ export default class KernelApi {
   }
   /**
    * 查询待审批任务
+   * @param {model.IdReq} params 查询参数
    * @returns {model.ResultType<schema.XFlowTaskArray>} 请求结果
    */
-  public async queryApproveTask(): Promise<model.ResultType<schema.XFlowTaskArray>> {
+  public async queryApproveTask(
+    params: model.IdReq,
+  ): Promise<model.ResultType<schema.XFlowTaskArray>> {
     return await this.request({
       module: 'flow',
       action: 'QueryApproveTask',
-      params: {},
+      params: params,
     });
   }
   /**
    * 查询待审阅抄送
    * @returns {model.ResultType<schema.XFlowTaskHistoryArray>} 请求结果
    */
-  public async queryNoticeTask(): Promise<
-    model.ResultType<schema.XFlowTaskHistoryArray>
-  > {
+  public async queryNoticeTask(
+    params: model.IdReq,
+  ): Promise<model.ResultType<schema.XFlowTaskHistoryArray>> {
     return await this.request({
       module: 'flow',
       action: 'QueryNoticeTask',
-      params: {},
+      params: params,
     });
   }
   /**
