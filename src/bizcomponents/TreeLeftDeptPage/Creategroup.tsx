@@ -1,6 +1,6 @@
 import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState } from 'react';
+import React, { useState,useEffect} from 'react';
 import settingStore from '@/store/setting';
 import {
   DownOutlined,
@@ -9,7 +9,7 @@ import {
   MoreOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-
+import settingController from '@/ts/controller/setting/content'
 import cls from './index.module.less';
 
 const x = 3;
@@ -69,20 +69,29 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 };
 
 type CreateGroupPropsType = {
-  onSelect?: TreeProps['onSelect'];
   createTitle: string;
   onClick?: () => void;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const [treeData,setTreeData]=useState([])
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { setEditItem } = settingStore((state) => ({ ...state }));
+
+  useEffect(() => { 
+    initData();
+  })
+
+  const initData = async () => {
+    const resultData = await settingController.getDepartments('381107910723375104');
+    console.log('resultData',resultData);
+  }
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -165,7 +174,9 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
             switcherIcon={<DownOutlined />}
             autoExpandParent={autoExpandParent}
             treeData={treeData1}
-            onSelect={onSelect}
+            onSelect={() => { 
+              
+            }}
             showIcon={true}
             titleRender={(e) => {
               return (

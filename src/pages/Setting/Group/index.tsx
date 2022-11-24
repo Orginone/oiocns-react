@@ -11,8 +11,7 @@ import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-import settingStore from '@/store/setting';
-
+import settingController from '@/ts/controller/setting';
 /**
  * 集团设置
  * @returns
@@ -20,40 +19,49 @@ import settingStore from '@/store/setting';
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { id } = props.match.params;
 
-  const { isOpenModal, setEditItem } = settingStore((state) => ({
-    ...state,
-  }));
-
-  console.log('isOpenModal', isOpenModal);
+  // const { isOpenModal, setEditItem } = settingStore((state) => ({
+  //   ...state,
+  // }));
 
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
+  const [isopen, setIsOpen] = useState<boolean>(settingController.getIsOpen); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
-  /**
-   * 假如说我现在要调用接口，获取集团的基本信息
-   *  */
+
+   /**
+   * @description: 监听点击事件，关闭弹窗 订阅
+   * @return {*}
+   */
+  useEffect(() => {
+    settingController.addListen('isOpenModal', () => { 
+      setIsOpen(true);
+      
+    })
+    return settingController.remove('isOpenModal', () => { 
+      setIsOpen(false);
+    })
+  }, []);
 
   useEffect(() => {
-    // settingController.getInstance().getGroupCompanies({}, data => {
-    //   console.log(data);
-    // })
+    settingController.addListen('createGroup', (e) => {
+      console.log('1111', e);     
+    })
+    return settingController.remove('createGroup', () => {
+        
+    })
   }, []);
 
   const onOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
     setLookApplyOpen(false);
-    // setIsOpen(false);
-    // setIsAddOpen(false);
-    setEditItem(false);
   };
   const handleOk = () => {
     setIsOpen(false);
     setIsAddOpen(false);
     setLookApplyOpen(false);
-    setEditItem(false);
+    // setEditItem(false);
   };
   // 操作内容渲染函数
   const renderOperation = (
@@ -100,7 +108,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setEditItem(true);
+            setIsOpen(true)
           }}>
           编辑
         </Button>
@@ -183,7 +191,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {deptCount}
       {/* 编辑集团 */}
       <EditCustomModal
-        open={isOpenModal}
+        open={isopen}
         title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
         handleCancel={handleOk}
