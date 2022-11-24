@@ -3,77 +3,31 @@ import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProductApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, message, Space, Tag } from 'antd';
+import { Button, Space, Tag } from 'antd';
 import appService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { DataType } from 'typings/globelType';
-import { PageParams } from 'typings/requestType';
-// import { Page } from '@/module/typings';
 
-// import styles from './index.module.less';
 appService.currentModel = 'product';
+
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
  */
 const handleApproveSelect = async (ids: React.Key[]) => {
-  if (ids.length > 0) {
-    const { success } = await appService.approve(ids.toString());
-    if (success) {
-      message.success('添加成功！');
-    } else {
-      message.error('抱歉，提交失败');
-    }
-  }
+  // if (ids.length > 0) {
+  //   const { success } = await appService.approve(ids.toString());
+  //   if (success) {
+  //     message.success('添加成功！');
+  //   } else {
+  //     message.error('抱歉，提交失败');
+  //   }
+  // }
 };
 // 根据状态值渲染标签
 const renderItemStatus = (record: ProductApprovalType) => {
   const status = appService.statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
-};
-
-// 生成说明数据
-const tableOperation = (
-  activeKey: string,
-  item: ProductApprovalType,
-  callback: Function,
-) => {
-  const handleFunction = (fn: Promise<{ msg: any; success: any }>) => {
-    fn.then(({ success }) => {
-      if (success) {
-        callback(true);
-      }
-    });
-  };
-  return activeKey == '1'
-    ? [
-        {
-          key: 'approve',
-          label: '同意',
-          onClick: () => {
-            handleFunction(appService.approve(item.id, 100)); // 0-100 待批 //100-200 已批 200 以上是拒绝
-            console.log('同意', 'approve', item);
-          },
-        },
-        {
-          key: 'refuse',
-          label: '拒绝',
-          onClick: () => {
-            handleFunction(appService.refuse(item.id, 201));
-            console.log('拒绝', 'back', item);
-          },
-        },
-      ]
-    : [
-        {
-          key: 'retractApply',
-          label: '取消申请',
-          onClick: () => {
-            handleFunction(appService.retractApply(item.id));
-            console.log('同意', 'approve', item);
-          },
-        },
-      ];
 };
 
 // 卡片渲染
@@ -161,22 +115,15 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
     },
   ];
   // 获取申请/审核列表
-  const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await appService.getList<
-      ProductApprovalType,
-      PageParams
-    >({
-      filter: '',
-      page: page,
-      pageSize: pageSize,
-    });
-    setPageData(data);
-    setPageTotal(total);
+  const LoadList = () => {
+    setPageData([...appService.currentList]);
+    setPageTotal(appService.currentList.length);
+    setNeedReload(false);
   };
 
   useEffect(() => {
     appService.activeStatus = activeKey as tabStatus;
-    handlePageChange(1, 12);
+    LoadList();
     setSelectedRowKeys([]);
   }, [activeKey, needReload]);
 
@@ -201,20 +148,19 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       }>
       <CardOrTableComp
         rowKey={'id'}
-        bordered={false}
         columns={columns}
         dataSource={pageData}
         total={total}
-        onChange={handlePageChange}
+        onChange={LoadList}
         operation={(item: ProductApprovalType) =>
-          tableOperation(activeKey, item, setNeedReload)
+          appService.tableOperation(item, setNeedReload)
         }
         renderCardContent={(arr) => (
           <TableItemCard<ProductApprovalType>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
             targetOrTeam="product"
-            operation={(item) => tableOperation(activeKey, item, setNeedReload)}
+            operation={(item) => appService.tableOperation(item, setNeedReload)}
           />
         )}
         rowSelection={{

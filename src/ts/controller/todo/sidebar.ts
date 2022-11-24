@@ -1,6 +1,6 @@
 // TODO 获取应用待办
 import { Product } from '@/ts/core/market';
-import Provider from '@/ts/core/provider';
+import { loadApplicationTodos } from '@/ts/core/todo';
 import { MenuProps } from 'antd';
 
 const apps: MenuProps[`items`] = [
@@ -70,24 +70,11 @@ class SideBar {
    * 查询我的应用
    */
   private getOwnProducts = async () => {
-    const data: Product[] | undefined = await Provider.getPerson?.getOwnProducts();
-    console.log('menu', data);
-    let menu: { label: string; key: string; node: Product }[] = [];
-    if (data && data.length > 0) {
-      // 遍历数据生成待办应用列表
-      menu = data.map((product) => {
-        const prod = product.prod;
-        return {
-          label: prod.name,
-          key: '/todo/' + prod.id,
-          node: product,
-        };
-      });
-    }
+    const data = await loadApplicationTodos();
     this._bottomMenu = {
       type: 'group',
       label: '应用待办',
-      children: menu,
+      children: data,
     };
   };
 }

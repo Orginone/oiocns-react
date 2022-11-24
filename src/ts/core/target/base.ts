@@ -425,7 +425,7 @@ export default class BaseTarget extends SpaceTarget {
   public async approvalJoinApply(
     id: string,
     status: number,
-  ): Promise<model.ResultType<any>> {
+  ): Promise<model.ResultType<schema.XRelation>> {
     return await kernel.joinTeamApproval({
       id,
       status,

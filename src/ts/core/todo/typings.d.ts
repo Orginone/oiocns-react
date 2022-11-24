@@ -1,3 +1,11 @@
+import { schema } from '@/ts/base';
+import {
+  XMarketRelation,
+  XMerchandise,
+  XRelation,
+  XRelationArray,
+} from '@/ts/base/schema';
+
 /**
  * 应用待办&平台待办
  * */
@@ -31,9 +39,35 @@ export interface TodoItem {
   /**@name 当前目标 对象 */
   target: any;
   /**@desc 同意 */
-  approve: () => void;
+  approve: (comment: string) => void;
   /**@desc 拒绝 */
-  refuse: () => {};
+  refuse: (comment: string) => {};
   /**@desc 取消申请 */
   retract: () => {};
+}
+export type StytemTodosType = XRelation | XMarketRelation | XMerchandise;
+export interface StytemITodo {
+  /**@id 当前模块id */
+  id: string;
+  /**@name 当前模块name */
+  name: string;
+  /**@count  待办数量*/
+  get count(): number;
+  /**@todoList  待办数据列表*/
+  todoList: StytemTodosType[];
+  /**@doList  已办数据列表*/
+  doList: StytemTodosType[];
+  /**@applyList  我的申请数据列表*/
+  applyList: StytemTodosType[];
+  /**@getTodoList 获取待办列表 */
+  getTodoList: () => void;
+  /**@getApplyList 获取申请列表 */
+  getApplyList: () => void;
+
+  /**@approve 同意请求 */
+  approve: (target: StytemTodosType) => any;
+  /**@reject 拒绝请求 */
+  reject: (target: StytemTodosType) => any;
+  /**@cancel 取消请求 */
+  cancel: (target: StytemTodosType) => any;
 }
