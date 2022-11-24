@@ -13,6 +13,7 @@ import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
+import type { MenuProps } from 'antd';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
@@ -110,8 +111,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @param {object} param1
    * @return {*}
    */
-  const handleMenuClick = ({ data, key }: { data: any; key: string }) => {
-    console.log('handleMenuClick55', data, key);
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    console.log('handleMenuClick55', key);
     switch (key) {
       case '删除商店':
         setIsDeleteOpen(true);
