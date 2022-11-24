@@ -142,7 +142,7 @@ console.log('dayin', dataSource);
         </div>
       </>
     );
-  }, [pageType, dataSource, resetColumns, defaultHeight]);
+  }, [pageType, dataSource,operation, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
    * @return {底部组件}

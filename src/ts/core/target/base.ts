@@ -161,6 +161,7 @@ export default class BaseTarget extends SpaceTarget {
         belongId: this.target.id,
       });
       if (res.success && res.data != undefined) {
+        this._ownAuthoritys =[];
         this._ownAuthoritys.push(res.data);
       }
       return res;
@@ -383,6 +384,11 @@ export default class BaseTarget extends SpaceTarget {
       },
     };
     const res = await kernel.queryAuthorityTree(params);
+    if(res.success){
+      this._ownAuthoritys =[];
+      this._ownAuthoritys.push(res.data);
+      console.log("此处加入缓存",this._ownAuthoritys)
+    }
     return res;
   }
 

@@ -1,5 +1,4 @@
-import Certificate from '../../../../components/CettificateComp/index';
-import { Typography, Divider } from 'antd';
+import { Typography } from 'antd';
 import React, { useState,useEffect } from 'react';
 import Person from '../../../../bizcomponents/PersonInfo/index';
 import CardOrTable from '../../../../components/CardOrTableComp';
@@ -8,13 +7,14 @@ import cls from './index.module.less';
 import CohortController from '../../../../ts/controller/cohort/index';
 import {schema} from '../../../../../src/ts/base'
 import AddRole from './addRole/index'
+import type { ProColumns } from '@ant-design/pro-components';
 // import API from '@/services';
 
 /**
  * 个人信息
  * @returns
  */
-const RoleManage: React.FC = (props) => {
+const RoleManage: React.FC<any> = (props) => {
   // const service = new CertificateService({
   //   nameSpace: 'myCertificate',
   //   searchApi: API.product.searchOwnProduct,
@@ -25,16 +25,22 @@ const RoleManage: React.FC = (props) => {
   // console.log(service);
   const [data, setData] = useState<schema.XAuthority[]>();
   const [open, setOpen] = useState<boolean>(false);
+  // const [id, setId] = useState<string>();
 
   useEffect(() => {
     getTableList()
-    // CohortController.setCallBack(setData);
   }, []);
-
+  useEffect(() => {
+    CohortController.setCallBack(setData);
+  }, []);
+  useEffect(() => {
+    console.log("值发生了改变");
+    
+  }, [data]);
   const getTableList = async () => {
-    const res = await CohortController.getRoleList(props.location.state.cohortId)
-    console.log("值",res.data)
-    setData([res.data])
+    const data = await CohortController.getRoleList(props.location.state.cohortId)
+    console.log("值",data[0])
+    setData([data[0]])
   };
   
   const certificateColumn: ProColumns<any>[] = [
@@ -87,11 +93,7 @@ const RoleManage: React.FC = (props) => {
   };
   const total: number = data&&data.length?data.length:0;
   const Page: number = 10;
-  const params = {
-    page: 10,
-    pageSize: 1,
-    filter: 'search',
-  };
+ 
   // service.getList<Page>(params);
 
   const tableAlertRender = (selectedRowKeys: any[]) => {
@@ -122,7 +124,7 @@ const RoleManage: React.FC = (props) => {
       <div>
         <Person />
       </div>
-       <AddRole open = {open} setOpen = {setOpen}/>
+       <AddRole open = {open} data = {data!} setOpen = {setOpen} id = {props.location.state.cohortId} />
       <div>
         <div className={cls['person-info-H']}>
           <Title level={4}>角色维护</Title>
