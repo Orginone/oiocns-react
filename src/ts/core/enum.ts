@@ -41,3 +41,7 @@ export enum CommonStatus {
   ApproveStartStatus = 100,
   RejectStartStatus = 200,
 }
+
+export enum ProductType {
+  WebApp = 'web应用',
+}

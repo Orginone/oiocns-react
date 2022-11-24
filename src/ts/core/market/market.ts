@@ -3,9 +3,9 @@ import { CommonStatus, TargetType } from '../enum';
 import { model } from '../../base';
 import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 
-export default class AppStore {
+export default class Market {
   // 商店实体
-  public readonly store: XMarket;
+  private readonly store: XMarket;
 
   constructor(store: XMarket) {
     this.store = store;

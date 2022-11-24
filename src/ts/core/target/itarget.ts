@@ -109,12 +109,6 @@ export interface ITarget {
 
 /** 市场相关操作方法 */
 export interface IMTarget {
-  /** 我的加入市场申请 */
-  joinMarketApplys: schema.XMarketRelation[];
-  /** 加入的市场 */
-  joinedMarkets: AppStore[];
-  /** 拥有的产品 */
-  owdProducts: Product[];
   /**
    * 根据编号查询市场
    * @param name 编号、名称
@@ -137,6 +131,24 @@ export interface IMTarget {
    * @returns
    */
   getOwnProducts(): Promise<Product[]>;
+  /**
+   * 查询购物车列表
+   */
+  getStaging(): Promise<schema.XStaging[]>;
+  /**
+   * 查询购买订单
+   */
+  getBuyOrders(
+    status: number,
+    page: model.PageRequest,
+  ): Promise<model.ResultType<schema.XOrderArray>>;
+  /**
+   * 查询售卖订单
+   */
+  getSellOrders(
+    status: number,
+    page: model.PageRequest,
+  ): Promise<model.ResultType<schema.XOrderDetailArray>>;
   /**
    * 查询加入市场的审批
    * @returns
@@ -213,6 +225,16 @@ export interface IMTarget {
     // 产品类型名
     typeName: string,
   ): Promise<model.ResultType<schema.XProduct>>;
+  /**
+   * 添加暂存区
+   * @param id 商品Id
+   */
+  stagingMerchandise(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 删除暂存区
+   * @param id 暂存区Id
+   */
+  deleteStaging(id: string): Promise<model.ResultType<any>>;
   /**
    * 删除市场
    * @param id 市场Id
@@ -436,4 +458,42 @@ export interface ICompany extends ITarget {
    * @returns
    */
   applyJoinGroup(id: string): Promise<model.ResultType<any>>;
+}
+
+export interface IGroup extends ITarget {
+  /**
+   * 查询加入的集团
+   * @returns
+   */
+  getJoinedGroups(): Promise<Group[]>;
+  /**
+   * 申请加入集团
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinGroup(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 删除子集团
+   * @param id 集团Id
+   * @returns
+   */
+  deleteSubTarget(id: string): Promise<model.ResultType<any>>;
+  /**
+   * 获取集团下的人员（单位、集团）
+   * @param id 组织Id 默认为当前集团
+   * @returns
+   */
+  getPersons(): Promise<ITarget[]>;
+  /**
+   * 获取集团下的单位
+   * @param id 组织Id 默认为当前集团
+   * @returns
+   */
+  getCompanys(): Promise<ITarget[]>;
+  /**
+   * 获取集团下的集团
+   * @param id 组织Id 默认为当前集团
+   * @returns
+   */
+  getSubGroups(): Promise<Group[]>;
 }

@@ -2,11 +2,12 @@ import BaseTarget from '@/ts/core/target/base';
 import { faildResult, kernel, model, schema } from '../../base';
 import { TargetType } from '../enum';
 import consts from '../consts';
+import { ITarget } from './itarget';
 
 export default class Group extends BaseTarget {
   constructor(target: schema.XTarget) {
     super(target);
-    this.subTypes = [TargetType.Group];
+    this.subTypes = [TargetType.Group, ...consts.CompanyTypes];
     this.joinTargetType = [TargetType.Group];
     this.pullTypes = consts.CompanyTypes;
     this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
@@ -16,37 +17,28 @@ export default class Group extends BaseTarget {
    * 查询加入的集团
    * @returns
    */
-  getJoinedGroups = async (): Promise<Group[]> => {
-    if (this._joinedGroups.length > 0) {
-      return this._joinedGroups;
-    }
-    let res = await this.getjoined({
-      spaceId: '0',
-      JoinTypeNames: [TargetType.Group],
+  public async getJoinedGroups(): Promise<Group[]> {
+    await super.getjoinedTargets();
+    return <Group[]>super.joinTargets.filter((a) => {
+      return (a.target.typeName = TargetType.Group);
     });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
-        this._joinedGroups.push(new Group(item));
-      });
-    }
-    return this._joinedGroups;
-  };
+  }
 
   /**
    * 申请加入集团
    * @param id 目标Id
    * @returns
    */
-  applyJoinGroup = async (id: string): Promise<model.ResultType<any>> => {
-    return await this.applyJoin(id, TargetType.Group);
-  };
+  public async applyJoinGroup(id: string): Promise<model.ResultType<any>> {
+    return super.applyJoin(id, TargetType.Group);
+  }
 
   /**
-   * 删除集团
+   * 删除子集团
    * @param id 集团Id
    * @returns
    */
-  deleteSubTarget = async (id: string): Promise<model.ResultType<any>> => {
+  public async deleteSubTarget(id: string): Promise<model.ResultType<any>> {
     const group = this.subTargets.find((group) => {
       return group.target.id == id;
     });
@@ -64,73 +56,41 @@ export default class Group extends BaseTarget {
       return res;
     }
     return faildResult(consts.UnauthorizedError);
-  };
+  }
 
   /**
    * 获取集团下的人员（单位、集团）
    * @param id 组织Id 默认为当前集团
    * @returns
    */
-  getPersons = async (
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> => {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Group],
-      [TargetType.Person],
-    );
-  };
+  public async getPersons(): Promise<ITarget[]> {
+    await this.getSubTargets();
+    return this.subTargets.filter((a) => {
+      return a.target.typeName == TargetType.Person;
+    });
+  }
 
   /**
    * 获取集团下的单位
    * @param id 组织Id 默认为当前集团
    * @returns
    */
-  getCompanys = async (
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> => {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Group],
-      [...consts.CompanyTypes],
-    );
-  };
+  public async getCompanys(): Promise<ITarget[]> {
+    await this.getSubTargets();
+    return this.subTargets.filter((a) => {
+      return consts.CompanyTypes.includes(<TargetType>a.target.typeName);
+    });
+  }
 
   /**
    * 获取集团下的集团
    * @param id 组织Id 默认为当前集团
    * @returns
    */
-  getSubGroups = async (
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> => {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(id, [TargetType.Group], [TargetType.Group]);
-  };
-
-  /**
-   * 拉单位进入集团
-   * @param companyIds 单位Id集合
-   * @returns 是否成功
-   */
-  pullCompanys = async (companyIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(companyIds, TargetType.Company);
-  };
-
-  /**
-   * 拉集团进入集团
-   * @param personIds 集团Id集合
-   * @returns 是否成功
-   */
-  pullGroups = async (groupIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(groupIds, TargetType.Group);
-  };
+  public async getSubGroups(): Promise<Group[]> {
+    await this.getSubTargets();
+    return <Group[]>this.subTargets.filter((a) => {
+      return a.target.typeName == TargetType.Group;
+    });
+  }
 }
