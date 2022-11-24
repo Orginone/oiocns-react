@@ -9,7 +9,7 @@ import {
   MoreOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-
+import settingController from '@/ts/controller/setting/content'
 import cls from './index.module.less';
 
 const x = 3;
@@ -85,6 +85,9 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
 
   const { setEditItem } = settingStore((state) => ({ ...state }));
 
+  useEffect(() => { 
+    initData();
+  })
 
   const initData = async () => {
     const resultData = await settingController.getDepartments('381107910723375104');

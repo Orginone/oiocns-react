@@ -11,7 +11,8 @@ import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-// import settingStore from '@/store/setting';
+import settingController from '@/ts/controller/setting';
+
 
 /**
  * 集团设置
@@ -20,11 +21,9 @@ import { RouteComponentProps } from 'react-router-dom';
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { id } = props.match.params;
 
-  const { isOpenModal, setEditItem } = settingStore((state) => ({
-    ...state,
-  }));
-
-  console.log('isOpenModal', isOpenModal);
+  // const { isOpenModal, setEditItem } = settingStore((state) => ({
+  //   ...state,
+  // }));
 
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
@@ -100,7 +99,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setEditItem(true);
+            settingController.setIsOpen(true);
           }}>
           编辑
         </Button>
@@ -183,7 +182,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {deptCount}
       {/* 编辑集团 */}
       <EditCustomModal
-        open={isOpenModal}
+        open={settingController.getIsOpen}
         title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
         handleCancel={handleOk}
