@@ -18,7 +18,7 @@ interface Iprops {
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
-  handleCancel: ()=> void;
+  handleCancel: () => void;
 }
 
 const { TextArea } = Input;
@@ -26,54 +26,51 @@ const { TextArea } = Input;
 const EditCustomModal = (props: Iprops) => {
   const { open, title, onOk, handleOk, handleCancel } = props;
   const [form] = Form.useForm();
-  useEffect(() => {
-   
-  }, []);
-  
+  useEffect(() => {}, []);
+
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
         title={title}
         open={open}
         onOk={handleOk}
-        onCancel={()=>handleCancel()}
+        onCancel={() => handleCancel()}
         getContainer={false}
+        
         footer={null}>
-        <Form form={form} name="control-hooks">
+        <Form form={form} layout="vertical">
+         
+          <Form.Item label="" name="avatar" noStyle>
+             <UploadAvatar />
+          </Form.Item>
+           
           <Row>
             <Col span={12}>
-              <Form.Item label="头像" name="avatar">
-                <UploadAvatar />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <Form.Item name="name" label="单位名称2">
+              <Form.Item name="name" label="单位名称2" rules={[{ required: true, message: '请输入单位名称!' }]}>
                 <Input placeholder="请输入单位名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="code" label="单位编号">
+              <Form.Item name="code" label="单位编号" rules={[{ required: true, message: '请输入单位编号!' }]}>
                 <Input placeholder="请输入单位编号" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col span={12}>
-              <Form.Item name="name" label="单位名称">
+              <Form.Item name="name" label="单位名称" rules={[{ required: true, message: '请输入单位名称!' }]}>
                 <Input placeholder="请输入单位名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="code" label="单位编号">
+              <Form.Item name="code" label="单位编号" rules={[{ required: true, message: '请输入单位标号' }]}>
                 <Input placeholder="请输入单位编号" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item name="describe" label="单位描述">
+              <Form.Item name="describe" label="单位描述" rules={[{ required: true, message: '请输入单位描述!' }]}>
                 <TextArea
                   // value={value}
                   // onChange={(e) => setValue(e.target.value)}
@@ -87,8 +84,11 @@ const EditCustomModal = (props: Iprops) => {
             <Space>
               <Button
                 type="primary"
-                onClick={() => {
-                  onOk();
+                onClick={async () => {
+                  const value =await form.validateFields()
+                  if (value) {
+                    // onOk();
+                  }
                 }}>
                 完成
               </Button>

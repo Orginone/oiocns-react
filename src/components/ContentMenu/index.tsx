@@ -16,6 +16,7 @@ type ContentMenuProps = {
   location: any;
   data?: MenuProps[`items`];
   menuClick?: MenuProps[`onClick`];
+  width?: number;
   menuSelect?: MenuProps[`onSelect`];
 };
 interface MemuItemType {
@@ -66,7 +67,7 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
 
 //侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
-  const { data: menuData } = props; // 顶级主菜单
+  const { data: menuData, width } = props; // 顶级主菜单
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
@@ -137,7 +138,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   };
 
   return (
-    <Sider className={cls.sider} width={220}>
+    <Sider className={cls.sider} width={width ?? 220}>
       {currentMacthRoute && (
         <div className={cls.title}>
           {(prevMenuData.length > 0 || renderMenu) && (

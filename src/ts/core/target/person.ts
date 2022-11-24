@@ -1,7 +1,7 @@
 import { CommonStatus, TargetType } from '../enum';
 import MarketTarget from './mbase';
 import consts from '../consts';
-import { model, schema, faildResult, kernel } from '../../base';
+import { model, schema, faildResult, kernel, common } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
@@ -19,6 +19,7 @@ export default class Person extends MarketTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
+    this.getCohort();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -32,6 +33,7 @@ export default class Person extends MarketTarget {
   public get ChohortArray(): Cohort[] {
     return this._joinedCohorts;
   }
+
   /**
    * 获取群组列表
    * @param params
@@ -340,9 +342,9 @@ export default class Person extends MarketTarget {
   public async queryMySpaceProduct(): Promise<schema.XProductArray> {
     let resultArray: any = [];
     // 判断如果是有个人空间
-    if (!this._curCompany) {
-      return resultArray;
-    }
+    // if (!this._curCompany) {
+    //   return resultArray;
+    // }
 
     let paramData: any = {};
     paramData.id = this._joinedCompanys[0].target.id;
@@ -375,27 +377,7 @@ export default class Person extends MarketTarget {
       this._friends = res.data.result;
     }
     return this._friends;
-  }
-
-  /**
-   * @description: 查询我加入的群
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._joinedCohorts.length > 0) {
-      return this._joinedCohorts;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
-    });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
-        this._joinedCohorts.push(new Cohort(item));
-      });
-    }
-    return this._joinedCohorts;
-  }
+  };
 
   /**
    * 申请添加好友

@@ -1,11 +1,3 @@
-/*
- * @Author: zhangqiang 1196217890@qq.com
- * @Date: 2022-11-21 15:15:12
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-21 15:15:43
- * @FilePath: /oiocns-react/src/pages/Person/_control/personcontroller.ts
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 /* eslint-disable no-unused-vars */
 import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
@@ -51,14 +43,13 @@ export default class personcontroller extends BaseController {
     let companys = await this.userDataService.getJoinedTargets(
       this.getPerson.target.id,
       TargetType.Person,
+      [TargetType.Company],
     );
     console.log('我加入的公司2===', companys);
 
-    let aa1 = await this.getPerson.queryMyProduct();
-    console.log('我的产品', aa1);
+    //let aa1 = await this.getPerson.queryMyProduct();
 
-    let aa2 = await this.getPerson.queryMySpaceProduct();
-    console.log('我的个人空间的产品', aa2);
+    //let aa2 = await this.getPerson.queryMySpaceProduct();
 
     // const companys = await Userdata.getInstance().searchCompany({
     //   page: 1,

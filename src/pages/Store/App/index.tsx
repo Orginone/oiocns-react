@@ -15,6 +15,7 @@ import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
+import { Product } from '@/ts/core/market';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -30,9 +31,6 @@ const StoreApp: React.FC = () => {
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
-  const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
-    {} as MarketTypes.ProductType,
-  );
   const items = useMemo(() =>
     // [
     //   {
@@ -105,46 +103,47 @@ const StoreApp: React.FC = () => {
 
     setShowShareModal(false);
   };
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: Product): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item.id } });
-          console.log('按钮事件', 'open', item);
+          history.push({ pathname: '/online', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          history.push({ pathname: '/store/app/info', state: { appId: item.id } });
-          console.log('按钮事件', 'detail', item);
+          StoreContent.selectedProduct(item);
+          history.push({ pathname: '/store/app/info', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'manage',
         label: '管理',
         onClick: () => {
-          history.push({ pathname: '/store/app/manage', state: { appId: item.id } });
-          console.log('按钮事件', 'manage', item);
+          StoreContent.selectedProduct(item);
+          history.push({ pathname: '/store/app/manage', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'putaway',
         label: '上架',
         onClick: () => {
-          console.log('按钮事件', 'putaway', item);
-          history.push({ pathname: '/store/app/putaway', state: { appId: item.id } });
+          StoreContent.selectedProduct(item);
+          history.push({
+            pathname: '/store/app/putaway',
+            state: { appId: item.prod.id },
+          });
         },
       },
       {
         key: 'share',
         label: '共享',
         onClick: () => {
+          StoreContent.selectedProduct(item);
           setShowShareModal(true);
         },
       },
@@ -152,17 +151,18 @@ const StoreApp: React.FC = () => {
         key: 'share2',
         label: '分配',
         onClick: () => {
-          console.log('按钮事件', 'share2', item);
+          StoreContent.selectedProduct(item);
         },
       },
       {
         key: 'save',
         label: '暂存',
         onClick: () => {
-          // setShowPublishListModal(true);
-          setSelectAppInfo({ ...item });
-          history.push({ pathname: '/store/app/publish', state: { appId: item.id } });
-          console.log('按钮事件', 'save', item);
+          StoreContent.selectedProduct(item);
+          history.push({
+            pathname: '/store/app/publish',
+            state: { appId: item.prod.id },
+          });
         },
       },
     ];
@@ -179,7 +179,8 @@ const StoreApp: React.FC = () => {
           tabList={items}
           onTabChange={(key) => {
             setStatusKey(key as ststusTypes);
-          }}>
+          }}
+        >
           <div className={cls['page-content-table']}>
             <AppShowComp
               queryFun={Provider.getPerson!.getOwnProducts}
@@ -209,27 +210,32 @@ const StoreApp: React.FC = () => {
         onCancel={() => {
           console.log(`取消按钮`);
           setShowShareModal(false);
-        }}>
+        }}
+      >
         <ShareComp onCheckeds={onCheckeds} />
       </Modal>
       {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
+        render={() => <AppInfo appId={StoreContent._curProduct?.prod.id || ''} />}
+      ></Route>
       <Route
         exact
         path="/store/app/publish"
-        render={() => <PublishList appId={selectAppInfo.id} />}></Route>
+        render={() => <PublishList appId={StoreContent._curProduct?.prod.id || ''} />}
+      ></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={selectAppInfo.id} />}></Route>
+        render={() => <Manage appId={StoreContent._curProduct?.prod.id || ''} />}
+      ></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
-        render={() => <PutawayComp appId={selectAppInfo.id} />}></Route>
+        render={() => <PutawayComp appId={StoreContent._curProduct?.prod.id || ''} />}
+      ></Route>
     </>
   );
 };

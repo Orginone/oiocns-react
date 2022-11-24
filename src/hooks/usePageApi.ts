@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 interface pageApiType {
   nameSpace: string; //命名空间--用于区分功能块
   searchApi?: Function; // 查 数据
@@ -14,10 +14,10 @@ interface PagequeryParamsBaseType {
   id?: number | string;
   status?: number | string;
 }
-type resultParams = {
-  offset: number;
-  limit: number;
-} & Omit<PagequeryParamsBaseType, 'page' | 'pageSize'>;
+// type resultParams = {
+//   offset: number;
+//   limit: number;
+// } & Omit<PagequeryParamsBaseType, 'page' | 'pageSize'>;
 const usePageApi = <T extends PagequeryParamsBaseType, P extends any>({
   nameSpace,
   searchApi,
@@ -28,9 +28,9 @@ const usePageApi = <T extends PagequeryParamsBaseType, P extends any>({
 // quitTargetApi,
 pageApiType) => {
   const [list, setList] = useState<P[]>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [queryParams, setqueryParams] = useState<any>({});
-  const queryLastTime: number = 0;
+  const [total] = useState<number>(0);
+  const [queryParams] = useState<any>({});
+  // const queryLastTime: number = 0;
   let nameSpaceStr = [...nameSpace];
   nameSpaceStr[0] = nameSpaceStr[0].toUpperCase();
   // const resNameSpaceStr = nameSpaceStr.join('');
@@ -39,30 +39,30 @@ pageApiType) => {
    * @param {T} params
    * @return {*}
    */
-  const _resetParams = (params: T): resultParams => {
-    const { page, pageSize, ...rest } = params;
-    const num = (page - 1) * pageSize;
+  // const _resetParams = (params: T): resultParams => {
+  //   const { page, pageSize, ...rest } = params;
+  //   const num = (page - 1) * pageSize;
 
-    return {
-      offset: num >= 0 ? num : 0,
-      limit: pageSize || 20,
-      ...rest,
-    };
-  };
+  //   return {
+  //     offset: num >= 0 ? num : 0,
+  //     limit: pageSize || 20,
+  //     ...rest,
+  //   };
+  // };
   /**
    * @desc: 判断是否刷新
    * @param {resultParams} newParams
    * @return {*}
    */
-  const _canRefreshData = (newParams: resultParams): boolean => {
-    // 缓存处理 条件如下 强制刷新 / 数据超时 / 已存在数据 但是请求参数未变化
-    const nowTime = new Date().getTime();
-    const bool = nowTime - queryLastTime < 5 * 3600 * 1000;
-    return (
-      bool ||
-      (list.length > 0 && JSON.stringify(newParams) === JSON.stringify(queryParams))
-    );
-  };
+  // const _canRefreshData = (newParams: resultParams): boolean => {
+  //   // 缓存处理 条件如下 强制刷新 / 数据超时 / 已存在数据 但是请求参数未变化
+  //   const nowTime = new Date().getTime();
+  //   const bool = nowTime - queryLastTime < 5 * 3600 * 1000;
+  //   return (
+  //     bool ||
+  //     (list.length > 0 && JSON.stringify(newParams) === JSON.stringify(queryParams))
+  //   );
+  // };
   /**
    * @desc: 刷新列表
    * @return {*}
