@@ -483,23 +483,23 @@ export default abstract class SpaceTarget {
     throw consts.FunctionNotFoundError;
   };
 
-  /**
-   * 申请加入群组
-   * @param _id 目标Id
-   * @returns
-   */
-  applyJoinCohort = (_id: string): Promise<model.ResultType<any>> => {
-    throw consts.FunctionNotFoundError;
-  };
+  // /**
+  //  * 申请加入群组
+  //  * @param _id 目标Id
+  //  * @returns
+  //  */
+  // applyJoinCohort = (_id: string): Promise<model.ResultType<any>> => {
+  //   throw consts.FunctionNotFoundError;
+  // };
 
-  /**
-   * 申请添加好友
-   * @param _id 目标Id
-   * @returns
-   */
-  applyFriend = (_id: string): Promise<model.ResultType<any>> => {
-    throw consts.FunctionNotFoundError;
-  };
+  // /**
+  //  * 申请添加好友
+  //  * @param _id 目标Id
+  //  * @returns
+  //  */
+  // applyFriend = (_id: string): Promise<model.ResultType<any>> => {
+  //   throw consts.FunctionNotFoundError;
+  // };
 
   /**
    * 审批我的好友申请

@@ -3,7 +3,7 @@ import AppStore from '@/ts/core/market/appstore';
 import Product from '@/ts/core/market/product';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
-import { myColumns } from './config';
+import { myColumns, marketColumns } from './config';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -21,7 +21,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  private _curProduct: Product | null = null;
+  public _curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -53,6 +53,8 @@ class StoreContent {
       case 'appInfo':
       case 'myApp':
         return myColumns;
+      case 'market':
+        return marketColumns;
       default:
         return [];
     }
@@ -69,6 +71,7 @@ class StoreContent {
       Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
+      console.log('shan店数据');
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
@@ -99,7 +102,10 @@ class StoreContent {
    */
   public selectedProduct(item: Product) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    item.prod.id !== this._curProduct?.prod.id && (this._curProduct = item);
+    // item.prod.id !== this._curProduct?.prod.id &&
+    console.log('修改选中');
+
+    this._curProduct = item;
   }
 }
 const storeContent = new StoreContent();

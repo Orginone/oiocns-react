@@ -1,23 +1,23 @@
 import { TargetType } from '@/module/enums';
 import { kernel } from '@/ts/base';
-import { generateUuid } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import Provider from '@/ts/core/provider';
 import { LoadChats } from '@/ts/core/chat';
+import BaseController from '../baseCtrl';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
 /**
  * 会话控制器
  */
-class ChatController {
+class ChatController extends BaseController {
   private _tabIndex: string = '1';
-  private _refreshCallback: { [name: string]: () => void } = {};
   private _groups: IChatGroup[] = [];
   private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
   constructor() {
+    super();
     Provider.onSetPerson(async () => {
       await this._initialization();
     });
@@ -111,26 +111,6 @@ class ChatController {
     this.changCallback();
   }
   /**
-   * 订阅变更
-   * @param callback 变更回调
-   * @returns 订阅ID
-   */
-  public subscribe(callback: () => void): string {
-    const id = generateUuid();
-    if (callback) {
-      callback();
-      this._refreshCallback[id] = callback;
-    }
-    return id;
-  }
-  /**
-   * 取消订阅
-   * @param id 订阅ID
-   */
-  public unsubscribe(id: string): void {
-    delete this._refreshCallback[id];
-  }
-  /**
    * 获取引用会话
    * @param chat 拷贝会话
    * @returns 引用会话
@@ -147,12 +127,6 @@ class ChatController {
     }
     return chat;
   }
-  /** 变更回调 */
-  public changCallback() {
-    Object.keys(this._refreshCallback).forEach((id) => {
-      this._refreshCallback[id].apply(this, []);
-    });
-  }
   /**
    * 删除会话
    * @param chat 会话
@@ -163,6 +137,9 @@ class ChatController {
     });
     if (index > -1) {
       this._chats.splice(index, 1);
+      if (chat.fullId === this._curChat?.fullId) {
+        this._curChat = undefined;
+      }
       this._cacheChats();
       this.changCallback();
     }

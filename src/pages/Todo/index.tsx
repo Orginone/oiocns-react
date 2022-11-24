@@ -3,7 +3,7 @@ import { renderRoutes } from 'react-router-config';
 import * as Icon from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-import todoService, { pageModel } from '@/ts/controller/todo';
+import todoService from '@/ts/controller/todo';
 import siderBar from '@/ts/controller/todo/sidebar';
 
 // import TodoMenu, { muneItems } from './Menu';
@@ -42,11 +42,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     });
     setTodoMenu(data as MenuProps[`items`]);
   }, []);
-  useEffect(() => {
-    const splitKey = location.pathname.split('/');
-    todoService.activeStatus = '1';
-    todoService.currentModel = splitKey[splitKey.length - 1] as pageModel; // 设置当前模块
-  }, [todoService, location.pathname]);
+
   // 菜单跳转
   const toNext = (e: any) => {
     const splitKey = e.key.split('/');

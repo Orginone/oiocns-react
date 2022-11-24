@@ -9,9 +9,9 @@
 import Company from '../../core/target/company';
 import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
-import { XTarget } from '../../base/schema';
+// import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
-import Types from '@/module/typings';
+// import Types from '@/module/typings';
 
 // 新建一个对象 ，避免代码冲突
 export interface spaceObjs {
@@ -123,14 +123,15 @@ class SettingController {
   ): Promise<ObjType> {
     const compid = this.companyID;
 
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
-      {
-        page: 0,
-        pageSize: 100,
-        filter: param.code,
-      },
-      TargetType.Department,
-    );
+    const datas: any /*Types.PageData<XTarget>*/ =
+      await this.userDataService.searchMyCompany(
+        {
+          page: 0,
+          pageSize: 100,
+          filter: param.code,
+        },
+        TargetType.Department,
+      );
     if (datas.data && datas.data?.length > 0) {
       return {
         msg: '重复创建',
@@ -170,14 +171,15 @@ class SettingController {
     // 获取当前单位
     //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
     // 判断是否重复 TODO
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
-      {
-        page: 0,
-        pageSize: 10,
-        filter: param.code,
-      },
-      TargetType.Department,
-    );
+    const datas: any /*Types.PageData<XTarget>*/ =
+      await this.userDataService.searchMyCompany(
+        {
+          page: 0,
+          pageSize: 10,
+          filter: param.code,
+        },
+        TargetType.Department,
+      );
 
     if (datas.data && datas.data?.length > 0) {
       return {

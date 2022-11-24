@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import cls from './index.module.less';
 
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
-import { MarketServiceType } from '@/module/appstore/market';
-import { IdPage } from '@/module/typings';
+// import { MarketServiceType } from '@/module/appstore/market';
+// import { IdPage } from '@/module/typings';
 import { MarketTypes } from 'typings/marketType';
-import { sleep } from '@/store/sleep';
+// import { sleep } from '@/store/sleep';
 import type { ProColumns } from '@ant-design/pro-components';
 
 interface AppShowCompType {
@@ -27,7 +27,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
 }) => {
   // const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
+  const [total] = useState<number>(0);
   const parentRef = useRef<any>(null); //父级容器Dom
 
   /**
