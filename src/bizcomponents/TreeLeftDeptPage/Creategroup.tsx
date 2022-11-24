@@ -1,16 +1,15 @@
 import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState } from 'react';
-import settingStore from '@/store/setting';
+import React, { useState,useEffect} from 'react';
 import {
   DownOutlined,
-  ApartmentOutlined,
   PlusOutlined,
   MoreOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-
+import settingController from '@/ts/controller/setting'
 import cls from './index.module.less';
+
 
 const x = 3;
 const y = 2;
@@ -69,20 +68,30 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 };
 
 type CreateGroupPropsType = {
-  onSelect?: TreeProps['onSelect'];
   createTitle: string;
   onClick?: () => void;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
+  // 树结构
+  const [treeData, setTreeData] = useState<{}>([])
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { setEditItem } = settingStore((state) => ({ ...state }));
+ 
+
+  useEffect(() => { 
+    initData();
+  },[])
+
+  const initData = async () => {
+    const resultData = await settingController.getDepartments('381107910723375104');
+    setTreeData(resultData);
+  }
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -104,52 +113,10 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
     setAutoExpandParent(true);
   };
 
-  const treeData1: DataNode[] = [
-    {
-      title: '浙江省资产年报集团',
-      key: '0',
-      children: [
-        {
-          title: '集团子节点',
-          key: '0-0',
-          icon: <ApartmentOutlined />,
-        },
-        {
-          title: '集团子节点',
-          key: '0-1',
-          icon: <ApartmentOutlined />,
-        },
-        {
-          title: '集团子节点',
-          key: '0-2',
-          icon: <ApartmentOutlined />,
-        },
-      ],
-    },
-    {
-      title: '浙江省资产年报集团',
-      key: '1',
-      children: [
-        {
-          title: '集团子节点',
-          key: '1-1',
-          icon: <ApartmentOutlined />,
-        },
-      ],
-    },
-  ];
-
   return (
     <div>
-      <Button
-        className={cls.creatgroup}
-        type="primary"
-        onClick={() => {
-          setEditItem(true);
-        }}>
-        {createTitle}
-      </Button>
-      {Array.isArray(treeData1) && treeData1.length > 0 ? (
+      
+      {Array.isArray(treeData) && treeData.length > 0 ? (
         <div className={cls.topMes}>
           <Input
             size="middle"
@@ -164,8 +131,12 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
             expandedKeys={expandedKeys}
             switcherIcon={<DownOutlined />}
             autoExpandParent={autoExpandParent}
-            treeData={treeData1}
-            onSelect={onSelect}
+            treeData={treeData}
+            onSelect={(e) => { 
+              if (e && e.length>0) {
+                settingController.trigger('createDept', { id: e[0] })
+              }
+            }}
             showIcon={true}
             titleRender={(e) => {
               return (
@@ -174,12 +145,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
                   onMouseOver={() => {
                     setHoverItemMes(e.key);
                   }}>
+                  {/* { e.icon? React.createElement(Icon[e.iconMes]):null} */}
                   <span style={{ paddingRight: '8px' }}>{e?.title}</span>
                   {hoverItemMes === e.key ? (
                     <Space>
                       <span
                         onClick={() => {
-                          setEditItem(true);
+                          settingController.trigger('isOpenModal')
                         }}>
                         <PlusOutlined />
                       </span>
@@ -193,7 +165,14 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
             }}
           />
         </div>
-      ) : null}
+      ) : <Button
+      className={cls.creatgroup}
+      type="primary"
+      onClick={() => {
+        settingController.trigger('isOpenModal')
+      }}>
+      {createTitle}
+    </Button>}
     </div>
   );
 };

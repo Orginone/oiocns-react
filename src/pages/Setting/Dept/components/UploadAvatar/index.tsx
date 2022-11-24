@@ -7,7 +7,6 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import React, { useState } from 'react';
-import ImgCrop from 'antd-img-crop';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { Upload } from 'antd';
 import cls from './index.module.less';
@@ -17,13 +16,18 @@ import cls from './index.module.less';
 */
 
 const UploadAvatar = () => {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([{
+    uid: '-1',
+    name: 'image.png',
+    status: 'done',
+    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+  },]);
   const onChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
   return (
     <div className={cls[`upload-avatar`]}>
-      <ImgCrop rotate>
+        头像:
         <Upload
           action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
           listType="picture-card"
@@ -32,7 +36,7 @@ const UploadAvatar = () => {
           onChange={onChange}>
           {fileList.length < 2 && '上传修改'}
         </Upload>
-      </ImgCrop>
+      
     </div>
   );
 };
