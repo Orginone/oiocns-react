@@ -6,10 +6,10 @@ import { ProColumns } from '@ant-design/pro-table';
 import { Button, message, Space, Tag, Typography } from 'antd';
 import storeService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
-import { Page } from '@/module/typings';
+import { PageParams } from 'typings/requestType';
 import { DataType } from 'typings/globelType';
 // import styles from './index.module.less';
-
+storeService.currentModel = 'store';
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
@@ -134,10 +134,13 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       valueType: 'dateTime',
     },
   ];
-  console.log('store');
+
   // 获取申请/审核列表
   const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await storeService.getList<MarketApprovalType, Page>({
+    const { data = [], total } = await storeService.getList<
+      MarketApprovalType,
+      PageParams
+    >({
       filter: '',
       page: page,
       pageSize: pageSize,
