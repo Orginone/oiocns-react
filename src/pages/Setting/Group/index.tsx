@@ -10,7 +10,7 @@ import { dataSource } from './datamock';
 import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import { RouteComponentProps } from 'react-router-dom';
-import settingStore from '@/store/setting';
+// import settingStore from '@/store/setting';
 
 /**
  * 集团设置
@@ -19,9 +19,9 @@ import settingStore from '@/store/setting';
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { id } = props.match.params;
   
-  const {isOpenModal,setEditItem} = settingStore((state) => ({
-     ...state
-  }))
+  // const {isOpenModal,setEditItem} = settingStore((state) => ({
+  //    ...state
+  // }))
   
   console.log('isOpenModal', isOpenModal);
   
@@ -171,7 +171,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {deptCount}
       {/* 编辑集团 */}
       <EditCustomModal
-        open={isOpenModal}
+        open={settingStore.isOpenModal}
         title={id?'请编辑集团信息':'新建集团'}
         onOk={onOk}
         handleCancel={handleOk}

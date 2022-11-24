@@ -1,8 +1,9 @@
-import { Input, Tree ,Space,TreeProps,Modal, Button} from 'antd';
+import { Input, Tree ,Space,TreeProps, Button} from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState } from 'react';
+import React, { useState,useEffect} from 'react';
 import settingStore from '@/store/setting';
-import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined ,SearchOutlined} from '@ant-design/icons';
+import { DownOutlined, ApartmentOutlined, PlusOutlined, MoreOutlined, SearchOutlined } from '@ant-design/icons';
+import settingController  from '@/ts/controller/setting/content';
 
 import cls from './index.module.less';
 
@@ -72,14 +73,28 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   onSelect,
   createTitle,
 }) => {
+  useEffect(() => { 
+    initData();
+  }, [])
+  
+
+  
+
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const [treeData,setTreeData]=useState([])
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const { setEditItem } = settingStore((state) => ({ ...state}))
+
+
+  const initData = async () => {
+    const resultData = await settingController.getDepartments('381107910723375104');
+    console.log('resultData',resultData);
+  }
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -148,7 +163,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           expandedKeys={expandedKeys}
           switcherIcon={<DownOutlined />}
           autoExpandParent={autoExpandParent}
-          treeData={treeData1}
+          treeData={treeData}
           onSelect={onSelect}
           showIcon={true}
           titleRender={(e) => { 
