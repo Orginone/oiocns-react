@@ -1,7 +1,7 @@
 export namespace MarketTypes {
   interface OperationType {
     key: string;
-    label: string;
+    label: any;
     onClick: () => void;
   }
   // 市场信息类型

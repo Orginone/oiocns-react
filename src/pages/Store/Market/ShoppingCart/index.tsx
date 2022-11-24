@@ -7,14 +7,12 @@ import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 
 const ShoppingCart: React.FC<any> = (props) => {
   // console.log(props);
-  console.log(marketCtrl.userId);
-
+  console.log(marketCtrl.isUserSpace());
   const { confirm } = Modal;
   const fls = [1, 2, 3, 4, 5, 6, 7]; //接口内的数据
   const v: any[] = [];
   for (let i in fls) {
     //处理立即购买显示隐藏
-    console.log(i);
 
     v.push(false);
   }
@@ -29,6 +27,7 @@ const ShoppingCart: React.FC<any> = (props) => {
         content: '此操作将生成交易订单。是否确认?',
         onOk() {
           console.log('OK', item);
+          marketCtrl.buyApp();
         },
         onCancel() {
           console.log('Cancel');
@@ -51,7 +50,7 @@ const ShoppingCart: React.FC<any> = (props) => {
           icon: <CheckCircleFilled className={cls['icon1']} />,
           content: '此操作将生成交易勾选订单。是否确认?',
           onOk() {
-            console.log('OK');
+            console.log('OK', checkval);
             setcheckval([]);
           },
           onCancel() {
@@ -65,7 +64,7 @@ const ShoppingCart: React.FC<any> = (props) => {
           icon: <CheckCircleFilled className={cls['icon1']} />,
           content: '此操作将生成交易订单。是否确认?',
           onOk() {
-            console.log('OK');
+            console.log('OK', checkval);
             setcheckval([]);
           },
           onCancel() {
