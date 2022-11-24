@@ -80,6 +80,7 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
+    Provider.setWorkSpace(item.id);
     // @modify 切换工作空间
     SettionCtrl.changeWorkSpace({
       id: item.id,
