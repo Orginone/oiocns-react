@@ -5,7 +5,6 @@ import settingStore from '@/store/setting';
 import cls from './index.module.less';
 
 type TreeLeftPageProps = {
-  onSelect?: () => void;
   createTitle?: string;
   isJoingroup?: boolean;
   isCreategroup?: boolean;
@@ -17,18 +16,12 @@ const TreeLeftPage: React.FC<TreeLeftPageProps> = ({
   createTitle = '添加岗位',
   onClick,
 }) => {
-  const { setSelectId } = settingStore((state) => ({ ...state }));
   return (
     <div className={cls.topMes}>
       {isCreategroup && (
         <Creategroup
           onClick={onClick}
           createTitle={createTitle}
-          onSelect={(e) => {
-            if (e[0]) {
-              setSelectId(e[0]);
-            }
-          }}
         />
       )}
     </div>
