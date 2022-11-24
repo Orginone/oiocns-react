@@ -18,7 +18,7 @@ interface Iprops {
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
-  handleCancel: ()=> void;
+  handleCancel: () => void;
 }
 
 const { TextArea } = Input;
@@ -26,17 +26,15 @@ const { TextArea } = Input;
 const EditCustomModal = (props: Iprops) => {
   const { open, title, onOk, handleOk, handleCancel } = props;
   const [form] = Form.useForm();
-  useEffect(() => {
-   
-  }, []);
-  
+  useEffect(() => {}, []);
+
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
         title={title}
         open={open}
         onOk={handleOk}
-        onCancel={()=>handleCancel()}
+        onCancel={() => handleCancel()}
         getContainer={false}
         footer={null}>
         <Form form={form} name="control-hooks">

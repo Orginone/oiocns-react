@@ -17,9 +17,13 @@ interface TreeType {
   handleTitleClick?: (_item: any) => void;
   handleAddClick?: (_item: any) => void; //点击更多按钮事件
   handleMenuClick?: MenuProps['onClick']; //点击更多按钮事件
+  type?: 'myshop'; // 判断来源
+  clickBtn?: any;
 }
 
 const StoreClassifyTree: React.FC<TreeType> = ({
+  type,
+  clickBtn,
   treeData,
   menu,
   searchable = false,
@@ -132,10 +136,14 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
-              <PlusOutlined
-                className={cls.titleIcon}
-                onClick={() => handleAddClick && handleAddClick(node)}
-              />
+              {type !== 'myshop' ? (
+                <PlusOutlined
+                  className={cls.titleIcon}
+                  onClick={() => handleAddClick && handleAddClick(node)}
+                />
+              ) : (
+                ''
+              )}
               <Dropdown
                 menu={{ items: renderMenu(), onClick: handleMenuClick }}
                 placement="bottom"
@@ -152,7 +160,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      <div className={cls.title}>全部分类 </div>
+      {type === 'myshop' ? <>{clickBtn}</> : <div className={cls.title}>全部分类 </div>}
       {searchable && (
         <div className={cls.title}>
           <Input prefix={<SearchOutlined />} placeholder="搜索分类" />

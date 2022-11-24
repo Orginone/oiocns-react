@@ -1,50 +1,47 @@
 import { model, kernel } from '../../base';
-/**
- * 文件系统项接口
- */
-export interface IFileSystemItem {
-  /** 主键,唯一 */
-  key: string;
-  /** 是否为根路径 */
-  isRoot: boolean;
-  /** 文件系统项对应的目标 */
-  target: model.FileItemModel;
-  /** 上级文件系统项 */
-  parent: FileSystemItem | undefined;
-  /** 下级文件系统项数组 */
-  children: FileSystemItem[];
-  /**
-   * 创建文件系统项（目录）
-   * @param name 文件系统项名称
-   */
-  create(name: string): Promise<boolean>;
-  /**
-   * 移动文件系统项（目录）
-   * @param {IFileSystemItem} destination 目标文件系统
-   */
-  move(destination: IFileSystemItem): Promise<boolean>;
-  /**
-   * 加载下级文件系统项数组
-   * @param {boolean} reload 重新加载,默认false
-   */
-  loadChildren(reload: boolean): Promise<boolean>;
-}
-
+import { IFileSystemItem } from './ifilesys';
 /**
  * 文件系统项实现
  */
 export class FileSystemItem implements IFileSystemItem {
   key: string;
   isRoot: boolean;
+  isOpened: boolean;
   target: model.FileItemModel;
-  parent: FileSystemItem | undefined;
-  children: FileSystemItem[];
-  constructor(target: model.FileItemModel, parent: FileSystemItem | undefined) {
+  parent: IFileSystemItem | undefined;
+  children: IFileSystemItem[];
+  constructor(target: model.FileItemModel, parent: IFileSystemItem | undefined) {
     this.key = target.key;
     this.children = [];
     this.target = target;
     this.parent = parent;
     this.isRoot = parent === undefined;
+    this.isOpened = this.isRoot;
+  }
+  async rename(name: string): Promise<boolean> {
+    if (this.target.name != name) {
+      const index = this.children.findIndex((item) => {
+        return item.target.name === name;
+      });
+      if (index === -1) {
+        const res = await kernel.anystore.objectRename(
+          this.formatKey(),
+          name,
+          this.target.isDirectory,
+          'user',
+        );
+        if (res.success) {
+          this.key = this.key.replace(this.target.name, '');
+          if (this.key.endsWith('/')) {
+            this.key = this.key.substring(0, this.key.length - 1);
+          }
+          this.target.name = name;
+          this.target.key = this.key;
+          return true;
+        }
+      }
+    }
+    return false;
   }
   async create(name: string): Promise<boolean> {
     const index = this.children.findIndex((item) => {
@@ -54,6 +51,21 @@ export class FileSystemItem implements IFileSystemItem {
       const res = await kernel.anystore.objectCreate(this.formatKey(name), 'user');
       if (res.success && res.data) {
         this.children.push(new FileSystemItem(res.data, this));
+        return true;
+      }
+    }
+    return false;
+  }
+  async copy(destination: IFileSystemItem): Promise<boolean> {
+    if (destination.target.isDirectory && this.key != destination.key) {
+      const res = await kernel.anystore.objectCopy(
+        this.formatKey(),
+        destination.key,
+        destination.target.isDirectory,
+        'user',
+      );
+      if (res.success) {
+        destination.children.push(this);
         return true;
       }
     }
@@ -81,7 +93,7 @@ export class FileSystemItem implements IFileSystemItem {
     return false;
   }
   async loadChildren(reload: boolean = false): Promise<boolean> {
-    if (reload || this.children.length < 1) {
+    if (this.target.isDirectory && (reload || this.children.length < 1)) {
       const res = await kernel.anystore.objects(this.formatKey(), 'user');
       if (res.success && res.data.length > 0) {
         this.children = res.data.map((item) => {

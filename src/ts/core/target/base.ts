@@ -405,7 +405,7 @@ export default class BaseTarget extends SpaceTarget {
    * 查询我的审批
    * @returns
    */
-  public async queryjoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
+  public queryjoinApproval = async () => {
     return await kernel.queryTeamJoinApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
@@ -414,7 +414,7 @@ export default class BaseTarget extends SpaceTarget {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-  }
+  };
 
   /**
    * 审批我的加入组织/个人申请
@@ -641,4 +641,39 @@ export default class BaseTarget extends SpaceTarget {
       targetIds: [this.target.id],
     });
   };
+  /**
+   * 修改组织或个人
+   * @param params id:targetId,code:修改后编号,TypeName:枚举,belongId: 归属ID,teamName:修改后名称,temcode:修改后编号
+   * ,teamReamrk：修改后描述;
+   * @returns
+   */
+  public async updateTargetBase(
+    name: string,
+    code: string,
+    typeName: TargetType,
+    remark: string,
+  ): Promise<model.ResultType<any>> {
+    const params = {
+      id: this.target.id,
+      name: name,
+      code: code,
+      typeName: typeName,
+      remark: remark,
+      belongId: this.target.belongId,
+      teamName: name,
+      teamCode: code,
+      teamRemark: remark,
+    };
+    let res = await kernel.updateTarget(params);
+    if (res.success) {
+      this.target.name = params.name;
+      this.target.code = params.code;
+      if (this.target.team != undefined) {
+        this.target.team.name = params.name;
+        this.target.team.code = params.code;
+        this.target.team.remark = params.teamRemark;
+      }
+    }
+    return res;
+  }
 }

@@ -10,9 +10,9 @@ import CommonClass from '../commonClass/BaseServiceClass';
 // readonly： 表示'只读',用来防止在构造函数之外对属性进行赋值
 // static 静态数据
 
-export interface MarketServiceType extends CommonClassType<MarketTypes.ProductType> {
-  PUBLIC_STORE: MarketTypes.MarketType; //共享仓库信息,用于获取共享仓库应用列表
-}
+// export interface MarketServiceType extends CommonClassType<MarketTypes.ProductType> {
+//   PUBLIC_STORE: MarketTypes.MarketType; //共享仓库信息,用于获取共享仓库应用列表
+// }
 
 export default class MarketService extends CommonClass {
   public PUBLIC_STORE: MarketTypes.MarketType = {} as MarketTypes.MarketType; //共享仓库信息
@@ -20,7 +20,7 @@ export default class MarketService extends CommonClass {
   public MyAppColumns: ProColumns<any>[] = []; //我的应用 表格头部展示数据
   public PublishColumns: ProColumns<any>[] = []; //应用上架 表格头部展示数据
 
-  constructor(data: CommonClassData) {
+  constructor(data: any) {
     super(data);
     // 获取共享仓库信息
     this.getPublicStore();
@@ -55,34 +55,34 @@ export default class MarketService extends CommonClass {
       },
       {
         title: '应用名称',
-        dataIndex: 'caption',
+        dataIndex: ['prod', 'caption'],
       },
       {
         title: '来源',
-        dataIndex: 'marketId',
+        dataIndex: ['prod', 'marketId'],
       },
       {
         title: '应用类型',
-        dataIndex: 'typeName',
+        dataIndex: ['prod', 'typeName'],
       },
       {
         title: '售卖权限',
-        dataIndex: 'sellAuth',
+        dataIndex: ['prod', 'sellAuth'],
       },
       {
         title: '价格',
-        dataIndex: 'price',
+        dataIndex: ['prod', 'price'],
       },
 
       {
         title: '创建时间',
-        dataIndex: 'createTime',
+        dataIndex: ['prod', 'createTime'],
       },
 
       {
         title: '备注',
         ellipsis: true,
-        dataIndex: 'remark',
+        dataIndex: ['prod', 'remark'],
       },
     ];
     this.ShopAppColumns = [...data];

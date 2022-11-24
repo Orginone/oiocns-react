@@ -31,7 +31,7 @@ const toobarComponentMaps: Record<TOOBAR_TYPE, JSX.Element> = {
 const ShareDrawForm: React.FC<ShareDrawFormType> = (props) => {
   const { onClose, open, title, placement = 'right', type } = props;
   return (
-    <Drawer  title={title} width={460} placement={placement} onClose={onClose} open={open}>
+    <Drawer title={title} width={460} placement={placement} onClose={onClose} open={open}>
       {toobarComponentMaps[type]}
     </Drawer>
   );
