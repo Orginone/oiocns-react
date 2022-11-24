@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Provider from '@/ts/core/provider';
+import SettionCtrl from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
@@ -29,7 +30,7 @@ const OrganizationalItem = (item: SpaceType) => {
       <Avatar className={styles.avatar} size={32}>
         {item?.name.substring(0, 1)}
       </Avatar>
-      <Typography.Text>{item?.name}</Typography.Text>
+      <Typography.Text className={styles['space-list']}>{item?.name}</Typography.Text>
     </Space>
   ) : (
     ''
@@ -79,7 +80,11 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    Provider.setWorkSpace(item.id);
+    // @modify 切换工作空间
+    SettionCtrl.changeWorkSpace({
+      id: item.id,
+      name: item.name,
+    });
     setCurrent({
       name: item.name,
       id: item.id,
