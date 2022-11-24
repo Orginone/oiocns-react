@@ -5,7 +5,7 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu, Button, Row, Col } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
@@ -19,6 +19,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
+
+  console.log('3333333', list);
 
   const menu = ['删除商店', '基础详情', '用户管理'];
   const onOk = () => {
@@ -38,6 +40,9 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     StoreSiderbar.TreeCallBack = setList;
     StoreSiderbar.getTreeData();
   }, []);
+  const treelist = useMemo(() => {
+    return list.filter((item) => item.title !== '开放市场');
+  }, [list]);
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
@@ -138,7 +143,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         handleTitleClick={handleTitleClick}
         handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
-        treeData={list}
+        treeData={treelist}
         menu={menu}
         type="myshop"
         clickBtn={ClickBtn}
