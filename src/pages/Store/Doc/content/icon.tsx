@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import cls from './index.module.less';
-import passport from '@/assets/icons/default_folder_opened.svg';
-import bank from '@/assets/icons/default_file.svg';
-import txt from '@/assets/icons/file_type_txt.svg';
-import image from '@/assets/icons/file_type_genstat.svg';
-import excel from '@/assets/icons/file_type_excel.svg';
-import word from '@/assets/icons/file_type_word.svg';
 
 const StoreDoc = (props: any) => {
-  const [type, setType] = useState<any>(null);
-  const { iconData } = props;
-  useEffect(() => {
-    let index = iconData.Name.lastIndexOf('.');
-    if (index == -1) {
-      setType('file');
-    } else {
-      let str = iconData.Name.substring(index + 1, iconData.Name.length);
-      setType(str);
+  const type = props.iconData;
+  const getImgSrc = (type: string) => {
+    let prifex = '/icons/';
+    switch (type) {
+      case '':
+        prifex += 'default_folder';
+        break;
+      case 'file':
+        prifex += 'default_file';
+        break;
+      default:
+        prifex += 'file_type_' + type;
+        break;
     }
-  }, []);
+    return prifex + '.svg';
+  };
   return (
     <div>
-      {type == 'file' ? (
+      <img src={getImgSrc(type)} className={cls.fileImg}></img>
+      {/* {type == 'file' ? (
         <img src={passport} className={cls.fileImg} alt="" />
       ) : type == 'txt' ? (
         <img src={txt} className={cls.fileImg} alt="" />
@@ -33,7 +33,7 @@ const StoreDoc = (props: any) => {
         <img src={word} className={cls.fileImg} alt="" />
       ) : (
         <img src={bank} className={cls.fileImg} alt="" />
-      )}
+      )} */}
     </div>
   );
 };

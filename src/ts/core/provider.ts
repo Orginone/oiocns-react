@@ -37,6 +37,9 @@ export default class Provider {
   /** 设置人员回调 */
   public static onSetPerson(callback: () => void): void {
     if (callback) {
+      if (this.getPerson) {
+        callback.apply(this, []);
+      }
       this._callbacks.push(callback);
     }
   }
