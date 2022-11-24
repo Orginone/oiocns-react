@@ -1,7 +1,7 @@
 import { model, schema } from '../../base';
 import { TargetType } from '../enum';
 import { IAuthority } from './authority/iauthority';
-import { AppStore, Product } from '../market';
+import { Market, BaseProduct } from '../market';
 import Company from './company';
 import Cohort from './cohort';
 import Department from './department';
@@ -119,7 +119,7 @@ export interface IMTarget {
    * 查询商店列表
    * @returns 商店列表
    */
-  getJoinMarkets(): Promise<AppStore[]>;
+  getJoinMarkets(): Promise<Market[]>;
   /**
    * 查询开放市场
    * @returns 市场
@@ -130,7 +130,7 @@ export interface IMTarget {
    * @param params
    * @returns
    */
-  getOwnProducts(): Promise<Product[]>;
+  getOwnProducts(): Promise<BaseProduct[]>;
   /**
    * 查询购物车列表
    */
