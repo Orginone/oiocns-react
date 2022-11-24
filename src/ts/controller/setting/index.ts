@@ -1,4 +1,4 @@
-import BaseController from '../baseCtrl';
+import BaseController from './SingletonPublish';
 class SettingController extends BaseController { 
   private _isOpenModal: boolean = false;
    /** 页面isOpen控制是否显示弹窗 */
@@ -9,7 +9,6 @@ class SettingController extends BaseController {
   public async setIsOpen(params: boolean) {
     console.log(params);
     this._isOpenModal = params;
-    this.changCallback();
   }
 }
 const settingController = new SettingController();

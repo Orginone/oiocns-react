@@ -69,12 +69,11 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 };
 
 type CreateGroupPropsType = {
-  onSelect?: TreeProps['onSelect'];
   createTitle: string;
   onClick?: () => void;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
@@ -175,7 +174,9 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
             switcherIcon={<DownOutlined />}
             autoExpandParent={autoExpandParent}
             treeData={treeData1}
-            onSelect={onSelect}
+            onSelect={() => { 
+              
+            }}
             showIcon={true}
             titleRender={(e) => {
               return (
