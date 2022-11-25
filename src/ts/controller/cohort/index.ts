@@ -13,8 +13,13 @@ class CohortController {
   private _myCohorts: Cohort[];
   private _joinCohorts: Cohort[];
   public callBack!: Function;
+<<<<<<< HEAD
   constructor() {
     this._cohorts = [];
+=======
+  constructor(cohorts: Cohort[]) {
+    this._cohorts = cohorts;
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
     this.workSpace = provider.getPerson!;
     this._myCohorts = this.getMyCohort;
     this._joinCohorts = this.getJoinCohort;
@@ -25,6 +30,7 @@ class CohortController {
   }
 
   // this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
+<<<<<<< HEAD
 /**
  * 获取我的群组
  */
@@ -38,10 +44,15 @@ class CohortController {
         this._cohorts = obj.ChohortArray;
       }
     }
+=======
+
+  public get getMyCohort(): Cohort[] {
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
     let data = this._cohorts.filter(
       (obj) => this.workSpace.target.id == obj.target.belongId,
     );
     console.log('我的群组', data);
+<<<<<<< HEAD
     return data;
   }
 /**
@@ -62,6 +73,19 @@ class CohortController {
     return data;
   }
 
+=======
+    return data;
+  }
+
+  public get getJoinCohort(): Cohort[] {
+    let data = this._cohorts.filter(
+      (obj) => this.workSpace.target.id != obj.target.belongId,
+    );
+    console.log('我加入的群组', data);
+    return data;
+  }
+
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
   public setCallBack(fun: Function) {
     this.callBack = fun;
   }
@@ -80,7 +104,12 @@ class CohortController {
     remark: string,
   ): Promise<any> {
     const res = await obj.updateTargetBase(name, code, TargetType.Cohort, remark);
+<<<<<<< HEAD
     this.callBack([...this.getMyCohort]);
+=======
+    this.callBack([...this._myCohorts]);
+    console.log('callback', this._myCohorts);
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
     return res;
   }
   /**
@@ -97,8 +126,13 @@ class CohortController {
     remark: string,
   ): Promise<any> {
     const res = await obj.createCohort(name, code, remark);
+<<<<<<< HEAD
     // this._cohorts = provider.getPerson!.ChohortArray;
     this.callBack([...this.getMyCohort]);
+=======
+    this._cohorts = provider.getPerson!.ChohortArray;
+    this.callBack([...this._myCohorts]);
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
     return res;
   }
   /**
@@ -169,17 +203,25 @@ class CohortController {
     if (res.success) {
       let data = this._cohorts.filter((obj) => id != obj.target.id);
       this._cohorts = data;
+<<<<<<< HEAD
       this.callBack([...this.getMyCohort]);
     }
     return res;
   }
 
+=======
+      this.callBack([...this._myCohorts]);
+    }
+    return res;
+  }
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411
   /**
    * 角色管理列表
    * @param obj
    * @param id
    * @returns
    */
+<<<<<<< HEAD
   public async getRoleList(id: string): Promise<schema.XAuthority[]> {
     this._myCohorts = this.getMyCohort;
     console.log("id内容",id)
@@ -238,3 +280,14 @@ class CohortController {
 }
 
 export default new CohortController();
+=======
+  public async getRoleList(id: string): Promise<model.ResultType<schema.XAuthority>> {
+    let cohort = this._myCohorts.filter((obj) => id == obj.target.id)[0];
+    let res = await cohort.selectAuthorityTree(id);
+    console.log('职权组织树:', res);
+    return res;
+  }
+}
+
+export default new CohortController(provider.getPerson!.ChohortArray);
+>>>>>>> 0243cfb9d49d0d0c3ef3713e9a99141addfb8411

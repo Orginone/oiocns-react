@@ -13,24 +13,40 @@ import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
-import type { MenuProps } from 'antd';
+import JoinOtherShop from '@/components/JoinOtherShop';
+import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
+  const [isJoinShop, setIsJoinShop] = useState<boolean>(false); // 加入商店
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
+  const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
 
-  console.log('3333333', list);
-
-  const menu = ['删除商店', '基础详情', '用户管理'];
-  const onOk = () => {
+  /**
+   * @description: 创建商店
+   * @param {any} formData
+   * @return {*}
+   */
+  const onOk = (formData: any) => {
+    marketCtrl.creatMarkrt({ ...formData });
     setIsAddOpen(false);
+    setIsJoinShop(false);
+  };
+
+  /**
+   * @description: 删除商店
+   * @return {*}
+   */
+  const onDeleteOk = () => {
     setIsDeleteOpen(false);
+    marketCtrl.deleteMarket(treeDataObj?.node);
   };
   const onCancel = () => {
     setIsAddOpen(false);
     setIsDeleteOpen(false);
+    setIsJoinShop(false);
   };
 
   const onClose = () => {
@@ -41,9 +57,16 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     StoreSiderbar.TreeCallBack = setList;
     StoreSiderbar.getTreeData();
   }, []);
+
+  /**
+   * @description: 处理商店树数据
+   * @param {*} useMemo
+   * @return {*}
+   */
   const treelist = useMemo(() => {
     return list.filter((item) => item.title !== '开放市场');
   }, [list]);
+
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
@@ -88,7 +111,13 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         }}>
         创建商店
       </Button>
-      <Button type="link">加入商店</Button>
+      <Button
+        type="link"
+        onClick={() => {
+          setIsJoinShop(true);
+        }}>
+        加入商店
+      </Button>
     </>
   );
 
@@ -111,19 +140,33 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     console.log('handleAddShop', item);
   };
 
-  /*******
-   * @desc: 目录更多操作 触发事件
-   * @param {object} param1
+  /**
+   * @description: 删除商店
+   * @param {any} item
    * @return {*}
    */
-  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    console.log('handleMenuClick55', key);
+  const handleDeleteShop = (item?: any) => {
+    setIsDeleteOpen(true);
+    setTreeDataObj(item);
+  };
+
+  /**
+   * @description: 目录更多操作 触发事件
+   * @param {string} key
+   * @param {any} node
+   * @return {*}
+   */
+  const handleMenuClick = (key: string, node: any) => {
+    console.log('handleMenuClick55', key, node);
     switch (key) {
       case '删除商店':
-        setIsDeleteOpen(true);
+        handleDeleteShop(node);
         break;
       case '基础详情':
         setIsDetailOpen(true);
+        break;
+      case '用户管理':
+        history.push('/market/usermanagement');
         break;
       default:
         break;
@@ -145,7 +188,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={treelist}
-        menu={menu}
+        menu={'menus'}
         type="myshop"
         clickBtn={ClickBtn}
       />
@@ -153,11 +196,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       <DeleteCustomModal
         title="提示"
         open={isDeleteOpen}
-        onOk={onOk}
+        onOk={onDeleteOk}
         onCancel={onCancel}
-        content={selectMenu}
+        content={treeDataObj.title}
       />
       <DetailDrawer title={'神马商店'} open={isDetailOpen} onClose={onClose} />
+      <JoinOtherShop title="搜索商店" open={isJoinShop} onCancel={onCancel} />
     </div>
   );
 };

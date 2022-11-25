@@ -176,12 +176,16 @@ class StoreClassify {
     const marketTree = await Provider.getPerson!.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
       const item = itemModel.store;
+      let arrs = ['基础详情', '用户管理'];
+      arrs.push(`${item.belongId === Provider.userId ? '删除商店' : '退出商店'}`);
       return {
         title: item.name,
         key: `0-${index}`,
         id: item.id,
         node: itemModel,
         children: [],
+        belongId: item.belongId,
+        menus: arrs,
       };
     });
 
