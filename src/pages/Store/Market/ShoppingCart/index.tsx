@@ -12,7 +12,8 @@ const ShoppingCart: React.FC<any> = (props) => {
   // console.log(marketCtrl.isUserSpace());
 
   const { confirm } = Modal;
-  const fls = Adata.result; //接口内的数据
+  const [fls, setfls] = useState(Adata.result); //接口内的数据
+
   const v: any[] = [];
   for (let i in fls) {
     //处理立即购买显示隐藏
@@ -31,6 +32,10 @@ const ShoppingCart: React.FC<any> = (props) => {
         onOk() {
           console.log('OK', item);
           marketCtrl.buyApp();
+          let fs = fls;
+          console.log(fs);
+
+          // fs.map((item, i) => {});
         },
         onCancel() {
           console.log('Cancel');

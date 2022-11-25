@@ -241,7 +241,14 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         open={isDetailOpen}
         onClose={onClose}
       />
-      <JoinOtherShop title="搜索商店" open={isJoinShop} onCancel={onCancel} />
+      <JoinOtherShop
+        title="搜索商店"
+        open={isJoinShop}
+        onCancel={onCancel}
+        onOk={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
     </div>
   );
 };

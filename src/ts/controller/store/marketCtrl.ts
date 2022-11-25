@@ -13,7 +13,6 @@ class MarketController {
   public get userId() {
     return Provider.userId;
   }
-<<<<<<< HEAD
   /**
    * 是否个人空间
    * @returns
@@ -36,7 +35,7 @@ class MarketController {
   //取消订单
   public cancleOrder() {
     Provider.getPerson?.cancleOrder();
-=======
+  }
 
   /**
    * @description: 创建商店
@@ -77,7 +76,6 @@ class MarketController {
 
   public async getJoinMarkets() {
     await this.curTarget?.getJoinMarkets();
->>>>>>> f020a167dcc54293d6aec01d2a27ac190ac14d70
   }
 }
 
