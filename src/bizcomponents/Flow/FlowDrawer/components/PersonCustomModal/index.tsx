@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Radio, Card, Empty } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
-import { perpleList } from './mock';
+// import { perpleList } from './mock';
 import Provider from '@/ts/core/provider';
 import { useAppwfConfig } from '@/module/flow/flow';
 import BaseTarget from '@/ts/core/target/base';

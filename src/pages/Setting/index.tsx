@@ -26,7 +26,6 @@ import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
 
 import { MenuProps } from 'antd';
 
-
 /* 信息中心菜单 */
 const infoMenuItems = [
   { label: '单位信息', key: 'info', icon: <InfoCircleOutlined /> },
@@ -70,8 +69,6 @@ const muneItems: MenuProps[`items`] = [
 ];
 
 const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
- 
-
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };

@@ -191,18 +191,24 @@ export default class MarketActionTarget extends BaseTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  createMarket = async (
+  createMarket = async ({
+    name,
+    code,
+    remark,
+    samrId = '0',
+    ispublic = true,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string = '0',
+    samrId: string;
     // 产品类型名
-    ispublic: boolean = true,
-  ): Promise<model.ResultType<schema.XMarket>> => {
+    ispublic: boolean;
+  }): Promise<model.ResultType<schema.XMarket>> => {
     const res = await kernel.createMarket({
       name,
       code,
@@ -222,20 +228,27 @@ export default class MarketActionTarget extends BaseTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct = async (
+  createProduct = async ({
+    name,
+    code,
+    remark,
+    resources,
+    thingId = '0',
+    typeName = 'webApp',
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string = '0',
+    thingId?: string;
     // 产品类型名
-    typeName: string = 'webApp',
-  ): Promise<model.ResultType<schema.XProduct>> => {
+    typeName?: string;
+  }): Promise<model.ResultType<schema.XProduct>> => {
     const res = await kernel.createProduct({
       name,
       code,
@@ -274,14 +287,15 @@ export default class MarketActionTarget extends BaseTarget {
    * @param product 应用
    * @returns
    */
-  deleteProduct = async (product: Product): Promise<model.ResultType<boolean>> => {
-    const index = this._owdProducts.indexOf(product);
+  deleteProduct = async (productId: string): Promise<model.ResultType<boolean>> => {
     const res = await kernel.deleteProduct({
-      id: product.prod.id,
+      id: productId,
       belongId: this.target.id,
     });
     if (res.success) {
-      delete this._owdProducts[index];
+      this._owdProducts = this._owdProducts.filter((v) => {
+        return v.prod.id !== productId;
+      });
     }
     return res;
   };

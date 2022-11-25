@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Avatar, Space, Col, Select } from 'antd';
 import cls from './index.module.less';
 
-/*
-    新建商店弹窗
-*/
+/**
+ * @description: 新建商店弹窗
+ * @return {*}
+ */
 
 interface Iprops {
   title: string; // 弹窗标题
@@ -22,7 +23,6 @@ const NewStoreModal = (props: Iprops) => {
     if (!open) {
       form.resetFields();
     }
-    // console.log('3211232131', router);
   }, [open]);
   const titles = (
     <Space className={cls[`new-store-title`]} size={8}>
@@ -33,7 +33,6 @@ const NewStoreModal = (props: Iprops) => {
   //触发确认事件
   const handleOk = async () => {
     const data = await form.validateFields();
-
     onOk && onOk(data);
   };
   // 内容区域
@@ -60,7 +59,7 @@ const NewStoreModal = (props: Iprops) => {
             rules={[{ required: true, message: '商店编码' }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="public" label="类型">
+          <Form.Item name="ispublic" label="类型">
             <Select
               options={[
                 {

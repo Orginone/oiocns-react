@@ -1,7 +1,7 @@
 import { CommonStatus, TargetType } from '../enum';
 import MarketTarget from './mbase';
 import consts from '../consts';
-import { model, schema, faildResult, kernel } from '../../base';
+import { model, schema, faildResult, kernel, common } from '../../base';
 import Cohort from './cohort';
 import Company from './company';
 import University from './university';
@@ -32,6 +32,7 @@ export default class Person extends MarketTarget {
   public get ChohortArray(): Cohort[] {
     return this._joinedCohorts;
   }
+
   /**
    * 获取群组列表
    * @param params
@@ -87,6 +88,7 @@ export default class Person extends MarketTarget {
       JoinTypeNames: [TargetType.Cohort],
     });
     if (res.success) {
+      this._joinedCohorts = [];
       res.data?.result?.forEach((item) => {
         this._joinedCohorts.push(new Cohort(item));
       });
@@ -160,15 +162,18 @@ export default class Person extends MarketTarget {
    * @param id 群组Id
    */
   quitCohorts = async (id: string): Promise<model.ResultType<any>> => {
+    console.log('过滤前的内容为', this._joinedCohorts);
     const res = await this.cancelJoinTeam(id);
     if (res.success) {
       var index = this._joinedCohorts.findIndex((cohort) => {
         return cohort.target.id == id;
       });
       if (index > 0) {
+        console.log('进入删除方法');
         this._joinedCohorts = this._joinedCohorts.filter((cohort) => {
           return cohort.target.id != id;
         });
+        console.log('过滤后的内容为', this._joinedCohorts);
       }
     }
     return res;
@@ -340,9 +345,9 @@ export default class Person extends MarketTarget {
   public async queryMySpaceProduct(): Promise<schema.XProductArray> {
     let resultArray: any = [];
     // 判断如果是有个人空间
-    if (!this._curCompany) {
-      return resultArray;
-    }
+    // if (!this._curCompany) {
+    //   return resultArray;
+    // }
 
     let paramData: any = {};
     paramData.id = this._joinedCompanys[0].target.id;
@@ -375,27 +380,7 @@ export default class Person extends MarketTarget {
       this._friends = res.data.result;
     }
     return this._friends;
-  }
-
-  /**
-   * @description: 查询我加入的群
-   * @return {*} 查询到的群组
-   */
-  public async getJoinedCohorts(): Promise<Cohort[]> {
-    if (this._joinedCohorts.length > 0) {
-      return this._joinedCohorts;
-    }
-    let res = await this.getjoined({
-      spaceId: this.target.id,
-      JoinTypeNames: [TargetType.Cohort],
-    });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
-        this._joinedCohorts.push(new Cohort(item));
-      });
-    }
-    return this._joinedCohorts;
-  }
+  };
 
   /**
    * 申请添加好友
@@ -448,7 +433,7 @@ export default class Person extends MarketTarget {
   approvalFriendApply = async (
     relation: XRelation,
     status: number = CommonStatus.ApproveStartStatus,
-  ): Promise<model.ResultType<any>> => {
+  ): Promise<model.ResultType<schema.XRelation>> => {
     const res = await super.approvalJoinApply(relation.id, status);
     if (res.success && relation.target != undefined) {
       this._friends.push(relation.target);

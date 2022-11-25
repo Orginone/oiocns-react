@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Cohort } from '../../module/org/index';
-import CohortServices from '../../ts/core/target/cohort';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
-import { Avatar, Card, Col, Result, Row, Tag, Typography, Button } from 'antd';
+import { Avatar, Col, Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
 import { UserOutlined } from '@ant-design/icons';
-
+import CohortController from '../../ts/controller/cohort/index'
+import Person from '../../ts/core/target/person';
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
   setCohort: Function;
+  person:Person
 };
 
 let tableProps: CohortSearchTableProps;
@@ -20,7 +21,7 @@ let tableProps: CohortSearchTableProps;
   弹出框表格查询
 */
 const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
-  const [searchKey, setSearchKey] = useState<Cohort>();
+  const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<Cohort[]>([]);
 
   useEffect(() => {
@@ -64,14 +65,10 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
 
   // 查询数据
   const getList = async (searchKey?: string) => {
-    const newCohortServices = new CohortServices(null);
-    const { data } = await newCohortServices.SearchCohort({
-      filter: searchKey, // || '91330304254498785G',
-      limit: 20,
-      offset: 0,
-    });
-    console.log(data.result);
-    setDataSource(data?.result || []);
+    
+    const res = CohortController.searchCohort(props.person,searchKey?searchKey:'')
+    console.log((await res).data.result);
+    setDataSource((await res).data.result || []);
     console.log('输出值', dataSource);
   };
 

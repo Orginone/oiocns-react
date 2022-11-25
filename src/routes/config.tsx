@@ -144,6 +144,13 @@ const TodoRouter: IRouteConfig[] = [
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,
+        component: React.lazy(() => import('@/pages/Todo/Store')),
+      },
+      {
+        path: '/todo/product',
+        title: '应用上架',
+        icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Product')),
       },
       {
@@ -248,6 +255,11 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
+    path: '/market/ShoppingCart',
+    title: '购物车',
+    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart')),
+  },
+  {
     path: '/market',
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
@@ -274,6 +286,12 @@ const MarketRouter: IRouteConfig[] = [
         path: '/market/publicProperty',
         title: '公物仓',
         component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
+      },
+      {
+        path: '/market/usermanagement',
+        title: '用户管理',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/UserManagement')),
       },
       {
         path: '/market',
@@ -406,6 +424,12 @@ const PersonRouter: IRouteConfig[] = [
         title: '群组设置',
         icon: <TeamOutlined />,
         component: React.lazy(() => import('@/pages/Person/Cohort')),
+      },
+      {
+        path: '/person/Role',
+        title: '角色管理',
+        // icon: <Outlined />,
+        component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
       },
       {
         path: '/person/wallet',

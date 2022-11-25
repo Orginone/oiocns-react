@@ -73,32 +73,33 @@ export default class Product {
 
   /**
    * 上架商品
-   * @param Caption 标题
-   * @param MarketId 市场ID
-   * @param SellAuth 售卖权限
-   * @param Information 详情信息
-   * @param Price 价格
-   * @param Days 期限
+   * @param params.Caption 标题
+   * @param params.MarketId 市场ID
+   * @param params.SellAuth 售卖权限
+   * @param params.Information 详情信息
+   * @param {number} params.Price 价格
+   * @param {string} params.Days 期限
    * @returns 是否上架成功
    */
-  public async publish(
-    caption: string,
-    marketId: string,
-    sellAuth: '所属权' | '使用权',
-    information: string,
-    price: number = 0,
-    days: string = '0',
-  ): Promise<model.ResultType<any>> {
+  public async publish(params: {
+    caption: string;
+    marketId: string;
+    sellAuth: '所属权' | '使用权';
+    information: string;
+    price: number;
+    days: string;
+  }): Promise<model.ResultType<any>> {
     const res = await kernel.createMerchandise({
-      id: '',
-      caption,
-      marketId,
-      sellAuth,
-      information,
-      price,
-      days,
+      id: '0',
+      caption: params.caption,
+      marketId: params.marketId,
+      sellAuth: params.sellAuth,
+      information: params.information,
+      price: Number(params.price) ?? 0,
+      days: params.days || '0',
       productId: this.prod.id,
     });
+
     if (res.success) {
       this._merchandise.unshift(res.data);
     }

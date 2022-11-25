@@ -1,7 +1,13 @@
-import { Tree ,Space,Input} from 'antd';
+import { Tree, Space, Input } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState } from 'react';
-import { DownOutlined, ApartmentOutlined,PlusOutlined, MoreOutlined,SearchOutlined} from '@ant-design/icons';
+import {
+  DownOutlined,
+  ApartmentOutlined,
+  PlusOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 
 import cls from './index.module.less';
 
@@ -51,7 +57,7 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
     if (node.children) {
-      if (node.children.some(item => item.key === key)) {
+      if (node.children.some((item) => item.key === key)) {
         parentKey = node.key;
       } else if (getParentKey(key, node.children)) {
         parentKey = getParentKey(key, node.children);
@@ -66,7 +72,6 @@ const JoinGroup: React.FC = () => {
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverItem, setHoverItem] = useState<React.Key>();
   const [searchValue, setSearchValue] = useState('');
-  
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -76,7 +81,7 @@ const JoinGroup: React.FC = () => {
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const newExpandedKeys = dataList
-      .map(item => {
+      .map((item) => {
         if (item.title.indexOf(value) > -1) {
           return getParentKey(item.key, defaultData);
         }
@@ -125,30 +130,43 @@ const JoinGroup: React.FC = () => {
 
   return (
     <div className={cls.topMes}>
-      <div className={cls.joingroup}>加入集团</div> 
-      <Input size="middle" className={cls.inputStyle} placeholder="搜索加入的集团"
-        prefix={<SearchOutlined />} onChange={ onChange } />
+      <div className={cls.joingroup}>加入集团</div>
+      <Input
+        size="middle"
+        className={cls.inputStyle}
+        placeholder="搜索加入的集团"
+        prefix={<SearchOutlined />}
+        onChange={onChange}
+      />
       <Tree
         onExpand={onExpand}
         expandedKeys={expandedKeys}
         switcherIcon={<DownOutlined />}
         autoExpandParent={autoExpandParent}
         treeData={treeData}
-        onClick={(e) => { 
+        onClick={(e) => {
           console.log(e);
-        } }
+        }}
         showIcon={true}
-        titleRender={(e) => { 
-          return <div className={cls.rightstyle} onMouseLeave={() => { setHoverItem('') }}  onMouseOver={() => {
-            setHoverItem(e.key);
-          }}>
-            <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-            {hoverItem === e.key ? <Space>
-              <PlusOutlined />
-              <MoreOutlined />
-            </Space>: null }
-           
-          </div>
+        titleRender={(e) => {
+          return (
+            <div
+              className={cls.rightstyle}
+              onMouseLeave={() => {
+                setHoverItem('');
+              }}
+              onMouseOver={() => {
+                setHoverItem(e.key);
+              }}>
+              <span style={{ paddingRight: '8px' }}>{e?.title}</span>
+              {hoverItem === e.key ? (
+                <Space>
+                  <PlusOutlined />
+                  <MoreOutlined />
+                </Space>
+              ) : null}
+            </div>
+          );
         }}
       />
     </div>

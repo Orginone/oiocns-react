@@ -13,13 +13,17 @@ interface TreeType {
   treeData?: any[];
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
-  menu?: string[]; //更多按钮列表 需提供 string[]
+  menu?: string[] | 'menus' | undefined; //更多按钮列表 需提供 string[]
   handleTitleClick?: (_item: any) => void;
   handleAddClick?: (_item: any) => void; //点击更多按钮事件
-  handleMenuClick?: MenuProps['onClick']; //点击更多按钮事件
+  handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
+  type?: 'myshop'; // 判断来源
+  clickBtn?: any;
 }
 
 const StoreClassifyTree: React.FC<TreeType> = ({
+  type,
+  clickBtn,
   treeData,
   menu,
   searchable = false,
@@ -30,11 +34,16 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
-  const renderMenu: () => MenuProps['items'] = () => {
-    if (!menu) {
-      return [];
+  const renderMenu: (data: any) => MenuProps['items'] = (data) => {
+    if (menu === 'menus') {
+      return data?.menus?.map((item: string) => {
+        return {
+          key: item,
+          label: item,
+        };
+      });
     }
-    return menu.map((item) => {
+    return menu?.map((item) => {
       return {
         key: item,
         label: item,
@@ -132,12 +141,25 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
-              <PlusOutlined
-                className={cls.titleIcon}
-                onClick={() => handleAddClick && handleAddClick(node)}
-              />
+              {type !== 'myshop' ? (
+                <PlusOutlined
+                  className={cls.titleIcon}
+                  onClick={() => handleAddClick && handleAddClick(node)}
+                />
+              ) : (
+                ''
+              )}
               <Dropdown
-                menu={{ items: renderMenu(), onClick: handleMenuClick }}
+                menu={
+                  menu
+                    ? {
+                        items: renderMenu(node),
+                        onClick: ({ key }) => {
+                          handleMenuClick && handleMenuClick(key, node);
+                        },
+                      }
+                    : undefined
+                }
                 placement="bottom"
                 trigger={['click']}>
                 <EllipsisOutlined className={cls.titleIcon} rotate={90} />
@@ -152,7 +174,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      <div className={cls.title}>全部分类 </div>
+      {type === 'myshop' ? <>{clickBtn}</> : <div className={cls.title}>全部分类 </div>}
       {searchable && (
         <div className={cls.title}>
           <Input prefix={<SearchOutlined />} placeholder="搜索分类" />

@@ -17,6 +17,7 @@ const Chat: React.FC = () => {
   const [isShowDetail, setIsShowDetail] = useState<boolean>(false); // 展开关闭详情
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
   const [chat, setChat] = useState(chatCtrl.chat); // 当前会话
+  console.log(chatCtrl.chat);
 
   /**
    * @description: 刷新页面
@@ -75,7 +76,9 @@ const Chat: React.FC = () => {
           </div>
         </div>
       ) : (
-        ''
+        <div className={charsStyle.chart_page}>
+          <div className={charsStyle.chart_empty}>奥集能平台</div>
+        </div>
       )}
       {/* 详情 */}
       {isShowDetail ? <GroupDetail /> : ''}

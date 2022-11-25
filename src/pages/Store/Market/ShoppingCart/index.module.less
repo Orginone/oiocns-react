@@ -1,0 +1,124 @@
+.maxbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.head {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  background-color: white;
+  justify-content: space-between;
+}
+.right {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+}
+.title {
+  color: #409eff;
+  font-size: 17px;
+}
+.left {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+}
+.gang {
+  margin: 0 10px;
+}
+.buy {
+  margin: 0 10px;
+  color: #409eff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.content {
+  min-width: 1200px;
+  overflow-x: auto;
+  flex: 1;
+  background-color: white;
+  margin-top: 5px;
+  width: 100%;
+}
+.botton {
+  margin: 10px 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+.click {
+  cursor: pointer;
+}
+
+.box {
+  width: 330px;
+  height: 170px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin: 10px;
+  display: flex;
+  border-radius: 5px;
+  position: relative;
+  float: left;
+}
+.box:hover {
+  transition: all 0.2s;
+  box-shadow: 0px 0px 10px 1px #88888845;
+}
+.boximg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: blue;
+}
+.boxleft {
+}
+.boxright {
+  margin-left: 10px;
+}
+.boxright_p1 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.boxright_p2 {
+  font-size: 12px;
+  color: rgb(162, 162, 162);
+}
+.boxright_p3 {
+  margin: 5px 0px;
+}
+.boxright_p31 {
+  color: rgb(230, 162, 60);
+  font-size: 17px;
+  font-weight: 600;
+}
+.boxright_p2,
+.boxright_p3,
+.boxright_p4 {
+  font-size: 12px;
+}
+.checkbox {
+  position: absolute;
+  right: 10px;
+  top: 20px;
+}
+.botton_buy {
+  background-color: rgb(245, 247, 250);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  cursor: pointer;
+}
+.botts {
+  display: none;
+}
+
+:global {
+  .ogo-modal-confirm-confirm .ogo-modal-confirm-body > .anticon {
+    color: #67c23a;
+  }
+}

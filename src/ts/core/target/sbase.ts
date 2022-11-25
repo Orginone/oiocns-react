@@ -367,13 +367,13 @@ export default abstract class SpaceTarget {
    * @param  >{Promise<model.MarketPromise<Model} 市场基础信息
    * @returns
    */
-  createMarket = async (
-    _name: string,
-    _code: string,
-    _remark: string,
-    _samrId: string,
-    _is: boolean,
-  ): Promise<model.ResultType<any>> => {
+  createMarket = async (_params: {
+    name: string;
+    code: string;
+    remark: string;
+    samrId: string;
+    ispublic: boolean;
+  }): Promise<model.ResultType<any>> => {
     throw consts.FunctionNotFoundError;
   };
 
@@ -381,20 +381,20 @@ export default abstract class SpaceTarget {
    * 创建应用
    * @param  {model.Product} 产品基础信息
    */
-  createProduct = async (
+  createProduct = async (_params: {
     // 名称
-    _name: string,
+    name: string;
     // 编号
-    _code: string,
+    code: string;
     // 备注
-    _remark: string,
+    remark: string;
     // 资源列
-    _resources: schema.XResource[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    _thingId: string,
+    thingId: string;
     // 产品类型名
-    _typeName: string,
-  ): Promise<model.ResultType<schema.XProduct>> => {
+    typeName: string;
+  }): Promise<model.ResultType<schema.XProduct>> => {
     throw consts.FunctionNotFoundError;
   };
 
@@ -483,23 +483,23 @@ export default abstract class SpaceTarget {
     throw consts.FunctionNotFoundError;
   };
 
-  /**
-   * 申请加入群组
-   * @param _id 目标Id
-   * @returns
-   */
-  applyJoinCohort = (_id: string): Promise<model.ResultType<any>> => {
-    throw consts.FunctionNotFoundError;
-  };
+  // /**
+  //  * 申请加入群组
+  //  * @param _id 目标Id
+  //  * @returns
+  //  */
+  // applyJoinCohort = (_id: string): Promise<model.ResultType<any>> => {
+  //   throw consts.FunctionNotFoundError;
+  // };
 
-  /**
-   * 申请添加好友
-   * @param _id 目标Id
-   * @returns
-   */
-  applyFriend = (_id: string): Promise<model.ResultType<any>> => {
-    throw consts.FunctionNotFoundError;
-  };
+  // /**
+  //  * 申请添加好友
+  //  * @param _id 目标Id
+  //  * @returns
+  //  */
+  // applyFriend = (_id: string): Promise<model.ResultType<any>> => {
+  //   throw consts.FunctionNotFoundError;
+  // };
 
   /**
    * 审批我的好友申请

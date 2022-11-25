@@ -3,7 +3,7 @@ import AppStore from '@/ts/core/market/appstore';
 import Product from '@/ts/core/market/product';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
-import { myColumns } from './config';
+import { myColumns, marketColumns } from './config';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -21,7 +21,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  private _curProduct: Product | null = null;
+  public _curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -31,15 +31,15 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem);
-    this._curMarket = new AppStore(menuItem); // 当前商店信息
+    console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    this._curMarket = menuItem.node ?? new AppStore(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
       return;
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-    console.log('当前页面', this.curPageType);
+    console.log('当前页面类型', this.curPageType);
 
     this.getStoreProduct(this.curPageType);
   }
@@ -53,6 +53,8 @@ class StoreContent {
       case 'appInfo':
       case 'myApp':
         return myColumns;
+      case 'market':
+        return marketColumns;
       default:
         return [];
     }
@@ -99,7 +101,10 @@ class StoreContent {
    */
   public selectedProduct(item: Product) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    item.prod.id !== this._curProduct?.prod.id && (this._curProduct = item);
+    // item.prod.id !== this._curProduct?.prod.id &&
+    console.log('修改选中');
+
+    this._curProduct = item;
   }
 }
 const storeContent = new StoreContent();

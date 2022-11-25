@@ -4,28 +4,14 @@ import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { TeamApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, message, Space, Tag } from 'antd';
+import { Space, Tag } from 'antd';
 import friendService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
-import { IdPage } from '@/module/typings';
 import { SettingFilled } from '@ant-design/icons';
-import { DataType } from 'typings/globelType';
-// import styles from './index.module.less';
 
-/**
- * 批量同意
- * @param ids  React.Key[] 选中的数据id数组
- */
-const handleApproveSelect = async (ids: React.Key[]) => {
-  if (ids.length > 0) {
-    const { success } = await friendService.approve(ids.toString());
-    if (success) {
-      message.success('添加成功！');
-    } else {
-      message.error('抱歉，提交失败');
-    }
-  }
-};
+// import styles from './index.module.less';
+friendService.currentModel = 'friend';
+
 // 生成说明数据
 const remarkText = (activeKey: string, item: TeamApprovalType) => {
   return activeKey === '2'
@@ -33,55 +19,6 @@ const remarkText = (activeKey: string, item: TeamApprovalType) => {
     : item.target.name + '请求添加好友';
 };
 
-// 生成说明数据
-const tableOperation = (
-  activeKey: string,
-  item: TeamApprovalType,
-  callback: Function,
-) => {
-  return activeKey == '1'
-    ? [
-        {
-          key: 'approve',
-          label: '同意',
-          onClick: () => {
-            friendService.approve(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-
-            console.log('同意', 'approve', item);
-          },
-        },
-        {
-          key: 'refuse',
-          label: '拒绝',
-          onClick: () => {
-            friendService.refuse(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-            console.log('拒绝', 'back', item);
-          },
-        },
-      ]
-    : [
-        {
-          key: 'retractApply',
-          label: '取消申请',
-          onClick: () => {
-            friendService.retractApply(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-            console.log('同意', 'approve', item);
-          },
-        },
-      ];
-};
 // 根据状态值渲染标签
 const renderItemStatus = (record: TeamApprovalType) => {
   const status = friendService.statusMap[record.status];
@@ -97,11 +34,9 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>(friendService.activeStatus);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const [openHeaderSetting, setOpenHeaderSetting] = useState<boolean>(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [pageData, setPageData] = useState<TeamApprovalType[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [newColumns, setNewColumns] = useState<ProColumns<TeamApprovalType>[]>();
-  console.log('friend');
   const columns: ProColumns<TeamApprovalType>[] = [
     {
       title: '序号',
@@ -113,14 +48,14 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       title: '说明',
       dataIndex: 'remark',
       render: (_, row) => {
-        return remarkText(activeKey, row);
+        return remarkText(friendService.activeStatus, row);
       },
     },
     {
       title: '事项',
-      dataIndex: 'name',
+      dataIndex: ['team', 'target', 'typeName'],
       render: () => {
-        return <Tag color="#5BD8A6">加好友</Tag>;
+        return <Tag color="#5BD8A6">好友</Tag>;
       },
     },
     {
@@ -144,21 +79,14 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
     },
   ];
   // 获取申请/审核列表
-  const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await friendService.getList<
-      TeamApprovalType,
-      PageParams
-    >({
-      page: page,
-      pageSize: pageSize,
-    });
-    setPageData(data);
-    setPageTotal(total);
+  const loadList = async () => {
+    setPageData([...friendService.currentList]);
+    setPageTotal(friendService.currentList ? friendService.currentList.length : 0);
+    setNeedReload(false);
   };
   useEffect(() => {
     friendService.activeStatus = activeKey as tabStatus;
-    handlePageChange(1, 12);
-    setSelectedRowKeys([]);
+    loadList();
   }, [activeKey, needReload]);
   useEffect(() => {
     setNewColumns(columns);
@@ -176,16 +104,6 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       }}
       tabBarExtraContent={
         <Space>
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => handleApproveSelect(selectedRowKeys)}>
-            同意
-          </Button>
-          <Button key="2" onClick={() => {}}>
-            拒绝
-          </Button>
-          <Button key="3">打印</Button>
           <SettingFilled
             onClick={() => {
               setOpenHeaderSetting(true);
@@ -201,40 +119,22 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       />
       <CardOrTableComp<TeamApprovalType>
         rowKey={'id'}
-        bordered={false}
+        // bordered={false}
         columns={newColumns}
         dataSource={pageData}
         total={total}
-        onChange={handlePageChange}
+        onChange={loadList}
         operation={(item: TeamApprovalType) =>
-          tableOperation(activeKey, item, setNeedReload)
+          friendService.tableOperation(item, setNeedReload)
         }
         renderCardContent={(arr) => (
           <TableItemCard<TeamApprovalType>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
-            targetOrTeam="team"
-            operation={(item) => tableOperation(activeKey, item, setNeedReload)}
+            targetOrTeam="target"
+            operation={(item) => friendService.tableOperation(item, setNeedReload)}
           />
         )}
-        rowSelection={{
-          onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-            console.log(
-              `selectedRowKeys: ${selectedRowKeys}`,
-              'selectedRows: ',
-              selectedRows,
-            );
-            setSelectedRowKeys(selectedRowKeys);
-          },
-        }}
-        tableAlertOptionRender={() => {
-          return (
-            <Space size={16}>
-              <a>批量同意</a>
-              <a>批量拒绝</a>
-            </Space>
-          );
-        }}
       />
     </PageCard>
   );

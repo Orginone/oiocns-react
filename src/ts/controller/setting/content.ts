@@ -11,6 +11,7 @@ import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
+import { model } from '../../base';
 import Types from '@/module/typings';
 
 // 新建一个对象 ，避免代码冲突
@@ -56,7 +57,7 @@ export type ResultType<T> = {
   success: boolean;
 };
 
-class SettingController {
+class ContentController {
   // openorclose
   isOpenModal: boolean = false;
   // 当前操作的部门
@@ -66,6 +67,8 @@ class SettingController {
 
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
+
+  private compService: Company = new Company(Provider.getPerson?.target!);
 
   // 切换空间的时候重新初始化，所以需要new
   constructor() {
@@ -85,33 +88,32 @@ class SettingController {
     if (parentId === '0') {
       compid = this.companyID;
     }
-
     const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
       TargetType.Department,
     );
     if (companys.length > 0) {
-      companys.forEach(async (e) => {
+      for (const comp of companys) {
         // 查找是否有children
         let arrayChild: spaceObjs[] = [];
         const company2s: Company[] = await this.userDataService.getBelongTargets(
-          e.target.id,
+          comp.target.id,
           TargetType.Department,
         );
         if (company2s.length > 0) {
-          arrayChild = await this.getDepartments(e.target.id);
+          arrayChild = await this.getDepartments(comp.target.id);
         }
-
         const spaceObj: spaceObjs = {
-          id: e.target.id,
-          key: e.target.id,
-          title: e.target.name,
+          id: comp.target.id,
+          key: comp.target.id,
+          title: comp.target.name,
           parentId: compid!,
           companyId: compid!,
           children: arrayChild,
         };
         arrays.push(spaceObj);
-      });
+      }
+      // companys.forEach(async (e) => {});
     }
     return arrays;
   }
@@ -161,6 +163,10 @@ class SettingController {
    * @returns
    */
   public async createDepartment(param: deptParams): Promise<ObjType> {
+    // 判断是否创建二级部门
+    if (param.parentId != null && param.parentId != this.companyID) {
+      return await this.createSecondDepartment(param, param.parentId);
+    }
     // 要选中公司的工作区
     const compid = this.companyID;
     // Provider.getWorkSpace()!.id;
@@ -201,8 +207,29 @@ class SettingController {
       success: res.success,
     };
   }
+
+  // 查询公司底下所有的用户
+  public async searchAllPersons(departId?: string): Promise<XTarget[]> {
+    const comp: Company = new Company(Provider.getPerson?.target!);
+    let res: model.ResultType<any>;
+    if (departId == null) {
+      res = await comp.getPersons(this.companyID);
+      console.log('===查询公司底下的用户', res);
+    } else {
+      res = await comp.getPersons(departId);
+      console.log('===查询部门底下的用户', res);
+    }
+    return res.data;
+  }
+
+  // 拉人进部门，
+  public async pullToDepartment(deptId: string, personId: string) {
+    const res = await this.compService.pullPersonInDepartment(deptId, [personId]);
+    return res;
+  }
+  // 或移除人出部门， 再拉入部门
 }
 
-const settingController = new SettingController();
+const contentController = new ContentController();
 
-export default settingController;
+export default contentController;
