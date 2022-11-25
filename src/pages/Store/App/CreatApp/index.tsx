@@ -4,8 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem, Resources } from './config';
 import { Form, Card, Row, Col, Space, PageHeader, message } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
-import StoreSevice from '@/ts/controller/store/content';
-import { model } from '@/ts/base';
+import StoreContent from '@/ts/controller/store/content';
 
 const CreatApp: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
@@ -23,10 +22,11 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
         flows: n.flows ? JSON.stringify(n.flows) : null,
       };
     });
-    const res = await StoreSevice.createProduct({
+    const res = await StoreContent.createProduct({
       ...values,
       resources: list,
     });
+    console.log('创建应用结果---------', res);
 
     if (res.success) {
       message.success('创建应用成功');
@@ -54,7 +54,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
           }}
           columns={columns}
           submitter={{
-            render: (_, doms) => {
+            render: (_: any, doms: any) => {
               return (
                 <Row>
                   <Col span={20}></Col>

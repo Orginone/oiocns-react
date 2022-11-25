@@ -58,6 +58,7 @@ const CreateCohort: React.FC<indexType> = ({
         // trigger={<a>点击我</a>}
         layoutType={layoutType}
         open={open}
+        width = {500}
         // steps={[
         //   {
         //     title: 'ProComponent',
@@ -67,12 +68,13 @@ const CreateCohort: React.FC<indexType> = ({
         //   gutter: 16,
         // }}
         initialValues={item}
-        colProps={{
-          span: 12,
-        }}
+        // colProps={{
+        //   span: 12,
+        // }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values: CohortEnty) => {
-          console.log('修改结果',CohortController.updateCohort(item,values.target.name,values.target.code,values.target.team?.remark!))
+          console.log("查看内容",item)
+          console.log('修改结果',CohortController.updateCohort(item,values.target.name,values.target.code,values.target.team?.remark!,item.target.belongId))
           // service.updateItem(param);
           console.log(values);
           setOpen(false);

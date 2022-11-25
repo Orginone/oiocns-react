@@ -4,10 +4,15 @@ import BaseTarget from './base';
 import { kernel, model, schema } from '../../base';
 
 export default class Cohort extends BaseTarget {
+  private _myPerson:schema.XTarget[]
   constructor(target: schema.XTarget) {
     super(target);
+    this._myPerson=[]
   }
 
+  public get getMyPerson(){
+    return this._myPerson
+  }
   /**
    * 拉人进入群组
    * @param personIds 人员id数组
@@ -57,7 +62,11 @@ export default class Cohort extends BaseTarget {
     if (id == '0') {
       id = this.target.id;
     }
-    return await this.getSubTargets(id, [TargetType.Cohort], [TargetType.Person]);
+    const res = await this.getSubTargets(id, [TargetType.Cohort], [TargetType.Person])
+    if(res.success){
+    this._myPerson = res.data.result!;
+    }
+    return res;
   };
 
   /**

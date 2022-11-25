@@ -19,7 +19,6 @@ export default class Person extends MarketTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this.getCohort();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -89,6 +88,7 @@ export default class Person extends MarketTarget {
       JoinTypeNames: [TargetType.Cohort],
     });
     if (res.success) {
+      this._joinedCohorts = [];
       res.data?.result?.forEach((item) => {
         this._joinedCohorts.push(new Cohort(item));
       });
@@ -162,15 +162,18 @@ export default class Person extends MarketTarget {
    * @param id 群组Id
    */
   quitCohorts = async (id: string): Promise<model.ResultType<any>> => {
+    console.log('过滤前的内容为', this._joinedCohorts);
     const res = await this.cancelJoinTeam(id);
     if (res.success) {
       var index = this._joinedCohorts.findIndex((cohort) => {
         return cohort.target.id == id;
       });
       if (index > 0) {
+        console.log('进入删除方法');
         this._joinedCohorts = this._joinedCohorts.filter((cohort) => {
           return cohort.target.id != id;
         });
+        console.log('过滤后的内容为', this._joinedCohorts);
       }
     }
     return res;
