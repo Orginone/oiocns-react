@@ -8,7 +8,7 @@ import {
   MoreOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import settingStore from '@/store/setting';
+import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
 
 const x = 3;
@@ -68,17 +68,15 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 };
 
 type CreateGroupPropsType = {
-  onSelect?: TreeProps['onSelect'];
   createTitle: string;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({  createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
 
-  const { setEditItem } = settingStore((state) => ({ ...state }));
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -168,7 +166,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
   return (
     <div>
       {/* 要把这个值给到 group组件 */}
-      <Button className={cls.creatgroup} type="primary" onClick={() => setEditItem(true)}>
+      <Button className={cls.creatgroup} type="primary" onClick={() => settingController.trigger('isOpenModal')}>
         {createTitle}
       </Button>
       {Array.isArray(treeData1) && treeData1.length > 0 ? (
@@ -187,7 +185,11 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
             switcherIcon={<DownOutlined />}
             autoExpandParent={autoExpandParent}
             treeData={treeData1}
-            onSelect={onSelect}
+            onSelect={(e) => { 
+              if (e && e.length>0) {
+                settingController.trigger('createGroup', { id: e[0] })
+              }
+            }}
             showIcon={true}
             titleRender={(e) => {
               return (
@@ -201,7 +203,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ onSelect, createTitle }) 
                     <Space>
                       <span
                         onClick={() => {
-                          setIsOpen(true);
+                          settingController.trigger('isOpenModal');
                         }}>
                         <PlusOutlined />
                       </span>

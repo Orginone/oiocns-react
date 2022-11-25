@@ -53,7 +53,12 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
+<<<<<<< HEAD
   console.log('dayin', dataSource);
+=======
+  // console.log('dayin', dataSource);
+
+>>>>>>> f020a167dcc54293d6aec01d2a27ac190ac14d70
   // 监听父级高度
   useEffect(() => {
     setTimeout(() => {
@@ -141,7 +146,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         </div>
       </>
     );
-  }, [pageType, dataSource, resetColumns, defaultHeight]);
+  }, [pageType, dataSource,operation, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
    * @return {底部组件}
