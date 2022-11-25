@@ -19,7 +19,6 @@ export default class Person extends MarketTarget {
     this._friends = [];
     this._joinedCohorts = [];
     this._joinedCompanys = [];
-    this.getCohort();
   }
 
   protected override get createTargetType(): TargetType[] {
@@ -92,6 +91,8 @@ export default class Person extends MarketTarget {
       res.data?.result?.forEach((item) => {
         this._joinedCohorts.push(new Cohort(item));
       });
+      console.log("我的所有群组",this._joinedCohorts)
+
     }
     return this._joinedCohorts;
   };
