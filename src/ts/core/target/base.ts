@@ -1,22 +1,13 @@
 import consts from '../consts';
-import { ITarget } from './itarget';
 import { TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
-import Department from './department';
-import Working from './working';
 import Provider from '../provider';
-import Group from './group';
-import Company from './company';
-import Hospital from './hospital';
-import University from './university';
 
-export default class BaseTarget implements ITarget {
+export default class BaseTarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
   public pullTypes: TargetType[];
-  public subTargets: ITarget[];
-  public joinTargets: ITarget[];
   public authorityTree: Authority | undefined;
 
   public createTargetType: TargetType[];
@@ -27,14 +18,12 @@ export default class BaseTarget implements ITarget {
     this.target = target;
     this.subTypes = [];
     this.pullTypes = [];
-    this.subTargets = [];
-    this.joinTargets = [];
     this.createTargetType = [];
     this.joinTargetType = [];
     this.searchTargetType = [];
   }
 
-  public async createSubTarget(
+  protected async createSubTarget(
     name: string,
     code: string,
     teamName: string,
@@ -52,7 +41,6 @@ export default class BaseTarget implements ITarget {
         remark,
       );
       if (res.success) {
-        this.subTargets.push(this.dealTarget(res.data));
         return await kernel.pullAnyToTeam({
           id: this.target.id,
           teamTypes: [this.target.typeName],
@@ -64,88 +52,48 @@ export default class BaseTarget implements ITarget {
     return faildResult(consts.UnauthorizedError);
   }
 
-  public async deleteSubTarget(id: string): Promise<model.ResultType<any>> {
-    const sub = this.subTargets.find((sub) => {
-      return (
-        sub.target.id == id && this.subTypes.includes(<TargetType>sub.target.typeName)
-      );
+  protected async deleteSubTarget(
+    id: string,
+    typeName: string,
+  ): Promise<model.ResultType<any>> {
+    return await kernel.deleteTarget({
+      id: id,
+      typeName: typeName,
+      belongId: Provider.spaceId,
     });
-    if (sub != undefined) {
-      let res = await kernel.deleteTarget({
-        id: id,
-        typeName: sub.target.typeName,
-        belongId: Provider.spaceId,
+  }
+
+  public async pullMember(
+    targets: schema.XTarget[],
+  ): Promise<model.ResultType<schema.XRelationArray>> {
+    targets = targets.filter((a) => {
+      return this.pullTypes.includes(<TargetType>a.typeName);
+    });
+    if (targets.length > 0) {
+      const res = await kernel.pullAnyToTeam({
+        id: this.target.id,
+        teamTypes: [this.target.typeName],
+        targetIds: targets.map((a) => {
+          return a.id;
+        }),
+        targetType: <TargetType>targets[0].typeName,
       });
-      if (res.success) {
-        this.subTargets = this.subTargets.filter((sub) => {
-          return sub.target.id != id;
-        });
-      }
+      return res;
     }
     return faildResult(consts.UnauthorizedError);
   }
 
-  protected dealTarget(target: schema.XTarget): ITarget {
-    switch (<TargetType>target.typeName) {
-      case TargetType.Company:
-        return new Company(target);
-      case TargetType.Hospital:
-        return new Hospital(target);
-      case TargetType.University:
-        return new University(target);
-      case TargetType.Department:
-        return new Department(target);
-      case TargetType.Working:
-        return new Working(target);
-      case TargetType.Group:
-        return new Group(target);
-      default:
-        return new BaseTarget(target);
-    }
-  }
-
-  public async pullMember(targets: schema.XTarget[]): Promise<model.ResultType<any>> {
-    targets = targets.filter((a) => {
-      return this.pullTypes.includes(<TargetType>a.typeName);
-    });
-    const res = await kernel.pullAnyToTeam({
-      id: this.target.id,
-      teamTypes: [this.target.typeName],
-      targetIds: targets.map((a) => {
-        return a.id;
-      }),
-      targetType: <TargetType>targets[0].typeName,
-    });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        const target = targets.find((s) => {
-          return s.id == a.targetId;
-        });
-        if (target != undefined) {
-          this.subTargets.push(this.dealTarget(target));
-        }
-      });
-    }
-    return res;
-  }
-
-  public async removeMember(
+  protected async removeMember(
     ids: string[],
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
     if (this.pullTypes.includes(typeName)) {
-      const res = await kernel.removeAnyOfTeam({
+      return await kernel.removeAnyOfTeam({
         id: this.target.id,
         teamTypes: [this.target.typeName],
         targetIds: ids,
         targetType: typeName,
       });
-      if (res.success) {
-        this.subTargets = this.subTargets.filter((target) => {
-          return !ids.includes(target.target.id);
-        });
-      }
-      return res;
     }
     return faildResult(consts.UnauthorizedError);
   }
@@ -156,7 +104,7 @@ export default class BaseTarget implements ITarget {
    * @param TypeName 类型
    * @returns
    */
-  public async searchTargetByName(
+  protected async searchTargetByName(
     name: string,
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
@@ -180,7 +128,7 @@ export default class BaseTarget implements ITarget {
    * @param typeName 对象
    * @returns
    */
-  public async applyJoin(
+  protected async applyJoin(
     destId: string,
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
@@ -209,42 +157,12 @@ export default class BaseTarget implements ITarget {
   }
 
   /**
-   * 查询我的申请
-   * @returns
-   */
-  public queryJoinApply = async () => {
-    return await kernel.queryJoinTeamApply({
-      id: this.target.id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    });
-  };
-
-  /**
-   * 查询我的审批
-   * @returns
-   */
-  public async queryJoinApproval(): Promise<model.ResultType<schema.XRelationArray>> {
-    return await kernel.queryTeamJoinApproval({
-      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    });
-  }
-
-  /**
    * 审批我的加入组织/个人申请
    * @param id
    * @param status
    * @returns
    */
-  public async approvalJoinApply(
+  protected async approvalJoinApply(
     id: string,
     status: number,
   ): Promise<model.ResultType<any>> {
@@ -259,72 +177,60 @@ export default class BaseTarget implements ITarget {
    * @param data 请求参数
    * @returns 请求结果
    */
-  public async getjoinedTargets(forceFlash: boolean = false): Promise<ITarget[]> {
-    if (!forceFlash && this.joinTargets.length > 0) {
-      return this.joinTargets;
-    }
-    const res = await kernel.queryJoinedTargetById({
-      id: this.target.id,
-      typeName: this.target.typeName,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-      spaceId: Provider.spaceId,
-      JoinTypeNames: this.joinTargetType,
+  protected async getjoinedTargets(
+    typeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    typeNames = typeNames.filter((a) => {
+      return this.joinTargetType.includes(a);
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.joinTargets.push(this.dealTarget(a));
+    if (typeNames.length > 0) {
+      return await kernel.queryJoinedTargetById({
+        id: this.target.id,
+        typeName: this.target.typeName,
+        page: {
+          offset: 0,
+          filter: '',
+          limit: common.Constants.MAX_UINT_16,
+        },
+        spaceId: Provider.spaceId,
+        JoinTypeNames: this.joinTargetType,
       });
     }
-    return this.joinTargets;
+    return faildResult(consts.UnauthorizedError);
   }
 
   /**
    * 获取子组织/个人
    * @returns 返回好友列表
    */
-  public async getSubTargets(forceFlash: boolean = false): Promise<ITarget[]> {
-    if (!forceFlash && this.subTargets.length > 0) {
-      return this.subTargets;
-    }
-    const res = await kernel.querySubTargetById({
+  protected async getSubTargets(
+    typeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.querySubTargetById({
       id: this.target.id,
       typeNames: [this.target.typeName],
-      subTypeNames: this.subTypes,
+      subTypeNames: typeNames,
       page: {
         offset: 0,
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.subTargets.push(this.dealTarget(a));
-      });
-    }
-    return this.subTargets;
   }
 
   /**
    * 拉自身进组织(创建组织的时候调用)
-   * @param id
-   * @param teamTypes
+   * @param target 目标对象
    * @returns
    */
   protected async join(target: schema.XTarget): Promise<model.ResultType<any>> {
     if (this.joinTargetType.includes(<TargetType>target.typeName)) {
-      const res = await kernel.pullAnyToTeam({
+      return await kernel.pullAnyToTeam({
         id: this.target.id,
         teamTypes: [target.typeName],
         targetType: this.target.typeName,
         targetIds: [this.target.id],
       });
-      if (res.success) {
-        this.joinTargets.push(this.dealTarget(target));
-      }
     }
     return faildResult(consts.UnauthorizedError);
   }
@@ -372,7 +278,7 @@ export default class BaseTarget implements ITarget {
    * @param teamRemark team备注
    * @returns
    */
-  public async updateTarget(
+  protected async updateTarget(
     name: string,
     code: string,
     teamName: string = '',
@@ -426,7 +332,7 @@ export default class BaseTarget implements ITarget {
     return this.authorityTree;
   }
 
-  private loopBuildAuthority(auth: schema.XAuthority): Authority {
+  protected loopBuildAuthority(auth: schema.XAuthority): Authority {
     const authority = new Authority(auth);
     auth.nodes?.forEach((a) => {
       authority.children.push(this.loopBuildAuthority(a));

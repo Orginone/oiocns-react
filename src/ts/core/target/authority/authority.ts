@@ -7,8 +7,15 @@ import Identity from './identity';
 
 export default class Authority implements IAuthority {
   private readonly _authority: schema.XAuthority;
-  public children: Authority[];
+  public children: IAuthority[];
   public identitys: Identity[];
+
+  constructor(auth: schema.XAuthority) {
+    this._authority = auth;
+    this.children = [];
+    this.identitys = [];
+  }
+
   private get existAuthority(): string[] {
     return [
       AuthorityType.ApplicationAdmin,
@@ -21,25 +28,15 @@ export default class Authority implements IAuthority {
   public get id(): string {
     return this._authority.id;
   }
-
   public get name(): string {
     return this._authority.name;
   }
-
   public get code(): string {
     return this._authority.code;
   }
-
   public get belongId(): string {
     return this._authority.belongId;
   }
-
-  constructor(auth: schema.XAuthority) {
-    this._authority = auth;
-    this.children = [];
-    this.identitys = [];
-  }
-
   public async createIdentity(
     name: string,
     code: string,
@@ -58,7 +55,6 @@ export default class Authority implements IAuthority {
     }
     return res;
   }
-
   public async deleteIdentity(id: string): Promise<model.ResultType<any>> {
     const index = this.identitys.findIndex((identity) => {
       return identity.id == id;
@@ -78,7 +74,6 @@ export default class Authority implements IAuthority {
     }
     return faildResult(consts.NotFoundError);
   }
-
   public async createSubAuthority(
     name: string,
     code: string,
@@ -102,7 +97,6 @@ export default class Authority implements IAuthority {
     }
     return res;
   }
-
   public async deleteSubAuthority(id: string): Promise<model.ResultType<any>> {
     const index = this.children.findIndex((auth) => {
       return auth.id == id;
@@ -122,7 +116,6 @@ export default class Authority implements IAuthority {
     }
     return faildResult(consts.UnauthorizedError);
   }
-
   public async updateAuthority(
     name: string,
     code: string,
@@ -166,7 +159,7 @@ export default class Authority implements IAuthority {
     }
     return this.identitys;
   }
-  public async getSubAuthoritys(): Promise<Authority[]> {
+  public async getSubAuthoritys(): Promise<IAuthority[]> {
     if (this.children.length > 0) {
       return this.children;
     }

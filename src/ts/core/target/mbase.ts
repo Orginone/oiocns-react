@@ -6,19 +6,19 @@ import BaseTarget from './base';
 import consts from '../consts';
 
 export default class MarketTarget extends BaseTarget implements IMTarget {
-  private _joinMarketApplys: schema.XMarketRelation[];
-  private _joinedMarkets: Market[];
-  private _publicMarkets: Market[];
-  private _ownProducts: BaseProduct[];
-  private _stagings: schema.XStaging[];
+  joinedMarkets: Market[];
+  publicMarkets: Market[];
+  ownProducts: BaseProduct[];
+  stagings: schema.XStaging[];
+  joinMarketApplys: schema.XMarketRelation[];
 
   constructor(target: schema.XTarget) {
     super(target);
-    this._stagings = [];
-    this._ownProducts = [];
-    this._joinedMarkets = [];
-    this._joinMarketApplys = [];
-    this._publicMarkets = [];
+    this.stagings = [];
+    this.ownProducts = [];
+    this.joinedMarkets = [];
+    this.joinMarketApplys = [];
+    this.publicMarkets = [];
   }
   public async getMarketByCode(
     name: string,
@@ -33,8 +33,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
   }
   public async getOwnProducts(): Promise<BaseProduct[]> {
-    if (this._ownProducts.length > 0) {
-      return this._ownProducts;
+    if (this.ownProducts.length > 0) {
+      return this.ownProducts;
     }
     const res = await kernel.querySelfProduct({
       id: this.target.id,
@@ -46,14 +46,14 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
-        this._ownProducts.push(new BaseProduct(product));
+        this.ownProducts.push(new BaseProduct(product));
       });
     }
-    return this._ownProducts;
+    return this.ownProducts;
   }
   public async getJoinMarkets(): Promise<Market[]> {
-    if (this._joinedMarkets.length > 0) {
-      return this._joinedMarkets;
+    if (this.joinedMarkets.length > 0) {
+      return this.joinedMarkets;
     }
     const res = await kernel.queryOwnMarket({
       id: this.target.id,
@@ -61,26 +61,26 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success && res.data && res.data.result) {
       res.data.result.forEach((market) => {
-        this._joinedMarkets.push(new Market(market));
+        this.joinedMarkets.push(new Market(market));
       });
     }
-    return this._joinedMarkets;
+    return this.joinedMarkets;
   }
   public async getPublicMarket(): Promise<Market[]> {
-    if (this._publicMarkets.length > 0) {
-      return this._publicMarkets;
+    if (this.publicMarkets.length > 0) {
+      return this.publicMarkets;
     }
     const res = await kernel.getPublicMarket();
     if (res.success) {
       res.data.result?.forEach((a) => {
-        this._publicMarkets.push(new Market(a));
+        this.publicMarkets.push(new Market(a));
       });
     }
-    return this._publicMarkets;
+    return this.publicMarkets;
   }
   public async getStaging(): Promise<schema.XStaging[]> {
-    if (this._stagings.length > 0) {
-      return this._stagings;
+    if (this.stagings.length > 0) {
+      return this.stagings;
     }
     const res = await kernel.queryStaging({
       id: this.target.id,
@@ -92,10 +92,10 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       res.data.result?.forEach((a) => {
-        this._stagings.push(a);
+        this.stagings.push(a);
       });
     }
-    return this._stagings;
+    return this.stagings;
   }
   public async getBuyOrders(
     status: number,
@@ -137,8 +137,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
    * @returns
    */
   public async getJoinMarketApplys(): Promise<schema.XMarketRelation[]> {
-    if (this._joinMarketApplys.length > 0) {
-      return this._joinMarketApplys;
+    if (this.joinMarketApplys.length > 0) {
+      return this.joinMarketApplys;
     }
     const res = await kernel.queryJoinMarketApply({
       id: this.target.id,
@@ -149,9 +149,9 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
     if (res.success && res.data?.result != undefined) {
-      this._joinMarketApplys = res.data.result;
+      this.joinMarketApplys = res.data.result;
     }
-    return this._joinMarketApplys;
+    return this.joinMarketApplys;
   }
 
   /**
@@ -174,7 +174,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinMarketApplys = this._joinMarketApplys.filter((apply) => {
+      this.joinMarketApplys = this.joinMarketApplys.filter((apply) => {
         return apply.id != id;
       });
     }
@@ -250,7 +250,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets.push(new Market(res.data!));
+      this.joinedMarkets.push(new Market(res.data!));
     }
     return res;
   }
@@ -284,13 +284,13 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._ownProducts.push(new BaseProduct(res.data!));
+      this.ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
   }
 
   public async stagingMerchandise(id: string): Promise<model.ResultType<any>> {
-    const stag = this._stagings.find((a) => {
+    const stag = this.stagings.find((a) => {
       a.merchandiseId == id;
     });
     if (stag == undefined) {
@@ -300,7 +300,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         belongId: this.target.id,
       });
       if (res.success) {
-        this._stagings.push(res.data);
+        this.stagings.push(res.data);
       }
       return res;
     }
@@ -308,7 +308,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
   }
 
   public async deleteStaging(id: string): Promise<model.ResultType<any>> {
-    const stag = this._stagings.find((a) => {
+    const stag = this.stagings.find((a) => {
       a.id == id;
     });
     if (stag != undefined) {
@@ -317,7 +317,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         belongId: this.target.id,
       });
       if (res.success) {
-        this._stagings = this._stagings.filter((a) => {
+        this.stagings = this.stagings.filter((a) => {
           a.id != id;
         });
       }
@@ -336,7 +336,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets = this._joinedMarkets.filter((market) => {
+      this.joinedMarkets = this.joinedMarkets.filter((market) => {
         return market.id != id;
       });
     }
@@ -354,7 +354,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._ownProducts = this._ownProducts.filter((prod) => {
+      this.ownProducts = this.ownProducts.filter((prod) => {
         return prod.id != id;
       });
     }
@@ -372,7 +372,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets = this._joinedMarkets.filter((market) => {
+      this.joinedMarkets = this.joinedMarkets.filter((market) => {
         return market.id != id;
       });
     }

@@ -1,45 +1,70 @@
-import BaseTarget from '@/ts/core/target/base';
-import { faildResult, kernel, model, schema } from '../../base';
-import { TargetType } from '../enum';
 import consts from '../consts';
-import { ITarget } from './itarget';
+import BaseTarget from './base';
+import { ResultType } from '@/ts/base/model';
+import { XTarget } from '@/ts/base/schema';
+import { IGroup } from './itarget';
+import { TargetType } from '../enum';
+import { faildResult, kernel } from '@/ts/base';
 
-export default class Group extends BaseTarget {
-  constructor(target: schema.XTarget) {
+export default class Group extends BaseTarget implements IGroup {
+  subGroup: IGroup[];
+  companys: XTarget[];
+  joinedGroup: XTarget[];
+
+  constructor(target: XTarget) {
     super(target);
+    this.subGroup = [];
+    this.companys = [];
+    this.joinedGroup = [];
     this.subTypes = [TargetType.Group, ...consts.CompanyTypes];
     this.joinTargetType = [TargetType.Group];
     this.pullTypes = consts.CompanyTypes;
     this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
   }
-
-  /**
-   * 查询加入的集团
-   * @returns
-   */
-  public async getJoinedGroups(): Promise<Group[]> {
-    await super.getjoinedTargets();
-    return <Group[]>super.joinTargets.filter((a) => {
-      return (a.target.typeName = TargetType.Group);
-    });
+  public async getJoinedGroups(): Promise<XTarget[]> {
+    if (this.joinedGroup.length > 0) {
+      return this.joinedGroup;
+    }
+    const res = await super.getjoinedTargets([TargetType.Group]);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.joinedGroup.push(a);
+      });
+    }
+    return this.joinedGroup;
   }
-
-  /**
-   * 申请加入集团
-   * @param id 目标Id
-   * @returns
-   */
-  public async applyJoinGroup(id: string): Promise<model.ResultType<any>> {
+  public async applyJoinGroup(id: string): Promise<ResultType<any>> {
     return super.applyJoin(id, TargetType.Group);
   }
-
-  /**
-   * 删除子集团
-   * @param id 集团Id
-   * @returns
-   */
-  public async deleteSubTarget(id: string): Promise<model.ResultType<any>> {
-    const group = this.subTargets.find((group) => {
+  public async createSubGroup(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+  ): Promise<ResultType<any>> {
+    const tres = await this.searchTargetByName(name, TargetType.Group);
+    if (!tres.data) {
+      const res = await this.createTarget(
+        name,
+        code,
+        TargetType.Group,
+        teamName,
+        teamCode,
+        remark,
+      );
+      if (res.success) {
+        const group = new Group(res.data);
+        this.subGroup.push(group);
+        return await group.pullMember([this.target]);
+      }
+      return res;
+    } else {
+      return faildResult('该集团已存在!');
+    }
+  }
+  public async deleteSubGroup(id: string): Promise<ResultType<any>> {
+    const group = this.subGroup.find((group) => {
       return group.target.id == id;
     });
     if (group != undefined) {
@@ -49,7 +74,7 @@ export default class Group extends BaseTarget {
         subNodeTypeNames: [TargetType.Group],
       });
       if (res.success) {
-        this.subTargets = this.subTargets.filter((group) => {
+        this.subGroup = this.subGroup.filter((group) => {
           return group.target.id != id;
         });
       }
@@ -57,40 +82,26 @@ export default class Group extends BaseTarget {
     }
     return faildResult(consts.UnauthorizedError);
   }
-
-  /**
-   * 获取集团下的人员（单位、集团）
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getPersons(): Promise<ITarget[]> {
-    await this.getSubTargets();
-    return this.subTargets.filter((a) => {
-      return a.target.typeName == TargetType.Person;
-    });
+  public async getCompanys(): Promise<XTarget[]> {
+    if (this.companys.length > 0) {
+      return this.companys;
+    }
+    const res = await this.getSubTargets(consts.CompanyTypes);
+    if (res.success && res.data.result != undefined) {
+      this.companys = res.data.result;
+    }
+    return this.companys;
   }
-
-  /**
-   * 获取集团下的单位
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getCompanys(): Promise<ITarget[]> {
-    await this.getSubTargets();
-    return this.subTargets.filter((a) => {
-      return consts.CompanyTypes.includes(<TargetType>a.target.typeName);
-    });
-  }
-
-  /**
-   * 获取集团下的集团
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getSubGroups(): Promise<Group[]> {
-    await this.getSubTargets();
-    return <Group[]>this.subTargets.filter((a) => {
-      return a.target.typeName == TargetType.Group;
-    });
+  public async getSubGroups(): Promise<IGroup[]> {
+    if (this.subGroup.length > 0) {
+      return this.subGroup;
+    }
+    const res = await this.getSubTargets([TargetType.Group]);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.subGroup.push(new Group(a));
+      });
+    }
+    return this.subGroup;
   }
 }
