@@ -191,18 +191,24 @@ export default class MarketActionTarget extends BaseTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  createMarket = async (
+  createMarket = async ({
+    name,
+    code,
+    remark,
+    samrId = '0',
+    ispublic = true,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string = '0',
+    samrId: string;
     // 产品类型名
-    ispublic: boolean = true,
-  ): Promise<model.ResultType<schema.XMarket>> => {
+    ispublic: boolean;
+  }): Promise<model.ResultType<schema.XMarket>> => {
     const res = await kernel.createMarket({
       name,
       code,

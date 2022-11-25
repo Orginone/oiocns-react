@@ -367,13 +367,13 @@ export default abstract class SpaceTarget {
    * @param  >{Promise<model.MarketPromise<Model} 市场基础信息
    * @returns
    */
-  createMarket = async (
-    _name: string,
-    _code: string,
-    _remark: string,
-    _samrId: string,
-    _is: boolean,
-  ): Promise<model.ResultType<any>> => {
+  createMarket = async (_params: {
+    name: string;
+    code: string;
+    remark: string;
+    samrId: string;
+    ispublic: boolean;
+  }): Promise<model.ResultType<any>> => {
     throw consts.FunctionNotFoundError;
   };
 
