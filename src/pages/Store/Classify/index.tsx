@@ -1,12 +1,12 @@
-import { MenuProps, Modal } from 'antd';
+import { Form, Input, MenuProps, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import { useHistory } from 'react-router-dom';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import CloudTreeComp from '@/components/CloudTreeComp';
-import NewStoreModal from '@/components/NewStoreModal'; // 新建商店
 import AppDetail from '@/components/AppDetail'; // 新建商店
+import { getUuid } from '@/utils/tools';
 
 import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
@@ -19,6 +19,8 @@ import { XProduct } from '@/ts/base/schema';
 //   { label: '数据', key: 'data', icon: 'FundOutlined' },
 //   { label: '资源', key: 'src', icon: 'DatabaseOutlined'},
 // ];
+let selectMenuObj = { key: '', id: '', children: [] },
+  selectMenuInfo: any = {};
 
 const menu = ['重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
 //自定义树
@@ -30,25 +32,33 @@ const StoreClassify: React.FC = () => {
   const [list, setList] = useState<XProduct[]>([]);
   const location = useLocation();
   const router = `${location.pathname}${location.search}`;
-  // const { user } = useStore((state) => ({ ...state })); // 用户信息
+  const [newMenuForm] = Form.useForm();
 
-  // const [total, setTotal] = useState<number>(0);
-  // const history = useHistory();
   useEffect(() => {
     console.log('初始化', 'APP頁面');
-    StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.subscribePart('appTreeData', setList);
     StoreSiderbar.changePageType('app');
     StoreSiderbar.getTreeData();
+    return () => {
+      return StoreSiderbar.unsubscribePart('appTreeData');
+    };
   }, []);
 
-  const onOk = async (data: any) => {
-    setisAppDetailOpen(false);
-    console.log('form数据', data);
-    // await Service.creatItem({
-    //   ...data,
-    //   samrId: user.team.targetId,
-    //   authId: user.workspaceId,
-    // });
+  const newMenuFormSubmit = async () => {
+    let { title } = await newMenuForm.validateFields();
+    console.log('是是是', title, selectMenuInfo);
+
+    let newObj = {
+      id: getUuid(),
+      key: `${selectMenuInfo?.key}-${selectMenuInfo?.children?.length || '01'}`,
+      title: title,
+    };
+    selectMenuInfo.children.push(newObj);
+    setIsStoreOpen(false);
+    // setList([...list]);
+    console.log('form数据', list);
+    // 数据缓存
+    StoreSiderbar.updataSelfAppMenu(list);
   };
   const onCancel = () => {
     setIsStoreOpen(false);
@@ -62,6 +72,7 @@ const StoreClassify: React.FC = () => {
    */
   const handleAddShop = (item: any) => {
     console.log('handleAddShop', item);
+    selectMenuInfo = { ...selectMenuObj, ...item };
     setIsStoreOpen(true);
   };
   /*******
@@ -117,13 +128,30 @@ const StoreClassify: React.FC = () => {
         }}>
         <SearchSjopComp />
       </Modal>
-      {/* 新建商店 */}
-      <NewStoreModal
-        title={'新建商店'}
+      <Modal
+        title="新建目录"
+        width={670}
+        destroyOnClose={true}
         open={isStoreOpen}
-        onOk={onOk}
-        onCancel={onCancel}
-      />
+        bodyStyle={{ padding: 0 }}
+        okText="确定"
+        onOk={() => {
+          console.log(`确定按钮`);
+          newMenuFormSubmit();
+        }}
+        onCancel={() => {
+          console.log(`取消按钮`);
+          setIsStoreOpen(false);
+        }}>
+        <Form form={newMenuForm} autoComplete="off">
+          <Form.Item
+            label="目录名称"
+            name="title"
+            rules={[{ required: true, message: '请填写目录名称' }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
       <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
       {/* <button onClick={(e)=>{
         console.log(e);

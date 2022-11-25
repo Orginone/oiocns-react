@@ -24,7 +24,7 @@ interface UserType {
 }
 
 // 个人空间
-type SpaceType = {
+export type SpaceType = {
   name: string;
   id: string;
 };

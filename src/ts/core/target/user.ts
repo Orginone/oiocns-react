@@ -342,6 +342,27 @@ export default class userdataservice extends BaseService {
   }
 
   /**
+   * 从部门移除
+   * @param id 好友Id
+   */
+  removeFromTeam = async (
+    personId: string,
+    ids: string[],
+    teamTypes: TargetType,
+  ): Promise<model.ResultType<any>> => {
+    // 从组织机构移除
+    const res = await kernel.removeAnyOfTeam({
+      id: personId,
+      teamTypes: [TargetType.Person],
+      targetIds: ids,
+      targetType: teamTypes,
+    });
+    // 退出公司
+
+    return res;
+  };
+
+  /**
    * 创建对象
    * @param data 创建参数
    * @returns 创建结果
