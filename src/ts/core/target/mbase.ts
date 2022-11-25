@@ -1,5 +1,5 @@
 import { common, faildResult, kernel, model, schema } from '../../base';
-import { Market, IProduct } from '../market';
+import { Market, BaseProduct } from '../market';
 import { TargetType } from '../enum';
 import { IMTarget } from './itarget';
 import BaseTarget from './base';
@@ -9,7 +9,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
   private _joinMarketApplys: schema.XMarketRelation[];
   private _joinedMarkets: Market[];
   private _publicMarkets: Market[];
-  private _ownProducts: IProduct[];
+  private _ownProducts: BaseProduct[];
   private _stagings: schema.XStaging[];
 
   constructor(target: schema.XTarget) {
@@ -32,7 +32,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
   }
-  public async getOwnProducts(): Promise<Product[]> {
+  public async getOwnProducts(): Promise<BaseProduct[]> {
     if (this._ownProducts.length > 0) {
       return this._ownProducts;
     }
@@ -46,7 +46,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
-        this._ownProducts.push(new Product(product));
+        this._ownProducts.push(new BaseProduct(product));
       });
     }
     return this._ownProducts;
@@ -66,7 +66,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     }
     return this._joinedMarkets;
   }
-  public async getPublicMarket(): Promise<model.ResultType<schema.XMarket>> {
+  public async getPublicMarket(): Promise<Market[]> {
     if (this._publicMarkets.length > 0) {
       return this._publicMarkets;
     }
@@ -284,13 +284,13 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._ownProducts.push(new Product(res.data!));
+      this._ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
   }
 
   public async stagingMerchandise(id: string): Promise<model.ResultType<any>> {
-    const stag = this._staging.find((a) => {
+    const stag = this._stagings.find((a) => {
       a.merchandiseId == id;
     });
     if (stag == undefined) {
@@ -300,7 +300,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         belongId: this.target.id,
       });
       if (res.success) {
-        this._staging.push(res.data);
+        this._stagings.push(res.data);
       }
       return res;
     }
@@ -308,7 +308,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
   }
 
   public async deleteStaging(id: string): Promise<model.ResultType<any>> {
-    const stag = this._staging.find((a) => {
+    const stag = this._stagings.find((a) => {
       a.id == id;
     });
     if (stag != undefined) {
@@ -317,7 +317,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         belongId: this.target.id,
       });
       if (res.success) {
-        this._staging = this._staging.filter((a) => {
+        this._stagings = this._stagings.filter((a) => {
           a.id != id;
         });
       }
@@ -337,7 +337,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       this._joinedMarkets = this._joinedMarkets.filter((market) => {
-        return market.store.id != id;
+        return market.id != id;
       });
     }
     return res;
@@ -354,8 +354,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._ownProducts = this._ownProducts.filter((market) => {
-        return market.prod.id != id;
+      this._ownProducts = this._ownProducts.filter((prod) => {
+        return prod.id != id;
       });
     }
     return res;
@@ -373,7 +373,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       this._joinedMarkets = this._joinedMarkets.filter((market) => {
-        return market.store.id != id;
+        return market.id != id;
       });
     }
     return res;

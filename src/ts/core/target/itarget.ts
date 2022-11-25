@@ -124,7 +124,7 @@ export interface IMTarget {
    * 查询开放市场
    * @returns 市场
    */
-  getPublicMarket(): Promise<model.ResultType<schema.XMarket>>;
+  getPublicMarket(): Promise<Market[]>;
   /**
    * 查询我的产品/应用
    * @param params

@@ -7,6 +7,10 @@ export default class BaseProduct {
   private _prod: schema.XProduct;
   private _resource: Resource[];
 
+  public get id(): string {
+    return this._prod.id;
+  }
+
   constructor(prod: schema.XProduct) {
     this._prod = prod;
     this._resource = [];

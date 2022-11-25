@@ -55,7 +55,7 @@ class StoreContent {
   public async getStoreProduct(params?: any) {
     let Fun!: Function;
     if (this.curPageType === 'app') {
-      Fun = Provider.getPerson.getOwnProducts;
+      Fun = Provider.getPerson?.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
