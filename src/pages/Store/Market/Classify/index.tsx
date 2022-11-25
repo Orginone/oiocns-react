@@ -54,8 +54,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
   useEffect(() => {
     StoreSiderbar.curPageType = 'market';
-    StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.subscribePart('marketTreeData', setList);
     StoreSiderbar.getTreeData();
+    return () => {
+      return StoreSiderbar.unsubscribePart('marketTreeData');
+    };
   }, []);
 
   /**
@@ -91,6 +94,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   ];
 
   const handleChange = (path: string) => {
+    console.log('是是是', path);
+    if (path === '/market/shop') {
+      StoreContent.changeMenu('market');
+    }
+
     setSelectMenu(path);
     history.push(path);
   };
