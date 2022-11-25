@@ -4,6 +4,8 @@ import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
 import React from 'react';
 import * as Icon from '@ant-design/icons';
+import Types from '@/module/typings';
+import { XTarget } from '../../base/schema';
 export interface spaceObjs {
   id: string;
   title: string;
@@ -14,6 +16,26 @@ export interface spaceObjs {
   // 对应公司的ID
   companyId: string;
 }
+
+// 创建部门的入参
+export type deptParams = {
+  name: string;
+  code: string;
+  teamName: string;
+  teamCode: string;
+  remark: string;
+  parentId?: string;
+  targetType?: TargetType.Department;
+};
+
+
+// 返回类型定义
+export type ObjType = {
+  // 消息
+  msg: string;
+  // 结果
+  success: boolean;
+};
 class SettingController extends BaseController { 
   private _isOpenModal: boolean = false;
     // 我的用户服务
@@ -74,6 +96,54 @@ class SettingController extends BaseController {
       }
       return arrays;
     }
+  
+  /**
+   * 创建一级部门
+   * @param param parentId 为空就是一级部门
+   * @returns
+   */
+  public async createDepartment(param: deptParams): Promise<ObjType> {
+    console.log('param',param);
+    // 要选中公司的工作区
+    const compid = this.companyID;
+    // Provider.getWorkSpace()!.id;
+    // 判断是否有公司数据
+
+    //let curCompanys: Company[] = await Provider.getPerson.getJoinedCompanys();
+    // 获取当前单位
+    //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
+    // 判断是否重复 TODO
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+      {
+        page: 0,
+        pageSize: 10,
+        filter: param.code,
+      },
+      TargetType.Department,
+    );
+
+    if (datas.data && datas.data?.length > 0) {
+      return {
+        msg: '重复创建',
+        success: false,
+      };
+    }
+
+    const res = await this.userDataService.createDepart(
+      param.name,
+      param.code,
+      param.teamName,
+      param.teamCode,
+      param.remark,
+      compid, // 上一层ID
+      true,
+      compid, // 属于哪个公司的ID
+    );
+    return {
+      msg: res.msg,
+      success: res.success,
+    };
+  }
 }
 const settingController = new SettingController();
 

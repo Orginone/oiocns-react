@@ -115,8 +115,15 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   return (
     <div>
+        <Button
+          className={cls.creatgroup}
+          type="primary"
+          onClick={() => {
+            settingController.trigger('isOpenModal')
+          }}>
+          {createTitle}
+        </Button>
       
-      {Array.isArray(treeData) && treeData.length > 0 ? (
         <div className={cls.topMes}>
           <Input
             size="middle"
@@ -125,7 +132,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
             prefix={<SearchOutlined />}
             onChange={onChange}
           />
-          <div className={cls.joingroup}>创建集团</div>
+          <div className={cls.joingroup}>创建的部门</div>
           <Tree
             onExpand={onExpand}
             expandedKeys={expandedKeys}
@@ -165,14 +172,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
             }}
           />
         </div>
-      ) : <Button
-      className={cls.creatgroup}
-      type="primary"
-      onClick={() => {
-        settingController.trigger('isOpenModal')
-      }}>
-      {createTitle}
-    </Button>}
+      
     </div>
   );
 };

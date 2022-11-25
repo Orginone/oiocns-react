@@ -240,6 +240,7 @@ useEffect(() => {
         handleCancel={() => {
           setIsOpenModal(false);
         }}
+        selectId={selectId}
         open={isOpenModal}
         title={selectId ? '编辑' : '新增'}
         onOk={onOk}
