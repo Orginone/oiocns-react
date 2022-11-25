@@ -44,9 +44,11 @@ const StoreClassify: React.FC = () => {
     };
   }, []);
 
+  /******* 新增 自定义目录
+   * @desc:
+   */
   const newMenuFormSubmit = async () => {
     let { title } = await newMenuForm.validateFields();
-    console.log('是是是', title, selectMenuInfo);
 
     let newObj = {
       id: getUuid(),
@@ -56,8 +58,33 @@ const StoreClassify: React.FC = () => {
     selectMenuInfo.children.push(newObj);
     setIsStoreOpen(false);
     // setList([...list]);
-    console.log('form数据', list);
     // 数据缓存
+    StoreSiderbar.updataSelfAppMenu(list);
+  };
+
+  const delSelfMenu = (id: string) => {
+    let parantObj: any = [];
+    function findParent(id: string, data: any[], parent: any) {
+      if (parantObj?.length) {
+        return;
+      }
+      if (
+        data.some((v) => {
+          return v.id == id;
+        })
+      ) {
+        data = data.filter((v: any) => {
+          return v.id !== id;
+        });
+        parent.children = data;
+      } else {
+        data.forEach((child: any) => {
+          findParent(id, child?.children, child);
+        });
+      }
+    }
+    findParent(id, list, { children: list });
+    console.log('删除', list, id, parantObj);
     StoreSiderbar.updataSelfAppMenu(list);
   };
   const onCancel = () => {
@@ -77,11 +104,20 @@ const StoreClassify: React.FC = () => {
   };
   /*******
    * @desc: 目录更多操作 触发事件
+   * @param {'重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'} key
    * @param {object} param1
    * @return {*}
    */
-  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    console.log('目录更多操作', key);
+  const handleMenuClick = (key: string, data: any) => {
+    console.log('目录更多操作', key, data);
+    switch (key) {
+      case '删除':
+        delSelfMenu(data.id);
+        break;
+
+      default:
+        break;
+    }
   };
   /*******
    * @desc: 点击目录 触发事件
@@ -153,10 +189,6 @@ const StoreClassify: React.FC = () => {
         </Form>
       </Modal>
       <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
-      {/* <button onClick={(e)=>{
-        console.log(e);
-        setisAppDetailOpen(true)
-      }}>123</button> */}
     </>
   );
 };
