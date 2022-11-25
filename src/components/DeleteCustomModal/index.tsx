@@ -14,6 +14,7 @@ interface Iprops {
   onOk: () => void; // 确认
   onCancel: () => void; // 取消
   content: string; // 展示内容
+  deleOrQuit: 'delete' | 'quit';
 }
 
 const DeleteCustomModal: React.FC<Iprops> = ({
@@ -22,6 +23,7 @@ const DeleteCustomModal: React.FC<Iprops> = ({
   onOk,
   onCancel,
   content,
+  deleOrQuit,
 }) => {
   return (
     <div className={cls['delete-custom-content']}>
@@ -32,7 +34,9 @@ const DeleteCustomModal: React.FC<Iprops> = ({
         onCancel={onCancel}
         getContainer={false}>
         <ExclamationCircleOutlined className={cls['delete-custom-icon']} />
-        <span>确认删除 {content}?</span>
+        <span>
+          {deleOrQuit === 'delete' ? '确认删除' : '确认退出'} {content}?
+        </span>
       </Modal>
     </div>
   );

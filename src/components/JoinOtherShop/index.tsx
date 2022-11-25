@@ -25,7 +25,7 @@ const JoinOtherShop: React.FC<Iprops> = ({ title, width, open, onOk, onCancel })
    * @description: 搜索
    * @return {*}
    */
-  const search = <SearchInput onChange={onChange} />;
+  const search = <SearchInput placeholder="请输入商店编码" onChange={onChange} />;
 
   /**
    * @description: 表格

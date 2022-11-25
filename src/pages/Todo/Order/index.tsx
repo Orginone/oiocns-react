@@ -1,33 +1,23 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import todoService, { tabStatus } from '@/ts/controller/todo';
-import { OderDetailType } from '@/module/todo/typings';
 import { Dropdown, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';
-
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { StatusPage } from '@/module/typings';
 import { EllipsisOutlined } from '@ant-design/icons';
-// import { chat } from '@/module/chat/orgchat';
-
+import { XOrder, XOrderDetail } from '@/ts/base/schema';
+// import { chatCtrl as chat } from '@/ts/controller/chat';
 todoService.currentModel = 'order';
-const orderTypeTabs = [
-  { tab: '销售订单', key: '5' },
-  { tab: '采购订单', key: '6' },
-];
-const statusoptions = {
-  1: { text: '待交付', status: 'Processing' },
-  //包含第三方监管和卖方的审核状态
-  102: { text: '已发货', status: 'Success' },
-  //后续可能有物流状态接入
-  220: { text: '买方取消订单', status: 'Error' },
-  221: { text: '卖方取消订单', status: 'Error' },
-  222: { text: '已退货', status: 'Default' },
+
+// 根据状态值渲染标签
+const renderItemStatus = (record: { status: number }) => {
+  const status = todoService.statusMap[record.status];
+  return <Tag color={status.color}>{status.text}</Tag>;
 };
 /**采购订单详情表格 */
 const expandedRowRender = (
   record: {
-    details: readonly Record<string, any>[] | undefined;
+    details: readonly XOrderDetail[] | undefined;
   },
   setNeedReload: Function,
 ) => {
@@ -52,7 +42,12 @@ const expandedRowRender = (
           // valueType: 'radio',
           // valueEnum: chat.nameMap,
         },
-        { title: '状态', dataIndex: 'status', key: 'status', valueEnum: statusoptions },
+        {
+          title: '状态',
+          dataIndex: 'status',
+          key: 'status',
+          render: (_, record) => renderItemStatus(record),
+        },
         {
           title: '下单时间',
           dataIndex: 'createTime',
@@ -66,7 +61,7 @@ const expandedRowRender = (
             return record.merchandise ? (
               <Tag color="processing">在售</Tag>
             ) : (
-              <Tag color="danger">已下架</Tag>
+              <Tag>已下架</Tag>
             );
           },
         },
@@ -77,7 +72,7 @@ const expandedRowRender = (
           valueType: 'option',
           render: (_, _record) => {
             // console.log(record);
-            const menuItems = tableOperation('2', _record, setNeedReload);
+            const menuItems = todoService.orderOperation(_record, setNeedReload);
             if (menuItems.length > 0) {
               return (
                 <Dropdown menu={{ items: menuItems }}>
@@ -98,61 +93,6 @@ const expandedRowRender = (
     />
   );
 };
-// 生成说明数据
-const tableOperation = (activeKey: string, item: OderDetailType, callback: Function) => {
-  // 是否是待发货的订单状态
-  const allowToCancel =
-    activeKey == `6` && item.details
-      ? item.details.find((n: OderDetailType) => n.status < 102)
-      : item.status < 102;
-  const menu = [];
-  if (allowToCancel) {
-    menu.push({
-      key: 'retractApply',
-      label: '取消订单',
-      onClick: () => {
-        todoService
-          .retractApply(
-            item.details
-              ? (item.details.map((n: any) => n.id) || []).toString()
-              : item.id,
-            activeKey == '5' ? 221 : 220,
-          )
-          .then(({ success }) => {
-            if (success) {
-              callback.call(callback, true);
-            }
-          });
-      },
-    });
-    if (activeKey == `1`) {
-      menu.push({
-        key: 'approve',
-        label: '确认交付',
-        onClick: () => {
-          todoService.approve(item.id, 102).then(({ success }) => {
-            if (success) {
-              callback.call(callback, true);
-            }
-          });
-        },
-      });
-    }
-  } else if (item.status == 102 && activeKey == `2`) {
-    menu.push({
-      key: 'refuse',
-      label: '退货退款',
-      onClick: () => {
-        todoService.refuse(item.id, 222).then(({ success }) => {
-          if (success) {
-            callback.call(callback, true);
-          }
-        });
-      },
-    });
-  }
-  return menu;
-};
 
 /**
  * 办事-订单
@@ -160,13 +100,10 @@ const tableOperation = (activeKey: string, item: OderDetailType, callback: Funct
  */
 const TodoOrg: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('5');
-  const [pageData, setPageData] = useState<Record<string, OderDetailType[]>>({
-    '5': [],
-    '6': [],
-  });
+  const [pageData, setPageData] = useState<XOrder[] | XOrderDetail[]>();
   const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const buyColumns: ProColumns<OderDetailType>[] = [
+  const buyColumns: ProColumns<XOrder>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -177,10 +114,14 @@ const TodoOrg: React.FC = () => {
       title: '订单号',
       dataIndex: 'code',
     },
-
     {
       title: '应用名称',
       dataIndex: 'name',
+    },
+    {
+      title: '订单总价',
+      dataIndex: 'price',
+      valueType: 'money',
     },
     {
       title: '下单时间',
@@ -188,7 +129,7 @@ const TodoOrg: React.FC = () => {
       valueType: 'dateTime',
     },
   ];
-  const saleColumns: ProColumns<OderDetailType>[] = [
+  const saleColumns: ProColumns<XOrderDetail>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -207,7 +148,7 @@ const TodoOrg: React.FC = () => {
       title: '市场名称',
       dataIndex: ['merchandise', 'marketId'],
       // valueType: 'radio',
-      // valueEnum: chat.nameMap,
+      // valueEnum: chat.getName,
     },
     {
       title: '买家',
@@ -231,7 +172,7 @@ const TodoOrg: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'status',
-      valueEnum: statusoptions,
+      render: (_, record) => renderItemStatus(record),
     },
     {
       title: '下单时间',
@@ -242,63 +183,54 @@ const TodoOrg: React.FC = () => {
       title: '商品状态',
       dataIndex: ['merchandise', 'status'],
       render: (_, record) => {
-        return record.merchandise ? <Tag>在售</Tag> : <Tag color="danger">已下架</Tag>;
+        return record.merchandise ? (
+          <Tag color="processing">在售</Tag>
+        ) : (
+          <Tag color="danger">已下架</Tag>
+        );
       },
     },
   ];
-  // 获取申请 / 审核列表;
-  const handlePageChange = async (page: number, pageSize: number) => {
-    if (!pageData || !pageData[activeKey] || needReload) {
-      // 如果已经加载过
-      const { data = [], total = 0 } = await todoService.getList<
-        OderDetailType,
-        StatusPage
-      >({
-        filter: '',
-        status: 0, //后续改成-1
-        page: page,
-        pageSize: pageSize,
-      });
-      setPageData({ ...pageData, [activeKey]: data });
-      setPageTotal(total);
-      setNeedReload(false);
-    } else {
-      setPageTotal(pageData[activeKey].length);
-    }
+  // 获取订单列表;
+  const loadList = () => {
+    console.log(todoService.currentList);
+    setPageData([...todoService.currentList]);
+    setPageTotal(todoService.currentList.length);
+    setNeedReload(false);
   };
 
   useEffect(() => {
-    setPageData({ ...pageData, [activeKey]: [] });
     todoService.activeStatus = activeKey as tabStatus;
-    handlePageChange(1, 12);
-  }, ['', activeKey, needReload]);
+    loadList();
+  }, [activeKey, needReload]);
 
   return (
     <PageCard
-      tabList={orderTypeTabs}
+      tabList={todoService.orderTabs}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
       }}>
-      {pageData && pageData[activeKey] && (
-        <CardOrTableComp
+      {pageData && (
+        <CardOrTableComp<XOrder | XOrderDetail>
           showChangeBtn={false}
           rowKey={'id'}
-          bordered={false}
           columns={activeKey == '5' ? saleColumns : buyColumns}
-          dataSource={pageData[activeKey]}
+          dataSource={pageData}
           expandable={
             activeKey == '6'
               ? {
+                  defaultExpandAllRows: true,
+                  indentSize: 0,
                   expandedRowRender: (record: any) =>
                     expandedRowRender(record, setNeedReload),
                 }
               : ''
           }
           total={total}
-          onChange={handlePageChange}
-          operation={(item: OderDetailType) =>
-            tableOperation(activeKey, item, setNeedReload)
+          onChange={loadList}
+          operation={(item: XOrder | XOrderDetail) =>
+            todoService.orderOperation(item, setNeedReload)
           }
         />
       )}
