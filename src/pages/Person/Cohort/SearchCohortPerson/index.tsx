@@ -33,23 +33,25 @@ const CohortPerson: React.FC<indexType> = (props) => {
   //   props.searchCallback(selectedRowKeys.selectedRows[0]);
   // };
   const [value, setValue] = useState<string>();
-  const [persons, setPersons] = useState<Person[]>([]);
+  // const [persons, setPersons] = useState<Person[]>([]);
   const getTableList = async () => {
     const res = await CohortController.getCohortPeronList(props.cohort);
     setData(res);
   };
-  // const keyWordChange = async (e: any) => {
-  //   setValue(e.target.value);
-  //   if (e.target.value) {
-  //     const res = await CohortController.searchPerson(person,e.target.value)
-  //     console.log(res)
-  //     // const res = await personService.searchPerson(e.target.value);
-  //     if(res.data.result!=null){
-  //     setPersons(res.data.result);
-  //     searchCallback(res.data.result[0]);
-  //     }
-  //     console.log("length",persons)
-  //   }
+  const keyWordChange = async (e: any) => {
+    setValue(e.target.value);
+    if (e.target.value) {
+      const res = await CohortController.searchPerson(props.cohort,e.target.value)
+      console.log(res)
+      if(res.data.result!=null){
+      setData([res.data.result[0]])
+      console.log("输出data",data)
+      }else{
+        getTableList();
+      }
+    }
+  }
+
   const cohortColumn: ProColumns<any>[] = [
     {
       title: '序号',

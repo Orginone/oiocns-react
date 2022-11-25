@@ -161,7 +161,7 @@ export default class BaseTarget extends SpaceTarget {
         belongId: this.target.id,
       });
       if (res.success && res.data != undefined) {
-        this._ownAuthoritys =[];
+        this._ownAuthoritys = [];
         this._ownAuthoritys.push(res.data);
       }
       return res;
@@ -384,10 +384,10 @@ export default class BaseTarget extends SpaceTarget {
       },
     };
     const res = await kernel.queryAuthorityTree(params);
-    if(res.success){
-      this._ownAuthoritys =[];
+    if (res.success) {
+      this._ownAuthoritys = [];
       this._ownAuthoritys.push(res.data);
-      console.log("此处加入缓存",this._ownAuthoritys)
+      console.log('此处加入缓存', this._ownAuthoritys);
     }
     return res;
   }
@@ -658,6 +658,7 @@ export default class BaseTarget extends SpaceTarget {
     code: string,
     typeName: TargetType,
     remark: string,
+    belongId: string,
   ): Promise<model.ResultType<any>> {
     const params = {
       id: this.target.id,
@@ -665,7 +666,7 @@ export default class BaseTarget extends SpaceTarget {
       code: code,
       typeName: typeName,
       remark: remark,
-      belongId: this.target.belongId,
+      belongId: belongId,
       teamName: name,
       teamCode: code,
       teamRemark: remark,
@@ -678,6 +679,7 @@ export default class BaseTarget extends SpaceTarget {
         this.target.team.name = params.name;
         this.target.team.code = params.code;
         this.target.team.remark = params.teamRemark;
+        this.target.belongId = params.belongId;
       }
     }
     return res;
