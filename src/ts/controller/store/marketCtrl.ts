@@ -41,6 +41,19 @@ class MarketController {
   public async deleteMarket(market: any) {
     await this.curTarget?.deleteMarket(market);
   }
+
+  /**
+   * @description: 退出商店
+   * @param {string} id
+   * @return {*}
+   */
+  public async quitMarket(id: string) {
+    await this.curTarget?.quitMarket(id);
+  }
+
+  public async getJoinMarkets() {
+    await this.curTarget?.getJoinMarkets();
+  }
 }
 const marketCtrl = new MarketController();
 export { marketCtrl };
