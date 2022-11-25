@@ -1,4 +1,4 @@
-import { Form, Input, MenuProps, Modal } from 'antd';
+import { Form, Input, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 // import { useHistory } from 'react-router-dom';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
