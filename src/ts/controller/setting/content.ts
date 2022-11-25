@@ -75,23 +75,23 @@ class SettingController {
   }
 
   // 测试代码不使用
-  public async test() {
-    const params: deptParams = {
-      name: '部门六一一',
-      code: 'BMSixONE',
-      teamName: '部门六一一',
-      teamCode: 'BMSixONE',
-      remark: '部门六一一',
-    };
-    console.log(params);
+  // public async test() {
+  //   const params: deptParams = {
+  //     name: '部门六一一',
+  //     code: 'BMSixONE',
+  //     teamName: '部门六一一',
+  //     teamCode: 'BMSixONE',
+  //     remark: '部门六一一',
+  //   };
+  //   console.log(params);
 
-    // const compid = '383264515724283904';
-    // const deptid = '381107910723375104';
-    // 381107910723375104
-    // console.log(await this.createSecondDepartment(params));
-    let arrays: spaceObjs[] = await this.getDepartments('0');
-    console.log('-------', arrays);
-  }
+  //   // const compid = '383264515724283904';
+  //   // const deptid = '381107910723375104';
+  //   // 381107910723375104
+  //   // console.log(await this.createSecondDepartment(params));
+  //   let arrays: spaceObjs[] = await this.getDepartments('0');
+  //   console.log('-------', arrays);
+  // }
 
   /**
    * 递归查询前单位底下的所有部门底下的子部门
@@ -179,6 +179,10 @@ class SettingController {
    * @returns
    */
   public async createDepartment(param: deptParams): Promise<ObjType> {
+    // 判断是否创建二级部门
+    if (param.parentId != null && param.parentId != this.companyID) {
+      return await this.createSecondDepartment(param, param.parentId);
+    }
     // 要选中公司的工作区
     const compid = this.companyID;
     // Provider.getWorkSpace()!.id;
@@ -219,6 +223,10 @@ class SettingController {
       success: res.success,
     };
   }
+  // 查询公司底下所有的用户
+  // 查询部门底下的用户
+  // 拉人进部门， 或移除人出部门
+  //
 }
 
 const settingController = new SettingController();
