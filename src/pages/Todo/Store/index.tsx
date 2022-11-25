@@ -3,10 +3,9 @@ import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { MarketApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, message, Space, Tag, Typography } from 'antd';
+import { Button, Space, Tag, Typography } from 'antd';
 import storeService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
-import { PageParams } from 'typings/requestType';
 import { DataType } from 'typings/globelType';
 // import styles from './index.module.less';
 storeService.currentModel = 'store';
@@ -15,58 +14,14 @@ storeService.currentModel = 'store';
  * @param ids  React.Key[] 选中的数据id数组
  */
 const handleApproveSelect = async (ids: React.Key[]) => {
-  if (ids.length > 0) {
-    const { success } = await storeService.approve(ids.toString());
-    if (success) {
-      message.success('添加成功！');
-    } else {
-      message.error('抱歉，提交失败');
-    }
-  }
-};
-
-// 生成说明数据
-const tableOperation = (
-  activeKey: string,
-  item: MarketApprovalType,
-  callback: Function,
-) => {
-  const handleFunction = (fn: Promise<{ msg: any; success: any }>) => {
-    fn.then(({ success }) => {
-      if (success) {
-        callback(true);
-      }
-    });
-  };
-  return activeKey == '1'
-    ? [
-        {
-          key: 'approve',
-          label: '同意',
-          onClick: () => {
-            handleFunction(storeService.approve(item.id, 100)); // 0-100 待批 //100-200 已批 200 以上是拒绝
-            console.log('同意', 'approve', item);
-          },
-        },
-        {
-          key: 'refuse',
-          label: '拒绝',
-          onClick: () => {
-            handleFunction(storeService.refuse(item.id, 201));
-            console.log('拒绝', 'back', item);
-          },
-        },
-      ]
-    : [
-        {
-          key: 'retractApply',
-          label: '取消申请',
-          onClick: () => {
-            handleFunction(storeService.retractApply(item.id));
-            console.log('同意', 'approve', item);
-          },
-        },
-      ];
+  // if (ids.length > 0) {
+  //   const { success } = await storeService.approve(ids.toString());
+  //   if (success) {
+  //     message.success('添加成功！');
+  //   } else {
+  //     message.error('抱歉，提交失败');
+  //   }
+  // }
 };
 
 // 根据状态值渲染标签
@@ -136,21 +91,14 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
   ];
 
   // 获取申请/审核列表
-  const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total } = await storeService.getList<
-      MarketApprovalType,
-      PageParams
-    >({
-      filter: '',
-      page: page,
-      pageSize: pageSize,
-    });
-    setPageData(data);
-    setPageTotal(total);
+  const handlePageChange = async () => {
+    setPageData([...storeService.currentList]);
+    setPageTotal(storeService.currentList.length);
+    setNeedReload(false);
   };
   useEffect(() => {
     storeService.activeStatus = activeKey as tabStatus;
-    handlePageChange(1, 12);
+    handlePageChange();
     setSelectedRowKeys([]);
   }, [activeKey, needReload]);
 
@@ -181,13 +129,13 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
         total={total}
         onChange={handlePageChange}
         operation={(item: MarketApprovalType) =>
-          tableOperation(activeKey, item, setNeedReload)
+          storeService.tableOperation(item, setNeedReload)
         }
         renderCardContent={(arr) => (
           <TableItemCard<MarketApprovalType>
             data={arr}
             operation={(item: MarketApprovalType) =>
-              tableOperation(activeKey, item, setNeedReload)
+              storeService.tableOperation(item, setNeedReload)
             }
             statusType={(item) => renderItemStatus(item)}
             targetOrTeam="market"

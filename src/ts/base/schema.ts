@@ -758,6 +758,8 @@ export type XOrder = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 相关商品
+  details?: XOrderDetail[];
 };
 
 //采购订单查询返回集合
@@ -780,6 +782,8 @@ export type XOrderDetail = {
   orderId: string;
   // 商品ID
   merchandiseId: string;
+  // 商品信息
+  merchandise?: XMerchandise[];
   // 卖方ID
   sellerId: string;
   // 卖方产品来源
@@ -804,6 +808,8 @@ export type XOrderDetail = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 采购订单
+  order?: XOrder;
 };
 
 //订单详情查询返回集合
