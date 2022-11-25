@@ -17,8 +17,8 @@ import { useHistory } from 'react-router-dom';
 import PersonInfoEnty from '../../../ts/core/provider';
 import CohortEnty from '../../../ts/core/target/cohort';
 import CohortController from '../../../ts/controller/cohort/index';
-import ChangeCohort from './SearchCohortPerson/index'
-import CreateCohort from '../../../bizcomponents/Cohort/index'
+import ChangeCohort from './SearchCohortPerson/index';
+import CreateCohort from '../../../bizcomponents/Cohort/index';
 /**
  * 个人信息
  * @returns
@@ -29,7 +29,7 @@ const CohortConfig: React.FC = () => {
   });
   const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
-  console.log("workSpaceId",PersonInfoEnty.getWorkSpace())
+  console.log('workSpaceId', PersonInfoEnty.getWorkSpace());
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
@@ -40,13 +40,25 @@ const CohortConfig: React.FC = () => {
   const history = useHistory();
   const [friend, setFriend] = useState<Person>();
   const [cohort, setcohort] = useState<Cohort>();
-  const [data, setData] = useState<CohortEnty[]>(CohortController.getMyCohort);
+  const [data, setData] = useState<CohortEnty[]>();
+  const [joinData, setJoinData] = useState<CohortEnty[]>();
+
   useEffect(() => {
     CohortController.setCallBack(setData);
+    CohortController.setJoinCallBack(setJoinData);
+    getData();
+    getJoinData();
   }, []);
   useEffect(() => {
     console.log('发生变化');
   }, [data]);
+  const getData = async () => {
+    setData(await CohortController.getMyCohort());
+  };
+  const getJoinData = async () => {
+    setJoinData(await CohortController.getJoinCohort());
+  };
+
   const renderOperation = (item: CohortEnty): CohortConfigType.OperationType[] => {
     return [
       {
@@ -79,8 +91,7 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: () => {
-          
-          history.push({pathname:'/person/Role',state:{"cohortId":item.target.id}})
+          history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
           console.log('按钮事件', 'roleManage', item);
         },
       },
@@ -104,9 +115,7 @@ const CohortConfig: React.FC = () => {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          console.log(
-            CohortController.deleteCohort(Person, item.target.id),
-          );
+          console.log(CohortController.deleteCohort(Person, item.target.id));
           // newCohortServices.deleteCohort(param);
           message.info('解散成功');
           // getTableList();
@@ -114,7 +123,28 @@ const CohortConfig: React.FC = () => {
       },
     ];
   };
-
+  const joinrenderOperation = (item: CohortEnty): CohortConfigType.OperationType[] => {
+    return [
+      {
+        key: 'inviteMembers',
+        label: '邀请成员',
+        onClick: () => {
+          showModal();
+          setItem(item);
+          console.log('按钮事件', 'inviteMembers', item);
+        },
+      },
+      {
+        key: 'exitCohort',
+        label: '退出群聊',
+        onClick: () => {
+          CohortController.quitCohort(Person, item.target.id);
+          message.info('退出成功');
+          console.log('按钮事件', 'exitCohort', item);
+        },
+      },
+    ];
+  };
   const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {};
 
   const handlePageChange = (page: number, pageSize: number) => {
@@ -131,21 +161,29 @@ const CohortConfig: React.FC = () => {
   const showModal = () => {
     setIsModalOpen(true);
   };
-   //转移权限确认事件
-   const changeHandleOk = async () => {
-    setIsModalOpen(false);
-    console.log("获取到选中对象",friend);
-    
+  //转移权限确认事件
+  const changeHandleOk = async () => {
+    setChangeIsModelOpen(false);
+    console.log(
+      CohortController.updateCohort(
+        item!,
+        item?.target.name!,
+        item?.target.code!,
+        item?.target.team?.remark!,
+        friend?.id!,
+      ),
+    );
+    console.log('获取到选中对象', friend);
   };
   //邀请成员确认事件
   const handleOk = async () => {
     setIsModalOpen(false);
     const res = CohortController.pullCohort(item!, [friend?.id!]);
-    if((await res).success){
-    console.log(res);
-    message.success('邀请成功');
-    }else{
-    message.error((await res).msg);
+    if ((await res).success) {
+      console.log(res);
+      message.success('邀请成功');
+    } else {
+      message.error((await res).msg);
     }
   };
   //申请加入群组确认事件
@@ -173,12 +211,13 @@ const CohortConfig: React.FC = () => {
           </Title>
           <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
-              <Modal title="转移权限"
+              <Modal
+                title="转移权限"
                 open={changeIsModelOpen}
                 onOk={changeHandleOk}
                 onCancel={() => setChangeIsModelOpen(false)}
                 width="1050px">
-                <ChangeCohort cohort = {item!} searchCallback={searchCallback}/>
+                <ChangeCohort cohort={item!} searchCallback={searchCallback} />
               </Modal>
 
               <Modal
@@ -236,7 +275,7 @@ const CohortConfig: React.FC = () => {
               key: '1',
               children: (
                 <CardOrTable<CohortEnty>
-                  dataSource={data}
+                  dataSource={data!}
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
@@ -261,7 +300,29 @@ const CohortConfig: React.FC = () => {
             {
               label: `加入的`,
               key: '2',
-              children: `Content of Tab Pane 2`,
+              children: (
+                <CardOrTable<CohortEnty>
+                  dataSource={joinData!}
+                  total={total}
+                  page={page}
+                  tableAlertRender={tableAlertRender}
+                  rowSelection={
+                    {
+                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+                      // 注释该行则默认不显示下拉选项
+                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                      // defaultSelectedRowKeys: [1],
+                    }
+                  }
+                  // defaultPageType={'table'}
+                  showChangeBtn={false}
+                  operation={joinrenderOperation}
+                  columns={cohortColumn as any}
+                  // style={divStyle}
+                  onChange={handlePageChange}
+                  rowKey={'id'}
+                />
+              ),
             },
           ]}
         />
