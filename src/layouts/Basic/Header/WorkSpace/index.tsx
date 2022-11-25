@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Provider from '@/ts/core/provider';
+import SettionCtrl from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
@@ -80,6 +81,11 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     Provider.setWorkSpace(item.id);
+    // @modify 切换工作空间
+    SettionCtrl.changeWorkSpace({
+      id: item.id,
+      name: item.name,
+    });
     setCurrent({
       name: item.name,
       id: item.id,

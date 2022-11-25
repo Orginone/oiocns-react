@@ -288,6 +288,12 @@ const MarketRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
       },
       {
+        path: '/market/usermanagement',
+        title: '用户管理',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/UserManagement')),
+      },
+      {
         path: '/market',
         title: '应用市场',
         render: () => <RouterRedirect to="/market/shop" />,
