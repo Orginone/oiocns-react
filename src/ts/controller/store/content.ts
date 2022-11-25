@@ -31,15 +31,15 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem);
-    this._curMarket = new AppStore(menuItem); // 当前商店信息
+    console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    this._curMarket = menuItem.node ?? new AppStore(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
       return;
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-    console.log('当前页面', this.curPageType);
+    console.log('当前页面类型', this.curPageType);
 
     this.getStoreProduct(this.curPageType);
   }
@@ -71,7 +71,6 @@ class StoreContent {
       Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
-      console.log('shan店数据');
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
