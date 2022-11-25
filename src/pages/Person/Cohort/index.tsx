@@ -8,8 +8,6 @@ import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
-import API from '@/services';
-import CreateCohort from '../../../bizcomponents/Cohort/index';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from '../../../bizcomponents/SearchCohort/index';
@@ -19,7 +17,8 @@ import { useHistory } from 'react-router-dom';
 import PersonInfoEnty from '../../../ts/core/provider';
 import CohortEnty from '../../../ts/core/target/cohort';
 import CohortController from '../../../ts/controller/cohort/index';
-
+import ChangeCohort from './SearchCohortPerson/index'
+import CreateCohort from '../../../bizcomponents/Cohort/index'
 /**
  * 个人信息
  * @returns
@@ -37,6 +36,7 @@ const CohortConfig: React.FC = () => {
   const [item, setItem] = useState<CohortEnty>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
+  const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
   const [friend, setFriend] = useState<Person>();
   const [cohort, setcohort] = useState<Cohort>();
@@ -95,6 +95,8 @@ const CohortConfig: React.FC = () => {
         key: 'changePermission',
         label: '转移权限',
         onClick: () => {
+          setItem(item);
+          setChangeIsModelOpen(true);
           console.log('按钮事件', 'changePermission', item);
         },
       },
@@ -128,6 +130,12 @@ const CohortConfig: React.FC = () => {
   };
   const showModal = () => {
     setIsModalOpen(true);
+  };
+   //转移权限确认事件
+   const changeHandleOk = async () => {
+    setIsModalOpen(false);
+    console.log("获取到选中对象",friend);
+    
   };
   //邀请成员确认事件
   const handleOk = async () => {
@@ -165,6 +173,14 @@ const CohortConfig: React.FC = () => {
           </Title>
           <div style={{ float: 'right' }}>
             <Space split={<Divider type="vertical" />}>
+              <Modal title="转移权限"
+                open={changeIsModelOpen}
+                onOk={changeHandleOk}
+                onCancel={() => setChangeIsModelOpen(false)}
+                width="1050px">
+                <ChangeCohort cohort = {item!} searchCallback={searchCallback}/>
+              </Modal>
+
               <Modal
                 title="邀请成员"
                 open={isModalOpen}
@@ -173,6 +189,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <Persons searchCallback={searchCallback} person={Person} />
               </Modal>
+
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
@@ -198,11 +215,11 @@ const CohortConfig: React.FC = () => {
                 />
               )}
 
-              {/* <CreateCohort
+              <CreateCohort
                 Person={Person}
                 service={service}
                 getTableList={getTableList}
-              /> */}
+              />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>
