@@ -101,6 +101,14 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
         return record.product.authority;
       },
     },
+    {
+      title: '状态 ',
+      dataIndex: 'status',
+      valueType: 'select',
+      render: (_, record) => {
+        return renderItemStatus(record);
+      },
+    },
     // {
     //   title: '申请人',
     //   dataIndex: '',

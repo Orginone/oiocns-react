@@ -1,4 +1,4 @@
-import { iTodo, StytemITodo, StytemTodosType, TodoItem } from './typings';
+import { iTodo, StytemITodo, StytemTodosType, TodoItem } from './interface';
 import { common, kernel, model, schema } from '../../base';
 import Provider from '../provider';
 import { CommonStatus, TargetType } from '../enum';
@@ -113,6 +113,7 @@ abstract class BaseTodo implements StytemITodo {
     return list.length > 1 ? list.filter((n) => n.id !== needRemoveId) : [];
   };
 }
+/**好友待办 */
 export class FriendTodo extends BaseTodo {
   // id: string;
   // name: string;
@@ -227,7 +228,6 @@ export class TeamTodo extends BaseTodo {
       }
     }
   };
-
   getApplyList = async () => {
     const res = await Provider.getPerson?.queryJoinApply();
     if (res?.success && res.data.result) {
@@ -237,7 +237,6 @@ export class TeamTodo extends BaseTodo {
     }
     return this.applyList;
   };
-
   approve = async (
     target: schema.XRelation,
   ): Promise<model.ResultType<schema.XRelation>> => {
@@ -307,7 +306,7 @@ export class StoreTodo extends BaseTodo {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res?.success && res.data.result && res.data.result.length > 0) {
+    if (res?.success && res.data.total > 0 && res.data.result) {
       res.data.result.forEach((n) => {
         if (n.status === 1) {
           this.todoList.push(n);

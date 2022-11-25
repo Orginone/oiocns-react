@@ -31,7 +31,6 @@
     "config/**/*",
     "vite.config.ts",
     "mock/_createProductionServer.ts",
-    "src/module/commonClass"
-  ],
+    "src/module/commonClass" ],
   "exclude": ["node_modules", "build", "dist", "**/*.js"]
 }

@@ -38,6 +38,13 @@ const TodoOrg: React.FC = () => {
       width: 60,
     },
     {
+      title: '申请人',
+      dataIndex: '',
+      render: (_, row) => {
+        return row.target.name;
+      },
+    },
+    {
       title: '说明',
       dataIndex: 'remark',
       render: (_, row) => {
@@ -52,10 +59,10 @@ const TodoOrg: React.FC = () => {
       },
     },
     {
-      title: '申请人',
-      dataIndex: '',
-      render: (_, row) => {
-        return row.target.name;
+      title: '状态',
+      dataIndex: 'status',
+      render: (_, record) => {
+        return renderItemStatus(record);
       },
     },
     {
