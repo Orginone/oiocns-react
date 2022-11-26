@@ -3,67 +3,17 @@ import { TeamApprovalType } from '@/module/todo/typings';
 import { Button, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';
-
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
 import todoService, { tabStatus } from '@/ts/controller/todo';
-// import { IdPage } from '@/module/typings';
 
-// todoService.currentModel = `org`;
+todoService.currentModel = `org`;
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: TeamApprovalType) => {
   return activeKey === '2'
-    ? '请求加入' + item.team.name + '单位'
-    : item.target.name + '请求加入单位';
-};
-// 生成说明数据
-const tableOperation = (
-  activeKey: string,
-  item: TeamApprovalType,
-  callback: Function,
-) => {
-  return activeKey == '1'
-    ? [
-        {
-          key: 'approve',
-          label: '同意',
-          onClick: () => {
-            todoService.approve(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-            console.log('同意', 'approve', item);
-          },
-        },
-        {
-          key: 'refuse',
-          label: '拒绝',
-          onClick: () => {
-            todoService.refuse(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-            console.log('拒绝', 'back', item);
-          },
-        },
-      ]
-    : [
-        {
-          key: 'retractApply',
-          label: '取消申请',
-          onClick: () => {
-            todoService.retractApply(item.id).then(({ success }) => {
-              if (success) {
-                callback.call(callback, true);
-              }
-            });
-            console.log('取消申请', 'approve', item);
-          },
-        },
-      ];
+    ? '请求加入' + item.team.name
+    : item.target.name + '请求加入' + item.team.name;
 };
 
 // 根据状态值渲染标签
@@ -88,6 +38,13 @@ const TodoOrg: React.FC = () => {
       width: 60,
     },
     {
+      title: '申请人',
+      dataIndex: '',
+      render: (_, row) => {
+        return row.target.name;
+      },
+    },
+    {
       title: '说明',
       dataIndex: 'remark',
       render: (_, row) => {
@@ -96,16 +53,16 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '事项',
-      dataIndex: 'name',
-      render: () => {
-        return <Tag color="#5BD8A6">加单位</Tag>;
+      dataIndex: ['team', 'target', 'typeName'],
+      render: (_) => {
+        return <Tag color="#5BD8A6">{_}</Tag>;
       },
     },
     {
-      title: '申请人',
-      dataIndex: '',
-      render: (_, row) => {
-        return row.target.name;
+      title: '状态',
+      dataIndex: 'status',
+      render: (_, record) => {
+        return renderItemStatus(record);
       },
     },
     {
@@ -115,18 +72,14 @@ const TodoOrg: React.FC = () => {
     },
   ];
   // 获取申请/审核列表
-  const handlePageChange = async (page: number, pageSize: number) => {
-    const { data = [], total = 0 } = await todoService.getList<TeamApprovalType, IdPage>({
-      id: '0',
-      page: page,
-      pageSize: pageSize,
-    });
-    setPageData(data);
-    setPageTotal(total);
+  const loadList = async () => {
+    setPageData([...todoService.currentList]);
+    setPageTotal(todoService.currentList ? todoService.currentList.length : 0);
+    setNeedReload(false);
   };
   useEffect(() => {
     todoService.activeStatus = activeKey as tabStatus;
-    handlePageChange(1, 12);
+    loadList();
   }, [activeKey, needReload]);
   return (
     <PageCard
@@ -150,17 +103,17 @@ const TodoOrg: React.FC = () => {
         columns={columns}
         dataSource={pageData}
         total={total}
-        onChange={handlePageChange}
+        onChange={loadList}
         operation={(item: TeamApprovalType) =>
-          tableOperation(activeKey, item, setNeedReload)
+          todoService.tableOperation(item, setNeedReload)
         }
         renderCardContent={(arr) => (
           <TableItemCard<TeamApprovalType>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
-            targetOrTeam="team"
+            targetOrTeam="target"
             operation={(item: TeamApprovalType) =>
-              tableOperation(activeKey, item, setNeedReload)
+              todoService.tableOperation(item, setNeedReload)
             }
           />
         )}

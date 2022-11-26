@@ -2,7 +2,7 @@ import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
 import { formatDate } from '@/utils/index';
-import { PageData } from 'typings/globelType';
+import { DataType, PageData } from 'typings/globelType';
 
 const showMessage = (response: any) => {
   if (response.success) {
@@ -10,8 +10,7 @@ const showMessage = (response: any) => {
   } else {
     message.error('操作失败！发生错误：  ' + response.msg);
   }
-}
-
+};
 
 const debounce = (fun: any, delay?: number) => {
   let timer: any = '';
@@ -46,9 +45,7 @@ const resetParams = (params: any) => {
  * @param res 后台分页响应
  * @returns
  */
-export function toPageData<T extends { result: any; total: number }>(
-  res: model.ResultType<T>,
-): PageData<T> {
+export function toPageData<T extends DataType>(res: model.ResultType<T>): PageData<T> {
   if (res.success) {
     return {
       success: true,
@@ -123,12 +120,27 @@ const handleFormatDate = (timeStr: string) => {
   // 不超过一天 展示 时/分
   return formatDate(timeStr, 'H:mm');
 };
+
+const getUuid = () => {
+  let s = [];
+  let hexDigits: any = '0123456789abcdef';
+  for (let i = 0; i < 36; i++) {
+    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+  }
+  s[14] = '4'; // bits 12-15 of the time_hi_and_version field to 0010
+  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+  s[8] = s[13] = s[18] = s[23] = '-';
+
+  let uuid = s.join('');
+  return uuid;
+};
 export {
   debounce,
+  getUuid,
   handleFormatDate,
   renderNum,
   resetParams,
   showChatTime,
+  showMessage,
   validIsSocialCreditCode,
-  showMessage
 };

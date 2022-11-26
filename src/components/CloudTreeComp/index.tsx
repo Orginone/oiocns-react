@@ -1,36 +1,54 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Tree } from 'antd';
-import type { TreeProps } from 'antd/es/tree';
 import React, { useEffect, useState } from 'react';
-import Bucket from '@/module/cloud/buckets';
-import Objectlay from '@/module/cloud/objectlay';
-import useCloudStore from '@/store/cloud';
 import cls from './index.module.less';
+import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 const StoreClassifyTree: React.FC = () => {
-  const [gData, setGData] = useState<any[]>([]);
-  const CloudStore: any = useCloudStore();
-  useEffect(() => {
-    getTreeData();
-  }, []);
-  useEffect(() => {
-    setGData(CloudStore.cloudTree);
-  }, [CloudStore.cloudTree]);
-  const getTreeData = () => {
-    if (Bucket.Root.HasSubDirectories) {
-      Bucket.Root.children = [{} as Objectlay];
+  const [expKeys, setExpKeys] = useState(['']);
+  const [treeData, setTreeData] = useState<any[]>([]);
+  const [keys, setKeys] = useState([docsCtrl.current?.key ?? '']);
+  const refreshUI = () => {
+    if (docsCtrl.current) {
+      setKeys([docsCtrl.current.key]);
+      let tkeys = docsCtrl.current.key.split('/');
+      tkeys.forEach((_, index) => {
+        const item = tkeys.slice(0, index + 1).join('/');
+        if (!expKeys.includes(item)) {
+          expKeys.push(item);
+        }
+      });
+      setExpKeys([...expKeys]);
     }
-    CloudStore.setCloudTree([Bucket.Root]);
+    setTreeData([loadTreeData(docsCtrl.root)]);
   };
-  const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-    Bucket.Current = info.node.props.data;
-    const res = await Bucket.GetContent();
-    CloudStore.setChoudData(res);
+  const loadTreeData = (item: any) => {
+    let result: any = {
+      key: item.key,
+      icon: expKeys.includes(item.key) ? (
+        <img src="/icons/default_folder_opened.svg"></img>
+      ) : (
+        <img src="/icons/default_folder.svg"></img>
+      ),
+      title: item.name,
+      children: [],
+    };
+    for (let i = 0; i < item.children.length; i++) {
+      if (item.children[i].target.isDirectory) {
+        result.children.push(loadTreeData(item.children[i]));
+      }
+    }
+    return result;
   };
-  const onLoadData = async (node: any) => {
-    const res = await Bucket.GetLeftTree(node.props.data);
-    let orgData = [...gData];
-    Bucket.HandleTree(orgData, res, node.Key);
-    CloudStore.setCloudTree(orgData);
+  useEffect(() => {
+    const id = docsCtrl.subscribe(refreshUI);
+    return () => {
+      docsCtrl.unsubscribe(id);
+    };
+  }, []);
+  const onSelect = (selectedKeys: any[]) => {
+    if (selectedKeys.length > 0) {
+      docsCtrl.open(selectedKeys[0]);
+    }
   };
   return (
     <div>
@@ -41,15 +59,18 @@ const StoreClassifyTree: React.FC = () => {
       <Tree
         className="draggable-tree"
         blockNode
-        fieldNames={{
-          title: 'Name',
-          key: 'Key',
-          children: 'treeData',
-        }}
-        treeData={gData}
-        loadData={onLoadData}
+        showIcon
+        treeData={treeData}
         onSelect={onSelect}
-        // onExpand={onExpand}
+        selectedKeys={keys}
+        expandedKeys={expKeys}
+        onExpand={(keys) => {
+          setExpKeys(
+            keys.map((item) => {
+              return item.toString();
+            }),
+          );
+        }}
       />
     </div>
   );

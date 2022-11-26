@@ -70,7 +70,7 @@ export default class Merchandise {
   }
 
   /**
-   * 卖方方取消订单
+   * 买方取消订单
    * @param detailId 订单Id
    * @param status 取消状态
    * @returns

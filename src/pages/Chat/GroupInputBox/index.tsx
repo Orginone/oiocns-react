@@ -1,6 +1,6 @@
 import { chatCtrl } from '@/ts/controller/chat';
 import { MessageType } from '@/ts/core/enum';
-import { AudioOutlined, SmileOutlined } from '@ant-design/icons';
+import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
@@ -152,10 +152,39 @@ const Groupinputbox = (props: Iprops) => {
                 })}
               </div>
             }>
-            <SmileOutlined className={inputboxStyle.icons_oneself} />
+            <IconFont type={'icon-biaoqing'} className={inputboxStyle.icons_oneself} />
           </Popover>
         </div>
-        <AudioOutlined className={inputboxStyle.icons_oneself} />
+        {/* <AudioOutlined  /> */}
+
+        <IconFont
+          className={inputboxStyle.icons_oneself}
+          type={'icon-maikefeng'}
+          onClick={() => {
+            message.warning('功能暂未开放');
+          }}
+        />
+        <IconFont
+          className={inputboxStyle.icons_oneself}
+          type={'icon-wenjian'}
+          onClick={() => {
+            message.warning('功能暂未开放');
+          }}
+        />
+        <IconFont
+          className={inputboxStyle.icons_oneself}
+          type={'icon-jietu'}
+          onClick={() => {
+            message.warning('功能暂未开放');
+          }}
+        />
+        <IconFont
+          className={inputboxStyle.icons_oneself}
+          type={'icon-shipin'}
+          onClick={() => {
+            message.warning('功能暂未开放');
+          }}
+        />
       </div>
       <div className={inputboxStyle.input_content}>
         <div
@@ -169,7 +198,7 @@ const Groupinputbox = (props: Iprops) => {
         <div className={inputboxStyle.send_box}>
           <Button
             type="primary"
-            style={{ backgroundColor: '#21ba45', color: '#fff', border: 'none' }}
+            style={{ color: '#fff', border: 'none' }}
             onClick={() => submit()}>
             发送
           </Button>

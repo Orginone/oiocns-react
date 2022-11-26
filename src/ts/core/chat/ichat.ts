@@ -4,6 +4,7 @@ import { MessageType } from '../enum';
  * 会话接口
  */
 export interface IChat {
+  loadCache(item: any): unknown;
   /** 唯一标识 */
   fullId: string;
   /** 会话Id */
@@ -60,11 +61,11 @@ export interface IChat {
    * 删除消息
    * @param id 删除消息
    */
-  deleteMessage(id: string): void;
+  deleteMessage(id: string): Promise<boolean>;
   /**
    * 清空历史记录
    */
-  clearMessage(): void;
+  clearMessage(): Promise<boolean>;
   /**
    * 会话接收到消息
    * @param msg 消息

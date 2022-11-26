@@ -1,4 +1,4 @@
-import { Button, Card, Dropdown, Menu, Tag, Tooltip } from 'antd';
+import { Card, Dropdown, Tag, Tooltip } from 'antd';
 import React from 'react';
 import cls from './index.module.less';
 import {
@@ -13,52 +13,51 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 
 import { useHistory } from 'react-router-dom';
-
+import StoreContent from '@/ts/controller/store/content';
 interface AppInfoType {
   appId: string;
 }
 
 const StoreAppInfo: React.FC<AppInfoType> = () => {
   const history = useHistory();
-  const renderBaseInfo = () => {
-    return (
-      <ul className={`${cls['base-info']} flex flex-direction-col`}>
-        <li className={`${cls['con']} flex `}>
-          <div className={cls['con-title']}>应用名称</div>
-          <EditOutlined
-            className={cls['con-name-edit-btn']}
-            style={{ fontSize: '1.5em' }}
-          />
-        </li>
-        <li className={`${cls['con']} flex flex-direction-col`}>
-          <span className={cls['con-label']}>应用图标</span>
-          <img className={cls['con-img']} src={Appimg} alt="" />
-        </li>
-        <li className={`${cls['con']} flex `}>
-          <div className={cls['con-info']}>
-            <span className={cls['con-label']}>应用名称</span>
-            <Tooltip title="prompt text">
-              <div className={cls['con-name']}>应用名称应用名称应用名称应用名称</div>
-            </Tooltip>
-          </div>
-          <div className={cls['con-info']}>
-            <span className={cls['con-label']}>应用描述</span>
-            <Tooltip title={''}>
-              <div className={cls['con-name']}>应用名称应用名称应用名称应用名称</div>
-            </Tooltip>
-          </div>
-        </li>
-        <li className={`${cls['con']} ${cls['endBox']} flex `}>
-          <p style={{ marginRight: '14px' }}>
-            创建人：<span>测试名称</span>
-          </p>
-          <p>
-            创建时间：<span>2023-1-1</span>
-          </p>
-        </li>
-      </ul>
-    );
-  };
+  const RenderBaseInfo = (
+    <ul className={`${cls['base-info']} flex flex-direction-col`}>
+      <li className={`${cls['con']} flex `}>
+        <div className={cls['con-title']}>{StoreContent._curProduct?.prod.name}</div>
+        <EditOutlined
+          className={cls['con-name-edit-btn']}
+          style={{ fontSize: '1.5em' }}
+        />
+      </li>
+      <li className={`${cls['con']} flex flex-direction-col`}>
+        <span className={cls['con-label']}>应用图标</span>
+        <img className={cls['con-img']} src={Appimg} alt="" />
+      </li>
+      <li className={`${cls['con']} flex `}>
+        <div className={cls['con-info']}>
+          <span className={cls['con-label']}>应用曾用名</span>
+          <Tooltip title="prompt text">
+            <div className={cls['con-name']}> {StoreContent._curProduct?.prod.name}</div>
+          </Tooltip>
+        </div>
+        <div className={cls['con-info']}>
+          <span className={cls['con-label']}>应用描述</span>
+          <Tooltip title={''}>
+            <div className={cls['con-name']}>{StoreContent._curProduct?.prod.remark}</div>
+          </Tooltip>
+        </div>
+      </li>
+      <li className={`${cls['con']} ${cls['endBox']} flex `}>
+        <p style={{ marginRight: '14px' }}>
+          创建人：<span>{StoreContent._curProduct?.prod.createUser}</span>
+        </p>
+        <p>
+          创建时间：<span>{StoreContent._curProduct?.prod.createTime}</span>
+        </p>
+      </li>
+    </ul>
+  );
+
   const renderManageInfo = () => {
     return (
       <ul className={cls['manage-info']}>
@@ -105,7 +104,8 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
                   icon={<CheckCircleOutlined />}
                   className={cls['user-tags']}
                   color="success"
-                  key={index}>
+                  key={index}
+                >
                   {item.name}
                 </Tag>
               );
@@ -133,20 +133,15 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
           />
         }
         extra={
-          <Dropdown
-            overlay={
-              <Menu>
-                <Menu.Item>删除</Menu.Item>
-              </Menu>
-            }
-            placement="bottom">
+          <Dropdown menu={{ items: [{ key: 'del', label: '删除' }] }} placement="bottom">
             <EllipsisOutlined
               style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
               rotate={90}
             />
           </Dropdown>
-        }>
-        {renderBaseInfo()}
+        }
+      >
+        {RenderBaseInfo}
       </Card>
       <Card className="manage-info-wrap" title={'应用管理'}>
         {renderManageInfo()}

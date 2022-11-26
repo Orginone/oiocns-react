@@ -1,5 +1,5 @@
-import { Card, Form, Modal } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Card, Modal } from 'antd';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -15,6 +15,7 @@ import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
+import { Product } from '@/ts/core/market';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -22,45 +23,30 @@ import StoreSidebar from '@/ts/controller/store/sidebar';
 //   deleteApi: API.product.delete,
 //   updateApi: API.product.update,
 // });
+type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState([]);
-  const [statusKey, setStatusKey] = useState('merchandise');
+  const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
-  const [selectAppInfo, setSelectAppInfo] = useState<MarketTypes.ProductType>(
-    {} as MarketTypes.ProductType,
-  );
-
-  const items = [
-    {
-      tab: `全部`,
-      key: '1',
-    },
-    {
-      tab: `创建的`,
-      key: '2',
-    },
-    {
-      tab: `购买的`,
-      key: '3',
-    },
-    {
-      tab: `共享的`,
-      key: '4',
-    },
-    {
-      tab: `分配的`,
-      key: '5',
-    },
-  ];
-
+  const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
     StoreContent.marketTableCallBack = setData;
     StoreContent.getStoreProduct();
   }, []);
+  // 根据以获取数据 动态产生tab
+  const items = useMemo(() => {
+    let typeSet = new Set(['全部']);
+    data.forEach((v: any) => {
+      typeSet.add(v.prod.source);
+    });
+    return Array.from(typeSet).map((k) => {
+      return { tab: k, key: k };
+    });
+  }, [data]);
 
   const BtnsList = ['购买', '创建', '暂存'];
   const handleBtnsClick = (item: { text: string }) => {
@@ -90,49 +76,61 @@ const StoreApp: React.FC = () => {
   // 共享确认回调
   const submitShare = () => {
     console.log('当前被选中的每一项', checkNodes);
+    console.log(
+      '测试测试测试',
+      shareRef,
+      // departHisData,
+      // authorData,
+      // personsData,
+      // personsHisData,
+      // identitysData,
+      // identitysHisData,
+    );
 
     setShowShareModal(false);
   };
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: Product): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item.id } });
-          console.log('按钮事件', 'open', item);
+          history.push({ pathname: '/online', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          history.push({ pathname: '/store/app/info', state: { appId: item.id } });
-          console.log('按钮事件', 'detail', item);
+          StoreContent.selectedProduct(item);
+          history.push({ pathname: '/store/app/info', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'manage',
         label: '管理',
         onClick: () => {
-          history.push({ pathname: '/store/app/manage', state: { appId: item.id } });
-          console.log('按钮事件', 'manage', item);
+          StoreContent.selectedProduct(item);
+          history.push({ pathname: '/store/app/manage', state: { appId: item.prod.id } });
         },
       },
       {
         key: 'putaway',
         label: '上架',
         onClick: () => {
-          console.log('按钮事件', 'putaway', item);
-          history.push({ pathname: '/store/app/putaway', state: { appId: item.id } });
+          StoreContent.selectedProduct(item);
+          history.push({
+            pathname: '/store/app/putaway',
+            state: { appId: item.prod.id },
+          });
         },
       },
       {
         key: 'share',
         label: '共享',
         onClick: () => {
+          StoreContent.selectedProduct(item);
+          shareRef.current?.resetData();
           setShowShareModal(true);
         },
       },
@@ -140,17 +138,18 @@ const StoreApp: React.FC = () => {
         key: 'share2',
         label: '分配',
         onClick: () => {
-          console.log('按钮事件', 'share2', item);
+          StoreContent.selectedProduct(item);
         },
       },
       {
         key: 'save',
         label: '暂存',
         onClick: () => {
-          // setShowPublishListModal(true);
-          setSelectAppInfo({ ...item });
-          history.push({ pathname: '/store/app/publish', state: { appId: item.id } });
-          console.log('按钮事件', 'save', item);
+          StoreContent.selectedProduct(item);
+          history.push({
+            pathname: '/store/app/publish',
+            state: { appId: item.prod.id },
+          });
         },
       },
     ];
@@ -166,21 +165,21 @@ const StoreApp: React.FC = () => {
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
           onTabChange={(key) => {
-            setStatusKey(key);
+            setStatusKey(key as ststusTypes);
           }}>
           <div className={cls['page-content-table']}>
-            {/* <AppShowComp
-              queryFun={Provider.getPerson.getOwnProducts}
+            <AppShowComp
+              queryFun={Provider.getPerson!.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
-              columns={StoreContent.getColumns()}
+              columns={StoreContent.getColumns('myApp')}
               renderOperation={renderOperation}
-            /> */}
+            />
           </div>
         </Card>
       </div>
     );
-  }, [data]);
+  }, [data, statusKey]);
 
   return (
     <>
@@ -198,26 +197,32 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp onCheckeds={onCheckeds} />
+        <ShareComp onCheckeds={onCheckeds}/>
       </Modal>
       {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={selectAppInfo.id} />}></Route>
+        render={() => (
+          <AppInfo appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/publish"
-        render={() => <PublishList appId={selectAppInfo.id} />}></Route>
+        render={() => (
+          <PublishList appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={selectAppInfo.id} />}></Route>
+        render={() => <Manage appId={StoreContent._curProduct?.prod.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
-        render={() => <PutawayComp appId={selectAppInfo.id} />}></Route>
+        render={() => (
+          <PutawayComp appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
     </>
   );
 };

@@ -6,6 +6,7 @@ import sideStyle from './index.module.less';
 import { chatCtrl } from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 import { IChat } from '@/ts/core/chat/ichat';
+import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
 
 /**
@@ -64,6 +65,7 @@ const GroupSideBar: React.FC = () => {
       selectMenu: [
         { value: 1, label: item.isToping ? '取消置顶' : '置顶会话' },
         { value: 2, label: '清空信息' },
+        { value: 3, label: '删除会话' },
       ],
     });
   };
@@ -73,18 +75,23 @@ const GroupSideBar: React.FC = () => {
    * @param {MenuItemType} item
    * @return {*}
    */
-  const handleContextChange = (item: MenuItemType) => {
+  const handleContextChange = async (item: MenuItemType) => {
     let refChat = chatCtrl.refChat(mousePosition.selectedItem);
     if (refChat) {
       switch (item.value) {
         case 1:
           refChat.isToping = !refChat.isToping;
+          refreshUI();
           break;
         case 2:
-          refChat.clearMessage();
+          if (await refChat.clearMessage()) {
+            chatCtrl.changCallback();
+          }
+          break;
+        case 3:
+          chatCtrl.deleteChat(refChat);
           break;
       }
-      refreshUI();
     }
   };
 
@@ -213,22 +220,26 @@ const GroupSideBar: React.FC = () => {
   ];
   return (
     <div className={sideStyle.chart_side_wrap}>
-      <div className={sideStyle.group_side_bar_search}>
-        <Input
-          placeholder="搜索"
-          prefix={<SearchOutlined />}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
+      <ContentMenu width={280}>
+        <div className={sideStyle.group_side_bar_search}>
+          <Input
+            placeholder="搜索"
+            prefix={<SearchOutlined />}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+            }}
+          />
+        </div>
+        <Tabs
+          centered
+          activeKey={index}
+          onTabClick={(k) => {
+            setIndex(k);
           }}
+          items={items}
         />
-      </div>
-      <Tabs
-        centered
-        activeKey={index}
-        onTabClick={(k) => {
-          setIndex(k);
-        }}
-        items={items}></Tabs>
+      </ContentMenu>
+
       {/* 鼠标右键 */}
       {mousePosition.isShowContext ? (
         <div

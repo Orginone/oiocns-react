@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-/* 
-    针对对Boolean之间的切换,展开收起功能
-*/
+/**
+ * @description: 针对对Boolean之间的切换,展开收起功能
+ * @return {*}
+ */
 
 const useToggle = (initialState: boolean = false) => {
   const [toggle, setToggle] = useState(initialState);

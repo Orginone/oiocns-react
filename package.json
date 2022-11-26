@@ -18,12 +18,12 @@
     "lint": "npm run lint:js && npm run lint:prettier && npm run tsc",
     "lint-staged": "lint-staged",
     "lint-staged:js": "eslint --ext .js,.jsx,.ts,.tsx ",
-    "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src ",
-    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
-    "lint:prettier": "prettier -c --write \"src/**/*\" --end-of-line auto",
+    "lint:fix": "eslint --fix --cache --ext .js,.jsx,.ts,.tsx  ./src ",
+    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx ./src",
+    "lint:prettier": "prettier -c --write \"src/**/*.tsx\" --end-of-line auto",
     "deploy": "gh-pages -d dist",
     "postinstall": "husky install",
-    "commitlint": "commitlint --from=master",
+    "commitlint": "commitlint",
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
   "husky": {
@@ -33,7 +33,7 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
+    "./src/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
     "./src/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ],

@@ -1,28 +1,26 @@
 import { TargetType } from '@/module/enums';
 import { kernel } from '@/ts/base';
-import { generateUuid } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import Provider from '@/ts/core/provider';
 import { LoadChats } from '@/ts/core/chat';
+import BaseController from '../baseCtrl';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
 /**
  * 会话控制器
  */
-class ChatController {
-  private _tabIndex: string;
-  private _refreshCallback: { [name: string]: () => void };
-  private _groups: IChatGroup[];
-  private _chats: IChat[];
+class ChatController extends BaseController {
+  private _tabIndex: string = '1';
+  private _groups: IChatGroup[] = [];
+  private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
-  constructor(groups: IChatGroup[]) {
-    this._groups = groups;
-    this._chats = [];
-    this._tabIndex = '1';
-    this._refreshCallback = {};
-    this._initialization();
+  constructor() {
+    super();
+    Provider.onSetPerson(async () => {
+      await this._initialization();
+    });
   }
   /** 通讯录 */
   public get groups() {
@@ -60,6 +58,19 @@ class ChatController {
     return '未知';
   }
   /**
+   * 获取未读数量
+   * @returns 未读数量
+   */
+  public getNoReadCount(): number {
+    let sum = 0;
+    this._groups.forEach((g) => {
+      g.chats.forEach((i) => {
+        sum += i.noReadCount;
+      });
+    });
+    return sum;
+  }
+  /**
    * 设置当前会话
    * @param chat 会话
    */
@@ -75,7 +86,7 @@ class ChatController {
       this._appendChats(this._curChat);
       this._cacheChats();
     }
-    this._callback();
+    this.changCallback();
   }
   /**
    * 是否为当前会话
@@ -97,27 +108,7 @@ class ChatController {
         group.isOpened = !group.isOpened;
       }
     }
-    this._callback();
-  }
-  /**
-   * 订阅变更
-   * @param callback 变更回调
-   * @returns 订阅ID
-   */
-  public subscribe(callback: () => void): string {
-    const id = generateUuid();
-    if (callback) {
-      callback.apply(this, []);
-      this._refreshCallback[id] = callback;
-    }
-    return id;
-  }
-  /**
-   * 取消订阅
-   * @param id 订阅ID
-   */
-  public unsubscribe(id: string): void {
-    delete this._refreshCallback[id];
+    this.changCallback();
   }
   /**
    * 获取引用会话
@@ -136,13 +127,28 @@ class ChatController {
     }
     return chat;
   }
-  /** 初始化 */
-  private _initialization(): void {
-    kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
+  /**
+   * 删除会话
+   * @param chat 会话
+   */
+  public deleteChat(chat: IChat): void {
+    const index = this._chats.findIndex((i) => {
+      return i.fullId === chat.fullId;
     });
+    if (index > -1) {
+      this._chats.splice(index, 1);
+      if (chat.fullId === this._curChat?.fullId) {
+        this._curChat = undefined;
+      }
+      this._cacheChats();
+      this.changCallback();
+    }
+  }
+  /** 初始化 */
+  private async _initialization(): Promise<void> {
+    this._groups = await LoadChats();
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
-      if (data && data.chats && data.chats.length > 0) {
+      if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
           let lchat = this.refChat(item);
           if (lchat) {
@@ -150,14 +156,11 @@ class ChatController {
             this._appendChats(lchat);
           }
         }
-        this._callback();
+        this.changCallback();
       }
     });
-  }
-  /** 变更回调 */
-  private _callback() {
-    Object.keys(this._refreshCallback).forEach((id) => {
-      this._refreshCallback[id].apply(this, []);
+    kernel.on('RecvMsg', (data) => {
+      this._recvMessage(data);
     });
   }
   /**
@@ -180,7 +183,7 @@ class ChatController {
           c.receiveMessage(data, !this.isCurrent(c));
           this._appendChats(c);
           this._cacheChats();
-          this._callback();
+          this.changCallback();
           return;
         }
       }
@@ -221,15 +224,6 @@ class ChatController {
       'user',
     );
   }
-
-  /**
-   * @description: 加载更多
-   * @return {*}
-   */
-  handleGetPerson = async () => {
-    await this._curChat?.morePerson('');
-    this._callback();
-  };
 }
 
-export const chatCtrl = new ChatController(await LoadChats());
+export const chatCtrl = new ChatController();

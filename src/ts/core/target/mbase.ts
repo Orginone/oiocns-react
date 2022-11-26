@@ -236,7 +236,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     // 备注
     remark: string,
     // 监管组织/个人
-    samrId: string = '0',
+    samrId: string,
     // 产品类型名
     ispublic: boolean = true,
   ): Promise<model.ResultType<schema.XMarket>> {
@@ -269,7 +269,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     // 资源列
     resources: model.ResourceModel[] | undefined,
     // 元数据Id
-    thingId: string = '0',
+    thingId?: string,
     // 产品类型名
     typeName: string = 'webApp',
   ): Promise<model.ResultType<schema.XProduct>> {

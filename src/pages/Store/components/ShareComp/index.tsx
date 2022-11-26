@@ -1,17 +1,37 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
-import React, { useState, useEffect, createContext } from 'react';
+import React, { useState, useEffect, useImperativeHandle } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import API from '@/services';
 import cls from './index.module.less';
+import { Product } from '@/ts/core/market';
 
 interface Iprops {
+  curProduct?: Product;
   onCheckeds?: (checkedValus: any) => void;
 }
 // const ShareRecent: React.FC = () => {
+const DestTypes = [
+  {
+    value: 1,
+    label: '组织',
+  },
+  {
+    value: 2,
+    label: '角色',
+  },
+  {
+    value: 3,
+    label: '岗位',
+  },
+  {
+    value: 4,
+    label: '人员',
+  },
+];
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds } = props;
-  const [radio, setRadio] = useState(1);
+  const [radio, setRadio] = useState<number>(1);
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
   const [leftTreeData, setLeftTreeData] = useState([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
@@ -23,6 +43,7 @@ const ShareRecent = (props: Iprops) => {
   const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
   const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
   const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
+  // useImperativeHandle(nodeRef, () => ());
   useEffect(() => {
     getLeftTree();
   }, []);
@@ -33,6 +54,15 @@ const ShareRecent = (props: Iprops) => {
     setIdentitysData([]);
     setCenterTreeData([]);
   }, [radio]);
+  // const resetData = () => {
+  //   getLeftTree();
+  //   setDepartData([]);
+  //   setAuthorData([]);
+  //   setPersonsData([]);
+  //   setIdentitysData([]);
+  //   setCenterTreeData([]);
+  //   setRadio(1);
+  // };
 
   const getLeftTree = async () => {
     const res = await API.cohort.getJoinedCohorts({ data: pageCurrent });
@@ -199,6 +229,7 @@ const ShareRecent = (props: Iprops) => {
   //     });
   //   }
   // };
+
   const handleBoxCancelClick = (hisData: any, dataList: any, data: any) => {
     let result = hisData.some((item: any) => {
       return item.id == data.id;
@@ -246,10 +277,17 @@ const ShareRecent = (props: Iprops) => {
       <div className={cls.top}>
         <p>分享形式：</p>
         <Radio.Group onChange={onChange} value={radio}>
-          <Radio value={1}>按群组共享</Radio>
-          <Radio value={2}>按角色共享</Radio>
-          <Radio value={3}>按身份共享</Radio>
-          <Radio value={4}>按人员共享</Radio>
+          {DestTypes.map((item) => {
+            return (
+              <Radio value={item.value} key={item.value}>
+                按{item.label}共享
+              </Radio>
+            );
+          })}
+          {/* <Radio value={'组织'}>按群组共享</Radio>
+          <Radio value={'角色'}>按角色共享</Radio>
+          <Radio value={'岗位'}>按身份共享</Radio>
+          <Radio value={'人员'}>按人员共享</Radio> */}
         </Radio.Group>
       </div>
       <div className={cls.content}>

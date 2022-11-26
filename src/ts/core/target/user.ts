@@ -12,13 +12,6 @@ import BaseService from './base';
 
 /**
  * 我的设置里面的接口
- * const person: Person = Provider.getPerson;
- * import Provider from '@/ts/core/provider';
-   import Person from '@/ts/core/target/person';   
-
-   import Userdata from '@/ts/core/target/user';
-   Userdata.getInstance().searchCompany();
-   querySelfProduct 我的产品，上架后才是商品
  */
 export default class userdataservice extends BaseService {
   // 单例
@@ -26,7 +19,7 @@ export default class userdataservice extends BaseService {
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(Provider.getPerson.target);
+      this._instance = new userdataservice(Provider.getPerson!.target);
     }
     return this._instance;
   }
@@ -43,7 +36,38 @@ export default class userdataservice extends BaseService {
       TargetType.University,
       TargetType.Group,
       TargetType.Hospital,
+      TargetType.Department,
     ];
+  }
+
+  public async getBelongTargetById(
+    companyId: string,
+    typeName: TargetType,
+    joinTypes: TargetType[],
+  ): Promise<Company[]> {
+    this.target.typeName = typeName;
+    let res = await this.getjoined({
+      spaceId: companyId,
+      JoinTypeNames: joinTypes,
+    });
+
+    let _joinedCompanys: Company[] = [];
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        switch (item.typeName) {
+          case TargetType.University:
+            _joinedCompanys.push(new University(item));
+            break;
+          case TargetType.Hospital:
+            _joinedCompanys.push(new Hospital(item));
+            break;
+          default:
+            _joinedCompanys.push(new Company(item));
+            break;
+        }
+      });
+    }
+    return _joinedCompanys;
   }
 
   /**
@@ -80,6 +104,23 @@ export default class userdataservice extends BaseService {
     return _joinedCompanys;
   }
 
+  public async getBelongTargets(
+    companyId: string,
+    typeName: TargetType,
+  ): Promise<Company[]> {
+    this.target.typeName = typeName;
+    this.target.id = companyId;
+    let res = await this.getSpaceSubDepts();
+
+    let _joinedCompanys: Company[] = [];
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((item) => {
+        _joinedCompanys.push(new Company(item));
+      });
+    }
+    return _joinedCompanys;
+  }
+
   /**
    * 设立单位
    * @param name 单位名称
@@ -90,7 +131,7 @@ export default class userdataservice extends BaseService {
    * @param type 单位类型,默认'单位', 可选:'大学','医院','单位'
    * @returns 是否成功
    */
-  public async createCompany(
+  public async createMyCompany(
     name: string,
     code: string,
     teamName: string,
@@ -116,8 +157,6 @@ export default class userdataservice extends BaseService {
     };
 
     const res = await this._create(data);
-    // 创建公司 或 集团
-    console.log('创建公司 或 集团===', res);
 
     if (res.success) {
       let company;
@@ -157,27 +196,30 @@ export default class userdataservice extends BaseService {
     personIds: string[],
     targetType: TargetType,
   ): Promise<model.ResultType<any>> {
-    return await this.pull({
-      targetType: targetType,
-      targetIds: personIds,
-    });
+    return await this.pull(personIds, targetType);
   }
 
   /**
    * 搜索单位(公司) 数组里面还有target
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
    */
-  public async searchCompany(page: Types.Page): Promise<Types.PageData<XTarget>> {
-    // 入参
+  public async searchMyCompany(
+    page: Types.Page,
+    typeName?: TargetType,
+  ): Promise<Types.PageData<XTarget>> {
     let paramData: any = {};
     paramData.name = page.filter;
     paramData.typeName = TargetType.Company;
+    if (typeName) {
+      paramData.typeName = typeName;
+    }
     paramData.page = {
       offset: 0,
       filter: page.filter,
       limit: common.Constants.MAX_UINT_8,
     };
 
+    // console.log('======param', JSON.stringify(paramData));
     // 结果集
     let pageData: any = {};
     try {
@@ -212,7 +254,7 @@ export default class userdataservice extends BaseService {
   }
 
   /**加入公司或集团等内容 */
-  public async applyJoinCompany(
+  public async applyJoinMyCompany(
     targetId: string,
     teamType: TargetType,
   ): Promise<model.ResultType<any>> {
@@ -226,7 +268,7 @@ export default class userdataservice extends BaseService {
   }
 
   /**取消加入组织或个人 */
-  public async cancelJoinCompany(
+  public async cancelJoinMyCompany(
     targetId: string,
     belongId: string,
     applyType: TargetType,
@@ -238,6 +280,87 @@ export default class userdataservice extends BaseService {
     });
     return res;
   }
+
+  protected async getSpaceSubDepts(): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.queryBelongTargetById({
+      id: this.target.id,
+      typeNames: [TargetType.Company, TargetType.Department],
+      subTypeNames: [TargetType.Department],
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+  }
+
+  /**
+   * 创建部门
+   * @param name 名称
+   * @param code 编号
+   * @param teamName 团队名称
+   * @param teamCode 团队编号
+   * @param remark 简介
+   * @param parentId 上级组织Id 默认公司 公司、部门
+   * @returns 成功返回的里面 包含一个target
+   */
+  public async createDepart(
+    name: string,
+    code: string,
+    teamName: string,
+    teamCode: string,
+    remark: string,
+    parentId: string,
+    // 如果是第一层部门，就是公司，如果是第二层部门，就是部门
+    isTop: boolean,
+    belongId: string,
+  ) {
+    const targetType = TargetType.Department;
+    // 创建部门
+    const res = await kernel.createTarget({
+      name,
+      code,
+      typeName: targetType,
+      belongId,
+      teamName,
+      teamCode,
+      teamRemark: remark,
+    });
+    if (res.success) {
+      // 把部门加入单位
+      const res2 = await kernel.pullAnyToTeam({
+        id: parentId,
+        teamTypes: [isTop ? TargetType.Company : TargetType.Department],
+        targetIds: [res.data?.id],
+        targetType: targetType,
+      });
+      if (!res2.success) {
+        return res2;
+      }
+    }
+    return res;
+  }
+
+  /**
+   * 从部门移除
+   * @param id 好友Id
+   */
+  removeFromTeam = async (
+    personId: string,
+    ids: string[],
+    teamTypes: TargetType,
+  ): Promise<model.ResultType<any>> => {
+    // 从组织机构移除
+    const res = await kernel.removeAnyOfTeam({
+      id: personId,
+      teamTypes: [TargetType.Person],
+      targetIds: ids,
+      targetType: teamTypes,
+    });
+    // 退出公司
+
+    return res;
+  };
 
   /**
    * 创建对象

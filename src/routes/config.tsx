@@ -27,13 +27,13 @@ import React from 'react';
 import { RouteConfig } from 'react-router-config';
 import { Redirect as RouterRedirect } from 'react-router-dom';
 
-import BasicLayout from '@/layouts/Basic';
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
 import PassportLock from '@/pages/Passport/Lock';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
+import BasicLayout from '@/layouts/Basic';
 
 export interface IRouteConfig extends RouteConfig {
   // 路由路径
@@ -120,23 +120,58 @@ const TodoRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Todo/Org')),
       },
       {
+        path: '/todo/appAndStore',
+        title: '商店审核',
+        icon: <ShopOutlined />,
+        // render: () => <div></div>,
+        routes: [
+          {
+            path: '/todo/product',
+            title: '应用上架',
+            icon: <ShopOutlined />,
+            component: React.lazy(() => import('@/pages/Todo/Product')),
+          },
+          {
+            path: '/todo/store',
+            title: '加入市场',
+            icon: <ShopOutlined />,
+            component: React.lazy(() => import('@/pages/Todo/Store')),
+          },
+        ],
+      },
+      {
         path: '/todo/app',
         title: '应用上架',
         icon: <ShopOutlined />,
+        hideInMenu: true,
+        component: React.lazy(() => import('@/pages/Todo/Store')),
+      },
+      {
+        path: '/todo/product',
+        title: '应用上架',
+        icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Product')),
       },
       {
         path: '/todo/store',
         title: '加入市场',
         icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Store')),
       },
-
       {
         path: '/todo/order',
         title: '订单管理',
         icon: <UnorderedListOutlined />,
         component: React.lazy(() => import('@/pages/Todo/Order')),
+      },
+      {
+        path: '/todo/:id',
+        title: '应用待办',
+        icon: <UnorderedListOutlined />,
+        hideInMenu: true,
+        component: React.lazy(() => import('@/pages/Todo/App')),
       },
     ],
   },
@@ -220,6 +255,11 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
+    path: '/market/ShoppingCart',
+    title: '购物车',
+    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart')),
+  },
+  {
     path: '/market',
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
@@ -246,6 +286,12 @@ const MarketRouter: IRouteConfig[] = [
         path: '/market/publicProperty',
         title: '公物仓',
         component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
+      },
+      {
+        path: '/market/usermanagement',
+        title: '用户管理',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/UserManagement')),
       },
       {
         path: '/market',
@@ -378,6 +424,12 @@ const PersonRouter: IRouteConfig[] = [
         title: '群组设置',
         icon: <TeamOutlined />,
         component: React.lazy(() => import('@/pages/Person/Cohort')),
+      },
+      {
+        path: '/person/Role',
+        title: '角色管理',
+        // icon: <Outlined />,
+        component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
       },
       {
         path: '/person/wallet',

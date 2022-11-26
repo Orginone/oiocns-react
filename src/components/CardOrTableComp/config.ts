@@ -1,5 +1,5 @@
 interface DataType {
-  key: React.Key;
+  key: string | ((record: any) => string);
   name: string;
   size: number;
   desc: string;
@@ -132,18 +132,18 @@ export const cohortColumn: ProColumns<any>[] = [
   },
   {
     title: '群组名称',
-    dataIndex: 'name',
+    dataIndex: ['target','name'],
   },
   {
     title: '群组编号',
-    dataIndex: 'code',
+    dataIndex: ['target','code'],
   },
   {
     title: '群组简介',
-    dataIndex: 'remark',
+    dataIndex: ['target','team','remark'],
   },
   {
     title: '归属',
-    dataIndex: 'belongId',
+    dataIndex: ['target','belongId'],
   },
 ];

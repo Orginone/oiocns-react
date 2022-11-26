@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /** 组织对象类型 */
 export enum TargetType {
   Group = '集团',

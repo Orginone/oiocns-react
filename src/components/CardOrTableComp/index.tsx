@@ -9,10 +9,11 @@ import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';
+import { PageShowType } from 'typings/globelType';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string; //唯一key
+  rowKey: string | ((record: T) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -52,6 +53,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
+  // console.log('dayin', dataSource);
 
   // 监听父级高度
   useEffect(() => {
@@ -71,7 +73,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
    * @return {Menu} - 渲染 按钮组
    */
   const menu = (item: any) => {
-    return <Menu items={operation && operation(item)} />;
+    return operation && operation(item); // <Menu items={operation && operation(item)} />;
   };
   /**
    * @desc: 渲染表格主体
@@ -91,7 +93,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             ? [
                 <Dropdown
                   className={cls['operation-btn']}
-                  overlay={menu(record)}
+                  menu={{ items: menu(record) }}
                   key="key">
                   <EllipsisOutlined />
                 </Dropdown>,
@@ -140,7 +142,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         </div>
       </>
     );
-  }, [pageType, dataSource, resetColumns, defaultHeight]);
+  }, [pageType, dataSource, operation, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
    * @return {底部组件}

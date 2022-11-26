@@ -124,14 +124,14 @@ export default class Market {
    * @param page 分页参数
    * @returns 返回商店商品列表
    */
-  public async getMerchandise(
+  public getMerchandise = async (
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMerchandiseArray>> {
+  ): Promise<model.ResultType<XMerchandiseArray>> => {
     return await kernel.searchMerchandise({
       id: this._store.id,
       page: page,
     });
-  }
+  };
 
   /**
    * 获取商品上架申请列表
