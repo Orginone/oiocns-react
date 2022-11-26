@@ -14,6 +14,7 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
 import settingController from '@/ts/controller/setting';
+import { initDatatype } from '@/ts/core/setting/isetting'
 /**
  * 部门设置
  * @returns
@@ -79,6 +80,18 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+  /** 添加人员的逻辑 */ 
+  const onPersonalOk = (params:initDatatype[]) => { 
+    console.log(params);
+    setIsAddOpen(false);
+  }
+
+  /** 设置岗位的逻辑 */ 
+  const handlePostOk = (checkJob:initDatatype,checkUser:initDatatype[]) => { 
+    console.log(checkJob, checkUser);
+    setIsSetPost(false);
+  }
+
   const onOk = () => {
     setIsAddOpen(false);
     setIsSetPost(false);
@@ -267,7 +280,7 @@ useEffect(() => {
       <AddPersonModal
         title={'添加成员'}
         open={isAddOpen}
-        onOk={onOk}
+        onOk={onPersonalOk}
         handleOk={handleOk}
       />
       {/* 查看申请 */}
@@ -286,7 +299,7 @@ useEffect(() => {
         handleOk={handleOk}
       />
       {/* 岗位设置 */}
-      <AddDeptModal title={'岗位设置'} open={isSetPost} onOk={onOk} handleOk={handleOk} />
+      <AddDeptModal title={'岗位设置'} open={isSetPost} onOk={handlePostOk} handleOk={onOk} />
     </div>
   );
 };

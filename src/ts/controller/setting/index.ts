@@ -18,7 +18,6 @@ export interface spaceObjs {
   // 对应公司的ID
   companyId: string;
 }
-<<<<<<< HEAD
 
 // 创建部门的入参
 export type deptParams = {
@@ -40,9 +39,6 @@ export type ObjType = {
   success: boolean;
 };
 class SettingController extends BaseController { 
-=======
-class SettingController extends BaseController {
->>>>>>> dev
   private _isOpenModal: boolean = false;
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
@@ -60,7 +56,6 @@ class SettingController extends BaseController {
     this._isOpenModal = params;
   }
 
-<<<<<<< HEAD
     // 创建二级以下的部门
     public async createSecondDepartment(
       param: deptParams,
@@ -101,9 +96,6 @@ class SettingController extends BaseController {
     }
 
    /**
-=======
-  /**
->>>>>>> dev
    * 递归查询前单位底下的所有部门底下的子部门
    * @param parentId
    * @returns
@@ -128,7 +120,8 @@ class SettingController extends BaseController {
         );
         if (company2s.length > 0) {
           const getValue = await this.getDepartments(comp.target.id);
-          arrayChild = getValue.map((item) => {
+          console.log('getValue',getValue);
+          arrayChild = getValue?.map((item) => {
             return { ...item, icon: React.createElement(Icon['ApartmentOutlined']) };
           });
         }
@@ -143,8 +136,7 @@ class SettingController extends BaseController {
         arrays.push(spaceObj);
       }
     }
-<<<<<<< HEAD
-  
+  }
    /**
    * 创建一级部门
    * @param param parentId 为空就是一级部门
@@ -209,10 +201,6 @@ class SettingController extends BaseController {
       }
       return res.data;
     }
-=======
-    return arrays;
-  }
->>>>>>> dev
 }
 const settingController = new SettingController();
 
