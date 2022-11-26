@@ -1,85 +1,49 @@
 import { TargetType } from '../enum';
-import consts from '../consts';
 import BaseTarget from './base';
-import { kernel, model, schema } from '../../base';
+import { schema } from '../../base';
+import consts from '../consts';
+import { ICohort } from './itarget';
+import { ResultType, TargetModel } from '@/ts/base/model';
 
-export default class Cohort extends BaseTarget {
-  private _myPerson:schema.XTarget[]
+export default class Cohort extends BaseTarget implements ICohort {
+  children: schema.XTarget[];
   constructor(target: schema.XTarget) {
     super(target);
-    this._myPerson=[]
+    this.children = [];
+    this.subTypes = [TargetType.Person, ...consts.CompanyTypes];
+    this.pullTypes = [TargetType.Person, ...consts.CompanyTypes];
+    this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
   }
-
-  public get getMyPerson(){
-    return this._myPerson
+  public async update(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>> {
+    return await super.updateTarget({
+      ...data,
+      teamCode: data.code,
+      teamName: data.name,
+    });
   }
-  /**
-   * 拉人进入群组
-   * @param personIds 人员id数组
-   * @returns 是否成功
-   */
-  public pullPerson = async (personIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(personIds, TargetType.Person);
-  };
-
-  /**
-   * 拉单位进入群组
-   * @param companyIds 单位Id集合
-   * @returns 是否成功
-   */
-  public pullCompanys = async (companyIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(companyIds, TargetType.Company);
-  };
-
-  /**
-   * 修改群组
-   * @param params id:targetId,code:修改后群组编号,TypeName:枚举中取Cohort,belongId: 归属ID,teamName:修改后名称,temcode:修改后编号
-   * ,teamReamrk：修改后描述;
-   * @returns
-   */
-  public async UpdateCohort(params: model.TargetModel): Promise<model.ResultType<any>> {
-    let res = await kernel.updateTarget(params);
+  public async getMember(): Promise<schema.XTarget[]> {
+    if (this.children.length > 0) {
+      return this.children;
+    }
+    const res = await super.getSubTargets(this.subTypes);
     if (res.success) {
-      this.target.name = params.name;
-      this.target.code = params.code;
-      if (this.target.team != undefined) {
-        this.target.team.name = params.name;
-        this.target.team.code = params.code;
-        this.target.team.remark = params.teamRemark;
-      }
+      res.data.result?.forEach((a) => {
+        this.children.push(a);
+      });
     }
-    return res;
+    return this.children;
   }
-
-  /**
-   * 获取群组下的人员（群组）
-   * @param id 组织Id 默认为群组
-   * @returns
-   */
-  public getPersons = async (
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> => {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    const res = await this.getSubTargets(id, [TargetType.Cohort], [TargetType.Person])
-    if(res.success){
-    this._myPerson = res.data.result!;
-    }
-    return res;
-  };
-
-  /**
-   * 获取群组下的单位（群组）
-   * @param id 组织Id 默认为群组
-   * @returns
-   */
-  public async getCompanys(
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    if (id == '0') {
-      id = this.target.id;
-    }
-    return await this.getSubTargets(id, [TargetType.Cohort], consts.CompanyTypes);
+  public async pullMember(
+    targets: schema.XTarget[],
+  ): Promise<ResultType<schema.XRelationArray>> {
+    return await super.pullMember(targets);
+  }
+  public async removeMember(
+    ids: string[],
+    typeName: TargetType,
+  ): Promise<ResultType<any>> {
+    return await super.removeMember(ids, typeName);
   }
 }

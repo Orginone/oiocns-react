@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import personService from '@/module/org/person';
 
@@ -12,7 +12,14 @@ import { PlusOutlined } from '@ant-design/icons';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import { ColumnsType } from 'antd/lib/table';
 import PersonInfoCard from '@/bizcomponents/PersonInfoCard';
-
+import { schema } from '../../../ts/base';
+import PersonInfoEnty from '../../../ts/core/provider';
+import friendController from '../../../ts/controller/friend/index';
+interface OperationType {
+  key: string;
+  label: string;
+  onClick: () => void;
+}
 const columns: ColumnsType<Person> = [
   {
     title: '好友名称',
@@ -43,7 +50,18 @@ const columns: ColumnsType<Person> = [
     render: (_, person) => person.team?.remark,
   },
 ];
-
+const renderOperation = (item: schema.XTarget): OperationType[] => {
+  return [
+    {
+      key: 'enterChat',
+      label: '删除',
+      onClick: () => {
+        friendController.deleteFriend(PersonInfoEnty.getPerson!, item.id);
+        console.log('按钮事件', 'enterChat', item);
+      },
+    },
+  ];
+};
 /**
  * 好友设置
  * @returns
@@ -52,32 +70,38 @@ const PersonFriend: React.FC = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friend, setFriend] = useState<Person>();
-  const { data } = useQuery<PageData<Person>>(['person.getFriends'], () =>
-    personService.getFriends({ page: 1, pageSize: 20 }),
-  );
+  const [data, setData] = useState<schema.XTarget[]>([]);
 
-  const mutation = useMutation((id: string) => personService.applyJoin(id), {
-    onSuccess: (data) => {
-      if (data.success) {
-        queryClient.invalidateQueries(['person.getFriends']);
-        message.success('添加好友成功!');
-      } else {
-        message.error(data.msg);
-      }
-    },
-  });
-
-  const renderCard = () => {
-    return data?.data.map((person: Person) => {
-      return (
-        <Col span={8} key={person.id}>
-          <div className={cls['person-frend-info-card']}>
-            <PersonInfoCard person={person} key={person.id} />
-          </div>
-        </Col>
-      );
-    });
+  useEffect(() => {
+    friendController.setCallBack(setData);
+    // friendController.setCallBack(setData);
+    getData();
+  }, []);
+  const getData = async () => {
+    setData(await friendController.getMyFriend());
   };
+  // const mutation = useMutation((id: string) => personService.applyJoin(id), {
+  //   onSuccess: (data) => {
+  //     if (data.success) {
+  //       queryClient.invalidateQueries(['person.getFriends']);
+  //       message.success('添加好友成功!');
+  //     } else {
+  //       message.error(data.msg);
+  //     }
+  //   },
+  // });
+
+  // const renderCard = () => {
+  //   return data?.data.map((person: Person) => {
+  //     return (
+  //       <Col span={8} key={person.id}>
+  //         <div className={cls['person-frend-info-card']}>
+  //           <PersonInfoCard person={person} key={person.id} />
+  //         </div>
+  //       </Col>
+  //     );
+  //   });
+  // };
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -85,9 +109,11 @@ const PersonFriend: React.FC = () => {
 
   const handleOk = () => {
     setIsModalOpen(false);
-    if (friend) {
-      mutation.mutate(friend?.id);
-    }
+    // if (friend) {
+    //   mutation.mutate(friend?.id);
+    // }
+
+    console.log(friend);
   };
 
   const handleCancel = () => {
@@ -115,9 +141,10 @@ const PersonFriend: React.FC = () => {
     <div className={cls['person-friend-container']}>
       {top}
       <CardOrTable
-        dataSource={data?.data || []}
-        total={data?.total}
-        renderCardContent={renderCard}
+        dataSource={data}
+        total={data.length}
+        operation={renderOperation}
+        // renderCardContent={renderCard}
         columns={columns as any}
         rowKey={'id'}
       />
@@ -129,7 +156,11 @@ const PersonFriend: React.FC = () => {
         onCancel={handleCancel}
         width={500}>
         <div>
-          <SearchPerson searchCallback={searchCallback}></SearchPerson>
+          {
+            <SearchPerson
+              person={PersonInfoEnty.getPerson!}
+              searchCallback={searchCallback}></SearchPerson>
+          }
         </div>
       </Modal>
     </div>

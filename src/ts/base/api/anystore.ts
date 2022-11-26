@@ -298,11 +298,16 @@ export default class AnyStore {
   /**
    * 删除文件系统项
    * @param {string} key 完整路径
+   * @param {boolean} isDirectory 是否为目录
    * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType<boolean>} 移除异步结果
    */
-  public async objectDelete(key: string, domain: string): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('ObjectDelete', key, domain);
+  public async objectDelete(
+    key: string,
+    isDirectory: boolean,
+    domain: string,
+  ): Promise<ResultType<any>> {
+    return await this._storeHub.invoke('ObjectDelete', key, isDirectory, domain);
   }
   /**
    * 对象变更通知

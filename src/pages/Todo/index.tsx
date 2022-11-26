@@ -48,7 +48,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     const splitKey = e.key.split('/');
     todoService.currentModel = splitKey[splitKey.length - 1]; // 设置当前模块
     history.push(`${e.key}`);
-    siderBar.handleClickMenu(e.label, e.item?.props?.node); // 出发控制器事件 生成面包屑数据
+    siderBar.handleClickMenu(e.item?.props.node); // 出发控制器事件 生成面包屑数据
   };
 
   return (

@@ -32,6 +32,10 @@ export interface IFileSystemItem {
    */
   create(name: string): Promise<boolean>;
   /**
+   * 删除文件系统项（目录）
+   */
+  delete(): Promise<boolean>;
+  /**
    * 重命名
    * @param name 新名称
    */
