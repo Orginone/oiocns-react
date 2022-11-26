@@ -3,6 +3,7 @@ import { TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
 import Provider from '../provider';
+import { IAuthority } from './authority/iauthority';
 
 export default class BaseTarget {
   public target: schema.XTarget;
@@ -286,7 +287,7 @@ export default class BaseTarget {
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(): Promise<Authority | undefined> {
+  public async selectAuthorityTree(): Promise<IAuthority | undefined> {
     if (this.authorityTree != undefined) {
       return this.authorityTree;
     }
