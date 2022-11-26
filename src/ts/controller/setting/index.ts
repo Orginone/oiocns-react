@@ -6,6 +6,8 @@ import React from 'react';
 import * as Icon from '@ant-design/icons';
 import Types from '@/module/typings';
 import { XTarget } from '../../base/schema';
+import { model } from '../../base';
+import Provider from '../../core/provider';
 export interface spaceObjs {
   id: string;
   title: string;
@@ -185,6 +187,20 @@ class SettingController extends BaseController {
         msg: res.msg,
         success: res.success,
       };
+    }
+  
+    // 查询公司底下所有的用户
+    public async searchAllPersons(departId?: string): Promise<XTarget[]> {
+      const comp: Company = new Company(Provider.getPerson?.target!);
+      let res: model.ResultType<any>;
+      if (departId == null) {
+        res = await comp.getPersons(this.companyID);
+        console.log('===查询公司底下的用户', res);
+      } else {
+        res = await comp.getPersons(departId);
+        console.log('===查询部门底下的用户', res);
+      }
+      return res.data;
     }
 }
 const settingController = new SettingController();

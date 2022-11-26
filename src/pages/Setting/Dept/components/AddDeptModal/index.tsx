@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Card, Row, Col, Checkbox, Button } from 'antd';
+import { Modal, Card, Row, Col, Checkbox, Button, message } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -26,6 +26,7 @@ const AddDeptModal = (props: Iprops) => {
   };
   const onChange = (val: any) => {
     console.log('1111111', val);
+    message.warning('点击了岗位设置')
   };
 
   const cardLeft = (

@@ -104,6 +104,7 @@ const SettingDept: React.FC = () => {
   })
   return settingController.remove('isOpenModal', () => { 
     setIsOpenModal(false);
+    setIsCreateDept(false);
   })
 }, []);
 
@@ -120,6 +121,15 @@ useEffect(() => {
     setIsCreateDept(false);
   })
 }, []);
+  
+  useEffect(() => { 
+    initData();
+  }, [selectId])
+
+  const initData =async () => { 
+    const resultData = await settingController.searchAllPersons(selectId);
+    console.log(resultData);
+  }
 
   // 标题tabs页
   const TitleItems = [
@@ -188,7 +198,9 @@ useEffect(() => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {}}>
+        <Button type="link" onClick={() => {
+           setIsSetPost(true);
+        }}>
           岗位设置
         </Button>
         <Button
