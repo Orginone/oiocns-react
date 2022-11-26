@@ -14,7 +14,7 @@ export interface spaceObjs {
   // 对应公司的ID
   companyId: string;
 }
-class SettingController extends BaseController { 
+class SettingController extends BaseController {
   private _isOpenModal: boolean = false;
     // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();

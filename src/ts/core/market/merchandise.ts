@@ -1,10 +1,10 @@
-import { common, kernel, model } from '../../base';
+import { kernel, model } from '../../base';
 import { XMerchandise, XOrderDetailArray } from '../../base/schema';
 import { CommonStatus } from '../enum';
+import IMerchandise from './imerchandise';
 
-export default class Merchandise {
-  // 商品实例
-  public readonly merchandise: XMerchandise;
+export default class Merchandise implements IMerchandise {
+  merchandise: XMerchandise;
 
   constructor(merchandise: XMerchandise) {
     this.merchandise = merchandise;
@@ -47,7 +47,7 @@ export default class Merchandise {
    * @param page 分页参数
    * @returns 交易情况
    */
-  public async getOrder(
+  public async getSellOrder(
     page: model.PageRequest,
   ): Promise<model.ResultType<XOrderDetailArray>> {
     return await kernel.querySellOrderListByMerchandise({

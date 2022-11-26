@@ -182,7 +182,7 @@ export default class BaseTarget {
           limit: common.Constants.MAX_UINT_16,
         },
         spaceId: Provider.spaceId,
-        JoinTypeNames: this.joinTargetType,
+        JoinTypeNames: typeNames,
       });
     }
     return faildResult(consts.UnauthorizedError);

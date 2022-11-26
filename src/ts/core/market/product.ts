@@ -1,86 +1,85 @@
-import { kernel, model } from '../../base';
-import { XMerchandise, XProduct, XResource } from '../../base/schema';
+import { CommonStatus } from './../enum';
+import { common } from '@/ts/base';
+import Provider from '@/ts/core/provider';
+import { kernel, model, schema } from '../../base';
+import IResource from './iresource';
+import Resource from './resource';
+import IProduct from './iproduct';
+import IMerchandise from './imerchandise';
+import Merchandise from './merchandise';
 
-export default class Product {
-  // 应用实体
-  public readonly prod: XProduct;
-  private _resource: XResource[] | undefined;
-  // 应用对应的商品列表
-  private _merchandise: XMerchandise[];
+export default class Product implements IProduct {
+  prod: schema.XProduct;
+  resource: IResource[];
+  merchandises: IMerchandise[];
 
-  constructor(prod: XProduct) {
+  constructor(prod: schema.XProduct) {
     this.prod = prod;
-    this._merchandise = [];
-    if (prod.resource != undefined) {
-      this._resource = prod.resource;
-    } else {
-      this._resource = [];
-    }
+    this.merchandises = [];
+    this.resource = [];
+    prod.resource?.forEach((a) => {
+      this.resource?.push(new Resource(a));
+    });
   }
-
-  /**
-   * 拓展操作 (应用分享/资源分发)
-   * @param sourceId 操作的Id 应用Id/资源Id
-   * @param sourceType 操作对象类型
-   * @param spaceId 工作空间Id
-   * @param teamId 组织Id
-   * @param destIds 目标Id
-   * @param destType 目标类型
-   * @returns
-   */
-  public async Extend(
-    sourceId: string,
-    sourceType: '产品' | '资源',
-    spaceId: string,
+  public async getMerchandises(): Promise<IMerchandise[]> {
+    if (this.merchandises.length > 0) {
+      return this.merchandises;
+    }
+    const res = await kernel.queryMerchandiseListByProduct({
+      id: this.prod.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
+    });
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.merchandises.push(new Merchandise(a));
+      });
+    }
+    return this.merchandises;
+  }
+  public async createExtend(
     teamId: string,
     destIds: string[],
     destType: string,
   ): Promise<model.ResultType<any>> {
     return await kernel.createSourceExtend({
-      sourceId,
-      sourceType,
+      sourceId: this.prod.id,
+      sourceType: '产品',
+      spaceId: Provider.spaceId,
       destIds,
       destType,
-      spaceId,
       teamId,
     });
   }
-
-  /**
-   * 查询拓展 (应用分享/资源分发)
-   * @param sourceId 操作的Id 应用Id/资源Id
-   * @param sourceType 操作对象类型
-   * @param spaceId 工作空间Id
-   * @param destType 目标类型
-   * @param teamId 组织Id
-   * @returns
-   */
+  public async deleteExtend(
+    teamId: string,
+    destIds: string[],
+    destType: string,
+  ): Promise<model.ResultType<any>> {
+    return await kernel.deleteSourceExtend({
+      sourceId: this.prod.id,
+      sourceType: '产品',
+      destIds,
+      destType,
+      spaceId: Provider.spaceId,
+      teamId,
+    });
+  }
   public async queryExtend(
-    sourceId: string,
-    sourceType: '产品' | '资源',
-    spaceId: string,
     destType: string,
     teamId?: string,
   ): Promise<model.ResultType<model.IdNameArray>> {
     return await kernel.queryExtendBySource({
-      sourceId,
-      sourceType,
-      spaceId,
+      sourceId: this.prod.id,
+      sourceType: '产品',
+      spaceId: Provider.spaceId,
       destType,
       teamId,
     });
   }
-
-  /**
-   * 上架商品
-   * @param params.Caption 标题
-   * @param params.MarketId 市场ID
-   * @param params.SellAuth 售卖权限
-   * @param params.Information 详情信息
-   * @param {number} params.Price 价格
-   * @param {string} params.Days 期限
-   * @returns 是否上架成功
-   */
   public async publish(params: {
     caption: string;
     marketId: string;
@@ -99,36 +98,25 @@ export default class Product {
       days: params.days || '0',
       productId: this.prod.id,
     });
-
     if (res.success) {
-      this._merchandise.unshift(res.data);
+      if (res.data.status >= CommonStatus.ApproveStartStatus) {
+        this.merchandises.push(new Merchandise(res.data));
+      }
     }
     return res;
   }
-
-  /**
-   * 下架商品
-   * @param merchandiseId 下架商品ID
-   * @returns 下架是否成功
-   */
-  public async unPublish(
-    merchandiseId: string,
-    belongId: string,
-  ): Promise<model.ResultType<any>> {
+  public async unPublish(id: string): Promise<model.ResultType<any>> {
     const res = await kernel.deleteMerchandise({
-      belongId: belongId,
-      id: merchandiseId,
+      id,
+      belongId: Provider.spaceId,
     });
     if (res.success) {
-      delete this._merchandise[
-        this._merchandise.findIndex((merchandise) => {
-          return merchandise.id == merchandiseId;
-        })
-      ];
+      this.merchandises = this.merchandises.filter((a) => {
+        return a.merchandise.id != id;
+      });
     }
     return res;
   }
-
   public async update(
     name: string,
     code: string,
@@ -151,7 +139,10 @@ export default class Product {
       this.prod.code = code;
       this.prod.typeName = typeName;
       this.prod.remark = remark;
-      this._resource = res.data.resource ?? [];
+      this.resource = [];
+      res.data.resource?.forEach((a) => {
+        this.resource.push(new Resource(a));
+      });
     }
     return res;
   }

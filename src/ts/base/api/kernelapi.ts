@@ -1853,11 +1853,11 @@ export default class KernelApi {
   }
   /**
    * 移除市场成员
-   * @param {model.IdReqModel} params 请求参数
+   * @param {model.MarketPullModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
   public async removeMarketMember(
-    params: model.IdReqModel,
+    params: model.MarketPullModel,
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'market',
