@@ -1,6 +1,9 @@
 import { schema } from '@/ts/base';
 import { XMarketRelation, XMerchandise, XRelation } from '@/ts/base/schema';
 
+export type XFlowTaskItem = schema.XFlowTask & { node: TodoItem };
+export type XFlowTaskHistoryItem = schema.XFlowTaskHistory & { node: TodoItem };
+export type XFlowInstanceItem = schema.XFlowInstance & { node: TodoItem };
 /**
  * 应用待办&平台待办
  * */
@@ -12,21 +15,21 @@ export interface iTodo {
   /**@count  待办数量*/
   count: number;
   /**@todoList  待办数据列表*/
-  todoList: TodoItem[] | undefined;
+  todoList: XFlowTaskItem[];
   /**@doList  已办数据列表*/
-  doList: TodoItem[] | undefined;
+  doList: XFlowTaskHistoryItem[];
   /**@noticeList  待审阅抄送列表*/
-  noticeList?: TodoItem[] | undefined;
+  noticeList?: XFlowTaskHistoryItem[];
   /**@applyList  我的申请数据列表*/
-  applyList: TodoItem[] | undefined;
+  applyList: XFlowInstanceItem[];
   /**@desc 获取待办列表 */
-  getTodoList: () => Promise<TodoItem[] | undefined>;
+  getTodoList: () => Promise<XFlowTaskItem[] | undefined>;
   /**@desc 获取已办列表 */
-  getDoList: () => Promise<TodoItem[] | undefined>;
+  getDoList: () => Promise<XFlowTaskHistoryItem[] | undefined>;
   /**@desc 获取待shenyuechaosx列表 */
-  getNoticeList?: () => Promise<TodoItem[] | undefined>;
+  getNoticeList?: () => Promise<XFlowTaskHistoryItem[] | undefined>;
   /**@desc 获取申请列表 */
-  getApplyList: () => Promise<TodoItem[] | undefined>;
+  getApplyList: () => Promise<XFlowInstanceItem[] | undefined>;
 }
 
 /**todoItem 应用待办数据*/

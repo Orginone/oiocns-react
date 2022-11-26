@@ -1,4 +1,12 @@
-import { iTodo, StytemITodo, StytemTodosType, TodoItem } from './interface';
+import {
+  iTodo,
+  StytemITodo,
+  StytemTodosType,
+  TodoItem,
+  XFlowTaskItem,
+  XFlowTaskHistoryItem,
+  XFlowInstanceItem,
+} from './interface';
 import { common, kernel, model, schema } from '../../base';
 import Provider from '../provider';
 import { CommonStatus, TargetType } from '../enum';
@@ -8,41 +16,49 @@ import { XRelation } from '../../base/schema';
 export class ApplicationTodo implements iTodo {
   id: string;
   name: string;
-  todoList: ApplicationTodoItem[] | undefined;
-  doList: ApplicationTodoItem[] | undefined;
-  noticeList: ApplicationTodoItem[] | undefined;
-  applyList: ApplicationTodoItem[] | undefined;
+  todoList: XFlowTaskItem[];
+  doList: XFlowTaskHistoryItem[];
+  noticeList: XFlowTaskHistoryItem[];
+  applyList: XFlowInstanceItem[];
   count: number = 0;
   constructor(id: string, name: string) {
     this.id = id;
     this.name = name;
+    this.todoList = [];
+    this.doList = [];
+    this.noticeList = [];
+    this.applyList = [];
   }
 
   public getTodoList = async () => {
+    if (this.todoList.length > 0) return this.todoList;
     const result = await kernel.queryApproveTask({ id: this.id });
-    return (this.todoList = this._createTodoItem(result));
+    return (this.todoList = this._createTodoItem(result) as XFlowTaskItem[]);
   };
   public getDoList = async () => {
+    if (this.doList.length > 0) return this.doList;
     const result = await kernel.queryRecord({
       id: this.id,
       spaceId: Provider.userId,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
 
-    return (this.doList = this._createTodoItem(result));
+    return (this.doList = this._createTodoItem(result) as XFlowTaskHistoryItem[]);
   };
   public getNoticeList = async () => {
+    if (this.noticeList.length > 0) return this.noticeList;
     const result = await kernel.queryNoticeTask({ id: this.id });
-    return (this.noticeList = this._createTodoItem(result));
+    return (this.noticeList = this._createTodoItem(result) as XFlowTaskHistoryItem[]);
   };
   public getApplyList = async () => {
+    if (this.applyList.length > 0) return this.applyList;
     const result = await kernel.queryInstance({
       id: this.id,
       spaceId: Provider.userId,
       status: 1,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
-    return (this.applyList = this._createTodoItem(result));
+    return (this.applyList = this._createTodoItem(result) as XFlowInstanceItem[]);
   };
 
   /**生成待办数据实例 */
@@ -52,7 +68,7 @@ export class ApplicationTodo implements iTodo {
     >,
   ) => {
     if (result.success && result.data && result.data.total > 0) {
-      return result.data.result!.map((n) => new ApplicationTodoItem(n));
+      return result.data.result!.map((n) => ({ ...n, node: new ApplicationTodoItem(n) }));
     } else {
       return [];
     }
@@ -134,7 +150,7 @@ export class FriendTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await Provider.getPerson?.queryjoinApproval();
+    const res = await Provider.getPerson?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName === TargetType.Person;
@@ -212,7 +228,7 @@ export class TeamTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await Provider.getPerson?.queryjoinApproval();
+    const res = await Provider.getPerson?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName !== TargetType.Person;
@@ -240,8 +256,8 @@ export class TeamTodo extends BaseTodo {
   approve = async (
     target: schema.XRelation,
   ): Promise<model.ResultType<schema.XRelation>> => {
-    const result = await Provider.getPerson!.approvalJoinApply(
-      target.id,
+    const result = await Provider.getPerson!.approvalFriendApply(
+      target,
       CommonStatus.ApplyStartStatus,
     );
     if (result.success) {
@@ -254,8 +270,8 @@ export class TeamTodo extends BaseTodo {
     return result;
   };
   reject = async (target: schema.XRelation) => {
-    const result = await Provider.getPerson!.approvalJoinApply(
-      target.id,
+    const result = await Provider.getPerson!.approvalFriendApply(
+      target,
       CommonStatus.RejectStartStatus,
     );
     if (result.success) {
