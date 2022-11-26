@@ -92,6 +92,10 @@ const SettingDept: React.FC = () => {
     setIsSetPost(false);
   }
 
+  const onApplyOk = () =>{ 
+    setLookApplyOpen(false);
+  }
+
   const onOk = () => {
     setIsAddOpen(false);
     setIsSetPost(false);
@@ -287,7 +291,7 @@ useEffect(() => {
       <LookApply
         title={'查看申请'}
         open={isLookApplyOpen}
-        onOk={onOk}
+        onOk={onApplyOk}
         handleOk={handleOk}
       />
 
