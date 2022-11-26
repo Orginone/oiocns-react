@@ -9,7 +9,7 @@ import CohortController from '../../../../../ts/controller/cohort/index';
 interface indexType {
   open: boolean;
   setOpen: Function;
-  data: schema.XAuthority[];
+  data: schema.XAuthority;
   id: string;
 }
 type target = {
@@ -27,7 +27,7 @@ interface DataItem {
   target: target;
 }
 
-function getColumns(data: schema.XAuthority[]): ProFormColumnsType<DataItem>[] {
+function getColumns(data: schema.XAuthority): ProFormColumnsType<DataItem>[] {
   const columns: ProFormColumnsType<DataItem>[] = [
     {
       // width: 'md',
@@ -97,7 +97,7 @@ function getColumns(data: schema.XAuthority[]): ProFormColumnsType<DataItem>[] {
       dataIndex: 'cascader',
       width: 270,
       fieldProps: {
-        options: data,
+        options: [data],
         fieldNames: {
           children: 'nodes',
           label: 'name',

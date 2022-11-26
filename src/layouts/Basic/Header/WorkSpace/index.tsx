@@ -94,18 +94,17 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (Provider.getPerson) {
-      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
-        setMenuList(allWorkSpaces);
-        Provider.getWorkSpace().then((curspace) => {
-          setCurrent(
-            allWorkSpaces.find((space) => {
-              return space.id == curspace?.target.id;
-            }),
-          );
-        });
-      });
-    }
+    // if (Provider.getPerson) {
+    //   Provider.getAllWorkSpaces().then((allWorkSpaces) => {
+    //     setMenuList(allWorkSpaces);
+    //     const curspace = Provider.getWorkSpace();
+    //     setCurrent(
+    //       allWorkSpaces.find((space) => {
+    //         return space.id == curspace?.target.id;
+    //       }),
+    //     );
+    //   });
+    // }
   }, []);
 
   return Provider.getPerson ? (

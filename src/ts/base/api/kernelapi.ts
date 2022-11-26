@@ -713,7 +713,7 @@ export default class KernelApi {
    */
   public async pullAnyToTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<boolean>> {
+  ): Promise<model.ResultType<schema.XRelationArray>> {
     return await this.request({
       module: 'target',
       action: 'PullAnyToTeam',
@@ -1410,7 +1410,7 @@ export default class KernelApi {
    * 查询软件共享仓库的市场
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */
-  public async getPublicMarket(): Promise<model.ResultType<schema.XMarket>> {
+  public async getPublicMarket(): Promise<model.ResultType<schema.XMarketArray>> {
     return await this.request({
       module: 'market',
       action: 'GetPublicMarket',
