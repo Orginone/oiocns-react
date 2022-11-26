@@ -71,6 +71,23 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
+  async delete(): Promise<boolean> {
+    const res = await kernel.anystore.objectDelete(
+      this._formatKey(),
+      this.target.isDirectory,
+      'user',
+    );
+    if (res.success) {
+      const index = this.parent?.children.findIndex((item) => {
+        return item.key == this.key;
+      });
+      if (index && index > -1) {
+        this.parent?.children.splice(index, 1);
+      }
+      return true;
+    }
+    return false;
+  }
   async copy(destination: IFileSystemItem): Promise<boolean> {
     if (destination.target.isDirectory && this.key != destination.key) {
       const res = await kernel.anystore.objectCopy(
