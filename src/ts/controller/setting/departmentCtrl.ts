@@ -33,6 +33,38 @@ class DepartmentController extends BaseController {
     this._curDepartment = department;
     this.changCallback();
   }
+
+  /** 删除部门 */
+  public deleteDepartMent(id: string) {
+    if (this._curDepartment?.target.id == id) {
+      this._curDepartment = undefined;
+    }
+    // 一级部门
+    const depart = this._departments.find((a) => {
+      return a.target.id == id;
+    });
+    if (depart != undefined) {
+      (settingCtrl.getCurWorkSpace?.target as ICompany).deleteDepartment(id);
+      this._departments = this._departments.filter((a) => a.target.id != id);
+    } else {
+      this._departments.find((a) => {
+        this._deleteDepartment(id, a);
+      });
+    }
+    this.changCallback();
+  }
+
+  private async _deleteDepartment(id: string, department: IDepartment) {
+    const res = await department.getDepartments();
+    res.find((a) => {
+      if (a.target.id == id) {
+        department.deleteDepartment(id);
+        return;
+      } else {
+        this._deleteDepartment(id, a);
+      }
+    });
+  }
 }
 
 export const departmentCtrl = new DepartmentController();

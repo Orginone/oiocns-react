@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Table, Tag, Dropdown } from 'antd';
+import { Modal, Table, Tag, Dropdown, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
@@ -11,12 +11,24 @@ interface Iprops {
   handleOk: () => void;
 }
 
+
+const LookApply = (props: Iprops) => {
+
+const { title, open, onOk, handleOk } = props;
+
+
 const items = [
   //操作行
   {
     key: '1',
     label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+      <a onClick={() => { 
+        Modal.confirm({
+          title: '提示', content: '是否确认通过该申请', onOk: () => {
+            message.success('申请已通过');
+            onOk();
+        }})
+      } }>
         通过
       </a>
     ),
@@ -24,7 +36,13 @@ const items = [
   {
     key: '2',
     label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+      <a onClick={() => { 
+        Modal.confirm({
+          title: '提示', content: '是否确认拒绝该申请', onOk: () => {
+            message.success('申请已被拒绝');
+            onOk();
+        }})
+      }}>
         拒绝
       </a>
     ),
@@ -80,8 +98,6 @@ const columns: ColumnsType<DataType> = [
   },
 ];
 
-const LookApply = (props: Iprops) => {
-  const { title, open, onOk, handleOk } = props;
   return (
     <Modal title={title} open={open} onOk={onOk} onCancel={handleOk}>
       <Table

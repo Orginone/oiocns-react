@@ -3,15 +3,15 @@ import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import { Person } from '../../module/org/index';
 import PersonInfoCard from './../PersonInfoCard';
-import CohortController from '../../ts/controller/cohort/index'
+import CohortController from '../../ts/controller/cohort/index';
 import personService from '../../module/org/person';
 import cls from './index.module.less';
 import person from '../../ts/core/target/person';
-
+import { schema } from '../../ts/base';
 type SearchPersonProps = {
   // eslint-disable-next-line no-unused-vars
-  searchCallback: (person: Person) => void;
-  person:person;
+  searchCallback: (person: schema.XTarget) => void;
+  person: person;
 };
 
 /**
@@ -33,20 +33,20 @@ const personInfoList: React.FC<Person[]> = (persons) => (
  * 搜索人员
  * @returns
  */
-const SearchPerson: React.FC<SearchPersonProps> = ({searchCallback,person }) => {
+const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback, person }) => {
   const [value, setValue] = useState<string>();
   const [persons, setPersons] = useState<Person[]>([]);
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
-      const res = await CohortController.searchPerson(person,e.target.value)
-      console.log(res)
+      const res = await CohortController.searchPerson(person, e.target.value);
+      console.log(res);
       // const res = await personService.searchPerson(e.target.value);
-      if(res.data.result!=null){
-      setPersons(res.data.result);
-      searchCallback(res.data.result[0]);
+      if (res.data.result != null) {
+        setPersons(res.data.result);
+        searchCallback(res.data.result[0]);
       }
-      console.log("length",persons)
+      console.log('length', persons);
     }
   };
 
@@ -63,10 +63,8 @@ const SearchPerson: React.FC<SearchPersonProps> = ({searchCallback,person }) => 
         value={value}
         onChange={keyWordChange}
       />
-      <div>{persons!=[] && personInfoList(persons)}</div>
-      {value && persons ==[] && (
-        <Result icon={<SmileOutlined />} title="暂无此用户" />
-      )}
+      <div>{persons != [] && personInfoList(persons)}</div>
+      {value && persons == [] && <Result icon={<SmileOutlined />} title="暂无此用户" />}
     </div>
   );
 };

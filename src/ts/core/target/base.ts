@@ -94,7 +94,7 @@ export default class BaseTarget {
    * @param TypeName 类型
    * @returns
    */
-  protected async searchTargetByName(
+  public async searchTargetByName(
     code: string,
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
@@ -118,7 +118,7 @@ export default class BaseTarget {
    * @param typeName 对象
    * @returns
    */
-  protected async applyJoin(
+  public async applyJoin(
     destId: string,
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {

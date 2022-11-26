@@ -500,11 +500,17 @@ export interface ICompany {
     data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
   /**
-   * 删除集团
-   * @param id 集团Id
+   * 删除子部门
+   * @param id 部门Id
    * @returns
    */
-  deleteGroup(id: string): Promise<ResultType<any>>;
+  deleteDepartment(id: string): Promise<ResultType<any>>;
+  /**
+   * 删除工作组
+   * @param id 工作组Id
+   * @returns
+   */
+  deleteWorking(id: string): Promise<ResultType<any>>;
   /**
    * 解散群组
    * @param id 群组id

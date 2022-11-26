@@ -70,6 +70,36 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return res;
   }
+  public async deleteDepartment(id: string): Promise<ResultType<any>> {
+    const department = this.departments.find((department) => {
+      return department.target.id == id;
+    });
+    if (department != undefined) {
+      let res = await this.deleteSubTarget(id, TargetType.Department);
+      if (res.success) {
+        this.departments = this.departments.filter((department) => {
+          return department.target.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
+  public async deleteWorking(id: string): Promise<ResultType<any>> {
+    const working = this.workings.find((working) => {
+      return working.target.id == id;
+    });
+    if (working != undefined) {
+      let res = await this.deleteSubTarget(id, TargetType.Working);
+      if (res.success) {
+        this.workings = this.workings.filter((working) => {
+          return working.target.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.UnauthorizedError);
+  }
   public async deleteGroup(id: string): Promise<ResultType<any>> {
     const group = this.joinedGroup.find((group) => {
       return group.target.id == id;
