@@ -3,7 +3,7 @@ import Cohort from './cohort';
 import consts from '../consts';
 import MarketTarget from './mbase';
 import { TargetType } from '../enum';
-import { ResultType } from '@/ts/base/model';
+import { ResultType, TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { faildResult, schema, kernel, common } from '@/ts/base';
@@ -40,22 +40,11 @@ export default class Company extends MarketTarget implements ICompany {
     this.searchTargetType = [TargetType.Person, TargetType.Cohort, TargetType.Group];
   }
   public async createGroup(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
-    const tres = await this.searchTargetByName(name, TargetType.Group);
+    const tres = await this.searchTargetByName(data.code, TargetType.Group);
     if (!tres.data) {
-      const res = await this.createTarget(
-        name,
-        code,
-        TargetType.Group,
-        teamName,
-        teamCode,
-        remark,
-      );
+      const res = await this.createTarget(data);
       if (res.success) {
         const group = new Group(res.data);
         this.joinedGroup.push(group);
@@ -67,18 +56,13 @@ export default class Company extends MarketTarget implements ICompany {
     }
   }
   public async createCohort(
-    name: string,
-    code: string,
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
-    const res = await this.createTarget(
-      name,
-      code,
-      TargetType.Cohort,
-      name,
-      code,
-      remark,
-    );
+    const res = await this.createTarget({
+      ...data,
+      teamCode: data.code,
+      teamName: data.name,
+    });
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
       this.joinedCohort.push(cohort);
@@ -205,16 +189,12 @@ export default class Company extends MarketTarget implements ICompany {
     return this.joinedGroup;
   }
   public async update(
-    name: string,
-    code: string,
-    teamName: string = '',
-    teamCode: string = '',
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<schema.XTarget>> {
-    if (!validIsSocialCreditCode(code)) {
+    if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');
     }
-    return await super.updateTarget(name, code, teamName, teamCode, remark);
+    return await super.updateTarget(data);
   }
   public async applyJoinCohort(id: string): Promise<ResultType<any>> {
     const cohort = this.joinedCohort.find((cohort) => {

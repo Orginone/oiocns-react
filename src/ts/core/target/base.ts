@@ -24,30 +24,19 @@ export default class BaseTarget {
   }
 
   protected async createSubTarget(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-    targetType: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.subTypes.includes(targetType)) {
-      const res = await this.createTarget(
-        name,
-        code,
-        targetType,
-        teamName,
-        teamCode,
-        remark,
-      );
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<schema.XTarget>> {
+    if (this.subTypes.includes(<TargetType>data.typeName)) {
+      const res = await this.createTarget(data);
       if (res.success) {
-        return await kernel.pullAnyToTeam({
+        await kernel.pullAnyToTeam({
           id: this.target.id,
           teamTypes: [this.target.typeName],
           targetIds: [res.data?.id],
-          targetType: targetType,
+          targetType: <TargetType>data.typeName,
         });
       }
+      return res;
     }
     return faildResult(consts.UnauthorizedError);
   }
@@ -99,22 +88,22 @@ export default class BaseTarget {
   }
 
   /**
-   * 根据名称查询组织/个人
-   * @param name 名称
+   * 根据编号查询组织/个人
+   * @param code 编号
    * @param TypeName 类型
    * @returns
    */
   protected async searchTargetByName(
-    name: string,
+    code: string,
     typeName: TargetType,
   ): Promise<model.ResultType<any>> {
     if (this.searchTargetType.includes(typeName)) {
       return await kernel.searchTargetByName({
-        name: name,
+        name: code,
         typeName: typeName,
         page: {
           offset: 0,
-          filter: name,
+          filter: code,
           limit: common.Constants.MAX_UINT_16,
         },
       });
@@ -246,22 +235,13 @@ export default class BaseTarget {
    * @returns
    */
   protected async createTarget(
-    name: string,
-    code: string,
-    typeName: TargetType,
-    teamName: string,
-    teamCode: string,
-    teamRemark: string,
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
   ): Promise<model.ResultType<schema.XTarget>> {
-    if (this.createTargetType.includes(typeName)) {
+    if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
-        name,
-        code,
-        typeName,
-        teamCode,
-        teamName,
-        teamRemark,
-        belongId: this.target.id,
+        ...data,
+        id: '0',
+        belongId: Provider.spaceId,
       });
     } else {
       return faildResult(consts.UnauthorizedError);
@@ -279,31 +259,23 @@ export default class BaseTarget {
    * @returns
    */
   protected async updateTarget(
-    name: string,
-    code: string,
-    teamName: string = '',
-    teamCode: string = '',
-    teamRemark: string,
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
   ): Promise<model.ResultType<schema.XTarget>> {
-    teamCode = teamCode == '' ? code : teamCode;
-    teamName = teamName == '' ? code : teamName;
+    data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
+    data.teamName = data.teamName == '' ? data.name : data.teamName;
     let res = await kernel.updateTarget({
-      name,
-      code,
-      teamCode,
-      teamName,
-      teamRemark,
+      ...data,
       id: this.target.id,
       belongId: this.target.belongId,
       typeName: this.target.typeName,
     });
     if (res.success) {
-      this.target.name = name;
-      this.target.code = code;
+      this.target.name = data.name;
+      this.target.code = data.code;
       if (this.target.team != undefined) {
-        this.target.team.name = name;
-        this.target.team.code = code;
-        this.target.team.remark = teamRemark;
+        this.target.team.name = data.teamName;
+        this.target.team.code = data.teamCode;
+        this.target.team.remark = data.teamRemark;
       }
     }
     return res;

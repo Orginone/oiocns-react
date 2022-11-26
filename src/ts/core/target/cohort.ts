@@ -3,7 +3,7 @@ import BaseTarget from './base';
 import { schema } from '../../base';
 import consts from '../consts';
 import { ICohort } from './itarget';
-import { ResultType } from '@/ts/base/model';
+import { ResultType, TargetModel } from '@/ts/base/model';
 
 export default class Cohort extends BaseTarget implements ICohort {
   children: schema.XTarget[];
@@ -15,11 +15,13 @@ export default class Cohort extends BaseTarget implements ICohort {
     this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
   }
   public async update(
-    name: string,
-    code: string,
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
-    return await super.updateTarget(name, code, name, code, remark);
+    return await super.updateTarget({
+      ...data,
+      teamCode: data.code,
+      teamName: data.name,
+    });
   }
   public async getMember(): Promise<schema.XTarget[]> {
     if (this.children.length > 0) {

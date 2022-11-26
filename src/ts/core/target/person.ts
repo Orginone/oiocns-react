@@ -9,7 +9,8 @@ import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { ICompany, IPerson, ICohort } from './itarget';
 import { schema, faildResult, kernel, common } from '@/ts/base';
-import { ResultType } from '@/ts/base/model';
+import { ResultType, TargetModel } from '@/ts/base/model';
+import { XTarget } from '@/ts/base/schema';
 
 export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[];
@@ -32,7 +33,11 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedCohort = [];
     this.joinedCompany = [];
   }
-
+  public async update(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<XTarget>> {
+    return await super.updateTarget(data);
+  }
   public async getJoinedCohorts(): Promise<ICohort[]> {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
@@ -70,18 +75,13 @@ export default class Person extends MarketTarget implements IPerson {
     return this.joinedCompany;
   }
   public async createCohort(
-    name: string,
-    code: string,
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
-    const res = await this.createTarget(
-      name,
-      code,
-      TargetType.Cohort,
-      name,
-      code,
-      remark,
-    );
+    const res = await this.createTarget({
+      ...data,
+      teamCode: data.code,
+      teamName: data.name,
+    });
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
       this.joinedCohort.push(cohort);
@@ -90,25 +90,20 @@ export default class Person extends MarketTarget implements IPerson {
     return res;
   }
   public async createCompany(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-    type: TargetType = TargetType.Company,
+    data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
-    if (!consts.CompanyTypes.includes(type)) {
+    if (!consts.CompanyTypes.includes(<TargetType>data.typeName)) {
       return faildResult('您无法创建该类型单位!');
     }
-    if (!validIsSocialCreditCode(code)) {
+    if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');
     }
-    const tres = await this.searchTargetByName(name, type);
+    const tres = await this.searchTargetByName(data.code, <TargetType>data.typeName);
     if (!tres.data) {
-      const res = await this.createTarget(name, code, type, teamName, teamCode, remark);
+      const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;
-        switch (type) {
+        switch (<TargetType>data.typeName) {
           case TargetType.University:
             company = new University(res.data);
             break;

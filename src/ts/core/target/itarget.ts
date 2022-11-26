@@ -1,5 +1,5 @@
 import { model, schema } from '@/ts/base';
-import { ResultType } from '@/ts/base/model';
+import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
 import { Market, BaseProduct } from '../market';
 import { IAuthority } from './authority/iauthority';
@@ -167,7 +167,9 @@ export interface ICohort {
    * @param code 群组编号
    * @param remark 群组备注
    */
-  update(name: string, code: string, remark: string): Promise<ResultType<any>>;
+  update(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
   /** 获取群成员列表 */
   getMember(): Promise<schema.XTarget[]>;
   /**
@@ -206,6 +208,13 @@ export interface IPerson {
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
   /**
+   * 更新人员
+   * @param data 人员基础信息
+   * @returns 是否成功
+   */
+  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
+
+  /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
@@ -219,30 +228,17 @@ export interface IPerson {
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
    * 创建群组
-   * @param name 名称
-   * @param code 编号
-   * @param remark 备注
-   * @returns 是否创建成功
+   * @param data 群组基本信息
    */
-  createCohort(name: string, code: string, remark: string): Promise<ResultType<any>>;
+  createCohort(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
   /**
    * 设立单位
-   * @param name 单位名称
-   * @param code 单位信用代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 单位简介
-   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @param data 单位基本信息
    * @returns 是否成功
    */
-  createCompany(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-    type: TargetType,
-  ): Promise<ResultType<any>>;
+  createCompany(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
   /**
    * 解散群组
    * @param id 群组id
@@ -479,21 +475,10 @@ export interface ICompany {
   joinMarketApplys: schema.XMarketRelation[];
   /**
    * 更新单位
-   * @param name 单位名称
-   * @param code 单位信用代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 单位简介
-   * @param type 单位类型,默认'单位',可选:'大学','医院','单位'
+   * @param data 单位基础信息
    * @returns 是否成功
    */
-  update(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<ResultType<schema.XTarget>>;
+  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
   /**
    * 创建集团
    * @param name 集团名称
@@ -503,13 +488,7 @@ export interface ICompany {
    * @param remark 集团简介
    * @returns 是否成功
    */
-  createGroup(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<ResultType<any>>;
+  createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
   /**
    * 创建群组
    * @param name 名称
@@ -517,7 +496,9 @@ export interface ICompany {
    * @param remark 备注
    * @returns 是否创建成功
    */
-  createCohort(name: string, code: string, remark: string): Promise<ResultType<any>>;
+  createCohort(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
   /**
    * 删除集团
    * @param id 集团Id
@@ -742,6 +723,11 @@ export interface IGroup {
   /** 子集团 */
   subGroup: IGroup[];
   /**
+   * 更新集团
+   * @param data 集团基本信息
+   */
+  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
+  /**
    * 查询加入的集团
    * @returns
    */
@@ -756,19 +742,9 @@ export interface IGroup {
   applyJoinGroup(id: string): Promise<ResultType<any>>;
   /**
    * 创建子集团
-   * @param name 子集团名称
-   * @param code 子集团编号
-   * @param teamName 团队名称
-   * @param teamCode 团队编号
-   * @param remark 备注
+   * @param data 子集团基本信息
    */
-  createSubGroup(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<ResultType<any>>;
+  createSubGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
   /**
    * 删除子集团
    * @param id 集团Id
@@ -787,7 +763,69 @@ export interface IGroup {
    */
   getSubGroups(): Promise<IGroup[]>;
 }
+/** 部门操作 */
+export interface IDepartment {
+  /** 部门实体 */
+  target: schema.XTarget;
+  /** 人员 */
+  person: schema.XTarget[];
+  /** 工作组 */
+  workings: IWorking[];
+  /** 子部门 */
+  departments: IDepartment[];
+  /** 职权树 */
+  authorityTree: IAuthority | undefined;
+  /** 更新部门 */
+  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
+  /** 获取职权树 */
+  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /** 获取部门人员 */
+  getPerson(): Promise<schema.XTarget[]>;
+  /** 获取子部门 */
+  getDepartments(): Promise<IDepartment[]>;
+  /** 获取工作组 */
+  getWorkings(): Promise<IWorking[]>;
+  /** 拉人进入部门 */
+  pullPerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
+  /** 踢人 */
+  removePerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
+  /** 创建子部门 */
+  createDepartment(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
+  /** 删除子部门 */
+  deleteDepartment(id: string): Promise<model.ResultType<any>>;
+  /** 创建工作组 */
+  createWorking(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
+  /** 删除工作组 */
+  deleteWorking(id: string): Promise<model.ResultType<any>>;
+}
 
-export interface IDepartment {}
-
-export interface IWorking {}
+export interface IWorking {
+  /** 部门实体 */
+  target: schema.XTarget;
+  /** 人员 */
+  person: schema.XTarget[];
+  /** 工作组 */
+  workings: IWorking[];
+  /** 职权树 */
+  authorityTree: IAuthority | undefined;
+  /** 更新工作组 */
+  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
+  /** 获取职权树 */
+  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /** 获取工作组 */
+  getWorkings(): Promise<IWorking[]>;
+  /** 拉人进入部门 */
+  pullPerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
+  /** 踢人 */
+  removePerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
+  /** 创建工作组 */
+  createWorking(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
+  /** 删除工作组 */
+  deleteWorking(id: string): Promise<model.ResultType<any>>;
+}

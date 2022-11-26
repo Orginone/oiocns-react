@@ -1,6 +1,6 @@
 import consts from '../consts';
 import BaseTarget from './base';
-import { ResultType } from '@/ts/base/model';
+import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
 import { IGroup } from './itarget';
 import { TargetType } from '../enum';
@@ -21,6 +21,11 @@ export default class Group extends BaseTarget implements IGroup {
     this.pullTypes = consts.CompanyTypes;
     this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
   }
+  public async update(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<XTarget>> {
+    return await super.updateTarget(data);
+  }
   public async getJoinedGroups(): Promise<XTarget[]> {
     if (this.joinedGroup.length > 0) {
       return this.joinedGroup;
@@ -37,22 +42,11 @@ export default class Group extends BaseTarget implements IGroup {
     return super.applyJoin(id, TargetType.Group);
   }
   public async createSubGroup(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
+    data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
-    const tres = await this.searchTargetByName(name, TargetType.Group);
+    const tres = await this.searchTargetByName(data.code, TargetType.Group);
     if (!tres.data) {
-      const res = await this.createTarget(
-        name,
-        code,
-        TargetType.Group,
-        teamName,
-        teamCode,
-        remark,
-      );
+      const res = await this.createTarget(data);
       if (res.success) {
         const group = new Group(res.data);
         this.subGroup.push(group);
