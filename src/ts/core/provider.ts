@@ -27,7 +27,7 @@ export default class Provider {
    */
   public static get spaceId(): string {
     if (this.getPerson && this._workSpace) {
-      return this._workSpace.target.id;
+      return this._workSpace.id;
     }
     throw new Error('未登录');
   }
@@ -39,30 +39,6 @@ export default class Provider {
         callback.apply(this, []);
       }
       this._callbacks.push(callback);
-    }
-  }
-
-  public static async getAllWorkSpaces(): Promise<{ id: string; name: string }[]> {
-    var workSpaces: { id: string; name: string }[] = [];
-    if (this._person != null) {
-      workSpaces.push({ id: this._person.target.id, name: '个人空间' });
-      const companys = await this._person.getJoinedCompanys();
-      companys.forEach((element) => {
-        workSpaces.push({ id: element.target.id, name: element.target.name });
-      });
-    }
-    throw new Error('未登录');
-  }
-
-  /**
-   * 获取当前工作空间
-   * @returns 工作当前空间
-   */
-  public static getWorkSpace(): SpaceType {
-    if (this.getPerson && this._workSpace) {
-      return this._workSpace;
-    } else {
-      throw new Error('未登录');
     }
   }
 
