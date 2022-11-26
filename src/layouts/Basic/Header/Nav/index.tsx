@@ -20,24 +20,28 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       title: '聊天',
       icon: 'icon-message',
       count: chatNum,
+      fath: '/chat',
     },
     {
       path: '/todo/friend',
       title: '待办',
       icon: 'icon-todo',
       count: 0,
+      fath: '/todo',
     },
     {
       path: '/store/app',
       title: '仓库',
       icon: 'icon-store',
       count: 0,
+      fath: '/store',
     },
     {
       path: '/setting/info',
       title: '设置',
       icon: 'icon-setting',
       count: 0,
+      fath: '/setting',
     },
   ];
   useEffect(() => {
@@ -59,7 +63,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
                 to={item.path}
                 title={item.title}
                 className={`${
-                  location.pathname.includes(item.path)
+                  location.pathname.includes(item.fath)
                     ? `${cls['active-icon']}`
                     : `${cls['un-active-icon']}`
                 }`}>

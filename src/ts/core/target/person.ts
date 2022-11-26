@@ -43,11 +43,15 @@ export default class Person extends MarketTarget implements IPerson {
       return this.joinedCohort;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort]);
+    console.log('输出返回结果', res);
     if (res.success) {
+      console.log('进入了');
+      this.joinedCohort = [];
       res.data.result?.forEach((a) => {
         this.joinedCohort.push(new Cohort(a));
       });
     }
+    console.log('输出结果', this.joinedCohort);
     return this.joinedCohort;
   }
   public async getJoinedCompanys(): Promise<ICompany[]> {
@@ -225,6 +229,10 @@ export default class Person extends MarketTarget implements IPerson {
           targetType: TargetType.Person,
         });
       });
+      for (var i = 0; i < ids.length; i++) {
+        const data = this.joinedFriend.filter((obj) => ids[i] != obj.id);
+        this.joinedFriend = data;
+      }
     }
     return res;
   }

@@ -6,9 +6,16 @@ import {
   productTodo,
   orderTodo,
 } from '@/ts/core/todo/index';
-import { FriendTodo, ProductTodo, StoreTodo, TeamTodo } from '@/ts/core/todo/todo';
+import {
+  ApplicationTodo,
+  FriendTodo,
+  ProductTodo,
+  StoreTodo,
+  TeamTodo,
+} from '@/ts/core/todo/todo';
 import { XOrder, XOrderDetail } from '@/ts/base/schema';
 import { OrderStatus } from '@/ts/core/todo/interface';
+import OrderTodo from '@/ts/core/todo/order';
 
 // type OrgType = '人员' | 'other';
 
@@ -30,18 +37,28 @@ export type tabStatus = '1' | '2' | '3' | '4' | '5' | '6';
  */
 interface TodoServiceProps {
   friend: FriendTodo;
+  org: TeamTodo;
+  store: StoreTodo;
+  product: ProductTodo;
+  order: OrderTodo;
+  // 当前应用待办appid
+  currentAppid: string;
+  applicationInstance: ApplicationTodo | undefined;
+
   statusList: statusItem[];
   currentModel: pageModel; // 当前模块
   activeStatus: tabStatus; // 当前选中的状态
 }
 
 class TodoService implements TodoServiceProps {
+  applicationInstance: ApplicationTodo | undefined;
   friend = friendTodo;
   org = teamTodo;
   store = storeTodo;
   product = productTodo;
   order = orderTodo;
-  /** tabs项 */
+  currentAppid: string = '';
+  /** 平台待办tabs项 */
   statusList: statusItem[] = [
     { tab: '待办', key: '1' },
     { tab: '已办', key: '2' },
@@ -52,6 +69,17 @@ class TodoService implements TodoServiceProps {
     { tab: '销售订单', key: '5' },
     { tab: '采购订单', key: '6' },
   ];
+  /**应用待办tabs */
+  applicationTabs: statusItem[] = [
+    { tab: '待办', key: '1' },
+    { tab: '抄送待审阅', key: '4' },
+    { tab: '已办', key: '2' },
+    { tab: '我的发起', key: '3' },
+  ];
+  /**当前页面模块名称 */
+  currentModel: pageModel = 'friend';
+  /** 当前tab数据状态*/
+  activeStatus: tabStatus = '1';
   /**数据状态枚举 */
   get statusMap() {
     return {
@@ -85,11 +113,34 @@ class TodoService implements TodoServiceProps {
       },
     };
   }
-  /**当前页面模块名称 */
-  currentModel: pageModel = 'friend';
-
-  /** 当前tab数据状态*/
-  activeStatus: tabStatus = '1';
+  /**当前实例 */
+  get currentInstance(): FriendTodo | TeamTodo | StoreTodo | ProductTodo {
+    return this[this.currentModel];
+  }
+  /**  获取平台待办列表 */
+  public get currentList() {
+    const listStatusCode = {
+      '1': 'todoList',
+      '2': 'doList',
+      '3': 'applyList',
+      '5': 'saleList',
+      '6': 'buyList',
+    };
+    const selfList = listStatusCode[this.activeStatus];
+    return this.currentInstance[selfList];
+  }
+  /**  获取应用待办列表 */
+  public applicationList = async () => {
+    if (!this.applicationInstance) return;
+    const listStatusCode = {
+      '1': 'getTodoList',
+      '2': 'getDoList',
+      '3': 'getApplyList',
+      '4': 'getNoticeList',
+    };
+    const selfListFn = listStatusCode[this.activeStatus];
+    return await this.applicationInstance[selfListFn]();
+  };
   /** 生成平台待办操作菜单*/
   tableOperation = (item: any, callback: Function) => {
     const afterOperate = (success: boolean, name: string) => {
@@ -206,23 +257,6 @@ class TodoService implements TodoServiceProps {
     return menu;
   };
 
-  /**当前实例 */
-  get currentInstance(): FriendTodo | TeamTodo | StoreTodo | ProductTodo {
-    return this[this.currentModel];
-  }
-
-  /** 获取待办列表 */
-  public get currentList() {
-    const listStatusCode = {
-      '1': 'todoList',
-      '2': 'doList',
-      '3': 'applyList',
-      '5': 'saleList',
-      '6': 'buyList',
-    };
-    const selfList = listStatusCode[this.activeStatus];
-    return this.currentInstance[selfList];
-  }
   public menuCallback = Function;
 }
 
