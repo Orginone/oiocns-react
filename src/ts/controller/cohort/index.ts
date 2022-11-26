@@ -281,7 +281,6 @@ class CohortController {
     this.joinCallBack([...cohorJoinData]);
     return res;
   }
-  
 }
 
 export default new CohortController();

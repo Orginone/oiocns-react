@@ -32,6 +32,9 @@ export default class Person extends MarketTarget {
   public get ChohortArray(): Cohort[] {
     return this._joinedCohorts;
   }
+  public get getMyFriend(): schema.XTarget[] {
+    return this._friends;
+  }
 
   /**
    * 获取群组列表
@@ -420,6 +423,10 @@ export default class Person extends MarketTarget {
           targetType: TargetType.Person,
         });
       });
+      for (var i = 0; i < ids.length; i++) {
+        const data = this._friends.filter((obj) => ids[i] != obj.id);
+        this._friends = data;
+      }
     }
     return res;
   };
