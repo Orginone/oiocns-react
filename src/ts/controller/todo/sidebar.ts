@@ -1,13 +1,14 @@
 // TODO 获取应用待办
-import { Product } from '@/ts/core/market';
-import { loadApplicationTodos } from '@/ts/core/todo';
-import { MenuProps } from 'antd';
+import { loadApplicationTodos, MenuTodoType } from '@/ts/core/todo';
+import { ApplicationTodo } from '@/ts/core/todo/todo';
+// import { MenuProps } from 'antd';
+import todoService from '.';
 
-const apps: MenuProps[`items`] = [
+const apps = [
   {
     label: '公益仓',
     key: '/todo/gyc',
-    icon: `HomeOutlined`,
+    // icon: `HomeOutlined`,
   }, // <HomeOutlined /> },
   { label: '办公OA', key: '/todo/oa', icon: `FileTextOutlined` }, // <FileTextOutlined /> },
   { label: '资产管理', key: '/todo/asset', icon: `FundOutlined` }, // <FundOutlined /> },
@@ -34,47 +35,62 @@ const systemTodo = [
 ]; //.map((n) => ({ ...n, icon: React.createElement(Icon[n.icon]) }));
 
 class SideBar {
-  private _topMenu = {
-    type: 'group',
-    label: '平台待办',
-    children: systemTodo,
-  };
-  private _bottomMenu = {
-    type: 'group',
-    label: '应用待办',
-    children: apps,
-  };
+  private _topMenu = systemTodo;
+  private _bottomMenu: MenuTodoType[] = apps;
+
   private _currentBread: string[];
+  _currentMenuId: string = ''; // 当前 应用待办id
   /**当前菜单 */
   get menuItems() {
-    return [this._topMenu, this._bottomMenu];
+    return [
+      {
+        type: 'group',
+        label: '平台待办',
+        children: this._topMenu,
+      },
+      {
+        type: 'group',
+        label: '应用待办',
+        children: this._bottomMenu,
+      },
+    ];
   }
   get curentBread() {
     return this._currentBread || [];
   }
   constructor() {
-    this.getOwnProducts();
+    this.loadApplicationTodos();
     this._currentBread = [];
   }
   /**点击左侧菜单 */
-  public handleClickMenu = (name: string, productInstans: Product) => {
+  public handleClickMenu = (productInstans: ApplicationTodo) => {
     if (productInstans) {
-      this._currentBread = ['应用待办', productInstans.prod.name];
+      this.currentMenuId = productInstans.id;
     } else {
-      this._currentBread = [];
+      this.currentMenuId = '';
     }
   };
-
+  set currentMenuId(value: string) {
+    this._currentMenuId = value;
+    if (value !== '' && this.currentApplication) {
+      todoService.applicationInstance = this.currentApplication.node;
+      this._currentBread = ['应用待办', this.currentApplication.label];
+    } else {
+      todoService.applicationInstance = undefined;
+      this._currentBread = [];
+    }
+  }
+  get currentApplication() {
+    return this._bottomMenu && this._currentMenuId !== ''
+      ? this._bottomMenu.find((n) => n && (n.key + '').indexOf(this._currentMenuId) > -1)
+      : null;
+  }
   /**
    * 查询我的应用
    */
-  private getOwnProducts = async () => {
+  private loadApplicationTodos = async () => {
     const data = await loadApplicationTodos();
-    this._bottomMenu = {
-      type: 'group',
-      label: '应用待办',
-      children: data,
-    };
+    this._bottomMenu = data;
   };
 }
 
