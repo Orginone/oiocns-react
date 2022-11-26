@@ -81,6 +81,4 @@ export default class Merchandise {
   ): Promise<model.ResultType<any>> {
     return await kernel.cancelOrderDetail({ id: detailId, status: status });
   }
-
-  
 }

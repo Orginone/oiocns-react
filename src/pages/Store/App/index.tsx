@@ -1,5 +1,5 @@
 import { Card, Modal } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -30,47 +30,23 @@ const StoreApp: React.FC = () => {
   const [data, setData] = useState([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [checkNodes, setCheckNodes] = useState<Array<any>>([{}]);
-  const items = useMemo(() =>
-    // [
-    //   {
-    //     tab: `全部`,
-    //     key: 'all',
-    //   },
-    //   {
-    //     tab: `创建的`,
-    //     key: 'created',
-    //   },
-    //   {
-    //     tab: `购买的`,
-    //     key: 'purchased',
-    //   },
-    //   {
-    //     tab: `共享的`,
-    //     key: 'shared',
-    //   },
-    //   {
-    //     tab: `分配的`,
-    //     key: 'allotted',
-    //   },
-    // ]
-    {
-      let typeSet = new Set(['全部']);
-      data.forEach((v: any) => {
-        typeSet.add(v.prod.source);
-      });
-      console.log('sssss', Array.from(typeSet));
-
-      return Array.from(typeSet).map((k) => {
-        return { tab: k, key: k };
-      });
-    }, [data]);
-
+  const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
     StoreContent.marketTableCallBack = setData;
     StoreContent.getStoreProduct();
   }, []);
+  // 根据以获取数据 动态产生tab
+  const items = useMemo(() => {
+    let typeSet = new Set(['全部']);
+    data.forEach((v: any) => {
+      typeSet.add(v.prod.source);
+    });
+    return Array.from(typeSet).map((k) => {
+      return { tab: k, key: k };
+    });
+  }, [data]);
 
   const BtnsList = ['购买', '创建', '暂存'];
   const handleBtnsClick = (item: { text: string }) => {
@@ -100,6 +76,16 @@ const StoreApp: React.FC = () => {
   // 共享确认回调
   const submitShare = () => {
     console.log('当前被选中的每一项', checkNodes);
+    console.log(
+      '测试测试测试',
+      shareRef,
+      // departHisData,
+      // authorData,
+      // personsData,
+      // personsHisData,
+      // identitysData,
+      // identitysHisData,
+    );
 
     setShowShareModal(false);
   };
@@ -144,6 +130,7 @@ const StoreApp: React.FC = () => {
         label: '共享',
         onClick: () => {
           StoreContent.selectedProduct(item);
+          shareRef.current?.resetData();
           setShowShareModal(true);
         },
       },
@@ -179,8 +166,7 @@ const StoreApp: React.FC = () => {
           tabList={items}
           onTabChange={(key) => {
             setStatusKey(key as ststusTypes);
-          }}
-        >
+          }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
               queryFun={Provider.getPerson!.getOwnProducts}
@@ -210,32 +196,33 @@ const StoreApp: React.FC = () => {
         onCancel={() => {
           console.log(`取消按钮`);
           setShowShareModal(false);
-        }}
-      >
-        <ShareComp onCheckeds={onCheckeds} />
+        }}>
+        <ShareComp onCheckeds={onCheckeds}/>
       </Modal>
       {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={StoreContent._curProduct?.prod.id || ''} />}
-      ></Route>
+        render={() => (
+          <AppInfo appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/publish"
-        render={() => <PublishList appId={StoreContent._curProduct?.prod.id || ''} />}
-      ></Route>
+        render={() => (
+          <PublishList appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={StoreContent._curProduct?.prod.id || ''} />}
-      ></Route>
+        render={() => <Manage appId={StoreContent._curProduct?.prod.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
-        render={() => <PutawayComp appId={StoreContent._curProduct?.prod.id || ''} />}
-      ></Route>
+        render={() => (
+          <PutawayComp appId={StoreContent._curProduct?.prod.id || ''} />
+        )}></Route>
     </>
   );
 };

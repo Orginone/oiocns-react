@@ -18,6 +18,7 @@ import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
+  const [deleOrQuit, setDeleOrQuit] = useState<'delete' | 'quit'>('delete');
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
   const [isJoinShop, setIsJoinShop] = useState<boolean>(false); // 加入商店
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
@@ -36,13 +37,22 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   /**
-   * @description: 删除商店
+   * @description: 删除 / 退出商店确认
    * @return {*}
    */
-  const onDeleteOk = () => {
+  const onDeleteOrQuitOk = () => {
     setIsDeleteOpen(false);
-    marketCtrl.deleteMarket(treeDataObj?.node);
+    {
+      deleOrQuit === 'delete'
+        ? marketCtrl.deleteMarket(treeDataObj?.node)
+        : marketCtrl.quitMarket(treeDataObj?.id);
+    }
   };
+
+  /**
+   * @description: 取消的回调
+   * @return {*}
+   */
   const onCancel = () => {
     setIsAddOpen(false);
     setIsDeleteOpen(false);
@@ -54,8 +64,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
   useEffect(() => {
     StoreSiderbar.curPageType = 'market';
-    StoreSiderbar.TreeCallBack = setList;
+    StoreSiderbar.subscribePart('marketTreeData', setList);
     StoreSiderbar.getTreeData();
+    return () => {
+      return StoreSiderbar.unsubscribePart('marketTreeData');
+    };
   }, []);
 
   /**
@@ -91,6 +104,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   ];
 
   const handleChange = (path: string) => {
+    console.log('是是是', path);
+    if (path === '/market/shop') {
+      StoreContent.changeMenu('market');
+    }
+
     setSelectMenu(path);
     history.push(path);
   };
@@ -141,12 +159,24 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   /**
-   * @description: 删除商店
+   * @description: 删除商店弹窗
    * @param {any} item
    * @return {*}
    */
   const handleDeleteShop = (item?: any) => {
     setIsDeleteOpen(true);
+    setDeleOrQuit('delete');
+    setTreeDataObj(item);
+  };
+
+  /**
+   * @description: 退出商店弹窗
+   * @param {any} item
+   * @return {*}
+   */
+  const handleQuitShop = (item?: any) => {
+    setIsDeleteOpen(true);
+    setDeleOrQuit('quit');
     setTreeDataObj(item);
   };
 
@@ -162,8 +192,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       case '删除商店':
         handleDeleteShop(node);
         break;
+      case '退出商店':
+        handleQuitShop(node);
+        break;
       case '基础详情':
         setIsDetailOpen(true);
+        setTreeDataObj(node);
         break;
       case '用户管理':
         history.push('/market/usermanagement');
@@ -195,13 +229,26 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       <NewStoreModal title="创建商店" open={isAddOpen} onOk={onOk} onCancel={onCancel} />
       <DeleteCustomModal
         title="提示"
+        deleOrQuit={deleOrQuit}
         open={isDeleteOpen}
-        onOk={onDeleteOk}
+        onOk={onDeleteOrQuitOk}
         onCancel={onCancel}
         content={treeDataObj.title}
       />
-      <DetailDrawer title={'神马商店'} open={isDetailOpen} onClose={onClose} />
-      <JoinOtherShop title="搜索商店" open={isJoinShop} onCancel={onCancel} />
+      <DetailDrawer
+        title={'神马商店'}
+        nodeDetail={treeDataObj?.node?.store}
+        open={isDetailOpen}
+        onClose={onClose}
+      />
+      <JoinOtherShop
+        title="搜索商店"
+        open={isJoinShop}
+        onCancel={onCancel}
+        onOk={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
     </div>
   );
 };

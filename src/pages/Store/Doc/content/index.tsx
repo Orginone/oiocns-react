@@ -9,6 +9,7 @@ import {
   Modal,
   Input,
   Breadcrumb,
+  UploadProps,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,6 +21,8 @@ import {
 } from '@ant-design/icons';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import { sleep } from '@/ts/base/common';
+import { RcFile } from 'antd/lib/upload/interface';
 
 const LeftTree = () => {
   const [title, setTitle] = useState('新建文件夹');
@@ -38,55 +41,19 @@ const LeftTree = () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
-  // // 双击文件
-  // const fileDoubleClick = async (e: any, data: any) => {
-  //   setOnIndex(null);
-  //   e.stopPropagation();
-  //   Bucket.Current = data;
-  //   const res = await Bucket.GetContent();
-  //   CloudStore.setChoudData(res);
-  // };
-  // // 删除文件
-  // const delFile = (data: any) => {
-  //   confirm({
-  //     title: '确认删除此文件?',
-  //     icon: <ExclamationCircleOutlined />,
-  //     okText: '确认',
-  //     okType: 'danger',
-  //     cancelText: '取消',
-  //     async onOk() {
-  //       await Bucket.deleteFile(data);
-  //       message.success('文件删除成功');
-  //       await getBaseFileList(true); // 渲染文档
-  //       let orgData = [...gData];
-  //       Bucket.HandleDeleteTree(orgData, Bucket.Current);
-  //       CloudStore.setCloudTree(orgData);
-  //     },
-  //     onCancel() {
-  //       console.log('Cancel');
-  //     },
-  //   });
-  // };
-  // const props: UploadProps = {
-  //   name: 'file',
-  //   action: `/orginone/anydata/Bucket/Upload?shareDomain=user&prefix=${key}`,
-  //   headers: {
-  //     authorization: sessionStorage.Token,
-  //   },
-  //   showUploadList: false,
-  //   async onChange(info) {
-  //     if (info.file.status !== 'uploading') {
-  //       console.log(info.file, info.fileList);
-  //     }
-  //     if (info.file.status === 'done') {
-  //       message.success('文件上传成功');
-  //       await getBaseFileList();
-  //       CloudStore.setCloudTree(gData);
-  //     } else if (info.file.status === 'error') {
-  //       message.error(`${info.file.name} file upload failed.`);
-  //     }
-  //   },
-  // };
+  const props: UploadProps = {
+    multiple: true,
+    showUploadList: false,
+    async customRequest(options) {
+      try {
+        const file: RcFile = options.file as RcFile;
+        console.log(file.uid, file.size, await file.text());
+      } catch (ex) {
+        console.log(ex);
+      }
+      await sleep(10000);
+    },
+  };
   const getImgSrc = (type: string) => {
     let prifex = '/icons/';
     switch (type) {
@@ -128,8 +95,10 @@ const LeftTree = () => {
         key: '1',
         label: (
           <div
-            onClick={() => {
-              // delFile(el);
+            onClick={async () => {
+              if (await docsCtrl.refItem(el.key)?.delete()) {
+                docsCtrl.changCallback();
+              }
             }}>
             删除文件
           </div>
@@ -179,7 +148,7 @@ const LeftTree = () => {
               docsCtrl.changCallback();
             }}
             icon={<SyncOutlined />}></Button>
-          <Upload>
+          <Upload {...props}>
             <Button shape="circle" type="text" icon={<CloudUploadOutlined />}></Button>
           </Upload>
           <Button
