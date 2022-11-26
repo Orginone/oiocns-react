@@ -94,9 +94,10 @@ const EditCustomModal = (props: Iprops) => {
                     if (!curentValue.success) {
                       message.error(curentValue.msg);
                     } else { 
-
+                      message.success('添加成功');
+                      settingController.trigger('updateDeptTree');
+                      handleOk();
                     }
-
                   }
                 }}>
                 完成

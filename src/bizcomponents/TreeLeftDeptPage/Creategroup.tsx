@@ -86,12 +86,21 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   useEffect(() => { 
     initData();
+  }, [])
+  
+  useEffect(() => { 
+    /** 监听页面是否需要更新 */ 
+    settingController.addListen('updateDeptTree', () => { 
+      initData();
+    })
   },[])
 
   const initData = async () => {
     const resultData = await settingController.getDepartments('381107910723375104');
     setTreeData(resultData);
   }
+  
+
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);

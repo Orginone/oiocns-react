@@ -25,7 +25,8 @@ const SettingDept: React.FC = () => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectId,setSelectId] = useState<string>()
+  const [selectId, setSelectId] = useState<string>()
+  const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
   // 操作内容渲染函数
   const renderOperation = (
@@ -97,7 +98,8 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
  useEffect(() => {
-  settingController.addListen('isOpenModal', () => { 
+   settingController.addListen('isOpenModal', () => { 
+    setIsCreateDept(true)
     setIsOpenModal(true);
   })
   return settingController.remove('isOpenModal', () => { 
@@ -109,11 +111,13 @@ const SettingDept: React.FC = () => {
  * 监听集团id发生变化，改变右侧数据
  * */ 
 useEffect(() => {
-  settingController.addListen('createDept', (e: {id:string}) => {
+  settingController.addListen('createDept', (e: { id: string }) => {
+    setIsCreateDept(true)
     setSelectId(e.id); 
   })
   return settingController.remove('createDept', () => {
     setSelectId(''); 
+    setIsCreateDept(false);
   })
 }, []);
 
@@ -154,6 +158,7 @@ useEffect(() => {
           type="link"
           onClick={() => {
             settingController.trigger('isOpenModal')
+            setIsCreateDept(false);
           }}>
           编辑
         </Button>
@@ -242,7 +247,7 @@ useEffect(() => {
         }}
         selectId={selectId}
         open={isOpenModal}
-        title={selectId ? '编辑' : '新增'}
+        title={isCreateDept ? '新增' : '编辑'}
         onOk={onOk}
         handleOk={handleOk}
       />

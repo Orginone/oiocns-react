@@ -54,6 +54,45 @@ class SettingController extends BaseController {
     this._isOpenModal = params;
   }
 
+    // 创建二级以下的部门
+    public async createSecondDepartment(
+      param: deptParams,
+      deptId: string,
+    ): Promise<ObjType> {
+      const compid = this.companyID;
+  
+      const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+        {
+          page: 0,
+          pageSize: 100,
+          filter: param.code,
+        },
+        TargetType.Department,
+      );
+      if (datas.data && datas.data?.length > 0) {
+        return {
+          msg: '重复创建',
+          success: false,
+        };
+      }
+      const res = await this.userDataService.createDepart(
+        param.name,
+        param.code,
+        param.teamName,
+        param.teamCode,
+        param.remark,
+        compid, // 团队ID
+        false,
+        deptId, // 属于哪个部门的ID
+      );
+  
+      // 加入到 公司部门底下的缓存
+      return {
+        msg: res.msg,
+        success: res.success,
+      };
+    }
+
    /**
    * 递归查询前单位底下的所有部门底下的子部门
    * @param parentId
@@ -97,53 +136,56 @@ class SettingController extends BaseController {
       return arrays;
     }
   
-  /**
+   /**
    * 创建一级部门
    * @param param parentId 为空就是一级部门
    * @returns
    */
-  public async createDepartment(param: deptParams): Promise<ObjType> {
-    console.log('param',param);
-    // 要选中公司的工作区
-    const compid = this.companyID;
-    // Provider.getWorkSpace()!.id;
-    // 判断是否有公司数据
-
-    //let curCompanys: Company[] = await Provider.getPerson.getJoinedCompanys();
-    // 获取当前单位
-    //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
-    // 判断是否重复 TODO
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
-      {
-        page: 0,
-        pageSize: 10,
-        filter: param.code,
-      },
-      TargetType.Department,
-    );
-
-    if (datas.data && datas.data?.length > 0) {
+    public async createDepartment(param: deptParams): Promise<ObjType> {
+      // 判断是否创建二级部门
+      if (param.parentId != null && param.parentId != this.companyID) {
+        return await this.createSecondDepartment(param, param.parentId);
+      }
+      // 要选中公司的工作区
+      const compid = this.companyID;
+      // Provider.getWorkSpace()!.id;
+      // 判断是否有公司数据
+  
+      //let curCompanys: Company[] = await Provider.getPerson.getJoinedCompanys();
+      // 获取当前单位
+      //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
+      // 判断是否重复 TODO
+      const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+        {
+          page: 0,
+          pageSize: 10,
+          filter: param.code,
+        },
+        TargetType.Department,
+      );
+  
+      if (datas.data && datas.data?.length > 0) {
+        return {
+          msg: '重复创建',
+          success: false,
+        };
+      }
+  
+      const res = await this.userDataService.createDepart(
+        param.name,
+        param.code,
+        param.teamName,
+        param.teamCode,
+        param.remark,
+        compid, // 上一层ID
+        true,
+        compid, // 属于哪个公司的ID
+      );
       return {
-        msg: '重复创建',
-        success: false,
+        msg: res.msg,
+        success: res.success,
       };
     }
-
-    const res = await this.userDataService.createDepart(
-      param.name,
-      param.code,
-      param.teamName,
-      param.teamCode,
-      param.remark,
-      compid, // 上一层ID
-      true,
-      compid, // 属于哪个公司的ID
-    );
-    return {
-      msg: res.msg,
-      success: res.success,
-    };
-  }
 }
 const settingController = new SettingController();
 
