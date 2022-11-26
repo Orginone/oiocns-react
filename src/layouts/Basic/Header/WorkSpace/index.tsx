@@ -17,11 +17,10 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Provider from '@/ts/core/provider';
-import SettionCtrl from '@/ts/controller/setting/settingCtrl';
+import SettionCtrl, { SpaceType } from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
-type SpaceType = { id: string; name: string };
 
 // 菜单列表项
 const OrganizationalItem = (item: SpaceType) => {
@@ -60,15 +59,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   const onSave = async () => {
     const values = await form.validateFields();
-    const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson?.createCompany(
-      name,
-      code,
-      teamName,
-      teamCode,
-      teamRemark,
-      typeName,
-    );
+    // const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
+    let res = await Provider.getPerson?.createCompany(values.company);
 
     if (res?.success) {
       message.info('申请加入单位成功');
@@ -80,30 +72,23 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    Provider.setWorkSpace(item.id);
     // @modify 切换工作空间
-    SettionCtrl.changeWorkSpace({
-      id: item.id,
-      name: item.name,
-    });
-    setCurrent({
-      name: item.name,
-      id: item.id,
-    });
+    SettionCtrl.changeWorkSpace(item);
+    setCurrent(item);
     setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
     if (Provider.getPerson) {
-      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
-        setMenuList(allWorkSpaces);
-        Provider.getWorkSpace().then((curspace) => {
-          setCurrent(
-            allWorkSpaces.find((space) => {
-              return space.id == curspace?.target.id;
-            }),
-          );
-        });
+      SettionCtrl.getAllWorkSpaces().then(() => {
+        setMenuList(SettionCtrl.workSpaceList);
+        setCurrent(SettionCtrl.currentWorkSpace);
+        // const curspace = Provider.getWorkSpace();
+        // setCurrent(
+        //   allWorkSpaces.find((space) => {
+        //     return space.id == curspace?.target.id;
+        //   }),
+        // );
       });
     }
   }, []);

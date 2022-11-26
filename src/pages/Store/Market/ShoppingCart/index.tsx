@@ -4,17 +4,19 @@ import cls from './index.module.less';
 import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+import { Adata } from './moke';
+import {} from '../../../../ts/controller/setting/settingCtrl';
 
 const ShoppingCart: React.FC<any> = (props) => {
   // console.log(props);
-  console.log(marketCtrl.userId);
+  // console.log(marketCtrl.isUserSpace());
 
   const { confirm } = Modal;
-  const fls = [1, 2, 3, 4, 5, 6, 7]; //接口内的数据
+  const [fls, setfls] = useState(Adata.result); //接口内的数据
+
   const v: any[] = [];
   for (let i in fls) {
     //处理立即购买显示隐藏
-    console.log(i);
 
     v.push(false);
   }
@@ -29,6 +31,11 @@ const ShoppingCart: React.FC<any> = (props) => {
         content: '此操作将生成交易订单。是否确认?',
         onOk() {
           console.log('OK', item);
+          marketCtrl.buyApp();
+          let fs = fls;
+          console.log(fs);
+
+          // fs.map((item, i) => {});
         },
         onCancel() {
           console.log('Cancel');
@@ -51,7 +58,7 @@ const ShoppingCart: React.FC<any> = (props) => {
           icon: <CheckCircleFilled className={cls['icon1']} />,
           content: '此操作将生成交易勾选订单。是否确认?',
           onOk() {
-            console.log('OK');
+            console.log('OK', checkval);
             setcheckval([]);
           },
           onCancel() {
@@ -65,7 +72,7 @@ const ShoppingCart: React.FC<any> = (props) => {
           icon: <CheckCircleFilled className={cls['icon1']} />,
           content: '此操作将生成交易订单。是否确认?',
           onOk() {
-            console.log('OK');
+            console.log('OK', checkval);
             setcheckval([]);
           },
           onCancel() {
@@ -108,6 +115,8 @@ const ShoppingCart: React.FC<any> = (props) => {
               setcheckval(checkedValues);
             }}>
             {fls.map((item, i) => {
+              console.log();
+
               return (
                 <div
                   className={cls['box']}
@@ -123,7 +132,7 @@ const ShoppingCart: React.FC<any> = (props) => {
                   <Checkbox
                     className={cls['checkbox']}
                     autoFocus
-                    value={item}
+                    value={item.merchandise.id}
                     onChange={(e: CheckboxChangeEvent) => {
                       console.log(`checked = ${e.target.checked}`);
                     }}>
@@ -133,15 +142,20 @@ const ShoppingCart: React.FC<any> = (props) => {
                     <img src="" alt="" className={cls['boximg']} />
                   </div>
                   <div className={cls['boxright']}>
-                    <div className={cls['boxright_p1']}>万年历</div>
+                    <div className={cls['boxright_p1']}>{item.merchandise.caption}</div>
                     <div className={cls['boxright_p2']}>
                       归属：{'123'} | 版本：{'0.0.1'}
                     </div>
                     <div className={cls['boxright_p3']}>
-                      价格：<span className={cls['boxright_p31']}>￥0,00</span>
+                      价格：
+                      <span className={cls['boxright_p31']}>
+                        {item.merchandise.price
+                          ? '￥' + item.merchandise.price
+                          : '￥0,00'}
+                      </span>
                     </div>
                     <div className={cls['boxright_p4']}>
-                      售卖权属：<span>使用权</span>
+                      售卖权属：<span>{item.merchandise.sellAuth}</span>
                     </div>
                   </div>
                   <div

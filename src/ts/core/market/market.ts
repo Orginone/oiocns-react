@@ -3,12 +3,15 @@ import { CommonStatus, TargetType } from '../enum';
 import { model } from '../../base';
 import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 
-export default class AppStore {
+export default class Market {
   // 商店实体
-  public readonly store: XMarket;
+  private readonly _store: XMarket;
+  public get id(): string {
+    return this._store.id;
+  }
 
   constructor(store: XMarket) {
-    this.store = store;
+    this._store = store;
   }
 
   /**
@@ -28,20 +31,20 @@ export default class AppStore {
     ispublic: boolean,
   ): Promise<model.ResultType<any>> {
     const res = await kernel.updateMarket({
-      id: this.store.id,
+      id: this._store.id,
       name,
       code,
       samrId,
       remark,
       public: ispublic,
-      belongId: this.store.belongId,
+      belongId: this._store.belongId,
     });
     if (res.success) {
-      this.store.name = name;
-      this.store.code = code;
-      this.store.samrId = samrId;
-      this.store.remark = remark;
-      this.store.public = ispublic;
+      this._store.name = name;
+      this._store.code = code;
+      this._store.samrId = samrId;
+      this._store.remark = remark;
+      this._store.public = ispublic;
     }
     return res;
   }
@@ -55,7 +58,7 @@ export default class AppStore {
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryMarketMember({
-      id: this.store.id,
+      id: this._store.id,
       page: page,
     });
   }
@@ -68,7 +71,7 @@ export default class AppStore {
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryJoinMarketApply({
-      id: this.store.id,
+      id: this._store.id,
       page,
     });
   }
@@ -97,7 +100,7 @@ export default class AppStore {
     typenames: string[],
   ): Promise<model.ResultType<any>> {
     return await kernel.pullAnyToMarket({
-      marketId: this.store.id,
+      marketId: this._store.id,
       targetIds: targetIds,
       typeNames: typenames,
     });
@@ -125,7 +128,7 @@ export default class AppStore {
     page: model.PageRequest,
   ): Promise<model.ResultType<XMerchandiseArray>> => {
     return await kernel.searchMerchandise({
-      id: this.store.id,
+      id: this._store.id,
       page: page,
     });
   };
@@ -139,7 +142,7 @@ export default class AppStore {
     page: model.PageRequest,
   ): Promise<model.ResultType<XMerchandiseArray>> {
     return await kernel.queryMerchandiesApplyByManager({
-      id: this.store.id,
+      id: this._store.id,
       page: page,
     });
   }

@@ -11,7 +11,11 @@ import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
+<<<<<<< HEAD
 import { model } from '../../base';
+=======
+// import { model } from '../../base';
+>>>>>>> dev
 import Types from '@/module/typings';
 
 // 新建一个对象 ，避免代码冲突
@@ -72,7 +76,7 @@ class ContentController {
 
   // 切换空间的时候重新初始化，所以需要new
   constructor() {
-    Provider.getWorkSpace();
+    // Provider.getWorkSpace();
     // 如果是一个公司的工作空间，需要初始化一个部门数组
     // 切换工作空间的时候 初始化控制器。
   }
@@ -210,6 +214,7 @@ class ContentController {
 
   // 查询公司底下所有的用户
   public async searchAllPersons(departId?: string): Promise<XTarget[]> {
+<<<<<<< HEAD
     const comp: Company = new Company(Provider.getPerson?.target!);
     let res: model.ResultType<any>;
     if (departId == null) {
@@ -220,12 +225,33 @@ class ContentController {
       console.log('===查询部门底下的用户', res);
     }
     return res.data;
+=======
+    const comp: Company = new Company(Provider.getPerson?.target);
+    let res: XTarget[];
+    if (departId == null) {
+      comp.target.id = this.companyID;
+      comp.target.typeName = TargetType.Company;
+      res = await comp.getPersons();
+      console.log('===查询公司底下的用户', res);
+    } else {
+      comp.target.id = departId;
+      comp.target.typeName = TargetType.Department;
+      res = await comp.getPersons();
+      console.log('===查询部门底下的用户', res);
+    }
+    return res;
+>>>>>>> dev
   }
 
   // 拉人进部门，
   public async pullToDepartment(deptId: string, personId: string) {
+<<<<<<< HEAD
     const res = await this.compService.pullPersonInDepartment(deptId, [personId]);
     return res;
+=======
+    // const res = await this.compService.pullPersonInDepartment(deptId, [personId]);
+    // return res;
+>>>>>>> dev
   }
   // 或移除人出部门， 再拉入部门
 }

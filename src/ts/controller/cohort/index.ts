@@ -13,28 +13,42 @@ class CohortController {
   private _myCohorts: Cohort[];
   private _joinCohorts: Cohort[];
   public callBack!: Function;
+  public joinCallBack!: Function;
   constructor() {
     this._cohorts = [];
     this.workSpace = provider.getPerson!;
-    this._myCohorts = this.getMyCohort;
-    this._joinCohorts = this.getJoinCohort;
+    this._myCohorts = [];
+    this.getMyCohort().then((res) => {
+      this._myCohorts = res;
+    });
+    this._joinCohorts = [];
+    this.getJoinCohort().then((res) => {
+      this._joinCohorts = res;
+    });
   }
 
   public get getCohorts(): Cohort[] {
     return this._cohorts;
   }
 
-  // this._joinedCohorts = this._joinedCohorts.filter((obj) => obj.target.id != id);
-/**
- * 获取我的群组
- */
-  public get getMyCohort(): Cohort[] {
+  public setCallBack(fun: Function) {
+    this.callBack = fun;
+  }
+  public setJoinCallBack(fun: Function) {
+    this.joinCallBack = fun;
+  }
+
+  /**
+   * 获取我的群组
+   * @returns
+   */
+  public getMyCohort = async (): Promise<Cohort[]> => {
     if (provider.getPerson?.target.id == provider.userId) {
       const obj = this.workSpace as Person;
-      if (obj.ChohortArray.length==0) {
-        obj.getJoinedCohorts();
+      if (obj.ChohortArray.length == 0) {
+        await obj.getJoinedCohorts();
         this._cohorts = obj.ChohortArray;
-      }else{
+      } else {
         this._cohorts = obj.ChohortArray;
       }
     }
@@ -43,28 +57,28 @@ class CohortController {
     );
     console.log('我的群组', data);
     return data;
-  }
-/**
- * 获取我加入的群组
- */
-  public get getJoinCohort(): Cohort[] {
+  };
+
+  /**
+   * 获取我的群组
+   * @returns
+   */
+  public getJoinCohort = async (): Promise<Cohort[]> => {
     if (provider.getPerson?.target.id == provider.userId) {
       const obj = this.workSpace as Person;
-      if (obj.ChohortArray == []) {
-        obj.getJoinedCohorts();
+      if (obj.ChohortArray.length == 0) {
+        await obj.getJoinedCohorts();
         this._cohorts = obj.ChohortArray;
-      } 
+      } else {
+        this._cohorts = obj.ChohortArray;
+      }
     }
     let data = this._cohorts.filter(
       (obj) => this.workSpace.target.id != obj.target.belongId,
     );
     console.log('我加入的群组', data);
     return data;
-  }
-
-  public setCallBack(fun: Function) {
-    this.callBack = fun;
-  }
+  };
 
   /**
    * 群组变更
@@ -78,9 +92,19 @@ class CohortController {
     name: string,
     code: string,
     remark: string,
+    belongId: string,
   ): Promise<any> {
-    const res = await obj.updateTargetBase(name, code, TargetType.Cohort, remark);
-    this.callBack([...this.getMyCohort]);
+    const res = await obj.updateTargetBase(
+      name,
+      code,
+      TargetType.Cohort,
+      remark,
+      belongId,
+    );
+    const cohortData = await this.getMyCohort();
+    this.callBack([...cohortData]);
+    const cohorJoinData = await this.getJoinCohort();
+    this.joinCallBack([...cohorJoinData]);
     return res;
   }
   /**
@@ -98,7 +122,8 @@ class CohortController {
   ): Promise<any> {
     const res = await obj.createCohort(name, code, remark);
     // this._cohorts = provider.getPerson!.ChohortArray;
-    this.callBack([...this.getMyCohort]);
+    const cohortData = await this.getMyCohort();
+    this.callBack([...cohortData]);
     return res;
   }
   /**
@@ -121,7 +146,7 @@ class CohortController {
    * @returns
    */
   public async searchPerson(
-    obj: Person | Company,
+    obj: Person | Company | Cohort,
     name: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.searchTargetByName(name, TargetType.Person);
@@ -169,7 +194,8 @@ class CohortController {
     if (res.success) {
       let data = this._cohorts.filter((obj) => id != obj.target.id);
       this._cohorts = data;
-      this.callBack([...this.getMyCohort]);
+      const cohortData = await this.getMyCohort();
+      this.callBack([...cohortData]);
     }
     return res;
   }
@@ -181,11 +207,11 @@ class CohortController {
    * @returns
    */
   public async getRoleList(id: string): Promise<schema.XAuthority[]> {
-    this._myCohorts = this.getMyCohort;
-    console.log("id内容",id)
-    console.log(this._myCohorts)
+    this._myCohorts = await this.getMyCohort();
+    console.log('id内容', id);
+    console.log(this._myCohorts);
     const cohort = this._myCohorts.filter((obj) => id == obj.target.id)[0];
-    if (cohort._ownAuthoritys.length==0) {
+    if (cohort._ownAuthoritys.length == 0) {
       let res = await cohort.selectAuthorityTree(id);
       console.log('职权组织树:', res);
       return [res.data];
@@ -221,20 +247,41 @@ class CohortController {
     this.callBack([...cohort._ownAuthoritys]);
     return res;
   }
+
   /**
-   * 获取群组下的好友
+   * 获取群组下的人员
    */
   public async getCohortPeronList(obj: Cohort): Promise<schema.XTarget[]> {
-    console.log("已进入")
-    console.log("测试输出",obj.getMyPerson)
-    if (obj.getMyPerson.length == 0 ) {
+    console.log('已进入');
+    console.log('测试输出', obj.getMyPerson);
+    if (obj.getMyPerson.length == 0) {
       let res = await obj.getPersons();
       console.log('群组下的人员列表:', res);
-      return res.data.result!;
-    }else{
-    return obj.getMyPerson;
+      return res.data.result!.filter((obj) => provider.userId != obj.id);
+    } else {
+      return obj.getMyPerson!.filter((obj) => provider.userId != obj.id);
     }
   }
+
+  /**
+   * 退出群组
+   * @param obj
+   * @param id
+   * @returns
+   */
+  public async quitCohort(
+    obj: Person | Company,
+    id: string,
+  ): Promise<model.ResultType<any>> {
+    console.log('已进入');
+    // console.log('测试输出', obj.getMyPerson);
+    let res = await obj.quitCohorts(id);
+    console.log('调用结果', res);
+    const cohorJoinData = await this.getJoinCohort();
+    this.joinCallBack([...cohorJoinData]);
+    return res;
+  }
+  
 }
 
 export default new CohortController();

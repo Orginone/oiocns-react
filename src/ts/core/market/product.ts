@@ -99,16 +99,6 @@ export default class Product {
       days: params.days || '0',
       productId: this.prod.id,
     });
-    console.log('哈哈哈哈', res, {
-      id: '',
-      caption: params.caption,
-      marketId: params.marketId,
-      sellAuth: params.sellAuth,
-      information: params.information,
-      price: Number(params.price) ?? 0,
-      days: params.days || '0',
-      productId: this.prod.id,
-    });
 
     if (res.success) {
       this._merchandise.unshift(res.data);
@@ -161,7 +151,7 @@ export default class Product {
       this.prod.code = code;
       this.prod.typeName = typeName;
       this.prod.remark = remark;
-      this._resource = res.data!.resource ?? [];
+      this._resource = res.data.resource ?? [];
     }
     return res;
   }
