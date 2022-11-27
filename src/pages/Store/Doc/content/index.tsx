@@ -80,8 +80,10 @@ const LeftTree = () => {
             createTime: new Date(),
             group: docsCtrl.current.name,
           };
-          taskList.push(task);
           docsCtrl.current?.upload(file.name, file, (p) => {
+            if (p === 0) {
+              taskList.push(task);
+            }
             task.process = p;
             setTaskList([...taskList]);
           });

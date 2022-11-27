@@ -31,15 +31,15 @@ class SettingController extends BaseController {
 
   /** 初始化 */
   private async _initialization() {
+    const companys = await Provider.getPerson!.getJoinedCompanys();
     let personSpace = {
       id: Provider.getPerson!.target.id,
       name: '个人空间',
       isUserSpace: true,
       target: Provider.getPerson!,
     };
+    this._workSpaces = [personSpace];
     this._curWorkSpace = personSpace;
-    this._workSpaces.push(personSpace);
-    const companys = await Provider.getPerson!.getJoinedCompanys();
     companys.forEach((a) => {
       this._workSpaces.push({
         id: a.target.id,
