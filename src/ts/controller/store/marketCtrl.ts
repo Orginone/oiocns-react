@@ -1,40 +1,78 @@
-import { Market } from '@/ts/core/market';
-import Provider from '../../core/provider';
+import { IPerson, ICompany } from './../../core/target/itarget';
+import { Market, BaseProduct } from '@/ts/core/market';
 import BaseController from '../baseCtrl';
-import { settingCtrl } from '../setting/settingCtrl';
-class MarketController extends BaseController {
+import { PageRequest } from '@/ts/base/model';
+export class MarketController extends BaseController {
+  /** 人员/单位 */
+  private _target: IPerson | ICompany;
+  /** 当前操作的商店 */
   private _curMarket: Market | undefined;
-  private _markets: Market[] | undefined;
-  constructor() {
-    super();
-    settingCtrl.OnWorkSpaceChanged(async () => {
-      await this._initialization();
-    });
-  }
+  /** 当前操作的应用 */
+  private _curProd: BaseProduct | undefined;
+  /** 可用应用 */
+  private _usefulProds: BaseProduct[] | undefined;
 
-  /** 初始化 */
-  private async _initialization(): Promise<void> {
-    let workSpace = settingCtrl.getCurWorkSpace;
-    if (!workSpace?.isUserSpace) {
-      this._curMarket = undefined;
-      this._markets = await workSpace?.target?.getJoinMarkets();
-    }
+  constructor(target: IPerson | ICompany) {
+    super();
+    this._target = target;
+    this._usefulProds = [];
+  }
+  /** 获得所有市场 */
+  public get getMarkets() {
+    return this._target.getJoinMarkets();
+  }
+  /** 获取当前操作的市场 */
+  public getCurrentMarket() {
+    return this._curMarket;
+  }
+  /** 获取购物车 */
+  public getStagings() {
+    return this._target.getStaging();
+  }
+  /** 获得所拥有的应用 */
+  public getOwnProduct() {
+    return this._target.getOwnProducts();
+  }
+  /** 获取当前操作的应用 */
+  public getCurrentProduct() {
+    return this._curProd;
+  }
+  /** 切换市场 */
+  public setCurrentMarket(market: Market) {
+    this._curMarket = market;
+    this.changCallback();
+  }
+  /** 切换应用 */
+  public setCurrentProduct(prod: BaseProduct) {
+    this._curProd = prod;
   }
   // 购买
-  public buyApp() {
-    Provider.getPerson?.buyApp();
+  public buyApp() {}
+  /**
+   * 添加购物车
+   * @param id 商品Id
+   */
+  public async addCart(id: string) {
+    await this._target.stagingMerchandise(id);
+    this.changCallback();
   }
-  //加购物车
-  public addCart() {
-    Provider.getPerson?.addCart();
+  /**
+   * 获取购买订单
+   * @param status 订单状态
+   * @param page 分页参数
+   * @returns
+   */
+  public async getBuyOrders(status: number, page: PageRequest) {
+    return await this._target.getBuyOrders(status, page);
   }
-  //获取订单
-  public getOrderList() {
-    Provider.getPerson?.getOrderList();
-  }
-  //取消订单
-  public cancleOrder() {
-    Provider.getPerson?.cancleOrder();
+  /**
+   * 获取售卖订单
+   * @param status 订单状态
+   * @param page 分页参数
+   * @returns
+   */
+  public async getSellOrders(status: number, page: PageRequest) {
+    return await this._target.getSellOrders(status, page);
   }
 
   /**
@@ -48,16 +86,13 @@ class MarketController extends BaseController {
     samrId: string;
     ispublic: boolean;
   }) {
-    const res = await settingCtrl.getCurWorkSpace?.target?.createMarket(
+    await this._target.createMarket(
       data.name,
       data.code,
       data.remark,
       data.samrId,
       data.ispublic,
     );
-    if (res?.success) {
-      this._markets?.push(new Market(res.data));
-    }
     this.changCallback();
   }
 
@@ -66,16 +101,8 @@ class MarketController extends BaseController {
    * @return {*}
    */
   public async deleteMarket(id: string) {
-    const index = this._markets?.findIndex((a) => {
-      return a.market.id == id;
-    });
-    if (index != undefined && index >= 0) {
-      const res = await settingCtrl.getCurWorkSpace?.target?.deleteMarket(market);
-      if (res?.success) {
-        this._markets?.splice(index, 1);
-      }
-      this.changCallback();
-    }
+    await this._target.deleteMarket(id);
+    this.changCallback();
   }
 
   /**
@@ -84,12 +111,7 @@ class MarketController extends BaseController {
    * @return {*}
    */
   public async quitMarket(id: string) {
-    await settingCtrl.getCurWorkSpace?.target?.quitMarket(id);
-  }
-
-  public async getJoinMarkets() {
-    await settingCtrl.getCurWorkSpace?.target?.getJoinMarkets();
+    await this._target.quitMarket(id);
+    this.changCallback();
   }
 }
-
-export const marketCtrl = new MarketController();

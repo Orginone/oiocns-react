@@ -1,6 +1,7 @@
 import Provider from '@/ts/core/provider';
-import { ICompany, IPerson } from './../../core/target/itarget';
+import { IPerson } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
+import CompanyController from './companyCtrl';
 
 /** 空间类型申明 */
 export type SpaceType = {
@@ -10,15 +11,15 @@ export type SpaceType = {
   name: string;
   /**是否是个人空间 */
   isUserSpace?: boolean;
-  /** 个人或公司 */
-  target: IPerson | ICompany;
+  /** 控制器 */
+  controller: CompanyController | SettingController;
 };
 
 /**
  * 设置层， 总控制器
  */
 class SettingController extends BaseController {
-  private _callbacks: (() => void)[] = [];
+  private _person: IPerson | undefined;
   private _curWorkSpace: SpaceType | undefined;
   private _workSpaces: SpaceType[] = [];
 
@@ -31,11 +32,12 @@ class SettingController extends BaseController {
 
   /** 初始化 */
   private async _initialization() {
+    this._person = Provider.getPerson;
     let personSpace = {
       id: Provider.getPerson!.target.id,
       name: '个人空间',
       isUserSpace: true,
-      target: Provider.getPerson!,
+      controller: this,
     };
     this._curWorkSpace = personSpace;
     this._workSpaces.push(personSpace);
@@ -45,10 +47,19 @@ class SettingController extends BaseController {
         id: a.target.id,
         name: a.target.name,
         isUserSpace: false,
-        target: a,
+        controller: new CompanyController(a),
       });
     });
     this.changCallback();
+  }
+
+  /** 获取当前人员 */
+  public get getPerson() {
+    return this._person;
+  }
+  /** 获得加入的群组 */
+  public get getCohorts() {
+    return this._person?.getJoinedCohorts();
   }
 
   /** 获得所有工作空间 */
@@ -56,6 +67,9 @@ class SettingController extends BaseController {
     return this._workSpaces;
   }
 
+  /**
+   * 获得当前空间
+   */
   public get getCurWorkSpace() {
     return this._curWorkSpace;
   }
@@ -63,17 +77,14 @@ class SettingController extends BaseController {
   /**切换工作空间 */
   public changeWorkSpace(space: SpaceType) {
     this._curWorkSpace = space;
-    this._callbacks.forEach((c) => {
-      c.apply(this, []);
-    });
+    this.changCallback();
   }
 
-  public OnWorkSpaceChanged(callback: () => void) {
-    if (callback) {
-      if (this._curWorkSpace) {
-        callback.apply(this, []);
-      }
-      this._callbacks.push(callback);
+  public getCurrentCtrl() {
+    if (this._curWorkSpace) {
+      return this._curWorkSpace?.controller;
+    } else {
+      return this;
     }
   }
 }
