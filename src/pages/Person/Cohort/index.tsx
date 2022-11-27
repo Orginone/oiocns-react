@@ -20,6 +20,7 @@ import CohortController from '../../../ts/controller/cohort/index';
 import ChangeCohort from './SearchCohortPerson/index';
 import CreateCohort from '../../../bizcomponents/Cohort/index';
 import { schema } from '../../../ts/base';
+import { recordExpression } from '@babel/types';
 /**
  * 个人信息
  * @returns
@@ -276,6 +277,7 @@ const CohortConfig: React.FC = () => {
               key: '1',
               children: (
                 <CardOrTable<CohortEnty>
+                  childrenColumnName={'nochildren'}
                   dataSource={data!}
                   total={total}
                   page={page}
@@ -294,7 +296,10 @@ const CohortConfig: React.FC = () => {
                   columns={cohortColumn as any}
                   // style={divStyle}
                   onChange={handlePageChange}
-                  rowKey={'id'}
+                  rowKey={(record) => {
+                    // console.log('8888888888888888888', record.target.id);
+                    return record.target.id;
+                  }}
                 />
               ),
             },
