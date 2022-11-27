@@ -8,6 +8,7 @@ import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { faildResult, schema, kernel, common } from '@/ts/base';
 import { IGroup, ICompany, ICohort, IDepartment, IWorking } from './itarget';
+import Working from './working';
 /**
  * 公司的元操作
  */
@@ -70,7 +71,30 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return res;
   }
-
+  public async removePerson(ids: string[]): Promise<ResultType<any>> {
+    const res = await kernel.removeAnyOfTeamAndBelong({
+      id: this.target.id,
+      teamTypes: [...consts.CompanyTypes, ...this.subTypes],
+      targetIds: ids,
+      targetType: TargetType.Person,
+    });
+    if (res.success) {
+      this.person = this.person.filter((a) => {
+        return !ids.includes(a.id);
+      });
+      this.workings.forEach((a) => {
+        a.person = a.person.filter((a) => {
+          return !ids.includes(a.id);
+        });
+      });
+      this.departments.forEach((a) => {
+        a.person = a.person.filter((a) => {
+          return !ids.includes(a.id);
+        });
+      });
+    }
+    return res;
+  }
   public async deleteDepartment(id: string): Promise<ResultType<any>> {
     const department = this.departments.find((department) => {
       return department.target.id == id;
@@ -190,7 +214,7 @@ export default class Company extends MarketTarget implements ICompany {
     const res = await this.getSubTargets([TargetType.Working]);
     if (res.success) {
       res.data.result?.forEach((a) => {
-        this.workings.push(new Department(a));
+        this.workings.push(new Working(a));
       });
     }
     return this.workings;
