@@ -70,6 +70,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return res;
   }
+
   public async deleteDepartment(id: string): Promise<ResultType<any>> {
     const department = this.departments.find((department) => {
       return department.target.id == id;
@@ -270,5 +271,19 @@ export default class Company extends MarketTarget implements ICompany {
       typeName: TargetType.Company,
       belongId: this.target.id,
     });
+  }
+  public async getUsefulProduct(): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct([
+      TargetType.Department,
+      TargetType.Working,
+      ...consts.CompanyTypes,
+    ]);
+  }
+  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, [
+      TargetType.Department,
+      TargetType.Working,
+      ...consts.CompanyTypes,
+    ]);
   }
 }

@@ -278,4 +278,10 @@ export default class Person extends MarketTarget implements IPerson {
       belongId: this.target.id,
     });
   }
+  public async getUsefulProduct(): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct([TargetType.Cohort, TargetType.Person]);
+  }
+  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
+  }
 }

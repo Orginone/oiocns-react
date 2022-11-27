@@ -422,7 +422,7 @@ export interface IPerson {
    * 加入购物车
    * @param id 商品Id
    */
-  stagingMerchandise(id: string): Promise<ResultType<any>>;
+  stagingMerchandise(id: string): Promise<ResultType<schema.XStaging>>;
   /**
    * 删除购物车
    * @param id
@@ -446,6 +446,13 @@ export interface IPerson {
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
+  /** 获得可用应用 */
+  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 获得可用资源
+   * @param id 应用Id
+   */
+  getUsefulResource(id: string): Promise<schema.XResource[]>;
 }
 /** 单位操作 */
 export interface ICompany {
@@ -715,6 +722,13 @@ export interface ICompany {
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
+  /** 获得可用应用 */
+  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 获得可用资源
+   * @param id 应用Id
+   */
+  getUsefulResource(id: string): Promise<schema.XResource[]>;
 }
 /** 集团操作 */
 export interface IGroup {
