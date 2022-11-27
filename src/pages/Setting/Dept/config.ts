@@ -25,3 +25,6 @@ export const columns: ColumnsType<any> = [
     dataIndex: 'sellAuth',
   },
 ];
+
+
+

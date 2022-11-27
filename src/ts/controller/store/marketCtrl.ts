@@ -1,24 +1,24 @@
+import { Market } from '@/ts/core/market';
 import Provider from '../../core/provider';
-class MarketController {
-  /**
-   * @description: 默认个人空间
-   * @return {*}
-   */
-  curTarget = Provider.getPerson;
-
-  /**
-   * @description: 当前用户
-   * @return {*}
-   */
-  public get userId() {
-    return Provider.userId;
+import BaseController from '../baseCtrl';
+import { settingCtrl } from '../setting/settingCtrl';
+class MarketController extends BaseController {
+  private _curMarket: Market | undefined;
+  private _markets: Market[] | undefined;
+  constructor() {
+    super();
+    settingCtrl.OnWorkSpaceChanged(async () => {
+      await this._initialization();
+    });
   }
-  /**
-   * 是否个人空间
-   * @returns
-   */
-  public get isUserSpace() {
-    return Provider.isUserSpace;
+
+  /** 初始化 */
+  private async _initialization(): Promise<void> {
+    let workSpace = settingCtrl.getCurWorkSpace;
+    if (!workSpace?.isUserSpace) {
+      this._curMarket = undefined;
+      this._markets = await workSpace?.target?.getJoinMarkets();
+    }
   }
   // 购买
   public buyApp() {
@@ -41,28 +41,41 @@ class MarketController {
    * @description: 创建商店
    * @return {*}
    */
-  public async creatMarkrt({
-    name,
-    code,
-    remark,
-    samrId,
-    ispublic,
-  }: {
+  public async creatMarkrt(data: {
     name: string;
     code: string;
     remark: string;
     samrId: string;
     ispublic: boolean;
   }) {
-    await this.curTarget?.createMarket({ name, code, remark, samrId, ispublic });
+    const res = await settingCtrl.getCurWorkSpace?.target?.createMarket(
+      data.name,
+      data.code,
+      data.remark,
+      data.samrId,
+      data.ispublic,
+    );
+    if (res?.success) {
+      this._markets?.push(new Market(res.data));
+    }
+    this.changCallback();
   }
 
   /**
    * @description: 删除商店
    * @return {*}
    */
-  public async deleteMarket(market: any) {
-    await this.curTarget?.deleteMarket(market);
+  public async deleteMarket(id: string) {
+    const index = this._markets?.findIndex((a) => {
+      return a.market.id == id;
+    });
+    if (index != undefined && index >= 0) {
+      const res = await settingCtrl.getCurWorkSpace?.target?.deleteMarket(market);
+      if (res?.success) {
+        this._markets?.splice(index, 1);
+      }
+      this.changCallback();
+    }
   }
 
   /**
@@ -71,13 +84,12 @@ class MarketController {
    * @return {*}
    */
   public async quitMarket(id: string) {
-    await this.curTarget?.quitMarket(id);
+    await settingCtrl.getCurWorkSpace?.target?.quitMarket(id);
   }
 
   public async getJoinMarkets() {
-    await this.curTarget?.getJoinMarkets();
+    await settingCtrl.getCurWorkSpace?.target?.getJoinMarkets();
   }
 }
 
-const marketCtrl = new MarketController();
-export { marketCtrl };
+export const marketCtrl = new MarketController();

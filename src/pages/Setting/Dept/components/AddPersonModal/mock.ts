@@ -6,6 +6,7 @@ export const deptList = [
       {
         name: '张三',
         id: '101',
+        checked:true,
       },
       {
         name: '李四',

@@ -360,6 +360,8 @@ export type TargetModel = {
   code: string;
   // 类型名
   typeName: string;
+  // 头像
+  avatar: string;
   // 创建组织/个人
   belongId: string;
   // 团队名称

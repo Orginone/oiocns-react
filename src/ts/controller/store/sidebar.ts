@@ -1,6 +1,6 @@
 import StoreContent from './content';
 import Provider from '@/ts/core/provider';
-import AppStore from '@/ts/core/market/appstore';
+import { Market } from '@/ts/core/market';
 // import Company from '@/ts/core/target/company';
 import { XMarket } from '@/ts/base/schema';
 import BaseController from '../baseCtrl';
@@ -21,7 +21,7 @@ type AppTreeType = {
   title: string;
   key: string;
   id: string;
-  node?: AppStore;
+  node?: Market;
   children?: any[];
 };
 const selfAppMenu = 'selfAppMenu';
@@ -46,7 +46,7 @@ class StoreClassify extends BaseController {
   ];
   // 商店导航
   static ShopMenu = [{ title: '开放市场', onclick: {}, children: this.SelfMenu }];
-  public _curMarket: AppStore | undefined = new AppStore({
+  public _curMarket: Market | undefined = new Market({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
   public curPageType: 'app' | 'market' = 'app'; // 当前功能页面 app-我的应用页面  market-市场页面
@@ -175,11 +175,11 @@ class StoreClassify extends BaseController {
   /**
    * 页面操作--切换商店
    */
-  public handleSelectMarket(market: AppStore) {
+  public handleSelectMarket(market: Market) {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.store.name || '商店';
+    this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包屑 商店', this.breadcrumb);
     // this.changCallbackPart(`${this.curPageType}TreeData`, [...this.curTreeData]);
     // this.TreeCallBack(market);
@@ -193,8 +193,8 @@ class StoreClassify extends BaseController {
    */
   public async getOwnMarket(isCaback = true) {
     const marketTree = await Provider.getPerson!.getJoinMarkets();
-    let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
-      const item = itemModel.store;
+    let arr: any = marketTree.map((itemModel: Market, index: any) => {
+      const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
       arrs.push(`${item.belongId === Provider.userId ? '删除商店' : '退出商店'}`);
       return {
