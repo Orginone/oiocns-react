@@ -308,6 +308,7 @@ const CohortConfig: React.FC = () => {
               key: '2',
               children: (
                 <CardOrTable<CohortEnty>
+                  childrenColumnName={'nochildren'}
                   dataSource={joinData!}
                   total={total}
                   page={page}
