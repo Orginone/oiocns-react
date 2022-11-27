@@ -72,7 +72,7 @@ class DocsController extends BaseController {
     }
   }
   /**
-   * 树结构搜多
+   * 树结构搜索
    * @param item 文件系统项
    * @param key 唯一标识
    * @returns

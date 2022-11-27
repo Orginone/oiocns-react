@@ -1,8 +1,5 @@
 import {
   Card,
-  Button,
-  Row,
-  Col,
   Upload,
   Dropdown,
   Menu,
@@ -10,6 +7,11 @@ import {
   Input,
   Breadcrumb,
   UploadProps,
+  Progress,
+  Image,
+  Space,
+  Divider,
+  Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import {
@@ -17,25 +19,46 @@ import {
   SyncOutlined,
   CloudUploadOutlined,
   FolderAddOutlined,
-  MoreOutlined,
 } from '@ant-design/icons';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
-import { sleep } from '@/ts/base/common';
 import { RcFile } from 'antd/lib/upload/interface';
+import { IFileSystemItem } from '@/ts/core/store/ifilesys';
+type NameValue = {
+  name: string;
+  value: string;
+};
+
+type UploadProgress = {
+  name: string;
+  size: number;
+  progress: number;
+};
 
 const LeftTree = () => {
+  const [progress, setProgress] = useState<UploadProgress>({
+    name: '',
+    size: 0,
+    progress: 0,
+  });
   const [title, setTitle] = useState('新建文件夹');
   const [reNameKey, setReNameKey] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [current, setCurrent] = useState(docsCtrl.current);
   const [createFileName, setCreateFileName] = useState<any>();
+  const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
   const refreshUI = () => {
-    if (docsCtrl.current) {
+    if (docsCtrl.current != undefined) {
       setCurrent({ ...docsCtrl.current });
     }
   };
   useEffect(() => {
+    fetch('/fileext.json').then(async (res) => {
+      const temp: NameValue[] = await res.json();
+      if (temp && temp.length > 0) {
+        setDicExtension(temp);
+      }
+    });
     const id = docsCtrl.subscribe(refreshUI);
     return () => {
       docsCtrl.unsubscribe(id);
@@ -47,27 +70,50 @@ const LeftTree = () => {
     async customRequest(options) {
       try {
         const file: RcFile = options.file as RcFile;
-        console.log(file.uid, file.size, await file.text());
+        docsCtrl.current?.upload(file.name, file, (p) => {
+          setProgress({
+            name: file.name,
+            size: file.size,
+            progress: parseInt((p * 10000).toFixed()) / 100,
+          });
+          if (p === 1) {
+            setTimeout(() => {
+              setProgress({
+                name: '',
+                size: 0,
+                progress: 0,
+              });
+            }, 1000);
+          }
+        });
       } catch (ex) {
         console.log(ex);
       }
-      await sleep(10000);
     },
   };
-  const getImgSrc = (type: string) => {
-    let prifex = '/icons/';
-    switch (type) {
-      case '':
-        prifex += 'default_folder';
-        break;
-      case 'file':
-        prifex += 'default_file';
-        break;
-      default:
-        prifex += 'file_type_' + type;
-        break;
+  const getThumbnail = (item: IFileSystemItem) => {
+    if (item.target.thumbnail.length > 0) {
+      return item.target.thumbnail;
     }
-    return prifex + '.svg';
+    let prifex = '/icons/';
+    if (item.target.extension === '') {
+      return prifex + 'default_folder.svg';
+    } else {
+      for (const d of dicExtension) {
+        if (d.name === item.target.extension.toLowerCase()) {
+          return prifex + 'file_type_' + d.value + '.svg';
+        }
+      }
+    }
+    return prifex + 'default_file.svg';
+  };
+  const getPreview = (el: any) => {
+    if (el.target.thumbnail?.length > 0) {
+      return {
+        src: '/orginone/anydata/bucket/load/' + el.target.shareLink,
+      };
+    }
+    return false;
   };
   const getBreadcrumb = (key: string, items: any[]) => {
     const item = docsCtrl.refItem(key);
@@ -130,79 +176,92 @@ const LeftTree = () => {
   };
   return (
     <Card className={cls.container}>
-      <div className={cls.top}>
-        <div className={cls.topBox}>
-          <Button
-            shape="circle"
+      <div className={cls.header}>
+        <Space wrap split={<Divider type="vertical" />} size={2}>
+          <Typography.Link
+            disabled={current?.parent == undefined ?? false}
             onClick={() => {
               docsCtrl.backup();
-            }}
-            type="text"
-            disabled={current?.parent == undefined ?? false}
-            icon={<ArrowUpOutlined />}></Button>
-          <Button
-            shape="circle"
-            type="text"
+            }}>
+            <ArrowUpOutlined />
+          </Typography.Link>
+          <Typography.Link
             onClick={() => {
               docsCtrl.current?.loadChildren(true);
               docsCtrl.changCallback();
-            }}
-            icon={<SyncOutlined />}></Button>
+            }}>
+            <SyncOutlined />
+          </Typography.Link>
           <Upload {...props}>
-            <Button shape="circle" type="text" icon={<CloudUploadOutlined />}></Button>
+            <Typography.Link>
+              <CloudUploadOutlined />
+            </Typography.Link>
           </Upload>
-          <Button
-            shape="circle"
-            type="text"
-            icon={<FolderAddOutlined />}
+          <Typography.Link
             onClick={() => {
               setCreateFileName('');
               setTitle('新建文件夹');
               setIsModalOpen(true);
-            }}></Button>
-          <MoreOutlined />
-          <Breadcrumb>
-            {getBreadcrumb(current?.key ?? '', []).map((item) => {
-              return (
-                <>
-                  <Breadcrumb.Item
-                    key={item.key}
-                    onClick={async () => {
-                      await docsCtrl.open(item.key);
-                    }}>
-                    {item.label}
-                  </Breadcrumb.Item>
-                </>
-              );
-            })}
-          </Breadcrumb>
-        </div>
+            }}>
+            <FolderAddOutlined />
+          </Typography.Link>
+          <div style={{ width: '100%', cursor: 'pointer' }}>
+            <Breadcrumb>
+              {getBreadcrumb(current?.key ?? '', []).map((item) => {
+                return (
+                  <>
+                    <Breadcrumb.Item
+                      key={item.key}
+                      onClick={async () => {
+                        await docsCtrl.open(item.key);
+                      }}>
+                      {item.label}
+                    </Breadcrumb.Item>
+                  </>
+                );
+              })}
+            </Breadcrumb>
+          </div>
+          {progress.size > 0 ? (
+            <div style={{ display: 'flex', position: 'absolute', right: 10, top: 18 }}>
+              <div>{progress.name}</div>
+              <div style={{ width: 170, marginLeft: 10 }}>
+                <Progress percent={progress.progress} size="small" />
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+        </Space>
       </div>
       <div className={cls.content}>
-        <div className={cls.file}>
-          <Row gutter={16}>
-            {current?.children.map((el) => {
-              return (
-                <Dropdown
+        <Image.PreviewGroup>
+          {current?.children.map((el) => {
+            return (
+              <Dropdown
+                key={el.key}
+                overlay={<Menu items={getItemMenu(el)} />}
+                trigger={['contextMenu']}>
+                <Card
+                  hoverable
+                  className={cls.fileBox}
                   key={el.key}
-                  overlay={<Menu items={getItemMenu(el)} />}
-                  trigger={['contextMenu']}>
-                  <Col
-                    key={el.key}
-                    span={2}
-                    onDoubleClick={() => {
-                      docsCtrl.open(el.key);
-                    }}>
-                    <div className={cls.fileBox}>
-                      <img src={getImgSrc(el.extension)} className={cls.fileImg}></img>
-                      <div className={cls.fileName}>{el.name}</div>
-                    </div>
-                  </Col>
-                </Dropdown>
-              );
-            })}
-          </Row>
-        </div>
+                  onDoubleClick={() => {
+                    docsCtrl.open(el.key);
+                  }}>
+                  <Image
+                    height={80}
+                    src={getThumbnail(el)}
+                    fallback="/icons/default_file.svg"
+                    preview={getPreview(el)}></Image>
+                  <div className={cls.fileName} title={el.name}>
+                    {el.name}
+                  </div>
+                </Card>
+              </Dropdown>
+            );
+          })}
+        </Image.PreviewGroup>
       </div>
       <Modal
         destroyOnClose

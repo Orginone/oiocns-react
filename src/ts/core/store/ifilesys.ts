@@ -2,6 +2,8 @@ import { FileItemModel } from '../../base/model';
 
 /** 可为空的文件系统 */
 export type IObjectItem = IFileSystemItem | undefined;
+/** 可为空的进度回调 */
+export type OnProgressType = (p: number) => void | undefined;
 
 /**
  * 文件系统项接口
@@ -13,8 +15,6 @@ export interface IFileSystemItem {
   name: string;
   /** 是否为根路径 */
   isRoot: boolean;
-  /** 拓展名 */
-  extension: string;
   /** 文件系统项对应的目标 */
   target: FileItemModel;
   /** 上级文件系统项 */
@@ -55,4 +55,12 @@ export interface IFileSystemItem {
    * @param {boolean} reload 重新加载,默认false
    */
   loadChildren(reload: boolean): Promise<boolean>;
+  /**
+   * 上传文件
+   * @param name 文件名
+   * @param id 唯一id
+   * @param file 文件内容
+   * @param {OnProgressType} onProgress 进度回调
+   */
+  upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void>;
 }
