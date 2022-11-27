@@ -1,8 +1,7 @@
 import StoreContent from './content';
-import Provider from '@/ts/core/provider';
-import AppStore from '@/ts/core/market/appstore';
-import Company from '@/ts/core/target/company';
-import { XMarket } from '@/ts/base/schema';
+import Provider from '../../core/provider';
+import { Market } from '../../core/market';
+import { XMarket } from '../../base/schema';
 /**
  * @desc: 设置模块 导航控件
  * @return {*}
@@ -19,21 +18,21 @@ type AppTreeType = {
   title: string;
   key: string;
   id: string;
-  node?: AppStore;
+  node?: Market;
   children?: any[];
 };
 
 class StoreClassify {
   // constructor(parameters) {}
   // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
-  public _curMarket: AppStore | undefined = new AppStore({
+  public _curMarket: Market | undefined = new Market({
     id: '358266491960954880',
   } as XMarket); // 当前商店信息
   public currentMenu: 'myApps' | 'market' = 'myApps'; // 当前功能页面 myApps-我的应用页面  market-市场页面
   public curTreeData: any; // 当前展示树内容
   public breadcrumb: string[] = ['设置', '我的应用']; //导航展示
   public TreeCallBack: undefined | ((data: any[]) => void) = undefined; //页面传进来的更新树形区域 钩子
-  public SelectMarketCallBack: undefined | ((item: AppStore) => void) = undefined; //选择商店后 触发展示区回调
+  public SelectMarketCallBack: undefined | ((item: Market) => void) = undefined; //选择商店后 触发展示区回调
 
   // 底部区域
   // 缓存 所有 tree 展示数据
@@ -100,11 +99,11 @@ class StoreClassify {
   /**
    * 页面操作--切换商店
    */
-  public handleSelectTree(market: AppStore) {
+  public handleSelectTree(market: Market) {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.store.name || '商店';
+    this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包靴 应用', this.breadcrumb);
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
   }
@@ -112,11 +111,11 @@ class StoreClassify {
   /**
    * 页面操作--切换商店
    */
-  public handleSelectMarket(market: AppStore) {
+  public handleSelectMarket(market: Market) {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
-    this.breadcrumb[3] = market.store.name || '商店';
+    this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包靴 商店', this.breadcrumb);
 
     this.SelectMarketCallBack && this.SelectMarketCallBack(market);
@@ -130,8 +129,8 @@ class StoreClassify {
    */
   private async getOwnMarket() {
     const marketTree = await Provider.getPerson.getJoinMarkets();
-    let arr: any = marketTree.map((itemModel: AppStore, index: any) => {
-      const item = itemModel.store;
+    let arr: any = marketTree.map((itemModel: Market, index: any) => {
+      const item = itemModel.market;
       return {
         title: item.name,
         key: `0-${index}`,

@@ -11,6 +11,11 @@ export default class BaseProduct {
     return this._prod.id;
   }
 
+  /** 获取应用资源 */
+  public get getResources() {
+    return this._resource;
+  }
+
   constructor(prod: schema.XProduct) {
     this._prod = prod;
     this._resource = [];

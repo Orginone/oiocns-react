@@ -2,16 +2,16 @@ import { kernel } from '../../base';
 import { CommonStatus, TargetType } from '../enum';
 import { model } from '../../base';
 import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
+import consts from '../consts';
+import IMarket from './imarket';
 
-export default class Market {
-  // 商店实体
-  private readonly _store: XMarket;
-  public get id(): string {
-    return this._store.id;
-  }
+export default class Market implements IMarket {
+  market: XMarket;
+  pullTypes: TargetType[];
 
   constructor(store: XMarket) {
-    this._store = store;
+    this.market = store;
+    this.pullTypes = [TargetType.Person, ...consts.CompanyTypes];
   }
 
   /**
@@ -31,20 +31,20 @@ export default class Market {
     ispublic: boolean,
   ): Promise<model.ResultType<any>> {
     const res = await kernel.updateMarket({
-      id: this._store.id,
+      id: this.market.id,
       name,
       code,
       samrId,
       remark,
       public: ispublic,
-      belongId: this._store.belongId,
+      belongId: this.market.belongId,
     });
     if (res.success) {
-      this._store.name = name;
-      this._store.code = code;
-      this._store.samrId = samrId;
-      this._store.remark = remark;
-      this._store.public = ispublic;
+      this.market.name = name;
+      this.market.code = code;
+      this.market.samrId = samrId;
+      this.market.remark = remark;
+      this.market.public = ispublic;
     }
     return res;
   }
@@ -54,11 +54,11 @@ export default class Market {
    * @param page 分页参数
    * @returns 加入的商店成员
    */
-  public async getUser(
+  public async getMember(
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryMarketMember({
-      id: this._store.id,
+      id: this.market.id,
       page: page,
     });
   }
@@ -67,11 +67,11 @@ export default class Market {
    * 分页获取加入商店申请
    * @param page
    */
-  public async getUserApply(
+  public async getJoinApply(
     page: model.PageRequest,
   ): Promise<model.ResultType<XMarketRelationArray>> {
     return await kernel.queryJoinMarketApply({
-      id: this._store.id,
+      id: this.market.id,
       page,
     });
   }
@@ -95,43 +95,35 @@ export default class Market {
    * @param typenames 对象类型
    * @returns 是否成功
    */
-  public async pull(
-    targetIds: string[],
-    typenames: string[],
-  ): Promise<model.ResultType<any>> {
+  public async pullMember(targetIds: string[]): Promise<model.ResultType<any>> {
     return await kernel.pullAnyToMarket({
-      marketId: this._store.id,
       targetIds: targetIds,
-      typeNames: typenames,
+      marketId: this.market.id,
+      typeNames: this.pullTypes,
     });
   }
 
   /**
    * 移除商店成员
-   * @param id 成员ID
+   * @param targetIds 成员ID集合
    * @param typename 成员类型
    * @return 移除人员结果
    */
-  public async removeMember(
-    id: string,
-    typename: TargetType,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.removeMarketMember({ id: id, belongId: '', typeName: typename });
+  public async removeMember(targetIds: string[]): Promise<model.ResultType<any>> {
+    return await kernel.removeMarketMember({
+      targetIds,
+      marketId: this.market.id,
+      typeNames: this.pullTypes,
+    });
   }
-
-  /**
-   * 获取商品列表
-   * @param page 分页参数
-   * @returns 返回商店商品列表
-   */
-  public getMerchandise = async (
+  public async getMerchandise(
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMerchandiseArray>> => {
+  ): Promise<model.ResultType<XMerchandiseArray>> {
     return await kernel.searchMerchandise({
-      id: this._store.id,
+      id: this.market.id,
       page: page,
     });
-  };
+  }
 
   /**
    * 获取商品上架申请列表
@@ -142,7 +134,7 @@ export default class Market {
     page: model.PageRequest,
   ): Promise<model.ResultType<XMerchandiseArray>> {
     return await kernel.queryMerchandiesApplyByManager({
-      id: this._store.id,
+      id: this.market.id,
       page: page,
     });
   }

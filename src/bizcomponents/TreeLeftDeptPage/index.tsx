@@ -12,7 +12,7 @@ type TreeLeftPageProps = {
 
 const TreeLeftPage: React.FC<TreeLeftPageProps> = ({
   isCreategroup = true,
-  createTitle = '添加岗位',
+  createTitle = '添加部门',
   onClick,
 }) => {
   return (
