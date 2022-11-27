@@ -56,6 +56,7 @@ export class FileSystemItem implements IFileSystemItem {
       if (res.success && res.data) {
         this.target.hasSubDirectories = true;
         this.children.push(new FileSystemItem(res.data, this));
+        return true;
       }
     }
     return false;
