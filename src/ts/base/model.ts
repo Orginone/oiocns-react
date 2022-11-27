@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -792,12 +793,60 @@ export type FileItemModel = {
   name: string;
   /** 完整路径 */
   key: string;
+  /** 共享链接 */
+  shareLink: string;
+  /** 拓展名 */
+  extension: string;
+  /** 缩略图 */
+  thumbnail: string;
   /** 创建时间 */
   dateCreated: Date;
   /** 修改时间 */
   dateModified: Date;
+  /** 文件类型 */
+  contentType: string;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */
   hasSubDirectories: boolean;
+};
+
+/** 桶支持的操作 */
+export enum BucketOpreates {
+  List = 'List',
+  Create = 'Create',
+  Rename = 'Rename',
+  Move = 'Move',
+  Copy = 'Copy',
+  Delete = 'Delete',
+  Upload = 'Upload',
+  AbortUpload = 'AbortUpload',
+}
+
+/** 桶操作携带的数据模型 */
+export type BucketOpreateModel = {
+  /** 完整路径 */
+  key: string;
+  /** 名称 */
+  name?: string;
+  /** 共享域 */
+  shareDomain: string;
+  /** 目标 */
+  destination?: string;
+  /** 操作 */
+  operate: BucketOpreates;
+  /** 携带的分片数据 */
+  fileItem?: FileChunkData;
+};
+
+/** 上传文件携带的数据 */
+export type FileChunkData = {
+  /** 分片索引 */
+  index: number;
+  /** 文件大小 */
+  size: number;
+  /** 上传的唯一ID */
+  uploadId: string;
+  /** 分片数据 */
+  data: number[];
 };

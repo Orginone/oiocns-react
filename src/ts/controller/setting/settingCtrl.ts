@@ -32,25 +32,27 @@ class SettingController extends BaseController {
 
   /** 初始化 */
   private async _initialization() {
-    this._person = Provider.getPerson;
-    let personSpace = {
-      id: Provider.getPerson!.target.id,
-      name: '个人空间',
-      isUserSpace: true,
-      controller: this,
-    };
-    this._curWorkSpace = personSpace;
-    this._workSpaces.push(personSpace);
-    const companys = await Provider.getPerson!.getJoinedCompanys();
-    companys.forEach((a) => {
-      this._workSpaces.push({
-        id: a.target.id,
-        name: a.target.name,
-        isUserSpace: false,
-        controller: new CompanyController(a),
+    if (Provider.getPerson) {
+      this._person = Provider.getPerson;
+      const companys = await this._person.getJoinedCompanys();
+      let personSpace = {
+        id: Provider.getPerson!.target.id,
+        name: '个人空间',
+        isUserSpace: true,
+        controller: this,
+      };
+      this._workSpaces = [personSpace];
+      this._curWorkSpace = personSpace;
+      companys.forEach((a) => {
+        this._workSpaces.push({
+          id: a.target.id,
+          name: a.target.name,
+          isUserSpace: false,
+          controller: new CompanyController(a),
+        });
       });
-    });
-    this.changCallback();
+      this.changCallback();
+    }
   }
 
   /** 获取当前人员 */

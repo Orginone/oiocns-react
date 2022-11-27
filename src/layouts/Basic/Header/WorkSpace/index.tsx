@@ -39,7 +39,7 @@ const OrganizationalItem = (item: SpaceType) => {
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [current, setCurrent] = useState<SpaceType>();
-  const [menuList, setMenuList] = useState<SpaceType[]>([]);
+  const [menuList, setMenuList] = useState(settingCtrl.getWorkSpaces);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
@@ -79,16 +79,16 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (Provider.getPerson) {
-      setMenuList(settingCtrl.getWorkSpaces);
-      setCurrent(settingCtrl.getCurWorkSpace);
-      // const curspace = Provider.getWorkSpace();
-      // setCurrent(
-      //   allWorkSpaces.find((space) => {
-      //     return space.id == curspace?.target.id;
-      //   }),
-      // );
-    }
+    const id = settingCtrl.subscribe(() => {
+      console.log(settingCtrl.getWorkSpaces);
+      setMenuList([...settingCtrl.getWorkSpaces]);
+      if (settingCtrl.getCurWorkSpace) {
+        setCurrent({ ...settingCtrl.getCurWorkSpace });
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
   }, []);
 
   return Provider.getPerson ? (

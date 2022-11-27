@@ -36,7 +36,9 @@ export default class Provider {
   public static onSetPerson(callback: () => void): void {
     if (callback) {
       if (this.getPerson) {
-        callback.apply(this, []);
+        setTimeout(() => {
+          callback.apply(this, []);
+        }, 500);
       }
       this._callbacks.push(callback);
     }
@@ -79,9 +81,11 @@ export default class Provider {
     this._person = new Person(data);
     this.setWorkSpace({ id: this._person.target.id, name: '个人空间' });
     sessionStorage.setItem(sessionStorageName, JSON.stringify(data));
-    this._callbacks.forEach((c) => {
-      c.apply(this, []);
-    });
+    setTimeout(() => {
+      this._callbacks.forEach((c) => {
+        c.apply(this, []);
+      });
+    }, 500);
   }
   /**
    * 登录

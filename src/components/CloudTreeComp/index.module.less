@@ -1,6 +1,19 @@
 :global {
+  .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
+    background-color: #f2f6fc;
+  }
   .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
     display: none;
+  }
+  .ogo-tree-indent-unit{
+    width: 6px;
+  }
+  .ogo-tree .ogo-tree-node-content-wrapper .ogo-tree-iconEle{
+    width: 18px;
+    margin-right: 4px;
+  }
+  .ogo-tree-switcher{
+    width: 20px;
   }
 }
 
@@ -27,9 +40,5 @@
 .titleIcon {
   &:nth-of-type(2) {
     font-size: 17px;
-  }
-
-  &:hover {
-    color: @primary-color;
   }
 }
