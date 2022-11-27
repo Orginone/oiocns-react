@@ -7,7 +7,6 @@ import {
   Input,
   Breadcrumb,
   UploadProps,
-  Progress,
   Image,
   Space,
   Divider,
@@ -19,30 +18,25 @@ import {
   SyncOutlined,
   CloudUploadOutlined,
   FolderAddOutlined,
+  CloudSyncOutlined,
+  AppstoreOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import { RcFile } from 'antd/lib/upload/interface';
 import { IFileSystemItem } from '@/ts/core/store/ifilesys';
+import Plan, { TaskModel } from '../plan';
 type NameValue = {
   name: string;
   value: string;
 };
 
-type UploadProgress = {
-  name: string;
-  size: number;
-  progress: number;
-};
-
 const LeftTree = () => {
-  const [progress, setProgress] = useState<UploadProgress>({
-    name: '',
-    size: 0,
-    progress: 0,
-  });
+  const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('新建文件夹');
   const [reNameKey, setReNameKey] = useState('');
+  const [taskList, setTaskList] = useState<TaskModel[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [current, setCurrent] = useState(docsCtrl.current);
   const [createFileName, setCreateFileName] = useState<any>();
@@ -64,28 +58,35 @@ const LeftTree = () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
+  const Uploading = () => {
+    for (const t of taskList) {
+      if (t.process < 1) {
+        return true;
+      }
+    }
+    return false;
+  };
   const props: UploadProps = {
     multiple: true,
     showUploadList: false,
     async customRequest(options) {
       try {
-        const file: RcFile = options.file as RcFile;
-        docsCtrl.current?.upload(file.name, file, (p) => {
-          setProgress({
+        if (docsCtrl.current) {
+          const file: RcFile = options.file as RcFile;
+          const task: TaskModel = {
+            process: 0,
             name: file.name,
             size: file.size,
-            progress: parseInt((p * 10000).toFixed()) / 100,
+            createTime: new Date(),
+            group: docsCtrl.current.name,
+          };
+          taskList.push(task);
+          docsCtrl.current?.upload(file.name, file, (p) => {
+            task.process = p;
+            setTaskList([...taskList]);
           });
-          if (p === 1) {
-            setTimeout(() => {
-              setProgress({
-                name: '',
-                size: 0,
-                progress: 0,
-              });
-            }, 1000);
-          }
-        });
+          setOpen(true);
+        }
       } catch (ex) {
         console.log(ex);
       }
@@ -175,125 +176,134 @@ const LeftTree = () => {
     ];
   };
   return (
-    <Card className={cls.container}>
-      <div className={cls.header}>
-        <Space wrap split={<Divider type="vertical" />} size={2}>
-          <Typography.Link
-            disabled={current?.parent == undefined ?? false}
-            onClick={() => {
-              docsCtrl.backup();
-            }}>
-            <ArrowUpOutlined />
-          </Typography.Link>
-          <Typography.Link
-            onClick={() => {
-              docsCtrl.current?.loadChildren(true);
-              docsCtrl.changCallback();
-            }}>
-            <SyncOutlined />
-          </Typography.Link>
-          <Upload {...props}>
-            <Typography.Link>
-              <CloudUploadOutlined />
+    <>
+      <Card className={cls.container}>
+        <div className={cls.docheader}>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            <Typography.Link
+              disabled={current?.parent == undefined ?? false}
+              onClick={() => {
+                docsCtrl.backup();
+              }}>
+              <ArrowUpOutlined />
             </Typography.Link>
-          </Upload>
-          <Typography.Link
-            onClick={() => {
-              setCreateFileName('');
-              setTitle('新建文件夹');
-              setIsModalOpen(true);
-            }}>
-            <FolderAddOutlined />
-          </Typography.Link>
-          <div style={{ width: '100%', cursor: 'pointer' }}>
-            <Breadcrumb>
-              {getBreadcrumb(current?.key ?? '', []).map((item) => {
-                return (
-                  <>
-                    <Breadcrumb.Item
-                      key={item.key}
-                      onClick={async () => {
-                        await docsCtrl.open(item.key);
-                      }}>
-                      {item.label}
-                    </Breadcrumb.Item>
-                  </>
-                );
-              })}
-            </Breadcrumb>
-          </div>
-          {progress.size > 0 ? (
-            <div style={{ display: 'flex', position: 'absolute', right: 10, top: 18 }}>
-              <div>{progress.name}</div>
-              <div style={{ width: 170, marginLeft: 10 }}>
-                <Progress percent={progress.progress} size="small" />
-              </div>
+            <Typography.Link
+              onClick={() => {
+                docsCtrl.current?.loadChildren(true);
+                docsCtrl.changCallback();
+              }}>
+              <SyncOutlined />
+            </Typography.Link>
+            <Upload {...props}>
+              <Typography.Link style={{ fontSize: 18 }}>
+                <CloudUploadOutlined />
+              </Typography.Link>
+            </Upload>
+            <Typography.Link
+              onClick={() => {
+                setCreateFileName('');
+                setTitle('新建文件夹');
+                setIsModalOpen(true);
+              }}>
+              <FolderAddOutlined />
+            </Typography.Link>
+            <div style={{ width: '100%', cursor: 'pointer' }}>
+              <Breadcrumb>
+                {getBreadcrumb(current?.key ?? '', []).map((item) => {
+                  return (
+                    <>
+                      <Breadcrumb.Item
+                        key={item.key}
+                        onClick={async () => {
+                          await docsCtrl.open(item.key);
+                        }}>
+                        {item.label}
+                      </Breadcrumb.Item>
+                    </>
+                  );
+                })}
+              </Breadcrumb>
             </div>
-          ) : (
-            ''
-          )}
-        </Space>
-      </div>
-      <div className={cls.content}>
-        <Image.PreviewGroup>
-          {current?.children.map((el) => {
-            return (
-              <Dropdown
-                key={el.key}
-                overlay={<Menu items={getItemMenu(el)} />}
-                trigger={['contextMenu']}>
-                <Card
-                  hoverable
-                  className={cls.fileBox}
+          </Space>
+          <Space wrap split={<Divider type="vertical" />} size={2}>
+            <Typography.Link
+              onClick={() => {
+                setOpen(true);
+              }}>
+              {Uploading() ? <LoadingOutlined /> : <CloudSyncOutlined />}
+            </Typography.Link>
+            <Typography.Link>
+              <AppstoreOutlined />
+            </Typography.Link>
+          </Space>
+        </div>
+        <div className={cls.content}>
+          <Image.PreviewGroup>
+            {current?.children.map((el) => {
+              return (
+                <Dropdown
                   key={el.key}
-                  onDoubleClick={() => {
-                    docsCtrl.open(el.key);
-                  }}>
-                  <Image
-                    height={80}
-                    src={getThumbnail(el)}
-                    fallback="/icons/default_file.svg"
-                    preview={getPreview(el)}></Image>
-                  <div className={cls.fileName} title={el.name}>
-                    {el.name}
-                  </div>
-                </Card>
-              </Dropdown>
-            );
-          })}
-        </Image.PreviewGroup>
-      </div>
-      <Modal
-        destroyOnClose
-        title={title}
-        open={isModalOpen}
-        onOk={async () => {
-          setIsModalOpen(false);
-          if (createFileName != '') {
-            if (title === '重名名') {
-              if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
-                docsCtrl.changCallback();
-              }
-            } else {
-              if (await docsCtrl.current?.create(createFileName)) {
-                docsCtrl.changCallback();
+                  overlay={<Menu items={getItemMenu(el)} />}
+                  trigger={['contextMenu']}>
+                  <Card
+                    hoverable
+                    className={cls.fileBox}
+                    key={el.key}
+                    onDoubleClick={() => {
+                      docsCtrl.open(el.key);
+                    }}>
+                    <Image
+                      height={80}
+                      src={getThumbnail(el)}
+                      fallback="/icons/default_file.svg"
+                      preview={getPreview(el)}></Image>
+                    <div className={cls.fileName} title={el.name}>
+                      {el.name}
+                    </div>
+                  </Card>
+                </Dropdown>
+              );
+            })}
+          </Image.PreviewGroup>
+        </div>
+        <Modal
+          destroyOnClose
+          title={title}
+          open={isModalOpen}
+          onOk={async () => {
+            setIsModalOpen(false);
+            if (createFileName != '') {
+              if (title === '重名名') {
+                if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
+                  docsCtrl.changCallback();
+                }
+              } else {
+                if (await docsCtrl.current?.create(createFileName)) {
+                  docsCtrl.changCallback();
+                }
               }
             }
-          }
-        }}
-        onCancel={() => {
-          setCreateFileName('');
-          setIsModalOpen(false);
-        }}>
-        <Input
-          defaultValue={createFileName}
-          onChange={(e: any) => {
-            setCreateFileName(e.target.value);
           }}
-          placeholder={title}
-        />
-      </Modal>
-    </Card>
+          onCancel={() => {
+            setCreateFileName('');
+            setIsModalOpen(false);
+          }}>
+          <Input
+            defaultValue={createFileName}
+            onChange={(e: any) => {
+              setCreateFileName(e.target.value);
+            }}
+            placeholder={title}
+          />
+        </Modal>
+      </Card>
+      <Plan
+        isOpen={open}
+        taskList={taskList}
+        onClose={() => {
+          setOpen(false);
+        }}></Plan>
+    </>
   );
 };
 export default LeftTree;
