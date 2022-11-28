@@ -75,7 +75,7 @@ class StoreContent {
     }
 
     const res = await Fun(params);
-    console.log('获取数据', res);
+    console.log('获取数据', type, res);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
