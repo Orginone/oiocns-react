@@ -15,7 +15,7 @@ import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
-import { Product } from '@/ts/core/market';
+import { BaseProduct } from '@/ts/core/market';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -89,13 +89,13 @@ const StoreApp: React.FC = () => {
 
     setShowShareModal(false);
   };
-  const renderOperation = (item: Product): MarketTypes.OperationType[] => {
+  const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item.prod.id } });
+          history.push({ pathname: '/online', state: { appId: item._prod?.id } });
         },
       },
       {
@@ -103,7 +103,9 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/info', state: { appId: item.prod.id } });
+          console.log('333', item.prod);
+
+          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
         },
       },
       {
@@ -111,7 +113,10 @@ const StoreApp: React.FC = () => {
         label: '管理',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/manage', state: { appId: item.prod.id } });
+          history.push({
+            pathname: '/store/app/manage',
+            state: { appId: item._prod?.id },
+          });
         },
       },
       {
@@ -121,7 +126,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/putaway',
-            state: { appId: item.prod.id },
+            state: { appId: item._prod?.id },
           });
         },
       },
@@ -148,7 +153,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/publish',
-            state: { appId: item.prod.id },
+            state: { appId: item._prod?.id },
           });
         },
       },
