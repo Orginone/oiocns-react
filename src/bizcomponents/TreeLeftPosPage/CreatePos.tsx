@@ -1,14 +1,27 @@
-import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
+import { Input, Card, List, Modal, Avatar, Button, Typography } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import {
   DownOutlined,
   PlusOutlined,
   MoreOutlined,
+  UserOutlined,
+  RightOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
+
+/** 获取角色当前名称 */
+interface PositionBean {
+  key: string;
+  id: string;
+  name: string;
+  code: string;
+  create: string;
+  createTime: string;
+  remark: string;
+}
 
 const x = 3;
 const y = 2;
@@ -109,6 +122,25 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     setAutoExpandParent(true);
   };
 
+  const data = [
+    {
+      icon: '',
+      title: '管理员',
+    },
+  ];
+
+  const positionList = (
+    <List
+      dataSource={data}
+      renderItem={(item) => (
+        <List.Item>
+          <UserOutlined />
+          {item.title}
+        </List.Item>
+      )}
+    />
+  );
+
   return (
     <div>
       <Button
@@ -130,45 +162,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
         />
 
         <div className={cls.joingroup}>创建的岗位</div>
-
-        <Tree
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          switcherIcon={<DownOutlined />}
-          autoExpandParent={autoExpandParent}
-          treeData={treeData}
-          onSelect={(e) => {
-            if (e && e.length > 0) {
-              settingController.trigger('createDept', { id: e[0] });
-            }
-          }}
-          showIcon={true}
-          titleRender={(e) => {
-            return (
-              <div
-                className={cls.rightstyle}
-                onMouseOver={() => {
-                  setHoverItemMes(e.key);
-                }}>
-                {/* { e.icon? React.createElement(Icon[e.iconMes]):null} */}
-                <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-                {hoverItemMes === e.key ? (
-                  <Space>
-                    <span
-                      onClick={() => {
-                        settingController.trigger('isOpenModal');
-                      }}>
-                      <PlusOutlined />
-                    </span>
-                    <span>
-                      <MoreOutlined />
-                    </span>
-                  </Space>
-                ) : null}
-              </div>
-            );
-          }}
-        />
+        {positionList}
       </div>
     </div>
   );

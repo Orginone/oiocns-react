@@ -193,22 +193,6 @@ const SettingDept: React.FC = () => {
   };
 
   // 岗位信息标题
-  const title2 = (
-    <div className={cls['company-dept-title']}>
-      <div>
-        <Title level={4}>岗位名字</Title>
-      </div>
-      <div>
-        <Button
-          type="link"
-          onClick={() => {
-            console.log('指派岗位');
-          }}>
-          指派岗位
-        </Button>
-      </div>
-    </div>
-  );
 
   //岗位主体
   const deptCount = (
