@@ -16,6 +16,7 @@ import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { Product } from '@/ts/core/market';
+import DeleteCustomModal from '@/components/DeleteCustomModal';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -30,6 +31,7 @@ const StoreApp: React.FC = () => {
   const [data, setData] = useState([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
   const shareRef = useRef<any>(null);
   useEffect(() => {
@@ -135,6 +137,15 @@ const StoreApp: React.FC = () => {
         },
       },
       {
+        key: 'delete',
+        label: '移除',
+        onClick: () => {
+          // StoreContent.selectedProduct(item);
+          // shareRef.current?.resetData();
+          setIsDeleteOpen(true);
+        },
+      },
+      {
         key: 'share2',
         label: '分配',
         onClick: () => {
@@ -197,8 +208,9 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp onCheckeds={onCheckeds}/>
+        <ShareComp onCheckeds={onCheckeds} />
       </Modal>
+      <DeleteCustomModal title="警告" open={isDeleteOpen} deleOrQuit="delete" />
       {/* 详情页面 /store/app/info*/}
       <Route
         exact

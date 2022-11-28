@@ -412,7 +412,7 @@ export default abstract class SpaceTarget {
    * @param _product 应用
    * @returns
    */
-  deleteProduct = async (_product: Product): Promise<model.ResultType<boolean>> => {
+  deleteProduct = async (_productId: string): Promise<model.ResultType<boolean>> => {
     throw consts.FunctionNotFoundError;
   };
 

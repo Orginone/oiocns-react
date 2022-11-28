@@ -50,10 +50,6 @@ class MarketController {
   public async quitMarket(id: string) {
     await this.curTarget?.quitMarket(id);
   }
-
-  public async getJoinMarkets() {
-    await this.curTarget?.getJoinMarkets();
-  }
 }
 const marketCtrl = new MarketController();
 export { marketCtrl };
