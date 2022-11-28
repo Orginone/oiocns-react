@@ -9,7 +9,7 @@ import {
   Input,
   message,
 } from 'antd';
-import { TeamOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
@@ -83,7 +83,7 @@ const App: React.FC = () => {
       <div>
         <a href="https://ant.design">{value.name.last}</a>
         <span>
-          <TeamOutlined size={10} style={{ paddingLeft: '5px' }} />
+          <UserOutlined size={10} style={{ paddingLeft: '5px' }} />
         </span>
       </div>
     );

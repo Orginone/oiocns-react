@@ -341,10 +341,7 @@ const CohortConfig: React.FC = () => {
                   columns={cohortColumn as any}
                   // style={divStyle}
                   onChange={handlePageChange}
-                  rowKey={(record) => {
-                    // console.log('8888888888888888888', record.target.id);
-                    return record.target.id;
-                  }}
+                  rowKey={'id'}
                 />
               ),
             },
