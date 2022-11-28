@@ -216,7 +216,11 @@ const LeftTree = () => {
             </antd.Typography.Link>
           </antd.Space>
         </div>
-        <div className={cls.content}>
+        <div
+          className={cls.content}
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}>
           <antd.Image.PreviewGroup>
             {current?.children.map((el) => {
               return (
