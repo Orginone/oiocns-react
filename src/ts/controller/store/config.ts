@@ -59,7 +59,7 @@ export const marketColumns: any = [
   },
   {
     title: '应用类型',
-    dataIndex: 'typeName',
+    dataIndex: ['product', 'typeName'],
   },
   {
     title: '售卖权限',
@@ -78,6 +78,6 @@ export const marketColumns: any = [
   {
     title: '备注',
     ellipsis: true,
-    dataIndex: 'remark',
+    dataIndex: ['product', 'remark'],
   },
 ];

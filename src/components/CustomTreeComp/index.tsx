@@ -1,9 +1,4 @@
-import {
-  EllipsisOutlined,
-  LeftCircleOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState } from 'react';
@@ -182,7 +177,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       <Tree
         className="draggable-tree"
-        switcherIcon={<LeftCircleOutlined />}
+        // switcherIcon={<LeftCircleOutlined />}
         titleRender={renderTreeTitle}
         defaultExpandedKeys={expandedKeys}
         draggable={draggable}
