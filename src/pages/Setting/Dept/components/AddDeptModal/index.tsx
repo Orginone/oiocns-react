@@ -1,19 +1,19 @@
 /**
  * 岗位设置弹窗
- * */ 
+ * */
 import React, { useState } from 'react';
-import { Modal, Card, Row, Col, Checkbox,Radio, Button, message } from 'antd';
+import { Modal, Card, Row, Col, Checkbox, Radio, Button, message } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { deptList, deptArrList } from './mock';
 import { deepClone } from '@/ts/base/common';
-import {initDatatype} from '@/ts/core/setting/isetting';
+import { initDatatype } from '@/ts/core/setting/isetting';
 
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: (checkJob:initDatatype,checkUser:initDatatype[]) => void;
+  onOk: (checkJob: initDatatype, checkUser: initDatatype[]) => void;
   handleOk: () => void;
 }
 
@@ -21,7 +21,7 @@ const AddDeptModal = (props: Iprops) => {
   const { title, open, onOk, handleOk } = props;
   let [openIdArr, setOpenIDArr] = useState<Array<string>>([]);
   const [checkUser, setCheckUser] = useState<initDatatype[]>([]);
-  const [checkJob, setCheckJob] = useState<{ id?: string, name?: string }>({});
+  const [checkJob, setCheckJob] = useState<{ id?: string; name?: string }>({});
   // 点击展开收起
   const toggle = (selectId: string) => {
     if (openIdArr.includes(selectId)) {
@@ -35,16 +35,18 @@ const AddDeptModal = (props: Iprops) => {
     let currentValue;
     if (val.target.checked) {
       currentValue = deepClone(checkUser);
-      currentValue.push({checked:val.target.checked,id, name });
-    } else { 
-      currentValue = checkUser.filter((item) => {return !(item.id === id)})
+      currentValue.push({ checked: val.target.checked, id, name });
+    } else {
+      currentValue = checkUser.filter((item) => {
+        return !(item.id === id);
+      });
     }
     setCheckUser(currentValue);
   };
 
   const onRadioChange = (_: any, id: string, name: string) => {
     setCheckJob(Object.assign({}, { id: id, name: name }));
-  }
+  };
 
   const cardLeft = (
     <Card>
@@ -68,7 +70,9 @@ const AddDeptModal = (props: Iprops) => {
                   {item.children.map((child) => {
                     return (
                       <div className={cls[`cardleft-item-children`]} key={child.id}>
-                        <Checkbox  onChange={(e) => onChange(e,child.id,child.name)}>{child.name}</Checkbox>
+                        <Checkbox onChange={(e) => onChange(e, child.id, child.name)}>
+                          {child.name}
+                        </Checkbox>
                       </div>
                     );
                   })}
@@ -94,19 +98,22 @@ const AddDeptModal = (props: Iprops) => {
             <div key={item.id} className={cls[`cardright-dept`]}>
               <span className={cls[`cardright-dept-title-name`]}>{item.name}</span>
               <div className={cls[`cardright-item`]}>
-                <Radio.Group value={checkJob.id||''}>
+                <Radio.Group value={checkJob.id || ''}>
                   {item.children.map((child) => {
                     return (
                       <div key={child.id} className={cls[`cardright-item-children`]}>
-                        <Radio onChange={(e) => {
-                          onRadioChange(e.target.checked,child.id,child.name);
-                         }} value={child.id}>{child.name}</Radio>
+                        <Radio
+                          onChange={(e) => {
+                            onRadioChange(e.target.checked, child.id, child.name);
+                          }}
+                          value={child.id}>
+                          {child.name}
+                        </Radio>
                       </div>
                     );
                   })}
                 </Radio.Group>
               </div>
-              
             </div>
           );
         })}
@@ -117,7 +124,7 @@ const AddDeptModal = (props: Iprops) => {
     <Modal
       title={title}
       open={open}
-      onCancel={()=>handleOk()}
+      onCancel={() => handleOk()}
       getContainer={false}
       width={600}
       footer={null}>
@@ -131,7 +138,7 @@ const AddDeptModal = (props: Iprops) => {
         <Button
           type="primary"
           onClick={() => {
-            onOk(checkJob,checkUser);
+            onOk(checkJob, checkUser);
           }}>
           完成
         </Button>
