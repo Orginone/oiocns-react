@@ -16,6 +16,7 @@ import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { BaseProduct } from '@/ts/core/market';
+import DeleteCustomModal from '@/components/DeleteCustomModal';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
