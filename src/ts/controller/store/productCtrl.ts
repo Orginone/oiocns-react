@@ -9,7 +9,7 @@ class productContCtrl {
   public async createProduct(
     values: Omit<ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
   ) {
-    return await provider!.getPerson!.createProduct(values);
+    return await provider!.getPerson!.createProduct({ ...values });
   }
 }
 

@@ -253,8 +253,6 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
-    console.log('555656565', res);
-
     if (res.success) {
       this.joinedMarkets.push(new Market(res.data!));
     }
@@ -265,20 +263,27 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  public async createProduct(
+  public createProduct = async ({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName = 'webApp',
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId?: string,
+    thingId?: string;
     // 产品类型名
-    typeName: string = 'webApp',
-  ): Promise<model.ResultType<schema.XProduct>> {
+    typeName?: string;
+  }): Promise<model.ResultType<schema.XProduct>> => {
     const res = await kernel.createProduct({
       name,
       code,
@@ -293,7 +298,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       this.ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
-  }
+  };
 
   public async stagingMerchandise(
     id: string,
@@ -307,9 +312,6 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         merchandiseId: id,
         belongId: this.target.id,
       });
-      if (res.success) {
-        this.stagings.push(res.data);
-      }
       return res;
     }
     return faildResult(consts.IsExistError);

@@ -86,8 +86,6 @@ export class MarketController extends BaseController {
     samrId: string;
     ispublic: boolean;
   }) => {
-    console.log('this._target', this._target);
-
     await this._target.createMarket(
       data.name,
       data.code,
@@ -102,10 +100,10 @@ export class MarketController extends BaseController {
    * @description: 删除商店
    * @return {*}
    */
-  public async deleteMarket(id: string) {
+  public deleteMarket = async (id: string) => {
     await this._target.deleteMarket(id);
     this.changCallback();
-  }
+  };
 
   /**
    * @description: 退出商店
