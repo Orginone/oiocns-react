@@ -13,6 +13,7 @@ interface TreeType {
   handleAddClick?: (node: any) => void; //点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   title?: ReactElement | string;
+  [key: string]: any;
 }
 
 const StoreClassifyTree: React.FC<TreeType> = ({
@@ -24,16 +25,21 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   handleAddClick,
   handleMenuClick,
   handleTitleClick,
+  ...otherTreeConfig
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
   const renderMenu: (data: any) => MenuProps['items'] = (data) => {
     if (menu === 'menus') {
       return data?.menus?.map((item: string) => {
-        return {
-          key: item,
-          label: item,
-        };
+        if (typeof item === 'string') {
+          return {
+            key: item,
+            label: item,
+          };
+        } else {
+          return item;
+        }
       });
     }
     return menu?.map((item) => {
@@ -180,6 +186,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       <Tree
         className="draggable-tree"
         // switcherIcon={<LeftCircleOutlined />}
+        showIcon
         titleRender={renderTreeTitle}
         defaultExpandedKeys={expandedKeys}
         draggable={draggable}
@@ -187,6 +194,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         onDragEnter={onDragEnter}
         onDrop={onDrop}
         treeData={treeData}
+        {...otherTreeConfig}
       />
     </div>
   );

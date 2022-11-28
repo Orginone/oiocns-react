@@ -1,3 +1,4 @@
+import { model } from '@/ts/base';
 import Provider from '../../core/provider';
 import { FileSystemItem } from '../../core/store/filesys';
 import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
@@ -20,7 +21,7 @@ class DocsController extends BaseController {
         hasSubDirectories: true,
         dateCreated: new Date(),
         dateModified: new Date(),
-      },
+      } as model.FileItemModel,
       undefined,
     );
     this._curKey = this._root.key;
