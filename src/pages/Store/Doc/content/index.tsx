@@ -1,106 +1,97 @@
-import {
-  Card,
-  Button,
-  Row,
-  Col,
-  Upload,
-  Dropdown,
-  Menu,
-  Modal,
-  Input,
-  Breadcrumb,
-} from 'antd';
+import * as antd from 'antd';
+import * as im from 'react-icons/im';
+import * as fa from 'react-icons/fa';
 import React, { useEffect, useState } from 'react';
-import {
-  ArrowUpOutlined,
-  SyncOutlined,
-  CloudUploadOutlined,
-  FolderAddOutlined,
-  MoreOutlined,
-} from '@ant-design/icons';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import { RcFile } from 'antd/lib/upload/interface';
+import { IFileSystemItem } from '@/ts/core/store/ifilesys';
+import Plan, { TaskModel } from '../plan';
+type NameValue = {
+  name: string;
+  value: string;
+};
 
 const LeftTree = () => {
+  const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('新建文件夹');
   const [reNameKey, setReNameKey] = useState('');
+  const [taskList, setTaskList] = useState<TaskModel[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [current, setCurrent] = useState(docsCtrl.current);
   const [createFileName, setCreateFileName] = useState<any>();
+  const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
   const refreshUI = () => {
-    if (docsCtrl.current) {
+    if (docsCtrl.current != undefined) {
       setCurrent({ ...docsCtrl.current });
     }
   };
   useEffect(() => {
+    fetch('/fileext.json').then(async (res) => {
+      const temp: NameValue[] = await res.json();
+      if (temp && temp.length > 0) {
+        setDicExtension(temp);
+      }
+    });
     const id = docsCtrl.subscribe(refreshUI);
     return () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
-  // // 双击文件
-  // const fileDoubleClick = async (e: any, data: any) => {
-  //   setOnIndex(null);
-  //   e.stopPropagation();
-  //   Bucket.Current = data;
-  //   const res = await Bucket.GetContent();
-  //   CloudStore.setChoudData(res);
-  // };
-  // // 删除文件
-  // const delFile = (data: any) => {
-  //   confirm({
-  //     title: '确认删除此文件?',
-  //     icon: <ExclamationCircleOutlined />,
-  //     okText: '确认',
-  //     okType: 'danger',
-  //     cancelText: '取消',
-  //     async onOk() {
-  //       await Bucket.deleteFile(data);
-  //       message.success('文件删除成功');
-  //       await getBaseFileList(true); // 渲染文档
-  //       let orgData = [...gData];
-  //       Bucket.HandleDeleteTree(orgData, Bucket.Current);
-  //       CloudStore.setCloudTree(orgData);
-  //     },
-  //     onCancel() {
-  //       console.log('Cancel');
-  //     },
-  //   });
-  // };
-  // const props: UploadProps = {
-  //   name: 'file',
-  //   action: `/orginone/anydata/Bucket/Upload?shareDomain=user&prefix=${key}`,
-  //   headers: {
-  //     authorization: sessionStorage.Token,
-  //   },
-  //   showUploadList: false,
-  //   async onChange(info) {
-  //     if (info.file.status !== 'uploading') {
-  //       console.log(info.file, info.fileList);
-  //     }
-  //     if (info.file.status === 'done') {
-  //       message.success('文件上传成功');
-  //       await getBaseFileList();
-  //       CloudStore.setCloudTree(gData);
-  //     } else if (info.file.status === 'error') {
-  //       message.error(`${info.file.name} file upload failed.`);
-  //     }
-  //   },
-  // };
-  const getImgSrc = (type: string) => {
-    let prifex = '/icons/';
-    switch (type) {
-      case '':
-        prifex += 'default_folder';
-        break;
-      case 'file':
-        prifex += 'default_file';
-        break;
-      default:
-        prifex += 'file_type_' + type;
-        break;
+  const Uploading = () => {
+    for (const t of taskList) {
+      if (t.process < 1) {
+        return true;
+      }
     }
-    return prifex + '.svg';
+    return false;
+  };
+  const props: antd.UploadProps = {
+    multiple: true,
+    showUploadList: false,
+    async customRequest(options) {
+      if (docsCtrl.current) {
+        const file: RcFile = options.file as RcFile;
+        const task: TaskModel = {
+          process: 0,
+          name: file.name,
+          size: file.size,
+          createTime: new Date(),
+          group: docsCtrl.current.name,
+        };
+        docsCtrl.current?.upload(file.name, file, (p) => {
+          if (p === 0) {
+            taskList.push(task);
+          }
+          task.process = p;
+          setTaskList([...taskList]);
+        });
+      }
+    },
+  };
+  const getThumbnail = (item: IFileSystemItem) => {
+    if (item.target.thumbnail.length > 0) {
+      return item.target.thumbnail;
+    }
+    let prifex = '/icons/';
+    if (item.target.extension === '') {
+      return prifex + 'default_folder.svg';
+    } else {
+      for (const d of dicExtension) {
+        if (d.name === item.target.extension.toLowerCase()) {
+          return prifex + 'file_type_' + d.value + '.svg';
+        }
+      }
+    }
+    return prifex + 'default_file.svg';
+  };
+  const getPreview = (el: any) => {
+    if (el.target.thumbnail?.length > 0) {
+      return {
+        src: '/orginone/anydata/bucket/load/' + el.target.shareLink,
+      };
+    }
+    return false;
   };
   const getBreadcrumb = (key: string, items: any[]) => {
     const item = docsCtrl.refItem(key);
@@ -126,17 +117,21 @@ const LeftTree = () => {
     return [
       {
         key: '1',
+        icon: <fa.FaTrashAlt />,
         label: (
           <div
-            onClick={() => {
-              // delFile(el);
+            onClick={async () => {
+              if (await docsCtrl.refItem(el.key)?.delete()) {
+                docsCtrl.changCallback();
+              }
             }}>
-            删除文件
+            删除
           </div>
         ),
       },
       {
         key: '2',
+        icon: <fa.FaEdit />,
         label: (
           <div
             onClick={() => {
@@ -160,112 +155,138 @@ const LeftTree = () => {
     ];
   };
   return (
-    <Card className={cls.container}>
-      <div className={cls.top}>
-        <div className={cls.topBox}>
-          <Button
-            shape="circle"
-            onClick={() => {
-              docsCtrl.backup();
-            }}
-            type="text"
-            disabled={current?.parent == undefined ?? false}
-            icon={<ArrowUpOutlined />}></Button>
-          <Button
-            shape="circle"
-            type="text"
-            onClick={() => {
-              docsCtrl.current?.loadChildren(true);
-              docsCtrl.changCallback();
-            }}
-            icon={<SyncOutlined />}></Button>
-          <Upload>
-            <Button shape="circle" type="text" icon={<CloudUploadOutlined />}></Button>
-          </Upload>
-          <Button
-            shape="circle"
-            type="text"
-            icon={<FolderAddOutlined />}
-            onClick={() => {
-              setCreateFileName('');
-              setTitle('新建文件夹');
-              setIsModalOpen(true);
-            }}></Button>
-          <MoreOutlined />
-          <Breadcrumb>
-            {getBreadcrumb(current?.key ?? '', []).map((item) => {
-              return (
-                <>
-                  <Breadcrumb.Item
-                    key={item.key}
-                    onClick={async () => {
-                      await docsCtrl.open(item.key);
-                    }}>
-                    {item.label}
-                  </Breadcrumb.Item>
-                </>
-              );
-            })}
-          </Breadcrumb>
+    <>
+      <antd.Card className={cls.container}>
+        <div className={cls.docheader}>
+          <antd.Space wrap split={<antd.Divider type="vertical" />} size={2}>
+            <antd.Typography.Link
+              disabled={current?.parent == undefined ?? false}
+              onClick={() => {
+                docsCtrl.backup();
+              }}>
+              <im.ImArrowUp2 />
+            </antd.Typography.Link>
+            <antd.Typography.Link
+              onClick={() => {
+                docsCtrl.current?.loadChildren(true);
+                docsCtrl.changCallback();
+              }}>
+              <im.ImSpinner9 />
+            </antd.Typography.Link>
+            <antd.Upload {...props}>
+              <antd.Typography.Link style={{ fontSize: 18 }}>
+                <im.ImUpload />
+              </antd.Typography.Link>
+            </antd.Upload>
+            <antd.Typography.Link
+              onClick={() => {
+                setCreateFileName('');
+                setTitle('新建文件夹');
+                setIsModalOpen(true);
+              }}>
+              <im.ImFolderPlus />
+            </antd.Typography.Link>
+            <div style={{ width: '100%', cursor: 'pointer' }}>
+              <antd.Breadcrumb separator={<im.ImPlay3 />}>
+                {getBreadcrumb(current?.key ?? '', []).map((item) => {
+                  return (
+                    <>
+                      <antd.Breadcrumb.Item
+                        key={item.key}
+                        onClick={async () => {
+                          await docsCtrl.open(item.key);
+                        }}>
+                        {item.label}
+                      </antd.Breadcrumb.Item>
+                    </>
+                  );
+                })}
+              </antd.Breadcrumb>
+            </div>
+          </antd.Space>
+          <antd.Space wrap split={<antd.Divider type="vertical" />} size={2}>
+            <antd.Typography.Link
+              onClick={() => {
+                setOpen(true);
+              }}>
+              {Uploading() ? <fa.FaHourglassHalf /> : <fa.FaHourglassEnd />}
+            </antd.Typography.Link>
+            <antd.Typography.Link>
+              <fa.FaTh />
+            </antd.Typography.Link>
+          </antd.Space>
         </div>
-      </div>
-      <div className={cls.content}>
-        <div className={cls.file}>
-          <Row gutter={16}>
+        <div
+          className={cls.content}
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}>
+          <antd.Image.PreviewGroup>
             {current?.children.map((el) => {
               return (
-                <Dropdown
+                <antd.Dropdown
                   key={el.key}
-                  overlay={<Menu items={getItemMenu(el)} />}
+                  overlay={<antd.Menu items={getItemMenu(el)} />}
                   trigger={['contextMenu']}>
-                  <Col
+                  <antd.Card
+                    hoverable
+                    className={cls.fileBox}
                     key={el.key}
-                    span={2}
                     onDoubleClick={() => {
                       docsCtrl.open(el.key);
                     }}>
-                    <div className={cls.fileBox}>
-                      <img src={getImgSrc(el.extension)} className={cls.fileImg}></img>
-                      <div className={cls.fileName}>{el.name}</div>
+                    <antd.Image
+                      height={80}
+                      src={getThumbnail(el)}
+                      fallback="/icons/default_file.svg"
+                      preview={getPreview(el)}></antd.Image>
+                    <div className={cls.fileName} title={el.name}>
+                      {el.name}
                     </div>
-                  </Col>
-                </Dropdown>
+                  </antd.Card>
+                </antd.Dropdown>
               );
             })}
-          </Row>
+          </antd.Image.PreviewGroup>
         </div>
-      </div>
-      <Modal
-        destroyOnClose
-        title={title}
-        open={isModalOpen}
-        onOk={async () => {
-          setIsModalOpen(false);
-          if (createFileName != '') {
-            if (title === '重名名') {
-              if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
-                docsCtrl.changCallback();
-              }
-            } else {
-              if (await docsCtrl.current?.create(createFileName)) {
-                docsCtrl.changCallback();
+        <antd.Modal
+          destroyOnClose
+          title={title}
+          open={isModalOpen}
+          onOk={async () => {
+            setIsModalOpen(false);
+            if (createFileName != '') {
+              if (title === '重名名') {
+                if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
+                  docsCtrl.changCallback();
+                }
+              } else {
+                if (await docsCtrl.current?.create(createFileName)) {
+                  docsCtrl.changCallback();
+                }
               }
             }
-          }
-        }}
-        onCancel={() => {
-          setCreateFileName('');
-          setIsModalOpen(false);
-        }}>
-        <Input
-          defaultValue={createFileName}
-          onChange={(e: any) => {
-            setCreateFileName(e.target.value);
           }}
-          placeholder={title}
-        />
-      </Modal>
-    </Card>
+          onCancel={() => {
+            setCreateFileName('');
+            setIsModalOpen(false);
+          }}>
+          <antd.Input
+            defaultValue={createFileName}
+            onChange={(e: any) => {
+              setCreateFileName(e.target.value);
+            }}
+            placeholder={title}
+          />
+        </antd.Modal>
+      </antd.Card>
+      <Plan
+        isOpen={open}
+        taskList={taskList}
+        onClose={() => {
+          setOpen(false);
+        }}></Plan>
+    </>
   );
 };
 export default LeftTree;

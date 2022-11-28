@@ -19,6 +19,8 @@ import CohortEnty from '../../../ts/core/target/cohort';
 import CohortController from '../../../ts/controller/cohort/index';
 import ChangeCohort from './SearchCohortPerson/index';
 import CreateCohort from '../../../bizcomponents/Cohort/index';
+import { schema } from '../../../ts/base';
+import { recordExpression } from '@babel/types';
 /**
  * 个人信息
  * @returns
@@ -29,7 +31,7 @@ const CohortConfig: React.FC = () => {
   });
   const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
-  console.log('workSpaceId', PersonInfoEnty.getWorkSpace());
+  // console.log('workSpaceId', PersonInfoEnty.getWorkSpace());
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
@@ -38,7 +40,7 @@ const CohortConfig: React.FC = () => {
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
   const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
-  const [friend, setFriend] = useState<Person>();
+  const [friend, setFriend] = useState<schema.XTarget>();
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
@@ -178,7 +180,7 @@ const CohortConfig: React.FC = () => {
   //邀请成员确认事件
   const handleOk = async () => {
     setIsModalOpen(false);
-    const res = CohortController.pullCohort(item!, [friend?.id!]);
+    const res = CohortController.pullCohort(item!, [friend!]);
     if ((await res).success) {
       console.log(res);
       message.success('邀请成功');
@@ -195,7 +197,7 @@ const CohortConfig: React.FC = () => {
     setAddIsModalOpen(false);
   };
 
-  const searchCallback = (person: Person) => {
+  const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
 
@@ -275,6 +277,7 @@ const CohortConfig: React.FC = () => {
               key: '1',
               children: (
                 <CardOrTable<CohortEnty>
+                  childrenColumnName={'nochildren'}
                   dataSource={data!}
                   total={total}
                   page={page}
@@ -293,7 +296,10 @@ const CohortConfig: React.FC = () => {
                   columns={cohortColumn as any}
                   // style={divStyle}
                   onChange={handlePageChange}
-                  rowKey={'id'}
+                  rowKey={(record) => {
+                    // console.log('8888888888888888888', record.target.id);
+                    return record.target.id;
+                  }}
                 />
               ),
             },
@@ -302,6 +308,7 @@ const CohortConfig: React.FC = () => {
               key: '2',
               children: (
                 <CardOrTable<CohortEnty>
+                  childrenColumnName={'nochildren'}
                   dataSource={joinData!}
                   total={total}
                   page={page}

@@ -1,77 +1,64 @@
-import { faildResult, kernel, model, schema } from '../../base';
-import { TargetType } from '../enum';
 import consts from '../consts';
 import BaseTarget from './base';
+import { ResultType, TargetModel } from '@/ts/base/model';
+import { XTarget } from '@/ts/base/schema';
+import { IGroup } from './itarget';
+import { TargetType } from '../enum';
+import { faildResult, kernel } from '@/ts/base';
 
-export default class Group extends BaseTarget {
-  public _subGroups: Group[];
-  constructor(target: schema.XTarget) {
+export default class Group extends BaseTarget implements IGroup {
+  subGroup: IGroup[];
+  companys: XTarget[];
+  joinedGroup: XTarget[];
+
+  constructor(target: XTarget) {
     super(target);
-    this._subGroups = [];
+    this.subGroup = [];
+    this.companys = [];
+    this.joinedGroup = [];
+    this.subTypes = [TargetType.Group, ...consts.CompanyTypes];
+    this.joinTargetType = [TargetType.Group];
+    this.pullTypes = consts.CompanyTypes;
+    this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
   }
-
-  protected get searchTargetType(): TargetType[] {
-    return [...consts.CompanyTypes];
+  public async update(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<XTarget>> {
+    return await super.updateTarget(data);
   }
-
-  /**
-   * 申请加入集团
-   * @param id 目标Id
-   * @returns
-   */
-  public applyJoinGroup = async (id: string): Promise<model.ResultType<any>> => {
-    return await this.applyJoin(id, TargetType.Group);
-  };
-
-  /**
-   * 设立子集团
-   * @param name 子集团名称
-   * @param code 子集团代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 子集团简介
-   * @returns 是否成功
-   */
-  public async createSubGroup(
-    name: string,
-    code: string,
-    teamName: string,
-    teamCode: string,
-    remark: string,
-  ): Promise<model.ResultType<any>> {
-    const tres = await this.getTargetByName({
-      name,
-      typeName: TargetType.Group,
-      page: { offset: 0, limit: 1, filter: code },
-    });
-    if (tres.success) {
-      if (!tres.data) {
-        const res = await this.createTarget(
-          name,
-          code,
-          TargetType.Group,
-          teamName,
-          teamCode,
-          remark,
-        );
-        if (res.success) {
-          this._subGroups.push(new Group(res.data));
-          return this.pull([res.data.id], TargetType.Group);
-        }
-        return res;
-      }
-      return faildResult(consts.IsExistError);
+  public async getJoinedGroups(): Promise<XTarget[]> {
+    if (this.joinedGroup.length > 0) {
+      return this.joinedGroup;
     }
-    return tres;
+    const res = await super.getjoinedTargets([TargetType.Group]);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.joinedGroup.push(a);
+      });
+    }
+    return this.joinedGroup;
   }
-
-  /**
-   * 删除集团
-   * @param id 集团Id
-   * @returns
-   */
-  public async deleteSubGroup(id: string): Promise<model.ResultType<any>> {
-    const group = this._subGroups.find((group) => {
+  public async applyJoinGroup(id: string): Promise<ResultType<any>> {
+    return super.applyJoin(id, TargetType.Group);
+  }
+  public async createSubGroup(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<any>> {
+    const tres = await this.searchTargetByName(data.code, TargetType.Group);
+    if (!tres.data) {
+      const res = await this.createTarget(data);
+      if (res.success) {
+        const group = new Group(res.data);
+        this.subGroup.push(group);
+        return await group.pullMember([this.target]);
+      }
+      return res;
+    } else {
+      return faildResult('该集团已存在!');
+    }
+  }
+  public async deleteSubGroup(id: string): Promise<ResultType<any>> {
+    const group = this.subGroup.find((group) => {
       return group.target.id == id;
     });
     if (group != undefined) {
@@ -81,7 +68,7 @@ export default class Group extends BaseTarget {
         subNodeTypeNames: [TargetType.Group],
       });
       if (res.success) {
-        this._subGroups = this._subGroups.filter((group) => {
+        this.subGroup = this.subGroup.filter((group) => {
           return group.target.id != id;
         });
       }
@@ -89,72 +76,26 @@ export default class Group extends BaseTarget {
     }
     return faildResult(consts.UnauthorizedError);
   }
-
-  /**
-   * 获取集团下的人员（单位、集团）
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getPersons(
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    if (id == '0') {
-      id = this.target.id;
+  public async getCompanys(): Promise<XTarget[]> {
+    if (this.companys.length > 0) {
+      return this.companys;
     }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Group],
-      [TargetType.Person],
-    );
-  }
-
-  /**
-   * 获取集团下的单位
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getCompanys(
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    if (id == '0') {
-      id = this.target.id;
+    const res = await this.getSubTargets(consts.CompanyTypes);
+    if (res.success && res.data.result != undefined) {
+      this.companys = res.data.result;
     }
-    return await this.getSubTargets(
-      id,
-      [...consts.CompanyTypes, TargetType.Group],
-      [...consts.CompanyTypes],
-    );
+    return this.companys;
   }
-
-  /**
-   * 获取集团下的集团
-   * @param id 组织Id 默认为当前集团
-   * @returns
-   */
-  public async getGroups(
-    id: string = '0',
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    if (id == '0') {
-      id = this.target.id;
+  public async getSubGroups(): Promise<IGroup[]> {
+    if (this.subGroup.length > 0) {
+      return this.subGroup;
     }
-    return await this.getSubTargets(id, [TargetType.Group], [TargetType.Group]);
+    const res = await this.getSubTargets([TargetType.Group]);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.subGroup.push(new Group(a));
+      });
+    }
+    return this.subGroup;
   }
-
-  /**
-   * 拉单位进入集团
-   * @param companyIds 单位Id集合
-   * @returns 是否成功
-   */
-  public pullCompanys = async (companyIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(companyIds, TargetType.Company);
-  };
-
-  /**
-   * 拉集团进入集团
-   * @param personIds 集团Id集合
-   * @returns 是否成功
-   */
-  public pullGroups = async (groupIds: string[]): Promise<model.ResultType<any>> => {
-    return await this.pull(groupIds, TargetType.Group);
-  };
 }

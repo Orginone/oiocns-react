@@ -15,7 +15,7 @@ import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
-import { Product } from '@/ts/core/market';
+import { BaseProduct } from '@/ts/core/market';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -89,13 +89,13 @@ const StoreApp: React.FC = () => {
 
     setShowShareModal(false);
   };
-  const renderOperation = (item: Product): MarketTypes.OperationType[] => {
+  const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item.prod.id } });
+          history.push({ pathname: '/online', state: { appId: item.id } });
         },
       },
       {
@@ -103,7 +103,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/info', state: { appId: item.prod.id } });
+          history.push({ pathname: '/store/app/info', state: { appId: item.id } });
         },
       },
       {
@@ -111,7 +111,7 @@ const StoreApp: React.FC = () => {
         label: '管理',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/manage', state: { appId: item.prod.id } });
+          history.push({ pathname: '/store/app/manage', state: { appId: item.id } });
         },
       },
       {
@@ -121,7 +121,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/putaway',
-            state: { appId: item.prod.id },
+            state: { appId: item.id },
           });
         },
       },
@@ -148,7 +148,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/publish',
-            state: { appId: item.prod.id },
+            state: { appId: item.id },
           });
         },
       },
@@ -203,26 +203,20 @@ const StoreApp: React.FC = () => {
       <Route
         exact
         path="/store/app/info"
-        render={() => (
-          <AppInfo appId={StoreContent._curProduct?.prod.id || ''} />
-        )}></Route>
+        render={() => <AppInfo appId={StoreContent._curProduct?.id || ''} />}></Route>
       <Route
         exact
         path="/store/app/publish"
-        render={() => (
-          <PublishList appId={StoreContent._curProduct?.prod.id || ''} />
-        )}></Route>
+        render={() => <PublishList appId={StoreContent._curProduct?.id || ''} />}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={StoreContent._curProduct?.prod.id || ''} />}></Route>
+        render={() => <Manage appId={StoreContent._curProduct?.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
-        render={() => (
-          <PutawayComp appId={StoreContent._curProduct?.prod.id || ''} />
-        )}></Route>
+        render={() => <PutawayComp appId={StoreContent._curProduct?.id || ''} />}></Route>
     </>
   );
 };

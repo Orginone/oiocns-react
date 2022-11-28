@@ -17,11 +17,10 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Provider from '@/ts/core/provider';
-import SettionCtrl from '@/ts/controller/setting/settingCtrl';
+import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
-type SpaceType = { id: string; name: string };
 
 // 菜单列表项
 const OrganizationalItem = (item: SpaceType) => {
@@ -40,7 +39,7 @@ const OrganizationalItem = (item: SpaceType) => {
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [current, setCurrent] = useState<SpaceType>();
-  const [menuList, setMenuList] = useState<SpaceType[]>([]);
+  const [menuList, setMenuList] = useState(settingCtrl.getWorkSpaces);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
@@ -60,15 +59,8 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   const onSave = async () => {
     const values = await form.validateFields();
-    const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson?.createCompany(
-      name,
-      code,
-      teamName,
-      teamCode,
-      teamRemark,
-      typeName,
-    );
+    // const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
+    let res = await Provider.getPerson?.createCompany(values.company);
 
     if (res?.success) {
       message.info('申请加入单位成功');
@@ -80,32 +72,23 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    Provider.setWorkSpace(item.id);
     // @modify 切换工作空间
-    SettionCtrl.changeWorkSpace({
-      id: item.id,
-      name: item.name,
-    });
-    setCurrent({
-      name: item.name,
-      id: item.id,
-    });
+    settingCtrl.changeWorkSpace(item);
+    setCurrent(item);
     setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (Provider.getPerson) {
-      Provider.getAllWorkSpaces().then((allWorkSpaces) => {
-        setMenuList(allWorkSpaces);
-        Provider.getWorkSpace().then((curspace) => {
-          setCurrent(
-            allWorkSpaces.find((space) => {
-              return space.id == curspace?.target.id;
-            }),
-          );
-        });
-      });
-    }
+    const id = settingCtrl.subscribe(() => {
+      console.log(settingCtrl.getWorkSpaces);
+      setMenuList([...settingCtrl.getWorkSpaces]);
+      if (settingCtrl.getCurWorkSpace) {
+        setCurrent({ ...settingCtrl.getCurWorkSpace });
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
   }, []);
 
   return Provider.getPerson ? (

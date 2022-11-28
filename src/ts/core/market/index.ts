@@ -1,5 +1,5 @@
-import AppStore from './appstore';
+import Market from './market';
 import Merchandise from './merchandise';
-import Product from './product';
+import BaseProduct from './pbase';
 
-export { AppStore, Merchandise, Product };
+export { BaseProduct, Market, Merchandise };
