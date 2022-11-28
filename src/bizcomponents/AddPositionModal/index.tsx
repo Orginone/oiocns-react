@@ -1,8 +1,9 @@
+/* eslint-disable react/no-unknown-property */
 /**
  * 对象设置弹窗
  * */
 import React, { useState, useRef } from 'react';
-import { Modal, Row, Button } from 'antd';
+import { Modal, Row, Button, Tag, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 // import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
@@ -10,6 +11,7 @@ import cls from './index.module.less';
 // import { deepClone } from '@/ts/base/common';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import { ObjectManagerList } from './mock';
+import AddNewPosition from './AddNewPosition';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 
@@ -40,6 +42,16 @@ const AddPostModal = (props: Iprops) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys);
   };
 
+  const onAddOk = (objs: any) => {
+    console.log('新增的数据', objs);
+    setOperateOpen(false);
+  };
+
+  const onHandleOk = () => {
+    console.log('onHandleOk');
+    setOperateOpen(false);
+  };
+
   const getCheckboxProps = (record: any) => {
     // console.log(record);
   };
@@ -60,6 +72,8 @@ const AddPostModal = (props: Iprops) => {
       dataIndex: 'public',
       key: 'public',
       width: '10%',
+      render: (_, record) =>
+        record.public === false ? <Tag color="red">否</Tag> : <Tag color="green">是</Tag>,
     },
     {
       title: '备注',
@@ -78,7 +92,7 @@ const AddPostModal = (props: Iprops) => {
         key: 'addNew',
         label: '新增',
         onClick: () => {
-          console.log('新增按钮事件', 'addNew', item);
+          setOperateOpen(true);
         },
       },
     ];
@@ -94,13 +108,6 @@ const AddPostModal = (props: Iprops) => {
       footer={null}>
       <div className="site-card-wrapper">
         <Row gutter={24}>
-          {/* <Table
-            columns={columns}
-            defaultExpandAllRows={true}
-            pagination={false}
-            dataSource={ObjectManagerList}
-          /> */}
-
           <CardOrTable
             dataSource={ObjectManagerList as any}
             rowKey={'key'}
@@ -128,7 +135,18 @@ const AddPostModal = (props: Iprops) => {
       </Row>
     </Modal>
   );
-  return <div className={cls[`add-person-modal`]}>{addmodal}</div>;
+  return (
+    <div className={cls[`add-person-modal`]}>
+      {addmodal}
+      {/* 新增岗位 */}
+      <AddNewPosition
+        title={'新增身份'}
+        open={operateOpen}
+        onOk={onAddOk}
+        handleOk={onHandleOk}
+      />
+    </div>
+  );
 };
 
 export default AddPostModal;
