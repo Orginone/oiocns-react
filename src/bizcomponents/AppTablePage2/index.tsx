@@ -5,6 +5,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
+import { BaseProduct } from '@/ts/core/market';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
@@ -34,7 +35,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
-    console.log('数据过滤', searchParams);
     if (!searchParams) {
       return;
     }
@@ -44,7 +44,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       setSataSource(list);
     } else {
       const result = list.filter((item) => {
-        return item.prod.source === searchParams.status;
+        return item?._prod?.source === searchParams.status;
       });
       setTotal(result.length);
       setSataSource(result);
@@ -97,7 +97,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: any) => record.prod.id}
+        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
         toolBarRender={toolBarRender}
       />
     </div>

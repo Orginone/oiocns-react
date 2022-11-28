@@ -1,5 +1,6 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Tree } from 'antd';
+import * as im from 'react-icons/im';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
@@ -25,9 +26,9 @@ const StoreClassifyTree: React.FC = () => {
     let result: any = {
       key: item.key,
       icon: expKeys.includes(item.key) ? (
-        <img src="/icons/default_folder_opened.svg"></img>
+        <im.ImFolderOpen color="#c09553" />
       ) : (
-        <img src="/icons/default_folder.svg"></img>
+        <im.ImFolder color="#c09553" />
       ),
       title: item.name,
       children: [],

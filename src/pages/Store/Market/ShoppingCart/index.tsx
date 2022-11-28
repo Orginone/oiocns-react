@@ -3,7 +3,7 @@ import { LeftOutlined, CheckCircleFilled } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+// import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 import { Adata } from './moke';
 import {} from '../../../../ts/controller/setting/settingCtrl';
 
@@ -41,7 +41,7 @@ const ShoppingCart: React.FC<any> = (props) => {
         content: '此操作将生成交易订单。是否确认?',
         onOk() {
           console.log('OK', item);
-          marketCtrl.buyApp();
+          // marketCtrl.buyApp();
           removeapp(item);
         },
         onCancel() {

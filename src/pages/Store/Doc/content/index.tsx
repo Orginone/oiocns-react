@@ -1,27 +1,7 @@
-import {
-  Card,
-  Upload,
-  Dropdown,
-  Menu,
-  Modal,
-  Input,
-  Breadcrumb,
-  UploadProps,
-  Image,
-  Space,
-  Divider,
-  Typography,
-} from 'antd';
+import * as antd from 'antd';
+import * as im from 'react-icons/im';
+import * as fa from 'react-icons/fa';
 import React, { useEffect, useState } from 'react';
-import {
-  ArrowUpOutlined,
-  SyncOutlined,
-  CloudUploadOutlined,
-  FolderAddOutlined,
-  CloudSyncOutlined,
-  AppstoreOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
 import cls from './index.module.less';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import { RcFile } from 'antd/lib/upload/interface';
@@ -66,31 +46,26 @@ const LeftTree = () => {
     }
     return false;
   };
-  const props: UploadProps = {
+  const props: antd.UploadProps = {
     multiple: true,
     showUploadList: false,
     async customRequest(options) {
-      try {
-        if (docsCtrl.current) {
-          const file: RcFile = options.file as RcFile;
-          const task: TaskModel = {
-            process: 0,
-            name: file.name,
-            size: file.size,
-            createTime: new Date(),
-            group: docsCtrl.current.name,
-          };
-          docsCtrl.current?.upload(file.name, file, (p) => {
-            if (p === 0) {
-              taskList.push(task);
-            }
-            task.process = p;
-            setTaskList([...taskList]);
-          });
-          setOpen(true);
-        }
-      } catch (ex) {
-        console.log(ex);
+      if (docsCtrl.current) {
+        const file: RcFile = options.file as RcFile;
+        const task: TaskModel = {
+          process: 0,
+          name: file.name,
+          size: file.size,
+          createTime: new Date(),
+          group: docsCtrl.current.name,
+        };
+        docsCtrl.current?.upload(file.name, file, (p) => {
+          if (p === 0) {
+            taskList.push(task);
+          }
+          task.process = p;
+          setTaskList([...taskList]);
+        });
       }
     },
   };
@@ -142,6 +117,7 @@ const LeftTree = () => {
     return [
       {
         key: '1',
+        icon: <fa.FaTrashAlt />,
         label: (
           <div
             onClick={async () => {
@@ -149,12 +125,13 @@ const LeftTree = () => {
                 docsCtrl.changCallback();
               }
             }}>
-            删除文件
+            删除
           </div>
         ),
       },
       {
         key: '2',
+        icon: <fa.FaEdit />,
         label: (
           <div
             onClick={() => {
@@ -179,96 +156,100 @@ const LeftTree = () => {
   };
   return (
     <>
-      <Card className={cls.container}>
+      <antd.Card className={cls.container}>
         <div className={cls.docheader}>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
-            <Typography.Link
+          <antd.Space wrap split={<antd.Divider type="vertical" />} size={2}>
+            <antd.Typography.Link
               disabled={current?.parent == undefined ?? false}
               onClick={() => {
                 docsCtrl.backup();
               }}>
-              <ArrowUpOutlined />
-            </Typography.Link>
-            <Typography.Link
+              <im.ImArrowUp2 />
+            </antd.Typography.Link>
+            <antd.Typography.Link
               onClick={() => {
                 docsCtrl.current?.loadChildren(true);
                 docsCtrl.changCallback();
               }}>
-              <SyncOutlined />
-            </Typography.Link>
-            <Upload {...props}>
-              <Typography.Link style={{ fontSize: 18 }}>
-                <CloudUploadOutlined />
-              </Typography.Link>
-            </Upload>
-            <Typography.Link
+              <im.ImSpinner9 />
+            </antd.Typography.Link>
+            <antd.Upload {...props}>
+              <antd.Typography.Link style={{ fontSize: 18 }}>
+                <im.ImUpload />
+              </antd.Typography.Link>
+            </antd.Upload>
+            <antd.Typography.Link
               onClick={() => {
                 setCreateFileName('');
                 setTitle('新建文件夹');
                 setIsModalOpen(true);
               }}>
-              <FolderAddOutlined />
-            </Typography.Link>
+              <im.ImFolderPlus />
+            </antd.Typography.Link>
             <div style={{ width: '100%', cursor: 'pointer' }}>
-              <Breadcrumb>
+              <antd.Breadcrumb separator={<im.ImPlay3 />}>
                 {getBreadcrumb(current?.key ?? '', []).map((item) => {
                   return (
                     <>
-                      <Breadcrumb.Item
+                      <antd.Breadcrumb.Item
                         key={item.key}
                         onClick={async () => {
                           await docsCtrl.open(item.key);
                         }}>
                         {item.label}
-                      </Breadcrumb.Item>
+                      </antd.Breadcrumb.Item>
                     </>
                   );
                 })}
-              </Breadcrumb>
+              </antd.Breadcrumb>
             </div>
-          </Space>
-          <Space wrap split={<Divider type="vertical" />} size={2}>
-            <Typography.Link
+          </antd.Space>
+          <antd.Space wrap split={<antd.Divider type="vertical" />} size={2}>
+            <antd.Typography.Link
               onClick={() => {
                 setOpen(true);
               }}>
-              {Uploading() ? <LoadingOutlined /> : <CloudSyncOutlined />}
-            </Typography.Link>
-            <Typography.Link>
-              <AppstoreOutlined />
-            </Typography.Link>
-          </Space>
+              {Uploading() ? <fa.FaHourglassHalf /> : <fa.FaHourglassEnd />}
+            </antd.Typography.Link>
+            <antd.Typography.Link>
+              <fa.FaTh />
+            </antd.Typography.Link>
+          </antd.Space>
         </div>
-        <div className={cls.content}>
-          <Image.PreviewGroup>
+        <div
+          className={cls.content}
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}>
+          <antd.Image.PreviewGroup>
             {current?.children.map((el) => {
               return (
-                <Dropdown
+                <antd.Dropdown
                   key={el.key}
-                  overlay={<Menu items={getItemMenu(el)} />}
+                  overlay={<antd.Menu items={getItemMenu(el)} />}
                   trigger={['contextMenu']}>
-                  <Card
+                  <antd.Card
                     hoverable
                     className={cls.fileBox}
                     key={el.key}
                     onDoubleClick={() => {
                       docsCtrl.open(el.key);
                     }}>
-                    <Image
+                    <antd.Image
                       height={80}
                       src={getThumbnail(el)}
                       fallback="/icons/default_file.svg"
-                      preview={getPreview(el)}></Image>
+                      preview={getPreview(el)}></antd.Image>
                     <div className={cls.fileName} title={el.name}>
                       {el.name}
                     </div>
-                  </Card>
-                </Dropdown>
+                  </antd.Card>
+                </antd.Dropdown>
               );
             })}
-          </Image.PreviewGroup>
+          </antd.Image.PreviewGroup>
         </div>
-        <Modal
+        <antd.Modal
           destroyOnClose
           title={title}
           open={isModalOpen}
@@ -290,15 +271,15 @@ const LeftTree = () => {
             setCreateFileName('');
             setIsModalOpen(false);
           }}>
-          <Input
+          <antd.Input
             defaultValue={createFileName}
             onChange={(e: any) => {
               setCreateFileName(e.target.value);
             }}
             placeholder={title}
           />
-        </Modal>
-      </Card>
+        </antd.Modal>
+      </antd.Card>
       <Plan
         isOpen={open}
         taskList={taskList}

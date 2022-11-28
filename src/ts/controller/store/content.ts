@@ -1,6 +1,6 @@
 import { XMarket } from '@/ts/base/schema';
 import { BaseProduct, Market } from '@/ts/core/market';
-import appContent from './appContent';
+import { productCtrl } from './productCtrl';
 import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
 /**
@@ -20,7 +20,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  public _curProduct: BaseProduct | null = null;
+  public curProduct: BaseProduct | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -30,7 +30,7 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
     this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
@@ -75,11 +75,12 @@ class StoreContent {
     }
 
     const res = await Fun(params);
+    console.log('获取数据', type, res);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
     }
-    console.log('获取数据', res);
+
     const { success, data } = res;
 
     if (success) {
@@ -92,7 +93,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: any) => appContent.createProduct(data);
+  public createProduct = async (data: any) => productCtrl.createProduct(data);
 
   /**
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
@@ -100,10 +101,10 @@ class StoreContent {
    */
   public selectedProduct(item: BaseProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this._curProduct?.prod.id &&
-    console.log('修改选中');
+    // item.prod.id !== this.curProduct?.prod.id &&
+    console.log('修改选中', item);
 
-    this._curProduct = item;
+    this.curProduct = item;
   }
 }
 const storeContent = new StoreContent();

@@ -18,7 +18,7 @@ interface AppInfoType {
 const StoreAppInfo: React.FC<AppInfoType> = () => {
   // const BtnsList = ['编辑应用分配'];
   useEffect(() => {
-    console.log('{StoreContent._curProduct?.prod.version}', StoreContent._curProduct);
+    console.log('{StoreContent.curProduct?.prod.version}', StoreContent.curProduct);
   }, []);
 
   const history = useHistory();
@@ -66,21 +66,20 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
             }}
           />
         }
-        className="app-info"
-      >
+        className="app-info">
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={StoreContent._curProduct?.prod.name}
+          title={StoreContent.curProduct?.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{StoreContent._curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{StoreContent.curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
                 <span className="vision">
-                  版本号 ：{StoreContent._curProduct?.prod.version}
+                  版本号 ：{StoreContent.curProduct?.prod.version}
                 </span>
                 <span className="lastTime">
-                  订阅到期时间 ：{StoreContent._curProduct?.prod.createTime}
+                  订阅到期时间 ：{StoreContent.curProduct?.prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
