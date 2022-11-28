@@ -245,9 +245,9 @@ const CohortConfig: React.FC = () => {
   };
   return (
     <div>
-      {/* <div>
+      <div>
         <PersonInfo />
-      </div> */}
+      </div>
       <Card>
         <div className={cls['person-info-content-header']}>
           <Title level={2}>
@@ -334,8 +334,9 @@ const CohortConfig: React.FC = () => {
                   }
                   width={1000}
                   height={1000}
+                  defaultPageType={'card'}
                   // defaultPageType={'table'}
-                  showChangeBtn={true}
+                  showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
@@ -364,9 +365,10 @@ const CohortConfig: React.FC = () => {
                     }
                   }
                   // defaultPageType={'table'}
-                  showChangeBtn={true}
+                  showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
+                  defaultPageType={'card'}
                   columns={cohortColumn as any}
                   // style={divStyle}
                   onChange={handlePageChange}
