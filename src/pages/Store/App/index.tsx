@@ -197,7 +197,7 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp onCheckeds={onCheckeds}/>
+        <ShareComp onCheckeds={onCheckeds} />
       </Modal>
       {/* 详情页面 /store/app/info*/}
       <Route
