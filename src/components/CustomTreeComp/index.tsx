@@ -1,7 +1,12 @@
-import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  ApartmentOutlined,
+  EllipsisOutlined,
+  PlusOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import cls from './index.module.less';
 
 interface TreeType {
@@ -9,23 +14,31 @@ interface TreeType {
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
   menu?: string[] | 'menus' | undefined; //更多按钮列表 需提供 string[]
-  handleTitleClick?: (node: any) => void;
+  parentIcon?: ReactElement; // 父级 --具备子集的层级展示图标
+  childIcon?: ReactElement; //子级 --无下级 展示 icon
+  handleTitleClick?: (node: any) => void; //名称 单击
+  onDoubleClickTitle?: (node: any) => void; // 名称 双击
   handleAddClick?: (node: any) => void; //点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   title?: ReactElement | string;
-  [key: string]: any;
+  isDirectoryTree?: boolean; //是否文档树
+  [key: string]: any; // 其他属性方法
 }
-
+const { DirectoryTree } = Tree;
 const StoreClassifyTree: React.FC<TreeType> = ({
+  isDirectoryTree = false,
   title,
   treeData,
   menu,
+  parentIcon,
+  childIcon = <ApartmentOutlined />,
   searchable = false,
   draggable = false,
   handleAddClick,
   handleMenuClick,
   handleTitleClick,
-  ...otherTreeConfig
+  onDoubleClickTitle,
+  ...rest
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
@@ -51,6 +64,14 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   //TODO: 树形数据需要切换
   // console.log('树形数据需要切换', treeData);
+  const resetTreeData: any = useMemo(() => {
+    console.log('3333', treeData);
+
+    return treeData;
+    // ?.map((v: any) => {
+    //   return (v.icon = <ApartmentOutlined />);
+    // });
+  }, [treeData]);
 
   const [gData, setGData] = useState([]);
   const [expandedKeys] = useState(['0-0', '0-0-0']);
@@ -134,9 +155,16 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           setMouseOverItem(node);
         }}
         onMouseLeave={() => {
-          setMouseOverItem({});
+          // setMouseOverItem({});
         }}>
-        <div onClick={() => handleTitleClick && handleTitleClick(node)}>{node.title}</div>
+        <div
+          onDoubleClick={() => {
+            onDoubleClickTitle && onDoubleClickTitle(node);
+          }}
+          onClick={() => handleTitleClick && handleTitleClick(node)}>
+          {node.children.length == 0 ? childIcon : parentIcon}
+          {node.title}
+        </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
@@ -183,19 +211,31 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           <Input prefix={<SearchOutlined />} placeholder="搜索分类" />
         </div>
       )}
-      <Tree
-        className="draggable-tree"
-        // switcherIcon={<LeftCircleOutlined />}
-        showIcon
-        titleRender={renderTreeTitle}
-        defaultExpandedKeys={expandedKeys}
-        draggable={draggable}
-        blockNode
-        onDragEnter={onDragEnter}
-        onDrop={onDrop}
-        treeData={treeData}
-        {...otherTreeConfig}
-      />
+      {isDirectoryTree ? (
+        <DirectoryTree
+          className="draggable-tree"
+          // switcherIcon={<LeftCircleOutlined />}
+          titleRender={renderTreeTitle}
+          defaultExpandedKeys={expandedKeys}
+          draggable={draggable}
+          onDragEnter={onDragEnter}
+          onDrop={onDrop}
+          treeData={resetTreeData}
+          {...rest}
+        />
+      ) : (
+        <Tree
+          className="draggable-tree"
+          // switcherIcon={<LeftCircleOutlined />}
+          titleRender={renderTreeTitle}
+          defaultExpandedKeys={expandedKeys}
+          draggable={draggable}
+          onDragEnter={onDragEnter}
+          onDrop={onDrop}
+          treeData={resetTreeData}
+          {...rest}
+        />
+      )}
     </div>
   );
 };
