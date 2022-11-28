@@ -14,7 +14,11 @@ import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from '@/components/JoinOtherShop';
+import { MarketController } from '@/ts/controller/store/marketCtrl';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 // import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+
+// const marketCtrl = new MarketController();
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
@@ -24,6 +28,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
   const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
+  const [curSpace, setCurSpace] = useState<any>({});
 
   /**
    * @description: 创建商店
@@ -31,10 +36,33 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = (formData: any) => {
-    // marketCtrl.creatMarkrt({ ...formData });
+    marketCtrl.creatMarkrt({ ...formData });
     setIsAddOpen(false);
     setIsJoinShop(false);
   };
+
+  const marketCtrl = new MarketController(curSpace);
+
+  console.log('9090909090', marketCtrl);
+
+  useEffect(() => {
+    // 获取用户加入的单位组织
+    const id = settingCtrl.subscribe(() => {
+      console.log('8989898989', settingCtrl.getWorkSpaces);
+      // setMenuList([...settingCtrl.getWorkSpaces]);
+      if (settingCtrl.getCurWorkSpace) {
+        // setCurrent({ ...settingCtrl.getCurWorkSpace });
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
+    // console.log('333333333333', settingCtrl.getCurWorkSpace);
+    // if (settingCtrl.getCurWorkSpace?.isUserSpace === true) {
+    //   setCurSpace(settingCtrl?.getCurWorkSpace?.controller);
+    // }
+  }, []);
+  // ('358230302696542208');"358249929149386752"
 
   /**
    * @description: 删除 / 退出商店确认

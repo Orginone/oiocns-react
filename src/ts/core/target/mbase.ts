@@ -253,6 +253,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
+    console.log('555656565', res);
+
     if (res.success) {
       this.joinedMarkets.push(new Market(res.data!));
     }

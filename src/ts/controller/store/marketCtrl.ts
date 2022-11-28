@@ -79,13 +79,15 @@ export class MarketController extends BaseController {
    * @description: 创建商店
    * @return {*}
    */
-  public async creatMarkrt(data: {
+  public creatMarkrt = async (data: {
     name: string;
     code: string;
     remark: string;
     samrId: string;
     ispublic: boolean;
-  }) {
+  }) => {
+    console.log('this._target', this._target);
+
     await this._target.createMarket(
       data.name,
       data.code,
@@ -94,7 +96,7 @@ export class MarketController extends BaseController {
       data.ispublic,
     );
     this.changCallback();
-  }
+  };
 
   /**
    * @description: 删除商店

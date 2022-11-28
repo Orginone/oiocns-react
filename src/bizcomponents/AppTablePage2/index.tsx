@@ -44,7 +44,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       setSataSource(list);
     } else {
       const result = list.filter((item) => {
-        return item.prod.source === searchParams.status;
+        return item?._prod?.source === searchParams.status;
       });
       setTotal(result.length);
       setSataSource(result);
@@ -97,7 +97,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: any) => record.prod.id}
+        rowKey={(record: any) => record?.prod?.id}
         toolBarRender={toolBarRender}
       />
     </div>
