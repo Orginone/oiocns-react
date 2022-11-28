@@ -329,6 +329,18 @@ const SettingRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
       {
+        path: '/setting/position/:id',
+        title: '岗位设置',
+        icon: <ApartmentOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Position')),
+      },
+      {
+        path: '/setting/position',
+        title: '岗位设置',
+        icon: <ApartmentOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Position')),
+      },
+      {
         path: '/setting/group/:id',
         title: '集团设置',
         icon: 'icon-setting',
