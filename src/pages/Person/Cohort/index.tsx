@@ -332,10 +332,8 @@ const CohortConfig: React.FC = () => {
                       // defaultSelectedRowKeys: [1],
                     }
                   }
-                  width={1000}
-                  height={1000}
-                  // defaultPageType={'table'}
-                  showChangeBtn={true}
+                  defaultPageType={'card'}
+                  showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
@@ -363,8 +361,8 @@ const CohortConfig: React.FC = () => {
                       // defaultSelectedRowKeys: [1],
                     }
                   }
-                  // defaultPageType={'table'}
-                  showChangeBtn={true}
+                  defaultPageType={'card'}
+                  showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
                   columns={cohortColumn as any}

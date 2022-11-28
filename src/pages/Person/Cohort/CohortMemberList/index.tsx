@@ -42,7 +42,6 @@ const App: React.FC = () => {
       .then((res) => res.json())
       .then((body) => {
         setData(data.concat(body.results));
-        message.success(`${body.results.length}条数据加载完成`);
       });
   };
 
