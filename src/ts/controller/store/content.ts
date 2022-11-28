@@ -1,8 +1,6 @@
 import { XMarket } from '@/ts/base/schema';
-// import AppStore from '@/ts/core/market/appstore';
-// import Product from '@/ts/core/market/product';
+import { Product, Market } from '@/ts/core/market';
 import { productCtrl } from './productCtrl';
-import { BaseProduct, Market } from '@/ts/core/market';
 import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
 /**
@@ -22,7 +20,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  public _curProduct: BaseProduct | null = null;
+  public curProduct: Product | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -101,12 +99,12 @@ class StoreContent {
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
    * @param {Product} item
    */
-  public selectedProduct(item: BaseProduct) {
+  public selectedProduct(item: Product) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this._curProduct?.prod.id &&
-    console.log('修改选中');
+    // item.prod.id !== this.curProduct?.prod.id &&
+    console.log('修改选中', item);
 
-    this._curProduct = item;
+    this.curProduct = item;
   }
 }
 const storeContent = new StoreContent();
