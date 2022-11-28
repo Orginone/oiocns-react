@@ -1,7 +1,7 @@
 import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import cls from './index.module.less';
 
 interface TreeType {
@@ -9,16 +9,14 @@ interface TreeType {
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
   menu?: string[] | 'menus' | undefined; //更多按钮列表 需提供 string[]
-  handleTitleClick?: (_item: any) => void;
-  handleAddClick?: (_item: any) => void; //点击更多按钮事件
+  handleTitleClick?: (node: any) => void;
+  handleAddClick?: (node: any) => void; //点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
-  type?: 'myshop'; // 判断来源
-  clickBtn?: any;
+  title?: () => ReactNode | string;
 }
 
 const StoreClassifyTree: React.FC<TreeType> = ({
-  type,
-  clickBtn,
+  title,
   treeData,
   menu,
   searchable = false,
@@ -136,10 +134,10 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
-              {type !== 'myshop' ? (
+              {handleAddClick ? (
                 <PlusOutlined
                   className={cls.titleIcon}
-                  onClick={() => handleAddClick && handleAddClick(node)}
+                  onClick={() => handleAddClick(node)}
                 />
               ) : (
                 ''
@@ -169,7 +167,11 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      {type === 'myshop' ? <>{clickBtn}</> : <div className={cls.title}>全部分类 </div>}
+      {typeof title === 'string' ? (
+        <div className={cls.title}>{`${title || '全部分类'}`} </div>
+      ) : (
+        '' // { title }
+      )}
       {searchable && (
         <div className={cls.title}>
           <Input prefix={<SearchOutlined />} placeholder="搜索分类" />

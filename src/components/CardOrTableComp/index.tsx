@@ -3,17 +3,18 @@ import type { ProColumns } from '@ant-design/pro-components';
 /* eslint-disable no-unused-vars */
 import cls from './index.module.less';
 
-import { Dropdown, Menu, Pagination } from 'antd';
+import { Dropdown, Pagination } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';
 import { PageShowType } from 'typings/globelType';
+import { BaseProduct } from '@/ts/core/market';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string | ((record: T) => string); //唯一key
+  rowKey: string | ((record: BaseProduct) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -22,6 +23,7 @@ interface PageType<T> {
   total?: number; // 总条数 总数量
   page?: number; // 当前页
   height?: number; //表格高度
+  width?: number; //表格高度
   stripe?: boolean; // 斑马纹
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
@@ -43,6 +45,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   total,
   page,
   height,
+  width,
   parentRef,
   stripe = false,
   style,
@@ -110,7 +113,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         className={cls['common-table']}
         columns={hideOperation ? columns : resetColumns}
         dataSource={dataSource}
-        scroll={{ x: 1000, y: height || defaultHeight }}
+        scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
         search={false}
         headerTitle={headerTitle}
         rowKey={rowKey || 'key'}
