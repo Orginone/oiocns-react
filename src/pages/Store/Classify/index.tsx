@@ -184,6 +184,7 @@ const StoreClassify: React.FC = () => {
         ) : (
           //其他树
           <StoreClassifyTree
+            title={'我的分类'}
             menu={menu}
             searchable
             draggable

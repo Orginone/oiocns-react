@@ -1,7 +1,7 @@
 import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import cls from './index.module.less';
 
 interface TreeType {
@@ -12,7 +12,7 @@ interface TreeType {
   handleTitleClick?: (node: any) => void;
   handleAddClick?: (node: any) => void; //点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
-  title?: () => ReactNode | string;
+  title?: ReactElement | string;
 }
 
 const StoreClassifyTree: React.FC<TreeType> = ({
@@ -167,10 +167,10 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      {typeof title === 'string' ? (
+      {typeof title === 'string' || !title ? (
         <div className={cls.title}>{`${title || '全部分类'}`} </div>
       ) : (
-        '' // { title }
+        title
       )}
       {searchable && (
         <div className={cls.title}>
