@@ -36,7 +36,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
   }
-  public async getOwnProducts(): Promise<BaseProduct[]> {
+  public getOwnProducts = async (): Promise<BaseProduct[]> => {
     if (this.ownProducts.length > 0) {
       return this.ownProducts;
     }
@@ -54,7 +54,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       });
     }
     return this.ownProducts;
-  }
+  };
   public async getJoinMarkets(): Promise<Market[]> {
     if (this.joinedMarkets.length > 0) {
       return this.joinedMarkets;
