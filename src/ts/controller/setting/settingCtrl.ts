@@ -1,7 +1,9 @@
 import Provider from '@/ts/core/provider';
+import Company from '@/ts/core/target/company';
 import { IPerson } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
 import CompanyController from './companyCtrl';
+import MarketTarget from '../../core/target/mbase';
 
 /** 空间类型申明 */
 export type SpaceType = {
@@ -11,6 +13,8 @@ export type SpaceType = {
   name: string;
   /**是否是个人空间 */
   isUserSpace?: boolean;
+  /** 当前空间的对象 */
+  targtObj?: MarketTarget;
   /** 控制器 */
   controller: CompanyController | SettingController;
 };
@@ -39,8 +43,10 @@ class SettingController extends BaseController {
         id: Provider.getPerson!.target.id,
         name: '个人空间',
         isUserSpace: true,
+        targtObj: Provider.getPerson!,
         controller: this,
       };
+
       this._workSpaces = [personSpace];
       this._curWorkSpace = personSpace;
       companys.forEach((a) => {
@@ -48,6 +54,7 @@ class SettingController extends BaseController {
           id: a.target.id,
           name: a.target.name,
           isUserSpace: false,
+          targtObj: a as Company,
           controller: new CompanyController(a),
         });
       });
@@ -78,7 +85,13 @@ class SettingController extends BaseController {
 
   /**切换工作空间 */
   public changeWorkSpace(space: SpaceType) {
-    this._curWorkSpace = space;
+    // 切换工作空间的时候， 直接把对象放到缓存里面
+    for (const bean of this._workSpaces) {
+      if (bean.id === space.id) {
+        this._curWorkSpace = bean;
+        break;
+      }
+    }
     this.changCallback();
   }
 
