@@ -97,7 +97,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: BaseProduct) => record._prod?.id}
+        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
         toolBarRender={toolBarRender}
       />
     </div>
