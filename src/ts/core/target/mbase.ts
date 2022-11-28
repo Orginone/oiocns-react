@@ -1,108 +1,44 @@
-import BaseTarget from './base';
-import { common, kernel, model, schema } from '../../base';
-import { AppStore, Product } from '../market';
-import { PageRequest } from '@/ts/base/model';
-import { XMarketRelationArray, XMerchandiseArray } from '@/ts/base/schema';
+import { common, faildResult, kernel, model, schema } from '../../base';
+import { Market, BaseProduct } from '../market';
 import { TargetType } from '../enum';
+import { IMTarget } from './itarget';
+import BaseTarget from './base';
+import consts from '../consts';
 
-export default class MarketActionTarget extends BaseTarget {
-  protected _joinMarketApplys: schema.XMarketRelation[];
-  protected _joinedMarkets: AppStore[];
-  protected _owdProducts: Product[];
+export default class MarketTarget extends BaseTarget implements IMTarget {
+  joinedMarkets: Market[];
+  publicMarkets: Market[];
+  ownProducts: BaseProduct[];
+  stagings: schema.XStaging[];
+  usefulProduct: schema.XProduct[];
+  usefulResource: Map<string, schema.XResource[]>;
+  joinMarketApplys: schema.XMarketRelation[];
+
   constructor(target: schema.XTarget) {
     super(target);
-    this._owdProducts = [];
-    this._joinedMarkets = [];
-    this._joinMarketApplys = [];
+    this.stagings = [];
+    this.ownProducts = [];
+    this.joinedMarkets = [];
+    this.joinMarketApplys = [];
+    this.usefulProduct = [];
+    this.publicMarkets = [];
+    this.usefulResource = new Map();
   }
-
-  /**
-   * 根据编号查询市场
-   * @param page 分页参数
-   * @returns
-   */
-  getMarketByCode = async (
-    page: model.PageRequest,
-  ): Promise<model.ResultType<schema.XMarketArray>> => {
+  public async getMarketByCode(
+    name: string,
+  ): Promise<model.ResultType<schema.XMarketArray>> {
     return await kernel.queryMarketByCode({
       id: '0',
-      page,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: name,
+      },
     });
-  };
-
-  /**
-   * 查询我发起的加入市场申请
-   * @param page 分页参数
-   * @returns
-   */
-  getJoinMarketApplys = async (page: PageRequest): Promise<schema.XMarketRelation[]> => {
-    if (this._joinMarketApplys.length > 0) {
-      return this._joinMarketApplys;
-    }
-    const res = await kernel.queryJoinMarketApply({
-      id: this.target.id,
-      page,
-    });
-    if (res.success && res.data?.result != undefined) {
-      this._joinMarketApplys = res.data.result;
-    }
-    return this._joinMarketApplys;
-  };
-
-  /**
-   * 删除发起的加入市场申请
-   * @param id 申请Id
-   */
-  cancelJoinMarketApply = async (id: string): Promise<model.ResultType<any>> => {
-    const res = await kernel.cancelJoinMarket({
-      id,
-      typeName: this.target.typeName,
-      belongId: this.target.id,
-    });
-    if (res.success) {
-      this._joinMarketApplys = this._joinMarketApplys.filter((apply) => {
-        return apply.id != id;
-      });
-    }
-    return res;
-  };
-
-  /**
-   * 查询商店列表
-   * @returns 商店列表
-   */
-  getJoinMarkets = async (): Promise<AppStore[]> => {
-    if (this._joinedMarkets.length > 0) {
-      return this._joinedMarkets;
-    }
-    const res = await kernel.queryOwnMarket({
-      id: this.target.id,
-      page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
-    });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((market) => {
-        this._joinedMarkets.push(new AppStore(market));
-      });
-    }
-    return this._joinedMarkets;
-  };
-
-  /**
-   * 查询开放市场
-   * @returns 市场
-   */
-  getPublicMarket = async (): Promise<model.ResultType<schema.XMarket>> => {
-    return await kernel.getPublicMarket();
-  };
-
-  /**
-   * 查询我的产品/应用
-   * @param params
-   * @returns
-   */
-  getOwnProducts = async (): Promise<Product[]> => {
-    if (this._owdProducts.length > 0) {
-      return this._owdProducts;
+  }
+  public async getOwnProducts(): Promise<BaseProduct[]> {
+    if (this.ownProducts.length > 0) {
+      return this.ownProducts;
     }
     const res = await kernel.querySelfProduct({
       id: this.target.id,
@@ -112,45 +48,150 @@ export default class MarketActionTarget extends BaseTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
-    console.log('我的应用', res);
-
     if (res.success && res?.data?.result != undefined) {
       res.data.result.forEach((product) => {
-        this._owdProducts.push(new Product(product));
+        this.ownProducts.push(new BaseProduct(product));
       });
     }
-    return this._owdProducts;
-  };
-
-  /**
-   * 申请加入市场
-   * @param id 市场ID
-   * @returns
-   */
-  applyJoinMarket = async (id: string): Promise<model.ResultType<any>> => {
-    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
-  };
-
-  /**
-   * 查询加入市场的审批
-   * @returns
-   */
-  getJoinApproval = async (): Promise<model.ResultType<XMarketRelationArray>> => {
-    return await kernel.queryJoinApproval({
-      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
+    return this.ownProducts;
+  }
+  public async getJoinMarkets(): Promise<Market[]> {
+    if (this.joinedMarkets.length > 0) {
+      return this.joinedMarkets;
+    }
+    const res = await kernel.queryOwnMarket({
+      id: this.target.id,
+      page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+    });
+    if (res.success && res.data && res.data.result) {
+      res.data.result.forEach((market) => {
+        this.joinedMarkets.push(new Market(market));
+      });
+    }
+    return this.joinedMarkets;
+  }
+  public async getPublicMarket(): Promise<Market[]> {
+    if (this.publicMarkets.length > 0) {
+      return this.publicMarkets;
+    }
+    const res = await kernel.getPublicMarket();
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.publicMarkets.push(new Market(a));
+      });
+    }
+    return this.publicMarkets;
+  }
+  public async getStaging(): Promise<schema.XStaging[]> {
+    if (this.stagings.length > 0) {
+      return this.stagings;
+    }
+    const res = await kernel.queryStaging({
+      id: this.target.id,
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
         filter: '',
       },
     });
-  };
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        this.stagings.push(a);
+      });
+    }
+    return this.stagings;
+  }
+  public async getBuyOrders(
+    status: number,
+    page: model.PageRequest,
+  ): Promise<model.ResultType<schema.XOrderArray>> {
+    return await kernel.queryBuyOrderList({
+      id: this.target.id,
+      status,
+      page,
+    });
+  }
+  public async getSellOrders(
+    status: number,
+    page: model.PageRequest,
+  ): Promise<model.ResultType<schema.XOrderDetailArray>> {
+    const res = await kernel.querySellOrderList({
+      id: this.target.id,
+      status,
+      page,
+    });
+    return res;
+  }
+  public async queryJoinMarketApproval(): Promise<
+    model.ResultType<schema.XMarketRelationArray>
+  > {
+    return await kernel.queryJoinApproval({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
+    });
+  }
+
+  /**
+   * 查询我发起的加入市场申请
+   * @param page 分页参数
+   * @returns
+   */
+  public async getJoinMarketApplys(): Promise<schema.XMarketRelation[]> {
+    if (this.joinMarketApplys.length > 0) {
+      return this.joinMarketApplys;
+    }
+    const res = await kernel.queryJoinMarketApply({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
+    });
+    if (res.success && res.data?.result != undefined) {
+      this.joinMarketApplys = res.data.result;
+    }
+    return this.joinMarketApplys;
+  }
+
+  /**
+   * 申请加入市场
+   * @param id 市场ID
+   * @returns
+   */
+  public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
+    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
+  }
+
+  /**
+   * 删除发起的加入市场申请
+   * @param id 申请Id
+   */
+  public async cancelJoinMarketApply(id: string): Promise<model.ResultType<any>> {
+    const res = await kernel.cancelJoinMarket({
+      id,
+      typeName: this.target.typeName,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      this.joinMarketApplys = this.joinMarketApplys.filter((apply) => {
+        return apply.id != id;
+      });
+    }
+    return res;
+  }
 
   /**
    * 查询应用上架的审批
    * @returns
    */
-  getPublicApproval = async (): Promise<model.ResultType<XMerchandiseArray>> => {
+  public async queryPublicApproval(): Promise<
+    model.ResultType<schema.XMerchandiseArray>
+  > {
     return await kernel.queryPublicApproval({
       id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
       page: {
@@ -159,7 +200,7 @@ export default class MarketActionTarget extends BaseTarget {
         filter: '',
       },
     });
-  };
+  }
 
   /**
    * 审批加入市场申请
@@ -167,12 +208,12 @@ export default class MarketActionTarget extends BaseTarget {
    * @param status 审批状态
    * @returns
    */
-  approvalJoinMarketApply = async (
+  public async approvalJoinMarketApply(
     id: string,
     status: number,
-  ): Promise<model.ResultType<boolean>> => {
+  ): Promise<model.ResultType<boolean>> {
     return kernel.approvalJoinApply({ id, status });
-  };
+  }
 
   /**
    * 审批商品上架申请
@@ -191,24 +232,18 @@ export default class MarketActionTarget extends BaseTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  createMarket = async ({
-    name,
-    code,
-    remark,
-    samrId = '0',
-    ispublic = true,
-  }: {
+  public async createMarket(
     // 名称
-    name: string;
+    name: string,
     // 编号
-    code: string;
+    code: string,
     // 备注
-    remark: string;
+    remark: string,
     // 监管组织/个人
-    samrId: string;
+    samrId: string,
     // 产品类型名
-    ispublic: boolean;
-  }): Promise<model.ResultType<schema.XMarket>> => {
+    ispublic: boolean = true,
+  ): Promise<model.ResultType<schema.XMarket>> {
     const res = await kernel.createMarket({
       name,
       code,
@@ -219,36 +254,29 @@ export default class MarketActionTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets.push(new AppStore(res.data!));
+      this.joinedMarkets.push(new Market(res.data!));
     }
     return res;
-  };
+  }
 
   /**
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct = async ({
-    name,
-    code,
-    remark,
-    resources,
-    thingId = '0',
-    typeName = 'webApp',
-  }: {
+  public async createProduct(
     // 名称
-    name: string;
+    name: string,
     // 编号
-    code: string;
+    code: string,
     // 备注
-    remark: string;
+    remark: string,
     // 资源列
-    resources: model.ResourceModel[] | undefined;
+    resources: model.ResourceModel[] | undefined,
     // 元数据Id
-    thingId?: string;
+    thingId?: string,
     // 产品类型名
-    typeName?: string;
-  }): Promise<model.ResultType<schema.XProduct>> => {
+    typeName: string = 'webApp',
+  ): Promise<model.ResultType<schema.XProduct>> {
     const res = await kernel.createProduct({
       name,
       code,
@@ -260,61 +288,136 @@ export default class MarketActionTarget extends BaseTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this._owdProducts.push(new Product(res.data!));
+      this.ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
-  };
+  }
 
+  public async stagingMerchandise(
+    id: string,
+  ): Promise<model.ResultType<schema.XStaging>> {
+    const stag = this.stagings.find((a) => {
+      a.merchandiseId == id;
+    });
+    if (stag == undefined) {
+      const res = await kernel.createStaging({
+        id: '0',
+        merchandiseId: id,
+        belongId: this.target.id,
+      });
+      if (res.success) {
+        this.stagings.push(res.data);
+      }
+      return res;
+    }
+    return faildResult(consts.IsExistError);
+  }
+
+  public async deleteStaging(id: string): Promise<model.ResultType<any>> {
+    const stag = this.stagings.find((a) => {
+      a.id == id;
+    });
+    if (stag != undefined) {
+      const res = await kernel.deleteStaging({
+        id,
+        belongId: this.target.id,
+      });
+      if (res.success) {
+        this.stagings = this.stagings.filter((a) => {
+          a.id != id;
+        });
+      }
+      return res;
+    }
+    return faildResult(consts.NotFoundError);
+  }
   /**
    * 删除市场
-   * @param market 市场
+   * @param id 市场Id
    * @returns
    */
-  deleteMarket = async (market: AppStore): Promise<model.ResultType<boolean>> => {
-    const index = this._joinedMarkets.indexOf(market);
+  public async deleteMarket(id: string): Promise<model.ResultType<boolean>> {
     const res = await kernel.deleteMarket({
-      id: market.store.id,
+      id,
       belongId: this.target.id,
     });
     if (res.success) {
-      delete this._owdProducts[index];
-    }
-    return res;
-  };
-
-  /**
-   * 删除应用
-   * @param product 应用
-   * @returns
-   */
-  deleteProduct = async (productId: string): Promise<model.ResultType<boolean>> => {
-    const res = await kernel.deleteProduct({
-      id: productId,
-      belongId: this.target.id,
-    });
-    if (res.success) {
-      this._owdProducts = this._owdProducts.filter((v) => {
-        return v.prod.id !== productId;
+      this.joinedMarkets = this.joinedMarkets.filter((market) => {
+        return market.market.id != id;
       });
     }
     return res;
-  };
+  }
+
+  /**
+   * 删除应用
+   * @param id 应用Id
+   * @returns
+   */
+  public async deleteProduct(id: string): Promise<model.ResultType<boolean>> {
+    const res = await kernel.deleteProduct({
+      id,
+      belongId: this.target.id,
+    });
+    if (res.success) {
+      this.ownProducts = this.ownProducts.filter((prod) => {
+        return prod.id != id;
+      });
+    }
+    return res;
+  }
 
   /**
    * 退出市场
    * @param id 退出的市场Id
    * @returns
    */
-  quitMarket = async (id: string): Promise<model.ResultType<any>> => {
+  public async quitMarket(id: string): Promise<model.ResultType<any>> {
     const res = await kernel.quitMarket({
       id,
       belongId: this.target.id,
     });
     if (res.success) {
-      this._joinedMarkets = this._joinedMarkets.filter((market) => {
-        return market.store.id != id;
+      this.joinedMarkets = this.joinedMarkets.filter((market) => {
+        return market.market.id != id;
       });
     }
     return res;
-  };
+  }
+  /** 获得可用应用 */
+  protected async getUsefulProduct(typeNames: TargetType[]): Promise<schema.XProduct[]> {
+    if (this.usefulProduct.length > 0) {
+      return this.usefulProduct;
+    }
+    const res = await kernel.queryUsefulProduct({
+      spaceId: this.target.id,
+      typeNames,
+    });
+    if (res.success && res.data.result != undefined) {
+      this.usefulProduct = res.data.result;
+    }
+    return this.usefulProduct;
+  }
+  /** 获得可用资源 */
+  protected async getUsefulResource(
+    id: string,
+    typeNames: TargetType[],
+  ): Promise<schema.XResource[]> {
+    if (this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
+      return this.usefulResource[id];
+    }
+    const res = await kernel.queryUsefulResource({
+      productId: id,
+      spaceId: this.target.id,
+      typeNames,
+    });
+    if (res.success) {
+      let resources;
+      res.data.result?.forEach((a) => {
+        resources.push(a);
+      });
+      this.usefulResource[id] = resources;
+    }
+    return this.usefulResource[id];
+  }
 }

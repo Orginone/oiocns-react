@@ -14,7 +14,7 @@ import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from '@/components/JoinOtherShop';
-import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+// import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
@@ -31,7 +31,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = (formData: any) => {
-    marketCtrl.creatMarkrt({ ...formData });
+    // marketCtrl.creatMarkrt({ ...formData });
     setIsAddOpen(false);
     setIsJoinShop(false);
   };
@@ -41,12 +41,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onDeleteOrQuitOk = () => {
-    setIsDeleteOpen(false);
-    {
-      deleOrQuit === 'delete'
-        ? marketCtrl.deleteMarket(treeDataObj?.node)
-        : marketCtrl.quitMarket(treeDataObj?.id);
-    }
+    // setIsDeleteOpen(false);
+    // {
+    //   deleOrQuit === 'delete'
+    //     ? marketCtrl.deleteMarket(treeDataObj?.node)
+    //     : marketCtrl.quitMarket(treeDataObj?.id);
+    // }
   };
 
   /**
@@ -241,7 +241,14 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         open={isDetailOpen}
         onClose={onClose}
       />
-      <JoinOtherShop title="搜索商店" open={isJoinShop} onCancel={onCancel} />
+      <JoinOtherShop
+        title="搜索商店"
+        open={isJoinShop}
+        onCancel={onCancel}
+        onOk={function (): void {
+          throw new Error('Function not implemented.');
+        }}
+      />
     </div>
   );
 };
