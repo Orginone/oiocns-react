@@ -75,6 +75,22 @@ const StoreApp: React.FC = () => {
     setCheckNodes(checkedValus);
   };
 
+  /**
+   * @description: 移除确认
+   * @return {*}
+   */
+  const onOk = () => {
+    setIsDeleteOpen(false);
+  };
+
+  /**
+   * @description: 取消确认
+   * @return {*}
+   */
+  const onCancel = () => {
+    setIsDeleteOpen(false);
+  };
+
   // 共享确认回调
   const submitShare = () => {
     console.log('当前被选中的每一项', checkNodes);
@@ -210,7 +226,14 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp onCheckeds={onCheckeds} />
       </Modal>
-      <DeleteCustomModal title="警告" open={isDeleteOpen} deleOrQuit="delete" />
+      <DeleteCustomModal
+        title="警告"
+        open={isDeleteOpen}
+        deleOrQuit="delete"
+        onOk={onOk}
+        onCancel={onCancel}
+        content="森应用"
+      />
       {/* 详情页面 /store/app/info*/}
       <Route
         exact
