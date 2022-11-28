@@ -30,7 +30,7 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
     this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
