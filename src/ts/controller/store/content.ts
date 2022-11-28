@@ -1,6 +1,6 @@
 import { XMarket } from '@/ts/base/schema';
 import { BaseProduct, Market } from '@/ts/core/market';
-import appContent from './appContent';
+import { productCtrl } from './productCtrl';
 import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
 /**
@@ -93,7 +93,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: any) => appContent.createProduct(data);
+  public createProduct = async (data: any) => productCtrl.createProduct(data);
 
   /**
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
