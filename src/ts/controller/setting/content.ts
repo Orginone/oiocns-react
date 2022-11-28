@@ -11,6 +11,7 @@ import Provider from '../../core/provider';
 import { TargetType } from '../../core/enum';
 import { XTarget } from '../../base/schema';
 import UserdataService from '../../core/target/user';
+// import { model } from '../../base';
 import Types from '@/module/typings';
 
 // 新建一个对象 ，避免代码冲突
@@ -56,7 +57,7 @@ export type ResultType<T> = {
   success: boolean;
 };
 
-class SettingController {
+class ContentController {
   // openorclose
   isOpenModal: boolean = false;
   // 当前操作的部门
@@ -67,30 +68,13 @@ class SettingController {
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
 
+  private compService: Company = new Company(Provider.getPerson?.target!);
+
   // 切换空间的时候重新初始化，所以需要new
   constructor() {
-    Provider.getWorkSpace();
+    // Provider.getWorkSpace();
     // 如果是一个公司的工作空间，需要初始化一个部门数组
     // 切换工作空间的时候 初始化控制器。
-  }
-
-  // 测试代码不使用
-  public async test() {
-    const params: deptParams = {
-      name: '部门六一一',
-      code: 'BMSixONE',
-      teamName: '部门六一一',
-      teamCode: 'BMSixONE',
-      remark: '部门六一一',
-    };
-    console.log(params);
-
-    // const compid = '383264515724283904';
-    // const deptid = '381107910723375104';
-    // 381107910723375104
-    // console.log(await this.createSecondDepartment(params));
-    let arrays: spaceObjs[] = await this.getDepartments('0');
-    console.log('-------', arrays);
   }
 
   /**
@@ -179,6 +163,10 @@ class SettingController {
    * @returns
    */
   public async createDepartment(param: deptParams): Promise<ObjType> {
+    // 判断是否创建二级部门
+    if (param.parentId != null && param.parentId != this.companyID) {
+      return await this.createSecondDepartment(param, param.parentId);
+    }
     // 要选中公司的工作区
     const compid = this.companyID;
     // Provider.getWorkSpace()!.id;
@@ -219,8 +207,33 @@ class SettingController {
       success: res.success,
     };
   }
+
+  // 查询公司底下所有的用户
+  public async searchAllPersons(departId?: string): Promise<XTarget[]> {
+    const comp: Company = new Company(Provider.getPerson?.target);
+    let res: XTarget[];
+    if (departId == null) {
+      comp.target.id = this.companyID;
+      comp.target.typeName = TargetType.Company;
+      res = await comp.getPersons();
+      console.log('===查询公司底下的用户', res);
+    } else {
+      comp.target.id = departId;
+      comp.target.typeName = TargetType.Department;
+      res = await comp.getPersons();
+      console.log('===查询部门底下的用户', res);
+    }
+    return res;
+  }
+
+  // 拉人进部门，
+  public async pullToDepartment(deptId: string, personId: string) {
+    // const res = await this.compService.pullPersonInDepartment(deptId, [personId]);
+    // return res;
+  }
+  // 或移除人出部门， 再拉入部门
 }
 
-const settingController = new SettingController();
+const contentController = new ContentController();
 
-export default settingController;
+export default contentController;

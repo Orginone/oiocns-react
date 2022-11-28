@@ -144,6 +144,13 @@ const TodoRouter: IRouteConfig[] = [
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,
+        component: React.lazy(() => import('@/pages/Todo/Store')),
+      },
+      {
+        path: '/todo/product',
+        title: '应用上架',
+        icon: <ShopOutlined />,
+        hideInMenu: true,
         component: React.lazy(() => import('@/pages/Todo/Product')),
       },
       {
@@ -279,6 +286,12 @@ const MarketRouter: IRouteConfig[] = [
         path: '/market/publicProperty',
         title: '公物仓',
         component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
+      },
+      {
+        path: '/market/usermanagement',
+        title: '用户管理',
+        icon: 'icon-message',
+        component: React.lazy(() => import('@/pages/Store/Market/UserManagement')),
       },
       {
         path: '/market',

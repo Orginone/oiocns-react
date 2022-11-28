@@ -4,7 +4,7 @@ import provider from '@/ts/core/provider';
 function createProduct(
   values: Omit<ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
 ) {
-  console.log(values);
-  return provider.getPerson.createProduct(values);
+  console.log('createProduct', values);
+  return provider!.getPerson!.createProduct(values);
 }
 export default { createProduct };

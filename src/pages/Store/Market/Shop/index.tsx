@@ -9,10 +9,9 @@ const Index: React.FC = () => {
   const [data, setData] = useState([]);
   useEffect(() => {
     StoreContent.marketTableCallBack = setData;
-    StoreContent.changeMenu('market');
     StoreContent.getStoreProduct('market');
+    // StoreContent.changeMenu('market');
   }, []);
-  console.log('三生三世', data);
 
   return (
     <>

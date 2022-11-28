@@ -1,6 +1,5 @@
 import { XMarket } from '@/ts/base/schema';
-import AppStore from '@/ts/core/market/appstore';
-import Product from '@/ts/core/market/product';
+import { BaseProduct, Market } from '@/ts/core/market';
 import appContent from './appContent';
 import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
@@ -17,11 +16,11 @@ class StoreContent {
   public Person = Provider.getPerson; // 获取当前 个人实例
   public marketTableCallBack!: (data: any) => void; //触发页面渲染 callback
   // curMarket = storeClassify._curMarket;
-  public _curMarket: AppStore | undefined = new AppStore({
+  public _curMarket: Market | undefined = new Market({
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  public _curProduct: Product | null = null;
+  public curProduct: BaseProduct | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -31,15 +30,15 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem);
-    this._curMarket = new AppStore(menuItem); // 当前商店信息
+    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
       return;
     }
     this._currentMenu = menuItem.title;
     this.curPageType = (await import('./sidebar')).default.curPageType;
-    console.log('当前页面', this.curPageType);
+    console.log('当前页面类型', this.curPageType);
 
     this.getStoreProduct(this.curPageType);
   }
@@ -71,17 +70,17 @@ class StoreContent {
       Fun = Provider.getPerson!.getOwnProducts;
       params = {};
     } else {
-      console.log('shan店数据');
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
 
     const res = await Fun(params);
+    console.log('获取数据', res);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
     }
-    console.log('获取数据', res);
+
     const { success, data } = res;
 
     if (success) {
@@ -100,12 +99,12 @@ class StoreContent {
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
    * @param {Product} item
    */
-  public selectedProduct(item: Product) {
+  public selectedProduct(item: BaseProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this._curProduct?.prod.id &&
-    console.log('修改选中');
+    // item.prod.id !== this.curProduct?.prod.id &&
+    console.log('修改选中', item);
 
-    this._curProduct = item;
+    this.curProduct = item;
   }
 }
 const storeContent = new StoreContent();

@@ -59,7 +59,7 @@ const NewStoreModal = (props: Iprops) => {
             rules={[{ required: true, message: '商店编码' }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="public" label="类型">
+          <Form.Item name="ispublic" label="类型">
             <Select
               options={[
                 {

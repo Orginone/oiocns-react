@@ -1,9 +1,4 @@
-import {
-  EllipsisOutlined,
-  LeftCircleOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState } from 'react';
@@ -13,10 +8,10 @@ interface TreeType {
   treeData?: any[];
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
-  menu?: string[]; //更多按钮列表 需提供 string[]
+  menu?: string[] | 'menus' | undefined; //更多按钮列表 需提供 string[]
   handleTitleClick?: (_item: any) => void;
   handleAddClick?: (_item: any) => void; //点击更多按钮事件
-  handleMenuClick?: MenuProps['onClick']; //点击更多按钮事件
+  handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   type?: 'myshop'; // 判断来源
   clickBtn?: any;
 }
@@ -34,11 +29,16 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   // 树形控件 更多操作
-  const renderMenu: () => MenuProps['items'] = () => {
-    if (!menu) {
-      return [];
+  const renderMenu: (data: any) => MenuProps['items'] = (data) => {
+    if (menu === 'menus') {
+      return data?.menus?.map((item: string) => {
+        return {
+          key: item,
+          label: item,
+        };
+      });
     }
-    return menu.map((item) => {
+    return menu?.map((item) => {
       return {
         key: item,
         label: item,
@@ -145,7 +145,16 @@ const StoreClassifyTree: React.FC<TreeType> = ({
                 ''
               )}
               <Dropdown
-                menu={{ items: renderMenu(), onClick: handleMenuClick }}
+                menu={
+                  menu
+                    ? {
+                        items: renderMenu(node),
+                        onClick: ({ key }) => {
+                          handleMenuClick && handleMenuClick(key, node);
+                        },
+                      }
+                    : undefined
+                }
                 placement="bottom"
                 trigger={['click']}>
                 <EllipsisOutlined className={cls.titleIcon} rotate={90} />
@@ -168,7 +177,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       <Tree
         className="draggable-tree"
-        switcherIcon={<LeftCircleOutlined />}
+        // switcherIcon={<LeftCircleOutlined />}
         titleRender={renderTreeTitle}
         defaultExpandedKeys={expandedKeys}
         draggable={draggable}

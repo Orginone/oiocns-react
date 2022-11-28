@@ -45,11 +45,9 @@ export default class userdataservice extends BaseService {
     typeName: TargetType,
     joinTypes: TargetType[],
   ): Promise<Company[]> {
+    this.target.id = companyId;
     this.target.typeName = typeName;
-    let res = await this.getjoined({
-      spaceId: companyId,
-      JoinTypeNames: joinTypes,
-    });
+    let res = await this.getjoinedTargets(joinTypes);
 
     let _joinedCompanys: Company[] = [];
     if (res.success && res.data && res.data.result) {
@@ -79,11 +77,9 @@ export default class userdataservice extends BaseService {
     typeName: TargetType,
     joinTypes: TargetType[],
   ): Promise<Company[]> {
+    this.target.id = companyId;
     this.target.typeName = typeName;
-    let res = await this.getjoined({
-      spaceId: companyId,
-      JoinTypeNames: joinTypes,
-    });
+    let res = await this.getjoinedTargets(joinTypes);
 
     let _joinedCompanys: Company[] = [];
     if (res.success && res.data && res.data.result) {
@@ -177,7 +173,7 @@ export default class userdataservice extends BaseService {
       if (targetType === TargetType.Group) {
         targetTypeSend = TargetType.Company;
       }
-      return this.pullTargets([company.target.id], targetTypeSend);
+      return this.pullTargets(company.target.id, targetTypeSend);
     }
 
     return {
@@ -193,10 +189,14 @@ export default class userdataservice extends BaseService {
    * @returns 是否成功
    */
   public async pullTargets(
-    personIds: string[],
+    personId: string,
     targetType: TargetType,
   ): Promise<model.ResultType<any>> {
-    return await this.pull(personIds, targetType);
+    const thisTarget: any = {
+      id: personId,
+      typeName: targetType,
+    };
+    return await this.pullMember([thisTarget]);
   }
 
   /**
@@ -321,6 +321,7 @@ export default class userdataservice extends BaseService {
       name,
       code,
       typeName: targetType,
+      avatar: '',
       belongId,
       teamName,
       teamCode,
@@ -340,6 +341,27 @@ export default class userdataservice extends BaseService {
     }
     return res;
   }
+
+  /**
+   * 从部门移除
+   * @param id 好友Id
+   */
+  removeFromTeam = async (
+    personId: string,
+    ids: string[],
+    teamTypes: TargetType,
+  ): Promise<model.ResultType<any>> => {
+    // 从组织机构移除
+    const res = await kernel.removeAnyOfTeam({
+      id: personId,
+      teamTypes: [TargetType.Person],
+      targetIds: ids,
+      targetType: teamTypes,
+    });
+    // 退出公司
+
+    return res;
+  };
 
   /**
    * 创建对象
