@@ -9,7 +9,7 @@ import Layout from 'antd/lib/layout/layout';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import Forget from '../Password/Forget';
-const  Person = PersonInfoEnty.getPerson;
+const Person = PersonInfoEnty.getPerson;
 const PersonInfo: React.FC = () => {
   const { Title } = Typography;
   // const { user } = useStore((state) => ({ ...state }));
@@ -29,7 +29,7 @@ const PersonInfo: React.FC = () => {
   const title = (
     <div className={cls['person-info-title']}>
       <div>
-        <Title level={2}>
+        <Title level={5}>
           <strong>当前用户</strong>
         </Title>
         <Avatar size={48} icon={<UserOutlined />} />
@@ -49,9 +49,7 @@ const PersonInfo: React.FC = () => {
           <Descriptions.Item label="姓名">{Person?.target.name}</Descriptions.Item>
           <Descriptions.Item label="性别">待定</Descriptions.Item>
           <Descriptions.Item label="邮箱">待定</Descriptions.Item>
-          <Descriptions.Item label="联系方式">
-            {Person?.target.code}
-          </Descriptions.Item>
+          <Descriptions.Item label="联系方式">{Person?.target.code}</Descriptions.Item>
           <Descriptions.Item label="家庭地址" span={2}>
             No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
           </Descriptions.Item>

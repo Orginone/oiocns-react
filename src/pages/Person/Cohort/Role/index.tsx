@@ -126,6 +126,7 @@ const RoleManage: React.FC<any> = (props) => {
         <Person />
       </div>
       <AddRole
+        key={data?.id}
         open={open}
         data={data!}
         setOpen={setOpen}

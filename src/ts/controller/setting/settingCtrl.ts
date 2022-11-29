@@ -43,6 +43,7 @@ class SettingController extends BaseController {
         id: Provider.getPerson!.target.id,
         name: '个人空间',
         isUserSpace: true,
+        // 个人空间对象设置
         targtObj: Provider.getPerson!,
         controller: this,
       };
@@ -54,6 +55,7 @@ class SettingController extends BaseController {
           id: a.target.id,
           name: a.target.name,
           isUserSpace: false,
+          // 单位空间对象设置
           targtObj: a as Company,
           controller: new CompanyController(a),
         });

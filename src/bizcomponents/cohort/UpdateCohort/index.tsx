@@ -1,11 +1,11 @@
 import React from 'react';
 // import cls from './index.module.less';
-import CohortEnty from '../../../ts/core/target/cohort'
+import CohortEnty from '../../../ts/core/target/cohort';
 import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
-import { BetaSchemaForm,  } from '@ant-design/pro-components';
+import { BetaSchemaForm } from '@ant-design/pro-components';
 import { message } from 'antd';
 
-import CohortController from '../../../ts/controller/cohort/index'
+import CohortController from '../../../ts/controller/cohort/index';
 type DataItem = {
   name: string;
   state: string;
@@ -19,7 +19,7 @@ interface indexType {
   getTableList: Function;
   columns: ProFormColumnsType<DataItem>[];
 }
-const CreateCohort: React.FC<indexType> = ({
+const UpdateCohort: React.FC<indexType> = ({
   layoutType,
   item,
   setOpen,
@@ -58,7 +58,7 @@ const CreateCohort: React.FC<indexType> = ({
         // trigger={<a>点击我</a>}
         layoutType={layoutType}
         open={open}
-        width = {500}
+        width={500}
         // steps={[
         //   {
         //     title: 'ProComponent',
@@ -73,8 +73,17 @@ const CreateCohort: React.FC<indexType> = ({
         // }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values: CohortEnty) => {
-          console.log("查看内容",item)
-          console.log('修改结果',CohortController.updateCohort(item,values.target.name,values.target.code,values.target.team?.remark!,item.target.belongId))
+          console.log('查看内容', item);
+          console.log(
+            '修改结果',
+            CohortController.updateCohort(
+              item,
+              values.target.name,
+              values.target.code,
+              values.target.team?.remark!,
+              item.target.belongId,
+            ),
+          );
           // service.updateItem(param);
           console.log(values);
           setOpen(false);
@@ -88,4 +97,4 @@ const CreateCohort: React.FC<indexType> = ({
   );
 };
 
-export default CreateCohort;
+export default UpdateCohort;

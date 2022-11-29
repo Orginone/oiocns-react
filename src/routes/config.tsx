@@ -444,6 +444,12 @@ const PersonRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
       },
       {
+        path: '/person/CohortMemberList',
+        title: '群组详情界面',
+        // icon: <Outlined />,
+        component: React.lazy(() => import('@/pages/Person/Cohort/CohortMemberList')),
+      },
+      {
         path: '/person/wallet',
         title: '卡包设置',
         icon: <WalletOutlined />,

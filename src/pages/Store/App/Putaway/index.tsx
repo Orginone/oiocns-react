@@ -20,7 +20,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
   const history = useHistory();
   const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
-  const AppInfo = StoreContent._curProduct;
+  const AppInfo = StoreContent.curProduct;
   useEffect(() => {
     StoreSidebar.getOwnMarket(false).then(() => {
       setMarketData(StoreSidebar.marketFooterTree.appTreeData);

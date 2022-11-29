@@ -11,6 +11,7 @@ interface indexType {
   setOpen: Function;
   data: schema.XAuthority;
   id: string;
+  [key: string]: any;
 }
 type target = {
   name: string;
