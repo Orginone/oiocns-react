@@ -25,6 +25,20 @@ interface TreeType {
   [key: string]: any; // 其他属性方法
 }
 const { DirectoryTree } = Tree;
+const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+  let parentKey: React.Key;
+  for (let i = 0; i < tree.length; i++) {
+    const node = tree[i];
+    if (node.children) {
+      if (node.children.some((item) => item.key === key)) {
+        parentKey = node.key;
+      } else if (getParentKey(key, node.children)) {
+        parentKey = getParentKey(key, node.children);
+      }
+    }
+  }
+  return parentKey!;
+};
 const StoreClassifyTree: React.FC<TreeType> = ({
   isDirectoryTree = false,
   title,
@@ -42,6 +56,8 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   const [searchValue, setSearchValue] = useState<string>('');
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
   // 树形控件 更多操作
   const renderMenu: (data: any) => MenuProps['items'] = (data) => {
     if (menu === 'menus') {
@@ -63,16 +79,28 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       };
     });
   };
-  //TODO: 树形数据需要切换
-  // console.log('树形数据需要切换', treeData);
-  // const resetTreeData: any = useMemo(() => {
-  //   console.log('3333', treeData);
 
-  //   return treeData;
-  //   // ?.map((v: any) => {
-  //   //   return (v.icon = <ApartmentOutlined />);
-  //   // });
-  // }, [treeData]);
+  const onExpand = (newExpandedKeys: React.Key[]) => {
+    setExpandedKeys(newExpandedKeys);
+    setAutoExpandParent(false);
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const newExpandedKeys = treeData
+      .map((item: { title: string | string[]; key: React.Key }) => {
+        if (item.title.indexOf(value) > -1) {
+          return getParentKey(item.key, treeData);
+        }
+        return null;
+      })
+      .filter(
+        (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
+      );
+    setExpandedKeys(newExpandedKeys as React.Key[]);
+    setSearchValue(value);
+    setAutoExpandParent(true);
+  };
   const resetTreeData = useMemo(() => {
     console.log('sousuo', searchValue);
 
@@ -101,11 +129,11 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           title,
         };
       });
+    console.log('打印测试', loop(treeData));
 
     return loop(treeData);
-  }, [searchValue]);
+  }, [searchValue, treeData]);
   const [gData, setGData] = useState([]);
-  const [expandedKeys] = useState(['0-0', '0-0-0']);
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
     console.log('拖拽', info);
@@ -240,13 +268,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {searchable && (
         <div className={cls.title}>
-          <Input
-            prefix={<SearchOutlined />}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-            }}
-            placeholder="搜索分类"
-          />
+          <Input prefix={<SearchOutlined />} onChange={onChange} placeholder="搜索分类" />
         </div>
       )}
       {isDirectoryTree ? (
@@ -271,6 +293,9 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           onDragEnter={onDragEnter}
           onDrop={onDrop}
           treeData={resetTreeData}
+          onExpand={onExpand}
+          expandedKeys={expandedKeys}
+          autoExpandParent={autoExpandParent}
           {...rest}
         />
       )}
