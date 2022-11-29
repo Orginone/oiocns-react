@@ -124,7 +124,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          console.log('333', item.prod);
+          console.log('333', item._prod);
 
           history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
         },
@@ -246,23 +246,25 @@ const StoreApp: React.FC = () => {
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={StoreContent.curProduct?.prod.id || ''} />}></Route>
+        render={() => (
+          <AppInfo appId={StoreContent.curProduct?._prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/publish"
         render={() => (
-          <PublishList appId={StoreContent.curProduct?.prod.id || ''} />
+          <PublishList appId={StoreContent.curProduct?._prod.id || ''} />
         )}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={StoreContent.curProduct?.prod.id || ''} />}></Route>
+        render={() => <Manage appId={StoreContent.curProduct?._prod.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
         render={() => (
-          <PutawayComp appId={StoreContent.curProduct?.prod.id || ''} />
+          <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
         )}></Route>
     </>
   );
