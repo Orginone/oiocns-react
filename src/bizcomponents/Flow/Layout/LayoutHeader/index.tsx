@@ -62,9 +62,9 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
       <div className={cls['layout-title']}>
         {form.formId && (
           <div className={cls['layout-header']}>
-            <span className={cls['layout-title-business']}>
+            {/* <span className={cls['layout-title-business']}>
               业务名：{form.formName || form.business || form.formId}
-            </span>
+            </span> */}
             <span className={cls['layout-titlebinding']}>
               绑定已有流程：
               <Select
