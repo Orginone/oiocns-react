@@ -169,15 +169,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   /**
-   * @desc: 创建新目录
-   * @param {any} item
-   * @return {*}
-   */
-  const handleAddShop = (item: any) => {
-    console.log('handleAddShop', item);
-  };
-
-  /**
    * @description: 删除商店弹窗
    * @param {any} item
    * @return {*}
@@ -235,14 +226,13 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         defaultOpenKeys={['openMarket']}
         onClick={({ key }) => handleChange(key)}
       />
-      {ClickBtn}
       <MarketClassifyTree
         key={selectMenu}
         handleTitleClick={handleTitleClick}
-        handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={treelist}
         menu={'menus'}
+        title={ClickBtn}
       />
       <NewStoreModal title="创建商店" open={isAddOpen} onOk={onOk} onCancel={onCancel} />
       <DeleteCustomModal
