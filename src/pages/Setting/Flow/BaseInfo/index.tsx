@@ -8,7 +8,7 @@ import {
   ProFormSelect,
   ProFormDependency,
 } from '@ant-design/pro-components';
-import { SmileOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
 import cls from './index.module.less';
 type BaseInfoProps = {
