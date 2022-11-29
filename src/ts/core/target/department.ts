@@ -74,18 +74,11 @@ export default class Department extends BaseTarget implements IDepartment {
     }
     return res;
   }
-  public async removePerson(targets: schema.XTarget[]): Promise<ResultType<any>> {
-    const res = await super.removeMember(
-      targets.map((a) => a.id),
-      TargetType.Person,
-    );
+  public async removePerson(ids: string[]): Promise<ResultType<any>> {
+    const res = await super.removeMember(ids, TargetType.Person);
     if (res.success) {
       this.person = this.person.filter((a) => {
-        return (
-          targets.find((t) => {
-            return a.id == t.id;
-          }) == undefined
-        );
+        return !ids.includes(a.id);
       });
     }
     return res;

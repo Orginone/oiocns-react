@@ -1,6 +1,8 @@
-import { Card, Layout, Steps, Button } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message } from 'antd';
 import React, { useState, useRef } from 'react';
 import cls from './index.module.less';
+
+import { RollbackOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 // import RootNode from '@/bizcomponents/Flow/Process/RootNode';
@@ -42,7 +44,7 @@ type FlowItem = {};
  */
 const SettingFlow: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [currentStep, setCurrentStep] = useState<StepType>(StepType.PROCESSMESS);
+  const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
 
   const columns: ProColumns<FlowItem>[] = [
@@ -61,90 +63,129 @@ const SettingFlow: React.FC = () => {
       valueType: 'option',
       key: 'option',
       render: (text, record, _, action) => [
-        <a>编辑</a>,
         <a
+          key="editor"
+          onClick={() => {
+            setEditorType(EditorType.PROCESSDESIGN);
+          }}>
+          编辑
+        </a>,
+        <a
+          key="look"
           onClick={() => {
             setEditorType(EditorType.PROCESSDESIGN);
           }}>
           查看
         </a>,
-        <a>删除</a>,
+        <a
+          key="delete"
+          onClick={() => {
+            Modal.confirm({
+              title: '提示',
+              content: '确定删除当前流程吗',
+              onOk: () => {
+                message.success('删除成功');
+              },
+            });
+          }}>
+          删除
+        </a>,
       ],
     },
   ];
 
+  const initData = () => {
+    setEditorType(EditorType.TABLEMES);
+    setCurrentStep(StepType.BASEINFO);
+  };
+
   return (
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
-        <div className={cls['company-info-content']}>
-          <Card bordered={false}>
-            <Layout>
-              <Header
-                style={{
-                  position: 'sticky',
-                  top: 0,
-                  zIndex: 100,
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginBottom: '10px',
+        {editorType === EditorType.TABLEMES ? (
+          <ProTable
+            actionRef={actionRef}
+            columns={columns}
+            request={async (params = {}, sort, filter) => {
+              console.log(sort, filter);
+              return {
+                data: [{ title: '测试流程1' }, { title: '测试流程2' }],
+                success: true,
+                total: 10,
+              };
+            }}
+            toolBarRender={() => [
+              <Button
+                key="button"
+                type="primary"
+                onClick={() => {
+                  setEditorType(EditorType.PROCESSDESIGN);
                 }}>
-                <div style={{ width: '600px' }}>
-                  <Steps current={currentStep}>
-                    <Step title={stepTypeAndNameMaps[StepType.BASEINFO]} />
-                    <Step title={stepTypeAndNameMaps[StepType.PROCESSMESS]} />
-                  </Steps>
-                </div>
-              </Header>
-              <Content>
-                <Card bordered={false}>
-                  {/* 基本信息组件 */}
-                  {currentStep === StepType.BASEINFO ? (
-                    <BaseInfo
-                      nextStep={() => {
-                        setCurrentStep(StepType.PROCESSMESS);
-                      }}
-                    />
-                  ) : null}
-                  {currentStep === StepType.PROCESSMESS &&
-                  editorType === EditorType.TABLEMES ? (
-                    <ProTable
-                      actionRef={actionRef}
-                      columns={columns}
-                      request={async (params = {}, sort, filter) => {
-                        console.log(sort, filter);
-                        return {
-                          data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                          success: true,
-                          total: 10,
-                        };
-                      }}
-                      toolBarRender={() => [
-                        <Button
-                          key="button"
-                          type="primary"
-                          onClick={() => {
-                            setCurrentStep(StepType.BASEINFO);
-                          }}>
-                          新建
-                        </Button>,
-                      ]}
-                    />
-                  ) : null}
+                新建
+              </Button>,
+            ]}
+          />
+        ) : null}
+        {editorType !== EditorType.TABLEMES ? (
+          <div className={cls['company-info-content']}>
+            <Card bordered={false}>
+              <Layout>
+                <Header
+                  style={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 100,
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '10px',
+                  }}>
+                  <div style={{ width: '600px' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-16px',
+                        left: '-74%',
+                      }}>
+                      <Button
+                        onClick={() => {
+                          initData();
+                        }}>
+                        <RollbackOutlined />
+                        返回
+                      </Button>
+                    </div>
+                    <Steps current={currentStep}>
+                      <Step title={stepTypeAndNameMaps[StepType.BASEINFO]} />
+                      <Step title={stepTypeAndNameMaps[StepType.PROCESSMESS]} />
+                    </Steps>
+                  </div>
+                </Header>
+                <Content>
+                  <Card bordered={false}>
+                    {/* 基本信息组件 */}
+                    {currentStep === StepType.BASEINFO ? (
+                      <BaseInfo
+                        nextStep={() => {
+                          setCurrentStep(StepType.PROCESSMESS);
+                        }}
+                      />
+                    ) : null}
 
-                  {currentStep === StepType.PROCESSMESS &&
-                  editorType === EditorType.PROCESSDESIGN ? (
-                    <ProcessDesign
-                      backTable={() => {
-                        setEditorType(EditorType.TABLEMES);
-                      }}></ProcessDesign>
-                  ) : null}
-                </Card>
-              </Content>
-            </Layout>
-          </Card>
-        </div>
+                    {currentStep === StepType.PROCESSMESS &&
+                    editorType === EditorType.PROCESSDESIGN ? (
+                      <ProcessDesign
+                        backTable={() => {
+                          initData();
+                        }}></ProcessDesign>
+                    ) : null}
+                  </Card>
+                </Content>
+              </Layout>
+            </Card>
+          </div>
+        ) : null}
       </Card>
     </div>
   );

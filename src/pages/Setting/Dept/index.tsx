@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Card, Button, Descriptions, Space } from 'antd';
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -14,7 +14,7 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
 import settingController from '@/ts/controller/setting';
-import { initDatatype } from '@/ts/core/setting/isetting'
+import { initDatatype } from '@/ts/core/setting/isetting';
 /**
  * 部门设置
  * @returns
@@ -26,7 +26,7 @@ const SettingDept: React.FC = () => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectId, setSelectId] = useState<string>()
+  const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
   // 操作内容渲染函数
@@ -80,21 +80,21 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
-  /** 添加人员的逻辑 */ 
-  const onPersonalOk = (params:initDatatype[]) => { 
+  /** 添加人员的逻辑 */
+  const onPersonalOk = (params: initDatatype[]) => {
     console.log(params);
     setIsAddOpen(false);
-  }
+  };
 
-  /** 设置岗位的逻辑 */ 
-  const handlePostOk = (checkJob:initDatatype,checkUser:initDatatype[]) => { 
+  /** 设置岗位的逻辑 */
+  const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
     console.log(checkJob, checkUser);
     setIsSetPost(false);
-  }
+  };
 
-  const onApplyOk = () =>{ 
+  const onApplyOk = () => {
     setLookApplyOpen(false);
-  }
+  };
 
   const onOk = () => {
     setIsAddOpen(false);
@@ -110,43 +110,43 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
   };
-/**
+  /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
- useEffect(() => {
-   settingController.addListen('isOpenModal', () => { 
-    setIsCreateDept(true)
-    setIsOpenModal(true);
-  })
-  return settingController.remove('isOpenModal', () => { 
-    setIsOpenModal(false);
-    setIsCreateDept(false);
-  })
-}, []);
+  useEffect(() => {
+    settingController.addListen('isOpenModal', () => {
+      setIsCreateDept(true);
+      setIsOpenModal(true);
+    });
+    return settingController.remove('isOpenModal', () => {
+      setIsOpenModal(false);
+      setIsCreateDept(false);
+    });
+  }, []);
 
-/**
- * 监听集团id发生变化，改变右侧数据
- * */ 
-useEffect(() => {
-  settingController.addListen('createDept', (e: { id: string }) => {
-    setIsCreateDept(true)
-    setSelectId(e.id); 
-  })
-  return settingController.remove('createDept', () => {
-    setSelectId(''); 
-    setIsCreateDept(false);
-  })
-}, []);
-  
-  useEffect(() => { 
+  /**
+   * 监听集团id发生变化，改变右侧数据
+   * */
+  useEffect(() => {
+    settingController.addListen('createDept', (e: { id: string }) => {
+      setIsCreateDept(true);
+      setSelectId(e.id);
+    });
+    return settingController.remove('createDept', () => {
+      setSelectId('');
+      setIsCreateDept(false);
+    });
+  }, []);
+
+  useEffect(() => {
     initData();
-  }, [selectId])
+  }, [selectId]);
 
-  const initData =async () => { 
+  const initData = async () => {
     const resultData = await settingController.searchAllPersons(selectId);
     console.log(resultData);
-  }
+  };
 
   // 标题tabs页
   const TitleItems = [
@@ -184,7 +184,7 @@ useEffect(() => {
         <Button
           type="link"
           onClick={() => {
-            settingController.trigger('isOpenModal')
+            settingController.trigger('isOpenModal');
             setIsCreateDept(false);
           }}>
           编辑
@@ -193,7 +193,11 @@ useEffect(() => {
       </div>
     </div>
   );
-  // 部门信息内容
+
+  /**
+   * @description: 部门信息内容
+   * @return {*}
+   */
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
@@ -215,9 +219,11 @@ useEffect(() => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {
-           setIsSetPost(true);
-        }}>
+        <Button
+          type="link"
+          onClick={() => {
+            setIsSetPost(true);
+          }}>
           岗位设置
         </Button>
         <Button
@@ -303,7 +309,12 @@ useEffect(() => {
         handleOk={handleOk}
       />
       {/* 岗位设置 */}
-      <AddDeptModal title={'岗位设置'} open={isSetPost} onOk={handlePostOk} handleOk={onOk} />
+      <AddDeptModal
+        title={'岗位设置'}
+        open={isSetPost}
+        onOk={handlePostOk}
+        handleOk={onOk}
+      />
     </div>
   );
 };

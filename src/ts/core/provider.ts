@@ -125,4 +125,18 @@ export default class Provider {
     }
     return res;
   }
+  /**
+   * 变更密码
+   * @param account 账号
+   * @param password 密码
+   * @param privateKey 私钥
+   * @returns
+   */
+  public static async resetPassword(
+    account: string,
+    password: string,
+    privateKey: string,
+  ): Promise<model.ResultType<any>> {
+    return await kernel.resetPassword(account, password, privateKey);
+  }
 }
