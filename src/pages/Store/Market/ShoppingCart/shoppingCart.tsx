@@ -39,6 +39,7 @@ const ShoppingCart: React.FC<any> = (props) => {
             // });
 
             setcheckval([]);
+            setCheckAll(false);
           },
           onCancel() {
             console.log('Cancel');
@@ -53,6 +54,7 @@ const ShoppingCart: React.FC<any> = (props) => {
           onOk() {
             console.log('OK', checkval);
             setcheckval([]);
+            setCheckAll(false);
           },
           onCancel() {
             console.log('Cancel');
