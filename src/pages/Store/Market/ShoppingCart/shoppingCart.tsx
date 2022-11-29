@@ -11,6 +11,8 @@ import { Col, Row, Tag } from 'antd';
 const ShoppingCart: React.FC<any> = (props) => {
   const [fls, setfls] = useState(Adata.result); //接口内的数据
   const [checkval, setcheckval] = useState([]); //勾选的数组
+  const [indeterminate, setIndeterminate] = useState(false);
+  const [checkAll, setCheckAll] = useState(false);
 
   const { confirm } = Modal;
   const showConfirms = (type: string) => {
@@ -59,6 +61,16 @@ const ShoppingCart: React.FC<any> = (props) => {
       }
     };
   };
+  const plainOptions: any = [];
+  fls.forEach((item) => {
+    plainOptions.push(item.id);
+  });
+  const onCheckAllChange = (e: CheckboxChangeEvent) => {
+    setcheckval(e.target.checked ? plainOptions : []);
+    setIndeterminate(false);
+    setCheckAll(e.target.checked);
+    console.log(checkval);
+  };
   return (
     <>
       <div className={cls['maxbox']}>
@@ -94,7 +106,14 @@ const ShoppingCart: React.FC<any> = (props) => {
               <Col span={3}>售卖权属</Col>
               <Col span={3}>价格</Col>
               <Col span={3}>使用期限</Col>
-              <Col span={4}>全选</Col>
+              <Col span={4}>
+                全选
+                <Checkbox
+                  indeterminate={indeterminate}
+                  onChange={onCheckAllChange}
+                  checked={checkAll}
+                />
+              </Col>
             </Row>
           </div>
           <div className={cls['content_mod']}>
