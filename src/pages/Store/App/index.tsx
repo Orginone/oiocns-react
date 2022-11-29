@@ -34,7 +34,7 @@ const StoreApp: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
-  const [deleteId, setDeleteId] = useState<string>('');
+  const [productObj, setProductObj] = useState<any>({});
   const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
@@ -83,7 +83,7 @@ const StoreApp: React.FC = () => {
    */
   const onOk = () => {
     setIsDeleteOpen(false);
-    productCtrl.deleteProduct(deleteId);
+    productCtrl.deleteProduct(productObj?._prod?.id);
   };
 
   /**
@@ -165,7 +165,7 @@ const StoreApp: React.FC = () => {
         label: '移除',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          setDeleteId(item?._prod?.id);
+          setProductObj(item);
           setIsDeleteOpen(true);
         },
       },
@@ -240,7 +240,7 @@ const StoreApp: React.FC = () => {
         deleOrQuit="delete"
         onOk={onOk}
         onCancel={onCancel}
-        content="森应用"
+        content={productObj?._prod?.name}
       />
       {/* 详情页面 /store/app/info*/}
       <Route

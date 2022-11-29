@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Avatar,
-  List,
-  Descriptions,
-  Typography,
-  Layout,
-  Card,
-  Input,
-  message,
-} from 'antd';
+import { Avatar, List, Descriptions, Typography, Layout, Card, Input, Tag } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
-import { stringify } from 'querystring';
 const fakeDataUrl =
   'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
 const ContainerHeight = 400;
+
 interface UserItem {
   email: string;
   gender: string;
@@ -75,14 +65,26 @@ const App: React.FC = () => {
       return (
         <div>
           <a href="https://ant.design">{value.name.last}</a>
+          <span style={{ paddingLeft: '5px' }}>{939097257}</span>
+          <span>
+            <Tag color="green" style={{ marginLeft: '10px' }}>
+              三级管理员
+            </Tag>
+          </span>
         </div>
       );
     }
     return (
       <div>
         <a href="https://ant.design">{value.name.last}</a>
+        <span style={{ paddingLeft: '5px' }}>{939097257}</span>
         <span>
-          <UserOutlined size={10} style={{ paddingLeft: '5px' }} />
+          <Tag color="green" style={{ marginLeft: '10px' }}>
+            三级管理员
+          </Tag>
+        </span>
+        <span>
+          <UserOutlined size={20} style={{ paddingLeft: '5px' }} />
         </span>
       </div>
     );

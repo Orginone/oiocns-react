@@ -142,6 +142,7 @@ class CohortController {
     name: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.searchTargetByName(name, TargetType.Cohort);
+    console.log(res);
     return res;
   }
   /**

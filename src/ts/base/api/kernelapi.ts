@@ -100,6 +100,30 @@ export default class KernelApi {
     return res;
   }
   /**
+   * 重置密码
+   * @param userName 用户名
+   * @param password 密码
+   * @returns {Promise<model.ResultType<any>>}
+   */
+  public async resetPassword(
+    userName: string,
+    password: string,
+    privatekey: string,
+  ): Promise<model.ResultType<any>> {
+    var res: model.ResultType<any>;
+    var req = {
+      account: userName,
+      password: password,
+      privateKey: privatekey,
+    };
+    if (this._storeHub.isConnected) {
+      res = await this._storeHub.invoke('ResetPassword', req);
+    } else {
+      res = await this._restRequest('resetpassword', req);
+    }
+    return res;
+  }
+  /**
    * 注册到后台核心获取accessToken
    * @param name 姓名
    * @param motto 座右铭
