@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { schema } from '../../ts/base';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
-import { Avatar, Col, Result, Row } from 'antd';
+import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import { CheckCard } from '@ant-design/pro-components';
-import { UserOutlined } from '@ant-design/icons';
 import CohortController from '../../ts/controller/cohort/index';
 import Person from '../../ts/core/target/person';
 import CohortCard from './SearchCohortCard';
@@ -31,7 +29,9 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
   const renderCardFun = (dataArr: schema.XTarget[]): React.ReactNode[] => {
     return dataArr.map((item: schema.XTarget) => {
       return (
-        <div style={{ display: 'inline-block', paddingTop: '20px', paddingLeft: '13px' }}>
+        <div
+          style={{ display: 'inline-block', paddingTop: '20px', paddingLeft: '13px' }}
+          key={item.id}>
           <Row>
             <CohortCard
               className="card"
@@ -44,7 +44,6 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
                 desc: 'remark',
                 creatTime: 'createTime',
               }}
-              onClick={() => console.log('按钮测试')}
             />
           </Row>
         </div>

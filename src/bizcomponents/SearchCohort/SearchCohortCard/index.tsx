@@ -1,9 +1,8 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu, Modal, Space, Button, Typography, Col } from 'antd';
+import { Avatar, Button, Typography, Col } from 'antd';
 import React, { useState } from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
-import { stringify } from 'querystring';
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -17,7 +16,6 @@ interface AppCardType {
   className?: string;
   defaultKey?: defaultObjType; // 卡片字段 对应数据字段
   // eslint-disable-next-line no-unused-vars
-  onClick?: (event?: any) => void;
   // eslint-disable-next-line no-unused-vars
 }
 const defaultObj = {
@@ -29,12 +27,7 @@ const defaultObj = {
   creatTime: 'creatTime', //上架时间
 };
 
-const CohortListCard: React.FC<AppCardType> = ({
-  className,
-  data,
-  defaultKey,
-  onClick,
-}) => {
+const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) => {
   const {} = { ...defaultObj, ...defaultKey };
   /**
    * @desc: 操作按钮区域
@@ -44,7 +37,7 @@ const CohortListCard: React.FC<AppCardType> = ({
 
   const Title = () => {
     return (
-      <div className="card-title flex" onClick={onClick}>
+      <div className="card-title flex">
         <div className="card-title-left">
           <Avatar src="https://joeschmoe.io/api/v1/random" size={60} />
           <div className="card-title-left-info">
@@ -80,7 +73,7 @@ const CohortListCard: React.FC<AppCardType> = ({
               icon={
                 <UsergroupAddOutlined style={{ fontSize: '25px', color: '#808080' }} />
               }
-              onClick={onClick}
+              // onClick={onClick}
             />
             {/* <UsergroupAddOutlined style={{ float: 'right', fontSize: '25px' }} /> */}
           </li>
