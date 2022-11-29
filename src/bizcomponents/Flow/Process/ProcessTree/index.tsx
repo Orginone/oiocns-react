@@ -643,18 +643,34 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
     let processTrees = getDomTree(React.createElement, dom);
     //插入末端节点
     processTrees.push(
-      React.createElement('div', { style: { textAlign: 'center' }, key: getRandomId() }, [
-        React.createElement(
-          'div',
-          {
-            className: cls['process-end'],
-            // dangerouslySetInnerHTML: { __html: '流程结束' },
-            // dangerouslySetInnerHTML:{textEndNode},
-            key: getRandomId(),
-          },
-          ['流程结束'],
-        ),
-      ]),
+      React.createElement(
+        'div',
+        { className: cls['all-process-end'], key: getRandomId() },
+        [
+          React.createElement(
+            'div',
+            { className: cls['process-content'], key: getRandomId() },
+            [
+              React.createElement(
+                'div',
+                {
+                  className: cls['process-left'],
+                  key: getRandomId(),
+                },
+                ['END'],
+              ),
+              React.createElement(
+                'div',
+                {
+                  className: cls['process-right'],
+                  key: getRandomId(),
+                },
+                ['结束'],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
     return React.createElement(
       'div',

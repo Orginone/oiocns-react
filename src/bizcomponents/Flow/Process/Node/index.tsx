@@ -1,9 +1,11 @@
 import { Tooltip } from 'antd';
 import {
+  TagOutlined,
   UserOutlined,
   CloseOutlined,
   RightOutlined,
   ExclamationCircleOutlined,
+  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
 import React, { useContext } from 'react';
@@ -37,10 +39,28 @@ type NodeProps = {
 };
 
 /**
+ * 添加的节点枚举
+ * */
+export enum AddNodeType {
+  APPROVAL,
+  CC,
+  CONDITIONS,
+  CONCURRENTS,
+}
+
+export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
+  [AddNodeType.APPROVAL]: '审批节点',
+  [AddNodeType.CC]: '抄送节点',
+  [AddNodeType.CONDITIONS]: '条件节点',
+  [AddNodeType.CONCURRENTS]: '同时审核节点',
+};
+
+/**
  * 流程节点
  * @returns
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
+  console.log('props', props);
   const delNode = () => {
     props.onDelNode();
   };
@@ -54,20 +74,62 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       </div>
     </div>
   );
+  // const nodeHeader = (
+  //   <div className={cls['node-body-header']} style={{ backgroundColor: props.headerBgc }}>
+  //     <UserOutlined style={{ fontSize: '12px', paddingRight: '5px' }} />
+  //     <span className={cls['name']}>{props.title}</span>
+  //     {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />}
+  //   </div>
+  // );
+
   const nodeHeader = (
-    <div className={cls['node-body-header']} style={{ backgroundColor: props.headerBgc }}>
-      <UserOutlined style={{ fontSize: '12px', paddingRight: '5px' }} />
-      <span className={cls['name']}>{props.title}</span>
-      {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />}
+    <div
+      className={
+        props.title === '审批对象' ? cls['node-body-people'] : cls['node-body-left']
+      }>
+      {props.title === '审批对象' ? (
+        <UsergroupAddOutlined
+          style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
+        />
+      ) : (
+        <TagOutlined
+          style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
+        />
+      )}
+      {/* <span className={cls['name']}>{props.title}</span> */}
     </div>
   );
+
+  // const nodeContent = (
+  //   <div className={cls['node-body-content']} onClick={select}>
+  //     {!props.content && <span className={cls['placeholder']}>{props.placeholder}</span>}
+  //     {props.content && <span className={cls['name']}>{props.content}</span>}
+  //     <RightOutlined className={cls['node-body-rightOutlined']} />
+  //   </div>
+  // );
+
   const nodeContent = (
-    <div className={cls['node-body-content']} onClick={select}>
-      {!props.content && <span className={cls['placeholder']}>{props.placeholder}</span>}
-      {props.content && <span className={cls['name']}>{props.content}</span>}
-      <RightOutlined className={cls['node-body-rightOutlined']} />
+    <div className={cls['node-body-right']} onClick={select}>
+      <div>
+        <span className={cls['name-title']}>{props.title}</span>
+      </div>
+      <div>
+        {!props.content && (
+          <span className={cls['placeholder']}>{props.placeholder}</span>
+        )}
+        {props.content && <span className={cls['name-title']}>{props.content}</span>}
+        {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
+        {!props.isRoot && (
+          <CloseOutlined
+            className={cls['iconPosition']}
+            style={{ fontSize: '12px' }}
+            onClick={delNode}
+          />
+        )}
+      </div>
     </div>
   );
+
   const nodeError = (
     <div className={cls['node-error']}>
       {props.showError && (
@@ -91,7 +153,10 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
         <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
-          <div>
+          <div
+            className={
+              props.title === '审批对象' ? cls['nodeAproStyle'] : cls['nodeNewStyle']
+            }>
             {nodeHeader}
             {nodeContent}
             {nodeError}

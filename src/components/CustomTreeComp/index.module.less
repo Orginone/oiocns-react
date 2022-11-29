@@ -14,9 +14,14 @@
     }
     .ogo-tree .ogo-tree-node-content-wrapper {
       width: 100%;
+      display: flex;
+      flex-grow: 1;
       padding: 2px 4px;
       font-size: 14px;
       align-items: center;
+    }
+    .ogo-tree-title {
+      flex-grow: 1;
     }
 
     .anticon {
@@ -50,7 +55,10 @@
   .treeTitleBox {
     display: flex;
     justify-content: space-between;
-    margin-right: 6px;
+    // margin-right: 6px;
+    width: 100%;
+    &Label {
+    }
   }
 
   .titleIcon {

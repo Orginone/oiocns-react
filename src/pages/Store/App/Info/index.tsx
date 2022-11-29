@@ -70,16 +70,16 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={StoreContent.curProduct?.prod.name}
+          title={StoreContent.curProduct?._prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{StoreContent.curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{StoreContent.curProduct?._prod.remark}</p>
               <p className="app-info-con-txt">
                 <span className="vision">
-                  版本号 ：{StoreContent.curProduct?.prod.version}
+                  版本号 ：{StoreContent.curProduct?._prod.version}
                 </span>
                 <span className="lastTime">
-                  订阅到期时间 ：{StoreContent.curProduct?.prod.createTime}
+                  订阅到期时间 ：{StoreContent.curProduct?._prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>

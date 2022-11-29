@@ -1,3 +1,4 @@
+import { ResultType } from '@/ts/base/model';
 import Person from '@/ts/core/target/person';
 
 /* eslint-disable no-unused-vars */
@@ -54,6 +55,19 @@ export type StateProps = {
   userObj: Person | null;
 
   login: (account: string, password: string) => Promise<boolean>;
+  register: (
+    name: string,
+    motto: string,
+    phone: string,
+    account: string,
+    password: string,
+    nickName: string,
+  ) => Promise<ResultType<any>>;
+  resetPassword: (
+    account: string,
+    password: string,
+    privateKey: string,
+  ) => Promise<ResultType<any>>;
   setUser: (val: Partial<UserType>) => void;
   getUserInfo: () => void;
 };

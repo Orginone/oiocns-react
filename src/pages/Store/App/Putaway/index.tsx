@@ -68,19 +68,18 @@ const AppPutaway: React.FC<AppInfoType> = () => {
               history.goBack();
             }}
           />
-        }
-      >
+        }>
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={AppInfo?.prod.name || '应用名称'}
+          title={AppInfo?._prod.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{AppInfo?.prod.remark}</p>
+              <p className="app-info-con-desc">{AppInfo?._prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：{AppInfo?.prod.version}</span>
+                <span className="vision">版本号 ：{AppInfo?._prod.version}</span>
                 <span className="lastTime">
-                  订阅到期时间 ：{AppInfo?.prod.createTime}
+                  订阅到期时间 ：{AppInfo?._prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
@@ -106,17 +105,15 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           layout="horizontal"
           initialValues={{
             sellAuth: '使用权',
-            caption: AppInfo?.prod.name,
-            typeName: AppInfo?.prod.typeName,
+            caption: AppInfo?._prod.name,
+            typeName: AppInfo?._prod.typeName,
           }}
           form={form}
-          autoComplete="off"
-        >
+          autoComplete="off">
           <Form.Item
             label="上架平台"
             name="marketId"
-            rules={[{ required: true, message: '请选择上架平台' }]}
-          >
+            rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
               {marketData.map((item) => {
                 return (

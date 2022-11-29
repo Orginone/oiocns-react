@@ -117,6 +117,7 @@ export class FileSystemItem implements IFileSystemItem {
     return false;
   }
   async loadChildren(reload: boolean = false): Promise<boolean> {
+    console.log('刷新树', this.target);
     if (this.target.isDirectory && (reload || this.children.length < 1)) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
         shareDomain: 'user',
