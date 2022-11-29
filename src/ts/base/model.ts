@@ -492,10 +492,10 @@ export type OrderPayModel = {
 };
 
 export type ProductModel = {
-  // 唯一ID
-  id: string | undefined;
   // 名称
   name: string;
+  // 唯一ID
+  id: string | undefined;
   // 编号
   code: string;
   // 元数据Id

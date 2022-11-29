@@ -11,13 +11,14 @@ import { Modal } from 'antd';
 import { title } from 'process';
 type ProcessDesignProps = {
   [key: string]: any;
+  backTable: () => void;
 };
 export const EventContext = createContext({} as { FlowSub: any });
 /**
  * 空节点
  * @returns
  */
-const ProcessDesign: React.FC<ProcessDesignProps> = () => {
+const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
@@ -190,7 +191,12 @@ const ProcessDesign: React.FC<ProcessDesignProps> = () => {
 
   return (
     <>
-      <LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>
+      <LayoutHeader
+        OnPreview={preview}
+        OnExit={exit}
+        backTable={() => {
+          backTable();
+        }}></LayoutHeader>
       <div className={cls['container']}>
         <EventContext.Provider value={{ FlowSub }}>
           <div className={cls['layout-body']}>

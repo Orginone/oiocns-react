@@ -14,7 +14,8 @@ import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from '@/components/JoinOtherShop';
-import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+import { MarketController } from '@/ts/controller/store/marketCtrl';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [list, setList] = useState<any[]>([]);
@@ -24,6 +25,24 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
   const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
+  const [curSpace, setCurSpace] = useState<any>({});
+
+  /**
+   * @description: 实例化商店对象
+   * @return {*}
+   */
+  const marketCtrl = new MarketController(curSpace);
+  useEffect(() => {
+    const id = settingCtrl.subscribe(() => {
+      setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
+      if (settingCtrl.getCurWorkSpace) {
+        setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
+  }, []);
 
   /**
    * @description: 创建商店
@@ -44,7 +63,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsDeleteOpen(false);
     {
       deleOrQuit === 'delete'
-        ? marketCtrl.deleteMarket(treeDataObj?.node)
+        ? marketCtrl.deleteMarket(treeDataObj?.id)
         : marketCtrl.quitMarket(treeDataObj?.id);
     }
   };
@@ -150,15 +169,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   /**
-   * @desc: 创建新目录
-   * @param {any} item
-   * @return {*}
-   */
-  const handleAddShop = (item: any) => {
-    console.log('handleAddShop', item);
-  };
-
-  /**
    * @description: 删除商店弹窗
    * @param {any} item
    * @return {*}
@@ -219,12 +229,10 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       <MarketClassifyTree
         key={selectMenu}
         handleTitleClick={handleTitleClick}
-        handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={treelist}
         menu={'menus'}
-        type="myshop"
-        clickBtn={ClickBtn}
+        title={ClickBtn}
       />
       <NewStoreModal title="创建商店" open={isAddOpen} onOk={onOk} onCancel={onCancel} />
       <DeleteCustomModal
@@ -236,8 +244,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         content={treeDataObj.title}
       />
       <DetailDrawer
-        title={'神马商店'}
-        nodeDetail={treeDataObj?.node?.store}
+        title={treeDataObj.title}
+        nodeDetail={treeDataObj?.node?.market}
         open={isDetailOpen}
         onClose={onClose}
       />

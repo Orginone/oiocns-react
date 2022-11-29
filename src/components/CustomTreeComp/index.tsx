@@ -1,46 +1,78 @@
 import {
+  ApartmentOutlined,
   EllipsisOutlined,
-  LeftCircleOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import React, { useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import cls from './index.module.less';
 
 interface TreeType {
-  treeData?: any[];
+  treeData: any[];
   draggable?: boolean; //是否可拖拽
   searchable?: boolean; //是否展示搜索区域
   menu?: string[] | 'menus' | undefined; //更多按钮列表 需提供 string[]
-  handleTitleClick?: (_item: any) => void;
-  handleAddClick?: (_item: any) => void; //点击更多按钮事件
+  parentIcon?: ReactElement; // 父级 --具备子集的层级展示图标
+  childIcon?: ReactElement; //子级 --无下级 展示 icon
+  handleTitleClick?: (node: any) => void; //名称 单击
+  onDoubleClickTitle?: (node: any) => void; // 名称 双击
+  handleAddClick?: (node: any) => void; //展示 点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
-  type?: 'myshop'; // 判断来源
-  clickBtn?: any;
+  title?: ReactElement | string;
+  isDirectoryTree?: boolean; //是否文档树
+  [key: string]: any; // 其他属性方法
 }
+const { DirectoryTree } = Tree;
+const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+  console.log('获取父级key', key!);
+  let parentKey: React.Key;
+  for (let i = 0; i < tree.length; i++) {
+    const node = tree[i];
+    if (node.children) {
+      if (node.children.some((item) => item.key === key)) {
+        parentKey = node.key;
+      } else if (getParentKey(key, node.children)) {
+        parentKey = getParentKey(key, node.children);
+      }
+    }
+  }
+  console.log('获取父级', parentKey!);
 
+  return parentKey!;
+};
 const StoreClassifyTree: React.FC<TreeType> = ({
-  type,
-  clickBtn,
+  isDirectoryTree = false,
+  title,
   treeData,
   menu,
+  parentIcon,
+  childIcon,
   searchable = false,
   draggable = false,
   handleAddClick,
   handleMenuClick,
   handleTitleClick,
+  onDoubleClickTitle,
+  ...rest
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  const [autoExpandParent, setAutoExpandParent] = useState(true);
   // 树形控件 更多操作
   const renderMenu: (data: any) => MenuProps['items'] = (data) => {
     if (menu === 'menus') {
       return data?.menus?.map((item: string) => {
-        return {
-          key: item,
-          label: item,
-        };
+        if (typeof item === 'string') {
+          return {
+            key: item,
+            label: item,
+          };
+        } else {
+          return item;
+        }
       });
     }
     return menu?.map((item) => {
@@ -50,11 +82,62 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       };
     });
   };
-  //TODO: 树形数据需要切换
-  // console.log('树形数据需要切换', treeData);
 
+  const onExpand = (newExpandedKeys: React.Key[]) => {
+    setExpandedKeys(newExpandedKeys);
+    setAutoExpandParent(false);
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const newExpandedKeys = resetTreeData.map((item: any) => {
+      console.log('包含value', item.title.indexOf(value) > 0);
+      if (item.title.indexOf(value) > 0) {
+        return getParentKey(item.key, treeData);
+      }
+      return null;
+    });
+    // .filter(
+    //   (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
+    // );
+    console.log('newExpandedKeys', newExpandedKeys);
+
+    setExpandedKeys(newExpandedKeys as React.Key[]);
+    setSearchValue(value);
+    setAutoExpandParent(true);
+  };
+  const resetTreeData = useMemo(() => {
+    console.log('sousuo', searchValue);
+
+    const loop = (data: DataNode[]): DataNode[] =>
+      data.map((item) => {
+        const strTitle = item.title as string;
+        const index = strTitle.indexOf(searchValue);
+        const beforeStr = strTitle.substring(0, index);
+        const afterStr = strTitle.slice(index + searchValue.length);
+        const searchTitle =
+          index > -1 ? (
+            <span>
+              {beforeStr}
+              <span style={{ color: 'red' }}>{searchValue}</span>
+              {afterStr}
+            </span>
+          ) : (
+            ''
+          );
+        if (item.children) {
+          return { ...item, searchTitle, children: loop(item.children) };
+        }
+
+        return {
+          ...item,
+        };
+      });
+    console.log('打印测试', loop(treeData));
+
+    return loop(treeData);
+  }, [searchValue, treeData]);
   const [gData, setGData] = useState([]);
-  const [expandedKeys] = useState(['0-0', '0-0-0']);
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
     console.log('拖拽', info);
@@ -137,14 +220,22 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         onMouseLeave={() => {
           setMouseOverItem({});
         }}>
-        <div onClick={() => handleTitleClick && handleTitleClick(node)}>{node.title}</div>
+        <div
+          className={cls.treeTitleBoxLabel}
+          onDoubleClick={() => {
+            onDoubleClickTitle && onDoubleClickTitle(node);
+          }}
+          onClick={() => handleTitleClick && handleTitleClick(node)}>
+          {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
+          {node.searchTitle || node.title}
+        </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
-              {type !== 'myshop' ? (
+              {handleAddClick ? (
                 <PlusOutlined
                   className={cls.titleIcon}
-                  onClick={() => handleAddClick && handleAddClick(node)}
+                  onClick={() => handleAddClick(node)}
                 />
               ) : (
                 ''
@@ -174,23 +265,42 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      {type === 'myshop' ? <>{clickBtn}</> : <div className={cls.title}>全部分类 </div>}
+      {title && typeof title === 'string' ? (
+        <div className={cls.title}>{`${title || '全部分类'}`} </div>
+      ) : (
+        title
+      )}
       {searchable && (
         <div className={cls.title}>
-          <Input prefix={<SearchOutlined />} placeholder="搜索分类" />
+          <Input prefix={<SearchOutlined />} onChange={onChange} placeholder="搜索分类" />
         </div>
       )}
-      <Tree
-        className="draggable-tree"
-        switcherIcon={<LeftCircleOutlined />}
-        titleRender={renderTreeTitle}
-        defaultExpandedKeys={expandedKeys}
-        draggable={draggable}
-        blockNode
-        onDragEnter={onDragEnter}
-        onDrop={onDrop}
-        treeData={treeData}
-      />
+      {isDirectoryTree ? (
+        <DirectoryTree
+          className="draggable-tree"
+          // switcherIcon={<LeftCircleOutlined />}
+          titleRender={renderTreeTitle}
+          defaultExpandedKeys={expandedKeys}
+          // draggable={draggable}
+          onDragEnter={onDragEnter}
+          onDrop={onDrop}
+          treeData={treeData}
+          {...rest}
+        />
+      ) : (
+        <Tree
+          className="draggable-tree"
+          // switcherIcon={<LeftCircleOutlined />}
+          titleRender={renderTreeTitle}
+          onDragEnter={onDragEnter}
+          onDrop={onDrop}
+          treeData={resetTreeData}
+          onExpand={onExpand}
+          expandedKeys={expandedKeys}
+          autoExpandParent={autoExpandParent}
+          {...rest}
+        />
+      )}
     </div>
   );
 };

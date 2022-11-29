@@ -10,34 +10,34 @@ export const myColumns: any = [
   },
   {
     title: '应用图标',
-    dataIndex: ['prod', 'id'],
+    dataIndex: ['_prod', 'id'],
   },
   {
     title: '应用名称',
-    dataIndex: ['prod', 'name'],
+    dataIndex: ['_prod', 'name'],
   },
   {
     title: '版本号',
-    dataIndex: ['prod', 'version'],
+    dataIndex: ['_prod', 'version'],
   },
   {
     title: '应用类型',
-    dataIndex: ['prod', 'typeName'],
+    dataIndex: ['_prod', 'typeName'],
   },
   {
     title: '应用来源',
     ellipsis: true,
-    dataIndex: ['prod', 'source'],
+    dataIndex: ['_prod', 'source'],
   },
   {
     title: '创建时间',
     width: 200,
-    dataIndex: ['prod', 'createTime'],
+    dataIndex: ['_prod', 'createTime'],
   },
   {
     title: '备注',
     ellipsis: true,
-    dataIndex: ['prod', 'remark'],
+    dataIndex: ['_prod', 'remark'],
   },
 ];
 export const marketColumns: any = [
@@ -59,7 +59,7 @@ export const marketColumns: any = [
   },
   {
     title: '应用类型',
-    dataIndex: 'typeName',
+    dataIndex: ['_product', 'typeName'],
   },
   {
     title: '售卖权限',
@@ -78,6 +78,6 @@ export const marketColumns: any = [
   {
     title: '备注',
     ellipsis: true,
-    dataIndex: 'remark',
+    dataIndex: ['_product', 'remark'],
   },
 ];

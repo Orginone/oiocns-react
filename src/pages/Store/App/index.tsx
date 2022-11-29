@@ -16,6 +16,8 @@ import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { BaseProduct } from '@/ts/core/market';
+import DeleteCustomModal from '@/components/DeleteCustomModal';
+import { productCtrl } from '@/ts/controller/store/productCtrl';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -30,7 +32,9 @@ const StoreApp: React.FC = () => {
   const [data, setData] = useState([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const [productObj, setProductObj] = useState<any>({});
   const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
@@ -41,7 +45,7 @@ const StoreApp: React.FC = () => {
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data.forEach((v: any) => {
-      typeSet.add(v.prod.source);
+      typeSet.add(v._prod.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -73,6 +77,23 @@ const StoreApp: React.FC = () => {
     setCheckNodes(checkedValus);
   };
 
+  /**
+   * @description: 移除确认
+   * @return {*}
+   */
+  const onOk = () => {
+    setIsDeleteOpen(false);
+    productCtrl.deleteProduct(productObj?._prod?.id);
+  };
+
+  /**
+   * @description: 取消确认
+   * @return {*}
+   */
+  const onCancel = () => {
+    setIsDeleteOpen(false);
+  };
+
   // 共享确认回调
   const submitShare = () => {
     console.log('当前被选中的每一项', checkNodes);
@@ -95,7 +116,7 @@ const StoreApp: React.FC = () => {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item.id } });
+          history.push({ pathname: '/online', state: { appId: item._prod?.id } });
         },
       },
       {
@@ -103,7 +124,9 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/info', state: { appId: item.id } });
+          console.log('333', item._prod);
+
+          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
         },
       },
       {
@@ -111,7 +134,10 @@ const StoreApp: React.FC = () => {
         label: '管理',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          history.push({ pathname: '/store/app/manage', state: { appId: item.id } });
+          history.push({
+            pathname: '/store/app/manage',
+            state: { appId: item._prod?.id },
+          });
         },
       },
       {
@@ -121,7 +147,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/putaway',
-            state: { appId: item.id },
+            state: { appId: item._prod?.id },
           });
         },
       },
@@ -132,6 +158,15 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           shareRef.current?.resetData();
           setShowShareModal(true);
+        },
+      },
+      {
+        key: 'delete',
+        label: '移除',
+        onClick: () => {
+          StoreContent.selectedProduct(item);
+          setProductObj(item);
+          setIsDeleteOpen(true);
         },
       },
       {
@@ -148,7 +183,7 @@ const StoreApp: React.FC = () => {
           StoreContent.selectedProduct(item);
           history.push({
             pathname: '/store/app/publish',
-            state: { appId: item.id },
+            state: { appId: item._prod?.id },
           });
         },
       },
@@ -199,24 +234,38 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp onCheckeds={onCheckeds} />
       </Modal>
+      <DeleteCustomModal
+        title="警告"
+        open={isDeleteOpen}
+        deleOrQuit="delete"
+        onOk={onOk}
+        onCancel={onCancel}
+        content={productObj?._prod?.name}
+      />
       {/* 详情页面 /store/app/info*/}
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={StoreContent._curProduct?.id || ''} />}></Route>
+        render={() => (
+          <AppInfo appId={StoreContent.curProduct?._prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/publish"
-        render={() => <PublishList appId={StoreContent._curProduct?.id || ''} />}></Route>
+        render={() => (
+          <PublishList appId={StoreContent.curProduct?._prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={StoreContent._curProduct?.id || ''} />}></Route>
+        render={() => <Manage appId={StoreContent.curProduct?._prod.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
-        render={() => <PutawayComp appId={StoreContent._curProduct?.id || ''} />}></Route>
+        render={() => (
+          <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
+        )}></Route>
     </>
   );
 };

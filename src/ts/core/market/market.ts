@@ -116,14 +116,14 @@ export default class Market implements IMarket {
       typeNames: this.pullTypes,
     });
   }
-  public async getMerchandise(
+  public getMerchandise = async (
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMerchandiseArray>> {
+  ): Promise<model.ResultType<XMerchandiseArray>> => {
     return await kernel.searchMerchandise({
       id: this.market.id,
       page: page,
     });
-  }
+  };
 
   /**
    * 获取商品上架申请列表
