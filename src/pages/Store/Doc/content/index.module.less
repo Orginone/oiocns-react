@@ -1,3 +1,4 @@
+@import '~antd/es/style/themes/variable';
 .container {
   width: 100%;
   height: 100%;
@@ -38,13 +39,12 @@
 .content {
   width: 100%;
   height: 100%;
-  display: inline-block;
 }
 .fileBox {
   border: none;
-  width: 100px;
-  height: 140px;
-  float: left;
+  width: 108px;
+  height: 168px;
+  // float: left;
   margin: 10px;
   text-align: center;
 }
@@ -57,15 +57,19 @@
   height: 100%;
   background-color: #f8f7f9;
 }
+.fileImage {
+  height: 100;
+  line-height: 96px;
+}
 .fileName {
   width: 100%;
-  display: -webkit-box; //使用了flex，需要加
-  overflow: hidden; //超出隐藏
-  word-break: break-all; //纯英文、数字、中文
-  text-overflow: ellipsis; //省略号
-  -webkit-box-orient: vertical; //垂直
-  -webkit-line-clamp: 2; //显示一行
-  white-space: pre-line;
+  // display: -webkit-box; //使用了flex，需要加
+  // overflow: hidden; //超出隐藏
+  // word-break: break-all; //纯英文、数字、中文
+  // text-overflow: ellipsis; //省略号
+  // -webkit-box-orient: vertical; //垂直
+  // -webkit-line-clamp: 2; //显示一行
+  // white-space: pre-line;
   text-align: center;
 }
 .circle {
