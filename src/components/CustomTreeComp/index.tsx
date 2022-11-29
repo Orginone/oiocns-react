@@ -18,7 +18,7 @@ interface TreeType {
   childIcon?: ReactElement; //子级 --无下级 展示 icon
   handleTitleClick?: (node: any) => void; //名称 单击
   onDoubleClickTitle?: (node: any) => void; // 名称 双击
-  handleAddClick?: (node: any) => void; //点击添加按钮事件
+  handleAddClick?: (node: any) => void; //展示 点击添加按钮事件
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   title?: ReactElement | string;
   isDirectoryTree?: boolean; //是否文档树
@@ -26,6 +26,7 @@ interface TreeType {
 }
 const { DirectoryTree } = Tree;
 const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+  console.log('获取父级key', key!);
   let parentKey: React.Key;
   for (let i = 0; i < tree.length; i++) {
     const node = tree[i];
@@ -37,6 +38,8 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
       }
     }
   }
+  console.log('获取父级', parentKey!);
+
   return parentKey!;
 };
 const StoreClassifyTree: React.FC<TreeType> = ({
@@ -45,7 +48,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   treeData,
   menu,
   parentIcon,
-  childIcon = <ApartmentOutlined />,
+  childIcon,
   searchable = false,
   draggable = false,
   handleAddClick,
@@ -87,16 +90,18 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const newExpandedKeys = treeData
-      .map((item: { title: string | string[]; key: React.Key }) => {
-        if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key, treeData);
-        }
-        return null;
-      })
-      .filter(
-        (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
-      );
+    const newExpandedKeys = resetTreeData.map((item: any) => {
+      console.log('包含value', item.title.indexOf(value) > 0);
+      if (item.title.indexOf(value) > 0) {
+        return getParentKey(item.key, treeData);
+      }
+      return null;
+    });
+    // .filter(
+    //   (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
+    // );
+    console.log('newExpandedKeys', newExpandedKeys);
+
     setExpandedKeys(newExpandedKeys as React.Key[]);
     setSearchValue(value);
     setAutoExpandParent(true);
@@ -110,7 +115,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         const index = strTitle.indexOf(searchValue);
         const beforeStr = strTitle.substring(0, index);
         const afterStr = strTitle.slice(index + searchValue.length);
-        const title =
+        const searchTitle =
           index > -1 ? (
             <span>
               {beforeStr}
@@ -118,15 +123,14 @@ const StoreClassifyTree: React.FC<TreeType> = ({
               {afterStr}
             </span>
           ) : (
-            <span>{strTitle}</span>
+            ''
           );
         if (item.children) {
-          return { ...item, title, children: loop(item.children) };
+          return { ...item, searchTitle, children: loop(item.children) };
         }
 
         return {
           ...item,
-          title,
         };
       });
     console.log('打印测试', loop(treeData));
@@ -223,7 +227,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           }}
           onClick={() => handleTitleClick && handleTitleClick(node)}>
           {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
-          {node.title}
+          {node.searchTitle || node.title}
         </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
@@ -261,7 +265,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
   return (
     <div className={cls.customTreeWrap}>
-      {typeof title === 'string' || !title ? (
+      {title && typeof title === 'string' ? (
         <div className={cls.title}>{`${title || '全部分类'}`} </div>
       ) : (
         title
@@ -277,7 +281,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           // switcherIcon={<LeftCircleOutlined />}
           titleRender={renderTreeTitle}
           defaultExpandedKeys={expandedKeys}
-          draggable={draggable}
+          // draggable={draggable}
           onDragEnter={onDragEnter}
           onDrop={onDrop}
           treeData={treeData}
@@ -288,8 +292,6 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           className="draggable-tree"
           // switcherIcon={<LeftCircleOutlined />}
           titleRender={renderTreeTitle}
-          defaultExpandedKeys={expandedKeys}
-          draggable={draggable}
           onDragEnter={onDragEnter}
           onDrop={onDrop}
           treeData={resetTreeData}
