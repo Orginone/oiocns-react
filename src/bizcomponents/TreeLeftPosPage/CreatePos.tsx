@@ -1,14 +1,8 @@
-import { Input, Card, List, Modal, Avatar, Button, Typography } from 'antd';
+import { Input, Row, Button, Col, MenuProps, message } from 'antd';
+import MarketClassifyTree from '@/components/CustomTreeComp';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState, useEffect } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  UserOutlined,
-  RightOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import React, { useState, useEffect, useMemo } from 'react';
+import { MoreOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
 
@@ -102,11 +96,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     // 创建数据
   };
 
-  const onExpand = (newExpandedKeys: React.Key[]) => {
-    setExpandedKeys(newExpandedKeys);
-    setAutoExpandParent(false);
-  };
-
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const newExpandedKeys = dataList
@@ -122,22 +111,69 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     setAutoExpandParent(true);
   };
 
-  const data = [
+  const items2: MenuProps['items'] = [
     {
-      icon: '',
-      title: '管理员',
+      label: '更改岗位名称',
+      key: '1',
+    },
+    {
+      label: '删除',
+      key: '2',
     },
   ];
+  const [selectMenu, setSelectMenu] = useState<string>('');
+
+  const items: DataNode[] = [
+    {
+      title: '管理员',
+      key: 'super-manager',
+      icon: <UserOutlined />,
+      children: [],
+    },
+    {
+      title: '管理员2',
+      key: 'super-manager2',
+      icon: <UserOutlined />,
+      children: [],
+    },
+  ];
+  const [list, setList] = useState<any[]>([]);
+  /**
+   * @description: 处理商店树数据
+   * @param {*} useMemo
+   * @return {*}
+   */
+  const treelist = useMemo(() => {
+    return items;
+  }, [list]);
+  const handleMenuClick = (item: any) => {
+    // 触发内容去变化
+  };
+  /**
+   * @description: 树表头展示
+   * @return {*}
+   */
+  const ClickBtn = (
+    <>
+      <Row>
+        <Col>商店分类</Col>
+      </Row>
+      <Button type="link" onClick={() => {}}>
+        创建商店
+      </Button>
+      <Button type="link" onClick={() => {}}>
+        加入商店
+      </Button>
+    </>
+  );
 
   const positionList = (
-    <List
-      dataSource={data}
-      renderItem={(item) => (
-        <List.Item>
-          <UserOutlined />
-          {item.title}
-        </List.Item>
-      )}
+    <MarketClassifyTree
+      key={selectMenu}
+      handleMenuClick={handleMenuClick}
+      treeData={items}
+      menu={'menus'}
+      clickBtn={ClickBtn}
     />
   );
 
@@ -161,7 +197,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
           onChange={onChange}
         />
 
-        <div className={cls.joingroup}>创建的岗位</div>
+        {/* <div className={cls.joingroup}>创建的岗位</div> */}
         {positionList}
       </div>
     </div>
