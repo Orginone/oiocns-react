@@ -284,4 +284,10 @@ export default class Person extends MarketTarget implements IPerson {
   public async getUsefulResource(id: string): Promise<schema.XResource[]> {
     return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
   }
+  public async resetPassword(
+    password: string,
+    privateKey: string,
+  ): Promise<ResultType<any>> {
+    return await kernel.resetPassword(this.target.code, password, privateKey);
+  }
 }
