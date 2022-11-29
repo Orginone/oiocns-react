@@ -158,11 +158,12 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           // setMouseOverItem({});
         }}>
         <div
+          className={cls.treeTitleBoxLabel}
           onDoubleClick={() => {
             onDoubleClickTitle && onDoubleClickTitle(node);
           }}
           onClick={() => handleTitleClick && handleTitleClick(node)}>
-          {node.children.length == 0 ? childIcon : parentIcon}
+          {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
           {node.title}
         </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
