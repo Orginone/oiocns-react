@@ -23,7 +23,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
   const RenderBaseInfo = (
     <ul className={`${cls['base-info']} flex flex-direction-col`}>
       <li className={`${cls['con']} flex `}>
-        <div className={cls['con-title']}>{StoreContent.curProduct?.prod.name}</div>
+        <div className={cls['con-title']}>{StoreContent.curProduct?._prod.name}</div>
         <EditOutlined
           className={cls['con-name-edit-btn']}
           style={{ fontSize: '1.5em' }}
@@ -37,22 +37,22 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用曾用名</span>
           <Tooltip title="prompt text">
-            <div className={cls['con-name']}> {StoreContent.curProduct?.prod.name}</div>
+            <div className={cls['con-name']}> {StoreContent.curProduct?._prod.name}</div>
           </Tooltip>
         </div>
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用描述</span>
           <Tooltip title={''}>
-            <div className={cls['con-name']}>{StoreContent.curProduct?.prod.remark}</div>
+            <div className={cls['con-name']}>{StoreContent.curProduct?._prod.remark}</div>
           </Tooltip>
         </div>
       </li>
       <li className={`${cls['con']} ${cls['endBox']} flex `}>
         <p style={{ marginRight: '14px' }}>
-          创建人：<span>{StoreContent.curProduct?.prod.createUser}</span>
+          创建人：<span>{StoreContent.curProduct?._prod.createUser}</span>
         </p>
         <p>
-          创建时间：<span>{StoreContent.curProduct?.prod.createTime}</span>
+          创建时间：<span>{StoreContent.curProduct?._prod.createTime}</span>
         </p>
       </li>
     </ul>
@@ -104,8 +104,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
                   icon={<CheckCircleOutlined />}
                   className={cls['user-tags']}
                   color="success"
-                  key={index}
-                >
+                  key={index}>
                   {item.name}
                 </Tag>
               );
@@ -139,8 +138,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
               rotate={90}
             />
           </Dropdown>
-        }
-      >
+        }>
         {RenderBaseInfo}
       </Card>
       <Card className="manage-info-wrap" title={'应用管理'}>

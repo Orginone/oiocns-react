@@ -269,7 +269,7 @@ const CohortConfig: React.FC = () => {
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
-                width="1050px">
+                width="700px">
                 <Persons searchCallback={searchCallback} person={Person} />
               </Modal>
 

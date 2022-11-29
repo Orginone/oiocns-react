@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import CloudTreeComp from '@/components/CloudTreeComp';
+import CloudTreeComp from '../Doc/components/CloudTreeComp';
 import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid } from '@/utils/tools';
 
 import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
-import StoreContent from '@/ts/controller/store/content';
+// import StoreContent from '@/ts/controller/store/content';
 import { XProduct } from '@/ts/base/schema';
 // const items = [
 //   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
@@ -180,7 +180,7 @@ const StoreClassify: React.FC = () => {
       <div className={cls.container}>
         {router == '/store/doc' ? (
           //文档树
-          <CloudTreeComp></CloudTreeComp>
+          <CloudTreeComp />
         ) : (
           //其他树
           <StoreClassifyTree

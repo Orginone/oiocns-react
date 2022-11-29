@@ -11,6 +11,15 @@ class productContCtrl {
   ) {
     return await provider!.getPerson!.createProduct({ ...values });
   }
+
+  /**
+   * @description: 移除应用
+   * @param {string} id
+   * @return {*}
+   */
+  public async deleteProduct(id: string) {
+    return await provider!.getPerson!.deleteProduct(id);
+  }
 }
 
 const productCtrl = new productContCtrl();

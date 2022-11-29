@@ -467,6 +467,12 @@ export interface IPerson {
    * @param id 应用Id
    */
   getUsefulResource(id: string): Promise<schema.XResource[]>;
+  /**
+   * 修改密码
+   * @param password 新密码
+   * @param privateKey 私钥
+   */
+  resetPassword(password: string, privateKey: string): Promise<ResultType<any>>;
 }
 /** 单位操作 */
 export interface ICompany {
@@ -520,6 +526,11 @@ export interface ICompany {
   createCohort(
     data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
+  /**
+   * 移除人员
+   * @param ids 人员Id集合
+   */
+  removePerson(ids: string[]): Promise<ResultType<any>>;
   /**
    * 删除子部门
    * @param id 部门Id
@@ -829,7 +840,7 @@ export interface IDepartment {
   /** 拉人进入部门 */
   pullPerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
   /** 踢人 */
-  removePerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
+  removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建子部门 */
   createDepartment(
     data: Omit<model.TargetModel, 'id' | 'belongId'>,
@@ -862,7 +873,7 @@ export interface IWorking {
   /** 拉人进入部门 */
   pullPerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
   /** 踢人 */
-  removePerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
+  removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建工作组 */
   createWorking(
     data: Omit<model.TargetModel, 'id' | 'belongId'>,
