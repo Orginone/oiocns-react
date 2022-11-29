@@ -199,7 +199,7 @@ const SettingDept: React.FC = () => {
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card
-          title={settingCtrl.getCurWorkSpace?.name}
+          title={'管理员'}
           className={cls['app-tabs']}
           extra={renderBtns()}
           bordered={false}>
