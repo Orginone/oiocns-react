@@ -156,6 +156,7 @@ const DocClassifyTree: React.FC = () => {
   return (
     <>
       <StoreClassifyTree
+        isDirectoryTree
         menu={'menus'}
         searchable
         showIcon
