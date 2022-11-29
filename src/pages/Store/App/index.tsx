@@ -17,6 +17,7 @@ import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { BaseProduct } from '@/ts/core/market';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
+import { productCtrl } from '@/ts/controller/store/productCtrl';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
 //   searchApi: Provider.getPerson.getJoinMarkets,
@@ -33,6 +34,7 @@ const StoreApp: React.FC = () => {
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const [deleteId, setDeleteId] = useState<string>('');
   const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
@@ -81,6 +83,7 @@ const StoreApp: React.FC = () => {
    */
   const onOk = () => {
     setIsDeleteOpen(false);
+    productCtrl.deleteProduct(deleteId);
   };
 
   /**
@@ -121,7 +124,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          console.log('333', item.prod);
+          console.log('333', item._prod);
 
           history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
         },
@@ -161,8 +164,8 @@ const StoreApp: React.FC = () => {
         key: 'delete',
         label: '移除',
         onClick: () => {
-          // StoreContent.selectedProduct(item);
-          // shareRef.current?.resetData();
+          StoreContent.selectedProduct(item);
+          setDeleteId(item?._prod?.id);
           setIsDeleteOpen(true);
         },
       },
@@ -243,23 +246,25 @@ const StoreApp: React.FC = () => {
       <Route
         exact
         path="/store/app/info"
-        render={() => <AppInfo appId={StoreContent.curProduct?.prod.id || ''} />}></Route>
+        render={() => (
+          <AppInfo appId={StoreContent.curProduct?._prod.id || ''} />
+        )}></Route>
       <Route
         exact
         path="/store/app/publish"
         render={() => (
-          <PublishList appId={StoreContent.curProduct?.prod.id || ''} />
+          <PublishList appId={StoreContent.curProduct?._prod.id || ''} />
         )}></Route>
       <Route
         exact
         path="/store/app/manage"
-        render={() => <Manage appId={StoreContent.curProduct?.prod.id || ''} />}></Route>
+        render={() => <Manage appId={StoreContent.curProduct?._prod.id || ''} />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route
         exact
         path="/store/app/putaway"
         render={() => (
-          <PutawayComp appId={StoreContent.curProduct?.prod.id || ''} />
+          <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
         )}></Route>
     </>
   );
