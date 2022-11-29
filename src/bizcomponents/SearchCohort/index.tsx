@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Cohort } from '../../module/org/index';
+import { schema } from '../../ts/base';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Avatar, Col, Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
 import { UserOutlined } from '@ant-design/icons';
-import CohortController from '../../ts/controller/cohort/index'
+import CohortController from '../../ts/controller/cohort/index';
 import Person from '../../ts/core/target/person';
+import CohortCard from './SearchCohortCard';
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
   setCohort: Function;
-  person:Person
+  person: Person;
 };
 
 let tableProps: CohortSearchTableProps;
@@ -22,51 +23,38 @@ let tableProps: CohortSearchTableProps;
 */
 const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
   const [searchKey, setSearchKey] = useState<string>();
-  const [dataSource, setDataSource] = useState<Cohort[]>([]);
+  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
 
   useEffect(() => {
     tableProps = props;
   }, []);
-
-  // 单位卡片渲染
-  const companyCardList = () => {
-    console.log('开始渲染');
-    return (
-      <CheckCard.Group
-        onChange={(value) => {
-          props.setCohort(value);
-          console.log('value', value);
-        }}
-        style={{ width: '100%', marginTop: '50px' }}
-        size="large"
-        defaultValue={['A']}>
-        <Row gutter={16}>
-          {dataSource.map((item) => (
-            <Col span={12} key={item.id}>
-              <CheckCard
-                style={{ marginInlineEnd: 8, marginInlineStart: 55, width: '300px' }}
-                title={item.name}
-                avatar={
-                  <Avatar
-                    style={{ backgroundColor: '#7265e6' }}
-                    icon={<UserOutlined />}
-                    size="default"
-                  />
-                }
-                value={item}
-                description={item.team.remark}
-              />
-            </Col>
-          ))}
-        </Row>
-      </CheckCard.Group>
-    );
+  const renderCardFun = (dataArr: schema.XTarget[]): React.ReactNode[] => {
+    return dataArr.map((item: schema.XTarget) => {
+      return (
+        <div style={{ display: 'inline-block', paddingTop: '20px', paddingLeft: '13px' }}>
+          <Row>
+            <CohortCard
+              className="card"
+              data={item}
+              key={item.id}
+              defaultKey={{
+                name: 'caption',
+                size: 'price',
+                type: 'sellAuth',
+                desc: 'remark',
+                creatTime: 'createTime',
+              }}
+              onClick={() => console.log('按钮测试')}
+            />
+          </Row>
+        </div>
+      );
+    });
   };
 
   // 查询数据
   const getList = async (searchKey?: string) => {
-    
-    const res = CohortController.searchCohort(props.person,searchKey?searchKey:'')
+    const res = CohortController.searchCohort(props.person, searchKey ? searchKey : '');
     console.log((await res).data.result);
     setDataSource((await res).data.result || []);
     console.log('输出值', dataSource);
@@ -87,8 +75,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
           }
         }}
       />
-
-      {dataSource.length > 0 && companyCardList()}
+      <div>{dataSource != [] && renderCardFun(dataSource)}</div>
       {searchKey && dataSource.length == 0 && (
         <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的单位`} />
       )}
