@@ -113,7 +113,7 @@ export default class KernelApi {
     var res: model.ResultType<any>;
     var req = {
       account: userName,
-      pwd: password,
+      password: password,
       privateKey: privatekey,
     };
     if (this._storeHub.isConnected) {

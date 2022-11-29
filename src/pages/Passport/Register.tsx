@@ -3,9 +3,8 @@ import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
-import $API from '@/services';
-
 import cls from './index.module.less';
+import useStore from '@/store';
 
 type RegisterReq = {
   account?: string;
@@ -25,6 +24,7 @@ const PassportRegister: React.FC = () => {
   const [body, setBody] = useState<RegisterReq>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState<String>();
+  const { register } = useStore((state) => ({ ...state }));
   const history = useHistory();
 
   // 上一步
@@ -52,7 +52,7 @@ const PassportRegister: React.FC = () => {
   };
 
   // 注册
-  const register = async (val: any) => {
+  const registerAction = async (val: any) => {
     if (!/^[\u4e00-\u9fa5]{2,8}$/.test(val.name)) {
       message.warn('请输入正确的姓名');
       return;
@@ -70,7 +70,14 @@ const PassportRegister: React.FC = () => {
       return;
     }
     // 请求
-    const res = await $API.person.register({ data: { ...val, ...body } });
+    const res = await register(
+      val.name,
+      val.motto,
+      val.phone,
+      body.account ?? '',
+      body.password ?? '',
+      val.nickName,
+    );
     if (res.success) {
       message.success('注册成功！');
       setPrivateKey(res.data.privateKey);
@@ -131,7 +138,7 @@ const PassportRegister: React.FC = () => {
 
       {current === 1 && (
         <div>
-          <Form onFinish={register}>
+          <Form onFinish={registerAction}>
             <Form.Item
               name="phone"
               rules={[{ required: true, message: '请输入电话号码' }]}>
