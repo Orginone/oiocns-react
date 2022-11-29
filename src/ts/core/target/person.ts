@@ -59,8 +59,8 @@ export default class Person extends MarketTarget implements IPerson {
       return this.joinedCompany;
     }
     const res = await this.getjoinedTargets(consts.CompanyTypes);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
+    if (res.success && res.data?.result) {
+      this.joinedCompany = res.data.result.map((a) => {
         let company;
         switch (a.typeName) {
           case TargetType.University:
@@ -73,7 +73,7 @@ export default class Person extends MarketTarget implements IPerson {
             company = new Company(a);
             break;
         }
-        this.joinedCompany.push(company);
+        return company;
       });
     }
     return this.joinedCompany;
@@ -277,5 +277,11 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Person,
       belongId: this.target.id,
     });
+  }
+  public async getUsefulProduct(): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct([TargetType.Cohort, TargetType.Person]);
+  }
+  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
   }
 }

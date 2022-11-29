@@ -86,12 +86,21 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   useEffect(() => { 
     initData();
+  }, [])
+  
+  useEffect(() => { 
+    /** 监听页面是否需要更新 */ 
+    settingController.addListen('updateDeptTree', () => { 
+      initData();
+    })
   },[])
 
   const initData = async () => {
     const resultData = await settingController.getDepartments('381107910723375104');
     setTreeData(resultData);
   }
+  
+
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -115,8 +124,15 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   return (
     <div>
+        <Button
+          className={cls.creatgroup}
+          type="primary"
+          onClick={() => {
+            settingController.trigger('isOpenModal')
+          }}>
+          {createTitle}
+        </Button>
       
-      {Array.isArray(treeData) && treeData.length > 0 ? (
         <div className={cls.topMes}>
           <Input
             size="middle"
@@ -125,7 +141,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
             prefix={<SearchOutlined />}
             onChange={onChange}
           />
-          <div className={cls.joingroup}>创建集团</div>
+          <div className={cls.joingroup}>创建的部门</div>
           <Tree
             onExpand={onExpand}
             expandedKeys={expandedKeys}
@@ -165,14 +181,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
             }}
           />
         </div>
-      ) : <Button
-      className={cls.creatgroup}
-      type="primary"
-      onClick={() => {
-        settingController.trigger('isOpenModal')
-      }}>
-      {createTitle}
-    </Button>}
+      
     </div>
   );
 };

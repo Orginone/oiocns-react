@@ -108,20 +108,27 @@ export interface IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 添加暂存区
    * @param id 商品Id
@@ -404,25 +411,32 @@ export interface IPerson {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 加入购物车
    * @param id 商品Id
    */
-  stagingMerchandise(id: string): Promise<ResultType<any>>;
+  stagingMerchandise(id: string): Promise<ResultType<schema.XStaging>>;
   /**
    * 删除购物车
    * @param id
@@ -446,6 +460,13 @@ export interface IPerson {
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
+  /** 获得可用应用 */
+  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 获得可用资源
+   * @param id 应用Id
+   */
+  getUsefulResource(id: string): Promise<schema.XResource[]>;
 }
 /** 单位操作 */
 export interface ICompany {
@@ -500,11 +521,17 @@ export interface ICompany {
     data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
   /**
-   * 删除集团
-   * @param id 集团Id
+   * 删除子部门
+   * @param id 部门Id
    * @returns
    */
-  deleteGroup(id: string): Promise<ResultType<any>>;
+  deleteDepartment(id: string): Promise<ResultType<any>>;
+  /**
+   * 删除工作组
+   * @param id 工作组Id
+   * @returns
+   */
+  deleteWorking(id: string): Promise<ResultType<any>>;
   /**
    * 解散群组
    * @param id 群组id
@@ -667,20 +694,27 @@ export interface ICompany {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 加入购物车
    * @param id 商品Id
@@ -709,6 +743,13 @@ export interface ICompany {
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
+  /** 获得可用应用 */
+  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 获得可用资源
+   * @param id 应用Id
+   */
+  getUsefulResource(id: string): Promise<schema.XResource[]>;
 }
 /** 集团操作 */
 export interface IGroup {

@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import CloudTreeComp from '@/components/CloudTreeComp';
+import CloudTreeComp from '../Doc/components/CloudTreeComp';
 import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid } from '@/utils/tools';
 
 import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
-import StoreContent from '@/ts/controller/store/content';
+// import StoreContent from '@/ts/controller/store/content';
 import { XProduct } from '@/ts/base/schema';
 // const items = [
 //   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
@@ -21,7 +21,7 @@ import { XProduct } from '@/ts/base/schema';
 // ];
 let selectMenuObj = { key: '', id: '', children: [] },
   selectMenuInfo: any = {};
-
+const { confirm } = Modal;
 const menu = ['重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
 //自定义树
 const StoreClassify: React.FC = () => {
@@ -54,39 +54,77 @@ const StoreClassify: React.FC = () => {
       id: getUuid(),
       key: `${selectMenuInfo?.key}-${selectMenuInfo?.children?.length || '01'}`,
       title: title,
+      children: [],
     };
+
     selectMenuInfo.children.push(newObj);
     setIsStoreOpen(false);
-    // setList([...list]);
     // 数据缓存
     StoreSiderbar.updataSelfAppMenu(list);
   };
 
-  const delSelfMenu = (id: string) => {
-    let parantObj: any = [];
-    function findParent(id: string, data: any[], parent: any) {
-      if (parantObj?.length) {
-        return;
+  /*******
+   * @desc: 删除一个自定义目录
+   * @param {string} name
+   * @param {string} id
+   */
+  const handleMenuChagnge = (
+    name: string,
+    id: string,
+    type: string,
+    newName?: string,
+  ) => {
+    confirm({
+      content: `确认${type}目录《 ${name} 》?`,
+      onOk() {
+        console.log('测试测试测试', findParent(id, { children: list }));
+
+        StoreSiderbar.updataSelfAppMenu(list);
+      },
+      onCancel() {},
+    });
+
+    let parantObj: any = undefined;
+    function findParent(id: string, parent: any) {
+      const data = parent.children;
+      if (parantObj) {
+        return parantObj;
       }
-      if (
-        data.some((v) => {
-          return v.id == id;
-        })
-      ) {
-        data = data.filter((v: any) => {
-          return v.id !== id;
-        });
-        parent.children = data;
+      const isAimObj = data.some((v: any) => {
+        return v.id == id;
+      });
+      if (isAimObj) {
+        parantObj = parent;
+        _updataMenuData(parent, id, type, newName);
       } else {
         data.forEach((child: any) => {
-          findParent(id, child?.children, child);
+          findParent(id, child);
         });
       }
     }
-    findParent(id, list, { children: list });
-    console.log('删除', list, id, parantObj);
-    StoreSiderbar.updataSelfAppMenu(list);
   };
+  function _updataMenuData(parent: any, id: string, type: string, newName?: string) {
+    switch (type) {
+      case '删除':
+        {
+          const newData = parent.children.filter((v: any) => {
+            return v.id !== id;
+          });
+          parent.children = newData;
+        }
+        break;
+      case '重命名':
+        {
+          parent.children.fotEach((v: any) => {
+            v.id == id && (v.title = newName);
+          });
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
   const onCancel = () => {
     setIsStoreOpen(false);
     setisAppDetailOpen(false);
@@ -111,8 +149,15 @@ const StoreClassify: React.FC = () => {
   const handleMenuClick = (key: string, data: any) => {
     console.log('目录更多操作', key, data);
     switch (key) {
+      case '重命名':
+        handleMenuChagnge(data.title, data.id, '重命名');
+        break;
       case '删除':
-        delSelfMenu(data.id);
+        handleMenuChagnge(data.title, data.id, '删除');
+        break;
+      case '创建副本':
+        //TODO: 复制当前对象 遍历修改所有id
+        // handleMenuChagnge(data.title, data.id, '创建副本');
         break;
 
       default:
@@ -126,17 +171,20 @@ const StoreClassify: React.FC = () => {
    */
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
-    StoreContent.changeMenu(item);
+    console.log('点击', item);
+
+    // StoreContent.changeMenu(item);
   };
   return (
     <>
       <div className={cls.container}>
         {router == '/store/doc' ? (
           //文档树
-          <CloudTreeComp></CloudTreeComp>
+          <CloudTreeComp />
         ) : (
           //其他树
           <StoreClassifyTree
+            title={'我的分类'}
             menu={menu}
             searchable
             draggable

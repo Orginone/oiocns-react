@@ -14,6 +14,7 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
 import settingController from '@/ts/controller/setting';
+import { initDatatype } from '@/ts/core/setting/isetting'
 /**
  * 部门设置
  * @returns
@@ -25,7 +26,8 @@ const SettingDept: React.FC = () => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectId,setSelectId] = useState<string>()
+  const [selectId, setSelectId] = useState<string>()
+  const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
   // 操作内容渲染函数
   const renderOperation = (
@@ -78,6 +80,22 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+  /** 添加人员的逻辑 */ 
+  const onPersonalOk = (params:initDatatype[]) => { 
+    console.log(params);
+    setIsAddOpen(false);
+  }
+
+  /** 设置岗位的逻辑 */ 
+  const handlePostOk = (checkJob:initDatatype,checkUser:initDatatype[]) => { 
+    console.log(checkJob, checkUser);
+    setIsSetPost(false);
+  }
+
+  const onApplyOk = () =>{ 
+    setLookApplyOpen(false);
+  }
+
   const onOk = () => {
     setIsAddOpen(false);
     setIsSetPost(false);
@@ -97,11 +115,13 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
  useEffect(() => {
-  settingController.addListen('isOpenModal', () => { 
+   settingController.addListen('isOpenModal', () => { 
+    setIsCreateDept(true)
     setIsOpenModal(true);
   })
   return settingController.remove('isOpenModal', () => { 
     setIsOpenModal(false);
+    setIsCreateDept(false);
   })
 }, []);
 
@@ -109,13 +129,24 @@ const SettingDept: React.FC = () => {
  * 监听集团id发生变化，改变右侧数据
  * */ 
 useEffect(() => {
-  settingController.addListen('createDept', (e: {id:string}) => {
+  settingController.addListen('createDept', (e: { id: string }) => {
+    setIsCreateDept(true)
     setSelectId(e.id); 
   })
   return settingController.remove('createDept', () => {
     setSelectId(''); 
+    setIsCreateDept(false);
   })
 }, []);
+  
+  useEffect(() => { 
+    initData();
+  }, [selectId])
+
+  const initData =async () => { 
+    const resultData = await settingController.searchAllPersons(selectId);
+    console.log(resultData);
+  }
 
   // 标题tabs页
   const TitleItems = [
@@ -154,6 +185,7 @@ useEffect(() => {
           type="link"
           onClick={() => {
             settingController.trigger('isOpenModal')
+            setIsCreateDept(false);
           }}>
           编辑
         </Button>
@@ -183,7 +215,9 @@ useEffect(() => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {}}>
+        <Button type="link" onClick={() => {
+           setIsSetPost(true);
+        }}>
           岗位设置
         </Button>
         <Button
@@ -240,8 +274,9 @@ useEffect(() => {
         handleCancel={() => {
           setIsOpenModal(false);
         }}
+        selectId={selectId}
         open={isOpenModal}
-        title={selectId ? '编辑' : '新增'}
+        title={isCreateDept ? '新增' : '编辑'}
         onOk={onOk}
         handleOk={handleOk}
       />
@@ -249,14 +284,14 @@ useEffect(() => {
       <AddPersonModal
         title={'添加成员'}
         open={isAddOpen}
-        onOk={onOk}
+        onOk={onPersonalOk}
         handleOk={handleOk}
       />
       {/* 查看申请 */}
       <LookApply
         title={'查看申请'}
         open={isLookApplyOpen}
-        onOk={onOk}
+        onOk={onApplyOk}
         handleOk={handleOk}
       />
 
@@ -268,7 +303,7 @@ useEffect(() => {
         handleOk={handleOk}
       />
       {/* 岗位设置 */}
-      <AddDeptModal title={'岗位设置'} open={isSetPost} onOk={onOk} handleOk={handleOk} />
+      <AddDeptModal title={'岗位设置'} open={isSetPost} onOk={handlePostOk} handleOk={onOk} />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { XMarket } from '@/ts/base/schema';
-import AppStore from '@/ts/core/market/appstore';
-import Product from '@/ts/core/market/product';
-import appContent from './appContent';
+import { BaseProduct, Market } from '@/ts/core/market';
+import { productCtrl } from './productCtrl';
 import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
 /**
@@ -17,11 +16,11 @@ class StoreContent {
   public Person = Provider.getPerson; // 获取当前 个人实例
   public marketTableCallBack!: (data: any) => void; //触发页面渲染 callback
   // curMarket = storeClassify._curMarket;
-  public _curMarket: AppStore | undefined = new AppStore({
+  public _curMarket: Market | undefined = new Market({
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  public _curProduct: Product | null = null;
+  public curProduct: BaseProduct | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -31,8 +30,8 @@ class StoreContent {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
-    this._curMarket = menuItem.node ?? new AppStore(menuItem); // 当前商店信息
+    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
       return;
@@ -76,11 +75,12 @@ class StoreContent {
     }
 
     const res = await Fun(params);
+    console.log('获取数据', type, res);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
     }
-    console.log('获取数据', res);
+
     const { success, data } = res;
 
     if (success) {
@@ -93,18 +93,18 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: any) => appContent.createProduct(data);
+  public createProduct = async (data: any) => productCtrl.createProduct(data);
 
   /**
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
    * @param {Product} item
    */
-  public selectedProduct(item: Product) {
+  public selectedProduct(item: BaseProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this._curProduct?.prod.id &&
-    console.log('修改选中');
+    // item.prod.id !== this.curProduct?.prod.id &&
+    console.log('修改选中', item);
 
-    this._curProduct = item;
+    this.curProduct = item;
   }
 }
 const storeContent = new StoreContent();

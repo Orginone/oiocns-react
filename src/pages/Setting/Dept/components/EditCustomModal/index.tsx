@@ -7,9 +7,10 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
+import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
 import cls from './index.module.less';
 import UploadAvatar from '../UploadAvatar';
+import settingController from '@/ts/controller/setting';
 /* 
   编辑
 */
@@ -19,12 +20,13 @@ interface Iprops {
   onOk: () => void;
   handleOk: () => void;
   handleCancel: () => void;
+  selectId?: string;
 }
 
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel } = props;
+  const { open, title, onOk, handleOk, handleCancel,selectId } = props;
   const [form] = Form.useForm();
   useEffect(() => {}, []);
 
@@ -46,7 +48,7 @@ const EditCustomModal = (props: Iprops) => {
            
           <Row>
             <Col span={12}>
-              <Form.Item name="name" label="单位名称2" rules={[{ required: true, message: '请输入单位名称!' }]}>
+              <Form.Item name="name" label="单位名称" rules={[{ required: true, message: '请输入单位名称!' }]}>
                 <Input placeholder="请输入单位名称" />
               </Form.Item>
             </Col>
@@ -58,19 +60,19 @@ const EditCustomModal = (props: Iprops) => {
           </Row>
           <Row>
             <Col span={12}>
-              <Form.Item name="name" label="单位名称" rules={[{ required: true, message: '请输入单位名称!' }]}>
-                <Input placeholder="请输入单位名称" />
+              <Form.Item name="teamName" label="我的部门" rules={[{ required: true, message: '请输入岗位名称!' }]}>
+                <Input placeholder="请输入岗位名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="code" label="单位编号" rules={[{ required: true, message: '请输入单位标号' }]}>
-                <Input placeholder="请输入单位编号" />
+              <Form.Item name="teamCode" label="团队编码" rules={[{ required: true, message: '请输入团编码' }]}>
+                <Input placeholder="请输入团队编码" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item name="describe" label="单位描述" rules={[{ required: true, message: '请输入单位描述!' }]}>
+              <Form.Item name="remark" label="描述" rules={[{ required: true, message: '请输入单位描述!' }]}>
                 <TextArea
                   // value={value}
                   // onChange={(e) => setValue(e.target.value)}
@@ -85,9 +87,17 @@ const EditCustomModal = (props: Iprops) => {
               <Button
                 type="primary"
                 onClick={async () => {
-                  const value =await form.validateFields()
+                  const value = await form.validateFields();
+                  value.parentId = selectId;
                   if (value) {
-                    // onOk();
+                    const curentValue = await settingController.createDepartment(value);
+                    if (!curentValue.success) {
+                      message.error(curentValue.msg);
+                    } else { 
+                      message.success('添加成功');
+                      settingController.trigger('updateDeptTree');
+                      handleOk();
+                    }
                   }
                 }}>
                 完成

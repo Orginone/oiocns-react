@@ -1,16 +1,28 @@
 @import (reference) '~antd/es/style/themes/variable';
+
 .customTreeWrap {
   :global {
     .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
       display: none;
     }
+
     .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
       background-color: #f2f6fc;
     }
+    .ogo-tree .ogo-tree-treenode {
+      width: 100%;
+    }
     .ogo-tree .ogo-tree-node-content-wrapper {
+      width: 100%;
       padding: 2px 4px;
       font-size: 14px;
+      align-items: center;
     }
+
+    .anticon {
+      margin-right: 2px;
+    }
+
     // .ogo-tree-switcher-noop {
     //   display: none;
     // }
@@ -36,9 +48,10 @@
   }
 
   .treeTitleBox {
-    display: flex;
+    display: inline-flex;
     justify-content: space-between;
-    margin-right: 6px;
+    // margin-right: 6px;
+    width: calc(100% - 24px);
   }
 
   .titleIcon {

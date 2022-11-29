@@ -23,7 +23,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
   const RenderBaseInfo = (
     <ul className={`${cls['base-info']} flex flex-direction-col`}>
       <li className={`${cls['con']} flex `}>
-        <div className={cls['con-title']}>{StoreContent._curProduct?.prod.name}</div>
+        <div className={cls['con-title']}>{StoreContent.curProduct?.prod.name}</div>
         <EditOutlined
           className={cls['con-name-edit-btn']}
           style={{ fontSize: '1.5em' }}
@@ -37,22 +37,22 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用曾用名</span>
           <Tooltip title="prompt text">
-            <div className={cls['con-name']}> {StoreContent._curProduct?.prod.name}</div>
+            <div className={cls['con-name']}> {StoreContent.curProduct?.prod.name}</div>
           </Tooltip>
         </div>
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用描述</span>
           <Tooltip title={''}>
-            <div className={cls['con-name']}>{StoreContent._curProduct?.prod.remark}</div>
+            <div className={cls['con-name']}>{StoreContent.curProduct?.prod.remark}</div>
           </Tooltip>
         </div>
       </li>
       <li className={`${cls['con']} ${cls['endBox']} flex `}>
         <p style={{ marginRight: '14px' }}>
-          创建人：<span>{StoreContent._curProduct?.prod.createUser}</span>
+          创建人：<span>{StoreContent.curProduct?.prod.createUser}</span>
         </p>
         <p>
-          创建时间：<span>{StoreContent._curProduct?.prod.createTime}</span>
+          创建时间：<span>{StoreContent.curProduct?.prod.createTime}</span>
         </p>
       </li>
     </ul>

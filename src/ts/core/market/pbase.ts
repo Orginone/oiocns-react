@@ -4,11 +4,16 @@ import Resource from './resource';
 
 export default class BaseProduct {
   // 应用实体
-  private _prod: schema.XProduct;
+  public _prod: schema.XProduct;
   private _resource: Resource[];
 
   public get id(): string {
     return this._prod.id;
+  }
+
+  /** 获取应用资源 */
+  public get getResources() {
+    return this._resource;
   }
 
   constructor(prod: schema.XProduct) {

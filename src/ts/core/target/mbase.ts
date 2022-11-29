@@ -10,6 +10,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
   publicMarkets: Market[];
   ownProducts: BaseProduct[];
   stagings: schema.XStaging[];
+  usefulProduct: schema.XProduct[];
+  usefulResource: Map<string, schema.XResource[]>;
   joinMarketApplys: schema.XMarketRelation[];
 
   constructor(target: schema.XTarget) {
@@ -18,7 +20,9 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     this.ownProducts = [];
     this.joinedMarkets = [];
     this.joinMarketApplys = [];
+    this.usefulProduct = [];
     this.publicMarkets = [];
+    this.usefulResource = new Map();
   }
   public async getMarketByCode(
     name: string,
@@ -32,7 +36,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
   }
-  public async getOwnProducts(): Promise<BaseProduct[]> {
+  public getOwnProducts = async (): Promise<BaseProduct[]> => {
     if (this.ownProducts.length > 0) {
       return this.ownProducts;
     }
@@ -50,7 +54,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       });
     }
     return this.ownProducts;
-  }
+  };
   public async getJoinMarkets(): Promise<Market[]> {
     if (this.joinedMarkets.length > 0) {
       return this.joinedMarkets;
@@ -259,20 +263,27 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  public async createProduct(
+  public createProduct = async ({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName = 'webApp',
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId?: string,
+    thingId?: string;
     // 产品类型名
-    typeName: string = 'webApp',
-  ): Promise<model.ResultType<schema.XProduct>> {
+    typeName?: string;
+  }): Promise<model.ResultType<schema.XProduct>> => {
     const res = await kernel.createProduct({
       name,
       code,
@@ -287,9 +298,11 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       this.ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
-  }
+  };
 
-  public async stagingMerchandise(id: string): Promise<model.ResultType<any>> {
+  public async stagingMerchandise(
+    id: string,
+  ): Promise<model.ResultType<schema.XStaging>> {
     const stag = this.stagings.find((a) => {
       a.merchandiseId == id;
     });
@@ -299,9 +312,6 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         merchandiseId: id,
         belongId: this.target.id,
       });
-      if (res.success) {
-        this.stagings.push(res.data);
-      }
       return res;
     }
     return faildResult(consts.IsExistError);
@@ -337,7 +347,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.id != id;
+        return market.market.id != id;
       });
     }
     return res;
@@ -373,9 +383,45 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.id != id;
+        return market.market.id != id;
       });
     }
     return res;
+  }
+  /** 获得可用应用 */
+  protected async getUsefulProduct(typeNames: TargetType[]): Promise<schema.XProduct[]> {
+    if (this.usefulProduct.length > 0) {
+      return this.usefulProduct;
+    }
+    const res = await kernel.queryUsefulProduct({
+      spaceId: this.target.id,
+      typeNames,
+    });
+    if (res.success && res.data.result != undefined) {
+      this.usefulProduct = res.data.result;
+    }
+    return this.usefulProduct;
+  }
+  /** 获得可用资源 */
+  protected async getUsefulResource(
+    id: string,
+    typeNames: TargetType[],
+  ): Promise<schema.XResource[]> {
+    if (this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
+      return this.usefulResource[id];
+    }
+    const res = await kernel.queryUsefulResource({
+      productId: id,
+      spaceId: this.target.id,
+      typeNames,
+    });
+    if (res.success) {
+      let resources;
+      res.data.result?.forEach((a) => {
+        resources.push(a);
+      });
+      this.usefulResource[id] = resources;
+    }
+    return this.usefulResource[id];
   }
 }

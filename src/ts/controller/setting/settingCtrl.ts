@@ -1,7 +1,9 @@
-/**
- * 设置层， 总控制器
- */
-import Provider from '../../core/provider';
+import Provider from '@/ts/core/provider';
+import Company from '@/ts/core/target/company';
+import { IPerson } from '@/ts/core/target/itarget';
+import BaseController from '../baseCtrl';
+import CompanyController from './companyCtrl';
+import MarketTarget from '../../core/target/mbase';
 
 /** 空间类型申明 */
 export type SpaceType = {
@@ -11,66 +13,97 @@ export type SpaceType = {
   name: string;
   /**是否是个人空间 */
   isUserSpace?: boolean;
+  /** 当前空间的对象 */
+  targtObj?: MarketTarget;
+  /** 控制器 */
+  controller: CompanyController | SettingController;
 };
 
-export default class SettingController {
-  // 当前的工作空间, 静态存储
-  static workSpace: SpaceType;
-  static workSpaceList: SpaceType[];
+/**
+ * 设置层， 总控制器
+ */
+class SettingController extends BaseController {
+  private _person: IPerson | undefined;
+  private _curWorkSpace: SpaceType | undefined;
+  private _workSpaces: SpaceType[] = [];
 
-  /**切换工作空间 */
-  public static changeWorkSpace(space: SpaceType) {
-    Provider.setWorkSpace(space);
-    // 判断是否是个人空间
-    if (Provider.getPerson?.target.id === space.id) {
-      space.isUserSpace = true;
-    } else {
-      space.isUserSpace = false;
-    }
+  constructor() {
+    super();
+    Provider.onSetPerson(async () => {
+      await this._initialization();
+    });
   }
-  public static async getAllWorkSpaces() {
-    let workSpaces: SpaceType[] = [];
-    if (Provider.getPerson?.target != null) {
-      workSpaces.push({
-        id: Provider.getPerson.target.id,
+
+  /** 初始化 */
+  private async _initialization() {
+    if (Provider.getPerson) {
+      this._person = Provider.getPerson;
+      const companys = await this._person.getJoinedCompanys();
+      let personSpace = {
+        id: Provider.getPerson!.target.id,
         name: '个人空间',
         isUserSpace: true,
-      });
-      const companys = await Provider.getPerson.getJoinedCompanys();
-      companys.forEach((element) => {
-        workSpaces.push({
-          id: element.target.id,
-          name: element.target.name,
+        // 个人空间对象设置
+        targtObj: Provider.getPerson!,
+        controller: this,
+      };
+
+      this._workSpaces = [personSpace];
+      this._curWorkSpace = personSpace;
+      companys.forEach((a) => {
+        this._workSpaces.push({
+          id: a.target.id,
+          name: a.target.name,
           isUserSpace: false,
+          // 单位空间对象设置
+          targtObj: a as Company,
+          controller: new CompanyController(a),
         });
       });
+      this.changCallback();
     }
-    SettingController.workSpaceList = workSpaces;
-    // return workSpaces;
+  }
+
+  /** 获取当前人员 */
+  public get getPerson() {
+    return this._person;
+  }
+  /** 获得加入的群组 */
+  public get getCohorts() {
+    return this._person?.getJoinedCohorts();
+  }
+
+  /** 获得所有工作空间 */
+  public get getWorkSpaces() {
+    return this._workSpaces;
   }
 
   /**
-   * 获取当前工作空间
-   * @returns 工作当前空间
+   * 获得当前空间
    */
-  static get currentWorkSpace() {
-    return SettingController.workSpaceList
-      ? SettingController.workSpaceList.find((n) => n.id === Provider.spaceId)
-      : {
-          id: Provider.getPerson!.target.id,
-          name: '个人空间',
-          isUserSpace: true,
-        };
+  public get getCurWorkSpace() {
+    return this._curWorkSpace;
   }
-  // public static async getWorkSpace(): Promise<spaceTarget | undefined> {
-  //   if (this._workSpace == null) {
-  //     let id = sessionStorage.getItem('_workSpaceId') + '';
-  //     const companys = await this._person.getJoinedCompanys();
-  //     let company = companys.find((company) => {
-  //       return company.target.id == id;
-  //     });
-  //     this._workSpace = company ? company : this._person;
-  //   }
-  //   return this._workSpace;
-  // }
+
+  /**切换工作空间 */
+  public changeWorkSpace(space: SpaceType) {
+    // 切换工作空间的时候， 直接把对象放到缓存里面
+    for (const bean of this._workSpaces) {
+      if (bean.id === space.id) {
+        this._curWorkSpace = bean;
+        break;
+      }
+    }
+    this.changCallback();
+  }
+
+  public getCurrentCtrl() {
+    if (this._curWorkSpace) {
+      return this._curWorkSpace?.controller;
+    } else {
+      return this;
+    }
+  }
 }
+
+export const settingCtrl = new SettingController();

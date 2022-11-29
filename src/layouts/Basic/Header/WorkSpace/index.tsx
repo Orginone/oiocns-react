@@ -17,7 +17,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Provider from '@/ts/core/provider';
-import SettionCtrl, { SpaceType } from '@/ts/controller/setting/settingCtrl';
+import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 type OrganizationalUnitsProps = {};
@@ -39,7 +39,7 @@ const OrganizationalItem = (item: SpaceType) => {
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   const [current, setCurrent] = useState<SpaceType>();
-  const [menuList, setMenuList] = useState<SpaceType[]>([]);
+  const [menuList, setMenuList] = useState(settingCtrl.getWorkSpaces);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
@@ -73,24 +73,22 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     // @modify 切换工作空间
-    SettionCtrl.changeWorkSpace(item);
+    settingCtrl.changeWorkSpace(item);
     setCurrent(item);
     setShowMenu(false);
   };
   useEffect(() => {
     // 获取用户加入的单位组织
-    if (Provider.getPerson) {
-      SettionCtrl.getAllWorkSpaces().then(() => {
-        setMenuList(SettionCtrl.workSpaceList);
-        setCurrent(SettionCtrl.currentWorkSpace);
-        // const curspace = Provider.getWorkSpace();
-        // setCurrent(
-        //   allWorkSpaces.find((space) => {
-        //     return space.id == curspace?.target.id;
-        //   }),
-        // );
-      });
-    }
+    const id = settingCtrl.subscribe(() => {
+      console.log(settingCtrl.getWorkSpaces);
+      setMenuList([...settingCtrl.getWorkSpaces]);
+      if (settingCtrl.getCurWorkSpace) {
+        setCurrent({ ...settingCtrl.getCurWorkSpace });
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
   }, []);
 
   return Provider.getPerson ? (
