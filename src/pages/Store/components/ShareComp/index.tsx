@@ -5,10 +5,12 @@ import ShareShowComp from '../ShareShowComp';
 import API from '@/services';
 import cls from './index.module.less';
 import { Product } from '@/ts/core/market';
+// import { productCtrl } from '@/ts/controller/store/productCtrl';
+import StoreContent from '@/ts/controller/store/content';
 
 interface Iprops {
   curProduct?: Product;
-  onCheckeds?: (type: string, checkedValus: any) => void;
+  onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
 }
 // const ShareRecent: React.FC = () => {
 const DestTypes = [
@@ -43,7 +45,9 @@ const ShareRecent = (props: Iprops) => {
   const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
   const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
   const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
+  const [selectedTeamId, setSelectedTeamId] = useState<string>('');
   // useImperativeHandle(nodeRef, () => ());
+  const [hasSelectRecord, setHasSelectRecord] = useState({});
   useEffect(() => {
     getLeftTree();
   }, []);
@@ -53,41 +57,28 @@ const ShareRecent = (props: Iprops) => {
     setPersonsData([]);
     setIdentitysData([]);
     setCenterTreeData([]);
-    handelCheckedChange();
   }, [radio]);
-  // const resetData = () => {
-  //   getLeftTree();
-  //   setDepartData([]);
-  //   setAuthorData([]);
-  //   setPersonsData([]);
-  //   setIdentitysData([]);
-  //   setCenterTreeData([]);
-  //   setRadio(1);
-  // };
-  const handelCheckedChange = () => {
-    const arr =
-      radio == 1
-        ? departData
-        : radio == 2
-        ? authorData
-        : radio == 3
-        ? personsData
-        : identitysData;
-    console.log('测试', DestTypes, radio);
+  const handelCheckedChange = (type: string, list: any) => {
+    console.log('测试', type, list);
 
-    onCheckeds && onCheckeds(DestTypes[radio - 1].label, arr);
+    onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
   const getLeftTree = async () => {
     const res = await API.cohort.getJoinedCohorts({ data: pageCurrent });
     setLeftTreeData(res.data.result);
     console.log(res);
   };
-  const onChange = (e: RadioChangeEvent) => {
-    console.log('radio checked', e.target.value);
-    setRadio(e.target.value);
-  };
+
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     console.log('selected', selectedKeys, info);
+    StoreContent.ShareProduct(selectedTeamId, hasSelectRecord.list, hasSelectRecord.type);
+    setSelectedTeamId(info.node.id);
+    setDepartData([]);
+    setAuthorData([]);
+    setPersonsData([]);
+    setIdentitysData([]);
+    setCenterTreeData([]);
+
     switch (radio) {
       case 2: {
         const res = await API.company.getAuthorityTree({
@@ -192,7 +183,7 @@ const ShareRecent = (props: Iprops) => {
         }
       });
     }
-    handelCheckedChange();
+    handelCheckedChange('组织', checkedKeys);
 
     setDepartData([...departData]);
   };
@@ -223,7 +214,8 @@ const ShareRecent = (props: Iprops) => {
       }
     }
     // onCheckeds && onCheckeds(DestTypes[radio].label, info.checkedNodes);
-    handelCheckedChange();
+    setHasSelectRecord({ type: DestTypes[radio - 1].label, list: checkedKeys });
+    handelCheckedChange(DestTypes[radio - 1].label, checkedKeys);
   };
   // 点击删除
   // const delContent = (item: any) => {
@@ -292,7 +284,11 @@ const ShareRecent = (props: Iprops) => {
     <div className={cls.layout}>
       <div className={cls.top}>
         <p>分享形式：</p>
-        <Radio.Group onChange={onChange} value={radio}>
+        <Radio.Group
+          onChange={(e: RadioChangeEvent) => {
+            setRadio(e.target.value);
+          }}
+          value={radio}>
           {DestTypes.map((item) => {
             return (
               <Radio value={item.value} key={item.value}>
@@ -300,10 +296,6 @@ const ShareRecent = (props: Iprops) => {
               </Radio>
             );
           })}
-          {/* <Radio value={'组织'}>按群组共享</Radio>
-          <Radio value={'角色'}>按角色共享</Radio>
-          <Radio value={'岗位'}>按身份共享</Radio>
-          <Radio value={'人员'}>按人员共享</Radio> */}
         </Radio.Group>
       </div>
       <div className={cls.content}>

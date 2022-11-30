@@ -56,7 +56,6 @@ const StoreClassify: React.FC = () => {
       title: title,
       children: [],
     };
-
     selectMenuInfo.children.push(newObj);
     setIsStoreOpen(false);
     // 数据缓存
@@ -137,7 +136,7 @@ const StoreClassify: React.FC = () => {
    */
   const handleAddShop = (item: any) => {
     console.log('handleAddShop', item);
-    selectMenuInfo = { ...selectMenuObj, ...item };
+    selectMenuInfo = item;
     setIsStoreOpen(true);
   };
   /*******

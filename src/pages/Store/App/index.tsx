@@ -72,12 +72,6 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const onCheckeds = (type: string, checkedValus: any) => {
-    console.log('输出选择', type, checkedValus);
-
-    setCheckNodes({ type, checkedValus });
-  };
-
   /**
    * @description: 移除确认
    * @return {*}
@@ -95,6 +89,11 @@ const StoreApp: React.FC = () => {
     setIsDeleteOpen(false);
   };
 
+  const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
+    console.log('输出选择', teamId, type, checkedValus);
+
+    setCheckNodes({ teamId, type, checkedValus });
+  };
   // 共享确认回调
   const submitShare = () => {
     console.log(
@@ -108,6 +107,11 @@ const StoreApp: React.FC = () => {
       // identitysHisData,
     );
 
+    StoreContent.ShareProduct(
+      checkNodes.teamId,
+      checkNodes.checkedValus,
+      checkNodes.type,
+    );
     // setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
