@@ -1,6 +1,6 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
-import React, { useState, useEffect, useImperativeHandle } from 'react';
+import React, { useState, useEffect } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import API from '@/services';
 import cls from './index.module.less';
@@ -8,7 +8,7 @@ import { Product } from '@/ts/core/market';
 
 interface Iprops {
   curProduct?: Product;
-  onCheckeds?: (checkedValus: any) => void;
+  onCheckeds?: (type: string, checkedValus: any) => void;
 }
 // const ShareRecent: React.FC = () => {
 const DestTypes = [
@@ -53,6 +53,7 @@ const ShareRecent = (props: Iprops) => {
     setPersonsData([]);
     setIdentitysData([]);
     setCenterTreeData([]);
+    handelCheckedChange();
   }, [radio]);
   // const resetData = () => {
   //   getLeftTree();
@@ -63,7 +64,19 @@ const ShareRecent = (props: Iprops) => {
   //   setCenterTreeData([]);
   //   setRadio(1);
   // };
+  const handelCheckedChange = () => {
+    const arr =
+      radio == 1
+        ? departData
+        : radio == 2
+        ? authorData
+        : radio == 3
+        ? personsData
+        : identitysData;
+    console.log('测试', DestTypes, radio);
 
+    onCheckeds && onCheckeds(DestTypes[radio - 1].label, arr);
+  };
   const getLeftTree = async () => {
     const res = await API.cohort.getJoinedCohorts({ data: pageCurrent });
     setLeftTreeData(res.data.result);
@@ -134,7 +147,6 @@ const ShareRecent = (props: Iprops) => {
   // 左侧树点击事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
     console.log('点击左侧', checkedKeys, info);
-    onCheckeds && onCheckeds(info.checkedNodes);
     if (info.checked) {
       let result = departHisData.some((item: any) => {
         return item.id == info.node.id;
@@ -180,6 +192,8 @@ const ShareRecent = (props: Iprops) => {
         }
       });
     }
+    handelCheckedChange();
+
     setDepartData([...departData]);
   };
   // 中间树形点击事件
@@ -208,6 +222,8 @@ const ShareRecent = (props: Iprops) => {
         setPersonsData(identitysData);
       }
     }
+    // onCheckeds && onCheckeds(DestTypes[radio].label, info.checkedNodes);
+    handelCheckedChange();
   };
   // 点击删除
   // const delContent = (item: any) => {

@@ -257,7 +257,7 @@ const MarketRouter: IRouteConfig[] = [
   {
     path: '/market/ShoppingCart',
     title: '购物车',
-    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart')),
+    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart/shoppingCart')),
   },
   {
     path: '/market',
@@ -327,6 +327,18 @@ const SettingRouter: IRouteConfig[] = [
         title: '部门设置',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
+      },
+      {
+        path: '/setting/position/:id',
+        title: '岗位设置',
+        icon: <ApartmentOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Position')),
+      },
+      {
+        path: '/setting/position',
+        title: '岗位设置',
+        icon: <ApartmentOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Position')),
       },
       {
         path: '/setting/group/:id',

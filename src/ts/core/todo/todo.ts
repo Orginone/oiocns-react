@@ -53,7 +53,7 @@ export class ApplicationTodo implements iTodo {
   public getApplyList = async () => {
     if (this.applyList.length > 0) return this.applyList;
     const result = await kernel.queryInstance({
-      id: this.id,
+      productId: this.id,
       spaceId: Provider.userId,
       status: 1,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },

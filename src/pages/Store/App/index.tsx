@@ -33,9 +33,8 @@ const StoreApp: React.FC = () => {
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
-  const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const [checkNodes, setCheckNodes] = useState<any>({});
   const [productObj, setProductObj] = useState<any>({});
-  const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
     StoreContent.marketTableCallBack = setData;
@@ -73,8 +72,10 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const onCheckeds = (checkedValus: any) => {
-    setCheckNodes(checkedValus);
+  const onCheckeds = (type: string, checkedValus: any) => {
+    console.log('输出选择', type, checkedValus);
+
+    setCheckNodes({ type, checkedValus });
   };
 
   /**
@@ -96,10 +97,9 @@ const StoreApp: React.FC = () => {
 
   // 共享确认回调
   const submitShare = () => {
-    console.log('当前被选中的每一项', checkNodes);
     console.log(
-      '测试测试测试',
-      shareRef,
+      '共享确认回调',
+      checkNodes,
       // departHisData,
       // authorData,
       // personsData,
@@ -108,7 +108,7 @@ const StoreApp: React.FC = () => {
       // identitysHisData,
     );
 
-    setShowShareModal(false);
+    // setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
@@ -156,7 +156,6 @@ const StoreApp: React.FC = () => {
         label: '共享',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          shareRef.current?.resetData();
           setShowShareModal(true);
         },
       },

@@ -20,6 +20,7 @@ class productContCtrl {
   public async deleteProduct(id: string) {
     return await provider!.getPerson!.deleteProduct(id);
   }
+  public async createExtend(params: any) {}
 }
 
 const productCtrl = new productContCtrl();

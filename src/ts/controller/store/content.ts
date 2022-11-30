@@ -101,10 +101,13 @@ class StoreContent {
    */
   public selectedProduct(item: BaseProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this.curProduct?.prod.id &&
+    // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改选中', item);
 
     this.curProduct = item;
+  }
+  public ShareProduct(){
+
   }
 }
 const storeContent = new StoreContent();
