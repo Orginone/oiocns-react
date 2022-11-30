@@ -168,6 +168,9 @@ export class FileSystemItem implements IFileSystemItem {
       }
     }
   }
+  async download(path: string, onProgress: OnProgressType): Promise<void> {
+    // TODO
+  }
   /**
    * 格式化key,主要针对路径中的中文
    * @returns 格式化后的key
