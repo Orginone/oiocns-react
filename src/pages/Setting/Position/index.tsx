@@ -10,7 +10,7 @@ import { dataSource } from './datamock';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
-// import AddDeptModal from './components/AddDeptModal';
+import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
@@ -18,8 +18,19 @@ import settingController from '@/ts/controller/setting';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 
+/** 获取角色当前名称 */
+interface PositionBean {
+  key: string;
+  id: string;
+  name: string;
+  code: string;
+  create: string;
+  createTime: string;
+  remark: string;
+}
+
 /**
- * 部门设置
+ * 岗位设置
  * @returns
  */
 const SettingDept: React.FC = () => {
@@ -31,54 +42,21 @@ const SettingDept: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
-  const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
+  const [Transfer, setTransfer] = useState<boolean>(false);
+
+  const [_currentPostion, setPosition] = useState<any>({});
+  //变更岗位
+
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
   ): MarketTypes.OperationType[] => {
     return [
       {
-        key: 'publish',
-        label: '修改信息',
+        key: 'remove',
+        label: '移除人员',
         onClick: () => {
-          console.log('按钮事件', 'publish', item);
-        },
-      },
-      {
-        key: 'share',
-        label: '变更部门',
-        onClick: () => {
-          // console.log('按钮事件', 'share', item);
-          setTransfer(true);
-        },
-      },
-      {
-        key: 'detail',
-        label: '岗位设置',
-        onClick: () => {
-          setIsSetPost(true);
-          // console.log('按钮事件', 'detail', item);
-        },
-      },
-      {
-        key: 'publishList',
-        label: '部门设置',
-        onClick: () => {
-          console.log('按钮事件', 'publishList', item);
-        },
-      },
-      {
-        key: 'caption',
-        label: '停用',
-        onClick: () => {
-          console.log('按钮事件', 'publishList', item);
-        },
-      },
-      {
-        key: 'caption1',
-        label: '移出单位',
-        onClick: () => {
-          console.log('按钮事件', 'publishList', item);
+          console.log('按钮事件', 'remove', item);
         },
       },
     ];
@@ -128,15 +106,24 @@ const SettingDept: React.FC = () => {
     });
   }, []);
 
+  useEffect(() => {
+    settingController.addListen('isSetPost', () => {
+      setIsSetPost(true);
+    });
+    return settingController.remove('isSetPost', () => {
+      setIsSetPost(false);
+    });
+  }, []);
+
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
   useEffect(() => {
-    settingController.addListen('createDept', (e: { id: string }) => {
+    settingController.addListen('createPosition', (e: { id: string }) => {
       setIsCreateDept(true);
       setSelectId(e.id);
     });
-    return settingController.remove('createDept', () => {
+    return settingController.remove('createPosition', () => {
       setSelectId('');
       setIsCreateDept(false);
     });
@@ -154,34 +141,20 @@ const SettingDept: React.FC = () => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `部门成员`,
+      tab: `岗位成员`,
       key: 'deptPerpeos',
     },
     {
-      tab: `部门应用`,
+      tab: `岗位应用`,
       key: 'deptApps',
     },
   ];
-  // tabs页
-  const items = [
-    {
-      tab: `全部`,
-      key: '1',
-    },
-    {
-      tab: `已开通`,
-      key: '2',
-    },
-    {
-      tab: `未开通`,
-      key: '3',
-    },
-  ];
-  // 部门信息标题
+
+  // 岗位信息标题
   const title = (
     <div className={cls['company-dept-title']}>
       <div>
-        <Title level={4}>部门信息</Title>
+        <Title level={4}>岗位信息</Title>
       </div>
       <div>
         <Button
@@ -192,32 +165,27 @@ const SettingDept: React.FC = () => {
           }}>
           编辑
         </Button>
-        <Button type="link">权限管理</Button>
+        <Button type="link">删除</Button>
       </div>
     </div>
   );
-
-  /**
-   * @description: 部门信息内容
-   * @return {*}
-   */
+  // 岗位信息内容
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="单位名称">浙江省财政厅</Descriptions.Item>
-          <Descriptions.Item label="单位编码">1130010101010101010</Descriptions.Item>
-          <Descriptions.Item label="我的岗位">浙江省财政厅-管理员</Descriptions.Item>
-          <Descriptions.Item label="团队编码">zjczt</Descriptions.Item>
+          <Descriptions.Item label="名称">管理员</Descriptions.Item>
+          <Descriptions.Item label="编码">super-admin</Descriptions.Item>
           <Descriptions.Item label="创建人">小明</Descriptions.Item>
-          <Descriptions.Item label="创建时间">2022-11-01 11:11:37</Descriptions.Item>
+          <Descriptions.Item label="创建时间">2022-11-17 15:34:57</Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            未公示
+            系统生成的对应组织的权责身份
           </Descriptions.Item>
         </Descriptions>
       </Card>
     </div>
   );
+
   // 按钮
   const renderBtns = () => {
     return (
@@ -225,54 +193,40 @@ const SettingDept: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            setIsSetPost(true);
+            console.log('指派岗位');
+            settingController.trigger('isSetPost');
           }}>
-          身份设置
-        </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            setIsAddOpen(true);
-          }}>
-          添加成员
-        </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            setLookApplyOpen(true);
-          }}>
-          查看申请
+          指派岗位
         </Button>
       </Space>
     );
   };
-  //部门主体
+
+  // 岗位信息标题
+
+  //岗位主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
-      <Card tabList={TitleItems}>
-        <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-          <Card
-            title={settingCtrl.getCurWorkSpace?.name}
-            className={cls['app-tabs']}
-            extra={renderBtns()}
-            tabList={items}
-            onTabChange={(key) => {
-              setStatusKey(key);
-              console.log('切换事件', key);
-            }}
-          />
-          <div className={cls['page-content-table']} ref={parentRef}>
-            <CardOrTable
-              dataSource={dataSource as any}
-              rowKey={'id'}
-              operation={renderOperation}
-              columns={columns as any}
-              parentRef={parentRef}
-              showChangeBtn={false}
-            />
+      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+        <Card
+          title={'管理员'}
+          className={cls['app-tabs']}
+          extra={renderBtns()}
+          bordered={false}>
+          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+            <div className={cls['page-content-table']} ref={parentRef}>
+              <CardOrTable
+                dataSource={dataSource as any}
+                rowKey={'id'}
+                operation={renderOperation}
+                columns={columns as any}
+                parentRef={parentRef}
+                showChangeBtn={false}
+              />
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
   return (
@@ -305,15 +259,20 @@ const SettingDept: React.FC = () => {
         handleOk={handleOk}
       />
 
-      {/* 变更部门 */}
+      {/* 变更岗位 */}
       <TransferDepartment
-        title={'转移部门'}
+        title={'转移岗位'}
         open={Transfer}
         onOk={onOk}
         handleOk={handleOk}
       />
-      {/* 对象设置 */}
-      <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      {/* 岗位设置 */}
+      <AddDeptModal
+        title={'岗位设置'}
+        open={isSetPost}
+        onOk={handlePostOk}
+        handleOk={onOk}
+      />
     </div>
   );
 };

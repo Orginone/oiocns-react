@@ -3,10 +3,18 @@ import { Avatar, List, Descriptions, Typography, Layout, Card, Input, Tag } from
 import { UserOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
+import Cohort from '@/ts/core/target/cohort';
+import CohortController from '../../../../ts/controller/cohort/index';
+import FriendController from '../../../../ts/controller/friend';
+
+import { schema } from '../../../../ts/base';
+import Provider from '@/ts/core/provider';
 const fakeDataUrl =
   'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
 const ContainerHeight = 400;
-
+interface defaultObjType {
+  cohortData: Cohort;
+}
 interface UserItem {
   email: string;
   gender: string;
@@ -24,9 +32,71 @@ interface UserItem {
 }
 const { Title } = Typography;
 const { Search } = Input;
-const App: React.FC = () => {
+const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const [data, setData] = useState<UserItem[]>([]);
-
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
+  const [friendList, setFriendList] = useState<schema.XTarget[]>([]);
+  /**获取群组下成员列表 */
+  const getMemberData = async () => {
+    const res = await CohortController.getCohortPeronList(cohortData);
+    setMemberData(res);
+  };
+  /**获取好友列表 */
+  const getFriendList = async () => {
+    const res = await FriendController.getMyFriend();
+    setFriendList(res);
+  };
+  /**
+   * 获取操作列表
+   * @param value
+   */
+  const getAction = (value: schema.XTarget) => {
+    const action = [];
+    if (friendList.filter((obj) => (obj.id = value.id)) == null) {
+      action.push(<a key="list-loadmore-more">添加好友</a>);
+    } else {
+      action.push(<a key="list-loadmore-edit">发起会话</a>);
+    }
+    if (value.belongId == Provider.spaceId) {
+      action.push(<a key="list-loadmore-more">踢出群组</a>);
+    }
+  };
+  /**
+   * 获取标题内容
+   * @param value
+   */
+  const getTitle = (value: schema.XTarget) => {
+    const title = [];
+    const indentity: string = '成员';
+    if (friendList.filter((obj) => (obj.id = value.id)) == null) {
+      title.push(
+        <div>
+          <a href="https://ant.design">{value.name}</a>
+          <span style={{ paddingLeft: '5px' }}>{value.code}</span>
+          <span>
+            <Tag color="green" style={{ marginLeft: '10px' }}>
+              {indentity}
+            </Tag>
+          </span>
+          <span>
+            <UserOutlined size={20} style={{ paddingLeft: '5px' }} />
+          </span>
+        </div>,
+      );
+    } else {
+      title.push(
+        <div>
+          <a href="https://ant.design">{value.name}</a>
+          <span style={{ paddingLeft: '5px' }}>{value.code}</span>
+          <span>
+            <Tag color="green" style={{ marginLeft: '10px' }}>
+              {indentity}
+            </Tag>
+          </span>
+        </div>,
+      );
+    }
+  };
   const appendData = () => {
     fetch(fakeDataUrl)
       .then((res) => res.json())
@@ -37,6 +107,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     appendData();
+    getMemberData();
+    getFriendList();
   }, []);
 
   const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
@@ -68,7 +140,7 @@ const App: React.FC = () => {
           <span style={{ paddingLeft: '5px' }}>{939097257}</span>
           <span>
             <Tag color="green" style={{ marginLeft: '10px' }}>
-              三级管理员
+              一级成员
             </Tag>
           </span>
         </div>
@@ -80,7 +152,7 @@ const App: React.FC = () => {
         <span style={{ paddingLeft: '5px' }}>{939097257}</span>
         <span>
           <Tag color="green" style={{ marginLeft: '10px' }}>
-            三级管理员
+            一级成员
           </Tag>
         </span>
         <span>
@@ -143,4 +215,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default MemberList;
