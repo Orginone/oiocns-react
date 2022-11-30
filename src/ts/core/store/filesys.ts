@@ -215,7 +215,7 @@ export class FileSystemItem implements IFileSystemItem {
         shareLink: source.target.shareLink,
         extension: source.target.extension,
         thumbnail: source.target.thumbnail,
-        key: source.key + '/' + source.name,
+        key: destination.key + '/' + source.name,
         isDirectory: source.target.isDirectory,
         contentType: source.target.contentType,
         hasSubDirectories: source.target.hasSubDirectories,

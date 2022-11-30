@@ -14,14 +14,26 @@ const DocClassifyTree: React.FC = () => {
   const [modalTitle, setModalTitle] = useState<string>('新建文件夹');
   const [treeData, setTreeData] = useState<any[]>();
   const [keys, setKeys] = useState([docsCtrl.current?.key ?? '']);
+  const [expKeys, setExpKeys] = useState([docsCtrl.current?.key ?? '']);
   const [coppyOrMoveTitle, setCoppyOrMoveTitle] = useState<string>('复制到');
   const [currentTaget, setCurrentTaget] = useState<any>(docsCtrl.current);
+
   const refreshUI = () => {
     if (docsCtrl.current) {
       setKeys([docsCtrl.current.key]);
+      let tkeys = docsCtrl.current.key.split('/');
+      tkeys.forEach((_, index) => {
+        const item = tkeys.slice(0, index + 1).join('/');
+        if (!expKeys.includes(item)) {
+          expKeys.push(item);
+        }
+      });
+      setExpKeys([...expKeys]);
+      setCurrentTaget(docsCtrl.current);
     }
     setTreeData([loadTreeData(docsCtrl.root)]);
   };
+
   const loadTreeData = (item: any) => {
     let result: any = {
       key: item.key,
@@ -45,10 +57,21 @@ const DocClassifyTree: React.FC = () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
-
+  const loadChild = async (node: any) => {
+    if (node.children.length === 0) await docsCtrl.open(node.key);
+  };
   const onSelect = (selectedKeys: string[]) => {
     if (selectedKeys.length > 0) {
       docsCtrl.open(selectedKeys[0]);
+    }
+  };
+  const onExpand = (
+    expandedKeys: string[],
+    { expanded: bool, node }: { expanded: boolean; node: any },
+  ) => {
+    setExpKeys(expandedKeys);
+    if (expandedKeys.length > 0 && bool) {
+      loadChild(node);
     }
   };
   const handleMenuClick = async (key: string, node: any) => {
@@ -102,9 +125,10 @@ const DocClassifyTree: React.FC = () => {
           searchable
           showIcon
           treeData={treeData}
-          defaultExpandedKeys={['']}
+          expandedKeys={expKeys}
           selectedKeys={keys}
           onSelect={onSelect}
+          onExpand={onExpand}
           handleMenuClick={handleMenuClick}
           icon={getIcon}
         />
@@ -114,13 +138,19 @@ const DocClassifyTree: React.FC = () => {
         open={isModalOpen}
         title={modalTitle}
         value={createFileName}
-        onChange={setIsModalOpen}
+        onChange={(val) => {
+          setIsModalOpen(val);
+          setCurrentTaget(docsCtrl.current);
+        }}
       />
       <CoppyOrMove
         currentTaget={currentTaget}
         open={moveModalOpen}
         title={coppyOrMoveTitle}
-        onChange={setMoveModalOpen}
+        onChange={(val) => {
+          setMoveModalOpen(val);
+          setCurrentTaget(docsCtrl.current);
+        }}
       />
     </>
   );

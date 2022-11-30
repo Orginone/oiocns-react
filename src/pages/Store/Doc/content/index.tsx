@@ -357,31 +357,21 @@ const LeftTree = () => {
                           <Card
                             size="small"
                             hoverable
+                            bordered={false}
                             key={el.key}
                             onDoubleClick={() => {
                               docsCtrl.open(el.key);
                             }}
                             onContextMenu={(e) => {
                               e.stopPropagation();
-                            }}
-                            // cover={
-                            //   <div className={cls.fileImage}>
-                            //     <Image
-                            //       // width={'auto'}
-                            //       height={getPreview(el) ? 80 : 60}
-                            //       src={getThumbnail(el)}
-                            //       fallback="/icons/default_file.svg"
-                            //       preview={getPreview(el)}
-                            //     />
-                            //   </div>
-                            // }
-                          >
+                            }}>
                             <div className={cls.fileImage}>
                               <Image
-                                height={getPreview(el) ? 80 : 60}
+                                height={getPreview(el) ? 'auto' : 60}
                                 src={getThumbnail(el)}
                                 fallback="/icons/default_file.svg"
-                                preview={getPreview(el)}></Image>
+                                preview={getPreview(el)}
+                              />
                             </div>
                             <div className={cls.fileName} title={el.name}>
                               <Typography.Text title={el.name} ellipsis>
