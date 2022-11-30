@@ -37,7 +37,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   }, []);
 
   const initData = async () => {
-    const resultData = await settingController.getDepartments('381107910723375104');
+    const resultData = await settingController.getDepartments('0');
     console.log('====查询部门', resultData);
     setTreeData(resultData);
   };

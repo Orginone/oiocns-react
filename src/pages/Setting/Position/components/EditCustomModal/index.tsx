@@ -110,7 +110,7 @@ const EditCustomModal = (props: Iprops) => {
         footer={null}>
         <BetaSchemaForm<DataItem>
           shouldUpdate={false}
-          layoutType="Form"
+          layoutType="Embed"
           onFinish={async (values) => {
             console.log('finish===', values);
             onOk();
