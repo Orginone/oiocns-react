@@ -21,7 +21,6 @@ const PersonInfoCard: React.FC<PersonInfoCardProps> = ({ person }) => (
         title={person.team?.name}
         description={person.code}
       />
-      {''}
       <Descriptions column={2}>
         <Descriptions.Item label="昵称">{person.name}</Descriptions.Item>
         <Descriptions.Item label="手机号">{person.team?.code}</Descriptions.Item>

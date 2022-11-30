@@ -11,11 +11,17 @@ export class MarketController extends BaseController {
   private _curProd: BaseProduct | undefined;
   /** 可用应用 */
   private _usefulProds: BaseProduct[] | undefined;
+  /**
+   * @description: 搜索到的商店
+   * @return {*}
+   */
+  public searchMarket: any;
 
   constructor(target: IPerson | ICompany) {
     super();
     this._target = target;
     this._usefulProds = [];
+    this.searchMarket = [];
   }
   /** 获得所有市场 */
   public get getMarkets() {
@@ -79,13 +85,13 @@ export class MarketController extends BaseController {
    * @description: 创建商店
    * @return {*}
    */
-  public async creatMarkrt(data: {
+  public creatMarkrt = async (data: {
     name: string;
     code: string;
     remark: string;
     samrId: string;
     ispublic: boolean;
-  }) {
+  }) => {
     await this._target.createMarket(
       data.name,
       data.code,
@@ -94,16 +100,16 @@ export class MarketController extends BaseController {
       data.ispublic,
     );
     this.changCallback();
-  }
+  };
 
   /**
    * @description: 删除商店
    * @return {*}
    */
-  public async deleteMarket(id: string) {
+  public deleteMarket = async (id: string) => {
     await this._target.deleteMarket(id);
     this.changCallback();
-  }
+  };
 
   /**
    * @description: 退出商店
@@ -113,5 +119,18 @@ export class MarketController extends BaseController {
   public async quitMarket(id: string) {
     await this._target.quitMarket(id);
     this.changCallback();
+  }
+
+  /**
+   * @description: 根据编号查询市场
+   * @param {string} code
+   * @return {*}
+   */
+  public async getMarketByCode(code: string) {
+    const res = await this._target.getMarketByCode(code);
+    if (res?.success && res?.data?.result != undefined) {
+      this.searchMarket = res?.data?.result;
+    }
+    return this.searchMarket;
   }
 }

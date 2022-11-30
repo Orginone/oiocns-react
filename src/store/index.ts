@@ -41,6 +41,19 @@ const useStore = create(
       setUser: async (data: Partial<UserType>) => {
         set({ user: data });
       },
+      register: async (
+        name: string,
+        motto: string,
+        phone: string,
+        account: string,
+        password: string,
+        nickName: string,
+      ) => {
+        return await Provider.register(name, motto, phone, account, password, nickName);
+      },
+      resetPassword: async (account: string, password: string, privateKey: string) => {
+        return await Provider.resetPassword(account, password, privateKey);
+      },
       setLoading: (val: boolean) => set({ loading: val }),
       setEditItem: (params: any) => set({ editItem: params }),
       getUserInfo: async () => {

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import AnyStore from './anystore';
 import StoreHub from './storehub';
 import type * as model from '../model';
@@ -96,6 +95,30 @@ export default class KernelApi {
     }
     if (res.success) {
       this._anystore.updateToken(res.data.accessToken);
+    }
+    return res;
+  }
+  /**
+   * 重置密码
+   * @param userName 用户名
+   * @param password 密码
+   * @returns {Promise<model.ResultType<any>>}
+   */
+  public async resetPassword(
+    userName: string,
+    password: string,
+    privatekey: string,
+  ): Promise<model.ResultType<any>> {
+    var res: model.ResultType<any>;
+    var req = {
+      account: userName,
+      password: password,
+      privateKey: privatekey,
+    };
+    if (this._storeHub.isConnected) {
+      res = await this._storeHub.invoke('ResetPassword', req);
+    } else {
+      res = await this._restRequest('resetpassword', req);
     }
     return res;
   }
@@ -2041,6 +2064,19 @@ export default class KernelApi {
       module: 'flow',
       action: 'DeleteFlowRelation',
       params: params,
+    });
+  }
+  /**
+   * 查询流程有关应用
+   * @returns {model.ResultType<model.IdWithNameModel[]>} 请求结果
+   */
+  public async queryApprovalProduct(): Promise<
+    model.ResultType<model.IdWithNameModel[]>
+  > {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryApprovalProduct',
+      params: {},
     });
   }
   /**

@@ -24,6 +24,10 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     this.publicMarkets = [];
     this.usefulResource = new Map();
   }
+  /**
+   * @description: 根据编号查询市场
+   * @return {*}
+   */
   public async getMarketByCode(
     name: string,
   ): Promise<model.ResultType<schema.XMarketArray>> {
@@ -36,7 +40,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
   }
-  public async getOwnProducts(): Promise<BaseProduct[]> {
+  public getOwnProducts = async (): Promise<BaseProduct[]> => {
     if (this.ownProducts.length > 0) {
       return this.ownProducts;
     }
@@ -54,7 +58,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       });
     }
     return this.ownProducts;
-  }
+  };
   public async getJoinMarkets(): Promise<Market[]> {
     if (this.joinedMarkets.length > 0) {
       return this.joinedMarkets;
@@ -263,20 +267,27 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  public async createProduct(
+  public createProduct = async ({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName = 'webApp',
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId?: string,
+    thingId?: string;
     // 产品类型名
-    typeName: string = 'webApp',
-  ): Promise<model.ResultType<schema.XProduct>> {
+    typeName?: string;
+  }): Promise<model.ResultType<schema.XProduct>> => {
     const res = await kernel.createProduct({
       name,
       code,
@@ -291,7 +302,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       this.ownProducts.push(new BaseProduct(res.data!));
     }
     return res;
-  }
+  };
 
   public async stagingMerchandise(
     id: string,
@@ -305,9 +316,6 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         merchandiseId: id,
         belongId: this.target.id,
       });
-      if (res.success) {
-        this.stagings.push(res.data);
-      }
       return res;
     }
     return faildResult(consts.IsExistError);

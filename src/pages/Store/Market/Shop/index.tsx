@@ -12,7 +12,6 @@ const Index: React.FC = () => {
     StoreContent.getStoreProduct('market');
     // StoreContent.changeMenu('market');
   }, []);
-  console.log('三生三世', data);
 
   return (
     <>

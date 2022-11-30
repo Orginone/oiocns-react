@@ -492,10 +492,10 @@ export type OrderPayModel = {
 };
 
 export type ProductModel = {
-  // 唯一ID
-  id: string | undefined;
   // 名称
   name: string;
+  // 唯一ID
+  id: string | undefined;
   // 编号
   code: string;
   // 元数据Id
@@ -767,8 +767,8 @@ export type FlowRelationModel = {
 };
 
 export type FlowReq = {
-  // 流程定义Id
-  id: string;
+  // 应用Id
+  productId: string;
   // 空间Id
   spaceId: string;
   // 状态

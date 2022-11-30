@@ -108,20 +108,27 @@ export interface IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 添加暂存区
    * @param id 商品Id
@@ -404,20 +411,27 @@ export interface IPerson {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 加入购物车
    * @param id 商品Id
@@ -453,6 +467,12 @@ export interface IPerson {
    * @param id 应用Id
    */
   getUsefulResource(id: string): Promise<schema.XResource[]>;
+  /**
+   * 修改密码
+   * @param password 新密码
+   * @param privateKey 私钥
+   */
+  resetPassword(password: string, privateKey: string): Promise<ResultType<any>>;
 }
 /** 单位操作 */
 export interface ICompany {
@@ -506,6 +526,11 @@ export interface ICompany {
   createCohort(
     data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
+  /**
+   * 移除人员
+   * @param ids 人员Id集合
+   */
+  removePerson(ids: string[]): Promise<ResultType<any>>;
   /**
    * 删除子部门
    * @param id 部门Id
@@ -680,20 +705,27 @@ export interface ICompany {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct(
+  createProduct({
+    name,
+    code,
+    remark,
+    resources,
+    thingId,
+    typeName,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 资源列
-    resources: model.ResourceModel[] | undefined,
+    resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string,
+    thingId: string;
     // 产品类型名
-    typeName: string,
-  ): Promise<ResultType<schema.XProduct>>;
+    typeName: string;
+  }): Promise<ResultType<schema.XProduct>>;
   /**
    * 加入购物车
    * @param id 商品Id
@@ -808,7 +840,7 @@ export interface IDepartment {
   /** 拉人进入部门 */
   pullPerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
   /** 踢人 */
-  removePerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
+  removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建子部门 */
   createDepartment(
     data: Omit<model.TargetModel, 'id' | 'belongId'>,
@@ -841,7 +873,7 @@ export interface IWorking {
   /** 拉人进入部门 */
   pullPerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
   /** 踢人 */
-  removePerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
+  removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建工作组 */
   createWorking(
     data: Omit<model.TargetModel, 'id' | 'belongId'>,

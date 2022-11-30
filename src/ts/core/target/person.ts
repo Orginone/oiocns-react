@@ -203,6 +203,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (res.success && res.data.result != undefined) {
       this.joinedFriend = res.data.result;
     }
+
     return this.joinedFriend;
   }
   public async applyFriend(target: schema.XTarget): Promise<ResultType<any>> {
@@ -283,5 +284,11 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async getUsefulResource(id: string): Promise<schema.XResource[]> {
     return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
+  }
+  public async resetPassword(
+    password: string,
+    privateKey: string,
+  ): Promise<ResultType<any>> {
+    return await kernel.resetPassword(this.target.code, password, privateKey);
   }
 }

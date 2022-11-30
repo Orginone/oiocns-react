@@ -13,10 +13,13 @@ import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
-import JoinOtherShop from '@/components/JoinOtherShop';
-import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+import JoinOtherShop from './JoinOtherShop';
+import { MarketController } from '@/ts/controller/store/marketCtrl';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
+import PersonInfoEnty from '@/ts/core/provider';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
+  const Person = PersonInfoEnty.getPerson;
   const [list, setList] = useState<any[]>([]);
   const [deleOrQuit, setDeleOrQuit] = useState<'delete' | 'quit'>('delete');
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
@@ -24,6 +27,25 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
   const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
+  const [curSpace, setCurSpace] = useState<any>({}); // 当前操作对象（个人/单位）
+  const [dataSource, setDataSource] = useState<any>([]); // table数据
+
+  /**
+   * @description: 实例化商店对象
+   * @return {*}
+   */
+  const marketCtrl = new MarketController(curSpace);
+  useEffect(() => {
+    const id = settingCtrl.subscribe(() => {
+      setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
+      if (settingCtrl.getCurWorkSpace) {
+        setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
+      }
+    });
+    return () => {
+      settingCtrl.unsubscribe(id);
+    };
+  }, []);
 
   /**
    * @description: 创建商店
@@ -33,7 +55,27 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onOk = (formData: any) => {
     marketCtrl.creatMarkrt({ ...formData });
     setIsAddOpen(false);
+  };
+
+  /**
+   * @description: 加入商店
+   * @return {*}
+   */
+  const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
+    setDataSource([]);
+    const res = await Person?.applyJoinMarket(val[0]?.id);
+    console.log('申请加入商店成功', res);
+  };
+
+  /**
+   * @description: 加入商店搜索回调
+   * @param {any} val
+   * @return {*}
+   */
+  const onChange = async (val: any) => {
+    const res = await marketCtrl.getMarketByCode(val.target.value);
+    setDataSource(res);
   };
 
   /**
@@ -44,7 +86,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsDeleteOpen(false);
     {
       deleOrQuit === 'delete'
-        ? marketCtrl.deleteMarket(treeDataObj?.node)
+        ? marketCtrl.deleteMarket(treeDataObj?.id)
         : marketCtrl.quitMarket(treeDataObj?.id);
     }
   };
@@ -57,6 +99,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsAddOpen(false);
     setIsDeleteOpen(false);
     setIsJoinShop(false);
+    setDataSource([]);
   };
 
   const onClose = () => {
@@ -108,7 +151,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     if (path === '/market/shop') {
       StoreContent.changeMenu('market');
     }
-
     setSelectMenu(path);
     history.push(path);
   };
@@ -147,15 +189,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
     StoreContent.changeMenu(item);
-  };
-
-  /**
-   * @desc: 创建新目录
-   * @param {any} item
-   * @return {*}
-   */
-  const handleAddShop = (item: any) => {
-    console.log('handleAddShop', item);
   };
 
   /**
@@ -219,12 +252,10 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       <MarketClassifyTree
         key={selectMenu}
         handleTitleClick={handleTitleClick}
-        handleAddClick={handleAddShop}
         handleMenuClick={handleMenuClick}
         treeData={treelist}
         menu={'menus'}
-        type="myshop"
-        clickBtn={ClickBtn}
+        title={ClickBtn}
       />
       <NewStoreModal title="创建商店" open={isAddOpen} onOk={onOk} onCancel={onCancel} />
       <DeleteCustomModal
@@ -236,8 +267,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         content={treeDataObj.title}
       />
       <DetailDrawer
-        title={'神马商店'}
-        nodeDetail={treeDataObj?.node?.store}
+        title={treeDataObj.title}
+        nodeDetail={treeDataObj?.node?.market}
         open={isDetailOpen}
         onClose={onClose}
       />
@@ -245,9 +276,9 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         title="搜索商店"
         open={isJoinShop}
         onCancel={onCancel}
-        onOk={function (): void {
-          throw new Error('Function not implemented.');
-        }}
+        onOk={onJoinOk}
+        onChange={onChange}
+        dataSource={dataSource || []}
       />
     </div>
   );

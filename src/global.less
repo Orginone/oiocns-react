@@ -28,6 +28,7 @@
   border-radius: @border-radius-base;
   margin: @margin-xs @margin-lg;
   max-height: 684px;
+  min-height: 90px;
   overflow-y: auto;
 }
 
@@ -48,6 +49,20 @@
 // more ··· 下拉操作菜单样式  end
 .ogo-result-title {
   font-size: 20px;
+}
+
+// 全局树结构
+.ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
+  background-color: #f2f6fc;
+}
+.ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
+  display: none;
+}
+.ogo-tree-indent-unit {
+  width: 8px !important;
+}
+.ogo-tree-switcher {
+  width: 16px !important;
 }
 
 // 弹性布局 start

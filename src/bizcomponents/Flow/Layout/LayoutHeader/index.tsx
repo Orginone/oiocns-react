@@ -7,6 +7,7 @@ import {
   PlusOutlined,
   ExclamationCircleOutlined,
   EditOutlined,
+  RollbackOutlined,
 } from '@ant-design/icons';
 import { Select, Button, message, Modal, Input } from 'antd';
 import { useAppwfConfig } from '@/module/flow/flow';
@@ -15,6 +16,7 @@ type LayoutHeaderProps = {
   OnPreview: Function;
   OnExit: Function;
   [key: string]: any;
+  backTable: () => void;
 };
 const { confirm } = Modal;
 /**
@@ -22,6 +24,7 @@ const { confirm } = Modal;
  * @returns
  */
 const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => {
+  const { backTable } = props;
   const form = useAppwfConfig((state: any) => state.form);
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -55,13 +58,13 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
     message.warning('该功能尚未开放');
   };
   return (
-    <>
+    <div className={cls['all-content']}>
       <div className={cls['layout-title']}>
         {form.formId && (
           <div className={cls['layout-header']}>
-            <span className={cls['layout-title-business']}>
+            {/* <span className={cls['layout-title-business']}>
               业务名：{form.formName || form.business || form.formId}
-            </span>
+            </span> */}
             <span className={cls['layout-titlebinding']}>
               绑定已有流程：
               <Select
@@ -97,10 +100,16 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
           退出
         </Button> */}
           </div>
-          <div className={cls['el-menu-demo']}>
-            <span className={cls['el-menu-demo-span']}>流程设计</span>
-          </div>
           <div className={cls['publish']}>
+            <Button
+              className={cls['publish-preview']}
+              size="small"
+              onClick={() => {
+                backTable();
+              }}>
+              <RollbackOutlined />
+              返回表格
+            </Button>
             <Button className={cls['publish-preview']} size="small" onClick={preview}>
               <EyeOutlined />
               预览
@@ -130,7 +139,7 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
