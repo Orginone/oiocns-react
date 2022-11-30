@@ -49,7 +49,6 @@ const AppCardComp: React.FC<AppCardType> = ({
     return <Menu items={operation && operation(data)} />;
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -88,14 +87,14 @@ const AppCardComp: React.FC<AppCardType> = ({
           {data[typeName] ? <Tag>{data[typeName]}</Tag> : ''}
         </li> */}
         <li className="card-content-date">
-          创建于 {data.target.createTime || '--'}
           <span style={{ float: 'right' }} className="app-size">
             归属:apex
           </span>
         </li>
         <li className="card-content-date">我的身份:管理员</li>
+        <li className="card-content-date">群组编号:{data.target.code}</li>
         <li className="card-content-date">
-          群组编号:{data.target.code}
+          <span>创建于 {data.target.createTime || '--'}</span>
           <a type="link" style={{ float: 'right' }} onClick={() => setIsModalOpen(true)}>
             详情
           </a>
@@ -107,7 +106,7 @@ const AppCardComp: React.FC<AppCardType> = ({
         onOk={handleOk}
         width={850}
         onCancel={handleCancel}>
-        <CohortMemberList />
+        <CohortMemberList cohortData={data} />
       </Modal>
     </div>
   );
