@@ -30,9 +30,7 @@ import { IFileSystemItem, IObjectItem } from '@/ts/core/store/ifilesys';
 import Plan, { TaskModel } from '../plan';
 import ResetNameModal from '../components/ResetName';
 import { FaHourglassEnd, FaHourglassHalf } from 'react-icons/fa';
-// import { ImDownload, ImFilesEmpty, ImRedo } from 'react-icons/im';
 import { ProTable } from '@ant-design/pro-components';
-
 import CoppyOrMove from '../components/CoppyOrMove';
 import { getItemMenu } from '../components/CommonMenu';
 type NameValue = {
@@ -150,7 +148,7 @@ const LeftTree = () => {
         break;
       case '2': // 重命名
         setReNameKey(node.key);
-        setCreateFileName(node.title);
+        setCreateFileName(node.name);
         setTitle('重命名');
         setIsModalOpen(true);
         break;
@@ -199,8 +197,7 @@ const LeftTree = () => {
             </Typography.Link>
             <Typography.Link
               onClick={() => {
-                docsCtrl.current?.loadChildren(true);
-                docsCtrl.changCallback();
+                handleMenuClick('刷新', {});
               }}>
               <im.ImSpinner9 />
             </Typography.Link>
@@ -211,14 +208,10 @@ const LeftTree = () => {
             </Upload>
             <Typography.Link
               onClick={() => {
-                setReNameKey('');
-                setTitle('新建文件夹');
-                setCreateFileName('');
-                setIsModalOpen(true);
+                handleMenuClick('新建文件夹', {});
               }}>
               <FolderAddFilled />
             </Typography.Link>
-            {/* <div style={{ width: '100%', cursor: 'pointer' }}> */}
             <Breadcrumb separator={<CaretRightOutlined />}>
               {getBreadcrumb(current?.key ?? '', []).map((item) => {
                 return (
@@ -449,7 +442,8 @@ const LeftTree = () => {
         taskList={taskList}
         onClose={() => {
           setOpen(false);
-        }}></Plan>
+        }}
+      />
     </>
   );
 };

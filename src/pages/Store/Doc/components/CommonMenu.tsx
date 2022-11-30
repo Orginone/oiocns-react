@@ -20,15 +20,7 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
       ),
       label: '刷新',
     },
-    {
-      key: '上传',
-      icon: (
-        <a>
-          <ImUpload />
-        </a>
-      ),
-      label: '上传',
-    },
+
     {
       key: '新建文件夹',
       icon: (
@@ -51,11 +43,44 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
     },
   ];
   if (el.key === '') {
-    return main;
+    return isTree
+      ? main
+      : [
+          main[0],
+          {
+            key: '上传',
+            icon: (
+              <a>
+                <ImUpload />
+              </a>
+            ),
+            label: '上传',
+          },
+          main[1],
+        ];
   } else if (el.key === '主目录') {
     return isTree ? [...main, ...copy] : copy;
   } else {
     const menus = [
+      {
+        key: '2',
+        icon: (
+          <a>
+            <FaEdit />
+          </a>
+        ),
+        label: `重命名`,
+      },
+      {
+        key: '3',
+        icon: (
+          <a>
+            <ImRedo />
+          </a>
+        ),
+        label: '移动到',
+      },
+      ...copy,
       {
         key: '1',
         icon: (
@@ -80,26 +105,7 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
           '下载'
         ),
       },
-      {
-        key: '2',
-        icon: (
-          <a>
-            <FaEdit />
-          </a>
-        ),
-        label: `重命名`,
-      },
-      {
-        key: '3',
-        icon: (
-          <a>
-            <ImRedo />
-          </a>
-        ),
-        label: '移动到',
-      },
-      ...copy,
     ];
-    return isTree ? [...main, ...menus] : menus;
+    return isTree ? [...menus] : menus;
   }
 };
