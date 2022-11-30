@@ -1,9 +1,4 @@
-import {
-  ApartmentOutlined,
-  EllipsisOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { ReactElement, useMemo, useState } from 'react';
@@ -229,37 +224,39 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
           {node.searchTitle || node.title}
         </div>
-        <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
-          {mouseOverItem.key === node.key ? (
-            <>
-              {handleAddClick ? (
-                <PlusOutlined
-                  className={cls.titleIcon}
-                  onClick={() => handleAddClick(node)}
-                />
-              ) : (
-                ''
-              )}
-              <Dropdown
-                menu={
-                  menu
-                    ? {
-                        items: renderMenu(node),
-                        onClick: ({ key }) => {
-                          handleMenuClick && handleMenuClick(key, node);
-                        },
-                      }
-                    : undefined
-                }
-                placement="bottom"
-                trigger={['click']}>
-                <EllipsisOutlined className={cls.titleIcon} rotate={90} />
-              </Dropdown>
-            </>
-          ) : (
-            ''
-          )}
-        </div>
+        {menu && (
+          <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
+            {mouseOverItem.key === node.key ? (
+              <>
+                {handleAddClick ? (
+                  <PlusOutlined
+                    className={cls.titleIcon}
+                    onClick={() => handleAddClick(node)}
+                  />
+                ) : (
+                  ''
+                )}
+                <Dropdown
+                  menu={
+                    menu
+                      ? {
+                          items: renderMenu(node),
+                          onClick: ({ key }) => {
+                            handleMenuClick && handleMenuClick(key, node);
+                          },
+                        }
+                      : undefined
+                  }
+                  placement="bottom"
+                  trigger={['click']}>
+                  <EllipsisOutlined className={cls.titleIcon} rotate={90} />
+                </Dropdown>
+              </>
+            ) : (
+              ''
+            )}
+          </div>
+        )}
       </div>
     );
   };
