@@ -141,13 +141,17 @@ const StoreClassify: React.FC = () => {
   };
   /*******
    * @desc: 目录更多操作 触发事件
-   * @param {'重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'} key
+   * @param {'新增子级','重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'} key
    * @param {object} param1
    * @return {*}
    */
   const handleMenuClick = (key: string, data: any) => {
     console.log('目录更多操作', key, data);
     switch (key) {
+      case '新增子级':
+        selectMenuInfo = data;
+        setIsStoreOpen(true);
+        break;
       case '重命名':
         handleMenuChagnge(data.title, data.id, '重命名');
         break;
@@ -186,10 +190,8 @@ const StoreClassify: React.FC = () => {
             title={'我的分类'}
             menu={menu}
             searchable
-            draggable
             treeData={list}
             handleTitleClick={handleTitleClick}
-            handleAddClick={handleAddShop}
             handleMenuClick={handleMenuClick}
           />
         )}

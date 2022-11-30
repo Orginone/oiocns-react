@@ -1,9 +1,9 @@
 import { Card, Modal } from 'antd';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
-import { BtnGroupDiv } from '@/components/CommonComp';
+import { BtnGroupDiv } from '@/components/BtnGroupComp';
 import PutawayComp from './Putaway';
 import ShareComp from '../components/ShareComp';
 import CreateApp from './CreatApp'; // 上架弹窗
