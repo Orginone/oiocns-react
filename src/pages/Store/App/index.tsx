@@ -33,9 +33,8 @@ const StoreApp: React.FC = () => {
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
-  const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
-  const [deleteId, setDeleteId] = useState<string>('');
-  const shareRef = useRef<any>(null);
+  const [checkNodes, setCheckNodes] = useState<any>({});
+  const [productObj, setProductObj] = useState<any>({});
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
     StoreContent.marketTableCallBack = setData;
@@ -73,8 +72,10 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const onCheckeds = (checkedValus: any) => {
-    setCheckNodes(checkedValus);
+  const onCheckeds = (type: string, checkedValus: any) => {
+    console.log('输出选择', type, checkedValus);
+
+    setCheckNodes({ type, checkedValus });
   };
 
   /**
@@ -83,7 +84,7 @@ const StoreApp: React.FC = () => {
    */
   const onOk = () => {
     setIsDeleteOpen(false);
-    productCtrl.deleteProduct(deleteId);
+    productCtrl.deleteProduct(productObj?._prod?.id);
   };
 
   /**
@@ -96,10 +97,9 @@ const StoreApp: React.FC = () => {
 
   // 共享确认回调
   const submitShare = () => {
-    console.log('当前被选中的每一项', checkNodes);
     console.log(
-      '测试测试测试',
-      shareRef,
+      '共享确认回调',
+      checkNodes,
       // departHisData,
       // authorData,
       // personsData,
@@ -108,7 +108,7 @@ const StoreApp: React.FC = () => {
       // identitysHisData,
     );
 
-    setShowShareModal(false);
+    // setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
@@ -156,7 +156,6 @@ const StoreApp: React.FC = () => {
         label: '共享',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          shareRef.current?.resetData();
           setShowShareModal(true);
         },
       },
@@ -165,7 +164,7 @@ const StoreApp: React.FC = () => {
         label: '移除',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          setDeleteId(item?._prod?.id);
+          setProductObj(item);
           setIsDeleteOpen(true);
         },
       },
@@ -240,7 +239,7 @@ const StoreApp: React.FC = () => {
         deleOrQuit="delete"
         onOk={onOk}
         onCancel={onCancel}
-        content="森应用"
+        content={productObj?._prod?.name}
       />
       {/* 详情页面 /store/app/info*/}
       <Route

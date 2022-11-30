@@ -196,7 +196,11 @@ const SettingDept: React.FC = () => {
       </div>
     </div>
   );
-  // 部门信息内容
+
+  /**
+   * @description: 部门信息内容
+   * @return {*}
+   */
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>

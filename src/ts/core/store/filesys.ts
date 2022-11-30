@@ -103,10 +103,11 @@ export class FileSystemItem implements IFileSystemItem {
         operate: BucketOpreates.Move,
       });
       if (res.success) {
-        const index = this.parent?.children.findIndex((item) => {
-          return item.key == this.key;
-        });
-        if (index && index > -1) {
+        const index =
+          this.parent?.children.findIndex((item) => {
+            return item.key == this.key;
+          }) ?? -1;
+        if (index > -1) {
           this.parent?.children.splice(index, 1);
         }
         destination.target.hasSubDirectories = true;
@@ -117,7 +118,6 @@ export class FileSystemItem implements IFileSystemItem {
     return false;
   }
   async loadChildren(reload: boolean = false): Promise<boolean> {
-    console.log('刷新树', this.target);
     if (this.target.isDirectory && (reload || this.children.length < 1)) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
         shareDomain: 'user',

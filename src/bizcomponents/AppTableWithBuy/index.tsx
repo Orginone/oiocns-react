@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import cls from './index.module.less';
-
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
 import { Link } from 'react-router-dom';
+import ProductDetailModal from '@/components/ProductDetailModal';
 
 interface AppShowCompType {
   className: string;
@@ -26,6 +26,8 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   // const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+  const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
+  const [data, setData] = useState<any>({});
   const parentRef = useRef<any>(null); //父级容器Dom
   useEffect(() => {
     setTotal(list?.length || 0);
@@ -50,6 +52,14 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const handleBuyAppFun = (type: 'buy' | 'join', selectItem: any) => {
     console.log('购买', type, selectItem.name, selectItem.id);
   };
+
+  /**
+   * @description: 关闭详情
+   * @return {*}
+   */
+  const onClose = () => {
+    setIsProduce(false);
+  };
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -73,7 +83,9 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         key: 'detail',
         label: '详情',
         onClick: () => {
-          console.log('按钮事件', 'detail', item);
+          setIsProduce(true);
+          setData(item);
+          console.log('详情详情详情详情', item);
         },
       },
     ];
@@ -118,6 +130,12 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         page={page}
         onChange={handlePageChange}
         rowKey={'id'}
+      />
+      <ProductDetailModal
+        open={isProduce}
+        title="应用详情"
+        onClose={onClose}
+        data={data}
       />
     </div>
   );
