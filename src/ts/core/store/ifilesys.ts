@@ -63,4 +63,10 @@ export interface IFileSystemItem {
    * @param {OnProgressType} onProgress 进度回调
    */
   upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void>;
+  /**
+   * 下载文件
+   * @param path 下载保存路径
+   * @param onProgress 进度回调
+   */
+  download(path: string, onProgress: OnProgressType): Promise<void>;
 }
