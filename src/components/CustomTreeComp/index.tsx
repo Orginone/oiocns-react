@@ -79,6 +79,10 @@ const StoreClassifyTree: React.FC<TreeType> = ({
     });
   };
 
+  /*******
+   * @desc: 过滤功能 //TODO:
+   * @param {React} e
+   */
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const newExpandedKeys = resetTreeData.map((item: any) => {
@@ -90,6 +94,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
     // .filter(
     //   (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
     // );
+    // 自动展示匹配项
     console.log('newExpandedKeys', newExpandedKeys);
 
     // setExpandedKeys(newExpandedKeys as React.Key[]);
@@ -123,10 +128,6 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       });
     return loop(treeData);
   }, [searchValue, treeData]);
-
-  function onRightClick() {
-    setVisibleMenu(true);
-  }
 
   const renderTreeTitle = (node: any) => {
     return (
