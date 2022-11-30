@@ -30,9 +30,7 @@ import { IFileSystemItem, IObjectItem } from '@/ts/core/store/ifilesys';
 import Plan, { TaskModel } from '../plan';
 import ResetNameModal from '../components/ResetName';
 import { FaHourglassEnd, FaHourglassHalf } from 'react-icons/fa';
-// import { ImDownload, ImFilesEmpty, ImRedo } from 'react-icons/im';
 import { ProTable } from '@ant-design/pro-components';
-
 import CoppyOrMove from '../components/CoppyOrMove';
 import { getItemMenu } from '../components/CommonMenu';
 type NameValue = {
@@ -150,7 +148,7 @@ const LeftTree = () => {
         break;
       case '2': // 重命名
         setReNameKey(node.key);
-        setCreateFileName(node.title);
+        setCreateFileName(node.name);
         setTitle('重命名');
         setIsModalOpen(true);
         break;
@@ -188,6 +186,7 @@ const LeftTree = () => {
   return (
     <>
       <Card
+        className={cls.pageCard}
         title={
           <Space wrap split={<Divider type="vertical" />} size={2}>
             <Typography.Link
@@ -199,8 +198,7 @@ const LeftTree = () => {
             </Typography.Link>
             <Typography.Link
               onClick={() => {
-                docsCtrl.current?.loadChildren(true);
-                docsCtrl.changCallback();
+                handleMenuClick('刷新', {});
               }}>
               <im.ImSpinner9 />
             </Typography.Link>
@@ -211,14 +209,10 @@ const LeftTree = () => {
             </Upload>
             <Typography.Link
               onClick={() => {
-                setReNameKey('');
-                setTitle('新建文件夹');
-                setCreateFileName('');
-                setIsModalOpen(true);
+                handleMenuClick('新建文件夹', {});
               }}>
               <FolderAddFilled />
             </Typography.Link>
-            {/* <div style={{ width: '100%', cursor: 'pointer' }}> */}
             <Breadcrumb separator={<CaretRightOutlined />}>
               {getBreadcrumb(current?.key ?? '', []).map((item) => {
                 return (
@@ -233,10 +227,8 @@ const LeftTree = () => {
                 );
               })}
             </Breadcrumb>
-            {/* </div> */}
           </Space>
         }
-        className={cls.container}
         extra={
           <Space wrap split={<Divider type="vertical" />} size={2}>
             <Typography.Link
@@ -365,26 +357,22 @@ const LeftTree = () => {
                           <Card
                             size="small"
                             hoverable
-                            // bordered={false}
-                            // className={cls.fileBox}
+                            bordered={false}
                             key={el.key}
                             onDoubleClick={() => {
                               docsCtrl.open(el.key);
                             }}
                             onContextMenu={(e) => {
                               e.stopPropagation();
-                            }}
-                            cover={
-                              <div className={cls.fileImage}>
-                                <Image
-                                  width={'100%'}
-                                  height={getPreview(el) ? 100 : 60}
-                                  src={getThumbnail(el)}
-                                  fallback="/icons/default_file.svg"
-                                  preview={getPreview(el)}
-                                />
-                              </div>
-                            }>
+                            }}>
+                            <div className={cls.fileImage}>
+                              <Image
+                                height={getPreview(el) ? 'auto' : 60}
+                                src={getThumbnail(el)}
+                                fallback="/icons/default_file.svg"
+                                preview={getPreview(el)}
+                              />
+                            </div>
                             <div className={cls.fileName} title={el.name}>
                               <Typography.Text title={el.name} ellipsis>
                                 {el.name}
@@ -413,43 +401,14 @@ const LeftTree = () => {
           title={coppyOrMoveTitle}
           onChange={setMoveModalOpen}
         />
-        {/* <Modal
-          destroyOnClose
-          title={title}
-          open={isModalOpen}
-          onOk={async () => {
-            setIsModalOpen(false);
-            if (createFileName != '') {
-              if (title === '重命名') {
-                if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
-                  docsCtrl.changCallback();
-                }
-              } else {
-                if (await docsCtrl.current?.create(createFileName)) {
-                  docsCtrl.changCallback();
-                }
-              }
-            }
-          }}
-          onCancel={() => {
-            setCreateFileName('');
-            setIsModalOpen(false);
-          }}>
-          <Input
-            defaultValue={createFileName}
-            onChange={(e: any) => {
-              setCreateFileName(e.target.value);
-            }}
-            placeholder={title}
-          />
-        </Modal>*/}
       </Card>
       <Plan
         isOpen={open}
         taskList={taskList}
         onClose={() => {
           setOpen(false);
-        }}></Plan>
+        }}
+      />
     </>
   );
 };

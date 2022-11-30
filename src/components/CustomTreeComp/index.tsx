@@ -17,6 +17,7 @@ interface TreeType {
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   title?: ReactElement | string;
   isDirectoryTree?: boolean; //是否文档树
+  className?: any; // 树的css
   [key: string]: any; // 其他属性方法
 }
 const { DirectoryTree } = Tree;
@@ -50,6 +51,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   handleMenuClick,
   handleTitleClick,
   onDoubleClickTitle,
+  className,
   ...rest
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
@@ -224,39 +226,37 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
           {node.searchTitle || node.title}
         </div>
-        {menu && (
-          <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
-            {mouseOverItem.key === node.key ? (
-              <>
-                {handleAddClick ? (
-                  <PlusOutlined
-                    className={cls.titleIcon}
-                    onClick={() => handleAddClick(node)}
-                  />
-                ) : (
-                  ''
-                )}
+        <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
+          {mouseOverItem.key === node.key ? (
+            <>
+              {handleAddClick ? (
+                <PlusOutlined
+                  className={cls.titleIcon}
+                  onClick={() => handleAddClick(node)}
+                />
+              ) : (
+                ''
+              )}
+              {menu ? (
                 <Dropdown
-                  menu={
-                    menu
-                      ? {
-                          items: renderMenu(node),
-                          onClick: ({ key }) => {
-                            handleMenuClick && handleMenuClick(key, node);
-                          },
-                        }
-                      : undefined
-                  }
+                  menu={{
+                    items: renderMenu(node),
+                    onClick: ({ key }) => {
+                      handleMenuClick && handleMenuClick(key, node);
+                    },
+                  }}
                   placement="bottom"
                   trigger={['click']}>
                   <EllipsisOutlined className={cls.titleIcon} rotate={90} />
                 </Dropdown>
-              </>
-            ) : (
-              ''
-            )}
-          </div>
-        )}
+              ) : (
+                ''
+              )}
+            </>
+          ) : (
+            ''
+          )}
+        </div>
       </div>
     );
   };
@@ -274,7 +274,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {isDirectoryTree ? (
         <DirectoryTree
-          className="draggable-tree"
+          className={className}
           // switcherIcon={<LeftCircleOutlined />}
           titleRender={renderTreeTitle}
           defaultExpandedKeys={expandedKeys}

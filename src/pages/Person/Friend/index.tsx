@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import personService from '@/module/org/person';
-
+import LookApply from '../../Setting/Dept/components/LookApply';
 import cls from './index.module.less';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { Person } from '@/module/org';
-import { PageData } from '@/module/typings';
 import Title from 'antd/lib/typography/Title';
-import { Button, Col, message, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Modal, Button } from 'antd';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import { ColumnsType } from 'antd/lib/table';
-import PersonInfoCard from '@/bizcomponents/PersonInfoCard';
 import { schema } from '../../../ts/base';
 import PersonInfoEnty from '../../../ts/core/provider';
 import friendController from '../../../ts/controller/friend/index';
@@ -67,10 +63,10 @@ const renderOperation = (item: schema.XTarget): OperationType[] => {
  * @returns
  */
 const PersonFriend: React.FC = () => {
-  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friend, setFriend] = useState<Person>();
   const [data, setData] = useState<schema.XTarget[]>([]);
+  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
 
   useEffect(() => {
     friendController.setCallBack(setData);
@@ -80,34 +76,14 @@ const PersonFriend: React.FC = () => {
   const getData = async () => {
     setData(await friendController.getMyFriend());
   };
-  // const mutation = useMutation((id: string) => personService.applyJoin(id), {
-  //   onSuccess: (data) => {
-  //     if (data.success) {
-  //       queryClient.invalidateQueries(['person.getFriends']);
-  //       message.success('添加好友成功!');
-  //     } else {
-  //       message.error(data.msg);
-  //     }
-  //   },
-  // });
-
-  // const renderCard = () => {
-  //   return data?.data.map((person: Person) => {
-  //     return (
-  //       <Col span={8} key={person.id}>
-  //         <div className={cls['person-frend-info-card']}>
-  //           <PersonInfoCard person={person} key={person.id} />
-  //         </div>
-  //       </Col>
-  //     );
-  //   });
-  // };
-
   const showModal = () => {
     setIsModalOpen(true);
   };
-
+  const onApplyOk = () => {
+    setLookApplyOpen(false);
+  };
   const handleOk = () => {
+    setLookApplyOpen(false);
     setIsModalOpen(false);
     // if (friend) {
     //   mutation.mutate(friend?.id);
@@ -131,8 +107,16 @@ const PersonFriend: React.FC = () => {
         <strong>我的好友</strong>
       </Title>
       <div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
-          加好友
+        <Button type="link" onClick={showModal}>
+          添加好友
+        </Button>
+
+        <Button
+          type="link"
+          onClick={() => {
+            setLookApplyOpen(true);
+          }}>
+          查看申请
         </Button>
       </div>
     </div>
@@ -163,6 +147,12 @@ const PersonFriend: React.FC = () => {
           }
         </div>
       </Modal>
+      <LookApply
+        title={'查看申请'}
+        open={isLookApplyOpen}
+        onOk={onApplyOk}
+        handleOk={handleOk}
+      />
     </div>
   );
 };

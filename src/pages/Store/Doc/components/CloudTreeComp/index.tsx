@@ -1,15 +1,10 @@
-// import { SearchOutlined } from '@ant-design/icons';
-// import { Input, Tree } from 'antd';
-// import { ImRedo, ImFilesEmpty, ImDownload } from 'react-icons/im';
-// import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-
 import React, { useEffect, useState } from 'react';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import ResetNameModal from '../ResetName';
 import CoppyOrMove from '../CoppyOrMove';
-import { getItemMenu } from '../CommonMenu';
-import { FolderOpenTwoTone, FolderTwoTone } from '@ant-design/icons';
+import { getIcon, getItemMenu } from '../CommonMenu';
+import cls from './index.module.less';
 
 const DocClassifyTree: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -17,17 +12,28 @@ const DocClassifyTree: React.FC = () => {
   const [reNameKey, setReNameKey] = useState<string>('');
   const [createFileName, setCreateFileName] = useState<string>('');
   const [modalTitle, setModalTitle] = useState<string>('新建文件夹');
-  // const [expKeys, setExpKeys] = useState(['']);
   const [treeData, setTreeData] = useState<any[]>();
   const [keys, setKeys] = useState([docsCtrl.current?.key ?? '']);
+  const [expKeys, setExpKeys] = useState([docsCtrl.current?.key ?? '']);
   const [coppyOrMoveTitle, setCoppyOrMoveTitle] = useState<string>('复制到');
   const [currentTaget, setCurrentTaget] = useState<any>(docsCtrl.current);
+
   const refreshUI = () => {
     if (docsCtrl.current) {
       setKeys([docsCtrl.current.key]);
+      let tkeys = docsCtrl.current.key.split('/');
+      tkeys.forEach((_, index) => {
+        const item = tkeys.slice(0, index + 1).join('/');
+        if (!expKeys.includes(item)) {
+          expKeys.push(item);
+        }
+      });
+      setExpKeys([...expKeys]);
+      setCurrentTaget(docsCtrl.current);
     }
     setTreeData([loadTreeData(docsCtrl.root)]);
   };
+
   const loadTreeData = (item: any) => {
     let result: any = {
       key: item.key,
@@ -51,23 +57,23 @@ const DocClassifyTree: React.FC = () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
-
+  const loadChild = async (node: any) => {
+    if (node.children.length === 0) await docsCtrl.open(node.key);
+  };
   const onSelect = (selectedKeys: string[]) => {
     if (selectedKeys.length > 0) {
       docsCtrl.open(selectedKeys[0]);
     }
   };
-  const getIcon = (props: { expanded: boolean; selected: boolean; isLeaf: boolean }) => {
-    // eslint-disable-next-line react/prop-types
-    const { expanded, selected, isLeaf } = props;
-    const color = '#c09553';
-    return expanded || (selected && isLeaf) ? (
-      <FolderOpenTwoTone twoToneColor={color} />
-    ) : (
-      <FolderTwoTone twoToneColor={color} />
-    );
+  const onExpand = (
+    expandedKeys: string[],
+    { expanded: bool, node }: { expanded: boolean; node: any },
+  ) => {
+    setExpKeys(expandedKeys);
+    if (expandedKeys.length > 0 && bool) {
+      loadChild(node);
+    }
   };
-
   const handleMenuClick = async (key: string, node: any) => {
     switch (key) {
       case '1': // 删除
@@ -111,6 +117,7 @@ const DocClassifyTree: React.FC = () => {
     <>
       {treeData && (
         <StoreClassifyTree
+          className={cls.docTree}
           title={'文档目录'}
           fieldNames={{ title: 'name' }}
           isDirectoryTree
@@ -118,9 +125,10 @@ const DocClassifyTree: React.FC = () => {
           searchable
           showIcon
           treeData={treeData}
-          defaultExpandedKeys={['']}
+          expandedKeys={expKeys}
           selectedKeys={keys}
           onSelect={onSelect}
+          onExpand={onExpand}
           handleMenuClick={handleMenuClick}
           icon={getIcon}
         />
@@ -130,37 +138,21 @@ const DocClassifyTree: React.FC = () => {
         open={isModalOpen}
         title={modalTitle}
         value={createFileName}
-        onChange={setIsModalOpen}
+        onChange={(val) => {
+          setIsModalOpen(val);
+          setCurrentTaget(docsCtrl.current);
+        }}
       />
       <CoppyOrMove
-        // treeData={docsCtrl.home?.parent}
         currentTaget={currentTaget}
         open={moveModalOpen}
         title={coppyOrMoveTitle}
-        onChange={setMoveModalOpen}
+        onChange={(val) => {
+          setMoveModalOpen(val);
+          setCurrentTaget(docsCtrl.current);
+        }}
       />
     </>
-    // <div>
-    //   <div className={cls.title}>全部分类</div>
-    //   <div className={cls.title}>
-    //     <Input size="small" prefix={<SearchOutlined />} placeholder="搜索分类" />
-    //   </div>
-    //   <Tree
-    //     className="draggable-tree"
-    //     blockNode
-    //     showIcon
-    //     treeData={treeData}
-    //     onSelect={onSelect}
-    //     selectedKeys={keys}
-    //     expandedKeys={expKeys}
-    //     onExpand={(keys) => {
-    //       setExpKeys(
-    //         keys.map((item) => {
-    //           return item.toString();
-    //         }),
-    //       );
-    //     }}></Tree>
-    // </div>
   );
 };
 

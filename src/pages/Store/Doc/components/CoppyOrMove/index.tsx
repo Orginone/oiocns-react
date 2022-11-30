@@ -2,13 +2,12 @@ import React, { Key, useMemo } from 'react';
 import { useState } from 'react';
 import { Modal, message, Tree } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
-import { FolderOpenTwoTone, FolderTwoTone } from '@ant-design/icons';
+import { getIcon } from '../CommonMenu';
 
 const { DirectoryTree } = Tree;
 
 const ResetNameModal = (props: {
   open: boolean;
-  // treeData: any[];
   title: string; // 弹出框名称
   currentTaget: any; // 需要操作的文件
   onChange: (val: boolean) => void;
@@ -45,7 +44,6 @@ const ResetNameModal = (props: {
       await node?.loadChildren(false);
       setSelectNode(node);
       setKeys(selectedKeys.toString());
-      // onSelect(selectedKeys as string[]);
     } else {
       setSelectNode(undefined);
     }
@@ -54,14 +52,6 @@ const ResetNameModal = (props: {
     setKeys('');
     setSelectNode(undefined);
     onChange(false);
-  };
-  const getIcon = ({ expanded }: { expanded: boolean }) => {
-    const color = '#c09553';
-    return expanded ? (
-      <FolderOpenTwoTone twoToneColor={color} />
-    ) : (
-      <FolderTwoTone twoToneColor={color} />
-    );
   };
   return (
     <Modal
