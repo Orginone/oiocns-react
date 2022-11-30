@@ -5,7 +5,8 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import { getItemMenu } from '../CommonMenu';
 import cls from '../../index.module.less';
-import { IFileSystemItem } from '@/ts/core/store/ifilesys';
+import { FileItemModel } from '@/ts/base/model';
+import { formatSize } from '@/ts/base/common';
 
 const TableContent = ({
   pageData,
@@ -15,10 +16,10 @@ const TableContent = ({
   parentRef,
 }: {
   parentRef: any;
-  pageData: IFileSystemItem[];
-  getThumbnail: (item: IFileSystemItem) => string;
-  handleMenuClick: (key: string, node: IFileSystemItem) => void;
-  getPreview: (node: IFileSystemItem) => false | { src: string };
+  pageData: FileItemModel[];
+  getThumbnail: (item: FileItemModel) => string;
+  handleMenuClick: (key: string, node: FileItemModel) => void;
+  getPreview: (node: FileItemModel) => false | { src: string };
 }) => {
   const [tableHeight, setTableHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -37,7 +38,7 @@ const TableContent = ({
     pageData && (
       <ProTable
         cardProps={{
-          bodyStyle: { padding: 0 },
+          bodyStyle: { padding: 0, cursor: 'pointer' },
         }}
         search={false}
         pagination={false}
@@ -46,22 +47,44 @@ const TableContent = ({
           {
             dataIndex: 'name',
             title: '名称',
+            ellipsis: {
+              showTitle: false,
+            },
             render: (_, record) => {
               return (
                 <Space>
                   <Image
+                    width={32}
                     height={32}
                     src={getThumbnail(record)}
                     fallback="/icons/default_file.svg"
                     preview={getPreview(record)}
                   />
-                  <Typography>{_}</Typography>
+                  <Typography.Text
+                    style={{ width: 300 }}
+                    ellipsis={true}
+                    title={_?.toString()}>
+                    {_}
+                  </Typography.Text>
                 </Space>
               );
             },
           },
           {
-            dataIndex: ['target', 'dateCreated'],
+            dataIndex: 'size',
+            title: '大小',
+            valueType: 'number',
+            width: 100,
+            render: (_, record) => <Typography>{formatSize(record.size)}</Typography>,
+          },
+          {
+            dataIndex: 'dateCreated',
+            title: '创建时间',
+            valueType: 'dateTime',
+            width: 200,
+          },
+          {
+            dataIndex: 'dateModified',
             title: '更新时间',
             valueType: 'dateTime',
             width: 200,

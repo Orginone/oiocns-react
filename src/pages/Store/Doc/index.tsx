@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Segmented, Card, Typography, UploadProps } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import { RcFile } from 'antd/lib/upload/interface';
-import { IFileSystemItem, IObjectItem } from '@/ts/core/store/ifilesys';
-import Plan, { TaskModel } from './plan';
+import TaskListComp, { TaskModel } from './components/TaskListComp';
 import ResetNameModal from './components/ResetName';
 import { FaHourglassEnd, FaHourglassHalf } from 'react-icons/fa';
 import CoppyOrMove from './components/CoppyOrMove';
@@ -12,6 +11,8 @@ import CardTiltle from './components/HeadContent';
 import CardListContent from './components/CardContent';
 import { IconFont } from '@/components/IconFont';
 import cls from './index.module.less';
+import { FileItemModel } from '@/ts/base/model';
+import { IObjectItem } from '@/ts/core/store/ifilesys';
 
 type NameValue = {
   name: string;
@@ -32,14 +33,14 @@ const StoreDoc: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [current, setCurrent] = useState(docsCtrl.current);
-  const [pageData, setPagedata] = useState<IFileSystemItem[]>([]);
+  const [pageData, setPagedata] = useState<FileItemModel[]>([]);
   const [createFileName, setCreateFileName] = useState<string>('');
   const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
   const uploadRef = useRef<any>();
   const parentRef = useRef<any>();
   const refreshUI = () => {
     if (docsCtrl.current != undefined) {
-      setPagedata([...docsCtrl.current.children]);
+      setPagedata(docsCtrl.current.childrenData);
       setCurrent({ ...docsCtrl.current });
     }
   };
@@ -82,30 +83,33 @@ const StoreDoc: React.FC = () => {
           }
           task.process = p;
           setTaskList([...taskList]);
+          if (p === 1) {
+            docsCtrl.changCallback();
+          }
         });
       }
     },
   };
-  const getThumbnail = (item: IFileSystemItem) => {
-    if (item.target.thumbnail.length > 0) {
-      return item.target.thumbnail;
+  const getThumbnail = (item: FileItemModel) => {
+    if (item.thumbnail.length > 0) {
+      return item.thumbnail;
     }
     let prifex = '/icons/';
-    if (item.target.extension === '') {
+    if (item.extension === '') {
       return prifex + 'default_folder.svg';
     } else {
       for (const d of dicExtension) {
-        if (d.name === item.target.extension.toLowerCase()) {
+        if (d.name === item.extension.toLowerCase()) {
           return prifex + 'file_type_' + d.value + '.svg';
         }
       }
     }
     return prifex + 'default_file.svg';
   };
-  const getPreview = (el: IFileSystemItem) => {
-    if (el.target.thumbnail?.length > 0) {
+  const getPreview = (el: FileItemModel) => {
+    if (el.thumbnail?.length > 0) {
       return {
-        src: '/orginone/anydata/bucket/load/' + el.target.shareLink,
+        src: '/orginone/anydata/bucket/load/' + el.shareLink,
       };
     }
     return false;
@@ -227,7 +231,7 @@ const StoreDoc: React.FC = () => {
         onChange={setMoveModalOpen}
       />
 
-      <Plan
+      <TaskListComp
         isOpen={open}
         taskList={taskList}
         onClose={() => {

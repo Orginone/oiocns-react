@@ -2,8 +2,7 @@ import React from 'react';
 import { Breadcrumb, Divider, Space, Typography, Upload, UploadProps } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import { IFileSystemItem } from '@/ts/core/store/ifilesys';
-import { ImSpinner9, ImArrowUp2, ImUpload } from 'react-icons/im';
-import { CaretRightOutlined, FolderAddFilled } from '@ant-design/icons';
+import { ImSpinner9, ImArrowUp2, ImUpload, ImFolderPlus, ImPlay3 } from 'react-icons/im';
 
 const getBreadcrumb = (key: string, items: any[]) => {
   const item = docsCtrl.refItem(key);
@@ -47,9 +46,9 @@ const CardTiltle = ({
       </Upload>
       <Typography.Link
         onClick={() => handleMenuClick('新建文件夹', {} as IFileSystemItem)}>
-        <FolderAddFilled />
+        <ImFolderPlus />
       </Typography.Link>
-      <Breadcrumb separator={<CaretRightOutlined />}>
+      <Breadcrumb separator={<ImPlay3 />}>
         {getBreadcrumb(current?.key ?? '', []).map((item) => {
           return (
             <Breadcrumb.Item key={item.key}>

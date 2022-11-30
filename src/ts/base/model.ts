@@ -793,6 +793,8 @@ export type FileItemModel = {
   name: string;
   /** 完整路径 */
   key: string;
+  /** 完整路径 */
+  size: number;
   /** 共享链接 */
   shareLink: string;
   /** 拓展名 */
