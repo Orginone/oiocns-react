@@ -6,7 +6,7 @@ import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 const ResetNameModal = (props: {
   open: boolean;
   title: string; // 弹出框名称
-  reNameKey: string; // 需要修改的值的key
+  reNameKey: string | undefined; // 需要修改的值的key
   value: string; // 需要修改的值
   onChange: (val: boolean) => void;
 }) => {
@@ -23,17 +23,25 @@ const ResetNameModal = (props: {
       open={open}
       onOk={async () => {
         if (createFileName != '') {
-          if (title === '重命名') {
+          if (title === '重命名' && reNameKey) {
             if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
               docsCtrl.changCallback();
             } else {
               message.error('更新失败，请稍后重试');
             }
           } else {
-            if (await docsCtrl.current?.create(createFileName)) {
-              docsCtrl.changCallback();
+            if (reNameKey !== undefined) {
+              if (await docsCtrl.refItem(reNameKey)?.create(createFileName)) {
+                docsCtrl.changCallback();
+              } else {
+                message.error('更新失败，请稍后重试');
+              }
             } else {
-              message.error('更新失败，请稍后重试');
+              if (await docsCtrl.current?.create(createFileName)) {
+                docsCtrl.changCallback();
+              } else {
+                message.error('更新失败，请稍后重试');
+              }
             }
           }
         }

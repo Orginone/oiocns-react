@@ -18,7 +18,7 @@ interface AppInfoType {
 const StoreAppInfo: React.FC<AppInfoType> = () => {
   // const BtnsList = ['编辑应用分配'];
   useEffect(() => {
-    console.log('{StoreContent.curProduct?.prod.version}', StoreContent.curProduct);
+    console.log('{StoreContent.curProduct?._prod.version}', StoreContent.curProduct);
   }, []);
 
   const history = useHistory();

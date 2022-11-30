@@ -1,11 +1,11 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu, Modal, Space, Typography } from 'antd';
+import { Avatar, Dropdown, Menu, Modal } from 'antd';
 import React, { useState } from 'react';
 import './index.less';
-import AppLogo from '@/assets/img/appLogo.png';
 import { MarketTypes } from 'typings/marketType';
 import Cohort from '@/ts/core/target/cohort';
 import CohortMemberList from '../CohortMemberList';
+
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -13,14 +13,11 @@ interface defaultObjType {
   desc: string;
   creatTime: string | number;
 }
-const { Text } = Typography;
 interface AppCardType {
   data: Cohort; //props
   className?: string;
   defaultKey?: defaultObjType; // 卡片字段 对应数据字段
-  // eslint-disable-next-line no-unused-vars
   onClick?: (event?: any) => void;
-  // eslint-disable-next-line no-unused-vars
   operation?: (_item: Cohort) => MarketTypes.OperationType[]; //操作区域数据
 }
 const defaultObj = {
@@ -32,7 +29,7 @@ const defaultObj = {
   creatTime: 'creatTime', //上架时间
 };
 
-const AppCardComp: React.FC<AppCardType> = ({
+const CohortCardComp: React.FC<AppCardType> = ({
   className,
   data,
   defaultKey,
@@ -50,10 +47,6 @@ const AppCardComp: React.FC<AppCardType> = ({
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
   const handleOk = () => {
     setIsModalOpen(false);
   };
@@ -61,6 +54,7 @@ const AppCardComp: React.FC<AppCardType> = ({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -84,18 +78,15 @@ const AppCardComp: React.FC<AppCardType> = ({
     <div className={`customCardWrap ${className}`}>
       <Title />
       <ul className="card-content">
-        {/* <li className="card-content-type con">
-          {data[typeName] ? <Tag>{data[typeName]}</Tag> : ''}
-        </li> */}
         <li className="card-content-date">
-          创建于 {data.target.createTime || '--'}
           <span style={{ float: 'right' }} className="app-size">
-            归属:apex
+            归属:{data.target.belongId}
           </span>
         </li>
         <li className="card-content-date">我的身份:管理员</li>
+        <li className="card-content-date">群组编号:{data.target.code}</li>
         <li className="card-content-date">
-          群组编号:{data.target.code}
+          <span>创建于 {data.target.createTime || '--'}</span>
           <a type="link" style={{ float: 'right' }} onClick={() => setIsModalOpen(true)}>
             详情
           </a>
@@ -107,10 +98,10 @@ const AppCardComp: React.FC<AppCardType> = ({
         onOk={handleOk}
         width={850}
         onCancel={handleCancel}>
-        <CohortMemberList />
+        <CohortMemberList cohortData={data} />
       </Modal>
     </div>
   );
 };
 
-export default AppCardComp;
+export default CohortCardComp;

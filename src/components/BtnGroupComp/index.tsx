@@ -12,6 +12,9 @@ interface BtnDivType {
   onClick?: Function;
 }
 
+/*******
+ * @desc:按钮组 统一组件
+ */
 export const BtnGroupDiv: React.FC<BtnDivType> = ({
   list,
   showDivider = true,

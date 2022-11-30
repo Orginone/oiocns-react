@@ -23,6 +23,7 @@ import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
 import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
 import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
+import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
 
 import { MenuProps } from 'antd';
 
@@ -35,6 +36,13 @@ const infoMenuItems = [
     icon: <ApartmentOutlined />,
     children: [],
     render: <TreeLeftDeptPage />,
+  },
+  {
+    label: '岗位设置',
+    key: 'position',
+    icon: <ApartmentOutlined />,
+    children: [],
+    render: <TreeLeftPosPage />,
   },
   {
     label: '集团设置',

@@ -1,9 +1,9 @@
 import { Card, Modal } from 'antd';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
-import { BtnGroupDiv } from '@/components/CommonComp';
+import { BtnGroupDiv } from '@/components/BtnGroupComp';
 import PutawayComp from './Putaway';
 import ShareComp from '../components/ShareComp';
 import CreateApp from './CreatApp'; // 上架弹窗
@@ -33,9 +33,8 @@ const StoreApp: React.FC = () => {
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
-  const [checkNodes, setCheckNodes] = useState<Array<any>>([]);
+  const [checkNodes, setCheckNodes] = useState<any>({});
   const [productObj, setProductObj] = useState<any>({});
-  const shareRef = useRef<any>(null);
   useEffect(() => {
     // storeContent.curPageType = 'myApps';
     StoreContent.marketTableCallBack = setData;
@@ -73,10 +72,6 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const onCheckeds = (checkedValus: any) => {
-    setCheckNodes(checkedValus);
-  };
-
   /**
    * @description: 移除确认
    * @return {*}
@@ -94,12 +89,16 @@ const StoreApp: React.FC = () => {
     setIsDeleteOpen(false);
   };
 
+  const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
+    console.log('输出选择', teamId, type, checkedValus);
+
+    setCheckNodes({ teamId, type, checkedValus });
+  };
   // 共享确认回调
   const submitShare = () => {
-    console.log('当前被选中的每一项', checkNodes);
     console.log(
-      '测试测试测试',
-      shareRef,
+      '共享确认回调',
+      checkNodes,
       // departHisData,
       // authorData,
       // personsData,
@@ -108,7 +107,12 @@ const StoreApp: React.FC = () => {
       // identitysHisData,
     );
 
-    setShowShareModal(false);
+    StoreContent.ShareProduct(
+      checkNodes.teamId,
+      checkNodes.checkedValus,
+      checkNodes.type,
+    );
+    // setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
@@ -156,7 +160,6 @@ const StoreApp: React.FC = () => {
         label: '共享',
         onClick: () => {
           StoreContent.selectedProduct(item);
-          shareRef.current?.resetData();
           setShowShareModal(true);
         },
       },

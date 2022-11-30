@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import AnyStore from './anystore';
 import StoreHub from './storehub';
 import type * as model from '../model';
@@ -2065,6 +2064,19 @@ export default class KernelApi {
       module: 'flow',
       action: 'DeleteFlowRelation',
       params: params,
+    });
+  }
+  /**
+   * 查询流程有关应用
+   * @returns {model.ResultType<model.IdWithNameModel[]>} 请求结果
+   */
+  public async queryApprovalProduct(): Promise<
+    model.ResultType<model.IdWithNameModel[]>
+  > {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryApprovalProduct',
+      params: {},
     });
   }
   /**
