@@ -1,15 +1,16 @@
 import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DownOutlined,
   PlusOutlined,
   MoreOutlined,
+  UserOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import settingController from '@/ts/controller/setting'
+import MarketClassifyTree from '@/components/CustomTreeComp';
+import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
-
 
 const x = 3;
 const y = 2;
@@ -77,30 +78,25 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   // 树结构
-  const [treeData, setTreeData] = useState<{}>([])
+  const [treeData, setTreeData] = useState<any[]>([]);
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectMenu, setSelectMenu] = useState<string>('');
 
- 
-
-  useEffect(() => { 
+  useEffect(() => {
     initData();
-  }, [])
-  
-  useEffect(() => { 
-    /** 监听页面是否需要更新 */ 
-    settingController.addListen('updateDeptTree', () => { 
+    /** 监听页面是否需要更新 */
+    settingController.addListen('updateDeptTree', () => {
       initData();
-    })
-  },[])
+    });
+  }, []);
 
   const initData = async () => {
-    const resultData = await settingController.getDepartments('381107910723375104');
+    const resultData = await settingController.getDepartments('0');
+    console.log('====查询部门', resultData);
     setTreeData(resultData);
-  }
-  
-
+  };
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -108,80 +104,63 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    const newExpandedKeys = dataList
-      .map((item) => {
-        if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key, defaultData);
-        }
-        return null;
-      })
-      .filter((item, i, self) => item && self.indexOf(item) === i);
-    setExpandedKeys(newExpandedKeys as React.Key[]);
-    setSearchValue(value);
-    setAutoExpandParent(true);
+    // const { value } = e.target;
+    // const newExpandedKeys = treeData
+    //   .map((item) => {
+    //     if (item.title.indexOf(value) > -1) {
+    //       return getParentKey(item.key, defaultData);
+    //     }
+    //     return null;
+    //   })
+    //   .filter((item, i, self) => item && self.indexOf(item) === i);
+    // setExpandedKeys(newExpandedKeys as React.Key[]);
+    // setSearchValue(value);
+    // setAutoExpandParent(true);
+    // 树过滤需要处理 TODO
+  };
+
+  const handleTitleClick = (node: any) => {
+    // 触发内容去变化
+  };
+
+  /**
+   * @desc: 创建新目录
+   * @param {any} item
+   * @return {*}
+   */
+  const handleAddClick = (node: any) => {
+    console.log('handleAddClick', node);
+    settingController.trigger('isOpenModal');
   };
 
   return (
     <div>
-        <Button
-          className={cls.creatgroup}
-          type="primary"
-          onClick={() => {
-            settingController.trigger('isOpenModal')
-          }}>
-          {createTitle}
-        </Button>
-      
-        <div className={cls.topMes}>
-          <Input
-            size="middle"
-            className={cls.inputStyle}
-            placeholder="搜索部门"
-            prefix={<SearchOutlined />}
-            onChange={onChange}
-          />
-          <div className={cls.joingroup}>创建的部门</div>
-          <Tree
-            onExpand={onExpand}
-            expandedKeys={expandedKeys}
-            switcherIcon={<DownOutlined />}
-            autoExpandParent={autoExpandParent}
-            treeData={treeData}
-            onSelect={(e) => { 
-              if (e && e.length>0) {
-                settingController.trigger('createDept', { id: e[0] })
-              }
-            }}
-            showIcon={true}
-            titleRender={(e) => {
-              return (
-                <div
-                  className={cls.rightstyle}
-                  onMouseOver={() => {
-                    setHoverItemMes(e.key);
-                  }}>
-                  {/* { e.icon? React.createElement(Icon[e.iconMes]):null} */}
-                  <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-                  {hoverItemMes === e.key ? (
-                    <Space>
-                      <span
-                        onClick={() => {
-                          settingController.trigger('isOpenModal')
-                        }}>
-                        <PlusOutlined />
-                      </span>
-                      <span>
-                        <MoreOutlined />
-                      </span>
-                    </Space>
-                  ) : null}
-                </div>
-              );
-            }}
-          />
-        </div>
-      
+      <Button
+        className={cls.creatgroup}
+        type="primary"
+        onClick={() => {
+          settingController.trigger('isOpenModal');
+        }}>
+        {createTitle}
+      </Button>
+
+      <div className={cls.topMes}>
+        <Input
+          size="middle"
+          className={cls.inputStyle}
+          placeholder="搜索部门"
+          prefix={<SearchOutlined />}
+          onChange={onChange}
+        />
+        <MarketClassifyTree
+          // childIcon={<UserOutlined />}
+          key={selectMenu}
+          handleTitleClick={handleTitleClick}
+          handleAddClick={handleAddClick}
+          treeData={treeData}
+          title={'全部部门'}
+        />
+      </div>
     </div>
   );
 };
