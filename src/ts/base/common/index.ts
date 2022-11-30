@@ -1,4 +1,5 @@
 export { CharCode } from './charCode';
+export { formatSize } from './format';
 export type { IDisposable } from './lifecycle';
 export { sleep } from './lifecycle';
 export {

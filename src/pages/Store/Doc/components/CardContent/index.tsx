@@ -1,10 +1,10 @@
 import { Dropdown, Image, Row, Col, Card, Typography } from 'antd';
 
 import React from 'react';
-import { IFileSystemItem } from '@/ts/core/store/ifilesys';
+import cls from '../../index.module.less';
 import { getItemMenu } from '../CommonMenu';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
-import cls from '../../index.module.less';
+import { FileItemModel } from '@/ts/base/model';
 
 const CardListContent = ({
   pageData,
@@ -12,12 +12,12 @@ const CardListContent = ({
   getPreview,
   getThumbnail,
 }: {
-  pageData: IFileSystemItem[];
-  getThumbnail: (item: IFileSystemItem) => string;
-  handleMenuClick: (key: string, node: IFileSystemItem) => void;
-  getPreview: (node: IFileSystemItem) => false | { src: string };
+  pageData: FileItemModel[];
+  getThumbnail: (item: FileItemModel) => string;
+  handleMenuClick: (key: string, node: FileItemModel) => void;
+  getPreview: (node: FileItemModel) => false | { src: string };
 }) => {
-  const FileCard = (el: IFileSystemItem) => (
+  const FileCard = (el: FileItemModel) => (
     <Dropdown
       menu={{
         items: getItemMenu(el),
@@ -56,9 +56,9 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: getItemMenu({ key: '' }),
+        items: getItemMenu(undefined),
         onClick: ({ key }) => {
-          handleMenuClick(key, {} as IFileSystemItem);
+          handleMenuClick(key, {} as FileItemModel);
         },
       }}
       trigger={['contextMenu']}>

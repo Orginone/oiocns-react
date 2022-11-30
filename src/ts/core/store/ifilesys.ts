@@ -21,6 +21,8 @@ export interface IFileSystemItem {
   parent: IObjectItem;
   /** 下级文件系统项数组 */
   children: IFileSystemItem[];
+  /** 下级文件系统数据 */
+  childrenData: FileItemModel[];
   /**
    * 根据名称查询子文件系统项
    * @param name 名称

@@ -24,7 +24,7 @@ type PlanType = {
   onClose: () => void;
 };
 
-const Plan: React.FC<PlanType> = (props: PlanType) => {
+const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
   const taskGroup = () => {
     let group: GroupTaskModel[] = [];
     props.taskList
@@ -94,4 +94,4 @@ const Plan: React.FC<PlanType> = (props: PlanType) => {
     </>
   );
 };
-export default Plan;
+export default TaskListComp;
