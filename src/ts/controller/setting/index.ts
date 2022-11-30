@@ -135,6 +135,7 @@ class SettingController extends BaseController {
         arrays.push(spaceObj);
       }
     }
+    return arrays;
   }
   /**
    * 创建一级部门
