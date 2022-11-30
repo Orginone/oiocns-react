@@ -1,25 +1,15 @@
 import React, { useState, useEffect } from 'react';
-// import cls from './index.module.less';
-import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
-import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
-import { message, Modal } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
-import JsonFrom from '../../../../components/SchemaForm';
-import { Card, Input, List, Result, Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 import { schema } from '../../../../ts/base';
 import CohortController from '../../../../ts/controller/cohort/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import Cohort from '../../../../ts/core/target/cohort';
-import { Person } from '@/module/org';
 import type { ProColumns } from '@ant-design/pro-components';
 interface indexType {
   searchCallback: Function;
   cohort: Cohort;
-}
-
-interface selectType {
-  selectedRowKeys: string[];
-  selectedRows: Person[];
 }
 
 const CohortPerson: React.FC<indexType> = (props) => {
@@ -28,12 +18,8 @@ const CohortPerson: React.FC<indexType> = (props) => {
   }, []);
 
   const [data, setData] = useState<schema.XTarget[]>([]);
-  // const tableAlertRender = (selectedRowKeys: selectType) => {
-  //   console.log("输出值")
-  //   props.searchCallback(selectedRowKeys.selectedRows[0]);
-  // };
+
   const [value, setValue] = useState<string>();
-  // const [persons, setPersons] = useState<Person[]>([]);
   const getTableList = async () => {
     const res = await CohortController.getCohortPeronList(props.cohort);
     setData(res);
@@ -103,7 +89,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
         dataSource={data}
         total={10}
         page={1}
-        // tableAlertRender={tableAlertRender}
         rowSelection={{
           type: 'radio',
           onSelect: (record: any, selected: any, selectedRows: any) => {
@@ -114,11 +99,8 @@ const CohortPerson: React.FC<indexType> = (props) => {
         tableAlertRender={false}
         tableAlertOptionRender={false}
         showChangeBtn={false}
-        // defaultPageType={'table'}
         hideOperation={true}
         columns={cohortColumn as any}
-        // style={divStyle}
-        // onChange={handlePageChange}
         rowKey={'id'}
       />
     </>

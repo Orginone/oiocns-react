@@ -11,11 +11,17 @@ export class MarketController extends BaseController {
   private _curProd: BaseProduct | undefined;
   /** 可用应用 */
   private _usefulProds: BaseProduct[] | undefined;
+  /**
+   * @description: 搜索到的商店
+   * @return {*}
+   */
+  public searchMarket: any;
 
   constructor(target: IPerson | ICompany) {
     super();
     this._target = target;
     this._usefulProds = [];
+    this.searchMarket = [];
   }
   /** 获得所有市场 */
   public get getMarkets() {
@@ -113,5 +119,18 @@ export class MarketController extends BaseController {
   public async quitMarket(id: string) {
     await this._target.quitMarket(id);
     this.changCallback();
+  }
+
+  /**
+   * @description: 根据编号查询市场
+   * @param {string} code
+   * @return {*}
+   */
+  public async getMarketByCode(code: string) {
+    const res = await this._target.getMarketByCode(code);
+    if (res?.success && res?.data?.result != undefined) {
+      this.searchMarket = res?.data?.result;
+    }
+    return this.searchMarket;
   }
 }

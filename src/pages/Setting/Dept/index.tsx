@@ -9,12 +9,15 @@ import { columns } from './config';
 import { dataSource } from './datamock';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
-import AddDeptModal from './components/AddDeptModal';
+import AddPostModal from '@/bizcomponents/AddPositionModal';
+// import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
 import settingController from '@/ts/controller/setting';
 import { initDatatype } from '@/ts/core/setting/isetting';
+import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
+
 /**
  * 部门设置
  * @returns
@@ -224,7 +227,7 @@ const SettingDept: React.FC = () => {
           onClick={() => {
             setIsSetPost(true);
           }}>
-          岗位设置
+          身份设置
         </Button>
         <Button
           type="link"
@@ -249,7 +252,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title="浙江省财政厅"
+            title={settingCtrl.getCurWorkSpace?.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}
@@ -265,6 +268,7 @@ const SettingDept: React.FC = () => {
               operation={renderOperation}
               columns={columns as any}
               parentRef={parentRef}
+              showChangeBtn={false}
             />
           </div>
         </div>
@@ -308,13 +312,8 @@ const SettingDept: React.FC = () => {
         onOk={onOk}
         handleOk={handleOk}
       />
-      {/* 岗位设置 */}
-      <AddDeptModal
-        title={'岗位设置'}
-        open={isSetPost}
-        onOk={handlePostOk}
-        handleOk={onOk}
-      />
+      {/* 对象设置 */}
+      <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
     </div>
   );
 };

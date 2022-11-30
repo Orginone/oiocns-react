@@ -1,5 +1,4 @@
 import type { ColumnsType } from 'antd/es/table';
-
 export const columns: ColumnsType<any> = [
   {
     title: '序号',
@@ -10,23 +9,22 @@ export const columns: ColumnsType<any> = [
     },
   },
   {
-    title: '商店名称',
+    title: '账号',
     dataIndex: 'caption',
   },
   {
-    title: '商店编码',
+    title: '昵称',
     dataIndex: 'marketId',
   },
   {
-    title: '商店简介',
+    title: '姓名',
     dataIndex: 'typeName',
   },
   {
-    title: '商店归属',
-    dataIndex: 'sellAuth',
-  },
-  {
-    title: '商店创建',
+    title: '手机号',
     dataIndex: 'sellAuth',
   },
 ];
+
+
+
