@@ -237,21 +237,21 @@ const StoreClassifyTree: React.FC<TreeType> = ({
               ) : (
                 ''
               )}
-              <Dropdown
-                menu={
-                  menu
-                    ? {
-                        items: renderMenu(node),
-                        onClick: ({ key }) => {
-                          handleMenuClick && handleMenuClick(key, node);
-                        },
-                      }
-                    : undefined
-                }
-                placement="bottom"
-                trigger={['click']}>
-                <EllipsisOutlined className={cls.titleIcon} rotate={90} />
-              </Dropdown>
+              {menu ? (
+                <Dropdown
+                  menu={{
+                    items: renderMenu(node),
+                    onClick: ({ key }) => {
+                      handleMenuClick && handleMenuClick(key, node);
+                    },
+                  }}
+                  placement="bottom"
+                  trigger={['click']}>
+                  <EllipsisOutlined className={cls.titleIcon} rotate={90} />
+                </Dropdown>
+              ) : (
+                ''
+              )}
             </>
           ) : (
             ''
