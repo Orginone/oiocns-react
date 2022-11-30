@@ -76,7 +76,7 @@ const newPosition = (props: Iprops) => {
       footer={null}>
       <BetaSchemaForm<DataItem>
         shouldUpdate={false}
-        layoutType="Embed"
+        layoutType="Form"
         onFinish={async (values) => {
           console.log('finish===', values);
           onOk(values);

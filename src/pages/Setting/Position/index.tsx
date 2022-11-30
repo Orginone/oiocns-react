@@ -10,7 +10,7 @@ import { dataSource } from './datamock';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
-// import AddDeptModal from './components/AddDeptModal';
+import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 // import settingStore from '@/store/setting';
@@ -106,6 +106,15 @@ const SettingDept: React.FC = () => {
     });
   }, []);
 
+  useEffect(() => {
+    settingController.addListen('isSetPost', () => {
+      setIsSetPost(true);
+    });
+    return settingController.remove('isSetPost', () => {
+      setIsSetPost(false);
+    });
+  }, []);
+
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
@@ -185,6 +194,7 @@ const SettingDept: React.FC = () => {
           type="link"
           onClick={() => {
             console.log('指派岗位');
+            settingController.trigger('isSetPost');
           }}>
           指派岗位
         </Button>
@@ -256,8 +266,13 @@ const SettingDept: React.FC = () => {
         onOk={onOk}
         handleOk={handleOk}
       />
-      {/* 对象设置 */}
-      <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      {/* 岗位设置 */}
+      <AddDeptModal
+        title={'岗位设置'}
+        open={isSetPost}
+        onOk={handlePostOk}
+        handleOk={onOk}
+      />
     </div>
   );
 };

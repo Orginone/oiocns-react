@@ -12,6 +12,62 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
 
+const x = 3;
+const y = 2;
+const z = 1;
+const defaultData: DataNode[] = [];
+
+const generateData = (_level: number, _preKey?: React.Key, _tns?: DataNode[]) => {
+  const preKey = _preKey || '0';
+  const tns = _tns || defaultData;
+
+  const children = [];
+  for (let i = 0; i < x; i++) {
+    const key = `${preKey}-${i}`;
+    tns.push({ title: key, key });
+    if (i < y) {
+      children.push(key);
+    }
+  }
+  if (_level < 0) {
+    return tns;
+  }
+  const level = _level - 1;
+  children.forEach((key, index) => {
+    tns[index].children = [];
+    return generateData(level, key, tns[index].children);
+  });
+};
+generateData(z);
+
+const dataList: { key: React.Key; title: string }[] = [];
+const generateList = (data: DataNode[]) => {
+  for (let i = 0; i < data.length; i++) {
+    const node = data[i];
+    const { key } = node;
+    dataList.push({ key, title: key as string });
+    if (node.children) {
+      generateList(node.children);
+    }
+  }
+};
+generateList(defaultData);
+
+const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+  let parentKey: React.Key;
+  for (let i = 0; i < tree.length; i++) {
+    const node = tree[i];
+    if (node.children) {
+      if (node.children.some((item) => item.key === key)) {
+        parentKey = node.key;
+      } else if (getParentKey(key, node.children)) {
+        parentKey = getParentKey(key, node.children);
+      }
+    }
+  }
+  return parentKey!;
+};
+
 type CreateGroupPropsType = {
   createTitle: string;
   onClick?: () => void;
@@ -22,7 +78,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   // 树结构
-  const [treeData, setTreeData] = useState<{}>([]);
+  const [treeData, setTreeData] = useState<any[]>([]);
 
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -48,25 +104,22 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    const newExpandedKeys = dataList
-      .map((item) => {
-        if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key, defaultData);
-        }
-        return null;
-      })
-      .filter((item, i, self) => item && self.indexOf(item) === i);
-    setExpandedKeys(newExpandedKeys as React.Key[]);
-    setSearchValue(value);
-    setAutoExpandParent(true);
+    // const { value } = e.target;
+    // const newExpandedKeys = treeData
+    //   .map((item) => {
+    //     if (item.title.indexOf(value) > -1) {
+    //       return getParentKey(item.key, defaultData);
+    //     }
+    //     return null;
+    //   })
+    //   .filter((item, i, self) => item && self.indexOf(item) === i);
+    // setExpandedKeys(newExpandedKeys as React.Key[]);
+    // setSearchValue(value);
+    // setAutoExpandParent(true);
+    // 树过滤需要处理 TODO
   };
 
   const handleTitleClick = (node: any) => {
-    // 触发内容去变化
-  };
-
-  const handleMenuClick = (_key: string, node: any) => {
     // 触发内容去变化
   };
 
