@@ -186,6 +186,7 @@ const LeftTree = () => {
   return (
     <>
       <Card
+        className={cls.pageCard}
         title={
           <Space wrap split={<Divider type="vertical" />} size={2}>
             <Typography.Link
@@ -226,10 +227,8 @@ const LeftTree = () => {
                 );
               })}
             </Breadcrumb>
-            {/* </div> */}
           </Space>
         }
-        className={cls.container}
         extra={
           <Space wrap split={<Divider type="vertical" />} size={2}>
             <Typography.Link
@@ -358,8 +357,6 @@ const LeftTree = () => {
                           <Card
                             size="small"
                             hoverable
-                            // bordered={false}
-                            // className={cls.fileBox}
                             key={el.key}
                             onDoubleClick={() => {
                               docsCtrl.open(el.key);
@@ -367,17 +364,25 @@ const LeftTree = () => {
                             onContextMenu={(e) => {
                               e.stopPropagation();
                             }}
-                            cover={
-                              <div className={cls.fileImage}>
-                                <Image
-                                  width={'100%'}
-                                  height={getPreview(el) ? 100 : 60}
-                                  src={getThumbnail(el)}
-                                  fallback="/icons/default_file.svg"
-                                  preview={getPreview(el)}
-                                />
-                              </div>
-                            }>
+                            // cover={
+                            //   <div className={cls.fileImage}>
+                            //     <Image
+                            //       // width={'auto'}
+                            //       height={getPreview(el) ? 80 : 60}
+                            //       src={getThumbnail(el)}
+                            //       fallback="/icons/default_file.svg"
+                            //       preview={getPreview(el)}
+                            //     />
+                            //   </div>
+                            // }
+                          >
+                            <div className={cls.fileImage}>
+                              <Image
+                                height={getPreview(el) ? 80 : 60}
+                                src={getThumbnail(el)}
+                                fallback="/icons/default_file.svg"
+                                preview={getPreview(el)}></Image>
+                            </div>
                             <div className={cls.fileName} title={el.name}>
                               <Typography.Text title={el.name} ellipsis>
                                 {el.name}
@@ -406,36 +411,6 @@ const LeftTree = () => {
           title={coppyOrMoveTitle}
           onChange={setMoveModalOpen}
         />
-        {/* <Modal
-          destroyOnClose
-          title={title}
-          open={isModalOpen}
-          onOk={async () => {
-            setIsModalOpen(false);
-            if (createFileName != '') {
-              if (title === '重命名') {
-                if (await docsCtrl.refItem(reNameKey)?.rename(createFileName)) {
-                  docsCtrl.changCallback();
-                }
-              } else {
-                if (await docsCtrl.current?.create(createFileName)) {
-                  docsCtrl.changCallback();
-                }
-              }
-            }
-          }}
-          onCancel={() => {
-            setCreateFileName('');
-            setIsModalOpen(false);
-          }}>
-          <Input
-            defaultValue={createFileName}
-            onChange={(e: any) => {
-              setCreateFileName(e.target.value);
-            }}
-            placeholder={title}
-          />
-        </Modal>*/}
       </Card>
       <Plan
         isOpen={open}

@@ -3,8 +3,7 @@ import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import ResetNameModal from '../ResetName';
 import CoppyOrMove from '../CoppyOrMove';
-import { getItemMenu } from '../CommonMenu';
-import { FolderOpenTwoTone, FolderTwoTone } from '@ant-design/icons';
+import { getIcon, getItemMenu } from '../CommonMenu';
 import cls from './index.module.less';
 
 const DocClassifyTree: React.FC = () => {
@@ -13,7 +12,6 @@ const DocClassifyTree: React.FC = () => {
   const [reNameKey, setReNameKey] = useState<string>('');
   const [createFileName, setCreateFileName] = useState<string>('');
   const [modalTitle, setModalTitle] = useState<string>('新建文件夹');
-  // const [expKeys, setExpKeys] = useState(['']);
   const [treeData, setTreeData] = useState<any[]>();
   const [keys, setKeys] = useState([docsCtrl.current?.key ?? '']);
   const [coppyOrMoveTitle, setCoppyOrMoveTitle] = useState<string>('复制到');
@@ -53,17 +51,6 @@ const DocClassifyTree: React.FC = () => {
       docsCtrl.open(selectedKeys[0]);
     }
   };
-  const getIcon = (props: { expanded: boolean; selected: boolean; isLeaf: boolean }) => {
-    // eslint-disable-next-line react/prop-types
-    const { expanded, selected, isLeaf } = props;
-    const color = '#c09553';
-    return expanded || (selected && isLeaf) ? (
-      <FolderOpenTwoTone twoToneColor={color} />
-    ) : (
-      <FolderTwoTone twoToneColor={color} />
-    );
-  };
-
   const handleMenuClick = async (key: string, node: any) => {
     switch (key) {
       case '1': // 删除
@@ -130,34 +117,12 @@ const DocClassifyTree: React.FC = () => {
         onChange={setIsModalOpen}
       />
       <CoppyOrMove
-        // treeData={docsCtrl.home?.parent}
         currentTaget={currentTaget}
         open={moveModalOpen}
         title={coppyOrMoveTitle}
         onChange={setMoveModalOpen}
       />
     </>
-    // <div>
-    //   <div className={cls.title}>全部分类</div>
-    //   <div className={cls.title}>
-    //     <Input size="small" prefix={<SearchOutlined />} placeholder="搜索分类" />
-    //   </div>
-    //   <Tree
-    //     className="draggable-tree"
-    //     blockNode
-    //     showIcon
-    //     treeData={treeData}
-    //     onSelect={onSelect}
-    //     selectedKeys={keys}
-    //     expandedKeys={expKeys}
-    //     onExpand={(keys) => {
-    //       setExpKeys(
-    //         keys.map((item) => {
-    //           return item.toString();
-    //         }),
-    //       );
-    //     }}></Tree>
-    // </div>
   );
 };
 
