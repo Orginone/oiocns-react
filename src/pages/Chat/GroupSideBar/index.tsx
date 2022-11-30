@@ -220,7 +220,7 @@ const GroupSideBar: React.FC = () => {
   ];
   return (
     <div className={sideStyle.chart_side_wrap}>
-      <ContentMenu width={280}>
+      <ContentMenu width={300}>
         <div className={sideStyle.group_side_bar_search}>
           <Input
             placeholder="搜索"

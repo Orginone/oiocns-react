@@ -60,7 +60,11 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
   };
   return (
     <>
-      <Drawer title="进度" placement="right" onClose={props.onClose} open={props.isOpen}>
+      <Drawer
+        title="操作记录"
+        placement="right"
+        onClose={props.onClose}
+        open={props.isOpen}>
         {taskGroup().map((g) => {
           return (
             <div key={g.group} className={cls['box']}>
@@ -81,7 +85,7 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
                       className={cls['mod_children_img']}
                     />
                     <div className={cls['mod_children_content']}>
-                      <div>{t.name}</div>
+                      <div className={cls.name}>{t.name}</div>
                       <Progress percent={getProcess(t.process)} width={70} />
                     </div>
                   </div>

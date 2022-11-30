@@ -136,9 +136,9 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void> {
+  async upload(name: string, file: Blob, p: OnProgressType): Promise<IObjectItem> {
     if (!this.findByName(name)) {
-      onProgress?.apply(this, [0]);
+      p?.apply(this, [0]);
       let data: BucketOpreateModel = {
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -164,13 +164,18 @@ export class FileSystemItem implements IFileSystemItem {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
           return;
-        } else if (end === file.size && res.data) {
-          this.children.push(new FileSystemItem(res.data, this));
         }
         index++;
-        onProgress?.apply(this, [(end * 1.0) / file.size]);
+        if (end === file.size && res.data) {
+          const node = new FileSystemItem(res.data, this);
+          this.children.push(node);
+          p?.apply(this, [1]);
+          return node;
+        }
+        p?.apply(this, [(end * 1.0) / file.size]);
       }
     }
+    return;
   }
   download(path: string, onProgress: OnProgressType): Promise<void> {
     throw new Error('Method not implemented.');
@@ -236,3 +241,21 @@ export class FileSystemItem implements IFileSystemItem {
     return node;
   }
 }
+
+/** 根目录 */
+export const rootDir = new FileSystemItem(
+  {
+    key: '',
+    size: 0,
+    name: '根目录',
+    isDirectory: true,
+    extension: '',
+    thumbnail: '',
+    shareLink: '',
+    contentType: '',
+    hasSubDirectories: true,
+    dateCreated: new Date(),
+    dateModified: new Date(),
+  },
+  undefined,
+);

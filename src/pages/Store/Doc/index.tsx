@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Segmented, Card, Typography, UploadProps } from 'antd';
+import { Segmented, Card, Typography, UploadProps, Upload } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
-import { RcFile } from 'antd/lib/upload/interface';
 import TaskListComp, { TaskModel } from './components/TaskListComp';
 import ResetNameModal from './components/ResetName';
-import { FaHourglassEnd, FaHourglassHalf } from 'react-icons/fa';
+import { FaTasks } from 'react-icons/fa';
 import CoppyOrMove from './components/CoppyOrMove';
 import TableContent from './components/TableContent';
 import CardTiltle from './components/HeadContent';
@@ -52,41 +51,21 @@ const StoreDoc: React.FC = () => {
       }
     });
     const id = docsCtrl.subscribe(refreshUI);
+    docsCtrl.subscribePart('taskList', (taskList: any) => {
+      setTaskList([...taskList]);
+    });
     return () => {
       docsCtrl.unsubscribe(id);
+      docsCtrl.unsubscribePart('taskList');
     };
   }, []);
-  const Uploading = () => {
-    for (const t of taskList) {
-      if (t.process < 1) {
-        return true;
-      }
-    }
-    return false;
-  };
   const uploadProps: UploadProps = {
     multiple: true,
     showUploadList: false,
     async customRequest(options) {
-      if (docsCtrl.current) {
-        const file: RcFile = options.file as RcFile;
-        const task: TaskModel = {
-          process: 0,
-          name: file.name,
-          size: file.size,
-          createTime: new Date(),
-          group: docsCtrl.current.name,
-        };
-        docsCtrl.current?.upload(file.name, file, (p) => {
-          if (p === 0) {
-            taskList.push(task);
-          }
-          task.process = p;
-          setTaskList([...taskList]);
-          if (p === 1) {
-            docsCtrl.changCallback();
-          }
-        });
+      const file = options.file as File;
+      if (docsCtrl.current && file) {
+        docsCtrl.upload(docsCtrl.current.key, file.name, file);
       }
     },
   };
@@ -149,7 +128,7 @@ const StoreDoc: React.FC = () => {
         setCreateFileName('');
         setIsModalOpen(true);
         break;
-      case '上传': // 刷新
+      case '上传': // 上传
         if (uploadRef && uploadRef.current && uploadRef.current.upload) {
           uploadRef.current.upload.uploader.onClick();
         }
@@ -161,17 +140,10 @@ const StoreDoc: React.FC = () => {
   return (
     <Card
       className={cls.pageCard}
-      title={
-        <CardTiltle
-          handleMenuClick={handleMenuClick}
-          props={uploadProps}
-          current={current}
-          uploadRef={uploadRef}
-        />
-      }
+      title={<CardTiltle handleMenuClick={handleMenuClick} current={current} />}
       extra={
         <Typography.Link onClick={() => setOpen(true)}>
-          {Uploading() ? <FaHourglassHalf /> : <FaHourglassEnd />}
+          <FaTasks fontSize={18}></FaTasks>
         </Typography.Link>
       }
       bordered={false}>
@@ -238,6 +210,7 @@ const StoreDoc: React.FC = () => {
           setOpen(false);
         }}
       />
+      <Upload {...uploadProps} ref={uploadRef}></Upload>
     </Card>
   );
 };
