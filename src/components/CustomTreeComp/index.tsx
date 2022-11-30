@@ -1,9 +1,4 @@
-import {
-  ApartmentOutlined,
-  EllipsisOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { EllipsisOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { ReactElement, useMemo, useState } from 'react';
@@ -22,6 +17,7 @@ interface TreeType {
   handleMenuClick?: (_key: string, node: any) => void; //点击更多按钮事件
   title?: ReactElement | string;
   isDirectoryTree?: boolean; //是否文档树
+  className?: any; // 树的css
   [key: string]: any; // 其他属性方法
 }
 const { DirectoryTree } = Tree;
@@ -55,6 +51,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   handleMenuClick,
   handleTitleClick,
   onDoubleClickTitle,
+  className,
   ...rest
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
@@ -240,21 +237,21 @@ const StoreClassifyTree: React.FC<TreeType> = ({
               ) : (
                 ''
               )}
-              <Dropdown
-                menu={
-                  menu
-                    ? {
-                        items: renderMenu(node),
-                        onClick: ({ key }) => {
-                          handleMenuClick && handleMenuClick(key, node);
-                        },
-                      }
-                    : undefined
-                }
-                placement="bottom"
-                trigger={['click']}>
-                <EllipsisOutlined className={cls.titleIcon} rotate={90} />
-              </Dropdown>
+              {menu ? (
+                <Dropdown
+                  menu={{
+                    items: renderMenu(node),
+                    onClick: ({ key }) => {
+                      handleMenuClick && handleMenuClick(key, node);
+                    },
+                  }}
+                  placement="bottom"
+                  trigger={['click']}>
+                  <EllipsisOutlined className={cls.titleIcon} rotate={90} />
+                </Dropdown>
+              ) : (
+                ''
+              )}
             </>
           ) : (
             ''
@@ -277,7 +274,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {isDirectoryTree ? (
         <DirectoryTree
-          className="draggable-tree"
+          className={className}
           // switcherIcon={<LeftCircleOutlined />}
           titleRender={renderTreeTitle}
           defaultExpandedKeys={expandedKeys}

@@ -1,8 +1,3 @@
-// import { SearchOutlined } from '@ant-design/icons';
-// import { Input, Tree } from 'antd';
-// import { ImRedo, ImFilesEmpty, ImDownload } from 'react-icons/im';
-// import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-
 import React, { useEffect, useState } from 'react';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import StoreClassifyTree from '@/components/CustomTreeComp';
@@ -10,6 +5,7 @@ import ResetNameModal from '../ResetName';
 import CoppyOrMove from '../CoppyOrMove';
 import { getItemMenu } from '../CommonMenu';
 import { FolderOpenTwoTone, FolderTwoTone } from '@ant-design/icons';
+import cls from './index.module.less';
 
 const DocClassifyTree: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -111,6 +107,7 @@ const DocClassifyTree: React.FC = () => {
     <>
       {treeData && (
         <StoreClassifyTree
+          className={cls.docTree}
           title={'文档目录'}
           fieldNames={{ title: 'name' }}
           isDirectoryTree
