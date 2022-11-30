@@ -61,7 +61,8 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   console.log('props', props);
-  const delNode = () => {
+  const delNode = (e) => {
+    e.preventDefault();
     props.onDelNode();
   };
   const select = () => {
@@ -109,20 +110,26 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   // );
 
   const nodeContent = (
-    <div className={cls['node-body-right']} onClick={select}>
-      <div>
+    <div className={cls['node-body-right']}>
+      <div onClick={select}>
         <span className={cls['name-title']}>{props.title}</span>
       </div>
       <div>
         {!props.content && (
-          <span className={cls['placeholder']}>{props.placeholder}</span>
+          <span onClick={select} className={cls['placeholder']}>
+            {props.placeholder}
+          </span>
         )}
-        {props.content && <span className={cls['name-title']}>{props.content}</span>}
+        {props.content && (
+          <span onClick={select} className={cls['name-title']}>
+            {props.content}
+          </span>
+        )}
         {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
         {!props.isRoot && (
           <CloseOutlined
             className={cls['iconPosition']}
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '12px', display: 'block' }}
             onClick={delNode}
           />
         )}

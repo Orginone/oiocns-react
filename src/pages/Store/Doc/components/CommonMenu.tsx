@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import { FolderAddFilled } from '@ant-design/icons';
+import { FolderAddFilled, FolderOpenTwoTone, FolderTwoTone } from '@ant-design/icons';
 import { ImRedo, ImFilesEmpty, ImDownload, ImSpinner9, ImUpload } from 'react-icons/im';
 
 const downFile = (el: any) => {
@@ -20,15 +20,7 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
       ),
       label: '刷新',
     },
-    {
-      key: '上传',
-      icon: (
-        <a>
-          <ImUpload />
-        </a>
-      ),
-      label: '上传',
-    },
+
     {
       key: '新建文件夹',
       icon: (
@@ -51,11 +43,44 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
     },
   ];
   if (el.key === '') {
-    return main;
+    return isTree
+      ? main
+      : [
+          main[0],
+          {
+            key: '上传',
+            icon: (
+              <a>
+                <ImUpload />
+              </a>
+            ),
+            label: '上传',
+          },
+          main[1],
+        ];
   } else if (el.key === '主目录') {
     return isTree ? [...main, ...copy] : copy;
   } else {
     const menus = [
+      {
+        key: '2',
+        icon: (
+          <a>
+            <FaEdit />
+          </a>
+        ),
+        label: `重命名`,
+      },
+      {
+        key: '3',
+        icon: (
+          <a>
+            <ImRedo />
+          </a>
+        ),
+        label: '移动到',
+      },
+      ...copy,
       {
         key: '1',
         icon: (
@@ -80,26 +105,22 @@ export const getItemMenu = (el: any, isTree?: boolean) => {
           '下载'
         ),
       },
-      {
-        key: '2',
-        icon: (
-          <a>
-            <FaEdit />
-          </a>
-        ),
-        label: `重命名`,
-      },
-      {
-        key: '3',
-        icon: (
-          <a>
-            <ImRedo />
-          </a>
-        ),
-        label: '移动到',
-      },
-      ...copy,
     ];
-    return isTree ? [...main, ...menus] : menus;
+    return isTree ? [...menus] : menus;
   }
+};
+
+export const getIcon = (props: {
+  expanded: boolean;
+  selected: boolean;
+  isLeaf: boolean;
+}) => {
+  // eslint-disable-next-line react/prop-types
+  const { expanded, selected, isLeaf } = props;
+  const color = '#c09553';
+  return expanded || (selected && isLeaf) ? (
+    <FolderOpenTwoTone twoToneColor={color} />
+  ) : (
+    <FolderTwoTone twoToneColor={color} />
+  );
 };
