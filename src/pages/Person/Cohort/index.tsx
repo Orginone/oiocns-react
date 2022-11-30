@@ -2,7 +2,6 @@ import { Button, Space, Tabs, Card, Modal, message } from 'antd';
 import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import PersonInfo from '../../../bizcomponents/PersonInfo/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
@@ -32,7 +31,6 @@ const CohortConfig: React.FC = () => {
   });
   const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
-  // console.log('workSpaceId', PersonInfoEnty.getWorkSpace());
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
@@ -72,7 +70,6 @@ const CohortConfig: React.FC = () => {
       console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
-        // console.log(chat);
         if (id == chat.target.id) {
           console.log(chat);
           return chat;
@@ -141,9 +138,7 @@ const CohortConfig: React.FC = () => {
         label: '解散群组',
         onClick: () => {
           console.log(CohortController.deleteCohort(Person, item.target.id));
-          // newCohortServices.deleteCohort(param);
           message.info('解散成功');
-          // getTableList();
         },
       },
     ];
@@ -245,9 +240,6 @@ const CohortConfig: React.FC = () => {
   };
   return (
     <div>
-      {/* <div>
-        <PersonInfo />
-      </div> */}
       <Card>
         <div className={cls['person-info-content-header']}>
           <Title level={2}>
@@ -310,7 +302,6 @@ const CohortConfig: React.FC = () => {
           </div>
         </div>
         <Tabs
-          // style = {}
           defaultActiveKey="1"
           onChange={onChange}
           items={[
@@ -324,20 +315,12 @@ const CohortConfig: React.FC = () => {
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
-                  rowSelection={
-                    {
-                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                      // 注释该行则默认不显示下拉选项
-                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                      // defaultSelectedRowKeys: [1],
-                    }
-                  }
+                  rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
-                  // style={divStyle}
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />
@@ -353,20 +336,12 @@ const CohortConfig: React.FC = () => {
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
-                  rowSelection={
-                    {
-                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                      // 注释该行则默认不显示下拉选项
-                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                      // defaultSelectedRowKeys: [1],
-                    }
-                  }
+                  rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
                   columns={cohortColumn as any}
-                  // style={divStyle}
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />
