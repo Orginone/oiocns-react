@@ -203,6 +203,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (res.success && res.data.result != undefined) {
       this.joinedFriend = res.data.result;
     }
+
     return this.joinedFriend;
   }
   public async applyFriend(target: schema.XTarget): Promise<ResultType<any>> {

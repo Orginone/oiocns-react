@@ -59,8 +59,6 @@ export default class BaseController {
   public unsubscribePart(FunKey: string): void {
     if (this._Callback.has(FunKey)) {
       this._Callback.delete(FunKey);
-    } else {
-      throw new Error('暂无该订阅回调:   ' + FunKey);
     }
   }
 
@@ -73,8 +71,6 @@ export default class BaseController {
     if (this._Callback.has(FunKey)) {
       const Fun = this._Callback.get(FunKey);
       Fun!(params);
-    } else {
-      throw new Error('暂无该订阅回调:  ' + FunKey);
     }
   }
 }

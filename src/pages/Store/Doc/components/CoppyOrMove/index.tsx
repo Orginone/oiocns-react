@@ -1,63 +1,96 @@
-import React, { Key } from 'react';
+import React, { Key, useMemo } from 'react';
 import { useState } from 'react';
 import { Modal, message, Tree } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import { getIcon } from '../CommonMenu';
+
+const { DirectoryTree } = Tree;
 
 const ResetNameModal = (props: {
   open: boolean;
-  treeData: any[];
   title: string; // 弹出框名称
   currentTaget: any; // 需要操作的文件
-  onSelect: (keys: string[]) => void;
   onChange: (val: boolean) => void;
 }) => {
-  const { open, title, onChange, treeData, currentTaget, onSelect } = props;
-  const [keys, setKeys] = useState<string>('');
+  const { open, title, onChange, currentTaget } = props;
+  const [keys, setKeys] = useState<string>();
   const [selectNode, setSelectNode] = useState<any>();
-  const handleSelect = (selectedKeys: Key[], { selected }: { selected: boolean }) => {
+  const treeData = useMemo(() => {
+    const loadTreeData = (item: any) => {
+      let result: any = {
+        key: item.key,
+        title: item.name,
+        children: [],
+        isLeaf: !item.target.hasSubDirectories,
+      };
+      if (item.children.length > 0) {
+        for (let i = 0; i < item.children.length; i++) {
+          if (item.children[i].target.isDirectory) {
+            result.children.push(loadTreeData(item.children[i]));
+          }
+        }
+      }
+      return result;
+    };
+    const data = loadTreeData(docsCtrl.root);
+    return [data];
+  }, [currentTaget, keys]);
+  const handleSelect = async (
+    selectedKeys: Key[],
+    { selected }: { selected: boolean },
+  ) => {
     if (selected) {
-      setSelectNode(docsCtrl.refItem(selectedKeys.toString()));
+      const node = docsCtrl.refItem(selectedKeys.toString());
+      await node?.loadChildren(false);
+      setSelectNode(node);
       setKeys(selectedKeys.toString());
-      onSelect(selectedKeys as string[]);
     } else {
       setSelectNode(undefined);
     }
   };
+  const hideModal = () => {
+    setKeys('');
+    setSelectNode(undefined);
+    onChange(false);
+  };
   return (
     <Modal
       destroyOnClose
-      title={'"' + currentTaget.title + '"' + title}
+      title={'"' + currentTaget?.name + '"' + title}
       open={open}
       onOk={async () => {
-        if (keys) {
+        if (keys !== undefined) {
           if (title === '移动到') {
             if (await docsCtrl.refItem(currentTaget.key)?.move(selectNode)) {
               docsCtrl.changCallback();
+              message.success('移动文件成功');
+              docsCtrl.open(selectNode.key);
             } else {
-              message.error('更新失败，请稍后重试');
+              message.error('移动失败，请稍后重试');
             }
           } else {
             if (await docsCtrl.refItem(currentTaget.key)?.copy(selectNode)) {
               docsCtrl.changCallback();
+              message.success('复制文件成功');
+              docsCtrl.open(selectNode.key);
             } else {
-              message.error('更新失败，请稍后重试');
+              message.error('复制失败，请稍后重试');
             }
           }
         }
-        onChange(false);
+        hideModal();
       }}
       onCancel={() => {
-        setKeys('');
-        setSelectNode(undefined);
-        onChange(false);
+        hideModal();
       }}>
-      {open && (
-        <Tree
+      {open && treeData && (
+        <DirectoryTree
           blockNode
           showIcon
+          icon={getIcon}
           treeData={treeData}
           onSelect={handleSelect}
-          selectedKeys={[keys]}
+          selectedKeys={keys !== undefined ? [keys] : []}
           defaultExpandedKeys={['']}
         />
       )}

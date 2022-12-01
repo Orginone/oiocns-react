@@ -1,11 +1,13 @@
 import { CloseCircleOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import cls from './index.module.less';
 type ShareShowRecentProps = {
   departData: any[];
   deleteFuc: () => void;
 };
 const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
+  console.log('所选数据', props.departData);
+
   return (
     <div className={cls.layout}>
       <div className={cls.title}>已选{props.departData.length}条数据</div>

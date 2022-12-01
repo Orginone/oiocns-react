@@ -12,12 +12,18 @@
 
   .avatar {
     background-color: @primary-color;
-    font-size: small;
-    font-weight: normal;
+
+    :global {
+      .ogo-avatar-string {
+        font-size: medium;
+        font-weight: normal;
+      }
+    }
   }
   .space-list {
     width: 148px;
     white-space: nowrap;
+    font-size: medium;
   }
   .down-icon {
     font-size: small;
@@ -39,8 +45,10 @@
     left: -16px;
     width: 220px;
     line-height: @header-height;
+
     .menu-list {
-      height: 112px;
+      // height: 112px;
+      max-height: 224px;
       overflow-y: auto;
     }
     .item {

@@ -24,6 +24,10 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     this.publicMarkets = [];
     this.usefulResource = new Map();
   }
+  /**
+   * @description: 根据编号查询市场
+   * @return {*}
+   */
   public async getMarketByCode(
     name: string,
   ): Promise<model.ResultType<schema.XMarketArray>> {

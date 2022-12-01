@@ -1,6 +1,6 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
 import { Avatar, Button, Typography, Col } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
 interface defaultObjType {
@@ -10,7 +10,6 @@ interface defaultObjType {
   desc: string;
   creatTime: string | number;
 }
-const { Text } = Typography;
 interface AppCardType {
   data: schema.XTarget; //props
   className?: string;

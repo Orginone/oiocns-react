@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Person } from '../../module/org/index';
 import PersonInfoCard from './../PersonInfoCard';
 import CohortController from '../../ts/controller/cohort/index';
-import personService from '../../module/org/person';
 import cls from './index.module.less';
 import person from '../../ts/core/target/person';
 import { schema } from '../../ts/base';
