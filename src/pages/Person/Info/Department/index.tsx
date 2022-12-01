@@ -10,7 +10,7 @@ import { UserDept } from '@/module/org';
 import { User } from 'typings/user';
 
 import cls from './index.module.less';
-import SearchCompany from '@/bizcomponents/SearchCompany';
+// import SearchCompany from '@/bizcomponents/SearchCompany';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司

@@ -1,8 +1,8 @@
-import { Button, Space } from 'antd';
+import { Button, Card, Space } from 'antd';
 import Certificate from '@/components/CettificateComp';
 import { Typography, Divider } from 'antd';
-import React, { useState } from 'react';
-import Person from '../../../bizcomponents/PersonInfo/index';
+import React, { useRef } from 'react';
+import Person from '@/bizcomponents/PersonInfo/index';
 import { Page } from '@/module/typings';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from 'typings/Certificate';
@@ -16,6 +16,7 @@ import API from '@/services';
  * @returns
  */
 const PersonInfo: React.FC = () => {
+  const parentRef = useRef<any>();
   const service = new CertificateService({
     nameSpace: 'myCertificate',
     searchApi: API.product.searchOwnProduct,
@@ -76,6 +77,27 @@ const PersonInfo: React.FC = () => {
       address: '浙江财政',
       joinDate: '1999-12-10',
     },
+    {
+      id: '361171414561246656',
+      cardName: '福大大',
+      network: '只需中心城中心',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
+    },
+    {
+      id: '361171414562242656',
+      cardName: '福大大',
+      network: '只需中心城中心',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
+    },
+    {
+      id: '361171414562246636',
+      cardName: '福大大',
+      network: '只需中心城中心',
+      address: '浙江财政',
+      joinDate: '1999-12-10',
+    },
   ];
   // 卡片内容渲染函数
   // const renderCardFun = (dataArr: MarketTypes.certificateType[]): React.ReactNode[] => {
@@ -98,9 +120,7 @@ const PersonInfo: React.FC = () => {
   //   });
   // };
   const { Title } = Typography;
-  const divStyle: React.CSSProperties = {
-    marginTop: '55px',
-  };
+
   const renderOperation = (
     item: CertificateType.cerManageType,
   ): CertificateType.OperationType[] => {
@@ -176,49 +196,46 @@ const PersonInfo: React.FC = () => {
   // TODO 1、个人空间显示加入的公司；2、单位空间显示所在的部门、工作组、岗位
   return (
     <div className={cls['person-info-container']}>
-      <div>
+      <div className={cls['margin-bottom']}>
         <Person />
       </div>
-      <div>
-        <div className={cls['person-info-H']}>
-          <Title level={4}>证书管理</Title>
-        </div>
-        <div className={cls['person-info-link']}>
-          <Space split={<Divider type="vertical" />}>
+      <Card
+        bordered={false}
+        className={cls['certificate-container']}
+        title={<Title level={5}>证书管理</Title>}
+        extra={
+          <Space split={<Divider type="vertical" />} size={0}>
             <Button type="link">删除</Button>
             <Button type="link">查看申请记录</Button>
             <Button type="link">加入平台</Button>
             <Button type="link">创建地址</Button>
           </Space>
-        </div>
-      </div>
-      {/* <div className={cls['person-info-company']}>
-        <PersonInfoCompany></PersonInfoCompany>
-      </div> */}
-      <div>
-        <CardOrTable<CertificateType.cerManageType>
-          dataSource={list}
-          total={total}
-          page={Page}
-          tableAlertRender={tableAlertRender}
-          rowSelection={
-            {
-              // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-              // 注释该行则默认不显示下拉选项
-              // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-              // defaultSelectedRowKeys: [1],
+        }>
+        <div className={cls.tableBox} ref={parentRef}>
+          <CardOrTable<CertificateType.cerManageType>
+            dataSource={list}
+            total={total}
+            page={Page}
+            tableAlertRender={tableAlertRender}
+            parentRef={parentRef}
+            rowSelection={
+              {
+                // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+                // 注释该行则默认不显示下拉选项
+                // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                // defaultSelectedRowKeys: [1],
+              }
             }
-          }
-          renderCardContent={renderCardFun}
-          // defaultPageType={'table'}
-          showChangeBtn={true}
-          operation={renderOperation}
-          columns={certificateColumn as any}
-          style={divStyle}
-          // onChange={handlePageChange}
-          rowKey={'id'}
-        />
-      </div>
+            renderCardContent={renderCardFun}
+            // defaultPageType={'table'}
+            showChangeBtn={true}
+            operation={renderOperation}
+            columns={certificateColumn as any}
+            // onChange={handlePageChange}
+            rowKey={'id'}
+          />
+        </div>
+      </Card>
     </div>
   );
 };

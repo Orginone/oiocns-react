@@ -1,13 +1,7 @@
-import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
+import { Input, Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
-import {
-  DownOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  UserOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
@@ -74,15 +68,13 @@ type CreateGroupPropsType = {
 };
 
 const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [searchValue, setSearchValue] = useState('');
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  // 树结构
-  const [treeData, setTreeData] = useState<any[]>([]);
-
-  const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  // const [searchValue, setSearchValue] = useState('');
+  // const [autoExpandParent, setAutoExpandParent] = useState(true);
+  // const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
+  // const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectMenu, setSelectMenu] = useState<string>('');
+  const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
     initData();
@@ -96,11 +88,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     const resultData = await settingController.getDepartments('0');
     console.log('====查询部门', resultData);
     setTreeData(resultData);
-  };
-
-  const onExpand = (newExpandedKeys: React.Key[]) => {
-    setExpandedKeys(newExpandedKeys);
-    setAutoExpandParent(false);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

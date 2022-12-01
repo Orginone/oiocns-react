@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Segmented, Card, Typography, UploadProps, Upload } from 'antd';
+import { Segmented, Card, Typography, UploadProps, Upload, message } from 'antd';
 import { docsCtrl } from '@/ts/controller/store/docsCtrl';
 import TaskListComp, { TaskModel } from './components/TaskListComp';
 import ResetNameModal from './components/ResetName';
@@ -12,6 +12,7 @@ import { IconFont } from '@/components/IconFont';
 import cls from './index.module.less';
 import { FileItemModel } from '@/ts/base/model';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
+import CloudTreeComp from './components/CloudTreeComp';
 
 type NameValue = {
   name: string;
@@ -97,12 +98,14 @@ const StoreDoc: React.FC = () => {
     switch (key) {
       case '1': // 删除
         if (await docsCtrl.refItem(node.key)?.delete()) {
+          message.success('删除成功');
           docsCtrl.changCallback();
+          docsCtrl.open('');
         }
         break;
       case '2': // 重命名
         setReNameKey(node.key);
-        setCreateFileName(node.name);
+        setCreateFileName(node.name ?? node.title);
         setTitle('重命名');
         setIsModalOpen(true);
         break;
@@ -123,7 +126,7 @@ const StoreDoc: React.FC = () => {
         docsCtrl.changCallback();
         break;
       case '新建文件夹': // 新建文件夹
-        setReNameKey(undefined);
+        setReNameKey(node.key ?? undefined);
         setTitle('新建文件夹');
         setCreateFileName('');
         setIsModalOpen(true);
@@ -137,6 +140,7 @@ const StoreDoc: React.FC = () => {
         break;
     }
   };
+
   return (
     <Card
       className={cls.pageCard}
@@ -174,7 +178,7 @@ const StoreDoc: React.FC = () => {
             icon: (
               <IconFont
                 type={'icon-chuangdanwei'}
-                className={segmentedValue === 'List' ? 'active' : ''}
+                className={segmentedValue === 'List' ? cls.active : ''}
               />
             ),
           },
@@ -183,7 +187,7 @@ const StoreDoc: React.FC = () => {
             icon: (
               <IconFont
                 type={'icon-jianyingyong'}
-                className={segmentedValue === 'Kanban' ? 'active' : ''}
+                className={segmentedValue === 'Kanban' ? cls.active : ''}
               />
             ),
           },
@@ -202,7 +206,6 @@ const StoreDoc: React.FC = () => {
         title={coppyOrMoveTitle}
         onChange={setMoveModalOpen}
       />
-
       <TaskListComp
         isOpen={open}
         taskList={taskList}
@@ -211,6 +214,7 @@ const StoreDoc: React.FC = () => {
         }}
       />
       <Upload {...uploadProps} ref={uploadRef}></Upload>
+      <CloudTreeComp handleMenuClick={handleMenuClick} />
     </Card>
   );
 };

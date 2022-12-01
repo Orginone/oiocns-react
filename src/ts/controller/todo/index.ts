@@ -127,7 +127,7 @@ class TodoService implements TodoServiceProps {
       '6': 'buyList',
     };
     const selfList = listStatusCode[this.activeStatus];
-    return this.currentInstance[selfList];
+    return this.currentInstance[selfList] || [];
   }
   /**  获取应用待办列表 */
   public applicationList = async () => {
