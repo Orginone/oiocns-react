@@ -133,4 +133,14 @@ export class MarketController extends BaseController {
     }
     return this.searchMarket;
   }
+
+  /**
+   * @description: 加入的商店成员
+   * @param {number} page
+   * @return {*}
+   */
+  public async getMember(page: number) {
+    const res = await this.getMember(page);
+    console.log('加入的商店成员', res);
+  }
 }
