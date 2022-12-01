@@ -16,6 +16,7 @@ import StoreContent from '@/ts/controller/store/content';
 import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { BaseProduct } from '@/ts/core/market';
+import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import { productCtrl } from '@/ts/controller/store/productCtrl';
 // const service = new MarketService({
@@ -269,6 +270,7 @@ const StoreApp: React.FC = () => {
         render={() => (
           <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
         )}></Route>
+      <TreeComp />
     </>
   );
 };

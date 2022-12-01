@@ -4,15 +4,13 @@ import React, { useEffect, useState } from 'react';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import CloudTreeComp from '../Doc/components/CloudTreeComp';
 import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid } from '@/utils/tools';
-
-import { useLocation } from 'react-router-dom';
 // import useStore from '@/store';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
 // import StoreContent from '@/ts/controller/store/content';
 import { XProduct } from '@/ts/base/schema';
+import ReactDOM from 'react-dom';
 // const items = [
 //   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
 //   { label: '文档', key: 'doc', icon: 'FileTextOutlined' },
@@ -30,8 +28,6 @@ const StoreClassify: React.FC = () => {
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [list, setList] = useState<XProduct[]>([]);
-  const location = useLocation();
-  const router = `${location.pathname}${location.search}`;
   const [newMenuForm] = Form.useForm();
 
   useEffect(() => {
@@ -173,66 +169,69 @@ const StoreClassify: React.FC = () => {
 
     // StoreContent.changeMenu(item);
   };
-  return (
+  const domNode = document.getElementById('templateMenu');
+  if (!domNode) return null;
+  return ReactDOM.createPortal(
     <>
-      <div className={cls.container}>
-        {router == '/store/doc' ? (
-          //文档树
-          <CloudTreeComp />
-        ) : (
-          //其他树
-          <StoreClassifyTree
-            title={'我的分类'}
-            menu={menu}
-            searchable
-            treeData={list}
-            handleTitleClick={handleTitleClick}
-            handleMenuClick={handleMenuClick}
-          />
-        )}
-      </div>
-      <Modal
-        title="搜索商店"
-        width={670}
-        destroyOnClose={true}
-        open={showModal}
-        bodyStyle={{ padding: 0 }}
-        okText="确定加入"
-        onOk={() => {
-          console.log(`确定按钮`);
-          setShowModal(false);
-        }}
-        onCancel={() => {
-          console.log(`取消按钮`);
-          setShowModal(false);
-        }}>
-        <SearchSjopComp />
-      </Modal>
-      <Modal
-        title={modalType + '目录'}
-        width={670}
-        destroyOnClose={true}
-        open={isStoreOpen}
-        okText="确定"
-        onOk={() => {
-          console.log(`确定按钮`);
-          newMenuFormSubmit();
-        }}
-        onCancel={() => {
-          console.log(`取消按钮`);
-          setIsStoreOpen(false);
-        }}>
-        <Form form={newMenuForm} autoComplete="off">
-          <Form.Item
-            label="目录名称"
-            name="title"
-            rules={[{ required: true, message: '请填写目录名称' }]}>
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
-      <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
-    </>
+      {list && (
+        <>
+          <div className={cls.container}>
+            {
+              //其他树
+              <StoreClassifyTree
+                title={'我的分类'}
+                menu={menu}
+                searchable
+                treeData={list}
+                handleTitleClick={handleTitleClick}
+                handleMenuClick={handleMenuClick}
+              />
+            }
+          </div>
+          <Modal
+            title="搜索商店"
+            width={670}
+            destroyOnClose={true}
+            open={showModal}
+            bodyStyle={{ padding: 0 }}
+            okText="确定加入"
+            onOk={() => {
+              console.log(`确定按钮`);
+              setShowModal(false);
+            }}
+            onCancel={() => {
+              console.log(`取消按钮`);
+              setShowModal(false);
+            }}>
+            <SearchSjopComp />
+          </Modal>
+          <Modal
+            title={modalType}
+            width={670}
+            destroyOnClose={true}
+            open={isStoreOpen}
+            okText="确定"
+            onOk={() => {
+              console.log(`确定按钮`);
+              newMenuFormSubmit();
+            }}
+            onCancel={() => {
+              console.log(`取消按钮`);
+              setIsStoreOpen(false);
+            }}>
+            <Form form={newMenuForm} autoComplete="off">
+              <Form.Item
+                name="title"
+                rules={[{ required: true, message: '请填写目录名称' }]}>
+                <Input placeholder="请填写目录名称" />
+              </Form.Item>
+            </Form>
+          </Modal>
+          <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
+        </>
+      )}
+    </>,
+    domNode,
   );
 };
 
