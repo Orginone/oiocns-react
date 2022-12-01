@@ -22,6 +22,7 @@ import CohortCard from './CohortCard';
 import { chatCtrl } from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import AddPostModal from '../../../bizcomponents/AddPositionModal';
 /**
  * 个人信息
  * @returns
@@ -44,6 +45,7 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
+  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
 
   useEffect(() => {
     CohortController.setCallBack(setData);
@@ -68,7 +70,6 @@ const CohortConfig: React.FC = () => {
   const getChat = (id: string): IChat | undefined => {
     for (var i = 0; i < chatCtrl.groups.length; i++) {
       const group = chatCtrl.groups[i];
-      console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
         if (id == chat.target.id) {
@@ -86,7 +87,6 @@ const CohortConfig: React.FC = () => {
         key: 'enterChat',
         label: '进入会话',
         onClick: () => {
-          console.log('获取到会话控制器', chatCtrl);
           chatCtrl.setCurrent(getChat(item.target.id));
           history.push('/chat');
           console.log('按钮事件', 'enterChat', item);
@@ -114,17 +114,20 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: () => {
-          history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
+          setIsSetPost(true);
+          // history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
           console.log('按钮事件', 'roleManage', item);
         },
       },
-      {
-        key: 'identityManage',
-        label: '身份管理',
-        onClick: () => {
-          console.log('按钮事件', 'identityManage');
-        },
-      },
+      // {
+      //   key: 'identityManage',
+      //   label: '身份管理',
+      //   onClick: () => {
+      //     // history.push('/setting/dept');
+      //     // setIsSetPost(true);
+      //     console.log('按钮事件', 'identityManage');
+      //   },
+      // },
       {
         key: 'changePermission',
         label: '转移权限',
@@ -203,7 +206,7 @@ const CohortConfig: React.FC = () => {
         friend?.id!,
       ),
     );
-    console.log('获取到选中对象', friend);
+    message.success('权限转移成功');
   };
   //邀请成员确认事件
   const handleOk = async () => {
@@ -274,7 +277,17 @@ const CohortConfig: React.FC = () => {
                 width="700px">
                 <Persons searchCallback={searchCallback} person={Person} />
               </Modal>
-
+              {/* 对象设置 */}
+              <AddPostModal
+                title={'身份设置'}
+                open={isSetPost}
+                onOk={() => {
+                  setIsSetPost(false);
+                }}
+                handleOk={() => {
+                  setIsSetPost(false);
+                }}
+              />
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}

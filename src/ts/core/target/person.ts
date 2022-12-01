@@ -33,9 +33,7 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedCohort = [];
     this.joinedCompany = [];
   }
-  public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<XTarget>> {
+  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
   public async getJoinedCohorts(): Promise<ICohort[]> {

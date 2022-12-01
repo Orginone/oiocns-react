@@ -175,7 +175,7 @@ export interface ICohort {
    * @param remark 群组备注
    */
   update(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+    data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
   /** 获取群成员列表 */
   getMember(): Promise<schema.XTarget[]>;

@@ -1,8 +1,10 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Button, Typography, Col } from 'antd';
-import React from 'react';
+import { Avatar, Button, Col } from 'antd';
+import React, { useEffect, useState } from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
+import CohortController from '../../../ts/controller/cohort/index';
+import Cohort from '@/ts/core/target/cohort';
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -28,6 +30,17 @@ const defaultObj = {
 
 const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) => {
   const {} = { ...defaultObj, ...defaultKey };
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    getname();
+  }, []);
+
+  const getname = async () => {
+    const res = await CohortController.getName(new Cohort(data));
+    setName(res);
+    console.log('获取归属', name);
+  };
   /**
    * @desc: 操作按钮区域
    * @param {any} item - 表格单条数据 data
@@ -55,18 +68,16 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) 
       <div className={`customCardWrap ${className}`}>
         <Title />
         <ul className="card-content">
-          {/* <li className="card-content-type con">
-          {data[typeName] ? <Tag>{data[typeName]}</Tag> : ''}
-        </li> */}
           <li className="card-content-date">
-            创建于 {data.createTime || '--'}
             <span style={{ float: 'right' }} className="app-size">
-              归属:apex
+              归属:{name}
             </span>
           </li>
           <li className="card-content-date">我的身份:管理员</li>
+          <li className="card-content-date">群组编号:{data.code}</li>
+
           <li className="card-content-date">
-            群组编号:{data.code}
+            <span>创建于 {data.createTime || '--'} </span>
             <Button
               style={{ float: 'right', border: 'none' }}
               icon={
@@ -74,7 +85,6 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) 
               }
               // onClick={onClick}
             />
-            {/* <UsergroupAddOutlined style={{ float: 'right', fontSize: '25px' }} /> */}
           </li>
         </ul>
       </div>

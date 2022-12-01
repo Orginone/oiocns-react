@@ -1,11 +1,11 @@
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Menu, Modal } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './index.less';
 import { MarketTypes } from 'typings/marketType';
 import Cohort from '@/ts/core/target/cohort';
 import CohortMemberList from '../CohortMemberList';
-
+import CohortController from '../../../../ts/controller/cohort/index';
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -46,6 +46,7 @@ const CohortCardComp: React.FC<AppCardType> = ({
     return <Menu items={operation && operation(data)} />;
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [name, setName] = useState('');
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -54,7 +55,14 @@ const CohortCardComp: React.FC<AppCardType> = ({
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-
+  useEffect(() => {
+    getname();
+  }, []);
+  const getname = async () => {
+    const res = await CohortController.getName(data);
+    setName(res);
+    console.log('获取归属', name);
+  };
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -80,7 +88,7 @@ const CohortCardComp: React.FC<AppCardType> = ({
       <ul className="card-content">
         <li className="card-content-date">
           <span style={{ float: 'right' }} className="app-size">
-            归属:{data.target.belongId}
+            归属:{name}
           </span>
         </li>
         <li className="card-content-date">我的身份:管理员</li>
@@ -95,6 +103,7 @@ const CohortCardComp: React.FC<AppCardType> = ({
       <Modal
         title="详情"
         open={isModalOpen}
+        destroyOnClose={true}
         onOk={handleOk}
         width={850}
         onCancel={handleCancel}>
