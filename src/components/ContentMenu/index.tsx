@@ -162,7 +162,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
           </Space>
         </div>
       )}
-      <div className={cls.container}>
+      <div className={cls.container} id="templateMenu">
         {props.data && !renderMenu && (
           <Menu
             // mode="inline"
