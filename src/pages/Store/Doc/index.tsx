@@ -13,6 +13,7 @@ import cls from './index.module.less';
 import { FileItemModel } from '@/ts/base/model';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
 import CloudTreeComp from './components/CloudTreeComp';
+import ReactDOM from 'react-dom';
 
 type NameValue = {
   name: string;
@@ -36,6 +37,7 @@ const StoreDoc: React.FC = () => {
   const [pageData, setPagedata] = useState<FileItemModel[]>([]);
   const [createFileName, setCreateFileName] = useState<string>('');
   const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
+  const treeContainer = document.getElementById('templateMenu');
   const uploadRef = useRef<any>();
   const parentRef = useRef<any>();
   const refreshUI = () => {
@@ -214,7 +216,15 @@ const StoreDoc: React.FC = () => {
         }}
       />
       <Upload {...uploadProps} ref={uploadRef}></Upload>
-      <CloudTreeComp handleMenuClick={handleMenuClick} />
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <CloudTreeComp
+              currentKey={current?.key ?? ''}
+              handleMenuClick={handleMenuClick}
+            />,
+            treeContainer,
+          )
+        : ''}
     </Card>
   );
 };
