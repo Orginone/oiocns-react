@@ -1,10 +1,10 @@
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input } from 'antd';
 import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
 import CohortService from '@/module/cohort/Cohort';
 import Person from '../../ts/core/target/person';
-import CohortController from '../../ts/controller/cohort/index'
+import CohortController from '../../ts/controller/cohort/index';
 
 /* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
@@ -13,7 +13,7 @@ interface CohortServiceType {
   Person: Person;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableList }) => {
+const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
   console.log(service);
   const layout = {
     labelCol: { span: 8 },
@@ -44,7 +44,12 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service, getTableLi
   const onSave = async () => {
     const values = await form.validateFields();
     console.log(values); //2.表单验证并获取表单值
-    CohortController.createCohort(Person,values.cohort.name, values.cohort.code, values.cohort.remark);
+    CohortController.createCohort(
+      Person,
+      values.cohort.name,
+      values.cohort.code,
+      values.cohort.remark,
+    );
     setIsModalOpen(false);
     // getTableList();
   };

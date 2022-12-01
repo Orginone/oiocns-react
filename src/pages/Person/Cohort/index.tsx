@@ -21,6 +21,7 @@ import { schema } from '../../../ts/base';
 import CohortCard from './CohortCard';
 import { chatCtrl } from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 /**
  * 个人信息
  * @returns
@@ -137,8 +138,17 @@ const CohortConfig: React.FC = () => {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          console.log(CohortController.deleteCohort(Person, item.target.id));
-          message.info('解散成功');
+          Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否确定解散该群组',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+              CohortController.deleteCohort(Person, item.target.id),
+                message.info('解散成功');
+            },
+          });
         },
       },
     ];
