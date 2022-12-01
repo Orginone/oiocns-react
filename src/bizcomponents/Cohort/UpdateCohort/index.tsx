@@ -1,5 +1,4 @@
 import React from 'react';
-// import cls from './index.module.less';
 import CohortEnty from '../../../ts/core/target/cohort';
 import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
@@ -28,49 +27,14 @@ const UpdateCohort: React.FC<indexType> = ({
   open,
   ...otherConfig
 }) => {
-  // const [layoutType, setLayoutType] = useState<ProFormLayoutType>('Form');
   return (
     <>
-      {/* <Space
-        style={{
-          width: '100%',
-        }}
-        direction="vertical">
-        <ProFormSelect
-          label="布局方式"
-          options={[
-            'Form',
-            'ModalForm',
-            'DrawerForm',
-            'LightFilter',
-            'QueryFilter',
-            'StepsForm',
-            'StepForm',
-            'Embed',
-          ]}
-          fieldProps={{
-            value: layoutType,
-            onChange: (e) => setLayoutType(e),
-          }}
-        />
-      </Space> */}
+      {}
       <BetaSchemaForm<CohortEnty>
-        // trigger={<a>点击我</a>}
         layoutType={layoutType}
         open={open}
         width={500}
-        // steps={[
-        //   {
-        //     title: 'ProComponent',
-        //   },
-        // ]}
-        // rowProps={{
-        //   gutter: 16,
-        // }}
         initialValues={item}
-        // colProps={{
-        //   span: 12,
-        // }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values: CohortEnty) => {
           console.log('查看内容', item);
@@ -84,10 +48,8 @@ const UpdateCohort: React.FC<indexType> = ({
               item.target.belongId,
             ),
           );
-          // service.updateItem(param);
           console.log(values);
           setOpen(false);
-          // getTableList();
           message.success('修改成功');
         }}
         columns={(layoutType === 'StepsForm' ? [columns] : columns) as any}

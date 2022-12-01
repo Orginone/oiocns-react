@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, List, Descriptions, Typography, Layout, Card, Input, Tag } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import {
+  Avatar,
+  List,
+  Descriptions,
+  Typography,
+  Layout,
+  Card,
+  Input,
+  Tag,
+  Modal,
+  message,
+} from 'antd';
+import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
 import Cohort from '@/ts/core/target/cohort';
@@ -40,7 +51,25 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const size: number = friendList.filter((obj) => obj.id == value.id).length;
     const action = [];
     if (size == 0) {
-      action.push(<a key="list-loadmore-more">添加好友</a>);
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() => {
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否申请添加好友',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                FriendController.applyFriend(Provider.getPerson!, value),
+                  message.info('发起申请成功');
+              },
+            });
+          }}>
+          添加好友
+        </a>,
+      );
     } else {
       action.push(
         <a key="list-loadmore-edit" onClick={() => enterChat(value.id)}>
