@@ -14,7 +14,7 @@ import {
   TeamTodo,
 } from '@/ts/core/todo/todo';
 import { XOrder, XOrderDetail } from '@/ts/base/schema';
-import { OrderStatus } from '@/ts/core/todo/interface';
+import { OrderStatus } from '@/ts/core/enum';
 import OrderTodo from '@/ts/core/todo/order';
 
 // type OrgType = '人员' | 'other';
@@ -224,8 +224,8 @@ class TodoService implements TodoServiceProps {
             .cancel(
               item,
               this.activeStatus == '5'
-                ? OrderStatus.sellerCancel
-                : OrderStatus.buyerCancel,
+                ? OrderStatus.SellerCancel
+                : OrderStatus.BuyerCancel,
             )
             .then(({ success }) => {
               afterOperate(success, '取消订单');

@@ -46,3 +46,11 @@ export enum CommonStatus {
 export enum ProductType {
   WebApp = 'web应用',
 }
+
+/**订单状态 */
+export enum OrderStatus {
+  Deliver = 102,
+  BuyerCancel = 220,
+  SellerCancel = 221,
+  RejectOrder = 222,
+}
