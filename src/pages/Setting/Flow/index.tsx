@@ -1,9 +1,9 @@
 import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
 import React, { useState, useRef } from 'react';
 import cls from './index.module.less';
-
+import { EditOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import { RollbackOutlined } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
+import { ProTable, ProCard } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 // import RootNode from '@/bizcomponents/Flow/Process/RootNode';
 // import ApprovalNode from '@/bizcomponents/Flow/Process/ApprovalNode';
@@ -143,17 +143,47 @@ const SettingFlow: React.FC = () => {
                 ]}
               />
             </Card>
-            <Card
+            <ProCard
               title="模版列表"
+              tabs={{
+                type: 'card',
+              }}
               extra={
                 <Space>
                   <Button>编辑分组</Button>
                   <Button type="primary">新增模版</Button>
                 </Space>
-              }
-              bordered={false}>
-              111
-            </Card>
+              }>
+              <ProCard.TabPane key="tab1" tab="全部">
+                {[1, 2, 3, 4].map((item, index) => {
+                  return (
+                    <ProCard
+                      title="模版"
+                      key="index"
+                      bordered={true}
+                      style={{ maxWidth: 300 }}
+                      actions={[
+                        <SettingOutlined key="setting" />,
+                        <EditOutlined key="edit" />,
+                        <DeleteOutlined key="delete" />,
+                      ]}>
+                      <div>Card content</div>
+                      <div>Card content</div>
+                      <div>Card content</div>
+                    </ProCard>
+                  );
+                })}
+              </ProCard.TabPane>
+              <ProCard.TabPane key="tab2" tab="模版分类">
+                内容二
+              </ProCard.TabPane>
+              <ProCard.TabPane key="tab2" tab="财务">
+                内容二
+              </ProCard.TabPane>
+              <ProCard.TabPane key="tab2" tab="人事">
+                内容二
+              </ProCard.TabPane>
+            </ProCard>
           </div>
         ) : null}
 
