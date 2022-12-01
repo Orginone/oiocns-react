@@ -26,7 +26,7 @@ interface Iprops {
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel,selectId } = props;
+  const { open, title, onOk, handleOk, handleCancel, selectId } = props;
   const [form] = Form.useForm();
   useEffect(() => {}, []);
 
@@ -38,41 +38,54 @@ const EditCustomModal = (props: Iprops) => {
         onOk={handleOk}
         onCancel={() => handleCancel()}
         getContainer={false}
-        
         footer={null}>
         <Form form={form} layout="vertical">
-         
           <Form.Item label="" name="avatar" noStyle>
-             <UploadAvatar />
+            <UploadAvatar />
           </Form.Item>
-           
+
           <Row>
             <Col span={12}>
-              <Form.Item name="name" label="单位名称" rules={[{ required: true, message: '请输入单位名称!' }]}>
+              <Form.Item
+                name="name"
+                label="单位名称"
+                rules={[{ required: true, message: '请输入单位名称!' }]}>
                 <Input placeholder="请输入单位名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="code" label="单位编号" rules={[{ required: true, message: '请输入单位编号!' }]}>
+              <Form.Item
+                name="code"
+                label="单位编号"
+                rules={[{ required: true, message: '请输入单位编号!' }]}>
                 <Input placeholder="请输入单位编号" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col span={12}>
-              <Form.Item name="teamName" label="我的部门" rules={[{ required: true, message: '请输入岗位名称!' }]}>
+              <Form.Item
+                name="teamName"
+                label="我的部门"
+                rules={[{ required: true, message: '请输入岗位名称!' }]}>
                 <Input placeholder="请输入岗位名称" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="teamCode" label="团队编码" rules={[{ required: true, message: '请输入团编码' }]}>
+              <Form.Item
+                name="teamCode"
+                label="团队编码"
+                rules={[{ required: true, message: '请输入团编码' }]}>
                 <Input placeholder="请输入团队编码" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item name="remark" label="描述" rules={[{ required: true, message: '请输入单位描述!' }]}>
+              <Form.Item
+                name="remark"
+                label="描述"
+                rules={[{ required: true, message: '请输入单位描述!' }]}>
                 <TextArea
                   // value={value}
                   // onChange={(e) => setValue(e.target.value)}
@@ -93,7 +106,7 @@ const EditCustomModal = (props: Iprops) => {
                     const curentValue = await settingController.createDepartment(value);
                     if (!curentValue.success) {
                       message.error(curentValue.msg);
-                    } else { 
+                    } else {
                       message.success('添加成功');
                       settingController.trigger('updateDeptTree');
                       handleOk();

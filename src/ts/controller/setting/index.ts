@@ -191,15 +191,19 @@ class SettingController extends BaseController {
   // 查询公司底下所有的用户
   public async searchAllPersons(departId?: string): Promise<XTarget[]> {
     const comp: Company = new Company(Provider.getPerson?.target!);
-    let res: model.ResultType<any>;
+    let res: XTarget[];
     if (departId == null) {
-      res = await comp.getPersons(this.companyID);
+      comp.target.id = this.companyID;
+      comp.target.typeName = TargetType.Company;
+      res = await comp.getPersons();
       console.log('===查询公司底下的用户', res);
     } else {
-      res = await comp.getPersons(departId);
+      comp.target.id = departId;
+      comp.target.typeName = TargetType.Department;
+      res = await comp.getPersons();
       console.log('===查询部门底下的用户', res);
     }
-    return res.data;
+    return res;
   }
 }
 const settingController = new SettingController();
