@@ -110,7 +110,7 @@ const AddPersonModal = (props: Iprops) => {
                 <div className={cls[`checklist`]}>
                   {checkUser.map((item) => {
                     return (
-                      <div className={cls['checklist-item']}>
+                      <div className={cls['checklist-item']} key={item.id}>
                         <Checkbox value={item.checked} onChange={() => {}}>
                           {item.name}
                         </Checkbox>

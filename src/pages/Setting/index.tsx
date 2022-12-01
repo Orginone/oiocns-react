@@ -66,7 +66,7 @@ const configMenuItems = [
 const muneItems: MenuProps[`items`] = [
   {
     type: 'group',
-    label: '信息中心',
+    label: '组织设置',
     children: infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key })),
   },
   {

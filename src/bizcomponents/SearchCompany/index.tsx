@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Card, Col, Result, Row, Tag, Typography, Button } from 'antd';
+import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 
 import { XTarget } from '@/ts/base/schema';
-import PersonController from '@/pages/Person/_control/personcontroller';
+import PersonController from '@/ts/controller/setting/personCtrl';
 
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
-import Provider from '@/ts/core/provider';
+// import Provider from '@/ts/core/provider';
 
 type CompanySearchTableProps = {
   [key: string]: any;
@@ -45,7 +45,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
                 description={<Tag color="blue">{item.code}</Tag>}
               />
               <div className={styles.description}>
-                <Typography.Text>简介：{item.team.remark || '-'}</Typography.Text>
+                <Typography.Text>简介：{item.team?.remark || '-'}</Typography.Text>
               </div>
             </Card>
           </Col>

@@ -15,7 +15,7 @@ import Person from '@/ts/core/target/person';
 abstract class BaseController {
   // 获取登录的用户
   public get getPerson(): Person {
-    return Provider.getPerson;
+    return Provider.getPerson!;
   }
 }
 

@@ -42,6 +42,21 @@ class CohortController {
     this.callBack([...friendData]);
     return res;
   }
+  /**
+   * 发起好友申请
+   * @param obj
+   * @param name
+   * @returns
+   */
+  public async applyFriend(
+    obj: Person,
+    target: schema.XTarget,
+  ): Promise<model.ResultType<any>> {
+    const res = await obj.applyFriend(target);
+    // const friendData = await this.getMyFriend();
+    // this.callBack([...friendData]);
+    return res;
+  }
 }
 
 export default new CohortController();

@@ -53,7 +53,7 @@ const SettingMenu: React.FC = () => {
         </div>
       </div> */}
       <div>
-        <div className={cls.subTitle}>信息中心</div>
+        <div className={cls.subTitle}>组织设置</div>
         <Menu items={infoMenuItems} onClick={to} />
       </div>
       <div>

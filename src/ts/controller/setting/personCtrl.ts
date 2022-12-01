@@ -2,22 +2,23 @@
 import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
 import UserdataService from '@/ts/core/target/user';
-import BaseController from './basecontroller';
-import Provider from '@/ts/core/provider';
+import BaseController from '../baseCtrl';
 import { TargetType } from '@/ts/core/enum';
+import { model } from '@/ts/base';
+import Provider from '@/ts/core/provider';
 
 /**
  * 控制器
- * import PersonController from '@/pages/Person/_control/personcontroller';
+ * import PersonController from '@/ts/controller/setting/personCtrl';
    PersonController.getInstance().searchCompany();
  */
-export default class settingController extends BaseController {
+export default class personcontroller extends BaseController {
   // 单例
-  private static _instance: settingController;
+  private static _instance: personcontroller;
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new settingController();
+      this._instance = new personcontroller();
     }
     return this._instance;
   }
@@ -35,7 +36,9 @@ export default class settingController extends BaseController {
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
    */
   public async searchCompany(page: Types.Page, callback: any) {
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchCompany(page);
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+      page,
+    );
     callback(datas);
   }
 
@@ -43,7 +46,7 @@ export default class settingController extends BaseController {
    * 获取用户已加入的单位组织
    */
   public async getJoinedCompanys(callback: any) {
-    const datas = Provider.getPerson.getJoinedCompanys();
+    const datas = await Provider.getPerson!.getJoinedCompanys();
     callback(datas);
   }
 
@@ -58,8 +61,8 @@ export default class settingController extends BaseController {
    * @param id 单位ID
    * @returns
    */
-  public async applyJoinCompany(id: string): Promise<boolean> {
-    const success = await this.userDataService.applyJoinCompany(id, TargetType.Company);
-    return success;
+  public async applyJoinCompany(id: string): Promise<model.ResultType<any>> {
+    const result = await this.userDataService.applyJoinMyCompany(id, TargetType.Company);
+    return result;
   }
 }

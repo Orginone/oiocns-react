@@ -222,6 +222,7 @@ class CohortController {
    */
   public async getRoleList(cohort: Cohort): Promise<Authority | undefined> {
     let res = await cohort.selectAuthorityTree();
+    console.log('aaaaa', await res?.queryAuthorityIdentity());
     console.log('职权组织树:', res);
     return res;
   }
