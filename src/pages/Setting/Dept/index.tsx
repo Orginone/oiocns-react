@@ -108,6 +108,7 @@ const SettingDept: React.FC = () => {
     setTransfer(false);
     setLookApplyOpen(false);
     setIsOpenModal(false);
+    setIsCreateDept(false);
   };
   const handleOk = () => {
     setIsAddOpen(false);
@@ -115,6 +116,7 @@ const SettingDept: React.FC = () => {
     setTransfer(false);
     setLookApplyOpen(false);
     setIsOpenModal(false);
+    setIsCreateDept(false);
   };
   /**
    * @description: 监听点击事件，关闭弹窗 订阅

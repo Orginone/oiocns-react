@@ -115,13 +115,14 @@ const EditCustomModal = (props: Iprops) => {
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
                     }
-                    console.log('create depart', value);
                     const curentValue = await settingController.createDepartment(value);
                     if (!curentValue.success) {
                       message.error(curentValue.msg);
+                      // form.resetFields();
                     } else {
                       message.success('添加成功');
                       settingController.trigger('updateDeptTree');
+                      form.resetFields();
                       handleOk();
                     }
                   }

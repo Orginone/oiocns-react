@@ -1,10 +1,11 @@
-import { Input, Button } from 'antd';
+import { Input, Button, Modal } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 
 const x = 3;
 const y = 2;
@@ -77,12 +78,30 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
+    if (settingCtrl.getCurWorkSpace && settingCtrl.getCurWorkSpace.isUserSpace == true) {
+      Modal.info({
+        title: '提示',
+        content: (
+          <div>
+            <p>请选择加入的部门空间！</p>
+          </div>
+        ),
+        onOk() {
+          location.href = '/home';
+        },
+      });
+    }
+
     initData();
     /** 监听页面是否需要更新 */
     settingController.addListen('updateDeptTree', () => {
       initData();
     });
   }, []);
+
+  useEffect(() => {
+    settingController.setCompanyID = settingCtrl.getCurWorkSpace?.id + '';
+  }, [settingCtrl.getCurWorkSpace]);
 
   const initData = async () => {
     const resultData = await settingController.getDepartments('0');

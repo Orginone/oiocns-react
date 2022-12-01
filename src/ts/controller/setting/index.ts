@@ -11,6 +11,7 @@ import Provider from '../../core/provider';
 import { rootDir } from '../../core/store/filesys';
 import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 import { kernel } from '@/ts/base';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 
 export interface spaceObjs {
   id: string;
@@ -47,23 +48,29 @@ export type ObjType = {
   // 结果
   success: boolean;
 };
-class SettingController extends BaseController {
+class SettingIndexController extends BaseController {
   private _isOpenModal: boolean = false;
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
   private _root: IFileSystemItem;
   // 对应公司的ID
   // 测试的时候先写死， 到时候切换成 当前工作空间ID
-  companyID: string = '381107910723375104';
+  private companyID: string = '';
   /** 页面isOpen控制是否显示弹窗 */
   public get getIsOpen() {
     return this._isOpenModal;
+  }
+  public set setCompanyID(id: string) {
+    this.companyID = id;
   }
   constructor() {
     super();
     this._root = rootDir;
     Provider.onSetPerson(async () => {
-      // this._home = await this._root.create(homeName);
+      if (settingCtrl.getCurWorkSpace) {
+        // 修改选中的公司空间
+        this.companyID = settingCtrl.getCurWorkSpace.id;
+      }
     });
   }
   /**设弹窗 */
@@ -99,7 +106,7 @@ class SettingController extends BaseController {
       param.teamName,
       param.teamCode,
       param.remark,
-      compid, // 团队ID
+      compid!, // 团队ID
       false,
       deptId, // 属于哪个部门的ID
     );
@@ -117,9 +124,9 @@ class SettingController extends BaseController {
    */
   public async getDepartments(parentId: string): Promise<spaceObjs[]> {
     let arrays: spaceObjs[] = [];
-    let compid = parentId;
+    let compid: string = parentId;
     if (parentId === '0') {
-      compid = this.companyID;
+      compid = this.companyID + '';
     }
     const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
@@ -194,9 +201,9 @@ class SettingController extends BaseController {
       param.teamName,
       param.teamCode,
       param.remark,
-      compid, // 上一层ID
+      compid + '', // 上一层ID
       true,
-      compid, // 属于哪个公司的ID
+      compid + '', // 属于哪个公司的ID
     );
     return {
       msg: res.msg,
@@ -224,7 +231,7 @@ class SettingController extends BaseController {
     const comp: Company = new Company(Provider.getPerson?.target!);
     let res: XTarget[];
     if (departId == null) {
-      comp.target.id = this.companyID;
+      comp.target.id = this.companyID + '';
       comp.target.typeName = TargetType.Company;
       res = await comp.getPersons();
       // console.log('===查询公司底下的用户', res);
@@ -249,6 +256,6 @@ class SettingController extends BaseController {
     return await this._root.upload(name, file, (p) => {});
   }
 }
-const settingController = new SettingController();
+const settingController = new SettingIndexController();
 
 export default settingController;
