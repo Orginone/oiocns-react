@@ -204,7 +204,7 @@ const PersonInfo: React.FC = () => {
         className={cls['certificate-container']}
         title={<Title level={5}>证书管理</Title>}
         extra={
-          <Space split={<Divider type="vertical" />}>
+          <Space split={<Divider type="vertical" />} size={0}>
             <Button type="link">删除</Button>
             <Button type="link">查看申请记录</Button>
             <Button type="link">加入平台</Button>
