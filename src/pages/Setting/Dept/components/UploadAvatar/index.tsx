@@ -24,6 +24,7 @@ export interface avatarUpload extends UploadFile {
 interface PostsProps {
   // eslint-disable-next-line no-unused-vars
   fileList: avatarUpload[];
+  setFileList: (ff: avatarUpload[]) => React.ReactNode;
   [key: string]: any;
 }
 
@@ -62,7 +63,6 @@ const UploadAvatar: React.FC<PostsProps> = (props) => {
             extension: result!.target.extension,
             key: result!.target.key,
           };
-          // eslint-disable-next-line react/prop-types
           props.setFileList([uploadFile]);
         }
       }
