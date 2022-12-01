@@ -2,7 +2,6 @@ import { IPerson, ICompany } from './../../core/target/itarget';
 import { Market, BaseProduct } from '@/ts/core/market';
 import BaseController from '../baseCtrl';
 import { PageRequest } from '@/ts/base/model';
-import { model } from '@/ts/base';
 export class MarketController extends BaseController {
   /** 人员/单位 */
   private _target: IPerson | ICompany;
@@ -29,10 +28,7 @@ export class MarketController extends BaseController {
     return this._target.getJoinMarkets();
   }
   /** 获取当前操作的市场 */
-  public getCurrentMarket(market: Market) {
-    if (market !== undefined) {
-      this._curMarket = market;
-    }
+  public getCurrentMarket() {
     return this._curMarket;
   }
   /** 获取购物车 */
@@ -137,15 +133,4 @@ export class MarketController extends BaseController {
     }
     return this.searchMarket;
   }
-
-  /**
-   * @description: 加入的商店成员
-   * @param {number} page
-   * @return {*}
-   */
-  public getMember = async (page: model.PageRequest) => {
-    console.log('加入的商店成员的对象', this._curMarket);
-    const res = await this._curMarket!.getMember(page);
-    console.log('加入的商店成员', res);
-  };
 }

@@ -11,18 +11,18 @@ export const columns: ColumnsType<any> = [
   },
   {
     title: '类型',
-    dataIndex: 'caption',
-  },
-  {
-    title: '编码',
-    dataIndex: 'marketId',
-  },
-  {
-    title: '名称',
     dataIndex: 'typeName',
   },
   {
+    title: '编码',
+    dataIndex: 'code',
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+  },
+  {
     title: '创建时间',
-    dataIndex: 'sellAuth',
+    dataIndex: 'createTime',
   },
 ];
