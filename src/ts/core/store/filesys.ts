@@ -22,12 +22,15 @@ export class FileSystemItem implements IFileSystemItem {
     this.name = target.name;
     this.isRoot = parent === undefined;
   }
-  findByName(name: string): IObjectItem {
-    for (const item of this.children) {
-      if (item.name === name) {
-        return item;
-      }
-    }
+  shareInfo(): model.FileItemShare {
+    return {
+      size: this.target.size,
+      name: this.target.name,
+      extension: this.target.extension,
+      shareLink:
+        location.origin + '/orginone/anydata/bucket/load/' + this.target.shareLink,
+      thumbnail: this.target.thumbnail,
+    };
   }
   get childrenData(): model.FileItemModel[] {
     return this.children.map((item) => {
@@ -35,7 +38,7 @@ export class FileSystemItem implements IFileSystemItem {
     });
   }
   async rename(name: string): Promise<boolean> {
-    if (this.name != name && !this.findByName(name)) {
+    if (this.name != name && !(await this._findByName(name))) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
         name: name,
         shareDomain: 'user',
@@ -51,8 +54,9 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async create(name: string): Promise<boolean> {
-    if (!this.findByName(name)) {
+  async create(name: string): Promise<IObjectItem> {
+    const exist = await this._findByName(name);
+    if (!exist) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -60,11 +64,12 @@ export class FileSystemItem implements IFileSystemItem {
       });
       if (res.success && res.data) {
         this.target.hasSubDirectories = true;
-        this.children.push(new FileSystemItem(res.data, this));
-        return true;
+        const node = new FileSystemItem(res.data, this);
+        this.children.push(node);
+        return node;
       }
     }
-    return false;
+    return exist;
   }
   async delete(): Promise<boolean> {
     const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
@@ -137,7 +142,8 @@ export class FileSystemItem implements IFileSystemItem {
     return false;
   }
   async upload(name: string, file: Blob, p: OnProgressType): Promise<IObjectItem> {
-    if (!this.findByName(name)) {
+    const exist = await this._findByName(name);
+    if (!exist) {
       p?.apply(this, [0]);
       let data: BucketOpreateModel = {
         shareDomain: 'user',
@@ -175,7 +181,7 @@ export class FileSystemItem implements IFileSystemItem {
         p?.apply(this, [(end * 1.0) / file.size]);
       }
     }
-    return;
+    return exist;
   }
   download(path: string, onProgress: OnProgressType): Promise<void> {
     throw new Error('Method not implemented.');
@@ -208,6 +214,19 @@ export class FileSystemItem implements IFileSystemItem {
       };
       reader.readAsArrayBuffer(file);
     });
+  }
+  /**
+   * 根据名称查询子文件系统项
+   * @param name 名称
+   */
+  private async _findByName(name: string): Promise<IObjectItem> {
+    await this.loadChildren();
+    for (const item of this.children) {
+      if (item.name === name) {
+        return item;
+      }
+    }
+    return;
   }
   /**
    * 根据新目录生成文件系统项

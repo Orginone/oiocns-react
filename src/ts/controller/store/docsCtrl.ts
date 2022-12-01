@@ -25,12 +25,7 @@ class DocsController extends BaseController {
     this._taskList = [];
     this._curKey = this._root.key;
     Provider.onSetPerson(async () => {
-      await this._root.loadChildren(true);
-      this._home = this._root.findByName(homeName);
-      if (!this._home) {
-        await this._root.create(homeName);
-        this._home = this._root.findByName(homeName);
-      }
+      this._home = await this._root.create(homeName);
       this.changCallback();
     });
   }
