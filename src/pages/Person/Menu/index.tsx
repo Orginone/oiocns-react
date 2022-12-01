@@ -65,7 +65,7 @@ const PersonMenu: React.FC = () => {
   return (
     <div className={cls.container}>
       <div>
-        <div className={cls.subTitle}>信息中心</div>
+        <div className={cls.subTitle}>组织设置</div>
         <Menu items={infoMenuItems} onClick={to} />
       </div>
       <div>

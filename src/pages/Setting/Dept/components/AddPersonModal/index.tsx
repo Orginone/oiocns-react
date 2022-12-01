@@ -5,12 +5,12 @@ import cls from './index.module.less';
 import { CloseCircleOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { deptList } from './mock';
 import { deepClone } from '@/ts/base/common';
-import {initDatatype} from '@/ts/core/setting/isetting';
+import { initDatatype } from '@/ts/core/setting/isetting';
 
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: (params:initDatatype[]) => void;
+  onOk: (params: initDatatype[]) => void;
   handleOk: () => void;
 }
 
@@ -32,24 +32,25 @@ const AddPersonModal = (props: Iprops) => {
   const onChange = (val: any, id: string, name: string) => {
     let currentValue, currentInitData;
     currentInitData = deepClone(initData);
-      initData.forEach((item) => { 
-        item.children.map((innerItem) => {
-          if (innerItem.id === id) {
-            innerItem.checked = val.target.checked;
-          }
-        })
-      })
+    initData.forEach((item) => {
+      item.children.map((innerItem) => {
+        if (innerItem.id === id) {
+          innerItem.checked = val.target.checked;
+        }
+      });
+    });
     if (val.target.checked) {
       currentValue = deepClone(checkUser);
       setInitData(initData);
-      currentValue.push({checked:val.target.checked,id, name });
-    } else { 
-      currentValue = checkUser.filter((item) => {return !(item.id === id)})
+      currentValue.push({ checked: val.target.checked, id, name });
+    } else {
+      currentValue = checkUser.filter((item) => {
+        return !(item.id === id);
+      });
     }
     setCheckUser(currentValue);
   };
 
-  
   const cardLeft = (
     <Card>
       <SearchInput placeholder="请输入角色姓名、部门" onChange={onChange} />
@@ -72,7 +73,11 @@ const AddPersonModal = (props: Iprops) => {
                   {item.children.map((child) => {
                     return (
                       <div className={cls[`cardleft-item-children`]} key={child.id}>
-                        <Checkbox checked={child.checked} onChange={(e) => onChange(e,child.id,child.name)}>{child.name}</Checkbox>
+                        <Checkbox
+                          checked={child.checked}
+                          onChange={(e) => onChange(e, child.id, child.name)}>
+                          {child.name}
+                        </Checkbox>
                       </div>
                     );
                   })}
@@ -86,7 +91,7 @@ const AddPersonModal = (props: Iprops) => {
       </div>
     </Card>
   );
- 
+
   const addmodal = (
     <Modal
       title={title}
@@ -100,32 +105,38 @@ const AddPersonModal = (props: Iprops) => {
           <Col span={12}>{cardLeft}</Col>
           <Col span={12}>
             <Card>
-                <Row>已选{checkUser.length}位用户</Row>
-                <Row>
+              <Row>已选{checkUser.length}位用户</Row>
+              <Row>
                 <div className={cls[`checklist`]}>
-                  {
-                    checkUser.map((item) => {  
-                    return  <div className={cls['checklist-item']}>
-                      <Checkbox value={item.checked} onChange={() => { }}>{item.name}</Checkbox>
-                        <CloseCircleOutlined className={cls[`checklist-item-deleteicon`]}
-                          onClick={() => { 
-                            const currentValue = checkUser.filter((innerItem) => { return !(innerItem.id === item.id) })
+                  {checkUser.map((item) => {
+                    return (
+                      <div className={cls['checklist-item']} key={item.id}>
+                        <Checkbox value={item.checked} onChange={() => {}}>
+                          {item.name}
+                        </Checkbox>
+                        <CloseCircleOutlined
+                          className={cls[`checklist-item-deleteicon`]}
+                          onClick={() => {
+                            const currentValue = checkUser.filter((innerItem) => {
+                              return !(innerItem.id === item.id);
+                            });
                             setCheckUser(currentValue);
                             let currentInitData = deepClone(initData);
-                            currentInitData.forEach((init) => { 
+                            currentInitData.forEach((init) => {
                               init.children.map((innerinit) => {
                                 if (innerinit.id === item.id) {
                                   innerinit.checked = false;
                                 }
-                              })
-                            })
+                              });
+                            });
                             setInitData(currentInitData);
-                          } } />
-                      </div>      
-                    })
-                  }
-                  </div >
-                </Row>
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </Row>
             </Card>
           </Col>
         </Row>
