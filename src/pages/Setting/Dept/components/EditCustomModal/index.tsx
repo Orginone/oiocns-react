@@ -48,6 +48,7 @@ const EditCustomModal = (props: Iprops) => {
         onOk={handleOk}
         onCancel={() => handleCancel()}
         getContainer={false}
+        destroyOnClose={true}
         footer={null}>
         <Form form={form} layout="vertical">
           <Form.Item label="" name="avatar" noStyle>
@@ -109,8 +110,8 @@ const EditCustomModal = (props: Iprops) => {
                 type="primary"
                 onClick={async () => {
                   const value = await form.validateFields();
-                  value.parentId = selectId;
                   if (value) {
+                    value.parentId = selectId;
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
                     }

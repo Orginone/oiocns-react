@@ -24,7 +24,7 @@ export interface avatarUpload extends UploadFile {
 interface PostsProps {
   // eslint-disable-next-line no-unused-vars
   fileList: avatarUpload[];
-  setFileList: (ff: avatarUpload[]) => React.ReactNode;
+  setFileList: (ff: avatarUpload[]) => void;
   [key: string]: any;
 }
 
