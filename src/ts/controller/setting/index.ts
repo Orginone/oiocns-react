@@ -8,6 +8,8 @@ import Types from '@/module/typings';
 import { XTarget } from '../../base/schema';
 import { model } from '../../base';
 import Provider from '../../core/provider';
+import { rootDir } from '../../core/store/filesys';
+import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 export interface spaceObjs {
   id: string;
   title: string;
@@ -29,7 +31,13 @@ export type deptParams = {
   parentId?: string;
   targetType?: TargetType.Department;
 };
-
+/** 任务模型 */
+export type SettingModel = {
+  name: string;
+  size: number;
+  process?: number;
+  createTime: Date;
+};
 // 返回类型定义
 export type ObjType = {
   // 消息
@@ -41,6 +49,7 @@ class SettingController extends BaseController {
   private _isOpenModal: boolean = false;
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
+  private _root: IFileSystemItem;
   // 对应公司的ID
   // 测试的时候先写死， 到时候切换成 当前工作空间ID
   companyID: string = '381107910723375104';
@@ -48,7 +57,13 @@ class SettingController extends BaseController {
   public get getIsOpen() {
     return this._isOpenModal;
   }
-
+  constructor() {
+    super();
+    this._root = rootDir;
+    Provider.onSetPerson(async () => {
+      // this._home = await this._root.create(homeName);
+    });
+  }
   /**设弹窗 */
   public async setIsOpen(params: boolean) {
     console.log(params);
@@ -204,6 +219,18 @@ class SettingController extends BaseController {
       console.log('===查询部门底下的用户', res);
     }
     return res;
+  }
+
+  // 上传到我的文件夹目录，然后再保存 share_link，到时候预览
+  public async upload(key: string, name: string, file: Blob): Promise<IObjectItem> {
+    // const task: SettingModel = {
+    //   process: 0,
+    //   name: name,
+    //   size: file.size,
+    //   createTime: new Date(),
+    // };
+
+    return await this._root.upload(name, file, (p) => {});
   }
 }
 const settingController = new SettingController();
