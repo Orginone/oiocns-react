@@ -21,6 +21,8 @@ export interface IFileSystemItem {
   parent: IObjectItem;
   /** 下级文件系统项数组 */
   children: IFileSystemItem[];
+  /** 下级文件系统数据 */
+  childrenData: FileItemModel[];
   /**
    * 根据名称查询子文件系统项
    * @param name 名称
@@ -62,7 +64,7 @@ export interface IFileSystemItem {
    * @param file 文件内容
    * @param {OnProgressType} onProgress 进度回调
    */
-  upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void>;
+  upload(name: string, file: Blob, onProgress: OnProgressType): Promise<IObjectItem>;
   /**
    * 下载文件
    * @param path 下载保存路径

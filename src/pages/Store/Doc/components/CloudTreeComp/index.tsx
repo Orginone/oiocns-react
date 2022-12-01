@@ -57,21 +57,18 @@ const DocClassifyTree: React.FC = () => {
       docsCtrl.unsubscribe(id);
     };
   }, []);
-  const loadChild = async (node: any) => {
-    if (node.children.length === 0) await docsCtrl.open(node.key);
-  };
   const onSelect = (selectedKeys: string[]) => {
     if (selectedKeys.length > 0) {
       docsCtrl.open(selectedKeys[0]);
     }
   };
-  const onExpand = (
+  const onExpand = async (
     expandedKeys: string[],
-    { expanded: bool, node }: { expanded: boolean; node: any },
+    { expanded, node }: { expanded: boolean; node: any },
   ) => {
     setExpKeys(expandedKeys);
-    if (expandedKeys.length > 0 && bool) {
-      loadChild(node);
+    if (expanded) {
+      await docsCtrl.open(node.key);
     }
   };
   const handleMenuClick = async (key: string, node: any) => {

@@ -29,6 +29,11 @@ export class FileSystemItem implements IFileSystemItem {
       }
     }
   }
+  get childrenData(): model.FileItemModel[] {
+    return this.children.map((item) => {
+      return item.target;
+    });
+  }
   async rename(name: string): Promise<boolean> {
     if (this.name != name && !this.findByName(name)) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
@@ -103,11 +108,10 @@ export class FileSystemItem implements IFileSystemItem {
         operate: BucketOpreates.Move,
       });
       if (res.success) {
-        const index =
-          this.parent?.children.findIndex((item) => {
-            return item.key == this.key;
-          }) ?? -1;
-        if (index > -1) {
+        const index = this.parent?.children.findIndex((item) => {
+          return item.key == this.key;
+        });
+        if (index && index > -1) {
           this.parent?.children.splice(index, 1);
         }
         destination.target.hasSubDirectories = true;
@@ -132,9 +136,9 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void> {
+  async upload(name: string, file: Blob, p: OnProgressType): Promise<IObjectItem> {
     if (!this.findByName(name)) {
-      onProgress?.apply(this, [0]);
+      p?.apply(this, [0]);
       let data: BucketOpreateModel = {
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -160,16 +164,21 @@ export class FileSystemItem implements IFileSystemItem {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
           return;
-        } else if (end === file.size && res.data) {
-          this.children.push(new FileSystemItem(res.data, this));
         }
         index++;
-        onProgress?.apply(this, [(end * 1.0) / file.size]);
+        if (end === file.size && res.data) {
+          const node = new FileSystemItem(res.data, this);
+          this.children.push(node);
+          p?.apply(this, [1]);
+          return node;
+        }
+        p?.apply(this, [(end * 1.0) / file.size]);
       }
     }
+    return;
   }
-  async download(path: string, onProgress: OnProgressType): Promise<void> {
-    // TODO
+  download(path: string, onProgress: OnProgressType): Promise<void> {
+    throw new Error('Method not implemented.');
   }
   /**
    * 格式化key,主要针对路径中的中文
@@ -215,6 +224,7 @@ export class FileSystemItem implements IFileSystemItem {
         name: source.name,
         dateCreated: new Date(),
         dateModified: new Date(),
+        size: source.target.size,
         shareLink: source.target.shareLink,
         extension: source.target.extension,
         thumbnail: source.target.thumbnail,
@@ -231,3 +241,21 @@ export class FileSystemItem implements IFileSystemItem {
     return node;
   }
 }
+
+/** 根目录 */
+export const rootDir = new FileSystemItem(
+  {
+    key: '',
+    size: 0,
+    name: '根目录',
+    isDirectory: true,
+    extension: '',
+    thumbnail: '',
+    shareLink: '',
+    contentType: '',
+    hasSubDirectories: true,
+    dateCreated: new Date(),
+    dateModified: new Date(),
+  },
+  undefined,
+);
