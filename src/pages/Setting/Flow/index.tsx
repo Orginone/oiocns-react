@@ -143,7 +143,7 @@ const SettingFlow: React.FC = () => {
                 ]}
               />
             </Card>
-            <ProCard
+            {/* <ProCard
               title="模版列表"
               tabs={{
                 type: 'card',
@@ -183,7 +183,7 @@ const SettingFlow: React.FC = () => {
               <ProCard.TabPane key="tab2" tab="人事">
                 内容二
               </ProCard.TabPane>
-            </ProCard>
+            </ProCard> */}
           </div>
         ) : null}
 
