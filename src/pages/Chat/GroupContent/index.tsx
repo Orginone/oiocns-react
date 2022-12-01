@@ -166,7 +166,8 @@ const GroupContent = (props: Iprops) => {
                   ) : (
                     <div
                       className={contentStyle.con_body}
-                      onClick={(e) => {
+                      onContextMenu={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         setSelectId(item.id);
                       }}>
@@ -233,7 +234,8 @@ const GroupContent = (props: Iprops) => {
                     ) : (
                       <div
                         className={contentStyle.con_body}
-                        onClick={(e) => {
+                        onContextMenu={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setSelectId(item.id);
                         }}>

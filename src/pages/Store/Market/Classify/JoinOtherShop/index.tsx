@@ -55,10 +55,9 @@ const JoinOtherShop: React.FC<Iprops> = ({
     {
       title: '商店简介',
       dataIndex: 'remark',
+      ellipsis: true,
       render: (remark: string, _record: any) => (
-        <Tooltip placement="bottom" title={remark}>
-          {remark}
-        </Tooltip>
+        <Tooltip autoAdjustOverflow={true}>{remark}</Tooltip>
       ),
     },
     {

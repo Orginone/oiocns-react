@@ -26,6 +26,7 @@ type AppTreeType = {
 };
 const selfAppMenu = 'selfAppMenu';
 class StoreClassify extends BaseController {
+  public marketMenber: any;
   constructor() {
     super();
     kernel.anystore.subscribed(selfAppMenu, 'user', (data: any) => {
@@ -175,12 +176,22 @@ class StoreClassify extends BaseController {
   /**
    * 页面操作--切换商店
    */
-  public handleSelectMarket(market: Market) {
+  public async handleSelectMarket(market: Market) {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包屑 商店', this.breadcrumb);
+    const res = await market.getMember({ offset: 0, limit: 10, filter: '' });
+    // if (res?.success && res?.data?.result != undefined) {
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
+    }
+    this.changCallback();
+    return this.marketMenber;
+    // console.log('页面操作--切换商店', this.marketMenber);
+
+    // return this.marketMenber;
     // this.changCallbackPart(`${this.curPageType}TreeData`, [...this.curTreeData]);
     // this.TreeCallBack(market);
   }
