@@ -234,6 +234,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
+        marketCtrl.getCurrentMarket(node?.node?.market);
+        marketCtrl.getMember({ offset: 1, limit: 10, filter: '' });
         break;
       default:
         break;
