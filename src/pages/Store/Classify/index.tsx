@@ -213,7 +213,6 @@ const StoreClassify: React.FC = () => {
         width={670}
         destroyOnClose={true}
         open={isStoreOpen}
-        bodyStyle={{ padding: 0 }}
         okText="确定"
         onOk={() => {
           console.log(`确定按钮`);

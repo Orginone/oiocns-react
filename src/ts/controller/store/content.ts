@@ -106,14 +106,34 @@ class StoreContent {
 
     this.curProduct = item;
   }
+
   /**
-   * @desc: 分享
+   * @desc: 查询分享信息
+   */
+  public async queryExtend(destType: string, teamId: string) {
+    let { success, data, msg } = await this.curProduct!.queryExtend(
+      destType,
+      teamId || '0',
+    );
+
+    if (!success) {
+      console.error(msg);
+      return [];
+    } else {
+      console.log('分享信息', data.result);
+      return data.result;
+    }
+  }
+  /**
+   * @desc: 分享应用
    */
   public async ShareProduct(teamId: string, destIds: string[], destType: string) {
     let { success, msg } = await this.curProduct!.Extend(teamId, destIds, destType);
 
     if (!success) {
       console.error(msg);
+    } else {
+      console.log('共享成功');
     }
   }
 }

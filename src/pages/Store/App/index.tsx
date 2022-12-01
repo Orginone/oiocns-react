@@ -112,7 +112,7 @@ const StoreApp: React.FC = () => {
       checkNodes.checkedValus,
       checkNodes.type,
     );
-    // setShowShareModal(false);
+    setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
