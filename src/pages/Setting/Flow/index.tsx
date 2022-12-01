@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
 import React, { useState, useRef } from 'react';
 import cls from './index.module.less';
 
@@ -59,6 +59,21 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
+      title: '状态',
+      dataIndex: 'status',
+      ellipsis: true,
+    },
+    {
+      title: '绑定应用',
+      dataIndex: 'linkApp',
+      ellipsis: true,
+    },
+    {
+      title: '创建人',
+      dataIndex: 'createPeople',
+      ellipsis: true,
+    },
+    {
       title: '操作',
       valueType: 'option',
       key: 'option',
@@ -103,29 +118,45 @@ const SettingFlow: React.FC = () => {
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
         {editorType === EditorType.TABLEMES ? (
-          <ProTable
-            actionRef={actionRef}
-            columns={columns}
-            request={async (params = {}, sort, filter) => {
-              console.log(sort, filter);
-              return {
-                data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                success: true,
-                total: 10,
-              };
-            }}
-            toolBarRender={() => [
-              <Button
-                key="button"
-                type="primary"
-                onClick={() => {
-                  setEditorType(EditorType.PROCESSDESIGN);
-                }}>
-                新建
-              </Button>,
-            ]}
-          />
+          <div>
+            <Card title="流程列表" bordered={false}>
+              <ProTable
+                actionRef={actionRef}
+                columns={columns}
+                request={async (params = {}, sort, filter) => {
+                  console.log(sort, filter);
+                  return {
+                    data: [{ title: '测试流程1' }, { title: '测试流程2' }],
+                    success: true,
+                    total: 10,
+                  };
+                }}
+                toolBarRender={() => [
+                  <Button
+                    key="button"
+                    type="primary"
+                    onClick={() => {
+                      setEditorType(EditorType.PROCESSDESIGN);
+                    }}>
+                    新建
+                  </Button>,
+                ]}
+              />
+            </Card>
+            <Card
+              title="模版列表"
+              extra={
+                <Space>
+                  <Button>编辑分组</Button>
+                  <Button type="primary">新增模版</Button>
+                </Space>
+              }
+              bordered={false}>
+              111
+            </Card>
+          </div>
         ) : null}
+
         {editorType !== EditorType.TABLEMES ? (
           <div className={cls['company-info-content']}>
             <Card bordered={false}>
