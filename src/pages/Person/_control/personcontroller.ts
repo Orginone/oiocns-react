@@ -29,23 +29,19 @@ export default class personcontroller extends BaseController {
   constructor() {
     super();
 
-    console.log('================ init controller');
     // 调试代码，要删除 @modify oyj
     this.myTest();
   }
 
   // 接口调试
   public async myTest(): Promise<boolean> {
-    this.getJoinedCompanys((data: any) => {
-      console.log('我加入的公司1===', data);
-    });
+    this.getJoinedCompanys((data: any) => {});
 
     let companys = await this.userDataService.getJoinedTargets(
       this.getPerson.target.id,
       TargetType.Person,
       [TargetType.Company],
     );
-    console.log('我加入的公司2===', companys);
 
     //let aa1 = await this.getPerson.queryMyProduct();
 
@@ -66,7 +62,9 @@ export default class personcontroller extends BaseController {
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
    */
   public async searchCompany(page: Types.Page, callback: any) {
-    const datas: Types.PageData<XTarget> = await this.userDataService.searchCompany(page);
+    const datas: Types.PageData<XTarget> = await this.userDataService.searchMyCompany(
+      page,
+    );
     callback(datas);
   }
 
@@ -90,7 +88,7 @@ export default class personcontroller extends BaseController {
    * @returns
    */
   public async applyJoinCompany(id: string): Promise<model.ResultType<any>> {
-    const result = await this.userDataService.applyJoinCompany(id, TargetType.Company);
+    const result = await this.userDataService.applyJoinMyCompany(id, TargetType.Company);
     return result;
   }
 }
