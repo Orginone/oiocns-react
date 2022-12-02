@@ -156,7 +156,7 @@ const CohortConfig: React.FC = () => {
         key: 'exitCohort',
         label: '退出群聊',
         onClick: () => {
-          CohortController.quitCohort(Person, item.target.id);
+          // CohortController.quitCohort(Person, item.target.id);
           message.info('退出成功');
           console.log('按钮事件', 'exitCohort', item);
         },
@@ -282,13 +282,13 @@ const CohortConfig: React.FC = () => {
                     onCancel: () => setOpen(false),
                   }}
                   open={open}
-                  columns={service.getcolumn()}
+                  columns={cohortColumn as any}
                   setOpen={setOpen}
                   item={item}
                 />
               )}
 
-              <CreateCohort Person={Person} service={service} />
+              <CreateCohort Person={Person} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>
