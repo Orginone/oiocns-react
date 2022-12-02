@@ -13,7 +13,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
  * @returns
  */
 const PersonInfo: React.FC = () => {
-  const user = userCtrl.User!.target;
+  const user = userCtrl.User.target;
   const [showDepartment, setShowDepartment] = useState<boolean>(false);
 
   // 信息标题

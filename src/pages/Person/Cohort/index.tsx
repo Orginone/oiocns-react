@@ -26,7 +26,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
  * @returns
  */
 const CohortConfig: React.FC = () => {
-  const Person = userCtrl.User!;
+  const Person = userCtrl.User;
   console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -251,7 +251,7 @@ const CohortConfig: React.FC = () => {
                 onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
                 width="700px">
-                <Persons searchCallback={searchCallback} person={userCtrl.User!} />
+                <Persons searchCallback={searchCallback} person={userCtrl.User} />
               </Modal>
               {/* 对象设置 */}
               <AddPostModal
