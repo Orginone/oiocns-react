@@ -4,9 +4,9 @@ import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import CardOrTable from '@/components/CardOrTableComp';
-import Cohort from '@/ts/core/target/cohort';
 import type { ProColumns } from '@ant-design/pro-components';
 import { ICohort } from '@/ts/core/target/itarget';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 interface indexType {
   searchCallback: Function;
   cohort: ICohort;
@@ -28,9 +28,9 @@ const CohortPerson: React.FC<indexType> = (props) => {
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
-      const res = await CohortController.searchPerson(props.cohort, e.target.value);
+      const res = await userCtrl.User?.searchPerson(e.target.value);
       console.log(res);
-      if (res.data.result != null) {
+      if (res?.data.result != null) {
         setData([res.data.result[0]]);
       } else {
         getTableList();

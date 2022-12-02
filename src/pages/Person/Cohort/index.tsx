@@ -36,7 +36,7 @@ const CohortConfig: React.FC = () => {
   const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
   const [friend, setFriend] = useState<schema.XTarget>();
-  const [cohort, setcohort] = useState<Cohort>();
+  const [cohort, setcohort] = useState<ICohort>();
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
@@ -45,6 +45,7 @@ const CohortConfig: React.FC = () => {
     // getJoinData();
   }, []);
   const getData = async () => {
+    console.log('111111111111111111', await userCtrl.User?.getJoinedCohorts());
     setData(
       (await userCtrl.User?.getJoinedCohorts())?.filter(
         (obj) => obj.target.belongId == userCtrl.User?.target.id,
@@ -204,9 +205,9 @@ const CohortConfig: React.FC = () => {
   };
   //申请加入群组确认事件
   const cohortHandleOk = async () => {
-    const data = await CohortController.joinCohort(Person, cohort?.id ? cohort.id : '');
-    if (!data.success) {
-      message.error(data.msg);
+    const data = await userCtrl.User?.applyJoinCohort(cohort?.target.id!);
+    if (!data?.success) {
+      message.error(data?.msg);
     } else message.info('申请加入成功');
     setAddIsModalOpen(false);
   };
