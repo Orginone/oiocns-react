@@ -20,7 +20,7 @@ class UserController extends BaseController {
       this._loadUser(JSON.parse(userJson));
       this._curSpace = this._findCompany(sessionStorage.getItem(sessionSpaceName) || '');
       if (this._curSpace) {
-        this.changCallbackPart(UserPartTypes.Space, [this._curSpace]);
+        this.changCallbackPart(UserPartTypes.Space);
       }
     }
   }
@@ -46,7 +46,7 @@ class UserController extends BaseController {
     } else {
       this._curSpace = this._findCompany(id);
     }
-    this.changCallbackPart(UserPartTypes.Space, [this._curSpace]);
+    this.changCallbackPart(UserPartTypes.Space);
   }
 
   /**
@@ -103,7 +103,7 @@ class UserController extends BaseController {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
     await this._user.getJoinedCompanys();
-    this.changCallbackPart(UserPartTypes.User, [this._user]);
+    this.changCallbackPart(UserPartTypes.User);
   }
 
   private _findCompany(id: string): ICompany | undefined {

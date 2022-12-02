@@ -1,72 +1,42 @@
+import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import useStore from '@/store';
-
 import cls from './index.module.less';
-
 /**
  * 用户头像
  * @returns
  */
 const UserAvatar: React.FC = () => {
-  const { user } = useStore((state) => ({ ...state }));
   const history = useHistory();
-
-  /**
-   * 退出登录
-   *  1. 清空Token
-   *  2. 清空用户信息
-   */
-  const logout = () => {
-    sessionStorage.clear();
-    history.push('/passport/login');
-  };
-
-  /**
-   * 锁屏
-   */
-  const lock = () => {
-    history.push('/passport/lock');
-  };
-
-  /**
-   * 前往个人中心
-   */
-  const personInfo = () => {
-    history.push('/person/info');
-  };
-
-  /**
-   * 下拉菜单点击
-   * @param e
-   */
-  const onClick: MenuProps['onClick'] = (e) => {
-    switch (e.key) {
-      case 'logout':
-        logout();
-        break;
-      case 'person/info':
-        personInfo();
-        break;
-      case 'lock':
-        lock();
-        break;
-      default:
-        break;
-    }
-  };
-
+  const [user, setUser] = useState(userCtrl.User);
+  useEffect(() => {
+    const id = userCtrl.subscribePart(UserPartTypes.User, () => {
+      if (userCtrl.User) {
+        setUser({ ...userCtrl.User });
+      }
+    });
+    return () => {
+      userCtrl.unsubscribe(id);
+    };
+  }, []);
   /**
    * 下拉菜单项
    */
   const menuItems: MenuProps = {
-    onClick: onClick,
+    onClick: (info) => {
+      if (info.key) {
+        if (info.key === '/passport/login') {
+          sessionStorage.clear();
+        }
+        history.push(info.key);
+      }
+    },
     items: [
       {
-        key: 'person/info',
+        key: '/person/info',
         icon: <UserOutlined />,
         label: '个人中心',
       },
@@ -74,12 +44,12 @@ const UserAvatar: React.FC = () => {
         type: 'divider' as const,
       },
       {
-        key: 'lock',
+        key: '/passport/lock',
         icon: <LockOutlined />,
         label: '离开锁屏',
       },
       {
-        key: 'logout',
+        key: '/passport/login',
         icon: <LogoutOutlined />,
         label: '退出登录',
       },
@@ -88,14 +58,11 @@ const UserAvatar: React.FC = () => {
 
   return (
     <Dropdown menu={menuItems} placement="bottomLeft">
-      {user.avatar ? (
-        <Avatar
-          src={'https://joeschmoe.io/api/v1/random'}
-          alt={user.userName}
-          size={28}></Avatar>
+      {user && user.target.avatar ? (
+        <Avatar src={user.target.avatar} alt={user.target.name} size={28}></Avatar>
       ) : (
-        <Avatar className={cls['header-user-avatar']} alt={user.userName}>
-          {user.userName?.substring(0, 1)}
+        <Avatar className={cls['header-user-avatar']} alt={user?.target.name}>
+          {user?.target.name.substring(0, 1)}
         </Avatar>
       )}
     </Dropdown>

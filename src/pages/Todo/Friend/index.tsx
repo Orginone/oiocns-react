@@ -2,7 +2,6 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 import TableHeaderOptions from '@/components/TableHeaderOptions';
 import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
-import { TeamApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
 import { Space, Tag } from 'antd';
 import friendService, { tabStatus } from '@/ts/controller/todo';

@@ -36,7 +36,7 @@ const StoreClassify: React.FC = () => {
     StoreSiderbar.changePageType('app');
     StoreSiderbar.getTreeData();
     return () => {
-      return StoreSiderbar.unsubscribePart('appTreeData');
+      return StoreSiderbar.unsubscribe('appTreeData');
     };
   }, []);
 

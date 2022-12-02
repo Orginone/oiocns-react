@@ -3,7 +3,7 @@ import { Drawer, Table, Input } from 'antd';
 import ProcessTree from '@/bizcomponents/Flow/Process/ProcessTree';
 import { EditOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import FlowDrawer from '@/bizcomponents/Flow/FlowDrawer';
 import { title } from 'process';
 type FormProcessDesignProps = {

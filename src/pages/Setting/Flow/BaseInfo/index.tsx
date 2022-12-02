@@ -9,7 +9,6 @@ import {
 } from '@ant-design/pro-components';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
-import settingStore from '@/store/setting';
 import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: () => void;

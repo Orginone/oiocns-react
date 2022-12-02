@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Card, Button, Descriptions, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
@@ -11,13 +10,9 @@ import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
-// import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-// import settingStore from '@/store/setting';
-import settingController from '@/ts/controller/setting';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 
 /**
  * 部门设置
@@ -28,7 +23,6 @@ const SettingDept: React.FC = () => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
-  const [statusKey, setStatusKey] = useState('merchandise');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
@@ -93,10 +87,10 @@ const SettingDept: React.FC = () => {
   };
 
   /** 设置岗位的逻辑 */
-  const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
-    console.log(checkJob, checkUser);
-    setIsSetPost(false);
-  };
+  // const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
+  //   console.log(checkJob, checkUser);
+  //   setIsSetPost(false);
+  // };
 
   const onApplyOk = () => {
     setLookApplyOpen(false);

@@ -158,7 +158,7 @@ const Groupdetail = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={chat?.target.name} label={''} />
+        <HeadImg name={chat?.target.name} label={''} imgWidth={38} />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>

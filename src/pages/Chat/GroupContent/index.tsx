@@ -80,15 +80,21 @@ const GroupContent = (props: Iprops) => {
         // eslint-disable-next-line no-case-declarations
         const img: FileItemShare = JSON.parse(item.showTxt);
         return (
-          <div className={`${contentStyle.con_content} ${contentStyle.txt}`}>
-            <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
-          </div>
+          <>
+            <div className={`${contentStyle.con_content_link}`}></div>
+            <div className={`${contentStyle.con_content_txt}`}>
+              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+            </div>
+          </>
         );
       default:
         return (
-          <div
-            className={`${contentStyle.con_content} ${contentStyle.txt}`}
-            dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+          <>
+            <div className={`${contentStyle.con_content_link}`}></div>
+            <div
+              className={`${contentStyle.con_content_txt}`}
+              dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+          </>
         );
     }
   };

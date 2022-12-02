@@ -3,10 +3,8 @@ import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig, DefaultProps } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import settingStore from '@/store/setting';
-import DefaultProps from '@/module/flow/flow';
 type ProcessDesignProps = {
   [key: string]: any;
   backTable: () => void;
@@ -25,9 +23,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const setForm = useAppwfConfig((state: any) => state.setForm);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
-  const { contionMes } = settingStore((state) => ({
-    ...state,
-  }));
   const preview = () => {
     previewRef.current?.preview(design);
   };

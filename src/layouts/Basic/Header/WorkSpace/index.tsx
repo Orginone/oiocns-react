@@ -19,7 +19,7 @@ import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
 
-type SpaceType = {
+export type SpaceType = {
   id: string;
   icon?: string;
   name: string;
@@ -72,18 +72,18 @@ const OrganizationalUnits: React.FC = () => {
     const all: SpaceType[] = userCtrl.User!.joinedCompany.map((item) => {
       return {
         id: item.target.id,
-        name: item.target.name,
+        name: item.target.team!.name,
         icon: item.target.avatar,
       };
     });
     all.unshift({
       id: userCtrl.User!.target.id,
-      name: userCtrl.User!.target.name,
+      name: userCtrl.User!.target.team!.name,
       icon: userCtrl.User!.target.avatar,
     });
     setCurrent({
       id: userCtrl.SpaceData.id,
-      name: userCtrl.SpaceData.name,
+      name: userCtrl.SpaceData.team!.name,
       icon: userCtrl.SpaceData.avatar,
     });
     setMenuList(

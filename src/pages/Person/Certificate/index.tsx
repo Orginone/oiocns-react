@@ -3,12 +3,10 @@ import Certificate from '@/components/CettificateComp';
 import { Typography, Divider } from 'antd';
 import React, { useRef } from 'react';
 import Person from '@/bizcomponents/PersonInfo/index';
-import { Page } from '@/module/typings';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from 'typings/Certificate';
 import { certificateColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
-import CertificateService from '@/module/certificate/Certificate';
 import API from '@/services';
 
 /**
