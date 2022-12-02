@@ -5,7 +5,7 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { IconFont } from '@/components/IconFont';
 
 import cls from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 
 /**
  * 顶部导航

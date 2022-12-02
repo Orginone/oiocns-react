@@ -2,9 +2,9 @@ import { TargetType } from '@/module/enums';
 import { kernel } from '@/ts/base';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
-import Provider from '@/ts/core/provider';
 import { LoadChats } from '@/ts/core/chat';
 import BaseController from '../baseCtrl';
+import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
@@ -13,13 +13,17 @@ const chatsObjectName = 'userchat';
  */
 class ChatController extends BaseController {
   private _tabIndex: string = '1';
+  private _userId: string = '';
   private _groups: IChatGroup[] = [];
   private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
   constructor() {
     super();
-    Provider.onSetPerson(async () => {
-      await this._initialization();
+    userCtrl.changCallbackPart(UserPartTypes.User, async () => {
+      if (this._userId != userCtrl.User!.target.id) {
+        this._userId = userCtrl.User!.target.id;
+        await this._initialization();
+      }
     });
   }
   /** 通讯录 */
@@ -36,7 +40,7 @@ class ChatController extends BaseController {
   }
   /** 当前用户 */
   public get userId() {
-    return Provider.userId;
+    return this._userId;
   }
   /** 页面Tab控制序列 */
   public get tabIndex() {
@@ -146,7 +150,7 @@ class ChatController extends BaseController {
   }
   /** 初始化 */
   private async _initialization(): Promise<void> {
-    this._groups = await LoadChats();
+    this._groups = await LoadChats(this._userId);
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
@@ -170,7 +174,7 @@ class ChatController extends BaseController {
    */
   private _recvMessage(data: XImMsg): void {
     let sessionId = data.toId;
-    if (data.toId === this.userId) {
+    if (data.toId === this._userId) {
       sessionId = data.fromId;
     }
     for (const item of this._groups) {
@@ -226,4 +230,4 @@ class ChatController extends BaseController {
   }
 }
 
-export const chatCtrl = new ChatController();
+export default new ChatController();
