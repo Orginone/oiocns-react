@@ -36,7 +36,6 @@ const CohortCardComp: React.FC<CohortCardType> = ({
   const getname = async () => {
     const res = await CohortController.getName(data);
     setName(res);
-    console.log('获取归属', name);
   };
   const Title = () => {
     return (

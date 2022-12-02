@@ -1,7 +1,7 @@
 import { OrderITodo, OrderStatus } from './interface';
 
-import Provider from '../provider';
 import { common, kernel, schema } from '../../base';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 export default class OrderTodo implements OrderITodo {
   id: string;
@@ -21,7 +21,7 @@ export default class OrderTodo implements OrderITodo {
   }
   getSaleList = async () => {
     const result = await kernel.querySellOrderList({
-      id: Provider.userId,
+      id: userCtrl.User!.target.id,
       status: 0,
       page: {
         offset: 0,
@@ -35,7 +35,7 @@ export default class OrderTodo implements OrderITodo {
   };
   getBuyList = async () => {
     const result = await kernel.queryBuyOrderList({
-      id: Provider.userId,
+      id: userCtrl.User!.target.id,
       status: 0,
       page: {
         offset: 0,

@@ -13,18 +13,12 @@ import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
-import Provider from '@/ts/core/provider';
 import StoreSidebar from '@/ts/controller/store/sidebar';
 import { BaseProduct } from '@/ts/core/market';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import { productCtrl } from '@/ts/controller/store/productCtrl';
-// const service = new MarketService({
-//   nameSpace: 'myApp',
-//   searchApi: Provider.getPerson.getJoinMarkets,
-//   createApi: API.product.register,
-//   deleteApi: API.product.delete,
-//   updateApi: API.product.update,
-// });
+import userCtrl from '@/ts/controller/setting/userCtrl';
+
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const StoreApp: React.FC = () => {
@@ -207,7 +201,7 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={Provider.getPerson!.getOwnProducts}
+              queryFun={userCtrl.User!.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={StoreContent.getColumns('myApp')}

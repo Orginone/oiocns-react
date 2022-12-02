@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { schema } from '../../ts/base';
+import { schema } from '@/ts/base';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CohortController from '../../ts/controller/cohort/index';
-import Person from '../../ts/core/target/person';
+import CohortController from '@/ts/controller/cohort/index';
+import { IPerson } from '@/ts/core/target/itarget';
 import CohortCard from './SearchCohortCard';
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
   setCohort: Function;
-  person: Person;
+  person: IPerson;
 };
 
 let tableProps: CohortSearchTableProps;

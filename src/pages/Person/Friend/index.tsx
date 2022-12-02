@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import LookApply from '../../Setting/Dept/components/LookApply';
 import cls from './index.module.less';
-import { Person } from '@/module/org';
 import Title from 'antd/lib/typography/Title';
 import { Modal, Button } from 'antd';
 import SearchPerson from '@/bizcomponents/SearchPerson';

@@ -3,19 +3,20 @@ import Person from '../../core/target/person';
 import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
 import { model, schema } from '../../base';
-import provider from '../../core/provider';
+import userCtrl from '../setting/userCtrl';
+import { ICompany, IPerson } from '@/ts/core/target/itarget';
 /**
  * 群组控制器
  */
 class CohortController {
-  private workSpace: Person | Company;
+  private workSpace: IPerson | ICompany;
   private _cohorts: Cohort[];
   private _myCohorts: Cohort[];
   public callBack!: Function;
   public joinCallBack!: Function;
   constructor() {
     this._cohorts = [];
-    this.workSpace = provider.getPerson!;
+    this.workSpace = userCtrl.User!;
     this._myCohorts = [];
   }
 
@@ -35,7 +36,7 @@ class CohortController {
    * @returns
    */
   public getMyCohort = async (): Promise<Cohort[]> => {
-    if (provider.getPerson?.target.id == provider.userId) {
+    if (userCtrl.User?.target.id == userCtrl.User?.target.id) {
       const obj = this.workSpace as Person;
       const data = await obj.getJoinedCohorts();
       this._cohorts = [];
@@ -55,7 +56,7 @@ class CohortController {
    * @returns
    */
   public getJoinCohort = async (): Promise<Cohort[]> => {
-    if (provider.getPerson?.target.id == provider.userId) {
+    if (userCtrl.User?.target.id == userCtrl.User?.target.id) {
       const obj = this.workSpace as Person;
       const data = await obj.getJoinedCohorts();
       this._cohorts = [];
@@ -108,7 +109,7 @@ class CohortController {
    * @returns
    */
   public async createCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     name: string,
     code: string,
     remark: string,
@@ -133,7 +134,7 @@ class CohortController {
    * @returns
    */
   public async searchCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     name: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.searchTargetByName(name, TargetType.Cohort);
@@ -160,7 +161,7 @@ class CohortController {
    * @returns
    */
   public async joinCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     destId: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.applyJoin(destId, TargetType.Cohort);
@@ -188,7 +189,7 @@ class CohortController {
    * @returns
    */
   public async deleteCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     id: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.deleteCohort(id);
@@ -227,7 +228,7 @@ class CohortController {
    */
   public async getCohortPeronList(obj: Cohort): Promise<schema.XTarget[]> {
     let res = await obj.getMember();
-    return res!.filter((obj) => provider.userId != obj.id);
+    return res!.filter((obj) => userCtrl.User?.target.id != obj.id);
   }
 
   /**

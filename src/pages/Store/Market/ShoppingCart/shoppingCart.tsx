@@ -4,11 +4,7 @@ import cls from './index.module.less';
 import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 // import { marketCtrl } from '@/ts/controller/store/marketCtrl';
-import { MarketController } from '@/ts/controller/store/marketCtrl';
-import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
-import Provider from '@/ts/core/provider';
 import { Adata } from './moke';
-import {} from '../../../../ts/controller/setting/settingCtrl';
 import { Col, Row, Tag } from 'antd';
 
 const ShoppingCart: React.FC<any> = (props) => {
@@ -17,9 +13,9 @@ const ShoppingCart: React.FC<any> = (props) => {
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
   const { confirm } = Modal;
-  // console.log(Provider.spaceId);
+  // console.log(userCtrl.Space!.target.id);
   // console.log(Provider.isUserSpace());
-  // console.log(Provider.getPerson);
+  // console.log(userCtrl.User!);
 
   // console.log(settingCtrl.getCurWorkSpace);//空间
   // console.log(settingCtrl.getPerson);

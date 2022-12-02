@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Segmented, Card, Typography, UploadProps, Upload, message } from 'antd';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import TaskListComp, { TaskModel } from './components/TaskListComp';
 import ResetNameModal from './components/ResetName';
 import { FaTasks } from 'react-icons/fa';

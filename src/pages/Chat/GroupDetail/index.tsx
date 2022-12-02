@@ -3,7 +3,7 @@ import { Button, Checkbox, Col, Modal, Row, Empty, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import detailStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 
 /**

@@ -1,7 +1,7 @@
-import Provider from '../../core/provider';
 import { rootDir } from '../../core/store/filesys';
 import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 import BaseController from '../baseCtrl';
+import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 /** 任务模型 */
 export type TaskModel = {
   group: string;
@@ -24,7 +24,7 @@ class DocsController extends BaseController {
     this._root = rootDir;
     this._taskList = [];
     this._curKey = this._root.key;
-    Provider.onSetPerson(async () => {
+    userCtrl.subscribePart(UserPartTypes.User, async () => {
       this._home = await this._root.create(homeName);
       this.changCallback();
     });
@@ -121,4 +121,4 @@ class DocsController extends BaseController {
   }
 }
 
-export const docsCtrl = new DocsController();
+export default new DocsController();

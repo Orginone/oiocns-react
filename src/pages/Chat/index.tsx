@@ -1,5 +1,5 @@
 import { deepClone } from '@/ts/base/common';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import React, { useEffect, useState } from 'react';
 import GroupContent from './GroupContent';
 import GroupDetail from './GroupDetail';

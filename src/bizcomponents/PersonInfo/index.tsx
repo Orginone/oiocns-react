@@ -2,8 +2,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions, Space } from 'antd';
 import { Typography, Divider, Collapse } from 'antd';
 import React, { useState } from 'react';
-import PersonInfoEnty from '../../ts/core/provider';
-
+import PersonInfoEnty from '@/ts/core/provider';
 import Layout from 'antd/lib/layout/layout';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
