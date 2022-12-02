@@ -16,10 +16,11 @@ import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import { MarketController } from '@/ts/controller/store/marketCtrl';
 import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
-import PersonInfoEnty from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+
 
 const MarketClassify: React.FC<any> = ({ history }) => {
-  const Person = PersonInfoEnty.getPerson;
+  const Person = userCtrl.User;
   const [list, setList] = useState<any[]>([]);
   const [deleOrQuit, setDeleOrQuit] = useState<'delete' | 'quit'>('delete');
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
