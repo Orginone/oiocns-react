@@ -16,7 +16,6 @@ import { BetaSchemaForm } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { ObjectManagerList } from '../../datamock';
 // import UploadAvatar from '../UploadAvatar';
-// import settingController from '@/ts/controller/setting';
 
 /* 
   编辑
