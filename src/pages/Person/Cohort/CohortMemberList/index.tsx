@@ -19,9 +19,9 @@ import CohortController from '@/ts/controller/cohort/index';
 import FriendController from '@/ts/controller/friend';
 import { useHistory } from 'react-router-dom';
 import { schema } from '@/ts/base';
-import Provider from '@/ts/core/provider';
 import { IChat } from '@/ts/core/chat/ichat';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: Cohort;
@@ -67,8 +67,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: () => {
-                FriendController.applyFriend(Provider.getPerson!, value),
-                  message.success('发起申请成功');
+                // FriendController.applyFriend(userCtrl.User, value),
+                message.success('发起申请成功');
               },
             });
           }}>
@@ -82,7 +82,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == Provider.userId) {
+    if (cohortData.target.belongId == userCtrl.User!.target.id) {
       action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
         <a
@@ -95,7 +95,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: () => {
-                FriendController.applyFriend(Provider.getPerson!, value),
+                FriendController.applyFriend(userCtrl.User!, value),
                   removeMember([value.id]);
                 message.success('操作成功');
               },

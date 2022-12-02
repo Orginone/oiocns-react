@@ -10,7 +10,7 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 import StoreContent from '@/ts/controller/store/content';
 import { useHistory } from 'react-router-dom';
-import Provider from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 interface AppInfoType {
   appId: string;
 }
@@ -101,7 +101,7 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
       <div className={cls['page-content-table']}>
         <AppShowComp
           headerTitle="已分配单位"
-          queryFun={Provider.getPerson!.getOwnProducts}
+          queryFun={userCtrl.User!.getOwnProducts}
           list={[]}
           columns={StoreContent.getColumns('appInfo')}
           renderOperation={renderOperation}

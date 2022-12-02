@@ -1,5 +1,5 @@
 import { ProductModel } from '@/ts/base/model';
-import provider from '@/ts/core/provider';
+import userCtrl from '../setting/userCtrl';
 
 class productContCtrl {
   /**
@@ -9,7 +9,7 @@ class productContCtrl {
   public async createProduct(
     values: Omit<ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
   ) {
-    return await provider!.getPerson!.createProduct({ ...values });
+    return await userCtrl.User!.createProduct({ ...values });
   }
 
   /**
@@ -18,7 +18,7 @@ class productContCtrl {
    * @return {*}
    */
   public async deleteProduct(id: string) {
-    return await provider!.getPerson!.deleteProduct(id);
+    return await userCtrl.User!.deleteProduct(id);
   }
 }
 

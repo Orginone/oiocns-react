@@ -2,17 +2,14 @@ import { Button, Form, Input } from 'antd';
 import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
-import CohortService from '@/module/cohort/Cohort';
 import Person from '../../ts/core/target/person';
 import CohortController from '../../ts/controller/cohort/index';
 
 interface CohortServiceType {
-  service: CohortService;
   Person: Person;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
-  console.log(service);
+const CreateCohort: React.FC<CohortServiceType> = ({ Person }) => {
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },

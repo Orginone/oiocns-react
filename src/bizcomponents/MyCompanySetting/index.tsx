@@ -4,19 +4,18 @@ import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 
 import CardOrTable from '@/components/CardOrTableComp';
-import { Company } from '@/module/org';
 import companyService from '@/module/org/company';
 // import { useQuery } from '@tanstack/react-query';
 import { User } from 'typings/user';
 
-import useStore from '@/store';
 import type * as schema from '@/ts/base/schema';
 
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import ApplyInfoService from './ApplyInfo';
-import Provider from '@/ts/core/provider';
 import Person from '@/ts/core/target/person';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { IPerson } from '@/ts/core/target/itarget';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -30,13 +29,11 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [applyInfoOpen, setApplyInfoOpen] = useState(false);
 
-  const [list, setList] = useState<Company[]>([]);
+  const [list, setList] = useState<schema.XTarget[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
 
   const [joinKey, setJoinKey] = useState<string>('');
-
-  const { user } = useStore((state) => ({ ...state }));
 
   useEffect(() => {
     getTableList();
@@ -116,7 +113,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     // setTotal(service.Total);
 
     // 从提供器里面取人员。
-    const person: Person = Provider.getPerson;
+    const person: IPerson = userCtrl.User!;
     const joinCompanys = await person.getJoinedCompanys();
     console.log('===获取到的内核数据！ ', joinCompanys);
 
