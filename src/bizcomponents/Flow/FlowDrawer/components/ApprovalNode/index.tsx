@@ -4,7 +4,6 @@ import { Row, Button, Divider, Select, Col, Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
-import Provider from '@/ts/core/provider';
 import { useAppwfConfig } from '@/module/flow/flow';
 /**
  * @description: 审批对象

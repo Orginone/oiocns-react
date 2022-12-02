@@ -6,7 +6,6 @@ import University from '../target/university';
 import Hospital from '../target/hospital';
 
 import Provider from '../provider';
-import Types from '../../../module/typings';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
 

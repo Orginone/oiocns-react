@@ -1,5 +1,5 @@
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel, model, schema } from '../../base';
-import Provider from '../provider';
 import Resource from './resource';
 
 export default class BaseProduct {
@@ -44,7 +44,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.Space?.target.id!,
       sourceId: this._prod.id,
     });
   }
@@ -69,7 +69,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.Space?.target.id!,
       sourceId: this._prod.id,
     });
   }
@@ -91,7 +91,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.Space?.target.id!,
       sourceId: this._prod.id,
     });
   }

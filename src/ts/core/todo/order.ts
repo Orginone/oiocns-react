@@ -1,6 +1,5 @@
 import { OrderITodo, OrderStatus } from './interface';
 
-import Provider from '../provider';
 import { common, kernel, schema } from '../../base';
 
 export default class OrderTodo implements OrderITodo {

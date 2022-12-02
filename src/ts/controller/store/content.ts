@@ -1,8 +1,8 @@
 import { XMarket } from '@/ts/base/schema';
 import { BaseProduct, Market } from '@/ts/core/market';
 import { productCtrl } from './productCtrl';
-import Provider from '@/ts/core/provider';
 import { myColumns, marketColumns } from './config';
+import userCtrl from '../setting/userCtrl';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -13,7 +13,7 @@ class StoreContent {
   // public public_store: XMerchandise[] = [];
   public curPageType: 'app' | 'market' = 'market'; // 判断当前所处页面类型,调用不同请求
   // public myAppList: XProduct[] = [];
-  public Person = Provider.getPerson; // 获取当前 个人实例
+  public Person = userCtrl.User; // 获取当前 个人实例
   public marketTableCallBack!: (data: any) => void; //触发页面渲染 callback
   // curMarket = storeClassify._curMarket;
   public _curMarket: Market | undefined = new Market({
@@ -67,7 +67,7 @@ class StoreContent {
   public async getStoreProduct(type = 'app', params?: any) {
     let Fun!: Function;
     if (type === 'app') {
-      Fun = Provider.getPerson!.getOwnProducts;
+      Fun = userCtrl.User!.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;

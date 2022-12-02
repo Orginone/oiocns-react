@@ -1,10 +1,10 @@
 import StoreContent from './content';
-import Provider from '@/ts/core/provider';
 import { Market } from '@/ts/core/market';
 // import Company from '@/ts/core/target/company';
 import { XMarket } from '@/ts/base/schema';
 import BaseController from '../baseCtrl';
 import { kernel } from '@/ts/base';
+import userCtrl from '../setting/userCtrl';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}
@@ -208,11 +208,11 @@ class StoreClassify extends BaseController {
    * @return {*}
    */
   public async getOwnMarket(isCaback = true) {
-    const marketTree = await Provider.getPerson!.getJoinMarkets();
+    const marketTree = await userCtrl.User!.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
-      arrs.push(`${item.belongId === Provider.userId ? '删除商店' : '退出商店'}`);
+      arrs.push(`${item.belongId === userCtrl.User?.target.id ? '删除商店' : '退出商店'}`);
       return {
         title: item.name,
         key: `0-${index}`,

@@ -7,7 +7,6 @@ import { XTarget } from '@/ts/base/schema';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-// import Provider from '@/ts/core/provider';
 
 type CompanySearchTableProps = {
   [key: string]: any;

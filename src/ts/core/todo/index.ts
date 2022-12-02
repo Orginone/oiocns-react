@@ -1,6 +1,6 @@
-import Provider from '../provider';
 import { ApplicationTodo, FriendTodo, TeamTodo, StoreTodo, ProductTodo } from './todo';
 import OrderTodo from './order';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 // import { kernel } from '@/ts/base';
 
 export type MenuTodoType = {
@@ -15,8 +15,8 @@ export type MenuTodoType = {
  */
 export const loadApplicationTodos = async () => {
   // 错误的接口数据，当下面的有数据时进行切换调试开发
-  if (Provider.getPerson) {
-    const data = await Provider.getPerson?.getOwnProducts(); // 暂用获取我的应用接口，待改为新借口
+  if (userCtrl.User) {
+    const data = await userCtrl.User?.getOwnProducts(); // 暂用获取我的应用接口，待改为新借口
     // console.log('menu', data);
     let applicationTodos: { label: string; key: string; node: ApplicationTodo }[] = [];
     if (data && data.length > 0) {

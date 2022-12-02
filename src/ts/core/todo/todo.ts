@@ -8,9 +8,9 @@ import {
   XFlowInstanceItem,
 } from './interface';
 import { common, kernel, model, schema } from '../../base';
-import Provider from '../provider';
 import { CommonStatus, TargetType } from '../enum';
 import { XRelation } from '../../base/schema';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /** 应用待办的实现*/
 export class ApplicationTodo implements iTodo {
@@ -39,7 +39,7 @@ export class ApplicationTodo implements iTodo {
     if (this.doList.length > 0) return this.doList;
     const result = await kernel.queryRecord({
       id: this.id,
-      spaceId: Provider.userId,
+      spaceId: userCtrl.User?.target.id!,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
 
@@ -54,7 +54,7 @@ export class ApplicationTodo implements iTodo {
     if (this.applyList.length > 0) return this.applyList;
     const result = await kernel.queryInstance({
       productId: this.id,
-      spaceId: Provider.userId,
+      spaceId: userCtrl.User?.target.id!,
       status: 1,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
@@ -150,7 +150,7 @@ export class FriendTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await Provider.getPerson?.queryJoinApproval();
+    const res = await userCtrl.User?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName === TargetType.Person;
@@ -168,7 +168,7 @@ export class FriendTodo extends BaseTodo {
   };
 
   getApplyList = async () => {
-    const res = await Provider.getPerson?.queryJoinApply();
+    const res = await userCtrl.User?.queryJoinApply();
     if (res?.success && res.data.result) {
       this.applyList = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName === TargetType.Person;
@@ -180,7 +180,7 @@ export class FriendTodo extends BaseTodo {
   approve = async (
     target: schema.XRelation,
   ): Promise<model.ResultType<schema.XRelation>> => {
-    const result = await Provider.getPerson!.approvalFriendApply(
+    const result = await userCtrl.User!.approvalFriendApply(
       target,
       CommonStatus.ApplyStartStatus,
     );
@@ -194,7 +194,7 @@ export class FriendTodo extends BaseTodo {
     return result;
   };
   reject = async (target: schema.XRelation) => {
-    const result = await Provider.getPerson!.approvalFriendApply(
+    const result = await userCtrl.User!.approvalFriendApply(
       target,
       CommonStatus.RejectStartStatus,
     );
@@ -205,7 +205,7 @@ export class FriendTodo extends BaseTodo {
     return result;
   };
   cancel = async (target: schema.XRelation) => {
-    const result = await Provider.getPerson!.cancelJoinApply(target.id);
+    const result = await userCtrl.User!.cancelJoinApply(target.id);
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
     }
@@ -228,7 +228,7 @@ export class TeamTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await Provider.getPerson?.queryJoinApproval();
+    const res = await userCtrl.User?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName !== TargetType.Person;
@@ -245,7 +245,7 @@ export class TeamTodo extends BaseTodo {
     }
   };
   getApplyList = async () => {
-    const res = await Provider.getPerson?.queryJoinApply();
+    const res = await userCtrl.User?.queryJoinApply();
     if (res?.success && res.data.result) {
       this.applyList = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName !== TargetType.Person;
@@ -256,7 +256,7 @@ export class TeamTodo extends BaseTodo {
   approve = async (
     target: schema.XRelation,
   ): Promise<model.ResultType<schema.XRelation>> => {
-    const result = await Provider.getPerson!.approvalFriendApply(
+    const result = await userCtrl.User!.approvalFriendApply(
       target,
       CommonStatus.ApplyStartStatus,
     );
@@ -270,7 +270,7 @@ export class TeamTodo extends BaseTodo {
     return result;
   };
   reject = async (target: schema.XRelation) => {
-    const result = await Provider.getPerson!.approvalFriendApply(
+    const result = await userCtrl.User!.approvalFriendApply(
       target,
       CommonStatus.RejectStartStatus,
     );
@@ -284,7 +284,7 @@ export class TeamTodo extends BaseTodo {
     const result = await kernel.cancelJoinTeam({
       id: target.id,
       typeName: target.team?.target?.typeName || TargetType.Company, // 如果没有就默认是单位，暂时
-      belongId: Provider.userId,
+      belongId: userCtrl.User?.target.id!,
     });
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
@@ -315,7 +315,7 @@ export class StoreTodo extends BaseTodo {
   }
   getTodoList = async () => {
     const res = await kernel.queryJoinMarketApplyByManager({
-      id: Provider.userId,
+      id: userCtrl.User?.target.id!,
       page: {
         offset: 0,
         filter: '',
@@ -335,7 +335,7 @@ export class StoreTodo extends BaseTodo {
 
   getApplyList = async () => {
     const res = await kernel.queryJoinMarketApplyByManager({
-      id: Provider.userId,
+      id: userCtrl.User?.target.id!,
       page: {
         offset: 0,
         filter: '',
@@ -376,7 +376,7 @@ export class StoreTodo extends BaseTodo {
     return result;
   };
   cancel = async (target: schema.XMarketRelation) => {
-    const result = await Provider.getPerson!.cancelJoinMarketApply(target.id);
+    const result = await userCtrl.User!.cancelJoinMarketApply(target.id);
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
     }
@@ -406,7 +406,7 @@ export class ProductTodo extends BaseTodo {
   }
   getTodoList = async () => {
     const res = await kernel.queryMerchandiesApplyByManager({
-      id: Provider.userId,
+      id: userCtrl.User?.target.id!,
       page: {
         offset: 0,
         filter: '',
@@ -426,7 +426,7 @@ export class ProductTodo extends BaseTodo {
 
   getApplyList = async () => {
     const res = await kernel.queryMerchandiseApply({
-      id: Provider.userId,
+      id: userCtrl.User?.target.id!,
       page: {
         offset: 0,
         filter: '',
@@ -468,7 +468,7 @@ export class ProductTodo extends BaseTodo {
   cancel = async (target: schema.XMerchandise) => {
     const result = await kernel.deleteMerchandise({
       id: target.id,
-      belongId: Provider.userId,
+      belongId: userCtrl.User?.target.id!,
     });
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
