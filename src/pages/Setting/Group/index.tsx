@@ -29,29 +29,27 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
 
-   /**
+  /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
   useEffect(() => {
-    settingController.addListen('isOpenModal', () => { 
+    settingController.addListen('isOpenModal', () => {
       setIsOpen(true);
-    })
-    return settingController.remove('isOpenModal', () => { 
+    });
+    return settingController.remove('isOpenModal', () => {
       setIsOpen(false);
-    })
+    });
   }, []);
 
   /**
    * 监听集团id发生变化，改变右侧数据
-   * */ 
+   * */
   useEffect(() => {
     settingController.addListen('createGroup', (e) => {
-      console.log('1111', e);     
-    })
-    return settingController.remove('createGroup', () => {
-        
-    })
+      console.log('1111', e);
+    });
+    return settingController.remove('createGroup', () => {});
   }, []);
 
   const onOk = () => {
@@ -110,7 +108,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setIsOpen(true)
+            setIsOpen(true);
           }}>
           编辑
         </Button>

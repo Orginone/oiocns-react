@@ -7,9 +7,9 @@ import Title from 'antd/lib/typography/Title';
 import { Modal, Button } from 'antd';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import { ColumnsType } from 'antd/lib/table';
-import { schema } from '../../../ts/base';
-import PersonInfoEnty from '../../../ts/core/provider';
-import friendController from '../../../ts/controller/friend/index';
+import { schema } from '@/ts/base';
+import PersonInfoEnty from '@/ts/core/provider';
+import friendController from '@/ts/controller/friend/index';
 interface OperationType {
   key: string;
   label: string;
@@ -63,13 +63,12 @@ const renderOperation = (item: schema.XTarget): OperationType[] => {
  */
 const PersonFriend: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [friend, setFriend] = useState<Person>();
+  const [friend, setFriend] = useState<schema.XTarget>();
   const [data, setData] = useState<schema.XTarget[]>([]);
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
 
   useEffect(() => {
     friendController.setCallBack(setData);
-    // friendController.setCallBack(setData);
     getData();
   }, []);
   const getData = async () => {
@@ -84,9 +83,6 @@ const PersonFriend: React.FC = () => {
   const handleOk = () => {
     setLookApplyOpen(false);
     setIsModalOpen(false);
-    // if (friend) {
-    //   mutation.mutate(friend?.id);
-    // }
 
     console.log(friend);
   };
@@ -96,7 +92,7 @@ const PersonFriend: React.FC = () => {
   };
 
   // 搜索回调
-  const searchCallback = (person: Person) => {
+  const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
 
@@ -127,7 +123,6 @@ const PersonFriend: React.FC = () => {
         dataSource={data}
         total={data.length}
         operation={renderOperation}
-        // renderCardContent={renderCard}
         columns={columns as any}
         rowKey={'id'}
       />

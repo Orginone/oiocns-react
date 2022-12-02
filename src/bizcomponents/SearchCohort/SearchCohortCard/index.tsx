@@ -16,20 +16,9 @@ interface AppCardType {
   data: schema.XTarget; //props
   className?: string;
   defaultKey?: defaultObjType; // 卡片字段 对应数据字段
-  // eslint-disable-next-line no-unused-vars
-  // eslint-disable-next-line no-unused-vars
 }
-const defaultObj = {
-  name: 'name', //名称
-  size: 'size', //大小
-  type: 'type', //是否免费
-  desc: 'desc', //描述
-  typeName: 'typeName', //应用类型
-  creatTime: 'creatTime', //上架时间
-};
 
-const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) => {
-  const {} = { ...defaultObj, ...defaultKey };
+const CohortListCard: React.FC<AppCardType> = ({ className, data }) => {
   const [name, setName] = useState('');
 
   useEffect(() => {
@@ -83,7 +72,6 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) 
               icon={
                 <UsergroupAddOutlined style={{ fontSize: '25px', color: '#808080' }} />
               }
-              // onClick={onClick}
             />
           </li>
         </ul>

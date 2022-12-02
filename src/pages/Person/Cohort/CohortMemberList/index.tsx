@@ -15,10 +15,10 @@ import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
 import Cohort from '@/ts/core/target/cohort';
-import CohortController from '../../../../ts/controller/cohort/index';
-import FriendController from '../../../../ts/controller/friend';
+import CohortController from '@/ts/controller/cohort/index';
+import FriendController from '@/ts/controller/friend';
 import { useHistory } from 'react-router-dom';
-import { schema } from '../../../../ts/base';
+import { schema } from '@/ts/base';
 import Provider from '@/ts/core/provider';
 import { IChat } from '@/ts/core/chat/ichat';
 import { chatCtrl } from '@/ts/controller/chat';
@@ -43,12 +43,10 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const res = await FriendController.getMyFriend();
     setFriendList(res);
   };
-  /**获取好友列表 */
+  /**移除成员 */
   const removeMember = async (ids: string[]) => {
     CohortController.setCallBack(setMemberData);
-    const res = await CohortController.removeCohort(cohortData, ids);
-    console.log('群组信息', cohortData);
-    console.log('踢出群组结果', res);
+    await CohortController.removeCohort(cohortData, ids);
   };
   /**
    * 获取操作列表
@@ -120,7 +118,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
-        // console.log(chat);
         if (id == chat.target.id) {
           console.log(chat);
           return chat;
@@ -182,8 +179,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     if (value!) {
       await getMemberData();
       setMemberData(memberData.filter((obj) => obj.code === value));
-      console.log('目前的值', memberData);
-      console.log('1111', value);
     } else {
       await getMemberData();
     }
@@ -222,9 +217,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
                   data={memberData}
                   height={ContainerHeight}
                   itemHeight={47}
-                  itemKey={'id'}
-                  // onScroll={onScroll}
-                >
+                  itemKey={'id'}>
                   {(item: schema.XTarget) => (
                     <List.Item key={item.id} actions={getAction(item)!}>
                       <List.Item.Meta

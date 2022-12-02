@@ -39,7 +39,7 @@ const DocClassifyTree = ({
       docsCtrl.open(selectedKeys[0]);
     }
   };
-  const onExpand = async (_keys: any, info: { expanded: any; node: { key: string } }) => {
+  const onExpand = async (_: any, info: { expanded: boolean; node: { key: string } }) => {
     if (info.expanded) {
       await docsCtrl.open(info.node.key);
     }
