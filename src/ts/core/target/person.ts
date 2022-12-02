@@ -43,7 +43,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort]);
+    const res = await this.getjoinedTargets([TargetType.Cohort], this.target.id);
     console.log('输出返回结果', res);
     if (res.success) {
       console.log('进入了');
@@ -59,7 +59,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (this.joinedCompany.length > 0) {
       return this.joinedCompany;
     }
-    const res = await this.getjoinedTargets(consts.CompanyTypes);
+    const res = await this.getjoinedTargets(consts.CompanyTypes, this.target.id);
     if (res.success && res.data?.result) {
       this.joinedCompany = res.data.result.map((a) => {
         let company;
@@ -86,6 +86,7 @@ export default class Person extends MarketTarget implements IPerson {
       ...data,
       teamCode: data.code,
       teamName: data.name,
+      belongId: this.target.id,
     });
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
@@ -95,8 +96,9 @@ export default class Person extends MarketTarget implements IPerson {
     return res;
   }
   public async createCompany(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
+    data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
+    data.belongId = this.target.id;
     if (!consts.CompanyTypes.includes(<TargetType>data.typeName)) {
       return faildResult('您无法创建该类型单位!');
     }

@@ -9,7 +9,6 @@ import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid } from '@/utils/tools';
 
 import { useLocation } from 'react-router-dom';
-// import useStore from '@/store';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
 // import StoreContent from '@/ts/controller/store/content';
 import { XProduct } from '@/ts/base/schema';

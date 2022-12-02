@@ -272,7 +272,7 @@ export interface IPerson {
    * @param id 目标Id
    * @returns
    */
-  applyJoinCompany(id: string, typeName: TargetType): Promise<ResultType<any>>;
+  applyJoinCompany(id: string): Promise<ResultType<any>>;
   /**
    * 退出群组
    * @param id 群组Id

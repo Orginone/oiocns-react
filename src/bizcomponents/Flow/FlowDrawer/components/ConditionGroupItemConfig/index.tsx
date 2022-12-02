@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { SettingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Row, Button, Select, InputNumber, Input } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import React, { useState, useCallback } from 'react';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Select, InputNumber, Input } from 'antd';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
 
 /**

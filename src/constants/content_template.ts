@@ -1,7 +1,7 @@
 export enum TOOBAR_TYPE {
-  SHARE,
-  COMMEMNT,
-  STORAGE,
+  'SHARE',
+  'COMMEMNT',
+  'STORAGE',
 }
 
 export const toobarTypeAndNameMaps: Record<TOOBAR_TYPE, string> = {

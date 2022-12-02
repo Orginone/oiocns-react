@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-import Types from '@/module/typings';
 import { XTarget } from '@/ts/base/schema';
 import UserdataService from '@/ts/core/target/user';
 import BaseController from './basecontroller';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Typography } from 'antd';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 
 /**
  * @description: 编辑名称
