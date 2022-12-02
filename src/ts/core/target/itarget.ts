@@ -18,6 +18,20 @@ export type SpaceType = {
 
 /** 市场相关操作方法 */
 export interface IMTarget {
+  /** 我加入的市场 */
+  joinedMarkets: Market[];
+  /** 开放市场 */
+  publicMarkets: Market[];
+  /** 拥有的产品/应用 */
+  ownProducts: BaseProduct[];
+  /** 我的购物车 */
+  stagings: schema.XStaging[];
+  /** 我发起的加入市场的申请 */
+  joinMarketApplys: schema.XMarketRelation[];
+  /** 可使用的应用 */
+  usefulProduct: schema.XProduct[];
+  /** 可使用的资源 */
+  usefulResource: Map<string, schema.XResource[]>;
   /**
    * 根据编号查询市场
    * @param name 编号、名称
@@ -163,13 +177,31 @@ export interface IMTarget {
    * @returns
    */
   deleteProduct(id: string): Promise<ResultType<boolean>>;
-
   /**
    * 退出市场
    * @param id 退出的市场Id
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
+  /** 获得可用应用 */
+  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 获得可用资源
+   * @param id 应用Id
+   */
+  getUsefulResource(id: string): Promise<schema.XResource[]>;
+}
+export interface IFlowTarget {
+  /** 获取流程定义列表 */
+  getDefines(): schema.XFlowDefine[];
+  // TODO
+  createDefine(data: schema.XFlowDefine): Promise<ResultType<schema.XFlowDefine>>;
+  createInstance(
+    data: model.FlowInstanceModel,
+  ): Promise<model.ResultType<schema.XFlowInstance>>;
+  createFlowRelation(
+    params: model.FlowRelationModel,
+  ): Promise<model.ResultType<schema.XFlowRelation>>;
 }
 /** 群组操作 */
 export interface ICohort {
@@ -203,9 +235,19 @@ export interface ICohort {
   removeMember(ids: string[], typeName: TargetType): Promise<ResultType<any>>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 查询单位
+   * @param code 单位的信用代码
+   */
+  searchCompany(code: string): Promise<ResultType<schema.XTargetArray>>;
+  /**
+   * 查询人员
+   * @param code 人员编号
+   */
+  searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson {
+export interface IPerson extends IMTarget {
   /** 人员实体 */
   target: schema.XTarget;
   /** 职权树 */
@@ -216,16 +258,6 @@ export interface IPerson {
   joinedCohort: ICohort[];
   /** 我加入的单位 */
   joinedCompany: ICompany[];
-  /** 我加入的市场 */
-  joinedMarkets: Market[];
-  /** 开放市场 */
-  publicMarkets: Market[];
-  /** 拥有的产品/应用 */
-  ownProducts: BaseProduct[];
-  /** 我的购物车 */
-  stagings: schema.XStaging[];
-  /** 我发起的加入市场的申请 */
-  joinMarketApplys: schema.XMarketRelation[];
   /** 空间类型数据 */
   getSpaceData: SpaceType;
   /**
@@ -234,7 +266,6 @@ export interface IPerson {
    * @returns 是否成功
    */
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
-
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
@@ -334,156 +365,6 @@ export interface IPerson {
    */
   cancelJoinApply(id: string): Promise<ResultType<any>>;
   /**
-   * 根据编号查询市场
-   * @param code 编号
-   */
-  getMarketByCode(code: string): Promise<ResultType<schema.XMarketArray>>;
-  /**
-   * 查询我拥有的应用
-   */
-  getOwnProducts(): Promise<BaseProduct[]>;
-  /** 查询我加入的市场 */
-  getJoinMarkets(): Promise<Market[]>;
-  /** 查询开放的市场 */
-  getPublicMarket(): Promise<Market[]>;
-  /** 查询购物车 */
-  getStaging(): Promise<schema.XStaging[]>;
-  /**
-   * 查询我购买的订单列表
-   * @param status 订单状态 0:不过滤状态
-   * @param page 分页参数
-   */
-  getBuyOrders(
-    status: number,
-    page: model.PageRequest,
-  ): Promise<ResultType<schema.XOrderArray>>;
-  /**
-   * 查询我卖出的订单列表
-   * @param status 订单状态 0:不过滤状态
-   * @param page 分页参数
-   */
-  getSellOrders(
-    status: number,
-    page: model.PageRequest,
-  ): Promise<ResultType<schema.XOrderDetailArray>>;
-  /**
-   * 申请加入市场
-   * @param id 市场ID
-   * @returns
-   */
-  applyJoinMarket(id: string): Promise<ResultType<any>>;
-  /**
-   * 取消加入市场申请
-   * @param id 申请Id
-   */
-  cancelJoinMarketApply(id: string): Promise<ResultType<any>>;
-  /**
-   * 查询我发起的加入市场申请
-   * @param page 分页参数
-   * @returns
-   */
-  getJoinMarketApplys(): Promise<schema.XMarketRelation[]>;
-  /**
-   * 查询加入市场审批
-   */
-  queryJoinMarketApproval(): Promise<ResultType<schema.XMarketRelationArray>>;
-  /**
-   * 查询应用上架的审批
-   * @returns
-   */
-  queryPublicApproval(): Promise<ResultType<schema.XMerchandiseArray>>;
-  /**
-   * 审批加入市场申请
-   * @param id 申请id
-   * @param status 审批状态
-   * @returns
-   */
-  approvalJoinMarketApply(id: string, status: number): Promise<ResultType<boolean>>;
-  /**
-   * 审批商品上架申请
-   * @param id 申请ID
-   * @param status 审批结果
-   * @returns 是否成功
-   */
-  approvalPublishApply(id: string, status: number): Promise<ResultType<any>>;
-  /**
-   * 创建市场
-   * @param  {model.MarketModel} 市场基础信息
-   * @returns
-   */
-  createMarket(
-    // 名称
-    name: string,
-    // 编号
-    code: string,
-    // 备注
-    remark: string,
-    // 监管组织/个人
-    samrId: string,
-    // 是否开放
-    ispublic: boolean,
-  ): Promise<ResultType<schema.XMarket>>;
-  /**
-   * 创建应用
-   * @param  {model.ProductModel} 产品基础信息
-   */
-  createProduct({
-    name,
-    code,
-    remark,
-    resources,
-    thingId,
-    typeName,
-  }: {
-    // 名称
-    name: string;
-    // 编号
-    code: string;
-    // 备注
-    remark: string;
-    // 资源列
-    resources: model.ResourceModel[] | undefined;
-    // 元数据Id
-    thingId: string;
-    // 产品类型名
-    typeName: string;
-  }): Promise<ResultType<schema.XProduct>>;
-  /**
-   * 加入购物车
-   * @param id 商品Id
-   */
-  stagingMerchandise(id: string): Promise<ResultType<schema.XStaging>>;
-  /**
-   * 删除购物车
-   * @param id
-   */
-  deleteStaging(id: string): Promise<ResultType<any>>;
-  /**
-   * 删除市场
-   * @param id 市场Id
-   * @returns
-   */
-  deleteMarket(id: string): Promise<ResultType<boolean>>;
-  /**
-   * 删除应用
-   * @param id 应用Id
-   * @returns
-   */
-  deleteProduct(id: string): Promise<ResultType<boolean>>;
-  /**
-   * 退出市场
-   * @param id 退出的市场Id
-   * @returns
-   */
-  quitMarket(id: string): Promise<ResultType<any>>;
-  /** 获得可用应用 */
-  getUsefulProduct(): Promise<schema.XProduct[]>;
-  /**
-   * 获得可用资源
-   * @param id 应用Id
-   */
-  getUsefulResource(id: string): Promise<schema.XResource[]>;
-  /**
    * 修改密码
    * @param password 新密码
    * @param privateKey 私钥
@@ -493,10 +374,20 @@ export interface IPerson {
    * 查询单位
    * @param code 单位的信用代码
    */
-  searchCompany(code: string): Promise<ResultType<schema.XTarget[]>>;
+  searchCompany(code: string): Promise<ResultType<schema.XTargetArray>>;
+  /**
+   * 查询群组
+   * @param code 群组编号
+   */
+  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
+  /**
+   * 查询人员
+   * @param code 人员编号
+   */
+  searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany {
+export interface ICompany extends IMTarget {
   /** 单位实体 */
   target: schema.XTarget;
   /** 职权树 */
@@ -511,16 +402,6 @@ export interface ICompany {
   joinedGroup: IGroup[];
   /** 我加入的群组 */
   joinedCohort: ICohort[];
-  /** 我加入的市场 */
-  joinedMarkets: Market[];
-  /** 开放市场 */
-  publicMarkets: Market[];
-  /** 拥有的产品/应用 */
-  ownProducts: BaseProduct[];
-  /** 我的购物车 */
-  stagings: schema.XStaging[];
-  /** 我发起的加入市场的申请 */
-  joinMarketApplys: schema.XMarketRelation[];
   /** 空间类型数据 */
   getSpaceData: SpaceType;
   /**
@@ -635,155 +516,15 @@ export interface ICompany {
    */
   cancelJoinApply(id: string): Promise<ResultType<any>>;
   /**
-   * 根据编号查询市场
-   * @param code 编号
+   * 查询群组
+   * @param code 群组编号
    */
-  getMarketByCode(code: string): Promise<ResultType<schema.XMarketArray>>;
+  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
-   * 查询我拥有的应用
+   * 查询集团
+   * @param code 集团编号
    */
-  getOwnProducts(): Promise<BaseProduct[]>;
-  /** 查询我加入的市场 */
-  getJoinMarkets(): Promise<Market[]>;
-  /** 查询开放的市场 */
-  getPublicMarket(): Promise<Market[]>;
-  /** 查询购物车 */
-  getStaging(): Promise<schema.XStaging[]>;
-  /**
-   * 查询我购买的订单列表
-   * @param status 订单状态 0:不过滤状态
-   * @param page 分页参数
-   */
-  getBuyOrders(
-    status: number,
-    page: model.PageRequest,
-  ): Promise<ResultType<schema.XOrderArray>>;
-  /**
-   * 查询我卖出的订单列表
-   * @param status 订单状态 0:不过滤状态
-   * @param page 分页参数
-   */
-  getSellOrders(
-    status: number,
-    page: model.PageRequest,
-  ): Promise<ResultType<schema.XOrderDetailArray>>;
-  /**
-   * 申请加入市场
-   * @param id 市场ID
-   * @returns
-   */
-  applyJoinMarket(id: string): Promise<ResultType<any>>;
-  /**
-   * 取消加入市场申请
-   * @param id 申请Id
-   */
-  cancelJoinMarketApply(id: string): Promise<ResultType<any>>;
-  /**
-   * 查询我发起的加入市场申请
-   * @param page 分页参数
-   * @returns
-   */
-  getJoinMarketApplys(): Promise<schema.XMarketRelation[]>;
-  /**
-   * 查询加入市场审批
-   */
-  queryJoinMarketApproval(): Promise<ResultType<schema.XMarketRelationArray>>;
-  /**
-   * 查询应用上架的审批
-   * @returns
-   */
-  queryPublicApproval(): Promise<ResultType<schema.XMerchandiseArray>>;
-  /**
-   * 审批加入市场申请
-   * @param id 申请id
-   * @param status 审批状态
-   * @returns
-   */
-  approvalJoinMarketApply(id: string, status: number): Promise<ResultType<boolean>>;
-  /**
-   * 审批商品上架申请
-   * @param id 申请ID
-   * @param status 审批结果
-   * @returns 是否成功
-   */
-  approvalPublishApply(id: string, status: number): Promise<ResultType<any>>;
-  /**
-   * 创建市场
-   * @param  {model.MarketModel} 市场基础信息
-   * @returns
-   */
-  createMarket(
-    // 名称
-    name: string,
-    // 编号
-    code: string,
-    // 备注
-    remark: string,
-    // 监管组织/个人
-    samrId: string,
-    // 是否开放
-    ispublic: boolean,
-  ): Promise<ResultType<schema.XMarket>>;
-  /**
-   * 创建应用
-   * @param  {model.ProductModel} 产品基础信息
-   */
-  createProduct({
-    name,
-    code,
-    remark,
-    resources,
-    thingId,
-    typeName,
-  }: {
-    // 名称
-    name: string;
-    // 编号
-    code: string;
-    // 备注
-    remark: string;
-    // 资源列
-    resources: model.ResourceModel[] | undefined;
-    // 元数据Id
-    thingId: string;
-    // 产品类型名
-    typeName: string;
-  }): Promise<ResultType<schema.XProduct>>;
-  /**
-   * 加入购物车
-   * @param id 商品Id
-   */
-  stagingMerchandise(id: string): Promise<ResultType<any>>;
-  /**
-   * 删除购物车
-   * @param id
-   */
-  deleteStaging(id: string): Promise<ResultType<any>>;
-  /**
-   * 删除市场
-   * @param id 市场Id
-   * @returns
-   */
-  deleteMarket(id: string): Promise<ResultType<boolean>>;
-  /**
-   * 删除应用
-   * @param id 应用Id
-   * @returns
-   */
-  deleteProduct(id: string): Promise<ResultType<boolean>>;
-  /**
-   * 退出市场
-   * @param id 退出的市场Id
-   * @returns
-   */
-  quitMarket(id: string): Promise<ResultType<any>>;
-  /** 获得可用应用 */
-  getUsefulProduct(): Promise<schema.XProduct[]>;
-  /**
-   * 获得可用资源
-   * @param id 应用Id
-   */
-  getUsefulResource(id: string): Promise<schema.XResource[]>;
+  searchGroup(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 集团操作 */
 export interface IGroup {
@@ -877,7 +618,6 @@ export interface IDepartment {
   /** 删除工作组 */
   deleteWorking(id: string): Promise<model.ResultType<any>>;
 }
-
 export interface IWorking {
   /** 部门实体 */
   target: schema.XTarget;

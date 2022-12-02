@@ -674,7 +674,7 @@ export type NameTypeModel = {
   // 名称
   name: string;
   // 类型名
-  typeName: string;
+  typeNames: string[];
   // 分页
   page: PageRequest | undefined;
 };

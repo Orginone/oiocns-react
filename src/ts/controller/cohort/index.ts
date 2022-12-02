@@ -137,7 +137,7 @@ class CohortController {
     obj: IPerson | ICompany,
     name: string,
   ): Promise<model.ResultType<any>> {
-    const res = await obj.searchTargetByName(name, TargetType.Cohort);
+    const res = await obj.searchTargetByName(name, [TargetType.Cohort]);
     console.log(res);
     return res;
   }
@@ -151,7 +151,7 @@ class CohortController {
     obj: Person | Company | Cohort,
     name: string,
   ): Promise<model.ResultType<any>> {
-    const res = await obj.searchTargetByName(name, TargetType.Person);
+    const res = await obj.searchTargetByName(name, [TargetType.Person]);
     return res;
   }
   /**
