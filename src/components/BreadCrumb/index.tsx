@@ -70,8 +70,6 @@ const BreadCrumb: React.FC = (props) => {
               : null,
           };
         });
-      // console.log(breadcrumbNameMap[url]?.title, menuItems);
-      // menu = <Menu ite ms={items}></Menu>;
     }
     return (
       breadcrumbNameMap[url]?.title && (

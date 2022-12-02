@@ -1,6 +1,5 @@
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown, Menu, MenuProps } from 'antd';
-import type { ItemType } from 'antd/es/menu/hooks/useItems';
+import { Avatar, Dropdown, MenuProps } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -63,30 +62,32 @@ const UserAvatar: React.FC = () => {
   /**
    * 下拉菜单项
    */
-  const menuItems: ItemType[] = [
-    {
-      key: 'person/info',
-      icon: <UserOutlined />,
-      label: '个人中心',
-    },
-    {
-      type: 'divider' as const,
-    },
-    {
-      key: 'lock',
-      icon: <LockOutlined />,
-      label: '离开锁屏',
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-    },
-  ];
+  const menuItems: MenuProps = {
+    onClick: onClick,
+    items: [
+      {
+        key: 'person/info',
+        icon: <UserOutlined />,
+        label: '个人中心',
+      },
+      {
+        type: 'divider' as const,
+      },
+      {
+        key: 'lock',
+        icon: <LockOutlined />,
+        label: '离开锁屏',
+      },
+      {
+        key: 'logout',
+        icon: <LogoutOutlined />,
+        label: '退出登录',
+      },
+    ],
+  };
 
-  const menu = <Menu items={menuItems} onClick={onClick}></Menu>;
   return (
-    <Dropdown overlay={menu} placement="bottomLeft">
+    <Dropdown menu={menuItems} placement="bottomLeft">
       {user.avatar ? (
         <Avatar
           src={'https://joeschmoe.io/api/v1/random'}

@@ -1,5 +1,6 @@
 import { BucketOpreateModel, ResultType } from '../model';
 import StoreHub from './storehub';
+import { logger } from '../common';
 
 /**
  * 任意数据存储类
@@ -42,7 +43,7 @@ export default class AnyStore {
             });
           })
           .catch((err) => {
-            console.log(err);
+            logger.error(err);
           });
       }
     });
@@ -101,7 +102,7 @@ export default class AnyStore {
             }
           })
           .catch((err) => {
-            console.log(err);
+            logger.error(err);
           });
       }
     }
@@ -121,7 +122,7 @@ export default class AnyStore {
           console.debug(`${key}取消订阅成功.`);
         })
         .catch((err) => {
-          console.log(err);
+          logger.error(err);
         });
     }
     delete this._subscribeCallbacks[fullKey];

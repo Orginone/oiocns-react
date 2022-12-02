@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown, Menu, Modal } from 'antd';
+import { Avatar, Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
 import { MarketTypes } from 'typings/marketType';
@@ -20,14 +20,14 @@ interface AppCardType {
   onClick?: (event?: any) => void;
   operation?: (_item: Cohort) => MarketTypes.OperationType[]; //操作区域数据
 }
-const defaultObj = {
-  name: 'name', //名称
-  size: 'size', //大小
-  type: 'type', //是否免费
-  desc: 'desc', //描述
-  typeName: 'typeName', //应用类型
-  creatTime: 'creatTime', //上架时间
-};
+// const defaultObj = {
+//   name: 'name', //名称
+//   size: 'size', //大小
+//   type: 'type', //是否免费
+//   desc: 'desc', //描述
+//   typeName: 'typeName', //应用类型
+//   creatTime: 'creatTime', //上架时间
+// };
 
 const CohortCardComp: React.FC<AppCardType> = ({
   className,
@@ -36,15 +36,7 @@ const CohortCardComp: React.FC<AppCardType> = ({
   onClick,
   operation,
 }) => {
-  const {} = { ...defaultObj, ...defaultKey };
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = () => {
-    return <Menu items={operation && operation(data)} />;
-  };
+  // const {} = { ...defaultObj, ...defaultKey };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
 
@@ -75,7 +67,10 @@ const CohortCardComp: React.FC<AppCardType> = ({
             <span className="app-size">{data.target.team?.remark || '--'}</span>
           </div>
         </div>
-        <Dropdown className="card-title-extra" overlay={menu} placement="bottom">
+        <Dropdown
+          className="card-title-extra"
+          menu={{ items: operation && operation(data) }}
+          placement="bottom">
           <EllipsisOutlined rotate={90} />
         </Dropdown>
       </div>

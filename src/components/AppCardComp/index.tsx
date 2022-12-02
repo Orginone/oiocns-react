@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu } from 'antd';
+import { Avatar, Tag, Dropdown } from 'antd';
 import React from 'react';
 import './index.less';
 import AppLogo from '@/assets/img/appLogo.png';
@@ -45,14 +45,6 @@ const AppCardComp: React.FC<AppCardType> = ({
     typeName = 'typeName',
     creatTime = 'creatTime',
   } = { ...defaultObj, ...defaultKey };
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = () => {
-    return <Menu items={operation && operation(data)} />;
-  };
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -66,7 +58,10 @@ const AppCardComp: React.FC<AppCardType> = ({
             <span className="app-size">{data[size] || '--'}MB</span>
           </div>
         </div>
-        <Dropdown className="card-title-extra" overlay={menu} placement="bottom">
+        <Dropdown
+          className="card-title-extra"
+          menu={{ items: operation && operation(data) }}
+          placement="bottom">
           <EllipsisOutlined rotate={90} />
         </Dropdown>
       </div>

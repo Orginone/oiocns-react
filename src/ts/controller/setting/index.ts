@@ -1,13 +1,18 @@
-import BaseController from './SingletonPublish';
 import UserdataService from '../../core/target/user';
 import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
 import React from 'react';
 import * as Icon from '@ant-design/icons';
 import Types from '@/module/typings';
-import { XTarget } from '../../base/schema';
-import { model } from '../../base';
+import { XTarget, XTargetArray } from '../../base/schema';
+// import { model } from '../../base';
 import Provider from '../../core/provider';
+import { rootDir } from '../../core/store/filesys';
+import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
+import { kernel } from '@/ts/base';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
+import BaseController from '../baseCtrl';
+
 export interface spaceObjs {
   id: string;
   title: string;
@@ -29,7 +34,13 @@ export type deptParams = {
   parentId?: string;
   targetType?: TargetType.Department;
 };
-
+/** 任务模型 */
+export type SettingModel = {
+  name: string;
+  size: number;
+  process?: number;
+  createTime: Date;
+};
 // 返回类型定义
 export type ObjType = {
   // 消息
@@ -37,21 +48,34 @@ export type ObjType = {
   // 结果
   success: boolean;
 };
-class SettingController extends BaseController {
+class SettingIndexController extends BaseController {
   private _isOpenModal: boolean = false;
   // 我的用户服务
   private userDataService: UserdataService = UserdataService.getInstance();
+  private _root: IFileSystemItem;
   // 对应公司的ID
   // 测试的时候先写死， 到时候切换成 当前工作空间ID
-  companyID: string = '381107910723375104';
+  private companyID: string = '';
   /** 页面isOpen控制是否显示弹窗 */
   public get getIsOpen() {
     return this._isOpenModal;
   }
-
+  public set setCompanyID(id: string) {
+    this.companyID = id;
+  }
+  constructor() {
+    super();
+    this._root = rootDir;
+    Provider.onSetPerson(async () => {
+      if (settingCtrl.getCurWorkSpace) {
+        // 修改选中的公司空间
+        this.companyID = settingCtrl.getCurWorkSpace.id;
+      }
+    });
+  }
   /**设弹窗 */
   public async setIsOpen(params: boolean) {
-    console.log(params);
+    // console.log(params);
     this._isOpenModal = params;
   }
 
@@ -82,12 +106,11 @@ class SettingController extends BaseController {
       param.teamName,
       param.teamCode,
       param.remark,
-      compid, // 团队ID
+      compid!, // 团队ID
       false,
       deptId, // 属于哪个部门的ID
     );
 
-    // 加入到 公司部门底下的缓存
     return {
       msg: res.msg,
       success: res.success,
@@ -101,9 +124,9 @@ class SettingController extends BaseController {
    */
   public async getDepartments(parentId: string): Promise<spaceObjs[]> {
     let arrays: spaceObjs[] = [];
-    let compid = parentId;
+    let compid: string = parentId;
     if (parentId === '0') {
-      compid = this.companyID;
+      compid = this.companyID + '';
     }
     const companys: Company[] = await this.userDataService.getBelongTargets(
       compid,
@@ -119,7 +142,7 @@ class SettingController extends BaseController {
         );
         if (company2s.length > 0) {
           const getValue = await this.getDepartments(comp.target.id);
-          console.log('getValue', getValue);
+          // console.log('getValue', getValue);
           arrayChild = getValue?.map((item) => {
             return { ...item, icon: React.createElement(Icon['ApartmentOutlined']) };
           });
@@ -178,9 +201,9 @@ class SettingController extends BaseController {
       param.teamName,
       param.teamCode,
       param.remark,
-      compid, // 上一层ID
+      compid + '', // 上一层ID
       true,
-      compid, // 属于哪个公司的ID
+      compid + '', // 属于哪个公司的ID
     );
     return {
       msg: res.msg,
@@ -188,24 +211,51 @@ class SettingController extends BaseController {
     };
   }
 
+  // 查询部门的内容
+  public async searchDeptment(departId: string): Promise<XTargetArray> {
+    const res = await kernel.queryTargetById({ ids: [departId], page: undefined });
+    if (res.success) {
+      return res.data;
+    } else {
+      return {
+        offset: 0,
+        limit: 0,
+        total: 0,
+        result: undefined,
+      };
+    }
+  }
+
   // 查询公司底下所有的用户
   public async searchAllPersons(departId?: string): Promise<XTarget[]> {
     const comp: Company = new Company(Provider.getPerson?.target!);
     let res: XTarget[];
     if (departId == null) {
-      comp.target.id = this.companyID;
+      comp.target.id = this.companyID + '';
       comp.target.typeName = TargetType.Company;
       res = await comp.getPersons();
-      console.log('===查询公司底下的用户', res);
+      // console.log('===查询公司底下的用户', res);
     } else {
       comp.target.id = departId;
       comp.target.typeName = TargetType.Department;
       res = await comp.getPersons();
-      console.log('===查询部门底下的用户', res);
+      // console.log('===查询部门底下的用户', res);
     }
     return res;
   }
+
+  // 上传到我的文件夹目录，然后再保存 share_link，到时候预览
+  public async upload(key: string, name: string, file: Blob): Promise<IObjectItem> {
+    // const task: SettingModel = {
+    //   process: 0,
+    //   name: name,
+    //   size: file.size,
+    //   createTime: new Date(),
+    // };
+
+    return await this._root.upload(name, file, (p) => {});
+  }
 }
-const settingController = new SettingController();
+const settingController = new SettingIndexController();
 
 export default settingController;

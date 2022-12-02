@@ -16,7 +16,8 @@ type LayoutHeaderProps = {
   OnPreview: Function;
   OnExit: Function;
   [key: string]: any;
-  backTable: () => void;
+  backTable?: () => void;
+  titleName: string;
 };
 const { confirm } = Modal;
 /**
@@ -24,7 +25,7 @@ const { confirm } = Modal;
  * @returns
  */
 const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => {
-  const { backTable } = props;
+  const { titleName } = props;
   const form = useAppwfConfig((state: any) => state.form);
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -80,36 +81,13 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
       <div>
         <div className={cls['layout-header']}>
           <div className={cls['back']}>
-            <span>
-              流程名：
-              {showInput && (
-                <Input
-                  style={{ width: '200px' }}
-                  onBlur={() => setShowInput(false)}
-                  onKeyDown={(e) => onkeydown(e)}></Input>
-              )}
-              {!showInput && (
-                <span onClick={() => setShowInput(true)}>
-                  新增流程
-                  <EditOutlined />
-                </span>
-              )}
-            </span>
+            <span>流程名：{titleName}</span>
             {/* <Button  size="small" onClick={exit} style={{ width: 100 }}>
         <CloseOutlined />
           退出
         </Button> */}
           </div>
           <div className={cls['publish']}>
-            <Button
-              className={cls['publish-preview']}
-              size="small"
-              onClick={() => {
-                backTable();
-              }}>
-              <RollbackOutlined />
-              返回表格
-            </Button>
             <Button className={cls['publish-preview']} size="small" onClick={preview}>
               <EyeOutlined />
               预览

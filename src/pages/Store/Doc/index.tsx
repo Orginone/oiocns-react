@@ -13,6 +13,7 @@ import cls from './index.module.less';
 import { FileItemModel } from '@/ts/base/model';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
 import CloudTreeComp from './components/CloudTreeComp';
+import ReactDOM from 'react-dom';
 
 type NameValue = {
   name: string;
@@ -36,6 +37,7 @@ const StoreDoc: React.FC = () => {
   const [pageData, setPagedata] = useState<FileItemModel[]>([]);
   const [createFileName, setCreateFileName] = useState<string>('');
   const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
+  const treeContainer = document.getElementById('templateMenu');
   const uploadRef = useRef<any>();
   const parentRef = useRef<any>();
   const refreshUI = () => {
@@ -99,8 +101,11 @@ const StoreDoc: React.FC = () => {
       case '1': // 删除
         if (await docsCtrl.refItem(node.key)?.delete()) {
           message.success('删除成功');
-          docsCtrl.changCallback();
-          docsCtrl.open('');
+          if (node.key === docsCtrl.current?.key) {
+            docsCtrl.open('');
+          } else {
+            docsCtrl.changCallback();
+          }
         }
         break;
       case '2': // 重命名
@@ -214,7 +219,15 @@ const StoreDoc: React.FC = () => {
         }}
       />
       <Upload {...uploadProps} ref={uploadRef}></Upload>
-      <CloudTreeComp handleMenuClick={handleMenuClick} />
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <CloudTreeComp
+              currentKey={current?.key ?? ''}
+              handleMenuClick={handleMenuClick}
+            />,
+            treeContainer,
+          )
+        : ''}
     </Card>
   );
 };

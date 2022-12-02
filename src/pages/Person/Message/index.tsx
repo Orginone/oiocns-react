@@ -1,3 +1,4 @@
+import { Card } from 'antd';
 import React from 'react';
 
 /**
@@ -5,7 +6,7 @@ import React from 'react';
  * @returns
  */
 const PersonMessage: React.FC = () => {
-  return <h2>消息设置</h2>;
+  return <Card>消息设置</Card>;
 };
 
 export default PersonMessage;

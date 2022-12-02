@@ -45,20 +45,12 @@ const Index: React.FC<BuyAppType> = (props) => {
     typeName = 'typeName',
     creatTime = 'creatTime',
   } = { ...defaultObj, ...defaultKey };
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = () => {
-    return <Menu items={operation && operation(data)} />;
-  };
   function renderName() {
     return (
       <>
         <span className={cls.nameLabel}>{data[name]}</span>
         {shouOperation ? (
-          <Dropdown overlay={menu} placement="bottom">
+          <Dropdown menu={{ items: operation && operation(data) }} placement="bottom">
             <EllipsisOutlined className={cls.operationBtn} />
           </Dropdown>
         ) : (

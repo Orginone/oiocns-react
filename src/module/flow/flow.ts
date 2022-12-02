@@ -230,6 +230,7 @@ export const useAppwfConfig = create((set, get) => ({
   },
   designList: [],
   form: {},
+  conditions: [],
   addNodeMap: async (data: any) =>
     set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) })),
   setSelectedNode: async (data: any) => set({ selectedNode: data }),
@@ -237,6 +238,7 @@ export const useAppwfConfig = create((set, get) => ({
   setOldDesign: async (data: any) => set({ oldDesign: data }),
   setDesignList: async (data: any) => set({ designList: data }),
   setForm: async (data: any) => set({ form: data }),
+  setFormFields: async (data: any) => set({ conditions: data }),
   setIsEdit: async (data: any) => set({ isEdit: data }),
   setScale: async (data: any) => set({ scale: data }),
 }));

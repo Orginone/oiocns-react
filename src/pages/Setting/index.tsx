@@ -38,18 +38,18 @@ const infoMenuItems = [
     render: <TreeLeftDeptPage />,
   },
   {
-    label: '岗位设置',
-    key: 'position',
-    icon: <ApartmentOutlined />,
-    children: [],
-    render: <TreeLeftPosPage />,
-  },
-  {
     label: '集团设置',
     key: 'group',
     icon: <FundOutlined />,
     children: [],
     render: <TreeLeftGroupPage />,
+  },
+  {
+    label: '岗位设置',
+    key: 'position',
+    icon: <ApartmentOutlined />,
+    children: [],
+    render: <TreeLeftPosPage />,
   },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
 ];

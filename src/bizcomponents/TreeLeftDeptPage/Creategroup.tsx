@@ -1,10 +1,11 @@
-import { Input, Button } from 'antd';
-import type { DataNode } from 'antd/es/tree';
+import { Input, Button, Modal } from 'antd';
+import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
+import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 
 const x = 3;
 const y = 2;
@@ -77,6 +78,20 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
+    if (settingCtrl.getCurWorkSpace && settingCtrl.getCurWorkSpace.isUserSpace == true) {
+      Modal.info({
+        title: '提示',
+        content: (
+          <div>
+            <p>请选择加入的部门空间！</p>
+          </div>
+        ),
+        onOk() {
+          location.href = '/home';
+        },
+      });
+    }
+
     initData();
     /** 监听页面是否需要更新 */
     settingController.addListen('updateDeptTree', () => {
@@ -84,9 +99,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     });
   }, []);
 
+  useEffect(() => {
+    settingController.setCompanyID = settingCtrl.getCurWorkSpace?.id + '';
+  }, [settingCtrl.getCurWorkSpace]);
+
   const initData = async () => {
     const resultData = await settingController.getDepartments('0');
-    console.log('====查询部门', resultData);
+    // console.log('====查询部门', resultData);
     setTreeData(resultData);
   };
 
@@ -109,16 +128,30 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const handleTitleClick = (node: any) => {
     // 触发内容去变化
   };
+  const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
+    console.log('选中树节点', selectedKeys, info.node);
+    if (selectedKeys.length > 0) {
+      settingController.trigger('changeSelectId', { id: selectedKeys[0] });
+    }
+  };
 
   /**
    * @desc: 创建新目录
    * @param {any} item
    * @return {*}
    */
-  const handleAddClick = (node: any) => {
-    console.log('handleAddClick', node);
-    settingController.trigger('isOpenModal');
+  // const handleAddClick = (node: any) => {
+  //   // console.log('handleAddClick', node);
+  //   settingController.trigger('isOpenModal');
+  // };
+  const handleMenuClick = (key: string, data: any) => {
+    // console.log('点击', key, data);
+    if (key === '新增部门') {
+      settingController.trigger('changeSelectId', { id: data.id });
+      settingController.trigger('isOpenModal');
+    }
   };
+  const menu = ['新增部门'];
 
   return (
     <div>
@@ -143,9 +176,11 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
           // childIcon={<UserOutlined />}
           key={selectMenu}
           handleTitleClick={handleTitleClick}
-          handleAddClick={handleAddClick}
+          handleMenuClick={handleMenuClick}
           treeData={treeData}
           title={'全部部门'}
+          menu={menu}
+          onSelect={onSelect}
         />
       </div>
     </div>

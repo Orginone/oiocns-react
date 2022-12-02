@@ -5,8 +5,10 @@ import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/module/flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
+import settingStore from '@/store/setting';
+import DefaultProps from '@/module/flow/flow';
 import { Modal } from 'antd';
 import { title } from 'process';
 type ProcessDesignProps = {
@@ -27,6 +29,9 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const setForm = useAppwfConfig((state: any) => state.setForm);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
+  const { contionMes } = settingStore((state) => ({
+    ...state,
+  }));
   const preview = () => {
     previewRef.current?.preview(design);
   };
@@ -95,16 +100,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
                 val: 50000,
                 valLabel: '',
               },
-              {
-                pos: 2,
-                paramKey: 'chulang',
-                paramLabel: '出让方式',
-                key: 'EQ',
-                label: '=',
-                type: 'DICT',
-                val: '01',
-                valLabel: '协议定价',
-              },
             ],
             name: '条件1',
           },
@@ -120,6 +115,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
     },
     remark: '备注说明',
   };
+
   const obj = {
     formId: '46547769841',
     business: '商品上架审核',
@@ -167,19 +163,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const startDesign = async (obj: any) => {
     let tempDesign;
     setForm(obj);
-    let formFileds: any[] = obj.field;
-    formFileds = formFileds.map((item: any) => {
-      return {
-        label: item.name,
-        value: item.code,
-        type: item.type,
-        dict: item.dict?.map((el: any) => {
-          return { label: el.name, value: el.code };
-        }),
-      };
-    });
-
-    DefaultProps.setFormFields(formFileds);
+    DefaultProps.setFormFields(contionMes?.labels);
     if (obj.flow) {
       tempDesign = JSON.parse(JSON.stringify(obj.flow));
     } else {
@@ -194,6 +178,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
       <LayoutHeader
         OnPreview={preview}
         OnExit={exit}
+        titleName={contionMes?.name}
         backTable={() => {
           backTable();
         }}></LayoutHeader>

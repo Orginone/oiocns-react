@@ -1,7 +1,7 @@
-import { Card, Layout, Steps, Button, Modal, message } from 'antd';
-import React, { useState, useRef } from 'react';
+import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
+import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
-
+import { EditOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import { RollbackOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -10,10 +10,12 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 // import CcNode from '@/bizcomponents/Flow/Process/CcNode';
 // import ConcurrentNode from '@/bizcomponents/Flow/Process/ConcurrentNode';
 // import ConditionNode from '@/bizcomponents/Flow/Process/ConditionNode';
+import DefaultProps from '@/module/flow/flow';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import BaseInfo from './BaseInfo';
 const { Header, Content } = Layout;
 const { Step } = Steps;
+
 /**
  * 字典
  * */
@@ -59,6 +61,21 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
+      title: '状态',
+      dataIndex: 'status',
+      ellipsis: true,
+    },
+    {
+      title: '绑定应用',
+      dataIndex: 'linkApp',
+      ellipsis: true,
+    },
+    {
+      title: '创建人',
+      dataIndex: 'createPeople',
+      ellipsis: true,
+    },
+    {
       title: '操作',
       valueType: 'option',
       key: 'option',
@@ -94,6 +111,8 @@ const SettingFlow: React.FC = () => {
     },
   ];
 
+  useEffect(() => {}, []);
+
   const initData = () => {
     setEditorType(EditorType.TABLEMES);
     setCurrentStep(StepType.BASEINFO);
@@ -103,30 +122,33 @@ const SettingFlow: React.FC = () => {
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
         {editorType === EditorType.TABLEMES ? (
-          <ProTable
-            actionRef={actionRef}
-            columns={columns}
-            request={async (params = {}, sort, filter) => {
-              console.log(sort, filter);
-              return {
-                data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                success: true,
-                total: 10,
-              };
-            }}
-            toolBarRender={() => [
-              <Button
-                key="button"
-                type="primary"
-                onClick={() => {
-                  setEditorType(EditorType.PROCESSDESIGN);
-                }}>
-                新建
-              </Button>,
-            ]}
-          />
-        ) : null}
-        {editorType !== EditorType.TABLEMES ? (
+          <div>
+            <Card title="流程列表" bordered={false}>
+              <ProTable
+                actionRef={actionRef}
+                columns={columns}
+                request={async (params = {}, sort, filter) => {
+                  console.log(sort, filter);
+                  return {
+                    data: [{ title: '测试流程1' }, { title: '测试流程2' }],
+                    success: true,
+                    total: 10,
+                  };
+                }}
+                toolBarRender={() => [
+                  <Button
+                    key="button"
+                    type="primary"
+                    onClick={() => {
+                      setEditorType(EditorType.PROCESSDESIGN);
+                    }}>
+                    新建
+                  </Button>,
+                ]}
+              />
+            </Card>
+          </div>
+        ) : (
           <div className={cls['company-info-content']}>
             <Card bordered={false}>
               <Layout>
@@ -171,21 +193,18 @@ const SettingFlow: React.FC = () => {
                           setCurrentStep(StepType.PROCESSMESS);
                         }}
                       />
-                    ) : null}
-
-                    {currentStep === StepType.PROCESSMESS &&
-                    editorType === EditorType.PROCESSDESIGN ? (
+                    ) : (
                       <ProcessDesign
                         backTable={() => {
                           initData();
                         }}></ProcessDesign>
-                    ) : null}
+                    )}
                   </Card>
                 </Content>
               </Layout>
             </Card>
           </div>
-        ) : null}
+        )}
       </Card>
     </div>
   );
