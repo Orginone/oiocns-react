@@ -17,12 +17,7 @@ const TreeLeftPage: React.FC<TreeLeftPageProps> = ({
 }) => {
   return (
     <div className={cls.topMes}>
-      {isCreategroup && (
-        <Creategroup
-          onClick={onClick}
-          createTitle={createTitle}
-        />
-      )}
+      {isCreategroup && <Creategroup onClick={onClick} createTitle={createTitle} />}
     </div>
   );
 };

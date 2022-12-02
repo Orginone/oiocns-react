@@ -101,8 +101,11 @@ const StoreDoc: React.FC = () => {
       case '1': // 删除
         if (await docsCtrl.refItem(node.key)?.delete()) {
           message.success('删除成功');
-          docsCtrl.changCallback();
-          docsCtrl.open('');
+          if (node.key === docsCtrl.current?.key) {
+            docsCtrl.open('');
+          } else {
+            docsCtrl.changCallback();
+          }
         }
         break;
       case '2': // 重命名

@@ -1,4 +1,3 @@
-import BaseController from './SingletonPublish';
 import UserdataService from '../../core/target/user';
 import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
@@ -12,6 +11,7 @@ import { rootDir } from '../../core/store/filesys';
 import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 import { kernel } from '@/ts/base';
 import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
+import BaseController from '../baseCtrl';
 
 export interface spaceObjs {
   id: string;
