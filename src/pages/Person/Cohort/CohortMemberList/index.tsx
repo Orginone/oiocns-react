@@ -70,7 +70,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               cancelText: '取消',
               onOk: () => {
                 FriendController.applyFriend(Provider.getPerson!, value),
-                  message.info('发起申请成功');
+                  message.success('发起申请成功');
               },
             });
           }}>
@@ -87,7 +87,22 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     if (cohortData.target.belongId == Provider.userId) {
       action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
-        <a key="list-loadmore-more" onClick={() => removeMember([value.id])}>
+        <a
+          key="list-loadmore-more"
+          onClick={() =>
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否踢出群组',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                FriendController.applyFriend(Provider.getPerson!, value),
+                  removeMember([value.id]);
+                message.success('操作成功');
+              },
+            })
+          }>
           踢出群组
         </a>,
       );

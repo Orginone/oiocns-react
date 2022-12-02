@@ -4,8 +4,6 @@ import Company from '../../core/target/company';
 import { TargetType } from '../../core/enum';
 import { model, schema } from '../../base';
 import provider from '../../core/provider';
-import Authority from '../../core/target/authority/authority';
-import { PropertySafetyFilled } from '@ant-design/icons';
 /**
  * 群组控制器
  */
@@ -13,14 +11,12 @@ class CohortController {
   private workSpace: Person | Company;
   private _cohorts: Cohort[];
   private _myCohorts: Cohort[];
-  private _joinCohorts: Cohort[];
   public callBack!: Function;
   public joinCallBack!: Function;
   constructor() {
     this._cohorts = [];
     this.workSpace = provider.getPerson!;
     this._myCohorts = [];
-    this._joinCohorts = [];
   }
 
   public get getCohorts(): Cohort[] {
@@ -71,7 +67,6 @@ class CohortController {
     let data = this._cohorts.filter(
       (obj) => this.workSpace.target.id != obj.target.belongId,
     );
-    console.log('我加入的群组', data);
     return data;
   };
 
@@ -127,7 +122,6 @@ class CohortController {
       avatar: 'test', //头像
     };
     const res = await obj.createCohort(data);
-    // this._cohorts = provider.getPerson!.ChohortArray;
     const cohortData = await this.getMyCohort();
     this.callBack([...cohortData]);
     return res;
@@ -184,7 +178,6 @@ class CohortController {
   ): Promise<model.ResultType<any>> {
     await obj.getMember();
     const res = await obj.pullMember(targets);
-    console.log('输出返回值', res);
     return res;
   }
   /**
@@ -210,8 +203,6 @@ class CohortController {
 
   public async getCohort(id: string): Promise<Cohort> {
     this._myCohorts = await this.getMyCohort();
-    console.log('id内容', id);
-    console.log(this._myCohorts);
     const cohort = this._myCohorts.filter((obj) => id == obj.target.id)[0];
     return cohort;
   }
@@ -232,54 +223,6 @@ class CohortController {
   }
 
   /**
-   * 角色管理列表
-   * @param obj
-   * @param id
-   * @returns
-   */
-  public async getRoleList(cohort: Cohort): Promise<Authority | undefined> {
-    let res = await cohort.selectAuthorityTree();
-    console.log('aaaaa', await res?.queryAuthorityIdentity());
-    console.log('职权组织树:', res);
-    return res;
-  }
-  /**
-   * 增加新角色
-   * @param id 群组id 路由不能传包含方法的对象，用id自行获取
-   * @param name 角色名称
-   * @param code 角色编号
-   * @param ispublic 是否公开
-   * @param parentIds 父级id数组（使用的是级联样式，所以是数组，目标为最后一个元素）
-   * @param remark 备注信息
-   * @returns
-   */
-  public async addRole(
-    id: string,
-    name: string,
-    code: string,
-    ispublic: boolean,
-    parentIds: string[],
-    remark: string,
-  ): Promise<model.ResultType<schema.XAuthority>> {
-    let cohort = this._myCohorts.filter((obj) => id == obj.target.id)[0];
-    console.log(this._myCohorts);
-    console.log('职权列表', cohort.authorityTree);
-    // const tree = cohort.getMyAuthorityTree;
-    const parentId = parentIds[parentIds.length - 1];
-    console.log('父职权id', parentId);
-    let res = await cohort.authorityTree!.createAuthority(
-      name,
-      code,
-      ispublic,
-      parentId,
-      remark,
-    );
-    console.log('职权组织树:', res);
-    this.callBack([...cohort._ownAuthoritys]);
-    return res;
-  }
-
-  /**
    * 获取群组下的人员
    */
   public async getCohortPeronList(obj: Cohort): Promise<schema.XTarget[]> {
@@ -297,10 +240,7 @@ class CohortController {
     obj: Person | Company,
     id: string,
   ): Promise<model.ResultType<any>> {
-    console.log('已进入');
-    // console.log('测试输出', obj.getMyPerson);
     let res = await obj.quitCohorts(id);
-    console.log('调用结果', res);
     const cohorJoinData = await this.getJoinCohort();
     this.joinCallBack([...cohorJoinData]);
     return res;
