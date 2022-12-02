@@ -2,7 +2,6 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions, Space } from 'antd';
 import { Typography, Divider, Collapse } from 'antd';
 import React, { useState } from 'react';
-import useStore from '../../store';
 import PersonInfoEnty from '../../ts/core/provider';
 
 import Layout from 'antd/lib/layout/layout';
@@ -12,7 +11,6 @@ import Forget from '../Password/Forget';
 const Person = PersonInfoEnty.getPerson;
 const PersonInfo: React.FC = () => {
   const { Title } = Typography;
-  // const { user } = useStore((state) => ({ ...state }));
   const { Panel } = Collapse;
   const [flag, setFlag] = useState('更多信息');
   const value = () => setFlag(changeStatus(flag));

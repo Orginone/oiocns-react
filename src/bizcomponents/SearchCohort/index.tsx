@@ -64,7 +64,6 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
       <SearchInput
         value={searchKey}
         placeholder="请输入群组编码"
-        // extra={`找到${dataSource?.length}家单位`}
         onChange={(event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
@@ -76,7 +75,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
       />
       <div>{dataSource != [] && renderCardFun(dataSource)}</div>
       {searchKey && dataSource.length == 0 && (
-        <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的单位`} />
+        <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码的内容`} />
       )}
     </div>
   );

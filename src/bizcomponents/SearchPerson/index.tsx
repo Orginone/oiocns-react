@@ -8,7 +8,6 @@ import cls from './index.module.less';
 import person from '../../ts/core/target/person';
 import { schema } from '../../ts/base';
 type SearchPersonProps = {
-  // eslint-disable-next-line no-unused-vars
   searchCallback: (person: schema.XTarget) => void;
   person: person;
 };
@@ -40,7 +39,6 @@ const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback, person }) =
     if (e.target.value) {
       const res = await CohortController.searchPerson(person, e.target.value);
       console.log(res);
-      // const res = await personService.searchPerson(e.target.value);
       if (res.data.result != null) {
         setPersons(res.data.result);
         searchCallback(res.data.result[0]);

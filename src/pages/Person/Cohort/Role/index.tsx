@@ -1,7 +1,7 @@
 import { Typography } from 'antd';
 import React, { useState, useEffect } from 'react';
-import Person from '../../../../bizcomponents/PersonInfo/index';
-import CardOrTable from '../../../../components/CardOrTableComp';
+import Person from '@/bizcomponents/PersonInfo/index';
+import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from '../../../../../typings/Certificate';
 import cls from './index.module.less';
 import CohortController from '../../../../ts/controller/cohort/index';

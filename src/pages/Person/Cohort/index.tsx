@@ -8,21 +8,21 @@ import { cohortColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
 import CohortService from '@/module/cohort/Cohort';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
-import Persons from '../../../bizcomponents/SearchPerson/index';
-import AddCohort from '../../../bizcomponents/SearchCohort/index';
-import { Cohort } from '../../../module/org/index';
+import Persons from '@/bizcomponents/SearchPerson/index';
+import AddCohort from '@/bizcomponents/SearchCohort/index';
+import { Cohort } from '@/module/org/index';
 import { useHistory } from 'react-router-dom';
-import PersonInfoEnty from '../../../ts/core/provider';
-import CohortEnty from '../../../ts/core/target/cohort';
-import CohortController from '../../../ts/controller/cohort/index';
+import PersonInfoEnty from '@/ts/core/provider';
+import CohortEnty from '@/ts/core/target/cohort';
+import CohortController from '@/ts/controller/cohort/index';
 import ChangeCohort from './SearchCohortPerson/index';
-import CreateCohort from '../../../bizcomponents/Cohort/index';
-import { schema } from '../../../ts/base';
+import CreateCohort from '@/bizcomponents/Cohort/index';
+import { schema } from '@/ts/base';
 import CohortCard from './CohortCard';
 import { chatCtrl } from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import AddPostModal from '../../../bizcomponents/AddPositionModal';
+import AddPostModal from '@/bizcomponents/AddPositionModal';
 /**
  * 个人信息
  * @returns
@@ -34,7 +34,6 @@ const CohortConfig: React.FC = () => {
   const Person = PersonInfoEnty.getPerson!;
   console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<CohortEnty>();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +44,7 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
-  const [isSetPost, setIsSetPost] = useState<boolean>(false);
+  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
 
   useEffect(() => {
     CohortController.setCallBack(setData);
@@ -53,7 +52,9 @@ const CohortConfig: React.FC = () => {
     getData();
     getJoinData();
   }, []);
-  useEffect(() => {}, [data]);
+  useEffect(() => {
+    console.log('发生变化');
+  }, [data]);
   const getData = async () => {
     setData(await CohortController.getMyCohort());
   };
@@ -167,6 +168,10 @@ const CohortConfig: React.FC = () => {
     ];
   };
 
+  const handlePageChange = (page: number) => {
+    setPage(page);
+  };
+
   const tableAlertRender = (selectedRowKeys: any[]) => {
     console.log(selectedRowKeys);
   };
@@ -220,13 +225,6 @@ const CohortConfig: React.FC = () => {
           className="card"
           data={item}
           key={item.target.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           onClick={() => console.log('按钮测试')}
           operation={renderOperation}
         />
@@ -312,7 +310,7 @@ const CohortConfig: React.FC = () => {
                 <CardOrTable<CohortEnty>
                   childrenColumnName={'nochildren'}
                   dataSource={data!}
-                  total={total}
+                  total={10}
                   page={page}
                   tableAlertRender={tableAlertRender}
                   rowSelection={{}}
@@ -321,6 +319,7 @@ const CohortConfig: React.FC = () => {
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
+                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ),
@@ -332,7 +331,7 @@ const CohortConfig: React.FC = () => {
                 <CardOrTable<CohortEnty>
                   childrenColumnName={'nochildren'}
                   dataSource={joinData!}
-                  total={total}
+                  total={10}
                   page={page}
                   tableAlertRender={tableAlertRender}
                   rowSelection={{}}
@@ -341,6 +340,7 @@ const CohortConfig: React.FC = () => {
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
                   columns={cohortColumn as any}
+                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ),

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ProFormColumnsType } from '@ant-design/pro-components';
-import JsonFrom from '../../../../../components/SchemaForm';
+import JsonFrom from '@/components/SchemaForm';
 import { schema } from '../../../../../../src/ts/base';
 
 interface indexType {
