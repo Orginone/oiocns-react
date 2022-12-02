@@ -3,7 +3,7 @@ import { Dropdown, Image, Row, Col, Card, Typography } from 'antd';
 import React from 'react';
 import cls from '../../index.module.less';
 import { getItemMenu } from '../CommonMenu';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemModel } from '@/ts/base/model';
 
 const CardListContent = ({

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ProTable } from '@ant-design/pro-components';
 import { Space, Image, Dropdown, Button, Typography } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { getItemMenu } from '../CommonMenu';
 import cls from '../../index.module.less';
 import { FileItemModel } from '@/ts/base/model';

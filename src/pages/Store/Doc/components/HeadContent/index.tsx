@@ -1,6 +1,6 @@
 import React from 'react';
 import { Breadcrumb, Divider, Space, Typography } from 'antd';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { IFileSystemItem } from '@/ts/core/store/ifilesys';
 import { ImSpinner9, ImArrowUp2, ImUpload, ImFolderPlus, ImPlay3 } from 'react-icons/im';
 

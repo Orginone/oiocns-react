@@ -7,7 +7,7 @@ import { TargetType } from '../enum';
 import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { ICompany, IPerson, ICohort } from './itarget';
+import { ICompany, IPerson, ICohort, SpaceType } from './itarget';
 import { schema, faildResult, kernel, common } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
@@ -32,6 +32,14 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedFriend = [];
     this.joinedCohort = [];
     this.joinedCompany = [];
+  }
+  public get getSpaceData(): SpaceType {
+    return {
+      id: this.target.id,
+      name: '个人空间',
+      icon: this.target.avatar,
+      typeName: this.target.typeName as TargetType,
+    };
   }
   searchCompany(code: string): Promise<ResultType<schema.XTarget[]>> {
     throw new Error('Method not implemented.');

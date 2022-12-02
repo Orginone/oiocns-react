@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, Progress } from 'antd';
 import cls from './index.module.less';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 
 export type TaskModel = {
   group: string;
@@ -20,14 +21,22 @@ type GroupTaskModel = {
 
 type PlanType = {
   isOpen: boolean;
-  taskList: TaskModel[];
   onClose: () => void;
 };
 
 const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
+  const [taskList, setTaskList] = useState(docsCtrl.taskList);
+  useEffect(() => {
+    const id = docsCtrl.subscribe(() => {
+      setTaskList([...docsCtrl.taskList]);
+    });
+    return () => {
+      docsCtrl.unsubscribe(id);
+    };
+  }, []);
   const taskGroup = () => {
     let group: GroupTaskModel[] = [];
-    props.taskList
+    taskList
       .sort((a, b) => {
         return a.createTime < b.createTime ? 1 : 0;
       })

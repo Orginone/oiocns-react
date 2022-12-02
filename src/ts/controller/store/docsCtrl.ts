@@ -97,7 +97,7 @@ class DocsController extends BaseController {
         } else if (p === 1) {
           this.changCallback();
         }
-        this.changCallbackPart('taskList', this.taskList);
+        this.changCallbackPart('taskList');
       });
     }
     return;
