@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
-import { schema } from '../../../../ts/base';
-import CohortController from '../../../../ts/controller/cohort/index';
+import { schema } from '@/ts/base';
+import CohortController from '@/ts/controller/cohort/index';
 import CardOrTable from '@/components/CardOrTableComp';
-import Cohort from '../../../../ts/core/target/cohort';
+import Cohort from '@/ts/core/target/cohort';
 import type { ProColumns } from '@ant-design/pro-components';
 interface indexType {
   searchCallback: Function;

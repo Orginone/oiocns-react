@@ -6,7 +6,6 @@ export default class CompanyController extends MarketController {
   private _company: ICompany;
   constructor(company: ICompany) {
     super(company);
-
     this._company = company;
   }
   /** 获得单位信息 */

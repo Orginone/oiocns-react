@@ -1,10 +1,10 @@
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
 import cls from './index.module.less';
-import useStore from '@/store';
 
 type RegisterReq = {
   account?: string;
@@ -24,7 +24,6 @@ const PassportRegister: React.FC = () => {
   const [body, setBody] = useState<RegisterReq>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState<String>();
-  const { register } = useStore((state) => ({ ...state }));
   const history = useHistory();
 
   // 上一步
@@ -70,7 +69,7 @@ const PassportRegister: React.FC = () => {
       return;
     }
     // 请求
-    const res = await register(
+    const res = await userCtrl.register(
       val.name,
       val.motto,
       val.phone,

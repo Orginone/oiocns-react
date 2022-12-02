@@ -1,3 +1,4 @@
+export { Callback } from './callback';
 export { CharCode } from './charCode';
 export { formatSize } from './format';
 export type { IDisposable } from './lifecycle';

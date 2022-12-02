@@ -5,38 +5,21 @@ import './index.less';
 import { MarketTypes } from 'typings/marketType';
 import Cohort from '@/ts/core/target/cohort';
 import CohortMemberList from '../CohortMemberList';
-import CohortController from '../../../../ts/controller/cohort/index';
-interface defaultObjType {
-  name: string;
-  size: number | string;
-  type: string;
-  desc: string;
-  creatTime: string | number;
-}
-interface AppCardType {
+import CohortController from '@/ts/controller/cohort/index';
+
+interface CohortCardType {
   data: Cohort; //props
   className?: string;
-  defaultKey?: defaultObjType; // 卡片字段 对应数据字段
   onClick?: (event?: any) => void;
   operation?: (_item: Cohort) => MarketTypes.OperationType[]; //操作区域数据
 }
-// const defaultObj = {
-//   name: 'name', //名称
-//   size: 'size', //大小
-//   type: 'type', //是否免费
-//   desc: 'desc', //描述
-//   typeName: 'typeName', //应用类型
-//   creatTime: 'creatTime', //上架时间
-// };
 
-const CohortCardComp: React.FC<AppCardType> = ({
+const CohortCardComp: React.FC<CohortCardType> = ({
   className,
   data,
-  defaultKey,
   onClick,
   operation,
 }) => {
-  // const {} = { ...defaultObj, ...defaultKey };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
 
@@ -53,7 +36,6 @@ const CohortCardComp: React.FC<AppCardType> = ({
   const getname = async () => {
     const res = await CohortController.getName(data);
     setName(res);
-    console.log('获取归属', name);
   };
   const Title = () => {
     return (

@@ -14,6 +14,7 @@ export type MenuTodoType = {
  * @returns
  */
 export const loadApplicationTodos = async () => {
+  // 错误的接口数据，当下面的有数据时进行切换调试开发
   if (Provider.getPerson) {
     const data = await Provider.getPerson?.getOwnProducts(); // 暂用获取我的应用接口，待改为新借口
     // console.log('menu', data);
@@ -21,14 +22,15 @@ export const loadApplicationTodos = async () => {
     if (data && data.length > 0) {
       // 遍历数据生成待办应用列表
       applicationTodos = data.map((product) => {
-        // const prod = product._prod;
+        const prod = product._prod;
         return {
-          label: product.id,
-          key: '/todo/' + product.id,
-          node: new ApplicationTodo(product.id, product.id),
+          label: prod.name,
+          key: '/todo/' + prod.id,
+          node: new ApplicationTodo(prod.id, prod.name),
         };
       });
     }
+    // 正确的接口 但是还没有数据没有调通
     // if (Provider.getPerson) {
     //   const result = await kernel.queryApproveTask({ id: Provider.userId }); // 暂用获取我的应用接口，待改为新借口
     //   console.log('menu', result);

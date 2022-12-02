@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import HeadImg from '@/components/headImg/headImg';
 import contentStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
 import { deepClone } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';

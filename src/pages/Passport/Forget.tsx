@@ -1,12 +1,11 @@
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { Button, Form, Input, message, Tabs } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 import cls from './index.module.less';
-import useStore from '@/store';
 
 const PassportForget: React.FC = () => {
-  const { resetPassword } = useStore((state) => ({ ...state }));
   // 提交
   const submit = async (val: any) => {
     if (val.firstPassword !== val.secondPassword) {
@@ -22,7 +21,11 @@ const PassportForget: React.FC = () => {
       message.warn('密码的长度不能大于15');
       return;
     }
-    const res = await resetPassword(val.account, val.firstPassword, val.privateKey);
+    const res = await userCtrl.resetPassword(
+      val.account,
+      val.firstPassword,
+      val.privateKey,
+    );
     if (res.success) {
       message.success('重置密码成功！');
     } else {

@@ -1,5 +1,5 @@
-import { chatCtrl } from '@/ts/controller/chat';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import chatCtrl from '@/ts/controller/chat';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover, Upload, UploadProps } from 'antd';

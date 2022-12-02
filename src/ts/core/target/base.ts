@@ -2,9 +2,7 @@ import consts from '../consts';
 import { TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
-import Provider from '../provider';
 import { IAuthority } from './authority/iauthority';
-import { Console } from 'console';
 export default class BaseTarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
@@ -25,7 +23,7 @@ export default class BaseTarget {
   }
 
   protected async createSubTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     if (this.subTypes.includes(<TargetType>data.typeName)) {
       const res = await this.createTarget(data);
@@ -45,11 +43,12 @@ export default class BaseTarget {
   protected async deleteSubTarget(
     id: string,
     typeName: string,
+    spaceId: string,
   ): Promise<model.ResultType<any>> {
     return await kernel.deleteTarget({
       id: id,
       typeName: typeName,
-      belongId: Provider.spaceId,
+      belongId: spaceId,
     });
   }
 
@@ -169,6 +168,7 @@ export default class BaseTarget {
    */
   protected async getjoinedTargets(
     typeNames: TargetType[],
+    spaceId: string,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
@@ -182,7 +182,7 @@ export default class BaseTarget {
           filter: '',
           limit: common.Constants.MAX_UINT_16,
         },
-        spaceId: Provider.spaceId,
+        spaceId: spaceId,
         JoinTypeNames: typeNames,
       });
     }
@@ -236,13 +236,12 @@ export default class BaseTarget {
    * @returns
    */
   protected async createTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
         id: '0',
-        belongId: Provider.spaceId,
       });
     } else {
       return faildResult(consts.UnauthorizedError);
@@ -312,59 +311,4 @@ export default class BaseTarget {
     });
     return authority;
   }
-
-  // /**
-  //  * 查询当前空间赋予我该角色的组织
-  //  * @param id
-  //  * @returns
-  //  */
-  // public async queryTargetsByAuthority(
-  //   id: string,
-  // ): Promise<model.ResultType<schema.XTargetArray>> {
-  //   return await kernel.queryTargetsByAuthority({
-  //     spaceId: this.target.id,
-  //     authId: id,
-  //   });
-  // }
-
-  // /**
-  //  * 查询组织所有职权
-  //  * @returns
-  //  */
-  // public async getAllAuthoritys(): Promise<Authority[]> {
-  //   if (this.allAuthoritys.length > 0) {
-  //     return this.allAuthoritys;
-  //   }
-  //   const res = await kernel.queryTargetAuthoritys({
-  //     id: this.target.id,
-  //     page: {
-  //       offset: 0,
-  //       filter: '',
-  //       limit: common.Constants.MAX_UINT_16,
-  //     },
-  //   });
-  //   if (res.success) {
-  //     res.data.result?.forEach((auth) => {
-  //       this.allAuthoritys.push(new Authority(auth));
-  //     });
-  //   }
-  //   return this.allAuthoritys;
-  // }
-
-  // /**
-  //  * 查询当前空间下拥有的身份
-  //  * @returns
-  //  */
-  // public async getOwnIdentitys(): Promise<Identity[]> {
-  //   if (this.ownIdentitys.length > 0) {
-  //     return this.ownIdentitys;
-  //   }
-  //   const res = await kernel.querySpaceIdentitys({ id: this.target.id });
-  //   if (res.success) {
-  //     res.data.result?.forEach((auth) => {
-  //       this.ownIdentitys.push(new Identity(auth));
-  //     });
-  //   }
-  //   return this.ownIdentitys;
-  // }
 }
