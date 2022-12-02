@@ -1,10 +1,10 @@
-import { TargetType } from '@/module/enums';
 import { kernel } from '@/ts/base';
 import { XImMsg } from '@/ts/base/schema';
 import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
 import { LoadChats } from '@/ts/core/chat';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
