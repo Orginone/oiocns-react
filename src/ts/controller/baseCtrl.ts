@@ -5,7 +5,7 @@ import { generateUuid } from '../base/common';
 export default class BaseController {
   private _refreshCallback: { [name: string]: Function } = {};
   private _partRefreshCallback: {
-    [name: string]: { [p: string]: (...args: any[]) => void };
+    [name: string]: { [p: string]: Function };
   } = {};
   constructor() {
     this._refreshCallback = {};
@@ -29,9 +29,10 @@ export default class BaseController {
    * @param callback 变更回调
    * @returns 订阅ID
    */
-  public subscribePart(p: string | string[], callback: (...args: any[]) => void): string {
+  public subscribePart(p: string | string[], callback: Function): string {
     const id = generateUuid();
     if (p.length > 0) {
+      callback();
       this._partRefreshCallback[id] = {};
       if (typeof p === 'string') {
         this._partRefreshCallback[id][p] = callback;
@@ -66,12 +67,12 @@ export default class BaseController {
    * 局部变更回调
    * @param {string} p 订阅方法名称
    */
-  public changCallbackPart(p: string, ...args: any[]): void {
+  public changCallbackPart(p: string): void {
     this.changCallback();
     Object.keys(this._partRefreshCallback).forEach((id) => {
       const callback = this._partRefreshCallback[id][p];
       if (callback) {
-        callback.apply(this, args);
+        callback.apply(this, []);
       }
     });
   }

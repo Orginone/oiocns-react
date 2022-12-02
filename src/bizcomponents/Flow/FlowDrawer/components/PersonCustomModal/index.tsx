@@ -3,7 +3,7 @@ import { Modal, Radio, Card, Empty } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 // import { perpleList } from './mock';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import BaseTarget from '@/ts/core/target/base';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 /**

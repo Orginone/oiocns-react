@@ -18,20 +18,11 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
 import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
-
-type SpaceType = {
-  id: string;
-  icon?: string;
-  name: string;
-};
+import { SpaceType } from '@/ts/core/target/itarget';
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits: React.FC = () => {
-  const [current, setCurrent] = useState<SpaceType>({
-    id: userCtrl.SpaceData.id,
-    name: userCtrl.SpaceData.name,
-    icon: userCtrl.SpaceData.avatar,
-  });
+  const [current, setCurrent] = useState<SpaceType>(userCtrl.SpaceData);
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -70,22 +61,10 @@ const OrganizationalUnits: React.FC = () => {
 
   const refreshUI = () => {
     const all: SpaceType[] = userCtrl.User!.joinedCompany.map((item) => {
-      return {
-        id: item.target.id,
-        name: item.target.name,
-        icon: item.target.avatar,
-      };
+      return item.getSpaceData;
     });
-    all.unshift({
-      id: userCtrl.User!.target.id,
-      name: userCtrl.User!.target.name,
-      icon: userCtrl.User!.target.avatar,
-    });
-    setCurrent({
-      id: userCtrl.SpaceData.id,
-      name: userCtrl.SpaceData.name,
-      icon: userCtrl.SpaceData.avatar,
-    });
+    all.unshift(userCtrl.User!.getSpaceData);
+    setCurrent(userCtrl.SpaceData);
     setMenuList(
       all.filter((item) => {
         return item.id != userCtrl.SpaceData.id;

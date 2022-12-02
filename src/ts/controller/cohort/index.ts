@@ -109,7 +109,7 @@ class CohortController {
    * @returns
    */
   public async createCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     name: string,
     code: string,
     remark: string,
@@ -134,7 +134,7 @@ class CohortController {
    * @returns
    */
   public async searchCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     name: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.searchTargetByName(name, TargetType.Cohort);
@@ -161,7 +161,7 @@ class CohortController {
    * @returns
    */
   public async joinCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     destId: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.applyJoin(destId, TargetType.Cohort);
@@ -189,7 +189,7 @@ class CohortController {
    * @returns
    */
   public async deleteCohort(
-    obj: Person | Company,
+    obj: IPerson | ICompany,
     id: string,
   ): Promise<model.ResultType<any>> {
     const res = await obj.deleteCohort(id);

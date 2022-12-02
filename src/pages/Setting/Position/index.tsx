@@ -9,14 +9,10 @@ import { columns } from './config';
 import { dataSource } from './datamock';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
-import AddPostModal from '@/bizcomponents/AddPositionModal';
 import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-// import settingStore from '@/store/setting';
-import settingController from '@/ts/controller/setting';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 
 /** 获取角色当前名称 */
 interface PositionBean {

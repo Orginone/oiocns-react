@@ -1,5 +1,5 @@
 import React from 'react';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import { getIcon, getItemMenu } from '../CommonMenu';
 import cls from './index.module.less';

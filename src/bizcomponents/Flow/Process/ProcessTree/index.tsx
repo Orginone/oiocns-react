@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
 import { message } from 'antd';
 import Root from '@/bizcomponents/Flow/Process/RootNode';

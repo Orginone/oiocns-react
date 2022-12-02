@@ -10,7 +10,7 @@ import {
   RollbackOutlined,
 } from '@ant-design/icons';
 import { Select, Button, message, Modal, Input } from 'antd';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
 type LayoutHeaderProps = {
   OnPreview: Function;

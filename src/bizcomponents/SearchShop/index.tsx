@@ -3,7 +3,6 @@ import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CommonClass from '@/module/commonClass/BaseServiceClass';
 import API from '@/services';
 import { MarketTypes } from 'typings/marketType';
 type CompanySearchTableProps = {

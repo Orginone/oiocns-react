@@ -3,7 +3,6 @@ import type { MenuProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { businessRouteList } from '@/routes/utils';
-import settingStore from '@/store/setting';
 
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
@@ -72,7 +71,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
-  const { setSelectId } = settingStore((state) => ({ ...state }));
   const currentMacthRoute = businessRouteList.find(
     (child) => child.path === props.match.path,
   );
@@ -146,7 +144,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
               className={cls.backicon}
               onClick={() => {
                 if (prevMenuData.length > 0) {
-                  setSelectId('');
                   setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
                   setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
                 }

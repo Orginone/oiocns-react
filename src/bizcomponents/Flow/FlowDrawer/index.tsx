@@ -5,7 +5,7 @@ import RootNode from './components/RootNode';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '../flow';
 
 /**
  * @description: 流程设置抽屉

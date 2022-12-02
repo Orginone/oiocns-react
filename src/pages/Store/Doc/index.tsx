@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Segmented, Card, Typography, UploadProps, Upload, message } from 'antd';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
-import TaskListComp, { TaskModel } from './components/TaskListComp';
+import TaskListComp from './components/TaskListComp';
 import ResetNameModal from './components/ResetName';
 import { FaTasks } from 'react-icons/fa';
 import CoppyOrMove from './components/CoppyOrMove';
@@ -30,7 +30,6 @@ const StoreDoc: React.FC = () => {
   const [currentTarget, setCurrentTarget] = useState<IObjectItem>();
   const [reNameKey, setReNameKey] = useState<string | undefined>('');
   const [segmentedValue, setSegmentedValue] = useState<'Kanban' | 'List'>('Kanban');
-  const [taskList, setTaskList] = useState<TaskModel[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
   const [current, setCurrent] = useState(docsCtrl.current);
@@ -54,12 +53,8 @@ const StoreDoc: React.FC = () => {
       }
     });
     const id = docsCtrl.subscribe(refreshUI);
-    docsCtrl.subscribePart('taskList', (taskList: any) => {
-      setTaskList([...taskList]);
-    });
     return () => {
       docsCtrl.unsubscribe(id);
-      docsCtrl.unsubscribePart('taskList');
     };
   }, []);
   const uploadProps: UploadProps = {
@@ -213,7 +208,6 @@ const StoreDoc: React.FC = () => {
       />
       <TaskListComp
         isOpen={open}
-        taskList={taskList}
         onClose={() => {
           setOpen(false);
         }}

@@ -4,6 +4,18 @@ import { TargetType } from '../enum';
 import { Market, BaseProduct } from '../market';
 import { IAuthority } from './authority/iauthority';
 
+/** 空间类型数据 */
+export type SpaceType = {
+  /** 唯一标识 */
+  id: string;
+  /** 名称 */
+  name: string;
+  /** 类型 */
+  typeName: TargetType;
+  /** 图标 */
+  icon?: string;
+};
+
 /** 市场相关操作方法 */
 export interface IMTarget {
   /**
@@ -214,6 +226,8 @@ export interface IPerson {
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /**
    * 更新人员
    * @param data 人员基础信息
@@ -507,6 +521,8 @@ export interface ICompany {
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /**
    * 更新单位
    * @param data 单位基础信息

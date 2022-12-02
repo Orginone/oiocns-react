@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Modal, Input, message } from 'antd';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 
 const ResetNameModal = (props: {
   open: boolean;

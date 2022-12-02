@@ -1,6 +1,5 @@
 import { Card, Avatar, Space, Typography, Dropdown, MenuProps } from 'antd';
 import React from 'react';
-import { ApprovalType } from '@/module/todo/typings';
 import styles from './index.module.less';
 import moment from 'moment';
 
