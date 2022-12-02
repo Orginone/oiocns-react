@@ -1,6 +1,4 @@
-import React, { useState, useRef, useEffect, createContext } from 'react';
-import { Route, useHistory } from 'react-router-dom';
-import Node from '@/bizcomponents/Flow/Process/Node';
+import React, { useRef, useEffect, createContext } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
@@ -9,8 +7,6 @@ import { useAppwfConfig } from '@/module/flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
 import settingStore from '@/store/setting';
 import DefaultProps from '@/module/flow/flow';
-import { Modal } from 'antd';
-import { title } from 'process';
 type ProcessDesignProps = {
   [key: string]: any;
   backTable: () => void;
@@ -41,24 +37,8 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   useEffect(() => {
     console.log('ProcessDesign第一次render...');
     startDesign(obj);
-  }, []); //这里传递了空数组
-  // const defaultDesign = {
-  //   name: '新建流程',
-  //   code: 'code',
-  //   formId: null,
-  //   formName: '',
-  //   appId: '',
-  //   appName: '',
-  //   remainHours: 240,
-  //   resource: {
-  //     nodeId: 'ROOT',
-  //     parentId: null,
-  //     type: 'ROOT',
-  //     name: '发起人',
-  //     children: {},
-  //   },
-  //   remark: '备注说明',
-  // };
+  }, []);
+
   const defaultDesign = {
     name: '新建流程',
     code: 'code',
@@ -181,7 +161,8 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
         titleName={contionMes?.name}
         backTable={() => {
           backTable();
-        }}></LayoutHeader>
+        }}
+      />
       <div className={cls['container']}>
         <EventContext.Provider value={{ FlowSub }}>
           <div className={cls['layout-body']}>
@@ -191,11 +172,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
               </div>
             )}
           </div>
-          {/* <Modal open={isShowDialog} footer={null}  maskClosable={false} width="100vw"  closable={false} title={<LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>} style={{maxWidth: "100vw",top: 0,paddingBottom: 0}}  bodyStyle={{ height: "calc(100vh - 55px )", overflowY: "auto"}}  >
-    <div className={cls["layout-body"]}>
-        {activeSelect === 'processDesign' && <div><FormProcessDesign/></div>}
-    </div>
-		</Modal> */}
+
           <LayoutPreview ref={previewRef} />
         </EventContext.Provider>
       </div>

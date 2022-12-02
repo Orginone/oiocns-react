@@ -5,7 +5,10 @@ import { persist } from 'zustand/middleware';
 type settingStoreType = {
   isOpenModal: boolean; //是否打开Modal层
   selectId: string; //增在操作设置的id
-  contionMes: {};
+  contionMes: {
+    labels: [];
+    name: string;
+  };
   setEditItem: (params: boolean) => void;
   setSelectId: (params: string) => void;
   setContions: (params: any) => void;
@@ -15,7 +18,7 @@ const settingStore = create(
   persist<settingStoreType>((set, get) => ({
     isOpenModal: false,
     selectId: '',
-    contionMes: {},
+    contionMes: { labels: [], name: '' },
     setEditItem: (params: boolean) => set({ isOpenModal: params }),
     setSelectId: (params: string) => set({ selectId: params }),
     setContions: (params: any) => set({ contionMes: params }),
