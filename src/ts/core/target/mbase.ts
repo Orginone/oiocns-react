@@ -13,6 +13,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
   usefulProduct: schema.XProduct[];
   usefulResource: Map<string, schema.XResource[]>;
   joinMarketApplys: schema.XMarketRelation[];
+  protected extendTargetType: TargetType[];
 
   constructor(target: schema.XTarget) {
     super(target);
@@ -23,6 +24,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     this.usefulProduct = [];
     this.publicMarkets = [];
     this.usefulResource = new Map();
+    this.extendTargetType = [];
   }
   /**
    * @description: 根据编号查询市场
@@ -393,13 +395,13 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     return res;
   }
   /** 获得可用应用 */
-  protected async getUsefulProduct(typeNames: TargetType[]): Promise<schema.XProduct[]> {
+  public async getUsefulProduct(): Promise<schema.XProduct[]> {
     if (this.usefulProduct.length > 0) {
       return this.usefulProduct;
     }
     const res = await kernel.queryUsefulProduct({
       spaceId: this.target.id,
-      typeNames,
+      typeNames: this.extendTargetType,
     });
     if (res.success && res.data.result != undefined) {
       this.usefulProduct = res.data.result;
@@ -407,17 +409,14 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     return this.usefulProduct;
   }
   /** 获得可用资源 */
-  protected async getUsefulResource(
-    id: string,
-    typeNames: TargetType[],
-  ): Promise<schema.XResource[]> {
+  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
     if (this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
       return this.usefulResource[id];
     }
     const res = await kernel.queryUsefulResource({
       productId: id,
       spaceId: this.target.id,
-      typeNames,
+      typeNames: this.extendTargetType,
     });
     if (res.success) {
       let resources;
