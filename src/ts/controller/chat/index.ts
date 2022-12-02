@@ -19,7 +19,7 @@ class ChatController extends BaseController {
   private _curChat: IChat | undefined;
   constructor() {
     super();
-    userCtrl.changCallbackPart(UserPartTypes.User, async () => {
+    userCtrl.subscribePart(UserPartTypes.User, async () => {
       if (this._userId != userCtrl.User!.target.id) {
         this._userId = userCtrl.User!.target.id;
         await this._initialization();

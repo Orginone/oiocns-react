@@ -1,7 +1,7 @@
 import React, { Key, useMemo } from 'react';
 import { useState } from 'react';
 import { Modal, message, Tree } from 'antd';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { getIcon } from '../CommonMenu';
 
 const { DirectoryTree } = Tree;

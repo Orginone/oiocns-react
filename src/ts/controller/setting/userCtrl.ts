@@ -1,6 +1,6 @@
 import BaseController from '../baseCtrl';
 import { kernel, model, schema } from '../../base';
-import { ICompany, IPerson } from '../../core/target/itarget';
+import { ICompany, IPerson, SpaceType } from '../../core/target/itarget';
 import Person from '../../core/target/person';
 export enum UserPartTypes {
   'User' = 'user',
@@ -33,11 +33,11 @@ class UserController extends BaseController {
     return this._curSpace;
   }
   /** 当前空间数据 */
-  get SpaceData(): schema.XTarget {
+  get SpaceData(): SpaceType {
     if (this._curSpace) {
-      return this._curSpace.target;
+      return this._curSpace.getSpaceData;
     }
-    return this._user!.target;
+    return this._user!.getSpaceData;
   }
   /** 设置当前空间 */
   public setCurSpace(id: string) {
