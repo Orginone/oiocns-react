@@ -1,41 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, List, Descriptions, Typography, Layout, Card, Input, Tag } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import {
+  Avatar,
+  List,
+  Descriptions,
+  Typography,
+  Layout,
+  Card,
+  Input,
+  Tag,
+  Modal,
+  message,
+} from 'antd';
+import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
 import Cohort from '@/ts/core/target/cohort';
-import CohortController from '../../../../ts/controller/cohort/index';
-import FriendController from '../../../../ts/controller/friend';
-
-import { schema } from '../../../../ts/base';
-import Provider from '@/ts/core/provider';
-const fakeDataUrl =
-  'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
+import CohortController from '@/ts/controller/cohort/index';
+// import FriendController from '@/ts/controller/friend';
+import { useHistory } from 'react-router-dom';
+import { schema } from '@/ts/base';
+import { IChat } from '@/ts/core/chat/ichat';
+import chatCtrl from '@/ts/controller/chat';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: Cohort;
 }
-interface UserItem {
-  email: string;
-  gender: string;
-  name: {
-    first: string;
-    last: string;
-    title: string;
-  };
-  nat: string;
-  picture: {
-    large: string;
-    medium: string;
-    thumbnail: string;
-  };
-}
 const { Title } = Typography;
 const { Search } = Input;
 const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
-  const [data, setData] = useState<UserItem[]>([]);
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
   const [friendList, setFriendList] = useState<schema.XTarget[]>([]);
+  const history = useHistory();
+
   /**获取群组下成员列表 */
   const getMemberData = async () => {
     const res = await CohortController.getCohortPeronList(cohortData);
@@ -46,20 +43,93 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const res = await FriendController.getMyFriend();
     setFriendList(res);
   };
+  /**移除成员 */
+  const removeMember = async (ids: string[]) => {
+    CohortController.setCallBack(setMemberData);
+    await CohortController.removeCohort(cohortData, ids);
+  };
   /**
    * 获取操作列表
    * @param value
    */
   const getAction = (value: schema.XTarget) => {
+    const size: number = friendList.filter((obj) => obj.id == value.id).length;
     const action = [];
-    if (friendList.filter((obj) => (obj.id = value.id)) == null) {
-      action.push(<a key="list-loadmore-more">添加好友</a>);
+    if (size == 0) {
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() => {
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否申请添加好友',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                // FriendController.applyFriend(userCtrl.User, value),
+                message.success('发起申请成功');
+              },
+            });
+          }}>
+          添加好友
+        </a>,
+      );
     } else {
-      action.push(<a key="list-loadmore-edit">发起会话</a>);
+      action.push(
+        <a key="list-loadmore-edit" onClick={() => enterChat(value.id)}>
+          发起会话
+        </a>,
+      );
     }
-    if (value.belongId == Provider.spaceId) {
-      action.push(<a key="list-loadmore-more">踢出群组</a>);
+    if (cohortData.target.belongId == userCtrl.User!.target.id) {
+      action.push(<a key="list-loadmore-more">身份管理</a>);
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() =>
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否踢出群组',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                FriendController.applyFriend(userCtrl.User!, value),
+                  removeMember([value.id]);
+                message.success('操作成功');
+              },
+            })
+          }>
+          踢出群组
+        </a>,
+      );
     }
+    return action;
+  };
+  /**
+   * 根据id获取会话
+   * @param id
+   * @returns
+   */
+  const getChat = (id: string): IChat | undefined => {
+    for (var i = 0; i < chatCtrl.groups.length; i++) {
+      const group = chatCtrl.groups[i];
+      console.log(group);
+      for (var j = 0; j < group.chats.length; j++) {
+        const chat = group.chats[j];
+        if (id == chat.target.id) {
+          console.log(chat);
+          return chat;
+        }
+      }
+    }
+    return undefined;
+  };
+  /**进入会话 */
+  const enterChat = (id: string) => {
+    chatCtrl.setCurrent(getChat(id));
+    history.push('/chat');
   };
   /**
    * 获取标题内容
@@ -68,7 +138,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const getTitle = (value: schema.XTarget) => {
     const title = [];
     const indentity: string = '成员';
-    if (friendList.filter((obj) => (obj.id = value.id)) == null) {
+    const size: number = friendList.filter((obj) => obj.id == value.id).length;
+    if (size != 0) {
       title.push(
         <div>
           <a href="https://ant.design">{value.name}</a>
@@ -96,71 +167,23 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </div>,
       );
     }
-  };
-  const appendData = () => {
-    fetch(fakeDataUrl)
-      .then((res) => res.json())
-      .then((body) => {
-        setData(data.concat(body.results));
-      });
+    return title;
   };
 
   useEffect(() => {
-    appendData();
     getMemberData();
     getFriendList();
   }, []);
 
-  const onScroll = (e: React.UIEvent<HTMLElement, UIEvent>) => {
-    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === ContainerHeight) {
-      appendData();
+  const onSearch = async (value: string) => {
+    if (value!) {
+      await getMemberData();
+      setMemberData(memberData.filter((obj) => obj.code === value));
+    } else {
+      await getMemberData();
     }
   };
-  const onSearch = (value: string) => console.log(value);
 
-  const action = (value: UserItem) => {
-    if (new String(value.name.first).length > 5) {
-      console.log(new String(value.name).length);
-      return [
-        <a key="list-loadmore-more">添加好友</a>,
-        <a key="list-loadmore-more">踢出群组</a>,
-      ];
-    }
-    return [
-      <a key="list-loadmore-edit">发起会话</a>,
-      <a key="list-loadmore-more">踢出群组</a>,
-    ];
-  };
-  const title = (value: UserItem) => {
-    if (new String(value.name.first).length > 5) {
-      console.log(new String(value.name).length);
-      return (
-        <div>
-          <a href="https://ant.design">{value.name.last}</a>
-          <span style={{ paddingLeft: '5px' }}>{939097257}</span>
-          <span>
-            <Tag color="green" style={{ marginLeft: '10px' }}>
-              一级成员
-            </Tag>
-          </span>
-        </div>
-      );
-    }
-    return (
-      <div>
-        <a href="https://ant.design">{value.name.last}</a>
-        <span style={{ paddingLeft: '5px' }}>{939097257}</span>
-        <span>
-          <Tag color="green" style={{ marginLeft: '10px' }}>
-            一级成员
-          </Tag>
-        </span>
-        <span>
-          <UserOutlined size={20} style={{ paddingLeft: '5px' }} />
-        </span>
-      </div>
-    );
-  };
   return (
     <div>
       <Card>
@@ -191,17 +214,16 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               }}>
               <List>
                 <VirtualList
-                  data={data}
+                  data={memberData}
                   height={ContainerHeight}
                   itemHeight={47}
-                  itemKey="email"
-                  onScroll={onScroll}>
-                  {(item: UserItem) => (
-                    <List.Item key={item.email} actions={action(item)}>
+                  itemKey={'id'}>
+                  {(item: schema.XTarget) => (
+                    <List.Item key={item.id} actions={getAction(item)!}>
                       <List.Item.Meta
-                        avatar={<Avatar src={item.picture.large} />}
-                        title={title(item)}
-                        description={item.email}
+                        avatar={<Avatar src={'https://joeschmoe.io/api/v1/random'} />}
+                        title={getTitle(item)!}
+                        description={item.team?.remark}
                       />
                     </List.Item>
                   )}

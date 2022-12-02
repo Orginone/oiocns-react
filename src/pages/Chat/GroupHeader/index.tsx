@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import QrCodeCustom from '@/components/qrCode';
 import headerStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 
 /**

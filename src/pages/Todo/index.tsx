@@ -11,7 +11,6 @@ import './index.less';
 import { Breadcrumb, MenuProps } from 'antd';
 
 const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
-  // const [breadcrumb, setBreadcrumb] = useState<MenuProps[`items`]>();
   const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>();
   const renderMenu = (menu: any[]) => {
     return menu.map((m) => {

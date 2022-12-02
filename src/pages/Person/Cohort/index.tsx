@@ -2,37 +2,32 @@ import { Button, Space, Tabs, Card, Modal, message } from 'antd';
 import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import PersonInfo from '../../../bizcomponents/PersonInfo/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
-import CohortService from '@/module/cohort/Cohort';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from '../../../bizcomponents/SearchCohort/index';
-import { Cohort } from '../../../module/org/index';
 import { useHistory } from 'react-router-dom';
-import PersonInfoEnty from '../../../ts/core/provider';
 import CohortEnty from '../../../ts/core/target/cohort';
-import CohortController from '../../../ts/controller/cohort/index';
 import ChangeCohort from './SearchCohortPerson/index';
 import CreateCohort from '../../../bizcomponents/Cohort/index';
 import { schema } from '../../../ts/base';
 import CohortCard from './CohortCard';
-import { chatCtrl } from '@/ts/controller/chat';
+import CohortController from '@/ts/controller/cohort';
+import chatCtrl from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import AddPostModal from '../../../bizcomponents/AddPositionModal';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 /**
  * 个人信息
  * @returns
  */
 const CohortConfig: React.FC = () => {
-  const service = new CohortService({
-    nameSpace: 'myCohort',
-  });
-  const Person = PersonInfoEnty.getPerson!;
+  const Person = userCtrl.User!;
   console.log('实体信息', Person);
-  // console.log('workSpaceId', PersonInfoEnty.getWorkSpace());
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
@@ -45,6 +40,7 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
+  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
 
   useEffect(() => {
     CohortController.setCallBack(setData);
@@ -69,10 +65,8 @@ const CohortConfig: React.FC = () => {
   const getChat = (id: string): IChat | undefined => {
     for (var i = 0; i < chatCtrl.groups.length; i++) {
       const group = chatCtrl.groups[i];
-      console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
-        // console.log(chat);
         if (id == chat.target.id) {
           console.log(chat);
           return chat;
@@ -88,7 +82,6 @@ const CohortConfig: React.FC = () => {
         key: 'enterChat',
         label: '进入会话',
         onClick: () => {
-          console.log('获取到会话控制器', chatCtrl);
           chatCtrl.setCurrent(getChat(item.target.id));
           history.push('/chat');
           console.log('按钮事件', 'enterChat', item);
@@ -116,15 +109,8 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: () => {
-          history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
+          setIsSetPost(true);
           console.log('按钮事件', 'roleManage', item);
-        },
-      },
-      {
-        key: 'identityManage',
-        label: '身份管理',
-        onClick: () => {
-          console.log('按钮事件', 'identityManage');
         },
       },
       {
@@ -140,10 +126,17 @@ const CohortConfig: React.FC = () => {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          console.log(CohortController.deleteCohort(Person, item.target.id));
-          // newCohortServices.deleteCohort(param);
-          message.info('解散成功');
-          // getTableList();
+          Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否确定解散该群组',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+              CohortController.deleteCohort(Person, item.target.id),
+                message.info('解散成功');
+            },
+          });
         },
       },
     ];
@@ -163,18 +156,16 @@ const CohortConfig: React.FC = () => {
         key: 'exitCohort',
         label: '退出群聊',
         onClick: () => {
-          CohortController.quitCohort(Person, item.target.id);
+          // CohortController.quitCohort(Person, item.target.id);
           message.info('退出成功');
           console.log('按钮事件', 'exitCohort', item);
         },
       },
     ];
   };
-  const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {};
 
-  const handlePageChange = (page: number, pageSize: number) => {
+  const handlePageChange = (page: number) => {
     setPage(page);
-    getTableList({ page, pageSize });
   };
 
   const tableAlertRender = (selectedRowKeys: any[]) => {
@@ -198,7 +189,7 @@ const CohortConfig: React.FC = () => {
         friend?.id!,
       ),
     );
-    console.log('获取到选中对象', friend);
+    message.success('权限转移成功');
   };
   //邀请成员确认事件
   const handleOk = async () => {
@@ -230,13 +221,6 @@ const CohortConfig: React.FC = () => {
           className="card"
           data={item}
           key={item.target.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           onClick={() => console.log('按钮测试')}
           operation={renderOperation}
         />
@@ -245,9 +229,6 @@ const CohortConfig: React.FC = () => {
   };
   return (
     <div>
-      {/* <div>
-        <PersonInfo />
-      </div> */}
       <Card>
         <div className={cls['person-info-content-header']}>
           <Title level={2}>
@@ -270,9 +251,19 @@ const CohortConfig: React.FC = () => {
                 onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
                 width="700px">
-                <Persons searchCallback={searchCallback} person={Person} />
+                <Persons searchCallback={searchCallback} person={userCtrl.User!} />
               </Modal>
-
+              {/* 对象设置 */}
+              <AddPostModal
+                title={'身份设置'}
+                open={isSetPost}
+                onOk={() => {
+                  setIsSetPost(false);
+                }}
+                handleOk={() => {
+                  setIsSetPost(false);
+                }}
+              />
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
@@ -291,18 +282,13 @@ const CohortConfig: React.FC = () => {
                     onCancel: () => setOpen(false),
                   }}
                   open={open}
-                  columns={service.getcolumn()}
+                  columns={cohortColumn as any}
                   setOpen={setOpen}
                   item={item}
-                  getTableList={getTableList}
                 />
               )}
 
-              <CreateCohort
-                Person={Person}
-                service={service}
-                getTableList={getTableList}
-              />
+              <CreateCohort Person={Person} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>
@@ -310,7 +296,6 @@ const CohortConfig: React.FC = () => {
           </div>
         </div>
         <Tabs
-          // style = {}
           defaultActiveKey="1"
           onChange={onChange}
           items={[
@@ -324,20 +309,12 @@ const CohortConfig: React.FC = () => {
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
-                  rowSelection={
-                    {
-                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                      // 注释该行则默认不显示下拉选项
-                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                      // defaultSelectedRowKeys: [1],
-                    }
-                  }
+                  rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
-                  // style={divStyle}
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />
@@ -353,20 +330,12 @@ const CohortConfig: React.FC = () => {
                   total={total}
                   page={page}
                   tableAlertRender={tableAlertRender}
-                  rowSelection={
-                    {
-                      // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
-                      // 注释该行则默认不显示下拉选项
-                      // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
-                      // defaultSelectedRowKeys: [1],
-                    }
-                  }
+                  rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
                   columns={cohortColumn as any}
-                  // style={divStyle}
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />

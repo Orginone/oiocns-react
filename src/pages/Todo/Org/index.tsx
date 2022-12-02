@@ -1,5 +1,4 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { TeamApprovalType } from '@/module/todo/typings';
 import { Button, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';

@@ -8,11 +8,11 @@ const apps = [
   {
     label: '公益仓',
     key: '/todo/gyc',
-    // icon: `HomeOutlined`,
-  }, // <HomeOutlined /> },
-  { label: '办公OA', key: '/todo/oa', icon: `FileTextOutlined` }, // <FileTextOutlined /> },
-  { label: '资产管理', key: '/todo/asset', icon: `FundOutlined` }, // <FundOutlined /> },
-  { label: '资产监控', key: '/todo/monitor', icon: `DatabaseOutlined` }, // <DatabaseOutlined />, children: [] },
+    icon: `HomeOutlined`,
+  },
+  { label: '办公OA', key: '/todo/oa', icon: `FileTextOutlined` },
+  { label: '资产管理', key: '/todo/asset', icon: `FundOutlined` },
+  { label: '资产监控', key: '/todo/monitor', icon: `DatabaseOutlined` },
 ];
 // 平台待办
 const systemTodo = [
@@ -32,7 +32,7 @@ const systemTodo = [
     ],
   },
   { label: '订单管理', key: '/todo/order', icon: `UnorderedListOutlined` },
-]; //.map((n) => ({ ...n, icon: React.createElement(Icon[n.icon]) }));
+];
 
 class SideBar {
   private _topMenu = systemTodo;

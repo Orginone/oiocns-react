@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover } from 'antd';
+import { Button, Popover, Image } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import HeadImg from '@/components/headImg/headImg';
 import contentStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
 import { deepClone } from '@/ts/base/common';
+import { XImMsg } from '@/ts/base/schema';
+import { MessageType } from '@/ts/core/enum';
+import { FileItemShare } from '@/ts/base/model';
 
 /**
  * @description: 聊天区域
@@ -67,6 +70,34 @@ const GroupContent = (props: Iprops) => {
   const handleReWrite = (txt: string) => {
     handleReWrites(txt);
   };
+  /**
+   * 显示消息
+   * @param msg 消息
+   */
+  const viewMsg = (item: XImMsg) => {
+    switch (item.msgType) {
+      case MessageType.Image:
+        // eslint-disable-next-line no-case-declarations
+        const img: FileItemShare = JSON.parse(item.showTxt);
+        return (
+          <>
+            <div className={`${contentStyle.con_content_link}`}></div>
+            <div className={`${contentStyle.con_content_txt}`}>
+              <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
+            </div>
+          </>
+        );
+      default:
+        return (
+          <>
+            <div className={`${contentStyle.con_content_link}`}></div>
+            <div
+              className={`${contentStyle.con_content_txt}`}
+              dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+          </>
+        );
+    }
+  };
 
   return (
     <div className={contentStyle.group_content_wrap}>
@@ -85,7 +116,6 @@ const GroupContent = (props: Iprops) => {
             {item.msgType === 'recall' ? (
               <div
                 className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}>
-                {/* {item.showTxt} */}
                 撤回了一条消息
                 {item.allowEdit ? (
                   <span
@@ -142,7 +172,8 @@ const GroupContent = (props: Iprops) => {
                   ) : (
                     <div
                       className={contentStyle.con_body}
-                      onClick={(e) => {
+                      onContextMenu={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         setSelectId(item.id);
                       }}>
@@ -151,11 +182,7 @@ const GroupContent = (props: Iprops) => {
                         label={''}
                         isSquare={false}
                       />
-                      <div className={`${contentStyle.con_content}`}>
-                        <div
-                          className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                          dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
-                      </div>
+                      <div className={`${contentStyle.con_content}`}>{viewMsg(item)}</div>
                     </div>
                   )}
                 </Popover>
@@ -213,14 +240,13 @@ const GroupContent = (props: Iprops) => {
                     ) : (
                       <div
                         className={contentStyle.con_body}
-                        onClick={(e) => {
+                        onContextMenu={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
                           setSelectId(item.id);
                         }}>
-                        <div className={contentStyle.con_content}>
-                          <div
-                            className={`${contentStyle.con_content} ${contentStyle.txt}`}
-                            dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
+                        <div className={`${contentStyle.con_content}`}>
+                          {viewMsg(item)}
                         </div>
                         <HeadImg name={chatCtrl.getName(item.fromId)} isSquare={false} />
                       </div>

@@ -1,3 +1,4 @@
+import { Card } from 'antd';
 import React from 'react';
 
 /**
@@ -5,7 +6,7 @@ import React from 'react';
  * @returns
  */
 const PersonSafe: React.FC = () => {
-  return <h2>安全管理</h2>;
+  return <Card>安全管理</Card>;
 };
 
 export default PersonSafe;

@@ -3,7 +3,7 @@ import { Button, Checkbox, Col, Modal, Row, Empty, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import detailStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 
 /**
@@ -158,7 +158,7 @@ const Groupdetail = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={chat?.target.name} label={''} />
+        <HeadImg name={chat?.target.name} label={''} imgWidth={38} />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>

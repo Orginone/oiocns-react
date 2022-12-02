@@ -102,6 +102,7 @@ const TodoOrg: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('5');
   const [pageData, setPageData] = useState<XOrder[] | XOrderDetail[]>();
   const [total, setPageTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const buyColumns: ProColumns<XOrder>[] = [
     {
@@ -192,16 +193,20 @@ const TodoOrg: React.FC = () => {
     },
   ];
   // 获取订单列表;
-  const loadList = () => {
-    console.log(todoService.currentList);
-    setPageData([...todoService.currentList]);
+  const loadList = (current: number, pageSize: number) => {
+    setCurrentPage(current);
+    const list = todoService.currentList.slice(
+      (current - 1) * pageSize,
+      pageSize * current,
+    );
+    setPageData(list);
     setPageTotal(todoService.currentList.length);
     setNeedReload(false);
   };
 
   useEffect(() => {
     todoService.activeStatus = activeKey as tabStatus;
-    loadList();
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
@@ -227,6 +232,7 @@ const TodoOrg: React.FC = () => {
                 }
               : ''
           }
+          page={currentPage}
           total={total}
           onChange={loadList}
           operation={(item: XOrder | XOrderDetail) =>

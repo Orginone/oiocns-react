@@ -1,29 +1,46 @@
 @import (reference) '~antd/es/style/themes/variable';
 
 .person-info-container {
-  background-color: @background-color-base;
+  background-color: @layout-body-background;
   height: 100%;
-}
-
-.person-info-info {
-  height: 35%;
-}
-
-.person-info-title {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  .margin-bottom {
+    margin-bottom: @margin-xs;
+  }
 }
-.person-info-link {
-  margin-top: 15px;
-  float: right;
+.certificate-container {
+  background-color: @component-background;
+  // margin-top: @margin-xs;
+  border-radius: @border-radius-base;
+  flex: 1;
+  overflow: hidden;
+  :global {
+    .ogo-card-head {
+      border: none;
+    }
+    .ogo-card-body {
+      padding-top: 0;
+      height: calc(100% - 64px);
+      //  display: 'flex';
+      //   flexDirection: 'column'
+    }
+  }
+
+  // height: calc(100% - 298px);
+  .tableBox {
+    height: 100%;
+  }
 }
-.person-info-H {
-  margin-top: 15px;
-  float: left;
-}
-.ogo-collapse {
-  margin-left: 1px;
-}
-.person-info-company {
-  height: 65%;
-}
+
+// .person-info-title {
+//   display: flex;
+//   justify-content: space-between;
+// }
+
+// .ogo-collapse {
+//   margin-left: 1px;
+// }
+// .person-info-company {
+//   height: 65%;
+// }

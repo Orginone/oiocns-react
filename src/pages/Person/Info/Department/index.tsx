@@ -1,16 +1,12 @@
-import { Button, Modal, Table, Tabs } from 'antd';
+import { Button, Tabs } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 
 import CardOrTable from '@/components/CardOrTableComp';
-import { UserDept } from '@/module/org';
-// import companyService from '@/module/org/company';
-// import { useQuery } from '@tanstack/react-query';
 import { User } from 'typings/user';
 
 import cls from './index.module.less';
-import SearchCompany from '@/bizcomponents/SearchCompany';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司

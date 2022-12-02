@@ -2,10 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { ProColumns } from '@ant-design/pro-components';
 /* eslint-disable no-unused-vars */
 import cls from './index.module.less';
-
 import { Dropdown, Pagination } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
-
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';

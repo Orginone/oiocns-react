@@ -1,7 +1,6 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
-import { ProductApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
 import { Button, Space, Tag } from 'antd';
 import appService, { tabStatus } from '@/ts/controller/todo';

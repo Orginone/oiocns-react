@@ -17,8 +17,6 @@ import { XOrder, XOrderDetail } from '@/ts/base/schema';
 import { OrderStatus } from '@/ts/core/enum';
 import OrderTodo from '@/ts/core/todo/order';
 
-// type OrgType = '人员' | 'other';
-
 /**
  * tabs 状态选项
  *  tab,key 待办：1  我发起的：2
@@ -44,7 +42,6 @@ interface TodoServiceProps {
   // 当前应用待办appid
   currentAppid: string;
   applicationInstance: ApplicationTodo | undefined;
-
   statusList: statusItem[];
   currentModel: pageModel; // 当前模块
   activeStatus: tabStatus; // 当前选中的状态
@@ -127,7 +124,7 @@ class TodoService implements TodoServiceProps {
       '6': 'buyList',
     };
     const selfList = listStatusCode[this.activeStatus];
-    return this.currentInstance[selfList];
+    return this.currentInstance[selfList] || [];
   }
   /**  获取应用待办列表 */
   public applicationList = async () => {

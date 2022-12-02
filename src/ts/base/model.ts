@@ -786,19 +786,26 @@ export type ApprovalTaskReq = {
   comment: string;
 };
 /**
- * 文件系统项数据模型
+ * 文件系统项分享数据
  */
-export type FileItemModel = {
+export type FileItemShare = {
+  /** 完整路径 */
+  size: number;
   /** 名称 */
   name: string;
-  /** 完整路径 */
-  key: string;
   /** 共享链接 */
   shareLink: string;
   /** 拓展名 */
   extension: string;
   /** 缩略图 */
   thumbnail: string;
+};
+/**
+ * 文件系统项数据模型
+ */
+export type FileItemModel = {
+  /** 完整路径 */
+  key: string;
   /** 创建时间 */
   dateCreated: Date;
   /** 修改时间 */
@@ -809,7 +816,7 @@ export type FileItemModel = {
   isDirectory: boolean;
   /** 是否包含子目录 */
   hasSubDirectories: boolean;
-};
+} & FileItemShare;
 
 /** 桶支持的操作 */
 export enum BucketOpreates {

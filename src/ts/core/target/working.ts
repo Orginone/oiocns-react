@@ -21,7 +21,7 @@ export default class Working extends BaseTarget implements IWorking {
     this.createTargetType = [TargetType.Working];
   }
   public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
+    data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
     return await super.updateTarget(data);
   }

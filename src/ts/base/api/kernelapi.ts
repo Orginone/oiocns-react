@@ -3,6 +3,7 @@ import StoreHub from './storehub';
 import type * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
+import { logger } from '../common';
 /**
  * 奥集能内核api
  */
@@ -31,7 +32,7 @@ export default class KernelApi {
         try {
           methods.forEach((m) => m.apply(this, [res.data]));
         } catch (e) {
-          console.log(e);
+          logger.error(e as Error);
         }
       }
     });
@@ -45,7 +46,7 @@ export default class KernelApi {
             }
           })
           .catch((err) => {
-            console.log(err);
+            logger.error(err);
           });
       }
     });

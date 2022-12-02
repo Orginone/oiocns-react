@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Card, Button, Descriptions, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
@@ -7,16 +6,13 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
 import { dataSource } from './datamock';
+import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
-// import AddDeptModal from './components/AddDeptModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-// import settingStore from '@/store/setting';
-import settingController from '@/ts/controller/setting';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 
 /**
  * 部门设置
@@ -27,11 +23,12 @@ const SettingDept: React.FC = () => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
-  const [statusKey, setStatusKey] = useState('merchandise');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
+
+  const [SelectDept, setSelectDept] = useState<schema.XTarget>();
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -76,7 +73,7 @@ const SettingDept: React.FC = () => {
       },
       {
         key: 'caption1',
-        label: '移出单位',
+        label: '移出部门',
         onClick: () => {
           console.log('按钮事件', 'publishList', item);
         },
@@ -90,10 +87,10 @@ const SettingDept: React.FC = () => {
   };
 
   /** 设置岗位的逻辑 */
-  const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
-    console.log(checkJob, checkUser);
-    setIsSetPost(false);
-  };
+  // const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
+  //   console.log(checkJob, checkUser);
+  //   setIsSetPost(false);
+  // };
 
   const onApplyOk = () => {
     setLookApplyOpen(false);
@@ -105,6 +102,7 @@ const SettingDept: React.FC = () => {
     setTransfer(false);
     setLookApplyOpen(false);
     setIsOpenModal(false);
+    setIsCreateDept(false);
   };
   const handleOk = () => {
     setIsAddOpen(false);
@@ -112,12 +110,17 @@ const SettingDept: React.FC = () => {
     setTransfer(false);
     setLookApplyOpen(false);
     setIsOpenModal(false);
+    setIsCreateDept(false);
   };
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
   useEffect(() => {
+    initData();
+    // 刚进入的时候选中公司 TODO
+    // setSelectDept();
+
     settingController.addListen('isOpenModal', () => {
       setIsCreateDept(true);
       setIsOpenModal(true);
@@ -143,12 +146,33 @@ const SettingDept: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    settingController.addListen('changeSelectId', (e: { id: string }) => {
+      setSelectId(e.id);
+    });
+    return settingController.remove('changeSelectId', () => {
+      setSelectId('');
+    });
+  }, []);
+
+  useEffect(() => {
     initData();
   }, [selectId]);
 
   const initData = async () => {
+    if (selectId) {
+      const obj = await settingController.searchDeptment(selectId);
+      if (obj.total > 0 && obj.result) {
+        // 创建人的查询
+        const obj1 = await settingController.searchDeptment(obj.result[0].createUser);
+        console.log(obj1);
+        if (obj1.result) {
+          obj.result[0].createUser = obj1.result[0].team?.name!;
+        }
+        setSelectDept(obj.result[0]);
+      }
+    }
     const resultData = await settingController.searchAllPersons(selectId);
-    console.log(resultData);
+    console.log('获取部门底下的人员', resultData);
   };
 
   // 标题tabs页
@@ -205,14 +229,12 @@ const SettingDept: React.FC = () => {
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="单位名称">浙江省财政厅</Descriptions.Item>
-          <Descriptions.Item label="单位编码">1130010101010101010</Descriptions.Item>
-          <Descriptions.Item label="我的岗位">浙江省财政厅-管理员</Descriptions.Item>
-          <Descriptions.Item label="团队编码">zjczt</Descriptions.Item>
-          <Descriptions.Item label="创建人">小明</Descriptions.Item>
-          <Descriptions.Item label="创建时间">2022-11-01 11:11:37</Descriptions.Item>
+          <Descriptions.Item label="部门名称">{SelectDept?.name}</Descriptions.Item>
+          <Descriptions.Item label="部门编码">{SelectDept?.code}</Descriptions.Item>
+          <Descriptions.Item label="创建人">{SelectDept?.createUser}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{SelectDept?.createTime}</Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            未公示
+            {SelectDept?.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -279,7 +301,7 @@ const SettingDept: React.FC = () => {
     <div className={cls[`dept-content-box`]}>
       {content}
       {deptCount}
-      {/* 编辑单位 */}
+      {/* 编辑部门 */}
       <EditCustomModal
         handleCancel={() => {
           setIsOpenModal(false);

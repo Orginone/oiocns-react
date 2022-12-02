@@ -1,8 +1,8 @@
 import { schema, kernel, model, common } from '../../base';
 import { TargetType, MessageType } from '../enum';
-import Provider from '../provider';
 import { StringPako } from '@/utils/package';
 import { ChatCache, IChat } from './ichat';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -54,7 +54,7 @@ class BaseChat implements IChat {
     this.lastMessage = cache.lastMessage;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.spaceId === Provider.userId) {
+    if (this.spaceId === userCtrl.User?.target.id) {
       const res = await kernel.anystore.remove(
         hisMsgCollName,
         {
@@ -71,7 +71,7 @@ class BaseChat implements IChat {
     return false;
   }
   async deleteMessage(id: string): Promise<boolean> {
-    if (this.spaceId === Provider.userId) {
+    if (this.spaceId === userCtrl.User?.target.id!) {
       const res = await kernel.anystore.remove(
         hisMsgCollName,
         {
@@ -111,7 +111,7 @@ class BaseChat implements IChat {
       msgType: type,
       toId: this.target.id,
       spaceId: this.spaceId,
-      fromId: Provider.userId,
+      fromId: userCtrl.User?.target.id!,
       msgBody: StringPako.deflate(text),
     });
     return res.success;
@@ -175,7 +175,7 @@ class PersonChat extends BaseChat {
     super(id, name, m);
   }
   override async moreMessage(filter: string): Promise<void> {
-    if (this.spaceId === Provider.userId) {
+    if (this.spaceId === userCtrl.User?.target.id) {
       await this.loadCacheMessages();
     } else {
       let res = await kernel.queryFriendImMsgs({
@@ -202,7 +202,7 @@ class CohortChat extends BaseChat {
     super(id, name, m);
   }
   override async moreMessage(filter: string): Promise<void> {
-    if (this.spaceId === Provider.userId) {
+    if (this.spaceId === userCtrl.User?.target.id) {
       await this.loadCacheMessages();
     } else {
       const res = await kernel.queryCohortImMsgs({

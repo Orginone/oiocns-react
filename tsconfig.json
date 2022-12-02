@@ -26,7 +26,6 @@
   },
   "include": [
     "src/*",
-    "src/**/*.d.ts",
     "typings/*.d.ts",
     "config/**/*",
     "vite.config.ts",

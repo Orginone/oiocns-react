@@ -1,26 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { docsCtrl } from '@/ts/controller/store/docsCtrl';
+import React from 'react';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import ResetNameModal from '../ResetName';
-import CoppyOrMove from '../CoppyOrMove';
 import { getIcon, getItemMenu } from '../CommonMenu';
 import cls from './index.module.less';
 
-const DocClassifyTree: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [moveModalOpen, setMoveModalOpen] = useState<boolean>(false);
-  const [reNameKey, setReNameKey] = useState<string>('');
-  const [createFileName, setCreateFileName] = useState<string>('');
-  const [modalTitle, setModalTitle] = useState<string>('新建文件夹');
-  const [treeData, setTreeData] = useState<any[]>();
-  const [keys, setKeys] = useState([docsCtrl.current?.key ?? '']);
-  const [coppyOrMoveTitle, setCoppyOrMoveTitle] = useState<string>('复制到');
-  const [currentTaget, setCurrentTaget] = useState<any>(docsCtrl.current);
-  const refreshUI = () => {
-    if (docsCtrl.current) {
-      setKeys([docsCtrl.current.key]);
-    }
-    setTreeData([loadTreeData(docsCtrl.root)]);
+const DocClassifyTree = ({
+  currentKey,
+  handleMenuClick,
+}: {
+  currentKey: string;
+  handleMenuClick: (key: string, node: any) => void;
+}) => {
+  const loadExpKeys = () => {
+    let tkeys = currentKey.split('/');
+    return tkeys.map((_, index) => {
+      return tkeys.slice(0, index + 1).join('/');
+    });
   };
   const loadTreeData = (item: any) => {
     let result: any = {
@@ -39,91 +34,34 @@ const DocClassifyTree: React.FC = () => {
     }
     return result;
   };
-  useEffect(() => {
-    const id = docsCtrl.subscribe(refreshUI);
-    return () => {
-      docsCtrl.unsubscribe(id);
-    };
-  }, []);
-
   const onSelect = (selectedKeys: string[]) => {
     if (selectedKeys.length > 0) {
       docsCtrl.open(selectedKeys[0]);
     }
   };
-  const handleMenuClick = async (key: string, node: any) => {
-    switch (key) {
-      case '1': // 删除
-        if (await docsCtrl.refItem(node.key)?.delete()) {
-          docsCtrl.changCallback();
-        }
-        break;
-      case '2': // 重命名
-        setReNameKey(node.key);
-        setCreateFileName(node.title);
-        setModalTitle('重命名');
-        setIsModalOpen(true);
-        break;
-      case '3': // 移动到
-        setCurrentTaget(docsCtrl.refItem(node.key));
-        setCoppyOrMoveTitle('移动到');
-        setMoveModalOpen(true);
-        break;
-      case '4': // 复制到
-        setCurrentTaget(docsCtrl.refItem(node.key));
-        setCoppyOrMoveTitle('复制到');
-        setMoveModalOpen(true);
-        break;
-      case '5': // 下载
-        break;
-      case '新建文件夹': // 新建文件夹
-        setReNameKey(node.key);
-        setCreateFileName('');
-        setModalTitle('新建文件夹');
-        setIsModalOpen(true);
-        break;
-      case '刷新': // 刷新
-        docsCtrl.refItem('')?.loadChildren(true);
-        docsCtrl.changCallback();
-        break;
-      default:
-        break;
+  const onExpand = async (_: any, info: { expanded: boolean; node: { key: string } }) => {
+    if (info.expanded) {
+      await docsCtrl.open(info.node.key);
     }
   };
   return (
-    <>
-      {treeData && (
-        <StoreClassifyTree
-          className={cls.docTree}
-          title={'文档目录'}
-          fieldNames={{ title: 'name' }}
-          isDirectoryTree
-          menu={'menus'}
-          searchable
-          showIcon
-          treeData={treeData}
-          defaultExpandedKeys={['']}
-          selectedKeys={keys}
-          onSelect={onSelect}
-          handleMenuClick={handleMenuClick}
-          icon={getIcon}
-        />
-      )}
-      <ResetNameModal
-        reNameKey={reNameKey}
-        open={isModalOpen}
-        title={modalTitle}
-        value={createFileName}
-        onChange={setIsModalOpen}
-      />
-      <CoppyOrMove
-        currentTaget={currentTaget}
-        open={moveModalOpen}
-        title={coppyOrMoveTitle}
-        onChange={setMoveModalOpen}
-      />
-    </>
+    <StoreClassifyTree
+      className={cls.docTree}
+      title={'文档目录'}
+      fieldNames={{ title: 'name' }}
+      isDirectoryTree
+      menu={'menus'}
+      searchable
+      showIcon
+      treeData={[loadTreeData(docsCtrl.root)]}
+      defaultExpandedKeys={loadExpKeys()}
+      selectedKeys={[currentKey]}
+      onSelect={onSelect}
+      onExpand={onExpand}
+      handleMenuClick={handleMenuClick}
+      icon={getIcon}
+    />
   );
 };
 
-export default React.memo(DocClassifyTree);
+export default DocClassifyTree;

@@ -1,57 +1,27 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu, Modal, Space, Typography } from 'antd';
-import React, { useState } from 'react';
+import { Avatar, Dropdown, Modal } from 'antd';
+import React, { useState, useEffect } from 'react';
 import './index.less';
-import AppLogo from '@/assets/img/appLogo.png';
 import { MarketTypes } from 'typings/marketType';
 import Cohort from '@/ts/core/target/cohort';
 import CohortMemberList from '../CohortMemberList';
-interface defaultObjType {
-  name: string;
-  size: number | string;
-  type: string;
-  desc: string;
-  creatTime: string | number;
-}
-const { Text } = Typography;
-interface AppCardType {
+import CohortController from '@/ts/controller/cohort/index';
+
+interface CohortCardType {
   data: Cohort; //props
   className?: string;
-  defaultKey?: defaultObjType; // 卡片字段 对应数据字段
-  // eslint-disable-next-line no-unused-vars
   onClick?: (event?: any) => void;
-  // eslint-disable-next-line no-unused-vars
   operation?: (_item: Cohort) => MarketTypes.OperationType[]; //操作区域数据
 }
-const defaultObj = {
-  name: 'name', //名称
-  size: 'size', //大小
-  type: 'type', //是否免费
-  desc: 'desc', //描述
-  typeName: 'typeName', //应用类型
-  creatTime: 'creatTime', //上架时间
-};
 
-const AppCardComp: React.FC<AppCardType> = ({
+const CohortCardComp: React.FC<CohortCardType> = ({
   className,
   data,
-  defaultKey,
   onClick,
   operation,
 }) => {
-  const {} = { ...defaultObj, ...defaultKey };
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = () => {
-    return <Menu items={operation && operation(data)} />;
-  };
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+  const [name, setName] = useState('');
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -59,6 +29,13 @@ const AppCardComp: React.FC<AppCardType> = ({
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+  useEffect(() => {
+    getname();
+  }, []);
+  const getname = async () => {
+    const res = await CohortController.getName(data);
+    setName(res);
   };
   const Title = () => {
     return (
@@ -72,7 +49,10 @@ const AppCardComp: React.FC<AppCardType> = ({
             <span className="app-size">{data.target.team?.remark || '--'}</span>
           </div>
         </div>
-        <Dropdown className="card-title-extra" overlay={menu} placement="bottom">
+        <Dropdown
+          className="card-title-extra"
+          menu={{ items: operation && operation(data) }}
+          placement="bottom">
           <EllipsisOutlined rotate={90} />
         </Dropdown>
       </div>
@@ -83,12 +63,9 @@ const AppCardComp: React.FC<AppCardType> = ({
     <div className={`customCardWrap ${className}`}>
       <Title />
       <ul className="card-content">
-        {/* <li className="card-content-type con">
-          {data[typeName] ? <Tag>{data[typeName]}</Tag> : ''}
-        </li> */}
         <li className="card-content-date">
           <span style={{ float: 'right' }} className="app-size">
-            归属:apex
+            归属:{name}
           </span>
         </li>
         <li className="card-content-date">我的身份:管理员</li>
@@ -103,6 +80,7 @@ const AppCardComp: React.FC<AppCardType> = ({
       <Modal
         title="详情"
         open={isModalOpen}
+        destroyOnClose={true}
         onOk={handleOk}
         width={850}
         onCancel={handleCancel}>
@@ -112,4 +90,4 @@ const AppCardComp: React.FC<AppCardType> = ({
   );
 };
 
-export default AppCardComp;
+export default CohortCardComp;

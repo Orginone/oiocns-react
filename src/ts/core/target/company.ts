@@ -7,7 +7,7 @@ import { ResultType, TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { faildResult, schema, kernel, common } from '@/ts/base';
-import { IGroup, ICompany, ICohort, IDepartment, IWorking } from './itarget';
+import { IGroup, ICompany, ICohort, IDepartment, IWorking, SpaceType } from './itarget';
 import Working from './working';
 /**
  * 公司的元操作
@@ -40,12 +40,20 @@ export default class Company extends MarketTarget implements ICompany {
     this.createTargetType = [TargetType.Cohort, TargetType.Group];
     this.searchTargetType = [TargetType.Person, TargetType.Cohort, TargetType.Group];
   }
+  public get getSpaceData(): SpaceType {
+    return {
+      id: this.target.id,
+      name: this.target.team!.name,
+      icon: this.target.avatar,
+      typeName: this.target.typeName as TargetType,
+    };
+  }
   public async createGroup(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
     const tres = await this.searchTargetByName(data.code, TargetType.Group);
     if (!tres.data) {
-      const res = await this.createTarget(data);
+      const res = await this.createTarget({ ...data, belongId: this.target.id });
       if (res.success) {
         const group = new Group(res.data);
         this.joinedGroup.push(group);
@@ -61,6 +69,7 @@ export default class Company extends MarketTarget implements ICompany {
   ): Promise<ResultType<any>> {
     const res = await this.createTarget({
       ...data,
+      belongId: this.target.id,
       teamCode: data.code,
       teamName: data.name,
     });
@@ -100,7 +109,7 @@ export default class Company extends MarketTarget implements ICompany {
       return department.target.id == id;
     });
     if (department != undefined) {
-      let res = await this.deleteSubTarget(id, TargetType.Department);
+      let res = await this.deleteSubTarget(id, TargetType.Department, this.target.id);
       if (res.success) {
         this.departments = this.departments.filter((department) => {
           return department.target.id != id;
@@ -115,7 +124,7 @@ export default class Company extends MarketTarget implements ICompany {
       return working.target.id == id;
     });
     if (working != undefined) {
-      let res = await this.deleteSubTarget(id, TargetType.Working);
+      let res = await this.deleteSubTarget(id, TargetType.Working, this.target.id);
       if (res.success) {
         this.workings = this.workings.filter((working) => {
           return working.target.id != id;
@@ -223,7 +232,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort]);
+    const res = await this.getjoinedTargets([TargetType.Cohort], this.target.id);
     if (res.success) {
       res.data.result?.forEach((a) => {
         this.joinedCohort.push(new Cohort(a));
@@ -235,7 +244,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
-    const res = await this.getjoinedTargets([TargetType.Group]);
+    const res = await this.getjoinedTargets([TargetType.Group], this.target.id);
     if (res.success) {
       res.data.result?.forEach((a) => {
         this.joinedGroup.push(new Group(a));
@@ -244,7 +253,7 @@ export default class Company extends MarketTarget implements ICompany {
     return this.joinedGroup;
   }
   public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
+    data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
     if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');

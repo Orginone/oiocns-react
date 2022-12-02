@@ -3,7 +3,7 @@ import { Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import sideStyle from './index.module.less';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { deepClone } from '@/ts/base/common';
 import { IChat } from '@/ts/core/chat/ichat';
 import ContentMenu from '@/components/ContentMenu';
@@ -220,7 +220,7 @@ const GroupSideBar: React.FC = () => {
   ];
   return (
     <div className={sideStyle.chart_side_wrap}>
-      <ContentMenu width={280}>
+      <ContentMenu width={300}>
         <div className={sideStyle.group_side_bar_search}>
           <Input
             placeholder="搜索"

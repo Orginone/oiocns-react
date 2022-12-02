@@ -1,10 +1,10 @@
 import StoreContent from './content';
-import Provider from '@/ts/core/provider';
 import { Market } from '@/ts/core/market';
 // import Company from '@/ts/core/target/company';
 import { XMarket } from '@/ts/base/schema';
 import BaseController from '../baseCtrl';
 import { kernel } from '@/ts/base';
+import userCtrl from '../setting/userCtrl';
 /**
  * @desc: 仓库模块 导航控件
  * @return {*}
@@ -26,6 +26,7 @@ type AppTreeType = {
 };
 const selfAppMenu = 'selfAppMenu';
 class StoreClassify extends BaseController {
+  public marketMenber: any;
   constructor() {
     super();
     kernel.anystore.subscribed(selfAppMenu, 'user', (data: any) => {
@@ -35,7 +36,7 @@ class StoreClassify extends BaseController {
       }
     });
   }
-  // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+  // static curCompoy: Company = userCtrl.User.curCompany as Company; // 获取当前所处的单位
 
   // 顶部菜单区域
   public static SelfMenu = [
@@ -175,15 +176,30 @@ class StoreClassify extends BaseController {
   /**
    * 页面操作--切换商店
    */
-  public handleSelectMarket(market: Market) {
+  public async handleSelectMarket(market: Market) {
     this._curMarket = market;
     //修改面包屑 当前展示区域
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包屑 商店', this.breadcrumb);
+    // 商店用户管理
+    const res = await market.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
+    }
+    this.changCallback();
+    return this.marketMenber;
+
     // this.changCallbackPart(`${this.curPageType}TreeData`, [...this.curTreeData]);
     // this.TreeCallBack(market);
   }
+
+  public removeMember = async (targetIds: string[]) => {
+    console.log('移出成员ID合集', targetIds);
+    const res = await this._curMarket?.removeMember(targetIds);
+    console.log('移出成员', res);
+  };
+
   /**
    * @desc: 获取市场列表
    * @param {number} params.offset 起始位置
@@ -192,11 +208,13 @@ class StoreClassify extends BaseController {
    * @return {*}
    */
   public async getOwnMarket(isCaback = true) {
-    const marketTree = await Provider.getPerson!.getJoinMarkets();
+    const marketTree = await userCtrl.User!.getJoinMarkets();
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
-      arrs.push(`${item.belongId === Provider.userId ? '删除商店' : '退出商店'}`);
+      arrs.push(
+        `${item.belongId === userCtrl.User?.target.id ? '删除商店' : '退出商店'}`,
+      );
       return {
         title: item.name,
         key: `0-${index}`,

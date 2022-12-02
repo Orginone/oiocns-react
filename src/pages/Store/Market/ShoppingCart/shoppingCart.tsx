@@ -5,7 +5,6 @@ import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 // import { marketCtrl } from '@/ts/controller/store/marketCtrl';
 import { Adata } from './moke';
-import {} from '../../../../ts/controller/setting/settingCtrl';
 import { Col, Row, Tag } from 'antd';
 
 const ShoppingCart: React.FC<any> = (props) => {
@@ -13,8 +12,16 @@ const ShoppingCart: React.FC<any> = (props) => {
   const [checkval, setcheckval] = useState([]); //勾选的数组
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
-
   const { confirm } = Modal;
+  // console.log(userCtrl.Space!.target.id);
+  // console.log(Provider.isUserSpace());
+  // console.log(userCtrl.User!);
+
+  // console.log(settingCtrl.getCurWorkSpace);//空间
+  // console.log(settingCtrl.getPerson);
+
+  // const marketCtrl = new MarketController(settingCtrl.getCurWorkSpace);
+
   const showConfirms = (type: string) => {
     //弹窗
     return () => {
@@ -30,14 +37,28 @@ const ShoppingCart: React.FC<any> = (props) => {
           content: '此操作将生成交易勾选订单。是否确认?',
           onOk() {
             console.log('OK', checkval);
-            // let fs = fls;
+            //另一段测试
+            // let fsdata = fls;
+            // let d = [];
             // checkval.forEach((v) => {
-            //   fs = fs.filter((val) => {
-            //     return val.id != v;
+            //   fsdata.forEach((val, i) => {
+            //     if (v == val.id) {
+            //       fsdata.splice(i, 1);
+            //     }
+            //     setfls(fsdata);
             //   });
-            //   setfls(fs);
             // });
 
+            // console.log(fsdata);
+            let fs = fls;
+            console.log(fs);
+
+            checkval.forEach((v) => {
+              fs = fs.filter((val) => {
+                return val.id != v;
+              });
+              setfls(fs);
+            });
             setcheckval([]);
             setCheckAll(false);
           },
@@ -68,7 +89,14 @@ const ShoppingCart: React.FC<any> = (props) => {
     plainOptions.push(item.id);
   });
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
-    setcheckval(e.target.checked ? plainOptions : []);
+    console.log(e.target.checked);
+
+    if (e.target.checked == true) {
+      setcheckval(plainOptions);
+    } else {
+      setcheckval([]);
+    }
+    // setcheckval(e.target.checked ? plainOptions : []);
     setIndeterminate(false);
     setCheckAll(e.target.checked);
     console.log(checkval);
@@ -125,6 +153,10 @@ const ShoppingCart: React.FC<any> = (props) => {
               onChange={(checkedValues: any) => {
                 console.log('checked = ', checkedValues);
                 setcheckval(checkedValues);
+                setCheckAll(checkedValues.length === plainOptions.length);
+                // setIndeterminate(
+                //   checkval.length != 0 && checkval.length < plainOptions.length,
+                // );
               }}>
               {fls.map((item, i) => {
                 return (
@@ -180,6 +212,10 @@ const ShoppingCart: React.FC<any> = (props) => {
                             value={item.id}
                             onChange={(e: CheckboxChangeEvent) => {
                               console.log(`checked = ${e.target.checked}`);
+                              // setIndeterminate(
+                              //   checkval.length != 0 &&
+                              //     checkval.length < plainOptions.length,
+                              // );
                             }}>
                             勾选
                           </Checkbox>

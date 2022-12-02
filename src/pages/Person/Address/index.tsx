@@ -6,7 +6,7 @@ import React from 'react';
  * @returns
  */
 const PersonAddress: React.FC = () => {
-  return <Card>用户信息</Card>;
+  return <Card>地址管理</Card>;
 };
 
 export default PersonAddress;

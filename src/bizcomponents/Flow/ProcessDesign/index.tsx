@@ -1,14 +1,10 @@
-import React, { useState, useRef, useEffect, createContext } from 'react';
-import { Route, useHistory } from 'react-router-dom';
-import Node from '@/bizcomponents/Flow/Process/Node';
+import React, { useRef, useEffect, createContext } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig, DefaultProps } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { Modal } from 'antd';
-import { title } from 'process';
 type ProcessDesignProps = {
   [key: string]: any;
   backTable: () => void;
@@ -36,24 +32,8 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   useEffect(() => {
     console.log('ProcessDesign第一次render...');
     startDesign(obj);
-  }, []); //这里传递了空数组
-  // const defaultDesign = {
-  //   name: '新建流程',
-  //   code: 'code',
-  //   formId: null,
-  //   formName: '',
-  //   appId: '',
-  //   appName: '',
-  //   remainHours: 240,
-  //   resource: {
-  //     nodeId: 'ROOT',
-  //     parentId: null,
-  //     type: 'ROOT',
-  //     name: '发起人',
-  //     children: {},
-  //   },
-  //   remark: '备注说明',
-  // };
+  }, []);
+
   const defaultDesign = {
     name: '新建流程',
     code: 'code',
@@ -95,16 +75,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
                 val: 50000,
                 valLabel: '',
               },
-              {
-                pos: 2,
-                paramKey: 'chulang',
-                paramLabel: '出让方式',
-                key: 'EQ',
-                label: '=',
-                type: 'DICT',
-                val: '01',
-                valLabel: '协议定价',
-              },
             ],
             name: '条件1',
           },
@@ -120,6 +90,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
     },
     remark: '备注说明',
   };
+
   const obj = {
     formId: '46547769841',
     business: '商品上架审核',
@@ -167,19 +138,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const startDesign = async (obj: any) => {
     let tempDesign;
     setForm(obj);
-    let formFileds: any[] = obj.field;
-    formFileds = formFileds.map((item: any) => {
-      return {
-        label: item.name,
-        value: item.code,
-        type: item.type,
-        dict: item.dict?.map((el: any) => {
-          return { label: el.name, value: el.code };
-        }),
-      };
-    });
-
-    DefaultProps.setFormFields(formFileds);
+    DefaultProps.setFormFields(contionMes?.labels);
     if (obj.flow) {
       tempDesign = JSON.parse(JSON.stringify(obj.flow));
     } else {
@@ -194,9 +153,11 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
       <LayoutHeader
         OnPreview={preview}
         OnExit={exit}
+        titleName={contionMes?.name}
         backTable={() => {
           backTable();
-        }}></LayoutHeader>
+        }}
+      />
       <div className={cls['container']}>
         <EventContext.Provider value={{ FlowSub }}>
           <div className={cls['layout-body']}>
@@ -206,11 +167,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
               </div>
             )}
           </div>
-          {/* <Modal open={isShowDialog} footer={null}  maskClosable={false} width="100vw"  closable={false} title={<LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>} style={{maxWidth: "100vw",top: 0,paddingBottom: 0}}  bodyStyle={{ height: "calc(100vh - 55px )", overflowY: "auto"}}  >
-    <div className={cls["layout-body"]}>
-        {activeSelect === 'processDesign' && <div><FormProcessDesign/></div>}
-    </div>
-		</Modal> */}
+
           <LayoutPreview ref={previewRef} />
         </EventContext.Provider>
       </div>

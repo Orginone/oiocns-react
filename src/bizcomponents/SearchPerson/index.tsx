@@ -1,17 +1,14 @@
 import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
 import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
-import { Person } from '../../module/org/index';
 import PersonInfoCard from './../PersonInfoCard';
-import CohortController from '../../ts/controller/cohort/index';
-import personService from '../../module/org/person';
+import CohortController from '@/ts/controller/cohort/index';
 import cls from './index.module.less';
-import person from '../../ts/core/target/person';
-import { schema } from '../../ts/base';
+import { IPerson } from '@/ts/core/target/itarget';
+import { schema } from '@/ts/base';
 type SearchPersonProps = {
-  // eslint-disable-next-line no-unused-vars
   searchCallback: (person: schema.XTarget) => void;
-  person: person;
+  person: IPerson;
 };
 
 /**
@@ -19,12 +16,12 @@ type SearchPersonProps = {
  * @param persons 人员列表
  * @returns
  */
-const personInfoList: React.FC<Person[]> = (persons) => (
+const personInfoList: React.FC<IPerson[]> = (persons) => (
   <Card bordered={false}>
     <List
       itemLayout="horizontal"
       dataSource={persons}
-      renderItem={(person: Person) => <PersonInfoCard person={person}></PersonInfoCard>}
+      renderItem={(person: IPerson) => <PersonInfoCard person={person}></PersonInfoCard>}
     />
   </Card>
 );
@@ -35,13 +32,12 @@ const personInfoList: React.FC<Person[]> = (persons) => (
  */
 const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback, person }) => {
   const [value, setValue] = useState<string>();
-  const [persons, setPersons] = useState<Person[]>([]);
+  const [persons, setPersons] = useState<IPerson[]>([]);
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
       const res = await CohortController.searchPerson(person, e.target.value);
       console.log(res);
-      // const res = await personService.searchPerson(e.target.value);
       if (res.data.result != null) {
         setPersons(res.data.result);
         searchCallback(res.data.result[0]);

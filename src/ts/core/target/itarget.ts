@@ -4,6 +4,18 @@ import { TargetType } from '../enum';
 import { Market, BaseProduct } from '../market';
 import { IAuthority } from './authority/iauthority';
 
+/** 空间类型数据 */
+export type SpaceType = {
+  /** 唯一标识 */
+  id: string;
+  /** 名称 */
+  name: string;
+  /** 类型 */
+  typeName: TargetType;
+  /** 图标 */
+  icon?: string;
+};
+
 /** 市场相关操作方法 */
 export interface IMTarget {
   /**
@@ -175,7 +187,7 @@ export interface ICohort {
    * @param remark 群组备注
    */
   update(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+    data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
   /** 获取群成员列表 */
   getMember(): Promise<schema.XTarget[]>;
@@ -214,6 +226,8 @@ export interface IPerson extends IMTarget {
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /**
    * 更新人员
    * @param data 人员基础信息
@@ -245,7 +259,9 @@ export interface IPerson extends IMTarget {
    * @param data 单位基本信息
    * @returns 是否成功
    */
-  createCompany(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
+  createCompany(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<schema.XTarget>>;
   /**
    * 解散群组
    * @param id 群组id
@@ -473,6 +489,11 @@ export interface IPerson extends IMTarget {
    * @param privateKey 私钥
    */
   resetPassword(password: string, privateKey: string): Promise<ResultType<any>>;
+  /**
+   * 查询单位
+   * @param code 单位的信用代码
+   */
+  searchCompany(code: string): Promise<ResultType<schema.XTarget[]>>;
 }
 /** 单位操作 */
 export interface ICompany {
@@ -500,6 +521,8 @@ export interface ICompany {
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /**
    * 更新单位
    * @param data 单位基础信息

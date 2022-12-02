@@ -1,9 +1,9 @@
 import { common, faildResult, kernel, model, schema } from '@/ts/base';
 import { IAuthority } from './iauthority';
 import { AuthorityType } from '../../enum';
-import Provider from '@/ts/core/provider';
 import consts from '@/ts/core/consts';
 import Identity from './identity';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 export default class Authority implements IAuthority {
   private readonly _authority: schema.XAuthority;
@@ -51,7 +51,7 @@ export default class Authority implements IAuthority {
       remark,
       id: undefined,
       authId: this.id,
-      belongId: Provider.spaceId,
+      belongId: userCtrl.Space!.target.id,
     });
     if (res.success && res.data != undefined) {
       this.identitys.push(new Identity(res.data));
@@ -65,7 +65,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteIdentity({
         id,
-        belongId: Provider.spaceId,
+        belongId: userCtrl.Space!.target.id,
         typeName: '',
       });
       if (res.success) {
@@ -93,7 +93,7 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: Provider.spaceId,
+      belongId: userCtrl.Space!.target.id,
     });
     if (res.success && res.data != undefined) {
       this.children.push(new Authority(res.data));
@@ -107,7 +107,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteAuthority({
         id,
-        belongId: Provider.spaceId,
+        belongId: userCtrl.Space!.target.id,
         typeName: '',
       });
       if (res.success) {
