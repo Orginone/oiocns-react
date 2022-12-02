@@ -15,13 +15,13 @@ import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
 import Cohort from '@/ts/core/target/cohort';
-import CohortController from '../../../../ts/controller/cohort/index';
-import FriendController from '../../../../ts/controller/friend';
+import CohortController from '@/ts/controller/cohort/index';
+import FriendController from '@/ts/controller/friend';
 import { useHistory } from 'react-router-dom';
-import { schema } from '../../../../ts/base';
-import Provider from '@/ts/core/provider';
+import { schema } from '@/ts/base';
 import { IChat } from '@/ts/core/chat/ichat';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: Cohort;
@@ -43,6 +43,11 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const res = await FriendController.getMyFriend();
     setFriendList(res);
   };
+  /**移除成员 */
+  const removeMember = async (ids: string[]) => {
+    CohortController.setCallBack(setMemberData);
+    await CohortController.removeCohort(cohortData, ids);
+  };
   /**
    * 获取操作列表
    * @param value
@@ -62,8 +67,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: () => {
-                FriendController.applyFriend(Provider.getPerson!, value),
-                  message.info('发起申请成功');
+                // FriendController.applyFriend(userCtrl.User, value),
+                message.success('发起申请成功');
               },
             });
           }}>
@@ -77,8 +82,28 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == Provider.userId) {
-      action.push(<a key="list-loadmore-more">踢出群组</a>);
+    if (cohortData.target.belongId == userCtrl.User!.target.id) {
+      action.push(<a key="list-loadmore-more">身份管理</a>);
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() =>
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否踢出群组',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                FriendController.applyFriend(userCtrl.User!, value),
+                  removeMember([value.id]);
+                message.success('操作成功');
+              },
+            })
+          }>
+          踢出群组
+        </a>,
+      );
     }
     return action;
   };
@@ -93,7 +118,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
-        // console.log(chat);
         if (id == chat.target.id) {
           console.log(chat);
           return chat;
@@ -155,8 +179,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     if (value!) {
       await getMemberData();
       setMemberData(memberData.filter((obj) => obj.code === value));
-      console.log('目前的值', memberData);
-      console.log('1111', value);
     } else {
       await getMemberData();
     }
@@ -195,9 +217,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
                   data={memberData}
                   height={ContainerHeight}
                   itemHeight={47}
-                  itemKey={'id'}
-                  // onScroll={onScroll}
-                >
+                  itemKey={'id'}>
                   {(item: schema.XTarget) => (
                     <List.Item key={item.id} actions={getAction(item)!}>
                       <List.Item.Meta

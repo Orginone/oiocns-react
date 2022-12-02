@@ -244,7 +244,7 @@ export default class Company extends MarketTarget implements ICompany {
     return this.joinedGroup;
   }
   public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
+    data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
     if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');

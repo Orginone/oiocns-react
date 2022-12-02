@@ -6,7 +6,6 @@ import {
   Divider,
   Modal,
   Row,
-  Skeleton,
   Space,
   Typography,
   Form,
@@ -16,30 +15,24 @@ import {
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import Provider from '@/ts/core/provider';
-import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
 import styles from './index.module.less';
 import { TargetType } from '@/ts/core/enum';
-type OrganizationalUnitsProps = {};
+import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
 
-// 菜单列表项
-const OrganizationalItem = (item: SpaceType) => {
-  return item && item.name ? (
-    <Space>
-      <Avatar className={styles.avatar} size={32}>
-        {item?.name.substring(0, 1)}
-      </Avatar>
-      <Typography.Text className={styles['space-list']}>{item?.name}</Typography.Text>
-    </Space>
-  ) : (
-    ''
-  );
+type SpaceType = {
+  id: string;
+  icon?: string;
+  name: string;
 };
 
 /* 组织单位头部左侧组件 */
-const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
-  const [current, setCurrent] = useState<SpaceType>();
-  const [menuList, setMenuList] = useState(settingCtrl.getWorkSpaces);
+const OrganizationalUnits: React.FC = () => {
+  const [current, setCurrent] = useState<SpaceType>({
+    id: userCtrl.SpaceData.id,
+    name: userCtrl.SpaceData.name,
+    icon: userCtrl.SpaceData.avatar,
+  });
+  const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
@@ -59,42 +52,72 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
   };
   const onSave = async () => {
     const values = await form.validateFields();
-    // const { name, code, teamName, teamCode, teamRemark, typeName } = values.company;
-    let res = await Provider.getPerson?.createCompany(values.company);
-
-    if (res?.success) {
+    const res = await userCtrl.User!.createCompany(values.company);
+    if (res.success) {
       message.info('申请加入单位成功');
+      setShowFormModal(false);
+      userCtrl.setCurSpace(res.data.id);
     } else {
       message.error('申请加入单位失败：' + res?.msg);
     }
-    setShowFormModal(!res?.success);
   };
   const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
-    // @modify 切换工作空间
-    settingCtrl.changeWorkSpace(item);
-    setCurrent(item);
+    userCtrl.setCurSpace(item.id);
     setShowMenu(false);
   };
-  useEffect(() => {
-    // 获取用户加入的单位组织
-    const id = settingCtrl.subscribe(() => {
-      console.log(settingCtrl.getWorkSpaces);
-      setMenuList([...settingCtrl.getWorkSpaces]);
-      if (settingCtrl.getCurWorkSpace) {
-        setCurrent({ ...settingCtrl.getCurWorkSpace });
-      }
+
+  const refreshUI = () => {
+    const all: SpaceType[] = userCtrl.User!.joinedCompany.map((item) => {
+      return {
+        id: item.target.id,
+        name: item.target.name,
+        icon: item.target.avatar,
+      };
     });
+    all.unshift({
+      id: userCtrl.User!.target.id,
+      name: userCtrl.User!.target.name,
+      icon: userCtrl.User!.target.avatar,
+    });
+    setCurrent({
+      id: userCtrl.SpaceData.id,
+      name: userCtrl.SpaceData.name,
+      icon: userCtrl.SpaceData.avatar,
+    });
+    setMenuList(
+      all.filter((item) => {
+        return item.id != userCtrl.SpaceData.id;
+      }),
+    );
+  };
+
+  useEffect(() => {
+    const id = userCtrl.subscribePart(
+      [UserPartTypes.Space, UserPartTypes.User],
+      refreshUI,
+    );
     return () => {
-      settingCtrl.unsubscribe(id);
+      userCtrl.unsubscribe(id);
     };
   }, []);
 
-  return Provider.getPerson ? (
+  const loadItem = (data: SpaceType) => {
+    return (
+      <Space>
+        <Avatar src={data.icon} className={styles.avatar} size={32}>
+          {data.name.substring(0, 1)}
+        </Avatar>
+        <Typography.Text className={styles['space-list']}>{data.name}</Typography.Text>
+      </Space>
+    );
+  };
+
+  return (
     <div className={styles.menu} onMouseLeave={() => setShowMenu(false)}>
       <Space onClick={() => setShowMenu(!showMenu)} className={styles['current-item']}>
-        {current ? OrganizationalItem(current) : <Skeleton active />}
+        {loadItem(current)}
         <CaretDownOutlined
           className={`${styles[`down-icon`]} ${showMenu ? styles.active : ''}`}
         />
@@ -105,15 +128,11 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
           height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56) : 0,
         }}>
         <div className={styles[`menu-list`]}>
-          {menuList.map((n) =>
-            current && n.id !== current.id ? (
-              <div className={styles.item} onClick={() => handleClickMenu(n)} key={n.id}>
-                {OrganizationalItem(n)}
-              </div>
-            ) : (
-              ''
-            ),
-          )}
+          {menuList.map((n) => (
+            <div className={styles.item} onClick={() => handleClickMenu(n)} key={n.id}>
+              {loadItem(n)}
+            </div>
+          ))}
         </div>
         <Divider className={styles.divider} />
         <Row justify="space-around">
@@ -241,8 +260,6 @@ const OrganizationalUnits: React.FC<OrganizationalUnitsProps> = () => {
         <SearchCompany />
       </Modal>
     </div>
-  ) : (
-    <Skeleton active />
   );
 };
 

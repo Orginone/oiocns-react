@@ -33,9 +33,10 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedCohort = [];
     this.joinedCompany = [];
   }
-  public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<XTarget>> {
+  searchCompany(code: string): Promise<ResultType<schema.XTarget[]>> {
+    throw new Error('Method not implemented.');
+  }
+  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
   public async getJoinedCohorts(): Promise<ICohort[]> {
@@ -95,7 +96,7 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async createCompany(
     data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<any>> {
+  ): Promise<ResultType<schema.XTarget>> {
     if (!consts.CompanyTypes.includes(<TargetType>data.typeName)) {
       return faildResult('您无法创建该类型单位!');
     }
@@ -119,7 +120,7 @@ export default class Person extends MarketTarget implements IPerson {
             break;
         }
         this.joinedCompany.push(company);
-        return company.pullMember([this.target]);
+        company.pullMember([this.target]);
       }
       return res;
     } else {

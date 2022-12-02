@@ -2,25 +2,19 @@ import { Button, Form, Input } from 'antd';
 import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
-import CohortService from '@/module/cohort/Cohort';
 import Person from '../../ts/core/target/person';
 import CohortController from '../../ts/controller/cohort/index';
 
-/* eslint-enable no-template-curly-in-string */
 interface CohortServiceType {
-  service: CohortService;
-  getTableList: Function;
   Person: Person;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
-  console.log(service);
+const CreateCohort: React.FC<CohortServiceType> = ({ Person }) => {
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
   };
 
-  /* eslint-disable no-template-curly-in-string */
   const validateMessages = {
     required: '群组名称不能为空',
     types: {
@@ -51,7 +45,6 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
       values.cohort.remark,
     );
     setIsModalOpen(false);
-    // getTableList();
   };
   return (
     <div>
@@ -73,7 +66,6 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
             label="群组名称"
             rules={[
               {
-                //[^\u4E00-\u9FA5]
                 pattern: /^[\u4e00-\u9fa5]{2,6}$/,
                 message: '群组内容只能为长度2-6的中文',
                 validateTrigger: 'onBlur',
@@ -87,7 +79,6 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person, service }) => {
             label="群组编号"
             rules={[
               {
-                //[^\u4E00-\u9FA5]
                 pattern: /^[a-zA-Z]+$/,
                 message: '群组编号为英文字符组成',
                 validateTrigger: 'onBlur',

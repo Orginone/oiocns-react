@@ -3,9 +3,9 @@ import { Modal, Radio, Card, Empty } from 'antd';
 import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
 // import { perpleList } from './mock';
-import Provider from '@/ts/core/provider';
 import { useAppwfConfig } from '@/module/flow/flow';
 import BaseTarget from '@/ts/core/target/base';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 /**
  * @description: 选择身份/选择岗位(内部、集团) 弹窗
  * @return {*}
@@ -17,9 +17,9 @@ interface Iprops {
   onOk: () => void;
   onCancel: () => void;
 }
-const joinedCohorts = await Provider.getPerson.getJoinedCohorts();
-const joinedInnerJob = await Provider.getPerson.getJoinedCohorts();
-const joinedGroupJob = await Provider.getPerson.getJoinedCohorts();
+const joinedCohorts = userCtrl.User?.getJoinedCohorts;
+const joinedInnerJob = userCtrl.User?.getJoinedCohorts;
+const joinedGroupJob = userCtrl.User?.getJoinedCohorts;
 const PersonCustomModal = (props: Iprops) => {
   const { open, title, onOk, onCancel } = props;
   const [jobType, setJobType] = useState(2);

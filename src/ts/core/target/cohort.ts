@@ -11,15 +11,16 @@ export default class Cohort extends BaseTarget implements ICohort {
     super(target);
     this.children = [];
     this.subTypes = [TargetType.Person, ...consts.CompanyTypes];
-    this.pullTypes = [TargetType.Person, ...consts.CompanyTypes];
+    this.pullTypes = [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
     this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
   }
   public async update(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+    data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
     return await super.updateTarget({
       ...data,
       teamCode: data.code,
+      belongId: data.belongId,
       teamName: data.name,
     });
   }
@@ -38,12 +39,35 @@ export default class Cohort extends BaseTarget implements ICohort {
   public async pullMember(
     targets: schema.XTarget[],
   ): Promise<ResultType<schema.XRelationArray>> {
+    const res = await super.pullMember(targets);
+    if (res.success) {
+      for (const value of targets) {
+        const size = this.children.filter((obj) => obj.id == value.id).length;
+        if (size == 0) {
+          this.children.push(value);
+        }
+      }
+    }
     return await super.pullMember(targets);
   }
   public async removeMember(
     ids: string[],
     typeName: TargetType,
   ): Promise<ResultType<any>> {
-    return await super.removeMember(ids, typeName);
+    const res = await super.removeMember(ids, typeName);
+    const newChildren: schema.XTarget[] = [];
+    if (res.success) {
+      for (const a of this.children) {
+        for (const b of ids) {
+          if (a.id != b) {
+            newChildren.push(a);
+          }
+        }
+      }
+    }
+    if (newChildren.length != 0) {
+      this.children = newChildren;
+    }
+    return res;
   }
 }

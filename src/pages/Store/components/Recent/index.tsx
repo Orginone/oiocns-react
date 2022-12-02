@@ -4,7 +4,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
-import { Dropdown, Menu, message, Typography } from 'antd';
+import { Dropdown, MenuProps, message, Typography } from 'antd';
 import React from 'react';
 
 import cls from './index.module.less';
@@ -60,6 +60,24 @@ const items = [
   },
 ];
 
+const moreMenu: MenuProps = {
+  onClick: (info) => {
+    message.info(info.key);
+  },
+  items: [
+    {
+      label: '详情',
+      key: '1',
+      icon: <UnorderedListOutlined />,
+    },
+    {
+      label: '管理',
+      key: '2',
+      icon: <SettingOutlined />,
+    },
+  ],
+};
+
 const StoreRecent: React.FC = () => {
   return (
     <div className={cls.cardContainer}>
@@ -80,28 +98,7 @@ const StoreRecent: React.FC = () => {
             }
             style={{ width: 260, height: 120 }}
             extra={
-              <Dropdown
-                placement="bottomRight"
-                overlay={
-                  <Menu
-                    onClick={({ domEvent }) => {
-                      domEvent.stopPropagation();
-                      message.info('menu click');
-                    }}
-                    items={[
-                      {
-                        label: '详情',
-                        key: '1',
-                        icon: <UnorderedListOutlined />,
-                      },
-                      {
-                        label: '管理',
-                        key: '2',
-                        icon: <SettingOutlined />,
-                      },
-                    ]}
-                  />
-                }>
+              <Dropdown placement="bottomRight" menu={moreMenu}>
                 <EllipsisOutlined
                   style={{ fontSize: 22, color: 'rgba(0,0,0,0.5)' }}
                   onClick={(e) => e.stopPropagation()}

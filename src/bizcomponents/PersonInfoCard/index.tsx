@@ -1,6 +1,6 @@
 import { Avatar, Descriptions, List } from 'antd';
 import React from 'react';
-import { Person } from '../../module/org/index';
+import { Person } from '@/module/org/index';
 
 type PersonInfoCardProps = {
   person: Person;

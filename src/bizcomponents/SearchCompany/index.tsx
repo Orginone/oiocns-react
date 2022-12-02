@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 
 import { XTarget } from '@/ts/base/schema';
-import PersonController from '@/ts/controller/setting/personCtrl';
 
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
-// import Provider from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type CompanySearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
 };
-
-let tableProps: CompanySearchTableProps;
 
 /*
   弹出框表格查询
@@ -26,10 +23,6 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
 
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
-
-  useEffect(() => {
-    tableProps = props;
-  }, []);
 
   // 单位卡片渲染
   const companyCardList = () => {
@@ -54,39 +47,22 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
     );
   };
 
-  // 查询数据
-  const getList = (searchKey?: string) => {
-    PersonController.getInstance().searchCompany(
-      {
-        page: 1,
-        pageSize: 10,
-        filter: searchKey, // || '91330304254498785G',
-      },
-      (data: any) => {
-        // 回调
-        if (data.success) {
-          setDataSource(data.data);
-          if (data.data.length > 0) {
-            if (tableProps.setJoinKey) tableProps.setJoinKey(data.data[0].id);
-          }
-        }
-      },
-    );
-  };
-
   return (
     <div className={styles[`search-card`]}>
       <SearchInput
         value={searchKey}
         placeholder="请输入单位编码"
         // extra={`找到${dataSource?.length}家单位`}
-        onChange={(event) => {
+        onChange={async (event) => {
           setSearchKey(event.target.value);
+          let data: XTarget[] = [];
           if (event.target.value) {
-            getList(event.target.value);
-          } else {
-            setDataSource([]);
+            const res = await userCtrl.User!.searchCompany(event.target.value);
+            if (res.success) {
+              data = res.data;
+            }
           }
+          setDataSource(data);
         }}
       />
       {dataSource.length > 0 && companyCardList()}

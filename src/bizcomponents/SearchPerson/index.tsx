@@ -1,14 +1,13 @@
 import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
 import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
-import { Person } from '../../module/org/index';
+import { Person } from '@/module/org/index';
 import PersonInfoCard from './../PersonInfoCard';
-import CohortController from '../../ts/controller/cohort/index';
+import CohortController from '@/ts/controller/cohort/index';
 import cls from './index.module.less';
-import person from '../../ts/core/target/person';
-import { schema } from '../../ts/base';
+import person from '@/ts/core/target/person';
+import { schema } from '@/ts/base';
 type SearchPersonProps = {
-  // eslint-disable-next-line no-unused-vars
   searchCallback: (person: schema.XTarget) => void;
   person: person;
 };
@@ -40,7 +39,6 @@ const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback, person }) =
     if (e.target.value) {
       const res = await CohortController.searchPerson(person, e.target.value);
       console.log(res);
-      // const res = await personService.searchPerson(e.target.value);
       if (res.data.result != null) {
         setPersons(res.data.result);
         searchCallback(res.data.result[0]);
