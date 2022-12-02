@@ -182,19 +182,24 @@ class StoreClassify extends BaseController {
     this.breadcrumb[2] = '应用市场';
     this.breadcrumb[3] = market.market.name || '商店';
     console.log('面包屑 商店', this.breadcrumb);
+    // 商店用户管理
     const res = await market.getMember({ offset: 0, limit: 10, filter: '' });
-    // if (res?.success && res?.data?.result != undefined) {
     if (res?.success) {
       this.marketMenber = res?.data?.result;
     }
     this.changCallback();
     return this.marketMenber;
-    // console.log('页面操作--切换商店', this.marketMenber);
 
-    // return this.marketMenber;
     // this.changCallbackPart(`${this.curPageType}TreeData`, [...this.curTreeData]);
     // this.TreeCallBack(market);
   }
+
+  public removeMember = async (targetIds: string[]) => {
+    console.log('移出成员ID合集', targetIds);
+    const res = await this._curMarket?.removeMember(targetIds);
+    console.log('移出成员', res);
+  };
+
   /**
    * @desc: 获取市场列表
    * @param {number} params.offset 起始位置
