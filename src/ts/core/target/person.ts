@@ -143,8 +143,10 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Cohort,
       belongId: this.target.id,
     });
+    console.log('过滤前', this.joinedCohort);
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((a) => a.target.id != id);
+      console.log('过滤后', this.joinedCohort);
     }
     return res;
   }

@@ -3,13 +3,13 @@ import { SearchOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
-import CohortController from '@/ts/controller/cohort/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import Cohort from '@/ts/core/target/cohort';
 import type { ProColumns } from '@ant-design/pro-components';
+import { ICohort } from '@/ts/core/target/itarget';
 interface indexType {
   searchCallback: Function;
-  cohort: Cohort;
+  cohort: ICohort;
 }
 
 const CohortPerson: React.FC<indexType> = (props) => {
@@ -21,7 +21,8 @@ const CohortPerson: React.FC<indexType> = (props) => {
 
   const [value, setValue] = useState<string>();
   const getTableList = async () => {
-    const res = await CohortController.getCohortPeronList(props.cohort);
+    // const res = await CohortController.getCohortPeronList(props.cohort);
+    const res = await props.cohort.getMember();
     setData(res);
   };
   const keyWordChange = async (e: any) => {

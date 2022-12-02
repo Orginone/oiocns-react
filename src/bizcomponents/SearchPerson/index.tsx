@@ -2,13 +2,12 @@ import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
 import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import PersonInfoCard from './../PersonInfoCard';
-import CohortController from '@/ts/controller/cohort/index';
 import cls from './index.module.less';
 import { IPerson } from '@/ts/core/target/itarget';
 import { schema } from '@/ts/base';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 type SearchPersonProps = {
   searchCallback: (person: schema.XTarget) => void;
-  person: IPerson;
 };
 
 /**
@@ -30,20 +29,20 @@ const personInfoList: React.FC<IPerson[]> = (persons) => (
  * 搜索人员
  * @returns
  */
-const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback, person }) => {
+const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback }) => {
   const [value, setValue] = useState<string>();
   const [persons, setPersons] = useState<IPerson[]>([]);
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
-    if (e.target.value) {
-      const res = await CohortController.searchPerson(person, e.target.value);
-      console.log(res);
-      if (res.data.result != null) {
-        setPersons(res.data.result);
-        searchCallback(res.data.result[0]);
-      }
-      console.log('length', persons);
-    }
+    // if (e.target.value) {
+    //   // const res = await userCtrl.User.;
+    //   console.log(res);
+    //   if (res.data.result != null) {
+    //     setPersons(res.data.result);
+    //     searchCallback(res.data.result[0]);
+    //   }
+    //   console.log('length', persons);          //有用代码，缺少接口后续补全
+    // }
   };
 
   return (

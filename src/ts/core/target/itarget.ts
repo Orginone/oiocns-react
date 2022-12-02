@@ -233,7 +233,7 @@ export interface IPerson {
    * @param data 人员基础信息
    * @returns 是否成功
    */
-  update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
+  update(data: Omit<TargetModel, 'id'>): Promise<ResultType<schema.XTarget>>;
 
   /**
    * @description: 查询我加入的群

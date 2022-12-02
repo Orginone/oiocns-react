@@ -15,7 +15,6 @@ import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
 import Cohort from '@/ts/core/target/cohort';
-import CohortController from '@/ts/controller/cohort/index';
 // import FriendController from '@/ts/controller/friend';
 import { useHistory } from 'react-router-dom';
 import { schema } from '@/ts/base';
