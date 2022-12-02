@@ -1,9 +1,8 @@
-import React, { Component, useState, useContext, useEffect } from 'react';
+import React, { useState } from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
-import ReactDOM from 'react-dom';
 import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { message, Button } from 'antd';
+import { message } from 'antd';
 import Root from '@/bizcomponents/Flow/Process/RootNode';
 import Approval from '@/bizcomponents/Flow/Process/ApprovalNode';
 import Cc from '@/bizcomponents/Flow/Process/CcNode';
@@ -11,7 +10,6 @@ import Concurrent from '@/bizcomponents/Flow/Process/ConcurrentNode';
 import Condition from '@/bizcomponents/Flow/Process/ConditionNode';
 import Empty from '@/bizcomponents/Flow/Process/EmptyNode';
 import cls from './index.module.less';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
 type ProcessTreeProps = {
   OnSelectedNode: Function;
   [key: string]: any;
@@ -677,7 +675,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
       {
         className: cls['_root'],
         key: getRandomId(),
-        // , ref:'_root'
       },
       processTrees,
     );
