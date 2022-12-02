@@ -15,7 +15,7 @@ const ShoppingCart: React.FC<any> = (props) => {
   const { confirm } = Modal;
   // console.log(userCtrl.Space!.target.id);
   // console.log(Provider.isUserSpace());
-  // console.log(userCtrl.User!);
+  // console.log(userCtrl.User);
 
   // console.log(settingCtrl.getCurWorkSpace);//空间
   // console.log(settingCtrl.getPerson);

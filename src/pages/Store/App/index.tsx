@@ -201,7 +201,7 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User!.getOwnProducts}
+              queryFun={userCtrl.User.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={StoreContent.getColumns('myApp')}

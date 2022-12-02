@@ -20,8 +20,8 @@ class ChatController extends BaseController {
   constructor() {
     super();
     userCtrl.subscribePart(UserPartTypes.User, async () => {
-      if (this._userId != userCtrl.User!.target.id) {
-        this._userId = userCtrl.User!.target.id;
+      if (this._userId != userCtrl.User.target.id) {
+        this._userId = userCtrl.User.target.id;
         await this._initialization();
       }
     });

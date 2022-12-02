@@ -17,9 +17,9 @@ interface Iprops {
   onOk: () => void;
   onCancel: () => void;
 }
-const joinedCohorts = userCtrl.User?.getJoinedCohorts;
-const joinedInnerJob = userCtrl.User?.getJoinedCohorts;
-const joinedGroupJob = userCtrl.User?.getJoinedCohorts;
+const joinedCohorts = userCtrl.User.getJoinedCohorts;
+const joinedInnerJob = userCtrl.User.getJoinedCohorts;
+const joinedGroupJob = userCtrl.User.getJoinedCohorts;
 const PersonCustomModal = (props: Iprops) => {
   const { open, title, onOk, onCancel } = props;
   const [jobType, setJobType] = useState(2);

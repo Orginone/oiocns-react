@@ -70,7 +70,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     } else {
       let thisSelectKey = joinKey;
       // code msg success
-      const responseObj = await userCtrl.User!.applyJoinCompany(thisSelectKey);
+      const responseObj = await userCtrl.User.applyJoinCompany(thisSelectKey);
       if (responseObj.success) {
         message.info('申请加入单位成功');
       } else {
@@ -111,7 +111,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     // setTotal(service.Total);
 
     // 从提供器里面取人员。
-    const person: IPerson = userCtrl.User!;
+    const person: IPerson = userCtrl.User;
     const joinCompanys = await person.getJoinedCompanys();
     console.log('===获取到的内核数据！ ', joinCompanys);
 

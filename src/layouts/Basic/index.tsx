@@ -14,7 +14,7 @@ type BasicLayoutProps = {
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
   useEffect(() => {
-    if (!userCtrl.User) {
+    if (!userCtrl.Logined) {
       history.push('/passport/login');
     }
   }, []);
@@ -22,7 +22,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   return (
     <Layout className={styles['page-layout']}>
       {/* 公共头部 */}
-      {userCtrl.User ? <BasicHeader /> : ''}
+      <BasicHeader />
       {/* 内容区域 */}
       <Layout>{renderRoutes(route.routes)}</Layout>
     </Layout>

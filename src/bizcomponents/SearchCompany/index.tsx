@@ -57,7 +57,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
           setSearchKey(event.target.value);
           let data: XTarget[] = [];
           if (event.target.value) {
-            const res = await userCtrl.User!.searchCompany(event.target.value);
+            const res = await userCtrl.User.searchCompany(event.target.value);
             if (res.success) {
               data = res.data;
             }

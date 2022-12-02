@@ -82,7 +82,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == userCtrl.User!.target.id) {
+    if (cohortData.target.belongId == userCtrl.User.target.id) {
       action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
         <a
@@ -95,7 +95,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: () => {
-                FriendController.applyFriend(userCtrl.User!, value),
+                FriendController.applyFriend(userCtrl.User, value),
                   removeMember([value.id]);
                 message.success('操作成功');
               },

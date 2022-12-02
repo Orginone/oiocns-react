@@ -16,7 +16,7 @@ class CohortController {
   public joinCallBack!: Function;
   constructor() {
     this._cohorts = [];
-    this.workSpace = userCtrl.User!;
+    this.workSpace = userCtrl.User;
     this._myCohorts = [];
   }
 
@@ -36,7 +36,7 @@ class CohortController {
    * @returns
    */
   public getMyCohort = async (): Promise<Cohort[]> => {
-    if (userCtrl.User?.target.id == userCtrl.User?.target.id) {
+    if (userCtrl.User.target.id == userCtrl.User.target.id) {
       const obj = this.workSpace as Person;
       const data = await obj.getJoinedCohorts();
       this._cohorts = [];
@@ -56,7 +56,7 @@ class CohortController {
    * @returns
    */
   public getJoinCohort = async (): Promise<Cohort[]> => {
-    if (userCtrl.User?.target.id == userCtrl.User?.target.id) {
+    if (userCtrl.User.target.id == userCtrl.User.target.id) {
       const obj = this.workSpace as Person;
       const data = await obj.getJoinedCohorts();
       this._cohorts = [];
@@ -228,7 +228,7 @@ class CohortController {
    */
   public async getCohortPeronList(obj: Cohort): Promise<schema.XTarget[]> {
     let res = await obj.getMember();
-    return res!.filter((obj) => userCtrl.User?.target.id != obj.id);
+    return res!.filter((obj) => userCtrl.User.target.id != obj.id);
   }
 
   /**
