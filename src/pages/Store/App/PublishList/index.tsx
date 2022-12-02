@@ -1,25 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
-import API from '@/services';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import { MarketTypes } from 'typings/marketType';
-import { IdPage } from '@/module/typings';
-import MarketService from '@/module/appstore/market';
-import useDebounce from '@/hooks/useDebounce';
+// import useDebounce from '@/hooks/useDebounce';
 import { Button } from 'antd';
 import { useLocation } from 'react-router-dom';
 interface PublishListType {
   appId: string;
 }
 
-const service = new MarketService({
-  nameSpace: 'PublishList',
-  searchApi: API.product.searchPublishList,
-  createApi: undefined,
-  deleteApi: API.product.unpublishMerchandise,
-  updateApi: undefined,
-});
 const PublishListComp: React.FC<PublishListType> = ({ appId }) => {
   const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -30,43 +20,13 @@ const PublishListComp: React.FC<PublishListType> = ({ appId }) => {
 
   const parentRef = useRef<any>(null); //父级容器Dom
 
-  useEffect(() => {
-    getTableList();
-  }, []);
-  /**
-   * @desc: 获取展示列表
-   * @param {string} searchKey 搜索关键词
-   * @param {boolean} isGofirst 是否返回第一页
-   * @return {*}
-   */
-  const getTableList = useDebounce(async (params1: any) => {
-    const [req = {}, searchKey = '', isGofirst = false] = params1;
-
-    if (isGofirst) {
-      setPage(1);
-    }
-
-    const params = {
-      id: appId,
-      page: isGofirst ? 1 : page,
-      pageSize: 10,
-      filter: searchKey,
-    };
-
-    await service.getList<IdPage>({ ...params, ...req });
-
-    console.log('获取列表', service['nameSpace'], service.List);
-
-    setList([...service.List]);
-    setTotal(service.Total);
-  }, 300);
+  useEffect(() => {}, []);
 
   /**
    * handlePageChage
    */
   const handlePageChange = (page: number, pageSize: number) => {
     setPage(page);
-    getTableList({ page, pageSize });
   };
   // // 操作内容渲染函数
   const renderOperation = (
@@ -119,7 +79,7 @@ const PublishListComp: React.FC<PublishListType> = ({ appId }) => {
         renderCardContent={renderCardFun}
         operation={renderOperation}
         headerTitle="应用上架列表"
-        columns={service.getPublishColumns()}
+        // columns={service.getPublishColumns()}
         onChange={handlePageChange}
         rowKey={'id'}
         toolBarRender={() => [

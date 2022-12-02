@@ -18,13 +18,7 @@ import { BaseProduct } from '@/ts/core/market';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-// const service = new MarketService({
-//   nameSpace: 'myApp',
-//   searchApi: userCtrl.User!.getJoinMarkets,
-//   createApi: API.product.register,
-//   deleteApi: API.product.delete,
-//   updateApi: API.product.update,
-// });
+
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const StoreApp: React.FC = () => {
