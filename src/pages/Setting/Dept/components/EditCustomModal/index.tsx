@@ -10,7 +10,6 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
 import cls from './index.module.less';
 import UploadAvatar, { avatarUpload } from '../UploadAvatar';
-import settingController from '@/ts/controller/setting';
 /* 
   编辑
 */
@@ -114,16 +113,6 @@ const EditCustomModal = (props: Iprops) => {
                     value.parentId = selectId;
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
-                    }
-                    const curentValue = await settingController.createDepartment(value);
-                    if (!curentValue.success) {
-                      message.error(curentValue.msg);
-                      // form.resetFields();
-                    } else {
-                      message.success('添加成功');
-                      settingController.trigger('updateDeptTree');
-                      form.resetFields();
-                      handleOk();
                     }
                   }
                 }}>

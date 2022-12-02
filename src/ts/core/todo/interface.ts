@@ -1,4 +1,5 @@
 import { schema } from '@/ts/base';
+import { OrderStatus } from '@/ts/core/enum';
 import { XMarketRelation, XMerchandise, XRelation } from '@/ts/base/schema';
 
 export type XFlowTaskItem = schema.XFlowTask & { node: TodoItem };
@@ -46,13 +47,6 @@ export interface TodoItem {
 
 export type StytemTodosType = XRelation | XMarketRelation | XMerchandise;
 
-/**订单状态 */
-export enum OrderStatus {
-  'deliver' = 102,
-  'buyerCancel' = 220,
-  'sellerCancel' = 221,
-  'rejectOrder' = 222,
-}
 export interface StytemITodo {
   /**@id 当前模块id */
   id: string;
@@ -101,6 +95,6 @@ export interface OrderITodo {
   /**@name 取消订单 */
   cancel: (
     target: schema.XOrderDetail,
-    status: OrderStatus.buyerCancel | OrderStatus.sellerCancel,
+    status: OrderStatus.BuyerCancel | OrderStatus.SellerCancel,
   ) => any;
 }

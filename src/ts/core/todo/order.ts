@@ -1,4 +1,5 @@
-import { OrderITodo, OrderStatus } from './interface';
+import { OrderITodo } from './interface';
+import { OrderStatus } from '../enum';
 
 import { common, kernel, schema } from '../../base';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -50,13 +51,13 @@ export default class OrderTodo implements OrderITodo {
   deliver = async (target: schema.XOrderDetail) => {
     const result = await kernel.deliverMerchandise({
       id: target.id,
-      status: OrderStatus.deliver,
+      status: OrderStatus.Deliver,
     });
     if (result.success) {
       this.saleList = this.removeList<schema.XOrderDetail>(
         this.saleList,
         target.id,
-        OrderStatus.deliver,
+        OrderStatus.Deliver,
       ) as schema.XOrderDetail[];
     }
     return result;
@@ -64,35 +65,35 @@ export default class OrderTodo implements OrderITodo {
   reject = async (target: schema.XOrderDetail) => {
     const result = await kernel.rejectMerchandise({
       id: target.id,
-      status: OrderStatus.rejectOrder,
+      status: OrderStatus.RejectOrder,
     });
     if (result.success) {
       this.buyList = this.removeList<schema.XOrder>(
         this.buyList,
         target.id,
-        OrderStatus.rejectOrder,
+        OrderStatus.RejectOrder,
       );
     }
     return result;
   };
   cancel = async (
     target: schema.XOrderDetail | schema.XOrder,
-    status: OrderStatus.buyerCancel | OrderStatus.sellerCancel,
+    status: OrderStatus.BuyerCancel | OrderStatus.SellerCancel,
   ) => {
     console.log({ id: target.id, status });
     const result = await kernel.cancelOrderDetail({ id: target.id, status });
     if (result.success) {
-      if (status === OrderStatus.buyerCancel) {
+      if (status === OrderStatus.BuyerCancel) {
         this.buyList = this.removeList<schema.XOrder>(
           this.buyList,
           target.id,
-          OrderStatus.buyerCancel,
+          OrderStatus.BuyerCancel,
         );
       } else {
         this.saleList = this.removeList<schema.XOrderDetail>(
           this.saleList,
           target.id,
-          OrderStatus.sellerCancel,
+          OrderStatus.SellerCancel,
         ) as schema.XOrderDetail[];
       }
     }
@@ -104,7 +105,7 @@ export default class OrderTodo implements OrderITodo {
     needRemoveId: string,
     type?: OrderStatus,
   ) => {
-    if (type === OrderStatus.buyerCancel || type === OrderStatus.rejectOrder) {
+    if (type === OrderStatus.BuyerCancel || type === OrderStatus.RejectOrder) {
       const newList: schema.XOrder[] = [];
       for (let index = 0; index < list.length; index++) {
         const { details, ...other } = list[index] as unknown as schema.XOrder;

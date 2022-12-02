@@ -14,6 +14,12 @@ export default class Cohort extends BaseTarget implements ICohort {
     this.pullTypes = [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
     this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
   }
+  public async searchPerson(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Person]);
+  }
+  public async searchCompany(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, consts.CompanyTypes);
+  }
   public async update(
     data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
