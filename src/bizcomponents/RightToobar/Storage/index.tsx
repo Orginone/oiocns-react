@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Card, List, Avatar, Comment } from 'antd';
+import { Input, Card, Avatar, Comment } from 'antd';
 import { SearchOutlined, DeleteOutlined, RightOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 

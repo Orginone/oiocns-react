@@ -2,7 +2,6 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions, Space } from 'antd';
 import { Typography, Divider, Collapse } from 'antd';
 import React, { useState } from 'react';
-import useStore from '../../store';
 import PersonInfoEnty from '../../ts/core/provider';
 
 import Layout from 'antd/lib/layout/layout';
