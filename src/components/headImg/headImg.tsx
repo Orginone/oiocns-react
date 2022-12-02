@@ -12,7 +12,7 @@ interface Iprops {
   imgWidth?: number;
 }
 const HeadImg = (props: Iprops) => {
-  const { name = '', url, limit = 2, isSquare = true, imgWidth = 40 + 'px' } = props;
+  const { name = '', url, limit = 2, isSquare = true, imgWidth = 36 + 'px' } = props;
   return (
     <>
       {url ? (
@@ -33,7 +33,9 @@ const HeadImg = (props: Iprops) => {
           className={`${headimgStyle.user_head_img_wrap} ${headimgStyle.txt_img} ${
             isSquare ? headimgStyle.square_box : headimgStyle.circle_box
           } `}>
-          <span>{name.slice(0, limit).toLocaleUpperCase()}</span>
+          <span className={headimgStyle.text}>
+            {name.slice(0, limit).toLocaleUpperCase()}
+          </span>
         </div>
       )}
     </>
