@@ -15,7 +15,6 @@ interface indexType {
   [key: string]: any;
   setOpen: Function;
   item: CohortEnty;
-  getTableList: Function;
   columns: ProFormColumnsType<DataItem>[];
 }
 const UpdateCohort: React.FC<indexType> = ({

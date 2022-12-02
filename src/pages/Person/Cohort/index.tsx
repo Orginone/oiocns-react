@@ -45,7 +45,7 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
-  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
+  const [isSetPost, setIsSetPost] = useState<boolean>(false);
 
   useEffect(() => {
     CohortController.setCallBack(setData);
@@ -53,9 +53,7 @@ const CohortConfig: React.FC = () => {
     getData();
     getJoinData();
   }, []);
-  useEffect(() => {
-    console.log('发生变化');
-  }, [data]);
+  useEffect(() => {}, [data]);
   const getData = async () => {
     setData(await CohortController.getMyCohort());
   };
@@ -115,19 +113,9 @@ const CohortConfig: React.FC = () => {
         label: '角色管理',
         onClick: () => {
           setIsSetPost(true);
-          // history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
           console.log('按钮事件', 'roleManage', item);
         },
       },
-      // {
-      //   key: 'identityManage',
-      //   label: '身份管理',
-      //   onClick: () => {
-      //     // history.push('/setting/dept');
-      //     // setIsSetPost(true);
-      //     console.log('按钮事件', 'identityManage');
-      //   },
-      // },
       {
         key: 'changePermission',
         label: '转移权限',
@@ -177,12 +165,6 @@ const CohortConfig: React.FC = () => {
         },
       },
     ];
-  };
-  const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {};
-
-  const handlePageChange = (page: number, pageSize: number) => {
-    setPage(page);
-    getTableList({ page, pageSize });
   };
 
   const tableAlertRender = (selectedRowKeys: any[]) => {
@@ -309,15 +291,10 @@ const CohortConfig: React.FC = () => {
                   columns={service.getcolumn()}
                   setOpen={setOpen}
                   item={item}
-                  getTableList={getTableList}
                 />
               )}
 
-              <CreateCohort
-                Person={Person}
-                service={service}
-                getTableList={getTableList}
-              />
+              <CreateCohort Person={Person} service={service} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>
@@ -344,7 +321,6 @@ const CohortConfig: React.FC = () => {
                   renderCardContent={renderCardFun}
                   operation={renderOperation}
                   columns={cohortColumn as any}
-                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ),
@@ -365,7 +341,6 @@ const CohortConfig: React.FC = () => {
                   renderCardContent={renderCardFun}
                   operation={joinrenderOperation}
                   columns={cohortColumn as any}
-                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ),

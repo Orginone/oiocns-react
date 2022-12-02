@@ -31,7 +31,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
       console.log(res);
       if (res.data.result != null) {
         setData([res.data.result[0]]);
-        console.log('输出data', data);
       } else {
         getTableList();
       }
