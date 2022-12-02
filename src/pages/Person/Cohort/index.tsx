@@ -32,7 +32,6 @@ const CohortConfig: React.FC = () => {
     nameSpace: 'myCohort',
   });
   const Person = PersonInfoEnty.getPerson!;
-  console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
   const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<CohortEnty>();
@@ -44,7 +43,7 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<Cohort>();
   const [data, setData] = useState<CohortEnty[]>();
   const [joinData, setJoinData] = useState<CohortEnty[]>();
-  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
+  const [isSetPost, setIsSetPost] = useState<boolean>(false);
 
   useEffect(() => {
     CohortController.setCallBack(setData);
@@ -52,9 +51,6 @@ const CohortConfig: React.FC = () => {
     getData();
     getJoinData();
   }, []);
-  useEffect(() => {
-    console.log('发生变化');
-  }, [data]);
   const getData = async () => {
     setData(await CohortController.getMyCohort());
   };
@@ -257,7 +253,6 @@ const CohortConfig: React.FC = () => {
                 width="700px">
                 <Persons searchCallback={searchCallback} person={Person} />
               </Modal>
-              {/* 对象设置 */}
               <AddPostModal
                 title={'身份设置'}
                 open={isSetPost}

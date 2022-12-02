@@ -1,12 +1,12 @@
 import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
 import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
-import { Person } from '../../module/org/index';
+import { Person } from '@/module/org/index';
 import PersonInfoCard from './../PersonInfoCard';
-import CohortController from '../../ts/controller/cohort/index';
+import CohortController from '@/ts/controller/cohort/index';
 import cls from './index.module.less';
-import person from '../../ts/core/target/person';
-import { schema } from '../../ts/base';
+import person from '@/ts/core/target/person';
+import { schema } from '@/ts/base';
 type SearchPersonProps = {
   searchCallback: (person: schema.XTarget) => void;
   person: person;
