@@ -1,15 +1,13 @@
-import provider from '../../core/provider';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
+import { TodoType } from '../enum';
 
 export class ApplicationTodo implements ITodoGroup {
   private _id: string;
   private _name: string;
   private _todoList: ApprovalItem[];
   private _noticeList: NoticeItem[];
-  get type(): string {
-    return '组织待办';
-  }
+  type: TodoType = TodoType.ApplicationTodo;
   get name(): string {
     return this._name;
   }
@@ -32,7 +30,13 @@ export class ApplicationTodo implements ITodoGroup {
     });
     if (res.success) {
       res.data.result?.forEach((a) => {
-        this._todoList.push(new ApprovalItem(a));
+        this._todoList.push(
+          new ApprovalItem(a, (id: string) => {
+            this._todoList = this._todoList.filter((s) => {
+              return s.Data.id != id;
+            });
+          }),
+        );
       });
     }
     return this._todoList;
@@ -61,7 +65,7 @@ export class ApplicationTodo implements ITodoGroup {
     let completeList: IApprovalItem[] = [];
     const res = await kernel.queryRecord({
       id: this._id,
-      spaceId: provider.spaceId,
+      spaceId: '0',
       page,
     });
     if (res.success) {
@@ -76,7 +80,7 @@ export class ApplicationTodo implements ITodoGroup {
     const res = await kernel.queryInstance({
       productId: this._id,
       status: 0,
-      spaceId: provider.spaceId,
+      spaceId: '0',
       page,
     });
     if (res.success) {
@@ -90,17 +94,27 @@ export class ApplicationTodo implements ITodoGroup {
 
 class ApprovalItem implements IApprovalItem {
   private _data: schema.XFlowTask;
-  constructor(data: schema.XFlowTask) {
+  private _completeFun: (id: string) => void;
+  constructor(data: schema.XFlowTask, completeFunc: (id: string) => void) {
     this._data = data;
+    this._completeFun = completeFunc;
   }
   get Data(): schema.XFlowTask {
     return this._data;
   }
   async pass(status: number, comment: string = ''): Promise<model.ResultType<any>> {
-    return await kernel.approvalTask({ id: this._data.id, status, comment });
+    const res = await kernel.approvalTask({ id: this._data.id, status, comment });
+    if (res.success) {
+      this._completeFun.apply(this, [this._data.id]);
+    }
+    return res;
   }
   async reject(status: number, comment: string): Promise<model.ResultType<any>> {
-    return await kernel.approvalTask({ id: this._data.id, status, comment });
+    const res = await kernel.approvalTask({ id: this._data.id, status, comment });
+    if (res.success) {
+      this._completeFun.apply(this, [this._data.id]);
+    }
+    return res;
   }
 }
 class NoticeItem implements IApprovalItem {

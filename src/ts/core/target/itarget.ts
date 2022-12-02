@@ -193,7 +193,7 @@ export interface ICohort {
   selectAuthorityTree(): Promise<IAuthority | undefined>;
 }
 /** 人员操作 */
-export interface IPerson {
+export interface IPerson extends IMTarget {
   /** 人员实体 */
   target: schema.XTarget;
   /** 职权树 */
@@ -854,7 +854,7 @@ export interface IDepartment {
   /** 删除工作组 */
   deleteWorking(id: string): Promise<model.ResultType<any>>;
 }
-
+/** 工作组 */
 export interface IWorking {
   /** 部门实体 */
   target: schema.XTarget;

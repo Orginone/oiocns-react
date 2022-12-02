@@ -1861,6 +1861,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 取消订单
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async cancelOrder(
+    params: model.ApprovalModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelOrder',
+      params: params,
+    });
+  }
+  /**
    * 取消订单详情
    * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果

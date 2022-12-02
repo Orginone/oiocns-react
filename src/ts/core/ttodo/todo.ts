@@ -1,9 +1,7 @@
+import { OrgTodo } from './orgrelation';
 import { kernel } from '../../base';
-import consts from '../consts';
-import { TargetType } from '../enum';
 import { ApplicationTodo } from './application';
 import { ITodo, ITodoGroup } from './itodo';
-import { OrgTodo } from './orgtodo';
 import { PublishTodo } from './publish';
 
 export default class Todo implements ITodo {
@@ -18,15 +16,8 @@ export default class Todo implements ITodo {
     return sum;
   }
   constructor() {
-    this._todoGroup.push(new OrgTodo('好友申请', [TargetType.Person]));
-    this._todoGroup.push(
-      new OrgTodo('单位审核', [
-        TargetType.Cohort,
-        TargetType.Group,
-        ...consts.CompanyTypes,
-      ]),
-    );
-    this._todoGroup.push(new PublishTodo('应用上架'));
+    this._todoGroup.push(new OrgTodo());
+    this._todoGroup.push(new PublishTodo());
     // this._todoGroup.push(new JoinMarketTodo('应用上架'));
   }
   async getTodoGroup(): Promise<ITodoGroup[]> {

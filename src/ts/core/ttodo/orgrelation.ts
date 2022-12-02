@@ -1,24 +1,14 @@
 import { common } from '../../base';
-import { CommonStatus, TargetType } from '../../core/enum';
+import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
 
 export class OrgTodo implements ITodoGroup {
-  private _name: string;
+  name: string = '组织审批';
   private _todoList: ApprovalItem[];
   private _doList: ApprovalItem[];
   private _applyList: ApplyItem[];
-  private _targetTypes: TargetType[];
-  get type(): string {
-    return '组织待办';
-  }
-  get name(): string {
-    return this._name;
-  }
-  constructor(name: string, targetTypes: TargetType[]) {
-    this._name = name;
-    this._targetTypes = targetTypes;
-  }
+  type: TodoType = TodoType.OrgTodo;
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
@@ -48,7 +38,6 @@ export class OrgTodo implements ITodoGroup {
     }
     const res = await kernel.queryJoinTeamApply({
       id: '0',
-      //   typeNames:this._targetTypes;
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,

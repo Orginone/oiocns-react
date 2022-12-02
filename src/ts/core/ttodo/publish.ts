@@ -1,22 +1,14 @@
 import { common } from '../../base';
-import { CommonStatus } from '../../core/enum';
+import { CommonStatus, TodoType } from '../../core/enum';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
 
 export class PublishTodo implements ITodoGroup {
-  private _name: string;
-  private _todoList: ApprovalItem[];
+  name: string = '应用上架';
   private _doList: ApprovalItem[];
   private _applyList: ApplyItem[];
-  get type(): string {
-    return '应用上架';
-  }
-  get name(): string {
-    return this._name;
-  }
-  constructor(name: string) {
-    this._name = name;
-  }
+  private _todoList: ApprovalItem[];
+  type: TodoType = TodoType.MarketTodo;
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
