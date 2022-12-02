@@ -168,11 +168,13 @@ export default class BaseTarget {
    */
   protected async getjoinedTargets(
     typeNames: TargetType[],
-    spaceId: string,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
     });
+    const spaceId = await (
+      await import('@/ts/controller/setting/userCtrl')
+    ).default.Space!.target.id;
     if (typeNames.length > 0) {
       return await kernel.queryJoinedTargetById({
         id: this.target.id,

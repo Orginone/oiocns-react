@@ -51,7 +51,7 @@ export default class Authority implements IAuthority {
       remark,
       id: undefined,
       authId: this.id,
-      belongId: userCtrl.Space?.target.id!,
+      belongId: userCtrl.Space!.target.id,
     });
     if (res.success && res.data != undefined) {
       this.identitys.push(new Identity(res.data));
@@ -65,7 +65,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteIdentity({
         id,
-        belongId: userCtrl.Space?.target.id!,
+        belongId: userCtrl.Space!.target.id,
         typeName: '',
       });
       if (res.success) {
@@ -93,7 +93,7 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: userCtrl.Space?.target.id!,
+      belongId: userCtrl.Space!.target.id,
     });
     if (res.success && res.data != undefined) {
       this.children.push(new Authority(res.data));
@@ -107,7 +107,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteAuthority({
         id,
-        belongId: userCtrl.Space?.target.id!,
+        belongId: userCtrl.Space!.target.id,
         typeName: '',
       });
       if (res.success) {

@@ -8,7 +8,6 @@ import companyService from '@/module/org/company';
 // import { useQuery } from '@tanstack/react-query';
 import { User } from 'typings/user';
 
-import useStore from '@/store';
 import type * as schema from '@/ts/base/schema';
 
 import cls from './index.module.less';
@@ -35,8 +34,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [total, setTotal] = useState<number>(0);
 
   const [joinKey, setJoinKey] = useState<string>('');
-
-  const { user } = useStore((state) => ({ ...state }));
 
   useEffect(() => {
     getTableList();

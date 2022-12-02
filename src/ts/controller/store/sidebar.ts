@@ -36,7 +36,7 @@ class StoreClassify extends BaseController {
       }
     });
   }
-  // static curCompoy: Company = Provider.getPerson.curCompany as Company; // 获取当前所处的单位
+  // static curCompoy: Company = userCtrl.User.curCompany as Company; // 获取当前所处的单位
 
   // 顶部菜单区域
   public static SelfMenu = [
@@ -207,7 +207,9 @@ class StoreClassify extends BaseController {
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
-      arrs.push(`${item.belongId === userCtrl.User?.target.id ? '删除商店' : '退出商店'}`);
+      arrs.push(
+        `${item.belongId === userCtrl.User?.target.id ? '删除商店' : '退出商店'}`,
+      );
       return {
         title: item.name,
         key: `0-${index}`,

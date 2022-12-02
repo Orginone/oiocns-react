@@ -39,7 +39,7 @@ export class ApplicationTodo implements iTodo {
     if (this.doList.length > 0) return this.doList;
     const result = await kernel.queryRecord({
       id: this.id,
-      spaceId: userCtrl.User?.target.id!,
+      spaceId: userCtrl.User!.target.id,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
 
@@ -54,7 +54,7 @@ export class ApplicationTodo implements iTodo {
     if (this.applyList.length > 0) return this.applyList;
     const result = await kernel.queryInstance({
       productId: this.id,
-      spaceId: userCtrl.User?.target.id!,
+      spaceId: userCtrl.User!.target.id,
       status: 1,
       page: { offset: 0, filter: '', limit: common.Constants.MAX_UINT_8 },
     });
@@ -150,7 +150,7 @@ export class FriendTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await userCtrl.User?.queryJoinApproval();
+    const res = await userCtrl.User!?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName === TargetType.Person;
@@ -168,7 +168,7 @@ export class FriendTodo extends BaseTodo {
   };
 
   getApplyList = async () => {
-    const res = await userCtrl.User?.queryJoinApply();
+    const res = await userCtrl.User!?.queryJoinApply();
     if (res?.success && res.data.result) {
       this.applyList = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName === TargetType.Person;
@@ -228,7 +228,7 @@ export class TeamTodo extends BaseTodo {
     return this.todoList.length;
   }
   getTodoList = async () => {
-    const res = await userCtrl.User?.queryJoinApproval();
+    const res = await userCtrl.User!?.queryJoinApproval();
     if (res?.success && res.data.result && res.data.result.length > 0) {
       const list = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName !== TargetType.Person;
@@ -245,7 +245,7 @@ export class TeamTodo extends BaseTodo {
     }
   };
   getApplyList = async () => {
-    const res = await userCtrl.User?.queryJoinApply();
+    const res = await userCtrl.User!?.queryJoinApply();
     if (res?.success && res.data.result) {
       this.applyList = res.data.result.filter((n: XRelation) => {
         return n.team?.target?.typeName !== TargetType.Person;
@@ -284,7 +284,7 @@ export class TeamTodo extends BaseTodo {
     const result = await kernel.cancelJoinTeam({
       id: target.id,
       typeName: target.team?.target?.typeName || TargetType.Company, // 如果没有就默认是单位，暂时
-      belongId: userCtrl.User?.target.id!,
+      belongId: userCtrl.User!.target.id,
     });
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
@@ -315,7 +315,7 @@ export class StoreTodo extends BaseTodo {
   }
   getTodoList = async () => {
     const res = await kernel.queryJoinMarketApplyByManager({
-      id: userCtrl.User?.target.id!,
+      id: userCtrl.User!.target.id,
       page: {
         offset: 0,
         filter: '',
@@ -335,7 +335,7 @@ export class StoreTodo extends BaseTodo {
 
   getApplyList = async () => {
     const res = await kernel.queryJoinMarketApplyByManager({
-      id: userCtrl.User?.target.id!,
+      id: userCtrl.User!.target.id,
       page: {
         offset: 0,
         filter: '',
@@ -406,7 +406,7 @@ export class ProductTodo extends BaseTodo {
   }
   getTodoList = async () => {
     const res = await kernel.queryMerchandiesApplyByManager({
-      id: userCtrl.User?.target.id!,
+      id: userCtrl.User!.target.id,
       page: {
         offset: 0,
         filter: '',
@@ -426,7 +426,7 @@ export class ProductTodo extends BaseTodo {
 
   getApplyList = async () => {
     const res = await kernel.queryMerchandiseApply({
-      id: userCtrl.User?.target.id!,
+      id: userCtrl.User!.target.id,
       page: {
         offset: 0,
         filter: '',
@@ -468,7 +468,7 @@ export class ProductTodo extends BaseTodo {
   cancel = async (target: schema.XMerchandise) => {
     const result = await kernel.deleteMerchandise({
       id: target.id,
-      belongId: userCtrl.User?.target.id!,
+      belongId: userCtrl.User!.target.id,
     });
     if (result.success) {
       this.applyList = this.removeList(this.applyList, target.id);
