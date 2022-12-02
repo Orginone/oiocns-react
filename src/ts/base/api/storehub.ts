@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import * as signalR from '@microsoft/signalr';
+import { logger } from '../common';
 import { IDisposable } from '../common/lifecycle';
 import { ResultType } from '../model';
 import { TxtHubProtocol } from '../protocol';
@@ -44,7 +45,7 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        console.log(`连接断开,${this._timeout}ms后重试。`, err);
+        logger.warn(`连接断开,${this._timeout}ms后重试。` + err.message);
         setTimeout(() => {
           this._starting();
         }, this._timeout);
@@ -107,7 +108,7 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        console.log(`连接失败,${this._timeout}ms后重试。`, err);
+        logger.warn(`连接失败,${this._timeout}ms后重试。` + err.message);
         setTimeout(() => {
           this._starting();
         }, this._timeout);
