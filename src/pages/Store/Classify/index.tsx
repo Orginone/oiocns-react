@@ -7,10 +7,13 @@ import StoreClassifyTree from '@/components/CustomTreeComp';
 import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid } from '@/utils/tools';
 // import useStore from '@/store';
-import StoreSiderbar from '@/ts/controller/store/sidebar';
 // import StoreContent from '@/ts/controller/store/content';
-import { XProduct } from '@/ts/base/schema';
 import ReactDOM from 'react-dom';
+import SelfAppCtrl, {
+  TreeType,
+  MenuOptTypes,
+  SelfCallBackTypes,
+} from '@/ts/controller/store/selfAppCtrl';
 // const items = [
 //   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
 //   { label: '文档', key: 'doc', icon: 'FileTextOutlined' },
@@ -20,23 +23,27 @@ import ReactDOM from 'react-dom';
 let selectMenuInfo: any = {},
   modalType = '';
 const { confirm } = Modal;
-const menu = ['新增子级', '重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'];
 //自定义树
 const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
-  const [list, setList] = useState<XProduct[]>([]);
+  const [treeData, setTreeData] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
 
   useEffect(() => {
     console.log('初始化', 'APP頁面');
-    StoreSiderbar.subscribePart('appTreeData', setList);
-    StoreSiderbar.changePageType('app');
-    StoreSiderbar.getTreeData();
+    const id = SelfAppCtrl.subscribePart(
+      SelfCallBackTypes.TreeData,
+      (data: TreeType[]) => {
+        setTreeData(data || []);
+      },
+    );
+    // StoreSiderbar.changePageType('app');
+    SelfAppCtrl.querySelfApps();
     return () => {
-      return StoreSiderbar.unsubscribe('appTreeData');
+      return SelfAppCtrl.unsubscribe(id);
     };
   }, []);
 
@@ -60,8 +67,8 @@ const StoreClassify: React.FC = () => {
 
     setIsStoreOpen(false);
     // 数据缓存
-    console.log('缓存数据', obj, list);
-    StoreSiderbar.updataSelfAppMenu(list);
+    console.log('缓存数据', obj, treeData);
+    SelfAppCtrl.cacheSelfMenu(treeData);
   };
   function findAimObj(isParent = false, id: string) {
     let aimObjet: any = undefined;
@@ -82,7 +89,7 @@ const StoreClassify: React.FC = () => {
         });
       }
     }
-    findParent(id, { children: list });
+    findParent(id, { children: treeData });
     return aimObjet;
   }
   /*******
@@ -120,7 +127,7 @@ const StoreClassify: React.FC = () => {
       default:
         break;
     }
-    StoreSiderbar.updataSelfAppMenu(list);
+    SelfAppCtrl.cacheSelfMenu(treeData);
   }
   const onCancel = () => {
     setIsStoreOpen(false);
@@ -129,11 +136,11 @@ const StoreClassify: React.FC = () => {
 
   /*******
    * @desc: 目录更多操作 触发事件
-   * @param {'新增子级','重命名', '创建副本', '拷贝链接', '移动到', '收藏', '删除'} key
+   * @param {'新增子级','重命名', '创建副本', '拷贝链接', '移动到', '固定到常用', '删除'} key
    * @param {object} param1
    * @return {*}
    */
-  const handleMenuClick = (key: string, data: any) => {
+  const handleMenuClick = (key: string | MenuOptTypes, data: any) => {
     console.log('目录更多操作', key, data);
     selectMenuInfo = data;
     modalType = key;
@@ -173,20 +180,18 @@ const StoreClassify: React.FC = () => {
   if (!domNode) return null;
   return ReactDOM.createPortal(
     <>
-      {list && (
+      {treeData && (
         <>
           <div className={cls.container}>
-            {
-              //其他树
-              <StoreClassifyTree
-                title={'我的分类'}
-                menu={menu}
-                searchable
-                treeData={list}
-                handleTitleClick={handleTitleClick}
-                handleMenuClick={handleMenuClick}
-              />
-            }
+            <StoreClassifyTree
+              title={'我的分类'}
+              menu={SelfAppCtrl.MenuOpts}
+              searchable
+              isDirectoryTree
+              treeData={treeData}
+              handleTitleClick={handleTitleClick}
+              handleMenuClick={handleMenuClick}
+            />
           </div>
           <Modal
             title="搜索商店"

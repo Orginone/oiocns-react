@@ -13,7 +13,7 @@ import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import StoreContent from '@/ts/controller/store/content';
-import StoreSidebar from '@/ts/controller/store/sidebar';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { BaseProduct } from '@/ts/core/market';
 import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
@@ -46,21 +46,17 @@ const StoreApp: React.FC = () => {
     });
   }, [data]);
 
-  const BtnsList = ['购买', '创建', '暂存'];
+  const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
     // console.log('按钮点击', item);
     switch (item.text) {
       case '购买':
-        StoreSidebar.changePageType('market');
-        // StoreSidebar.getTreeData();
         history.push('/market/shop');
         break;
       case '创建':
         history.push('/store/app/create');
         break;
-      case '暂存':
-        console.log('点击事件', '暂存');
-        break;
+
       default:
         console.log('点击事件未注册', item.text);
         break;

@@ -137,7 +137,7 @@ export interface IMTarget {
     // 资源列
     resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string;
+    thingId?: string;
     // 产品类型名
     typeName: string;
   }): Promise<ResultType<schema.XProduct>>;
@@ -444,7 +444,7 @@ export interface IPerson {
     // 资源列
     resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string;
+    thingId?: string;
     // 产品类型名
     typeName: string;
   }): Promise<ResultType<schema.XProduct>>;
@@ -745,7 +745,7 @@ export interface ICompany {
     // 资源列
     resources: model.ResourceModel[] | undefined;
     // 元数据Id
-    thingId: string;
+    thingId?: string;
     // 产品类型名
     typeName: string;
   }): Promise<ResultType<schema.XProduct>>;

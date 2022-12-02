@@ -90,6 +90,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         dataSource={dataSource}
         total={total}
         page={page}
+        // pageSize={2}
         stripe
         headerTitle={headerTitle}
         parentRef={parentRef}

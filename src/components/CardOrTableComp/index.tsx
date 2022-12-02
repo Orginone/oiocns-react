@@ -20,6 +20,7 @@ interface PageType<T> {
   columns?: ProColumns<any>[]; //表格头部数组
   total?: number; // 总条数 总数量
   page?: number; // 当前页
+  pageSize?: number;
   height?: number; //表格高度
   width?: number; //表格高度
   stripe?: boolean; // 斑马纹
@@ -42,6 +43,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   operation,
   total,
   page,
+  pageSize,
   height,
   width,
   parentRef,
