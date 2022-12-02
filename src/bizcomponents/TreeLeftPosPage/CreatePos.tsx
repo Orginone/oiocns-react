@@ -1,21 +1,10 @@
-import { Input, Row, Button, Col, MenuProps, message } from 'antd';
+import { Input, Button } from 'antd';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import type { DataNode } from 'antd/es/tree';
-import React, { useState, useEffect, useMemo } from 'react';
-import { MoreOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
-
-/** 获取角色当前名称 */
-interface PositionBean {
-  key: string;
-  id: string;
-  name: string;
-  code: string;
-  create: string;
-  createTime: string;
-  remark: string;
-}
 
 type CreateGroupPropsType = {
   createTitle: string;
@@ -38,14 +27,12 @@ const items: DataNode[] = [
 ];
 
 const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [searchValue, setSearchValue] = useState('');
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  // 树结构
-  const [treeData, setTreeData] = useState<{}>([]);
-
-  const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+  // const [searchValue, setSearchValue] = useState('');
+  // const [autoExpandParent, setAutoExpandParent] = useState(true);
+  // const [treeData, setTreeData] = useState<{}>([]);
+  // const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
+  // const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
     initData();

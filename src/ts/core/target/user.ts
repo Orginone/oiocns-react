@@ -327,7 +327,7 @@ export default class userdataservice extends BaseService {
       teamCode,
       teamRemark: remark,
     });
-    if (res.success) {
+    if (res.success && isTop) {
       // 把部门加入单位
       const res2 = await kernel.pullAnyToTeam({
         id: parentId,

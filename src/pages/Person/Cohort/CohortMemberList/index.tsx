@@ -43,6 +43,13 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const res = await FriendController.getMyFriend();
     setFriendList(res);
   };
+  /**获取好友列表 */
+  const removeMember = async (ids: string[]) => {
+    CohortController.setCallBack(setMemberData);
+    const res = await CohortController.removeCohort(cohortData, ids);
+    console.log('群组信息', cohortData);
+    console.log('踢出群组结果', res);
+  };
   /**
    * 获取操作列表
    * @param value
@@ -78,7 +85,12 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       );
     }
     if (cohortData.target.belongId == Provider.userId) {
-      action.push(<a key="list-loadmore-more">踢出群组</a>);
+      action.push(<a key="list-loadmore-more">身份管理</a>);
+      action.push(
+        <a key="list-loadmore-more" onClick={() => removeMember([value.id])}>
+          踢出群组
+        </a>,
+      );
     }
     return action;
   };

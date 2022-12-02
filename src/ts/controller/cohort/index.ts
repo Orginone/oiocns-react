@@ -95,6 +95,7 @@ class CohortController {
       remark: remark,
       typeName: TargetType.Cohort,
       teamRemark: remark,
+      belongId: belongId,
       avatar: 'test', //头像
     };
     const res = await obj.update(data);
@@ -181,6 +182,7 @@ class CohortController {
     obj: Cohort,
     targets: schema.XTarget[],
   ): Promise<model.ResultType<any>> {
+    await obj.getMember();
     const res = await obj.pullMember(targets);
     console.log('输出返回值', res);
     return res;
@@ -212,6 +214,21 @@ class CohortController {
     console.log(this._myCohorts);
     const cohort = this._myCohorts.filter((obj) => id == obj.target.id)[0];
     return cohort;
+  }
+  /**
+   * 根据id获取名称
+   * @param obj
+   * @param belongId
+   * @returns
+   */
+  public async getName(obj: Cohort): Promise<string> {
+    const list = await obj.getMember();
+    for (const value of list) {
+      if ((value.id = obj.target.belongId)) {
+        return value.team?.name!;
+      }
+    }
+    return '';
   }
 
   /**
@@ -266,9 +283,7 @@ class CohortController {
    * 获取群组下的人员
    */
   public async getCohortPeronList(obj: Cohort): Promise<schema.XTarget[]> {
-    console.log('已进入');
     let res = await obj.getMember();
-    console.log('群组下的人员列表:', res);
     return res!.filter((obj) => provider.userId != obj.id);
   }
 
@@ -288,6 +303,18 @@ class CohortController {
     console.log('调用结果', res);
     const cohorJoinData = await this.getJoinCohort();
     this.joinCallBack([...cohorJoinData]);
+    return res;
+  }
+
+  /**
+   * 踢出群组
+   * @param obj
+   * @param targets
+   * @returns
+   */
+  public async removeCohort(obj: Cohort, ids: string[]): Promise<model.ResultType<any>> {
+    const res = await obj.removeMember(ids, TargetType.Person);
+    this.callBack(await this.getCohortPeronList(obj));
     return res;
   }
 }

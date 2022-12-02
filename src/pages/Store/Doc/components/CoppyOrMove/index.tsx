@@ -13,7 +13,7 @@ const ResetNameModal = (props: {
   onChange: (val: boolean) => void;
 }) => {
   const { open, title, onChange, currentTaget } = props;
-  const [keys, setKeys] = useState<string>('');
+  const [keys, setKeys] = useState<string>();
   const [selectNode, setSelectNode] = useState<any>();
   const treeData = useMemo(() => {
     const loadTreeData = (item: any) => {
@@ -59,11 +59,12 @@ const ResetNameModal = (props: {
       title={'"' + currentTaget?.name + '"' + title}
       open={open}
       onOk={async () => {
-        if (keys) {
+        if (keys !== undefined) {
           if (title === '移动到') {
             if (await docsCtrl.refItem(currentTaget.key)?.move(selectNode)) {
               docsCtrl.changCallback();
               message.success('移动文件成功');
+              docsCtrl.open(selectNode.key);
             } else {
               message.error('移动失败，请稍后重试');
             }
@@ -71,6 +72,7 @@ const ResetNameModal = (props: {
             if (await docsCtrl.refItem(currentTaget.key)?.copy(selectNode)) {
               docsCtrl.changCallback();
               message.success('复制文件成功');
+              docsCtrl.open(selectNode.key);
             } else {
               message.error('复制失败，请稍后重试');
             }
@@ -88,7 +90,7 @@ const ResetNameModal = (props: {
           icon={getIcon}
           treeData={treeData}
           onSelect={handleSelect}
-          selectedKeys={[keys]}
+          selectedKeys={keys !== undefined ? [keys] : []}
           defaultExpandedKeys={['']}
         />
       )}

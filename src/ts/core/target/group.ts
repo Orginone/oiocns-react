@@ -21,9 +21,7 @@ export default class Group extends BaseTarget implements IGroup {
     this.pullTypes = consts.CompanyTypes;
     this.searchTargetType = [...consts.CompanyTypes, TargetType.Group];
   }
-  public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<XTarget>> {
+  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
   public async getJoinedGroups(): Promise<XTarget[]> {

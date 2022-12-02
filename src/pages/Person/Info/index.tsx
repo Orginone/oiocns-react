@@ -42,11 +42,11 @@ const PersonInfo: React.FC = () => {
     <div className={cls['person-info-info']}>
       <Card bordered={false}>
         <Descriptions title={title} column={2}>
-          <Descriptions.Item label="昵称">deom</Descriptions.Item>
+          <Descriptions.Item label="昵称">{user.userName}</Descriptions.Item>
           {/* <Descriptions.Item label="性别">{}</Descriptions.Item>
           <Descriptions.Item label="邮箱">{}</Descriptions.Item> */}
-          <Descriptions.Item label="联系方式">1388888888888</Descriptions.Item>
-          <Descriptions.Item label="联系地址" span={2}>
+          <Descriptions.Item label="联系方式">{user.team.code}</Descriptions.Item>
+          <Descriptions.Item label="座右铭" span={2}>
             {user.motto}
           </Descriptions.Item>
         </Descriptions>

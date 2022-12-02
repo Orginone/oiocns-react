@@ -4,7 +4,7 @@ import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
 import Provider from '../provider';
 import { IAuthority } from './authority/iauthority';
-
+import { Console } from 'console';
 export default class BaseTarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
@@ -260,19 +260,19 @@ export default class BaseTarget {
    * @returns
    */
   protected async updateTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     let res = await kernel.updateTarget({
       ...data,
       id: this.target.id,
-      belongId: this.target.belongId,
       typeName: this.target.typeName,
     });
     if (res.success) {
       this.target.name = data.name;
       this.target.code = data.code;
+      this.target.belongId = data.belongId;
       if (this.target.team != undefined) {
         this.target.team.name = data.teamName;
         this.target.team.code = data.teamCode;
