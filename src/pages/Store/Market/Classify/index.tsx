@@ -15,9 +15,7 @@ import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import { MarketController } from '@/ts/controller/store/marketCtrl';
-import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const Person = userCtrl.User;
@@ -28,25 +26,13 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
   const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
-  const [curSpace, setCurSpace] = useState<any>({}); // 当前操作对象（个人/单位）
   const [dataSource, setDataSource] = useState<any>([]); // table数据
 
   /**
    * @description: 实例化商店对象
    * @return {*}
    */
-  const marketCtrl = new MarketController(curSpace);
-  useEffect(() => {
-    const id = settingCtrl.subscribe(() => {
-      setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
-      if (settingCtrl.getCurWorkSpace) {
-        setCurSpace(settingCtrl?.getCurWorkSpace?.targtObj);
-      }
-    });
-    return () => {
-      settingCtrl.unsubscribe(id);
-    };
-  }, []);
+  const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
 
   /**
    * @description: 创建商店
@@ -111,7 +97,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     StoreSiderbar.subscribePart('marketTreeData', setList);
     StoreSiderbar.getTreeData();
     return () => {
-      return StoreSiderbar.unsubscribePart('marketTreeData');
+      return StoreSiderbar.unsubscribe('marketTreeData');
     };
   }, []);
 
