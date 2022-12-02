@@ -5,9 +5,9 @@ import { kernel, schema, model, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
-import Provider from '../provider';
 import { XTarget } from '../../base/schema';
 import BaseService from './base';
+import userCtrl from '../../controller/setting/userCtrl';
 
 /**
  * 我的设置里面的接口
@@ -18,7 +18,7 @@ export default class userdataservice extends BaseService {
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(Provider.getPerson!.target);
+      this._instance = new userdataservice(userCtrl.User!.target);
     }
     return this._instance;
   }

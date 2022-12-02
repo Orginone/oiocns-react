@@ -1,6 +1,5 @@
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel, model, schema } from '../../base';
-
 import IResource from './iresource';
 
 /**
@@ -23,7 +22,7 @@ export default class Resource implements IResource {
       sourceType: '资源',
       destIds,
       destType,
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space!.target.id,
       teamId,
     });
   }
@@ -37,7 +36,7 @@ export default class Resource implements IResource {
       sourceType: '资源',
       destIds,
       destType,
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space!.target.id,
       teamId,
     });
   }
@@ -48,7 +47,7 @@ export default class Resource implements IResource {
     return await kernel.queryExtendBySource({
       sourceId: this.resource.id,
       sourceType: '资源',
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space!.target.id,
       destType,
       teamId,
     });

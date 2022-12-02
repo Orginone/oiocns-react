@@ -20,7 +20,7 @@ import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 // const service = new MarketService({
 //   nameSpace: 'myApp',
-//   searchApi: Provider.getPerson.getJoinMarkets,
+//   searchApi: userCtrl.User!.getJoinMarkets,
 //   createApi: API.product.register,
 //   deleteApi: API.product.delete,
 //   updateApi: API.product.update,
