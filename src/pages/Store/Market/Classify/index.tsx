@@ -5,7 +5,7 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu, Button, Row, Col } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import StoreSiderbar from '@/ts/controller/store/sidebar';

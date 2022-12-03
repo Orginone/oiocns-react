@@ -1,10 +1,9 @@
-import Provider from '../../core/provider';
 import { common } from '../../base';
-import { CommonStatus, TodoType } from '../../core/enum';
+import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
 
-export class MarketJoinTodo implements ITodoGroup {
+class MarketJoinTodo implements ITodoGroup {
   private _name: string;
   private _todoList: ApprovalItem[];
   private _doList: ApprovalItem[];
@@ -14,6 +13,8 @@ export class MarketJoinTodo implements ITodoGroup {
   }
   constructor() {
     this._name = '加入市场';
+    this._todoList = [];
+    this._doList = [];
   }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
@@ -24,7 +25,7 @@ export class MarketJoinTodo implements ITodoGroup {
   async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
-      id: Provider.spaceId,
+      id: '0',
       page,
     });
     if (res.success) {
@@ -34,8 +35,8 @@ export class MarketJoinTodo implements ITodoGroup {
     }
     return applyList;
   }
-  async getTodoList(): Promise<IApprovalItem[]> {
-    if (this._todoList.length > 0) {
+  async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
     await this.getJoinApproval();
@@ -48,12 +49,12 @@ export class MarketJoinTodo implements ITodoGroup {
     await this.getJoinApproval();
     return this._doList;
   }
-  async getNoticeList(): Promise<IApprovalItem[]> {
+  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
   private async getJoinApproval() {
     const res = await kernel.queryJoinApproval({
-      id: Provider.spaceId,
+      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -133,8 +134,15 @@ class ApplyItem implements IApplyItem {
   async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
     return await kernel.cancelJoinMarket({
       id: this._data.id,
-      belongId: Provider.spaceId,
+      belongId: '0',
       typeName: '',
     });
   }
 }
+
+/** 加载市场任务 */
+export const loadMarketTodo = async () => {
+  const marketTodo = new MarketJoinTodo();
+  await marketTodo.getTodoList();
+  return marketTodo;
+};

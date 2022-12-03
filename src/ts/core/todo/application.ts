@@ -2,7 +2,7 @@ import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
 import { TodoType } from '../enum';
 
-export class ApplicationTodo implements ITodoGroup {
+class ApplicationTodo implements ITodoGroup {
   private _id: string;
   private _name: string;
   private _todoList: ApprovalItem[];
@@ -14,6 +14,8 @@ export class ApplicationTodo implements ITodoGroup {
   constructor(id: string, name: string) {
     this._id = id;
     this._name = name;
+    this._todoList = [];
+    this._noticeList = [];
   }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
@@ -21,8 +23,8 @@ export class ApplicationTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getTodoList(): Promise<IApprovalItem[]> {
-    if (this._todoList.length > 0) {
+  async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
     const res = await kernel.queryApproveTask({
@@ -41,8 +43,8 @@ export class ApplicationTodo implements ITodoGroup {
     }
     return this._todoList;
   }
-  async getNoticeList(): Promise<IApprovalItem[]> {
-    if (this._noticeList.length > 0) {
+  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._noticeList.length > 0) {
       return this._noticeList;
     }
     const res = await kernel.queryNoticeTask({
@@ -168,3 +170,15 @@ class ApplyItem implements IApplyItem {
     });
   }
 }
+
+/** 加载应用任务 */
+export const loadAppTodo = async () => {
+  const appTodo: ITodoGroup[] = [];
+  const res = await kernel.queryApprovalProduct();
+  if (res.success) {
+    res.data.forEach((a) => {
+      appTodo.push(new ApplicationTodo(a.id, a.name));
+    });
+  }
+  return appTodo;
+};

@@ -11,7 +11,7 @@ export default class BaseController {
     this._refreshCallback = {};
   }
   /**
-   * 订阅变更
+   * @desc 订阅变更
    * @param callback 变更回调
    * @returns 订阅ID
    */
@@ -25,7 +25,7 @@ export default class BaseController {
   }
 
   /**
-   * 订阅局部变更
+   * @desc 订阅局部变更
    * @param callback 变更回调
    * @returns 订阅ID
    */
@@ -46,7 +46,7 @@ export default class BaseController {
   }
 
   /**
-   * 取消订阅
+   * @desc 取消订阅
    * @param id 订阅ID
    */
   public unsubscribe(id: string): void {
@@ -55,7 +55,7 @@ export default class BaseController {
   }
 
   /**
-   * 变更回调
+   * @desc 变更回调
    */
   public changCallback() {
     Object.keys(this._refreshCallback).forEach((id) => {
@@ -64,7 +64,7 @@ export default class BaseController {
   }
 
   /**
-   * 局部变更回调
+   * @desc 局部变更回调
    * @param {string} p 订阅方法名称
    */
   public changCallbackPart(p: string, params?: any): void {

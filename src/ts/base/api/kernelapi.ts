@@ -2016,6 +2016,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 发布流程定义（包括创建、更新操作）
+   * @param {model.CreateDefineReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
+   */
+  public async publishDefine(
+    params: model.CreateDefineReq,
+  ): Promise<model.ResultType<schema.XFlowDefine>> {
+    return await this.request({
+      module: 'flow',
+      action: 'PublishDefine',
+      params: params,
+    });
+  }
+  /**
    * 创建流程实例(启动流程)
    * @param {model.FlowInstanceModel} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstance>} 请求结果
