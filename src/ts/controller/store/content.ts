@@ -67,7 +67,7 @@ class StoreContent {
   public async getStoreProduct(type = 'app', params?: any) {
     let Fun!: Function;
     if (type === 'app') {
-      Fun = userCtrl.User!.getOwnProducts;
+      Fun = userCtrl.User.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;

@@ -25,7 +25,7 @@ import { ICohort } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core/enum';
 
 const CohortConfig: React.FC = () => {
-  const Person = userCtrl.User!;
+  const Person = userCtrl.User;
   console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);

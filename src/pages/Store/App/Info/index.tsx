@@ -98,7 +98,7 @@ const StoreAppInfo: React.FC = () => {
       <div className={cls['page-content-table']}>
         <AppShowComp
           headerTitle="已分配单位"
-          queryFun={userCtrl.User!.getOwnProducts}
+          queryFun={userCtrl.User.getOwnProducts}
           list={[]}
           columns={SelfAppCtrl.getColumns('appInfo')}
           renderOperation={renderOperation}

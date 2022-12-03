@@ -9,7 +9,7 @@ class productContCtrl {
   public async createProduct(
     values: Omit<ProductModel, 'id' | 'thingId' | 'typeName' | 'belongId'>,
   ) {
-    return await userCtrl.User!.createProduct({ ...values });
+    return await userCtrl.User.createProduct({ ...values });
   }
 
   /**
@@ -18,7 +18,7 @@ class productContCtrl {
    * @return {*}
    */
   public async deleteProduct(id: string) {
-    return await userCtrl.User!.deleteProduct(id);
+    return await userCtrl.User.deleteProduct(id);
   }
 }
 

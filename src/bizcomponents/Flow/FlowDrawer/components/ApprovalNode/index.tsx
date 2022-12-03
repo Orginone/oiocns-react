@@ -13,7 +13,7 @@ import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 const { Option } = Select;
 
 const ApprovalNode = () => {
-  // const personObj = userCtrl.User!.getJoinedCohorts();
+  // const personObj = userCtrl.User.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
