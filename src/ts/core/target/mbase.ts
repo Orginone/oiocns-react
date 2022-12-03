@@ -322,22 +322,16 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
   }
 
   public async deleteStaging(id: string): Promise<model.ResultType<any>> {
-    const stag = this.stagings.find((a) => {
-      a.id == id;
+    const res = await kernel.deleteStaging({
+      id,
+      belongId: this.target.id,
     });
-    if (stag != undefined) {
-      const res = await kernel.deleteStaging({
-        id,
-        belongId: this.target.id,
+    if (res.success) {
+      this.stagings = this.stagings.filter((a) => {
+        a.id != id;
       });
-      if (res.success) {
-        this.stagings = this.stagings.filter((a) => {
-          a.id != id;
-        });
-      }
-      return res;
     }
-    return faildResult(consts.NotFoundError);
+    return res;
   }
   /**
    * 删除市场
@@ -393,22 +387,25 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     return res;
   }
   /** 获得可用应用 */
-  public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    if (this.usefulProduct.length > 0) {
+  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
+    if (!reload && this.usefulProduct.length > 0) {
       return this.usefulProduct;
     }
     const res = await kernel.queryUsefulProduct({
       spaceId: this.target.id,
       typeNames: this.extendTargetType,
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.usefulProduct = res.data.result;
     }
     return this.usefulProduct;
   }
   /** 获得可用资源 */
-  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    if (this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
+  public async getUsefulResource(
+    id: string,
+    reload: boolean = false,
+  ): Promise<schema.XResource[]> {
+    if (!reload && this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
       return this.usefulResource[id];
     }
     const res = await kernel.queryUsefulResource({
@@ -416,12 +413,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       spaceId: this.target.id,
       typeNames: this.extendTargetType,
     });
-    if (res.success) {
-      let resources;
-      res.data.result?.forEach((a) => {
-        resources.push(a);
-      });
-      this.usefulResource[id] = resources;
+    if (res.success && res.data.result) {
+      this.usefulResource[id] = res.data.result;
     }
     return this.usefulResource[id];
   }

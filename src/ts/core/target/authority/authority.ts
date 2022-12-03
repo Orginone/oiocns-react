@@ -144,8 +144,8 @@ export default class Authority implements IAuthority {
     }
     return res;
   }
-  public async queryAuthorityIdentity(): Promise<Identity[]> {
-    if (this.identitys.length > 0) {
+  public async queryAuthorityIdentity(reload: boolean = false): Promise<Identity[]> {
+    if (!reload && this.identitys.length > 0) {
       return this.identitys;
     }
     const res = await kernel.queryAuthorityIdentitys({
@@ -157,15 +157,15 @@ export default class Authority implements IAuthority {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((identity) => {
-        this.identitys.push(new Identity(identity));
+    if (res.success && res.data.result) {
+      this.identitys = res.data.result.map((a) => {
+        return new Identity(a);
       });
     }
     return this.identitys;
   }
-  public async getSubAuthoritys(): Promise<IAuthority[]> {
-    if (this.children.length > 0) {
+  public async getSubAuthoritys(reload: boolean = false): Promise<IAuthority[]> {
+    if (!reload && this.children.length > 0) {
       return this.children;
     }
     const res = await kernel.querySubAuthoritys({
@@ -176,9 +176,9 @@ export default class Authority implements IAuthority {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((auth) => {
-        this.children.push(new Authority(auth, this._belongId));
+    if (res.success && res.data.result) {
+      this.children = res.data.result.map((auth) => {
+        return new Authority(auth, this._belongId);
       });
     }
     return this.children;
