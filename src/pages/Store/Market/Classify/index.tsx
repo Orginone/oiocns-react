@@ -101,16 +101,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     };
   }, []);
 
-  /**
-   * @description: 处理商店树数据
-   * @param {*} useMemo
-   * @return {*}
-   */
-  const treelist = useMemo(() => {
-    console.log('城市市场', list);
-
-    return list?.filter((item) => item.title !== '开放市场');
-  }, [list]);
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
@@ -242,7 +232,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         key={selectMenu}
         handleTitleClick={handleTitleClick}
         handleMenuClick={handleMenuClick}
-        treeData={treelist}
+        treeData={list}
         menu={'menus'}
         title={ClickBtn}
       />
