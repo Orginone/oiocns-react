@@ -316,6 +316,9 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
         merchandiseId: id,
         belongId: this.target.id,
       });
+      if (res.success && res.data) {
+        this.stagings.push(res.data);
+      }
       return res;
     }
     return faildResult(consts.IsExistError);
