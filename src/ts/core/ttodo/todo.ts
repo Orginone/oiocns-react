@@ -3,6 +3,7 @@ import { kernel } from '../../base';
 import { ApplicationTodo } from './application';
 import { ITodo, ITodoGroup } from './itodo';
 import { PublishTodo } from './publish';
+import { MarketJoinTodo } from './marketjoin';
 
 export default class Todo implements ITodo {
   private _todoGroup: ITodoGroup[];
@@ -18,7 +19,7 @@ export default class Todo implements ITodo {
   constructor() {
     this._todoGroup.push(new OrgTodo());
     this._todoGroup.push(new PublishTodo());
-    // this._todoGroup.push(new JoinMarketTodo('应用上架'));
+    this._todoGroup.push(new MarketJoinTodo());
   }
   async getTodoGroup(): Promise<ITodoGroup[]> {
     if (this._applicationTodo.length <= 0) {
