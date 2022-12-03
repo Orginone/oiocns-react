@@ -25,14 +25,14 @@ class OrgTodo implements ITodoGroup {
   async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(page?: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getApprovalList();
     return this._doList;
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page?: model.PageRequest): Promise<IApplyItem[]> {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
