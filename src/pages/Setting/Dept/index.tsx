@@ -94,6 +94,11 @@ const SettingDept: React.FC = () => {
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
+      case 'new':
+        setting.setCurrTreeDeptNode('');
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        break;
       case '新增部门':
         setIsCreateDept(true);
         setIsOpenModal(true);
@@ -166,9 +171,7 @@ const SettingDept: React.FC = () => {
     initData();
     // 刚进入的时候选中公司 TODO
     setting.setCompanyID = userCtrl?.Space?.target.id + '';
-    setting.getDepartments('0').then((deptChild) => {
-      console.log('myalldept', deptChild);
-    });
+    setting.setRoot = userCtrl?.Space!.target;
 
     const id = setting.getCompanyCtrl.subscribe(async () => {
       // 选中树操作

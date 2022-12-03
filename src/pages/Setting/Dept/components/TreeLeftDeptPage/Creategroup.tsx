@@ -134,8 +134,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     if (children) {
       return;
     }
-    const deptChild = await setting.getDepartments(target.target.id);
-    // await target.getDepartments(); 不从缓存里面取，查询底下的部门
+    const deptChild = await target.getDepartments();
+
     setTreeData((origin) =>
       updateTreeData(
         origin,
@@ -161,7 +161,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         <Button
           className={cls.creatgroup}
           type="primary"
-          onClick={() => handleMenuClick('新增部门', {})}>
+          onClick={() => handleMenuClick('new', {})}>
           {createTitle}
         </Button>
         <MarketClassifyTree

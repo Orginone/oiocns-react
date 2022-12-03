@@ -12,6 +12,8 @@ import cls from './index.module.less';
 import UploadAvatar, { avatarUpload } from '../UploadAvatar';
 import SettingService from '../../service';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import IDepartment from '@/ts/core/target/department';
+import { TargetType } from '@/ts/core/enum';
 
 /* 
   编辑
@@ -114,12 +116,31 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
-                    debugger;
                     value.parentId = setting.getCurrTreeDeptNode();
+                    value.belongId = userCtrl.Space?.target.id;
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
                     }
-                    const curentValue = await setting.createDepartment(value);
+                    // 新增部门
+                    value.typeName = TargetType.Department;
+
+                    let curentValue: any;
+                    if (value.parentId == '') {
+                      // 如果是一级部门， 就从根部门里面新增
+                      curentValue = await setting.getRoot.createDepartment(value);
+                    } else {
+                      // 如果是二级部门，就查找后，再从部门新增
+                      const currObj = await setting.refItem(value.parentId);
+                      if (currObj) {
+                        curentValue = await currObj!.createDepartment(value);
+                      } else {
+                        curentValue = {
+                          success: false,
+                          msg: '查询失败！',
+                        };
+                      }
+                    }
+
                     if (!curentValue.success) {
                       message.error(curentValue.msg);
                       // form.resetFields();

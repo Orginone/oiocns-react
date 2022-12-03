@@ -1,15 +1,14 @@
-import React from 'react';
-import * as Icon from '@ant-design/icons';
-
 import Company from '@/ts/core/target/company';
 import { TargetType } from '@/ts/core/enum';
-import { XTarget, XTargetArray } from '@/ts/base/schema';
+// import { XTarget, XTargetArray } from '@/ts/base/schema';
 import UserCtrl from '@/ts/controller/setting/userCtrl';
 import CompanyCtrl from '@/ts/controller/setting/companyCtrl';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
 import docCtrl from '@/ts/controller/store/docsCtrl';
-import { IDepartment } from '@/ts/core/target/itarget';
+import { ICompany, IDepartment } from '@/ts/core/target/itarget';
+import { schema } from '@/ts/base';
 import Department from '@/ts/core/target/department';
+// import Department from '@/ts/core/target/department';
 
 export interface spaceObjs {
   id: string;
@@ -61,17 +60,28 @@ export default class SettingService {
   }
 
   private _isOpenModal: boolean = false;
-  // private _root: IFileSystemItem;
   // 我的用户服务
   private companyCtrl: CompanyCtrl;
   // 对应公司的ID
   private companyID: string = '';
+
   // 部门树，选中的节点
   private _currTreeDeptNode: string = '';
+  /**选中的跟部门 */
+  private _root: IDepartment;
+
   /** 页面isOpen控制是否显示弹窗 */
   public get getIsOpen() {
     return this._isOpenModal;
   }
+  public get getRoot() {
+    return this._root;
+  }
+
+  public set setRoot(target: schema.XTarget) {
+    this._root = new Department(target);
+  }
+
   public set setCompanyID(id: string) {
     this.companyID = id;
   }
@@ -86,159 +96,40 @@ export default class SettingService {
   }
   constructor() {
     if (UserCtrl.Space != null) {
-      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.Space?.target));
       this.setCompanyID = UserCtrl.Space?.target.id;
+      this._root = new Department(UserCtrl.Space?.target);
+      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.Space?.target));
     } else {
-      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.User?.target));
       this.setCompanyID = '';
+      this._root = new Department(UserCtrl.User?.target);
+      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.User?.target));
     }
   }
 
   /**设弹窗 */
   public async setIsOpen(params: boolean) {
-    // console.log(params);
     this._isOpenModal = params;
   }
 
-  // 创建二级以下的部门
-  public async createSecondDepartment(
-    param: deptParams,
-    deptId: string,
-  ): Promise<ObjType> {
-    const compid = this.companyID;
-
-    const datas: XTargetArray = await this.companyCtrl
-      .getUserService()
-      .searchMyCompany(param.code, TargetType.Department);
-    if (datas.total > 0) {
-      return {
-        msg: '重复创建',
-        success: false,
-      };
+  private async _search(
+    item: IDepartment,
+    key: string,
+  ): Promise<IDepartment | undefined> {
+    console.log('-------', item, key);
+    if (item.target.id === key) {
+      return item;
     }
-    const res = await this.companyCtrl.getUserService().createDepart(
-      param.name,
-      param.code,
-      param.teamName,
-      param.teamCode,
-      param.remark,
-      compid!, // 团队ID
-      false,
-      deptId, // 属于哪个部门的ID
-    );
-
-    return {
-      msg: res.msg,
-      success: res.success,
-    };
-  }
-
-  /**
-   * 递归查询前单位底下的所有部门底下的子部门
-   * @param parentId
-   * @returns
-   */
-  public async getDepartments(parentId: string): Promise<IDepartment[]> {
-    let arrays: IDepartment[] = [];
-    let compid: string = parentId;
-    if (parentId === '0') {
-      compid = this.companyID + '';
-    }
-    const companys: Company[] = await this.companyCtrl
-      .getUserService()
-      .getBelongTargets(compid, TargetType.Department);
-    if (companys.length > 0) {
-      for (const comp of companys) {
-        // 查找是否有children
-        let arrayChild: IDepartment[] = [];
-        const company2s: Company[] = await this.companyCtrl
-          .getUserService()
-          .getBelongTargets(comp.target.id, TargetType.Department);
-        if (company2s.length > 0) {
-          const getValue = await this.getDepartments(comp.target.id);
-          // console.log('getValue', getValue);
-          arrayChild = getValue?.map((item) => {
-            return { ...item, icon: React.createElement(Icon['ApartmentOutlined']) };
-          });
-        }
-        let dept = new Department(comp.target);
-        dept.departments = arrayChild;
-        arrays.push(dept);
+    const depts = await item.getDepartments();
+    for (const i of depts) {
+      const res = this._search(i, key);
+      if (res) {
+        return res;
       }
     }
-    return arrays;
-  }
-  /**
-   * 创建一级部门
-   * @param param parentId 为空就是一级部门
-   * @returns
-   */
-  public async createDepartment(param: deptParams): Promise<ObjType> {
-    // 判断是否创建二级部门
-    if (
-      param.parentId != null &&
-      param.parentId != '' &&
-      param.parentId != this.companyID
-    ) {
-      return await this.createSecondDepartment(param, param.parentId);
-    }
-    // 要选中公司的工作区
-    const compid = this.companyID;
-    // Provider.getWorkSpace()!.id;
-    // 判断是否有公司数据
-
-    //let curCompanys: Company[] = await Provider.getPerson.getJoinedCompanys();
-    // 获取当前单位
-    //let curCompany: Company = curCompanys.filter((e) => e.target.id === compid)[0];
-    // 判断是否重复 TODO
-    const datas: XTargetArray = await this.companyCtrl
-      .getUserService()
-      .searchMyCompany(param.code, TargetType.Department);
-
-    if (datas.total > 0) {
-      return {
-        msg: '重复创建',
-        success: false,
-      };
-    }
-
-    const res = await this.companyCtrl.getUserService().createDepart(
-      param.name,
-      param.code,
-      param.teamName,
-      param.teamCode,
-      param.remark,
-      compid + '', // 上一层ID
-      true,
-      compid + '', // 属于哪个公司的ID
-    );
-    return {
-      msg: res.msg,
-      success: res.success,
-    };
   }
 
-  // 查询部门的内容
-  public async searchDeptment(departId: string): Promise<XTargetArray> {
-    return await this.companyCtrl.getUserService().searchDeptment(departId);
-  }
-
-  // 查询公司底下所有的用户
-  public async searchAllPersons(departId?: string): Promise<XTarget[]> {
-    const comp: Company = new Company(UserCtrl.User.target!);
-    let res: XTarget[];
-    if (departId == null) {
-      comp.target.id = this.companyID + '';
-      comp.target.typeName = TargetType.Company;
-      res = await comp.getPersons();
-      // console.log('===查询公司底下的用户', res);
-    } else {
-      comp.target.id = departId;
-      comp.target.typeName = TargetType.Department;
-      res = await comp.getPersons();
-      // console.log('===查询部门底下的用户', res);
-    }
-    return res;
+  public async refItem(key: string): Promise<IDepartment | undefined> {
+    return await this._search(this._root, key);
   }
 
   // 上传到我的文件夹目录，然后再保存 share_link，到时候预览
