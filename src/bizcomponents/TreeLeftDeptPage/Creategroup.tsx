@@ -77,7 +77,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (userCtrl.Space && userCtrl.Space == undefined) {
+    if (!userCtrl.IsCompanySpace) {
       Modal.info({
         title: '提示',
         content: (

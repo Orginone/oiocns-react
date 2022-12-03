@@ -75,7 +75,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     (child) => child.path === props.match.path,
   );
   const menuFlat = menuData ? flatMenuData(menuData) : [];
-
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     setActiveMenu(location.pathname);
@@ -83,7 +82,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (menuData) {
       listenPrev(current);
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuData]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);

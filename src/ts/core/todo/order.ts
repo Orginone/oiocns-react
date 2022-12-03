@@ -22,7 +22,7 @@ export default class OrderTodo implements OrderITodo {
   }
   getSaleList = async () => {
     const result = await kernel.querySellOrderList({
-      id: userCtrl.User!.target.id,
+      id: userCtrl.User.target.id,
       status: 0,
       page: {
         offset: 0,
@@ -36,7 +36,7 @@ export default class OrderTodo implements OrderITodo {
   };
   getBuyList = async () => {
     const result = await kernel.queryBuyOrderList({
-      id: userCtrl.User!.target.id,
+      id: userCtrl.User.target.id,
       status: 0,
       page: {
         offset: 0,

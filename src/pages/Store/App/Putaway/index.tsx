@@ -7,20 +7,17 @@ import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import StoreContent from '@/ts/controller/store/content';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import StoreSidebar from '@/ts/controller/store/sidebar';
-interface AppInfoType {
-  appId: string;
-}
 
 /*******
  * @desc: 应用上架
  */
-const AppPutaway: React.FC<AppInfoType> = () => {
+const AppPutaway: React.FC = () => {
   const history = useHistory();
   const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
-  const AppInfo = StoreContent.curProduct;
+  const AppInfo = SelfAppCtrl.curProduct;
   useEffect(() => {
     StoreSidebar.getOwnMarket(false).then(() => {
       setMarketData(StoreSidebar.marketFooterTree.appTreeData);

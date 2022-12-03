@@ -81,7 +81,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == userCtrl.User!.target.id) {
+    if (cohortData.target.belongId == userCtrl.User.target.id) {
       action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
         <a

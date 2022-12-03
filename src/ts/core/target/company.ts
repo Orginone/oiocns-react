@@ -43,7 +43,12 @@ export default class Company extends MarketTarget implements ICompany {
       ...consts.CompanyTypes,
     ];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
-    this.createTargetType = [TargetType.Cohort, TargetType.Group];
+    this.createTargetType = [
+      TargetType.Department,
+      TargetType.Working,
+      TargetType.Cohort,
+      TargetType.Group,
+    ];
     this.searchTargetType = [TargetType.Person, TargetType.Cohort, TargetType.Group];
   }
   public async searchCohort(code: string): Promise<ResultType<schema.XTargetArray>> {

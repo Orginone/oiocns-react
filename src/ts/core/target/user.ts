@@ -18,7 +18,7 @@ export default class userdataservice extends BaseService {
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(userCtrl.User!.target);
+      this._instance = new userdataservice(userCtrl.User.target);
     }
     return this._instance;
   }

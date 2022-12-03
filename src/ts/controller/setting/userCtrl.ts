@@ -24,13 +24,29 @@ class UserController extends BaseController {
       }
     }
   }
+  /** 是否已登录 */
+  get Logined(): boolean {
+    return this._user != undefined;
+  }
+  /** 是否为单位空间 */
+  get IsCompanySpace(): boolean {
+    return this._curSpace != undefined;
+  }
   /** 当前用户 */
-  get User(): IPerson | undefined {
-    return this._user;
+  get User(): IPerson {
+    if(this._user){
+      return this._user;
+    }else{
+      return { id: '', target: {id: ''} } as unknown as Person;
+    }
   }
   /** 当前单位空间 */
-  get Space(): ICompany | undefined {
-    return this._curSpace;
+  get Space(): ICompany {
+    if(this._curSpace){
+      return this._curSpace;
+    }else{
+      return { id: '', target: {id: ''} } as unknown as ICompany;
+    }
   }
   /** 当前空间数据 */
   get SpaceData(): SpaceType {

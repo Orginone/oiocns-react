@@ -43,7 +43,7 @@ const OrganizationalUnits: React.FC = () => {
   };
   const onSave = async () => {
     const values = await form.validateFields();
-    const res = await userCtrl.User!.createCompany(values.company);
+    const res = await userCtrl.User.createCompany(values.company);
     if (res.success) {
       message.info('申请加入单位成功');
       setShowFormModal(false);
@@ -60,10 +60,10 @@ const OrganizationalUnits: React.FC = () => {
   };
 
   const refreshUI = () => {
-    const all: SpaceType[] = userCtrl.User!.joinedCompany.map((item) => {
+    const all: SpaceType[] = userCtrl.User.joinedCompany.map((item) => {
       return item.getSpaceData;
     });
-    all.unshift(userCtrl.User!.getSpaceData);
+    all.unshift(userCtrl.User.getSpaceData);
     setCurrent(userCtrl.SpaceData);
     setMenuList(
       all.filter((item) => {
