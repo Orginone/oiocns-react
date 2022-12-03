@@ -13,7 +13,7 @@ import {
   StoreTodo,
   TeamTodo,
 } from '@/ts/core/todo/todo';
-import { XOrder, XOrderDetail } from '@/ts/base/schema';
+import { XMarketRelation, XOrder, XOrderDetail, XRelation } from '@/ts/base/schema';
 import { OrderStatus } from '@/ts/core/enum';
 import OrderTodo from '@/ts/core/todo/order';
 
@@ -139,7 +139,10 @@ class TodoService implements TodoServiceProps {
     return await this.applicationInstance[selfListFn]();
   };
   /** 生成平台待办操作菜单*/
-  tableOperation = (item: any, callback: Function) => {
+  tableOperation = (
+    item: XRelation | XMarketRelation | XMarketRelation | XMerchandise,
+    callback: Function,
+  ) => {
     const afterOperate = (success: boolean, name: string) => {
       if (success) {
         message.success(`${name}成功`);
@@ -258,5 +261,4 @@ class TodoService implements TodoServiceProps {
 }
 
 const todoService = new TodoService();
-
 export default todoService;

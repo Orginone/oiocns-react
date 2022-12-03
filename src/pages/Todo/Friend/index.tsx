@@ -7,19 +7,20 @@ import { Space, Tag } from 'antd';
 import friendService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { SettingFilled } from '@ant-design/icons';
+import { XRelation } from '@/ts/base/schema';
 
 // import styles from './index.module.less';
 friendService.currentModel = 'friend';
 
 // 生成说明数据
-const remarkText = (activeKey: string, item: TeamApprovalType) => {
+const remarkText = (activeKey: string, item: XRelation) => {
   return activeKey === '2'
-    ? '请求添加' + item.team.name + '为好友'
-    : item.target.name + '请求添加好友';
+    ? '请求添加' + item?.team?.name + '为好友'
+    : item?.target?.name + '请求添加好友';
 };
 
 // 根据状态值渲染标签
-const renderItemStatus = (record: TeamApprovalType) => {
+const renderItemStatus = (record: XRelation) => {
   const status = friendService.statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
@@ -33,10 +34,10 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>(friendService.activeStatus);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const [openHeaderSetting, setOpenHeaderSetting] = useState<boolean>(false);
-  const [pageData, setPageData] = useState<TeamApprovalType[]>([]);
+  const [pageData, setPageData] = useState<XRelation[]>([]);
   const [total, setPageTotal] = useState<number>(0);
-  const [newColumns, setNewColumns] = useState<ProColumns<TeamApprovalType>[]>();
-  const columns: ProColumns<TeamApprovalType>[] = [
+  const [newColumns, setNewColumns] = useState<ProColumns<XRelation>[]>();
+  const columns: ProColumns<XRelation>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -110,24 +111,22 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
           />
         </Space>
       }>
-      <TableHeaderOptions<TeamApprovalType>
+      <TableHeaderOptions<XRelation>
         plainOptions={columns}
         open={openHeaderSetting}
         handleOk={(data) => handleOk(data)}
         onCancel={() => setOpenHeaderSetting(false)}
       />
-      <CardOrTableComp<TeamApprovalType>
+      <CardOrTableComp<XRelation>
         rowKey={'id'}
         // bordered={false}
         columns={newColumns}
         dataSource={pageData}
         total={total}
         onChange={loadList}
-        operation={(item: TeamApprovalType) =>
-          friendService.tableOperation(item, setNeedReload)
-        }
+        operation={(item: XRelation) => friendService.tableOperation(item, setNeedReload)}
         renderCardContent={(arr) => (
-          <TableItemCard<TeamApprovalType>
+          <TableItemCard<XRelation>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
             targetOrTeam="target"

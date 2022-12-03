@@ -57,7 +57,7 @@
     "@tanstack/react-query-devtools": "^4.12.0",
     "@types/qrcode": "^1.5.0",
     "@wcjiang/notify": "^2.1.0",
-    "antd": "^4.16.0",
+    "antd": "^4.24.4",
     "antd-img-crop": "^4.2.8",
     "array-move": "^4.0.0",
     "axios": "^1.1.2",

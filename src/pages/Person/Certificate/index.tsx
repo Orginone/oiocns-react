@@ -7,7 +7,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from 'typings/Certificate';
 import { certificateColumn } from '@/components/CardOrTableComp/config';
 import cls from './index.module.less';
-import API from '@/services';
+// import API from '@/services';
 
 /**
  * 个人信息
@@ -15,14 +15,14 @@ import API from '@/services';
  */
 const PersonInfo: React.FC = () => {
   const parentRef = useRef<any>();
-  const service = new CertificateService({
-    nameSpace: 'myCertificate',
-    searchApi: API.product.searchOwnProduct,
-    createApi: API.product.register,
-    deleteApi: API.product.delete,
-    updateApi: API.product.update,
-  });
-  console.log(service);
+  // const service = new CertificateService({
+  //   nameSpace: 'myCertificate',
+  //   searchApi: API.product.searchOwnProduct,
+  //   createApi: API.product.register,
+  //   deleteApi: API.product.delete,
+  //   updateApi: API.product.update,
+  // });
+  // console.log(service);
 
   //模拟数据
   const list: any = [

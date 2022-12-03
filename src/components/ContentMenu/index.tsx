@@ -159,7 +159,10 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
             <LeftOutlined
               className={cls.backicon}
               onClick={() => {
-                history.back();
+                if (currentMenuData?.length === 0) {
+                  history.back();
+                }
+                setCurrent(null);
                 if (prevMenuData.length > 0) {
                   setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
                   setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
@@ -176,7 +179,6 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
               </>
             ) : (
               <>
-                {' '}
                 {createIcon(currentMacthRoute?.icon)}
                 <strong>{currentMacthRoute.title}</strong>{' '}
               </>
