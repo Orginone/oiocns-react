@@ -1,5 +1,6 @@
-import { Card, Button, Descriptions, Space } from 'antd';
+import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
+import { Card, Button, Descriptions, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -14,7 +15,8 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import settingService from './service';
+import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
+
 /**
  * 部门设置
  * @returns
@@ -30,6 +32,7 @@ const SettingDept: React.FC = () => {
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
 
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
+  const treeContainer = document.getElementById('templateMenu');
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -43,7 +46,7 @@ const SettingDept: React.FC = () => {
         },
       },
       {
-        key: 'share',
+        key: 'changeDept',
         label: '变更部门',
         onClick: () => {
           // console.log('按钮事件', 'share', item);
@@ -80,6 +83,20 @@ const SettingDept: React.FC = () => {
         },
       },
     ];
+  };
+  /**点击操作内容触发的事件 */
+  const handleMenuClick = (key: string, item: any) => {
+    switch (key) {
+      case '新增部门':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.id);
+        break;
+      case 'changeDept': //变更部门
+        setIsOpenModal(true);
+        setSelectDept(item);
+        setSelectId(item.id);
+    }
   };
   /** 添加人员的逻辑 */
   const onPersonalOk = (params: initDatatype[]) => {
@@ -279,6 +296,17 @@ const SettingDept: React.FC = () => {
       />
       {/* 对象设置 */}
       <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      {/* 左侧树 */}
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <TreeLeftDeptPage
+              createTitle="新增"
+              setCurrent={setSelectDept}
+              handleMenuClick={handleMenuClick}
+            />,
+            treeContainer,
+          )
+        : ''}
     </div>
   );
 };
