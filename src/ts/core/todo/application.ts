@@ -30,15 +30,13 @@ class ApplicationTodo implements ITodoGroup {
     const res = await kernel.queryApproveTask({
       id: this._id,
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this._todoList.push(
-          new ApprovalItem(a, (id: string) => {
-            this._todoList = this._todoList.filter((s) => {
-              return s.Data.id != id;
-            });
-          }),
-        );
+    if (res.success && res.data.result) {
+      this._todoList = res.data.result.map((a) => {
+        return new ApprovalItem(a, (id: string) => {
+          this._todoList = this._todoList.filter((s) => {
+            return s.Data.id != id;
+          });
+        });
       });
     }
     return this._todoList;
@@ -50,15 +48,13 @@ class ApplicationTodo implements ITodoGroup {
     const res = await kernel.queryNoticeTask({
       id: this._id,
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this._noticeList.push(
-          new NoticeItem(a, (s) => {
-            this._noticeList = this._noticeList.filter((q) => {
-              return q.Data.id != s;
-            });
-          }),
-        );
+    if (res.success && res.data.result) {
+      this._noticeList = res.data.result.map((a) => {
+        return new NoticeItem(a, (s) => {
+          this._noticeList = this._noticeList.filter((q) => {
+            return q.Data.id != s;
+          });
+        });
       });
     }
     return this._noticeList;

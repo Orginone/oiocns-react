@@ -61,28 +61,33 @@ class MarketJoinTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        let rePassFun = (id: string) => {
-          this._doList = this._doList.filter((q) => {
-            return q.Data.id != id;
+    if (res.success && res.data.result) {
+      let rePassFun = (id: string) => {
+        this._doList = this._doList.filter((q) => {
+          return q.Data.id != id;
+        });
+      };
+      let passFun = (id: string) => {
+        this._todoList = this._todoList.filter((q) => {
+          return q.Data.id != id;
+        });
+      };
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status >= CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, rePassFun, () => {});
+        });
+      this._todoList = res.data.result
+        .filter((a) => {
+          return a.status < CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, passFun, (data) => {
+            this._doList.push(new ApprovalItem(data, rePassFun, () => {}));
           });
-        };
-        let passFun = (id: string) => {
-          this._todoList = this._todoList.filter((q) => {
-            return q.Data.id != id;
-          });
-        };
-        if (a.status >= CommonStatus.RejectStartStatus) {
-          this._doList.push(new ApprovalItem(a, rePassFun, () => {}));
-        } else {
-          this._todoList.push(
-            new ApprovalItem(a, passFun, (data) => {
-              this._doList.push(new ApprovalItem(data, rePassFun, () => {}));
-            }),
-          );
-        }
-      });
+        });
     }
   }
 }

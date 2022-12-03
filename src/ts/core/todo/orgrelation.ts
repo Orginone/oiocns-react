@@ -44,15 +44,13 @@ class OrgTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this._applyList.push(
-          new ApplyItem(a, (q) => {
-            this._applyList = this._applyList.filter((s) => {
-              return s.Data.id != q.id;
-            });
-          }),
-        );
+    if (res.success && res.data.result) {
+      this._applyList = res.data.result.map((a) => {
+        return new ApplyItem(a, (q) => {
+          this._applyList = this._applyList.filter((s) => {
+            return s.Data.id != q.id;
+          });
+        });
       });
     }
     return this._applyList;
@@ -66,7 +64,7 @@ class OrgTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
+    if (res.success && res.data.result) {
       // 同意回调
       let passfun = (s: schema.XRelation) => {
         this._todoList = this._todoList.filter((q) => {
@@ -80,19 +78,24 @@ class OrgTodo implements ITodoGroup {
         });
       };
       // 拒绝回调
-      let rejectfun = (s) => {
+      let rejectfun = (s: schema.XRelation) => {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
-      let reRejectfun = (s) => {};
-      this._doList = [];
-      this._todoList = [];
-      res.data.result?.forEach((a) => {
-        if (a.status >= CommonStatus.RejectStartStatus) {
-          this._doList.push(new ApprovalItem(a, rePassfun, reRejectfun));
-        } else {
-          this._todoList.push(new ApprovalItem(a, passfun, rejectfun));
-        }
-      });
+      let reRejectfun = (s: schema.XRelation) => {};
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status >= CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, rePassfun, reRejectfun);
+        });
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status < CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, passfun, rejectfun);
+        });
     }
   }
 }
