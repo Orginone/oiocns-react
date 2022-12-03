@@ -5,7 +5,7 @@ import { kernel, schema, model, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
-import { XTarget } from '../../base/schema';
+import { XTarget, XTargetArray } from '../../base/schema';
 import BaseService from './base';
 import userCtrl from '../../controller/setting/userCtrl';
 
@@ -364,7 +364,20 @@ export default class userdataservice extends BaseService {
 
     return res;
   };
-
+  // 查询部门的内容
+  public async searchDeptment(departId: string): Promise<XTargetArray> {
+    const res = await kernel.queryTargetById({ ids: [departId], page: undefined });
+    if (res.success) {
+      return res.data;
+    } else {
+      return {
+        offset: 0,
+        limit: 0,
+        total: 0,
+        result: undefined,
+      };
+    }
+  }
   /**
    * 创建对象
    * @param data 创建参数

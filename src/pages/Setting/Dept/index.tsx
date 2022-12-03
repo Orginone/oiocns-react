@@ -14,7 +14,7 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-
+import settingService from './service';
 /**
  * 部门设置
  * @returns

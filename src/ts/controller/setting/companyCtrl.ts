@@ -6,7 +6,7 @@ import userService from '../../core/target/user';
 export default class CompanyController extends MarketController {
   private _company: ICompany;
   // 设置部分的接口
-  private _userService = userService.getInstance;
+  private _userService = userService.getInstance();
   constructor(company: ICompany) {
     super(company);
     this._company = company;
