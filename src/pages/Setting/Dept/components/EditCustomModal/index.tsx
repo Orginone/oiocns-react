@@ -10,6 +10,9 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
 import cls from './index.module.less';
 import UploadAvatar, { avatarUpload } from '../UploadAvatar';
+import SettingService from '../../service';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+
 /* 
   编辑
 */
@@ -25,6 +28,7 @@ interface Iprops {
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
+  const setting = SettingService.getInstance();
   // 头像的保存
   const [fileList, setFileList] = useState<avatarUpload[]>([
     {
@@ -110,9 +114,19 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
-                    value.parentId = selectId;
+                    debugger;
+                    value.parentId = setting.getCurrTreeDeptNode();
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
+                    }
+                    const curentValue = await setting.createDepartment(value);
+                    if (!curentValue.success) {
+                      message.error(curentValue.msg);
+                      // form.resetFields();
+                    } else {
+                      message.success('添加成功');
+                      form.resetFields();
+                      handleOk();
                     }
                   }
                 }}>

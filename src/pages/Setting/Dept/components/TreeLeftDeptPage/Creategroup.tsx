@@ -7,6 +7,8 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import SettingService from '../../service';
+import { IDepartment } from '@/ts/core/target/itarget';
+import { getUuid } from '@/utils/tools';
 
 const x = 3;
 const y = 2;
@@ -61,13 +63,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   handleMenuClick,
   setCurrent,
 }) => {
-  // const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  // const [searchValue, setSearchValue] = useState('');
-  // const [autoExpandParent, setAutoExpandParent] = useState(true);
-  // const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  // const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const [selectMenu, setSelectMenu] = useState<string>('');
   const [treeData, setTreeData] = useState<any[]>([]);
+  const setting = SettingService.getInstance();
 
   useEffect(() => {
     if (userCtrl.Space && userCtrl.Space == undefined) {
@@ -86,7 +83,14 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
 
     initData();
     // 控制选中的部门ID。
-    SettingService.setCompanyID = userCtrl?.Space?.target.id + '';
+    setting.setCompanyID = userCtrl?.Space?.target.id + '';
+    const id = userCtrl.subscribe(() => {
+      initData();
+      setting.getCompanyCtrl.changCallback();
+    });
+    return () => {
+      userCtrl.unsubscribe(id);
+    };
   }, ['', userCtrl.Space]);
 
   const initData = async () => {
@@ -98,10 +102,10 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       setTreeData(tree);
     }
   };
-  const createTeeDom = (n) => {
+  const createTeeDom = (n: IDepartment) => {
     const { target } = n;
     return {
-      key: target.id,
+      key: target.id + getUuid(),
       title: target.name,
       icon: target.avatar,
       // children: [],
@@ -131,7 +135,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     if (children) {
       return;
     }
-    const deptChild = await SettingService.getDepartments(target.target.id);
+    const deptChild = await setting.getDepartments(target.target.id);
     // await target.getDepartments(); 不从缓存里面取，查询底下的部门
     setTreeData((origin) =>
       updateTreeData(
@@ -142,25 +146,12 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     );
   };
 
-  // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  // const { value } = e.target;
-  // const newExpandedKeys = treeData
-  //   .map((item) => {
-  //     if (item.title.indexOf(value) > -1) {
-  //       return getParentKey(item.key, defaultData);
-  //     }
-  //     return null;
-  //   })
-  //   .filter((item, i, self) => item && self.indexOf(item) === i);
-  // setExpandedKeys(newExpandedKeys as React.Key[]);
-  // setSearchValue(value);
-  // setAutoExpandParent(true);
-  // 树过滤需要处理 TODO
-  // };
-
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
-    console.log('选中树节点', selectedKeys, info.node);
-    if (info.selected) setCurrent(info.node.target);
+    console.log('选中树节点', selectedKeys);
+    if (info.selected) {
+      setCurrent(info.node.target.target);
+      setting.setCurrTreeDeptNode(info.node.target.target.id);
+    }
   };
 
   const menu = ['新增部门'];

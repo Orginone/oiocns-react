@@ -50,13 +50,25 @@ export type ObjType = {
 };
 
 /**请求接口的服务 */
-class SettingService {
+export default class SettingService {
+  // 单例
+  private static _instance: SettingService;
+  public static getInstance() {
+    if (this._instance == null) {
+      console.log('getInstance');
+      this._instance = new SettingService();
+    }
+    return this._instance;
+  }
+
   private _isOpenModal: boolean = false;
   // private _root: IFileSystemItem;
   // 我的用户服务
   private companyCtrl: CompanyCtrl;
   // 对应公司的ID
   private companyID: string = '';
+  // 部门树，选中的节点
+  private _currTreeDeptNode: string = '';
   /** 页面isOpen控制是否显示弹窗 */
   public get getIsOpen() {
     return this._isOpenModal;
@@ -64,11 +76,22 @@ class SettingService {
   public set setCompanyID(id: string) {
     this.companyID = id;
   }
+  public get getCompanyCtrl() {
+    return this.companyCtrl;
+  }
+  public getCurrTreeDeptNode() {
+    return this._currTreeDeptNode;
+  }
+  public setCurrTreeDeptNode(id: string) {
+    this._currTreeDeptNode = id;
+  }
   constructor() {
     if (UserCtrl.Space != null) {
       this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.Space?.target));
+      this.setCompanyID = UserCtrl.Space?.target.id;
     } else {
       this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.User?.target));
+      this.setCompanyID = '';
     }
   }
 
@@ -153,7 +176,11 @@ class SettingService {
    */
   public async createDepartment(param: deptParams): Promise<ObjType> {
     // 判断是否创建二级部门
-    if (param.parentId != null && param.parentId != this.companyID) {
+    if (
+      param.parentId != null &&
+      param.parentId != '' &&
+      param.parentId != this.companyID
+    ) {
       return await this.createSecondDepartment(param, param.parentId);
     }
     // 要选中公司的工作区
@@ -220,6 +247,3 @@ class SettingService {
     return await docCtrl.upload(key, name, file);
   }
 }
-
-const settingService = new SettingService();
-export default settingService;

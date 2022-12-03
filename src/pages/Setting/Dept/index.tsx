@@ -23,6 +23,7 @@ import SettingService from './service';
  * @returns
  */
 const SettingDept: React.FC = () => {
+  const setting = SettingService.getInstance();
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
@@ -91,25 +92,31 @@ const SettingDept: React.FC = () => {
       case '新增部门':
         setIsCreateDept(true);
         setIsOpenModal(true);
-        setSelectId(item.id);
+        setSelectId(item.target.target.id);
+        setting.getCompanyCtrl.changCallback();
+        setting.setCurrTreeDeptNode(item.target.target.id);
         break;
       case 'changeDept': //变更部门
         setIsOpenModal(true);
         setSelectDept(item);
-        setSelectId(item.id);
+        setSelectId(item.target.target.id);
+        setting.getCompanyCtrl.changCallback();
+        setting.setCurrTreeDeptNode(item.target.target.id);
     }
   };
+
+  // 选中树的时候操作
+  const setTreeCurrent = (current: schema.XTarget) => {
+    setSelectDept(current);
+    setSelectId(current.id);
+    setting.setCurrTreeDeptNode(current.id);
+  };
+
   /** 添加人员的逻辑 */
   const onPersonalOk = (params: initDatatype[]) => {
     console.log(params);
     setIsAddOpen(false);
   };
-
-  /** 设置岗位的逻辑 */
-  // const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
-  //   console.log(checkJob, checkUser);
-  //   setIsSetPost(false);
-  // };
 
   const onApplyOk = () => {
     setLookApplyOpen(false);
@@ -123,6 +130,7 @@ const SettingDept: React.FC = () => {
     setIsOpenModal(false);
     setIsCreateDept(false);
   };
+
   const handleOk = () => {
     setIsAddOpen(false);
     setIsSetPost(false);
@@ -130,6 +138,8 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
     setIsCreateDept(false);
+    // 处理刷新的功能
+    userCtrl.changCallback();
   };
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
@@ -138,11 +148,22 @@ const SettingDept: React.FC = () => {
   useEffect(() => {
     initData();
     // 刚进入的时候选中公司 TODO
-    // setSelectDept();
-  }, []);
+    setting.setCompanyID = userCtrl?.Space?.target.id + '';
+    setting.getDepartments('0').then((deptChild) => {
+      console.log('all dept', deptChild);
+    });
+
+    const id = setting.getCompanyCtrl.subscribe(() => {
+      console.log(123123123, setting.getCurrTreeDeptNode());
+    });
+    return () => {
+      setting.getCompanyCtrl.unsubscribe(id);
+    };
+  }, ['', userCtrl?.Space]);
 
   useEffect(() => {
     initData();
+    setting.setCompanyID = userCtrl?.Space?.target.id ?? '';
   }, [selectId]);
 
   const initData = async () => {};
@@ -302,8 +323,9 @@ const SettingDept: React.FC = () => {
         ? ReactDOM.createPortal(
             <TreeLeftDeptPage
               createTitle="新增"
-              setCurrent={setSelectDept}
+              setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
+              currentKey={''}
             />,
             treeContainer,
           )
@@ -313,6 +335,7 @@ const SettingDept: React.FC = () => {
 };
 
 export default SettingDept;
+
 function setIsSetPost(arg0: boolean) {
   throw new Error('Function not implemented.');
 }

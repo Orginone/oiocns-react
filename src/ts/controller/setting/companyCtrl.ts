@@ -7,6 +7,7 @@ export default class CompanyController extends MarketController {
   private _company: ICompany;
   // 设置部分的接口
   private _userService = userService.getInstance();
+
   constructor(company: ICompany) {
     super(company);
     this._company = company;
@@ -19,6 +20,7 @@ export default class CompanyController extends MarketController {
   public getUserService() {
     return this._userService;
   }
+
   /** 获得部门 */
   public async getDepartMents() {
     return await this._company.getDepartments();
