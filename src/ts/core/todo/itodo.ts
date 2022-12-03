@@ -39,8 +39,9 @@ export interface IApplyItem {
 export interface IOrderApplyItem extends IApplyItem {
   /**
    * 取消订单详情项
+   * @param stidatus 详情项Id
    * @param status 状态
    * @param remark 备注
    */
-  cancelItem(status: number, remark: string): Promise<model.ResultType<any>>;
+  cancelItem(id: string, status: number, remark: string): Promise<model.ResultType<any>>;
 }
