@@ -1,9 +1,12 @@
 import { IDepartment } from './../../core/target/itarget';
 import { ICompany } from '../../core/target/itarget';
 import { MarketController } from '../store/marketCtrl';
+import userService from '../../core/target/user';
 
 export default class CompanyController extends MarketController {
   private _company: ICompany;
+  // 设置部分的接口
+  private _userService = userService.getInstance;
   constructor(company: ICompany) {
     super(company);
     this._company = company;
@@ -11,6 +14,10 @@ export default class CompanyController extends MarketController {
   /** 获得单位信息 */
   public getCompany() {
     return this._company;
+  }
+  /** 设置的接口使用 */
+  public getUserService() {
+    return this._userService;
   }
   /** 获得部门 */
   public async getDepartMents() {

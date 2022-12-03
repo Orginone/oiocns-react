@@ -218,7 +218,6 @@ export default class userdataservice extends BaseService {
       limit: common.Constants.MAX_UINT_8,
     };
 
-    // console.log('======param', JSON.stringify(paramData));
     // 结果集
     let pageData: schema.XTargetArray = {
       offset: 0,
