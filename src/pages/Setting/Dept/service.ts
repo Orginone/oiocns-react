@@ -55,7 +55,6 @@ export default class SettingService {
   private static _instance: SettingService;
   public static getInstance() {
     if (this._instance == null) {
-      console.log('getInstance');
       this._instance = new SettingService();
     }
     return this._instance;

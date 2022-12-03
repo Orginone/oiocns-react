@@ -150,19 +150,16 @@ const SettingDept: React.FC = () => {
     // 刚进入的时候选中公司 TODO
     setting.setCompanyID = userCtrl?.Space?.target.id + '';
     setting.getDepartments('0').then((deptChild) => {
-      console.log('all dept', deptChild);
+      console.log('myalldept', deptChild);
     });
 
-    const id = setting.getCompanyCtrl.subscribe(() => {
-      console.log(123123123, setting.getCurrTreeDeptNode());
-    });
+    const id = setting.getCompanyCtrl.subscribe(() => {});
     return () => {
       setting.getCompanyCtrl.unsubscribe(id);
     };
   }, ['', userCtrl?.Space]);
 
   useEffect(() => {
-    initData();
     setting.setCompanyID = userCtrl?.Space?.target.id ?? '';
   }, [selectId]);
 
