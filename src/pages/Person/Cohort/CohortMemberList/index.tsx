@@ -14,16 +14,16 @@ import {
 import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
-import Cohort from '@/ts/core/target/cohort';
-// import FriendController from '@/ts/controller/friend';
 import { useHistory } from 'react-router-dom';
 import { schema } from '@/ts/base';
 import { IChat } from '@/ts/core/chat/ichat';
 import chatCtrl from '@/ts/controller/chat';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { ICohort } from '@/ts/core/target/itarget';
+import { TargetType } from '@/ts/core/enum';
 const ContainerHeight = 400;
 interface defaultObjType {
-  cohortData: Cohort;
+  cohortData: ICohort;
 }
 const { Title } = Typography;
 const { Search } = Input;
@@ -34,18 +34,18 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
 
   /**获取群组下成员列表 */
   const getMemberData = async () => {
-    const res = await CohortController.getCohortPeronList(cohortData);
-    setMemberData(res);
+    const res = await cohortData.getMember();
+    setMemberData(res.filter((obj) => obj.id != userCtrl.User?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {
-    const res = await FriendController.getMyFriend();
-    setFriendList(res);
+    const res = await userCtrl.User?.getFriends();
+    setFriendList(res!);
   };
   /**移除成员 */
   const removeMember = async (ids: string[]) => {
-    CohortController.setCallBack(setMemberData);
-    await CohortController.removeCohort(cohortData, ids);
+    await cohortData.removeMember(ids, TargetType.Person);
+    setMemberData(await cohortData.getMember());
   };
   /**
    * 获取操作列表
@@ -65,8 +65,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               content: '是否申请添加好友',
               okText: '确认',
               cancelText: '取消',
-              onOk: () => {
-                // FriendController.applyFriend(userCtrl.User, value),
+              onOk: async () => {
+                await userCtrl.User?.applyFriend(value);
                 message.success('发起申请成功');
               },
             });
@@ -93,9 +93,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               content: '是否踢出群组',
               okText: '确认',
               cancelText: '取消',
-              onOk: () => {
-                FriendController.applyFriend(userCtrl.User!, value),
-                  removeMember([value.id]);
+              onOk: async () => {
+                await removeMember([value.id]);
                 message.success('操作成功');
               },
             })
@@ -114,11 +113,9 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const getChat = (id: string): IChat | undefined => {
     for (var i = 0; i < chatCtrl.groups.length; i++) {
       const group = chatCtrl.groups[i];
-      console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
         if (id == chat.target.id) {
-          console.log(chat);
           return chat;
         }
       }
@@ -198,7 +195,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
 
           <div style={{ paddingBottom: '16px', textAlign: 'right' }}>
             <Search
-              placeholder="请输入人员名称"
+              placeholder="请输入用户编号"
               onSearch={onSearch}
               style={{ width: 200 }}
             />
