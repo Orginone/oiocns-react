@@ -24,7 +24,7 @@ class TodoController extends BaseController {
       this.changCallback();
     });
   }
-  /** 订单审批 */
+  /** 组织单位审批 */
   public get OrgTodo(): ITodoGroup {
     return this._orgTodo!;
   }

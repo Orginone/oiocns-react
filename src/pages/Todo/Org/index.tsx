@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
-import todoService, { tabStatus } from '@/ts/controller/todo';
+// import todoService, { tabStatus } from '@/ts/controller/todo';
 
-todoService.currentModel = `org`;
+currentModel = `org`;
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: TeamApprovalType) => {
@@ -17,7 +17,7 @@ const remarkText = (activeKey: string, item: TeamApprovalType) => {
 
 // 根据状态值渲染标签
 const renderItemStatus = (record: TeamApprovalType) => {
-  const status = todoService.statusMap[record.status];
+  const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
 /**
@@ -72,17 +72,17 @@ const TodoOrg: React.FC = () => {
   ];
   // 获取申请/审核列表
   const loadList = async () => {
-    setPageData([...todoService.currentList]);
-    setPageTotal(todoService.currentList ? todoService.currentList.length : 0);
+    setPageData([...currentList]);
+    setPageTotal(currentList ? currentList.length : 0);
     setNeedReload(false);
   };
   useEffect(() => {
-    todoService.activeStatus = activeKey as tabStatus;
-    loadList();
+    activeStatus = activeKey as tabStatus;
+    loadList(needReload);
   }, [activeKey, needReload]);
   return (
     <PageCard
-      tabList={todoService.statusList}
+      tabList={statusList}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
@@ -103,17 +103,13 @@ const TodoOrg: React.FC = () => {
         dataSource={pageData}
         total={total}
         onChange={loadList}
-        operation={(item: TeamApprovalType) =>
-          todoService.tableOperation(item, setNeedReload)
-        }
+        operation={(item: TeamApprovalType) => tableOperation(item, setNeedReload)}
         renderCardContent={(arr) => (
           <TableItemCard<TeamApprovalType>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
             targetOrTeam="target"
-            operation={(item: TeamApprovalType) =>
-              todoService.tableOperation(item, setNeedReload)
-            }
+            operation={(item: TeamApprovalType) => tableOperation(item, setNeedReload)}
           />
         )}
         rowSelection={{}}
