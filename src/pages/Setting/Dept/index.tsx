@@ -16,6 +16,7 @@ import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
+import SettingService from './service';
 
 /**
  * 部门设置

@@ -1,10 +1,12 @@
 import { Button, Modal } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
-import MarketClassifyTree from '@/components/CustomTreeComp';
+
 import cls from './index.module.less';
+import MarketClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
+import SettingService from '../../service';
 
 const x = 3;
 const y = 2;
@@ -47,21 +49,6 @@ const generateList = (data: DataNode[]) => {
 };
 generateList(defaultData);
 
-// const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
-//   let parentKey: React.Key;
-//   for (let i = 0; i < tree.length; i++) {
-//     const node = tree[i];
-//     if (node.children) {
-//       if (node.children.some((item) => item.key === key)) {
-//         parentKey = node.key;
-//       } else if (getParentKey(key, node.children)) {
-//         parentKey = getParentKey(key, node.children);
-//       }
-//     }
-//   }
-//   return parentKey!;
-// };
-
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
@@ -98,6 +85,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     }
 
     initData();
+    // 控制选中的部门ID。
+    SettingService.setCompanyID = userCtrl?.Space?.target.id + '';
   }, ['', userCtrl.Space]);
 
   const initData = async () => {
@@ -137,13 +126,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       }
       return node;
     });
+
   const loadDept = async ({ key, children, target }: any) => {
     if (children) {
       return;
     }
-
-    const deptChild = await target.getDepartments();
-    console.log(deptChild);
+    const deptChild = await SettingService.getDepartments(target.target.id);
+    // await target.getDepartments(); 不从缓存里面取，查询底下的部门
     setTreeData((origin) =>
       updateTreeData(
         origin,
@@ -171,45 +160,20 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
     console.log('选中树节点', selectedKeys, info.node);
-    // setSelectMenu(selectedKeys);
-
     if (info.selected) setCurrent(info.node.target);
-    // if (selectedKeys.length > 0) {
-    // }
   };
 
-  /**
-   * @desc: 创建新目录
-   * @param {any} item
-   * @return {*}
-   */
-  // const handleAddClick = (node: any) => {
-  //   // console.log('handleAddClick', node);
-  // };
-  // const handleMenuClick = (key: string, data: any) => {
-  //   // console.log('点击', key, data);
-  //   if (key === '新增部门') {
-  //   }
-  // };
   const menu = ['新增部门'];
 
   return (
     <div>
-      <Button
-        className={cls.creatgroup}
-        type="primary"
-        onClick={() => handleMenuClick('新增部门', {})}>
-        {createTitle}
-      </Button>
-
       <div className={cls.topMes}>
-        {/* <Input
-          size="middle"
-          className={cls.inputStyle}
-          placeholder="搜索部门"
-          prefix={<SearchOutlined />}
-          onChange={onChange}
-        /> */}
+        <Button
+          className={cls.creatgroup}
+          type="primary"
+          onClick={() => handleMenuClick('新增部门', {})}>
+          {createTitle}
+        </Button>
         <MarketClassifyTree
           // key={selectMenu}
           // isDirectoryTree

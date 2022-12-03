@@ -4,10 +4,12 @@ import * as Icon from '@ant-design/icons';
 import Company from '@/ts/core/target/company';
 import { TargetType } from '@/ts/core/enum';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
-import { rootDir } from '@/ts/core/store/filesys';
-import { IFileSystemItem, IObjectItem } from '@/ts/core/store/ifilesys';
 import UserCtrl from '@/ts/controller/setting/userCtrl';
 import CompanyCtrl from '@/ts/controller/setting/companyCtrl';
+import { IObjectItem } from '@/ts/core/store/ifilesys';
+import docCtrl from '@/ts/controller/store/docsCtrl';
+import { IDepartment } from '@/ts/core/target/itarget';
+import Department from '@/ts/core/target/department';
 
 export interface spaceObjs {
   id: string;
@@ -50,12 +52,10 @@ export type ObjType = {
 /**请求接口的服务 */
 class SettingService {
   private _isOpenModal: boolean = false;
+  // private _root: IFileSystemItem;
   // 我的用户服务
-  private _root: IFileSystemItem;
-  private _image: IObjectItem;
   private companyCtrl: CompanyCtrl;
   // 对应公司的ID
-  // 测试的时候先写死， 到时候切换成 当前工作空间ID
   private companyID: string = '';
   /** 页面isOpen控制是否显示弹窗 */
   public get getIsOpen() {
@@ -65,10 +65,6 @@ class SettingService {
     this.companyID = id;
   }
   constructor() {
-    this._root = rootDir;
-    this._root.create('图片').then((e) => {
-      this._image = e;
-    });
     if (UserCtrl.Space != null) {
       this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.Space?.target));
     } else {
@@ -120,8 +116,8 @@ class SettingService {
    * @param parentId
    * @returns
    */
-  public async getDepartments(parentId: string): Promise<spaceObjs[]> {
-    let arrays: spaceObjs[] = [];
+  public async getDepartments(parentId: string): Promise<IDepartment[]> {
+    let arrays: IDepartment[] = [];
     let compid: string = parentId;
     if (parentId === '0') {
       compid = this.companyID + '';
@@ -132,7 +128,7 @@ class SettingService {
     if (companys.length > 0) {
       for (const comp of companys) {
         // 查找是否有children
-        let arrayChild: spaceObjs[] = [];
+        let arrayChild: IDepartment[] = [];
         const company2s: Company[] = await this.companyCtrl
           .getUserService()
           .getBelongTargets(comp.target.id, TargetType.Department);
@@ -143,15 +139,9 @@ class SettingService {
             return { ...item, icon: React.createElement(Icon['ApartmentOutlined']) };
           });
         }
-        const spaceObj: spaceObjs = {
-          id: comp.target.id,
-          key: comp.target.id,
-          title: comp.target.name,
-          parentId: compid!,
-          companyId: compid!,
-          children: arrayChild,
-        };
-        arrays.push(spaceObj);
+        let dept = new Department(comp.target);
+        dept.departments = arrayChild;
+        arrays.push(dept);
       }
     }
     return arrays;
@@ -227,8 +217,7 @@ class SettingService {
 
   // 上传到我的文件夹目录，然后再保存 share_link，到时候预览
   public async upload(key: string, name: string, file: Blob): Promise<IObjectItem> {
-    console.log(key);
-    return await this._root.upload(name, file, (p) => {});
+    return await docCtrl.upload(key, name, file);
   }
 }
 
