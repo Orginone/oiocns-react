@@ -30,7 +30,9 @@ const StoreApp: React.FC = () => {
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [productObj, setProductObj] = useState<any>({});
   useEffect(() => {
-    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, setData);
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
+      setData([...SelfAppCtrl.tableData]);
+    });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
     return () => {
