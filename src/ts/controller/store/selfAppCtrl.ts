@@ -217,11 +217,15 @@ class SelfAppController extends BaseController {
    * @desc: 查询分享信息
    */
   public async queryProductExtend(destType: string, teamId: string) {
+    console.log('查询分享信息', destType, teamId);
+    if (!destType) {
+      return;
+    }
     let { success, data, msg } = await this._curProduct!.queryExtend(
       destType,
       teamId || '0',
     );
-
+    console.log('分享信息', success, data, msg);
     if (!success) {
       console.error(msg);
       return [];

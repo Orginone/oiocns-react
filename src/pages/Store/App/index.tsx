@@ -16,7 +16,7 @@ import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtr
 import { BaseProduct } from '@/ts/core/market';
 import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
-import { productCtrl } from '@/ts/controller/store/productCtrl';
+// import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
@@ -71,7 +71,7 @@ const StoreApp: React.FC = () => {
    */
   const onOk = () => {
     setIsDeleteOpen(false);
-    productCtrl.deleteProduct(productObj?._prod?.id);
+    // productCtrl.deleteProduct(productObj?._prod?.id);
   };
 
   /**
@@ -192,7 +192,7 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User.getOwnProducts}
+              queryFun={userCtrl.User?.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={SelfAppCtrl.getColumns('myApp')}

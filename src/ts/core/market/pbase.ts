@@ -87,11 +87,19 @@ export default class BaseProduct {
     destType: string,
     teamId?: string,
   ): Promise<model.ResultType<model.IdNameArray>> {
+    console.log('菜市场上次', {
+      destType,
+      teamId,
+      sourceType: '产品',
+      spaceId: userCtrl.Space.target.id,
+      sourceId: this._prod.id,
+    });
+
     return await kernel.queryExtendBySource({
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: userCtrl.Space.target.id!,
+      spaceId: userCtrl.Space.target.id ?? userCtrl.User.target.id,
       sourceId: this._prod.id,
     });
   }
