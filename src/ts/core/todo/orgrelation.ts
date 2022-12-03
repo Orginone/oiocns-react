@@ -1,28 +1,28 @@
 import { common } from '../../base';
-import { CommonStatus, TodoType } from '../../core/enum';
+import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
 import { model, kernel, schema } from '../../base';
 
-export class PublishTodo implements ITodoGroup {
-  name: string = '应用上架';
-  private _doList: ApprovalItem[];
-  private _applyList: ApplyItem[];
-  private _todoList: ApprovalItem[];
-  type: TodoType = TodoType.MarketTodo;
+class OrgTodo implements ITodoGroup {
+  name: string = '组织审批';
+  private _todoList: ApprovalItem[] = [];
+  private _doList: ApprovalItem[] = [];
+  private _applyList: ApplyItem[] = [];
+  type: TodoType = TodoType.OrgTodo;
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
     }
     return this._todoList.length;
   }
-  async getTodoList(): Promise<IApprovalItem[]> {
-    if (this._todoList.length > 0) {
+  async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
     await this.getApprovalList();
     return this._todoList;
   }
-  async getNoticeList(): Promise<IApprovalItem[]> {
+  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
   async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
@@ -36,7 +36,7 @@ export class PublishTodo implements ITodoGroup {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
-    const res = await kernel.queryMerchandiesApplyByManager({
+    const res = await kernel.queryJoinTeamApply({
       id: '0',
       page: {
         offset: 0,
@@ -47,9 +47,9 @@ export class PublishTodo implements ITodoGroup {
     if (res.success) {
       res.data.result?.forEach((a) => {
         this._applyList.push(
-          new ApplyItem(a, (id: string) => {
+          new ApplyItem(a, (q) => {
             this._applyList = this._applyList.filter((s) => {
-              return s.Data.id != id;
+              return s.Data.id != q.id;
             });
           }),
         );
@@ -58,7 +58,7 @@ export class PublishTodo implements ITodoGroup {
     return this._applyList;
   }
   private async getApprovalList() {
-    const res = await kernel.queryPublicApproval({
+    const res = await kernel.queryTeamJoinApproval({
       id: '0',
       page: {
         offset: 0,
@@ -68,22 +68,22 @@ export class PublishTodo implements ITodoGroup {
     });
     if (res.success) {
       // 同意回调
-      let passfun = (id: string) => {
+      let passfun = (s: schema.XRelation) => {
         this._todoList = this._todoList.filter((q) => {
-          return q.Data.id != id;
+          return q.Data.id != s.id;
         });
       };
       // 已办中再次同意回调
-      let rePassfun = (id: string) => {
+      let rePassfun = (s: schema.XRelation) => {
         this._doList = this._doList.filter((q) => {
-          return q.Data.id != id;
+          return q.Data.id != s.id;
         });
       };
       // 拒绝回调
-      let rejectfun = (s: schema.XMerchandise) => {
+      let rejectfun = (s) => {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
-      let reRejectfun = (s: schema.XMerchandise) => {};
+      let reRejectfun = (s) => {};
       res.data.result?.forEach((a) => {
         if (a.status >= CommonStatus.RejectStartStatus) {
           this._doList.push(new ApprovalItem(a, rePassfun, reRejectfun));
@@ -94,61 +94,65 @@ export class PublishTodo implements ITodoGroup {
     }
   }
 }
+
 class ApprovalItem implements IApprovalItem {
-  private _data: schema.XMerchandise;
-  private _passCall: (id: string) => void;
-  private _rejectCall: (data: schema.XMerchandise) => void;
-  get Data(): schema.XMerchandise {
-    return this._data;
-  }
+  private _data: schema.XRelation;
+  private _passCall: (data: schema.XRelation) => void;
+  private _rejectCall: (data: schema.XRelation) => void;
   constructor(
-    data: schema.XMerchandise,
-    passCall: (id: string) => void,
-    rejectCall: (data: schema.XMerchandise) => void,
+    data: schema.XRelation,
+    passCall: (data: schema.XRelation) => void,
+    rejectCall: (data: schema.XRelation) => void,
   ) {
     this._data = data;
     this._passCall = passCall;
     this._rejectCall = rejectCall;
   }
-  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
-    const res = await kernel.approvalMerchandise({
-      id: this._data.id,
-      status,
-    });
+  get Data(): schema.XRelation {
+    return this._data;
+  }
+  async pass(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+    const res = await kernel.joinTeamApproval({ id: this._data.id, status });
     if (res.success) {
-      this._passCall.apply(this, [this._data.id]);
+      this._passCall.apply(this, [this._data]);
     }
     return res;
   }
   async reject(status: number, remark: string): Promise<model.ResultType<any>> {
-    const res = await kernel.approvalMerchandise({
-      id: this._data.id,
-      status,
-    });
+    const res = await kernel.joinTeamApproval({ id: this._data.id, status });
     if (res.success) {
       this._rejectCall.apply(this, [this._data]);
     }
     return res;
   }
 }
+
 class ApplyItem implements IApplyItem {
-  private _data: schema.XMerchandise;
-  private _cancelCall: (id: string) => void;
-  get Data(): schema.XMerchandise {
+  private _data: schema.XRelation;
+  private _cancelFun: (s: schema.XRelation) => void;
+  constructor(data: schema.XRelation, cancelFun: (s: schema.XRelation) => void) {
+    this._data = data;
+    this._cancelFun = cancelFun;
+  }
+  get Data(): schema.XRelation {
     return this._data;
   }
-  constructor(data: schema.XMerchandise, cancelCall: (id: string) => void) {
-    this._data = data;
-    this._cancelCall = cancelCall;
-  }
   async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
-    const res = await kernel.deleteMerchandise({
+    const res = await kernel.cancelJoinTeam({
       id: this._data.id,
+      typeName: '',
       belongId: '0',
     });
     if (res.success) {
-      this._cancelCall.apply(this, [this._data.id]);
+      this._cancelFun.apply(this, this._data);
     }
     return res;
   }
 }
+
+/** 加载组织任务 */
+export const loadOrgTodo = async () => {
+  const orgTodo = new OrgTodo();
+  await orgTodo.getTodoList();
+  return orgTodo;
+};

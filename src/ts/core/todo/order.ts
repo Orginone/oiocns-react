@@ -1,136 +1,141 @@
-import { OrderITodo } from './interface';
-import { OrderStatus } from '../enum';
+import { common } from '../../base';
+import { CommonStatus, TodoType } from '../enum';
+import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
+import { model, kernel, schema } from '../../base';
 
-import { common, kernel, schema } from '../../base';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-
-export default class OrderTodo implements OrderITodo {
-  id: string;
-  name: string;
-  get count(): number {
-    return this.saleList.length;
+export class OrderTodo implements ITodoGroup {
+  name: string = '订单审批';
+  private _todoList: ApprovalItem[] = [];
+  private _doList: ApprovalItem[] = [];
+  type: TodoType = TodoType.OrderTodo;
+  async getCount(): Promise<number> {
+    if (this._todoList.length <= 0) {
+      await this.getTodoList();
+    }
+    return this._todoList.length;
   }
-  saleList: schema.XOrderDetail[];
-  buyList: schema.XOrder[];
-  constructor() {
-    this.name = '订单管理';
-    this.id = 'order';
-    this.saleList = [];
-    this.buyList = [];
-    this.getSaleList();
-    this.getBuyList();
+  async getTodoList(): Promise<IApprovalItem[]> {
+    if (this._todoList.length > 0) {
+      return this._todoList;
+    }
+    await this.getApprovalList();
+    return this._todoList;
   }
-  getSaleList = async () => {
-    const result = await kernel.querySellOrderList({
-      id: userCtrl.User.target.id,
+  async getNoticeList(): Promise<IApprovalItem[]> {
+    throw new Error('Method not implemented.');
+  }
+  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+    if (this._doList.length > 0) {
+      return this._doList;
+    }
+    await this.getApprovalList();
+    return this._doList;
+  }
+  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+    let applyList: IApplyItem[] = [];
+    const res = await kernel.queryBuyOrderList({
+      id: '0',
       status: 0,
       page: {
         offset: 0,
-        filter: '',
         limit: common.Constants.MAX_UINT_16,
+        filter: '',
       },
     });
-    if (result?.success && result.data.total > 0 && result.data.result) {
-      this.saleList = result.data.result;
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        applyList.push(new OrderApplyItem(a));
+      });
     }
-  };
-  getBuyList = async () => {
-    const result = await kernel.queryBuyOrderList({
-      id: userCtrl.User.target.id,
+    return applyList;
+  }
+  private async getApprovalList() {
+    const res = await kernel.querySellOrderList({
+      id: '0',
       status: 0,
       page: {
         offset: 0,
-        filter: '',
         limit: common.Constants.MAX_UINT_16,
+        filter: '',
       },
     });
-    if (result?.success && result.data.total > 0 && result.data.result) {
-      this.buyList = result.data.result;
-    }
-  };
-  deliver = async (target: schema.XOrderDetail) => {
-    const result = await kernel.deliverMerchandise({
-      id: target.id,
-      status: OrderStatus.Deliver,
-    });
-    if (result.success) {
-      this.saleList = this.removeList<schema.XOrderDetail>(
-        this.saleList,
-        target.id,
-        OrderStatus.Deliver,
-      ) as schema.XOrderDetail[];
-    }
-    return result;
-  };
-  reject = async (target: schema.XOrderDetail) => {
-    const result = await kernel.rejectMerchandise({
-      id: target.id,
-      status: OrderStatus.RejectOrder,
-    });
-    if (result.success) {
-      this.buyList = this.removeList<schema.XOrder>(
-        this.buyList,
-        target.id,
-        OrderStatus.RejectOrder,
-      );
-    }
-    return result;
-  };
-  cancel = async (
-    target: schema.XOrderDetail | schema.XOrder,
-    status: OrderStatus.BuyerCancel | OrderStatus.SellerCancel,
-  ) => {
-    console.log({ id: target.id, status });
-    const result = await kernel.cancelOrderDetail({ id: target.id, status });
-    if (result.success) {
-      if (status === OrderStatus.BuyerCancel) {
-        this.buyList = this.removeList<schema.XOrder>(
-          this.buyList,
-          target.id,
-          OrderStatus.BuyerCancel,
-        );
-      } else {
-        this.saleList = this.removeList<schema.XOrderDetail>(
-          this.saleList,
-          target.id,
-          OrderStatus.SellerCancel,
-        ) as schema.XOrderDetail[];
-      }
-    }
-    return result;
-  };
-
-  protected removeList = <T extends Record<string, any>>(
-    list: T[],
-    needRemoveId: string,
-    type?: OrderStatus,
-  ) => {
-    if (type === OrderStatus.BuyerCancel || type === OrderStatus.RejectOrder) {
-      const newList: schema.XOrder[] = [];
-      for (let index = 0; index < list.length; index++) {
-        const { details, ...other } = list[index] as unknown as schema.XOrder;
-        if (details && details.length > 0) {
-          newList.push({
-            ...other,
-            details: details.map((n: schema.XOrderDetail) => {
-              if (n.id === needRemoveId) {
-                n.status = type;
-              }
-              return n;
-            }),
-          });
+    if (res.success) {
+      // 同意回调
+      let approvalCall = (data: schema.XOrderDetail) => {
+        this._todoList = this._todoList.filter((q) => {
+          return q.Data.id != data.id;
+        });
+        this._doList.unshift(new ApprovalItem(data, () => {}));
+      };
+      res.data.result?.forEach((a) => {
+        if (a.status >= CommonStatus.RejectStartStatus) {
+          this._doList.push(new ApprovalItem(a, () => {}));
+        } else {
+          this._todoList.push(new ApprovalItem(a, approvalCall));
         }
-      }
-      return newList;
-    } else {
-      return list.length > 0
-        ? list.filter((n: any) => {
-            if (n.id === needRemoveId && n.status) {
-              n.status = type;
-            }
-            return n;
-          })
-        : [];
+      });
     }
-  };
+  }
 }
+class ApprovalItem implements IApprovalItem {
+  private _data: schema.XOrderDetail;
+  private _approvalCall: (data: schema.XOrderDetail) => void | undefined;
+  get Data(): schema.XOrderDetail {
+    return this._data;
+  }
+  constructor(
+    data: schema.XOrderDetail,
+    approvalCall: (data: schema.XOrderDetail) => void,
+  ) {
+    this._data = data;
+    this._approvalCall = approvalCall;
+  }
+  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
+    const res = await kernel.deliverMerchandise({
+      id: this._data.id,
+      status,
+    });
+    if (res.success) {
+      this._approvalCall.apply(this, [this._data]);
+    }
+    return res;
+  }
+  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+    const res = await kernel.cancelOrderDetail({
+      id: this._data.id,
+      status,
+    });
+    if (res.success) {
+      this._approvalCall.apply(this, [this._data]);
+    }
+    return res;
+  }
+}
+export class OrderApplyItem implements IOrderApplyItem {
+  private _data: schema.XOrder;
+  get Data(): schema.XOrder {
+    return this._data;
+  }
+  constructor(data: schema.XOrder) {
+    this._data = data;
+  }
+  async cancel(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+    return await kernel.cancelOrder({
+      id: this._data.id,
+      status,
+    });
+  }
+  async cancelItem(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+    return await kernel.cancelOrderDetail({
+      id: this._data.id,
+      status,
+    });
+  }
+}
+
+/** 加载订单任务 */
+export const loadOrderTodo = async () => {
+  const orderTodo = new OrderTodo();
+  await orderTodo.getTodoList();
+  return orderTodo;
+};
