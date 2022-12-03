@@ -36,9 +36,26 @@ export default class Company extends MarketTarget implements ICompany {
       TargetType.Section,
     ];
     this.pullTypes = [TargetType.Person];
+
+    this.extendTargetType = [
+      TargetType.Department,
+      TargetType.Working,
+      ...consts.CompanyTypes,
+    ];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
-    this.createTargetType = [TargetType.Cohort, TargetType.Group];
+    this.createTargetType = [
+      TargetType.Department,
+      TargetType.Working,
+      TargetType.Cohort,
+      TargetType.Group,
+    ];
     this.searchTargetType = [TargetType.Person, TargetType.Cohort, TargetType.Group];
+  }
+  public async searchCohort(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Cohort]);
+  }
+  public async searchGroup(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Group]);
   }
   public get getSpaceData(): SpaceType {
     return {
@@ -51,7 +68,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async createGroup(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
-    const tres = await this.searchTargetByName(data.code, TargetType.Group);
+    const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
     if (!tres.data) {
       const res = await this.createTarget({ ...data, belongId: this.target.id });
       if (res.success) {
@@ -232,7 +249,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort], this.target.id);
+    const res = await this.getjoinedTargets([TargetType.Cohort]);
     if (res.success) {
       res.data.result?.forEach((a) => {
         this.joinedCohort.push(new Cohort(a));
@@ -244,7 +261,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
-    const res = await this.getjoinedTargets([TargetType.Group], this.target.id);
+    const res = await this.getjoinedTargets([TargetType.Group]);
     if (res.success) {
       res.data.result?.forEach((a) => {
         this.joinedGroup.push(new Group(a));
@@ -306,17 +323,9 @@ export default class Company extends MarketTarget implements ICompany {
     });
   }
   public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct([
-      TargetType.Department,
-      TargetType.Working,
-      ...consts.CompanyTypes,
-    ]);
+    return super.getUsefulProduct();
   }
   public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, [
-      TargetType.Department,
-      TargetType.Working,
-      ...consts.CompanyTypes,
-    ]);
+    return super.getUsefulResource(id);
   }
 }

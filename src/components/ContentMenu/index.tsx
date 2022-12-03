@@ -67,6 +67,7 @@ const createIcon = (icon?: string | React.Component | React.ReactNode) => {
 //侧边导航栏
 const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) => {
   const { data: menuData, width } = props; // 顶级主菜单
+  const [current, setCurrent] = useState<MemuItemType | null>();
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
@@ -75,15 +76,15 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     (child) => child.path === props.match.path,
   );
   const menuFlat = menuData ? flatMenuData(menuData) : [];
-
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     setActiveMenu(location.pathname);
     const current = checkRoute(location.pathname, menuFlat);
+    setCurrent(current);
     if (menuData) {
       listenPrev(current);
     }
-  }, [location.pathname]);
+  }, [location.pathname, menuData]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
@@ -115,10 +116,8 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   /**点击submenu  一定有children*/
   const handleChange: MenuProps[`onOpenChange`] = (paths) => {
     const current = menuFlat.find((n) => n.key === paths[0]);
-
     if (current!.children!.length > 0) {
       const nextRoute: any = current!.children![0];
-
       if (nextRoute.key === location.pathname) {
         listenPrev(current!);
       }
@@ -134,32 +133,9 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       }
     }
   };
-
-  return (
-    <Sider className={cls.sider} width={width ?? 220}>
-      {currentMacthRoute && (
-        <div className={cls.title}>
-          {(prevMenuData.length > 0 || renderMenu) && (
-            <LeftOutlined
-              className={cls.backicon}
-              onClick={() => {
-                if (prevMenuData.length > 0) {
-                  setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
-                  setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
-                }
-                setRenderMenu(undefined);
-              }}
-            />
-          )}
-          <Space>
-            <>{createIcon(currentMacthRoute?.icon)}</>
-            <div>
-              <strong>{currentMacthRoute.title}</strong>
-            </div>
-          </Space>
-        </div>
-      )}
-      <div className={cls.container} id="templateMenu">
+  const mainRender = () => {
+    return (
+      <>
         {props.data && !renderMenu && (
           <Menu
             // mode="inline"
@@ -172,6 +148,46 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
             defaultSelectedKeys={[activeMenu]}></Menu>
         )}
         {props.children || renderMenu}
+      </>
+    );
+  };
+  return (
+    <Sider className={cls.sider} width={width ?? 220}>
+      {currentMacthRoute && (
+        <div className={cls.title}>
+          {(prevMenuData.length > 0 || renderMenu) && (
+            <LeftOutlined
+              className={cls.backicon}
+              onClick={() => {
+                if (currentMenuData?.length === 0) {
+                  history.back();
+                }
+                setCurrent(null);
+                if (prevMenuData.length > 0) {
+                  setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
+                  setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
+                }
+                setRenderMenu(undefined);
+              }}
+            />
+          )}
+          <Space>
+            {current ? (
+              <>
+                {createIcon(current?.icon)}
+                <strong>{current.label}</strong>{' '}
+              </>
+            ) : (
+              <>
+                {createIcon(currentMacthRoute?.icon)}
+                <strong>{currentMacthRoute.title}</strong>{' '}
+              </>
+            )}
+          </Space>
+        </div>
+      )}
+      <div className={cls.container} id="templateMenu">
+        {mainRender()}
       </div>
     </Sider>
   );

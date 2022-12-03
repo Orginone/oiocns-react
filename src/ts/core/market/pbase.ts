@@ -44,7 +44,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space.target.id || userCtrl.User.target.id,
       sourceId: this._prod.id,
     });
   }
@@ -69,7 +69,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space.target.id || userCtrl.User.target.id,
       sourceId: this._prod.id,
     });
   }
@@ -91,7 +91,7 @@ export default class BaseProduct {
       destType,
       teamId,
       sourceType: '产品',
-      spaceId: userCtrl.Space?.target.id!,
+      spaceId: userCtrl.Space.target.id || userCtrl.User.target.id,
       sourceId: this._prod.id,
     });
   }

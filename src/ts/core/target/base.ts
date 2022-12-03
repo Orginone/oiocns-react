@@ -95,12 +95,15 @@ export default class BaseTarget {
    */
   public async searchTargetByName(
     code: string,
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.searchTargetType.includes(typeName)) {
+    typeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    typeNames = this.searchTargetType.filter((a) => {
+      return typeNames.includes(a);
+    });
+    if (typeNames.length > 0) {
       return await kernel.searchTargetByName({
         name: code,
-        typeName: typeName,
+        typeNames: typeNames,
         page: {
           offset: 0,
           filter: code,
@@ -160,15 +163,9 @@ export default class BaseTarget {
       status,
     });
   }
-
-  /**
-   * 获取加入的组织
-   * @param data 请求参数
-   * @returns 请求结果
-   */
   protected async getjoinedTargets(
     typeNames: TargetType[],
-    spaceId: string,
+    spaceId: string = '0',
   ): Promise<model.ResultType<schema.XTargetArray>> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
@@ -306,7 +303,7 @@ export default class BaseTarget {
   }
 
   protected loopBuildAuthority(auth: schema.XAuthority): Authority {
-    const authority = new Authority(auth);
+    const authority = new Authority(auth, this.target.id);
     auth.nodes?.forEach((a) => {
       authority.children.push(this.loopBuildAuthority(a));
     });

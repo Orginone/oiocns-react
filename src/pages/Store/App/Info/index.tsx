@@ -8,17 +8,14 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
-import StoreContent from '@/ts/controller/store/content';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-interface AppInfoType {
-  appId: string;
-}
 
-const StoreAppInfo: React.FC<AppInfoType> = () => {
+const StoreAppInfo: React.FC = () => {
   // const BtnsList = ['编辑应用分配'];
   useEffect(() => {
-    console.log('{StoreContent.curProduct?._prod.version}', StoreContent.curProduct);
+    console.log('{SelfAppCtrl.curProduct?._prod.version}', SelfAppCtrl.curProduct);
   }, []);
 
   const history = useHistory();
@@ -70,16 +67,16 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={StoreContent.curProduct?._prod.name}
+          title={SelfAppCtrl.curProduct?._prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{StoreContent.curProduct?._prod.remark}</p>
+              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?._prod.remark}</p>
               <p className="app-info-con-txt">
                 <span className="vision">
-                  版本号 ：{StoreContent.curProduct?._prod.version}
+                  版本号 ：{SelfAppCtrl.curProduct?._prod.version}
                 </span>
                 <span className="lastTime">
-                  订阅到期时间 ：{StoreContent.curProduct?._prod.createTime}
+                  订阅到期时间 ：{SelfAppCtrl.curProduct?._prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
@@ -101,9 +98,9 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
       <div className={cls['page-content-table']}>
         <AppShowComp
           headerTitle="已分配单位"
-          queryFun={userCtrl.User!.getOwnProducts}
+          queryFun={userCtrl.User.getOwnProducts}
           list={[]}
-          columns={StoreContent.getColumns('appInfo')}
+          columns={SelfAppCtrl.getColumns('appInfo')}
           renderOperation={renderOperation}
         />
         {/* <AppShowComp

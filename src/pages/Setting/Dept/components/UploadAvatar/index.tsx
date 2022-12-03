@@ -10,8 +10,8 @@ import React from 'react';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { Upload, message } from 'antd';
 import cls from './index.module.less';
-import settingCtrl from '@/ts/controller/setting';
 import { getUuid } from '@/utils/tools';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 
 /**自定义的头像对象返回，根目录返回文件 预览的时候用shareLink处理  */
 export interface avatarUpload extends UploadFile {
@@ -49,22 +49,22 @@ const UploadAvatar: React.FC<PostsProps> = (props) => {
       const file = options.file as File;
       if (file) {
         const uuid = getUuid();
-        const result = await settingCtrl.upload(uuid, file.name, file);
-        // console.log(result);
-        if (result && result.target && result!.target.thumbnail!.length > 0) {
-          const uploadFile: avatarUpload = {
-            uid: uuid,
-            name: file.name,
-            status: 'done',
-            url: result!.target.thumbnail,
-            size: result!.target.size,
-            shareLink: result!.target.shareLink,
-            contentType: result!.target.contentType,
-            extension: result!.target.extension,
-            key: result!.target.key,
-          };
-          props.setFileList([uploadFile]);
-        }
+        const result = docsCtrl.upload(uuid, file.name, file);
+        console.log(result);
+        // if (result && result.target && result!.target.thumbnail!.length > 0) {
+        //   const uploadFile: avatarUpload = {
+        //     uid: uuid,
+        //     name: file.name,
+        //     status: 'done',
+        //     url: result!.target.thumbnail,
+        //     size: result!.target.size,
+        //     shareLink: result!.target.shareLink,
+        //     contentType: result!.target.contentType,
+        //     extension: result!.target.extension,
+        //     key: result!.target.key,
+        //   };
+        //   props.setFileList([uploadFile]);
+        // }
       }
     },
   };

@@ -10,7 +10,12 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
 import cls from './index.module.less';
 import UploadAvatar, { avatarUpload } from '../UploadAvatar';
-import settingController from '@/ts/controller/setting';
+import SettingService from '../../service';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+// import IDepartment from '@/ts/core/target/department';
+import { TargetType } from '@/ts/core/enum';
+import Department from '@/ts/core/target/department';
+
 /* 
   编辑
 */
@@ -26,6 +31,7 @@ interface Iprops {
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
+  const setting = SettingService.getInstance();
   // 头像的保存
   const [fileList, setFileList] = useState<avatarUpload[]>([
     {
@@ -111,17 +117,61 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
-                    value.parentId = selectId;
+                    value.parentId = setting.getCurrTreeDeptNode();
+                    value.belongId = userCtrl.Space?.target.id;
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
                     }
-                    const curentValue = await settingController.createDepartment(value);
+                    // 新增部门
+                    value.typeName = TargetType.Department;
+                    // 查询是否重复创建
+                    const dept = setting.getRoot as Department;
+                    dept.searchTargetType = [TargetType.Department, TargetType.Company];
+                    let datas = await dept.searchTargetByName(value.code, [
+                      TargetType.Department,
+                    ]);
+                    if (!datas.success) {
+                      message.error(datas.msg);
+                      return;
+                    }
+                    if (datas?.data && datas.data?.total > 0) {
+                      message.error('重复创建');
+                      return;
+                    }
+                    datas = await dept.searchTargetByName(value.name, [
+                      TargetType.Department,
+                    ]);
+                    if (!datas.success) {
+                      message.error(datas.msg);
+                      return;
+                    }
+                    if (datas?.data && datas.data?.total > 0) {
+                      message.error('重复创建');
+                      return;
+                    }
+
+                    let curentValue: any;
+                    if (value.parentId == '') {
+                      // 如果是一级部门， 就从根部门里面新增
+                      curentValue = await setting.getRoot.createDepartment(value);
+                    } else {
+                      // 如果是二级部门，就查找后，再从部门新增
+                      const currObj = await setting.refItem(value.parentId);
+                      if (currObj) {
+                        curentValue = await currObj!.createDepartment(value);
+                      } else {
+                        curentValue = {
+                          success: false,
+                          msg: '查询失败！',
+                        };
+                      }
+                    }
+
                     if (!curentValue.success) {
                       message.error(curentValue.msg);
                       // form.resetFields();
                     } else {
-                      message.success('添加成功');
-                      settingController.trigger('updateDeptTree');
+                      message.success(curentValue.msg);
                       form.resetFields();
                       handleOk();
                     }

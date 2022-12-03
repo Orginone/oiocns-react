@@ -6,6 +6,7 @@ import { IconFont } from '@/components/IconFont';
 
 import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 /**
  * 顶部导航
@@ -14,6 +15,7 @@ import chatCtrl from '@/ts/controller/chat';
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
   const [chatNum, setChatNum] = useState(0);
+  const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
       path: '/chat',
@@ -26,7 +28,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       path: '/todo/friend',
       title: '待办',
       icon: 'icon-todo',
-      count: 0,
+      count: taskNum,
       fath: '/todo',
     },
     {
@@ -48,8 +50,12 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     const id = chatCtrl.subscribe(() => {
       setChatNum(chatCtrl.getNoReadCount());
     });
+    const tid = todoCtrl.subscribe(async () => {
+      setTaskNum(await todoCtrl.TaskCount());
+    });
     return () => {
-      return chatCtrl.unsubscribe(id);
+      chatCtrl.unsubscribe(id);
+      todoCtrl.unsubscribe(tid);
     };
   }, []);
   return (

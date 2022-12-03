@@ -1,136 +1,47 @@
-import { IPerson, ICompany } from './../../core/target/itarget';
-import { Market, BaseProduct } from '@/ts/core/market';
+import { Market } from '@/ts/core/market';
+import IMarket from '@/ts/core/market/imarket';
+import { IMTarget } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
-import { PageRequest } from '@/ts/base/model';
+import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 export class MarketController extends BaseController {
-  /** 人员/单位 */
-  private _target: IPerson | ICompany;
-  /** 当前操作的商店 */
-  private _curMarket: Market | undefined;
-  /** 当前操作的应用 */
-  private _curProd: BaseProduct | undefined;
-  /** 可用应用 */
-  private _usefulProds: BaseProduct[] | undefined;
+  /** 市场操作对象 */
+  private _target: IMTarget | undefined;
+  /** 当前操作的市场 */
+  private _curMarket: IMarket | undefined;
   /**
    * @description: 搜索到的商店
    * @return {*}
    */
   public searchMarket: any;
 
-  constructor(target: IPerson | ICompany) {
+  constructor() {
     super();
-    this._target = target;
-    this._usefulProds = [];
     this.searchMarket = [];
+    userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], () => {
+      if (userCtrl.IsCompanySpace) {
+        this._target = userCtrl.Space;
+      } else {
+        this._target = userCtrl.User;
+      }
+      this.changCallback();
+    });
   }
-  /** 获得所有市场 */
-  public get getMarkets() {
-    return this._target.getJoinMarkets();
+  /** 市场操作对象 */
+  public get Market(): IMTarget {
+    if (this._target) {
+      return this._target;
+    } else {
+      return {} as IMTarget;
+    }
   }
   /** 获取当前操作的市场 */
   public getCurrentMarket() {
     return this._curMarket;
-  }
-  /** 获取购物车 */
-  public getStagings() {
-    return this._target.getStaging();
-  }
-  /** 获得所拥有的应用 */
-  public getOwnProduct() {
-    return this._target.getOwnProducts();
-  }
-  /** 获取当前操作的应用 */
-  public getCurrentProduct() {
-    return this._curProd;
   }
   /** 切换市场 */
   public setCurrentMarket(market: Market) {
     this._curMarket = market;
     this.changCallback();
   }
-  /** 切换应用 */
-  public setCurrentProduct(prod: BaseProduct) {
-    this._curProd = prod;
-  }
-  // 购买
-  public buyApp() {}
-  /**
-   * 添加购物车
-   * @param id 商品Id
-   */
-  public async addCart(id: string) {
-    await this._target.stagingMerchandise(id);
-    this.changCallback();
-  }
-  /**
-   * 获取购买订单
-   * @param status 订单状态
-   * @param page 分页参数
-   * @returns
-   */
-  public async getBuyOrders(status: number, page: PageRequest) {
-    return await this._target.getBuyOrders(status, page);
-  }
-  /**
-   * 获取售卖订单
-   * @param status 订单状态
-   * @param page 分页参数
-   * @returns
-   */
-  public async getSellOrders(status: number, page: PageRequest) {
-    return await this._target.getSellOrders(status, page);
-  }
-
-  /**
-   * @description: 创建商店
-   * @return {*}
-   */
-  public creatMarkrt = async (data: {
-    name: string;
-    code: string;
-    remark: string;
-    samrId: string;
-    ispublic: boolean;
-  }) => {
-    await this._target.createMarket(
-      data.name,
-      data.code,
-      data.remark,
-      data.samrId,
-      data.ispublic,
-    );
-    this.changCallback();
-  };
-
-  /**
-   * @description: 删除商店
-   * @return {*}
-   */
-  public deleteMarket = async (id: string) => {
-    await this._target.deleteMarket(id);
-    this.changCallback();
-  };
-
-  /**
-   * @description: 退出商店
-   * @param {string} id
-   * @return {*}
-   */
-  public async quitMarket(id: string) {
-    await this._target.quitMarket(id);
-    this.changCallback();
-  }
-
-  /**
-   * @description: 根据编号查询市场
-   * @param {string} code
-   * @return {*}
-   */
-  public async getMarketByCode(code: string) {
-    const res = await this._target.getMarketByCode(code);
-    if (res?.success && res?.data?.result != undefined) {
-      this.searchMarket = res?.data?.result;
-    }
-    return this.searchMarket;
-  }
 }
+export default new MarketController();

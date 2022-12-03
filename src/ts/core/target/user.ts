@@ -5,7 +5,7 @@ import { kernel, schema, model, common } from '../../base';
 import University from '../target/university';
 import Hospital from '../target/hospital';
 
-import { XTarget } from '../../base/schema';
+import { XTarget, XTargetArray } from '../../base/schema';
 import BaseService from './base';
 import userCtrl from '../../controller/setting/userCtrl';
 
@@ -18,7 +18,7 @@ export default class userdataservice extends BaseService {
   /**单例模式 */
   public static getInstance() {
     if (this._instance == null) {
-      this._instance = new userdataservice(userCtrl.User!.target);
+      this._instance = new userdataservice(userCtrl.User.target);
     }
     return this._instance;
   }
@@ -203,24 +203,28 @@ export default class userdataservice extends BaseService {
    * @returns 根据编码搜索单位, 单位、公司表格需要的数据格式
    */
   public async searchMyCompany(
-    page: Types.Page,
+    filter: string,
     typeName?: TargetType,
-  ): Promise<Types.PageData<XTarget>> {
+  ): Promise<schema.XTargetArray> {
     let paramData: any = {};
-    paramData.name = page.filter;
+    paramData.name = filter;
     paramData.typeName = TargetType.Company;
     if (typeName) {
       paramData.typeName = typeName;
     }
     paramData.page = {
       offset: 0,
-      filter: page.filter,
+      filter: filter,
       limit: common.Constants.MAX_UINT_8,
     };
 
-    // console.log('======param', JSON.stringify(paramData));
     // 结果集
-    let pageData: any = {};
+    let pageData: schema.XTargetArray = {
+      offset: 0,
+      limit: 0,
+      total: 0,
+      result: [],
+    };
     try {
       let res = await kernel.searchTargetByName(paramData);
       if (res.success && res.data && res.data.result) {
@@ -239,16 +243,15 @@ export default class userdataservice extends BaseService {
               break;
           }
         });
-        pageData.success = true;
-        pageData.data = list;
+        pageData.total = list.length;
+        pageData.result = list;
       } else {
-        pageData.success = false;
-        pageData.msg = res.msg;
+        pageData.total = 0;
       }
     } catch (error) {
-      pageData.success = false;
-      pageData.msg = '接口调用错误';
+      pageData.total = 0;
     }
+
     return pageData;
   }
 
@@ -361,7 +364,20 @@ export default class userdataservice extends BaseService {
 
     return res;
   };
-
+  // 查询部门的内容
+  public async searchDeptment(departId: string): Promise<XTargetArray> {
+    const res = await kernel.queryTargetById({ ids: [departId], page: undefined });
+    if (res.success) {
+      return res.data;
+    } else {
+      return {
+        offset: 0,
+        limit: 0,
+        total: 0,
+        result: undefined,
+      };
+    }
+  }
   /**
    * 创建对象
    * @param data 创建参数

@@ -13,17 +13,14 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 
 import { useHistory } from 'react-router-dom';
-import StoreContent from '@/ts/controller/store/content';
-interface AppInfoType {
-  appId: string;
-}
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
-const StoreAppInfo: React.FC<AppInfoType> = () => {
+const StoreAppInfo: React.FC = () => {
   const history = useHistory();
   const RenderBaseInfo = (
     <ul className={`${cls['base-info']} flex flex-direction-col`}>
       <li className={`${cls['con']} flex `}>
-        <div className={cls['con-title']}>{StoreContent.curProduct?._prod.name}</div>
+        <div className={cls['con-title']}>{SelfAppCtrl.curProduct?._prod.name}</div>
         <EditOutlined
           className={cls['con-name-edit-btn']}
           style={{ fontSize: '1.5em' }}
@@ -37,26 +34,27 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用曾用名</span>
           <Tooltip title="prompt text">
-            <div className={cls['con-name']}> {StoreContent.curProduct?._prod.name}</div>
+            <div className={cls['con-name']}> {SelfAppCtrl.curProduct?._prod.name}</div>
           </Tooltip>
         </div>
         <div className={cls['con-info']}>
           <span className={cls['con-label']}>应用描述</span>
           <Tooltip title={''}>
-            <div className={cls['con-name']}>{StoreContent.curProduct?._prod.remark}</div>
+            <div className={cls['con-name']}>{SelfAppCtrl.curProduct?._prod.remark}</div>
           </Tooltip>
         </div>
       </li>
       <li className={`${cls['con']} ${cls['endBox']} flex `}>
         <p style={{ marginRight: '14px' }}>
-          创建人：<span>{StoreContent.curProduct?._prod.createUser}</span>
+          创建人：<span>{SelfAppCtrl.curProduct?._prod.createUser}</span>
         </p>
         <p>
-          创建时间：<span>{StoreContent.curProduct?._prod.createTime}</span>
+          创建时间：<span>{SelfAppCtrl.curProduct?._prod.createTime}</span>
         </p>
       </li>
     </ul>
   );
+  console.log('SelfAppCtrl.curProduct', SelfAppCtrl.curProduct);
 
   const renderManageInfo = () => {
     return (

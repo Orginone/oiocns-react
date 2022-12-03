@@ -1044,7 +1044,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryAuthorityIdentitys(
-    params: model.IDBelongReq,
+    params: model.IDWithBelongPageReq,
   ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await this.request({
       module: 'target',
@@ -1862,6 +1862,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 取消订单
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async cancelOrder(
+    params: model.ApprovalModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelOrder',
+      params: params,
+    });
+  }
+  /**
    * 取消订单详情
    * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -1998,6 +2012,20 @@ export default class KernelApi {
     return await this.request({
       module: 'flow',
       action: 'CreateDefine',
+      params: params,
+    });
+  }
+  /**
+   * 发布流程定义（包括创建、更新操作）
+   * @param {model.CreateDefineReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
+   */
+  public async publishDefine(
+    params: model.CreateDefineReq,
+  ): Promise<model.ResultType<schema.XFlowDefine>> {
+    return await this.request({
+      module: 'flow',
+      action: 'PublishDefine',
       params: params,
     });
   }

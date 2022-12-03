@@ -5,6 +5,7 @@ import AppCard from '@/components/AppCardOfBuy';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
 import { Link } from 'react-router-dom';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
 
 interface AppShowCompType {
@@ -77,6 +78,9 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         label: <Link to="/market/ShoppingCart">加入购物车</Link>,
         onClick: () => {
           console.log('按钮事件', 'toBuyCar', item);
+          marketCtrl.Market.stagingMerchandise(item.id).then((res) => {
+            console.log(res);
+          });
         },
       },
       {

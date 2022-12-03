@@ -87,52 +87,27 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
   };
+
+  const [currentCtrl, setCurrentCtrl] = useState();
+
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
-  useEffect(() => {
-    settingController.addListen('isOpenModal', () => {
-      setIsCreateDept(true);
-      setIsOpenModal(true);
-    });
-    return settingController.remove('isOpenModal', () => {
-      setIsOpenModal(false);
-      setIsCreateDept(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
-  useEffect(() => {
-    settingController.addListen('isSetPost', () => {
-      setIsSetPost(true);
-    });
-    return settingController.remove('isSetPost', () => {
-      setIsSetPost(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
-  useEffect(() => {
-    settingController.addListen('createPosition', (e: { id: string }) => {
-      setIsCreateDept(true);
-      setSelectId(e.id);
-    });
-    return settingController.remove('createPosition', () => {
-      setSelectId('');
-      setIsCreateDept(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     initData();
   }, [selectId]);
 
-  const initData = async () => {
-    const resultData = await settingController.searchAllPersons(selectId);
-    console.log(resultData);
-  };
+  const initData = async () => {};
 
   // 标题tabs页
   const TitleItems = [
@@ -156,7 +131,6 @@ const SettingDept: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            settingController.trigger('isOpenModal');
             setIsCreateDept(false);
           }}>
           编辑
@@ -186,12 +160,7 @@ const SettingDept: React.FC = () => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button
-          type="link"
-          onClick={() => {
-            console.log('指派岗位');
-            settingController.trigger('isSetPost');
-          }}>
+        <Button type="link" onClick={() => {}}>
           指派岗位
         </Button>
       </Space>

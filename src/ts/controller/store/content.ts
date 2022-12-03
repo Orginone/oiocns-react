@@ -1,6 +1,5 @@
 import { XMarket } from '@/ts/base/schema';
 import { BaseProduct, Market } from '@/ts/core/market';
-import { productCtrl } from './productCtrl';
 import { myColumns, marketColumns } from './config';
 import userCtrl from '../setting/userCtrl';
 /**
@@ -93,7 +92,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: any) => productCtrl.createProduct(data);
+  public createProduct = async (data: any) => {};
 
   /**
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
@@ -106,14 +105,34 @@ class StoreContent {
 
     this.curProduct = item;
   }
+
   /**
-   * @desc: 分享
+   * @desc: 查询分享信息
+   */
+  public async queryExtend(destType: string, teamId: string) {
+    let { success, data, msg } = await this.curProduct!.queryExtend(
+      destType,
+      teamId || '0',
+    );
+
+    if (!success) {
+      console.error(msg);
+      return [];
+    } else {
+      console.log('分享信息', data.result);
+      return data.result;
+    }
+  }
+  /**
+   * @desc: 分享应用
    */
   public async ShareProduct(teamId: string, destIds: string[], destType: string) {
     let { success, msg } = await this.curProduct!.Extend(teamId, destIds, destType);
 
     if (!success) {
       console.error(msg);
+    } else {
+      console.log('共享成功');
     }
   }
 }

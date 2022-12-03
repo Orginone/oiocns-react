@@ -12,32 +12,37 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import StoreContent from '@/ts/controller/store/content';
-import StoreSidebar from '@/ts/controller/store/sidebar';
+import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import { BaseProduct } from '@/ts/core/market';
+import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
-import { productCtrl } from '@/ts/controller/store/productCtrl';
+// import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<BaseProduct[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [productObj, setProductObj] = useState<any>({});
   useEffect(() => {
-    // storeContent.curPageType = 'myApps';
-    StoreContent.marketTableCallBack = setData;
-    StoreContent.getStoreProduct();
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
+      setData([...SelfAppCtrl.tableData]);
+    });
+    // StoreSiderbar.changePageType('app');
+    SelfAppCtrl.querySelfApps();
+    return () => {
+      return SelfAppCtrl.unsubscribe(id);
+    };
   }, []);
   // 根据以获取数据 动态产生tab
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
-    data.forEach((v: any) => {
+    data?.forEach((v: any) => {
       typeSet.add(v._prod.source);
     });
     return Array.from(typeSet).map((k) => {
@@ -45,21 +50,17 @@ const StoreApp: React.FC = () => {
     });
   }, [data]);
 
-  const BtnsList = ['购买', '创建', '暂存'];
+  const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
     // console.log('按钮点击', item);
     switch (item.text) {
       case '购买':
-        StoreSidebar.changePageType('market');
-        // StoreSidebar.getTreeData();
         history.push('/market/shop');
         break;
       case '创建':
         history.push('/store/app/create');
         break;
-      case '暂存':
-        console.log('点击事件', '暂存');
-        break;
+
       default:
         console.log('点击事件未注册', item.text);
         break;
@@ -72,7 +73,7 @@ const StoreApp: React.FC = () => {
    */
   const onOk = () => {
     setIsDeleteOpen(false);
-    productCtrl.deleteProduct(productObj?._prod?.id);
+    // productCtrl.deleteProduct(productObj?._prod?.id);
   };
 
   /**
@@ -101,12 +102,8 @@ const StoreApp: React.FC = () => {
       // identitysHisData,
     );
 
-    StoreContent.ShareProduct(
-      checkNodes.teamId,
-      checkNodes.checkedValus,
-      checkNodes.type,
-    );
-    // setShowShareModal(false);
+    SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
+    setShowShareModal(false);
   };
   const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
     return [
@@ -114,6 +111,7 @@ const StoreApp: React.FC = () => {
         key: 'open',
         label: '打开',
         onClick: () => {
+          SelfAppCtrl.OpenApp(item);
           history.push({ pathname: '/online', state: { appId: item._prod?.id } });
         },
       },
@@ -121,9 +119,7 @@ const StoreApp: React.FC = () => {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          StoreContent.selectedProduct(item);
-          console.log('333', item._prod);
-
+          SelfAppCtrl.curProduct = item;
           history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
         },
       },
@@ -131,10 +127,9 @@ const StoreApp: React.FC = () => {
         key: 'manage',
         label: '管理',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           history.push({
             pathname: '/store/app/manage',
-            state: { appId: item._prod?.id },
           });
         },
       },
@@ -142,10 +137,9 @@ const StoreApp: React.FC = () => {
         key: 'putaway',
         label: '上架',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           history.push({
             pathname: '/store/app/putaway',
-            state: { appId: item._prod?.id },
           });
         },
       },
@@ -153,7 +147,7 @@ const StoreApp: React.FC = () => {
         key: 'share',
         label: '共享',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           setShowShareModal(true);
         },
       },
@@ -161,7 +155,7 @@ const StoreApp: React.FC = () => {
         key: 'delete',
         label: '移除',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           setProductObj(item);
           setIsDeleteOpen(true);
         },
@@ -170,17 +164,16 @@ const StoreApp: React.FC = () => {
         key: 'share2',
         label: '分配',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
         },
       },
       {
         key: 'save',
         label: '暂存',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           history.push({
             pathname: '/store/app/publish',
-            state: { appId: item._prod?.id },
           });
         },
       },
@@ -201,10 +194,10 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User!.getOwnProducts}
+              queryFun={userCtrl.User?.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
-              columns={StoreContent.getColumns('myApp')}
+              columns={SelfAppCtrl.getColumns('myApp')}
               renderOperation={renderOperation}
             />
           </div>
@@ -240,29 +233,12 @@ const StoreApp: React.FC = () => {
         content={productObj?._prod?.name}
       />
       {/* 详情页面 /store/app/info*/}
-      <Route
-        exact
-        path="/store/app/info"
-        render={() => (
-          <AppInfo appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
-      <Route
-        exact
-        path="/store/app/publish"
-        render={() => (
-          <PublishList appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
-      <Route
-        exact
-        path="/store/app/manage"
-        render={() => <Manage appId={StoreContent.curProduct?._prod.id || ''} />}></Route>
+      <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
+      <Route exact path="/store/app/publish" render={() => <PublishList />}></Route>
+      <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
-      <Route
-        exact
-        path="/store/app/putaway"
-        render={() => (
-          <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
+      <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
+      <TreeComp />
     </>
   );
 };
