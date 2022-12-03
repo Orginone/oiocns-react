@@ -6,6 +6,7 @@ import { Button, Space, Tag } from 'antd';
 import appService, { tabStatus } from '@/ts/controller/todo';
 import React, { useState, useEffect } from 'react';
 import { DataType } from 'typings/globelType';
+import { schema } from '@/ts/base';
 
 appService.currentModel = 'product';
 
@@ -24,7 +25,7 @@ const handleApproveSelect = async (ids: React.Key[]) => {
   // }
 };
 // 根据状态值渲染标签
-const renderItemStatus = (record: ProductApprovalType) => {
+const renderItemStatus = (record: schema.XMerchandise) => {
   const status = appService.statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
@@ -38,10 +39,10 @@ type TodoCommonTableProps = {};
 const TodoStore: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>(appService.activeStatus);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [pageData, setPageData] = useState<ProductApprovalType[]>([]);
+  const [pageData, setPageData] = useState<schema.XMerchandise[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const columns: ProColumns<ProductApprovalType>[] = [
+  const columns: ProColumns<schema.XMerchandise>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -52,7 +53,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       title: '市场名称',
       dataIndex: 'name',
       render: (_, record) => {
-        return record.market.name;
+        return record.market?.name;
       },
     },
     {
@@ -61,8 +62,8 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       render: (_, record) => {
         return (
           <Space>
-            {record.product.name}
-            <Tag color="#5BD8A6">{record.product.source}</Tag>
+            {record.product?.name}
+            <Tag color="#5BD8A6">{record.product?.source}</Tag>
           </Space>
         );
       },
@@ -71,7 +72,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       title: '应用编号',
       dataIndex: 'code',
       render: (_, record) => {
-        return record.product.code;
+        return record.product?.code;
       },
     },
     {
@@ -97,7 +98,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       title: '应用权限',
       dataIndex: 'sellAuth',
       render: (_, record) => {
-        return record.product.authority;
+        return record.product?.authority;
       },
     },
     {
@@ -141,29 +142,18 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       onTabChange={(key: string) => {
         setActiveKey(key as string);
       }}
-      tabBarExtraContent={
-        <Space>
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => handleApproveSelect(selectedRowKeys)}>
-            同意
-          </Button>
-          <Button key="2">拒绝</Button>
-          <Button key="3">打印</Button>
-        </Space>
-      }>
+      tabBarExtraContent={''}>
       <CardOrTableComp
         rowKey={'id'}
         columns={columns}
         dataSource={pageData}
         total={total}
         onChange={LoadList}
-        operation={(item: ProductApprovalType) =>
+        operation={(item: schema.XMerchandise) =>
           appService.tableOperation(item, setNeedReload)
         }
         renderCardContent={(arr) => (
-          <TableItemCard<ProductApprovalType>
+          <TableItemCard<schema.XMerchandise>
             data={arr}
             statusType={(item) => renderItemStatus(item)}
             targetOrTeam="product"

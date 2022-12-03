@@ -38,8 +38,8 @@ export default class Authority implements IAuthority {
   public get belongId(): string {
     return this._authority.belongId;
   }
-  public get authority(): schema.XAuthority {
-    return this._authority;
+  public get remark(): string {
+    return this._authority.remark;
   }
   public async createIdentity(
     name: string,

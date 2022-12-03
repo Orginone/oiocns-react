@@ -38,7 +38,7 @@ const UpdateCohort: React.FC<indexType> = ({
         initialValues={item}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values: ICohort) => {
-          await item.update({
+          const res = await item.update({
             name: values.target.name,
             code: values.target.code,
             typeName: TargetType.Cohort,
@@ -46,9 +46,14 @@ const UpdateCohort: React.FC<indexType> = ({
             belongId: item.target.belongId,
             avatar: 'test', //头像
           });
+          if (res.success) {
+            message.success('修改成功');
+          } else {
+            message.error(res.msg);
+          }
+
           setOpen(false);
           callBack();
-          message.success('修改成功');
         }}
         columns={(layoutType === 'StepsForm' ? [columns] : columns) as any}
         {...otherConfig}

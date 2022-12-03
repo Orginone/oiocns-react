@@ -1,6 +1,5 @@
 import { XMarket } from '@/ts/base/schema';
 import { BaseProduct, Market } from '@/ts/core/market';
-import { productCtrl } from './productCtrl';
 import { myColumns, marketColumns } from './config';
 import userCtrl from '../setting/userCtrl';
 /**
@@ -67,7 +66,7 @@ class StoreContent {
   public async getStoreProduct(type = 'app', params?: any) {
     let Fun!: Function;
     if (type === 'app') {
-      Fun = userCtrl.User.getOwnProducts;
+      Fun = userCtrl.User!.getOwnProducts;
       params = {};
     } else {
       Fun = this._curMarket!.getMerchandise;
@@ -93,7 +92,7 @@ class StoreContent {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: any) => productCtrl.createProduct(data);
+  public createProduct = async (data: any) => {};
 
   /**
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中

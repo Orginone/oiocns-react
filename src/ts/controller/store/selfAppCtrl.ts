@@ -1,5 +1,6 @@
 import { ProductModel } from '@/ts/base/model';
 import { BaseProduct } from '@/ts/core/market';
+import { IMTarget } from '@/ts/core/target/itarget';
 import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
@@ -60,12 +61,13 @@ interface RecMsg {
   data: TreeType[];
 }
 class SelfAppController extends BaseController {
+  private _curSpace: IMTarget = userCtrl.User;
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
   private _treeData!: TreeType[]; //缓存树形数据
   /* -----**应用功能区---------- */
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
-  private _curProduct: BaseProduct = [] as any;
+  private _curProduct: BaseProduct | undefined = undefined;
   // 顶部最近使用应用
   private recentlyUsedApps!: BaseProduct[];
   // 常用菜单
@@ -90,8 +92,8 @@ class SelfAppController extends BaseController {
   private selfAppsData: BaseProduct[] = [];
 
   // 获取数据
-  public get curProduct(): BaseProduct {
-    return this._curProduct;
+  public get curProduct(): BaseProduct | undefined {
+    return this._curProduct || undefined;
   }
   public get tableData(): BaseProduct[] {
     return this.selfAppsData;
@@ -113,16 +115,20 @@ class SelfAppController extends BaseController {
     this._curMenuKey = key;
   }
 
-  set curProduct(prod: BaseProduct) {
+  set curProduct(prod: BaseProduct | undefined) {
     this._curProduct = prod;
   }
 
   constructor() {
     super();
     /* 监听空间切换 */
-    userCtrl.subscribePart(UserPartTypes.User, async () => {
+    userCtrl.subscribePart(UserPartTypes.Space, async () => {
       // this.changCallbackPart();
-      console.log('监听单位切换');
+      console.log('监听单位切换', userCtrl.Space, userCtrl.SpaceData);
+      this._curSpace =userCtrl.IsCompanySpace? userCtrl.Space :userCtrl.User;
+      console.log('this._curSpace', this._curSpace, userCtrl.Space);
+
+      this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
     kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg) => {
@@ -133,6 +139,12 @@ class SelfAppController extends BaseController {
     });
   }
 
+  private resetData() {
+    this._curMenuKey = 'app';
+    this.breadcrumb = ['仓库', '我的应用'];
+    this._curProduct = undefined;
+    this.querySelfApps()
+  }
   public handleMenuOpt(type: MenuOptTypes, _data: TreeType) {
     console.log('菜单操作', type, _data);
   }
@@ -177,7 +189,7 @@ class SelfAppController extends BaseController {
    * @return {BaseProduct[]} 应用列表
    */
   public async querySelfApps() {
-    const list = await userCtrl.User!.getOwnProducts();
+    const list = await this._curSpace.getOwnProducts();
     console.log('获取我的应用表格数据', list);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData, list);
@@ -217,11 +229,15 @@ class SelfAppController extends BaseController {
    * @desc: 查询分享信息
    */
   public async queryProductExtend(destType: string, teamId: string) {
+    console.log('查询分享信息', destType, teamId);
+    if (!destType) {
+      return;
+    }
     let { success, data, msg } = await this._curProduct!.queryExtend(
       destType,
       teamId || '0',
     );
-
+    console.log('分享信息', success, data, msg);
     if (!success) {
       console.error(msg);
       return [];

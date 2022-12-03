@@ -1,12 +1,5 @@
-import { TodoType } from './../enum';
+import { TodoType } from '../enum';
 import { model } from '../../base';
-
-export interface ITodo {
-  /**@count  待办数量*/
-  getCount(): Promise<number>;
-  /** 获得待办分组 */
-  getTodoGroup(): Promise<ITodoGroup[]>;
-}
 
 /** 待办组 */
 export interface ITodoGroup {
@@ -17,9 +10,9 @@ export interface ITodoGroup {
   /**@count  待办数量*/
   getCount(): Promise<number>;
   /**@desc 获取待办列表 */
-  getTodoList(): Promise<IApprovalItem[]>;
+  getTodoList(refresh: boolean): Promise<IApprovalItem[]>;
   /**@desc 获取待抄送待阅列表 */
-  getNoticeList(): Promise<IApprovalItem[]>;
+  getNoticeList(refresh: boolean): Promise<IApprovalItem[]>;
   /**@desc 获取已办列表 */
   getDoList(page: model.PageRequest): Promise<IApprovalItem[]>;
   /**@desc 获取申请列表 */
@@ -41,4 +34,13 @@ export interface IApplyItem {
   Data: any;
   /**@cancel 取消 */
   cancel(status: number, remark: string): Promise<model.ResultType<any>>;
+}
+
+export interface IOrderApplyItem extends IApplyItem {
+  /**
+   * 取消订单详情项
+   * @param status 状态
+   * @param remark 备注
+   */
+  cancelItem(status: number, remark: string): Promise<model.ResultType<any>>;
 }

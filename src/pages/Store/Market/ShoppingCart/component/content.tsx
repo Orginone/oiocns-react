@@ -67,7 +67,6 @@ const content = (props: any) => {
                   //       let c = props.checkval;
                   //       c.push(props.fls[props.i].id);
                   //       console.log(c);
-                  //       // debugger;
                   //       props.setcheckval(c);
                   //     }
                   //   }

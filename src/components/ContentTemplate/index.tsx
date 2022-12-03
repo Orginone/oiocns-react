@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 import { IRouteConfig } from '@/routes/config';
 
-import BreadCrumb from '../BreadCrumb';
+import BreadCrumbBox from '../BreadCrumb';
 import ContentMenu from '../ContentMenu';
 import { TOOBAR_TYPE, toobarTypeAndNameMaps } from '@/constants/content_template';
 import RightToobar from '@/bizcomponents/RightToobar';
@@ -69,7 +69,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
           // 面包屑与操作区
           <Row className={cls[`content-top`]} justify="space-between">
             {!hideBreadCrumb ? (
-              <Col>{<BreadCrumb>{contentTopLeft}</BreadCrumb>}</Col>
+              <Col>{<BreadCrumbBox>{contentTopLeft}</BreadCrumbBox>}</Col>
             ) : (
               <Col>{contentTopLeft}</Col>
             )}

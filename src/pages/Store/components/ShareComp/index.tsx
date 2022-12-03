@@ -2,17 +2,17 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from '../ShareShowComp';
-import API from '@/services';
 import cls from './index.module.less';
 import { Product } from '@/ts/core/market';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
-import StoreContent from '@/ts/controller/store/content';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { kernel } from '@/ts/base';
+import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 interface Iprops {
   curProduct?: Product;
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
 }
-// const ShareRecent: React.FC = () => {
 const DestTypes = [
   {
     value: 1,
@@ -35,7 +35,7 @@ const ShareRecent = (props: Iprops) => {
   const { onCheckeds } = props;
   const [radio, setRadio] = useState<number>(1);
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
-  const [leftTreeData, setLeftTreeData] = useState([]);
+  const [leftTreeData, setLeftTreeData] = useState<any>([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
   const [departHisData, setDepartHisData] = useState<any[]>([]); // radio=1 历史数据
@@ -46,7 +46,6 @@ const ShareRecent = (props: Iprops) => {
   const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
   const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
   const [selectedTeamId, setSelectedTeamId] = useState<string>('');
-  // useImperativeHandle(nodeRef, () => ());
   const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
     {} as any,
   );
@@ -65,30 +64,37 @@ const ShareRecent = (props: Iprops) => {
     queryExtend();
   }, [radio]);
   const handelCheckedChange = (type: string, list: any) => {
-    console.log('测试', type, list);
-
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
   const getLeftTree = async () => {
-    const res = await API.cohort.getJoinedCohorts({ data: pageCurrent });
-    setLeftTreeData(res.data.result);
+    const res = await userCtrl.User!.getJoinedCohorts();
+    console.log('共享获取组织', res);
+    const ShowList = res?.map((item) => {
+      return {
+        ...item.target,
+        node: item,
+      };
+    });
+
+    setLeftTreeData([...ShowList]);
     console.log(res);
   };
   const queryExtend = async (type?: string, teamId?: string) => {
     const _type = type || DestTypes[radio - 1].label;
     const _teamId = teamId || selectedTeamId || '0';
     let curData = recordShareInfo.has(_type) ? recordShareInfo.get(_type) : {};
-    curData[_teamId] = await StoreContent.queryExtend(_type, _teamId);
+    curData[_teamId] = await selfAppCtrl.queryProductExtend(_type, _teamId);
     recordShareInfo.set(_type, curData);
-    console.log('请求分配列表', curData[_teamId]);
+    console.log('请求分配列表', teamId, curData[_teamId]);
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     console.log('selected', selectedKeys, info);
-    StoreContent.ShareProduct(
-      selectedTeamId,
-      hasSelectRecord!.list,
-      hasSelectRecord!.type,
-    );
+    hasSelectRecord?.list?.lenght &&
+      selfAppCtrl.ShareProduct(
+        selectedTeamId,
+        hasSelectRecord!.list,
+        hasSelectRecord!.type,
+      );
     setSelectedTeamId(info.node.id);
     setDepartData([]);
     setAuthorData([]);
@@ -98,44 +104,36 @@ const ShareRecent = (props: Iprops) => {
 
     switch (radio) {
       case 2: {
-        const res = await API.company.getAuthorityTree({
-          data: {
-            id: info.node.id,
-            filter: '',
-          },
-        });
-        res.data = handleTreeData(res.data, info.node.id);
-        setCenterTreeData([res.data]);
+        const res = await userCtrl.User!.selectAuthorityTree();
+
+        let data = handleTreeData(res, info.node.id);
+        setCenterTreeData([data]);
         break;
       }
       case 3: {
-        const res2 = await API.company.getIdentities({
-          data: {
-            id: info.node.id,
+        // 岗位 --职权树
+
+        const res2 = await kernel.queryTargetIdentitys({
+          id: info.node.id,
+          page: {
             limit: pageCurrent.limit,
             offset: pageCurrent.offset,
             filter: '',
           },
         });
+
         const { result = [] } = res2.data;
         setCenterTreeData(result ? result : []);
         break;
       }
       case 4:
         {
-          let action = 'getPersons';
-          if (info.node.TypeName === '子集团') {
-            action = 'getSubgroupCompanies';
-          }
-          const res3 = await API.cohort[action]({
-            data: {
-              id: info.node.id,
-              limit: pageCurrent.limit,
-              offset: pageCurrent.offset,
-              filter: '',
-            },
-          });
-          setCenterTreeData(res3.data.result ? res3.data.result : []);
+          let action = 'getMember';
+          // // if (info.node.TypeName === '子集团') {
+          // //   action = 'getSubgroupCompanies';
+          // // }
+          const res3 = await info?.node?.node[action]();
+          setCenterTreeData(res3 || []);
         }
         break;
       default:
@@ -144,13 +142,13 @@ const ShareRecent = (props: Iprops) => {
   };
   const handleTreeData = (node: any, belongId: string) => {
     node.disabled = !(node.belongId && node.belongId == belongId);
-    if (node.nodes) {
-      node.nodes = node.nodes.map((children: any) => {
-        return handleTreeData(children, belongId);
+    if (node.children) {
+      node.nodes = node.children.map((child: any) => {
+        return handleTreeData(child, belongId);
       });
     }
     //判断是否有操作权限
-    return node;
+    return { ...node._authority, node };
   };
   // 左侧树点击事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
@@ -230,7 +228,6 @@ const ShareRecent = (props: Iprops) => {
         setPersonsData(identitysData);
       }
     }
-    // onCheckeds && onCheckeds(DestTypes[radio].label, info.checkedNodes);
     setHasSelectRecord({ type: DestTypes[radio - 1].label, list: checkedKeys });
     handelCheckedChange(DestTypes[radio - 1].label, checkedKeys);
   };

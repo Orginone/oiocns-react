@@ -1,11 +1,12 @@
-import { Card, Button, Descriptions, Space } from 'antd';
+import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
+import { Card, Button, Descriptions, Space, Modal } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
+// import { dataSource } from './datamock';
 import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
@@ -14,12 +15,17 @@ import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
+import SettingService from './service';
+import { IDepartment } from '@/ts/core/target/itarget';
+import Department from '@/ts/core/target/department';
 
 /**
  * 部门设置
  * @returns
  */
 const SettingDept: React.FC = () => {
+  const setting = SettingService.getInstance();
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
@@ -29,7 +35,11 @@ const SettingDept: React.FC = () => {
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
 
+  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
+
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
+
+  const treeContainer = document.getElementById('templateMenu');
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -43,7 +53,7 @@ const SettingDept: React.FC = () => {
         },
       },
       {
-        key: 'share',
+        key: 'changeDept',
         label: '变更部门',
         onClick: () => {
           // console.log('按钮事件', 'share', item);
@@ -81,17 +91,54 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+  /**点击操作内容触发的事件 */
+  const handleMenuClick = (key: string, item: any) => {
+    switch (key) {
+      case 'new':
+        setting.setCurrTreeDeptNode('');
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        break;
+      case '新增部门':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.target.target.id);
+        setting.getCompanyCtrl.changCallback();
+        setting.setCurrTreeDeptNode(item.target.target.id);
+        break;
+      case 'changeDept': //变更部门
+        setIsOpenModal(true);
+        setSelectDept(item);
+        // setting.getCompanyCtrl.changCallback();
+        // setSelectId(item.target.target.id);
+        // setting.setCurrTreeDeptNode(item.target.target.id);
+        break;
+      case 'updateDept':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.id);
+        setting.setCurrTreeDeptNode(item.id);
+        setting.getCompanyCtrl.changCallback();
+        break;
+    }
+  };
+
+  // 选中树的时候操作
+  const setTreeCurrent = (current: schema.XTarget) => {
+    setSelectDept(current);
+    setSelectId(current.id);
+    setting.setCurrTreeDeptNode(current.id);
+
+    new Department(SelectDept!).getPerson().then((e) => {
+      setDataSource(e);
+    });
+  };
+
   /** 添加人员的逻辑 */
   const onPersonalOk = (params: initDatatype[]) => {
     console.log(params);
     setIsAddOpen(false);
   };
-
-  /** 设置岗位的逻辑 */
-  // const handlePostOk = (checkJob: initDatatype, checkUser: initDatatype[]) => {
-  //   console.log(checkJob, checkUser);
-  //   setIsSetPost(false);
-  // };
 
   const onApplyOk = () => {
     setLookApplyOpen(false);
@@ -105,6 +152,7 @@ const SettingDept: React.FC = () => {
     setIsOpenModal(false);
     setIsCreateDept(false);
   };
+
   const handleOk = () => {
     setIsAddOpen(false);
     setIsSetPost(false);
@@ -112,19 +160,44 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
     setIsCreateDept(false);
+    // 处理刷新的功能
+    userCtrl.changCallback();
   };
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
   useEffect(() => {
+    if (userCtrl.Space == undefined) {
+      Modal.info({
+        title: '提示',
+        content: (
+          <div>
+            <p>请选择加入的部门空间！</p>
+          </div>
+        ),
+        onOk() {
+          location.href = '/home';
+        },
+      });
+    }
     initData();
     // 刚进入的时候选中公司 TODO
-    // setSelectDept();
-  }, []);
+    setting.setCompanyID = userCtrl?.Space?.target.id + '';
+    setting.setRoot = userCtrl?.Space!.target;
+
+    const id = setting.getCompanyCtrl.subscribe(async () => {
+      // 选中树操作
+      let pp = await setting.getCompanyCtrl.getCompany().getPersons();
+      console.log(pp);
+    });
+    return () => {
+      setting.getCompanyCtrl.unsubscribe(id);
+    };
+  }, ['', userCtrl?.Space]);
 
   useEffect(() => {
-    initData();
+    setting.setCompanyID = userCtrl?.Space?.target.id ?? '';
   }, [selectId]);
 
   const initData = async () => {};
@@ -147,14 +220,6 @@ const SettingDept: React.FC = () => {
       tab: `全部`,
       key: '1',
     },
-    {
-      tab: `已开通`,
-      key: '2',
-    },
-    {
-      tab: `未开通`,
-      key: '3',
-    },
   ];
 
   // 部门信息标题
@@ -164,7 +229,11 @@ const SettingDept: React.FC = () => {
         <Title level={4}>部门信息</Title>
       </div>
       <div>
-        <Button type="link" onClick={() => {}}>
+        <Button
+          type="link"
+          onClick={() => {
+            handleMenuClick('updateDept', SelectDept);
+          }}>
           编辑
         </Button>
         <Button type="link">权限管理</Button>
@@ -179,7 +248,15 @@ const SettingDept: React.FC = () => {
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}></Descriptions>
+        <Descriptions title={title} bordered column={2}>
+          <Descriptions.Item label="部门名称">{SelectDept?.name}</Descriptions.Item>
+          <Descriptions.Item label="部门编码">{SelectDept?.code}</Descriptions.Item>
+          <Descriptions.Item label="创建人">{SelectDept?.createUser}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{SelectDept?.createTime}</Descriptions.Item>
+          <Descriptions.Item label="描述" span={2}>
+            {SelectDept?.team?.remark}
+          </Descriptions.Item>
+        </Descriptions>
       </Card>
     </div>
   );
@@ -279,11 +356,24 @@ const SettingDept: React.FC = () => {
       />
       {/* 对象设置 */}
       <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      {/* 左侧树 */}
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <TreeLeftDeptPage
+              createTitle="新增"
+              setCurrent={setTreeCurrent}
+              handleMenuClick={handleMenuClick}
+              currentKey={''}
+            />,
+            treeContainer,
+          )
+        : ''}
     </div>
   );
 };
 
 export default SettingDept;
+
 function setIsSetPost(arg0: boolean) {
   throw new Error('Function not implemented.');
 }
