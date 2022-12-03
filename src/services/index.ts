@@ -55,5 +55,5 @@ InitRequests(FUNS, urls, true, []);
 
 InitRequests(APPFUNS, urls, false, []);
 
-export default FUNS;
+// export default FUNS;
 export { APPFUNS };

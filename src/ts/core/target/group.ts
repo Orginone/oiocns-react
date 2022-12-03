@@ -47,7 +47,7 @@ export default class Group extends BaseTarget implements IGroup {
     if (!tres.data) {
       const res = await this.createTarget({
         ...data,
-        belongId: userCtrl.Space!.target.id,
+        belongId: userCtrl.Space.target.id,
       });
       if (res.success) {
         const group = new Group(res.data);

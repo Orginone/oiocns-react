@@ -217,7 +217,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title={userCtrl.Space?.target.name}
+            title={userCtrl.Space.target.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}
