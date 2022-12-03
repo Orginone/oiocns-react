@@ -35,7 +35,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
-    if (!searchParams) {
+    if (!searchParams || !list?.length) {
       return;
     }
 
@@ -54,7 +54,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     //   return;
     // }
     // getTableList(searchParams, '', true);
-  }, [searchParams]);
+  }, [searchParams, list]);
 
   /**
    * handlePageChage

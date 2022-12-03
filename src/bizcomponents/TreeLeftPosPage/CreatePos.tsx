@@ -3,7 +3,6 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
-import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
 
 type CreateGroupPropsType = {
@@ -72,12 +71,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   return (
     <div>
-      <Button
-        className={cls.creatgroup}
-        type="primary"
-        onClick={() => {
-          settingController.trigger('isOpenModal');
-        }}>
+      <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
         {createTitle}
       </Button>
 

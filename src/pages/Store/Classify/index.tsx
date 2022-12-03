@@ -31,13 +31,16 @@ const StoreClassify: React.FC = () => {
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [treeData, setTreeData] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
+  const [curMenuKey, setCurMenuKey] = useState<string>(SelfAppCtrl.curMenuKey);
 
   useEffect(() => {
     console.log('初始化', 'APP頁面');
     const id = SelfAppCtrl.subscribePart(
       SelfCallBackTypes.TreeData,
       (data: TreeType[]) => {
-        setTreeData(data || []);
+        console.log('apptree', data, SelfAppCtrl.treeData);
+
+        setTreeData(data || SelfAppCtrl.treeData || []);
       },
     );
     // StoreSiderbar.changePageType('app');
@@ -170,10 +173,10 @@ const StoreClassify: React.FC = () => {
    * @param {any} item
    * @return {*}
    */
-  const handleTitleClick = (item: any) => {
+  const handleTitleClick = (item: TreeType) => {
     // 触发内容去变化
     console.log('点击', item);
-
+    SelfAppCtrl.curMenuKey = item.key || item.id;
     // StoreContent.changeMenu(item);
   };
   const domNode = document.getElementById('templateMenu');

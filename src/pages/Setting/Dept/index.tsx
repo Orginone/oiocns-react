@@ -13,6 +13,7 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /**
  * 部门设置
@@ -120,60 +121,13 @@ const SettingDept: React.FC = () => {
     initData();
     // 刚进入的时候选中公司 TODO
     // setSelectDept();
-
-    settingController.addListen('isOpenModal', () => {
-      setIsCreateDept(true);
-      setIsOpenModal(true);
-    });
-    return settingController.remove('isOpenModal', () => {
-      setIsOpenModal(false);
-      setIsCreateDept(false);
-    });
-  }, []);
-
-  /**
-   * 监听集团id发生变化，改变右侧数据
-   * */
-  useEffect(() => {
-    settingController.addListen('createDept', (e: { id: string }) => {
-      setIsCreateDept(true);
-      setSelectId(e.id);
-    });
-    return settingController.remove('createDept', () => {
-      setSelectId('');
-      setIsCreateDept(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    settingController.addListen('changeSelectId', (e: { id: string }) => {
-      setSelectId(e.id);
-    });
-    return settingController.remove('changeSelectId', () => {
-      setSelectId('');
-    });
   }, []);
 
   useEffect(() => {
     initData();
   }, [selectId]);
 
-  const initData = async () => {
-    if (selectId) {
-      const obj = await settingController.searchDeptment(selectId);
-      if (obj.total > 0 && obj.result) {
-        // 创建人的查询
-        const obj1 = await settingController.searchDeptment(obj.result[0].createUser);
-        console.log(obj1);
-        if (obj1.result) {
-          obj.result[0].createUser = obj1.result[0].team?.name!;
-        }
-        setSelectDept(obj.result[0]);
-      }
-    }
-    const resultData = await settingController.searchAllPersons(selectId);
-    console.log('获取部门底下的人员', resultData);
-  };
+  const initData = async () => {};
 
   // 标题tabs页
   const TitleItems = [
@@ -186,6 +140,7 @@ const SettingDept: React.FC = () => {
       key: 'deptApps',
     },
   ];
+
   // tabs页
   const items = [
     {
@@ -201,6 +156,7 @@ const SettingDept: React.FC = () => {
       key: '3',
     },
   ];
+
   // 部门信息标题
   const title = (
     <div className={cls['company-dept-title']}>
@@ -208,12 +164,7 @@ const SettingDept: React.FC = () => {
         <Title level={4}>部门信息</Title>
       </div>
       <div>
-        <Button
-          type="link"
-          onClick={() => {
-            settingController.trigger('isOpenModal');
-            setIsCreateDept(false);
-          }}>
+        <Button type="link" onClick={() => {}}>
           编辑
         </Button>
         <Button type="link">权限管理</Button>
@@ -228,15 +179,7 @@ const SettingDept: React.FC = () => {
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="部门名称">{SelectDept?.name}</Descriptions.Item>
-          <Descriptions.Item label="部门编码">{SelectDept?.code}</Descriptions.Item>
-          <Descriptions.Item label="创建人">{SelectDept?.createUser}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">{SelectDept?.createTime}</Descriptions.Item>
-          <Descriptions.Item label="描述" span={2}>
-            {SelectDept?.team?.remark}
-          </Descriptions.Item>
-        </Descriptions>
+        <Descriptions title={title} bordered column={2}></Descriptions>
       </Card>
     </div>
   );
@@ -274,7 +217,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title={settingCtrl.getCurWorkSpace?.name}
+            title={userCtrl.Space?.target.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}
@@ -341,3 +284,6 @@ const SettingDept: React.FC = () => {
 };
 
 export default SettingDept;
+function setIsSetPost(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}

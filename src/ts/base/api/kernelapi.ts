@@ -1044,7 +1044,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryAuthorityIdentitys(
-    params: model.IDBelongReq,
+    params: model.IDWithBelongPageReq,
   ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await this.request({
       module: 'target',
@@ -1858,6 +1858,20 @@ export default class KernelApi {
     return await this.request({
       module: 'market',
       action: 'CancelJoinMarket',
+      params: params,
+    });
+  }
+  /**
+   * 取消订单
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async cancelOrder(
+    params: model.ApprovalModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelOrder',
       params: params,
     });
   }

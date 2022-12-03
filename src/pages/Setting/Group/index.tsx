@@ -11,7 +11,6 @@ import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-import settingController from '@/ts/controller/setting';
 /**
  * 集团设置
  * @returns
@@ -24,7 +23,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   // }));
 
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isopen, setIsOpen] = useState<boolean>(settingController.getIsOpen); // 编辑
+  const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
@@ -33,24 +32,12 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
-  useEffect(() => {
-    settingController.addListen('isOpenModal', () => {
-      setIsOpen(true);
-    });
-    return settingController.remove('isOpenModal', () => {
-      setIsOpen(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
-  useEffect(() => {
-    settingController.addListen('createGroup', (e) => {
-      console.log('1111', e);
-    });
-    return settingController.remove('createGroup', () => {});
-  }, []);
+  useEffect(() => {}, []);
 
   const onOk = () => {
     setIsOpen(false);

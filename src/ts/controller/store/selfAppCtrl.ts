@@ -3,6 +3,7 @@ import { BaseProduct } from '@/ts/core/market';
 import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { marketColumns, myColumns } from './config';
 const selfAppMenu = 'selfAppMenu';
 
 const defaultTreeData: TreeType[] = [
@@ -44,6 +45,7 @@ export type MenuOptTypes =
 export enum SelfCallBackTypes {
   'TreeData' = 'TreeData',
   'TableData' = 'TableData',
+  'Recently' = 'Recently',
 }
 export interface TreeType {
   title: string;
@@ -60,12 +62,12 @@ interface RecMsg {
 class SelfAppController extends BaseController {
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
-  private treeData!: TreeType[]; //缓存树形数据
+  private _treeData!: TreeType[]; //缓存树形数据
   /* -----**应用功能区---------- */
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
-  private _curProduct!: BaseProduct;
+  private _curProduct: BaseProduct = [] as any;
   // 顶部最近使用应用
-  private recentlyUsedApps: BaseProduct[];
+  private recentlyUsedApps!: BaseProduct[];
   // 常用菜单
   public static oftenUsedMenus = [
     { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
@@ -85,16 +87,33 @@ class SelfAppController extends BaseController {
   ];
 
   // 存储 我的应用原数据 提供过滤使用
-  private selfAppsData: BaseProduct[];
+  private selfAppsData: BaseProduct[] = [];
 
   // 获取数据
-
+  public get curProduct(): BaseProduct {
+    return this._curProduct;
+  }
+  public get tableData(): BaseProduct[] {
+    return this.selfAppsData;
+  }
+  public get treeData(): TreeType[] {
+    return this._treeData;
+  }
   public get MenuOpts(): string[] {
     return SelfAppController._MenuOpts;
   }
+
+  public get curMenuKey(): string {
+    return this._curMenuKey;
+  }
+
   // 设置数据
 
-  public set setCurProduct(prod: BaseProduct) {
+  set curMenuKey(key: string) {
+    this._curMenuKey = key;
+  }
+
+  set curProduct(prod: BaseProduct) {
     this._curProduct = prod;
   }
 
@@ -109,13 +128,9 @@ class SelfAppController extends BaseController {
     kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg) => {
       console.log('订阅数据推送 自定义目录===>', Msg.data);
       const { data = defaultTreeData } = Msg;
-      this.treeData = data;
+      this._treeData = data;
+      this.changCallbackPart(SelfCallBackTypes.TreeData, [...data]);
     });
-  }
-  /* 切换显示目录 */
-  public changeMenu(_data: TreeType) {
-    console.log('切换目录', _data);
-    this._curMenuKey = _data?.key || _data.id;
   }
 
   public handleMenuOpt(type: MenuOptTypes, _data: TreeType) {
@@ -128,7 +143,8 @@ class SelfAppController extends BaseController {
    */
   public cacheSelfMenu(data: TreeType[]): void {
     console.log('缓存触发', data);
-
+    this._treeData = data;
+    this.changCallbackPart(SelfCallBackTypes.TreeData, [...data]);
     kernel.anystore.set(
       selfAppMenu,
       {
@@ -140,7 +156,22 @@ class SelfAppController extends BaseController {
       'user',
     );
   }
-
+  /**
+   * @desc: 获取表格头部展示数据
+   * @return {*}
+   */
+  public getColumns(pageKey?: string) {
+    switch (pageKey) {
+      case 'appInfo':
+      case 'myApp':
+        return myColumns;
+      case 'market':
+        return marketColumns;
+      default:
+        return [];
+    }
+    //TODO:待完善
+  }
   /**
    * @desc: 获取我的应用列表
    * @return {BaseProduct[]} 应用列表
@@ -149,6 +180,16 @@ class SelfAppController extends BaseController {
     const list = await userCtrl.User!.getOwnProducts();
     console.log('获取我的应用表格数据', list);
     this.selfAppsData = list;
+    this.changCallbackPart(SelfCallBackTypes.TableData, list);
+  }
+
+  /**
+   * @desc: 添加最近使用应用
+   * @param {BaseProduct} data
+   */
+  public OpenApp(data: BaseProduct) {
+    this.recentlyUsedApps.unshift(data);
+    this.changCallbackPart(SelfCallBackTypes.Recently, [...this.recentlyUsedApps]);
   }
 
   /**

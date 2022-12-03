@@ -2,14 +2,14 @@ import { Button, Form, Input } from 'antd';
 import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
-import { IPerson } from '@/ts/core/target/itarget';
-import CohortController from '../../ts/controller/cohort/index';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
 
 interface CohortServiceType {
-  Person: IPerson;
+  callBack: Function;
 }
 
-const CreateCohort: React.FC<CohortServiceType> = ({ Person }) => {
+const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -38,12 +38,14 @@ const CreateCohort: React.FC<CohortServiceType> = ({ Person }) => {
   const onSave = async () => {
     const values = await form.validateFields();
     console.log(values); //2.表单验证并获取表单值
-    CohortController.createCohort(
-      Person,
-      values.cohort.name,
-      values.cohort.code,
-      values.cohort.remark,
-    );
+    await userCtrl.User?.createCohort({
+      name: values.cohort.name,
+      code: values.cohort.code,
+      typeName: TargetType.Cohort,
+      teamRemark: values.cohort.remark,
+      avatar: 'test', //头像})
+    });
+    callBack();
     setIsModalOpen(false);
   };
   return (
