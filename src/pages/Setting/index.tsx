@@ -43,6 +43,7 @@ const infoMenuItems = [
     key: 'position',
     icon: <ApartmentOutlined />,
     children: [],
+    render: <></>,
     // render: <TreeLeftPosPage />,
   },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
