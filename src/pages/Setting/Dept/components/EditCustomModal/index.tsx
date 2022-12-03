@@ -145,7 +145,7 @@ const EditCustomModal = (props: Iprops) => {
                       message.error(curentValue.msg);
                       // form.resetFields();
                     } else {
-                      message.success('添加成功');
+                      message.success(curentValue.msg);
                       form.resetFields();
                       handleOk();
                     }

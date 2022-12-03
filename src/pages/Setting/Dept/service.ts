@@ -115,13 +115,13 @@ export default class SettingService {
     item: IDepartment,
     key: string,
   ): Promise<IDepartment | undefined> {
-    console.log('-------', item, key);
     if (item.target.id === key) {
       return item;
     }
+    // 手动查找子对象
     const depts = await item.getDepartments();
     for (const i of depts) {
-      const res = this._search(i, key);
+      const res = await this._search(i, key);
       if (res) {
         return res;
       }

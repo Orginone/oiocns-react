@@ -85,8 +85,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     // 控制选中的部门ID。
     setting.setCompanyID = userCtrl?.Space?.target.id + '';
     const id = userCtrl.subscribe(async () => {
-      setting.getCompanyCtrl.changCallback();
+      // setting.getCompanyCtrl.changCallback();
+
+      // 如果新增部门，就需要重新初始化树
+      userCtrl?.setCurSpace(userCtrl?.Space?.target.id!);
+      initData();
     });
+
     return () => {
       userCtrl.unsubscribe(id);
     };
