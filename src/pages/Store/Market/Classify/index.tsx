@@ -109,7 +109,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const treelist = useMemo(() => {
     return list.filter((item) => item.title !== '开放市场');
   }, [list]);
-
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
