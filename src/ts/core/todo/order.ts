@@ -16,8 +16,8 @@ export class OrderTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getTodoList(): Promise<IApprovalItem[]> {
-    if (this._todoList.length > 0) {
+  async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
     await this.getApprovalList();
@@ -44,9 +44,9 @@ export class OrderTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        applyList.push(new OrderApplyItem(a));
+    if (res.success && res.data.result) {
+      applyList = res.data.result.map((a) => {
+        return new OrderApplyItem(a);
       });
     }
     return applyList;
@@ -61,7 +61,7 @@ export class OrderTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
+    if (res.success && res.data.result) {
       // 同意回调
       let approvalCall = (data: schema.XOrderDetail) => {
         this._todoList = this._todoList.filter((q) => {
@@ -69,13 +69,20 @@ export class OrderTodo implements ITodoGroup {
         });
         this._doList.unshift(new ApprovalItem(data, () => {}));
       };
-      res.data.result?.forEach((a) => {
-        if (a.status >= CommonStatus.RejectStartStatus) {
-          this._doList.push(new ApprovalItem(a, () => {}));
-        } else {
-          this._todoList.push(new ApprovalItem(a, approvalCall));
-        }
-      });
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status >= CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, () => {});
+        });
+      this._todoList = res.data.result
+        .filter((a) => {
+          return a.status < CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, approvalCall);
+        });
     }
   }
 }
