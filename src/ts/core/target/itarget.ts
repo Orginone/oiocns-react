@@ -402,6 +402,8 @@ export interface ICompany extends IMTarget {
   joinedGroup: IGroup[];
   /** 我加入的群组 */
   joinedCohort: ICohort[];
+  /** 子组织类型 */
+  subTypes: TargetType[];
   /** 空间类型数据 */
   getSpaceData: SpaceType;
   /**
@@ -538,6 +540,8 @@ export interface IGroup {
   companys: schema.XTarget[];
   /** 子集团 */
   subGroup: IGroup[];
+  /** 子组织类型 */
+  subTypes: TargetType[];
   /**
    * 更新集团
    * @param data 集团基本信息

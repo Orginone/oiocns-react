@@ -229,9 +229,7 @@ class StoreClassify extends BaseController {
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
-      arrs.push(
-        `${item.belongId === userCtrl.User.target.id ? '删除商店' : '退出商店'}`,
-      );
+      arrs.push(`${item.belongId === userCtrl.User.target.id ? '删除商店' : '退出商店'}`);
       return {
         title: item.name,
         key: `0-${index}`,
