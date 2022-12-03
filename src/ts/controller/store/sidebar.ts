@@ -30,7 +30,7 @@ class StoreClassify extends BaseController {
   constructor() {
     super();
     kernel.anystore.subscribed(selfAppMenu, 'user', (data: any) => {
-      console.log('订阅数据推送 自定义目录===>', data.data);
+      console.log('订阅数据推送 自定义目录===>', data);
       if (data?.data?.length > 0) {
         this.appFooterTree.appTreeData = data.data;
       }
@@ -65,12 +65,29 @@ class StoreClassify extends BaseController {
   public appFooterTree: footerTreeType = {
     appTreeData: [
       {
-        title: '默认分类',
-        key: '1-1',
+        title: '我的应用',
+        key: '0-1',
         id: '1',
         children: [],
       },
-      { title: '我的应用', key: '1-2', id: '2', children: [] },
+      {
+        title: '文档',
+        key: '0-2',
+        id: '2',
+        children: [],
+      },
+      {
+        title: '数据',
+        key: '0-3',
+        id: '3',
+        children: [],
+      },
+      {
+        title: '资源',
+        key: '0-4',
+        id: '4',
+        children: [],
+      },
     ],
     docxTreeData: [],
     dataTreeData: [],
@@ -142,7 +159,7 @@ class StoreClassify extends BaseController {
     }
     if (data.length > 0) {
       this.curTreeData = data;
-      this.changCallbackPart(`${this.curPageType}TreeData`, [...this.curTreeData]);
+      this.changCallbackPart(`${this.curPageType}TreeData`, [...data]);
     } else {
       console.log('获取-tree');
 

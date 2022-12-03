@@ -4,7 +4,6 @@ import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CohortController from '@/ts/controller/cohort/index';
 import { IPerson } from '@/ts/core/target/itarget';
 import CohortCard from './SearchCohortCard';
 type CohortSearchTableProps = {

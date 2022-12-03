@@ -3,7 +3,6 @@ import { Avatar, Button, Col } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
-import CohortController from '../../../ts/controller/cohort/index';
 import Cohort from '@/ts/core/target/cohort';
 interface defaultObjType {
   name: string;

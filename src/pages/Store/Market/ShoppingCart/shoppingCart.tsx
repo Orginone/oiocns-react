@@ -3,10 +3,12 @@ import { LeftOutlined, CheckCircleFilled } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Pagination, Checkbox, Modal, message } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-// import { marketCtrl } from '@/ts/controller/store/marketCtrl';
+import { MarketController } from '@/ts/controller/store/marketCtrl';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { Adata } from './moke';
 import { Col, Row, Tag } from 'antd';
-
+import Header from './component/hearde';
+import Content from './component/content';
 const ShoppingCart: React.FC<any> = (props) => {
   const [fls, setfls] = useState(Adata.result); //接口内的数据
   const [checkval, setcheckval] = useState([]); //勾选的数组
@@ -15,7 +17,12 @@ const ShoppingCart: React.FC<any> = (props) => {
   const { confirm } = Modal;
   // console.log(userCtrl.Space!.target.id);
   // console.log(Provider.isUserSpace());
-  // console.log(userCtrl.User);
+  console.log(userCtrl.User);
+  const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
+
+  // console.log(marketCtrl._target);//获取人员信息包括购物车
+
+  // console.log(marketCtrl);
 
   // console.log(settingCtrl.getCurWorkSpace);//空间
   // console.log(settingCtrl.getPerson);
@@ -50,11 +57,12 @@ const ShoppingCart: React.FC<any> = (props) => {
             // });
 
             // console.log(fsdata);
-            let fs = fls;
+            // let fs = fls;
+            let fs = JSON.parse(JSON.stringify(fls));
             console.log(fs);
 
             checkval.forEach((v) => {
-              fs = fs.filter((val) => {
+              fs = fs.filter((val: any) => {
                 return val.id != v;
               });
               setfls(fs);
@@ -104,28 +112,7 @@ const ShoppingCart: React.FC<any> = (props) => {
   return (
     <>
       <div className={cls['maxbox']}>
-        <div className={cls['head']}>
-          <div className={cls['left']}>
-            <div
-              className={cls['click']}
-              onClick={() => {
-                props.history.go(-1);
-              }}>
-              <LeftOutlined />
-              返回
-            </div>
-            <div className={cls['gang']}>|</div>
-            <div className={cls['title']}>{props.route.title}</div>
-          </div>
-          <div className={cls['right']}>
-            <div className={cls['buy']} onClick={showConfirms('rm')}>
-              删除
-            </div>
-            <div className={cls['buy']} onClick={showConfirms('add')}>
-              购买
-            </div>
-          </div>
-        </div>
+        <Header showConfirms={showConfirms} fatherprops={props} />
         <div className={cls['content']}>
           <div className={cls['content_head']}>
             <Row className={cls['content_head_top']}>
@@ -160,7 +147,15 @@ const ShoppingCart: React.FC<any> = (props) => {
               }}>
               {fls.map((item, i) => {
                 return (
-                  <div className={cls['content_body']} key={i}>
+                  <div key={i}>
+                    <Content
+                      item={item}
+                      i={i}
+                      fls={fls}
+                      setcheckval={setcheckval}
+                      checkval={checkval}
+                    />
+                    {/* <div className={cls['content_body']} key={i}>
                     <Row>
                       <Col span={8}>
                         <div>
@@ -209,7 +204,7 @@ const ShoppingCart: React.FC<any> = (props) => {
                         <div className={cls['lab6']}>
                           <Checkbox
                             autoFocus
-                            value={item.id}
+                            value={fls[i].id}
                             onChange={(e: CheckboxChangeEvent) => {
                               console.log(`checked = ${e.target.checked}`);
                               // setIndeterminate(
@@ -222,6 +217,7 @@ const ShoppingCart: React.FC<any> = (props) => {
                         </div>
                       </Col>
                     </Row>
+                  </div> */}
                   </div>
                 );
               })}

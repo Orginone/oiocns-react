@@ -1,3 +1,4 @@
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import consts from '../consts';
 import BaseTarget from './base';
 import { ResultType, TargetModel } from '@/ts/base/model';
@@ -42,9 +43,12 @@ export default class Group extends BaseTarget implements IGroup {
   public async createSubGroup(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
-    const tres = await this.searchTargetByName(data.code, TargetType.Group);
+    const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
     if (!tres.data) {
-      const res = await this.createTarget(data);
+      const res = await this.createTarget({
+        ...data,
+        belongId: userCtrl.Space!.target.id,
+      });
       if (res.success) {
         const group = new Group(res.data);
         this.subGroup.push(group);

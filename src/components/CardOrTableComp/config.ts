@@ -132,18 +132,32 @@ export const cohortColumn: ProColumns<any>[] = [
   },
   {
     title: '群组名称',
-    dataIndex: ['target','name'],
+    dataIndex: ['target', 'name'],
   },
   {
     title: '群组编号',
-    dataIndex: ['target','code'],
+    dataIndex: ['target', 'code'],
   },
   {
     title: '群组简介',
-    dataIndex: ['target','team','remark'],
+    dataIndex: ['target', 'team', 'remark'],
   },
   {
     title: '归属',
-    dataIndex: ['target','belongId'],
+    dataIndex: ['target', 'belongId'],
+  },
+];
+export const updateCohortColumn: ProColumns<any>[] = [
+  {
+    title: '群组名称',
+    dataIndex: ['target', 'name'],
+  },
+  {
+    title: '群组编号',
+    dataIndex: ['target', 'code'],
+  },
+  {
+    title: '群组简介',
+    dataIndex: ['target', 'team', 'remark'],
   },
 ];

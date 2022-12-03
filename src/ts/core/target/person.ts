@@ -32,6 +32,7 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedFriend = [];
     this.joinedCohort = [];
     this.joinedCompany = [];
+    this.extendTargetType = [TargetType.Cohort, TargetType.Person];
   }
   public get getSpaceData(): SpaceType {
     return {
@@ -41,8 +42,14 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: this.target.typeName as TargetType,
     };
   }
-  searchCompany(code: string): Promise<ResultType<schema.XTarget[]>> {
-    throw new Error('Method not implemented.');
+  public async searchCohort(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Cohort]);
+  }
+  public async searchPerson(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Person]);
+  }
+  public async searchCompany(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, consts.CompanyTypes);
   }
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
@@ -51,7 +58,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort], this.target.id);
+    const res = await this.getjoinedTargets([TargetType.Cohort]);
     console.log('输出返回结果', res);
     if (res.success) {
       console.log('进入了');
@@ -67,7 +74,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (this.joinedCompany.length > 0) {
       return this.joinedCompany;
     }
-    const res = await this.getjoinedTargets(consts.CompanyTypes, this.target.id);
+    const res = await this.getjoinedTargets(consts.CompanyTypes);
     if (res.success && res.data?.result) {
       this.joinedCompany = res.data.result.map((a) => {
         let company;
@@ -113,7 +120,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');
     }
-    const tres = await this.searchTargetByName(data.code, <TargetType>data.typeName);
+    const tres = await this.searchTargetByName(data.code, consts.CompanyTypes);
     if (!tres.data) {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
@@ -143,8 +150,10 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Cohort,
       belongId: this.target.id,
     });
+    console.log('过滤前', this.joinedCohort);
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((a) => a.target.id != id);
+      console.log('过滤后', this.joinedCohort);
     }
     return res;
   }
@@ -291,10 +300,10 @@ export default class Person extends MarketTarget implements IPerson {
     });
   }
   public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct([TargetType.Cohort, TargetType.Person]);
+    return super.getUsefulProduct();
   }
   public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
+    return super.getUsefulResource(id);
   }
   public async resetPassword(
     password: string,

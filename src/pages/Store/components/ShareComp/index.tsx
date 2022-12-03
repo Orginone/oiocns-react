@@ -47,9 +47,13 @@ const ShareRecent = (props: Iprops) => {
   const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
   const [selectedTeamId, setSelectedTeamId] = useState<string>('');
   // useImperativeHandle(nodeRef, () => ());
-  const [hasSelectRecord, setHasSelectRecord] = useState({});
+  const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
+    {} as any,
+  );
+  let recordShareInfo = new Map();
   useEffect(() => {
     getLeftTree();
+    queryExtend('组织', '');
   }, []);
   useEffect(() => {
     setDepartData([]);
@@ -57,6 +61,8 @@ const ShareRecent = (props: Iprops) => {
     setPersonsData([]);
     setIdentitysData([]);
     setCenterTreeData([]);
+    setSelectedTeamId('');
+    queryExtend();
   }, [radio]);
   const handelCheckedChange = (type: string, list: any) => {
     console.log('测试', type, list);
@@ -68,10 +74,21 @@ const ShareRecent = (props: Iprops) => {
     setLeftTreeData(res.data.result);
     console.log(res);
   };
-
+  const queryExtend = async (type?: string, teamId?: string) => {
+    const _type = type || DestTypes[radio - 1].label;
+    const _teamId = teamId || selectedTeamId || '0';
+    let curData = recordShareInfo.has(_type) ? recordShareInfo.get(_type) : {};
+    curData[_teamId] = await StoreContent.queryExtend(_type, _teamId);
+    recordShareInfo.set(_type, curData);
+    console.log('请求分配列表', curData[_teamId]);
+  };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     console.log('selected', selectedKeys, info);
-    StoreContent.ShareProduct(selectedTeamId, hasSelectRecord.list, hasSelectRecord.type);
+    StoreContent.ShareProduct(
+      selectedTeamId,
+      hasSelectRecord!.list,
+      hasSelectRecord!.type,
+    );
     setSelectedTeamId(info.node.id);
     setDepartData([]);
     setAuthorData([]);
