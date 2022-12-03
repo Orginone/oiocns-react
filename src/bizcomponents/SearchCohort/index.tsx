@@ -4,14 +4,12 @@ import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CohortController from '@/ts/controller/cohort/index';
-import { IPerson } from '@/ts/core/target/itarget';
 import CohortCard from './SearchCohortCard';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
   setCohort: Function;
-  person: IPerson;
 };
 
 let tableProps: CohortSearchTableProps;
@@ -33,18 +31,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
           style={{ display: 'inline-block', paddingTop: '20px', paddingLeft: '13px' }}
           key={item.id}>
           <Row>
-            <CohortCard
-              className="card"
-              data={item}
-              key={item.id}
-              defaultKey={{
-                name: 'caption',
-                size: 'price',
-                type: 'sellAuth',
-                desc: 'remark',
-                creatTime: 'createTime',
-              }}
-            />
+            <CohortCard className="card" data={item} key={item.id} />
           </Row>
         </div>
       );
@@ -53,10 +40,8 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
 
   // 查询数据
   const getList = async (searchKey?: string) => {
-    const res = CohortController.searchCohort(props.person, searchKey ? searchKey : '');
-    console.log((await res).data.result);
-    setDataSource((await res).data.result || []);
-    console.log('输出值', dataSource);
+    const res = await userCtrl.User?.searchCohort(searchKey || '');
+    setDataSource(res?.data.result || []);
   };
 
   return (

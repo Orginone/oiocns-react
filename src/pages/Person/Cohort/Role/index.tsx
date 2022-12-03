@@ -4,7 +4,6 @@ import Person from '@/bizcomponents/PersonInfo/index';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CertificateType } from '../../../../../typings/Certificate';
 import cls from './index.module.less';
-import CohortController from '../../../../ts/controller/cohort/index';
 import { schema } from '../../../../../src/ts/base';
 import AddRole from './addRole/index';
 import type { ProColumns } from '@ant-design/pro-components';

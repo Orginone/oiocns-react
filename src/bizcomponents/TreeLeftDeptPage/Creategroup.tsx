@@ -3,9 +3,8 @@ import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
-import { settingCtrl } from '@/ts/controller/setting/settingCtrl';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const x = 3;
 const y = 2;
@@ -78,7 +77,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (settingCtrl.getCurWorkSpace && settingCtrl.getCurWorkSpace.isUserSpace == true) {
+    if (!userCtrl.IsCompanySpace) {
       Modal.info({
         title: '提示',
         content: (
@@ -93,21 +92,9 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
     }
 
     initData();
-    /** 监听页面是否需要更新 */
-    settingController.addListen('updateDeptTree', () => {
-      initData();
-    });
   }, []);
 
-  useEffect(() => {
-    settingController.setCompanyID = settingCtrl.getCurWorkSpace?.id + '';
-  }, [settingCtrl.getCurWorkSpace]);
-
-  const initData = async () => {
-    const resultData = await settingController.getDepartments('0');
-    // console.log('====查询部门', resultData);
-    setTreeData(resultData);
-  };
+  const initData = async () => {};
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // const { value } = e.target;
@@ -131,7 +118,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
     console.log('选中树节点', selectedKeys, info.node);
     if (selectedKeys.length > 0) {
-      settingController.trigger('changeSelectId', { id: selectedKeys[0] });
     }
   };
 
@@ -142,25 +128,17 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
    */
   // const handleAddClick = (node: any) => {
   //   // console.log('handleAddClick', node);
-  //   settingController.trigger('isOpenModal');
   // };
   const handleMenuClick = (key: string, data: any) => {
     // console.log('点击', key, data);
     if (key === '新增部门') {
-      settingController.trigger('changeSelectId', { id: data.id });
-      settingController.trigger('isOpenModal');
     }
   };
   const menu = ['新增部门'];
 
   return (
     <div>
-      <Button
-        className={cls.creatgroup}
-        type="primary"
-        onClick={() => {
-          settingController.trigger('isOpenModal');
-        }}>
+      <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
         {createTitle}
       </Button>
 

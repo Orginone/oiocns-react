@@ -6,11 +6,8 @@ import { MarketTypes } from 'typings/marketType';
 // import useDebounce from '@/hooks/useDebounce';
 import { Button } from 'antd';
 import { useLocation } from 'react-router-dom';
-interface PublishListType {
-  appId: string;
-}
 
-const PublishListComp: React.FC<PublishListType> = ({ appId }) => {
+const PublishListComp: React.FC = () => {
   const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);

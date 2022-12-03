@@ -3,7 +3,8 @@ import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import { useAppwfConfig, DefaultProps } from '@/bizcomponents/Flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+// {  DefaultProps }  报错临时处理
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
   [key: string]: any;
@@ -138,7 +139,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const startDesign = async (obj: any) => {
     let tempDesign;
     setForm(obj);
-    DefaultProps.setFormFields(contionMes?.labels);
+    // DefaultProps.setFormFields(contionMes?.labels);
     if (obj.flow) {
       tempDesign = JSON.parse(JSON.stringify(obj.flow));
     } else {
@@ -153,7 +154,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
       <LayoutHeader
         OnPreview={preview}
         OnExit={exit}
-        titleName={contionMes?.name}
+        titleName={'contionMes?.name' || '临时数据'}
         backTable={() => {
           backTable();
         }}

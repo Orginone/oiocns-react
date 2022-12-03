@@ -146,7 +146,9 @@ const StoreClassifyTree: React.FC<TreeType> = ({
             onDoubleClickTitle && onDoubleClickTitle(node);
           }}
           onClick={() => handleTitleClick && handleTitleClick(node)}>
-          {isDirectoryTree == false && node.children.length == 0 ? childIcon : parentIcon}
+          {isDirectoryTree == false && node.children && node.children.length == 0
+            ? childIcon
+            : parentIcon}
           {node.searchTitle || node.title}
         </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>

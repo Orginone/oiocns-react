@@ -8,7 +8,6 @@ import SearchPerson from '@/bizcomponents/SearchPerson';
 import { ColumnsType } from 'antd/lib/table';
 import { schema } from '@/ts/base';
 import PersonInfoEnty from '@/ts/core/provider';
-import friendController from '@/ts/controller/friend/index';
 interface OperationType {
   key: string;
   label: string;

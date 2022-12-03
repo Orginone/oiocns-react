@@ -1,24 +1,16 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col } from 'antd';
+import { Avatar, Button, Col, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
-import CohortController from '../../../ts/controller/cohort/index';
 import Cohort from '@/ts/core/target/cohort';
-interface defaultObjType {
-  name: string;
-  size: number | string;
-  type: string;
-  desc: string;
-  creatTime: string | number;
-}
-interface AppCardType {
+import userCtrl from '@/ts/controller/setting/userCtrl';
+interface CohortCardType {
   data: schema.XTarget; //props
   className?: string;
-  defaultKey?: defaultObjType; // 卡片字段 对应数据字段
 }
 
-const CohortListCard: React.FC<AppCardType> = ({ className, data }) => {
+const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
   const [name, setName] = useState('');
 
   useEffect(() => {
@@ -26,9 +18,17 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data }) => {
   }, []);
 
   const getname = async () => {
-    const res = await CohortController.getName(new Cohort(data));
-    setName(res);
-    console.log('获取归属', name);
+    const cohort = new Cohort(data);
+    const res = (await cohort.getMember()).filter((obj) => obj.id === data.belongId);
+    setName(res[0].team?.name!);
+  };
+  const applyCohort = async (data: schema.XTarget) => {
+    const res = await userCtrl.User?.applyJoinCohort(data.id);
+    if (res?.success) {
+      message.success('发起申请成功');
+    } else {
+      message.error(res?.msg);
+    }
   };
   /**
    * @desc: 操作按钮区域
@@ -72,6 +72,7 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data }) => {
               icon={
                 <UsergroupAddOutlined style={{ fontSize: '25px', color: '#808080' }} />
               }
+              onClick={() => applyCohort(data)}
             />
           </li>
         </ul>

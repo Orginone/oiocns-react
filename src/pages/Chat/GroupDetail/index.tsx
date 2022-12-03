@@ -269,9 +269,11 @@ const Groupdetail = () => {
           </div>
         </div>
         {chat?.spaceId === chatCtrl.userId ? (
-          <div className={`${detailStyle.footer} ${detailStyle.group_detail_wrap}`}>
+          <div className={`${detailStyle.footer} `}>
             <Button
+              block
               type="primary"
+              size={'large'}
               onClick={async () => {
                 if (await chatCtrl.refChat(chat)?.clearMessage()) {
                   chatCtrl.changCallback();
@@ -281,13 +283,13 @@ const Groupdetail = () => {
             </Button>
             {chat?.target.typeName === '群组' ? (
               <>
-                <Button type="primary" danger>
+                <Button type="primary" danger size={'large'} block>
                   退出该群
                 </Button>
               </>
             ) : (
               <>
-                <Button type="primary" danger>
+                <Button type="primary" danger size={'large'} block>
                   删除好友
                 </Button>
               </>

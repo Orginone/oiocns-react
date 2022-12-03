@@ -3,15 +3,14 @@ import { Avatar, Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
 import { MarketTypes } from 'typings/marketType';
-import Cohort from '@/ts/core/target/cohort';
 import CohortMemberList from '../CohortMemberList';
-import CohortController from '@/ts/controller/cohort/index';
+import { ICohort } from '@/ts/core/target/itarget';
 
 interface CohortCardType {
-  data: Cohort; //props
+  data: ICohort; //props
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: Cohort) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (_item: ICohort) => MarketTypes.OperationType[]; //操作区域数据
 }
 
 const CohortCardComp: React.FC<CohortCardType> = ({
@@ -34,8 +33,8 @@ const CohortCardComp: React.FC<CohortCardType> = ({
     getname();
   }, []);
   const getname = async () => {
-    const res = await CohortController.getName(data);
-    setName(res);
+    const res = (await data.getMember()).filter((obj) => obj.id === data.target.belongId);
+    setName(res[0].team?.name!);
   };
   const Title = () => {
     return (

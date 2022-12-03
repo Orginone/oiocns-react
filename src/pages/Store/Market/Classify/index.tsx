@@ -5,7 +5,7 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu, Button, Row, Col } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import StoreSiderbar from '@/ts/controller/store/sidebar';
@@ -100,15 +100,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       return StoreSiderbar.unsubscribe('marketTreeData');
     };
   }, []);
-
-  /**
-   * @description: 处理商店树数据
-   * @param {*} useMemo
-   * @return {*}
-   */
-  const treelist = useMemo(() => {
-    return list?.filter((item) => item.title !== '开放市场');
-  }, [list]);
 
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
@@ -241,7 +232,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         key={selectMenu}
         handleTitleClick={handleTitleClick}
         handleMenuClick={handleMenuClick}
-        treeData={treelist}
+        treeData={list}
         menu={'menus'}
         title={ClickBtn}
       />

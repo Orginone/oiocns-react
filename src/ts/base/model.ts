@@ -674,7 +674,7 @@ export type NameTypeModel = {
   // 名称
   name: string;
   // 类型名
-  typeName: string;
+  typeNames: string[];
   // 分页
   page: PageRequest | undefined;
 };
@@ -753,6 +753,75 @@ export type FlowInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
+};
+
+export type CreateDefineReq = {
+  // 唯一Id
+  Id: string;
+  // 名称
+  Name: string;
+  // 编号
+  Code: string;
+  // 备注
+  Remark: string;
+  // 节点信息
+  Resource: FlowNode;
+  // 归属Id
+  BelongId: string;
+};
+
+export type FlowNode = {
+  Id: string;
+  NodeId: string;
+  ParentId: string;
+  Type: string;
+  Name: string;
+  Desc: string;
+  Props: Prop;
+  Children: FlowNode;
+  Branches: Branche[];
+};
+
+export type Branche = {
+  Id: string;
+  NodeId: string;
+  ParentId: string;
+  Name: string;
+  Type: string;
+  Conditions: Condition[];
+  Children: FlowNode;
+};
+
+export type Condition = {
+  Pos: number;
+  ParamKey: string;
+  ParamLabel: string;
+  Key: string;
+  Label: string;
+  Type: string;
+  Val: string;
+  ValLabel: string;
+};
+
+export type Prop = {
+  AssignedType: string;
+  Mode: string;
+  AssignedUser: Assigned[];
+  Refuse: Refuse;
+  FriendDialogmode: boolean;
+  Num: number;
+};
+
+export type Assigned = {
+  Id: string;
+  Name: string;
+  Type: string;
+  OrgIds: string;
+};
+
+export type Refuse = {
+  Type: string;
+  Target: string;
 };
 
 export type FlowRelationModel = {
