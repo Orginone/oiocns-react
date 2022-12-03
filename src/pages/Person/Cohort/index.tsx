@@ -25,8 +25,6 @@ import { ICohort } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core/enum';
 
 const CohortConfig: React.FC = () => {
-  const Person = userCtrl.User;
-  console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
@@ -42,10 +40,8 @@ const CohortConfig: React.FC = () => {
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
   useEffect(() => {
     getData();
-    // getJoinData();
   }, []);
   const getData = async () => {
-    console.log('111111111111111111', await userCtrl.User?.getJoinedCohorts());
     setData(
       (await userCtrl.User?.getJoinedCohorts())?.filter(
         (obj) => obj.target.belongId == userCtrl.User?.target.id,
@@ -69,7 +65,6 @@ const CohortConfig: React.FC = () => {
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
         if (id == chat.target.id) {
-          console.log(chat);
           return chat;
         }
       }
@@ -85,7 +80,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           chatCtrl.setCurrent(getChat(item.target.id));
           history.push('/chat');
-          console.log('按钮事件', 'enterChat', item);
         },
       },
       {
@@ -94,7 +88,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           showModal();
           setItem(item);
-          console.log('按钮事件', 'inviteMembers', item);
         },
       },
       {
@@ -103,7 +96,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           setItem(item);
           setOpen(true);
-          console.log('按钮事件', 'updateCohort', item);
         },
       },
       {
@@ -111,7 +103,6 @@ const CohortConfig: React.FC = () => {
         label: '角色管理',
         onClick: () => {
           setIsSetPost(true);
-          console.log('按钮事件', 'roleManage', item);
         },
       },
       {
@@ -120,7 +111,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           setItem(item);
           setChangeIsModelOpen(true);
-          console.log('按钮事件', 'changePermission', item);
         },
       },
       {
@@ -151,7 +141,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           showModal();
           setItem(item);
-          console.log('按钮事件', 'inviteMembers', item);
         },
       },
       {
@@ -160,7 +149,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           // CohortController.quitCohort(Person, item.target.id);
           message.info('退出成功');
-          console.log('按钮事件', 'exitCohort', item);
         },
       },
     ];
@@ -190,6 +178,7 @@ const CohortConfig: React.FC = () => {
       belongId: item.target.belongId,
       avatar: 'test', //头像
     });
+    getData();
     message.success('权限转移成功');
   };
   //邀请成员确认事件
@@ -197,7 +186,6 @@ const CohortConfig: React.FC = () => {
     setIsModalOpen(false);
     const res = await item?.pullMember([friend!]);
     if (res?.success) {
-      console.log(res);
       message.success('邀请成功');
     } else {
       message.error(res?.msg);
@@ -271,7 +259,7 @@ const CohortConfig: React.FC = () => {
                 onOk={cohortHandleOk}
                 onCancel={() => setAddIsModalOpen(false)}
                 width="1050px">
-                <AddCohort person={Person} setCohort={setcohort} />
+                <AddCohort setCohort={setcohort} />
               </Modal>
               {item && (
                 <UpdateCohort

@@ -21,7 +21,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
 
   const [value, setValue] = useState<string>();
   const getTableList = async () => {
-    // const res = await CohortController.getCohortPeronList(props.cohort);
     const res = await props.cohort.getMember();
     setData(res);
   };
@@ -29,7 +28,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
     setValue(e.target.value);
     if (e.target.value) {
       const res = await userCtrl.User?.searchPerson(e.target.value);
-      console.log(res);
       if (res?.data.result != null) {
         setData([res.data.result[0]]);
       } else {
