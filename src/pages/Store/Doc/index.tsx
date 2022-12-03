@@ -133,7 +133,7 @@ const StoreDoc: React.FC = () => {
 
   return (
     <Card
-      key={key}
+      id={key}
       className={cls.pageCard}
       title={<CardTiltle handleMenuClick={handleMenuClick} current={docsCtrl.current!} />}
       extra={

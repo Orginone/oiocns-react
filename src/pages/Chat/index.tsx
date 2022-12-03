@@ -36,7 +36,7 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div key={key} className={charsStyle.cohort_wrap}>
+    <div id={key} className={charsStyle.cohort_wrap}>
       {/* 导航栏 */}
       <div className={charsStyle.custom_group_silder_menu}>
         <GroupSideBar />

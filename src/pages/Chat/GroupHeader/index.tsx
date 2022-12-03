@@ -55,7 +55,7 @@ const Groupheader = (props: Iprops) => {
 
   return (
     <>
-      <div key={key} className={headerStyle.group_header_wrap}>
+      <div id={key} className={headerStyle.group_header_wrap}>
         <div className={`${headerStyle.user} ${headerStyle.flex}`}>
           <HeadImg name={chatCtrl.chat?.target.name} label={''} />
           <div>

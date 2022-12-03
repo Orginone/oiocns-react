@@ -245,7 +245,7 @@ const GroupSideBar: React.FC = () => {
     },
   ];
   return (
-    <div key={key} className={sideStyle.chart_side_wrap}>
+    <div id={key} className={sideStyle.chart_side_wrap}>
       <ContentMenu width={300}>
         <div className={sideStyle.group_side_bar_search}>
           <Input

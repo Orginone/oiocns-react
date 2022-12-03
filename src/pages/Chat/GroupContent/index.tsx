@@ -97,7 +97,7 @@ const GroupContent = (props: Iprops) => {
   };
 
   return (
-    <div key={key} className={css.group_content_wrap}>
+    <div id={key} className={css.group_content_wrap}>
       {messages.map((item, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>

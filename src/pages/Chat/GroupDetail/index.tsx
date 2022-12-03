@@ -202,7 +202,7 @@ const Groupdetail = () => {
 
   return (
     <>
-      <div key={key} className={detailStyle.group_detail_wrap}>
+      <div id={key} className={detailStyle.group_detail_wrap}>
         {heads}
         <div className={detailStyle.user_list}>
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
