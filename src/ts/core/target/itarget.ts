@@ -192,16 +192,41 @@ export interface IMTarget {
   getUsefulResource(id: string): Promise<schema.XResource[]>;
 }
 export interface IFlowTarget {
+  /** 流程定义 */
+  defines: schema.XFlowDefine[];
   /** 获取流程定义列表 */
-  getDefines(): schema.XFlowDefine[];
-  // TODO
-  createDefine(data: schema.XFlowDefine): Promise<ResultType<schema.XFlowDefine>>;
+  getDefines(): Promise<schema.XFlowDefine[]>;
+  /**
+   * 发布流程定义（包含创建、更新）
+   * @param data
+   */
+  publishDefine(data: model.CreateDefineReq): Promise<ResultType<schema.XFlowDefine>>;
+  /**
+   * 删除流程定义
+   * @param id 流程定义Id
+   */
+  deleteDefine(id: string): Promise<model.ResultType<boolean>>;
+  /**
+   * 发起流程实例
+   * @param data 流程实例参数
+   */
   createInstance(
     data: model.FlowInstanceModel,
   ): Promise<model.ResultType<schema.XFlowInstance>>;
-  createFlowRelation(
+  /**
+   * 绑定应用业务与流程定义
+   * @param params
+   */
+  bindingFlowRelation(
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<schema.XFlowRelation>>;
+  /**
+   * 解绑应用业务与流程定义
+   * @param params
+   */
+  unbindingFlowRelation(
+    params: model.FlowRelationModel,
+  ): Promise<model.ResultType<boolean>>;
 }
 /** 群组操作 */
 export interface ICohort {
@@ -247,7 +272,7 @@ export interface ICohort {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson extends IMTarget {
+export interface IPerson extends IMTarget, IFlowTarget {
   /** 人员实体 */
   target: schema.XTarget;
   /** 职权树 */
@@ -387,7 +412,7 @@ export interface IPerson extends IMTarget {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany extends IMTarget {
+export interface ICompany extends IMTarget, IFlowTarget {
   /** 单位实体 */
   target: schema.XTarget;
   /** 职权树 */

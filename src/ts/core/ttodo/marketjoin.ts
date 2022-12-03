@@ -1,4 +1,3 @@
-import Provider from '../../core/provider';
 import { common } from '../../base';
 import { CommonStatus, TodoType } from '../../core/enum';
 import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
@@ -24,7 +23,7 @@ export class MarketJoinTodo implements ITodoGroup {
   async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
-      id: Provider.spaceId,
+      id: '0',
       page,
     });
     if (res.success) {
@@ -53,7 +52,7 @@ export class MarketJoinTodo implements ITodoGroup {
   }
   private async getJoinApproval() {
     const res = await kernel.queryJoinApproval({
-      id: Provider.spaceId,
+      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -133,7 +132,7 @@ class ApplyItem implements IApplyItem {
   async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
     return await kernel.cancelJoinMarket({
       id: this._data.id,
-      belongId: Provider.spaceId,
+      belongId: '0',
       typeName: '',
     });
   }

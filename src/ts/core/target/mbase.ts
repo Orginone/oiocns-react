@@ -2,10 +2,10 @@ import { common, faildResult, kernel, model, schema } from '../../base';
 import { Market, BaseProduct } from '../market';
 import { TargetType } from '../enum';
 import { IMTarget } from './itarget';
-import BaseTarget from './base';
+import FlowTarget from './flow';
 import consts from '../consts';
 
-export default class MarketTarget extends BaseTarget implements IMTarget {
+export default class MarketTarget extends FlowTarget implements IMTarget {
   joinedMarkets: Market[];
   publicMarkets: Market[];
   ownProducts: BaseProduct[];
