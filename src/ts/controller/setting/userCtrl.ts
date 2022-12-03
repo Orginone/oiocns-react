@@ -34,18 +34,18 @@ class UserController extends BaseController {
   }
   /** 当前用户 */
   get User(): IPerson {
-    if(this._user){
+    if (this._user) {
       return this._user;
-    }else{
-      return { id: '', target: {id: ''} } as unknown as Person;
+    } else {
+      return { id: '', target: { id: '' } } as unknown as Person;
     }
   }
   /** 当前单位空间 */
   get Space(): ICompany {
-    if(this._curSpace){
+    if (this._curSpace) {
       return this._curSpace;
-    }else{
-      return { id: '', target: {id: ''} } as unknown as ICompany;
+    } else {
+      return { id: '', target: { id: '' } } as unknown as ICompany;
     }
   }
   /** 当前空间数据 */
