@@ -12,8 +12,9 @@ import cls from './index.module.less';
 import UploadAvatar, { avatarUpload } from '../UploadAvatar';
 import SettingService from '../../service';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import IDepartment from '@/ts/core/target/department';
+// import IDepartment from '@/ts/core/target/department';
 import { TargetType } from '@/ts/core/enum';
+import Department from '@/ts/core/target/department';
 
 /* 
   编辑
@@ -123,6 +124,31 @@ const EditCustomModal = (props: Iprops) => {
                     }
                     // 新增部门
                     value.typeName = TargetType.Department;
+                    // 查询是否重复创建
+                    const dept = setting.getRoot as Department;
+                    dept.searchTargetType = [TargetType.Department, TargetType.Company];
+                    let datas = await dept.searchTargetByName(value.code, [
+                      TargetType.Department,
+                    ]);
+                    if (!datas.success) {
+                      message.error(datas.msg);
+                      return;
+                    }
+                    if (datas?.data && datas.data?.total > 0) {
+                      message.error('重复创建');
+                      return;
+                    }
+                    datas = await dept.searchTargetByName(value.name, [
+                      TargetType.Department,
+                    ]);
+                    if (!datas.success) {
+                      message.error(datas.msg);
+                      return;
+                    }
+                    if (datas?.data && datas.data?.total > 0) {
+                      message.error('重复创建');
+                      return;
+                    }
 
                     let curentValue: any;
                     if (value.parentId == '') {
