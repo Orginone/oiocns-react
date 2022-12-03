@@ -32,7 +32,7 @@ export class OrderTodo implements ITodoGroup {
     return this._doList;
   }
   async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
-    let applyList: IApplyItem[] = [];
+    let applyList: IOrderApplyItem[] = [];
     const res = await kernel.queryBuyOrderList({
       id: '0',
       status: 0,
