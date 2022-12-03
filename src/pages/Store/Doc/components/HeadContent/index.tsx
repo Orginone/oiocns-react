@@ -23,7 +23,7 @@ const CardTiltle = ({
   current,
 }: {
   handleMenuClick: (key: string, node: IFileSystemItem) => void;
-  current?: IFileSystemItem;
+  current: IFileSystemItem;
 }) => {
   return (
     <Space wrap split={<Divider type="vertical" />} size={2}>
@@ -32,14 +32,13 @@ const CardTiltle = ({
         onClick={() => docsCtrl.backup()}>
         <ImArrowUp2 />
       </Typography.Link>
-      <Typography.Link onClick={() => handleMenuClick('刷新', {} as IFileSystemItem)}>
+      <Typography.Link onClick={() => handleMenuClick('刷新', current)}>
         <ImSpinner9 />
       </Typography.Link>
-      <Typography.Link onClick={() => handleMenuClick('上传', {} as IFileSystemItem)}>
+      <Typography.Link onClick={() => handleMenuClick('上传', current)}>
         <ImUpload />
       </Typography.Link>
-      <Typography.Link
-        onClick={() => handleMenuClick('新建文件夹', {} as IFileSystemItem)}>
+      <Typography.Link onClick={() => handleMenuClick('新建文件夹', current)}>
         <ImFolderPlus />
       </Typography.Link>
       <Breadcrumb separator={<ImPlay3 />}>

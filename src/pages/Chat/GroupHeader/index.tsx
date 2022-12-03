@@ -1,11 +1,11 @@
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Modal } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import QrCodeCustom from '@/components/qrCode';
 import headerStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
-import { deepClone } from '@/ts/base/common';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 头部展示
@@ -18,19 +18,8 @@ interface Iprops {
 
 const Groupheader = (props: Iprops) => {
   const { handleViewDetail } = props;
-  const [chat, setChat] = useState(chatCtrl.chat);
+  const [key] = useCtrlUpdate(chatCtrl);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
-
-  const refreshUI = () => {
-    setChat(deepClone(chatCtrl.chat));
-  };
-
-  useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
-    return () => {
-      chatCtrl.unsubscribe(id);
-    };
-  }, []);
 
   /**
    * @description: 打开邀请好友弹窗
@@ -66,28 +55,28 @@ const Groupheader = (props: Iprops) => {
 
   return (
     <>
-      <div className={headerStyle.group_header_wrap}>
+      <div key={key} className={headerStyle.group_header_wrap}>
         <div className={`${headerStyle.user} ${headerStyle.flex}`}>
-          <HeadImg name={chat?.target.name} label={''} />
+          <HeadImg name={chatCtrl.chat?.target.name} label={''} />
           <div>
             <div className={`${headerStyle.flex} ${headerStyle.user_info_top}`}>
               <div className={`${headerStyle.user_info_top_name}`}>
-                {chat?.target.name}
-                {chat?.target.typeName !== '人员' ? (
-                  <span>({chat?.personCount ?? 0 > 0})</span>
+                {chatCtrl.chat?.target.name}
+                {chatCtrl.chat?.target.typeName !== '人员' ? (
+                  <span>({chatCtrl.chat?.personCount ?? 0 > 0})</span>
                 ) : (
                   ''
                 )}
                 <Breadcrumb>
-                  <Breadcrumb.Item>{chat?.spaceName}</Breadcrumb.Item>
-                  <Breadcrumb.Item>{chat?.target.label}</Breadcrumb.Item>
+                  <Breadcrumb.Item>{chatCtrl.chat?.spaceName}</Breadcrumb.Item>
+                  <Breadcrumb.Item>{chatCtrl.chat?.target.label}</Breadcrumb.Item>
                 </Breadcrumb>
               </div>
             </div>
           </div>
         </div>
         <span className={headerStyle.btn_box}>
-          {chat?.target.typeName !== '人员' ? (
+          {chatCtrl.chat?.target.typeName !== '人员' ? (
             <PlusOutlined
               style={{ fontSize: '20px', marginRight: '8px' }}
               onClick={handleAddFun}
@@ -105,8 +94,8 @@ const Groupheader = (props: Iprops) => {
         onCancel={handleCancel}
         getContainer={false}>
         <div>方式一：共享二维码，邀请好友</div>
-        <div className="QrDiv" key={chat?.target.id}>
-          <QrCodeCustom qrText={chat?.target.name} />
+        <div className="QrDiv" key={chatCtrl.chat?.target.id}>
+          <QrCodeCustom qrText={chatCtrl.chat?.target.name} />
         </div>
         <div>方式二：共享链接，邀请好友</div>
         <div className="share-link">展示链接...</div>

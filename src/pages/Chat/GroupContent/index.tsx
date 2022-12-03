@@ -7,10 +7,10 @@ import HeadImg from '@/components/headImg/headImg';
 import css from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
-import { deepClone } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 聊天区域
@@ -22,13 +22,11 @@ interface Iprops {
 }
 
 const GroupContent = (props: Iprops) => {
+  const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
   const [messages, setMessages] = useState(chatCtrl.chat?.messages ?? []);
   const { handleReWrites } = props;
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
-  const refreshUI = async () => {
-    setMessages(deepClone(chatCtrl.chat?.messages ?? []));
-  };
 
   /**
    * @description: 滚动到底部
@@ -48,11 +46,10 @@ const GroupContent = (props: Iprops) => {
   }, [messages]);
 
   useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
-    return () => {
-      chatCtrl.unsubscribe(id);
-    };
-  }, []);
+    if (chatCtrl.chat) {
+      setMessages(chatCtrl.chat.messages);
+    }
+  }, [key]);
 
   const isShowTime = (index: number) => {
     if (index == 0 && messages) return true;
@@ -100,7 +97,7 @@ const GroupContent = (props: Iprops) => {
   };
 
   return (
-    <div className={css.group_content_wrap}>
+    <div key={key} className={css.group_content_wrap}>
       {messages.map((item, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
@@ -156,7 +153,7 @@ const GroupContent = (props: Iprops) => {
                           danger
                           onClick={async () => {
                             if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                              refreshUI();
+                              forceUpdate();
                             }
                           }}>
                           删除
@@ -223,7 +220,7 @@ const GroupContent = (props: Iprops) => {
                             danger
                             onClick={async () => {
                               if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                                refreshUI();
+                                forceUpdate();
                               }
                             }}>
                             删除

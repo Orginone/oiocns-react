@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import sideStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
-import { deepClone } from '@/ts/base/common';
 import { IChat } from '@/ts/core/chat/ichat';
 import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
 import { MessageType, TargetType } from '@/ts/core/enum';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 右键菜单信息
@@ -28,9 +28,7 @@ interface MenuItemType {
 }
 
 const GroupSideBar: React.FC = () => {
-  const [index, setIndex] = useState('1');
-  const [chats, setChats] = useState(chatCtrl.chats);
-  const [groups, setGroups] = useState(chatCtrl.groups);
+  const [key] = useCtrlUpdate(chatCtrl);
   const [searchValue, setSearchValue] = useState<string>(''); // 搜索值
   const [mousePosition, setMousePosition] = useState<MousePosition>({
     isShowContext: false,
@@ -103,11 +101,9 @@ const GroupSideBar: React.FC = () => {
           chatCtrl.setToping(mousePosition.selectedItem);
           break;
         case 2:
-          {
-            const refChat = chatCtrl.refChat(mousePosition.selectedItem);
-            if (refChat && (await refChat.clearMessage())) {
-              chatCtrl.changCallback();
-            }
+          if (mousePosition.selectedItem) {
+            await mousePosition.selectedItem.clearMessage();
+            chatCtrl.changCallback();
           }
           break;
         case 3:
@@ -127,24 +123,12 @@ const GroupSideBar: React.FC = () => {
   };
 
   /**
-   * @description: 刷新页面
-   * @return {*}
-   */
-  const refreshUI = () => {
-    setIndex(chatCtrl.tabIndex);
-    setChats(deepClone(chatCtrl.chats));
-    setGroups(deepClone(chatCtrl.groups));
-  };
-
-  /**
    * @description: 监听点击事件，关闭弹窗
    * @return {*}
    */
   useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
     document.addEventListener('click', _handleClick);
     return () => {
-      chatCtrl.unsubscribe(id);
       document.removeEventListener('click', _handleClick);
     };
   }, []);
@@ -222,7 +206,7 @@ const GroupSideBar: React.FC = () => {
             e.preventDefault();
           }}
           className={sideStyle.group_side_bar_wrap}>
-          {loadChats(filterChats(chats))}
+          {loadChats(filterChats(chatCtrl.chats))}
         </div>
       ),
     },
@@ -235,7 +219,7 @@ const GroupSideBar: React.FC = () => {
           onContextMenu={(e) => {
             e.preventDefault();
           }}>
-          {groups.map((item) => {
+          {chatCtrl.groups.map((item) => {
             return (
               <div key={item.spaceId}>
                 <div className={`${sideStyle.group_con} ${sideStyle.item}`}>
@@ -261,7 +245,7 @@ const GroupSideBar: React.FC = () => {
     },
   ];
   return (
-    <div className={sideStyle.chart_side_wrap}>
+    <div key={key} className={sideStyle.chart_side_wrap}>
       <ContentMenu width={300}>
         <div className={sideStyle.group_side_bar_search}>
           <Input
@@ -274,9 +258,9 @@ const GroupSideBar: React.FC = () => {
         </div>
         <Tabs
           centered
-          activeKey={index}
+          activeKey={chatCtrl.tabIndex}
           onTabClick={(k) => {
-            setIndex(k);
+            chatCtrl.setTabIndex(k);
           }}
           items={items}
         />

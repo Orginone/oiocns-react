@@ -35,14 +35,9 @@ const StoreClassify: React.FC = () => {
 
   useEffect(() => {
     console.log('初始化', 'APP頁面');
-    const id = SelfAppCtrl.subscribePart(
-      SelfCallBackTypes.TreeData,
-      (data: TreeType[]) => {
-        console.log('apptree', data, SelfAppCtrl.treeData);
-
-        setTreeData(data || SelfAppCtrl.treeData || []);
-      },
-    );
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TreeData, () => {
+      setTreeData(SelfAppCtrl.treeData);
+    });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
     return () => {

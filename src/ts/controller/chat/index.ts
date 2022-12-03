@@ -82,7 +82,7 @@ class ChatController extends BaseController {
    */
   public async setCurrent(chat: IChat | undefined): Promise<void> {
     this._tabIndex = '1';
-    this._curChat = this.refChat(chat);
+    this._curChat = this._refChat(chat);
     if (this._curChat) {
       this._curChat.noReadCount = 0;
       await this._curChat.moreMessage('');
@@ -116,22 +116,9 @@ class ChatController extends BaseController {
     }
     this.changCallback();
   }
-  /**
-   * 获取引用会话
-   * @param chat 拷贝会话
-   * @returns 引用会话
-   */
-  public refChat(chat: IChat | undefined): IChat | undefined {
-    if (chat) {
-      for (const item of this._groups) {
-        for (const c of item.chats) {
-          if (c.chatId === chat.chatId && c.spaceId === chat.spaceId) {
-            return c;
-          }
-        }
-      }
-    }
-    return chat;
+  public setTabIndex(index: string): void {
+    this._tabIndex = index;
+    this.changCallback();
   }
   /**
    * 删除会话
@@ -167,7 +154,7 @@ class ChatController extends BaseController {
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
-          let lchat = this.refChat(item);
+          let lchat = this._refChat(item);
           if (lchat) {
             lchat.loadCache(item);
             this._appendChats(lchat);
@@ -205,6 +192,23 @@ class ChatController extends BaseController {
         }
       }
     }
+  }
+  /**
+   * 获取引用会话
+   * @param chat 拷贝会话
+   * @returns 引用会话
+   */
+  private _refChat(chat: IChat | undefined): IChat | undefined {
+    if (chat) {
+      for (const item of this._groups) {
+        for (const c of item.chats) {
+          if (c.chatId === chat.chatId && c.spaceId === chat.spaceId) {
+            return c;
+          }
+        }
+      }
+    }
+    return chat;
   }
   /**
    * 追加新会话

@@ -14,6 +14,7 @@ import { FileItemModel } from '@/ts/base/model';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
 import CloudTreeComp from './components/CloudTreeComp';
 import ReactDOM from 'react-dom';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 type NameValue = {
   name: string;
@@ -24,6 +25,7 @@ type NameValue = {
  * @returns
  */
 const StoreDoc: React.FC = () => {
+  const [key] = useCtrlUpdate(docsCtrl);
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('新建文件夹');
   const [coppyOrMoveTitle, setCoppyOrMoveTitle] = useState('复制到');
@@ -32,19 +34,11 @@ const StoreDoc: React.FC = () => {
   const [segmentedValue, setSegmentedValue] = useState<'Kanban' | 'List'>('Kanban');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [moveModalOpen, setMoveModalOpen] = useState(false);
-  const [current, setCurrent] = useState(docsCtrl.current);
-  const [pageData, setPagedata] = useState<FileItemModel[]>([]);
   const [createFileName, setCreateFileName] = useState<string>('');
   const [dicExtension, setDicExtension] = useState<NameValue[]>([]);
   const treeContainer = document.getElementById('templateMenu');
   const uploadRef = useRef<any>();
   const parentRef = useRef<any>();
-  const refreshUI = () => {
-    if (docsCtrl.current != undefined) {
-      setPagedata(docsCtrl.current.childrenData);
-      setCurrent({ ...docsCtrl.current });
-    }
-  };
   useEffect(() => {
     fetch('/fileext.json').then(async (res) => {
       const temp: NameValue[] = await res.json();
@@ -52,10 +46,6 @@ const StoreDoc: React.FC = () => {
         setDicExtension(temp);
       }
     });
-    const id = docsCtrl.subscribe(refreshUI);
-    return () => {
-      docsCtrl.unsubscribe(id);
-    };
   }, []);
   const uploadProps: UploadProps = {
     multiple: true,
@@ -93,7 +83,7 @@ const StoreDoc: React.FC = () => {
   };
   const handleMenuClick = async (key: string, node: any) => {
     switch (key) {
-      case '1': // 删除
+      case '删除': // 删除
         if (await docsCtrl.refItem(node.key)?.delete()) {
           message.success('删除成功');
           if (node.key === docsCtrl.current?.key) {
@@ -103,23 +93,23 @@ const StoreDoc: React.FC = () => {
           }
         }
         break;
-      case '2': // 重命名
+      case '重命名': // 重命名
         setReNameKey(node.key);
         setCreateFileName(node.name ?? node.title);
         setTitle('重命名');
         setIsModalOpen(true);
         break;
-      case '3': // 移动到
+      case '移动到': // 移动到
         setCurrentTarget(docsCtrl.refItem(node.key));
         setCoppyOrMoveTitle('移动到');
         setMoveModalOpen(true);
         break;
-      case '4': // 复制到
+      case '复制到': // 复制到
         setCurrentTarget(docsCtrl.refItem(node.key));
         setCoppyOrMoveTitle('复制到');
         setMoveModalOpen(true);
         break;
-      case '5': // 下载
+      case '下载': // 下载
         break;
       case '刷新': // 刷新
         docsCtrl.current?.loadChildren(true);
@@ -143,8 +133,9 @@ const StoreDoc: React.FC = () => {
 
   return (
     <Card
+      key={key}
       className={cls.pageCard}
-      title={<CardTiltle handleMenuClick={handleMenuClick} current={current} />}
+      title={<CardTiltle handleMenuClick={handleMenuClick} current={docsCtrl.current!} />}
       extra={
         <Typography.Link onClick={() => setOpen(true)}>
           <FaTasks fontSize={18}></FaTasks>
@@ -155,14 +146,14 @@ const StoreDoc: React.FC = () => {
         {segmentedValue === 'List' ? (
           <TableContent
             parentRef={parentRef}
-            pageData={pageData}
+            pageData={docsCtrl.current?.childrenData ?? []}
             getThumbnail={getThumbnail}
             getPreview={getPreview}
             handleMenuClick={handleMenuClick}
           />
         ) : (
           <CardListContent
-            pageData={pageData}
+            pageData={docsCtrl.current?.childrenData ?? []}
             getThumbnail={getThumbnail}
             handleMenuClick={handleMenuClick}
             getPreview={getPreview}
@@ -216,7 +207,7 @@ const StoreDoc: React.FC = () => {
       {treeContainer
         ? ReactDOM.createPortal(
             <CloudTreeComp
-              currentKey={current?.key ?? ''}
+              currentKey={docsCtrl.current?.key ?? ''}
               handleMenuClick={handleMenuClick}
             />,
             treeContainer,
