@@ -200,7 +200,11 @@ const SettingDept: React.FC = () => {
         <Title level={4}>部门信息</Title>
       </div>
       <div>
-        <Button type="link" onClick={() => {}}>
+        <Button
+          type="link"
+          onClick={() => {
+            handleMenuClick('changeDept', SelectDept);
+          }}>
           编辑
         </Button>
         <Button type="link">权限管理</Button>
@@ -215,7 +219,15 @@ const SettingDept: React.FC = () => {
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}></Descriptions>
+        <Descriptions title={title} bordered column={2}>
+          <Descriptions.Item label="部门名称">{SelectDept?.name}</Descriptions.Item>
+          <Descriptions.Item label="部门编码">{SelectDept?.code}</Descriptions.Item>
+          <Descriptions.Item label="创建人">{SelectDept?.createUser}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">{SelectDept?.createTime}</Descriptions.Item>
+          <Descriptions.Item label="描述" span={2}>
+            {SelectDept?.team?.remark}
+          </Descriptions.Item>
+        </Descriptions>
       </Card>
     </div>
   );

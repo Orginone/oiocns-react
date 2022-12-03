@@ -146,7 +146,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   };
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
-    console.log('选中树节点', selectedKeys);
+    selectedKeys;
     if (info.selected) {
       setCurrent(info.node.target.target);
       setting.setCurrTreeDeptNode(info.node.target.target.id);
