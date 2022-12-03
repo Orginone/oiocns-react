@@ -13,11 +13,11 @@ import Working from './working';
  * 公司的元操作
  */
 export default class Company extends MarketTarget implements ICompany {
-  person: schema.XTarget[];
-  departments: IDepartment[];
-  workings: IWorking[];
-  joinedGroup: IGroup[];
-  joinedCohort: ICohort[];
+   person: schema.XTarget[];
+   departments: IDepartment[];
+   workings: IWorking[];
+   joinedGroup: IGroup[];
+   joinedCohort: ICohort[];
 
   constructor(target: schema.XTarget) {
     super(target);
@@ -210,30 +210,29 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return faildResult(consts.UnauthorizedError);
   }
-  public async getPersons(): Promise<schema.XTarget[]> {
-    if (this.person.length > 0) {
+  public async getPersons(reload: boolean = false): Promise<schema.XTarget[]> {
+    if (!reload && this.person.length > 0) {
       return this.person;
     }
-
     const res = await this.getSubTargets([TargetType.Person]);
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.person = res.data.result;
     }
     return this.person;
   }
-  public async getDepartments(): Promise<IDepartment[]> {
+  public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
     if (this.departments.length > 0) {
       return this.departments;
     }
     const res = await this.getSubTargets([TargetType.Department]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.departments.push(new Department(a));
+    if (res.success && res.data.result) {
+      this.departments = res.data.result.map((a) => {
+        return new Department(a);
       });
     }
     return this.departments;
   }
-  public async getWorkings(): Promise<IWorking[]> {
+  public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
     if (this.workings.length > 0) {
       return this.workings;
     }
@@ -245,7 +244,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return this.workings;
   }
-  public async getJoinedCohorts(): Promise<ICohort[]> {
+  public async getJoinedCohorts(reload: boolean = false): Promise<ICohort[]> {
     if (this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
@@ -257,7 +256,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return this.joinedCohort;
   }
-  public async getJoinedGroups(): Promise<IGroup[]> {
+  public async getJoinedGroups(reload: boolean = false): Promise<IGroup[]> {
     if (this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }

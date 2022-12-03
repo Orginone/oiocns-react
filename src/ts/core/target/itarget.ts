@@ -42,22 +42,22 @@ export interface IMTarget {
    * 查询商店列表
    * @returns 商店列表
    */
-  getJoinMarkets(): Promise<Market[]>;
+  getJoinMarkets(reload: boolean): Promise<Market[]>;
   /**
    * 查询开放市场
    * @returns 市场
    */
-  getPublicMarket(): Promise<Market[]>;
+  getPublicMarket(reload: boolean): Promise<Market[]>;
   /**
    * 查询我的产品/应用
    * @param params
    * @returns
    */
-  getOwnProducts(): Promise<BaseProduct[]>;
+  getOwnProducts(reload: boolean): Promise<BaseProduct[]>;
   /**
    * 查询购物车列表
    */
-  getStaging(): Promise<schema.XStaging[]>;
+  getStaging(reload: boolean): Promise<schema.XStaging[]>;
   /**
    * 查询购买订单
    */
@@ -194,8 +194,14 @@ export interface IMTarget {
 export interface IFlowTarget {
   /** 流程定义 */
   defines: schema.XFlowDefine[];
+  /** 流程绑定关系 */
+  defineRelations: schema.XFlowRelation[];
   /** 获取流程定义列表 */
-  getDefines(): Promise<schema.XFlowDefine[]>;
+  getDefines(reload: boolean): Promise<schema.XFlowDefine[]>;
+  /**
+   * 查询流程定义绑定项
+   */
+  queryFlowRelation(reload: boolean): Promise<schema.XFlowRelation[]>;
   /**
    * 发布流程定义（包含创建、更新）
    * @param data
@@ -247,7 +253,7 @@ export interface ICohort {
     data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
   /** 获取群成员列表 */
-  getMember(): Promise<schema.XTarget[]>;
+  getMember(reload: boolean): Promise<schema.XTarget[]>;
   /**
    * 拉取成员加入群组
    * @param targets 成员列表
@@ -417,6 +423,10 @@ export interface ICompany extends IMTarget, IFlowTarget {
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 子组织类型 */
+  subTypes: TargetType[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /** 单位人员 */
   person: schema.XTarget[];
   /** 我的子部门 */
@@ -427,10 +437,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
   joinedGroup: IGroup[];
   /** 我加入的群组 */
   joinedCohort: ICohort[];
-  /** 子组织类型 */
-  subTypes: TargetType[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
   /**
    * 更新单位
    * @param data 单位基础信息
@@ -496,30 +502,30 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * 获取单位下的人员
    * @returns
    */
-  getPersons(): Promise<schema.XTarget[]>;
+  getPersons(reload: boolean): Promise<schema.XTarget[]>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
    * 获取单位下的部门（单位、部门）
    * @returns
    */
-  getDepartments(): Promise<IDepartment[]>;
+  getDepartments(reload: boolean): Promise<IDepartment[]>;
   /**
    * 获取组织下的工作组（单位、部门、工作组）
    * @param id 组织Id 默认为当前单位
    * @returns 返回好友列表
    */
-  getWorkings(): Promise<IWorking[]>;
+  getWorkings(reload: boolean): Promise<IWorking[]>;
   /**
    * @description: 查询我加入的群
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(): Promise<ICohort[]>;
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
   /**
    * @description: 查询我加入的集团
    * @return {*} 查询到的群组
    */
-  getJoinedGroups(): Promise<IGroup[]>;
+  getJoinedGroups(reload: boolean): Promise<IGroup[]>;
   /**
    * 申请加入群组
    * @param id 目标Id

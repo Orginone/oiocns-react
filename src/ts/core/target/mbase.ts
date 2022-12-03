@@ -42,8 +42,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       },
     });
   }
-  public getOwnProducts = async (): Promise<BaseProduct[]> => {
-    if (this.ownProducts.length > 0) {
+  public async getOwnProducts(reload: boolean = false): Promise<BaseProduct[]> {
+    if (!reload && this.ownProducts.length > 0) {
       return this.ownProducts;
     }
     const res = await kernel.querySelfProduct({
@@ -54,42 +54,42 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
-    if (res.success && res?.data?.result != undefined) {
-      res.data.result.forEach((product) => {
-        this.ownProducts.push(new BaseProduct(product));
+    if (res.success && res.data.result) {
+      this.ownProducts = res.data.result.map((a) => {
+        return new BaseProduct(a);
       });
     }
     return this.ownProducts;
-  };
-  public async getJoinMarkets(): Promise<Market[]> {
-    if (this.joinedMarkets.length > 0) {
+  }
+  public async getJoinMarkets(reload: boolean = false): Promise<Market[]> {
+    if (!reload && this.joinedMarkets.length > 0) {
       return this.joinedMarkets;
     }
     const res = await kernel.queryOwnMarket({
       id: this.target.id,
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((market) => {
-        this.joinedMarkets.push(new Market(market));
+    if (res.success && res.data.result) {
+      this.joinedMarkets = res.data.result.map((a) => {
+        return new Market(a);
       });
     }
     return this.joinedMarkets;
   }
-  public async getPublicMarket(): Promise<Market[]> {
-    if (this.publicMarkets.length > 0) {
+  public async getPublicMarket(reload: boolean = false): Promise<Market[]> {
+    if (!reload && this.publicMarkets.length > 0) {
       return this.publicMarkets;
     }
     const res = await kernel.getPublicMarket();
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.publicMarkets.push(new Market(a));
+    if (res.success && res.data.result) {
+      this.publicMarkets = res.data.result.map((a) => {
+        return new Market(a);
       });
     }
     return this.publicMarkets;
   }
-  public async getStaging(): Promise<schema.XStaging[]> {
-    if (this.stagings.length > 0) {
+  public async getStaging(reload: boolean = false): Promise<schema.XStaging[]> {
+    if (!reload && this.stagings.length > 0) {
       return this.stagings;
     }
     const res = await kernel.queryStaging({
@@ -100,10 +100,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.stagings.push(a);
-      });
+    if (res.success && res.data.result) {
+      this.stagings = res.data.result;
     }
     return this.stagings;
   }
