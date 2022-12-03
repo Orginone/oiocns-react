@@ -15,13 +15,15 @@ class TodoController extends BaseController {
   private _appTodo: ITodoGroup[] = [];
   constructor() {
     super();
-    userCtrl.subscribePart(UserPartTypes.User, async () => {
-      this._orgTodo = await loadOrgTodo();
-      this._appTodo = await loadAppTodo();
-      this._pubTodo = await loadPublishTodo();
-      this._orderTodo = await loadOrgTodo();
-      this._marketTodo = await loadMarketTodo();
-      this.changCallback();
+    userCtrl.subscribePart(UserPartTypes.User, () => {
+      setTimeout(async () => {
+        this._orgTodo = await loadOrgTodo();
+        this._appTodo = await loadAppTodo();
+        this._pubTodo = await loadPublishTodo();
+        this._orderTodo = await loadOrgTodo();
+        this._marketTodo = await loadMarketTodo();
+        this.changCallback();
+      }, 800);
     });
   }
   /** 组织单位审批 */

@@ -19,10 +19,12 @@ class ChatController extends BaseController {
   private _curChat: IChat | undefined;
   constructor() {
     super();
-    userCtrl.subscribePart(UserPartTypes.User, async () => {
+    userCtrl.subscribePart(UserPartTypes.User, () => {
       if (this._userId != userCtrl.User.target.id) {
         this._userId = userCtrl.User.target.id;
-        await this._initialization();
+        setTimeout(async () => {
+          await this._initialization();
+        }, 500);
       }
     });
   }
@@ -144,6 +146,17 @@ class ChatController extends BaseController {
       if (chat.fullId === this._curChat?.fullId) {
         this._curChat = undefined;
       }
+      this._cacheChats();
+      this.changCallback();
+    }
+  }
+  /** 置顶功能 */
+  public setToping(chat: IChat): void {
+    const index = this._chats.findIndex((i) => {
+      return i.fullId === chat.fullId;
+    });
+    if (index > -1) {
+      this._chats[index].isToping = !this._chats[index].isToping;
       this._cacheChats();
       this.changCallback();
     }
