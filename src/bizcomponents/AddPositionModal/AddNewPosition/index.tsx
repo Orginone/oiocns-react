@@ -1,19 +1,23 @@
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 import cls from '../index.module.less';
 import React from 'react';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: (data: any) => void;
   handleOk: () => void;
+  authData: IAuthority;
 }
 
 type DataItem = {
   name: string;
   state: string;
+  code: string;
+  public: boolean;
+  remark: string;
 };
 
 const columns: ProFormColumnsType<DataItem>[] = [
@@ -49,6 +53,11 @@ const columns: ProFormColumnsType<DataItem>[] = [
     title: '是否公开',
     dataIndex: 'public',
     valueType: 'switch',
+    fieldProps: {
+      style: {
+        width: '200px',
+      },
+    },
     width: 'm',
   },
   {
@@ -63,7 +72,7 @@ const columns: ProFormColumnsType<DataItem>[] = [
 ];
 
 const newPosition = (props: Iprops) => {
-  const { title, open, onOk, handleOk } = props;
+  const { title, open, handleOk, authData } = props;
 
   const addmodal = (
     <Modal
@@ -78,8 +87,17 @@ const newPosition = (props: Iprops) => {
         shouldUpdate={false}
         layoutType="Form"
         onFinish={async (values) => {
-          console.log('finish===', values);
-          onOk(values);
+          const res = await authData.createSubAuthority(
+            values.name,
+            values.code,
+            values.public,
+            values.remark,
+          );
+          if (res.success) {
+            message.info('新增成功');
+          } else {
+            message.error(res.msg);
+          }
         }}
         columns={columns}
       />

@@ -87,6 +87,9 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
   };
+
+  const [currentCtrl, setCurrentCtrl] = useState();
+
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}

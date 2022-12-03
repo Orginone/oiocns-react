@@ -10,6 +10,8 @@ export interface IAuthority {
   code: string;
   /** 职权归属ID */
   belongId: string;
+  /**备注 */
+  remark: string;
   /** 子职权 */
   children: IAuthority[];
   /** 职权下的身份 */

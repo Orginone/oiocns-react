@@ -3,17 +3,17 @@ import CardOrTable from '@/components/CardOrTableComp';
 import LookApply from '../../Setting/Dept/components/LookApply';
 import cls from './index.module.less';
 import Title from 'antd/lib/typography/Title';
-import { Modal, Button } from 'antd';
-import SearchPerson from '@/bizcomponents/SearchPerson';
+import { Modal, Button, message } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { schema } from '@/ts/base';
-import PersonInfoEnty from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import SearchPerson from '@/bizcomponents/SearchPerson';
 interface OperationType {
   key: string;
   label: string;
   onClick: () => void;
 }
-const columns: ColumnsType<Person> = [
+const columns: ColumnsType<any> = [
   {
     title: '好友名称',
     dataIndex: 'team.name',
@@ -43,18 +43,7 @@ const columns: ColumnsType<Person> = [
     render: (_, person) => person.team?.remark,
   },
 ];
-const renderOperation = (item: schema.XTarget): OperationType[] => {
-  return [
-    {
-      key: 'enterChat',
-      label: '删除',
-      onClick: () => {
-        friendController.deleteFriend(PersonInfoEnty.getPerson!, item.id);
-        console.log('按钮事件', 'enterChat', item);
-      },
-    },
-  ];
-};
+
 /**
  * 好友设置
  * @returns
@@ -66,11 +55,11 @@ const PersonFriend: React.FC = () => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
 
   useEffect(() => {
-    friendController.setCallBack(setData);
     getData();
   }, []);
+
   const getData = async () => {
-    setData(await friendController.getMyFriend());
+    setData(await userCtrl.User.getFriends());
   };
   const showModal = () => {
     setIsModalOpen(true);
@@ -78,11 +67,17 @@ const PersonFriend: React.FC = () => {
   const onApplyOk = () => {
     setLookApplyOpen(false);
   };
-  const handleOk = () => {
-    setLookApplyOpen(false);
+  const handleOk = async () => {
     setIsModalOpen(false);
-
     console.log(friend);
+    const res = await userCtrl.User.applyFriend(friend!);
+    // console.log(await userCtrl.User)
+    console.log(res);
+    if (res.success) {
+      message.success('已发起好友申请');
+    } else {
+      message.error(res.msg);
+    }
   };
 
   const handleCancel = () => {
@@ -93,7 +88,18 @@ const PersonFriend: React.FC = () => {
   const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
-
+  const renderOperation = (item: schema.XTarget): OperationType[] => {
+    return [
+      {
+        key: 'enterChat',
+        label: '删除',
+        onClick: async () => {
+          await userCtrl.User.removeFriend([item.id]);
+          getData();
+        },
+      },
+    ];
+  };
   const top = (
     <div className={cls['person-friend-top']}>
       <Title level={4}>
@@ -131,19 +137,15 @@ const PersonFriend: React.FC = () => {
         onOk={handleOk}
         onCancel={handleCancel}
         width={500}>
-        <div>
-          {
-            <SearchPerson
-              person={PersonInfoEnty.getPerson!}
-              searchCallback={searchCallback}></SearchPerson>
-          }
-        </div>
+        <div>{<SearchPerson searchCallback={searchCallback}></SearchPerson>}</div>
       </Modal>
       <LookApply
         title={'查看申请'}
         open={isLookApplyOpen}
         onOk={onApplyOk}
-        handleOk={handleOk}
+        handleOk={() => {
+          setLookApplyOpen(false);
+        }}
       />
     </div>
   );

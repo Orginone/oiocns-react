@@ -40,7 +40,6 @@ const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback }) => {
       const res = await userCtrl.User?.searchPerson(e.target.value);
       if (res?.data.result != null) {
         setPersons([res.data.result[0]]);
-
         searchCallback(res.data.result[0]);
       }
     }

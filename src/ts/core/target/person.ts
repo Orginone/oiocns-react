@@ -191,6 +191,7 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async quitCohorts(id: string): Promise<ResultType<any>> {
     const res = await this.cancelJoinTeam(id);
+
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((cohort) => {
         return cohort.target.id != id;
