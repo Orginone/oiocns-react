@@ -437,12 +437,12 @@ const PersonRouter: IRouteConfig[] = [
         icon: <TeamOutlined />,
         component: React.lazy(() => import('@/pages/Person/Cohort')),
       },
-      {
-        path: '/person/Role',
-        title: '角色管理',
-        // icon: <Outlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
-      },
+      // {
+      //   path: '/person/Role',
+      //   title: '角色管理',
+      //   // icon: <Outlined />,
+      //   component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
+      // },
       {
         path: '/person/CohortMemberList',
         title: '群组详情界面',
