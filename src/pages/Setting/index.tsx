@@ -29,7 +29,7 @@ const infoMenuItems = [
     key: 'dept',
     icon: <ApartmentOutlined />,
     children: [],
-    // render: <TreeLeftDeptPage />,
+    render: <></>, //<TreeLeftDeptPage />
   },
   {
     label: '集团设置',
@@ -77,6 +77,7 @@ const muneItems = [
 
 const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
   const toNext = (e: any) => {
+    debugger;
     history.push(`${e.key}`);
   };
   const [menus, setMenu] = useState(muneItems);
