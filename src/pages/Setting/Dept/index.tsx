@@ -6,7 +6,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
+// import { dataSource } from './datamock';
 import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
@@ -17,6 +17,8 @@ import { initDatatype } from '@/ts/core/setting/isetting';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
 import SettingService from './service';
+import { IDepartment } from '@/ts/core/target/itarget';
+import Department from '@/ts/core/target/department';
 
 /**
  * 部门设置
@@ -33,7 +35,10 @@ const SettingDept: React.FC = () => {
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
 
+  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
+
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
+
   const treeContainer = document.getElementById('templateMenu');
   // 操作内容渲染函数
   const renderOperation = (
@@ -99,9 +104,17 @@ const SettingDept: React.FC = () => {
       case 'changeDept': //变更部门
         setIsOpenModal(true);
         setSelectDept(item);
-        setSelectId(item.target.target.id);
+        // setting.getCompanyCtrl.changCallback();
+        // setSelectId(item.target.target.id);
+        // setting.setCurrTreeDeptNode(item.target.target.id);
+        break;
+      case 'updateDept':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.id);
+        setting.setCurrTreeDeptNode(item.id);
         setting.getCompanyCtrl.changCallback();
-        setting.setCurrTreeDeptNode(item.target.target.id);
+        break;
     }
   };
 
@@ -110,6 +123,10 @@ const SettingDept: React.FC = () => {
     setSelectDept(current);
     setSelectId(current.id);
     setting.setCurrTreeDeptNode(current.id);
+
+    new Department(SelectDept!).getPerson().then((e) => {
+      setDataSource(e);
+    });
   };
 
   /** 添加人员的逻辑 */
@@ -153,7 +170,11 @@ const SettingDept: React.FC = () => {
       console.log('myalldept', deptChild);
     });
 
-    const id = setting.getCompanyCtrl.subscribe(() => {});
+    const id = setting.getCompanyCtrl.subscribe(async () => {
+      // 选中树操作
+      let pp = await setting.getCompanyCtrl.getCompany().getPersons();
+      console.log(pp);
+    });
     return () => {
       setting.getCompanyCtrl.unsubscribe(id);
     };
@@ -183,14 +204,6 @@ const SettingDept: React.FC = () => {
       tab: `全部`,
       key: '1',
     },
-    {
-      tab: `已开通`,
-      key: '2',
-    },
-    {
-      tab: `未开通`,
-      key: '3',
-    },
   ];
 
   // 部门信息标题
@@ -203,7 +216,7 @@ const SettingDept: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            handleMenuClick('changeDept', SelectDept);
+            handleMenuClick('updateDept', SelectDept);
           }}>
           编辑
         </Button>
