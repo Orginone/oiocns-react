@@ -43,6 +43,7 @@ const infoMenuItems = [
     key: 'position',
     icon: <ApartmentOutlined />,
     children: [],
+    render: <></>,
     // render: <TreeLeftPosPage />,
   },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
@@ -77,7 +78,6 @@ const muneItems = [
 
 const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
   const toNext = (e: any) => {
-    debugger;
     history.push(`${e.key}`);
   };
   const [menus, setMenu] = useState(muneItems);

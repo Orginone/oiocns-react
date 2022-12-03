@@ -2123,6 +2123,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询应用业务与定义的绑定关系
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
+   */
+  public async queryDefineRelation(
+    params: model.IdReq,
+  ): Promise<model.ResultType<schema.XFlowRelationArray>> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryDefineRelation',
+      params: params,
+    });
+  }
+  /**
    * 查询发起的流程实例
    * @param {model.FlowReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstanceArray>} 请求结果

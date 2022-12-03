@@ -44,3 +44,4 @@ export class MarketController extends BaseController {
     this.changCallback();
   }
 }
+export default new MarketController();

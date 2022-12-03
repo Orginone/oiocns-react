@@ -1,25 +1,19 @@
-/* eslint-disable react/no-unknown-property */
-/**
- * 对象设置弹窗
- * */
 import React, { useState, useRef } from 'react';
-import { Modal, Row, Button, Tag, Input } from 'antd';
+import { Modal, Row, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-// import SearchInput from '@/components/SearchInput';
 import cls from './index.module.less';
-// import { DownOutlined, UpOutlined } from '@ant-design/icons';
-// import { deepClone } from '@/ts/base/common';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import { ObjectManagerList } from './mock';
 import AddNewPosition from './AddNewPosition';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface Iprops {
   title: string;
   open: boolean;
   onOk: (checkJob: initDatatype, checkUser: initDatatype[]) => void;
   handleOk: () => void;
+  datasource: IAuthority;
 }
 interface DataType {
   key: React.ReactNode;
@@ -34,26 +28,14 @@ interface DataType {
 }
 
 const AddPostModal = (props: Iprops) => {
-  const { title, open, onOk, handleOk } = props;
+  const { title, open, handleOk, datasource } = props;
   const parentRef = useRef<any>(null); //父级容器Dom
   const [operateOpen, setOperateOpen] = useState<boolean>(false); //切换设置
-
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-  };
-
-  const onAddOk = (objs: any) => {
-    console.log('新增的数据', objs);
-    setOperateOpen(false);
-  };
+  const [item, setItem] = useState<IAuthority>(); //切换设置
 
   const onHandleOk = () => {
     console.log('onHandleOk');
     setOperateOpen(false);
-  };
-
-  const getCheckboxProps = (record: any) => {
-    // console.log(record);
   };
 
   const columns: ColumnsType<DataType> = [
@@ -84,15 +66,14 @@ const AddPostModal = (props: Iprops) => {
   ];
 
   /**渲染操作 */
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IAuthority): MarketTypes.OperationType[] => {
     return [
       {
         key: 'addNew',
         label: '新增',
         onClick: () => {
           setOperateOpen(true);
+          setItem(item);
         },
       },
     ];
@@ -109,30 +90,18 @@ const AddPostModal = (props: Iprops) => {
       <div className="site-card-wrapper">
         <Row gutter={24}>
           <CardOrTable
-            dataSource={ObjectManagerList as any}
-            rowKey={'key'}
+            dataSource={[datasource]}
+            rowKey={'id'}
             operation={renderOperation}
             columns={columns as any}
             parentRef={parentRef}
             showChangeBtn={false}
             pagination={false}
             defaultExpandAllRows={true}
-            rowSelection={{
-              onChange: onSelectChange,
-              getCheckboxProps: getCheckboxProps,
-            }}
+            childrenColumnName={'children'}
           />
         </Row>
       </div>
-      <Row justify="end">
-        <Button
-          type="primary"
-          onClick={() => {
-            onOk();
-          }}>
-          完成
-        </Button>
-      </Row>
     </Modal>
   );
   return (
@@ -142,8 +111,8 @@ const AddPostModal = (props: Iprops) => {
       <AddNewPosition
         title={'新增身份'}
         open={operateOpen}
-        onOk={onAddOk}
         handleOk={onHandleOk}
+        authData={item!}
       />
     </div>
   );

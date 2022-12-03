@@ -91,14 +91,12 @@ class BaseChat implements IChat {
     }
     return false;
   }
-  async reCallMessage(id: string): Promise<boolean> {
+  async reCallMessage(id: string): Promise<void> {
     for (const item of this.messages) {
       if (item.id === id) {
-        const res = await kernel.recallImMsg(item);
-        return res.success;
+        await kernel.recallImMsg(item);
       }
     }
-    return false;
   }
   async morePerson(filter: string): Promise<void> {
     await common.sleep(0);

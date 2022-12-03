@@ -1,4 +1,4 @@
-import { SearchOutlined } from '@ant-design/icons';
+import * as imIcon from 'react-icons/im';
 import { Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
@@ -8,6 +8,7 @@ import { deepClone } from '@/ts/base/common';
 import { IChat } from '@/ts/core/chat/ichat';
 import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
+import { MessageType, TargetType } from '@/ts/core/enum';
 
 /**
  * @description: 右键菜单信息
@@ -37,15 +38,35 @@ const GroupSideBar: React.FC = () => {
 
   /** 会话过滤功能 */
   const filterChats = (chats: IChat[], noreadOnly: boolean = false): IChat[] => {
-    return chats.filter((item) => {
-      return (
-        (!noreadOnly || item.noReadCount > 0) &&
-        (item.target.name.includes(searchValue) ||
-          item.target.typeName.includes(searchValue) ||
-          item.spaceName.includes(searchValue) ||
-          (item.lastMessage && item.lastMessage.msgBody.includes(searchValue)))
-      );
-    });
+    const sortNumber = (c: IChat) => {
+      let sum = 0;
+      if (c.isToping) {
+        sum += 10;
+      }
+      if (c.lastMessage) {
+        sum += 2;
+      }
+      return sum;
+    };
+    return chats
+      .filter((item) => {
+        return (
+          (!noreadOnly || item.noReadCount > 0) &&
+          (item.target.name.includes(searchValue) ||
+            item.target.typeName.includes(searchValue) ||
+            item.spaceName.includes(searchValue) ||
+            (item.lastMessage && item.lastMessage.msgBody.includes(searchValue)))
+        );
+      })
+      .sort((a, b) => {
+        const num = sortNumber(b) - sortNumber(a);
+        if (num === 0) {
+          const atime = new Date(a.lastMessage?.createTime || a.target.msgTime);
+          const btime = new Date(b.lastMessage?.createTime || b.target.msgTime);
+          return btime > atime ? 1 : -1;
+        }
+        return num;
+      });
   };
 
   /**
@@ -59,7 +80,7 @@ const GroupSideBar: React.FC = () => {
     }
     setMousePosition({
       left: e.pageX + 6,
-      top: e.pageY - 6,
+      top: e.pageY - 60,
       isShowContext: true,
       selectedItem: item,
       selectMenu: [
@@ -76,20 +97,21 @@ const GroupSideBar: React.FC = () => {
    * @return {*}
    */
   const handleContextChange = async (item: MenuItemType) => {
-    let refChat = chatCtrl.refChat(mousePosition.selectedItem);
-    if (refChat) {
+    if (mousePosition.selectedItem) {
       switch (item.value) {
         case 1:
-          refChat.isToping = !refChat.isToping;
-          refreshUI();
+          chatCtrl.setToping(mousePosition.selectedItem);
           break;
         case 2:
-          if (await refChat.clearMessage()) {
-            chatCtrl.changCallback();
+          {
+            const refChat = chatCtrl.refChat(mousePosition.selectedItem);
+            if (refChat && (await refChat.clearMessage())) {
+              chatCtrl.changCallback();
+            }
           }
           break;
         case 3:
-          chatCtrl.deleteChat(refChat);
+          chatCtrl.deleteChat(mousePosition.selectedItem);
           break;
       }
     }
@@ -129,6 +151,21 @@ const GroupSideBar: React.FC = () => {
 
   /** 渲染会话 */
   const loadChats = (chats: IChat[]) => {
+    const getBarTxt = (c: IChat) => {
+      if (c.lastMessage) {
+        switch (c.lastMessage.msgType) {
+          case MessageType.Image:
+            return '[图片]';
+          case MessageType.Video:
+            return '[视频]';
+          case MessageType.Voice:
+            return '[语音]';
+          default:
+            return c.lastMessage.showTxt;
+        }
+      }
+      return '';
+    };
     return chats.map((child) => {
       const msgTime = child.lastMessage?.createTime || child.target.msgTime;
       return (
@@ -136,7 +173,7 @@ const GroupSideBar: React.FC = () => {
           key={child.fullId}
           className={`${sideStyle.con_body_session} ${
             chatCtrl.isCurrent(child) ? sideStyle.active : ''
-          }`}
+          } ${child.isToping ? sideStyle.session_toping : ''}`}
           onContextMenu={(e: any) => handleContextClick(e, child)}>
           <HeadImg name={child.target.name} label={child.target.label} />
           {child.noReadCount > 0 ? (
@@ -155,6 +192,11 @@ const GroupSideBar: React.FC = () => {
               <div
                 className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
                 {child.target.name}
+                {child.target.typeName != TargetType.Person ? (
+                  <imIcon.ImBubbles color="#aaa" />
+                ) : (
+                  ''
+                )}
               </div>
               <div
                 className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>
@@ -162,7 +204,7 @@ const GroupSideBar: React.FC = () => {
               </div>
             </div>
             <div className={`${sideStyle.group_con_show} ${sideStyle.msg}`}>
-              {child.lastMessage?.showTxt}
+              {getBarTxt(child)}
             </div>
           </div>
         </div>
@@ -224,7 +266,7 @@ const GroupSideBar: React.FC = () => {
         <div className={sideStyle.group_side_bar_search}>
           <Input
             placeholder="搜索"
-            prefix={<SearchOutlined />}
+            prefix={<imIcon.ImSearch />}
             onChange={(e) => {
               setSearchValue(e.target.value);
             }}

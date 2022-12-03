@@ -170,7 +170,6 @@ export default class BaseTarget {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
     });
-
     if (typeNames.length > 0) {
       return await kernel.queryJoinedTargetById({
         id: this.target.id,

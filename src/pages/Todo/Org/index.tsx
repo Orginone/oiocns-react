@@ -1,23 +1,25 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { Button, Space, Tag } from 'antd';
+import { Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
-import todoService, { tabStatus } from '@/ts/controller/todo';
-
-todoService.currentModel = `org`;
+import { TargetType } from '@/ts/core/enum';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import { XRelation } from '@/ts/base/schema';
+import { statusList, statusMap, tableOperation } from '../components';
 
 // 生成说明数据
-const remarkText = (activeKey: string, item: TeamApprovalType) => {
-  return activeKey === '2'
-    ? '请求加入' + item.team.name
-    : item.target.name + '请求加入' + item.team.name;
+const remarkText = (activeKey: string, item: XRelation) => {
+  return activeKey === '3'
+    ? '请求加入' + item?.team?.name
+    : item?.target?.name + '请求加入' + item?.team?.name;
 };
 
 // 根据状态值渲染标签
-const renderItemStatus = (record: TeamApprovalType) => {
-  const status = todoService.statusMap[record.status];
+const renderItemStatus = (record: XRelation) => {
+  const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
 /**
@@ -26,10 +28,10 @@ const renderItemStatus = (record: TeamApprovalType) => {
  */
 const TodoOrg: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
-  const [pageData, setPageData] = useState<TeamApprovalType[]>([]);
+  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const columns: ProColumns<TeamApprovalType>[] = [
+  const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -38,81 +40,81 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '申请人',
-      dataIndex: '',
-      render: (_, row) => {
-        return row.target.name;
-      },
+      dataIndex: ['Data', 'target', 'name'],
     },
     {
       title: '说明',
       dataIndex: 'remark',
       render: (_, row) => {
-        return remarkText(activeKey, row);
+        return remarkText(activeKey, row.Data);
       },
     },
     {
       title: '事项',
-      dataIndex: ['team', 'target', 'typeName'],
+      dataIndex: ['Data', 'team', 'target', 'typeName'],
       render: (_) => {
         return <Tag color="#5BD8A6">{_}</Tag>;
       },
     },
     {
       title: '状态',
-      dataIndex: 'status',
+      dataIndex: ['Data', 'status'],
       render: (_, record) => {
-        return renderItemStatus(record);
+        return renderItemStatus(record.Data);
       },
     },
     {
       title: '申请时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
   ];
   // 获取申请/审核列表
-  const loadList = async () => {
-    setPageData([...todoService.currentList]);
-    setPageTotal(todoService.currentList ? todoService.currentList.length : 0);
+  const loadList = async (page: number, pageSize: number) => {
+    const listStatusCode = {
+      '2': 'getDoList',
+      '3': 'getApplyList',
+    };
+    if (activeKey === '1') {
+      const data = await todoCtrl.OrgTodo.getTodoList(needReload);
+      setPageData(data.filter((n) => n.Data.team.target.typeName !== TargetType.Person));
+      setPageTotal(data.length);
+    } else {
+      const data = await todoCtrl.OrgTodo[listStatusCode[activeKey]]();
+      setPageData(data);
+      setPageTotal(data.length);
+    }
     setNeedReload(false);
   };
   useEffect(() => {
-    todoService.activeStatus = activeKey as tabStatus;
-    loadList();
+    setPageData([]);
+    setPageTotal(0);
+    loadList(1, 10);
   }, [activeKey, needReload]);
   return (
     <PageCard
-      tabList={todoService.statusList}
+      tabList={statusList}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
-      }}
-      tabBarExtraContent={
-        <Space>
-          <Button key="1" type="primary">
-            同意
-          </Button>
-          <Button key="2">拒绝</Button>
-          <Button key="3">打印</Button>
-        </Space>
-      }>
-      <CardOrTableComp
-        rowKey={'id'}
+      }}>
+      <CardOrTableComp<IApplyItem | IApprovalItem>
+        rowKey={(record: IApplyItem | IApprovalItem) => record.Data?.id}
         bordered={false}
         columns={columns}
         dataSource={pageData}
         total={total}
         onChange={loadList}
-        operation={(item: TeamApprovalType) =>
-          todoService.tableOperation(item, setNeedReload)
+        operation={(item: IApplyItem | IApprovalItem) =>
+          tableOperation(activeKey, item, setNeedReload)
         }
         renderCardContent={(arr) => (
-          <TableItemCard<TeamApprovalType>
+          <TableItemCard<IApplyItem | IApprovalItem>
             data={arr}
-            statusType={(item) => renderItemStatus(item)}
+            statusType={(item) => renderItemStatus(item.Data)}
             targetOrTeam="target"
-            operation={(item: TeamApprovalType) =>
-              todoService.tableOperation(item, setNeedReload)
+            operation={(item: IApplyItem | IApprovalItem) =>
+              tableOperation(activeKey, item, setNeedReload)
             }
           />
         )}

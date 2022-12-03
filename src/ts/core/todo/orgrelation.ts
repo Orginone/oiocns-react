@@ -25,14 +25,14 @@ class OrgTodo implements ITodoGroup {
   async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(page?: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getApprovalList();
     return this._doList;
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page?: model.PageRequest): Promise<IApplyItem[]> {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
@@ -44,15 +44,13 @@ class OrgTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this._applyList.push(
-          new ApplyItem(a, (q) => {
-            this._applyList = this._applyList.filter((s) => {
-              return s.Data.id != q.id;
-            });
-          }),
-        );
+    if (res.success && res.data.result) {
+      this._applyList = res.data.result.map((a) => {
+        return new ApplyItem(a, (q) => {
+          this._applyList = this._applyList.filter((s) => {
+            return s.Data.id != q.id;
+          });
+        });
       });
     }
     return this._applyList;
@@ -66,7 +64,7 @@ class OrgTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
+    if (res.success && res.data.result) {
       // 同意回调
       let passfun = (s: schema.XRelation) => {
         this._todoList = this._todoList.filter((q) => {
@@ -80,17 +78,24 @@ class OrgTodo implements ITodoGroup {
         });
       };
       // 拒绝回调
-      let rejectfun = (s) => {
+      let rejectfun = (s: schema.XRelation) => {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
-      let reRejectfun = (s) => {};
-      res.data.result?.forEach((a) => {
-        if (a.status >= CommonStatus.RejectStartStatus) {
-          this._doList.push(new ApprovalItem(a, rePassfun, reRejectfun));
-        } else {
-          this._todoList.push(new ApprovalItem(a, passfun, rejectfun));
-        }
-      });
+      let reRejectfun = (s: schema.XRelation) => {};
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status >= CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, rePassfun, reRejectfun);
+        });
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status < CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, passfun, rejectfun);
+        });
     }
   }
 }
@@ -137,14 +142,14 @@ class ApplyItem implements IApplyItem {
   get Data(): schema.XRelation {
     return this._data;
   }
-  async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
+  async cancel(status?: number, remark?: string): Promise<model.ResultType<any>> {
     const res = await kernel.cancelJoinTeam({
       id: this._data.id,
       typeName: '',
       belongId: '0',
     });
     if (res.success) {
-      this._cancelFun.apply(this, this._data);
+      this._cancelFun.apply(this, [this._data]);
     }
     return res;
   }
