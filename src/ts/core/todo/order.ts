@@ -1,3 +1,5 @@
+import consts from '../consts';
+import { faildResult } from '../../base';
 import { common } from '../../base';
 import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
@@ -131,10 +133,32 @@ export class OrderApplyItem implements IOrderApplyItem {
     status: number,
     remark: string = '',
   ): Promise<model.ResultType<any>> {
-    return await kernel.cancelOrderDetail({
-      id: this._data.id,
-      status,
+    let detail = this._data.details?.find((a) => {
+      return a.id == id;
     });
+    if (detail) {
+      let res: model.ResultType<boolean>;
+      if (detail?.status > CommonStatus.ApproveStartStatus) {
+        res = await kernel.rejectMerchandise({
+          id: this._data.id,
+          status,
+        });
+        if (res.success) {
+          detail.status = status;
+        }
+        return res;
+      } else {
+        res = await kernel.cancelOrderDetail({
+          id: this._data.id,
+          status,
+        });
+        if (res.success) {
+          detail.status = status;
+        }
+        return res;
+      }
+    }
+    return faildResult(consts.NotFoundError);
   }
   async reject(
     id: string,

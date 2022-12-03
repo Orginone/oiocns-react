@@ -25,15 +25,13 @@ export default class Group extends BaseTarget implements IGroup {
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
-  public async getJoinedGroups(): Promise<XTarget[]> {
-    if (this.joinedGroup.length > 0) {
+  public async getJoinedGroups(reload: boolean = false): Promise<XTarget[]> {
+    if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
     const res = await super.getjoinedTargets([TargetType.Group]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.joinedGroup.push(a);
-      });
+    if (res.success && res.data.result) {
+      this.joinedGroup = res.data.result;
     }
     return this.joinedGroup;
   }
@@ -78,24 +76,24 @@ export default class Group extends BaseTarget implements IGroup {
     }
     return faildResult(consts.UnauthorizedError);
   }
-  public async getCompanys(): Promise<XTarget[]> {
-    if (this.companys.length > 0) {
+  public async getCompanys(reload: boolean = false): Promise<XTarget[]> {
+    if (!reload && this.companys.length > 0) {
       return this.companys;
     }
     const res = await this.getSubTargets(consts.CompanyTypes);
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.companys = res.data.result;
     }
     return this.companys;
   }
-  public async getSubGroups(): Promise<IGroup[]> {
-    if (this.subGroup.length > 0) {
+  public async getSubGroups(reload: boolean = false): Promise<IGroup[]> {
+    if (!reload && this.subGroup.length > 0) {
       return this.subGroup;
     }
     const res = await this.getSubTargets([TargetType.Group]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.subGroup.push(new Group(a));
+    if (res.success && res.data.result) {
+      this.subGroup = res.data.result.map((a) => {
+        return new Group(a);
       });
     }
     return this.subGroup;

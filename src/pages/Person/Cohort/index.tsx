@@ -6,7 +6,6 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
 import { cohortColumn } from '@/components/CardOrTableComp/config';
 import { updateCohortColumn } from '@/components/CardOrTableComp/config';
-
 import cls from './index.module.less';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
@@ -23,7 +22,6 @@ import AddPostModal from '../../../bizcomponents/AddPositionModal';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core/enum';
-
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -37,18 +35,18 @@ const CohortConfig: React.FC = () => {
   const [cohort, setcohort] = useState<ICohort>();
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
-  const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
+  const [isSetPost, setIsSetPost] = useState<boolean>(false);
   useEffect(() => {
     getData();
   }, []);
   const getData = async () => {
     setData(
-      (await userCtrl.User?.getJoinedCohorts())?.filter(
+      (await userCtrl.getCohortList())?.filter(
         (obj) => obj.target.belongId == userCtrl.User?.target.id,
       ),
     );
     setJoinData(
-      (await userCtrl.User?.getJoinedCohorts())?.filter(
+      (await userCtrl.getCohortList())?.filter(
         (obj) => obj.target.belongId != userCtrl.User?.target.id,
       ),
     );
@@ -101,7 +99,9 @@ const CohortConfig: React.FC = () => {
       {
         key: 'roleManage',
         label: '角色管理',
-        onClick: () => {
+        onClick: async () => {
+          await item.selectAuthorityTree();
+          setItem(item);
           setIsSetPost(true);
         },
       },
@@ -133,6 +133,7 @@ const CohortConfig: React.FC = () => {
       },
     ];
   };
+
   const joinrenderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
     return [
       {
@@ -146,8 +147,9 @@ const CohortConfig: React.FC = () => {
       {
         key: 'exitCohort',
         label: '退出群聊',
-        onClick: () => {
-          // CohortController.quitCohort(Person, item.target.id);
+        onClick: async () => {
+          await userCtrl.User.quitCohorts(item.target.id);
+          getData();
           message.info('退出成功');
         },
       },
@@ -203,7 +205,11 @@ const CohortConfig: React.FC = () => {
   const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
-  const renderCardFun = (dataArr: ICohort[]): React.ReactNode[] => {
+
+  const renderCardFun = (
+    dataArr: ICohort[],
+    operaiton: (_item: ICohort) => CohortConfigType.OperationType[],
+  ): React.ReactNode[] => {
     return dataArr.map((item: ICohort) => {
       return (
         <CohortCard
@@ -211,11 +217,12 @@ const CohortConfig: React.FC = () => {
           data={item}
           key={item.target.id}
           onClick={() => console.log('按钮测试')}
-          operation={renderOperation}
+          operation={operaiton}
         />
       );
     });
   };
+
   return (
     <div>
       <Card>
@@ -243,16 +250,19 @@ const CohortConfig: React.FC = () => {
                 <Persons searchCallback={searchCallback} />
               </Modal>
               {/* 对象设置 */}
-              <AddPostModal
-                title={'身份设置'}
-                open={isSetPost}
-                onOk={() => {
-                  setIsSetPost(false);
-                }}
-                handleOk={() => {
-                  setIsSetPost(false);
-                }}
-              />
+              {item?.authorityTree && (
+                <AddPostModal
+                  title={'角色设置'}
+                  open={isSetPost}
+                  onOk={() => {
+                    setIsSetPost(false);
+                  }}
+                  handleOk={() => {
+                    setIsSetPost(false);
+                  }}
+                  datasource={item?.authorityTree}
+                />
+              )}
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
@@ -302,8 +312,7 @@ const CohortConfig: React.FC = () => {
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
-                  renderCardContent={renderCardFun}
-                  operation={renderOperation}
+                  renderCardContent={(data) => renderCardFun(data, renderOperation)}
                   columns={cohortColumn as any}
                   onChange={handlePageChange}
                   rowKey={'id'}
@@ -323,8 +332,7 @@ const CohortConfig: React.FC = () => {
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
-                  renderCardContent={renderCardFun}
-                  operation={joinrenderOperation}
+                  renderCardContent={(data) => renderCardFun(data, joinrenderOperation)}
                   columns={cohortColumn as any}
                   onChange={handlePageChange}
                   rowKey={'id'}

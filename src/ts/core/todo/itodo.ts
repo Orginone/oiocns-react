@@ -41,6 +41,7 @@ export interface IOrderApplyItem extends IApplyItem {
   Data: XOrder;
   /**
    * 取消订单详情项
+   * @param stidatus 详情项Id
    * @param status 状态
    * @param remark 备注
    */

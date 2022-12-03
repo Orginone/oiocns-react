@@ -210,61 +210,60 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return faildResult(consts.UnauthorizedError);
   }
-  public async getPersons(): Promise<schema.XTarget[]> {
-    if (this.person.length > 0) {
+  public async getPersons(reload: boolean = false): Promise<schema.XTarget[]> {
+    if (!reload && this.person.length > 0) {
       return this.person;
     }
-
     const res = await this.getSubTargets([TargetType.Person]);
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.person = res.data.result;
     }
     return this.person;
   }
-  public async getDepartments(): Promise<IDepartment[]> {
-    if (this.departments.length > 0) {
+  public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
+    if (!reload && this.departments.length > 0) {
       return this.departments;
     }
     const res = await this.getSubTargets([TargetType.Department]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.departments.push(new Department(a));
+    if (res.success && res.data.result) {
+      this.departments = res.data.result.map((a) => {
+        return new Department(a);
       });
     }
     return this.departments;
   }
-  public async getWorkings(): Promise<IWorking[]> {
-    if (this.workings.length > 0) {
+  public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
+    if (!reload && this.workings.length > 0) {
       return this.workings;
     }
     const res = await this.getSubTargets([TargetType.Working]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.workings.push(new Working(a));
+    if (res.success && res.data.result) {
+      this.workings = res.data.result?.map((a) => {
+        return new Working(a);
       });
     }
     return this.workings;
   }
-  public async getJoinedCohorts(): Promise<ICohort[]> {
-    if (this.joinedCohort.length > 0) {
+  public async getJoinedCohorts(reload: boolean = false): Promise<ICohort[]> {
+    if (!reload && this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.joinedCohort.push(new Cohort(a));
+    if (res.success && res.data.result) {
+      this.joinedCohort = res.data.result.map((a) => {
+        return new Cohort(a);
       });
     }
     return this.joinedCohort;
   }
-  public async getJoinedGroups(): Promise<IGroup[]> {
-    if (this.joinedGroup.length > 0) {
+  public async getJoinedGroups(reload: boolean = false): Promise<IGroup[]> {
+    if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
     const res = await this.getjoinedTargets([TargetType.Group]);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.joinedGroup.push(new Group(a));
+    if (res.success && res.data.result) {
+      this.joinedGroup = res.data.result.map((a) => {
+        return new Group(a);
       });
     }
     return this.joinedGroup;
@@ -322,10 +321,13 @@ export default class Company extends MarketTarget implements ICompany {
       belongId: this.target.id,
     });
   }
-  public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct();
+  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct(reload);
   }
-  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id);
+  public async getUsefulResource(
+    id: string,
+    reload: boolean = false,
+  ): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, reload);
   }
 }
