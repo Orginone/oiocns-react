@@ -1,4 +1,4 @@
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 
@@ -67,35 +67,21 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const setting = SettingService.getInstance();
 
   useEffect(() => {
-    if (userCtrl.Space && userCtrl.Space == undefined) {
-      Modal.info({
-        title: '提示',
-        content: (
-          <div>
-            <p>请选择加入的部门空间！</p>
-          </div>
-        ),
-        onOk() {
-          location.href = '/home';
-        },
-      });
-    }
-
-    initData();
     // 控制选中的部门ID。
-    setting.setCompanyID = userCtrl?.Space?.target.id + '';
     const id = userCtrl.subscribe(async () => {
-      // setting.getCompanyCtrl.changCallback();
-
-      // 如果新增部门，就需要重新初始化树
-      userCtrl?.setCurSpace(userCtrl?.Space?.target.id!);
-      initData();
+      // 如果新增部门，就需要重新初始化树TODO
+      if (userCtrl?.Space) {
+        if (userCtrl.Space.departments.length > 0) {
+          userCtrl.Space.departments = [];
+        }
+        initData();
+      }
     });
 
     return () => {
       userCtrl.unsubscribe(id);
     };
-  }, ['', userCtrl.Space]);
+  }, []);
 
   const initData = async () => {
     const data = await userCtrl?.Space?.getDepartments();
@@ -139,7 +125,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     if (children) {
       return;
     }
-    const deptChild = await target.getDepartments();
+    const deptChild: any[] = await target.getDepartments();
 
     setTreeData((origin) =>
       updateTreeData(
