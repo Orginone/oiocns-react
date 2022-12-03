@@ -119,15 +119,30 @@ export class OrderApplyItem implements IOrderApplyItem {
   constructor(data: schema.XOrder) {
     this._data = data;
   }
+
   async cancel(status: number, remark: string = ''): Promise<model.ResultType<any>> {
     return await kernel.cancelOrder({
       id: this._data.id,
       status,
     });
   }
-  async cancelItem(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+  async cancelItem(
+    id: string,
+    status: number,
+    remark: string = '',
+  ): Promise<model.ResultType<any>> {
     return await kernel.cancelOrderDetail({
       id: this._data.id,
+      status,
+    });
+  }
+  async reject(
+    id: string,
+    status: number,
+    remark: string = '',
+  ): Promise<model.ResultType<any>> {
+    return await kernel.rejectMerchandise({
+      id,
       status,
     });
   }

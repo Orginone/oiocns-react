@@ -1,5 +1,6 @@
 import { TodoType } from '../enum';
 import { model } from '../../base';
+import { XOrder } from '@/ts/base/schema';
 
 /** 待办组 */
 export interface ITodoGroup {
@@ -37,10 +38,17 @@ export interface IApplyItem {
 }
 
 export interface IOrderApplyItem extends IApplyItem {
+  Data: XOrder;
   /**
    * 取消订单详情项
    * @param status 状态
    * @param remark 备注
    */
-  cancelItem(status: number, remark: string): Promise<model.ResultType<any>>;
+  cancelItem(id: string, status: number, remark: string): Promise<model.ResultType<any>>;
+  /**
+   * 退货退款订单详情项
+   * @param status 状态
+   * @param remark 备注
+   */
+  reject(id: string, status: number, remark: string): Promise<model.ResultType<any>>;
 }

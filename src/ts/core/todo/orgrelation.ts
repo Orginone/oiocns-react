@@ -84,6 +84,8 @@ class OrgTodo implements ITodoGroup {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
       let reRejectfun = (s) => {};
+      this._doList = [];
+      this._todoList = [];
       res.data.result?.forEach((a) => {
         if (a.status >= CommonStatus.RejectStartStatus) {
           this._doList.push(new ApprovalItem(a, rePassfun, reRejectfun));
@@ -137,14 +139,14 @@ class ApplyItem implements IApplyItem {
   get Data(): schema.XRelation {
     return this._data;
   }
-  async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
+  async cancel(status?: number, remark?: string): Promise<model.ResultType<any>> {
     const res = await kernel.cancelJoinTeam({
       id: this._data.id,
       typeName: '',
       belongId: '0',
     });
     if (res.success) {
-      this._cancelFun.apply(this, this._data);
+      this._cancelFun.apply(this, [this._data]);
     }
     return res;
   }
