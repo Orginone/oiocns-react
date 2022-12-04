@@ -22,6 +22,7 @@ import AddPostModal from '../../../bizcomponents/AddPositionModal';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core/enum';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -36,9 +37,10 @@ const CohortConfig: React.FC = () => {
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
+  const [chatKey] = useCtrlUpdate(chatCtrl);
   useEffect(() => {
     getData();
-  }, []);
+  }, [chatKey]);
   const getData = async () => {
     setData(
       (await userCtrl.getCohortList())?.filter(
@@ -304,6 +306,7 @@ const CohortConfig: React.FC = () => {
               key: '1',
               children: (
                 <CardOrTable<ICohort>
+                  id={chatKey}
                   childrenColumnName={'nochildren'}
                   dataSource={data!}
                   total={total}

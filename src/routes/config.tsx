@@ -353,6 +353,18 @@ const SettingRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Setting/Group')),
       },
       {
+        path: '/setting/friend',
+        title: '好友设置',
+        icon: <UserOutlined />,
+        component: React.lazy(() => import('@/pages/Person/Friend')),
+      },
+      {
+        path: '/setting/cohort',
+        title: '群组设置',
+        icon: <TeamOutlined />,
+        component: React.lazy(() => import('@/pages/Person/Cohort')),
+      },
+      {
         path: '/setting/help',
         title: '帮助中心',
         icon: <SmileOutlined />,
@@ -424,18 +436,6 @@ const PersonRouter: IRouteConfig[] = [
         title: '通行设置',
         icon: <IdcardOutlined />,
         component: React.lazy(() => import('@/pages/Person/Passport')),
-      },
-      {
-        path: '/person/friend',
-        title: '好友设置',
-        icon: <UserOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Friend')),
-      },
-      {
-        path: '/person/cohort',
-        title: '群组设置',
-        icon: <TeamOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort')),
       },
       {
         path: '/person/wallet',
