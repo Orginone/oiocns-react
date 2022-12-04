@@ -10,7 +10,6 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { DestTypes } from '@/constants/const';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
@@ -104,13 +103,16 @@ const StoreAppInfo: React.FC = () => {
         </div>
       </Card>
       <div className={cls['page-content-table']}>
-        <Card title="已共享信息" tabList={items} onTabChange={onTabChange}>
+        <Card
+          title="已共享信息"
+          tabList={items}
+          style={{ padding: 0 }}
+          onTabChange={onTabChange}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User?.getOwnProducts}
               showChangeBtn={false}
               list={list}
-              columns={SelfAppCtrl.getColumns('appInfo')}
+              columns={SelfAppCtrl.getColumns('shareInfo')}
               renderOperation={renderOperation}
             />
           </div>

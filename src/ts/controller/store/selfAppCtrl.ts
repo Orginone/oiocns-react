@@ -4,7 +4,7 @@ import { IMTarget } from '@/ts/core/target/itarget';
 import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
-import { marketColumns, myColumns } from './config';
+import { marketColumns, myColumns, shareInfoColumns } from './config';
 const selfAppMenu = 'selfAppMenu';
 const RecentlyApps = 'RecentlyApps';
 
@@ -198,7 +198,8 @@ class SelfAppController extends BaseController {
    */
   public getColumns(pageKey?: string) {
     switch (pageKey) {
-      case 'appInfo':
+      case 'shareInfo':
+        return shareInfoColumns;
       case 'myApp':
         return myColumns;
       case 'market':
