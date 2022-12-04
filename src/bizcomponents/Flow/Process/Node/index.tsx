@@ -60,7 +60,6 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  * @returns
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
-  console.log('props', props);
   const delNode = (e: React.MouseEvent) => {
     e.preventDefault();
     props.onDelNode();
