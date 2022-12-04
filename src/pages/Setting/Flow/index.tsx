@@ -139,8 +139,8 @@ const SettingFlow: React.FC = () => {
   const publish = () => {
     console.log('搜集上来的表单', DefaultProps.getFormFields());
     const data = DefaultProps.getFormFields();
-    const result = userCtrl.Space.publishDefine(data);
-    console.log(result);
+    // const result = userCtrl.Space.publishDefine(data);
+    // console.log(result);
     message.warning('该功能尚未开放');
   };
 

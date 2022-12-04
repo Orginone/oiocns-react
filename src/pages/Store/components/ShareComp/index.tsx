@@ -9,6 +9,7 @@ import { Product } from '@/ts/core/market';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel } from '@/ts/base';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import { IDepartment, IGroup } from '@/ts/core/target/itarget';
 
 interface Iprops {
   curProduct?: Product;
@@ -35,7 +36,11 @@ const DestTypes = [
 ];
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
-  const [radio, setRadio] = useState<number>(1);
+  const [isCompanySpace] = useState<boolean>(userCtrl.IsCompanySpace); //是否工作空间
+  const [CompanyList, setCompanyList] = useState<IGroup[]>([]); //集团列表
+  const [deptList, setDeptList] = useState<IDepartment[]>([]); //当前空间下的部门
+  const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
+  const [radio, setRadio] = useState<number>(1); //分配类型
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
@@ -52,9 +57,21 @@ const ShareRecent = (props: Iprops) => {
     {} as any,
   );
   let recordShareInfo = new Map();
+
   useEffect(() => {
+    if (isCompanySpace) {
+      if (shareType === '共享') {
+        // 获取共享的集团列表
+        // queryCompanys();
+      } else {
+        // 获取应用资源
+        const resource = selfAppCtrl.curProduct!.resource || [];
+        setResourceList(resource);
+      }
+    } else {
+      queryExtend('组织', '');
+    }
     getLeftTree();
-    queryExtend('组织', '');
   }, []);
   useEffect(() => {
     setDepartData([]);
@@ -65,13 +82,18 @@ const ShareRecent = (props: Iprops) => {
     setSelectedTeamId('');
     queryExtend();
   }, [radio]);
+
+  // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
   const getLeftTree = async () => {
     let FunName: Function = userCtrl.User!.getJoinedCohorts;
     if (userCtrl.IsCompanySpace) {
-      FunName = userCtrl.Company!.getJoinedGroups;
+      FunName =
+        shareType === '共享'
+          ? userCtrl.Company!.getJoinedGroups
+          : userCtrl.Company!.getDepartments;
     }
     const res = await FunName();
     console.log('共享获取组织', res);
@@ -136,11 +158,15 @@ const ShareRecent = (props: Iprops) => {
         {
           let action = 'getMember';
           if (info.node.typeName === '集团') {
-            action = 'getSubGroups';
+            //集团下 查单位
+            action = 'getCompanys';
+          } else if (info.node.typeName === '部门') {
+            action = 'getPerson';
           }
+          console.log('输出,typeName', info.node.typeName);
           const res3 = await info?.node?.node[action]();
 
-          console.log('输出,获取人员', res3);
+          console.log('输出,获取人员', info.node.typeName, res3);
 
           setCenterTreeData(res3 || []);
         }
@@ -305,23 +331,23 @@ const ShareRecent = (props: Iprops) => {
 
   return (
     <div className={cls.layout}>
-      {shareType === '分配' ? (
+      {/* {shareType === '分配' ? (
         <div className={cls.top}>
           <p className={cls['top-label']}>分配集团:</p>
           <Select
-            defaultValue=""
             style={{ minWidth: 160 }}
-            options={[
-              {
-                value: 'lucy',
-                label: 'Lucy',
-              },
-            ]}
+            onChange={handleCompanyChange}
+            options={CompanyList.map((comp) => {
+              return {
+                value: comp.target.id,
+                label: comp.target.name,
+              };
+            })}
           />
         </div>
       ) : (
         ''
-      )}
+      )} */}
       <div className={cls.top}>
         <p className={cls['top-label']}>{props.shareType}形式：</p>
         <Radio.Group
@@ -332,7 +358,12 @@ const ShareRecent = (props: Iprops) => {
           {DestTypes.map((item) => {
             return (
               <Radio value={item.value} key={item.value}>
-                按{item.label}
+                按
+                {isCompanySpace && shareType === '共享' && item.label === '人员'
+                  ? '单位'
+                  : isCompanySpace && shareType === '共享' && item.label === '组织'
+                  ? '集团'
+                  : item.label}
                 {props.shareType}
               </Radio>
             );
