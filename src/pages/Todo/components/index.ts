@@ -1,10 +1,8 @@
 import { CommonStatus } from '@/ts/core/enum';
 import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core/todo/itodo';
 import { message } from 'antd';
-
-// import { XMarketRelation, XOrder, XOrderDetail, XRelation } from '@/ts/base/schema';
 import { OrderStatus } from '@/ts/core/enum';
-import { XOrder, XOrderDetail } from '@/ts/base/schema';
+import { XOrderDetail } from '@/ts/base/schema';
 
 /**
  * tabs 状态选项
@@ -53,7 +51,6 @@ const applicationTabs: statusItem[] = [
   { tab: '已办', key: '2' },
   { tab: '我的发起', key: '3' },
 ];
-// const handleMenuClick = (key: string, item: any) => {};
 /** 生成平台待办操作菜单*/
 const tableOperation = (
   active: string,
@@ -164,9 +161,12 @@ const orderOperation = (
   // 是否是待发货的订单状态
   let allowToCancel = item.status < 102;
   if (activeStatus == `6`) {
-    if (typeof (item as XOrder).details === 'object') {
-      // 说明他是采购订单的主订单 不能取消订单
-      allowToCancel = false;
+    if (_record) {
+      allowToCancel = _record ? _record.status < 102 : false;
+    } else {
+      allowToCancel =
+        !!item.details &&
+        item.details.find((n: XOrderDetail) => n.status < OrderStatus.Deliver);
     }
   }
   const menu = [];
@@ -197,7 +197,7 @@ const orderOperation = (
         },
       });
     }
-  } else if (item.status == OrderStatus.Deliver && activeStatus == `6` && _record) {
+  } else if (_record && _record.status == OrderStatus.Deliver) {
     menu.push({
       key: 'reject',
       label: '退货退款',

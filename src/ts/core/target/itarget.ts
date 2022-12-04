@@ -1,7 +1,8 @@
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import { Market, BaseProduct } from '../market';
+import { Market } from '../market';
+import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 
 /** 空间类型数据 */
@@ -23,7 +24,7 @@ export interface IMTarget {
   /** 开放市场 */
   publicMarkets: Market[];
   /** 拥有的产品/应用 */
-  ownProducts: BaseProduct[];
+  ownProducts: IProduct[];
   /** 我的购物车 */
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
@@ -56,7 +57,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns
    */
-  getOwnProducts(reload: boolean): Promise<BaseProduct[]>;
+  getOwnProducts(reload: boolean): Promise<IProduct[]>;
   /**
    * 查询购物车列表
    * @param reload 是否强制刷新
@@ -207,51 +208,11 @@ export interface IMTarget {
    */
   getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
 }
-export interface ISpace {
-  /** 我加入的群组 */
-  joinedCohort: ICohort[];
+export interface IFlow {
   /** 流程定义 */
   defines: schema.XFlowDefine[];
   /** 流程绑定关系 */
   defineRelations: schema.XFlowRelation[];
-  /** 空间类型数据 */
-  spaceData: SpaceType;
-  /**
-   * @description: 查询我加入的群
-   * @param reload 是否强制刷新
-   * @return {*} 查询到的群组
-   */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
-  /**
-   * 创建群组
-   * @param data 群组基本信息
-   */
-  createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<ResultType<any>>;
-  /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<ResultType<any>>;
-  /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<ResultType<any>>;
-  /**
-   * 查询群组
-   * @param code 群组编号
-   */
-  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
    * 获取流程定义列表
    * @param reload 是否强制刷新
@@ -293,6 +254,49 @@ export interface ISpace {
   unbindingFlowRelation(
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
+}
+
+export interface ISpace extends IFlow {
+  /** 我加入的群组 */
+  joinedCohort: ICohort[];
+  /** 空间类型数据 */
+  spaceData: SpaceType;
+  /**
+   * @description: 查询我加入的群
+   * @param reload 是否强制刷新
+   * @return {*} 查询到的群组
+   */
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
+  /**
+   * 创建群组
+   * @param data 群组基本信息
+   */
+  createCohort(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
+  /**
+   * 退出群组
+   * @param id 群组Id
+   */
+  quitCohorts(id: string): Promise<ResultType<any>>;
+  /**
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
+   */
+  deleteCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 查询群组
+   * @param code 群组编号
+   */
+  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 群组操作 */
 export interface ICohort {

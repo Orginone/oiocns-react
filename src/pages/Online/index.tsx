@@ -3,6 +3,7 @@ import cls from './index.module.less';
 import React, { useRef, useEffect, useState } from 'react';
 import usePostMessage from '@/hooks/usePostMessage';
 import { useLocation } from 'react-router-dom';
+import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 const Index: React.FC = () => {
   const ifmRef = useRef<any>(null);
@@ -10,13 +11,12 @@ const Index: React.FC = () => {
   const {
     state: { appId },
   } = useLocation<any>();
-
+  const Resources = selfAppCtrl.curProduct!.getResources;
   useEffect(() => {
-    AppService.getResource(appId).then((res) => {
-      setLink(res[0].link);
-      usePostMessage(ifmRef, {}, link);
-    });
+    setLink(Resources[0].resource.link);
   }, [appId]);
+  // setLink(Resources[0].link);
+  usePostMessage(ifmRef, {}, Resources[0].resource.link);
 
   return (
     <>

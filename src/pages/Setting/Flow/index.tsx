@@ -5,6 +5,8 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 const { Header, Content } = Layout;
 const { Step } = Steps;
@@ -41,6 +43,7 @@ const SettingFlow: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
+  const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
 
   const columns: ProColumns<FlowItem>[] = [
     {
@@ -104,11 +107,17 @@ const SettingFlow: React.FC = () => {
     },
   ];
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    initData();
+  }, []);
 
-  const initData = () => {
+  const initData = async () => {
     setEditorType(EditorType.TABLEMES);
     setCurrentStep(StepType.BASEINFO);
+    const result = await userCtrl.Space.getDefines(false);
+    if (result) {
+      setDataSource(result);
+    }
   };
 
   return (
@@ -120,14 +129,16 @@ const SettingFlow: React.FC = () => {
               <ProTable
                 actionRef={actionRef}
                 columns={columns}
-                request={async (params = {}, sort, filter) => {
-                  console.log(sort, filter);
-                  return {
-                    data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                    success: true,
-                    total: 10,
-                  };
-                }}
+                search={false}
+                dataSource={dataSource}
+                // request={async (params = {}, sort, filter) => {
+                //   console.log(params, sort, filter);
+                //   return {
+                //     data: [{ title: '测试流程1' }, { title: '测试流程2' }],
+                //     success: true,
+                //     total: 10,
+                //   };
+                // }}
                 toolBarRender={() => [
                   <Button
                     key="button"

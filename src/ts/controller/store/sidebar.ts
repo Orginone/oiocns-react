@@ -225,7 +225,7 @@ class StoreClassify extends BaseController {
    * @return {*}
    */
   public async getOwnMarket(isCaback = true) {
-    const marketTree = await userCtrl.User.getJoinMarkets();
+    const marketTree = await userCtrl.User.getJoinMarkets(false);
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
