@@ -495,7 +495,7 @@ export type ProductModel = {
   // 名称
   name: string;
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 编号
   code: string;
   // 元数据Id
@@ -512,19 +512,19 @@ export type ProductModel = {
 
 export type ResourceModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 编号
   code: string;
   // 名称
   name: string;
   // 产品ID
-  productId: string;
+  productId?: string;
   // 访问私钥
   privateKey: string;
   // 入口地址
   link: string;
   // 流程项
-  flows: string;
+  flows?: string;
   // 组件
   components: string;
 };

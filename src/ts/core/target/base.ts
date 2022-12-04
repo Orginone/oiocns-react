@@ -8,6 +8,7 @@ export default class BaseTarget {
   public subTypes: TargetType[];
   public pullTypes: TargetType[];
   public authorityTree: Authority | undefined;
+  public ownIdentitys: schema.XIdentity[];
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -20,6 +21,7 @@ export default class BaseTarget {
     this.createTargetType = [];
     this.joinTargetType = [];
     this.searchTargetType = [];
+    this.ownIdentitys = [];
   }
 
   protected async createSubTarget(
@@ -279,14 +281,39 @@ export default class BaseTarget {
   }
 
   /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  async judgeHasIdentity(id: string): Promise<boolean> {
+    if (this.ownIdentitys.length == 0) {
+      await this.getOwnIdentitys(true);
+    }
+    return this.ownIdentitys.find((a) => a.id == id) != undefined;
+  }
+
+  private async getOwnIdentitys(reload: boolean = false) {
+    if (!reload && this.ownIdentitys.length > 0) {
+      return this.ownIdentitys;
+    }
+    const res = await kernel.querySpaceIdentitys({ id: this.target.id });
+    if (res.success && res.data.result) {
+      this.ownIdentitys = res.data.result;
+    }
+    return this.ownIdentitys;
+  }
+
+  /**
    * 查询组织职权树
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(): Promise<IAuthority | undefined> {
-    if (this.authorityTree != undefined) {
+  public async selectAuthorityTree(
+    reload: boolean = false,
+  ): Promise<IAuthority | undefined> {
+    if (!reload && this.authorityTree != undefined) {
       return this.authorityTree;
     }
+    await this.getOwnIdentitys(reload);
     const res = await kernel.queryAuthorityTree({
       id: this.target.id,
       page: {

@@ -126,6 +126,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           ...item,
         };
       });
+
     return loop(treeData);
   }, [searchValue, treeData]);
 

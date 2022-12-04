@@ -46,12 +46,19 @@ export default class BaseController {
   }
 
   /**
-   * @desc 取消订阅
+   * @desc 取消订阅 支持取消多个
    * @param key 订阅ID
    */
-  public unsubscribe(key: string): void {
-    delete this._refreshCallback[key];
-    delete this._partRefreshCallback[key];
+  public unsubscribe(key: string | string[]): void {
+    if (typeof key == 'string') {
+      delete this._refreshCallback[key];
+      delete this._partRefreshCallback[key];
+    } else {
+      key.forEach((id: string) => {
+        delete this._refreshCallback[id];
+        delete this._partRefreshCallback[id];
+      });
+    }
   }
 
   /**

@@ -128,22 +128,29 @@ export default class BaseProduct {
 
   /**
    * 上架商品
-   * @param Caption 标题
-   * @param MarketId 市场ID
-   * @param SellAuth 售卖权限
-   * @param Information 详情信息
-   * @param Price 价格
-   * @param Days 期限
+   * @param params.Caption 标题
+   * @param params.MarketId 市场ID
+   * @param params.SellAuth 售卖权限
+   * @param params.Information 详情信息
+   * @param params.Price 价格
+   * @param params.Days 期限
    * @returns 是否上架成功
    */
-  public async publish(
-    caption: string,
-    marketId: string,
-    sellAuth: '所属权' | '使用权',
-    information: string,
-    price: number = 0,
-    days: string = '0',
-  ): Promise<model.ResultType<any>> {
+  public async publish({
+    caption,
+    marketId,
+    sellAuth,
+    information,
+    price = 0,
+    days = '0',
+  }: {
+    caption: string;
+    marketId: string;
+    sellAuth: '所属权' | '使用权';
+    information: string;
+    price: number;
+    days: string;
+  }): Promise<model.ResultType<any>> {
     return await kernel.createMerchandise({
       id: '',
       caption,

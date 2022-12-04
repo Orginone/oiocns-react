@@ -81,3 +81,22 @@ export const marketColumns: any = [
     dataIndex: ['_product', 'remark'],
   },
 ];
+
+export const shareInfoColumns: any = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    width: 50,
+    render: (_key: any, _record: any, index: number) => {
+      return index + 1;
+    },
+  },
+  {
+    title: 'id',
+    dataIndex: 'id',
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+  },
+];

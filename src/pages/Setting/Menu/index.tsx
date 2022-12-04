@@ -6,6 +6,7 @@ import {
   HomeOutlined,
   InfoCircleOutlined,
   SettingOutlined,
+  TeamOutlined,
   SmileOutlined,
 } from '@ant-design/icons';
 import { Menu } from 'antd';
