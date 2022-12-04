@@ -78,7 +78,6 @@ class MarketController extends BaseController {
       return;
     }
     this._currentMenu = menuItem.title;
-    this.curPageType = (await import('./sidebar')).default.curPageType;
     console.log('当前页面类型', this.curPageType);
 
     this.getStoreProduct(this.curPageType);
