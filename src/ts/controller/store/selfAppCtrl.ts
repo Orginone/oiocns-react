@@ -72,7 +72,6 @@ class SelfAppController extends BaseController {
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
   private _curProduct: IProduct | undefined = undefined;
   // 顶部最近使用应用
-  private recentlyUsedApps!: IProduct[];
   public recentlyUsedAppsIds: string[] = [];
   // 常用菜单
   public static oftenUsedMenus = [
@@ -230,7 +229,7 @@ class SelfAppController extends BaseController {
    * @param {IProduct} data
    */
   public OpenApp(data: IProduct) {
-    this.recentlyUsedApps.unshift(data);
+    this.recentlyUsedAppsIds.unshift(data.prod.id);
     this.changCallbackPart(SelfCallBackTypes.Recently);
   }
 
