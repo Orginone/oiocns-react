@@ -120,7 +120,10 @@ const SettingFlow: React.FC = () => {
   ];
 
   useEffect(() => {
-    initData();
+    const id = userCtrl.subscribe(initData);
+    return () => {
+      userCtrl.unsubscribe(id);
+    };
   }, []);
 
   const initData = async () => {
@@ -139,6 +142,8 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
+    design.BelongId = userCtrl.Space.target.id;
+    console.log('design', design);
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
