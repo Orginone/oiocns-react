@@ -5,7 +5,7 @@ import { RollbackOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
-import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import BaseInfo from './BaseInfo';
 const { Header, Content } = Layout;
 const { Step } = Steps;
@@ -112,8 +112,10 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     setEditorType(EditorType.TABLEMES);
     setCurrentStep(StepType.BASEINFO);
-    const result = await userCtrl.Flow.getDefines();
-    console.log(result);
+    const result = await userCtrl.Space.getDefines(false);
+    if (result) {
+      console.log('result', result);
+    }
   };
 
   return (
@@ -126,7 +128,7 @@ const SettingFlow: React.FC = () => {
                 actionRef={actionRef}
                 columns={columns}
                 request={async (params = {}, sort, filter) => {
-                  console.log(sort, filter);
+                  console.log(params, sort, filter);
                   return {
                     data: [{ title: '测试流程1' }, { title: '测试流程2' }],
                     success: true,
