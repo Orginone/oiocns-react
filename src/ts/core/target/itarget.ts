@@ -40,24 +40,28 @@ export interface IMTarget {
   getMarketByCode(name: string): Promise<ResultType<schema.XMarketArray>>;
   /**
    * 查询商店列表
+   * @param reload 是否强制刷新
    * @returns 商店列表
    */
-  getJoinMarkets(): Promise<Market[]>;
+  getJoinMarkets(reload: boolean): Promise<Market[]>;
   /**
    * 查询开放市场
+   * @param reload 是否强制刷新
    * @returns 市场
    */
-  getPublicMarket(): Promise<Market[]>;
+  getPublicMarket(reload: boolean): Promise<Market[]>;
   /**
    * 查询我的产品/应用
    * @param params
+   * @param reload 是否强制刷新
    * @returns
    */
-  getOwnProducts(): Promise<BaseProduct[]>;
+  getOwnProducts(reload: boolean): Promise<BaseProduct[]>;
   /**
    * 查询购物车列表
+   * @param reload 是否强制刷新
    */
-  getStaging(): Promise<schema.XStaging[]>;
+  getStaging(reload: boolean): Promise<schema.XStaging[]>;
   /**
    * 查询购买订单
    */
@@ -185,19 +189,33 @@ export interface IMTarget {
    * @returns
    */
   quitMarket(id: string): Promise<ResultType<any>>;
-  /** 获得可用应用 */
-  getUsefulProduct(): Promise<schema.XProduct[]>;
+  /**
+   * 查询可用的应用
+   * @param reload 是否强制刷新
+   */
+  getUsefulProduct(reload: boolean): Promise<schema.XProduct[]>;
   /**
    * 获得可用资源
    * @param id 应用Id
+   * @param reload 是否强制刷新
    */
-  getUsefulResource(id: string): Promise<schema.XResource[]>;
+  getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
 }
 export interface IFlowTarget {
   /** 流程定义 */
   defines: schema.XFlowDefine[];
-  /** 获取流程定义列表 */
-  getDefines(): Promise<schema.XFlowDefine[]>;
+  /** 流程绑定关系 */
+  defineRelations: schema.XFlowRelation[];
+  /**
+   * 获取流程定义列表
+   * @param reload 是否强制刷新
+   */
+  getDefines(reload: boolean): Promise<schema.XFlowDefine[]>;
+  /**
+   * 查询流程定义绑定项
+   * @param reload 是否强制刷新
+   */
+  queryFlowRelation(reload: boolean): Promise<schema.XFlowRelation[]>;
   /**
    * 发布流程定义（包含创建、更新）
    * @param data
@@ -248,8 +266,11 @@ export interface ICohort {
   update(
     data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>>;
-  /** 获取群成员列表 */
-  getMember(): Promise<schema.XTarget[]>;
+  /**
+   * 获取群成员列表
+   * @param reload 是否强制刷新
+   */
+  getMember(reload: boolean): Promise<schema.XTarget[]>;
   /**
    * 拉取成员加入群组
    * @param targets 成员列表
@@ -295,14 +316,16 @@ export interface IPerson extends IMTarget, IFlowTarget {
   update(data: Omit<TargetModel, 'id'>): Promise<ResultType<schema.XTarget>>;
   /**
    * @description: 查询我加入的群
+   * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(): Promise<ICohort[]>;
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
   /**
    * 获取单位列表
+   * @param reload 是否强制刷新
    * @return 加入的单位列表
    */
-  getJoinedCompanys(): Promise<ICompany[]>;
+  getJoinedCompanys(reload: boolean): Promise<ICompany[]>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
@@ -357,9 +380,10 @@ export interface IPerson extends IMTarget, IFlowTarget {
   quitCompany(id: string): Promise<ResultType<any>>;
   /**
    * 获取好友列表
+   * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getFriends(): Promise<schema.XTarget[]>;
+  getFriends(reload: boolean): Promise<schema.XTarget[]>;
   /**
    * 申请添加好友
    * @param target 目标
@@ -419,6 +443,10 @@ export interface ICompany extends IMTarget, IFlowTarget {
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 子组织类型 */
+  subTypes: TargetType[];
+  /** 空间类型数据 */
+  getSpaceData: SpaceType;
   /** 单位人员 */
   person: schema.XTarget[];
   /** 我的子部门 */
@@ -429,10 +457,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
   joinedGroup: IGroup[];
   /** 我加入的群组 */
   joinedCohort: ICohort[];
-  /** 子组织类型 */
-  subTypes: TargetType[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
   /**
    * 更新单位
    * @param data 单位基础信息
@@ -496,32 +520,36 @@ export interface ICompany extends IMTarget, IFlowTarget {
   quitGroup(id: string): Promise<ResultType<any>>;
   /**
    * 获取单位下的人员
+   * @param reload 是否强制刷新
    * @returns
    */
-  getPersons(): Promise<schema.XTarget[]>;
+  getPersons(reload: boolean): Promise<schema.XTarget[]>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
    * 获取单位下的部门（单位、部门）
+   * @param reload 是否强制刷新
    * @returns
    */
-  getDepartments(): Promise<IDepartment[]>;
+  getDepartments(reload: boolean): Promise<IDepartment[]>;
   /**
    * 获取组织下的工作组（单位、部门、工作组）
-   * @param id 组织Id 默认为当前单位
+   * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getWorkings(): Promise<IWorking[]>;
+  getWorkings(reload: boolean): Promise<IWorking[]>;
   /**
    * @description: 查询我加入的群
+   * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(): Promise<ICohort[]>;
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
   /**
    * @description: 查询我加入的集团
+   * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedGroups(): Promise<IGroup[]>;
+  getJoinedGroups(reload: boolean): Promise<IGroup[]>;
   /**
    * 申请加入群组
    * @param id 目标Id
@@ -576,9 +604,10 @@ export interface IGroup {
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
   /**
    * 查询加入的集团
+   * @param reload 是否强制刷新
    * @returns
    */
-  getJoinedGroups(): Promise<schema.XTarget[]>;
+  getJoinedGroups(reload: boolean): Promise<schema.XTarget[]>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
@@ -600,15 +629,16 @@ export interface IGroup {
   deleteSubGroup(id: string): Promise<ResultType<any>>;
   /**
    * 获取集团下的单位
+   * @param reload 是否强制刷新
    * @returns
    */
-  getCompanys(): Promise<schema.XTarget[]>;
+  getCompanys(reload: boolean): Promise<schema.XTarget[]>;
   /**
    * 获取子集团
-   * @param id 组织Id 默认为当前集团
+   * @param reload 是否强制刷新
    * @returns
    */
-  getSubGroups(): Promise<IGroup[]>;
+  getSubGroups(reload: boolean): Promise<IGroup[]>;
 }
 /** 部门操作 */
 export interface IDepartment {
@@ -626,28 +656,33 @@ export interface IDepartment {
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
-  /** 获取部门人员 */
-  getPerson(): Promise<schema.XTarget[]>;
-  /** 获取子部门 */
-  getDepartments(): Promise<IDepartment[]>;
-  /** 获取工作组 */
-  getWorkings(): Promise<IWorking[]>;
+  /**
+   * 获取部门人员
+   * @param reload 是否强制刷新
+   */
+  getPerson(reload: boolean): Promise<schema.XTarget[]>;
+  /**
+   * 获取子部门
+   * @param reload 是否强制刷新
+   */
+  getDepartments(reload: boolean): Promise<IDepartment[]>;
+  /**
+   * 获取工作组
+   * @param reload 是否强制刷新
+   */
+  getWorkings(reload: boolean): Promise<IWorking[]>;
   /** 拉人进入部门 */
   pullPerson(person: schema.XTarget[]): Promise<model.ResultType<any>>;
   /** 踢人 */
   removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建子部门 */
-  createDepartment(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
-  ): Promise<model.ResultType<any>>;
+  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
   /** 删除子部门 */
-  deleteDepartment(id: string): Promise<model.ResultType<any>>;
+  deleteDepartment(id: string, spaceId: string): Promise<model.ResultType<any>>;
   /** 创建工作组 */
-  createWorking(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
-  ): Promise<model.ResultType<any>>;
+  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
   /** 删除工作组 */
-  deleteWorking(id: string): Promise<model.ResultType<any>>;
+  deleteWorking(id: string, spaceId: string): Promise<model.ResultType<any>>;
 }
 /** 工作组 */
 export interface IWorking {
@@ -663,16 +698,29 @@ export interface IWorking {
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
-  /** 获取工作组 */
-  getWorkings(): Promise<IWorking[]>;
+  /**
+   * 获取工作组
+   * @param reload 是否强制刷新
+   */
+  getWorkings(reload: boolean): Promise<IWorking[]>;
+  /**
+   * 获取人员
+   * @param reload 是否强制刷新
+   */
+  getPerson(reload: boolean): Promise<schema.XTarget[]>;
   /** 拉人进入部门 */
   pullPerson(targets: schema.XTarget[]): Promise<model.ResultType<any>>;
-  /** 踢人 */
+  /**
+   * 踢人
+   * @param ids 人员Id集合
+   */
   removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建工作组 */
-  createWorking(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
-  ): Promise<model.ResultType<any>>;
-  /** 删除工作组 */
-  deleteWorking(id: string): Promise<model.ResultType<any>>;
+  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  /**
+   * 删除工作组
+   * @param id 工作组Id
+   * @param spaceId 单位Id
+   */
+  deleteWorking(id: string, spaceId: string): Promise<model.ResultType<any>>;
 }

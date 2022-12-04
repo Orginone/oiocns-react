@@ -2,7 +2,7 @@ import { Card, Avatar, Space, Typography, Dropdown, MenuProps } from 'antd';
 import React from 'react';
 import styles from './index.module.less';
 import moment from 'moment';
-
+import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 const { Meta } = Card;
 interface TableItemCardProps<T> {
   data: T[];
@@ -18,11 +18,14 @@ interface TableItemCardProps<T> {
  * @params statusType 事项 卡片tag显示的类型
  * @returns JSX.Element
  */
-const TableItemCard = <T extends ApprovalType>(props: TableItemCardProps<T>) => {
+const TableItemCard = <T extends IApplyItem | IApprovalItem>(
+  props: TableItemCardProps<T>,
+) => {
   const { data, statusType, targetOrTeam, operation } = props;
   return (
     <>
-      {data.map((item: T) => {
+      {data.map((instans: T) => {
+        const item = instans.Data;
         return (
           <Card key={item.id} className={styles[`table-card`]}>
             <Meta
@@ -37,12 +40,12 @@ const TableItemCard = <T extends ApprovalType>(props: TableItemCardProps<T>) => 
                     <span className={styles['card-title']}>
                       {item[targetOrTeam].name}
                     </span>
-                    {statusType && statusType(item)}
+                    {statusType && statusType(instans)}
                   </Space>
                   {operation && (
                     <Dropdown.Button
                       type="text"
-                      menu={{ items: operation(item) }}
+                      menu={{ items: operation(instans) }}
                       className={styles['drop-down']}
                     />
                   )}

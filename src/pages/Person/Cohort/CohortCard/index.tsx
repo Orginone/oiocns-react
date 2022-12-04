@@ -2,15 +2,14 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
-import { MarketTypes } from 'typings/marketType';
 import CohortMemberList from '../CohortMemberList';
 import { ICohort } from '@/ts/core/target/itarget';
-
+import { CohortConfigType } from 'typings/Cohort';
 interface CohortCardType {
   data: ICohort; //props
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: ICohort) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (_item: ICohort) => CohortConfigType.OperationType[]; //操作区域数据
 }
 
 const CohortCardComp: React.FC<CohortCardType> = ({
@@ -36,6 +35,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({
     const res = (await data.getMember()).filter((obj) => obj.id === data.target.belongId);
     setName(res[0].team?.name!);
   };
+
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -67,7 +67,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({
             归属:{name}
           </span>
         </li>
-        <li className="card-content-date">我的身份:管理员</li>
+        <li className="card-content-date">我的身份:管理</li>
         <li className="card-content-date">群组编号:{data.target.code}</li>
         <li className="card-content-date">
           <span>创建于 {data.target.createTime || '--'}</span>

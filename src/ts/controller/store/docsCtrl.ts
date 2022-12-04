@@ -24,9 +24,11 @@ class DocsController extends BaseController {
     this._root = rootDir;
     this._taskList = [];
     this._curKey = this._root.key;
-    userCtrl.subscribePart(UserPartTypes.User, async () => {
-      this._home = await this._root.create(homeName);
-      this.changCallback();
+    userCtrl.subscribePart(UserPartTypes.User, () => {
+      setTimeout(async () => {
+        this._home = await this._root.create(homeName);
+        this.changCallback();
+      }, 200);
     });
   }
   /** 根目录 */

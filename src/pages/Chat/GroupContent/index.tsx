@@ -4,13 +4,13 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import HeadImg from '@/components/headImg/headImg';
-import contentStyle from './index.module.less';
+import css from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
-import { deepClone } from '@/ts/base/common';
 import { XImMsg } from '@/ts/base/schema';
 import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 聊天区域
@@ -22,13 +22,11 @@ interface Iprops {
 }
 
 const GroupContent = (props: Iprops) => {
+  const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
   const [messages, setMessages] = useState(chatCtrl.chat?.messages ?? []);
   const { handleReWrites } = props;
   const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
-  const refreshUI = async () => {
-    setMessages(deepClone(chatCtrl.chat?.messages ?? []));
-  };
 
   /**
    * @description: 滚动到底部
@@ -48,11 +46,10 @@ const GroupContent = (props: Iprops) => {
   }, [messages]);
 
   useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
-    return () => {
-      chatCtrl.unsubscribe(id);
-    };
-  }, []);
+    if (chatCtrl.chat) {
+      setMessages(chatCtrl.chat.messages);
+    }
+  }, [key]);
 
   const isShowTime = (index: number) => {
     if (index == 0 && messages) return true;
@@ -81,8 +78,8 @@ const GroupContent = (props: Iprops) => {
         const img: FileItemShare = JSON.parse(item.showTxt);
         return (
           <>
-            <div className={`${contentStyle.con_content_link}`}></div>
-            <div className={`${contentStyle.con_content_txt}`}>
+            <div className={`${css.con_content_link}`}></div>
+            <div className={`${css.con_content_txt} ${css.con_content_img}`}>
               <Image src={img.thumbnail} preview={{ src: img.shareLink }} />
             </div>
           </>
@@ -90,9 +87,9 @@ const GroupContent = (props: Iprops) => {
       default:
         return (
           <>
-            <div className={`${contentStyle.con_content_link}`}></div>
+            <div className={`${css.con_content_link}`}></div>
             <div
-              className={`${contentStyle.con_content_txt}`}
+              className={`${css.con_content_txt}`}
               dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
           </>
         );
@@ -100,13 +97,13 @@ const GroupContent = (props: Iprops) => {
   };
 
   return (
-    <div className={contentStyle.group_content_wrap}>
+    <div id={key} className={css.group_content_wrap}>
       {messages.map((item, index: any) => {
         return (
           <React.Fragment key={item.fromId + index}>
             {/* 聊天间隔时间3分钟则 显示时间 */}
             {isShowTime(index) ? (
-              <div className={contentStyle.chats_space_Time}>
+              <div className={css.chats_space_Time}>
                 <span>{showChatTime(item.createTime)}</span>
               </div>
             ) : (
@@ -114,12 +111,11 @@ const GroupContent = (props: Iprops) => {
             )}
             {/* 重新编辑 */}
             {item.msgType === 'recall' ? (
-              <div
-                className={`${contentStyle.group_content_left} ${contentStyle.con} ${contentStyle.recall}`}>
+              <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
                 撤回了一条消息
                 {item.allowEdit ? (
                   <span
-                    className={contentStyle.reWrite}
+                    className={css.reWrite}
                     onClick={() => {
                       handleReWrite(item.msgBody);
                     }}>
@@ -134,10 +130,10 @@ const GroupContent = (props: Iprops) => {
             )}
             {/* 左侧聊天内容显示 */}
             {item.fromId !== chatCtrl.userId ? (
-              <div className={`${contentStyle.group_content_left} ${contentStyle.con}`}>
+              <div className={`${css.group_content_left} ${css.con}`}>
                 <Popover
                   trigger="hover"
-                  overlayClassName={contentStyle.targerBoxClass}
+                  overlayClassName={css.targerBoxClass}
                   open={selectId == item.id}
                   key={item.id}
                   placement="bottom"
@@ -157,7 +153,7 @@ const GroupContent = (props: Iprops) => {
                           danger
                           onClick={async () => {
                             if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                              refreshUI();
+                              forceUpdate();
                             }
                           }}>
                           删除
@@ -171,7 +167,7 @@ const GroupContent = (props: Iprops) => {
                     ''
                   ) : (
                     <div
-                      className={contentStyle.con_body}
+                      className={css.con_body}
                       onContextMenu={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -182,7 +178,7 @@ const GroupContent = (props: Iprops) => {
                         label={''}
                         isSquare={false}
                       />
-                      <div className={`${contentStyle.con_content}`}>{viewMsg(item)}</div>
+                      <div className={`${css.con_content}`}>{viewMsg(item)}</div>
                     </div>
                   )}
                 </Popover>
@@ -190,11 +186,10 @@ const GroupContent = (props: Iprops) => {
             ) : (
               <>
                 {/* 右侧聊天内容显示 */}
-                <div
-                  className={`${contentStyle.group_content_right} ${contentStyle.con}`}>
+                <div className={`${css.group_content_right} ${css.con}`}>
                   <Popover
                     trigger="hover"
-                    overlayClassName={contentStyle.targerBoxClass}
+                    overlayClassName={css.targerBoxClass}
                     open={selectId == item.id}
                     key={item.id}
                     placement="bottom"
@@ -225,7 +220,7 @@ const GroupContent = (props: Iprops) => {
                             danger
                             onClick={async () => {
                               if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                                refreshUI();
+                                forceUpdate();
                               }
                             }}>
                             删除
@@ -239,15 +234,13 @@ const GroupContent = (props: Iprops) => {
                       ''
                     ) : (
                       <div
-                        className={contentStyle.con_body}
+                        className={css.con_body}
                         onContextMenu={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           setSelectId(item.id);
                         }}>
-                        <div className={`${contentStyle.con_content}`}>
-                          {viewMsg(item)}
-                        </div>
+                        <div className={`${css.con_content}`}>{viewMsg(item)}</div>
                         <HeadImg name={chatCtrl.getName(item.fromId)} isSquare={false} />
                       </div>
                     )}

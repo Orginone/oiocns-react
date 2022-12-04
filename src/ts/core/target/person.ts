@@ -54,24 +54,24 @@ export default class Person extends MarketTarget implements IPerson {
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
-  public async getJoinedCohorts(): Promise<ICohort[]> {
-    if (this.joinedCohort.length > 0) {
+  public async getJoinedCohorts(reload: boolean): Promise<ICohort[]> {
+    if (!reload && this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort]);
     console.log('输出返回结果', res);
-    if (res.success) {
+    if (res.success && res.data.result) {
       console.log('进入了');
       this.joinedCohort = [];
-      res.data.result?.forEach((a) => {
-        this.joinedCohort.push(new Cohort(a));
+      this.joinedCohort = res.data.result.map((a) => {
+        return new Cohort(a);
       });
     }
     console.log('输出结果', this.joinedCohort);
     return this.joinedCohort;
   }
-  public async getJoinedCompanys(): Promise<ICompany[]> {
-    if (this.joinedCompany.length > 0) {
+  public async getJoinedCompanys(reload: boolean = false): Promise<ICompany[]> {
+    if (!reload && this.joinedCompany.length > 0) {
       return this.joinedCompany;
     }
     const res = await this.getjoinedTargets(consts.CompanyTypes);
@@ -191,6 +191,7 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async quitCohorts(id: string): Promise<ResultType<any>> {
     const res = await this.cancelJoinTeam(id);
+
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((cohort) => {
         return cohort.target.id != id;
@@ -215,12 +216,12 @@ export default class Person extends MarketTarget implements IPerson {
     });
     return res;
   }
-  public async getFriends(): Promise<schema.XTarget[]> {
-    if (this.joinedFriend.length > 0) {
+  public async getFriends(reload: boolean = false): Promise<schema.XTarget[]> {
+    if (!reload && this.joinedFriend.length > 0) {
       return this.joinedFriend;
     }
     const res = await this.getSubTargets([TargetType.Person]);
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.joinedFriend = res.data.result;
     }
 
@@ -299,11 +300,14 @@ export default class Person extends MarketTarget implements IPerson {
       belongId: this.target.id,
     });
   }
-  public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct();
+  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct(reload);
   }
-  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id);
+  public async getUsefulResource(
+    id: string,
+    reload: boolean = false,
+  ): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, reload);
   }
   public async resetPassword(
     password: string,

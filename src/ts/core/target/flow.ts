@@ -6,8 +6,9 @@ import { IFlowTarget } from './itarget';
 
 export default class FlowTarget extends BaseTarget implements IFlowTarget {
   defines: schema.XFlowDefine[] = [];
-  async getDefines(): Promise<schema.XFlowDefine[]> {
-    if (this.defines.length > 0) {
+  defineRelations: schema.XFlowRelation[] = [];
+  async getDefines(reload: boolean = false): Promise<schema.XFlowDefine[]> {
+    if (!reload && this.defines.length > 0) {
       return this.defines;
     }
     const res = await kernel.queryDefine({ id: this.target.id });
@@ -15,6 +16,18 @@ export default class FlowTarget extends BaseTarget implements IFlowTarget {
       this.defines = res.data.result;
     }
     return this.defines;
+  }
+  async queryFlowRelation(reload: boolean = false): Promise<schema.XFlowRelation[]> {
+    if (!reload && this.defineRelations.length > 0) {
+      return this.defineRelations;
+    }
+    const res = await kernel.queryDefineRelation({
+      id: this.target.id,
+    });
+    if (res.success && res.data.result) {
+      this.defineRelations = res.data.result;
+    }
+    return this.defineRelations;
   }
   async publishDefine(
     data: model.CreateDefineReq,
@@ -43,11 +56,24 @@ export default class FlowTarget extends BaseTarget implements IFlowTarget {
   async bindingFlowRelation(
     data: model.FlowRelationModel,
   ): Promise<ResultType<schema.XFlowRelation>> {
-    return await kernel.createFlowRelation(data);
+    const res = await kernel.createFlowRelation(data);
+    if (res.success) {
+      this.defineRelations = this.defineRelations.filter((a) => {
+        a.productId != data.productId || a.functionCode != data.functionCode;
+      });
+      this.defineRelations.push(res.data);
+    }
+    return res;
   }
   async unbindingFlowRelation(
     data: model.FlowRelationModel,
   ): Promise<ResultType<boolean>> {
-    return await kernel.deleteFlowRelation(data);
+    const res = await kernel.deleteFlowRelation(data);
+    if (res.success) {
+      this.defineRelations = this.defineRelations.filter((a) => {
+        a.productId != data.productId || a.functionCode != data.functionCode;
+      });
+    }
+    return res;
   }
 }
