@@ -1,14 +1,12 @@
-import Company from '@/ts/core/target/company';
 import { TargetType } from '@/ts/core/enum';
-// import { XTarget, XTargetArray } from '@/ts/base/schema';
-import UserCtrl from '@/ts/controller/setting/userCtrl';
-import CompanyCtrl from '@/ts/controller/setting/companyCtrl';
 import { IObjectItem } from '@/ts/core/store/ifilesys';
-import docCtrl from '@/ts/controller/store/docsCtrl';
-import { ICompany, IDepartment } from '@/ts/core/target/itarget';
+import { IDepartment } from '@/ts/core/target/itarget';
 import { schema } from '@/ts/base';
 import Department from '@/ts/core/target/department';
-// import Department from '@/ts/core/target/department';
+// import Company from '@/ts/core/target/company';
+// import { XTarget, XTargetArray } from '@/ts/base/schema';
+import UserCtrl from '@/ts/controller/setting/userCtrl';
+import docCtrl from '@/ts/controller/store/docsCtrl';
 
 export interface spaceObjs {
   id: string;
@@ -59,11 +57,9 @@ export default class SettingService {
     return this._instance;
   }
 
-  private _isOpenModal: boolean = false;
-  // 我的用户服务
-  private companyCtrl: CompanyCtrl;
-  // 对应公司的ID
   private companyID: string = '';
+  private _isOpenModal: boolean = false;
+  // 对应公司的ID
 
   // 部门树，选中的节点
   private _currTreeDeptNode: string = '';
@@ -85,9 +81,6 @@ export default class SettingService {
   public set setCompanyID(id: string) {
     this.companyID = id;
   }
-  public get getCompanyCtrl() {
-    return this.companyCtrl;
-  }
   public getCurrTreeDeptNode() {
     return this._currTreeDeptNode;
   }
@@ -98,11 +91,9 @@ export default class SettingService {
     if (UserCtrl.Space != null) {
       this.setCompanyID = UserCtrl.Space?.target.id;
       this._root = new Department(UserCtrl.Space?.target);
-      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.Space?.target));
     } else {
       this.setCompanyID = '';
       this._root = new Department(UserCtrl.User?.target);
-      this.companyCtrl = new CompanyCtrl(new Company(UserCtrl.User?.target));
     }
   }
 
@@ -118,8 +109,8 @@ export default class SettingService {
     if (item.target.id === key) {
       return item;
     }
-    // 手动查找子对象
-    const depts = await item.getDepartments();
+
+    const depts = await item.getDepartments(false);
     for (const i of depts) {
       const res = await this._search(i, key);
       if (res) {
