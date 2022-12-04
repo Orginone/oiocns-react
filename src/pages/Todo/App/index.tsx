@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import PageCard from '../components/PageCard';
-import { RouteComponentProps } from 'react-router-dom';
 import { ProColumns } from '@ant-design/pro-components';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { applicationTabs, statusMap, tableOperation } from '../components';
@@ -15,15 +14,7 @@ const renderItemStatus = (record: any) => {
   const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
-type RouterParams = {
-  id: string;
-};
-const AppTodo: React.FC<RouteComponentProps<RouterParams>> = (props) => {
-  const {
-    match: {
-      params: { id },
-    },
-  } = props;
+const AppTodo: React.FC = () => {
   const [pageData, setpageData] = useState<IApprovalItem[] | IApplyItem[]>();
   const [activeKey, setActiveKey] = useState<string>('1');
   const [needReload, setNeedReload] = useState<boolean>(false);
@@ -53,31 +44,24 @@ const AppTodo: React.FC<RouteComponentProps<RouterParams>> = (props) => {
     { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
   ];
   const loadList = async (page: number, pageSize: number) => {
-    if (id) {
-      const currentTodo = todoCtrl.currentAppTodo(id);
-      if (!currentTodo) {
-        setpageData([]);
-        return;
-      }
+    if (todoCtrl.CurAppTodo) {
       const code = {
         '1': 'getTodoList',
         '2': 'getDoList',
         '3': 'getApplyList',
         '4': 'getNoticeList',
       };
-      const list = await currentTodo[code[activeKey]](
+      const list = await todoCtrl.CurAppTodo[code[activeKey]](
         activeKey === '3' ? resetParams({ page, pageSize }) : null,
       );
       console.log(code[activeKey], list);
       setpageData(list);
       setTotal(list.length);
+    } else {
+      setpageData([]);
     }
     setNeedReload(false);
   };
-  // useEffect(() => {
-  //   const id = todoCtrl.subscribe(loadList);
-  //   return () => todoCtrl.unsubscribe(id);
-  // }, []);
   useEffect(() => {
     loadList(1, 10);
   }, [activeKey, needReload]);
