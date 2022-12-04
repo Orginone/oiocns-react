@@ -8,13 +8,11 @@ import { Menu, Button, Row, Col } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import StoreSiderbar from '@/ts/controller/store/sidebar';
-import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
+import marketCtrl, { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
@@ -67,7 +65,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onChange = async (val: any) => {
-    const res = await marketCtrl.getMarketByCode(val.target.value);
+    const res = await marketCtrl.Market.getMarketByCode(val.target.value);
     setDataSource(res);
   };
 
@@ -78,9 +76,9 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onDeleteOrQuitOk = () => {
     setIsDeleteOpen(false);
     {
-      deleOrQuit === 'delete'
-        ? marketCtrl.deleteMarket(treeDataObj?.id)
-        : marketCtrl.quitMarket(treeDataObj?.id);
+      // deleOrQuit === 'delete'
+      //   ? marketCtrl.getCurrentMarket.deleteMarket(treeDataObj?.id)
+      //   : marketCtrl.quitMarket(treeDataObj?.id);
     }
   };
 
@@ -99,11 +97,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsDetailOpen(false);
   };
   useEffect(() => {
-    StoreSiderbar.curPageType = 'market';
-    StoreSiderbar.subscribePart('marketTreeData', setList);
-    StoreSiderbar.getTreeData();
+    const id = marketCtrl.subscribePart(MarketCallBackTypes.marketList, () => {
+      setList([...marketCtrl.marketList]);
+    });
+    marketCtrl.queryMarketList();
     return () => {
-      return StoreSiderbar.unsubscribe('marketTreeData');
+      return marketCtrl.unsubscribe(id);
     };
   }, []);
 
@@ -133,7 +132,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleChange = (path: string) => {
     console.log('是是是', path);
     if (path === '/market/shop') {
-      StoreContent.changeMenu('market');
+      // StoreContent.changeMenu('market');
     }
     setSelectMenu(path);
     history.push(path);
@@ -172,7 +171,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
-    StoreContent.changeMenu(item);
+    // StoreContent.changeMenu(item);
   };
 
   /**
@@ -218,7 +217,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
-        StoreSiderbar.handleSelectMarket(node?.node);
+        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
