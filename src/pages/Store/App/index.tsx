@@ -13,37 +13,38 @@ import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
-import DeleteCustomModal from '@/components/DeleteCustomModal';
+// import DeleteCustomModal from '@/components/DeleteCustomModal';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
-
 const StoreApp: React.FC = () => {
   const history = useHistory();
-  const [data, setData] = useState<BaseProduct[]>([]);
+  const [data, setData] = useState<IProduct[]>([]);
+  const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
-  const [productObj, setProductObj] = useState<any>({});
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
       setData([...SelfAppCtrl.tableData]);
     });
+    const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
+      console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
+      setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
+    });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
     return () => {
-      return SelfAppCtrl.unsubscribe(id);
+      return SelfAppCtrl.unsubscribe([id, id2]);
     };
   }, []);
   // 根据以获取数据 动态产生tab
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v._prod.source);
+      typeSet.add(v.prod?.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -67,22 +68,17 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  /**
-   * @description: 移除确认
-   * @return {*}
-   */
-  const onOk = () => {
-    setIsDeleteOpen(false);
-    // productCtrl.deleteProduct(productObj?._prod?.id);
-  };
+  const RentlyApps = useMemo(() => {
+    let recentlyApps: IProduct[] = [];
+    recentlyAppIds?.forEach((id: string) => {
+      const prod = data.find((v) => {
+        return v.prod.id === id;
+      });
+      prod && recentlyApps.push(prod);
+    });
 
-  /**
-   * @description: 取消确认
-   * @return {*}
-   */
-  const onCancel = () => {
-    setIsDeleteOpen(false);
-  };
+    return recentlyApps;
+  }, [recentlyAppIds, data]);
 
   const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
     console.log('输出选择', teamId, type, checkedValus);
@@ -91,28 +87,18 @@ const StoreApp: React.FC = () => {
   };
   // 共享确认回调
   const submitShare = () => {
-    console.log(
-      '共享确认回调',
-      checkNodes,
-      // departHisData,
-      // authorData,
-      // personsData,
-      // personsHisData,
-      // identitysData,
-      // identitysHisData,
-    );
-
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
-  const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
+          SelfAppCtrl.curProduct = item;
           SelfAppCtrl.OpenApp(item);
-          history.push({ pathname: '/online', state: { appId: item._prod?.id } });
+          history.push({ pathname: '/online', state: { appId: item.prod?.id } });
         },
       },
       {
@@ -120,7 +106,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
+          history.push({ pathname: '/store/app/info' });
         },
       },
       {
@@ -152,29 +138,29 @@ const StoreApp: React.FC = () => {
         },
       },
       {
-        key: 'delete',
-        label: '移除',
-        onClick: () => {
-          SelfAppCtrl.curProduct = item;
-          setProductObj(item);
-          setIsDeleteOpen(true);
-        },
-      },
-      {
         key: 'share2',
         label: '分配',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
+          setShowShareModal(true);
         },
       },
+      // {
+      //   key: 'save',
+      //   label: '暂存',
+      //   onClick: () => {
+      //     SelfAppCtrl.curProduct = item;
+      //     history.push({
+      //       pathname: '/store/app/publish',
+      //     });
+      //   },
+      // },
       {
-        key: 'save',
-        label: '暂存',
+        key: 'delete',
+        label: <span style={{ color: 'red' }}> 移除</span>,
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({
-            pathname: '/store/app/publish',
-          });
+          SelfAppCtrl.handleDeleteApp();
         },
       },
     ];
@@ -183,7 +169,7 @@ const StoreApp: React.FC = () => {
   const AppIndex = useMemo(() => {
     return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {<StoreRecent />}
+        {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />}
         <Card
           title="应用"
           className={cls['app-tabs']}
@@ -194,7 +180,6 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User?.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={SelfAppCtrl.getColumns('myApp')}
@@ -224,14 +209,14 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp onCheckeds={onCheckeds} />
       </Modal>
-      <DeleteCustomModal
+      {/* <DeleteCustomModal
         title="警告"
         open={isDeleteOpen}
         deleOrQuit="delete"
         onOk={onOk}
         onCancel={onCancel}
-        content={productObj?._prod?.name}
-      />
+        content={SelfAppCtrl.curProduct!.prod.name}
+      /> */}
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/publish" render={() => <PublishList />}></Route>

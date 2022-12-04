@@ -154,12 +154,12 @@ class StoreClassify extends BaseController {
       this.curMenu[this.curPageType] == 'data' ||
       this.curMenu[this.curPageType] == 'assets'
     ) {
-      this.changCallbackPart(`${this.curPageType}TreeData`, []);
+      this.changCallbackPart(`${this.curPageType}TreeData`);
       return;
     }
     if (data.length > 0) {
       this.curTreeData = data;
-      this.changCallbackPart(`${this.curPageType}TreeData`, [...data]);
+      this.changCallbackPart(`${this.curPageType}TreeData`);
     } else {
       console.log('获取-tree');
 
@@ -187,7 +187,7 @@ class StoreClassify extends BaseController {
   public updataSelfAppMenu(list: any[]) {
     this.appFooterTree.appTreeData = list;
     this.cacheSelfMenu(list);
-    this.changCallbackPart(`appTreeData`, [...list]);
+    this.changCallbackPart(`appTreeData`);
   }
   /* ----------------------------------------市场功能区--------------------------------------- */
   /**
@@ -225,7 +225,7 @@ class StoreClassify extends BaseController {
    * @return {*}
    */
   public async getOwnMarket(isCaback = true) {
-    const marketTree = await userCtrl.User.getJoinMarkets();
+    const marketTree = await userCtrl.User.getJoinMarkets(false);
     let arr: any = marketTree.map((itemModel: Market, index: any) => {
       const item = itemModel.market;
       let arrs = ['基础详情', '用户管理'];
@@ -245,7 +245,7 @@ class StoreClassify extends BaseController {
     if (!isCaback) {
       return marketTree;
     }
-    isCaback && this.changCallbackPart(`${this.curPageType}TreeData`, arr);
+    isCaback && this.changCallbackPart(`${this.curPageType}TreeData`);
   }
 
   /**

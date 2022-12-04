@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
-import Node from '@/bizcomponents/Flow/Process/Node';
+import React from 'react';
 import {
   EyeOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
-  ExclamationCircleOutlined,
-  EditOutlined,
-  RollbackOutlined,
 } from '@ant-design/icons';
-import { Select, Button, message, Modal, Input } from 'antd';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { Select, Button, message } from 'antd';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
+
 type LayoutHeaderProps = {
   OnPreview: Function;
   OnExit: Function;
@@ -19,7 +16,6 @@ type LayoutHeaderProps = {
   backTable?: () => void;
   titleName: string;
 };
-const { confirm } = Modal;
 /**
  * 标题栏
  * @returns
@@ -29,33 +25,17 @@ const LayoutHeader: React.FC<LayoutHeaderProps> = (props: LayoutHeaderProps) => 
   const form = useAppwfConfig((state: any) => state.form);
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
-  const [showInput, setShowInput] = useState(false);
+  // const getFormFields = useAppwfConfig((state: any) => state.getFormFields);
   const changeScale = (val: any) => {
     setScale(val);
   };
-  const exit = () => {
-    confirm({
-      title: '未发布的内容将不会被保存，是否直接退出?',
-      icon: <ExclamationCircleOutlined />,
-      okText: '确认',
-      okType: 'danger',
-      cancelText: '取消',
-      onOk() {
-        props.OnExit();
-      },
-      onCancel() {},
-    });
-  };
-  const onkeydown = (e: any) => {
-    if (e.keyCode === 13) {
-      setShowInput(false);
-    }
-  };
+
   const preview = () => {
     props.OnPreview();
   };
 
   const publish = () => {
+    console.log('搜集上来的表单', DefaultProps.getFormFields());
     message.warning('该功能尚未开放');
   };
   return (

@@ -8,14 +8,14 @@ import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
   [key: string]: any;
-  backTable: () => void;
+  conditionData: { name: string };
 };
-export const EventContext = createContext({} as { FlowSub: any });
+export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns
  */
-const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
+const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
   // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
@@ -24,6 +24,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const setForm = useAppwfConfig((state: any) => state.setForm);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
+
   const preview = () => {
     previewRef.current?.preview(design);
   };
@@ -151,16 +152,10 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
 
   return (
     <>
-      <LayoutHeader
-        OnPreview={preview}
-        OnExit={exit}
-        titleName={'contionMes?.name' || '临时数据'}
-        backTable={() => {
-          backTable();
-        }}
-      />
+      <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} />
       <div className={cls['container']}>
-        <EventContext.Provider value={{ FlowSub }}>
+        {/* conditionData */}
+        <EventContext.Provider value={{ FlowSub, conditionData }}>
           <div className={cls['layout-body']}>
             {activeSelect === 'processDesign' && (
               <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>

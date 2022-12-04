@@ -36,7 +36,7 @@ class PublishTodo implements ITodoGroup {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
-    const res = await kernel.queryMerchandiesApplyByManager({
+    const res = await kernel.queryMerchandiseApply({
       id: '0',
       page: {
         offset: 0,

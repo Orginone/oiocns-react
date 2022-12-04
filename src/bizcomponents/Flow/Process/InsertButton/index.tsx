@@ -9,7 +9,6 @@ import {
 import React, { useContext } from 'react';
 import cls from './index.module.less';
 import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
-import useEventEmitter from '@/hooks/useEventEmitter';
 type InsertButtonProps = {
   onInsertNode: Function;
   [key: string]: any;
@@ -53,6 +52,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
     props.onInsertNode('CONCURRENTS');
     FlowSub.emit('insertNode', 'CONCURRENTS');
   };
+
   const content = (
     <div className={cls[`node-select`]}>
       <div onClick={addApprovalNode}>

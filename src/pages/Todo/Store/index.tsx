@@ -2,7 +2,7 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 import PageCard from '../components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, Space, Tag, Typography } from 'antd';
+import { Space, Tag, Typography } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { DataType } from 'typings/globelType';
 import { statusList, statusMap, tableOperation } from '../components';
@@ -96,7 +96,6 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       '3': 'getApplyList',
     };
     const data = await todoCtrl.MarketTodo[listStatusCode[activeKey]](needReload);
-    console.log(data);
     setPageData(data);
     setPageTotal(data.length);
     setNeedReload(false);
@@ -114,19 +113,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
-      }}
-      tabBarExtraContent={
-        <Space>
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => handleApproveSelect(selectedRowKeys)}>
-            同意
-          </Button>
-          <Button key="2">拒绝</Button>
-          <Button key="3">打印</Button>
-        </Space>
-      }>
+      }}>
       <CardOrTableComp<IApplyItem | IApprovalItem>
         rowKey={'id'}
         bordered={false}

@@ -140,11 +140,11 @@ const TodoRouter: IRouteConfig[] = [
         ],
       },
       {
-        path: '/todo/app',
+        path: '/todo/app/:id',
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/Store')),
+        component: React.lazy(() => import('@/pages/Todo/App')),
       },
       {
         path: '/todo/product',

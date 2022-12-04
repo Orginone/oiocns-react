@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect } from 'react';
@@ -63,7 +64,7 @@ const ShareRecent = (props: Iprops) => {
     setSelectedTeamId('');
     queryExtend();
   }, [radio]);
-  const handelCheckedChange = (type: string, list: any) => {
+  const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
   const getLeftTree = async () => {
@@ -77,7 +78,6 @@ const ShareRecent = (props: Iprops) => {
     });
 
     setLeftTreeData([...ShowList]);
-    console.log(res);
   };
   const queryExtend = async (type?: string, teamId?: string) => {
     const _type = type || DestTypes[radio - 1].label;
@@ -198,7 +198,7 @@ const ShareRecent = (props: Iprops) => {
         }
       });
     }
-    handelCheckedChange('组织', checkedKeys);
+    handelCheckedChange(checkedKeys);
 
     setDepartData([...departData]);
   };
@@ -229,7 +229,7 @@ const ShareRecent = (props: Iprops) => {
       }
     }
     setHasSelectRecord({ type: DestTypes[radio - 1].label, list: checkedKeys });
-    handelCheckedChange(DestTypes[radio - 1].label, checkedKeys);
+    handelCheckedChange(checkedKeys);
   };
   // 点击删除
   // const delContent = (item: any) => {

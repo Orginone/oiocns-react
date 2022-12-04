@@ -5,21 +5,19 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu, Button, Row, Col } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import StoreSiderbar from '@/ts/controller/store/sidebar';
-import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
-  const Person = userCtrl.User;
-  const [list, setList] = useState<any[]>([]);
+  const [key, forceUpdate] = useCtrlUpdate(marketCtrl);
   const [deleOrQuit, setDeleOrQuit] = useState<'delete' | 'quit'>('delete');
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
   const [isJoinShop, setIsJoinShop] = useState<boolean>(false); // 加入商店
@@ -29,25 +27,14 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [dataSource, setDataSource] = useState<any>([]); // table数据
 
   /**
-   * @description: 实例化商店对象
-   * @return {*}
-   */
-  // const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
-
-  /**
    * @description: 创建商店
    * @param {any} formData
    * @return {*}
    */
-  const onOk = (formData: any) => {
-    marketCtrl.Market.createMarket(
-      formData.name,
-      formData.code,
-      formData.remark,
-      formData.samrId,
-      formData.ispublic,
-    );
+  const onOk = async (formData: any) => {
+    await marketCtrl.Market.createMarket({ ...formData });
     setIsAddOpen(false);
+    forceUpdate();
   };
 
   /**
@@ -57,7 +44,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    const res = await Person?.applyJoinMarket(val[0]?.id);
+    const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
     console.log('申请加入商店成功', res);
   };
 
@@ -67,21 +54,24 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onChange = async (val: any) => {
-    const res = await marketCtrl.getMarketByCode(val.target.value);
-    setDataSource(res);
+    const res = await marketCtrl.Market.getMarketByCode(val.target.value);
+    if (res?.success) {
+      setDataSource(res.data.result);
+    }
   };
 
   /**
    * @description: 删除 / 退出商店确认
    * @return {*}
    */
-  const onDeleteOrQuitOk = () => {
+  const onDeleteOrQuitOk = async () => {
     setIsDeleteOpen(false);
-    {
-      deleOrQuit === 'delete'
-        ? marketCtrl.deleteMarket(treeDataObj?.id)
-        : marketCtrl.quitMarket(treeDataObj?.id);
+    if (deleOrQuit === 'delete') {
+      await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+    } else {
+      await marketCtrl.Market.quitMarket(treeDataObj?.id);
     }
+    forceUpdate();
   };
 
   /**
@@ -98,14 +88,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onClose = () => {
     setIsDetailOpen(false);
   };
-  useEffect(() => {
-    StoreSiderbar.curPageType = 'market';
-    StoreSiderbar.subscribePart('marketTreeData', setList);
-    StoreSiderbar.getTreeData();
-    return () => {
-      return StoreSiderbar.unsubscribe('marketTreeData');
-    };
-  }, []);
 
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
@@ -133,7 +115,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleChange = (path: string) => {
     console.log('是是是', path);
     if (path === '/market/shop') {
-      StoreContent.changeMenu('market');
+      marketCtrl.changeMenu('market');
     }
     setSelectMenu(path);
     history.push(path);
@@ -172,7 +154,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
-    StoreContent.changeMenu(item);
+    marketCtrl.changeMenu(item);
   };
 
   /**
@@ -218,15 +200,36 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
-        StoreSiderbar.handleSelectMarket(node?.node);
+        marketCtrl.setCurrentMarket(node?.node);
+        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
     }
   };
 
+  const getTreeData = () => {
+    return marketCtrl.Market.joinedMarkets.map((itemModel, index) => {
+      let arrs = ['基础详情', '用户管理'];
+      if (itemModel.market.belongId === userCtrl.User.target.id) {
+        arrs.push('删除商店');
+      } else {
+        arrs.push('退出商店');
+      }
+      return {
+        title: itemModel.market.name,
+        key: `0-${index}`,
+        id: itemModel.market.id,
+        node: itemModel,
+        children: [],
+        belongId: itemModel.market.belongId,
+        menus: arrs,
+      };
+    });
+  };
+
   return (
-    <div className={cls.container}>
+    <div id={key} className={cls.container}>
       <div className={cls.subTitle}>常用分类</div>
       <Menu
         mode="inline"
@@ -238,7 +241,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         key={selectMenu}
         handleTitleClick={handleTitleClick}
         handleMenuClick={handleMenuClick}
-        treeData={list}
+        treeData={getTreeData()}
         menu={'menus'}
         title={ClickBtn}
       />

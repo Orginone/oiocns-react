@@ -70,8 +70,9 @@ const expandedRowRender = (
           key: 'operation',
           valueType: 'option',
           render: (_, _record) => {
-            // console.log(record);
+            console.log(record);
             const menuItems = orderOperation(activeKey, record, setNeedReload, _record);
+            console.log(menuItems);
             if (menuItems.length > 0) {
               return (
                 <Dropdown menu={{ items: menuItems }}>
@@ -83,7 +84,7 @@ const expandedRowRender = (
           },
         },
       ]}
-      rowKey="id"
+      rowKey={(record) => record.id}
       headerTitle={false}
       search={false}
       options={false}
@@ -142,7 +143,7 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '应用名称',
-      dataIndex: 'caption',
+      dataIndex: ['Data', 'caption'],
     },
     {
       title: '市场名称',
@@ -163,11 +164,17 @@ const TodoOrg: React.FC = () => {
     {
       title: '使用期限',
       dataIndex: ['Data', 'days'],
+      render: (_, record) => {
+        return record.Data.days ? _ : '无期限';
+      },
     },
     {
       title: '价格',
       dataIndex: ['Data', 'price'],
       valueType: 'money',
+      render: (_, record) => {
+        return record.Data.price ? _ : '免费';
+      },
     },
     {
       title: '状态',
@@ -176,7 +183,7 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '下单时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
     {
@@ -216,13 +223,13 @@ const TodoOrg: React.FC = () => {
       {pageData && (
         <CardOrTableComp<IOrderApplyItem | IApprovalItem>
           showChangeBtn={false}
-          rowKey={'id'}
+          rowKey={(record) => record?.Data?.id}
           columns={activeKey == '5' ? saleColumns : buyColumns}
           dataSource={pageData}
           expandable={
             activeKey == '6'
               ? {
-                  defaultExpandAllRows: true,
+                  // defaultExpandAllRows: true,
                   indentSize: 0,
                   expandedRowRender: (record: IOrderApplyItem) =>
                     expandedRowRender(activeKey, record, setNeedReload),

@@ -11,22 +11,18 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
 import cls from './index.module.less';
 type BaseInfoProps = {
-  nextStep: () => void;
+  nextStep: (params: any) => void;
 };
 
 const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
   const [form] = Form.useForm();
-  const { setContions } = settingStore((state) => ({ ...state }));
   return (
     <div className={cls['contentMes']}>
       <ProForm
         layout="horizontal"
         form={form}
         onFinish={async (e) => {
-          console.log('e', e);
-          let formFileds: any[] = e;
-          setContions(formFileds);
-          nextStep();
+          nextStep(e);
         }}>
         <ProFormText
           name="name"
