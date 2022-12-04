@@ -76,13 +76,12 @@ export class OrderTodo implements ITodoGroup {
         .map((a) => {
           return new ApprovalItem(a, () => {});
         });
-      this._todoList = res.data.result
-        .filter((a) => {
-          return a.status < CommonStatus.RejectStartStatus;
-        })
-        .map((a) => {
-          return new ApprovalItem(a, approvalCall);
-        });
+      this._todoList = res.data.result.map((a) => {
+        return new ApprovalItem(a, approvalCall);
+      });
+      // .filter((a) => {
+      //   return a.status < CommonStatus.RejectStartStatus;
+      // })
     }
   }
 }
