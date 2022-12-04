@@ -140,7 +140,7 @@ const TodoRouter: IRouteConfig[] = [
         ],
       },
       {
-        path: '/todo/app',
+        path: '/todo/app/:id',
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,
@@ -167,7 +167,7 @@ const TodoRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Todo/Order')),
       },
       {
-        path: '/todo/:id',
+        path: '/todo/',
         title: '应用待办',
         icon: <UnorderedListOutlined />,
         hideInMenu: true,
@@ -318,13 +318,13 @@ const SettingRouter: IRouteConfig[] = [
       },
       {
         path: '/setting/dept/:id',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
       {
         path: '/setting/dept',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },

@@ -6,6 +6,8 @@ import { XOrder } from '@/ts/base/schema';
 export interface ITodoGroup {
   /**@type 待办类型 */
   type: TodoType;
+  /**@id 唯一值 */
+  id?: string;
   /** 待办名称 */
   name: string;
   /**@count  待办数量*/

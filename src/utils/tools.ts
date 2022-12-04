@@ -36,6 +36,7 @@ const resetParams = (params: any) => {
   return {
     offset: num >= 0 ? num : 0,
     limit: pageSize || 20,
+    filter: '',
     ...rest,
   };
 };

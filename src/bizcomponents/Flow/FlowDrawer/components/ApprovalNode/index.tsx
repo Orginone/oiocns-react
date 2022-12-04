@@ -5,6 +5,7 @@ import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+
 /**
  * @description: 审批对象
  * @return {*}
@@ -41,34 +42,31 @@ const ApprovalNode = () => {
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
       <Row>
-        {Provider.isUserSpace() && (
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              selectedNode.props.assignedType = 'DENTITY';
-              setSelectedNode(selectedNode);
-              setIsOpen(true);
-              // getJoinedCohort();
-            }}>
-            选择身份
-          </Button>
-        )}
-        {!Provider.isUserSpace() && (
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              selectedNode.props.assignedType = 'JOB';
-              setSelectedNode(selectedNode);
-              setIsOpen(true);
-              // getJoinedCohort();
-            }}>
-            选择岗位
-          </Button>
-        )}
+        {/* 这里应该是判断权限的 */}
+        <Button
+          type="primary"
+          shape="round"
+          size="small"
+          onClick={() => {
+            selectedNode.props.assignedType = 'DENTITY';
+            setSelectedNode(selectedNode);
+            setIsOpen(true);
+            // getJoinedCohort();
+          }}>
+          选择身份
+        </Button>
+        <Button
+          type="primary"
+          shape="round"
+          size="small"
+          onClick={() => {
+            selectedNode.props.assignedType = 'JOB';
+            setSelectedNode(selectedNode);
+            setIsOpen(true);
+            // getJoinedCohort();
+          }}>
+          选择岗位
+        </Button>
       </Row>
       <Divider />
       <div className={cls['roval-node-select']}>

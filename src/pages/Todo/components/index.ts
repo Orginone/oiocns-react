@@ -65,8 +65,9 @@ const tableOperation = (
       message.error(`操作失败`);
     }
   };
-  return active == '1'
-    ? [
+  switch (active) {
+    case '1':
+      return [
         {
           key: 'approve',
           label: '同意',
@@ -85,9 +86,9 @@ const tableOperation = (
               afterOperate(success);
             }),
         },
-      ]
-    : active == '2'
-    ? [
+      ];
+    case '2':
+      return [
         {
           key: 'approve',
           label: '同意',
@@ -98,8 +99,9 @@ const tableOperation = (
                 afterOperate(success);
               }),
         },
-      ]
-    : [
+      ];
+    case '3':
+      return [
         {
           key: 'retractApply',
           label: '取消申请',
@@ -111,6 +113,20 @@ const tableOperation = (
               }),
         },
       ];
+    default:
+      return [
+        {
+          key: 'retractApply',
+          label: '已阅',
+          onClick: () =>
+            (item as IApprovalItem)
+              .pass(CommonStatus.ApproveStartStatus, '')
+              .then(({ success }) => {
+                afterOperate(success);
+              }),
+        },
+      ];
+  }
 };
 const statusMap = {
   1: {

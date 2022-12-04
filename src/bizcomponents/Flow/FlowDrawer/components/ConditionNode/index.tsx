@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import cls from './index.module.less';
 import ConditionGroupItemConfig from '@/bizcomponents/Flow/FlowDrawer/components/ConditionGroupItemConfig';
 
 /**
@@ -13,13 +12,7 @@ const ConditionNode = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onOk = () => {
-    setIsOpen(false);
-  };
-  const onCancel = () => {
-    setIsOpen(false);
-  };
+
   const addConditionGroup = () => {
     selectedNode.conditions.push({
       pos: selectedNode.conditions.length + 1,

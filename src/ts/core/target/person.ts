@@ -54,7 +54,7 @@ export default class Person extends MarketTarget implements IPerson {
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
-  public async getJoinedCohorts(reload: boolean): Promise<ICohort[]> {
+  public getJoinedCohorts = async (reload: boolean): Promise<ICohort[]> => {
     if (!reload && this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
@@ -69,7 +69,7 @@ export default class Person extends MarketTarget implements IPerson {
     }
     console.log('输出结果', this.joinedCohort);
     return this.joinedCohort;
-  }
+  };
   public async getJoinedCompanys(reload: boolean = false): Promise<ICompany[]> {
     if (!reload && this.joinedCompany.length > 0) {
       return this.joinedCompany;

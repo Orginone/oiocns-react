@@ -79,18 +79,20 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   // 获取申请/审核列表
   const loadList = async (page: number, pageSize: number) => {
     const listStatusCode = {
+      '1': 'getTodoList',
       '2': 'getDoList',
       '3': 'getApplyList',
     };
-    if (activeKey === '1') {
-      const data = await todoCtrl.OrgTodo.getTodoList(needReload);
-      setPageData(data.filter((n) => n.Data.team.target.typeName === TargetType.Person));
-      setPageTotal(data.length);
-    } else {
-      const data = await todoCtrl.OrgTodo[listStatusCode[activeKey]]();
-      setPageData(data);
-      setPageTotal(data.length);
-    }
+    const data = await todoCtrl.OrgTodo[listStatusCode[activeKey]](
+      activeKey === '1' ? needReload : null,
+    );
+    const list = data.filter(
+      (n: IApprovalItem | IApplyItem) =>
+        n.Data.team.target.typeName === TargetType.Person,
+    );
+    console.log(list);
+    setPageData(list);
+    setPageTotal(list.length);
     setNeedReload(false);
   };
   useEffect(() => {

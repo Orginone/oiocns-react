@@ -1,28 +1,26 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
 import cls from './index.module.less';
+
+type ConditionGroupItemConfigProps = {};
 
 /**
  * @description: 条件
  * @return {*}
  */
-
-const ConditionGroupItemConfig = () => {
+const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+  const { conditionData } = useContext(EventContext);
+  console.log('conditionData', conditionData);
   const [key, setKey] = useState(0);
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onOk = () => {
-    setIsOpen(false);
-  };
-  const onCancel = () => {
-    setIsOpen(false);
-  };
-
   const paramChange = (paramKey: any, condition: any) => {
+    console.log('选中之后标题没有赋值', condition);
+    console.log('选中之后标题key', paramKey);
     for (let field of DefaultProps.getFormFields()) {
       if (field.value == paramKey) {
         condition.paramKey = paramKey;
@@ -105,8 +103,10 @@ const ConditionGroupItemConfig = () => {
                 style={{ width: 150 }}
                 placeholder="请选择参数"
                 allowClear
-                options={DefaultProps.getFormFields()}
-                onChange={(val) => {
+                // 需要选择的参数
+                options={conditionData?.labels || []}
+                onChange={(val, option) => {
+                  console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
                 }}
                 defaultValue={condition.paramKey || null}

@@ -1,8 +1,16 @@
-import { Card, Layout, Steps, Button, Modal, message } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
-import { RollbackOutlined } from '@ant-design/icons';
+import {
+  RollbackOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  SendOutlined,
+  MinusOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -28,11 +36,6 @@ export enum EditorType {
   'PROCESSDESIGN',
 }
 
-export const editorTypeAndNameMaps: Record<EditorType, string> = {
-  [EditorType.TABLEMES]: '基本信息',
-  [EditorType.PROCESSDESIGN]: '流程设计',
-};
-
 type FlowItem = {};
 
 /**
@@ -44,6 +47,13 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
+  const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
+    name: '',
+    labels: [],
+  });
+  const form = useAppwfConfig((state: any) => state.form);
+  const scale = useAppwfConfig((state: any) => state.scale);
+  const setScale = useAppwfConfig((state: any) => state.setScale);
 
   const columns: ProColumns<FlowItem>[] = [
     {
@@ -75,7 +85,7 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record, _, action) => [
+      render: () => [
         <a
           key="editor"
           onClick={() => {
@@ -112,12 +122,26 @@ const SettingFlow: React.FC = () => {
   }, []);
 
   const initData = async () => {
-    setEditorType(EditorType.TABLEMES);
-    setCurrentStep(StepType.BASEINFO);
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
       setDataSource(result);
     }
+  };
+
+  const changeScale = (val: any) => {
+    setScale(val);
+  };
+
+  const preview = () => {
+    // props.OnPreview();
+  };
+
+  const publish = () => {
+    console.log('搜集上来的表单', DefaultProps.getFormFields());
+    const data = DefaultProps.getFormFields();
+    const result = userCtrl.Space.publishDefine(data);
+    console.log(result);
+    message.warning('该功能尚未开放');
   };
 
   return (
@@ -131,14 +155,6 @@ const SettingFlow: React.FC = () => {
                 columns={columns}
                 search={false}
                 dataSource={dataSource}
-                // request={async (params = {}, sort, filter) => {
-                //   console.log(params, sort, filter);
-                //   return {
-                //     data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                //     success: true,
-                //     total: 10,
-                //   };
-                // }}
                 toolBarRender={() => [
                   <Button
                     key="button"
@@ -167,25 +183,74 @@ const SettingFlow: React.FC = () => {
                     alignItems: 'center',
                     marginBottom: '10px',
                   }}>
-                  <div style={{ width: '600px' }}>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '-16px',
-                        left: '-74%',
-                      }}>
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                    <div>
                       <Button
                         onClick={() => {
-                          initData();
+                          Modal.confirm({
+                            title: '未发布的内容将不会被保存，是否直接退出?',
+                            icon: <ExclamationCircleOutlined />,
+                            okText: '确认',
+                            okType: 'danger',
+                            cancelText: '取消',
+                            onOk() {
+                              setEditorType(EditorType.TABLEMES);
+                              setCurrentStep(StepType.BASEINFO);
+                            },
+                            onCancel() {},
+                          });
                         }}>
                         <RollbackOutlined />
                         返回
                       </Button>
                     </div>
-                    <Steps current={currentStep}>
-                      <Step title={stepTypeAndNameMaps[StepType.BASEINFO]} />
-                      <Step title={stepTypeAndNameMaps[StepType.PROCESSMESS]} />
-                    </Steps>
+                    <div style={{ width: '300px' }}>
+                      <Steps current={currentStep}>
+                        <Step title={stepTypeAndNameMaps[StepType.BASEINFO]} />
+                        <Step title={stepTypeAndNameMaps[StepType.PROCESSMESS]} />
+                      </Steps>
+                    </div>
+                    <div className={cls['publish']}>
+                      {currentStep === StepType.PROCESSMESS && (
+                        <Space>
+                          <Button
+                            className={cls['publish-preview']}
+                            size="small"
+                            onClick={preview}>
+                            <EyeOutlined />
+                            预览
+                          </Button>
+                          <Button
+                            className={cls['publis-issue']}
+                            size="small"
+                            type="primary"
+                            onClick={publish}>
+                            <SendOutlined />
+                            发布
+                          </Button>
+                          <Button
+                            className={cls['scale']}
+                            size="small"
+                            disabled={scale <= 40}
+                            onClick={() => changeScale(scale - 10)}>
+                            <MinusOutlined />
+                          </Button>
+                          <span>{scale}%</span>
+                          <Button
+                            size="small"
+                            disabled={scale >= 150}
+                            onClick={() => changeScale(scale + 10)}>
+                            <PlusOutlined />
+                          </Button>
+                        </Space>
+                      )}
+                    </div>
                   </div>
                 </Header>
                 <Content>
@@ -193,15 +258,13 @@ const SettingFlow: React.FC = () => {
                     {/* 基本信息组件 */}
                     {currentStep === StepType.BASEINFO ? (
                       <BaseInfo
-                        nextStep={() => {
+                        nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
+                          setConditionData(params);
                         }}
                       />
                     ) : (
-                      <ProcessDesign
-                        backTable={() => {
-                          initData();
-                        }}></ProcessDesign>
+                      <ProcessDesign conditionData={conditionData}></ProcessDesign>
                     )}
                   </Card>
                 </Content>

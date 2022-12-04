@@ -256,7 +256,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return this.joinedCohort;
   }
-  public async getJoinedGroups(reload: boolean = false): Promise<IGroup[]> {
+  public getJoinedGroups = async (reload: boolean = false): Promise<IGroup[]> => {
     if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
@@ -267,7 +267,7 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.joinedGroup;
-  }
+  };
   public async update(
     data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {

@@ -7,6 +7,7 @@ import GroupHeader from './GroupHeader';
 import GroupInputBox from './GroupInputBox';
 import GroupSideBar from './GroupSideBar';
 import charsStyle from './index.module.less';
+import { WechatOutlined } from '@ant-design/icons';
 
 /**
  * @description: 沟通聊天
@@ -57,7 +58,9 @@ const Chat: React.FC = () => {
         </div>
       ) : (
         <div className={charsStyle.chart_page}>
-          <div className={charsStyle.chart_empty}>奥集能平台</div>
+          <div className={charsStyle.chart_empty}>
+            <WechatOutlined style={{ fontSize: 140 }} />
+          </div>
         </div>
       )}
       {/* 详情 */}

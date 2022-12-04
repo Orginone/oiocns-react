@@ -24,6 +24,7 @@ export default class Department extends BaseTarget implements IDepartment {
     this.subTypes = [TargetType.Department, TargetType.Working];
     this.createTargetType = [TargetType.Department, TargetType.Working];
   }
+
   public async update(
     data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
