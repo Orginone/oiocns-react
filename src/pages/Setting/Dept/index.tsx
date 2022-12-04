@@ -1,12 +1,12 @@
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space } from 'antd';
+import { Card, Button, Descriptions, Space, Modal } from 'antd';
+// import { dataSource } from './datamock';
+import { columns } from './config';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
-import { columns } from './config';
-// import { dataSource } from './datamock';
 import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
@@ -14,11 +14,11 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
 import SettingService from './service';
-import { IDepartment } from '@/ts/core/target/itarget';
 import Department from '@/ts/core/target/department';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+// import { IDepartment } from '@/ts/core/target/itarget';
 
 /**
  * 部门设置
@@ -103,22 +103,17 @@ const SettingDept: React.FC = () => {
         setIsCreateDept(true);
         setIsOpenModal(true);
         setSelectId(item.target.target.id);
-        setting.getCompanyCtrl.changCallback();
         setting.setCurrTreeDeptNode(item.target.target.id);
         break;
       case 'changeDept': //变更部门
         setIsOpenModal(true);
         setSelectDept(item);
-        // setting.getCompanyCtrl.changCallback();
-        // setSelectId(item.target.target.id);
-        // setting.setCurrTreeDeptNode(item.target.target.id);
         break;
       case 'updateDept':
         setIsCreateDept(true);
         setIsOpenModal(true);
         setSelectId(item.id);
         setting.setCurrTreeDeptNode(item.id);
-        setting.getCompanyCtrl.changCallback();
         break;
     }
   };
@@ -168,19 +163,23 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
   useEffect(() => {
+    if (userCtrl.Space == undefined) {
+      Modal.info({
+        title: '提示',
+        content: (
+          <div>
+            <p>请选择加入的部门空间！</p>
+          </div>
+        ),
+        onOk() {
+          location.href = '/home';
+        },
+      });
+    }
     initData();
     // 刚进入的时候选中公司 TODO
     setting.setCompanyID = userCtrl?.Space?.target.id + '';
     setting.setRoot = userCtrl?.Space!.target;
-
-    const id = setting.getCompanyCtrl.subscribe(async () => {
-      // 选中树操作
-      let pp = await setting.getCompanyCtrl.getCompany().getPersons();
-      console.log(pp);
-    });
-    return () => {
-      setting.getCompanyCtrl.unsubscribe(id);
-    };
   }, ['', userCtrl?.Space]);
 
   useEffect(() => {

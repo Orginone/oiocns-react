@@ -20,7 +20,6 @@ export interface IAuthority {
    * 创建身份
    * @param name 名称
    * @param code 编号
-   * @param authId 职权Id
    * @param remark 备注
    * @returns
    */
@@ -57,7 +56,6 @@ export interface IAuthority {
   deleteSubAuthority(id: string): Promise<model.ResultType<any>>;
   /**
    * 更新职权
-   * @param id 唯一ID
    * @param name 名称
    * @param code 编号
    * @param ispublic 公开的
@@ -72,14 +70,14 @@ export interface IAuthority {
   ): Promise<model.ResultType<schema.XAuthority>>;
   /**
    * 查询指定职权下的身份列表
-   * @param id
+   *  @param reload 是否强制刷新
    * @returns
    */
-  queryAuthorityIdentity(): Promise<IIdentity[]>;
+  queryAuthorityIdentity(reload: boolean): Promise<IIdentity[]>;
   /**
    * 查询职权子职权
-   * @param id
+   *  @param reload 是否强制刷新
    * @returns
    */
-  getSubAuthoritys(): Promise<IAuthority[]>;
+  getSubAuthoritys(reload: boolean): Promise<IAuthority[]>;
 }

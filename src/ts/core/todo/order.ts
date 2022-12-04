@@ -1,3 +1,5 @@
+import consts from '../consts';
+import { faildResult } from '../../base';
 import { common } from '../../base';
 import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
@@ -14,8 +16,8 @@ export class OrderTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getTodoList(): Promise<IApprovalItem[]> {
-    if (this._todoList.length > 0) {
+  async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
     await this.getApprovalList();
@@ -42,9 +44,9 @@ export class OrderTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        applyList.push(new OrderApplyItem(a));
+    if (res.success && res.data.result) {
+      applyList = res.data.result.map((a) => {
+        return new OrderApplyItem(a);
       });
     }
     return applyList;
@@ -59,7 +61,7 @@ export class OrderTodo implements ITodoGroup {
         filter: '',
       },
     });
-    if (res.success) {
+    if (res.success && res.data.result) {
       // 同意回调
       let approvalCall = (data: schema.XOrderDetail) => {
         this._todoList = this._todoList.filter((q) => {
@@ -67,13 +69,19 @@ export class OrderTodo implements ITodoGroup {
         });
         this._doList.unshift(new ApprovalItem(data, () => {}));
       };
-      res.data.result?.forEach((a) => {
-        if (a.status >= CommonStatus.RejectStartStatus) {
-          this._doList.push(new ApprovalItem(a, () => {}));
-        } else {
-          this._todoList.push(new ApprovalItem(a, approvalCall));
-        }
+      this._doList = res.data.result
+        .filter((a) => {
+          return a.status >= CommonStatus.RejectStartStatus;
+        })
+        .map((a) => {
+          return new ApprovalItem(a, () => {});
+        });
+      this._todoList = res.data.result.map((a) => {
+        return new ApprovalItem(a, approvalCall);
       });
+      // .filter((a) => {
+      //   return a.status < CommonStatus.RejectStartStatus;
+      // })
     }
   }
 }
@@ -119,15 +127,52 @@ export class OrderApplyItem implements IOrderApplyItem {
   constructor(data: schema.XOrder) {
     this._data = data;
   }
+
   async cancel(status: number, remark: string = ''): Promise<model.ResultType<any>> {
     return await kernel.cancelOrder({
       id: this._data.id,
       status,
     });
   }
-  async cancelItem(status: number, remark: string = ''): Promise<model.ResultType<any>> {
-    return await kernel.cancelOrderDetail({
-      id: this._data.id,
+  async cancelItem(
+    id: string,
+    status: number,
+    remark: string = '',
+  ): Promise<model.ResultType<any>> {
+    let detail = this._data.details?.find((a) => {
+      return a.id == id;
+    });
+    if (detail) {
+      let res: model.ResultType<boolean>;
+      if (detail?.status > CommonStatus.ApproveStartStatus) {
+        res = await kernel.rejectMerchandise({
+          id: this._data.id,
+          status,
+        });
+        if (res.success) {
+          detail.status = status;
+        }
+        return res;
+      } else {
+        res = await kernel.cancelOrderDetail({
+          id: this._data.id,
+          status,
+        });
+        if (res.success) {
+          detail.status = status;
+        }
+        return res;
+      }
+    }
+    return faildResult(consts.NotFoundError);
+  }
+  async reject(
+    id: string,
+    status: number,
+    remark: string = '',
+  ): Promise<model.ResultType<any>> {
+    return await kernel.rejectMerchandise({
+      id,
       status,
     });
   }

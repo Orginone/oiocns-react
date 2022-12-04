@@ -3,9 +3,9 @@ import { generateUuid } from '../base/common';
  * 控制器基类
  */
 export default class BaseController {
-  private _refreshCallback: { [name: string]: Function } = {};
+  private _refreshCallback: { [name: string]: (key: string) => void } = {};
   private _partRefreshCallback: {
-    [name: string]: { [p: string]: Function };
+    [name: string]: { [p: string]: (key: string) => void };
   } = {};
   constructor() {
     this._refreshCallback = {};
@@ -15,10 +15,10 @@ export default class BaseController {
    * @param callback 变更回调
    * @returns 订阅ID
    */
-  public subscribe(callback: Function): string {
+  public subscribe(callback: (key: string) => void): string {
     const id = generateUuid();
     if (callback) {
-      callback();
+      callback(id);
       this._refreshCallback[id] = callback;
     }
     return id;
@@ -29,37 +29,37 @@ export default class BaseController {
    * @param callback 变更回调
    * @returns 订阅ID
    */
-  public subscribePart(p: string | string[], callback: Function): string {
-    const id = generateUuid();
+  public subscribePart(p: string | string[], callback: (key: string) => void): string {
+    const key = generateUuid();
     if (p.length > 0) {
-      callback();
-      this._partRefreshCallback[id] = {};
+      callback(key);
+      this._partRefreshCallback[key] = {};
       if (typeof p === 'string') {
-        this._partRefreshCallback[id][p] = callback;
+        this._partRefreshCallback[key][p] = callback;
       } else {
         for (const i of p) {
-          this._partRefreshCallback[id][i] = callback;
+          this._partRefreshCallback[key][i] = callback;
         }
       }
     }
-    return id;
+    return key;
   }
 
   /**
    * @desc 取消订阅
-   * @param id 订阅ID
+   * @param key 订阅ID
    */
-  public unsubscribe(id: string): void {
-    delete this._refreshCallback[id];
-    delete this._partRefreshCallback[id];
+  public unsubscribe(key: string): void {
+    delete this._refreshCallback[key];
+    delete this._partRefreshCallback[key];
   }
 
   /**
    * @desc 变更回调
    */
   public changCallback() {
-    Object.keys(this._refreshCallback).forEach((id) => {
-      this._refreshCallback[id].apply(this, []);
+    Object.keys(this._refreshCallback).forEach((key) => {
+      this._refreshCallback[key].apply(this, [generateUuid()]);
     });
   }
 
@@ -67,12 +67,12 @@ export default class BaseController {
    * @desc 局部变更回调
    * @param {string} p 订阅方法名称
    */
-  public changCallbackPart(p: string, params?: any): void {
+  public changCallbackPart(p: string): void {
     this.changCallback();
-    Object.keys(this._partRefreshCallback).forEach((id) => {
-      const callback = this._partRefreshCallback[id][p];
+    Object.keys(this._partRefreshCallback).forEach((key) => {
+      const callback = this._partRefreshCallback[key][p];
       if (callback) {
-        params ? callback(params) : callback.apply(this, []);
+        callback.apply(this, [generateUuid()]);
       }
     });
   }

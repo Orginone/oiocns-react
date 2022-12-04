@@ -1,10 +1,10 @@
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Col, Modal, Row, Empty, Typography } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import detailStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
-import { deepClone } from '@/ts/base/common';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description:  个人、群聊详情
@@ -26,19 +26,7 @@ interface itemResult {
 }
 
 const Groupdetail = () => {
-  const [chat, setChat] = useState(chatCtrl.chat);
-  const refreshUI = () => {
-    setChat(deepClone(chatCtrl.chat));
-  };
-  const { Text } = Typography;
-
-  useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
-    return () => {
-      chatCtrl.unsubscribe(id);
-    };
-  }, []);
-
+  const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
   // const [isModalOpen, setIsModalOpen] = useState<boolean>(false); // 邀请好友
   // const [isShiftUp, setIsShiftUp] = useState<boolean>(false); // 移出群聊
   const [state, setState] = useState<any>({
@@ -158,18 +146,18 @@ const Groupdetail = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={chat?.target.name} label={''} imgWidth={38} />
+        <HeadImg name={chatCtrl.chat?.target.name} label={''} imgWidth={38} />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>
-          {chat?.target.name}
-          {chat?.target.typeName !== '人员' ? (
-            <span className={detailStyle.number}>({chat?.personCount})</span>
+          {chatCtrl.chat?.target.name}
+          {chatCtrl.chat?.target.typeName !== '人员' ? (
+            <span className={detailStyle.number}>({chatCtrl.chat?.personCount})</span>
           ) : (
             ''
           )}
         </h4>
-        <div className={detailStyle.base_info_desc}>{chat?.target.remark}</div>
+        <div className={detailStyle.base_info_desc}>{chatCtrl.chat?.target.remark}</div>
       </Col>
     </Row>
   );
@@ -180,17 +168,15 @@ const Groupdetail = () => {
    */
   const grouppeoples = (
     <>
-      {chat?.persons.map((item: any) => {
+      {chatCtrl.chat?.persons.map((item: any) => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
             <HeadImg name={item.name} label={''} />
-            <Text className={detailStyle.img_list_con_name} ellipsis={true}>
-              {item.name}
-            </Text>
+            <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
           </div>
         );
       })}
-      {chat?.target.typeName === '群组' ? (
+      {chatCtrl.chat?.target.typeName === '群组' ? (
         <>
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
@@ -216,17 +202,17 @@ const Groupdetail = () => {
 
   return (
     <>
-      <div className={detailStyle.group_detail_wrap}>
+      <div id={key} className={detailStyle.group_detail_wrap}>
         {heads}
         <div className={detailStyle.user_list}>
           <div className={`${detailStyle.img_list} ${detailStyle.con}`}>
             {grouppeoples}
-            {chat?.personCount ?? 0 > 1 ? (
+            {chatCtrl.chat?.personCount ?? 0 > 1 ? (
               <span
                 className={`${detailStyle.img_list} ${detailStyle.more_btn}`}
                 onClick={async () => {
                   await chatCtrl.chat?.morePerson('');
-                  refreshUI();
+                  forceUpdate();
                 }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>
@@ -237,15 +223,19 @@ const Groupdetail = () => {
               ''
             )}
           </div>
-          {chat?.target.typeName === '群组' ? (
+          {chatCtrl.chat?.target.typeName === '群组' ? (
             <>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊名称</span>
-                <span className={detailStyle.con_value}>{chat?.target.remark}</span>
+                <span className={detailStyle.con_value}>
+                  {chatCtrl.chat?.target.remark}
+                </span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>群聊描述</span>
-                <span className={detailStyle.con_value}>{chat?.target.remark}</span>
+                <span className={detailStyle.con_value}>
+                  {chatCtrl.chat?.target.remark}
+                </span>
               </div>
               <div className={`${detailStyle.con} ${detailStyle.setting_con} `}>
                 <span className={detailStyle.con_label}>我在本群的昵称</span>
@@ -260,7 +250,9 @@ const Groupdetail = () => {
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
-            <span>{chat?.target.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}</span>
+            <span>
+              {chatCtrl.chat?.target.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}
+            </span>
             <Checkbox />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
@@ -268,20 +260,20 @@ const Groupdetail = () => {
             <RightOutlined />
           </div>
         </div>
-        {chat?.spaceId === chatCtrl.userId ? (
+        {chatCtrl.chat?.spaceId === chatCtrl.userId ? (
           <div className={`${detailStyle.footer} `}>
             <Button
               block
               type="primary"
               size={'large'}
               onClick={async () => {
-                if (await chatCtrl.refChat(chat)?.clearMessage()) {
+                if (await chatCtrl.chat?.clearMessage()) {
                   chatCtrl.changCallback();
                 }
               }}>
               清空聊天记录
             </Button>
-            {chat?.target.typeName === '群组' ? (
+            {chatCtrl.chat?.target.typeName === '群组' ? (
               <>
                 <Button type="primary" danger size={'large'} block>
                   退出该群
@@ -343,7 +335,7 @@ const Groupdetail = () => {
       <Modal>
         <div className={detailStyle.invitateBox}>
           <>
-            {chat?.persons.map((item: any, index: any) => {
+            {chatCtrl.chat?.persons.map((item: any, index: any) => {
               return (
                 <div
                   key={item.id}
