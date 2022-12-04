@@ -36,7 +36,6 @@ const StoreApp: React.FC = () => {
     });
     const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
       console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
-
       setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
     });
     // StoreSiderbar.changePageType('app');
@@ -109,17 +108,6 @@ const StoreApp: React.FC = () => {
   };
   // 共享确认回调
   const submitShare = () => {
-    console.log(
-      '共享确认回调',
-      checkNodes,
-      // departHisData,
-      // authorData,
-      // personsData,
-      // personsHisData,
-      // identitysData,
-      // identitysHisData,
-    );
-
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
@@ -139,7 +127,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
+          history.push({ pathname: '/store/app/info' });
         },
       },
       {
@@ -184,6 +172,7 @@ const StoreApp: React.FC = () => {
         label: '分配',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
+          setShowShareModal(true);
         },
       },
       {

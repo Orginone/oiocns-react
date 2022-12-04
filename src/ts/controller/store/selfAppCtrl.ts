@@ -180,6 +180,9 @@ class SelfAppController extends BaseController {
    */
   public cacheRecently(): void {
     console.log('缓存 最近使用应用');
+    if (this.recentlyUsedAppsIds.length > 7) {
+      this.recentlyUsedAppsIds.pop();
+    }
     this.changCallbackPart(SelfCallBackTypes.Recently);
     kernel.anystore.set(
       RecentlyApps,
