@@ -50,7 +50,7 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
-      id: undefined,
+      id: '0',
       authId: this.id,
       belongId: this._belongId,
     });
@@ -150,7 +150,6 @@ export default class Authority implements IAuthority {
     }
     const res = await kernel.queryAuthorityIdentitys({
       id: this._authority.id,
-      belongId: this._belongId,
       page: {
         offset: 0,
         filter: '',

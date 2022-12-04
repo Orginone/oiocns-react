@@ -167,7 +167,7 @@ const TodoRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Todo/Order')),
       },
       {
-        path: '/todo/:id',
+        path: '/todo/',
         title: '应用待办',
         icon: <UnorderedListOutlined />,
         hideInMenu: true,

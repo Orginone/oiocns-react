@@ -9,23 +9,25 @@ export const columns: ColumnsType<any> = [
     },
   },
   {
-    title: '简称',
-    dataIndex: 'caption',
+    title: '名称',
+    dataIndex: 'name',
   },
   {
     title: '信用代码',
-    dataIndex: 'marketId',
-  },
-  {
-    title: '全称',
-    dataIndex: 'typeName',
+    dataIndex: 'code',
   },
   {
     title: '代码',
-    dataIndex: 'sellAuth',
+    key: 'sellAuth',
+    render: (_key: any, _record: any, index: number) => {
+      return _record.team?.code;
+    },
   },
   {
     title: '简介',
-    dataIndex: 'sellAuth',
+    key: 'remark',
+    render: (_key: any, _record: any, index: number) => {
+      return _record.team?.remark;
+    },
   },
 ];

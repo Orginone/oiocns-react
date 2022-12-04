@@ -7,6 +7,9 @@ export default class Identity implements IIdentity {
   constructor(identity: schema.XIdentity) {
     this._identity = identity;
   }
+  public get target(): schema.XIdentity {
+    return this._identity;
+  }
   public get id(): string {
     return this._identity.id;
   }
