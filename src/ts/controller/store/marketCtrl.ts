@@ -8,11 +8,10 @@ class MarketController extends BaseController {
   private _target: IMTarget | undefined;
   /** 当前操作的市场 */
   private _curMarket: IMarket | undefined;
-  /**
-   * @description: 搜索到的商店
-   * @return {*}
-   */
+  /** 搜索到的商店 */
   public searchMarket: any;
+  /** 所有的用户 */
+  public marketMenber: any;
 
   constructor() {
     super();
@@ -40,7 +39,9 @@ class MarketController extends BaseController {
   }
   /** 切换市场 */
   public setCurrentMarket(market: Market) {
+    console.log('切换市场', market);
     this._curMarket = market;
+    this.getMember();
     this.changCallback();
   }
 
@@ -81,8 +82,8 @@ class MarketController extends BaseController {
    * @param {any} marckt
    * @return {*}
    */
-  public createMarket(marckt: any) {
-    this._target?.createMarket({ ...marckt });
+  public async createMarket(marckt: any) {
+    await this._target?.createMarket({ ...marckt });
     this.changCallback();
   }
 
@@ -91,8 +92,8 @@ class MarketController extends BaseController {
    * @param {string} id
    * @return {*}
    */
-  public deleteMarket(id: string) {
-    this._target?.deleteMarket(id);
+  public async deleteMarket(id: string) {
+    await this._target?.deleteMarket(id);
     this.changCallback();
   }
 
@@ -101,8 +102,8 @@ class MarketController extends BaseController {
    * @param {string} id
    * @return {*}
    */
-  public quitMarket(id: string) {
-    this._target?.quitMarket(id);
+  public async quitMarket(id: string) {
+    await this._target?.quitMarket(id);
     this.changCallback();
   }
 
@@ -111,9 +112,32 @@ class MarketController extends BaseController {
    * @param {string} name
    * @return {*}
    */
-  public getMarketByCode(name: string) {
-    this._target?.getMarketByCode(name);
+  public async getMarketByCode(name: string) {
+    await this._target?.getMarketByCode(name);
     this.changCallback();
   }
+
+  /**
+   * @description: 获取市场里的所有用户
+   * @return {*}
+   */
+  public async getMember() {
+    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
+    }
+    return this.marketMenber;
+  }
+
+  /**
+   * @description: 移出市场里的成员
+   * @param {string} targetIds
+   * @return {*}
+   */
+  public removeMember = async (targetIds: string[]) => {
+    console.log('移出成员ID合集', targetIds);
+    const res = await this._curMarket?.removeMember(targetIds);
+    console.log('移出成员', res);
+  };
 }
 export default new MarketController();

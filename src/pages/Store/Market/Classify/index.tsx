@@ -228,7 +228,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
-        StoreSiderbar.handleSelectMarket(node?.node);
+        marketCtrl.setCurrentMarket(node?.node);
+        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
