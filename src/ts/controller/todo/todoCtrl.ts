@@ -47,6 +47,14 @@ class TodoController extends BaseController {
   public get PublishTodo(): ITodoGroup {
     return this._pubTodo!;
   }
+  /** 当前选中的应用待办 */
+  public currentAppTodo = (id: string) => {
+    return this._appTodo.find((n: ITodoGroup) => n.id === id);
+  };
+  /**当前好友待办数量 */
+  public firendTodoCount = () => {
+    this._orgTodo;
+  };
   /** 获取总的待办数量 */
   public async TaskCount(): Promise<number> {
     let sum = 0;

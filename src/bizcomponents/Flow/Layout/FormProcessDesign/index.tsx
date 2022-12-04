@@ -1,11 +1,9 @@
-import React, { Component, useState } from 'react';
-import { Drawer, Table, Input } from 'antd';
+import React, { useState } from 'react';
+import { Drawer, Table } from 'antd';
 import ProcessTree from '@/bizcomponents/Flow/Process/ProcessTree';
-import { EditOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import FlowDrawer from '@/bizcomponents/Flow/FlowDrawer';
-import { title } from 'process';
 type FormProcessDesignProps = {
   [key: string]: any;
 };
@@ -25,6 +23,7 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
     setShowConfig(false);
   };
   const Selected = (node: any) => {
+    console.log('点击的node', node);
     setShowConfig(true);
     setSelectedNode(node);
   };
@@ -49,31 +48,6 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
         </Table>
       </Drawer>
     </div>
-    // <Drawer  v-model="showConfig" :modal-append-to-body="false"  :size="selectedNode?.type === 'CONDITION' ? '600px':'500px'" direction="rtl" destroy-on-close>
-    //   <template #header="{  titleId, titleClass }">
-    //     <el-input v-model="selectedNode.name" size="default" v-show="showInput" style="width: 300px"
-    //       @blur="showInput = false" @keyup.enter.native="showInput = false"></el-input>
-    //   <el-link :id="titleId" :class="titleClass" v-show="!showInput" @click="showInput = true">
-    //     {{selectedNode.name}}<el-icon class="el-icon--right"><Edit /></el-icon>
-    //   </el-link>
-    // </template>
-    //   <div class="node-config-content">
-    //     <NodeConfig />
-    //   </div>
-    // </Drawer>
-
-    // <Drawer
-    //   v-model="dialogTableVisible"
-    //   title="详情"
-    //   direction="rtl"
-    //   size="50%"
-    // >
-    //   <Table  :data="_flowRecords">
-    //     <Column  property="target" label="审批人"  />
-    //     <Column  property="createTime" label="时间"  />
-    //     <Column  property="comment" label="审批意见" />
-    //   </Table >
-    // </Drawer>
   );
 };
 

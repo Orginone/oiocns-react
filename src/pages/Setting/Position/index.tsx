@@ -1,29 +1,22 @@
 /* eslint-disable no-unused-vars */
+import ReactDOM from 'react-dom';
 import { Card, Button, Descriptions, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
+
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
 import { dataSource } from './datamock';
+import { schema } from '@/ts/base';
+import { initDatatype } from '@/ts/core/setting/isetting';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
 import AddDeptModal from './components/AddDeptModal';
+import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-import { initDatatype } from '@/ts/core/setting/isetting';
-
-/** 获取角色当前名称 */
-interface PositionBean {
-  key: string;
-  id: string;
-  name: string;
-  code: string;
-  create: string;
-  createTime: string;
-  remark: string;
-}
 
 /**
  * 岗位设置
@@ -41,7 +34,9 @@ const SettingDept: React.FC = () => {
   const [Transfer, setTransfer] = useState<boolean>(false);
 
   const [_currentPostion, setPosition] = useState<any>({});
-  //变更岗位
+
+  const treeContainer = document.getElementById('templateMenu');
+  //变更岗位 getOwnIdentitys
 
   // 操作内容渲染函数
   const renderOperation = (
@@ -96,8 +91,6 @@ const SettingDept: React.FC = () => {
    */
   useEffect(() => {}, []);
 
-  useEffect(() => {}, []);
-
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
@@ -106,6 +99,32 @@ const SettingDept: React.FC = () => {
   useEffect(() => {
     initData();
   }, [selectId]);
+
+  /**点击操作内容触发的事件 */
+  const handleMenuClick = (key: string, item: any) => {
+    switch (key) {
+      case 'new':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        break;
+      case '新增部门':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.target.target.id);
+        break;
+      case 'changeDept': //变更部门
+        setIsOpenModal(true);
+        break;
+      case 'updateDept':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.id);
+        break;
+    }
+  };
+
+  // 选中树的时候操作
+  const setTreeCurrent = (current: schema.XTarget) => {};
 
   const initData = async () => {};
 
@@ -238,6 +257,19 @@ const SettingDept: React.FC = () => {
         onOk={handlePostOk}
         handleOk={onOk}
       />
+
+      {/* 左侧树 */}
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <TreeLeftDeptPage
+              createTitle="新增"
+              setCurrent={setTreeCurrent}
+              handleMenuClick={handleMenuClick}
+              currentKey={''}
+            />,
+            treeContainer,
+          )
+        : ''}
     </div>
   );
 };
