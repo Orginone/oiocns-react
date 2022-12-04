@@ -23,8 +23,6 @@ import cls from './index.module.less';
 const infoMenuItems = [
   { label: '个人信息', key: 'info', icon: <InfoCircleOutlined /> },
   { label: '通行设置', key: 'passport', icon: <IdcardOutlined /> },
-  { label: '好友设置', key: 'friend', icon: <UserOutlined /> },
-  { label: '群组设置', key: 'cohort', icon: <TeamOutlined /> },
   { label: '卡包设置', key: 'wallet', icon: <WalletOutlined /> },
   { label: '首页设置', key: 'homeset', icon: <HomeOutlined /> },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
