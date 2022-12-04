@@ -4,8 +4,9 @@ import { IMTarget } from '@/ts/core/target/itarget';
 import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
-import { marketColumns, myColumns } from './config';
+import { marketColumns, myColumns, shareInfoColumns } from './config';
 const selfAppMenu = 'selfAppMenu';
+const RecentlyApps = 'RecentlyApps';
 
 const defaultTreeData: TreeType[] = [
   {
@@ -70,6 +71,7 @@ class SelfAppController extends BaseController {
   private _curProduct: IProduct | undefined = undefined;
   // 顶部最近使用应用
   private recentlyUsedApps!: IProduct[];
+  public recentlyUsedAppsIds: string[] = [];
   // 常用菜单
   public static oftenUsedMenus = [
     { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
@@ -133,6 +135,12 @@ class SelfAppController extends BaseController {
       this._treeData = data;
       this.changCallbackPart(SelfCallBackTypes.TreeData);
     });
+    kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: any) => {
+      // console.log('订阅数据推送 自定义目录===>', Msg.data);
+      const { data = [] } = Msg;
+      this.recentlyUsedAppsIds = data;
+      this.changCallbackPart(SelfCallBackTypes.Recently);
+    });
   }
 
   private resetData() {
@@ -168,12 +176,31 @@ class SelfAppController extends BaseController {
     );
   }
   /**
+   * 缓存 最近使用应用
+   * @param message 新消息，无则为空
+   */
+  public cacheRecently(): void {
+    console.log('缓存 最近使用应用');
+    this.changCallbackPart(SelfCallBackTypes.Recently);
+    kernel.anystore.set(
+      RecentlyApps,
+      {
+        operation: 'replaceAll',
+        data: {
+          data: this.recentlyUsedAppsIds,
+        },
+      },
+      'user',
+    );
+  }
+  /**
    * @desc: 获取表格头部展示数据
    * @return {*}
    */
   public getColumns(pageKey?: string) {
     switch (pageKey) {
-      case 'appInfo':
+      case 'shareInfo':
+        return shareInfoColumns;
       case 'myApp':
         return myColumns;
       case 'market':
@@ -187,9 +214,8 @@ class SelfAppController extends BaseController {
    * @desc: 获取我的应用列表
    * @return {IProduct[]} 应用列表
    */
-  public async querySelfApps() {
-    const list = await this._curSpace.getOwnProducts(false);
-    console.log('获取我的应用表格数据', list);
+  public async querySelfApps(reload = false) {
+    const list = await this._curSpace.getOwnProducts(reload);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData);
   }
@@ -207,9 +233,17 @@ class SelfAppController extends BaseController {
    * @desc 创建应用
    * @params
    */
-  public createProduct = async (data: ProductModel) => {
-    const Target = userCtrl.Company ?? userCtrl.User;
-    Target!.createProduct(data);
+  public createProduct = async (
+    data: Omit<ProductModel, 'id' | 'belongId'>,
+  ): Promise<any> => {
+    const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
+    data.typeName = 'Web应用';
+    const res = await Target.createProduct(data);
+    if (res.success) {
+      this.querySelfApps(true);
+      return true;
+    }
+    return false;
   };
 
   /**

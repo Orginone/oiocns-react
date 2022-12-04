@@ -7,7 +7,6 @@ import { IRouteConfig } from '@/routes/config';
 
 // import TodoMenu, { muneItems } from './Menu';
 import './index.less';
-import { Breadcrumb, MenuProps } from 'antd';
 import {
   HomeOutlined,
   FileTextOutlined,
@@ -37,7 +36,7 @@ const systemTodo = [
     children: [
       {
         label: '应用上架',
-        key: '/todo/app',
+        key: '/todo/product',
         icon: <ShopOutlined />,
       },
       { label: '加入市场', key: '/todo/store', icon: <ShopOutlined /> },

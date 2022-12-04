@@ -64,6 +64,8 @@ type DataItem = {
   name: string;
   // state: string;
   code: string;
+  remark: string;
+  typeName: string;
   resources: Resources[];
 };
 const groupTitle = (name: string) => {
@@ -102,6 +104,11 @@ const baseColumns: ProFormColumnsType<DataItem> = {
       dataIndex: 'code',
       // width: 'md',
       colProps: { span: 12 },
+    },
+    {
+      title: '应用类型',
+      dataIndex: 'typeName',
+      colProps: { span: 24 },
     },
     {
       title: '应用详情',

@@ -1,3 +1,4 @@
+import IProduct from '@/ts/core/market/iproduct';
 import {
   EllipsisOutlined,
   SettingOutlined,
@@ -8,58 +9,11 @@ import { Dropdown, MenuProps, message, Typography } from 'antd';
 import React from 'react';
 
 import cls from './index.module.less';
-
-const items = [
-  {
-    id: 1,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '资产监管',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-  {
-    id: 6,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '资产内控',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-  {
-    id: 2,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '房产管理',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-  {
-    id: 3,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '通用报表',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-  {
-    id: 4,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '公务仓',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-  {
-    id: 5,
-    avatar:
-      'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg',
-    title: '公益仓',
-    description:
-      '选择一个由流程编排提供的典型用户案例，可以从中学习到流程编排很多设计理念。',
-  },
-];
-
+interface Props {
+  dataSource: IProduct[];
+}
+const imgSrc =
+  'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg';
 const moreMenu: MenuProps = {
   onClick: (info) => {
     message.info(info.key);
@@ -78,22 +32,24 @@ const moreMenu: MenuProps = {
   ],
 };
 
-const StoreRecent: React.FC = () => {
+const StoreRecent: React.FC<Props> = ({ dataSource }) => {
+  console.log('试试', dataSource);
+
   return (
     <div className={cls.cardContainer}>
-      {items.map((item) => {
+      {dataSource.map((item) => {
         return (
           <CheckCard
             className={cls.card}
-            key={item.id}
-            avatar={item.avatar}
-            title={item.title}
+            key={item.prod.id}
+            avatar={imgSrc}
+            title={item.prod.name}
             description={
               <Typography.Paragraph
                 type="secondary"
                 className={cls.decription}
                 ellipsis={{ rows: 3 }}>
-                {item.description}
+                {item.prod.remark}
               </Typography.Paragraph>
             }
             style={{ width: 260, height: 120 }}
@@ -111,4 +67,4 @@ const StoreRecent: React.FC = () => {
   );
 };
 
-export default StoreRecent;
+export default React.memo(StoreRecent);
