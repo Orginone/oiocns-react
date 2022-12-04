@@ -26,6 +26,7 @@ const StoreApp: React.FC = () => {
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
+  const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
       setData([...SelfAppCtrl.tableData]);
@@ -133,6 +134,7 @@ const StoreApp: React.FC = () => {
         key: 'share',
         label: '共享',
         onClick: () => {
+          setShareType('共享');
           SelfAppCtrl.curProduct = item;
           setShowShareModal(true);
         },
@@ -141,6 +143,7 @@ const StoreApp: React.FC = () => {
         key: 'share2',
         label: '分配',
         onClick: () => {
+          setShareType('分配');
           SelfAppCtrl.curProduct = item;
           setShowShareModal(true);
         },
@@ -195,7 +198,7 @@ const StoreApp: React.FC = () => {
     <>
       {location.pathname === '/store/app' && AppIndex}
       <Modal
-        title="应用分享"
+        title={`应用${shareType}`}
         width={800}
         destroyOnClose={true}
         open={showShareModal}
@@ -207,7 +210,7 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp onCheckeds={onCheckeds} />
+        <ShareComp shareType={shareType} onCheckeds={onCheckeds} />
       </Modal>
       {/* <DeleteCustomModal
         title="警告"

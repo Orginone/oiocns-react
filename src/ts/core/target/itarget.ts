@@ -557,7 +557,7 @@ export interface ICompany extends IMTarget, ISpace {
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedGroups(reload: boolean): Promise<IGroup[]>;
+  getJoinedGroups(reload?: boolean): Promise<IGroup[]>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -645,7 +645,7 @@ export interface IGroup {
    * @param reload 是否强制刷新
    * @returns
    */
-  getSubGroups(reload: boolean): Promise<IGroup[]>;
+  getSubGroups(reload?: boolean): Promise<IGroup[]>;
 }
 /** 部门操作 */
 export interface IDepartment {

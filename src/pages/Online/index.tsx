@@ -15,11 +15,11 @@ const Index: React.FC = () => {
   const Resources = selfAppCtrl.curProduct!.resource || [];
   useEffect(() => {
     if (Resources.length === 0) {
+      console.error('资源信息有误');
       return history.goBack();
     }
     setLink(Resources[0].resource.link);
   }, [appId]);
-  // setLink(Resources[0].link);
   usePostMessage(ifmRef, {}, Resources[0].resource.link);
 
   return (
