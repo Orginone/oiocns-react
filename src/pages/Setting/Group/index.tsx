@@ -7,7 +7,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
+// import { dataSource } from './datamock';
 // import AddPersonModal from '../Dept/components/AddPersonModal';
 // import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
@@ -16,6 +16,7 @@ import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
 import { IGroup } from '@/ts/core/target/itarget';
 import Group from '@/ts/core/target/group';
+import { XTarget } from '@/ts/base/schema';
 /**
  * 集团设置
  * @returns
@@ -30,6 +31,8 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [statusKey, setStatusKey] = useState('merchandise');
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
+  const [dataSource, setDataSource] = useState<XTarget[]>();
+
   const [id, setId] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
@@ -41,6 +44,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const setTreeCurrent = (current: schema.XTarget) => {
     setId(current.id);
     setCurrentGroup(new Group(current));
+    currentGroup?.getCompanys(false).then((e) => {
+      console.log(e);
+      setDataSource(e);
+    });
   };
 
   /**点击操作内容触发的事件 */
@@ -174,7 +181,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   //集团主体
   const deptCount = (
     <div className={`${cls['group-wrap-pages']}`}>
-      <Card tabList={TitleItems}>
+      <Card>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
             title={currentGroup?.target.name}
@@ -183,18 +190,18 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
             onTabChange={(key) => {
               setStatusKey(key);
               console.log('切换事件', key);
-            }}
-          />
-          <div className={cls['page-content-table']} ref={parentRef}>
-            <CardOrTable
-              dataSource={dataSource as any}
-              rowKey={'key'}
-              operation={renderOperation}
-              columns={columns as any}
-              parentRef={parentRef}
-              showChangeBtn={false}
-            />
-          </div>
+            }}>
+            <div className={cls['page-content-table']} ref={parentRef}>
+              <CardOrTable
+                dataSource={dataSource as any}
+                rowKey={'key'}
+                operation={renderOperation}
+                columns={columns as any}
+                parentRef={parentRef}
+                showChangeBtn={false}
+              />
+            </div>
+          </Card>
         </div>
       </Card>
     </div>
