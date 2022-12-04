@@ -3,7 +3,7 @@ import IMarket from '@/ts/core/market/imarket';
 import { IMTarget } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
-export class MarketController extends BaseController {
+class MarketController extends BaseController {
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
   /** 当前操作的市场 */
@@ -44,3 +44,4 @@ export class MarketController extends BaseController {
     this.changCallback();
   }
 }
+export default new MarketController();

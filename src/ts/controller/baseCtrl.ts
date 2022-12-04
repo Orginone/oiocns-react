@@ -67,13 +67,11 @@ export default class BaseController {
    * @desc 局部变更回调
    * @param {string} p 订阅方法名称
    */
-  public changCallbackPart(p: string, params?: any): void {
+  public changCallbackPart(p: string): void {
     this.changCallback();
     Object.keys(this._partRefreshCallback).forEach((id) => {
       const callback = this._partRefreshCallback[id][p];
-      if (callback) {
-        params ? callback(params) : callback.apply(this, []);
-      }
+      callback && callback.apply(this, []);
     });
   }
 }
