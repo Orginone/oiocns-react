@@ -236,18 +236,24 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  public async createMarket(
+  public async createMarket({
+    name,
+    code,
+    remark,
+    samrId,
+    ispublic = true,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string,
+    samrId: string;
     // 产品类型名
-    ispublic: boolean = true,
-  ): Promise<model.ResultType<schema.XMarket>> {
+    ispublic: boolean;
+  }): Promise<model.ResultType<schema.XMarket>> {
     const res = await kernel.createMarket({
       name,
       code,
@@ -257,6 +263,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
+    console.log('创建市场的结果', res);
+
     if (res.success) {
       this.joinedMarkets.push(new Market(res.data!));
     }
