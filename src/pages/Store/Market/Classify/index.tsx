@@ -5,19 +5,19 @@ import {
   FundFilled,
 } from '@ant-design/icons';
 import { Menu, Button, Row, Col } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
-import marketCtrl, { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
-  const Person = userCtrl.User;
-  const [list, setList] = useState<any[]>([]);
+  const [key, forceUpdate] = useCtrlUpdate(marketCtrl);
   const [deleOrQuit, setDeleOrQuit] = useState<'delete' | 'quit'>('delete');
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 创建商店
   const [isJoinShop, setIsJoinShop] = useState<boolean>(false); // 加入商店
@@ -31,9 +31,10 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @param {any} formData
    * @return {*}
    */
-  const onOk = (formData: any) => {
-    marketCtrl.Market.createMarket({ ...formData });
+  const onOk = async (formData: any) => {
+    await marketCtrl.Market.createMarket({ ...formData });
     setIsAddOpen(false);
+    forceUpdate();
   };
 
   /**
@@ -43,7 +44,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    const res = await Person?.applyJoinMarket(val[0]?.id);
+    const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
     console.log('申请加入商店成功', res);
   };
 
@@ -63,13 +64,14 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @description: 删除 / 退出商店确认
    * @return {*}
    */
-  const onDeleteOrQuitOk = () => {
+  const onDeleteOrQuitOk = async () => {
     setIsDeleteOpen(false);
-    {
-      deleOrQuit === 'delete'
-        ? marketCtrl.Market.deleteMarket(treeDataObj?.id)
-        : marketCtrl.Market.quitMarket(treeDataObj?.id);
+    if (deleOrQuit === 'delete') {
+      await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+    } else {
+      await marketCtrl.Market.quitMarket(treeDataObj?.id);
     }
+    forceUpdate();
   };
 
   /**
@@ -86,16 +88,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onClose = () => {
     setIsDetailOpen(false);
   };
-
-  useEffect(() => {
-    const id = marketCtrl.subscribePart(MarketCallBackTypes.marketList, () => {
-      setList([...marketCtrl.marketList]);
-    });
-    marketCtrl.queryMarketList();
-    return () => {
-      return marketCtrl.unsubscribe(id);
-    };
-  }, []);
 
   const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
@@ -216,8 +208,28 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     }
   };
 
+  const getTreeData = () => {
+    return marketCtrl.Market.joinedMarkets.map((itemModel, index) => {
+      let arrs = ['基础详情', '用户管理'];
+      if (itemModel.market.belongId === userCtrl.User.target.id) {
+        arrs.push('删除商店');
+      } else {
+        arrs.push('退出商店');
+      }
+      return {
+        title: itemModel.market.name,
+        key: `0-${index}`,
+        id: itemModel.market.id,
+        node: itemModel,
+        children: [],
+        belongId: itemModel.market.belongId,
+        menus: arrs,
+      };
+    });
+  };
+
   return (
-    <div className={cls.container}>
+    <div id={key} className={cls.container}>
       <div className={cls.subTitle}>常用分类</div>
       <Menu
         mode="inline"
@@ -229,7 +241,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         key={selectMenu}
         handleTitleClick={handleTitleClick}
         handleMenuClick={handleMenuClick}
-        treeData={list}
+        treeData={getTreeData()}
         menu={'menus'}
         title={ClickBtn}
       />
