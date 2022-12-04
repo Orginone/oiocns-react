@@ -25,7 +25,7 @@ export default class Group extends BaseTarget implements IGroup {
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
-  public async getJoinedGroups(reload: boolean = false): Promise<XTarget[]> {
+  public getJoinedGroups = async (reload: boolean = false): Promise<XTarget[]> => {
     if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
@@ -34,7 +34,7 @@ export default class Group extends BaseTarget implements IGroup {
       this.joinedGroup = res.data.result;
     }
     return this.joinedGroup;
-  }
+  };
   public async applyJoinGroup(id: string): Promise<ResultType<any>> {
     return super.applyJoin(id, TargetType.Group);
   }

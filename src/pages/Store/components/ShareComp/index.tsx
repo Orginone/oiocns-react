@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
+import { Input, Radio, RadioChangeEvent, Tree, Select, TreeProps } from 'antd';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
@@ -12,6 +12,7 @@ import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 interface Iprops {
   curProduct?: Product;
+  shareType: '分配' | '共享';
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
 }
 const DestTypes = [
@@ -33,7 +34,7 @@ const DestTypes = [
   },
 ];
 const ShareRecent = (props: Iprops) => {
-  const { onCheckeds } = props;
+  const { onCheckeds, shareType } = props;
   const [radio, setRadio] = useState<number>(1);
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
@@ -68,9 +69,13 @@ const ShareRecent = (props: Iprops) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
   const getLeftTree = async () => {
-    const res = await userCtrl.User!.getJoinedCohorts();
+    let FunName: Function = userCtrl.User!.getJoinedCohorts;
+    if (userCtrl.IsCompanySpace) {
+      FunName = userCtrl.Company!.getJoinedGroups;
+    }
+    const res = await FunName();
     console.log('共享获取组织', res);
-    const ShowList = res?.map((item) => {
+    const ShowList = res?.map((item: { target: any }) => {
       return {
         ...item.target,
         node: item,
@@ -123,16 +128,20 @@ const ShareRecent = (props: Iprops) => {
         });
 
         const { result = [] } = res2.data;
+        console.log('输出,岗位', res2);
         setCenterTreeData(result ? result : []);
         break;
       }
       case 4:
         {
           let action = 'getMember';
-          // // if (info.node.TypeName === '子集团') {
-          // //   action = 'getSubgroupCompanies';
-          // // }
+          if (info.node.typeName === '集团') {
+            action = 'getSubGroups';
+          }
           const res3 = await info?.node?.node[action]();
+
+          console.log('输出,获取人员', res3);
+
           setCenterTreeData(res3 || []);
         }
         break;
@@ -296,8 +305,25 @@ const ShareRecent = (props: Iprops) => {
 
   return (
     <div className={cls.layout}>
+      {shareType === '分配' ? (
+        <div className={cls.top}>
+          <p className={cls['top-label']}>分配集团:</p>
+          <Select
+            defaultValue=""
+            style={{ minWidth: 160 }}
+            options={[
+              {
+                value: 'lucy',
+                label: 'Lucy',
+              },
+            ]}
+          />
+        </div>
+      ) : (
+        ''
+      )}
       <div className={cls.top}>
-        <p>分享形式：</p>
+        <p className={cls['top-label']}>{props.shareType}形式：</p>
         <Radio.Group
           onChange={(e: RadioChangeEvent) => {
             setRadio(e.target.value);
@@ -306,7 +332,8 @@ const ShareRecent = (props: Iprops) => {
           {DestTypes.map((item) => {
             return (
               <Radio value={item.value} key={item.value}>
-                按{item.label}共享
+                按{item.label}
+                {props.shareType}
               </Radio>
             );
           })}
