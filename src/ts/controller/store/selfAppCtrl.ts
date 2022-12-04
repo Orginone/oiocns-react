@@ -5,8 +5,10 @@ import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 import { marketColumns, myColumns, shareInfoColumns } from './config';
+import { Modal } from 'antd';
 const selfAppMenu = 'selfAppMenu';
 const RecentlyApps = 'RecentlyApps';
+const { confirm } = Modal;
 
 const defaultTreeData: TreeType[] = [
   {
@@ -70,7 +72,6 @@ class SelfAppController extends BaseController {
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
   private _curProduct: IProduct | undefined = undefined;
   // 顶部最近使用应用
-  private recentlyUsedApps!: IProduct[];
   public recentlyUsedAppsIds: string[] = [];
   // 常用菜单
   public static oftenUsedMenus = [
@@ -228,7 +229,7 @@ class SelfAppController extends BaseController {
    * @param {IProduct} data
    */
   public OpenApp(data: IProduct) {
-    this.recentlyUsedApps.unshift(data);
+    this.recentlyUsedAppsIds.unshift(data.prod.id);
     this.changCallbackPart(SelfCallBackTypes.Recently);
   }
 
@@ -255,7 +256,6 @@ class SelfAppController extends BaseController {
    */
   public selectedProduct(item: IProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改当前操作应用', item);
 
     this._curProduct = item;
@@ -297,6 +297,20 @@ class SelfAppController extends BaseController {
     } else {
       console.log('共享成功');
     }
+  }
+  /**
+   * @description: 移除确认
+   * @return {*}
+   */
+  public async handleDeleteApp() {
+    confirm({
+      content: `确认删除《 ${this._curProduct!.prod.name} 》?`,
+      onOk: async () => {
+        await this._curSpace.deleteProduct(this._curProduct!.prod.id);
+        this.querySelfApps(true);
+      },
+      onCancel() {},
+    });
   }
 }
 

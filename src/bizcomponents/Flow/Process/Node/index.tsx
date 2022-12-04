@@ -42,10 +42,10 @@ type NodeProps = {
  * 添加的节点枚举
  * */
 export enum AddNodeType {
-  APPROVAL,
-  CC,
-  CONDITIONS,
-  CONCURRENTS,
+  'APPROVAL',
+  'CC',
+  'CONDITIONS',
+  'CONCURRENTS',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -61,7 +61,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   console.log('props', props);
-  const delNode = (e) => {
+  const delNode = (e: React.MouseEvent) => {
     e.preventDefault();
     props.onDelNode();
   };
@@ -75,13 +75,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       </div>
     </div>
   );
-  // const nodeHeader = (
-  //   <div className={cls['node-body-header']} style={{ backgroundColor: props.headerBgc }}>
-  //     <UserOutlined style={{ fontSize: '12px', paddingRight: '5px' }} />
-  //     <span className={cls['name']}>{props.title}</span>
-  //     {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />}
-  //   </div>
-  // );
 
   const nodeHeader = (
     <div

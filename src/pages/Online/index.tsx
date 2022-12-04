@@ -2,7 +2,7 @@ import cls from './index.module.less';
 
 import React, { useRef, useEffect, useState } from 'react';
 import usePostMessage from '@/hooks/usePostMessage';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 const Index: React.FC = () => {
@@ -11,8 +11,12 @@ const Index: React.FC = () => {
   const {
     state: { appId },
   } = useLocation<any>();
-  const Resources = selfAppCtrl.curProduct!.getResources;
+  const history = useHistory();
+  const Resources = selfAppCtrl.curProduct!.resource || [];
   useEffect(() => {
+    if (Resources.length === 0) {
+      return history.goBack();
+    }
     setLink(Resources[0].resource.link);
   }, [appId]);
   // setLink(Resources[0].link);

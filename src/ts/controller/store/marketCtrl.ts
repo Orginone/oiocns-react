@@ -5,9 +5,6 @@ import BaseController from '../baseCtrl';
 import { myColumns, marketColumns } from './config';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 
-export enum MarketCallBackTypes {
-  'marketList' = 'marketList',
-}
 class MarketController extends BaseController {
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
@@ -19,8 +16,6 @@ class MarketController extends BaseController {
   public curPageType: 'app' | 'market' = 'market';
   /** 触发页面渲染 callback */
   public marketTableCallBack!: (data: any) => void;
-  /** 市场列表 */
-  private _marketList: any[] = [];
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
@@ -29,18 +24,15 @@ class MarketController extends BaseController {
   constructor() {
     super();
     this.searchMarket = [];
-    userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], () => {
+    userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], async () => {
       if (userCtrl.IsCompanySpace) {
         this._target = userCtrl.Company;
       } else {
         this._target = userCtrl.User;
       }
+      await this._target.getJoinMarkets();
       this.changCallback();
     });
-  }
-
-  public get marketList(): any[] {
-    return this._marketList;
   }
 
   /** 市场操作对象 */
@@ -127,70 +119,6 @@ class MarketController extends BaseController {
       const { result = [] } = data;
       this.marketTableCallBack([...result]);
     }
-  }
-
-  /**
-   * @desc: 获取树形组件 商店展示数据
-   * @return {*}
-   */
-  public async queryMarketList() {
-    const marketTree = await this._target!.getJoinMarkets();
-    let arr: any = marketTree.map((itemModel: Market, index: any) => {
-      const item = itemModel.market;
-      let arrs = ['基础详情', '用户管理'];
-      arrs.push(`${item.belongId === userCtrl.User.target.id ? '删除商店' : '退出商店'}`);
-      return {
-        title: item.name,
-        key: `0-${index}`,
-        id: item.id,
-        node: itemModel,
-        children: [],
-        belongId: item.belongId,
-        menus: arrs,
-      };
-    });
-    this._marketList = arr;
-    this.changCallbackPart(MarketCallBackTypes.marketList);
-  }
-
-  /**
-   * @description: 创建市场
-   * @param {any} marckt
-   * @return {*}
-   */
-  public async createMarket(marckt: any) {
-    await this._target?.createMarket({ ...marckt });
-    this.changCallback();
-  }
-
-  /**
-   * @description: 删除市场
-   * @param {string} id
-   * @return {*}
-   */
-  public async deleteMarket(id: string) {
-    await this._target?.deleteMarket(id);
-    this.changCallback();
-  }
-
-  /**
-   * @description: 退出市场
-   * @param {string} id
-   * @return {*}
-   */
-  public async quitMarket(id: string) {
-    await this._target?.quitMarket(id);
-    this.changCallback();
-  }
-
-  /**
-   * @description: 根据编号查询市场
-   * @param {string} name
-   * @return {*}
-   */
-  public async getMarketByCode(name: string) {
-    await this._target?.getMarketByCode(name);
-    this.changCallback();
   }
 
   /**
