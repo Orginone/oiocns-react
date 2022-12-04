@@ -39,10 +39,6 @@ const TodoOrg: React.FC = () => {
       width: 60,
     },
     {
-      title: '申请人',
-      dataIndex: ['Data', 'target', 'name'],
-    },
-    {
       title: '说明',
       dataIndex: 'remark',
       render: (_, row) => {
@@ -64,6 +60,10 @@ const TodoOrg: React.FC = () => {
       },
     },
     {
+      title: '申请人',
+      dataIndex: ['Data', 'target', 'name'],
+    },
+    {
       title: '申请时间',
       dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
@@ -72,18 +72,19 @@ const TodoOrg: React.FC = () => {
   // 获取申请/审核列表
   const loadList = async (page: number, pageSize: number) => {
     const listStatusCode = {
+      '1': 'getTodoList',
       '2': 'getDoList',
       '3': 'getApplyList',
     };
-    if (activeKey === '1') {
-      const data = await todoCtrl.OrgTodo.getTodoList(needReload);
-      setPageData(data.filter((n) => n.Data.team.target.typeName !== TargetType.Person));
-      setPageTotal(data.length);
-    } else {
-      const data = await todoCtrl.OrgTodo[listStatusCode[activeKey]]();
-      setPageData(data);
-      setPageTotal(data.length);
-    }
+    const data = await todoCtrl.OrgTodo[listStatusCode[activeKey]](
+      activeKey === '1' ? needReload : null,
+    );
+    const list = data.filter(
+      (n: IApprovalItem | IApplyItem) =>
+        n.Data.team.target.typeName !== TargetType.Person,
+    );
+    setPageData(list);
+    setPageTotal(list.length);
     setNeedReload(false);
   };
   useEffect(() => {

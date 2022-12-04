@@ -133,7 +133,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   };
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
-    selectedKeys;
     if (info.selected) {
       setCurrent(info.node.target.target);
       setting.setCurrTreeDeptNode(info.node.target.target.id);
