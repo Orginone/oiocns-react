@@ -16,7 +16,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import Department from '@/ts/core/target/department';
 
-/* 
+/*
   编辑
 */
 interface Iprops {
@@ -118,7 +118,7 @@ const EditCustomModal = (props: Iprops) => {
                   const value = await form.validateFields();
                   if (value) {
                     value.parentId = setting.getCurrTreeDeptNode();
-                    value.belongId = userCtrl.Space?.target.id;
+                    value.belongId = userCtrl.Company?.target.id;
                     if (fileList.length > 0 && fileList[0].shareLink) {
                       value.avatar = fileList[0].shareLink;
                     }
