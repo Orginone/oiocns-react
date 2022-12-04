@@ -136,12 +136,44 @@ const SettingFlow: React.FC = () => {
     // props.OnPreview();
   };
 
+  type FlowNode = {
+    Id: string;
+    NodeId: string;
+    ParentId: string;
+    Type: string;
+    Name: string;
+    Desc: string;
+    Children: FlowNode;
+    Branches: [
+      {
+        Id: string;
+        NodeId: string;
+        ParentId: string;
+        Name: string;
+        Type: string;
+        Conditions: [
+          {
+            Pos: number;
+            ParamKey: string;
+            ParamLabel: string;
+            Key: string;
+            Label: string;
+            Type: string;
+            Val: string;
+            ValLabel: string;
+          },
+        ];
+        Children: FlowNode;
+      },
+    ];
+  };
+
   const publish = () => {
     console.log('搜集上来的表单', DefaultProps.getFormFields());
     const data = DefaultProps.getFormFields();
-    const result = userCtrl.Space.publishDefine(data);
-    console.log(result);
-    message.warning('该功能尚未开放');
+    // const result = userCtrl.Space.publishDefine(data);
+    // console.log(result);
+    // message.warning('该功能尚未开放');
   };
 
   return (

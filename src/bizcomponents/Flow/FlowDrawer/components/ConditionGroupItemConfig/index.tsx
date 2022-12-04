@@ -16,11 +16,10 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const { conditionData } = useContext(EventContext);
   console.log('conditionData', conditionData);
+  console.log('selectedNode', selectedNode);
   const [key, setKey] = useState(0);
 
   const paramChange = (paramKey: any, condition: any) => {
-    console.log('选中之后标题没有赋值', condition);
-    console.log('选中之后标题key', paramKey);
     for (let field of DefaultProps.getFormFields()) {
       if (field.value == paramKey) {
         condition.paramKey = paramKey;
@@ -104,7 +103,8 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 placeholder="请选择参数"
                 allowClear
                 // 需要选择的参数
-                options={conditionData?.labels || []}
+                // options={conditionData?.labels || []}
+                options={DefaultProps.getFormFields()}
                 onChange={(val, option) => {
                   console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
@@ -117,6 +117,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 allowClear
                 options={[conditionKeys(condition.type)]}
               /> */}
+              {/* 如果不是数字 */}
               {condition.type != 'NUMERIC' && (
                 <Select
                   style={{ width: 100 }}
@@ -132,6 +133,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                   defaultValue={condition.key || null}
                 />
               )}
+              {/* 数字类型 */}
               {condition.type == 'NUMERIC' && (
                 <Select
                   style={{ width: 100 }}
@@ -151,6 +153,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                   defaultValue={condition.key || null}
                 />
               )}
+              {/* 数字类型 */}
               {condition.type == 'NUMERIC' && (
                 <InputNumber
                   style={{ width: 200 }}
@@ -160,6 +163,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                   defaultValue={condition.val || null}
                 />
               )}
+              {/* 如果是枚举类型 */}
               {condition.type == 'DICT' && (
                 <Select
                   style={{ width: 200 }}
@@ -172,6 +176,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                   defaultValue={condition.val || null}
                 />
               )}
+              {/* 既不是枚举也不是数字类型 */}
               {condition.type != 'DICT' && condition.type != 'NUMERIC' && (
                 <Input
                   style={{ width: 200 }}
