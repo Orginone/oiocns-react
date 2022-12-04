@@ -16,9 +16,13 @@ const ShoppingCart: React.FC<any> = (props) => {
   const [checkAll, setCheckAll] = useState(false);
   const { confirm } = Modal;
   const [messageApi, contextHolder] = message.useMessage();
-  console.log(userCtrl.Space);
+
+  // console.log(userCtrl.Space);
   // console.log(Provider.isUserSpace());
-  console.log(userCtrl.User);
+  // console.log(userCtrl.User);
+  // console.log(settingCtrl.getCurWorkSpace);//空间
+  // console.log(settingCtrl.getPerson);
+  // const marketCtrl = new MarketController(settingCtrl.getCurWorkSpace);
 
   useEffect(() => {
     marketCtrl.Market.getStaging(false).then((res: any) => {
@@ -27,10 +31,6 @@ const ShoppingCart: React.FC<any> = (props) => {
       setfls(res);
     });
   }, []);
-  // console.log(settingCtrl.getCurWorkSpace);//空间
-  // console.log(settingCtrl.getPerson);
-
-  // const marketCtrl = new MarketController(settingCtrl.getCurWorkSpace);
 
   const showConfirms = (type: string) => {
     //弹窗
@@ -47,29 +47,15 @@ const ShoppingCart: React.FC<any> = (props) => {
           content: '此操作将生成交易勾选订单。是否确认?',
           onOk() {
             console.log('OK', checkval);
-            //另一段测试
-            // let fsdata = fls;
-            // let d = [];
-            // checkval.forEach((v) => {
-            //   fsdata.forEach((val, i) => {
-            //     if (v == val.id) {
-            //       fsdata.splice(i, 1);
-            //     }
-            //     setfls(fsdata);
-            //   });
-            // });
-
-            // console.log(fsdata);
-            // let fs = fls;
-
             let fs = JSON.parse(JSON.stringify(fls)); //勾选的做判断
-            console.log(fs);
+            // console.log(fs);
             checkval.forEach((v) => {
               fs = fs.filter((val: any) => {
                 return val.id != v;
               });
               setfls(fs);
             });
+            //购买成功全局通知
             messageApi.open({
               type: 'success',
               content: '购买成功',
@@ -91,6 +77,7 @@ const ShoppingCart: React.FC<any> = (props) => {
             console.log('OK', checkval);
             checkval.forEach((item) => {
               marketCtrl.Market.deleteStaging(item).then((res) => {
+                //接口
                 console.log(res);
               });
             });
@@ -98,6 +85,7 @@ const ShoppingCart: React.FC<any> = (props) => {
               //获取购物车
               console.log(res);
               setfls(res);
+              //删除成功全局通知
               messageApi.open({
                 type: 'success',
                 content: '删除成功',
@@ -119,6 +107,7 @@ const ShoppingCart: React.FC<any> = (props) => {
     plainOptions.push(item.id);
   });
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
+    //全选
     console.log(e.target.checked);
 
     if (e.target.checked == true) {
