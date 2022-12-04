@@ -25,7 +25,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 const infoMenuItems = [
   { label: '单位信息', key: 'info', icon: <InfoCircleOutlined /> },
   {
-    label: '部门设置',
+    label: '内设机构',
     key: 'dept',
     icon: <ApartmentOutlined />,
     children: [],

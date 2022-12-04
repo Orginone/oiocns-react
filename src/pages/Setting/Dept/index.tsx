@@ -22,7 +22,7 @@ import { RouteComponentProps } from 'react-router-dom';
 // import { IDepartment } from '@/ts/core/target/itarget';
 
 /**
- * 部门设置
+ * 内设机构
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
@@ -69,7 +69,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       },
       {
         key: 'publishList',
-        label: '部门设置',
+        label: '内设机构',
         onClick: () => {
           console.log('按钮事件', 'publishList', item);
         },
@@ -278,18 +278,18 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             onTabChange={(key) => {
               setStatusKey(key);
               console.log('切换事件', key);
-            }}
-          />
-          <div className={cls['page-content-table']} ref={parentRef}>
-            <CardOrTable
-              dataSource={dataSource as any}
-              rowKey={'id'}
-              operation={renderOperation}
-              columns={columns as any}
-              parentRef={parentRef}
-              showChangeBtn={false}
-            />
-          </div>
+            }}>
+            <div className={cls['page-content-table']} ref={parentRef}>
+              <CardOrTable
+                dataSource={dataSource as any}
+                rowKey={'id'}
+                operation={renderOperation}
+                columns={columns as any}
+                parentRef={parentRef}
+                showChangeBtn={false}
+              />
+            </div>
+          </Card>
         </div>
       </Card>
     </div>
@@ -332,7 +332,13 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         handleOk={handleOk}
       />
       {/* 对象设置 */}
-      <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      <AddPostModal
+        title={'身份设置'}
+        open={isSetPost}
+        onOk={onOk}
+        handleOk={onOk}
+        datasource={[]}
+      />
       {/* 左侧树 */}
       {treeContainer
         ? ReactDOM.createPortal(
@@ -350,7 +356,3 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
 };
 
 export default SettingDept;
-
-function setIsSetPost(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}

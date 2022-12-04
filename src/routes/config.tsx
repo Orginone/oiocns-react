@@ -318,13 +318,13 @@ const SettingRouter: IRouteConfig[] = [
       },
       {
         path: '/setting/dept/:id',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
       {
         path: '/setting/dept',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
