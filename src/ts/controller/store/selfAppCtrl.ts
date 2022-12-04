@@ -124,7 +124,7 @@ class SelfAppController extends BaseController {
     super();
     /* 监听空间切换 */
     userCtrl.subscribePart(UserPartTypes.Space, async () => {
-      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
+      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Space : userCtrl.User;
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
