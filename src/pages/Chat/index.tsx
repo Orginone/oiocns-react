@@ -1,6 +1,6 @@
-import { deepClone } from '@/ts/base/common';
 import chatCtrl from '@/ts/controller/chat';
-import React, { useEffect, useState } from 'react';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import React, { useState } from 'react';
 import GroupContent from './GroupContent';
 import GroupDetail from './GroupDetail';
 import GroupHeader from './GroupHeader';
@@ -14,28 +14,9 @@ import charsStyle from './index.module.less';
  */
 
 const Chat: React.FC = () => {
+  const [key] = useCtrlUpdate(chatCtrl);
   const [isShowDetail, setIsShowDetail] = useState<boolean>(false); // 展开关闭详情
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
-  const [chat, setChat] = useState(chatCtrl.chat); // 当前会话
-
-  /**
-   * @description: 刷新页面
-   * @return {*}
-   */
-  const refreshUI = () => {
-    setChat(deepClone(chatCtrl.chat));
-  };
-
-  /**
-   * @description: 监听点击事件，关闭弹窗
-   * @return {*}
-   */
-  useEffect(() => {
-    const id = chatCtrl.subscribe(refreshUI);
-    return () => {
-      chatCtrl.unsubscribe(id);
-    };
-  }, []);
 
   /**
    * @description: 展开详情页
@@ -55,13 +36,13 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className={charsStyle.cohort_wrap}>
+    <div id={key} className={charsStyle.cohort_wrap}>
       {/* 导航栏 */}
       <div className={charsStyle.custom_group_silder_menu}>
         <GroupSideBar />
       </div>
       {/* 主体 */}
-      {chat ? (
+      {chatCtrl.chat ? (
         <div className={charsStyle.chart_page}>
           {/* 头部 */}
           <GroupHeader handleViewDetail={handleViewDetail} />

@@ -3,7 +3,6 @@ import cls from './index.module.less';
 
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
-import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
 import { BaseProduct } from '@/ts/core/market';
 interface AppShowCompType {
@@ -35,19 +34,21 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
-    if (!searchParams || !list?.length) {
-      return;
-    }
+    console.log('展示数据', list);
+
+    // if (!searchParams || !list?.length) {
+    //   return;
+    // }
 
     if (searchParams.status === '全部') {
       setTotal(list.length);
-      setSataSource(list);
+      setSataSource([...list]);
     } else {
       const result = list.filter((item) => {
         return item?._prod?.source === searchParams.status;
       });
       setTotal(result.length);
-      setSataSource(result);
+      setSataSource([...result]);
     }
     //TODO: 其他条件 发出请求
     // if (Object.keys(searchParams).length == 0) {
@@ -65,17 +66,19 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: MarketTypes.ProductType[]): React.ReactNode[] => {
-    return dataArr.map((item: MarketTypes.ProductType) => {
+  const renderCardFun = (dataArr: BaseProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: BaseProduct) => {
+      console.log('卡片数据', item);
+
       return (
         <AppCard
           className="card"
-          data={item}
-          key={item.id}
+          data={item._prod}
+          key={item._prod.id}
           defaultKey={{
-            name: 'caption',
+            name: 'name',
             size: 'price',
-            type: 'sellAuth',
+            type: 'source',
             desc: 'remark',
             creatTime: 'createTime',
           }}
@@ -86,7 +89,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<MarketTypes.ProductType>
+      <CardOrTable<BaseProduct>
         dataSource={dataSource}
         total={total}
         page={page}

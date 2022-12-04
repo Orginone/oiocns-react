@@ -59,10 +59,10 @@ const UserAvatar: React.FC = () => {
   return (
     <Dropdown menu={menuItems} placement="bottomLeft">
       {user && user.target.avatar ? (
-        <Avatar src={user.target.avatar} alt={user.target.name} size={28}></Avatar>
+        <Avatar src={user?.target?.avatar} alt={user.target.name} size={28}></Avatar>
       ) : (
         <Avatar className={cls['header-user-avatar']} alt={user?.target.name}>
-          {user?.target.name.substring(0, 1)}
+          {user?.target?.name?.substring(0, 1)}
         </Avatar>
       )}
     </Dropdown>

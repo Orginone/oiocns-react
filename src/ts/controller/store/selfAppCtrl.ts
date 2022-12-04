@@ -123,19 +123,16 @@ class SelfAppController extends BaseController {
     super();
     /* 监听空间切换 */
     userCtrl.subscribePart(UserPartTypes.Space, async () => {
-      // this.changCallbackPart();
-      console.log('监听单位切换', userCtrl.Space, userCtrl.SpaceData);
-      this._curSpace =userCtrl.IsCompanySpace? userCtrl.Space :userCtrl.User;
-      console.log('this._curSpace', this._curSpace, userCtrl.Space);
-
+      // console.log('监听单位切换', userCtrl.Space, userCtrl.SpaceData);
+      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Space : userCtrl.User;
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
     kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg) => {
-      console.log('订阅数据推送 自定义目录===>', Msg.data);
+      // console.log('订阅数据推送 自定义目录===>', Msg.data);
       const { data = defaultTreeData } = Msg;
       this._treeData = data;
-      this.changCallbackPart(SelfCallBackTypes.TreeData, [...data]);
+      this.changCallbackPart(SelfCallBackTypes.TreeData);
     });
   }
 
@@ -143,7 +140,7 @@ class SelfAppController extends BaseController {
     this._curMenuKey = 'app';
     this.breadcrumb = ['仓库', '我的应用'];
     this._curProduct = undefined;
-    this.querySelfApps()
+    this.querySelfApps();
   }
   public handleMenuOpt(type: MenuOptTypes, _data: TreeType) {
     console.log('菜单操作', type, _data);
@@ -155,8 +152,11 @@ class SelfAppController extends BaseController {
    */
   public cacheSelfMenu(data: TreeType[]): void {
     console.log('缓存触发', data);
-    this._treeData = data;
-    this.changCallbackPart(SelfCallBackTypes.TreeData, [...data]);
+    if (!data || !(data instanceof Array)) {
+      return console.error('缓存自定义目录格式有误,请重试');
+    }
+    this._treeData = data || defaultTreeData;
+    this.changCallbackPart(SelfCallBackTypes.TreeData);
     kernel.anystore.set(
       selfAppMenu,
       {
@@ -192,7 +192,7 @@ class SelfAppController extends BaseController {
     const list = await this._curSpace.getOwnProducts();
     console.log('获取我的应用表格数据', list);
     this.selfAppsData = list;
-    this.changCallbackPart(SelfCallBackTypes.TableData, list);
+    this.changCallbackPart(SelfCallBackTypes.TableData);
   }
 
   /**
@@ -201,7 +201,7 @@ class SelfAppController extends BaseController {
    */
   public OpenApp(data: BaseProduct) {
     this.recentlyUsedApps.unshift(data);
-    this.changCallbackPart(SelfCallBackTypes.Recently, [...this.recentlyUsedApps]);
+    this.changCallbackPart(SelfCallBackTypes.Recently);
   }
 
   /**

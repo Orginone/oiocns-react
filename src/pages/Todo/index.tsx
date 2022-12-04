@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { renderRoutes } from 'react-router-config';
-import * as Icon from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
 // import todoService from '@/ts/controller/todo';

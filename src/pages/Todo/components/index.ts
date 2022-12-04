@@ -1,7 +1,10 @@
+import { CommonStatus } from '@/ts/core/enum';
+import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core/todo/itodo';
 import { message } from 'antd';
 
 // import { XMarketRelation, XOrder, XOrderDetail, XRelation } from '@/ts/base/schema';
-// import { OrderStatus } from '@/ts/core/enum';
+import { OrderStatus } from '@/ts/core/enum';
+import { XOrder, XOrderDetail } from '@/ts/base/schema';
 
 /**
  * tabs 状态选项
@@ -54,28 +57,36 @@ const applicationTabs: statusItem[] = [
 /** 生成平台待办操作菜单*/
 const tableOperation = (
   active: string,
-  item: any,
-  handleMenuClick: (key: string, item: any) => {},
+  item: IApprovalItem | IApplyItem,
+  callback: (refresh: boolean) => void,
 ) => {
-  // const afterOperate = (success: boolean, name: string) => {
-  //   if (success) {
-  //     message.success(`${name}成功`);
-  //     callback(true);
-  //   } else {
-  //     message.error(`${name}失败`);
-  //   }
-  // };
+  const afterOperate = (success: boolean) => {
+    if (success) {
+      message.success(`操作成功`);
+      callback(true);
+    } else {
+      message.error(`操作失败`);
+    }
+  };
   return active == '1'
     ? [
         {
           key: 'approve',
           label: '同意',
-          onClick: () => handleMenuClick('approve', item),
+          onClick: () =>
+            (item as IApprovalItem)
+              .pass(CommonStatus.ApproveStartStatus, '')
+              .then(({ success }) => {
+                afterOperate(success);
+              }),
         },
         {
           key: 'refuse',
           label: '拒绝',
-          onClick: () => handleMenuClick('refuse', item),
+          onClick: () =>
+            (item as IApprovalItem).reject(200, '').then(({ success }) => {
+              afterOperate(success);
+            }),
         },
       ]
     : active == '2'
@@ -83,14 +94,24 @@ const tableOperation = (
         {
           key: 'approve',
           label: '同意',
-          onClick: () => handleMenuClick('approve', item),
+          onClick: () =>
+            (item as IApprovalItem)
+              .pass(CommonStatus.ApproveStartStatus, '')
+              .then(({ success }) => {
+                afterOperate(success);
+              }),
         },
       ]
     : [
         {
           key: 'retractApply',
           label: '取消申请',
-          onClick: () => handleMenuClick('retractApply', item),
+          onClick: () =>
+            (item as IApplyItem)
+              .cancel(CommonStatus.RejectStartStatus, '')
+              .then(({ success }) => {
+                afterOperate(success);
+              }),
         },
       ];
 };
@@ -124,7 +145,73 @@ const statusMap = {
     text: '已退货',
   },
 };
-
+/** 生成订单操作菜单  */
+const orderOperation = (
+  activeStatus: string,
+  data: IApprovalItem | IOrderApplyItem,
+  callback: Function,
+  _record?: XOrderDetail,
+) => {
+  const afterOperate = (success: boolean, name: string) => {
+    if (success) {
+      message.success(`${name}成功`);
+      callback(true);
+    } else {
+      message.error(`${name}失败`);
+    }
+  };
+  const item = data.Data;
+  // 是否是待发货的订单状态
+  let allowToCancel = item.status < 102;
+  if (activeStatus == `6`) {
+    if (typeof (item as XOrder).details === 'object') {
+      // 说明他是采购订单的主订单 不能取消订单
+      allowToCancel = false;
+    }
+  }
+  const menu = [];
+  if (allowToCancel) {
+    menu.push({
+      key: 'retractApply',
+      label: '取消订单',
+      onClick: () => {
+        if (activeStatus == '5') {
+          (data as IApprovalItem)
+            .reject(OrderStatus.SellerCancel, '')
+            .then(({ success }) => afterOperate(success, '取消订单'));
+        } else if (_record) {
+          (data as IOrderApplyItem)
+            .cancelItem(_record?.id, OrderStatus.BuyerCancel, '')
+            .then(({ success }) => afterOperate(success, '取消订单'));
+        }
+      },
+    });
+    if (activeStatus == `5`) {
+      menu.push({
+        key: 'approve',
+        label: '确认交付',
+        onClick: () => {
+          (data as IApprovalItem).pass(OrderStatus.Deliver, '').then(({ success }) => {
+            afterOperate(success, '确认交付');
+          });
+        },
+      });
+    }
+  } else if (item.status == OrderStatus.Deliver && activeStatus == `6` && _record) {
+    menu.push({
+      key: 'reject',
+      label: '退货退款',
+      onClick: () => {
+        (data as IOrderApplyItem)
+          .reject(_record.id, OrderStatus.RejectOrder, '')
+          .then(({ success }) => {
+            afterOperate(success, '退货退款');
+          });
+      },
+    });
+  }
+  return menu;
+};
 // class TodoService {
 //   applicationInstance: ApplicationTodo | undefined;
 //   friend = friendTodo;
@@ -292,4 +379,11 @@ const statusMap = {
 
 // const todoService = new TodoService();
 // export default todoService;
-export { applicationTabs, orderTabs, statusList, statusMap, tableOperation };
+export {
+  applicationTabs,
+  orderOperation,
+  orderTabs,
+  statusList,
+  statusMap,
+  tableOperation,
+};

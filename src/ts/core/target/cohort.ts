@@ -30,15 +30,13 @@ export default class Cohort extends BaseTarget implements ICohort {
       teamName: data.name,
     });
   }
-  public async getMember(): Promise<schema.XTarget[]> {
-    if (this.children.length > 0) {
+  public async getMember(reload: boolean): Promise<schema.XTarget[]> {
+    if (!reload && this.children.length > 0) {
       return this.children;
     }
     const res = await super.getSubTargets(this.subTypes);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.children.push(a);
-      });
+    if (res.success && res.data.result) {
+      this.children = res.data.result;
     }
     return this.children;
   }

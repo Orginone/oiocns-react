@@ -34,24 +34,19 @@ const StoreClassify: React.FC = () => {
   const [curMenuKey, setCurMenuKey] = useState<string>(SelfAppCtrl.curMenuKey);
 
   useEffect(() => {
-    console.log('初始化', 'APP頁面');
-    const id = SelfAppCtrl.subscribePart(
-      SelfCallBackTypes.TreeData,
-      (data: TreeType[]) => {
-        console.log('apptree', data, SelfAppCtrl.treeData);
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TreeData, () => {
+      console.log('监听,tree变化', SelfAppCtrl.treeData || []);
+      const arr = SelfAppCtrl.treeData || [];
 
-        setTreeData(data || SelfAppCtrl.treeData || []);
-      },
-    );
-    // StoreSiderbar.changePageType('app');
-    SelfAppCtrl.querySelfApps();
+      setTreeData([...arr]);
+    });
     return () => {
       return SelfAppCtrl.unsubscribe(id);
     };
   }, []);
 
-  /******* 新增 自定义目录
-   * @desc:
+  /*******
+   * @desc:新增 自定义目录
    */
   const newMenuFormSubmit = async () => {
     let { title } = await newMenuForm.validateFields();
@@ -70,7 +65,6 @@ const StoreClassify: React.FC = () => {
 
     setIsStoreOpen(false);
     // 数据缓存
-    console.log('缓存数据', obj, treeData);
     SelfAppCtrl.cacheSelfMenu(treeData);
   };
   function findAimObj(isParent = false, id: string) {

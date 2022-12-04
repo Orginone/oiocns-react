@@ -7,6 +7,7 @@ import { IconFont } from '@/components/IconFont';
 import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * 顶部导航
@@ -14,17 +15,19 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
-  const [chatNum, setChatNum] = useState(0);
+  const [chatKey] = useCtrlUpdate(chatCtrl);
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
+      key: chatKey,
       path: '/chat',
       title: '聊天',
       icon: 'icon-message',
-      count: chatNum,
+      count: chatCtrl.getNoReadCount(),
       fath: '/chat',
     },
     {
+      key: 'task',
       path: '/todo/friend',
       title: '待办',
       icon: 'icon-todo',
@@ -32,6 +35,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/todo',
     },
     {
+      key: 'store',
       path: '/store/app',
       title: '仓库',
       icon: 'icon-store',
@@ -39,6 +43,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/store',
     },
     {
+      key: 'setting',
       path: '/setting/info',
       title: '设置',
       icon: 'icon-setting',
@@ -47,15 +52,11 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
   ];
   useEffect(() => {
-    const id = chatCtrl.subscribe(() => {
-      setChatNum(chatCtrl.getNoReadCount());
-    });
-    const tid = todoCtrl.subscribe(async () => {
+    const id = todoCtrl.subscribe(async () => {
       setTaskNum(await todoCtrl.TaskCount());
     });
     return () => {
-      chatCtrl.unsubscribe(id);
-      todoCtrl.unsubscribe(tid);
+      return todoCtrl.unsubscribe(id);
     };
   }, []);
   return (
@@ -63,7 +64,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       <Space size={36}>
         {navs.map((item) => {
           return (
-            <Badge key={item.path} count={item.count} size="small">
+            <Badge key={item.key} count={item.count} size="small">
               <Link
                 key={item.path}
                 to={item.path}

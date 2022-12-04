@@ -67,17 +67,15 @@ const CardListContent = ({
         onContextMenu={(e) => {
           e.stopPropagation();
         }}>
-        <Image.PreviewGroup>
-          <Row gutter={[16, 16]}>
-            {pageData.map((el) => {
-              return (
-                <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
-                  {FileCard(el)}
-                </Col>
-              );
-            })}
-          </Row>
-        </Image.PreviewGroup>
+        <Row gutter={[16, 16]}>
+          {pageData.map((el) => {
+            return (
+              <Col xs={8} sm={8} md={6} lg={4} xl={3} xxl={2} key={el.key}>
+                {FileCard(el)}
+              </Col>
+            );
+          })}
+        </Row>
       </div>
     </Dropdown>
   );
