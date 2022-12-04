@@ -121,7 +121,7 @@ export default class Person extends MarketTarget implements IPerson {
       return faildResult('请填写正确的代码!');
     }
     const tres = await this.searchTargetByName(data.code, consts.CompanyTypes);
-    if (!tres.data) {
+    if (!tres.data.result) {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;

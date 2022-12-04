@@ -1,17 +1,21 @@
-import { Input, Button } from 'antd';
+import { Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
-import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 
 import { schema } from '@/ts/base';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
   setCurrent: (current: schema.XTarget) => void;
-  handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
+  handleMenuClick: (key: string, item: any) => void;
+  // 点击操作触发的事件
+  authTree: IAuthority;
 };
 
 const items: DataNode[] = [
@@ -31,11 +35,11 @@ const items: DataNode[] = [
 
 const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
   useEffect(() => {
-    initData();
+    getDataDetail();
   }, []);
 
-  const initData = async () => {
-    // 查询后台的数据
+  const getDataDetail = async () => {
+    console.log('111111111', await userCtrl.Company.selectAuthorityTree(false));
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
@@ -60,7 +64,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
       key={selectMenu}
       handleMenuClick={handleMenuClick}
       handleTitleClick={handleTitleClick}
-      treeData={items}
+      treeData={[]}
       menu={menu}
       title={'全部岗位'}
     />

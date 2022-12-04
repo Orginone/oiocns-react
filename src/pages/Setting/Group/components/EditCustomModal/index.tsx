@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { TargetType } from '@/ts/core/enum';
-import Department from '@/ts/core/target/department';
+// import userCtrl from '@/ts/controller/setting/userCtrl';
+// import { TargetType } from '@/ts/core/enum';
+// import Department from '@/ts/core/target/department';
 
 interface Iprops {
   title: string;
   open: boolean;
   onOk: () => void;
-  handleOk: () => void;
+  handleOk: (item: any) => void;
   handleCancel: () => void;
   selectId?: string;
 }
@@ -17,9 +17,11 @@ interface Iprops {
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId } = props;
+  const { open, title, handleOk, handleCancel } = props;
   const [form] = Form.useForm();
-  useEffect(() => {}, []);
+  useEffect(() => {
+    form.resetFields();
+  }, [props.open]);
 
   return (
     <div className={cls['edit-custom-modal']}>
@@ -53,7 +55,7 @@ const EditCustomModal = (props: Iprops) => {
           <Row>
             <Col span={24}>
               <Form.Item
-                name="remark"
+                name="teamRemark"
                 label="描述"
                 rules={[{ required: true, message: '请输入集团描述!' }]}>
                 <TextArea
@@ -70,6 +72,7 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
+                    handleOk(value);
                   }
                 }}>
                 完成

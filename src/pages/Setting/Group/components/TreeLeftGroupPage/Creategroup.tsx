@@ -50,21 +50,6 @@ const generateList = (data: DataNode[]) => {
 };
 generateList(defaultData);
 
-const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
-  let parentKey: React.Key;
-  for (let i = 0; i < tree.length; i++) {
-    const node = tree[i];
-    if (node.children) {
-      if (node.children.some((item) => item.key === key)) {
-        parentKey = node.key;
-      } else if (getParentKey(key, node.children)) {
-        parentKey = getParentKey(key, node.children);
-      }
-    }
-  }
-  return parentKey!;
-};
-
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
@@ -80,8 +65,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [treeData, setTreeData] = useState<any[]>([]);
 
-  const [createTreeData, setCreateTreeData] = useState<any[]>([]);
-
   useEffect(() => {
     initData(false);
   }, [key]);
@@ -93,16 +76,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       const tree = data.map((n: any) => {
         return createTeeDom(n);
       });
-      const data2 = data.filter((n: any) => {
-        if (n.target.createUser === userCtrl.User.target.id) {
-          return createTeeDom(n);
-        }
-      });
-      const tree2 = data2.map((n: any) => {
-        return createTeeDom(n);
-      });
       setTreeData(tree);
-      setCreateTreeData(tree2);
     }
   };
   const createTeeDom = (n: IDepartment) => {
@@ -173,19 +147,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           showIcon
           searchable
           handleMenuClick={handleMenuClick}
-          treeData={createTreeData}
-          title={'创建集团'}
-          menu={menu}
-          loadData={loadDept}
-          onSelect={onSelect}
-        />
-        <MarketClassifyTree
-          id={key}
-          showIcon
-          searchable
-          handleMenuClick={handleMenuClick}
           treeData={treeData}
-          title={'加入集团'}
+          title={'集团管理'}
           menu={menu}
           loadData={loadDept}
           onSelect={onSelect}

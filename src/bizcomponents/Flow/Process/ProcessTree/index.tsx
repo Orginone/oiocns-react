@@ -136,7 +136,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
       //空节点，存在于分支尾部
 
       let childDoms: any = node.children ? getDomTree(h, node.children) : [];
-      console.log(childDoms);
+
       decodeAppendDom(h, node, childDoms, {
         _disabled: node?._disabled,
         _executable: node?._executable,

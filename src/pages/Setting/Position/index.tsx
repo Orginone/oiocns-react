@@ -17,12 +17,17 @@ import AddDeptModal from './components/AddDeptModal';
 import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-
+import { RouteComponentProps } from 'react-router-dom';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
+type RouterParams = {
+  id: string;
+};
 /**
  * 岗位设置
  * @returns
  */
-const SettingDept: React.FC = () => {
+const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
@@ -83,8 +88,7 @@ const SettingDept: React.FC = () => {
     setIsOpenModal(false);
   };
 
-  const [currentCtrl, setCurrentCtrl] = useState();
-
+  const [authTree, setauthTree] = useState<IAuthority>();
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -126,7 +130,12 @@ const SettingDept: React.FC = () => {
   // 选中树的时候操作
   const setTreeCurrent = (current: schema.XTarget) => {};
 
-  const initData = async () => {};
+  const initData = async () => {
+    const cohort = await userCtrl.getCohortList();
+    const data = cohort.filter((obj) => obj.target.id == id);
+    await data[0].selectAuthorityTree(false);
+    setauthTree(data[0].authorityTree);
+  };
 
   // 标题tabs页
   const TitleItems = [
@@ -266,6 +275,7 @@ const SettingDept: React.FC = () => {
               setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
               currentKey={''}
+              authTree={authTree!}
             />,
             treeContainer,
           )

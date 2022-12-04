@@ -58,9 +58,10 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
               name="type"
               label="字段类型"
               request={async () => [
-                { label: '字符串', value: '字符串' },
-                { label: '数字', value: '数字' },
-                { label: '枚举', value: '枚举' },
+                { label: '字符串', value: 'STRING' },
+                { label: '数字', value: 'NUMERIC' },
+                { label: '枚举', value: 'DICT' },
+                { label: '日期', value: 'DATE' },
               ]}
               placeholder="请选择类型"
               rules={[{ required: true, message: '请选择类型!' }]}
@@ -68,7 +69,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
           </ProFormGroup>
           <ProFormDependency key="remark" name={['type']}>
             {({ type }) => {
-              if (type !== '枚举') {
+              if (type !== 'DICT') {
                 return false;
               }
               return (

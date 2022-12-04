@@ -17,26 +17,31 @@ interface TreeType {
   title?: ReactElement | string;
   isDirectoryTree?: boolean; //是否文档树
   className?: any; // 树的css
+  fieldNames?: {
+    title: string;
+    key: string | ((_record: any) => string);
+    children: string;
+  };
   [key: string]: any; // 其他属性方法
 }
 const { DirectoryTree } = Tree;
-const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
-  console.log('获取父级key', key!);
-  let parentKey: React.Key;
-  for (let i = 0; i < tree.length; i++) {
-    const node = tree[i];
-    if (node.children) {
-      if (node.children.some((item) => item.key === key)) {
-        parentKey = node.key;
-      } else if (getParentKey(key, node.children)) {
-        parentKey = getParentKey(key, node.children);
-      }
-    }
-  }
-  console.log('获取父级', parentKey!);
+// const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+//   console.log('获取父级key', key!);
+//   let parentKey: React.Key;
+//   for (let i = 0; i < tree.length; i++) {
+//     const node = tree[i];
+//     if (node[fieldNames.children]) {
+//       if (node[fieldNames.children].some((item) => item.key === key)) {
+//         parentKey = node.key;
+//       } else if (getParentKey(key, node[fieldNames.children])) {
+//         parentKey = getParentKey(key, node[fieldNames.children]);
+//       }
+//     }
+//   }
+//   console.log('获取父级', parentKey!);
 
-  return parentKey!;
-};
+//   return parentKey!;
+// };
 const StoreClassifyTree: React.FC<TreeType> = ({
   isDirectoryTree = false,
   title,
@@ -50,6 +55,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   handleTitleClick,
   onDoubleClickTitle,
   className,
+  fieldNames = { title: 'title', key: 'key', children: 'children' },
   ...rest
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
@@ -86,8 +92,8 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     const newExpandedKeys = resetTreeData.map((item: any) => {
-      if (item.title.indexOf(value) > 0) {
-        return getParentKey(item.key, treeData);
+      if (item[fieldNames.title].indexOf(value) > 0) {
+        // return getParentKey(item.key, treeData);
       }
       return null;
     });
@@ -104,7 +110,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   const resetTreeData = useMemo(() => {
     const loop = (data: DataNode[]): DataNode[] =>
       data?.map((item) => {
-        const strTitle = item.title as string;
+        const strTitle = item[fieldNames.title] as string;
         const index = strTitle.indexOf(searchValue);
         const beforeStr = strTitle.substring(0, index);
         const afterStr = strTitle.slice(index + searchValue.length);
@@ -118,8 +124,12 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           ) : (
             ''
           );
-        if (item.children) {
-          return { ...item, searchTitle, children: loop(item.children) };
+        if (item[fieldNames.children]) {
+          return {
+            ...item,
+            searchTitle,
+            [fieldNames.children]: loop(item[fieldNames.children]),
+          };
         }
 
         return {
@@ -147,10 +157,12 @@ const StoreClassifyTree: React.FC<TreeType> = ({
             onDoubleClickTitle && onDoubleClickTitle(node);
           }}
           onClick={() => handleTitleClick && handleTitleClick(node)}>
-          {isDirectoryTree == false && node.children && node.children.length == 0
+          {isDirectoryTree == false &&
+          node[fieldNames.children] &&
+          node[fieldNames.children].length == 0
             ? childIcon
             : parentIcon}
-          {node.searchTitle || node.title}
+          {node.searchTitle || node[fieldNames.title]}
           {node?.tag ? (
             <Tag style={{ marginLeft: '6px' }} color={node.tag?.color}>
               {node.tag?.txt}

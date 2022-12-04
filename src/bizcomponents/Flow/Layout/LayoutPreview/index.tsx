@@ -24,9 +24,6 @@ const LayoutPreview = (props: LayoutPreviewProps, ref: any) => {
     setIsShowDialog(true);
     console.log('预览');
     setDesignJson(JSON.stringify(Object.assign({}, design), null, 4));
-    // state.isShowDialog = true;
-    // state.design = Object.assign({}, design);
-    // state.designJson = JSON.stringify(design, null, 4)
   };
   return (
     <div>
