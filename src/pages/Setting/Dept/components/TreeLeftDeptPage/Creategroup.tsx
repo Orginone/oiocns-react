@@ -75,7 +75,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
         userCtrl.Company.departments = [];
       }
-      initData(false);
+      initData(true);
     }
   }, [key]);
 
