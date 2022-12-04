@@ -5,8 +5,10 @@ import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 import { marketColumns, myColumns, shareInfoColumns } from './config';
+import { Modal } from 'antd';
 const selfAppMenu = 'selfAppMenu';
 const RecentlyApps = 'RecentlyApps';
+const { confirm } = Modal;
 
 const defaultTreeData: TreeType[] = [
   {
@@ -255,7 +257,6 @@ class SelfAppController extends BaseController {
    */
   public selectedProduct(item: IProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改当前操作应用', item);
 
     this._curProduct = item;
@@ -297,6 +298,20 @@ class SelfAppController extends BaseController {
     } else {
       console.log('共享成功');
     }
+  }
+  /**
+   * @description: 移除确认
+   * @return {*}
+   */
+  public async handleDeleteApp() {
+    confirm({
+      content: `确认删除《 ${this._curProduct!.prod.name} 》?`,
+      onOk: async () => {
+        await this._curSpace.deleteProduct(this._curProduct!.prod.id);
+        this.querySelfApps(true);
+      },
+      onCancel() {},
+    });
   }
 }
 

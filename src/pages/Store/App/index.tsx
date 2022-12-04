@@ -15,20 +15,17 @@ import { MarketTypes } from 'typings/marketType';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
-import DeleteCustomModal from '@/components/DeleteCustomModal';
+// import DeleteCustomModal from '@/components/DeleteCustomModal';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
-
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState<IProduct[]>([]);
   const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
-  const [productObj, setProductObj] = useState<any>({});
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
       setData([...SelfAppCtrl.tableData]);
@@ -47,7 +44,7 @@ const StoreApp: React.FC = () => {
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v._prod?.source);
+      typeSet.add(v.prod?.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -82,23 +79,6 @@ const StoreApp: React.FC = () => {
 
     return recentlyApps;
   }, [recentlyAppIds, data]);
-
-  /**
-   * @description: 移除确认
-   * @return {*}
-   */
-  const onOk = () => {
-    setIsDeleteOpen(false);
-    // productCtrl.deleteProduct(productObj?._prod?.id);
-  };
-
-  /**
-   * @description: 取消确认
-   * @return {*}
-   */
-  const onCancel = () => {
-    setIsDeleteOpen(false);
-  };
 
   const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
     console.log('输出选择', teamId, type, checkedValus);
@@ -158,15 +138,6 @@ const StoreApp: React.FC = () => {
         },
       },
       {
-        key: 'delete',
-        label: '移除',
-        onClick: () => {
-          SelfAppCtrl.curProduct = item;
-          setProductObj(item);
-          setIsDeleteOpen(true);
-        },
-      },
-      {
         key: 'share2',
         label: '分配',
         onClick: () => {
@@ -174,14 +145,22 @@ const StoreApp: React.FC = () => {
           setShowShareModal(true);
         },
       },
+      // {
+      //   key: 'save',
+      //   label: '暂存',
+      //   onClick: () => {
+      //     SelfAppCtrl.curProduct = item;
+      //     history.push({
+      //       pathname: '/store/app/publish',
+      //     });
+      //   },
+      // },
       {
-        key: 'save',
-        label: '暂存',
+        key: 'delete',
+        label: <span style={{ color: 'red' }}> 移除</span>,
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({
-            pathname: '/store/app/publish',
-          });
+          SelfAppCtrl.handleDeleteApp();
         },
       },
     ];
@@ -230,14 +209,14 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp onCheckeds={onCheckeds} />
       </Modal>
-      <DeleteCustomModal
+      {/* <DeleteCustomModal
         title="警告"
         open={isDeleteOpen}
         deleOrQuit="delete"
         onOk={onOk}
         onCancel={onCancel}
-        content={productObj?._prod?.name}
-      />
+        content={SelfAppCtrl.curProduct!.prod.name}
+      /> */}
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/publish" render={() => <PublishList />}></Route>
