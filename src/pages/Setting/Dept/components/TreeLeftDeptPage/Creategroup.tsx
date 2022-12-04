@@ -10,7 +10,7 @@ import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
 import { getUuid } from '@/utils/tools';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { PlusOutlined } from '@ant-design/icons';
+import { BulbFilled, PlusOutlined } from '@ant-design/icons';
 
 type CreateGroupPropsType = {
   createTitle: string;
@@ -49,6 +49,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
     return {
       key: target.id + getUuid(),
       title: target.name,
+      tag: { color: '#8ba5ec', txt: target.typeName },
       icon: target.avatar,
       // children: [],
       isLeaf: false,
