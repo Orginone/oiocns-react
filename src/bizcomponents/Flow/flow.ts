@@ -1,15 +1,15 @@
 import create from 'zustand';
 
-type appwfState = {
-  nodeMap: Record<string, any>;
-  isEdit: null;
-  selectedNode: Record<string, any>;
-  selectFormItem: null;
-  design: Record<string, any>;
-  oldDesign: Record<string, any>;
-  designList: Array<Record<string, any>>;
-  form: any;
-};
+// type appwfState = {
+//   nodeMap: Record<string, any>;
+//   isEdit: null;
+//   selectedNode: Record<string, any>;
+//   selectFormItem: null;
+//   design: Record<string, any>;
+//   oldDesign: Record<string, any>;
+//   designList: Array<Record<string, any>>;
+//   form: any;
+// };
 
 //审批节点默认属性
 type Approvalprops = {
@@ -234,7 +234,7 @@ export const useAppwfConfig = create((set, get) => ({
   addNodeMap: async (data: any) =>
     set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) })),
   setSelectedNode: async (data: any) => set({ selectedNode: data }),
-  setDesign: async (data: any) => set({ design: data }),
+  setDesign: async (data: any) => set({ design: data }), //设置初始数据
   setOldDesign: async (data: any) => set({ oldDesign: data }),
   setDesignList: async (data: any) => set({ designList: data }),
   setForm: async (data: any) => set({ form: data }),

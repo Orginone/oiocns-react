@@ -1,7 +1,7 @@
 import { Card, Layout, Steps, Button, Modal, message } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
-import { RollbackOutlined } from '@ant-design/icons';
+import { RollbackOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
@@ -44,6 +44,10 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
+  const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
+    name: '',
+    labels: [],
+  });
 
   const columns: ProColumns<FlowItem>[] = [
     {
@@ -75,7 +79,7 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record, _, action) => [
+      render: () => [
         <a
           key="editor"
           onClick={() => {
@@ -112,8 +116,6 @@ const SettingFlow: React.FC = () => {
   }, []);
 
   const initData = async () => {
-    setEditorType(EditorType.TABLEMES);
-    setCurrentStep(StepType.BASEINFO);
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
       setDataSource(result);
@@ -131,14 +133,6 @@ const SettingFlow: React.FC = () => {
                 columns={columns}
                 search={false}
                 dataSource={dataSource}
-                // request={async (params = {}, sort, filter) => {
-                //   console.log(params, sort, filter);
-                //   return {
-                //     data: [{ title: '测试流程1' }, { title: '测试流程2' }],
-                //     success: true,
-                //     total: 10,
-                //   };
-                // }}
                 toolBarRender={() => [
                   <Button
                     key="button"
@@ -176,7 +170,18 @@ const SettingFlow: React.FC = () => {
                       }}>
                       <Button
                         onClick={() => {
-                          initData();
+                          Modal.confirm({
+                            title: '未发布的内容将不会被保存，是否直接退出?',
+                            icon: <ExclamationCircleOutlined />,
+                            okText: '确认',
+                            okType: 'danger',
+                            cancelText: '取消',
+                            onOk() {
+                              setEditorType(EditorType.TABLEMES);
+                              setCurrentStep(StepType.BASEINFO);
+                            },
+                            onCancel() {},
+                          });
                         }}>
                         <RollbackOutlined />
                         返回
@@ -193,15 +198,13 @@ const SettingFlow: React.FC = () => {
                     {/* 基本信息组件 */}
                     {currentStep === StepType.BASEINFO ? (
                       <BaseInfo
-                        nextStep={() => {
+                        nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
+                          setConditionData(params);
                         }}
                       />
                     ) : (
-                      <ProcessDesign
-                        backTable={() => {
-                          initData();
-                        }}></ProcessDesign>
+                      <ProcessDesign conditionData={conditionData}></ProcessDesign>
                     )}
                   </Card>
                 </Content>

@@ -40,6 +40,7 @@ const PersonCustomModal = (props: Iprops) => {
   };
 
   const getAllIdentitys = async (select: BaseTarget) => {
+    console.log('select', select);
     let identitys = await select.getAllIdentitys();
     setIdentitys(identitys);
     return identitys;
