@@ -158,7 +158,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           searchable
           handleMenuClick={handleMenuClick}
           treeData={treeData}
-          title={'内设集团'}
+          title={'内设机构'}
           menu={menu}
           loadData={loadDept}
           onSelect={onSelect}
