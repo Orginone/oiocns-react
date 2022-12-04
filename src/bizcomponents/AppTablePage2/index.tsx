@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
@@ -34,8 +34,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
-  console.log(999999999999, list, dataSource);
-
   useEffect(() => {
     if (!list?.length) {
       return;
@@ -46,16 +44,11 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       setSataSource([...list]);
     } else {
       const result = list.filter((item) => {
-        return item?._prod?.source === searchParams.status;
+        return item?.prod?.source === searchParams.status;
       });
       setTotal(result.length);
       setSataSource([...result]);
     }
-    //TODO: 其他条件 发出请求
-    // if (Object.keys(searchParams).length == 0) {
-    //   return;
-    // }
-    // getTableList(searchParams, '', true);
   }, [searchParams, list]);
 
   /**
@@ -67,15 +60,13 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: BaseProduct[]): React.ReactNode[] => {
-    return dataArr.map((item: BaseProduct) => {
-      console.log('卡片数据', item);
-
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       return (
         <AppCard
           className="card"
-          data={item._prod}
-          key={item._prod.id}
+          data={item}
+          key={item.prod.id}
           defaultKey={{
             name: 'name',
             size: 'price',
@@ -90,7 +81,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<BaseProduct>
+      <CardOrTable<IProduct>
         dataSource={dataSource}
         total={total}
         page={page}
@@ -102,7 +93,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
+        rowKey={(record: IProduct) => record.prod?.id || 'id'}
         toolBarRender={toolBarRender}
         {...rest}
       />

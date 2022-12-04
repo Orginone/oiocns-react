@@ -1,7 +1,8 @@
 import { XMarket } from '@/ts/base/schema';
-import { BaseProduct, Market } from '@/ts/core/market';
+import { Market } from '@/ts/core/market';
 import { myColumns, marketColumns } from './config';
 import userCtrl from '../setting/userCtrl';
+import IProduct from '@/ts/core/market/iproduct';
 /**
  * @desc: 仓库 展示区 控件
  * @return {*}
@@ -19,7 +20,7 @@ class StoreContent {
     id: '358266491960954880',
   } as XMarket); //TODO: 当前商店信息
 
-  public curProduct: BaseProduct | null = null;
+  public curProduct: IProduct | null = null;
   //TODO: 获取 最近使用应用
   constructor() {}
 
@@ -98,9 +99,8 @@ class StoreContent {
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
    * @param {Product} item
    */
-  public selectedProduct(item: BaseProduct) {
+  public selectedProduct(item: IProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改当前操作应用', item);
 
     this.curProduct = item;
@@ -127,7 +127,7 @@ class StoreContent {
    * @desc: 分享应用
    */
   public async ShareProduct(teamId: string, destIds: string[], destType: string) {
-    let { success, msg } = await this.curProduct!.Extend(teamId, destIds, destType);
+    let { success, msg } = await this.curProduct!.createExtend(teamId, destIds, destType);
 
     if (!success) {
       console.error(msg);

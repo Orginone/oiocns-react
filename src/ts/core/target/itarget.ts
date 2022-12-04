@@ -1,7 +1,8 @@
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import { Market, BaseProduct } from '../market';
+import { Market } from '../market';
+import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 
 /** 空间类型数据 */
@@ -23,7 +24,7 @@ export interface IMTarget {
   /** 开放市场 */
   publicMarkets: Market[];
   /** 拥有的产品/应用 */
-  ownProducts: BaseProduct[];
+  ownProducts: IProduct[];
   /** 我的购物车 */
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
@@ -43,7 +44,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns 商店列表
    */
-  getJoinMarkets(reload: boolean): Promise<Market[]>;
+  getJoinMarkets(reload?: boolean): Promise<Market[]>;
   /**
    * 查询开放市场
    * @param reload 是否强制刷新
@@ -56,7 +57,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns
    */
-  getOwnProducts(reload: boolean): Promise<BaseProduct[]>;
+  getOwnProducts(reload: boolean): Promise<IProduct[]>;
   /**
    * 查询购物车列表
    * @param reload 是否强制刷新
@@ -124,18 +125,24 @@ export interface IMTarget {
    * @param
    * @returns
    */
-  createMarket(
+  createMarket({
+    name,
+    code,
+    remark,
+    samrId,
+    ispublic,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string,
+    samrId: string;
     // 产品类型名
-    ispublic: boolean,
-  ): Promise<ResultType<schema.XMarket>>;
+    ispublic: boolean;
+  }): Promise<ResultType<schema.XMarket>>;
   /**
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
@@ -259,7 +266,7 @@ export interface ISpace extends IFlow {
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
+  getJoinedCohorts(reload?: boolean): Promise<ICohort[]>;
   /**
    * 创建群组
    * @param data 群组基本信息
@@ -380,7 +387,7 @@ export interface IPerson extends IMTarget, ISpace {
    * 获取职权树
    * @param reload 是否强制刷新
    */
-  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
+  selectAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
   /**
    * 设立单位
    * @param data 单位基本信息
@@ -411,7 +418,7 @@ export interface IPerson extends IMTarget, ISpace {
    * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getFriends(reload: boolean): Promise<schema.XTarget[]>;
+  getFriends(reload?: boolean): Promise<schema.XTarget[]>;
   /**
    * 申请添加好友
    * @param target 目标

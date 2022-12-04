@@ -1,7 +1,7 @@
+import Product from './product';
 import { XProduct } from '../../base/schema';
-import BaseProduct from './pbase';
 
-export default class webApp extends BaseProduct {
+export default class webApp extends Product {
   constructor(prod: XProduct) {
     super(prod);
   }
