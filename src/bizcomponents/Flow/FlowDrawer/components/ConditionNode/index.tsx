@@ -12,7 +12,7 @@ const ConditionNode = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-
+  /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
     selectedNode.conditions.push({
       pos: selectedNode.conditions.length + 1,
@@ -23,6 +23,7 @@ const ConditionNode = () => {
       type: 'NUMERIC',
       val: null,
     });
+
     setSelectedNode(selectedNode);
     setKey(key + 1);
   };

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Radio, RadioChangeEvent, Tree, Select, TreeProps } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
+import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
 import { Product } from '@/ts/core/market';
@@ -9,8 +9,6 @@ import { Product } from '@/ts/core/market';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel } from '@/ts/base';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
-import { IDepartment, IGroup } from '@/ts/core/target/itarget';
-
 interface Iprops {
   curProduct?: Product;
   shareType: '分配' | '共享';
@@ -37,8 +35,8 @@ const DestTypes = [
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
   const [isCompanySpace] = useState<boolean>(userCtrl.IsCompanySpace); //是否工作空间
-  const [CompanyList, setCompanyList] = useState<IGroup[]>([]); //集团列表
-  const [deptList, setDeptList] = useState<IDepartment[]>([]); //当前空间下的部门
+  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
+
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
   const [radio, setRadio] = useState<number>(1); //分配类型
   const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
@@ -79,7 +77,8 @@ const ShareRecent = (props: Iprops) => {
     setPersonsData([]);
     setIdentitysData([]);
     setCenterTreeData([]);
-    setSelectedTeamId('');
+    setSelectedTeamId('0');
+    setLeftTreeSelectedKeys([]);
     queryExtend();
   }, [radio]);
 
@@ -116,6 +115,8 @@ const ShareRecent = (props: Iprops) => {
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     console.log('selected', selectedKeys, info);
+    setLeftTreeSelectedKeys(selectedKeys);
+
     hasSelectRecord?.list?.lenght &&
       selfAppCtrl.ShareProduct(
         selectedTeamId,
@@ -385,6 +386,7 @@ const ShareRecent = (props: Iprops) => {
                 key: 'id',
                 children: 'children',
               }}
+              selectedKeys={leftTreeSelectedKeys}
               onSelect={onSelect}
               onCheck={handleCheckChange}
               treeData={leftTreeData}

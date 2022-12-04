@@ -4,6 +4,7 @@ import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { Button } from 'antd';
 // {  DefaultProps }  报错临时处理
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
@@ -26,6 +27,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
 
   const preview = () => {
+    console.log('design', design);
     previewRef.current?.preview(design);
   };
   const exit = () => {
@@ -39,11 +41,8 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
   const defaultDesign = {
     name: '新建流程',
     code: 'code',
-    formId: null,
-    formName: '',
-    appId: '',
-    appName: '',
-    remainHours: 240,
+    Remark: '',
+    BelongId: '',
     resource: {
       nodeId: 'ROOT',
       parentId: null,
@@ -68,13 +67,13 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
             type: 'CONDITION',
             conditions: [
               {
-                pos: 1,
+                pos: '1',
                 paramKey: 'price',
                 paramLabel: '金额',
                 key: 'LTE',
                 label: '≤',
                 type: 'NUMERIC',
-                val: 50000,
+                val: '50000',
                 valLabel: '',
               },
             ],
@@ -152,6 +151,12 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
 
   return (
     <>
+      <Button
+        onClick={() => {
+          preview();
+        }}>
+        测一下预览
+      </Button>
       <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} />
       <div className={cls['container']}>
         {/* conditionData */}
