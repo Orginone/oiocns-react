@@ -18,13 +18,14 @@ import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
 import SettingService from './service';
 import Department from '@/ts/core/target/department';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { RouteComponentProps } from 'react-router-dom';
 // import { IDepartment } from '@/ts/core/target/itarget';
 
 /**
  * 部门设置
  * @returns
  */
-const SettingDept: React.FC = () => {
+const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const setting = SettingService.getInstance();
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
@@ -162,23 +163,14 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
   useEffect(() => {
-    if (userCtrl.Company == undefined) {
-      Modal.info({
-        title: '提示',
-        content: (
-          <div>
-            <p>请选择加入的部门空间！</p>
-          </div>
-        ),
-        onOk() {
-          location.href = '/home';
-        },
-      });
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    } else {
+      initData();
+      // 刚进入的时候选中公司 TODO
+      setting.setCompanyID = userCtrl?.Company?.target.id + '';
+      setting.setRoot = userCtrl?.Company!.target;
     }
-    initData();
-    // 刚进入的时候选中公司 TODO
-    setting.setCompanyID = userCtrl?.Company?.target.id + '';
-    setting.setRoot = userCtrl?.Company!.target;
   }, ['', userCtrl?.Company]);
 
   useEffect(() => {
@@ -279,7 +271,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title={userCtrl.Company.target.name}
+            title={userCtrl?.Company?.target?.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}
