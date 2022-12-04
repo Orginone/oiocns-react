@@ -1,4 +1,4 @@
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 import {
   EllipsisOutlined,
   SettingOutlined,
@@ -10,7 +10,7 @@ import React from 'react';
 
 import cls from './index.module.less';
 interface Props {
-  dataSource: BaseProduct[];
+  dataSource: IProduct[];
 }
 const imgSrc =
   'https://gw.alipayobjects.com/zos/bmw-prod/f601048d-61c2-44d0-bf57-ca1afe7fd92e.svg';
@@ -41,15 +41,15 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
         return (
           <CheckCard
             className={cls.card}
-            key={item._prod.id}
+            key={item.prod.id}
             avatar={imgSrc}
-            title={item._prod.name}
+            title={item.prod.name}
             description={
               <Typography.Paragraph
                 type="secondary"
                 className={cls.decription}
                 ellipsis={{ rows: 3 }}>
-                {item._prod.remark}
+                {item.prod.remark}
               </Typography.Paragraph>
             }
             style={{ width: 260, height: 120 }}

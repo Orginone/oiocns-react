@@ -13,7 +13,7 @@ import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
@@ -23,7 +23,7 @@ type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配�
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
-  const [data, setData] = useState<BaseProduct[]>([]);
+  const [data, setData] = useState<IProduct[]>([]);
   const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
@@ -74,10 +74,10 @@ const StoreApp: React.FC = () => {
   };
 
   const RentlyApps = useMemo(() => {
-    let recentlyApps: BaseProduct[] = [];
+    let recentlyApps: IProduct[] = [];
     recentlyAppIds?.forEach((id: string) => {
       const prod = data.find((v) => {
-        return v._prod.id === id;
+        return v.prod.id === id;
       });
       prod && recentlyApps.push(prod);
     });
@@ -123,7 +123,7 @@ const StoreApp: React.FC = () => {
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
-  const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
@@ -131,7 +131,7 @@ const StoreApp: React.FC = () => {
         onClick: () => {
           SelfAppCtrl.curProduct = item;
           SelfAppCtrl.OpenApp(item);
-          history.push({ pathname: '/online', state: { appId: item._prod?.id } });
+          history.push({ pathname: '/online', state: { appId: item.prod?.id } });
         },
       },
       {
@@ -139,7 +139,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
+          history.push({ pathname: '/store/app/info', state: { appId: item.prod?.id } });
         },
       },
       {
