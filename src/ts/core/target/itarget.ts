@@ -413,7 +413,7 @@ export interface IPerson extends IMTarget, ISpace, ITarget {
    * @param reload 是否强制刷新
    * @return 加入的单位列表
    */
-  getJoinedCompanys(reload: boolean): Promise<ICompany[]>;
+  getJoinedCompanys(reload?: boolean): Promise<ICompany[]>;
   /**
    * 设立单位
    * @param data 单位基本信息
@@ -555,7 +555,7 @@ export interface ICompany extends IMTarget, ISpace, ITarget {
    * @param reload 是否强制刷新
    * @returns
    */
-  getDepartments(reload: boolean): Promise<IDepartment[]>;
+  getDepartments(reload?: boolean): Promise<IDepartment[]>;
   /**
    * 获取组织下的工作组（单位、部门、工作组）
    * @param reload 是否强制刷新
