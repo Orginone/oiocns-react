@@ -50,21 +50,6 @@ const generateList = (data: DataNode[]) => {
 };
 generateList(defaultData);
 
-const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
-  let parentKey: React.Key;
-  for (let i = 0; i < tree.length; i++) {
-    const node = tree[i];
-    if (node.children) {
-      if (node.children.some((item) => item.key === key)) {
-        parentKey = node.key;
-      } else if (getParentKey(key, node.children)) {
-        parentKey = getParentKey(key, node.children);
-      }
-    }
-  }
-  return parentKey!;
-};
-
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
@@ -79,8 +64,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
 }) => {
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [treeData, setTreeData] = useState<any[]>([]);
-
-  const [createTreeData, setCreateTreeData] = useState<any[]>([]);
 
   useEffect(() => {
     initData(false);
