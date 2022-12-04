@@ -48,6 +48,7 @@ const infoMenuItems = [
   },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
 ];
+
 const userInfoMenuItems = [
   { label: '好友设置', key: '/person/friend', icon: <UserOutlined /> },
   { label: '群组设置', key: '/person/cohort', icon: <TeamOutlined /> },
@@ -87,7 +88,6 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
       userCtrl?.Company === undefined
         ? userInfoMenuItems
         : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
-
     setMenu([{ ..._newMenu }, ...other]);
   };
   useEffect(() => {

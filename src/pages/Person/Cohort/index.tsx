@@ -124,7 +124,7 @@ const CohortConfig: React.FC = () => {
             okText: '确认',
             cancelText: '取消',
             onOk: async () => {
-              await userCtrl.User?.deleteCohort(item.target.id);
+              await userCtrl.Space.deleteCohort(item.target.id);
               getData();
               message.success('解散成功');
             },
@@ -148,7 +148,7 @@ const CohortConfig: React.FC = () => {
         key: 'exitCohort',
         label: '退出群聊',
         onClick: async () => {
-          await userCtrl.User.quitCohorts(item.target.id);
+          await userCtrl.Space.quitCohorts(item.target.id);
           getData();
           message.info('退出成功');
         },
@@ -195,7 +195,7 @@ const CohortConfig: React.FC = () => {
   };
   //申请加入群组确认事件
   const cohortHandleOk = async () => {
-    const data = await userCtrl.User?.applyJoinCohort(cohort?.target.id!);
+    const data = await userCtrl.Space?.applyJoinCohort(cohort?.target.id!);
     if (!data?.success) {
       message.error(data?.msg);
     } else message.info('申请加入成功');
