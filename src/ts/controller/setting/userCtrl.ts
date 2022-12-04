@@ -41,12 +41,8 @@ class UserController extends BaseController {
     }
   }
   /** 当前单位空间 */
-  get Space(): ICompany {
-    if (this._curSpace) {
-      return this._curSpace;
-    } else {
-      return { id: '', target: { id: '' } } as unknown as ICompany;
-    }
+  get Space(): ICompany | undefined {
+    return this._curSpace;
   }
   /** 当前空间数据 */
   get SpaceData(): SpaceType {
