@@ -2,6 +2,8 @@ import { model, schema } from '../../../base';
 import { TargetType } from '../../enum';
 
 export interface IIdentity {
+  /** 实体对象 */
+  target: schema.XIdentity;
   /** 当前身份Id */
   id: string;
   /**

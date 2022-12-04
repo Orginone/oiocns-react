@@ -17,24 +17,6 @@ export interface IAuthority {
   /** 职权下的身份 */
   identitys: IIdentity[];
   /**
-   * 创建身份
-   * @param name 名称
-   * @param code 编号
-   * @param remark 备注
-   * @returns
-   */
-  createIdentity(
-    name: string,
-    code: string,
-    remark: string,
-  ): Promise<model.ResultType<schema.XIdentity>>;
-  /**
-   * 删除身份
-   * @param id 身份Id
-   * @returns
-   */
-  deleteIdentity(id: string): Promise<model.ResultType<any>>;
-  /**
    * 创建子职权
    * @param name 名称
    * @param code 编号

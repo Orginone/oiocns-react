@@ -41,7 +41,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [_currentPostion, setPosition] = useState<any>({});
 
   const treeContainer = document.getElementById('templateMenu');
-  //变更岗位
+  //变更岗位 getOwnIdentitys
 
   // 操作内容渲染函数
   const renderOperation = (

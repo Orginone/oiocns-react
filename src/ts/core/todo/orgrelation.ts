@@ -89,7 +89,7 @@ class OrgTodo implements ITodoGroup {
         .map((a) => {
           return new ApprovalItem(a, rePassfun, reRejectfun);
         });
-      this._doList = res.data.result
+      this._todoList = res.data.result
         .filter((a) => {
           return a.status < CommonStatus.RejectStartStatus;
         })

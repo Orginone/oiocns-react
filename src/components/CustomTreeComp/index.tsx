@@ -1,5 +1,5 @@
 import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
-import { Dropdown, Input, MenuProps, Tree } from 'antd';
+import { Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { ReactElement, useMemo, useState } from 'react';
 import cls from './index.module.less';
@@ -151,6 +151,13 @@ const StoreClassifyTree: React.FC<TreeType> = ({
             ? childIcon
             : parentIcon}
           {node.searchTitle || node.title}
+          {node?.tag ? (
+            <Tag style={{ marginLeft: '6px' }} color={node.tag?.color}>
+              {node.tag?.txt}
+            </Tag>
+          ) : (
+            ''
+          )}
         </div>
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (

@@ -10,81 +10,109 @@ import {
   ShopOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
-import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { Breadcrumb, MenuProps } from 'antd';
-
-// 平台待办
-const systemTodo = [
-  { label: '好友申请', key: '/todo/friend', icon: <UserOutlined /> },
-  { label: '单位审核', key: '/todo/org', icon: <AuditOutlined /> },
-  {
-    label: '商店审核',
-    key: 'appAndStore',
-    icon: <ShopOutlined />,
-    children: [
-      {
-        label: '应用上架',
-        key: '/todo/product',
-        icon: <ShopOutlined />,
-      },
-      { label: '加入市场', key: '/todo/store', icon: <ShopOutlined /> },
-    ],
-  },
-  { label: '订单管理', key: '/todo/order', icon: <UnorderedListOutlined /> },
-];
+import { Badge, BadgeProps, Breadcrumb, MenuProps } from 'antd';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { TargetType } from '@/ts/core/enum';
 
 const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
   const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>();
-  const [currentTodo, setCurrentTodo] = useState<any>();
-  const renderMenu = () => {
-    console.log('yingyongdaiban', todoCtrl.AppTodo);
-    const todos = todoCtrl.AppTodo.map((m) => {
-      return {
+  const [key] = useCtrlUpdate(todoCtrl);
+
+  // 加载左侧平台待办菜单数据
+  const loadLeftMenus = async () => {
+    const orgCount = await todoCtrl.OrgTodo.getCount();
+    const data = await todoCtrl.OrgTodo.getTodoList(false);
+    const friend = data.filter((n) => n.Data.team.target.typeName === TargetType.Person);
+    const mcount = await todoCtrl.MarketTodo.getCount();
+    const pcount = await todoCtrl.PublishTodo.getCount();
+    const ocount = await todoCtrl.OrderTodo.getCount();
+    let newtodos = [];
+    const getBadgeProps = (count: number) => {
+      return { size: 'small', offset: [10, 0], count: count } as BadgeProps;
+    };
+    for (const m of todoCtrl.AppTodo) {
+      const count = await m.getCount();
+      newtodos.push({
         key: '/todo/app/' + m.id,
-        label: m.name,
+        label: <Badge {...getBadgeProps(count)}>{m.name}</Badge>,
         icon: <FundOutlined />,
-      };
-    });
-    const muneItems = [
+      });
+    }
+    setTodoMenu([
       {
         type: 'group',
         label: '平台待办',
-        children: systemTodo,
+        children: [
+          {
+            label: <Badge {...getBadgeProps(friend.length)}>好友申请</Badge>,
+            key: '/todo/friend',
+            icon: <UserOutlined />,
+          },
+          {
+            label: <Badge {...getBadgeProps(orgCount - friend.length)}>组织审核</Badge>,
+            key: '/todo/org',
+            icon: <AuditOutlined />,
+          },
+          {
+            label: <Badge {...getBadgeProps(pcount + mcount)}>商店审核</Badge>,
+            key: 'appAndStore',
+            icon: <ShopOutlined />,
+            children: [
+              {
+                label: <Badge {...getBadgeProps(pcount)}>上架审核</Badge>,
+                key: '/todo/product',
+                icon: <ShopOutlined />,
+              },
+              {
+                label: <Badge {...getBadgeProps(mcount)}>加入商店</Badge>,
+                key: '/todo/store',
+                icon: <ShopOutlined />,
+              },
+            ],
+          },
+          {
+            label: <Badge {...getBadgeProps(ocount)}>订单管理</Badge>,
+            key: '/todo/order',
+            icon: <UnorderedListOutlined />,
+          },
+        ],
       },
       {
         type: 'group',
         label: '应用待办',
-        children: todos,
+        children: newtodos,
       },
-    ];
-    setTodoMenu(muneItems as ItemType[]);
+    ]);
   };
-
   useEffect(() => {
-    const id = todoCtrl.subscribe(renderMenu);
-    return () => {
-      todoCtrl.unsubscribe(id);
-    };
-  }, []);
-
-  // 菜单跳转
-  const toNext = (e: any) => {
-    history.push(`${e.key}`);
-    const todo = e.key.indexOf('/todo/app/') > -1 ? e.key.replace('/todo/app/', '') : '';
-    setCurrentTodo(todo !== '' ? todoCtrl.currentAppTodo(todo) : undefined);
-  };
+    setTimeout(async () => {
+      if (todoCtrl.OrgTodo) {
+        await loadLeftMenus();
+      }
+    }, 10);
+  }, [key]);
 
   return (
     <ContentTemplate
       siderMenuData={todoMenu}
-      menuClick={toNext}
+      menuClick={(item) => {
+        if (item.key.startsWith('/todo/app/')) {
+          todoCtrl.setCurrentAppTodo(item.key.substring(10));
+        }
+        history.push(item.key);
+      }}
       contentTopLeft={
-        currentTodo && (
-          <Breadcrumb.Item key={currentTodo?.id}>{currentTodo?.name}</Breadcrumb.Item>
-        )
+        todoCtrl.CurAppTodo
+          ? [
+              <Breadcrumb.Item key="yingyongdaiban">应用待办</Breadcrumb.Item>,
+              <Breadcrumb.Item key={todoCtrl.CurAppTodo.id}>
+                {todoCtrl.CurAppTodo.name}
+              </Breadcrumb.Item>,
+            ]
+          : ''
       }>
-      {renderRoutes(route.routes)}
+      <div style={{ height: '100%' }}>{renderRoutes(route.routes)}</div>
     </ContentTemplate>
   );
 };

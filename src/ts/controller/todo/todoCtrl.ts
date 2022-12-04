@@ -14,7 +14,7 @@ class TodoController extends BaseController {
   private _orderTodo: ITodoGroup | undefined;
   private _marketTodo: ITodoGroup | undefined;
   private _appTodo: ITodoGroup[] = [];
-  private _currentAppTodo: ITodoGroup | undefined;
+  private _curAppTodo: ITodoGroup | undefined;
   constructor() {
     super();
     userCtrl.subscribePart(UserPartTypes.User, () => {
@@ -49,10 +49,17 @@ class TodoController extends BaseController {
     return this._pubTodo!;
   }
   /** 当前选中的应用待办 */
-  public currentAppTodo = (id: string) => {
-    return this._appTodo.find((n: ITodoGroup) => n.id === id);
+  public get CurAppTodo(): ITodoGroup | undefined {
+    return this._curAppTodo;
+  }
+  /** 设置选中应用待办 */
+  public setCurrentAppTodo = (id: string) => {
+    this._curAppTodo = this._appTodo.find((n: ITodoGroup) => n.id === id);
   };
-
+  /**当前好友待办数量 */
+  public firendTodoCount = () => {
+    this._orgTodo;
+  };
   /** 获取总的待办数量 */
   public async TaskCount(): Promise<number> {
     let sum = 0;

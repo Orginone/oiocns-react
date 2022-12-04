@@ -48,7 +48,9 @@ export default class Product implements IProduct {
     return await kernel.createSourceExtend({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: userCtrl.Company.target.id,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       destIds,
       destType,
       teamId,
@@ -64,7 +66,9 @@ export default class Product implements IProduct {
       sourceType: '产品',
       destIds,
       destType,
-      spaceId: userCtrl.Company.target.id,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       teamId,
     });
   }
@@ -75,7 +79,9 @@ export default class Product implements IProduct {
     return await kernel.queryExtendBySource({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: userCtrl.Company.target.id,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       destType,
       teamId,
     });

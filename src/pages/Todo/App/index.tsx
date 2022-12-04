@@ -2,61 +2,68 @@
 import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import PageCard from '../components/PageCard';
-import { RouteComponentProps } from 'react-router-dom';
 import { ProColumns } from '@ant-design/pro-components';
-
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { applicationTabs, tableOperation } from '../components';
+import { applicationTabs, statusMap, tableOperation } from '../components';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import { resetParams } from '@/utils/tools';
+import { Tag } from 'antd';
 
-type RouterParams = {
-  id: string;
+// 根据状态值渲染标签
+const renderItemStatus = (record: any) => {
+  const status = statusMap[record.status];
+  return <Tag color={status.color}>{status.text}</Tag>;
 };
-const AppTodo: React.FC<RouteComponentProps<RouterParams>> = (props) => {
-  const {
-    match: {
-      params: { id },
-    },
-  } = props;
+const AppTodo: React.FC = () => {
   const [pageData, setpageData] = useState<IApprovalItem[] | IApplyItem[]>();
   const [activeKey, setActiveKey] = useState<string>('1');
   const [needReload, setNeedReload] = useState<boolean>(false);
   const [total, setTotal] = useState<number>(0);
-  const columns: ProColumns<IApprovalItem | IApplyItem>[] = [
+  const columns: ProColumns<IApprovalItem>[] = [
     { title: '序号', valueType: 'index', width: 60 },
     { title: '当前流程', dataIndex: ['Data', 'flowInstance', 'title'] },
     { title: '申请人', dataIndex: ['Data', 'createUser'] },
     { title: '事项', dataIndex: ['Data', 'flowInstance', 'content'] },
-    { title: '状态', dataIndex: ['Data', 'status'] },
-    { title: '流程状态', dataIndex: ['Data', 'flowInstance', 'status'] },
-    { title: '更新时间', dataIndex: 'updateTime', valueType: 'dateTime' },
+    {
+      title: '状态',
+      dataIndex: ['Data', 'status'],
+      render: (_, record) => renderItemStatus(record.Data),
+    },
+    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
   ];
-  const loadList = async () => {
-    if (id) {
-      const currentTodo = todoCtrl.currentAppTodo(id);
-      if (!currentTodo) {
-        setpageData([]);
-        return;
-      }
+  const applyColumns: ProColumns<IApplyItem>[] = [
+    { title: '序号', valueType: 'index', width: 60 },
+    { title: '当前流程', dataIndex: ['Data', 'title'] },
+    { title: '审核人', dataIndex: ['Data', 'title'] },
+    { title: '事项', dataIndex: ['Data', 'content'] },
+    {
+      title: '状态',
+      dataIndex: ['Data', 'status'],
+      render: (_, record) => renderItemStatus(record.Data),
+    },
+    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
+  ];
+  const loadList = async (page: number, pageSize: number) => {
+    if (todoCtrl.CurAppTodo) {
       const code = {
         '1': 'getTodoList',
         '2': 'getDoList',
         '3': 'getApplyList',
         '4': 'getNoticeList',
       };
-      const list = await currentTodo[code[activeKey]]();
+      const list = await todoCtrl.CurAppTodo[code[activeKey]](
+        activeKey === '3' ? resetParams({ page, pageSize }) : null,
+      );
       console.log(code[activeKey], list);
       setpageData(list);
       setTotal(list.length);
+    } else {
+      setpageData([]);
     }
     setNeedReload(false);
   };
   useEffect(() => {
-    const id = todoCtrl.subscribe(loadList);
-    return () => todoCtrl.unsubscribe(id);
-  }, []);
-  useEffect(() => {
-    loadList();
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
@@ -69,8 +76,8 @@ const AppTodo: React.FC<RouteComponentProps<RouterParams>> = (props) => {
       {pageData && (
         <CardOrTableComp<IApprovalItem | IApplyItem>
           dataSource={pageData}
-          rowKey={(record) => record.Data.id}
-          columns={columns}
+          rowKey={(record) => record?.Data?.id || Math.random() * 10000}
+          columns={activeKey === '3' ? applyColumns : columns}
           total={total}
           onChange={loadList}
           operation={(item: IApplyItem | IApprovalItem) =>

@@ -1044,7 +1044,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
    */
   public async queryAuthorityIdentitys(
-    params: model.IDWithBelongPageReq,
+    params: model.IDBelongReq,
   ): Promise<model.ResultType<schema.XIdentityArray>> {
     return await this.request({
       module: 'target',
