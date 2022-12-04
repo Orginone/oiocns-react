@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -11,25 +11,33 @@ import Appimg from '@/assets/img/appLogo.png';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { DestTypes } from '@/constants/const';
+// 根据以获取数据 动态产生tab
+const items = DestTypes.map((k) => {
+  return { tab: k.label, key: k.label };
+});
 
 const StoreAppInfo: React.FC = () => {
   // const BtnsList = ['编辑应用分配'];
+  const [list, setList] = useState<any>([]);
+  const [tabKey, setTabKey] = useState('组织');
   useEffect(() => {
-    console.log('{SelfAppCtrl.curProduct?._prod.version}', SelfAppCtrl.curProduct);
+    console.log('{SelfAppCtrl.curProduct?._prod.version}');
+    getExtend();
   }, []);
 
-  const history = useHistory();
-  // const handleBtnsClick = (item: { text: string }) => {
-  //   switch (item.text) {
-  //     case '编辑应用分配':
-  //       console.log('编辑应用分配编辑应用分配');
+  const getExtend = useCallback(async () => {
+    const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
+    console.log('请求分享/分配信息', tabKey, res);
+    setList(res?.data?.result ?? []);
+  }, [tabKey]);
 
-  //       break;
-  //     default:
-  //       console.log('点击事件未注册', item.text);
-  //       break;
-  //   }
-  // };
+  const history = useHistory();
+  function onTabChange(key: any) {
+    console.log('onTabChange', key);
+    setTabKey(key);
+    getExtend();
+  }
   const renderOperation = (
     item: MarketTypes.ProductType,
   ): MarketTypes.OperationType[] => {
@@ -96,22 +104,17 @@ const StoreAppInfo: React.FC = () => {
         </div>
       </Card>
       <div className={cls['page-content-table']}>
-        <AppShowComp
-          headerTitle="已分配单位"
-          queryFun={userCtrl.User.getOwnProducts}
-          list={[]}
-          columns={SelfAppCtrl.getColumns('appInfo')}
-          renderOperation={renderOperation}
-        />
-        {/* <AppShowComp
-          service={service}
-          toolBarRender={() => <BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          headerTitle="已分配单位"
-          columns={service.getMyappColumns()}
-          renderOperation={renderOperation}
-          searchParams={''}
-          style={{ paddingTop: 0 }}
-        /> */}
+        <Card title="已共享信息" tabList={items} onTabChange={onTabChange}>
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              queryFun={userCtrl.User?.getOwnProducts}
+              showChangeBtn={false}
+              list={list}
+              columns={SelfAppCtrl.getColumns('appInfo')}
+              renderOperation={renderOperation}
+            />
+          </div>
+        </Card>
       </div>
     </div>
   );

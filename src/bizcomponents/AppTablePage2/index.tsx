@@ -14,6 +14,7 @@ interface AppShowCompType {
   renderOperation?: any; //渲染操作按钮
   headerTitle?: string; //表格头部文字
   style?: React.CSSProperties;
+  [key: string]: any;
 }
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
@@ -26,6 +27,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   toolBarRender,
   renderOperation,
   style,
+  ...rest
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -34,11 +36,9 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const parentRef = useRef<any>(null); //父级容器Dom
 
   useEffect(() => {
-    console.log('展示数据', list);
-
-    // if (!searchParams || !list?.length) {
-    //   return;
-    // }
+    if (!searchParams || !list?.length) {
+      return;
+    }
 
     if (searchParams.status === '全部') {
       setTotal(list.length);
@@ -103,6 +103,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         onChange={handlePageChange}
         rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
         toolBarRender={toolBarRender}
+        {...rest}
       />
     </div>
   );

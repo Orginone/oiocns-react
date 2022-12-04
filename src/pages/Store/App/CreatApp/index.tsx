@@ -4,7 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem, Resources } from './config';
 import { Form, Card, Row, Col, Space, PageHeader, message } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
-import StoreContent from '@/ts/controller/store/content';
+import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 const CreatApp: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
@@ -18,11 +18,11 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
     const list = resources.map((n: Resources) => {
       return {
         ...n,
-        components: n?.components ? JSON.stringify(n.components) : null,
-        flows: n.flows ? JSON.stringify(n.flows) : null,
+        components: n?.components ? JSON.stringify(n.components) : '',
+        flows: n.flows ? JSON.stringify(n.flows) : undefined,
       };
     });
-    const res = await StoreContent.createProduct({
+    const res = await selfAppCtrl.createProduct({
       ...values,
       resources: list,
     });
