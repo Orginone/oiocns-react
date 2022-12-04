@@ -24,7 +24,7 @@ type RouterParams = {
   id: string;
 };
 /**
- * 岗位设置
+ * 岗位设置    由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
