@@ -84,7 +84,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   }, []);
 
   const initData = async () => {
-    const data = await userCtrl?.Space?.getDepartments();
+    const data = await userCtrl?.Space?.getDepartments(false);
     if (data?.length) {
       const tree = data.map((n) => {
         return createTeeDom(n);
