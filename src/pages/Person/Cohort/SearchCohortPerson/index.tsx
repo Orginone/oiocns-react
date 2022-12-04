@@ -21,7 +21,7 @@ const CohortPerson: React.FC<indexType> = (props) => {
 
   const [value, setValue] = useState<string>();
   const getTableList = async () => {
-    const res = await props.cohort.getMember();
+    const res = await props.cohort.getMember(false);
     setData(res);
   };
   const keyWordChange = async (e: any) => {

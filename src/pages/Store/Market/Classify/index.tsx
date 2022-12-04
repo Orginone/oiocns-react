@@ -27,24 +27,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [dataSource, setDataSource] = useState<any>([]); // table数据
 
   /**
-   * @description: 实例化商店对象
-   * @return {*}
-   */
-  // const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
-
-  /**
    * @description: 创建商店
    * @param {any} formData
    * @return {*}
    */
   const onOk = (formData: any) => {
-    marketCtrl.Market.createMarket(
-      formData.name,
-      formData.code,
-      formData.remark,
-      formData.samrId,
-      formData.ispublic,
-    );
+    marketCtrl.Market.createMarket({ ...formData });
     setIsAddOpen(false);
   };
 
@@ -66,7 +54,9 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const onChange = async (val: any) => {
     const res = await marketCtrl.Market.getMarketByCode(val.target.value);
-    setDataSource(res);
+    if (res?.success) {
+      setDataSource(res.data.result);
+    }
   };
 
   /**
@@ -76,9 +66,9 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onDeleteOrQuitOk = () => {
     setIsDeleteOpen(false);
     {
-      // deleOrQuit === 'delete'
-      //   ? marketCtrl.getCurrentMarket.deleteMarket(treeDataObj?.id)
-      //   : marketCtrl.quitMarket(treeDataObj?.id);
+      deleOrQuit === 'delete'
+        ? marketCtrl.Market.deleteMarket(treeDataObj?.id)
+        : marketCtrl.Market.quitMarket(treeDataObj?.id);
     }
   };
 
@@ -96,6 +86,27 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onClose = () => {
     setIsDetailOpen(false);
   };
+
+  useEffect(() => {
+    marketCtrl.Market.getJoinMarkets(false).then((res) => {
+      let arr: any = res.map((itemModel: any, index: any) => {
+        const item = itemModel.market;
+        let arrs = ['基础详情', '用户管理'];
+        arrs.push(`${item.belongId === Person.target.id ? '删除商店' : '退出商店'}`);
+        return {
+          title: item.name,
+          key: `0-${index}`,
+          id: item.id,
+          node: itemModel,
+          children: [],
+          belongId: item.belongId,
+          menus: arrs,
+        };
+      });
+      setList(arr);
+    });
+  }, []);
+
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.marketList, () => {
       setList([...marketCtrl.marketList]);
@@ -217,6 +228,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
+        marketCtrl.setCurrentMarket(node?.node);
         // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:

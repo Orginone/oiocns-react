@@ -1,14 +1,16 @@
+import { Product } from '@/ts/core/market';
 import { common, faildResult, kernel, model, schema } from '../../base';
-import { Market, BaseProduct } from '../market';
+import { Market } from '../market';
 import { TargetType } from '../enum';
 import { IMTarget } from './itarget';
 import FlowTarget from './flow';
 import consts from '../consts';
+import IProduct from '../market/iproduct';
 
 export default class MarketTarget extends FlowTarget implements IMTarget {
   joinedMarkets: Market[];
   publicMarkets: Market[];
-  ownProducts: BaseProduct[];
+  ownProducts: IProduct[];
   stagings: schema.XStaging[];
   usefulProduct: schema.XProduct[];
   usefulResource: Map<string, schema.XResource[]>;
@@ -42,7 +44,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       },
     });
   }
-  public async getOwnProducts(reload: boolean = false): Promise<BaseProduct[]> {
+  public async getOwnProducts(reload: boolean = false): Promise<IProduct[]> {
     if (!reload && this.ownProducts.length > 0) {
       return this.ownProducts;
     }
@@ -56,7 +58,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success && res.data.result) {
       this.ownProducts = res.data.result.map((a) => {
-        return new BaseProduct(a);
+        return new Product(a);
       });
     }
     return this.ownProducts;
@@ -236,18 +238,24 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  public async createMarket(
+  public async createMarket({
+    name,
+    code,
+    remark,
+    samrId,
+    ispublic = true,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string,
+    samrId: string;
     // 产品类型名
-    ispublic: boolean = true,
-  ): Promise<model.ResultType<schema.XMarket>> {
+    ispublic: boolean;
+  }): Promise<model.ResultType<schema.XMarket>> {
     const res = await kernel.createMarket({
       name,
       code,
@@ -257,6 +265,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
+    console.log('创建市场的结果', res);
+
     if (res.success) {
       this.joinedMarkets.push(new Market(res.data!));
     }
@@ -299,7 +309,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this.ownProducts.push(new BaseProduct(res.data!));
+      this.ownProducts.push(new Product(res.data!));
     }
     return res;
   };
@@ -366,7 +376,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success) {
       this.ownProducts = this.ownProducts.filter((prod) => {
-        return prod.id != id;
+        return prod.prod.id != id;
       });
     }
     return res;

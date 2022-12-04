@@ -13,11 +13,10 @@ class MarketController extends BaseController {
   /** 当前操作的市场 */
   private _curMarket: IMarket | undefined;
   private _marketList: any[] = [];
-  /**
-   * @description: 搜索到的商店
-   * @return {*}
-   */
+  /** 搜索到的商店 */
   public searchMarket: any;
+  /** 所有的用户 */
+  public marketMenber: any;
 
   constructor() {
     super();
@@ -50,7 +49,9 @@ class MarketController extends BaseController {
   }
   /** 切换市场 */
   public setCurrentMarket(market: Market) {
+    console.log('切换市场', market);
     this._curMarket = market;
+    this.getMember();
     this.changCallback();
   }
 
@@ -79,5 +80,68 @@ class MarketController extends BaseController {
 
     this.changCallbackPart(MarketCallBackTypes.marketList);
   }
+
+  /**
+   * @description: 创建市场
+   * @param {any} marckt
+   * @return {*}
+   */
+  public async createMarket(marckt: any) {
+    await this._target?.createMarket({ ...marckt });
+    this.changCallback();
+  }
+
+  /**
+   * @description: 删除市场
+   * @param {string} id
+   * @return {*}
+   */
+  public async deleteMarket(id: string) {
+    await this._target?.deleteMarket(id);
+    this.changCallback();
+  }
+
+  /**
+   * @description: 退出市场
+   * @param {string} id
+   * @return {*}
+   */
+  public async quitMarket(id: string) {
+    await this._target?.quitMarket(id);
+    this.changCallback();
+  }
+
+  /**
+   * @description: 根据编号查询市场
+   * @param {string} name
+   * @return {*}
+   */
+  public async getMarketByCode(name: string) {
+    await this._target?.getMarketByCode(name);
+    this.changCallback();
+  }
+
+  /**
+   * @description: 获取市场里的所有用户
+   * @return {*}
+   */
+  public async getMember() {
+    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
+    }
+    return this.marketMenber;
+  }
+
+  /**
+   * @description: 移出市场里的成员
+   * @param {string} targetIds
+   * @return {*}
+   */
+  public removeMember = async (targetIds: string[]) => {
+    console.log('移出成员ID合集', targetIds);
+    const res = await this._curMarket?.removeMember(targetIds);
+    console.log('移出成员', res);
+  };
 }
 export default new MarketController();
