@@ -256,6 +256,8 @@ export interface ICohort {
   authorityTree: IAuthority | undefined;
   /** 群组成员 */
   children: schema.XTarget[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
 
   /**
    * 更新群组信息
@@ -281,8 +283,16 @@ export interface ICohort {
    * @param targets
    */
   removeMember(ids: string[], typeName: TargetType): Promise<ResultType<any>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 查询单位
    * @param code 单位的信用代码
@@ -308,6 +318,8 @@ export interface IPerson extends IMTarget, IFlowTarget {
   joinedCompany: ICompany[];
   /** 空间类型数据 */
   getSpaceData: SpaceType;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新人员
    * @param data 人员基础信息
@@ -326,8 +338,16 @@ export interface IPerson extends IMTarget, IFlowTarget {
    * @return 加入的单位列表
    */
   getJoinedCompanys(reload: boolean): Promise<ICompany[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 创建群组
    * @param data 群组基本信息
@@ -457,6 +477,8 @@ export interface ICompany extends IMTarget, IFlowTarget {
   joinedGroup: IGroup[];
   /** 我加入的群组 */
   joinedCohort: ICohort[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新单位
    * @param data 单位基础信息
@@ -524,8 +546,16 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns
    */
   getPersons(reload: boolean): Promise<schema.XTarget[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取单位下的部门（单位、部门）
    * @param reload 是否强制刷新
@@ -597,6 +627,8 @@ export interface IGroup {
   subGroup: IGroup[];
   /** 子组织类型 */
   subTypes: TargetType[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新集团
    * @param data 集团基本信息
@@ -608,8 +640,16 @@ export interface IGroup {
    * @returns
    */
   getJoinedGroups(reload: boolean): Promise<schema.XTarget[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -652,10 +692,20 @@ export interface IDepartment {
   departments: IDepartment[];
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /** 更新部门 */
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取部门人员
    * @param reload 是否强制刷新
@@ -694,10 +744,20 @@ export interface IWorking {
   workings: IWorking[];
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /** 更新工作组 */
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取工作组
    * @param reload 是否强制刷新
