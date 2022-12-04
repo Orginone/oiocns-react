@@ -10,21 +10,22 @@ export const columns: ColumnsType<any> = [
   },
   {
     title: '账号',
-    dataIndex: 'caption',
+    dataIndex: 'code',
   },
   {
     title: '昵称',
-    dataIndex: 'marketId',
+    dataIndex: 'name',
   },
   {
     title: '姓名',
-    dataIndex: 'typeName',
+    dataIndex: ['team', 'name'],
+  },
+  {
+    title: '备注',
+    dataIndex: ['team', 'remark'],
   },
   {
     title: '手机号',
-    dataIndex: 'sellAuth',
+    dataIndex: ['team', 'code'],
   },
 ];
-
-
-

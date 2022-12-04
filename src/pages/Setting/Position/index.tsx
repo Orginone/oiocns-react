@@ -8,7 +8,6 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
 import { schema } from '@/ts/base';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import EditCustomModal from './components/EditCustomModal';
@@ -18,8 +17,9 @@ import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import { XTarget } from '@/ts/base/schema';
 type RouterParams = {
   id: string;
 };
@@ -37,6 +37,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false);
+  const [indentity, setIndentity] = useState<IIdentity>();
 
   const [_currentPostion, setPosition] = useState<any>({});
 
@@ -89,6 +90,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   };
 
   const [authTree, setauthTree] = useState<IAuthority>();
+  const [personData, setPersonData] = useState<XTarget[]>();
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -100,9 +102,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
    * */
   useEffect(() => {}, []);
 
-  useEffect(() => {
-    initData();
-  }, [selectId]);
+  useEffect(() => {}, [selectId]);
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
@@ -130,13 +130,6 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   // 选中树的时候操作
   const setTreeCurrent = (current: schema.XTarget) => {};
 
-  const initData = async () => {
-    const cohort = await userCtrl.getCohortList();
-    const data = cohort.filter((obj) => obj.target.id == id);
-    await data[0].selectAuthorityTree(false);
-    setauthTree(data[0].authorityTree);
-  };
-
   // 标题tabs页
   const TitleItems = [
     {
@@ -159,7 +152,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         <Button
           type="link"
           onClick={() => {
-            setIsCreateDept(false);
+            setIsOpenModal(true);
+            setIndentity(indentity);
           }}>
           编辑
         </Button>
@@ -172,12 +166,16 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="名称">管理员</Descriptions.Item>
-          <Descriptions.Item label="编码">super-admin</Descriptions.Item>
-          <Descriptions.Item label="创建人">小明</Descriptions.Item>
-          <Descriptions.Item label="创建时间">2022-11-17 15:34:57</Descriptions.Item>
+          <Descriptions.Item label="名称">{indentity?.target.name}</Descriptions.Item>
+          <Descriptions.Item label="编码">{indentity?.target.code}</Descriptions.Item>
+          <Descriptions.Item label="创建人">
+            {indentity?.target.createUser}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建时间">
+            {indentity?.target.createTime}
+          </Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            系统生成的对应组织的权责身份
+            {indentity?.target.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -209,7 +207,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
-                dataSource={dataSource as any}
+                dataSource={personData as any}
                 rowKey={'id'}
                 operation={renderOperation}
                 columns={columns as any}
@@ -236,6 +234,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         title={isCreateDept ? '新增' : '编辑'}
         onOk={onOk}
         handleOk={handleOk}
+        defaultData={indentity!}
       />
       {/* 添加成员 */}
       <AddPersonModal
@@ -275,7 +274,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
               setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
               currentKey={''}
-              authTree={authTree!}
+              callBack={setIndentity}
+              personCallBack={setPersonData}
             />,
             treeContainer,
           )
