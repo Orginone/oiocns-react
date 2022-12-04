@@ -17,7 +17,6 @@ import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
@@ -48,7 +47,7 @@ const StoreApp: React.FC = () => {
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v._prod.source);
+      typeSet.add(v._prod?.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -202,7 +201,6 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User?.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={SelfAppCtrl.getColumns('myApp')}
