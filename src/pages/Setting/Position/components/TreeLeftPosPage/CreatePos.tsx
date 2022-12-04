@@ -1,13 +1,17 @@
 import { Input, Button } from 'antd';
-import MarketClassifyTree from '@/components/CustomTreeComp';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+
+import { schema } from '@/ts/base';
+import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 
 type CreateGroupPropsType = {
   createTitle: string;
-  onClick?: () => void;
+  currentKey: string;
+  setCurrent: (current: schema.XTarget) => void;
+  handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
 };
 
 const items: DataNode[] = [
@@ -25,14 +29,7 @@ const items: DataNode[] = [
   },
 ];
 
-const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
-  // const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  // const [searchValue, setSearchValue] = useState('');
-  // const [autoExpandParent, setAutoExpandParent] = useState(true);
-  // const [treeData, setTreeData] = useState<{}>([]);
-  // const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-  // const [isOpen, setIsOpen] = useState<boolean>(false);
-
+const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
   useEffect(() => {
     initData();
   }, []);
@@ -42,7 +39,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
-
   const [selectMenu, setSelectMenu] = useState<string>('');
 
   const handleMenuClick = (key: string, data: any) => {
@@ -59,6 +55,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const menu = ['更改岗位名称', '删除'];
   const positionList = (
     <MarketClassifyTree
+      searchable
       childIcon={<UserOutlined />}
       key={selectMenu}
       handleMenuClick={handleMenuClick}
@@ -71,20 +68,11 @@ const CreatePosition: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
 
   return (
     <div>
-      <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
-        {createTitle}
-      </Button>
-
       <div className={cls.topMes}>
-        <Input
-          size="middle"
-          className={cls.inputStyle}
-          placeholder="搜索岗位"
-          prefix={<SearchOutlined />}
-          onChange={onChange}
-        />
+        <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
+          新增岗位
+        </Button>
 
-        {/* <div className={cls.joingroup}>创建的岗位</div> */}
         {positionList}
       </div>
     </div>

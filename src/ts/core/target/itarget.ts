@@ -261,6 +261,9 @@ export interface ISpace extends IFlow {
   joinedCohort: ICohort[];
   /** 空间类型数据 */
   spaceData: SpaceType;
+  /**空间信息 */
+  target: schema.XTarget;
+
   /**
    * @description: 查询我加入的群
    * @param reload 是否强制刷新

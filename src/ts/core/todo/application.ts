@@ -11,6 +11,9 @@ class ApplicationTodo implements ITodoGroup {
   get name(): string {
     return this._name;
   }
+  get id(): string {
+    return this._id;
+  }
   constructor(id: string, name: string) {
     this._id = id;
     this._name = name;
@@ -171,6 +174,7 @@ class ApplyItem implements IApplyItem {
 export const loadAppTodo = async () => {
   const appTodo: ITodoGroup[] = [];
   const res = await kernel.queryApprovalProduct();
+  console.log('queryApprovalProduct', res);
   if (res.success) {
     res.data.forEach((a) => {
       appTodo.push(new ApplicationTodo(a.id, a.name));

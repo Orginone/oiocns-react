@@ -96,7 +96,6 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       '3': 'getApplyList',
     };
     const data = await todoCtrl.MarketTodo[listStatusCode[activeKey]](needReload);
-    console.log(data);
     setPageData(data);
     setPageTotal(data.length);
     setNeedReload(false);

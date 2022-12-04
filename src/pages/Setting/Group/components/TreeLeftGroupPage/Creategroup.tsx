@@ -1,15 +1,13 @@
 import { Button } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
-
 import cls from './index.module.less';
-import MarketClassifyTree from '@/components/CustomTreeComp';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
-import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
-import { getUuid } from '@/utils/tools';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { getUuid } from '@/utils/tools';
+import MarketClassifyTree from '@/components/CustomTreeComp';
 
 const x = 3;
 const y = 2;
@@ -52,6 +50,21 @@ const generateList = (data: DataNode[]) => {
 };
 generateList(defaultData);
 
+const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
+  let parentKey: React.Key;
+  for (let i = 0; i < tree.length; i++) {
+    const node = tree[i];
+    if (node.children) {
+      if (node.children.some((item) => item.key === key)) {
+        parentKey = node.key;
+      } else if (getParentKey(key, node.children)) {
+        parentKey = getParentKey(key, node.children);
+      }
+    }
+  }
+  return parentKey!;
+};
+
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
@@ -65,27 +78,31 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   setCurrent,
 }) => {
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
-
   const [treeData, setTreeData] = useState<any[]>([]);
-  const setting = SettingService.getInstance();
+
+  const [createTreeData, setCreateTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    // 如果新增部门，就需要重新初始化树TODO
-    if (userCtrl?.Company) {
-      if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
-        userCtrl.Company.departments = [];
-      }
-      initData(true);
-    }
+    initData(false);
   }, [key]);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.Company?.getDepartments(reload);
+    const data = await userCtrl?.Company?.getJoinedGroups(reload);
+    // 创建的集团， 加入的集团
     if (data?.length) {
-      const tree = data.map((n) => {
+      const tree = data.map((n: any) => {
+        return createTeeDom(n);
+      });
+      const data2 = data.filter((n: any) => {
+        if (n.target.createUser === userCtrl.User.target.id) {
+          return createTeeDom(n);
+        }
+      });
+      const tree2 = data2.map((n: any) => {
         return createTeeDom(n);
       });
       setTreeData(tree);
+      setCreateTreeData(tree2);
     }
   };
   const createTeeDom = (n: IDepartment) => {
@@ -121,7 +138,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     if (children) {
       return;
     }
-    const deptChild: any[] = await target.getDepartments();
+    const deptChild: any[] = await target.getSubGroups(false);
+    console.log(deptChild);
 
     setTreeData((origin) =>
       updateTreeData(
@@ -133,13 +151,14 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   };
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
+    selectedKeys;
     if (info.selected) {
       setCurrent(info.node.target.target);
-      setting.setCurrTreeDeptNode(info.node.target.target.id);
     }
   };
 
-  const menu = ['新增部门'];
+  const menu = ['新增集团'];
+
   return (
     <div>
       <div className={cls.topMes}>
@@ -150,15 +169,23 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           {createTitle}
         </Button>
         <MarketClassifyTree
-          // key={selectMenu}
-          // isDirectoryTree
-          // handleTitleClick={handleTitleClick}
+          id={key}
+          showIcon
+          searchable
+          handleMenuClick={handleMenuClick}
+          treeData={createTreeData}
+          title={'创建集团'}
+          menu={menu}
+          loadData={loadDept}
+          onSelect={onSelect}
+        />
+        <MarketClassifyTree
           id={key}
           showIcon
           searchable
           handleMenuClick={handleMenuClick}
           treeData={treeData}
-          title={'内设机构'}
+          title={'加入集团'}
           menu={menu}
           loadData={loadDept}
           onSelect={onSelect}

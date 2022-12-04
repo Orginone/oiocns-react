@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space, Modal } from 'antd';
+import { Card, Button, Descriptions, Space } from 'antd';
 // import { dataSource } from './datamock';
 import { columns } from './config';
 import Title from 'antd/lib/typography/Title';
@@ -19,6 +19,7 @@ import SettingService from './service';
 import Department from '@/ts/core/target/department';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { RouteComponentProps } from 'react-router-dom';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 // import { IDepartment } from '@/ts/core/target/itarget';
 
 /**
@@ -37,7 +38,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
-
+  const [authorityTree, setAuthorityTree] = useState<IAuthority>();
   const treeContainer = document.getElementById('templateMenu');
   // 操作内容渲染函数
   const renderOperation = (
@@ -124,8 +125,15 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     setSelectId(current.id);
     setting.setCurrTreeDeptNode(current.id);
 
-    new Department(SelectDept!).getPerson().then((e) => {
+    const dept = new Department(SelectDept!);
+
+    dept.getPerson().then((e) => {
       setDataSource(e);
+    });
+    dept.selectAuthorityTree(false).then((auths) => {
+      if (auths) {
+        setAuthorityTree(auths);
+      }
     });
   };
 
@@ -244,7 +252,9 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         <Button
           type="link"
           onClick={() => {
-            setIsSetPost(true);
+            if (authorityTree) {
+              setIsSetPost(true);
+            }
           }}>
           身份设置
         </Button>
@@ -332,7 +342,18 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         handleOk={handleOk}
       />
       {/* 对象设置 */}
-      <AddPostModal title={'身份设置'} open={isSetPost} onOk={onOk} handleOk={onOk} />
+      <AddPostModal
+        title={'身份设置'}
+        open={isSetPost}
+        onOk={() => {
+          setIsSetPost(false);
+        }}
+        handleOk={() => {
+          setIsSetPost(false);
+        }}
+        datasource={authorityTree}
+      />
+
       {/* 左侧树 */}
       {treeContainer
         ? ReactDOM.createPortal(

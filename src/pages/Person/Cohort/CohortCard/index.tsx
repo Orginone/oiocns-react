@@ -32,7 +32,9 @@ const CohortCardComp: React.FC<CohortCardType> = ({
     getname();
   }, []);
   const getname = async () => {
-    const res = (await data.getMember()).filter((obj) => obj.id === data.target.belongId);
+    const res = (await data.getMember(false)).filter(
+      (obj) => obj.id === data.target.belongId,
+    );
     setName(res[0].team?.name!);
   };
 

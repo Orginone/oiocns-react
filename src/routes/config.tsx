@@ -140,7 +140,7 @@ const TodoRouter: IRouteConfig[] = [
         ],
       },
       {
-        path: '/todo/app',
+        path: '/todo/app/:id',
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,

@@ -4,8 +4,8 @@ import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
-import { cohortColumn } from '@/components/CardOrTableComp/config';
-import { updateCohortColumn } from '@/components/CardOrTableComp/config';
+import { cohortColumn } from './column';
+import { updateColumn } from './column/index';
 import cls from './index.module.less';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
@@ -37,19 +37,19 @@ const CohortConfig: React.FC = () => {
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
-  const [chatKey] = useCtrlUpdate(chatCtrl);
+  const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
     getData();
   }, [chatKey]);
   const getData = async () => {
     setData(
       (await userCtrl.getCohortList())?.filter(
-        (obj) => obj.target.belongId == userCtrl.User?.target.id,
+        (obj) => obj.target.belongId == userCtrl.Space?.target.id,
       ),
     );
     setJoinData(
       (await userCtrl.getCohortList())?.filter(
-        (obj) => obj.target.belongId != userCtrl.User?.target.id,
+        (obj) => obj.target.belongId != userCtrl.Space?.target.id,
       ),
     );
   };
@@ -283,7 +283,7 @@ const CohortConfig: React.FC = () => {
                     onCancel: () => setOpen(false),
                   }}
                   open={open}
-                  columns={updateCohortColumn as any}
+                  columns={updateColumn as any}
                   setOpen={setOpen}
                   item={item}
                   callBack={getData}
