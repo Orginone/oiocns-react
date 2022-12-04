@@ -63,6 +63,13 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
 
   useEffect(() => {
     const id = todoCtrl.subscribe(renderMenu);
+
+    const todo =
+      location.pathname.indexOf('/todo/app/') > -1
+        ? location.pathname.replace('/todo/app/', '')
+        : '';
+    setCurrentTodo(todo !== '' ? todoCtrl.currentAppTodo(todo) : undefined);
+    console.log(todoCtrl.currentAppTodo(todo));
     return () => {
       todoCtrl.unsubscribe(id);
     };
@@ -73,16 +80,21 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     history.push(`${e.key}`);
     const todo = e.key.indexOf('/todo/app/') > -1 ? e.key.replace('/todo/app/', '') : '';
     setCurrentTodo(todo !== '' ? todoCtrl.currentAppTodo(todo) : undefined);
+    console.log(todoCtrl.currentAppTodo(todo));
   };
-
   return (
     <ContentTemplate
       siderMenuData={todoMenu}
       menuClick={toNext}
       contentTopLeft={
-        currentTodo && (
-          <Breadcrumb.Item key={currentTodo?.id}>{currentTodo?.name}</Breadcrumb.Item>
-        )
+        currentTodo
+          ? [
+              <Breadcrumb.Item key="yingyongdaiban">应用待办</Breadcrumb.Item>,
+              <Breadcrumb.Item key={currentTodo?.id}>
+                {currentTodo?.name}
+              </Breadcrumb.Item>,
+            ]
+          : ''
       }>
       {renderRoutes(route.routes)}
     </ContentTemplate>
