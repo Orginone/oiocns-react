@@ -110,6 +110,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   const resetTreeData = useMemo(() => {
     const loop = (data: DataNode[]): DataNode[] =>
       data?.map((item) => {
+        console.log(item);
         const strTitle = item[fieldNames.title] as string;
         const index = strTitle.indexOf(searchValue);
         const beforeStr = strTitle.substring(0, index);
