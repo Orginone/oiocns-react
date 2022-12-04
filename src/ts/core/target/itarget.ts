@@ -125,18 +125,24 @@ export interface IMTarget {
    * @param
    * @returns
    */
-  createMarket(
+  createMarket({
+    name,
+    code,
+    remark,
+    samrId,
+    ispublic,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string,
+    samrId: string;
     // 产品类型名
-    ispublic: boolean,
-  ): Promise<ResultType<schema.XMarket>>;
+    ispublic: boolean;
+  }): Promise<ResultType<schema.XMarket>>;
   /**
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
