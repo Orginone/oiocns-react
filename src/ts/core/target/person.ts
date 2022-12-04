@@ -34,7 +34,7 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedCompany = [];
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
   }
-  public get getSpaceData(): SpaceType {
+  public get spaceData(): SpaceType {
     return {
       id: this.target.id,
       name: '个人空间',

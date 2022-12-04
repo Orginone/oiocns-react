@@ -61,13 +61,13 @@ const OrganizationalUnits = () => {
 
   const refreshUI = () => {
     const all: SpaceType[] = userCtrl.User.joinedCompany.map((item) => {
-      return item.getSpaceData;
+      return item.spaceData;
     });
-    all.unshift(userCtrl.User.getSpaceData);
-    setCurrent(userCtrl.SpaceData);
+    all.unshift(userCtrl.User.spaceData);
+    setCurrent(userCtrl.Space.spaceData);
     setMenuList(
       all.filter((item) => {
-        return item.id != userCtrl.SpaceData.id;
+        return item.id != userCtrl.Space.spaceData.id;
       }),
     );
   };

@@ -15,16 +15,14 @@ const { Header } = Layout;
 const BasicHeader: React.FC = () => {
   if (!userCtrl.User) return <PageLoading />;
   return (
-    userCtrl.SpaceData && (
-      <Header className={cls[`basic-header`]}>
-        <OrganizationalUnits />
-        <Space size={32} align="center">
-          <HeaderHome />
-          <HeaderNav />
-          <UserAvatar></UserAvatar>
-        </Space>
-      </Header>
-    )
+    <Header className={cls[`basic-header`]}>
+      <OrganizationalUnits />
+      <Space size={32} align="center">
+        <HeaderHome />
+        <HeaderNav />
+        <UserAvatar></UserAvatar>
+      </Space>
+    </Header>
   );
 };
 
