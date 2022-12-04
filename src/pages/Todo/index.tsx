@@ -12,7 +12,9 @@ import {
 } from '@ant-design/icons';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { Breadcrumb, MenuProps } from 'antd';
+import { Badge, Breadcrumb, MenuProps } from 'antd';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { TargetType } from '@/ts/core/enum';
 
 // 平台待办
 const systemTodo = [
@@ -37,20 +39,54 @@ const systemTodo = [
 const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
   const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>();
   const [currentTodo, setCurrentTodo] = useState<any>();
-  const renderMenu = () => {
+  const [key] = useCtrlUpdate(todoCtrl);
+
+  const systemMenu = async () => {
+    const orgCount = await todoCtrl.OrgTodo.getCount();
+    const data = await todoCtrl.OrgTodo.getTodoList(false);
+    const friend = data.filter((n) => n.Data.team.typeName === TargetType.Person);
+    let new_system = [...systemTodo];
+    new_system[0].icon = <Badge dot={friend.length !== 0}>{systemTodo[0].icon}</Badge>;
+    new_system[1].icon = (
+      <Badge dot={orgCount - friend.length !== 0}>{systemTodo[1].icon}</Badge>
+    );
+    new_system[2].icon = (
+      <Badge
+        dot={
+          (await todoCtrl.MarketTodo.getCount()) +
+            (await todoCtrl.PublishTodo.getCount()) !==
+          0
+        }>
+        {systemTodo[2].icon}
+      </Badge>
+    );
+    new_system[3].icon = (
+      <Badge dot={(await todoCtrl.OrderTodo.getCount()) !== 0}>
+        {systemTodo[3].icon}
+      </Badge>
+    );
+    return new_system;
+  };
+
+  const renderMenu = async () => {
     console.log('yingyongdaiban', todoCtrl.AppTodo);
-    const todos = todoCtrl.AppTodo.map((m) => {
+    const todos = todoCtrl.AppTodo.map(async (m) => {
       return {
         key: '/todo/app/' + m.id,
         label: m.name,
-        icon: <FundOutlined />,
+        icon: (
+          <Badge dot={(await m.getCount()) !== 0}>
+            <FundOutlined />
+          </Badge>
+        ),
       };
     });
+
     const muneItems = [
       {
         type: 'group',
         label: '平台待办',
-        children: systemTodo,
+        children: systemMenu(),
       },
       {
         type: 'group',
@@ -60,27 +96,22 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     ];
     setTodoMenu(muneItems as ItemType[]);
   };
-
   useEffect(() => {
-    const id = todoCtrl.subscribe(renderMenu);
-
+    if (todoCtrl.OrgTodo) {
+      renderMenu();
+    }
     const todo =
       location.pathname.indexOf('/todo/app/') > -1
         ? location.pathname.replace('/todo/app/', '')
         : '';
     setCurrentTodo(todo !== '' ? todoCtrl.currentAppTodo(todo) : undefined);
-    console.log(todoCtrl.currentAppTodo(todo));
-    return () => {
-      todoCtrl.unsubscribe(id);
-    };
-  }, []);
+  }, [key]);
 
   // 菜单跳转
   const toNext = (e: any) => {
     history.push(`${e.key}`);
     const todo = e.key.indexOf('/todo/app/') > -1 ? e.key.replace('/todo/app/', '') : '';
     setCurrentTodo(todo !== '' ? todoCtrl.currentAppTodo(todo) : undefined);
-    console.log(todoCtrl.currentAppTodo(todo));
   };
   return (
     <ContentTemplate
@@ -96,7 +127,9 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
             ]
           : ''
       }>
-      {renderRoutes(route.routes)}
+      <div id={key} style={{ height: '100%' }}>
+        {renderRoutes(route.routes)}
+      </div>
     </ContentTemplate>
   );
 };
