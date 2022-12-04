@@ -2,14 +2,13 @@ import { Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
-
 import { schema } from '@/ts/base';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { TargetType } from '@/ts/core/enum';
-
+/*由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
