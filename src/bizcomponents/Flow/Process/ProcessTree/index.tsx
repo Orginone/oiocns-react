@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import useEventEmitter from '@/hooks/useEventEmitter';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import { message } from 'antd';
 import Root from '@/bizcomponents/Flow/Process/RootNode';
 import Approval from '@/bizcomponents/Flow/Process/ApprovalNode';
@@ -20,30 +19,8 @@ type ProcessTreeProps = {
  * @returns
  */
 
-/**
- * vue3 -> react
- * X 1.获取组件实例  +获取组件实例的全局配置
- * √ 2.计算属性    （useMemo）
- * √ 3.状态更新    （useState）
- * X 4.引入其他组件 components
- * ? 5.h函数生成虚拟DOM (React.createElement)
- * ? 6.emit
- * ? 7.DefaultProps
- * √ 8.pinia 状态管理工具 Zustand
- */
 const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
-  // const { FlowSub } = useContext(EventContext);
-  // FlowSub.useSubScription('insertNode', (s: any) => {
-  //   console.log('监听insertNode事件', s);
-  // });
   const [key, setKey] = useState(0);
-  // const {
-  //   appContext
-  // } =  () as ComponentInternalInstance;
-
-  // const ctx = getCurrentInstance();
-
-  // const proxy = appContext.config.globalProperties;
 
   /**组件渲染中变更dom   共享状态*/
   let design = useAppwfConfig((state: any) => state.design);
@@ -54,24 +31,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
 
   /**组件渲染中变更nodeMap  共享状态*/
-  // var nodeMap = new Map()
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
-
-  // const { setSelectedNode, addNodeMap, nodeMap, dom } = useAppwfConfig((state) => ({ ...state }));
-  // const stores = useAppwfConfig(proxy.$pinia);
-
-  // const nodeMap = computed(() => {
-  //   return proxy.$pinia.state.value.appwfConfig.nodeMap;
-  // });
-
-  // const dom = computed(() => {
-  //   return proxy.$pinia.state.value.appwfConfig.design.resource;
-  // });
-
-  /**组件渲染中变更state  私有状态*/
-  // const [state, setState] = useState({ valid: true });
-
-  const emitter = useEventEmitter();
 
   const getDomTree = (h: any, node: any) => {
     if (!node || !node.nodeId) {
@@ -346,9 +306,10 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
   const isBranchSubNode = (node: any) => {
     return node && (node.type === 'CONDITION' || node.type === 'CONCURRENT');
   };
-  const isConcurrentNode = (node: any) => {
-    return node.type === 'CONCURRENTS';
-  };
+  // const isConcurrentNode = (node: any) => {
+  //   return node.type === 'CONCURRENTS';
+  // };
+
   const getRandomId = () => {
     return `node_${new Date().getTime().toString().substring(5)}${Math.round(
       Math.random() * 9000 + 1000,
@@ -563,18 +524,20 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
       message.warning('出现错误，找不到上级节点😥');
     }
   };
-  const validateProcess = () => {
-    // state.valid = true;
-    let err: any = [];
-    validate(err, dom.value);
-    return err;
-  };
-  const validateNode = (err: any, node: any) => {
-    // var cmp:any = ctx.refs[node.nodeId];
-    // if (cmp.validate) {
-    //   state.valid = cmp.validate(err)
-    // }
-  };
+  // const validateProcess = () => {
+  //   // state.valid = true;
+  //   let err: any = [];
+  //   validate(err, dom.value);
+  //   return err;
+  // };
+
+  // const validateNode = (err: any, node: any) => {
+  // var cmp:any = ctx.refs[node.nodeId];
+  // if (cmp.validate) {
+  //   state.valid = cmp.validate(err)
+  // }
+  // };
+
   //更新指定节点的dom
   // const nodeDomUpdate = (node: any) => {
   //   var cmp:any = ctx.refs[node.nodeId];
@@ -595,23 +558,23 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
     }
   };
   //校验所有节点设置
-  const validate = (err: any, node: any) => {
-    if (isPrimaryNode(node)) {
-      validateNode(err, node);
-      validate(err, node.children);
-    } else if (isBranchNode(node)) {
-      //校验每个分支
-      node.branches.map((branchNode: any) => {
-        //校验条件节点
-        validateNode(err, branchNode);
-        //校验条件节点后面的节点
-        validate(err, branchNode.children);
-      });
-      validate(err, node.children);
-    } else if (isEmptyNode(node)) {
-      validate(err, node.children);
-    }
-  };
+  // const validate = (err: any, node: any) => {
+  //   if (isPrimaryNode(node)) {
+  //     validateNode(err, node);
+  //     validate(err, node.children);
+  //   } else if (isBranchNode(node)) {
+  //     //校验每个分支
+  //     node.branches.map((branchNode: any) => {
+  //       //校验条件节点
+  //       validateNode(err, branchNode);
+  //       //校验条件节点后面的节点
+  //       validate(err, branchNode.children);
+  //     });
+  //     validate(err, node.children);
+  //   } else if (isEmptyNode(node)) {
+  //     validate(err, node.children);
+  //   }
+  // };
 
   const deepCopy = (obj: any) => {
     //判断 传入对象 为 数组 或者 对象
