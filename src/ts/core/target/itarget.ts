@@ -44,7 +44,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns 商店列表
    */
-  getJoinMarkets(reload: boolean): Promise<Market[]>;
+  getJoinMarkets(reload?: boolean): Promise<Market[]>;
   /**
    * 查询开放市场
    * @param reload 是否强制刷新
