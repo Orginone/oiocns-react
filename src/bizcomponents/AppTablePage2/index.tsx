@@ -60,13 +60,13 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: BaseProduct[]): React.ReactNode[] => {
-    return dataArr.map((item: BaseProduct) => {
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       return (
         <AppCard
           className="card"
           data={item}
-          key={item._prod.id}
+          key={item.prod.id}
           defaultKey={{
             name: 'name',
             size: 'price',
