@@ -1,7 +1,8 @@
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import { Market, BaseProduct } from '../market';
+import { Market } from '../market';
+import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 
 /** 空间类型数据 */
@@ -23,7 +24,7 @@ export interface IMTarget {
   /** 开放市场 */
   publicMarkets: Market[];
   /** 拥有的产品/应用 */
-  ownProducts: BaseProduct[];
+  ownProducts: IProduct[];
   /** 我的购物车 */
   stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
@@ -56,7 +57,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns
    */
-  getOwnProducts(reload: boolean): Promise<BaseProduct[]>;
+  getOwnProducts(reload: boolean): Promise<IProduct[]>;
   /**
    * 查询购物车列表
    * @param reload 是否强制刷新

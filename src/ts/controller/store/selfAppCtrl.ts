@@ -1,5 +1,5 @@
 import { ProductModel } from '@/ts/base/model';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 import { IMTarget } from '@/ts/core/target/itarget';
 import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
@@ -67,9 +67,9 @@ class SelfAppController extends BaseController {
   private _treeData!: TreeType[]; //缓存树形数据
   /* -----**应用功能区---------- */
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
-  private _curProduct: BaseProduct | undefined = undefined;
+  private _curProduct: IProduct | undefined = undefined;
   // 顶部最近使用应用
-  private recentlyUsedApps!: BaseProduct[];
+  private recentlyUsedApps!: IProduct[];
   // 常用菜单
   public static oftenUsedMenus = [
     { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
@@ -89,13 +89,13 @@ class SelfAppController extends BaseController {
   ];
 
   // 存储 我的应用原数据 提供过滤使用
-  private selfAppsData: BaseProduct[] = [];
+  private selfAppsData: IProduct[] = [];
 
   // 获取数据
-  public get curProduct(): BaseProduct | undefined {
+  public get curProduct(): IProduct | undefined {
     return this._curProduct || undefined;
   }
-  public get tableData(): BaseProduct[] {
+  public get tableData(): IProduct[] {
     return this.selfAppsData;
   }
   public get treeData(): TreeType[] {
@@ -115,7 +115,7 @@ class SelfAppController extends BaseController {
     this._curMenuKey = key;
   }
 
-  set curProduct(prod: BaseProduct | undefined) {
+  set curProduct(prod: IProduct | undefined) {
     this._curProduct = prod;
   }
 
@@ -185,7 +185,7 @@ class SelfAppController extends BaseController {
   }
   /**
    * @desc: 获取我的应用列表
-   * @return {BaseProduct[]} 应用列表
+   * @return {IProduct[]} 应用列表
    */
   public async querySelfApps() {
     const list = await this._curSpace.getOwnProducts(false);
@@ -196,9 +196,9 @@ class SelfAppController extends BaseController {
 
   /**
    * @desc: 添加最近使用应用
-   * @param {BaseProduct} data
+   * @param {IProduct} data
    */
-  public OpenApp(data: BaseProduct) {
+  public OpenApp(data: IProduct) {
     this.recentlyUsedApps.unshift(data);
     this.changCallbackPart(SelfCallBackTypes.Recently);
   }
@@ -216,7 +216,7 @@ class SelfAppController extends BaseController {
    * @desc: 判断当前操作对象是否为已选产品 不是则 修改选中
    * @param {Product} item
    */
-  public selectedProduct(item: BaseProduct) {
+  public selectedProduct(item: IProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
     // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改当前操作应用', item);
@@ -249,7 +249,11 @@ class SelfAppController extends BaseController {
    * @desc: 分享应用
    */
   public async ShareProduct(teamId: string, destIds: string[], destType: string) {
-    let { success, msg } = await this._curProduct!.Extend(teamId, destIds, destType);
+    let { success, msg } = await this._curProduct!.createExtend(
+      teamId,
+      destIds,
+      destType,
+    );
 
     if (!success) {
       console.error(msg);

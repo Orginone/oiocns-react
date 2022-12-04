@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
@@ -66,15 +66,15 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: BaseProduct[]): React.ReactNode[] => {
-    return dataArr.map((item: BaseProduct) => {
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       console.log('卡片数据', item);
 
       return (
         <AppCard
           className="card"
-          data={item._prod}
-          key={item._prod.id}
+          data={item.prod}
+          key={item.prod.id}
           defaultKey={{
             name: 'name',
             size: 'price',
@@ -89,7 +89,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<BaseProduct>
+      <CardOrTable<IProduct>
         dataSource={dataSource}
         total={total}
         page={page}
@@ -101,7 +101,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
+        rowKey={(record: IProduct) => record.prod?.id || 'id'}
         toolBarRender={toolBarRender}
       />
     </div>
