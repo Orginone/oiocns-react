@@ -1,5 +1,5 @@
 import { Card, Modal } from 'antd';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -202,7 +202,7 @@ const StoreApp: React.FC = () => {
   const AppIndex = useMemo(() => {
     return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {<StoreRecent dataSource={RentlyApps} />}
+        {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />}
         <Card
           title="应用"
           className={cls['app-tabs']}
