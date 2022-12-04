@@ -50,7 +50,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   };
 
   const valueChange = (value: any, condition: any) => {
-    condition.val = value;
+    condition.val = String(value);
     var filter = DefaultProps.getFormFields().filter(
       (item: any) => item.value == condition.paramKey,
     );

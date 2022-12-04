@@ -10,7 +10,7 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
-import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -47,6 +47,7 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
+
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
@@ -54,6 +55,7 @@ const SettingFlow: React.FC = () => {
   const form = useAppwfConfig((state: any) => state.form);
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
+  const design = useAppwfConfig((state: any) => state.design);
 
   const columns: ProColumns<FlowItem>[] = [
     {
@@ -133,46 +135,16 @@ const SettingFlow: React.FC = () => {
   };
 
   const preview = () => {
-    // props.OnPreview();
+    // const design = useAppwfConfig((state: any) => state.design);
   };
 
-  type FlowNode = {
-    Id: string;
-    NodeId: string;
-    ParentId: string;
-    Type: string;
-    Name: string;
-    Desc: string;
-    Children: FlowNode;
-    Branches: [
-      {
-        Id: string;
-        NodeId: string;
-        ParentId: string;
-        Name: string;
-        Type: string;
-        Conditions: [
-          {
-            Pos: number;
-            ParamKey: string;
-            ParamLabel: string;
-            Key: string;
-            Label: string;
-            Type: string;
-            Val: string;
-            ValLabel: string;
-          },
-        ];
-        Children: FlowNode;
-      },
-    ];
-  };
-
-  const publish = () => {
-    console.log('搜集上来的表单', DefaultProps.getFormFields());
-    const data = DefaultProps.getFormFields();
-    // const result = userCtrl.Space.publishDefine(data);
-    // console.log(result);
+  const publish = async () => {
+    const result = await userCtrl.Space.publishDefine(design);
+    if (result.data) {
+      message.success('添加成功');
+    } else {
+      message.warning(result.msg);
+    }
     // message.warning('该功能尚未开放');
   };
 
@@ -243,10 +215,19 @@ const SettingFlow: React.FC = () => {
                       </Button>
                     </div>
                     <div style={{ width: '300px' }}>
-                      <Steps current={currentStep}>
-                        <Step title={stepTypeAndNameMaps[StepType.BASEINFO]} />
-                        <Step title={stepTypeAndNameMaps[StepType.PROCESSMESS]} />
-                      </Steps>
+                      <Steps
+                        current={currentStep}
+                        items={[
+                          {
+                            title: stepTypeAndNameMaps[StepType.BASEINFO],
+                          },
+                          {
+                            title: stepTypeAndNameMaps[StepType.PROCESSMESS],
+                          },
+                        ]}
+                        onChange={(e) => {
+                          setCurrentStep(e);
+                        }}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (
