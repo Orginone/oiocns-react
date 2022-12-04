@@ -9,7 +9,7 @@ interface Iprops {
   title: string;
   open: boolean;
   onOk: () => void;
-  handleOk: () => void;
+  handleOk: (item: any) => void;
   handleCancel: () => void;
   selectId?: string;
 }
@@ -53,7 +53,7 @@ const EditCustomModal = (props: Iprops) => {
           <Row>
             <Col span={24}>
               <Form.Item
-                name="remark"
+                name="teamRemark"
                 label="描述"
                 rules={[{ required: true, message: '请输入集团描述!' }]}>
                 <TextArea
@@ -70,6 +70,7 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
+                    handleOk(value);
                   }
                 }}>
                 完成
