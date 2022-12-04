@@ -35,7 +35,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   /**获取群组下成员列表 */
   const getMemberData = async () => {
     const res = await cohortData.getMember(false);
-    setMemberData(res.filter((obj) => obj.id != userCtrl.User?.target.id));
+    setMemberData(res.filter((obj) => obj.id != userCtrl.Space?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {

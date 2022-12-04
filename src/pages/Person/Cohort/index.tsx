@@ -37,19 +37,19 @@ const CohortConfig: React.FC = () => {
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
-  const [chatKey] = useCtrlUpdate(chatCtrl);
+  const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
     getData();
   }, [chatKey]);
   const getData = async () => {
     setData(
       (await userCtrl.getCohortList())?.filter(
-        (obj) => obj.target.belongId == userCtrl.User?.target.id,
+        (obj) => obj.target.belongId == userCtrl.Space?.target.id,
       ),
     );
     setJoinData(
       (await userCtrl.getCohortList())?.filter(
-        (obj) => obj.target.belongId != userCtrl.User?.target.id,
+        (obj) => obj.target.belongId != userCtrl.Space?.target.id,
       ),
     );
   };

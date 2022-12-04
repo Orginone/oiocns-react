@@ -8,6 +8,8 @@ import { ColumnsType } from 'antd/lib/table';
 import { schema } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import SearchPerson from '@/bizcomponents/SearchPerson';
+import { useHistory } from 'react-router-dom';
+
 interface OperationType {
   key: string;
   label: string;
@@ -57,9 +59,10 @@ const PersonFriend: React.FC = () => {
   useEffect(() => {
     getData();
   }, []);
+  const history = useHistory();
 
   const getData = async () => {
-    setData(await userCtrl.User.getFriends());
+    setData(await userCtrl.User.getFriends(false));
   };
   const showModal = () => {
     setIsModalOpen(true);
@@ -113,7 +116,7 @@ const PersonFriend: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            setLookApplyOpen(true);
+            history.push('/todo/friend');
           }}>
           查看申请
         </Button>
