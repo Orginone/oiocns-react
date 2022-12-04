@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space } from 'antd';
+import { Card, Button, Descriptions, Space, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -17,6 +17,9 @@ import EditCustomModal from './components/EditCustomModal';
 import { IGroup } from '@/ts/core/target/itarget';
 import Group from '@/ts/core/target/group';
 import { XTarget } from '@/ts/base/schema';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
+import { getUuid } from '@/utils/tools';
 /**
  * 集团设置
  * @returns
@@ -32,8 +35,8 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
   const [dataSource, setDataSource] = useState<XTarget[]>();
-
   const [id, setId] = useState<string>('');
+  const [groupModalID, setGroupModalID] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -45,18 +48,24 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setId(current.id);
     setCurrentGroup(new Group(current));
     currentGroup?.getCompanys(false).then((e) => {
-      console.log(e);
       setDataSource(e);
     });
   };
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
+    console.log(key, item, '====');
     switch (key) {
       case 'new':
+        setGroupModalID(getUuid());
+        setId('');
         setIsOpen(true);
         break;
       case '新增集团':
+        setGroupModalID(getUuid());
+        setId(item.target.target.id);
+        setCurrentGroup(item.target);
+        setIsOpen(true);
         break;
       case 'changeGroup':
         break;
@@ -70,11 +79,44 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setIsAddOpen(false);
     setLookApplyOpen(false);
   };
-  const handleOk = () => {
-    setIsOpen(false);
-    setIsAddOpen(false);
-    setLookApplyOpen(false);
-    // setEditItem(false);
+
+  const handleOk = async (item: any) => {
+    // 新增
+    if (item) {
+      console.log(item);
+      // currentGroup?.createSubGroup
+      if (userCtrl.IsCompanySpace) {
+        item.teamCode = item.code;
+        item.teamName = item.name;
+
+        item.typeName = TargetType.Group;
+        if (id != '') {
+          item.belongId = id;
+          const res = await currentGroup?.createSubGroup(item);
+          if (res?.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res?.msg);
+          }
+        } else {
+          item.belongId = userCtrl.Company.target.id;
+          const res = await userCtrl.Company.createGroup(item);
+          if (res.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res.msg);
+          }
+        }
+      }
+    } else {
+      setIsAddOpen(false);
+      setLookApplyOpen(false);
+      setIsOpen(false);
+    }
   };
   // 操作内容渲染函数
   const renderOperation = (
