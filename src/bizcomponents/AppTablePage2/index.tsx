@@ -34,13 +34,14 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
+  console.log(999999999999, list, dataSource);
 
   useEffect(() => {
-    if (!searchParams || !list?.length) {
+    if (!list?.length) {
       return;
     }
 
-    if (searchParams.status === '全部') {
+    if (!searchParams || searchParams.status === '全部') {
       setTotal(list.length);
       setSataSource([...list]);
     } else {
