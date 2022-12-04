@@ -11,6 +11,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICompany, IPerson } from '@/ts/core/target/itarget';
 import ApplyInfoService from './ApplyInfo';
 import { MarketTypes } from 'typings/marketType';
+import { TargetType } from '@/ts/core/enum';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -66,7 +67,11 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     } else {
       let thisSelectKey = joinKey;
       // code msg success
-      const responseObj = await userCtrl.User.applyJoinCompany(thisSelectKey);
+      const responseObj = await userCtrl.User.applyJoinCompany(
+        thisSelectKey,
+        TargetType.Company,
+      );
+
       if (responseObj.success) {
         message.info('申请加入单位成功!');
       } else {
@@ -195,9 +200,9 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
           <strong>单位设置</strong>
         </Title>
         <div>
-          <Button type="link" onClick={showDepartment}>
+          {/* <Button type="link" onClick={showDepartment}>
             部门岗位
-          </Button>
+          </Button> */}
           <Button type="link" onClick={showApplyModal}>
             查看申请记录
           </Button>
