@@ -1,14 +1,13 @@
-import { Input, Tree, Space, TreeProps, Modal, Button } from 'antd';
-import type { DataNode } from 'antd/es/tree';
-import React, { useState } from 'react';
-import {
-  DownOutlined,
-  ApartmentOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { Button } from 'antd';
+import type { DataNode, TreeProps } from 'antd/es/tree';
+import React, { useState, useEffect } from 'react';
 import cls from './index.module.less';
+import { schema } from '@/ts/base';
+import { IDepartment } from '@/ts/core/target/itarget';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { getUuid } from '@/utils/tools';
+import MarketClassifyTree from '@/components/CustomTreeComp';
 
 const x = 3;
 const y = 2;
@@ -68,85 +67,130 @@ const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
 
 type CreateGroupPropsType = {
   createTitle: string;
+  currentKey: string;
+  setCurrent: (current: schema.XTarget) => void;
+  handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
-  const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [searchValue, setSearchValue] = useState('');
-  const [autoExpandParent, setAutoExpandParent] = useState(true);
-  const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
+const Creategroup: React.FC<CreateGroupPropsType> = ({
+  createTitle,
+  handleMenuClick,
+  setCurrent,
+}) => {
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
+  const [treeData, setTreeData] = useState<any[]>([]);
 
-  const onExpand = (newExpandedKeys: React.Key[]) => {
-    setExpandedKeys(newExpandedKeys);
-    setAutoExpandParent(false);
-  };
+  const [createTreeData, setCreateTreeData] = useState<any[]>([]);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    const newExpandedKeys = dataList
-      .map((item) => {
-        if (item.title.indexOf(value) > -1) {
-          return getParentKey(item.key, defaultData);
+  useEffect(() => {
+    initData(false);
+  }, [key]);
+
+  const initData = async (reload: boolean) => {
+    const data = await userCtrl?.Company?.getJoinedGroups(reload);
+    // 创建的集团， 加入的集团
+    if (data?.length) {
+      const tree = data.map((n: any) => {
+        return createTeeDom(n);
+      });
+      const data2 = data.filter((n: any) => {
+        if (n.target.createUser === userCtrl.User.target.id) {
+          return createTeeDom(n);
         }
-        return null;
-      })
-      .filter((item, i, self) => item && self.indexOf(item) === i);
-    setExpandedKeys(newExpandedKeys as React.Key[]);
-    setSearchValue(value);
-    setAutoExpandParent(true);
+      });
+      const tree2 = data2.map((n: any) => {
+        return createTeeDom(n);
+      });
+      setTreeData(tree);
+      setCreateTreeData(tree2);
+    }
   };
+  const createTeeDom = (n: IDepartment) => {
+    const { target } = n;
+    return {
+      key: target.id + getUuid(),
+      title: target.name,
+      icon: target.avatar,
+      // children: [],
+      isLeaf: false,
+      target: n,
+    };
+  };
+  const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
+    list.map((node) => {
+      if (node.key === key) {
+        return {
+          ...node,
+          children,
+          isLeaf: children.length == 0,
+        };
+      }
+      if (node.children) {
+        return {
+          ...node,
+          children: updateTreeData(node.children, key, children),
+        };
+      }
+      return node;
+    });
+
+  const loadDept = async ({ key, children, target }: any) => {
+    if (children) {
+      return;
+    }
+    const deptChild: any[] = await target.getSubGroups(false);
+    console.log(deptChild);
+
+    setTreeData((origin) =>
+      updateTreeData(
+        origin,
+        key,
+        deptChild.map((n) => createTeeDom(n)),
+      ),
+    );
+  };
+
+  const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
+    selectedKeys;
+    if (info.selected) {
+      setCurrent(info.node.target.target);
+    }
+  };
+
+  const menu = ['新增集团'];
 
   return (
     <div>
-      {/* 要把这个值给到 group组件 */}
-      <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
-        {createTitle}
-      </Button>
-      {Array.isArray(treeData1) && treeData1.length > 0 ? (
-        <div className={cls.topMes}>
-          <Input
-            size="middle"
-            className={cls.inputStyle}
-            placeholder="搜索创建的集团"
-            prefix={<SearchOutlined />}
-            onChange={onChange}
-          />
-          <div className={cls.joingroup}>创建集团</div>
-          <Tree
-            onExpand={onExpand}
-            expandedKeys={expandedKeys}
-            switcherIcon={<DownOutlined />}
-            autoExpandParent={autoExpandParent}
-            treeData={treeData1}
-            onSelect={(e) => {
-              if (e && e.length > 0) {
-              }
-            }}
-            showIcon={true}
-            titleRender={(e) => {
-              return (
-                <div
-                  className={cls.rightstyle}
-                  onMouseOver={() => {
-                    setHoverItemMes(e.key);
-                  }}>
-                  <span style={{ paddingRight: '8px' }}>{e?.title}</span>
-                  {hoverItemMes === e.key ? (
-                    <Space>
-                      <span onClick={() => {}}>
-                        <PlusOutlined />
-                      </span>
-                      <span>
-                        <MoreOutlined />
-                      </span>
-                    </Space>
-                  ) : null}
-                </div>
-              );
-            }}
-          />
-        </div>
-      ) : null}
+      <div className={cls.topMes}>
+        <Button
+          className={cls.creatgroup}
+          type="primary"
+          onClick={() => handleMenuClick('new', {})}>
+          {createTitle}
+        </Button>
+        <MarketClassifyTree
+          id={key}
+          showIcon
+          searchable
+          handleMenuClick={handleMenuClick}
+          treeData={createTreeData}
+          title={'创建集团'}
+          menu={menu}
+          loadData={loadDept}
+          onSelect={onSelect}
+        />
+        <MarketClassifyTree
+          id={key}
+          showIcon
+          searchable
+          handleMenuClick={handleMenuClick}
+          treeData={treeData}
+          title={'加入集团'}
+          menu={menu}
+          loadData={loadDept}
+          onSelect={onSelect}
+        />
+      </div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, Button, Descriptions, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
@@ -11,12 +12,14 @@ import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-
+import TreeLeftGroupPage from './components/TreeLeftGroupPage/Creategroup';
+import { schema } from '@/ts/base';
 /**
  * 集团设置
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
+  const treeContainer = document.getElementById('templateMenu');
   const { id } = props.match.params;
 
   // const { isOpenModal, setEditItem } = settingStore((state) => ({
@@ -39,6 +42,23 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
    * 监听集团id发生变化，改变右侧数据
    * */
   useEffect(() => {}, []);
+
+  // 选中树的时候操作
+  const setTreeCurrent = (current: schema.XTarget) => {};
+
+  /**点击操作内容触发的事件 */
+  const handleMenuClick = (key: string, item: any) => {
+    switch (key) {
+      case 'new':
+        break;
+      case '新增集团':
+        break;
+      case 'changeGroup':
+        break;
+      case 'updateGroup':
+        break;
+    }
+  };
 
   const onOk = () => {
     setIsOpen(false);
@@ -199,6 +219,19 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         onOk={onOk}
         handleOk={handleOk}
       />
+
+      {/* 左侧树 */}
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <TreeLeftGroupPage
+              createTitle="新增"
+              setCurrent={setTreeCurrent}
+              handleMenuClick={handleMenuClick}
+              currentKey={''}
+            />,
+            treeContainer,
+          )
+        : ''}
     </div>
   );
 };

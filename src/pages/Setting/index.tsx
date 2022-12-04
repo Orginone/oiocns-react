@@ -36,7 +36,7 @@ const infoMenuItems = [
     key: 'group',
     icon: <FundOutlined />,
     children: [],
-    render: <TreeLeftGroupPage />,
+    render: <></>,
   },
   {
     label: '岗位设置',
