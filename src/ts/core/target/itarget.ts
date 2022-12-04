@@ -201,7 +201,7 @@ export interface IMTarget {
    */
   getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
 }
-export interface IFlowTarget {
+export interface IFlow {
   /** 流程定义 */
   defines: schema.XFlowDefine[];
   /** 流程绑定关系 */
@@ -248,6 +248,49 @@ export interface IFlowTarget {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
+
+export interface ISpace extends IFlow {
+  /** 我加入的群组 */
+  joinedCohort: ICohort[];
+  /** 空间类型数据 */
+  spaceData: SpaceType;
+  /**
+   * @description: 查询我加入的群
+   * @param reload 是否强制刷新
+   * @return {*} 查询到的群组
+   */
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
+  /**
+   * 创建群组
+   * @param data 群组基本信息
+   */
+  createCohort(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
+  /**
+   * 退出群组
+   * @param id 群组Id
+   */
+  quitCohorts(id: string): Promise<ResultType<any>>;
+  /**
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
+   */
+  deleteCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 查询群组
+   * @param code 群组编号
+   */
+  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
+}
 /** 群组操作 */
 export interface ICohort {
   /** 群组实体对象 */
@@ -256,6 +299,8 @@ export interface ICohort {
   authorityTree: IAuthority | undefined;
   /** 群组成员 */
   children: schema.XTarget[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
 
   /**
    * 更新群组信息
@@ -281,8 +326,16 @@ export interface ICohort {
    * @param targets
    */
   removeMember(ids: string[], typeName: TargetType): Promise<ResultType<any>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 查询单位
    * @param code 单位的信用代码
@@ -295,19 +348,17 @@ export interface ICohort {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson extends IMTarget, IFlowTarget {
+export interface IPerson extends IMTarget, ISpace {
   /** 人员实体 */
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 我的好友 */
   joinedFriend: schema.XTarget[];
-  /** 我加入的群组 */
-  joinedCohort: ICohort[];
   /** 我加入的单位 */
   joinedCompany: ICompany[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新人员
    * @param data 人员基础信息
@@ -315,26 +366,21 @@ export interface IPerson extends IMTarget, IFlowTarget {
    */
   update(data: Omit<TargetModel, 'id'>): Promise<ResultType<schema.XTarget>>;
   /**
-   * @description: 查询我加入的群
-   * @param reload 是否强制刷新
-   * @return {*} 查询到的群组
-   */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
-  /**
    * 获取单位列表
    * @param reload 是否强制刷新
    * @return 加入的单位列表
    */
   getJoinedCompanys(reload: boolean): Promise<ICompany[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
-   * 创建群组
-   * @param data 群组基本信息
+   * 判断是否拥有该身份
+   * @param id 身份id
    */
-  createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>>;
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 设立单位
    * @param data 单位基本信息
@@ -344,35 +390,17 @@ export interface IPerson extends IMTarget, IFlowTarget {
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<schema.XTarget>>;
   /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<ResultType<any>>;
-  /**
    * 删除单位
    * @param id 单位Id
    * @returns
    */
   deleteCompany(id: string): Promise<ResultType<any>>;
   /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<ResultType<any>>;
-  /**
    * 申请加入单位
    * @param id 目标Id
    * @returns
    */
   applyJoinCompany(id: string, typeName: TargetType): Promise<ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<ResultType<any>>;
   /**
    * 退出单位
    * @param id 单位Id
@@ -427,26 +455,19 @@ export interface IPerson extends IMTarget, IFlowTarget {
    */
   searchCompany(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
-   * 查询群组
-   * @param code 群组编号
-   */
-  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
-  /**
    * 查询人员
    * @param code 人员编号
    */
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany extends IMTarget, IFlowTarget {
+export interface ICompany extends IMTarget, ISpace {
   /** 单位实体 */
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 子组织类型 */
   subTypes: TargetType[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
   /** 单位人员 */
   person: schema.XTarget[];
   /** 我的子部门 */
@@ -455,8 +476,8 @@ export interface ICompany extends IMTarget, IFlowTarget {
   workings: IWorking[];
   /** 我加入的集团 */
   joinedGroup: IGroup[];
-  /** 我加入的群组 */
-  joinedCohort: ICohort[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新单位
    * @param data 单位基础信息
@@ -473,16 +494,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns 是否成功
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
-  /**
-   * 创建群组
-   * @param name 名称
-   * @param code 编号
-   * @param remark 备注
-   * @returns 是否创建成功
-   */
-  createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>>;
   /**
    * 移除人员
    * @param ids 人员Id集合
@@ -501,18 +512,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    */
   deleteWorking(id: string): Promise<ResultType<any>>;
   /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<ResultType<any>>;
-  /**
    *  退出集团
    * @param id 集团Id
    * @returns
@@ -524,8 +523,16 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns
    */
   getPersons(reload: boolean): Promise<schema.XTarget[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取单位下的部门（单位、部门）
    * @param reload 是否强制刷新
@@ -539,23 +546,11 @@ export interface ICompany extends IMTarget, IFlowTarget {
    */
   getWorkings(reload: boolean): Promise<IWorking[]>;
   /**
-   * @description: 查询我加入的群
-   * @param reload 是否强制刷新
-   * @return {*} 查询到的群组
-   */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
-  /**
    * @description: 查询我加入的集团
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
   getJoinedGroups(reload: boolean): Promise<IGroup[]>;
-  /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<ResultType<any>>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -572,11 +567,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns
    */
   cancelJoinApply(id: string): Promise<ResultType<any>>;
-  /**
-   * 查询群组
-   * @param code 群组编号
-   */
-  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
    * 查询集团
    * @param code 集团编号
@@ -597,6 +587,8 @@ export interface IGroup {
   subGroup: IGroup[];
   /** 子组织类型 */
   subTypes: TargetType[];
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /**
    * 更新集团
    * @param data 集团基本信息
@@ -608,8 +600,16 @@ export interface IGroup {
    * @returns
    */
   getJoinedGroups(reload: boolean): Promise<schema.XTarget[]>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -652,10 +652,20 @@ export interface IDepartment {
   departments: IDepartment[];
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /** 更新部门 */
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取部门人员
    * @param reload 是否强制刷新
@@ -694,10 +704,20 @@ export interface IWorking {
   workings: IWorking[];
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 拥有的身份 */
+  ownIdentitys: schema.XIdentity[];
   /** 更新工作组 */
   update(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<schema.XTarget>>;
-  /** 获取职权树 */
-  selectAuthorityTree(): Promise<IAuthority | undefined>;
+  /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  judgeHasIdentity(id: string): Promise<boolean>;
+  /**
+   * 获取职权树
+   * @param reload 是否强制刷新
+   */
+  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
   /**
    * 获取工作组
    * @param reload 是否强制刷新

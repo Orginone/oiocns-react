@@ -46,13 +46,14 @@ const infoMenuItems = [
     render: <></>,
     // render: <TreeLeftPosPage />,
   },
+  { label: '群组设置', key: 'cohort', icon: <TeamOutlined /> },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
 ];
-const userInfoMenuItems = [
-  { label: '好友设置', key: '/person/friend', icon: <UserOutlined /> },
-  { label: '群组设置', key: '/person/cohort', icon: <TeamOutlined /> },
-];
 
+const userInfoMenuItems = [
+  { label: '好友设置', key: '/setting/friend', icon: <UserOutlined /> },
+  { label: '群组设置', key: '/setting/cohort', icon: <TeamOutlined /> },
+];
 /* 自定义设置菜单 */
 const configMenuItems = [
   { label: '单位首页', key: 'homeset', icon: <HomeOutlined /> },
@@ -83,11 +84,10 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
   const [menus, setMenu] = useState(muneItems);
   const changeMenu = () => {
     let [_newMenu, ...other] = [...muneItems];
-    _newMenu.children =
-      userCtrl?.Space === undefined
-        ? userInfoMenuItems
-        : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
 
+    _newMenu.children = !userCtrl?.IsCompanySpace
+      ? userInfoMenuItems
+      : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
     setMenu([{ ..._newMenu }, ...other]);
   };
   useEffect(() => {

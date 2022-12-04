@@ -19,11 +19,11 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
 
   const getname = async () => {
     const cohort = new Cohort(data);
-    const res = (await cohort.getMember()).filter((obj) => obj.id === data.belongId);
+    const res = (await cohort.getMember(false)).filter((obj) => obj.id === data.belongId);
     setName(res[0].team?.name!);
   };
   const applyCohort = async (data: schema.XTarget) => {
-    const res = await userCtrl.User?.applyJoinCohort(data.id);
+    const res = await userCtrl.Space?.applyJoinCohort(data.id);
     if (res?.success) {
       message.success('发起申请成功');
     } else {

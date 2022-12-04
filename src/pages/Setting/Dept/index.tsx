@@ -1,12 +1,12 @@
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, Button, Descriptions, Space, Modal } from 'antd';
+// import { dataSource } from './datamock';
+import { columns } from './config';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
-import { columns } from './config';
-// import { dataSource } from './datamock';
 import type * as schema from '@/ts/base/schema';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
@@ -14,17 +14,18 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
 import SettingService from './service';
-import { IDepartment } from '@/ts/core/target/itarget';
 import Department from '@/ts/core/target/department';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { RouteComponentProps } from 'react-router-dom';
+// import { IDepartment } from '@/ts/core/target/itarget';
 
 /**
  * 部门设置
  * @returns
  */
-const SettingDept: React.FC = () => {
+const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const setting = SettingService.getInstance();
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
@@ -34,9 +35,7 @@ const SettingDept: React.FC = () => {
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
-
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
-
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
 
   const treeContainer = document.getElementById('templateMenu');
@@ -91,6 +90,7 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
@@ -103,22 +103,17 @@ const SettingDept: React.FC = () => {
         setIsCreateDept(true);
         setIsOpenModal(true);
         setSelectId(item.target.target.id);
-        setting.getCompanyCtrl.changCallback();
         setting.setCurrTreeDeptNode(item.target.target.id);
         break;
       case 'changeDept': //变更部门
         setIsOpenModal(true);
         setSelectDept(item);
-        // setting.getCompanyCtrl.changCallback();
-        // setSelectId(item.target.target.id);
-        // setting.setCurrTreeDeptNode(item.target.target.id);
         break;
       case 'updateDept':
         setIsCreateDept(true);
         setIsOpenModal(true);
         setSelectId(item.id);
         setting.setCurrTreeDeptNode(item.id);
-        setting.getCompanyCtrl.changCallback();
         break;
     }
   };
@@ -168,36 +163,18 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
   useEffect(() => {
-    if (userCtrl.Space == undefined) {
-      Modal.info({
-        title: '提示',
-        content: (
-          <div>
-            <p>请选择加入的部门空间！</p>
-          </div>
-        ),
-        onOk() {
-          location.href = '/home';
-        },
-      });
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    } else {
+      initData();
+      // 刚进入的时候选中公司 TODO
+      setting.setCompanyID = userCtrl?.Company?.target.id + '';
+      setting.setRoot = userCtrl?.Company!.target;
     }
-    initData();
-    // 刚进入的时候选中公司 TODO
-    setting.setCompanyID = userCtrl?.Space?.target.id + '';
-    setting.setRoot = userCtrl?.Space!.target;
-
-    const id = setting.getCompanyCtrl.subscribe(async () => {
-      // 选中树操作
-      let pp = await setting.getCompanyCtrl.getCompany().getPersons();
-      console.log(pp);
-    });
-    return () => {
-      setting.getCompanyCtrl.unsubscribe(id);
-    };
-  }, ['', userCtrl?.Space]);
+  }, ['', userCtrl?.Company]);
 
   useEffect(() => {
-    setting.setCompanyID = userCtrl?.Space?.target.id ?? '';
+    setting.setCompanyID = userCtrl?.Company?.target.id ?? '';
   }, [selectId]);
 
   const initData = async () => {};
@@ -294,7 +271,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title={userCtrl.Space.target.name}
+            title={userCtrl?.Company?.target?.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}

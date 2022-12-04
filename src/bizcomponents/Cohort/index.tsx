@@ -15,16 +15,6 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
     wrapperCol: { span: 16 },
   };
 
-  const validateMessages = {
-    required: '群组名称不能为空',
-    types: {
-      email: '${label} is not a valid email!',
-      number: '${label} is not a valid number!',
-    },
-    number: {
-      range: '${label} must be between ${min} and ${max}',
-    },
-  };
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -38,7 +28,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
   const onSave = async () => {
     const values = await form.validateFields();
     console.log(values); //2.表单验证并获取表单值
-    await userCtrl.User?.createCohort({
+    await userCtrl.Space?.createCohort({
       name: values.cohort.name,
       code: values.cohort.code,
       typeName: TargetType.Cohort,
@@ -61,7 +51,6 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
           labelCol={{ span: 7 }}
           wrapperCol={{ span: 20 }}
           layout="horizontal"
-          validateMessages={validateMessages}
           form={form}>
           <Form.Item
             name={['cohort', 'name']}

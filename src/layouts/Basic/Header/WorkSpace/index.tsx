@@ -21,8 +21,8 @@ import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 
 /* 组织单位头部左侧组件 */
-const OrganizationalUnits: React.FC = () => {
-  const [current, setCurrent] = useState<SpaceType>(userCtrl.SpaceData);
+const OrganizationalUnits = () => {
+  const [current, setCurrent] = useState<SpaceType>();
   const [menuList, setMenuList] = useState<SpaceType[]>([]);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -61,17 +61,16 @@ const OrganizationalUnits: React.FC = () => {
 
   const refreshUI = () => {
     const all: SpaceType[] = userCtrl.User.joinedCompany.map((item) => {
-      return item.getSpaceData;
+      return item.spaceData;
     });
-    all.unshift(userCtrl.User.getSpaceData);
-    setCurrent(userCtrl.SpaceData);
+    all.unshift(userCtrl.User.spaceData);
+    setCurrent(userCtrl.Space.spaceData);
     setMenuList(
       all.filter((item) => {
-        return item.id != userCtrl.SpaceData.id;
+        return item.id != userCtrl.Space.spaceData.id;
       }),
     );
   };
-
   useEffect(() => {
     const id = userCtrl.subscribePart(
       [UserPartTypes.Space, UserPartTypes.User],
@@ -81,14 +80,13 @@ const OrganizationalUnits: React.FC = () => {
       userCtrl.unsubscribe(id);
     };
   }, []);
-
   const loadItem = (data: SpaceType) => {
     return (
       <Space>
-        <Avatar src={data.icon} className={styles.avatar} size={32}>
-          {data.name.substring(0, 1)}
+        <Avatar src={data?.icon} className={styles.avatar} size={32}>
+          {data?.name?.substring(0, 1)}
         </Avatar>
-        <Typography.Text className={styles['space-list']}>{data.name}</Typography.Text>
+        <Typography.Text className={styles['space-list']}>{data?.name}</Typography.Text>
       </Space>
     );
   };
@@ -96,7 +94,7 @@ const OrganizationalUnits: React.FC = () => {
   return (
     <div className={styles.menu} onMouseLeave={() => setShowMenu(false)}>
       <Space onClick={() => setShowMenu(!showMenu)} className={styles['current-item']}>
-        {loadItem(current)}
+        {current && loadItem(current)}
         <CaretDownOutlined
           className={`${styles[`down-icon`]} ${showMenu ? styles.active : ''}`}
         />

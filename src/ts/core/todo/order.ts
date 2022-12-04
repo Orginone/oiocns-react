@@ -14,7 +14,7 @@ export class OrderTodo implements ITodoGroup {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
     }
-    return this._todoList.length;
+    return this._todoList.length - this._doList.length;
   }
   async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
     if (!refresh && this._todoList.length > 0) {
@@ -71,15 +71,13 @@ export class OrderTodo implements ITodoGroup {
       };
       this._doList = res.data.result
         .filter((a) => {
-          return a.status >= CommonStatus.RejectStartStatus;
+          return a.status >= CommonStatus.ApproveStartStatus;
         })
         .map((a) => {
           return new ApprovalItem(a, () => {});
         });
       this._todoList = res.data.result
-        .filter((a) => {
-          return a.status < CommonStatus.RejectStartStatus;
-        })
+        .sort((a, b) => a.status - b.status)
         .map((a) => {
           return new ApprovalItem(a, approvalCall);
         });

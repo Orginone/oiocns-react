@@ -78,6 +78,9 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const menuFlat = menuData ? flatMenuData(menuData) : [];
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
+    if (props.location?.state?.refresh) {
+      loadPrvMenu();
+    }
     setActiveMenu(location.pathname);
     const current = checkRoute(location.pathname, menuFlat);
     setCurrent(current);
@@ -151,6 +154,15 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       </>
     );
   };
+  /** 加载上一级菜单菜单*/
+  const loadPrvMenu = () => {
+    setCurrent(null);
+    if (prevMenuData.length > 0) {
+      setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
+      setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
+    }
+    setRenderMenu(undefined);
+  };
   return (
     <Sider className={cls.sider} width={width ?? 220}>
       {currentMacthRoute && (
@@ -162,12 +174,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
                 if (currentMenuData?.length === 0) {
                   history.back();
                 }
-                setCurrent(null);
-                if (prevMenuData.length > 0) {
-                  setCurrentMenuData(prevMenuData[prevMenuData.length - 1]);
-                  setPrevMenuData(prevMenuData.slice(0, prevMenuData.length - 1));
-                }
-                setRenderMenu(undefined);
+                loadPrvMenu();
               }}
             />
           )}

@@ -9,6 +9,7 @@ import { schema } from '@/ts/base';
 import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
 import { getUuid } from '@/utils/tools';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 const x = 3;
 const y = 2;
@@ -63,28 +64,23 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   handleMenuClick,
   setCurrent,
 }) => {
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
+
   const [treeData, setTreeData] = useState<any[]>([]);
   const setting = SettingService.getInstance();
 
   useEffect(() => {
-    // 控制选中的部门ID。
-    const id = userCtrl.subscribe(async () => {
-      // 如果新增部门，就需要重新初始化树TODO
-      if (userCtrl?.Space) {
-        if (userCtrl.Space.departments.length > 0) {
-          userCtrl.Space.departments = [];
-        }
-        initData();
+    // 如果新增部门，就需要重新初始化树TODO
+    if (userCtrl?.Company) {
+      if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
+        userCtrl.Company.departments = [];
       }
-    });
+      initData(true);
+    }
+  }, [key]);
 
-    return () => {
-      userCtrl.unsubscribe(id);
-    };
-  }, []);
-
-  const initData = async () => {
-    const data = await userCtrl?.Space?.getDepartments();
+  const initData = async (reload: boolean) => {
+    const data = await userCtrl?.Company?.getDepartments(reload);
     if (data?.length) {
       const tree = data.map((n) => {
         return createTeeDom(n);
@@ -145,7 +141,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   };
 
   const menu = ['新增部门'];
-
   return (
     <div>
       <div className={cls.topMes}>
@@ -158,9 +153,10 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         <MarketClassifyTree
           // key={selectMenu}
           // isDirectoryTree
+          // handleTitleClick={handleTitleClick}
+          id={key}
           showIcon
           searchable
-          // handleTitleClick={handleTitleClick}
           handleMenuClick={handleMenuClick}
           treeData={treeData}
           title={'内设集团'}

@@ -34,18 +34,18 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
 
   /**获取群组下成员列表 */
   const getMemberData = async () => {
-    const res = await cohortData.getMember();
+    const res = await cohortData.getMember(false);
     setMemberData(res.filter((obj) => obj.id != userCtrl.User?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {
-    const res = await userCtrl.User?.getFriends();
+    const res = await userCtrl.User?.getFriends(false);
     setFriendList(res!);
   };
   /**移除成员 */
   const removeMember = async (ids: string[]) => {
     await cohortData.removeMember(ids, TargetType.Person);
-    setMemberData(await cohortData.getMember());
+    setMemberData(await cohortData.getMember(true));
   };
   /**
    * 获取操作列表

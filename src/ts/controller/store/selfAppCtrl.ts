@@ -124,8 +124,7 @@ class SelfAppController extends BaseController {
     super();
     /* 监听空间切换 */
     userCtrl.subscribePart(UserPartTypes.Space, async () => {
-      // console.log('监听单位切换', userCtrl.Space, userCtrl.SpaceData);
-      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Space : userCtrl.User;
+      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
@@ -213,9 +212,8 @@ class SelfAppController extends BaseController {
    * @desc: 获取我的应用列表
    * @return {BaseProduct[]} 应用列表
    */
-  public async querySelfApps(isReload = false) {
-    const list = await this._curSpace.getOwnProducts(isReload);
-    console.log('获取我的应用表格数据', list);
+  public async querySelfApps(reload = false) {
+    const list = await this._curSpace.getOwnProducts(reload);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData);
   }
