@@ -16,7 +16,6 @@ type BaseInfoProps = {
 
 const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
   const [form] = Form.useForm();
-  const { setContions } = settingStore((state) => ({ ...state }));
   return (
     <div className={cls['contentMes']}>
       <ProForm
@@ -24,8 +23,8 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
         form={form}
         onFinish={async (e) => {
           console.log('e', e);
-          let formFileds: any[] = e;
-          setContions(formFileds);
+          // let formFileds: any[] = e;
+          // setContions(formFileds);
           nextStep();
         }}>
         <ProFormText

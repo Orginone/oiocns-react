@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
@@ -81,7 +81,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<BaseProduct>
+      <CardOrTable<IProduct>
         dataSource={dataSource}
         total={total}
         page={page}
@@ -93,7 +93,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
+        rowKey={(record: IProduct) => record.prod?.id || 'id'}
         toolBarRender={toolBarRender}
         {...rest}
       />

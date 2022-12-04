@@ -8,6 +8,7 @@ import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import { statusList, statusMap, tableOperation } from '../components';
 import { XRelation } from '@/ts/base/schema';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { resetParams } from '@/utils/tools';
 
 // 根据状态值渲染标签
 const renderItemStatus = (record: XRelation) => {
@@ -25,6 +26,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
   const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
   const [total, setPageTotal] = useState<number>(0);
+  const [current, setCurrent] = useState<number>(1);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
@@ -93,10 +95,20 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       '2': 'getDoList',
       '3': 'getApplyList',
     };
-    const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
-    setPageData(data);
-    setPageTotal(data.length);
-    setNeedReload(false);
+    setCurrent(page);
+    if (activeKey === '3') {
+      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](
+        resetParams({ page, pageSize }),
+      );
+      setPageData(data);
+      setPageTotal(data.length);
+    } else {
+      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
+      const list = data.slice((current - 1) * pageSize, pageSize * current);
+      setPageData(list);
+      setPageTotal(list.length);
+      setNeedReload(false);
+    }
   };
 
   useEffect(() => {
@@ -111,13 +123,13 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
-      }}
-      tabBarExtraContent={''}>
+      }}>
       <CardOrTableComp<IApplyItem | IApprovalItem>
-        rowKey={'id'}
+        rowKey={(record) => record?.Data?.id}
         columns={columns}
         dataSource={pageData}
         total={total}
+        page={current}
         onChange={loadList}
         operation={(item: IApplyItem | IApprovalItem) =>
           tableOperation(activeKey, item, setNeedReload)

@@ -22,12 +22,17 @@ class MarketJoinTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page?: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
       id: '0',
-      page,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
     });
+    console.log(res);
     if (res.success) {
       res.data.result?.forEach((a) => {
         applyList.push(new ApplyItem(a));
@@ -61,6 +66,7 @@ class MarketJoinTodo implements ITodoGroup {
         filter: '',
       },
     });
+
     if (res.success && res.data.result) {
       let rePassFun = (id: string) => {
         this._doList = this._doList.filter((q) => {
@@ -81,7 +87,7 @@ class MarketJoinTodo implements ITodoGroup {
         });
       this._todoList = res.data.result
         .filter((a) => {
-          return a.status < CommonStatus.RejectStartStatus;
+          return a.status === CommonStatus.ApplyStartStatus;
         })
         .map((a) => {
           return new ApprovalItem(a, passFun, (data) => {
