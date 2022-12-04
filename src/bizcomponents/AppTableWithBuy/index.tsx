@@ -78,6 +78,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         label: <Link to="/market/ShoppingCart">加入购物车</Link>,
         onClick: () => {
           console.log('按钮事件', 'toBuyCar', item);
+
           marketCtrl.Market.stagingMerchandise(item.id).then((res) => {
             console.log(res);
           });

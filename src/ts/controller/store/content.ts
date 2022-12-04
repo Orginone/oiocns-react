@@ -101,7 +101,6 @@ class StoreContent {
    */
   public selectedProduct(item: IProduct) {
     // 判断当前操作对象是否为已选产品 不是则 修改选中
-    // item.prod.id !== this.curProduct?._prod.id &&
     console.log('修改当前操作应用', item);
 
     this.curProduct = item;
