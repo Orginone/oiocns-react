@@ -5,6 +5,7 @@ import { loadAppTodo } from '../../core/todo/application';
 import { loadPublishTodo } from '../../core/todo/publish';
 import { loadOrgTodo } from '../../core/todo/orgrelation';
 import { loadMarketTodo } from '../../core/todo/marketjoin';
+import { loadOrderTodo } from '../../core/todo/order';
 
 /** 待办控制器 */
 class TodoController extends BaseController {
@@ -20,7 +21,7 @@ class TodoController extends BaseController {
         this._orgTodo = await loadOrgTodo();
         this._appTodo = await loadAppTodo();
         this._pubTodo = await loadPublishTodo();
-        this._orderTodo = await loadOrgTodo();
+        this._orderTodo = await loadOrderTodo();
         this._marketTodo = await loadMarketTodo();
         this.changCallback();
       }, 800);

@@ -71,16 +71,16 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
 
   useEffect(() => {
     // 如果新增部门，就需要重新初始化树TODO
-    if (userCtrl?.Space) {
-      if (userCtrl.Space.departments.length > 0) {
-        userCtrl.Space.departments = [];
+    if (userCtrl?.Company) {
+      if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
+        userCtrl.Company.departments = [];
       }
-      initData();
+      initData(false);
     }
   }, [key]);
 
-  const initData = async () => {
-    const data = await userCtrl?.Space?.getDepartments(false);
+  const initData = async (reload: boolean) => {
+    const data = await userCtrl?.Company?.getDepartments(reload);
     if (data?.length) {
       const tree = data.map((n) => {
         return createTeeDom(n);
