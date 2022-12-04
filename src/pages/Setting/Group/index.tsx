@@ -11,6 +11,7 @@ import EditCustomModal from '../Dept/components/EditCustomModal';
 import AddPersonModal from '../Dept/components/AddPersonModal';
 import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
+
 /**
  * 集团设置
  * @returns
