@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { TargetType } from '@/ts/core/enum';
-import Department from '@/ts/core/target/department';
+// import userCtrl from '@/ts/controller/setting/userCtrl';
+// import { TargetType } from '@/ts/core/enum';
+// import Department from '@/ts/core/target/department';
 
 interface Iprops {
   title: string;
@@ -19,7 +19,9 @@ const { TextArea } = Input;
 const EditCustomModal = (props: Iprops) => {
   const { open, title, onOk, handleOk, handleCancel, selectId } = props;
   const [form] = Form.useForm();
-  useEffect(() => {}, []);
+  useEffect(() => {
+    form.resetFields();
+  }, [props.open]);
 
   return (
     <div className={cls['edit-custom-modal']}>

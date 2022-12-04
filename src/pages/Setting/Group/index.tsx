@@ -19,6 +19,7 @@ import Group from '@/ts/core/target/group';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
+import { getUuid } from '@/utils/tools';
 /**
  * 集团设置
  * @returns
@@ -34,8 +35,8 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
   const [dataSource, setDataSource] = useState<XTarget[]>();
-
   const [id, setId] = useState<string>('');
+  const [groupModalID, setGroupModalID] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -53,11 +54,18 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
+    console.log(key, item, '====');
     switch (key) {
       case 'new':
+        setGroupModalID(getUuid());
+        setId('');
         setIsOpen(true);
         break;
       case '新增集团':
+        setGroupModalID(getUuid());
+        setId(item.target.target.id);
+        setCurrentGroup(item.target);
+        setIsOpen(true);
         break;
       case 'changeGroup':
         break;
@@ -71,6 +79,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setIsAddOpen(false);
     setLookApplyOpen(false);
   };
+
   const handleOk = async (item: any) => {
     // 新增
     if (item) {
@@ -79,23 +88,35 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       if (userCtrl.IsCompanySpace) {
         item.teamCode = item.code;
         item.teamName = item.name;
-        item.belongId = userCtrl.Company.target.id;
+
         item.typeName = TargetType.Group;
-        const res = await userCtrl.Company.createGroup(item);
-        if (res.success) {
-          message.info(res.msg);
-          setIsOpen(false);
+        if (id != '') {
+          item.belongId = id;
+          const res = await currentGroup?.createSubGroup(item);
+          if (res?.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res?.msg);
+          }
         } else {
-          message.error(res.msg);
+          item.belongId = userCtrl.Company.target.id;
+          const res = await userCtrl.Company.createGroup(item);
+          if (res.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res.msg);
+          }
         }
       }
     } else {
-      setIsOpen(false);
       setIsAddOpen(false);
       setLookApplyOpen(false);
+      setIsOpen(false);
     }
-
-    // setEditItem(false);
   };
   // 操作内容渲染函数
   const renderOperation = (
