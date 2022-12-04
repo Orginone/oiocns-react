@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { User } from 'typings/user';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ApplyInfoProps = {
   // eslint-disable-next-line no-unused-vars
@@ -42,8 +43,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
   };
 
   const cancleApply = async (id: string) => {
-    const responseObj = await personService.cancelJoin(id);
-    console.log('===取消申请', responseObj);
+    const responseObj = await userCtrl.User.cancelJoinApply(id);
     if (responseObj.success) {
       message.info('取消申请成功');
       getTableList();
@@ -54,12 +54,10 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
 
   const getTableList = async () => {
     let thisdata: DataType[] = [];
-    const { data } = await personService.getAllApply({
-      page: 1,
-      pageSize: 100,
-    });
-    data
-      ? data.map((item: AllApply, index) => {
+    const { data } = await userCtrl.User.queryJoinApply();
+
+    data.result
+      ? data.result.map((item: any, index: any) => {
           thisdata.push({
             applyId: item.id + '',
             order: index + 1,
@@ -70,6 +68,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
           });
         })
       : '';
+
     setList(thisdata);
     setTotal(thisdata.length);
   };
@@ -77,6 +76,10 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
   useEffect(() => {
     getTableList();
   }, []);
+
+  useEffect(() => {
+    // 用户修改的时候 ，处理代码
+  }, [userCtrl.User]);
 
   const columns: ColumnsType<DataType> = [
     {
