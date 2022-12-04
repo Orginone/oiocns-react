@@ -120,6 +120,8 @@ export interface IMTarget {
   /**
    * 创建市场
    * @param  {model.MarketModel} 市场基础信息
+   * @param { String } params.name
+   * @param
    * @returns
    */
   createMarket(

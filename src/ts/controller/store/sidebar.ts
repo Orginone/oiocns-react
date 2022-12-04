@@ -114,7 +114,7 @@ class StoreClassify extends BaseController {
     // this.curMenu[type] = this.recordPageType[type];
     this.curTreeData = this[`${type}FooterTree`][`${this.curMenu[type]}Treedata`] || [];
     setTimeout(() => {
-      this.changCallbackPart(`${type}TreeData`, this.curTreeData);
+      this.changCallbackPart(`${type}TreeData`);
     }, 5);
   }
   /**
@@ -127,7 +127,7 @@ class StoreClassify extends BaseController {
     if (targetData?.length > 0) {
       this.curTreeData = targetData;
       // this.TreeCallBack(targetData);
-      this.changCallbackPart(`${key}TreeData`, targetData);
+      this.changCallbackPart(`${key}TreeData`);
       return;
     }
     //1. 直接触发展示区 更新展示数据

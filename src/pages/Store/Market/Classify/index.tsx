@@ -14,7 +14,7 @@ import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
-import { MarketController } from '@/ts/controller/store/marketCtrl';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
@@ -32,7 +32,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @description: 实例化商店对象
    * @return {*}
    */
-  const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
+  // const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);
 
   /**
    * @description: 创建商店
@@ -40,7 +40,13 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = (formData: any) => {
-    marketCtrl.creatMarkrt({ ...formData });
+    marketCtrl.Market.createMarket(
+      formData.name,
+      formData.code,
+      formData.remark,
+      formData.samrId,
+      formData.ispublic,
+    );
     setIsAddOpen(false);
   };
 

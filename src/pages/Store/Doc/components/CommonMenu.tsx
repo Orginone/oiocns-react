@@ -34,7 +34,7 @@ export const getItemMenu = (el: NullFileItemModel, isTree?: boolean) => {
   ];
   const copy = [
     {
-      key: '4',
+      key: '复制到',
       icon: (
         <a>
           <ImFilesEmpty />
@@ -49,7 +49,7 @@ export const getItemMenu = (el: NullFileItemModel, isTree?: boolean) => {
     } else {
       const menus = [
         {
-          key: '2',
+          key: '重命名',
           icon: (
             <a>
               <FaEdit />
@@ -58,7 +58,7 @@ export const getItemMenu = (el: NullFileItemModel, isTree?: boolean) => {
           label: `重命名`,
         },
         {
-          key: '3',
+          key: '移动到',
           icon: (
             <a>
               <ImRedo />
@@ -68,7 +68,7 @@ export const getItemMenu = (el: NullFileItemModel, isTree?: boolean) => {
         },
         ...copy,
         {
-          key: '1',
+          key: '删除',
           icon: (
             <a>
               <FaTrashAlt />
@@ -77,7 +77,7 @@ export const getItemMenu = (el: NullFileItemModel, isTree?: boolean) => {
           label: '删除',
         },
         {
-          key: '5',
+          key: '下载',
           icon: (
             <a>
               <ImDownload />

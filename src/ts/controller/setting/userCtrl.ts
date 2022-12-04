@@ -70,9 +70,9 @@ class UserController extends BaseController {
    */
   public async getCohortList(): Promise<ICohort[]> {
     if (this._curSpace) {
-      return await this._curSpace.getJoinedCohorts();
+      return await this._curSpace.getJoinedCohorts(false);
     } else {
-      return await this._user!.getJoinedCohorts();
+      return await this._user!.getJoinedCohorts(false);
     }
   }
   /**
@@ -128,7 +128,7 @@ class UserController extends BaseController {
   private async _loadUser(person: schema.XTarget): Promise<void> {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
-    await this._user.getJoinedCompanys();
+    await this._user.getJoinedCompanys(false);
     this.changCallbackPart(UserPartTypes.User);
   }
 
