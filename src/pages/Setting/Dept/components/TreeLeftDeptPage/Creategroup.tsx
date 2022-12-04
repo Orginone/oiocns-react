@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import type { DataNode, TreeProps } from 'antd/es/tree';
+import type { TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 
 import cls from './index.module.less';
@@ -10,47 +10,7 @@ import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
 import { getUuid } from '@/utils/tools';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-
-const x = 3;
-const y = 2;
-const z = 1;
-const defaultData: DataNode[] = [];
-
-const generateData = (_level: number, _preKey?: React.Key, _tns?: DataNode[]) => {
-  const preKey = _preKey || '0';
-  const tns = _tns || defaultData;
-
-  const children = [];
-  for (let i = 0; i < x; i++) {
-    const key = `${preKey}-${i}`;
-    tns.push({ title: key, key });
-    if (i < y) {
-      children.push(key);
-    }
-  }
-  if (_level < 0) {
-    return tns;
-  }
-  const level = _level - 1;
-  children.forEach((key, index) => {
-    tns[index].children = [];
-    return generateData(level, key, tns[index].children);
-  });
-};
-generateData(z);
-
-const dataList: { key: React.Key; title: string }[] = [];
-const generateList = (data: DataNode[]) => {
-  for (let i = 0; i < data.length; i++) {
-    const node = data[i];
-    const { key } = node;
-    dataList.push({ key, title: key as string });
-    if (node.children) {
-      generateList(node.children);
-    }
-  }
-};
-generateList(defaultData);
+import { PlusOutlined } from '@ant-design/icons';
 
 type CreateGroupPropsType = {
   createTitle: string;
@@ -59,12 +19,8 @@ type CreateGroupPropsType = {
   handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({
-  createTitle,
-  handleMenuClick,
-  setCurrent,
-}) => {
-  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
+const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurrent }) => {
+  const [key] = useCtrlUpdate(userCtrl);
 
   const [treeData, setTreeData] = useState<any[]>([]);
   const setting = SettingService.getInstance();
@@ -145,14 +101,11 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       <div className={cls.topMes}>
         <Button
           className={cls.creatgroup}
-          type="primary"
-          onClick={() => handleMenuClick('new', {})}>
-          {createTitle}
-        </Button>
+          icon={<PlusOutlined className={cls.addIcon} />}
+          type="text"
+          onClick={() => handleMenuClick('new', {})}
+        />
         <MarketClassifyTree
-          // key={selectMenu}
-          // isDirectoryTree
-          // handleTitleClick={handleTitleClick}
           id={key}
           showIcon
           searchable

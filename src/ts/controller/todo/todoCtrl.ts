@@ -14,7 +14,6 @@ class TodoController extends BaseController {
   private _orderTodo: ITodoGroup | undefined;
   private _marketTodo: ITodoGroup | undefined;
   private _appTodo: ITodoGroup[] = [];
-  private _currentAppTodo: ITodoGroup | undefined;
   constructor() {
     super();
     userCtrl.subscribePart(UserPartTypes.User, () => {
@@ -52,7 +51,10 @@ class TodoController extends BaseController {
   public currentAppTodo = (id: string) => {
     return this._appTodo.find((n: ITodoGroup) => n.id === id);
   };
-
+  /**当前好友待办数量 */
+  public firendTodoCount = () => {
+    this._orgTodo;
+  };
   /** 获取总的待办数量 */
   public async TaskCount(): Promise<number> {
     let sum = 0;

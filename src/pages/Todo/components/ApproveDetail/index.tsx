@@ -1,5 +1,6 @@
 import React from 'react';
+import { Drawer } from 'antd';
 const ApproveDetail = () => {
-  return <></>;
+  return <Drawer title="审批"></Drawer>;
 };
 export default ApproveDetail;

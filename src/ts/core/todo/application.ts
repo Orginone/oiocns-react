@@ -78,6 +78,7 @@ class ApplicationTodo implements ITodoGroup {
   }
   async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: ApplyItem[] = [];
+
     const res = await kernel.queryInstance({
       productId: this._id,
       status: 0,
