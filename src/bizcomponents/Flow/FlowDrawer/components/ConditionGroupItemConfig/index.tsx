@@ -15,6 +15,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const { conditionData } = useContext(EventContext);
+  console.log('conditionData', conditionData);
   const [key, setKey] = useState(0);
 
   const paramChange = (paramKey: any, condition: any) => {
@@ -104,7 +105,8 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 allowClear
                 // 需要选择的参数
                 options={conditionData?.labels || []}
-                onChange={(val) => {
+                onChange={(val, option) => {
+                  console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
                 }}
                 defaultValue={condition.paramKey || null}
