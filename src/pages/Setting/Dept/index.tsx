@@ -34,9 +34,7 @@ const SettingDept: React.FC = () => {
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
-
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
-
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
 
   const treeContainer = document.getElementById('templateMenu');
@@ -91,6 +89,7 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
