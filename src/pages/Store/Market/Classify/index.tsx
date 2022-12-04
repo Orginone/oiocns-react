@@ -88,26 +88,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   useEffect(() => {
-    marketCtrl.Market.getJoinMarkets(false).then((res) => {
-      let arr: any = res.map((itemModel: any, index: any) => {
-        const item = itemModel.market;
-        let arrs = ['基础详情', '用户管理'];
-        arrs.push(`${item.belongId === Person.target.id ? '删除商店' : '退出商店'}`);
-        return {
-          title: item.name,
-          key: `0-${index}`,
-          id: item.id,
-          node: itemModel,
-          children: [],
-          belongId: item.belongId,
-          menus: arrs,
-        };
-      });
-      setList(arr);
-    });
-  }, []);
-
-  useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.marketList, () => {
       setList([...marketCtrl.marketList]);
     });
@@ -143,7 +123,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleChange = (path: string) => {
     console.log('是是是', path);
     if (path === '/market/shop') {
-      // StoreContent.changeMenu('market');
+      marketCtrl.changeMenu('market');
     }
     setSelectMenu(path);
     history.push(path);
@@ -182,7 +162,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
-    // StoreContent.changeMenu(item);
+    marketCtrl.changeMenu(item);
   };
 
   /**

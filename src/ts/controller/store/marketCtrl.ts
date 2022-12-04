@@ -2,6 +2,7 @@ import { Market } from '@/ts/core/market';
 import IMarket from '@/ts/core/market/imarket';
 import { IMTarget } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
+import { myColumns, marketColumns } from './config';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 
 export enum MarketCallBackTypes {
@@ -12,6 +13,13 @@ class MarketController extends BaseController {
   private _target: IMTarget | undefined;
   /** 当前操作的市场 */
   private _curMarket: IMarket | undefined;
+  /** 当前展示 菜单 */
+  private _currentMenu = 'Public';
+  /** 判断当前所处页面类型,调用不同请求 */
+  public curPageType: 'app' | 'market' = 'market';
+  /** 触发页面渲染 callback */
+  public marketTableCallBack!: (data: any) => void;
+  /** 市场列表 */
   private _marketList: any[] = [];
   /** 搜索到的商店 */
   public searchMarket: any;
@@ -43,16 +51,83 @@ class MarketController extends BaseController {
       return {} as IMTarget;
     }
   }
+
   /** 获取当前操作的市场 */
   public getCurrentMarket() {
     return this._curMarket;
   }
+
   /** 切换市场 */
   public setCurrentMarket(market: Market) {
     console.log('切换市场', market);
     this._curMarket = market;
     this.getMember();
     this.changCallback();
+  }
+
+  /**
+   * @desc: 切换侧边栏 触发 展示数据变化
+   * @param {any} menuItem
+   * @return {*}
+   */
+  public async changeMenu(menuItem: any) {
+    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
+    this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
+    // 点击重复 则判定为无效
+    if (this._currentMenu === menuItem.title) {
+      return;
+    }
+    this._currentMenu = menuItem.title;
+    this.curPageType = (await import('./sidebar')).default.curPageType;
+    console.log('当前页面类型', this.curPageType);
+
+    this.getStoreProduct(this.curPageType);
+  }
+
+  /**
+   * @desc: 获取表格头部展示数据
+   * @return {*}
+   */
+  public getColumns(pageKey?: string) {
+    switch (pageKey) {
+      case 'appInfo':
+      case 'myApp':
+        return myColumns;
+      case 'market':
+        return marketColumns;
+      default:
+        return [];
+    }
+    //TODO:待完善
+  }
+
+  /** 获取我的应用列表/商店-商品列表
+   * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
+   * @return {*}
+   */
+  public async getStoreProduct(type = 'app', params?: any) {
+    let Fun!: Function;
+    if (type === 'app') {
+      Fun = userCtrl.User!.getOwnProducts;
+      params = {};
+    } else {
+      Fun = this._curMarket!.getMerchandise;
+      params = { offset: 0, limit: 10, filter: '', ...params };
+    }
+
+    const res = await Fun(params);
+    console.log('获取数据', type, res);
+    if (Array.isArray(res)) {
+      this.marketTableCallBack([...res]);
+      return;
+    }
+
+    const { success, data } = res;
+
+    if (success) {
+      const { result = [] } = data;
+      this.marketTableCallBack([...result]);
+    }
   }
 
   /**
@@ -75,9 +150,7 @@ class MarketController extends BaseController {
         menus: arrs,
       };
     });
-
     this._marketList = arr;
-
     this.changCallbackPart(MarketCallBackTypes.marketList);
   }
 
@@ -130,6 +203,7 @@ class MarketController extends BaseController {
     if (res?.success) {
       this.marketMenber = res?.data?.result;
     }
+    console.log('获取市场里的所有用户', res);
     return this.marketMenber;
   }
 
