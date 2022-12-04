@@ -2,9 +2,9 @@ import { kernel } from './../../base/index';
 import BaseTarget from './base';
 import { model, schema } from '../../base';
 import { ResultType } from '../../base/model';
-import { IFlowTarget } from './itarget';
+import { IFlow } from './itarget';
 
-export default class FlowTarget extends BaseTarget implements IFlowTarget {
+export default class FlowTarget extends BaseTarget implements IFlow {
   defines: schema.XFlowDefine[] = [];
   defineRelations: schema.XFlowRelation[] = [];
   async getDefines(reload: boolean = false): Promise<schema.XFlowDefine[]> {
