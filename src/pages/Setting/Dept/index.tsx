@@ -1,7 +1,5 @@
-import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, Button, Descriptions, Space } from 'antd';
-// import { dataSource } from './datamock';
 import { columns } from './config';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
@@ -14,7 +12,7 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
 import { initDatatype } from '@/ts/core/setting/isetting';
-import TreeLeftDeptPage from './components/TreeLeftDeptPage/Creategroup';
+import TreeLeftDeptPage from './components/TreeLeftDeptPage';
 import SettingService from './service';
 import Department from '@/ts/core/target/department';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -39,7 +37,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
   const [authorityTree, setAuthorityTree] = useState<IAuthority>();
-  const treeContainer = document.getElementById('templateMenu');
+
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -124,9 +122,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     setSelectDept(current);
     setSelectId(current.id);
     setting.setCurrTreeDeptNode(current.id);
-
-    const dept = new Department(SelectDept!);
-
+    const dept = new Department(current);
     dept.getPerson().then((e) => {
       setDataSource(e);
     });
@@ -231,19 +227,29 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
    * @return {*}
    */
   const content = (
-    <div className={cls['company-dept-content']}>
-      <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="部门名称">{SelectDept?.name}</Descriptions.Item>
-          <Descriptions.Item label="部门编码">{SelectDept?.code}</Descriptions.Item>
-          <Descriptions.Item label="创建人">{SelectDept?.createUser}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">{SelectDept?.createTime}</Descriptions.Item>
-          <Descriptions.Item label="描述" span={2}>
-            {SelectDept?.team?.remark}
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
-    </div>
+    // <div >
+    <Card bordered={false} className={cls['company-dept-content']}>
+      <Descriptions
+        size="middle"
+        title={title}
+        bordered
+        column={2}
+        labelStyle={{ textAlign: 'center' }}
+        contentStyle={{ textAlign: 'center' }}>
+        <Descriptions.Item label="部门名称">{SelectDept?.name || ''}</Descriptions.Item>
+        <Descriptions.Item label="部门编码">{SelectDept?.code || ''}</Descriptions.Item>
+        <Descriptions.Item label="创建人">
+          {SelectDept?.createUser || ''}
+        </Descriptions.Item>
+        <Descriptions.Item label="创建时间">
+          {SelectDept?.createTime || ''}
+        </Descriptions.Item>
+        <Descriptions.Item label="描述" span={2}>
+          {SelectDept?.team?.remark}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+    // </div>
   );
   // 按钮
   const renderBtns = () => {
@@ -333,7 +339,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         onOk={onApplyOk}
         handleOk={handleOk}
       />
-
       {/* 变更部门 */}
       <TransferDepartment
         title={'转移部门'}
@@ -341,15 +346,8 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         onOk={onOk}
         handleOk={handleOk}
       />
+
       {/* 对象设置 */}
-      <AddPostModal
-        title={'身份设置'}
-        open={isSetPost}
-        onOk={onOk}
-        handleOk={onOk}
-        datasource={[]}
-      />
-      {/* 左侧树 */}
       <AddPostModal
         title={'身份设置'}
         open={isSetPost}
@@ -361,19 +359,13 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         }}
         datasource={authorityTree}
       />
-
       {/* 左侧树 */}
-      {treeContainer
-        ? ReactDOM.createPortal(
-            <TreeLeftDeptPage
-              createTitle="新增"
-              setCurrent={setTreeCurrent}
-              handleMenuClick={handleMenuClick}
-              currentKey={''}
-            />,
-            treeContainer,
-          )
-        : ''}
+      <TreeLeftDeptPage
+        createTitle="新增"
+        setCurrent={setTreeCurrent}
+        handleMenuClick={handleMenuClick}
+        currentKey={''}
+      />
     </div>
   );
 };

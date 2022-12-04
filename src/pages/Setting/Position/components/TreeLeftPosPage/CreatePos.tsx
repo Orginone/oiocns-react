@@ -72,7 +72,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
         <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
           新增岗位
         </Button>
-
         {positionList}
       </div>
     </div>
