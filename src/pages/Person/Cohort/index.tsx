@@ -91,6 +91,13 @@ const CohortConfig: React.FC = () => {
         },
       },
       {
+        key: 'aaa',
+        label: '身份管理',
+        onClick: () => {
+          history.push('/setting/position/' + item.target.id);
+        },
+      },
+      {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
