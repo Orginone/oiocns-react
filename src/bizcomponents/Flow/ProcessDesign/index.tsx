@@ -3,7 +3,7 @@ import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 // {  DefaultProps }  报错临时处理
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
@@ -140,7 +140,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
   const startDesign = async (obj: any) => {
     let tempDesign;
     setForm(obj);
-    // DefaultProps.setFormFields(contionMes?.labels);
+    DefaultProps.setFormFields(conditionData?.labels);
     if (obj.flow) {
       tempDesign = JSON.parse(JSON.stringify(obj.flow));
     } else {
@@ -163,7 +163,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
               </div>
             )}
           </div>
-
           <LayoutPreview ref={previewRef} />
         </EventContext.Provider>
       </div>
