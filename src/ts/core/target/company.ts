@@ -57,7 +57,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async searchGroup(code: string): Promise<ResultType<schema.XTargetArray>> {
     return await this.searchTargetByName(code, [TargetType.Group]);
   }
-  public get getSpaceData(): SpaceType {
+  public get spaceData(): SpaceType {
     return {
       id: this.target.id,
       name: this.target.team!.name,

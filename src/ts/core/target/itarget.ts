@@ -201,11 +201,51 @@ export interface IMTarget {
    */
   getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
 }
-export interface IFlowTarget {
+export interface ISpace {
+  /** 我加入的群组 */
+  joinedCohort: ICohort[];
   /** 流程定义 */
   defines: schema.XFlowDefine[];
   /** 流程绑定关系 */
   defineRelations: schema.XFlowRelation[];
+  /** 空间类型数据 */
+  spaceData: SpaceType;
+  /**
+   * @description: 查询我加入的群
+   * @param reload 是否强制刷新
+   * @return {*} 查询到的群组
+   */
+  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
+  /**
+   * 创建群组
+   * @param data 群组基本信息
+   */
+  createCohort(
+    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
+  ): Promise<ResultType<any>>;
+  /**
+   * 退出群组
+   * @param id 群组Id
+   */
+  quitCohorts(id: string): Promise<ResultType<any>>;
+  /**
+   * 解散群组
+   * @param id 群组id
+   * @param belongId 群组归属id
+   * @returns
+   */
+  deleteCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 申请加入群组
+   * @param id 目标Id
+   * @returns
+   */
+  applyJoinCohort(id: string): Promise<ResultType<any>>;
+  /**
+   * 查询群组
+   * @param code 群组编号
+   */
+  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
    * 获取流程定义列表
    * @param reload 是否强制刷新
@@ -295,31 +335,21 @@ export interface ICohort {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson extends IMTarget, IFlowTarget {
+export interface IPerson extends IMTarget, ISpace {
   /** 人员实体 */
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 我的好友 */
   joinedFriend: schema.XTarget[];
-  /** 我加入的群组 */
-  joinedCohort: ICohort[];
   /** 我加入的单位 */
   joinedCompany: ICompany[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
   /**
    * 更新人员
    * @param data 人员基础信息
    * @returns 是否成功
    */
   update(data: Omit<TargetModel, 'id'>): Promise<ResultType<schema.XTarget>>;
-  /**
-   * @description: 查询我加入的群
-   * @param reload 是否强制刷新
-   * @return {*} 查询到的群组
-   */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
   /**
    * 获取单位列表
    * @param reload 是否强制刷新
@@ -329,13 +359,6 @@ export interface IPerson extends IMTarget, IFlowTarget {
   /** 获取职权树 */
   selectAuthorityTree(): Promise<IAuthority | undefined>;
   /**
-   * 创建群组
-   * @param data 群组基本信息
-   */
-  createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>>;
-  /**
    * 设立单位
    * @param data 单位基本信息
    * @returns 是否成功
@@ -344,35 +367,17 @@ export interface IPerson extends IMTarget, IFlowTarget {
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<schema.XTarget>>;
   /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<ResultType<any>>;
-  /**
    * 删除单位
    * @param id 单位Id
    * @returns
    */
   deleteCompany(id: string): Promise<ResultType<any>>;
   /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<ResultType<any>>;
-  /**
    * 申请加入单位
    * @param id 目标Id
    * @returns
    */
   applyJoinCompany(id: string, typeName: TargetType): Promise<ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<ResultType<any>>;
   /**
    * 退出单位
    * @param id 单位Id
@@ -427,26 +432,19 @@ export interface IPerson extends IMTarget, IFlowTarget {
    */
   searchCompany(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
-   * 查询群组
-   * @param code 群组编号
-   */
-  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
-  /**
    * 查询人员
    * @param code 人员编号
    */
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany extends IMTarget, IFlowTarget {
+export interface ICompany extends IMTarget, ISpace {
   /** 单位实体 */
   target: schema.XTarget;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 子组织类型 */
   subTypes: TargetType[];
-  /** 空间类型数据 */
-  getSpaceData: SpaceType;
   /** 单位人员 */
   person: schema.XTarget[];
   /** 我的子部门 */
@@ -455,8 +453,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
   workings: IWorking[];
   /** 我加入的集团 */
   joinedGroup: IGroup[];
-  /** 我加入的群组 */
-  joinedCohort: ICohort[];
   /**
    * 更新单位
    * @param data 单位基础信息
@@ -474,16 +470,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
   /**
-   * 创建群组
-   * @param name 名称
-   * @param code 编号
-   * @param remark 备注
-   * @returns 是否创建成功
-   */
-  createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>>;
-  /**
    * 移除人员
    * @param ids 人员Id集合
    */
@@ -500,18 +486,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns
    */
   deleteWorking(id: string): Promise<ResultType<any>>;
-  /**
-   * 解散群组
-   * @param id 群组id
-   * @param belongId 群组归属id
-   * @returns
-   */
-  deleteCohort(id: string): Promise<ResultType<any>>;
-  /**
-   * 退出群组
-   * @param id 群组Id
-   */
-  quitCohorts(id: string): Promise<ResultType<any>>;
   /**
    *  退出集团
    * @param id 集团Id
@@ -539,23 +513,11 @@ export interface ICompany extends IMTarget, IFlowTarget {
    */
   getWorkings(reload: boolean): Promise<IWorking[]>;
   /**
-   * @description: 查询我加入的群
-   * @param reload 是否强制刷新
-   * @return {*} 查询到的群组
-   */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
-  /**
    * @description: 查询我加入的集团
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
   getJoinedGroups(reload: boolean): Promise<IGroup[]>;
-  /**
-   * 申请加入群组
-   * @param id 目标Id
-   * @returns
-   */
-  applyJoinCohort(id: string): Promise<ResultType<any>>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -572,11 +534,6 @@ export interface ICompany extends IMTarget, IFlowTarget {
    * @returns
    */
   cancelJoinApply(id: string): Promise<ResultType<any>>;
-  /**
-   * 查询群组
-   * @param code 群组编号
-   */
-  searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
   /**
    * 查询集团
    * @param code 集团编号

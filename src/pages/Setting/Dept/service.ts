@@ -88,9 +88,9 @@ export default class SettingService {
     this._currTreeDeptNode = id;
   }
   constructor() {
-    if (UserCtrl.Space != null) {
-      this.setCompanyID = UserCtrl.Space?.target.id;
-      this._root = new Department(UserCtrl.Space?.target);
+    if (UserCtrl.Company != null) {
+      this.setCompanyID = UserCtrl.Company?.target.id;
+      this._root = new Department(UserCtrl.Company?.target);
     } else {
       this.setCompanyID = '';
       this._root = new Department(UserCtrl.User?.target);

@@ -70,9 +70,9 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
     // 控制选中的部门ID。
     const id = userCtrl.subscribe(async () => {
       // 如果新增部门，就需要重新初始化树TODO
-      if (userCtrl?.Space) {
-        if (userCtrl.Space.departments.length > 0) {
-          userCtrl.Space.departments = [];
+      if (userCtrl?.Company) {
+        if (userCtrl.Company.departments.length > 0) {
+          userCtrl.Company.departments = [];
         }
         initData(true);
       }
@@ -84,7 +84,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   }, []);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.Space?.getDepartments(reload);
+    const data = await userCtrl?.Company?.getDepartments(reload);
     if (data?.length) {
       const tree = data.map((n) => {
         return createTeeDom(n);

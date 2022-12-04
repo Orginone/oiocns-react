@@ -1,6 +1,6 @@
 import BaseController from '../baseCtrl';
 import { kernel, model, schema } from '../../base';
-import { ICohort, ICompany, IFlowTarget, IPerson, SpaceType } from '../../core/target/itarget';
+import { ICohort, ICompany, ISpace, IPerson, SpaceType } from '../../core/target/itarget';
 import Person from '../../core/target/person';
 export enum UserPartTypes {
   'User' = 'user',
@@ -41,27 +41,19 @@ class UserController extends BaseController {
     }
   }
   /** 当前单位空间 */
-  get Space(): ICompany {
+  get Company(): ICompany {
     if (this._curSpace) {
       return this._curSpace;
     } else {
       return { id: '', target: { id: '' } } as unknown as ICompany;
     }
   }
-  /** 当前空间数据 */
-  get SpaceData(): SpaceType {
+  /** 当前空间对象 */
+  get Space(): ISpace {
     if (this._curSpace) {
-      return this._curSpace.getSpaceData;
-    }
-    return this._user!.getSpaceData;
-  }
-  /** 流程操作对象 */
-  public Flow(): IFlowTarget {
-    if(this._curSpace){
       return this._curSpace;
-    }else{
-      return this._user!;
     }
+    return this._user!;
   }
   /** 设置当前空间 */
   public setCurSpace(id: string) {
