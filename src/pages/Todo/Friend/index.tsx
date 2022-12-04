@@ -90,6 +90,7 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       (n: IApprovalItem | IApplyItem) =>
         n.Data.team.target.typeName === TargetType.Person,
     );
+    console.log(list);
     setPageData(list);
     setPageTotal(list.length);
     setNeedReload(false);

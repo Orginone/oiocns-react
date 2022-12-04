@@ -44,7 +44,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
   const systemMenu = async () => {
     const orgCount = await todoCtrl.OrgTodo.getCount();
     const data = await todoCtrl.OrgTodo.getTodoList(false);
-    const friend = data.filter((n) => n.Data.team.typeName === TargetType.Person);
+    const friend = data.filter((n) => n.Data.team.target.typeName === TargetType.Person);
     let new_system = [...systemTodo];
     new_system[0].icon = <Badge dot={friend.length !== 0}>{systemTodo[0].icon}</Badge>;
     new_system[1].icon = (
@@ -67,36 +67,38 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     );
     return new_system;
   };
-
   const renderMenu = async () => {
     console.log('yingyongdaiban', todoCtrl.AppTodo);
-    const todos = todoCtrl.AppTodo.map(async (m) => {
-      return {
+    let newtodos = [];
+    for (const m of todoCtrl.AppTodo) {
+      const count = await m.getCount();
+      console.log(count);
+      newtodos.push({
         key: '/todo/app/' + m.id,
         label: m.name,
         icon: (
-          <Badge dot={(await m.getCount()) !== 0}>
+          <Badge dot={count !== 0}>
             <FundOutlined />
           </Badge>
         ),
-      };
-    });
-
+      });
+    }
     const muneItems = [
       {
         type: 'group',
         label: '平台待办',
-        children: systemMenu(),
+        children: await systemMenu(),
       },
       {
         type: 'group',
         label: '应用待办',
-        children: todos,
+        children: newtodos,
       },
     ];
     setTodoMenu(muneItems as ItemType[]);
   };
   useEffect(() => {
+    console.log(key);
     if (todoCtrl.OrgTodo) {
       renderMenu();
     }
