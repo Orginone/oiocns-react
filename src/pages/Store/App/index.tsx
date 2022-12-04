@@ -17,7 +17,6 @@ import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
@@ -36,7 +35,6 @@ const StoreApp: React.FC = () => {
     });
     const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
       console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
-
       setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
     });
     // StoreSiderbar.changePageType('app');
@@ -49,7 +47,7 @@ const StoreApp: React.FC = () => {
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v._prod.source);
+      typeSet.add(v._prod?.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -109,17 +107,6 @@ const StoreApp: React.FC = () => {
   };
   // 共享确认回调
   const submitShare = () => {
-    console.log(
-      '共享确认回调',
-      checkNodes,
-      // departHisData,
-      // authorData,
-      // personsData,
-      // personsHisData,
-      // identitysData,
-      // identitysHisData,
-    );
-
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
@@ -139,7 +126,7 @@ const StoreApp: React.FC = () => {
         label: '详情',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
-          history.push({ pathname: '/store/app/info', state: { appId: item.prod?.id } });
+          history.push({ pathname: '/store/app/info' });
         },
       },
       {
@@ -184,6 +171,7 @@ const StoreApp: React.FC = () => {
         label: '分配',
         onClick: () => {
           SelfAppCtrl.curProduct = item;
+          setShowShareModal(true);
         },
       },
       {
@@ -213,7 +201,6 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={userCtrl.User?.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
               columns={SelfAppCtrl.getColumns('myApp')}

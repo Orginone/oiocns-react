@@ -34,8 +34,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
-  console.log(999999999999, list, dataSource);
-
   useEffect(() => {
     if (!list?.length) {
       return;
@@ -51,11 +49,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       setTotal(result.length);
       setSataSource([...result]);
     }
-    //TODO: 其他条件 发出请求
-    // if (Object.keys(searchParams).length == 0) {
-    //   return;
-    // }
-    // getTableList(searchParams, '', true);
   }, [searchParams, list]);
 
   /**
@@ -69,12 +62,10 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   // 卡片内容渲染函数
   const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
     return dataArr.map((item: IProduct) => {
-      console.log('卡片数据', item);
-
       return (
         <AppCard
           className="card"
-          data={item.prod}
+          data={item}
           key={item.prod.id}
           defaultKey={{
             name: 'name',

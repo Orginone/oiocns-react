@@ -266,7 +266,7 @@ export interface ISpace extends IFlow {
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
-  getJoinedCohorts(reload: boolean): Promise<ICohort[]>;
+  getJoinedCohorts(reload?: boolean): Promise<ICohort[]>;
   /**
    * 创建群组
    * @param data 群组基本信息
@@ -387,7 +387,7 @@ export interface IPerson extends IMTarget, ISpace {
    * 获取职权树
    * @param reload 是否强制刷新
    */
-  selectAuthorityTree(reload: boolean): Promise<IAuthority | undefined>;
+  selectAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
   /**
    * 设立单位
    * @param data 单位基本信息
@@ -418,7 +418,7 @@ export interface IPerson extends IMTarget, ISpace {
    * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getFriends(reload: boolean): Promise<schema.XTarget[]>;
+  getFriends(reload?: boolean): Promise<schema.XTarget[]>;
   /**
    * 申请添加好友
    * @param target 目标

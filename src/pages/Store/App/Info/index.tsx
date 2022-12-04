@@ -21,7 +21,7 @@ const StoreAppInfo: React.FC = () => {
   const [list, setList] = useState<any>([]);
   const [tabKey, setTabKey] = useState('组织');
   useEffect(() => {
-    console.log('{SelfAppCtrl.curProduct?._prod.version}');
+    console.log('{SelfAppCtrl.curProduct?.prod.version}');
     getExtend();
   }, []);
 
@@ -74,16 +74,16 @@ const StoreAppInfo: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={SelfAppCtrl.curProduct?._prod.name}
+          title={SelfAppCtrl.curProduct?.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?._prod.remark}</p>
+              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
                 <span className="vision">
-                  版本号 ：{SelfAppCtrl.curProduct?._prod.version}
+                  版本号 ：{SelfAppCtrl.curProduct?.prod.version}
                 </span>
                 <span className="lastTime">
-                  订阅到期时间 ：{SelfAppCtrl.curProduct?._prod.createTime}
+                  订阅到期时间 ：{SelfAppCtrl.curProduct?.prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
