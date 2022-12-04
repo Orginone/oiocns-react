@@ -15,7 +15,7 @@ const ShoppingCart: React.FC<any> = (props) => {
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
   const { confirm } = Modal;
-  console.log(userCtrl.Space);
+  console.log(userCtrl.Company);
   // console.log(Provider.isUserSpace());
   console.log(userCtrl.User);
   // const marketCtrl = new MarketController(userCtrl!.Space ?? userCtrl!.User);

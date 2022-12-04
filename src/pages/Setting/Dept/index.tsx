@@ -34,9 +34,7 @@ const SettingDept: React.FC = () => {
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
-
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
-
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
 
   const treeContainer = document.getElementById('templateMenu');
@@ -91,6 +89,7 @@ const SettingDept: React.FC = () => {
       },
     ];
   };
+
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
@@ -163,7 +162,7 @@ const SettingDept: React.FC = () => {
    * @return {*}
    */
   useEffect(() => {
-    if (userCtrl.Space == undefined) {
+    if (userCtrl.Company == undefined) {
       Modal.info({
         title: '提示',
         content: (
@@ -178,12 +177,12 @@ const SettingDept: React.FC = () => {
     }
     initData();
     // 刚进入的时候选中公司 TODO
-    setting.setCompanyID = userCtrl?.Space?.target.id + '';
-    setting.setRoot = userCtrl?.Space!.target;
-  }, ['', userCtrl?.Space]);
+    setting.setCompanyID = userCtrl?.Company?.target.id + '';
+    setting.setRoot = userCtrl?.Company!.target;
+  }, ['', userCtrl?.Company]);
 
   useEffect(() => {
-    setting.setCompanyID = userCtrl?.Space?.target.id ?? '';
+    setting.setCompanyID = userCtrl?.Company?.target.id ?? '';
   }, [selectId]);
 
   const initData = async () => {};
@@ -280,7 +279,7 @@ const SettingDept: React.FC = () => {
       <Card tabList={TitleItems}>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title={userCtrl.Space.target.name}
+            title={userCtrl.Company.target.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             tabList={items}

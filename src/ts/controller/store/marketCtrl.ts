@@ -19,7 +19,7 @@ class MarketController extends BaseController {
     this.searchMarket = [];
     userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], () => {
       if (userCtrl.IsCompanySpace) {
-        this._target = userCtrl.Space;
+        this._target = userCtrl.Company;
       } else {
         this._target = userCtrl.User;
       }

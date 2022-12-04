@@ -84,7 +84,7 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
   const changeMenu = () => {
     let [_newMenu, ...other] = [...muneItems];
     _newMenu.children =
-      userCtrl?.Space === undefined
+      userCtrl?.Company === undefined
         ? userInfoMenuItems
         : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
 

@@ -48,7 +48,7 @@ export default class Product implements IProduct {
     return await kernel.createSourceExtend({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: userCtrl.Space.target.id,
+      spaceId: userCtrl.Company.target.id,
       destIds,
       destType,
       teamId,
@@ -64,7 +64,7 @@ export default class Product implements IProduct {
       sourceType: '产品',
       destIds,
       destType,
-      spaceId: userCtrl.Space.target.id,
+      spaceId: userCtrl.Company.target.id,
       teamId,
     });
   }
@@ -75,7 +75,7 @@ export default class Product implements IProduct {
     return await kernel.queryExtendBySource({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: userCtrl.Space.target.id,
+      spaceId: userCtrl.Company.target.id,
       destType,
       teamId,
     });
@@ -108,7 +108,7 @@ export default class Product implements IProduct {
   public async unPublish(id: string): Promise<model.ResultType<any>> {
     const res = await kernel.deleteMerchandise({
       id,
-      belongId: userCtrl.Space.target.id,
+      belongId: userCtrl.Company.target.id,
     });
     if (res.success) {
       this.merchandises = this.merchandises.filter((a) => {
