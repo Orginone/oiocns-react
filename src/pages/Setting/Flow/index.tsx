@@ -139,7 +139,10 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
-    const result = await userCtrl.Space.publishDefine(design);
+    const result = await userCtrl.Space.publishDefine({
+      ...design,
+      BelongId: userCtrl.Space.target.id,
+    });
     if (result.data) {
       message.success('添加成功');
     } else {
