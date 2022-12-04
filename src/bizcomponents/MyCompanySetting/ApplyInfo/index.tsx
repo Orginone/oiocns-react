@@ -3,6 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { User } from 'typings/user';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ApplyInfoProps = {
   // eslint-disable-next-line no-unused-vars
@@ -77,6 +78,10 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
   useEffect(() => {
     getTableList();
   }, []);
+
+  useEffect(() => {
+    // 用户修改的时候 ，处理代码
+  }, [userCtrl.User]);
 
   const columns: ColumnsType<DataType> = [
     {
