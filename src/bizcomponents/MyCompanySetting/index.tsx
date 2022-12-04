@@ -2,18 +2,16 @@ import { Button, Modal, Tabs, message } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-
 import CardOrTable from '@/components/CardOrTableComp';
-// import { useQuery } from '@tanstack/react-query';
-import { User } from 'typings/user';
 
 import type * as schema from '@/ts/base/schema';
-
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import ApplyInfoService from './ApplyInfo';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IPerson } from '@/ts/core/target/itarget';
+import { ICompany, IPerson } from '@/ts/core/target/itarget';
+import ApplyInfoService from './ApplyInfo';
+import { MarketTypes } from 'typings/marketType';
+import { TargetType } from '@/ts/core/enum';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -27,7 +25,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [applyInfoOpen, setApplyInfoOpen] = useState(false);
 
-  const [list, setList] = useState<schema.XTarget[]>([]);
+  const [list, setList] = useState<ICompany[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
 
@@ -49,7 +47,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   };
 
   const showModal = () => {
-    // 第一次进入页面的时候 是否选中
     setJoinKey('');
     setIsModalOpen(true);
   };
@@ -70,9 +67,13 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     } else {
       let thisSelectKey = joinKey;
       // code msg success
-      const responseObj = await userCtrl.User.applyJoinCompany(thisSelectKey);
+      const responseObj = await userCtrl.User.applyJoinCompany(
+        thisSelectKey,
+        TargetType.Company,
+      );
+
       if (responseObj.success) {
-        message.info('申请加入单位成功');
+        message.info('申请加入单位成功!');
       } else {
         message.error('申请加入单位失败：' + responseObj.msg);
       }
@@ -83,8 +84,33 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     setIsModalOpen(false);
   };
 
-  const setTabName = (key: string) => {
-    console.log(key);
+  const setTabName = async (key: string) => {
+    // 1 2 3
+    const person: IPerson = userCtrl.User;
+    const joinCompanys = await person.getJoinedCompanys(false);
+    // console.log(joinCompanys);
+    if (parseInt(key) == 2) {
+      const createCompanys: any[] = [];
+      for (const comp of joinCompanys) {
+        if (comp.target.createUser == person.target.id) {
+          createCompanys.push(comp);
+        }
+      }
+      setList(createCompanys);
+      setTotal(createCompanys.length);
+    } else if (parseInt(key) == 3) {
+      const otherCompanys: any[] = [];
+      for (const comp of joinCompanys) {
+        if (comp.target.createUser != person.target.id) {
+          otherCompanys.push(comp);
+        }
+      }
+      setList(otherCompanys);
+      setTotal(otherCompanys.length);
+    } else {
+      setList(joinCompanys);
+      setTotal(joinCompanys.length);
+    }
   };
 
   /**
@@ -98,8 +124,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     getTableList({ page, pageSize });
   };
 
-  // const tableAlertRender = (selectedRowKeys: any[], selectedRows: any[]) => {};
-
   /**
    * @desc: 获取展示列表
    * @param {string} searchKey 搜索关键词
@@ -107,55 +131,34 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
    * @return {*}
    */
   const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {
-    // setList([...service.List]);
-    // setTotal(service.Total);
-
-    // 从提供器里面取人员。
+    console.log(req, searchKey, isGofirst);
     const person: IPerson = userCtrl.User;
-    const joinCompanys = await person.getJoinedCompanys();
-    console.log('===获取到的内核数据！ ', joinCompanys);
-
-    // const companys = await Userdata.getInstance().searchCompany({
-    //   page: 1,
-    //   pageSize: 100,
-    //   filter: '91330304254498785G'
-    // });
-    // console.log("===获取到的内核数据2！ ", companys);
-
-    const { data } = await companyService.searchCompany({
-      page: 1,
-      pageSize: 100,
-    });
-
-    // const data2 = useQuery<Company[]>(['company.getJoinedCompany'], () =>
-    //   companyService.getJoinedCompany({ page: 1, pageSize: 1000 }),
-    // );
-    const joinData = await companyService.getJoinedCompany({
-      page: 1,
-      pageSize: 1000,
-    });
-
-    setList(joinData);
-    setTotal(joinData.length);
+    const joinCompanys = await person.getJoinedCompanys(false);
+    console.log(joinCompanys);
+    setList(joinCompanys);
+    setTotal(joinCompanys.length);
   };
 
-  const columns: ColumnsType<Company> = [
+  const columns: ColumnsType<ICompany> = [
     {
       title: '单位名称',
-      dataIndex: 'name',
+      key: 'name',
+      render: (item) => item.target.name,
     },
     {
       title: '单位编码',
-      dataIndex: 'code',
+      key: 'code',
+      render: (item) => item.target.code,
     },
     {
       title: '单位描述',
-      dataIndex: 'typeName',
+      key: 'remark',
+      render: (item) => item.target.team.remark,
     },
   ];
 
   // 操作内容
-  const renderOperation = (item: Company): User.OperationType[] => {
+  const renderOperation = (item: ICompany): MarketTypes.OperationType[] => {
     return [
       {
         key: 'companyInfo',
@@ -187,7 +190,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   };
 
   const getCheckboxProps = (record: any) => {
-    // console.log(record);
+    record;
   };
 
   return (
@@ -197,9 +200,9 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
           <strong>单位设置</strong>
         </Title>
         <div>
-          <Button type="link" onClick={showDepartment}>
+          {/* <Button type="link" onClick={showDepartment}>
             部门岗位
-          </Button>
+          </Button> */}
           <Button type="link" onClick={showApplyModal}>
             查看申请记录
           </Button>
@@ -213,7 +216,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
         defaultActiveKey="1"
         onChange={(key: string) => {
           setTabName(key);
-          // 切换
         }}
         items={[
           {

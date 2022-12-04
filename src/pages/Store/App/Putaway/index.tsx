@@ -68,14 +68,14 @@ const AppPutaway: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={curProduct?._prod.name || '应用名称'}
+          title={curProduct?.prod.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{curProduct?._prod.remark}</p>
+              <p className="app-info-con-desc">{curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：{curProduct?._prod.version}</span>
+                <span className="vision">版本号 ：{curProduct?.prod.version}</span>
                 <span className="lastTime">
-                  订阅到期时间 ：{curProduct?._prod.createTime}
+                  订阅到期时间 ：{curProduct?.prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
@@ -101,8 +101,8 @@ const AppPutaway: React.FC = () => {
           layout="horizontal"
           initialValues={{
             sellAuth: '使用权',
-            caption: curProduct?._prod.name,
-            typeName: curProduct?._prod.typeName,
+            caption: curProduct?.prod.name,
+            typeName: curProduct?.prod.typeName,
           }}
           form={form}
           autoComplete="off">

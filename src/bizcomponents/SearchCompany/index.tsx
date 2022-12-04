@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 
@@ -13,6 +13,8 @@ type CompanySearchTableProps = {
   setJoinKey?: (key: string) => void;
 };
 
+let tableProps: CompanySearchTableProps;
+
 /*
   弹出框表格查询
 */
@@ -20,6 +22,10 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   type dataObject = XTarget & {
     selectStyle: string;
   };
+
+  useEffect(() => {
+    tableProps = props;
+  }, []);
 
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
@@ -55,16 +61,19 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         // extra={`找到${dataSource?.length}家单位`}
         onChange={async (event) => {
           setSearchKey(event.target.value);
-          let data: XTarget[] = [];
           if (event.target.value) {
             const res = await userCtrl.User.searchCompany(event.target.value);
-            if (res.success) {
-              data = res.data;
+            if (res.success && res.data && res.data.result) {
+              setDataSource(res.data.result);
+              const joinKey = res.data.result[0].id!;
+              if (tableProps.setJoinKey) {
+                tableProps.setJoinKey(joinKey);
+              }
             }
           }
-          setDataSource(data);
         }}
       />
+
       {dataSource.length > 0 && companyCardList()}
       {searchKey && dataSource.length == 0 && (
         <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的单位`} />

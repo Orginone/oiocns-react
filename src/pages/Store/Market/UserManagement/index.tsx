@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import storeClassify from '@/ts/controller/store/sidebar';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import cls from './index.module.less';
 import { columns } from './config';
 
@@ -39,7 +40,8 @@ const UserManagement = () => {
         onClick: () => {
           const targetIds: string[] = [];
           targetIds.push(item?.id);
-          storeClassify.removeMember(targetIds);
+          marketCtrl.removeMember(targetIds);
+          // storeClassify.removeMember(targetIds);
         },
       },
     ];

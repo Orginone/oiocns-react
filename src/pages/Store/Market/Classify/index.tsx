@@ -8,13 +8,11 @@ import { Menu, Button, Row, Col } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import StoreSiderbar from '@/ts/controller/store/sidebar';
-import StoreContent from '@/ts/controller/store/content';
 import NewStoreModal from '@/components/NewStoreModal';
 import DeleteCustomModal from '@/components/DeleteCustomModal';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
+import marketCtrl, { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
@@ -90,30 +88,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   };
 
   useEffect(() => {
-    marketCtrl.Market.getJoinMarkets(false).then((res) => {
-      let arr: any = res.map((itemModel: any, index: any) => {
-        const item = itemModel.market;
-        let arrs = ['基础详情', '用户管理'];
-        arrs.push(`${item.belongId === Person.target.id ? '删除商店' : '退出商店'}`);
-        return {
-          title: item.name,
-          key: `0-${index}`,
-          id: item.id,
-          node: itemModel,
-          children: [],
-          belongId: item.belongId,
-          menus: arrs,
-        };
-      });
-      setList(arr);
+    const id = marketCtrl.subscribePart(MarketCallBackTypes.marketList, () => {
+      setList([...marketCtrl.marketList]);
     });
-  }, []);
-
-  useEffect(() => {
-    StoreSiderbar.curPageType = 'market';
-    StoreSiderbar.getTreeData();
+    marketCtrl.queryMarketList();
     return () => {
-      return StoreSiderbar.unsubscribe('marketTreeData');
+      return marketCtrl.unsubscribe(id);
     };
   }, []);
 
@@ -143,7 +123,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const handleChange = (path: string) => {
     console.log('是是是', path);
     if (path === '/market/shop') {
-      StoreContent.changeMenu('market');
+      marketCtrl.changeMenu('market');
     }
     setSelectMenu(path);
     history.push(path);
@@ -182,7 +162,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const handleTitleClick = (item: any) => {
     // 触发内容去变化
-    StoreContent.changeMenu(item);
+    marketCtrl.changeMenu(item);
   };
 
   /**
@@ -228,7 +208,8 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         break;
       case '用户管理':
         history.push('/market/usermanagement');
-        StoreSiderbar.handleSelectMarket(node?.node);
+        marketCtrl.setCurrentMarket(node?.node);
+        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
