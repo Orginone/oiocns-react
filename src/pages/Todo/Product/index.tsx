@@ -93,7 +93,9 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       '2': 'getDoList',
       '3': 'getApplyList',
     };
+
     const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
+    console.log(data);
     setPageData(data);
     setPageTotal(data.length);
     setNeedReload(false);
@@ -114,7 +116,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       }}
       tabBarExtraContent={''}>
       <CardOrTableComp<IApplyItem | IApprovalItem>
-        rowKey={'id'}
+        rowKey={(record) => record?.Data?.id}
         columns={columns}
         dataSource={pageData}
         total={total}
