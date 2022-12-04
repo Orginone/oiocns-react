@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import cls from './index.module.less';
 // import userCtrl from '@/ts/controller/setting/userCtrl';
 // import { TargetType } from '@/ts/core/enum';
@@ -17,7 +17,7 @@ interface Iprops {
 const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId } = props;
+  const { open, title, handleOk, handleCancel } = props;
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
