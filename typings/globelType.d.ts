@@ -1,3 +1,5 @@
+import { RouteConfig } from 'react-router-config';
+
 type MenuItemType = {
   id?: string;
   name: string;
@@ -15,27 +17,6 @@ interface DataType {
 
 type PageShowType = 'table' | 'card'; //数据页面展示形式 表格 / 卡片
 
-// 全局继承类 所需类型
-interface CommonClassType<P> {
-  List: P[]; //展示列表
-  Total: number; //数据总数
-  getList: <T extends { page: number; pageSize: number }>(params: T) => void; // 获取列表
-  creatItem: (params: any) => void; // 获取列表
-  updateItem: (params: any) => void; // 获取列表
-  deleteItem: (targetId: string) => void; // 获取列表
-  quitTarget: (targetId: string) => void; // 获取列表
-  joinTarget: (targetId: string) => void; // 获取列表
-}
-
-interface CommonClassData {
-  nameSpace: string; //命名空间--用于区分功能
-  searchApi?: Function; // 查 数据
-  createApi?: Function; // 增 数据
-  deleteApi?: Function; // 删 数据
-  updateApi?: Function; // 改 数据
-  joinTargetApi?: Function; // 向...加入
-  quitTargetApi?: Function; // 从...退出
-}
 
 /**
  * 前端业务分页结果的数据类型
@@ -46,3 +27,22 @@ export type PageData<P = {}> = {
   data: P[];
   msg?: string;
 };
+interface IRouteConfig extends RouteConfig {
+  // 路由路径
+  path: string;
+  // 路由组件
+  component?: any;
+  // 302 跳转
+  redirect?: string;
+  exact?: boolean;
+  // 路由信息
+  title: string;
+  // 元数据
+  meta?: any;
+  // 图标
+  icon?: string | React.ReactNode;
+  // 是否校验权限, false 为不校验, 不存在该属性或者为true 为校验, 子路由会继承父路由的 auth 属性
+  auth?: boolean;
+  // 子路由
+  routes?: IRouteConfig[];
+}

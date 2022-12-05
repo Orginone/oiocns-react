@@ -64,8 +64,6 @@ export interface IMTarget {
   publicMarkets: Market[];
   /** 拥有的产品/应用 */
   ownProducts: IProduct[];
-  /** 我的购物车 */
-  stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
   /** 可使用的应用 */
@@ -97,11 +95,6 @@ export interface IMTarget {
    * @returns
    */
   getOwnProducts(reload: boolean): Promise<IProduct[]>;
-  /**
-   * 查询购物车列表
-   * @param reload 是否强制刷新
-   */
-  getStaging(reload: boolean): Promise<schema.XStaging[]>;
   /**
    * 查询购买订单
    */
@@ -208,16 +201,6 @@ export interface IMTarget {
     typeName: string;
   }): Promise<ResultType<schema.XProduct>>;
   /**
-   * 添加暂存区
-   * @param id 商品Id
-   */
-  stagingMerchandise(id: string): Promise<ResultType<any>>;
-  /**
-   * 删除暂存区
-   * @param id 暂存区Id
-   */
-  deleteStaging(id: string): Promise<ResultType<any>>;
-  /**
    * 删除市场
    * @param id 市场Id
    * @returns
@@ -294,7 +277,6 @@ export interface IFlow {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
-
 export interface ISpace extends IFlow {
   /** 我加入的群组 */
   joinedCohort: ICohort[];
@@ -521,6 +503,10 @@ export interface ICompany extends IMTarget, ISpace, ITarget {
    * @returns 是否成功
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
+  /** 创建部门 */
+  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  /** 创建部门 */
+  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
   /**
    * 移除人员
    * @param ids 人员Id集合

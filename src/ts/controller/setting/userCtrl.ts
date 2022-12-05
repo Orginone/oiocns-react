@@ -37,7 +37,7 @@ class UserController extends BaseController {
     if (this._user) {
       return this._user;
     } else {
-      return { id: '', target: { id: '' } } as unknown as Person;
+      return { id: '', target: { id: '' } } as unknown as IPerson;
     }
   }
   /** 当前单位空间 */

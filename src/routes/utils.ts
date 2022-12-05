@@ -1,7 +1,7 @@
 // import routes from '.';
-import routes, { IRouteConfig } from './config';
+import routes from './config';
 import type { RouteComponentConfig as IRoute } from './index';
-
+import type { IRouteConfig } from '../../typings/globelType.d';
 /**
  *
  * 将路由转换为一维数组

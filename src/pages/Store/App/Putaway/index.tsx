@@ -6,23 +6,23 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
-import StoreSidebar from '@/ts/controller/store/sidebar';
+// import StoreSidebar from '@/ts/controller/store/sidebar';
 
 /*******
  * @desc: 应用上架
  */
 const AppPutaway: React.FC = () => {
   const history = useHistory();
-  const [marketData, setMarketData] = useState<any[]>([]);
+  // const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
   const curProduct = SelfAppCtrl.curProduct;
-  useEffect(() => {
-    StoreSidebar.getOwnMarket(false).then(() => {
-      setMarketData(StoreSidebar.marketFooterTree.appTreeData);
-    });
-  }, []);
+  // useEffect(() => {
+  //   StoreSidebar.getOwnMarket(false).then(() => {
+  //     setMarketData(StoreSidebar.marketFooterTree.appTreeData);
+  //   });
+  // }, []);
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
@@ -111,13 +111,13 @@ const AppPutaway: React.FC = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {marketData.map((item) => {
+              {/* {marketData.map((item) => {
                 return (
                   <Select.Option value={item.id} key={item.id}>
                     {item.title}
                   </Select.Option>
                 );
-              })}
+              })} */}
             </Select>
           </Form.Item>
           <Form.Item label="应用名称" name="caption">

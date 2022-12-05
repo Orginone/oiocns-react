@@ -8,7 +8,7 @@ import {
   FundOutlined,
 } from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 import { MenuProps } from 'antd';
 // import StoreSiderbar from '@/ts/controller/store/sidebar';
 
