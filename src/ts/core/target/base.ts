@@ -55,7 +55,7 @@ export default class BaseTarget implements ITarget {
       if (res.success) {
         this.identitys = this.identitys.splice(index, 1);
       }
-      return true;
+      return res.success;
     }
     return false;
   }
