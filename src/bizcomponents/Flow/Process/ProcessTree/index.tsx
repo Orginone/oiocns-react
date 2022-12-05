@@ -91,7 +91,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
       });
 
       //插入添加分支/条件的按钮
-      branchItems.unshift(
+      branchItems?.unshift(
         h(
           'div',
           {

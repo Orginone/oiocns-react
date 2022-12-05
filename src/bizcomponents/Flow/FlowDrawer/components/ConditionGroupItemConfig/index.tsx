@@ -85,7 +85,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
 
   return (
     <div>
-      {selectedNode.conditions.map((condition: any, index: number) => (
+      {selectedNode.conditions?.map((condition: any, index: number) => (
         <div key={index + '_g'} className={cls['group']}>
           <div className={cls['group-header']}>
             <div

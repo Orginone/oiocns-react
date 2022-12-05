@@ -14,7 +14,8 @@ const ConditionNode = () => {
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
-    selectedNode.conditions.push({
+    console.timeLog('selectedNode.conditions', selectedNode.conditions);
+    selectedNode.conditions?.push({
       pos: selectedNode.conditions.length + 1,
       paramKey: '',
       paramLabel: '',

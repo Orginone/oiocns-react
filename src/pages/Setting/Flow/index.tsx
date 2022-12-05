@@ -30,12 +30,14 @@ export const stepTypeAndNameMaps: Record<StepType, string> = {
   [StepType.PROCESSMESS]: '流程设计',
 };
 
-export enum EditorType {
-  'TABLEMES',
-  'PROCESSDESIGN',
+export enum TabType {
+  'TABLEMES', //表格
+  'PROCESSDESIGN', //流程
 }
 
-type FlowItem = {};
+type FlowItem = {
+  content: string;
+};
 
 /**
  * 流程设置
@@ -44,14 +46,14 @@ type FlowItem = {};
 const SettingFlow: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
-  const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
+  const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
-
+  const [editorValue, setEditorValue] = useState<string>('{}');
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
   });
-  // const form = useAppwfConfig((state: any) => state.form);
+
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -73,13 +75,8 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '绑定应用',
-      dataIndex: 'linkApp',
-      ellipsis: true,
-    },
-    {
       title: '创建人',
-      dataIndex: 'createPeople',
+      dataIndex: 'createUser',
       ellipsis: true,
     },
     {
@@ -96,20 +93,15 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: () => [
+      render: (text, record) => [
         <a
           key="editor"
           onClick={() => {
-            setEditorType(EditorType.PROCESSDESIGN);
+            setTabType(TabType.PROCESSDESIGN);
+            setCurrentStep(StepType.PROCESSMESS);
+            setEditorValue(record?.content);
           }}>
           编辑
-        </a>,
-        <a
-          key="look"
-          onClick={() => {
-            setEditorType(EditorType.PROCESSDESIGN);
-          }}>
-          查看
         </a>,
         <a
           key="delete"
@@ -117,8 +109,13 @@ const SettingFlow: React.FC = () => {
             Modal.confirm({
               title: '提示',
               content: '确定删除当前流程吗',
-              onOk: () => {
-                message.success('删除成功');
+              onOk: async () => {
+                const currentData = await userCtrl.Space.deleteDefine(record.id);
+                console.log('currentData', currentData);
+                if (currentData) {
+                  initData();
+                  message.success('删除成功');
+                }
               },
             });
           }}>
@@ -167,7 +164,7 @@ const SettingFlow: React.FC = () => {
   return (
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
-        {editorType === EditorType.TABLEMES ? (
+        {tabType === TabType.TABLEMES ? (
           <div>
             <Card title="流程列表" bordered={false}>
               <ProTable
@@ -180,7 +177,7 @@ const SettingFlow: React.FC = () => {
                     key="button"
                     type="primary"
                     onClick={() => {
-                      setEditorType(EditorType.PROCESSDESIGN);
+                      setTabType(TabType.PROCESSDESIGN);
                     }}>
                     新建
                   </Button>,
@@ -220,8 +217,9 @@ const SettingFlow: React.FC = () => {
                             okType: 'danger',
                             cancelText: '取消',
                             onOk() {
-                              setEditorType(EditorType.TABLEMES);
+                              setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
+                              setEditorValue('{}');
                             },
                             onCancel() {},
                           });
@@ -293,7 +291,9 @@ const SettingFlow: React.FC = () => {
                         }}
                       />
                     ) : (
-                      <ProcessDesign conditionData={conditionData}></ProcessDesign>
+                      <ProcessDesign
+                        editorValue={editorValue}
+                        conditionData={conditionData}></ProcessDesign>
                     )}
                   </Card>
                 </Content>
