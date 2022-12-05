@@ -599,8 +599,8 @@ export interface IGroup extends ITarget {
    * @param id 目标Id
    * @returns
    */
-  applyJoinGroup(id: string): Promise<ResultType<any>>;
   /**
+   applyJoinGroup(id: string): Promise<ResultType<any>>;
    * 创建子集团
    * @param data 子集团基本信息
    */
