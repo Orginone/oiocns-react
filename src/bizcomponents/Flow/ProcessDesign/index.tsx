@@ -9,13 +9,19 @@ type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
   editorValue: string;
+  designData: any;
 };
 export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns
  */
-const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData, editorValue }) => {
+const ProcessDesign: React.FC<ProcessDesignProps> = ({
+  conditionData,
+  editorValue,
+  designData,
+}) => {
+  console.log('designData', designData);
   // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
@@ -65,15 +71,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData, editorValu
 
   const startDesign = async () => {
     let tempDesign;
-
     console.log('editorValue', editorValue);
     if (editorValue && editorValue !== '{}') {
       tempDesign = JSON.parse(editorValue);
-      DefaultProps.setFormFields(tempDesign?.remark);
+      DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
     } else {
       DefaultProps.setFormFields(conditionData?.labels);
       defaultDesign.remark = JSON.stringify(conditionData?.labels);
-      defaultDesign.name = JSON.stringify(conditionData?.name);
+      defaultDesign.name = conditionData?.name;
       tempDesign = JSON.parse(JSON.stringify(defaultDesign));
     }
     // setOldDesign(tempDesign);

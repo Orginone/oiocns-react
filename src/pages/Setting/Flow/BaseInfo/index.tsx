@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ProFormText,
   ProForm,
@@ -13,14 +13,23 @@ import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: (params: any) => void;
   currentFormValue: {};
+  onChange: (params: any) => void;
 };
 
-const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue }) => {
+const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
+  useEffect(() => {
+    form.setFieldsValue(currentFormValue);
+  }, [currentFormValue]);
+
   return (
     <div className={cls['contentMes']}>
       <ProForm
         layout="horizontal"
+        onValuesChange={(e) => {
+          console.log('表单填写', e);
+          onChange(e);
+        }}
         form={form}
         onFinish={async (e) => {
           nextStep(e);

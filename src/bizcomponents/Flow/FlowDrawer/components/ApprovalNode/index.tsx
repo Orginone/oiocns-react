@@ -24,6 +24,7 @@ const ApprovalNode = () => {
     selectedNode.props.assignedUser = [{ name: params.node.name, id: params.node.id }];
     setSelectedNode(selectedNode);
     setSelectPost(params);
+    setIsOpen(false);
   };
   const onCancel = () => {
     setIsOpen(false);
@@ -77,7 +78,7 @@ const ApprovalNode = () => {
           <Form.Item label="会签人数">
             <InputNumber
               onChange={(e) => {
-                selectedNode.props.num = String(e);
+                selectedNode.props.num = e;
               }}
               placeholder="请设置会签人数"
               addonBefore={<UserOutlined />}

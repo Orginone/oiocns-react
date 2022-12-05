@@ -152,14 +152,13 @@ const SettingFlow: React.FC = () => {
     design.belongId = userCtrl.Space.target.id;
     console.log('design', design);
     const result = await userCtrl.Space.publishDefine(design);
-    console.log(result);
     if (result.data) {
       message.success('添加成功');
+      setTabType(TabType.TABLEMES);
       initData();
     } else {
       message.warning(result.msg);
     }
-    // message.warning('该功能尚未开放');
   };
 
   return (
@@ -286,6 +285,10 @@ const SettingFlow: React.FC = () => {
                     {/* 基本信息组件 */}
                     {currentStep === StepType.BASEINFO ? (
                       <BaseInfo
+                        currentFormValue={conditionData}
+                        onChange={(params) => {
+                          setConditionData(params);
+                        }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
                           setConditionData(params);
@@ -293,6 +296,7 @@ const SettingFlow: React.FC = () => {
                       />
                     ) : (
                       <ProcessDesign
+                        designData={design}
                         editorValue={editorValue}
                         conditionData={conditionData}></ProcessDesign>
                     )}
