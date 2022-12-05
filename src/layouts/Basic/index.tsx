@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
 import React, { useEffect } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';

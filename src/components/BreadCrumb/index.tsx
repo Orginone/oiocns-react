@@ -1,8 +1,9 @@
-import { Breadcrumb, MenuProps, Space, Typography } from 'antd';
+import { Breadcrumb, Space, Typography } from 'antd';
 import React, { ReactNode, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { IRouteConfig } from 'typings/globelType';
 
-import routes, { IRouteConfig } from '../../routes/config';
+import routes from '../../routes/config';
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 import './index.less';
 import {
   FundOutlined,
