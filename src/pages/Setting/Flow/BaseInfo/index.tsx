@@ -26,9 +26,9 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
     <div className={cls['contentMes']}>
       <ProForm
         layout="horizontal"
-        onValuesChange={(e) => {
-          console.log('表单填写', e);
-          onChange(e);
+        onValuesChange={async () => {
+          console.log('await form.getFieldsValue()', await form.getFieldsValue());
+          onChange(await form.getFieldsValue());
         }}
         form={form}
         onFinish={async (e) => {
@@ -67,7 +67,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
             <ProFormSelect
               name="type"
               label="字段类型"
-              request={async () => [
+              options={[
                 { label: '字符串', value: 'STRING' },
                 { label: '数字', value: 'NUMERIC' },
                 { label: '枚举', value: 'DICT' },
