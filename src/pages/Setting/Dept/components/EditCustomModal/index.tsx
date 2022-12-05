@@ -1,67 +1,97 @@
-/*
- * @Author: zhangqiang 1196217890@qq.com
- * @Date: 2022-11-14 16:43:05
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-21 09:51:54
- * @FilePath: /oiocns-react/src/pages/Setting/Dept/components/EditCustomModal/index.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Row, Col, Space, Button, message } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Row, Col, message } from 'antd';
 import cls from './index.module.less';
-import UploadAvatar, { avatarUpload } from '../UploadAvatar';
 import SettingService from '../../service';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-// import IDepartment from '@/ts/core/target/department';
 import { TargetType } from '@/ts/core/enum';
 import Department from '@/ts/core/target/department';
-
-/*
-  编辑
-*/
+import { IDepartment } from '@/ts/core/target/itarget';
+const { TextArea } = Input;
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: () => void;
   handleOk: () => void;
   handleCancel: () => void;
   selectId?: string;
+  editDept?: IDepartment;
 }
-
-const { TextArea } = Input;
 
 const EditCustomModal = (props: Iprops) => {
   const setting = SettingService.getInstance();
-  // 头像的保存
-  const [fileList, setFileList] = useState<avatarUpload[]>([
-    {
-      uid: '-1',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-  ]);
-
-  const { open, title, onOk, handleOk, handleCancel, selectId } = props;
+  const { open, title, handleOk, handleCancel, editDept } = props;
   const [form] = Form.useForm();
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (open) {
+      title !== '新增' ? form.setFieldsValue(editDept?.target) : form.resetFields();
+    }
+  }, [open]);
+  const submitData = async () => {
+    const value = await form.validateFields();
+    if (value) {
+      // 编辑自己的部门信息
+      if (title === '编辑') {
+        if (editDept) {
+          await editDept.update({ ...editDept.target, ...value });
+        }
+      } else {
+        const newValue = {
+          ...value,
+          teamName: value.name,
+          teamCode: value.code,
+          belongId: userCtrl.Company?.target.id,
+          typeName: TargetType.Department,
+          parentId: editDept ? editDept.target.id : '',
+        };
+        // 查询是否重复创建
+        const dept = setting.getRoot as Department;
+        dept.searchTargetType = [TargetType.Department, TargetType.Company];
+        let datas = await dept.searchTargetByName(newValue.code, [TargetType.Department]);
+        if (!datas.success) {
+          message.error(datas.msg);
+          return;
+        }
+        if (datas?.data && datas.data?.total > 0) {
+          message.error('重复创建');
+          return;
+        }
+        datas = await dept.searchTargetByName(newValue.name, [TargetType.Department]);
+        if (!datas.success) {
+          message.error(datas.msg);
+          return;
+        }
+        if (datas?.data && datas.data?.total > 0) {
+          message.error('重复创建');
+          return;
+        }
+        let curentValue: any;
 
+        if (editDept) {
+          // 新增下级部门信息
+          curentValue = await editDept.createDepartment(newValue);
+        } else {
+          // 如果是一级部门， 就从根部门里面新增
+          curentValue = await setting.getRoot.createDepartment(newValue);
+        }
+        if (!curentValue.success) {
+          message.error(curentValue.msg);
+        } else {
+          message.success(curentValue.msg);
+          handleOk();
+        }
+      }
+    }
+  };
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
         title={title}
         open={open}
-        onOk={handleOk}
+        onOk={submitData}
         onCancel={() => handleCancel()}
         getContainer={false}
-        destroyOnClose={true}
-        footer={null}>
+        destroyOnClose={true}>
         <Form form={form} layout="vertical">
-          <Form.Item label="" name="avatar" noStyle>
-            <UploadAvatar fileList={fileList} setFileList={setFileList} />
-          </Form.Item>
-
-          <Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 name="name"
@@ -79,108 +109,12 @@ const EditCustomModal = (props: Iprops) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={12}>
-              <Form.Item
-                name="teamName"
-                label="团队名称"
-                rules={[{ required: true, message: '请输入团队名称!' }]}>
-                <Input placeholder="请输入团队名称" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="teamCode"
-                label="团队编码"
-                rules={[{ required: true, message: '请输入团编码' }]}>
-                <Input placeholder="请输入团队编码" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Form.Item
-                name="remark"
-                label="描述"
-                rules={[{ required: true, message: '请输入部门描述!' }]}>
-                <TextArea
-                  placeholder="请输入部门描述"
-                  autoSize={{ minRows: 1, maxRows: 1 }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row justify="end">
-            <Space>
-              <Button
-                type="primary"
-                onClick={async () => {
-                  const value = await form.validateFields();
-                  if (value) {
-                    value.parentId = setting.getCurrTreeDeptNode();
-                    value.belongId = userCtrl.Company?.target.id;
-                    if (fileList.length > 0 && fileList[0].shareLink) {
-                      value.avatar = fileList[0].shareLink;
-                    }
-                    // 新增部门
-                    value.typeName = TargetType.Department;
-                    // 查询是否重复创建
-                    const dept = setting.getRoot as Department;
-                    dept.searchTargetType = [TargetType.Department, TargetType.Company];
-                    let datas = await dept.searchTargetByName(value.code, [
-                      TargetType.Department,
-                    ]);
-                    if (!datas.success) {
-                      message.error(datas.msg);
-                      return;
-                    }
-                    if (datas?.data && datas.data?.total > 0) {
-                      message.error('重复创建');
-                      return;
-                    }
-                    datas = await dept.searchTargetByName(value.name, [
-                      TargetType.Department,
-                    ]);
-                    if (!datas.success) {
-                      message.error(datas.msg);
-                      return;
-                    }
-                    if (datas?.data && datas.data?.total > 0) {
-                      message.error('重复创建');
-                      return;
-                    }
-
-                    let curentValue: any;
-                    if (value.parentId == '') {
-                      // 如果是一级部门， 就从根部门里面新增
-                      curentValue = await setting.getRoot.createDepartment(value);
-                    } else {
-                      // 如果是二级部门，就查找后，再从部门新增
-                      const currObj = await setting.refItem(value.parentId);
-                      if (currObj) {
-                        curentValue = await currObj!.createDepartment(value);
-                      } else {
-                        curentValue = {
-                          success: false,
-                          msg: '查询失败！',
-                        };
-                      }
-                    }
-
-                    if (!curentValue.success) {
-                      message.error(curentValue.msg);
-                      // form.resetFields();
-                    } else {
-                      message.success(curentValue.msg);
-                      form.resetFields();
-                      handleOk();
-                    }
-                  }
-                }}>
-                完成
-              </Button>
-            </Space>
-          </Row>
+          <Form.Item name="remark" label="描述">
+            <TextArea
+              placeholder="请输入部门描述"
+              autoSize={{ minRows: 2, maxRows: 3 }}
+            />
+          </Form.Item>
         </Form>
       </Modal>
     </div>
