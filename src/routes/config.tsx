@@ -39,21 +39,25 @@ const PassportRouter: IRouteConfig[] = [
   {
     path: '/passport/login',
     component: PassportLogin,
+    exact: true,
     title: '登录',
   },
   {
     path: '/passport/register',
     component: PassportRegister,
+    exact: true,
     title: '注册',
   },
   {
     path: '/passport/lock',
     component: PassportLock,
+    exact: true,
     title: '锁屏',
   },
   {
     path: '/passport/forget',
     component: PassportForget,
+    exact: true,
     title: '忘记密码',
   },
 ];
@@ -521,4 +525,24 @@ const Routers: IRouteConfig[] = [
   },
 ];
 
+interface rType {
+  path: string;
+  title: string;
+  routes?: rType[];
+}
+function handleInfo(routeArr: IRouteConfig[]): rType[] {
+  return routeArr.map((r: IRouteConfig) => {
+    let obj: rType = {
+      path: r.path,
+      title: r.title,
+    };
+    if (r.routes && r.routes?.length > 0) {
+      obj.routes = handleInfo(r.routes);
+    }
+    return obj;
+  });
+}
+// 处理 向外导出的 路由目录树 不携带组件信息
+
+export const routerInfo = handleInfo(Routers);
 export default Routers;

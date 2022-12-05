@@ -1,7 +1,7 @@
 import { Col, Layout, MenuProps, Row, Space } from 'antd';
 import React, { useState } from 'react';
 
-import { IRouteConfig } from 'typings/globelType';
+// import { IRouteConfig } from 'typings/globelType';
 
 import BreadCrumbBox from '../BreadCrumb';
 import ContentMenu from '../ContentMenu';
@@ -25,7 +25,7 @@ type ContentTemplateType = {
   hideBreadCrumb?: boolean; // 是否隐藏面包屑
   hideTooBar?: boolean; //是否隐藏右侧内容
   children?: React.ReactNode; // 子组件
-  route?: IRouteConfig; // 路由
+  route?: any; // 路由
   siderMenuData?: MenuProps[`items`];
   menuClick?: MenuClickEventHandler;
   menuSelect?: MenuProps[`onSelect`];
