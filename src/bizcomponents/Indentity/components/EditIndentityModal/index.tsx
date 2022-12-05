@@ -12,42 +12,39 @@ import React, { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
-
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-// import UploadAvatar from '../UploadAvatar';
+import {
+  IDepartment,
+  IPerson,
+  IGroup,
+  ICompany,
+  ICohort,
+} from '@/ts/core/target/itarget';
 
 /* 
   编辑
 */
 interface Iprops {
-  title: string;
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
   handleCancel: () => void;
-  selectId?: string;
   defaultData: IIdentity;
   callback: Function;
+  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
 }
 
-type DataItem = {
-  name: string;
-  state: string;
-};
-
 // initialValues={item}
-const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId, callback, defaultData } =
-    props;
+const EditIndentityModal = (props: Iprops) => {
+  const { open, onOk, handleOk, reObject, callback, defaultData } = props;
   const [authTree, setAuthTree] = useState<IAuthority>();
   useEffect(() => {
     authTreeData();
   }, []);
   const authTreeData = async () => {
-    const res = await userCtrl.Company.selectAuthorityTree(false);
+    const res = await reObject.selectAuthorityTree(false);
     setAuthTree(res);
   };
   const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
@@ -116,7 +113,7 @@ const EditCustomModal = (props: Iprops) => {
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
-        title={title}
+        title={'编辑'}
         open={open}
         getContainer={false}
         width={450}
@@ -147,4 +144,4 @@ const EditCustomModal = (props: Iprops) => {
   );
 };
 
-export default EditCustomModal;
+export default EditIndentityModal;

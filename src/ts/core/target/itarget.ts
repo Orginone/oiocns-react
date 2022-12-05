@@ -323,7 +323,7 @@ export interface ISpace extends IFlow {
   searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 群组操作 */
-export interface ICohort {
+export interface ICohort extends ITarget {
   /** 群组实体对象 */
   target: schema.XTarget;
   /** 职权树 */

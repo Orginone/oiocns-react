@@ -29,9 +29,9 @@ interface DataType {
 
 const AddPostModal = (props: Iprops) => {
   const { title, open, handleOk, datasource } = props;
-  const parentRef = useRef<any>(null); //父级容器Dom
-  const [operateOpen, setOperateOpen] = useState<boolean>(false); //切换设置
-  const [item, setItem] = useState<IAuthority>(); //切换设置
+  const parentRef = useRef<any>(null);
+  const [operateOpen, setOperateOpen] = useState<boolean>(false);
+  const [item, setItem] = useState<IAuthority>();
 
   const onHandleOk = () => {
     console.log('onHandleOk');
@@ -65,7 +65,6 @@ const AddPostModal = (props: Iprops) => {
     },
   ];
 
-  /**渲染操作 */
   const renderOperation = (item: IAuthority): MarketTypes.OperationType[] => {
     return [
       {
@@ -107,7 +106,6 @@ const AddPostModal = (props: Iprops) => {
   return (
     <div className={cls[`add-person-modal`]}>
       {addmodal}
-      {/* 新增岗位 */}
       <AddNewPosition
         title={'新增身份'}
         open={operateOpen}
