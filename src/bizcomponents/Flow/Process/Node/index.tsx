@@ -89,17 +89,8 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />
       )}
-      {/* <span className={cls['name']}>{props.title}</span> */}
     </div>
   );
-
-  // const nodeContent = (
-  //   <div className={cls['node-body-content']} onClick={select}>
-  //     {!props.content && <span className={cls['placeholder']}>{props.placeholder}</span>}
-  //     {props.content && <span className={cls['name']}>{props.content}</span>}
-  //     <RightOutlined className={cls['node-body-rightOutlined']} />
-  //   </div>
-  // );
 
   const nodeContent = (
     <div className={cls['node-body-right']}>
@@ -113,7 +104,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           </span>
         )}
         {props.content && (
-          <span onClick={select} className={cls['name-title']}>
+          <span onClick={select} className={cls['name-select-title']}>
             {props.content}
           </span>
         )}

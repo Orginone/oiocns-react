@@ -1,6 +1,6 @@
 import { Col, Layout, MenuProps, Row, Space } from 'antd';
 import React, { useState } from 'react';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 import { Link } from 'react-router-dom';
 import BreadCrumbBox from '../BreadCrumb';
 import ContentMenu from '../ContentMenu';

@@ -2,7 +2,7 @@ import { Layout, Menu, Space } from 'antd';
 import type { MenuProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { businessRouteList } from '@/routes/utils';
+// import { businessRouteList } from '@/routes/utils';
 
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
@@ -72,9 +72,10 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
-  const currentMacthRoute = businessRouteList.find(
-    (child) => child.path === props.match.path,
-  );
+  const currentMacthRoute = [] as any;
+  //  businessRouteList.find(
+  //   (child) => child.path === props.match.path,
+  // );
   const menuFlat = menuData ? flatMenuData(menuData) : [];
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {

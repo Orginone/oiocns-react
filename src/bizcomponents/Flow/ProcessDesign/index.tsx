@@ -65,18 +65,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
             nodeId: 'node_590719745789',
             parentId: 'node_590719745693',
             type: 'CONDITION',
-            conditions: [
-              {
-                pos: '1',
-                paramKey: 'price',
-                paramLabel: '金额',
-                key: 'LTE',
-                label: '≤',
-                type: 'NUMERIC',
-                val: '50000',
-                valLabel: '',
-              },
-            ],
+            conditions: [],
             name: '条件1',
           },
           {

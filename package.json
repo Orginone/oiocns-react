@@ -24,6 +24,7 @@
     "deploy": "gh-pages -d dist",
     "postinstall": "husky install",
     "commitlint": "commitlint",
+    "preview": "vite preview --open",
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite"
   },
   "husky": {

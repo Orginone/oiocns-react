@@ -63,7 +63,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
     } else if (isBranchNode(node)) {
       let index = 0;
       //遍历分支节点，包含并行及条件节点
-      let branchItems = node.branches.map((branchNode: any) => {
+      let branchItems = node.branches?.map((branchNode: any) => {
         //处理每个分支内子节点
         toMapping(branchNode);
         let childDoms = branchNode.children
