@@ -5,8 +5,8 @@ import AppCard from '@/components/AppCardOfBuy';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
 import { message } from 'antd';
-import { Link } from 'react-router-dom';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
+// import { Link } from 'react-router-dom';
+// import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import BuyCustomModal from './BuyCustomModal';
 
