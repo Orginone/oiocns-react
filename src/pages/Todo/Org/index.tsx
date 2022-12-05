@@ -1,7 +1,7 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
 import { TargetType } from '@/ts/core/enum';

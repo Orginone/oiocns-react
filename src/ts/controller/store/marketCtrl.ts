@@ -2,8 +2,15 @@ import { Market } from '@/ts/core/market';
 import IMarket from '@/ts/core/market/imarket';
 import { IMTarget } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
+import { kernel } from '../../base';
 import { myColumns, marketColumns } from './config';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { JOIN_SHOPING_CAR } from '@/constants/const';
+import { message } from 'antd';
+
+export enum MarketCallBackTypes {
+  'ApplyData' = 'ApplyData',
+}
 
 class MarketController extends BaseController {
   /** 市场操作对象 */
@@ -20,6 +27,10 @@ class MarketController extends BaseController {
   public searchMarket: any;
   /** 所有的用户 */
   public marketMenber: any;
+  /** 加入购物车商品 */
+  public JoinShopingCar: any[] = [];
+  /** 购物车商品列表 */
+  private _shopinglist: any[] = []; //缓存树形数据
 
   constructor() {
     super();
@@ -33,6 +44,22 @@ class MarketController extends BaseController {
       await this._target.getJoinMarkets();
       this.changCallback();
     });
+    /* 获取 历史缓存的 购物车商品列表 */
+    kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+      console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+      const { data = [] } = shoplist;
+
+      this._shopinglist = data || [];
+      this.changCallbackPart(MarketCallBackTypes.ApplyData);
+    });
+  }
+
+  /**
+   * @description: 获取购物车商品列表的方法
+   * @return {*}
+   */
+  public get shopinglist(): any[] {
+    return this._shopinglist;
   }
 
   /** 市场操作对象 */
@@ -138,6 +165,42 @@ class MarketController extends BaseController {
     console.log('移出成员ID合集', targetIds);
     const res = await this._curMarket?.removeMember(targetIds);
     console.log('移出成员', res);
+  };
+
+  /**
+   * @description: 添加/删除 购物车
+   * @return {*}
+   */
+  public joinOrdeleApply = async (data: any) => {
+    if (this._shopinglist.length === 0) {
+      this._shopinglist.push(data);
+      message.success('已加入购物车');
+    } else if (this._shopinglist.some((item) => item.id === data?.id)) {
+      message.warning('您已添加该商品，请勿重复添加');
+      return;
+    } else {
+      this._shopinglist.push(data);
+      message.success('已加入购物车');
+    }
+    this.cacheJoinShopingCar(this._shopinglist);
+  };
+
+  /**
+   * 缓存 加入购物车的商品
+   * @param message 新消息，无则为空
+   */
+  public cacheJoinShopingCar = (data: any): void => {
+    this.changCallbackPart(MarketCallBackTypes.ApplyData);
+    kernel.anystore.set(
+      JOIN_SHOPING_CAR,
+      {
+        operation: 'replaceAll',
+        data: {
+          data: data || [],
+        },
+      },
+      'user',
+    );
   };
 }
 export default new MarketController();

@@ -1,5 +1,5 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-table';
 import { Space, Tag, Typography } from 'antd';

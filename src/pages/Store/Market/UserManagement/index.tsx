@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
-import storeClassify from '@/ts/controller/store/sidebar';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import cls from './index.module.less';
 import { columns } from './config';
@@ -14,11 +13,11 @@ const UserManagement = () => {
   const [data, setData] = useState<any>([]); // 当前操作的商店对象
   const [dataSource, setDataSource] = useState<any>([]); // 商店内对应的用户信息
   useEffect(() => {
-    const id = storeClassify.subscribe(() => {
-      setData(storeClassify?.marketMenber);
+    const id = marketCtrl.subscribe(() => {
+      setData(marketCtrl?.marketMenber);
     });
     return () => {
-      storeClassify.unsubscribe(id);
+      marketCtrl.unsubscribe(id);
     };
   }, []);
   useEffect(() => {
@@ -41,7 +40,6 @@ const UserManagement = () => {
           const targetIds: string[] = [];
           targetIds.push(item?.id);
           marketCtrl.removeMember(targetIds);
-          // storeClassify.removeMember(targetIds);
         },
       },
     ];

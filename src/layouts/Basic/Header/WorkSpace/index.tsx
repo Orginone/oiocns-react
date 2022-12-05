@@ -102,7 +102,7 @@ const OrganizationalUnits = () => {
       <div
         className={`${styles.list} ${showMenu ? styles.active : ''}`}
         style={{
-          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 36) : 0,
+          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 56) : 0,
         }}>
         <div className={styles[`menu-list`]}>
           {menuList.map((n) => (

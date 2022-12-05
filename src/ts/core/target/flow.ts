@@ -45,9 +45,11 @@ export default class FlowTarget extends BaseTarget {
   }
   async deleteDefine(id: string): Promise<ResultType<boolean>> {
     const res = await kernel.deleteDefine({ id });
-    this.defines = this.defines.filter((a) => {
-      return a.id == id;
-    });
+    if (res.success) {
+      this.defines = this.defines.filter((a) => {
+        return a.id != id;
+      });
+    }
     return res;
   }
   async createInstance(
