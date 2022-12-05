@@ -1,57 +1,71 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space } from 'antd';
+import { Card, Button, Descriptions, Space, message } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
-import EditCustomModal from '../Dept/components/EditCustomModal';
-import AddPersonModal from '../Dept/components/AddPersonModal';
-import LookApply from '../Dept/components/LookApply';
+// import { dataSource } from './datamock';
+// import AddPersonModal from '../Dept/components/AddPersonModal';
+// import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
 import TreeLeftGroupPage from './components/TreeLeftGroupPage/Creategroup';
 import { schema } from '@/ts/base';
+import EditCustomModal from './components/EditCustomModal';
+import { IGroup } from '@/ts/core/target/itarget';
+import Group from '@/ts/core/target/group';
+import { XTarget } from '@/ts/base/schema';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
+import { getUuid } from '@/utils/tools';
 /**
  * 集团设置
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const treeContainer = document.getElementById('templateMenu');
-  const { id } = props.match.params;
-
-  // const { isOpenModal, setEditItem } = settingStore((state) => ({
-  //   ...state,
-  // }));
 
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [statusKey, setStatusKey] = useState('merchandise');
+  const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
+  const [dataSource, setDataSource] = useState<XTarget[]>();
+  const [id, setId] = useState<string>('');
+  const [groupModalID, setGroupModalID] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
   useEffect(() => {}, []);
 
-  /**
-   * 监听集团id发生变化，改变右侧数据
-   * */
-  useEffect(() => {}, []);
-
   // 选中树的时候操作
-  const setTreeCurrent = (current: schema.XTarget) => {};
+  const setTreeCurrent = (current: schema.XTarget) => {
+    setId(current.id);
+    setCurrentGroup(new Group(current));
+    currentGroup?.getCompanys(false).then((e) => {
+      setDataSource(e);
+    });
+  };
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
+    console.log(key, item, '====');
     switch (key) {
       case 'new':
+        setGroupModalID(getUuid());
+        setId('');
+        setIsOpen(true);
         break;
       case '新增集团':
+        setGroupModalID(getUuid());
+        setId(item.target.target.id);
+        setCurrentGroup(item.target);
+        setIsOpen(true);
         break;
       case 'changeGroup':
         break;
@@ -65,11 +79,44 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setIsAddOpen(false);
     setLookApplyOpen(false);
   };
-  const handleOk = () => {
-    setIsOpen(false);
-    setIsAddOpen(false);
-    setLookApplyOpen(false);
-    // setEditItem(false);
+
+  const handleOk = async (item: any) => {
+    // 新增
+    if (item) {
+      console.log(item);
+      // currentGroup?.createSubGroup
+      if (userCtrl.IsCompanySpace) {
+        item.teamCode = item.code;
+        item.teamName = item.name;
+
+        item.typeName = TargetType.Group;
+        if (id != '') {
+          item.belongId = id;
+          const res = await currentGroup?.createSubGroup(item);
+          if (res?.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res?.msg);
+          }
+        } else {
+          item.belongId = userCtrl.Company.target.id;
+          const res = await userCtrl.Company.createGroup(item);
+          if (res.success) {
+            message.info(res.msg);
+            userCtrl.changCallback();
+            setIsOpen(false);
+          } else {
+            message.error(res.msg);
+          }
+        }
+      }
+    } else {
+      setIsAddOpen(false);
+      setLookApplyOpen(false);
+      setIsOpen(false);
+    }
   };
   // 操作内容渲染函数
   const renderOperation = (
@@ -129,19 +176,26 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     <div className={cls['company-group-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="集团名称">浙江省财政厅</Descriptions.Item>
-          <Descriptions.Item label="集团编码">1130010101010101010</Descriptions.Item>
-          <Descriptions.Item label="我的岗位">浙江省财政厅-管理员</Descriptions.Item>
-          <Descriptions.Item label="团队编码">zjczt</Descriptions.Item>
-          <Descriptions.Item label="创建人">小明</Descriptions.Item>
-          <Descriptions.Item label="创建时间">2022-11-01 11:11:37</Descriptions.Item>
+          <Descriptions.Item label="集团名称">
+            {currentGroup?.target.name}
+          </Descriptions.Item>
+          <Descriptions.Item label="集团编码">
+            {currentGroup?.target.code}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建人">
+            {currentGroup?.target.createUser}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建时间">
+            {currentGroup?.target.createTime}
+          </Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            未公示
+            {currentGroup?.target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
     </div>
   );
+
   // 按钮
   const renderBtns = () => {
     return (
@@ -166,29 +220,30 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       </Space>
     );
   };
-  //部门主体
+  //集团主体
   const deptCount = (
     <div className={`${cls['group-wrap-pages']}`}>
-      <Card tabList={TitleItems}>
+      <Card>
         <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
           <Card
-            title="浙江省资产年报集团"
+            title={currentGroup?.target.name}
             className={cls['app-tabs']}
             extra={renderBtns()}
             onTabChange={(key) => {
               setStatusKey(key);
               console.log('切换事件', key);
-            }}
-          />
-          <div className={cls['page-content-table']} ref={parentRef}>
-            <CardOrTable
-              dataSource={dataSource as any}
-              rowKey={'key'}
-              operation={renderOperation}
-              columns={columns as any}
-              parentRef={parentRef}
-            />
-          </div>
+            }}>
+            <div className={cls['page-content-table']} ref={parentRef}>
+              <CardOrTable
+                dataSource={dataSource as any}
+                rowKey={'key'}
+                operation={renderOperation}
+                columns={columns as any}
+                parentRef={parentRef}
+                showChangeBtn={false}
+              />
+            </div>
+          </Card>
         </div>
       </Card>
     </div>
@@ -203,20 +258,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
         handleCancel={handleOk}
-        handleOk={handleOk}
-      />
-      {/* 添加单位 */}
-      <AddPersonModal
-        title={'搜索单位'}
-        open={isAddOpen}
-        onOk={onOk}
-        handleOk={handleOk}
-        columns={columns}
-      />
-      <LookApply
-        title={'查看申请'}
-        open={isLookApplyOpen}
-        onOk={onOk}
         handleOk={handleOk}
       />
 

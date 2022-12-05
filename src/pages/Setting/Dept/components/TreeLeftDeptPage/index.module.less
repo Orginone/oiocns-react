@@ -1,12 +1,9 @@
 .topMes {
-  height: 700px;
-  overflow-y: scroll;
-  :global(.ogo-tree-switcher-noop) {
-    width: 0;
+  .docTree {
+    height: calc(100vh - 250px);
+    overflow-y: auto;
   }
-  :global(.ogo-input-affix-wrapper) {
-    border-radius: 20px;
-  }
+
   .joingroup {
     padding: 10px 0;
     color: #909399;
@@ -19,9 +16,10 @@
     margin-bottom: 10px;
   }
   .creatgroup {
-    margin-top: 4px;
+    margin-top: -8px;
     position: absolute;
     right: 10px;
+    z-index: 1;
     .addIcon {
       color: #909399;
     }

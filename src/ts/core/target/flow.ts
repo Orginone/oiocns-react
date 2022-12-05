@@ -33,10 +33,12 @@ export default class FlowTarget extends BaseTarget {
     data: model.CreateDefineReq,
   ): Promise<ResultType<schema.XFlowDefine>> {
     const res = await kernel.publishDefine(data);
-    if (data.Id != '') {
-      this.defines = this.defines.filter((a) => {
-        return a.id == data.Id;
-      });
+    if (res.success) {
+      if (res.data.id) {
+        this.defines = this.defines.filter((a) => {
+          return a.id == res.data?.id;
+        });
+      }
     }
     this.defines.push(res.data);
     return res;

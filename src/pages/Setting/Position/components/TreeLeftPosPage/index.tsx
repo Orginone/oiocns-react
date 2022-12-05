@@ -1,7 +1,7 @@
 import React from 'react';
 import CreatePos from './CreatePos';
 import cls from './index.module.less';
-
+/*由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 type TreeLeftPageProps = {
   createTitle?: string;
   isJoingroup?: boolean;

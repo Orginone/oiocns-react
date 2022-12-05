@@ -42,7 +42,7 @@ export default class Group extends BaseTarget implements IGroup {
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
-    if (!tres.data) {
+    if (!tres.data.result) {
       const res = await this.createTarget({
         ...data,
         belongId: userCtrl.Company.target.id,

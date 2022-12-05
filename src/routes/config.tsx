@@ -20,7 +20,6 @@ import {
   TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
-  VerifiedOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
 import React from 'react';
@@ -460,12 +459,6 @@ const PersonRouter: IRouteConfig[] = [
         title: '地址管理',
         icon: <HomeOutlined />,
         component: React.lazy(() => import('@/pages/Person/Address')),
-      },
-      {
-        path: '/person/certificate',
-        title: '证书管理',
-        icon: <VerifiedOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Certificate')),
       },
       {
         path: '/person/safe',

@@ -69,7 +69,7 @@ export default class Company extends MarketTarget implements ICompany {
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<ResultType<any>> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
-    if (!tres.data) {
+    if (!tres.data.result) {
       const res = await this.createTarget({ ...data, belongId: this.target.id });
       if (res.success) {
         const group = new Group(res.data);
@@ -220,7 +220,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return this.person;
   }
-  public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
+  public getDepartments = async (reload: boolean = false): Promise<IDepartment[]> => {
     if (!reload && this.departments.length > 0) {
       return this.departments;
     }
@@ -231,7 +231,7 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.departments;
-  }
+  };
   public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
     if (!reload && this.workings.length > 0) {
       return this.workings;

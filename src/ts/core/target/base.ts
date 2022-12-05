@@ -3,12 +3,16 @@ import { TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
-export default class BaseTarget {
+import { IIdentity } from './authority/iidentity';
+import { ITarget } from './itarget';
+import Identity from './authority/identity';
+export default class BaseTarget implements ITarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
   public pullTypes: TargetType[];
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
+  public identitys: IIdentity[];
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -22,6 +26,59 @@ export default class BaseTarget {
     this.joinTargetType = [];
     this.searchTargetType = [];
     this.ownIdentitys = [];
+    this.identitys = [];
+  }
+  async createIdentity(
+    params: Omit<model.IdentityModel, 'id' | 'belongId'>,
+  ): Promise<IIdentity | undefined> {
+    const res = await kernel.createIdentity({
+      ...params,
+      id: '0',
+      belongId: this.target.id,
+    });
+    if (res.success && res.data != undefined) {
+      const newItem = new Identity(res.data);
+      this.identitys.push(newItem);
+      return newItem;
+    }
+  }
+  async deleteIdentity(id: string): Promise<boolean> {
+    const index = this.identitys.findIndex((item) => {
+      return item.id === id;
+    });
+    if (index > -1) {
+      const res = await kernel.deleteIdentity({
+        id: id,
+        typeName: this.target.typeName,
+        belongId: this.target.id,
+      });
+      if (res.success) {
+        this.identitys = this.identitys.filter((a) => {
+          return a.id != id;
+        });
+      }
+      return res.success;
+    }
+    return false;
+  }
+  async getIdentitys(): Promise<IIdentity[]> {
+    if (this.identitys.length > 0) {
+      return this.identitys;
+    }
+    const res = await kernel.queryTargetIdentitys({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+    if (res.success && res.data && res.data.result) {
+      this.identitys = res.data.result.map((item) => {
+        return new Identity(item);
+      });
+    }
+    return this.identitys;
   }
 
   protected async createSubTarget(

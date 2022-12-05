@@ -1,17 +1,15 @@
 import { Product } from '@/ts/core/market';
-import { common, faildResult, kernel, model, schema } from '../../base';
+import { common, kernel, model, schema } from '../../base';
 import { Market } from '../market';
 import { TargetType } from '../enum';
 import { IMTarget } from './itarget';
 import FlowTarget from './flow';
-import consts from '../consts';
 import IProduct from '../market/iproduct';
 
 export default class MarketTarget extends FlowTarget implements IMTarget {
   joinedMarkets: Market[];
   publicMarkets: Market[];
   ownProducts: IProduct[];
-  stagings: schema.XStaging[];
   usefulProduct: schema.XProduct[];
   usefulResource: Map<string, schema.XResource[]>;
   joinMarketApplys: schema.XMarketRelation[];
@@ -19,7 +17,6 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
 
   constructor(target: schema.XTarget) {
     super(target);
-    this.stagings = [];
     this.ownProducts = [];
     this.joinedMarkets = [];
     this.joinMarketApplys = [];
@@ -89,23 +86,6 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       });
     }
     return this.publicMarkets;
-  }
-  public async getStaging(reload: boolean = false): Promise<schema.XStaging[]> {
-    if (!reload && this.stagings.length > 0) {
-      return this.stagings;
-    }
-    const res = await kernel.queryStaging({
-      id: this.target.id,
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
-    });
-    if (res.success && res.data.result) {
-      this.stagings = res.data.result;
-    }
-    return this.stagings;
   }
   public async getBuyOrders(
     status: number,
@@ -313,39 +293,6 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     }
     return res;
   };
-
-  public async stagingMerchandise(
-    id: string,
-  ): Promise<model.ResultType<schema.XStaging>> {
-    const stag = this.stagings.find((a) => {
-      a.merchandiseId == id;
-    });
-    if (stag == undefined) {
-      const res = await kernel.createStaging({
-        id: '0',
-        merchandiseId: id,
-        belongId: this.target.id,
-      });
-      if (res.success && res.data) {
-        this.stagings.push(res.data);
-      }
-      return res;
-    }
-    return faildResult(consts.IsExistError);
-  }
-
-  public async deleteStaging(id: string): Promise<model.ResultType<any>> {
-    const res = await kernel.deleteStaging({
-      id,
-      belongId: this.target.id,
-    });
-    if (res.success) {
-      this.stagings = this.stagings.filter((a) => {
-        a.id != id;
-      });
-    }
-    return res;
-  }
   /**
    * 删除市场
    * @param id 市场Id
