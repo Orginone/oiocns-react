@@ -48,7 +48,8 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
-  const [editorValue, setEditorValue] = useState<string>('{}');
+  const [editorValue, setEditorValue] = useState<string | null>();
+  const [designData, setDesignData] = useState();
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
@@ -150,7 +151,6 @@ const SettingFlow: React.FC = () => {
 
   const publish = async () => {
     design.belongId = userCtrl.Space.target.id;
-    console.log('design', design);
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
@@ -219,7 +219,7 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
-                              setEditorValue('{}');
+                              setEditorValue(null);
                             },
                             onCancel() {},
                           });
@@ -241,6 +241,7 @@ const SettingFlow: React.FC = () => {
                         ]}
                         onChange={(e) => {
                           setCurrentStep(e);
+                          setDesignData(design);
                         }}></Steps>
                     </div>
                     <div className={cls['publish']}>
@@ -296,7 +297,7 @@ const SettingFlow: React.FC = () => {
                       />
                     ) : (
                       <ProcessDesign
-                        designData={design}
+                        designData={designData}
                         editorValue={editorValue}
                         conditionData={conditionData}></ProcessDesign>
                     )}

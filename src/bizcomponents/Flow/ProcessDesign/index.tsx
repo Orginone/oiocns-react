@@ -32,16 +32,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
 
   const preview = () => {
-    console.log('design', design);
     previewRef.current?.preview(design);
   };
   const exit = () => {
     // setIsShowDialog(false)
   };
   useEffect(() => {
-    console.log('ProcessDesign第一次render...');
     startDesign();
-  }, []);
+  }, [designData]);
 
   const defaultDesign = {
     name: '新建流程',
@@ -76,10 +74,18 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
       tempDesign = JSON.parse(editorValue);
       DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
     } else {
-      DefaultProps.setFormFields(conditionData?.labels);
-      defaultDesign.remark = JSON.stringify(conditionData?.labels);
-      defaultDesign.name = conditionData?.name;
-      tempDesign = JSON.parse(JSON.stringify(defaultDesign));
+      console.log('designData_____', designData);
+      if (!designData) {
+        DefaultProps.setFormFields(conditionData?.labels);
+        defaultDesign.remark = JSON.stringify(conditionData?.labels);
+        defaultDesign.name = conditionData?.name;
+        tempDesign = JSON.parse(JSON.stringify(defaultDesign));
+      } else {
+        DefaultProps.setFormFields(conditionData?.labels);
+        defaultDesign.remark = JSON.stringify(conditionData?.labels);
+        defaultDesign.name = conditionData?.name;
+        tempDesign = designData;
+      }
     }
     // setOldDesign(tempDesign);
     setDesign(tempDesign);
@@ -90,7 +96,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
       <LayoutHeader
         OnPreview={preview}
         OnExit={exit}
-        titleName={JSON.parse(editorValue)?.name || conditionData?.name}
+        titleName={(editorValue && JSON.parse(editorValue)?.name) || conditionData?.name}
       />
       <div className={cls['container']}>
         {/* conditionData */}
