@@ -61,7 +61,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   }, []);
   return (
     <div className={cls['header-nav-container']}>
-      <Space size={36}>
+      <Space size={30}>
         {navs.map((item) => {
           return (
             <Badge key={item.key} count={item.count} size="small">

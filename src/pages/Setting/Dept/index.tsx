@@ -70,7 +70,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         label: '移出部门',
         onClick: async () => {
           if (selectPerson && SelectDept) {
-            const { success } = await SelectDept.removePerson(item.id);
+            const { success } = await SelectDept.removePerson([item.id]);
             if (success) {
               message.success('添加成功');
               userCtrl.changCallback();
@@ -85,7 +85,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: IDepartment | undefined, pid?: string) => {
-    if (!item) return;
     switch (key) {
       case 'new':
         setting.setCurrTreeDeptNode('');
@@ -94,6 +93,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         setIsOpenModal(true);
         break;
       case '新增部门':
+        if (!item) return;
         setEditDept(item);
         setCreateOrEdit('新增');
         setSelectId(item.target.id);
@@ -103,6 +103,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       case 'changeDept': //变更部门
         break;
       case 'updateDept': // 编辑部门
+        if (!item) return;
         setCreateOrEdit('编辑');
         setEditDept(item);
         setSelectId(item.target.id);
@@ -154,7 +155,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
   };
-
   const onApplyOk = () => {
     setLookApplyOpen(false);
   };
@@ -234,7 +234,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           <CardOrTable<schema.XTarget>
             dataSource={dataSource}
             rowKey={'id'}
-            operation={(item: schema.XTarget) => renderOperation}
+            operation={renderOperation}
             columns={columns}
             parentRef={parentRef}
             showChangeBtn={false}
@@ -310,17 +310,19 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         handleOk={handleOk}
       />
       {/* 对象设置 */}
-      <AddPostModal
-        title={'权限设置'}
-        open={isSetPost}
-        onOk={() => {
-          setIsSetPost(false);
-        }}
-        handleOk={() => {
-          setIsSetPost(false);
-        }}
-        datasource={authorityTree}
-      />
+      {authorityTree && (
+        <AddPostModal
+          title={'权限设置'}
+          open={isSetPost}
+          onOk={() => {
+            setIsSetPost(false);
+          }}
+          handleOk={() => {
+            setIsSetPost(false);
+          }}
+          datasource={authorityTree}
+        />
+      )}
       {/* 左侧树 */}
       <TreeLeftDeptPage
         setCurrent={setTreeCurrent}
