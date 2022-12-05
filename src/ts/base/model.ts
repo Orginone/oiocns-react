@@ -447,8 +447,8 @@ export type OrderModel = {
   code: string;
   // 创建组织/个人
   belongId: string;
-  // 商品ID
-  merchandiseId: string;
+  // 商品ID集合
+  merchandiseIds: string[];
 };
 
 export type OrderModelByStags = {

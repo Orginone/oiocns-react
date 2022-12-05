@@ -165,4 +165,26 @@ export default class Market implements IMarket {
       belongId: belongId,
     });
   }
+
+  async createOrder(
+    // 存证ID
+    nftId: string,
+    // 名称
+    name: string,
+    // 编号
+    code: string,
+    // 创建组织/个人
+    spaceId: string,
+    // 商品ID集合
+    merchandiseIds: string[],
+  ): Promise<model.ResultType<schema.XOrder>> {
+    return await kernel.createOrder({
+      id: '0',
+      nftId,
+      name,
+      code,
+      belongId: spaceId,
+      merchandiseIds,
+    });
+  }
 }
