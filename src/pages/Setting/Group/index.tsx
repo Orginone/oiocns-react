@@ -23,6 +23,7 @@ import { getUuid } from '@/utils/tools';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Company from '@/ts/core/target/company';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 /**
  * 集团设置
@@ -44,6 +45,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
 
+  const [selectId, setSelectId] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -66,6 +68,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       case 'new':
         setGroupModalID(getUuid());
         setId('');
+        setSelectId('new');
         setIsOpen(true);
         break;
       case '新增集团':
@@ -73,6 +76,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         setId(item.target.target.id);
         setCurrentGroup(item.target);
         setIsOpen(true);
+        setSelectId('second');
         break;
       case 'changeGroup':
         break;
@@ -109,18 +113,21 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setLookApplyOpen(false);
   };
 
+  const handleCancel = async () => {
+    setIsOpen(false);
+  };
+
   const handleOk = async (item: any) => {
     // 新增
     if (item) {
       console.log(item);
-      // currentGroup?.createSubGroup
-      if (userCtrl.IsCompanySpace) {
-        item.teamCode = item.code;
-        item.teamName = item.name;
-
-        item.typeName = TargetType.Group;
-        if (id != '') {
-          const res = await currentGroup?.createSubGroup(item);
+      if (item.selectId == 'update') {
+        // 更新集团
+        if (userCtrl.IsCompanySpace) {
+          item.teamCode = item.code;
+          item.teamName = item.name;
+          item.typeName = TargetType.Group;
+          const res = await currentGroup?.update(item);
           if (res?.success) {
             message.info(res.msg);
             userCtrl.changCallback();
@@ -128,15 +135,33 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           } else {
             message.error(res?.msg);
           }
-        } else {
-          item.belongId = userCtrl.Company.target.id;
-          const res = await userCtrl.Company.createGroup(item);
-          if (res.success) {
-            message.info(res.msg);
-            userCtrl.changCallback();
-            setIsOpen(false);
+        }
+      } else {
+        // currentGroup?.createSubGroup
+        if (userCtrl.IsCompanySpace) {
+          item.teamCode = item.code;
+          item.teamName = item.name;
+
+          item.typeName = TargetType.Group;
+          if (id != '') {
+            const res = await currentGroup?.createSubGroup(item);
+            if (res?.success) {
+              message.info(res.msg);
+              userCtrl.changCallback();
+              setIsOpen(false);
+            } else {
+              message.error(res?.msg);
+            }
           } else {
-            message.error(res.msg);
+            item.belongId = userCtrl.Company.target.id;
+            const res = await userCtrl.Company.createGroup(item);
+            if (res.success) {
+              message.info(res.msg);
+              userCtrl.changCallback();
+              setIsOpen(false);
+            } else {
+              message.error(res.msg);
+            }
           }
         }
       }
@@ -192,11 +217,33 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setIsOpen(true);
+            if (currentGroup) {
+              setIsOpen(true);
+              setSelectId('update');
+            }
           }}>
           编辑
         </Button>
-        <Button type="link">删除</Button>
+        <Button
+          type="link"
+          onClick={() => {
+            if (currentGroup) {
+              Modal.confirm({
+                title: '确认',
+                icon: <ExclamationCircleOutlined />,
+                content: '删除部门？',
+                okText: '确认',
+                cancelText: '取消',
+                onOk: async () => {
+                  // 删除子部门
+                  // 如果是一级部门 Company 底下删除
+                  // 如果是二级集团 从父集团底下删除；
+                },
+              });
+            }
+          }}>
+          删除
+        </Button>
       </div>
     </div>
   );
@@ -285,8 +332,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         open={isopen}
         title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
-        handleCancel={handleOk}
+        currentGroup={currentGroup}
         handleOk={handleOk}
+        handleCancel={handleCancel}
+        selectId={selectId}
       />
       <Modal
         title="添加单位"
