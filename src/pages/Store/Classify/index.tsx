@@ -37,7 +37,6 @@ const StoreClassify: React.FC = () => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TreeData, () => {
       console.log('监听,tree变化', SelfAppCtrl.treeData || []);
       const arr = SelfAppCtrl.treeData || [];
-
       setTreeData([...arr]);
     });
     return () => {
