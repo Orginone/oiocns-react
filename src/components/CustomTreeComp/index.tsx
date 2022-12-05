@@ -164,7 +164,10 @@ const StoreClassifyTree: React.FC<TreeType> = ({
             : parentIcon}
           {node.searchTitle || node[fieldNames.title]}
           {node?.tag ? (
-            <Tag style={{ marginLeft: '6px' }} color={node.tag?.color}>
+            <Tag
+              style={{ marginLeft: '6px' }}
+              className={cls.titleTag}
+              color={node.tag?.color}>
               {node.tag?.txt}
             </Tag>
           ) : (

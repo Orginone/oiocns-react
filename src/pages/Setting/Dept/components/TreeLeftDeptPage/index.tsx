@@ -8,7 +8,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
-import { getUuid } from '@/utils/tools';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
@@ -108,6 +107,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
           onClick={() => handleMenuClick('new', {})}
         />
         <MarketClassifyTree
+          className={cls.docTree}
           showIcon
           searchable
           handleMenuClick={handleMenuClick}

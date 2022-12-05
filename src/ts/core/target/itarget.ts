@@ -64,8 +64,6 @@ export interface IMTarget {
   publicMarkets: Market[];
   /** 拥有的产品/应用 */
   ownProducts: IProduct[];
-  /** 我的购物车 */
-  stagings: schema.XStaging[];
   /** 我发起的加入市场的申请 */
   joinMarketApplys: schema.XMarketRelation[];
   /** 可使用的应用 */
@@ -97,11 +95,6 @@ export interface IMTarget {
    * @returns
    */
   getOwnProducts(reload: boolean): Promise<IProduct[]>;
-  /**
-   * 查询购物车列表
-   * @param reload 是否强制刷新
-   */
-  getStaging(reload: boolean): Promise<schema.XStaging[]>;
   /**
    * 查询购买订单
    */
@@ -207,16 +200,6 @@ export interface IMTarget {
     // 产品类型名
     typeName: string;
   }): Promise<ResultType<schema.XProduct>>;
-  /**
-   * 添加暂存区
-   * @param id 商品Id
-   */
-  stagingMerchandise(id: string): Promise<ResultType<any>>;
-  /**
-   * 删除暂存区
-   * @param id 暂存区Id
-   */
-  deleteStaging(id: string): Promise<ResultType<any>>;
   /**
    * 删除市场
    * @param id 市场Id
