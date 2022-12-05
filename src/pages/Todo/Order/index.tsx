@@ -1,7 +1,7 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { Dropdown, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { EllipsisOutlined } from '@ant-design/icons';
 

@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { schema } from '@/ts/base';
 import SettingService from '../../service';
 import { IDepartment } from '@/ts/core/target/itarget';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
@@ -13,9 +12,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
 
 type CreateGroupPropsType = {
-  createTitle: string;
   currentKey: string;
-  setCurrent: (current: schema.XTarget) => void;
+  setCurrent: (current: IDepartment) => void;
   handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
 };
 
@@ -31,22 +29,23 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
         userCtrl.Company.departments = [];
       }
-      initData(true);
+      initData(false);
     }
+    console.log(1111);
   }, [key]);
 
   const initData = async (reload: boolean) => {
     const data = await userCtrl?.Company?.getDepartments(reload);
     if (data?.length) {
       setCurrentKey(data[0].target.id);
-      setCurrent(data[0].target);
+      setCurrent(data[0]);
       const tree = data.map((n) => {
         return createTeeDom(n);
       });
       setTreeData(tree);
     }
   };
-  const createTeeDom = (n: IDepartment) => {
+  const createTeeDom = (n: IDepartment, pid?: string) => {
     const { target } = n;
     return {
       key: target.id,
@@ -55,6 +54,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       icon: target.avatar,
       isLeaf: false,
       target: n,
+      pid,
     };
   };
   const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
@@ -83,20 +83,21 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       updateTreeData(
         origin,
         key,
-        deptChild.map((n) => createTeeDom(n)),
+        deptChild.map((n) => createTeeDom(n, target.id)),
       ),
     );
   };
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
     setCurrentKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
+    loadDept(info.node);
     if (info.selected) {
-      setCurrent(info.node.target.target);
+      setCurrent(info.node.target);
       setting.setCurrTreeDeptNode(info.node.target.target.id);
     }
   };
 
-  const menu = ['新增部门'];
+  const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
       <div className={cls.topMes}>
@@ -110,7 +111,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
           className={cls.docTree}
           showIcon
           searchable
-          handleMenuClick={handleMenuClick}
+          handleMenuClick={(key, node) => handleMenuClick(key, node.target, node.pid)}
           treeData={treeData}
           title={'内设机构'}
           menu={menu}
