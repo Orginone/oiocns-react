@@ -17,7 +17,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 const { Header, Content } = Layout;
-const { Step } = Steps;
 
 /**
  * 字典
@@ -52,7 +51,7 @@ const SettingFlow: React.FC = () => {
     name: '',
     labels: [],
   });
-  const form = useAppwfConfig((state: any) => state.form);
+  // const form = useAppwfConfig((state: any) => state.form);
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -65,7 +64,7 @@ const SettingFlow: React.FC = () => {
     },
     {
       title: '流程名称',
-      dataIndex: 'title',
+      dataIndex: 'name',
       ellipsis: true,
     },
     {
@@ -81,6 +80,16 @@ const SettingFlow: React.FC = () => {
     {
       title: '创建人',
       dataIndex: 'createPeople',
+      ellipsis: true,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      ellipsis: true,
+    },
+    {
+      title: '备注',
+      dataIndex: 'remark',
       ellipsis: true,
     },
     {
@@ -129,6 +138,7 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
+      console.log('result', result);
       setDataSource(result);
     }
   };
@@ -145,6 +155,7 @@ const SettingFlow: React.FC = () => {
     design.BelongId = userCtrl.Space.target.id;
     console.log('design', design);
     const result = await userCtrl.Space.publishDefine(design);
+    console.log(result);
     if (result.data) {
       message.success('添加成功');
     } else {
