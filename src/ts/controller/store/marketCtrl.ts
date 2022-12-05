@@ -1,18 +1,16 @@
-import { Market } from '@/ts/core/market';
-import IMarket from '@/ts/core/market/imarket';
-import { IMTarget } from '@/ts/core/target/itarget';
-import BaseController from '../baseCtrl';
-import { kernel } from '../../base';
+import { IMarket, IMTarget, createMarket, emitter, DomainTypes } from '@/ts/core';
+import { kernel } from '@/ts/base';
 import { myColumns, marketColumns } from './config';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 import { JOIN_SHOPING_CAR } from '@/constants/const';
 import { message } from 'antd';
+import { Emitter } from '@/ts/base/common';
+import userCtrl from '../setting/userCtrl';
 
 export enum MarketCallBackTypes {
   'ApplyData' = 'ApplyData',
 }
 
-class MarketController extends BaseController {
+class MarketController extends Emitter {
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
   /** 当前操作的市场 */
@@ -35,7 +33,7 @@ class MarketController extends BaseController {
   constructor() {
     super();
     this.searchMarket = [];
-    userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], async () => {
+    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
       if (userCtrl.IsCompanySpace) {
         this._target = userCtrl.Company;
       } else {
@@ -77,7 +75,7 @@ class MarketController extends BaseController {
   }
 
   /** 切换市场 */
-  public setCurrentMarket(market: Market) {
+  public setCurrentMarket(market: IMarket) {
     console.log('切换市场', market);
     this._curMarket = market;
     this.getMember();
@@ -90,7 +88,7 @@ class MarketController extends BaseController {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
+    this._curMarket = menuItem.node ?? createMarket(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
       return;

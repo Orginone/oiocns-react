@@ -40,7 +40,7 @@ export default class Company extends MarketTarget implements ICompany {
     this.extendTargetType = [
       TargetType.Department,
       TargetType.Working,
-      ...consts.CompanyTypes,
+      ...this.companyTypes,
     ];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
     this.createTargetType = [
@@ -123,7 +123,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async removePerson(ids: string[]): Promise<ResultType<any>> {
     const res = await kernel.removeAnyOfTeamAndBelong({
       id: this.target.id,
-      teamTypes: [...consts.CompanyTypes, ...this.subTypes],
+      teamTypes: [...this.companyTypes, ...this.subTypes],
       targetIds: ids,
       targetType: TargetType.Person,
     });

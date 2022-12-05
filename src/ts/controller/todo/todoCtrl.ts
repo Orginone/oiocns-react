@@ -1,14 +1,17 @@
-import BaseController from '../baseCtrl';
-import { ITodoGroup } from '../../core/todo/itodo';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
-import { loadAppTodo } from '../../core/todo/application';
-import { loadPublishTodo } from '../../core/todo/publish';
-import { loadOrgTodo } from '../../core/todo/orgrelation';
-import { loadMarketTodo } from '../../core/todo/marketjoin';
-import { loadOrderTodo } from '../../core/todo/order';
+import {
+  loadAppTodo,
+  loadOrderTodo,
+  loadMarketTodo,
+  loadOrgTodo,
+  loadPublishTodo,
+  ITodoGroup,
+  DomainTypes,
+  emitter,
+} from '@/ts/core';
+import { Emitter } from '@/ts/base/common';
 
 /** 待办控制器 */
-class TodoController extends BaseController {
+class TodoController extends Emitter {
   private _orgTodo: ITodoGroup | undefined;
   private _pubTodo: ITodoGroup | undefined;
   private _orderTodo: ITodoGroup | undefined;
@@ -17,7 +20,7 @@ class TodoController extends BaseController {
   private _curAppTodo: ITodoGroup | undefined;
   constructor() {
     super();
-    userCtrl.subscribePart(UserPartTypes.User, () => {
+    emitter.subscribePart(DomainTypes.User, () => {
       setTimeout(async () => {
         this._orgTodo = await loadOrgTodo();
         this._appTodo = await loadAppTodo();

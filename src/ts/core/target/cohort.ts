@@ -1,7 +1,6 @@
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 import { schema } from '../../base';
-import consts from '../consts';
 import { ICohort } from './itarget';
 import { ResultType, TargetModel } from '@/ts/base/model';
 
@@ -10,15 +9,15 @@ export default class Cohort extends BaseTarget implements ICohort {
   constructor(target: schema.XTarget) {
     super(target);
     this.children = [];
-    this.subTypes = [TargetType.Person, ...consts.CompanyTypes];
-    this.pullTypes = [TargetType.Person, TargetType.Cohort, ...consts.CompanyTypes];
-    this.searchTargetType = [TargetType.Person, ...consts.CompanyTypes];
+    this.subTypes = [TargetType.Person, ...this.companyTypes];
+    this.pullTypes = [TargetType.Person, TargetType.Cohort, ...this.companyTypes];
+    this.searchTargetType = [TargetType.Person, ...this.companyTypes];
   }
   public async searchPerson(code: string): Promise<ResultType<schema.XTargetArray>> {
     return await this.searchTargetByName(code, [TargetType.Person]);
   }
   public async searchCompany(code: string): Promise<ResultType<schema.XTargetArray>> {
-    return await this.searchTargetByName(code, consts.CompanyTypes);
+    return await this.searchTargetByName(code, this.companyTypes);
   }
   public async update(
     data: Omit<TargetModel, 'id' | 'teamName' | 'teamCode'>,

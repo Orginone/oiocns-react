@@ -1,5 +1,5 @@
 import consts from '../consts';
-import { TargetType } from '../enum';
+import { companyTypes, TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
@@ -17,6 +17,7 @@ export default class BaseTarget implements ITarget {
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
   public searchTargetType: TargetType[];
+  public companyTypes: TargetType[];
 
   constructor(target: schema.XTarget) {
     this.target = target;
@@ -27,6 +28,7 @@ export default class BaseTarget implements ITarget {
     this.searchTargetType = [];
     this.ownIdentitys = [];
     this.identitys = [];
+    this.companyTypes = [...companyTypes];
   }
   async createIdentity(
     params: Omit<model.IdentityModel, 'id' | 'belongId'>,
