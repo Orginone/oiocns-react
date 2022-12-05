@@ -6,6 +6,7 @@ export interface IIdentity {
   target: schema.XIdentity;
   /** 当前身份Id */
   id: string;
+
   /**
    * 更新身份
    * @param name 名称

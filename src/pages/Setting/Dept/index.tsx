@@ -40,7 +40,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [selectPerson, setSelectPerson] = useState<schema.XTarget>(); // 当前要拉的人
   const [editDept, setEditDept] = useState<IDepartment>();
   const [authorityTree, setAuthorityTree] = useState<IAuthority>();
-
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): MarketTypes.OperationType[] => {
     return [

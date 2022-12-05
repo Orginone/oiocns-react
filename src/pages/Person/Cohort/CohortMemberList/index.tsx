@@ -31,7 +31,10 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
   const [friendList, setFriendList] = useState<schema.XTarget[]>([]);
   const history = useHistory();
-
+  useEffect(() => {
+    getMemberData();
+    getFriendList();
+  }, []);
   /**获取群组下成员列表 */
   const getMemberData = async () => {
     const res = await cohortData.getMember(false);
@@ -165,12 +168,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     }
     return title;
   };
-
-  useEffect(() => {
-    getMemberData();
-    getFriendList();
-  }, []);
-
   const onSearch = async (value: string) => {
     if (value!) {
       await getMemberData();

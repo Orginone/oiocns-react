@@ -53,8 +53,8 @@ export default class BaseTarget implements ITarget {
         belongId: this.target.id,
       });
       if (res.success) {
-        this.identitys = this.identitys.filter((a) => {
-          return a.id != id;
+        this.identitys = this.identitys.filter((obj) => {
+          return obj.id != id;
         });
       }
       return res.success;
