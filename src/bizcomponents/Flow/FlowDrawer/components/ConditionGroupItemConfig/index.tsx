@@ -51,7 +51,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
 
   const valueChange = (value: any, condition: any) => {
     condition.val = String(value);
-    var filter = DefaultProps.getFormFields().filter(
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == condition.paramKey,
     );
     var dict = [];
@@ -73,7 +73,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   // );
 
   const dictory = useCallback((paramKey: any) => {
-    var filter = DefaultProps.getFormFields().filter(
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == paramKey,
     );
 

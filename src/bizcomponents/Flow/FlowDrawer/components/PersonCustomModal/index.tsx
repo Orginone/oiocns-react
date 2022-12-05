@@ -45,6 +45,7 @@ const PersonCustomModal = (props: Iprops) => {
   );
 
   useEffect(() => {
+    console.log(1111);
     getLeftTree();
   }, [shareType]);
 
@@ -58,12 +59,12 @@ const PersonCustomModal = (props: Iprops) => {
 
   const getLeftTree = async () => {
     let FunName: Function = userCtrl.User!.getJoinedCohorts;
-    if (userCtrl.IsCompanySpace) {
-      FunName =
-        shareType === '共享'
-          ? userCtrl.Company!.getJoinedGroups
-          : userCtrl.Company!.getDepartments;
-    }
+
+    FunName =
+      shareType === '共享'
+        ? userCtrl.Company!.getJoinedGroups
+        : userCtrl.Company!.getDepartments;
+
     const res = await FunName();
 
     const ShowList = res?.map((item: { target: any }) => {

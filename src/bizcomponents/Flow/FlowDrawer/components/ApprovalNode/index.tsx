@@ -77,7 +77,7 @@ const ApprovalNode = () => {
           <Form.Item label="会签人数">
             <InputNumber
               onChange={(e) => {
-                selectedNode.props.num = e;
+                selectedNode.props.num = String(e);
               }}
               placeholder="请设置会签人数"
               addonBefore={<UserOutlined />}

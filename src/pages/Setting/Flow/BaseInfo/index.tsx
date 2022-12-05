@@ -12,9 +12,10 @@ import { Form } from 'antd';
 import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: (params: any) => void;
+  currentFormValue: {};
 };
 
-const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
+const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue }) => {
   const [form] = Form.useForm();
   return (
     <div className={cls['contentMes']}>

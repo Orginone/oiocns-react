@@ -69,7 +69,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData, editorValu
     console.log('editorValue', editorValue);
     if (editorValue && editorValue !== '{}') {
       tempDesign = JSON.parse(editorValue);
-      console.log('tempDesign', tempDesign.remark);
       DefaultProps.setFormFields(tempDesign?.remark);
     } else {
       DefaultProps.setFormFields(conditionData?.labels);
