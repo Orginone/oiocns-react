@@ -277,7 +277,6 @@ export interface IFlow {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
-
 export interface ISpace extends IFlow {
   /** 我加入的群组 */
   joinedCohort: ICohort[];
@@ -504,6 +503,10 @@ export interface ICompany extends IMTarget, ISpace, ITarget {
    * @returns 是否成功
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
+  /** 创建部门 */
+  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  /** 创建部门 */
+  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
   /**
    * 移除人员
    * @param ids 人员Id集合

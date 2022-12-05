@@ -51,14 +51,7 @@ const JoinOtherShop: React.FC<Iprops> = ({
     {
       title: '商店编码',
       dataIndex: 'code',
-    },
-    {
-      title: '商店简介',
-      dataIndex: 'remark',
-      ellipsis: true,
-      render: (remark: string, _record: any) => (
-        <Tooltip autoAdjustOverflow={true}>{remark}</Tooltip>
-      ),
+      width: 100,
     },
     {
       title: '商店归属',
@@ -67,6 +60,14 @@ const JoinOtherShop: React.FC<Iprops> = ({
     {
       title: '商店创建',
       dataIndex: 'createUser',
+    },
+    {
+      title: '商店简介',
+      dataIndex: 'remark',
+      ellipsis: true,
+      render: (remark: string, _record: any) => (
+        <Tooltip autoAdjustOverflow={true}>{remark}</Tooltip>
+      ),
     },
   ];
 
