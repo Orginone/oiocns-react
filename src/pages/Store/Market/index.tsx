@@ -2,10 +2,8 @@ import './index.less';
 
 import React from 'react';
 import { renderRoutes } from 'react-router-config';
-
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-
 import MarketClassify from './Classify';
 
 interface PageType {
@@ -21,7 +19,7 @@ const Market: React.FC<PageType> = (props) => {
   const { route, history } = props;
   // console.log(renderRoutes(route.routes));
   return (
-    <ContentTemplate sider={<MarketClassify history={history} />}>
+    <ContentTemplate sider={<MarketClassify history={history} />} type="market">
       {renderRoutes(route.routes)}
     </ContentTemplate>
   );

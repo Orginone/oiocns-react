@@ -1,9 +1,7 @@
 import React from 'react';
 import { renderRoutes } from 'react-router-config';
-
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from '@/routes/config';
-
 import { mainMenu } from './Menu';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
