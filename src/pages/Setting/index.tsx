@@ -13,9 +13,9 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 // import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
-import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
+// import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
 // import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
 
 import { MenuProps } from 'antd';

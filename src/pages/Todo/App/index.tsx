@@ -1,7 +1,7 @@
 // 应用待办
 import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import { ProColumns } from '@ant-design/pro-components';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { applicationTabs, statusMap, tableOperation } from '../components';

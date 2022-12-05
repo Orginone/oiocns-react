@@ -2,7 +2,7 @@ import React from 'react';
 import { renderRoutes } from 'react-router-config';
 
 import passport from '@/assets/img/passport.png';
-import type { IRouteConfig } from '@/routes/config';
+import type { IRouteConfig } from 'typings/globelType';
 
 import cls from './index.module.less';
 

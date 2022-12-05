@@ -4,19 +4,24 @@ import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { Button } from 'antd';
-// {  DefaultProps }  报错临时处理
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
+  editorValue: string;
+  designData: any;
 };
 export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns
  */
-const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
+const ProcessDesign: React.FC<ProcessDesignProps> = ({
+  conditionData,
+  editorValue,
+  designData,
+}) => {
+  console.log('designData', designData);
   // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
@@ -35,14 +40,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
   };
   useEffect(() => {
     console.log('ProcessDesign第一次render...');
-    startDesign(obj);
+    startDesign();
   }, []);
 
   const defaultDesign = {
     name: '新建流程',
     code: 'code',
-    Remark: '',
-    BelongId: '',
+    remark: '',
+    belongId: '',
     resource: {
       nodeId: 'ROOT',
       parentId: null,
@@ -54,110 +59,39 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
         props: {},
         type: 'CONDITIONS',
         name: '条件分支',
-        children: {
-          nodeId: 'node_590719747331',
-          parentId: 'node_590719745693',
-          type: 'EMPTY',
-          children: {},
-        },
-        branches: [
-          {
-            nodeId: 'node_590719745789',
-            parentId: 'node_590719745693',
-            type: 'CONDITION',
-            conditions: [
-              {
-                pos: '1',
-                paramKey: 'price',
-                paramLabel: '金额',
-                key: 'LTE',
-                label: '≤',
-                type: 'NUMERIC',
-                val: '50000',
-                valLabel: '',
-              },
-            ],
-            name: '条件1',
-          },
-          {
-            nodeId: 'node_590719746648',
-            parentId: 'node_590719745693',
-            type: 'CONDITION',
-            conditions: [],
-            name: '条件2',
-          },
-        ],
+        // children: {
+        //   nodeId: 'node_590719747331',
+        //   parentId: 'node_590719745693',
+        //   type: 'EMPTY',
+        //   children: {},
+        // },
       },
     },
-    remark: '备注说明',
   };
 
-  const obj = {
-    formId: '46547769841',
-    business: '商品上架审核',
-    field: [
-      {
-        name: '金额',
-        code: 'price',
-        type: 'NUMERIC',
-        customId: 1,
-        key: '价格',
-      },
-      {
-        name: '项目名称',
-        code: 'name',
-        type: 'STRING',
-        customId: 2,
-      },
-      {
-        name: '出让方式',
-        code: 'chulang',
-        type: 'DICT',
-        customId: 3,
-        dict: [
-          {
-            name: '协议定价',
-            code: '01',
-          },
-          {
-            name: '挂牌',
-            code: '02',
-          },
-          {
-            name: '拍卖',
-            code: '03',
-          },
-        ],
-      },
-    ],
-    customId: 1,
-    appId: '368453782260027392',
-    appName: '测试流程应用',
-    sourceId: '368453782268416000',
-  };
-
-  const startDesign = async (obj: any) => {
+  const startDesign = async () => {
     let tempDesign;
-    setForm(obj);
-    DefaultProps.setFormFields(conditionData?.labels);
-    if (obj.flow) {
-      tempDesign = JSON.parse(JSON.stringify(obj.flow));
+    console.log('editorValue', editorValue);
+    if (editorValue && editorValue !== '{}') {
+      tempDesign = JSON.parse(editorValue);
+      DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
     } else {
+      DefaultProps.setFormFields(conditionData?.labels);
+      defaultDesign.remark = JSON.stringify(conditionData?.labels);
+      defaultDesign.name = conditionData?.name;
       tempDesign = JSON.parse(JSON.stringify(defaultDesign));
     }
-    setOldDesign(tempDesign);
+    // setOldDesign(tempDesign);
     setDesign(tempDesign);
   };
 
   return (
     <>
-      <Button
-        onClick={() => {
-          preview();
-        }}>
-        测一下预览
-      </Button>
-      <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} />
+      <LayoutHeader
+        OnPreview={preview}
+        OnExit={exit}
+        titleName={JSON.parse(editorValue)?.name || conditionData?.name}
+      />
       <div className={cls['container']}>
         {/* conditionData */}
         <EventContext.Provider value={{ FlowSub, conditionData }}>

@@ -68,6 +68,9 @@ export const marketColumns: any = [
   {
     title: '价格',
     dataIndex: 'price',
+    render: (_text: string, record: any) => {
+      return record?.price === undefined ? '免费' : record?.price;
+    },
   },
 
   {

@@ -1,8 +1,7 @@
 import { Col, Layout, MenuProps, Row, Space } from 'antd';
 import React, { useState } from 'react';
-
-import { IRouteConfig } from '@/routes/config';
-
+import { IRouteConfig } from 'typings/globelType';
+import { Link } from 'react-router-dom';
 import BreadCrumbBox from '../BreadCrumb';
 import ContentMenu from '../ContentMenu';
 import { TOOBAR_TYPE, toobarTypeAndNameMaps } from '@/constants/content_template';
@@ -29,6 +28,7 @@ type ContentTemplateType = {
   siderMenuData?: MenuProps[`items`];
   menuClick?: MenuClickEventHandler;
   menuSelect?: MenuProps[`onSelect`];
+  type?: 'market';
 };
 
 /**
@@ -50,6 +50,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
     contentTopRight,
     hideBreadCrumb = false,
     hideTooBar = false,
+    type,
   } = props;
   // TODO 布局样式、侧边展开和收缩 侧边栏顶部([icon/名称] 需传入展示)
 
@@ -90,13 +91,21 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
                   }}>
                   {toobarTypeAndNameMaps[TOOBAR_TYPE.COMMEMNT]}
                 </a>
-                <a
-                  onClick={() => {
-                    setCurrentType(TOOBAR_TYPE.STORAGE);
-                    setOpen(true);
-                  }}>
-                  {toobarTypeAndNameMaps[TOOBAR_TYPE.STORAGE]}
-                </a>
+                {type === 'market' ? (
+                  <a>
+                    <Link to="/market/shopingcar">
+                      {toobarTypeAndNameMaps[TOOBAR_TYPE.STORAGE]}
+                    </Link>
+                  </a>
+                ) : (
+                  <a
+                    onClick={() => {
+                      setCurrentType(TOOBAR_TYPE.STORAGE);
+                      setOpen(true);
+                    }}>
+                    {toobarTypeAndNameMaps[TOOBAR_TYPE.STORAGE]}
+                  </a>
+                )}
               </Space>
             </Col>
           </Row>
