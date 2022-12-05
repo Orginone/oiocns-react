@@ -48,7 +48,6 @@ const DocClassifyTree = ({
     <StoreClassifyTree
       className={cls.docTree}
       title={'文档目录'}
-      fieldNames={{ title: 'name' }}
       isDirectoryTree
       menu={'menus'}
       searchable

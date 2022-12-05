@@ -20,12 +20,11 @@ import {
   TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
-  VerifiedOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
 import React from 'react';
-import { RouteConfig } from 'react-router-config';
 import { Redirect as RouterRedirect } from 'react-router-dom';
+import { IRouteConfig } from 'typings/globelType';
 
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
@@ -34,26 +33,6 @@ import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
 import BasicLayout from '@/layouts/Basic';
-
-export interface IRouteConfig extends RouteConfig {
-  // 路由路径
-  path: string;
-  // 路由组件
-  component?: any;
-  // 302 跳转
-  redirect?: string;
-  exact?: boolean;
-  // 路由信息
-  title: string;
-  // 元数据
-  meta?: any;
-  // 图标
-  icon?: string | React.ReactNode;
-  // 是否校验权限, false 为不校验, 不存在该属性或者为true 为校验, 子路由会继承父路由的 auth 属性
-  auth?: boolean;
-  // 子路由
-  routes?: IRouteConfig[];
-}
 
 /* 通行证 */
 const PassportRouter: IRouteConfig[] = [
@@ -255,9 +234,9 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
-    path: '/market/ShoppingCart',
+    path: '/market/shopingcar',
     title: '购物车',
-    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart/shoppingCart')),
+    component: React.lazy(() => import('@/pages/Store/Market/ShopingCar')),
   },
   {
     path: '/market',
@@ -460,12 +439,6 @@ const PersonRouter: IRouteConfig[] = [
         title: '地址管理',
         icon: <HomeOutlined />,
         component: React.lazy(() => import('@/pages/Person/Address')),
-      },
-      {
-        path: '/person/certificate',
-        title: '证书管理',
-        icon: <VerifiedOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Certificate')),
       },
       {
         path: '/person/safe',

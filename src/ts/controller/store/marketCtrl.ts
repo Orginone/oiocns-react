@@ -63,7 +63,6 @@ class MarketController extends BaseController {
    * @return {*}
    */
   public async changeMenu(menuItem: any) {
-    // console.log('changeMenu', menuItem, this._currentMenu, menuItem.title);
     this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
     // 点击重复 则判定为无效
     if (this._currentMenu === menuItem.title) {
@@ -71,7 +70,6 @@ class MarketController extends BaseController {
     }
     this._currentMenu = menuItem.title;
     console.log('当前页面类型', this.curPageType);
-
     this.getStoreProduct(this.curPageType);
   }
 
@@ -105,16 +103,13 @@ class MarketController extends BaseController {
       Fun = this._curMarket!.getMerchandise;
       params = { offset: 0, limit: 10, filter: '', ...params };
     }
-
     const res = await Fun(params);
     console.log('获取数据', type, res);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
     }
-
     const { success, data } = res;
-
     if (success) {
       const { result = [] } = data;
       this.marketTableCallBack([...result]);

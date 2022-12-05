@@ -160,7 +160,7 @@ const StoreApp: React.FC = () => {
       // },
       {
         key: 'delete',
-        label: <span style={{ color: 'red' }}> 移除</span>,
+        label: <span style={{ color: 'red' }}>移除</span>,
         onClick: () => {
           SelfAppCtrl.curProduct = item;
           SelfAppCtrl.handleDeleteApp();

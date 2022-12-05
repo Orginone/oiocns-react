@@ -57,11 +57,11 @@ export interface TreeType {
   id: string;
   children: TreeType[];
 }
-interface RecMsg {
+interface RecMsg<T> {
   Key: string;
   Name: string;
   UpdateTime: string;
-  data: TreeType[];
+  data: T[];
 }
 class SelfAppController extends BaseController {
   private _curSpace: IMTarget = userCtrl.User;
@@ -130,14 +130,14 @@ class SelfAppController extends BaseController {
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
-    kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg) => {
+    kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg<TreeType>) => {
       // console.log('订阅数据推送 自定义目录===>', Msg.data);
       const { data = defaultTreeData } = Msg;
       this._treeData = data;
       this.changCallbackPart(SelfCallBackTypes.TreeData);
     });
-    kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: any) => {
-      // console.log('订阅数据推送 自定义目录===>', Msg.data);
+    kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: RecMsg<string>) => {
+      // console.log('订阅数据推送 最近使用应用===>', Msg.data);
       const { data = [] } = Msg;
       this.recentlyUsedAppsIds = data;
       this.changCallbackPart(SelfCallBackTypes.Recently);

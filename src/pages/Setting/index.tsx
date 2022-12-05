@@ -13,9 +13,9 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from '@/routes/config';
+import { IRouteConfig } from 'typings/globelType';
 // import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
-import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
+// import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
 // import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
 
 import { MenuProps } from 'antd';
@@ -81,9 +81,9 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
     history.push(`${e.key}`);
   };
   const [menus, setMenu] = useState(muneItems);
+
   const changeMenu = () => {
     let [_newMenu, ...other] = [...muneItems];
-
     _newMenu.children = !userCtrl?.IsCompanySpace
       ? userInfoMenuItems
       : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
