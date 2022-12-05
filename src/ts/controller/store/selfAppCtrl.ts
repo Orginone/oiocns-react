@@ -5,7 +5,7 @@ import { kernel } from '../../base';
 import BaseController from '../baseCtrl';
 import userCtrl, { UserPartTypes } from '../setting/userCtrl';
 import { marketColumns, myColumns, shareInfoColumns } from './config';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 const selfAppMenu = 'selfAppMenu';
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
@@ -296,6 +296,7 @@ class SelfAppController extends BaseController {
       console.error(msg);
     } else {
       console.log('共享成功');
+      message.success('共享成功');
     }
   }
   /**
