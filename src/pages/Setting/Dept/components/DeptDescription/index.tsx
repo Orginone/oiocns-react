@@ -24,7 +24,9 @@ const DeptDescription = (props: {
         column={2}
         labelStyle={{ textAlign: 'center', color: '#606266' }}
         contentStyle={{ textAlign: 'center', color: '#606266' }}>
-        <Descriptions.Item label="部门名称">{selectDept?.name || ''}</Descriptions.Item>
+        <Descriptions.Item label="部门名称">
+          <strong> {selectDept?.name || ''}</strong>
+        </Descriptions.Item>
         <Descriptions.Item label="部门编码">{selectDept?.code || ''}</Descriptions.Item>
         <Descriptions.Item label="所属单位">
           {userCtrl.Company.target.name || ''}

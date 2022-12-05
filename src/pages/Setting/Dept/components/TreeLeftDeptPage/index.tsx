@@ -14,7 +14,7 @@ import ReactDOM from 'react-dom';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IDepartment) => void;
-  handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
+  handleMenuClick: (key: string, item: IDepartment | undefined, id?: string) => void; // 点击操作触发的事件
 };
 
 const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurrent }) => {
@@ -45,7 +45,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       setTreeData(tree);
     }
   };
-  const createTeeDom = (n: IDepartment, pid?: string) => {
+  const createTeeDom: any = (n: IDepartment, pid?: string) => {
     const { target } = n;
     return {
       key: target.id,
@@ -53,7 +53,11 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       tag: { color: '#8ba5ec', txt: target.typeName },
       icon: target.avatar,
       isLeaf: false,
-      target: n,
+      intans: n,
+      children:
+        n.departments.length > 0
+          ? n.departments.map((m) => createTeeDom(m, n.target.id))
+          : undefined,
       pid,
     };
   };
@@ -74,26 +78,26 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       }
       return node;
     });
-  const loadDept = async ({ key, children, target }: any) => {
+  const loadDept = async ({ key, children, intans }: any) => {
     if (children) {
       return;
     }
-    const deptChild: any[] = await target.getDepartments();
+    const deptChild: any[] = await intans.getDepartments();
     setTreeData((origin) =>
       updateTreeData(
         origin,
         key,
-        deptChild.map((n) => createTeeDom(n, target.id)),
+        deptChild.map((n) => createTeeDom(n, intans.target.id)),
       ),
     );
   };
 
-  const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
+  const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     setCurrentKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
-    loadDept(info.node);
+    await loadDept(info.node);
     if (info.selected) {
-      setCurrent(info.node.target);
-      setting.setCurrTreeDeptNode(info.node.target.target.id);
+      setCurrent(info.node.intans);
+      setting.setCurrTreeDeptNode(info.node.intans.target.id);
     }
   };
 
@@ -105,13 +109,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
           className={cls.creatgroup}
           icon={<PlusOutlined className={cls.addIcon} />}
           type="text"
-          onClick={() => handleMenuClick('new', {})}
+          onClick={() => handleMenuClick('new', undefined)}
         />
         <MarketClassifyTree
           className={cls.docTree}
           showIcon
           searchable
-          handleMenuClick={(key, node) => handleMenuClick(key, node.target, node.pid)}
+          handleMenuClick={(key, node) => handleMenuClick(key, node.intans, node.pid)}
           treeData={treeData}
           title={'内设机构'}
           menu={menu}

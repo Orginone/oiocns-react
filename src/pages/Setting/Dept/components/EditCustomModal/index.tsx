@@ -6,7 +6,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import Department from '@/ts/core/target/department';
 import { IDepartment } from '@/ts/core/target/itarget';
-
+const { TextArea } = Input;
 interface Iprops {
   title: string;
   open: boolean;
@@ -16,14 +16,10 @@ interface Iprops {
   editDept?: IDepartment;
 }
 
-const { TextArea } = Input;
-
 const EditCustomModal = (props: Iprops) => {
   const setting = SettingService.getInstance();
-
   const { open, title, handleOk, handleCancel, editDept } = props;
   const [form] = Form.useForm();
-  console.log(editDept);
   useEffect(() => {
     if (open) {
       title !== '新增' ? form.setFieldsValue(editDept?.target) : form.resetFields();
@@ -78,7 +74,6 @@ const EditCustomModal = (props: Iprops) => {
         }
         if (!curentValue.success) {
           message.error(curentValue.msg);
-          // form.resetFields();
         } else {
           message.success(curentValue.msg);
           handleOk();
