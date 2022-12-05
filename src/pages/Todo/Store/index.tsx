@@ -9,6 +9,7 @@ import { statusList, statusMap, tableOperation } from '../components';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { XRelation } from '@/ts/base/schema';
+import { nanoid } from '@ant-design/pro-utils';
 
 /**
  * 批量同意
@@ -115,7 +116,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
         setActiveKey(key as string);
       }}>
       <CardOrTableComp<IApplyItem | IApprovalItem>
-        rowKey={(record) => record.Data.id}
+        rowKey={(record) => record?.Data?.id || nanoid()}
         bordered={false}
         columns={columns}
         dataSource={pageData}
