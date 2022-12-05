@@ -1,8 +1,15 @@
-import { model } from '@/ts/base';
-import Provider from '../../core/provider';
-import { FileSystemItem } from '../../core/store/filesys';
+import { rootDir } from '../../core/store/filesys';
 import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
 import BaseController from '../baseCtrl';
+import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+/** 任务模型 */
+export type TaskModel = {
+  group: string;
+  name: string;
+  size: number;
+  process: number;
+  createTime: Date;
+};
 const homeName = '主目录';
 /**
  * 文档控制器
@@ -11,28 +18,17 @@ class DocsController extends BaseController {
   private _curKey: string;
   private _home: IObjectItem;
   private _root: IFileSystemItem;
+  private _taskList: TaskModel[];
   constructor() {
     super();
-    this._root = new FileSystemItem(
-      {
-        key: '',
-        name: '根目录',
-        isDirectory: true,
-        hasSubDirectories: true,
-        dateCreated: new Date(),
-        dateModified: new Date(),
-      } as model.FileItemModel,
-      undefined,
-    );
+    this._root = rootDir;
+    this._taskList = [];
     this._curKey = this._root.key;
-    Provider.onSetPerson(async () => {
-      await this._root.loadChildren(true);
-      this._home = this._root.findByName(homeName);
-      if (!this._home) {
-        await this._root.create(homeName);
-        this._home = this._root.findByName(homeName);
-      }
-      this.changCallback();
+    userCtrl.subscribePart(UserPartTypes.User, () => {
+      setTimeout(async () => {
+        this._home = await this._root.create(homeName);
+        this.changCallback();
+      }, 200);
     });
   }
   /** 根目录 */
@@ -46,6 +42,10 @@ class DocsController extends BaseController {
   /** 当前目录 */
   public get current(): IObjectItem {
     return this.refItem(this._curKey);
+  }
+  /** 任务列表 */
+  public get taskList(): TaskModel[] {
+    return this._taskList;
   }
   /**
    * 根据key查找节点
@@ -61,8 +61,11 @@ class DocsController extends BaseController {
       this.changCallback();
     }
   }
-  /** 打开文件系统项 */
-  public async open(key: string) {
+  /**
+   * 打开文件系统项
+   * @param key 唯一标识
+   */
+  public async open(key: string): Promise<void> {
     const item = this.refItem(key);
     if (item) {
       if (item.target.isDirectory) {
@@ -71,6 +74,35 @@ class DocsController extends BaseController {
         this.changCallback();
       }
     }
+  }
+  /**
+   * 上传文件
+   * @param key 上传的位置唯一标识
+   * @param name 文件名
+   * @param file 文件内容
+   * @returns 文件对象
+   */
+  public async upload(key: string, name: string, file: Blob): Promise<IObjectItem> {
+    const item = this.refItem(key);
+    if (item) {
+      const task: TaskModel = {
+        process: 0,
+        name: name,
+        size: file.size,
+        createTime: new Date(),
+        group: item.name,
+      };
+      return await item.upload(name, file, (p) => {
+        task.process = p;
+        if (p === 0) {
+          this._taskList.push(task);
+        } else if (p === 1) {
+          this.changCallback();
+        }
+        this.changCallbackPart('taskList');
+      });
+    }
+    return;
   }
   /**
    * 树结构搜索
@@ -91,4 +123,4 @@ class DocsController extends BaseController {
   }
 }
 
-export const docsCtrl = new DocsController();
+export default new DocsController();

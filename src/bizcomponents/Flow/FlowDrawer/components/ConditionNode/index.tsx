@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
-import { useAppwfConfig } from '@/module/flow/flow';
-import cls from './index.module.less';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import ConditionGroupItemConfig from '@/bizcomponents/Flow/FlowDrawer/components/ConditionGroupItemConfig';
 
 /**
@@ -13,15 +12,10 @@ const ConditionNode = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onOk = () => {
-    setIsOpen(false);
-  };
-  const onCancel = () => {
-    setIsOpen(false);
-  };
+  /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
-    selectedNode.conditions.push({
+    console.timeLog('selectedNode.conditions', selectedNode.conditions);
+    selectedNode.conditions?.push({
       pos: selectedNode.conditions.length + 1,
       paramKey: '',
       paramLabel: '',
@@ -30,6 +24,7 @@ const ConditionNode = () => {
       type: 'NUMERIC',
       val: null,
     });
+
     setSelectedNode(selectedNode);
     setKey(key + 1);
   };

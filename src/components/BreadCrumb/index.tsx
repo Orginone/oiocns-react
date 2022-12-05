@@ -1,18 +1,18 @@
-import { Breadcrumb, MenuProps, Space, Typography } from 'antd';
+import { Breadcrumb, Space, Typography } from 'antd';
 import React, { ReactNode, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { IRouteConfig } from 'typings/globelType';
 
-import routes, { IRouteConfig } from '../../routes/config';
+import { routerInfo } from '../../routes/config';
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
 
 const breadcrumbNameMap: Record<string, IRouteConfig> = {};
-
 /**
  * 遍历路由，初始化映射关系
- * @param routes 路由
+ * @param routerInfo 路由
  */
-const initMap = (routes: IRouteConfig[]) => {
+const initMap = (routes: any[]) => {
   routes.forEach((route) => {
     breadcrumbNameMap[route.path] = route;
     if (route.routes && route.routes.length > 0) {
@@ -34,8 +34,8 @@ const createIcon = (icon?: string | React.Component | ReactNode) => {
  * 全局面包屑
  * @returns
  */
-const BreadCrumb: React.FC = (props) => {
-  useMemo(() => initMap(routes), []);
+const BreadCrumb = (props: any) => {
+  useMemo(() => initMap(routerInfo), []);
 
   const location = useLocation();
   const history = useHistory();
@@ -44,7 +44,7 @@ const BreadCrumb: React.FC = (props) => {
   // TODO 面包屑下拉菜单
   const items = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-    let menuItems: MenuProps[`items`] = undefined;
+    let menuItems = undefined;
     if (breadcrumbNameMap[url]?.routes) {
       menuItems = breadcrumbNameMap[url].routes
         ?.filter((n: any) => !n.hideInMenu)
@@ -70,15 +70,14 @@ const BreadCrumb: React.FC = (props) => {
               : null,
           };
         });
-      // console.log(breadcrumbNameMap[url]?.title, menuItems);
-      // menu = <Menu ite ms={items}></Menu>;
     }
     return (
       breadcrumbNameMap[url]?.title && (
         <Breadcrumb.Item
           key={url}
           className={cls['comp-breadcrumb']}
-          menu={menuItems ? { items: menuItems } : undefined}>
+          // menu={menuItems ? { items: menuItems } : undefined}
+        >
           {location.pathname === url && createIcon(breadcrumbNameMap[url]?.icon)}
           <Typography.Text>{breadcrumbNameMap[url]?.title}</Typography.Text>
         </Breadcrumb.Item>

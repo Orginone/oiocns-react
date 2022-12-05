@@ -31,7 +31,7 @@ const Home: React.FC = () => {
   useEffect(() => {}, []);
   return (
     <div className="work-home">
-      {/* 顶部图片 */}
+      {/* 顶部图片11111 */}
       <BannerCom imgList={imgList} />
       {/* 快捷入口及应用 */}
       <div className=" flex">

@@ -1,21 +1,22 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
-import { MarketApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, Space, Tag, Typography } from 'antd';
-import storeService, { tabStatus } from '@/ts/controller/todo';
+import { Space, Tag, Typography } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { DataType } from 'typings/globelType';
-// import styles from './index.module.less';
-storeService.currentModel = 'store';
+import { statusList, statusMap, tableOperation } from '../components';
+import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { XRelation } from '@/ts/base/schema';
+
 /**
  * 批量同意
  * @param ids  React.Key[] 选中的数据id数组
  */
 const handleApproveSelect = async (ids: React.Key[]) => {
   // if (ids.length > 0) {
-  //   const { success } = await storeService.approve(ids.toString());
+  //   const { success } = await approve(ids.toString());
   //   if (success) {
   //     message.success('添加成功！');
   //   } else {
@@ -25,8 +26,8 @@ const handleApproveSelect = async (ids: React.Key[]) => {
 };
 
 // 根据状态值渲染标签
-const renderItemStatus = (record: MarketApprovalType) => {
-  const status = storeService.statusMap[record.status];
+const renderItemStatus = (record: XRelation) => {
+  const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
 
@@ -37,12 +38,12 @@ type TodoCommonTableProps = {};
  * @returns
  */
 const TodoStore: React.FC<TodoCommonTableProps> = () => {
-  const [activeKey, setActiveKey] = useState<string>(storeService.activeStatus);
+  const [activeKey, setActiveKey] = useState<string>('1');
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [pageData, setPageData] = useState<MarketApprovalType[]>([]);
+  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
   const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const columns: ProColumns<MarketApprovalType>[] = [
+  const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -51,18 +52,15 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
     },
     {
       title: '市场名称',
-      dataIndex: 'market.name',
-      render: (_, row) => {
-        return row?.market.name;
-      },
+      dataIndex: ['Data', 'market', 'name'],
     },
     {
       title: '市场编码',
-      dataIndex: 'code',
+      dataIndex: ['Data', 'market', 'code'],
       render: (_, row) => {
         return (
-          <Typography.Paragraph copyable={{ text: row?.market.code }}>
-            {row?.market.code}
+          <Typography.Paragraph copyable={{ text: row?.Data.market.code }}>
+            {_}
           </Typography.Paragraph>
         );
       },
@@ -72,7 +70,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       dataIndex: 'status',
       valueType: 'select',
       render: (_, record) => {
-        return renderItemStatus(record);
+        return renderItemStatus(record.Data);
       },
     },
     {
@@ -80,64 +78,59 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       dataIndex: '',
       hideInTable: activeKey === '2',
       render: (_, row) => {
-        return row.target ? row.target.name : '本人';
+        return row.Data.target ? row.Data.target.name : '本人';
       },
     },
     {
       title: '申请时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
   ];
 
   // 获取申请/审核列表
-  const handlePageChange = async () => {
-    setPageData([...storeService.currentList]);
-    setPageTotal(storeService.currentList.length);
+  const loadList = async (page: number, pageSize: number) => {
+    const listStatusCode = {
+      '1': 'getTodoList',
+      '2': 'getDoList',
+      '3': 'getApplyList',
+    };
+    const data = await todoCtrl.MarketTodo[listStatusCode[activeKey]](needReload);
+    setPageData(data);
+    setPageTotal(data.length);
     setNeedReload(false);
   };
+
   useEffect(() => {
-    storeService.activeStatus = activeKey as tabStatus;
-    handlePageChange();
-    setSelectedRowKeys([]);
+    setPageData([]);
+    setPageTotal(0);
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
     <PageCard
-      tabList={storeService.statusList}
+      tabList={statusList}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
-      }}
-      tabBarExtraContent={
-        <Space>
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => handleApproveSelect(selectedRowKeys)}>
-            同意
-          </Button>
-          <Button key="2">拒绝</Button>
-          <Button key="3">打印</Button>
-        </Space>
-      }>
-      <CardOrTableComp
-        rowKey={'id'}
+      }}>
+      <CardOrTableComp<IApplyItem | IApprovalItem>
+        rowKey={(record) => record.Data.id}
         bordered={false}
         columns={columns}
         dataSource={pageData}
         total={total}
-        onChange={handlePageChange}
-        operation={(item: MarketApprovalType) =>
-          storeService.tableOperation(item, setNeedReload)
+        onChange={loadList}
+        operation={(item: IApplyItem | IApprovalItem) =>
+          tableOperation(activeKey, item, setNeedReload)
         }
         renderCardContent={(arr) => (
-          <TableItemCard<MarketApprovalType>
+          <TableItemCard<IApplyItem | IApprovalItem>
             data={arr}
-            operation={(item: MarketApprovalType) =>
-              storeService.tableOperation(item, setNeedReload)
+            operation={(item: IApplyItem | IApprovalItem) =>
+              tableOperation(activeKey, item, setNeedReload)
             }
-            statusType={(item) => renderItemStatus(item)}
+            statusType={(item) => renderItemStatus(item.Data)}
             targetOrTeam="market"
           />
         )}

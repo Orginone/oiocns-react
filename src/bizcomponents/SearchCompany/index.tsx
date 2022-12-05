@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Card, Col, Result, Row, Tag, Typography, Button } from 'antd';
+import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 
 import { XTarget } from '@/ts/base/schema';
-import PersonController from '@/pages/Person/_control/personcontroller';
 
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
-import Provider from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type CompanySearchTableProps = {
   [key: string]: any;
@@ -24,12 +23,12 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
     selectStyle: string;
   };
 
-  const [searchKey, setSearchKey] = useState<string>();
-  const [dataSource, setDataSource] = useState<XTarget[]>([]);
-
   useEffect(() => {
     tableProps = props;
   }, []);
+
+  const [searchKey, setSearchKey] = useState<string>();
+  const [dataSource, setDataSource] = useState<XTarget[]>([]);
 
   // 单位卡片渲染
   const companyCardList = () => {
@@ -45,32 +44,12 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
                 description={<Tag color="blue">{item.code}</Tag>}
               />
               <div className={styles.description}>
-                <Typography.Text>简介：{item.team.remark || '-'}</Typography.Text>
+                <Typography.Text>简介：{item.team?.remark || '-'}</Typography.Text>
               </div>
             </Card>
           </Col>
         ))}
       </Row>
-    );
-  };
-
-  // 查询数据
-  const getList = (searchKey?: string) => {
-    PersonController.getInstance().searchCompany(
-      {
-        page: 1,
-        pageSize: 10,
-        filter: searchKey, // || '91330304254498785G',
-      },
-      (data: any) => {
-        // 回调
-        if (data.success) {
-          setDataSource(data.data);
-          if (data.data.length > 0) {
-            if (tableProps.setJoinKey) tableProps.setJoinKey(data.data[0].id);
-          }
-        }
-      },
     );
   };
 
@@ -80,15 +59,21 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         value={searchKey}
         placeholder="请输入单位编码"
         // extra={`找到${dataSource?.length}家单位`}
-        onChange={(event) => {
+        onChange={async (event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
-            getList(event.target.value);
-          } else {
-            setDataSource([]);
+            const res = await userCtrl.User.searchCompany(event.target.value);
+            if (res.success && res.data && res.data.result) {
+              setDataSource(res.data.result);
+              const joinKey = res.data.result[0].id!;
+              if (tableProps.setJoinKey) {
+                tableProps.setJoinKey(joinKey);
+              }
+            }
           }
         }}
       />
+
       {dataSource.length > 0 && companyCardList()}
       {searchKey && dataSource.length == 0 && (
         <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的单位`} />

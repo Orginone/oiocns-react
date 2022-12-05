@@ -1,17 +1,18 @@
 import { common, faildResult, kernel, model, schema } from '@/ts/base';
 import { IAuthority } from './iauthority';
 import { AuthorityType } from '../../enum';
-import Provider from '@/ts/core/provider';
 import consts from '@/ts/core/consts';
 import Identity from './identity';
 
 export default class Authority implements IAuthority {
+  private _belongId: string;
   private readonly _authority: schema.XAuthority;
   public children: IAuthority[];
   public identitys: Identity[];
 
-  constructor(auth: schema.XAuthority) {
+  constructor(auth: schema.XAuthority, belongId: string) {
     this._authority = auth;
+    this._belongId = belongId;
     this.children = [];
     this.identitys = [];
   }
@@ -37,8 +38,8 @@ export default class Authority implements IAuthority {
   public get belongId(): string {
     return this._authority.belongId;
   }
-  public get authority(): schema.XAuthority {
-    return this._authority;
+  public get remark(): string {
+    return this._authority.remark;
   }
   public async createIdentity(
     name: string,
@@ -49,9 +50,9 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
-      id: undefined,
+      id: '0',
       authId: this.id,
-      belongId: Provider.spaceId,
+      belongId: this._belongId,
     });
     if (res.success && res.data != undefined) {
       this.identitys.push(new Identity(res.data));
@@ -65,7 +66,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteIdentity({
         id,
-        belongId: Provider.spaceId,
+        belongId: this._belongId,
         typeName: '',
       });
       if (res.success) {
@@ -93,10 +94,10 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: Provider.spaceId,
+      belongId: this._belongId,
     });
     if (res.success && res.data != undefined) {
-      this.children.push(new Authority(res.data));
+      this.children.push(new Authority(res.data, this._belongId));
     }
     return res;
   }
@@ -107,7 +108,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteAuthority({
         id,
-        belongId: Provider.spaceId,
+        belongId: this._belongId,
         typeName: '',
       });
       if (res.success) {
@@ -143,8 +144,8 @@ export default class Authority implements IAuthority {
     }
     return res;
   }
-  public async queryAuthorityIdentity(): Promise<Identity[]> {
-    if (this.identitys.length > 0) {
+  public async queryAuthorityIdentity(reload: boolean = false): Promise<Identity[]> {
+    if (!reload && this.identitys.length > 0) {
       return this.identitys;
     }
     const res = await kernel.queryAuthorityIdentitys({
@@ -155,15 +156,15 @@ export default class Authority implements IAuthority {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((identity) => {
-        this.identitys.push(new Identity(identity));
+    if (res.success && res.data.result) {
+      this.identitys = res.data.result.map((a) => {
+        return new Identity(a);
       });
     }
     return this.identitys;
   }
-  public async getSubAuthoritys(): Promise<IAuthority[]> {
-    if (this.children.length > 0) {
+  public async getSubAuthoritys(reload: boolean = false): Promise<IAuthority[]> {
+    if (!reload && this.children.length > 0) {
       return this.children;
     }
     const res = await kernel.querySubAuthoritys({
@@ -174,9 +175,9 @@ export default class Authority implements IAuthority {
         limit: common.Constants.MAX_UINT_16,
       },
     });
-    if (res.success) {
-      res.data.result?.forEach((auth) => {
-        this.children.push(new Authority(auth));
+    if (res.success && res.data.result) {
+      this.children = res.data.result.map((auth) => {
+        return new Authority(auth, this._belongId);
       });
     }
     return this.children;

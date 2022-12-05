@@ -1,27 +1,23 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { SettingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Row, Button, Select, InputNumber, Input } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import React, { useState, useCallback, useContext } from 'react';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Select, InputNumber, Input } from 'antd';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
 import cls from './index.module.less';
+
+type ConditionGroupItemConfigProps = {};
 
 /**
  * @description: 条件
  * @return {*}
  */
-
-const ConditionGroupItemConfig = () => {
+const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+  const { conditionData } = useContext(EventContext);
+  console.log('conditionData', conditionData);
+  console.log('selectedNode', selectedNode);
   const [key, setKey] = useState(0);
-
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const onOk = () => {
-    setIsOpen(false);
-  };
-  const onCancel = () => {
-    setIsOpen(false);
-  };
 
   const paramChange = (paramKey: any, condition: any) => {
     for (let field of DefaultProps.getFormFields()) {
@@ -54,8 +50,8 @@ const ConditionGroupItemConfig = () => {
   };
 
   const valueChange = (value: any, condition: any) => {
-    condition.val = value;
-    var filter = DefaultProps.getFormFields().filter(
+    condition.val = String(value);
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == condition.paramKey,
     );
     var dict = [];
@@ -77,7 +73,7 @@ const ConditionGroupItemConfig = () => {
   // );
 
   const dictory = useCallback((paramKey: any) => {
-    var filter = DefaultProps.getFormFields().filter(
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == paramKey,
     );
 
@@ -89,7 +85,7 @@ const ConditionGroupItemConfig = () => {
 
   return (
     <div>
-      {selectedNode.conditions.map((condition: any, index: number) => (
+      {selectedNode.conditions?.map((condition: any, index: number) => (
         <div key={index + '_g'} className={cls['group']}>
           <div className={cls['group-header']}>
             <div
@@ -106,8 +102,11 @@ const ConditionGroupItemConfig = () => {
                 style={{ width: 150 }}
                 placeholder="请选择参数"
                 allowClear
+                // 需要选择的参数
+                // options={conditionData?.labels || []}
                 options={DefaultProps.getFormFields()}
-                onChange={(val) => {
+                onChange={(val, option) => {
+                  console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
                 }}
                 defaultValue={condition.paramKey || null}
@@ -118,6 +117,7 @@ const ConditionGroupItemConfig = () => {
                 allowClear
                 options={[conditionKeys(condition.type)]}
               /> */}
+              {/* 如果不是数字 */}
               {condition.type != 'NUMERIC' && (
                 <Select
                   style={{ width: 100 }}
@@ -133,6 +133,7 @@ const ConditionGroupItemConfig = () => {
                   defaultValue={condition.key || null}
                 />
               )}
+              {/* 数字类型 */}
               {condition.type == 'NUMERIC' && (
                 <Select
                   style={{ width: 100 }}
@@ -152,6 +153,7 @@ const ConditionGroupItemConfig = () => {
                   defaultValue={condition.key || null}
                 />
               )}
+              {/* 数字类型 */}
               {condition.type == 'NUMERIC' && (
                 <InputNumber
                   style={{ width: 200 }}
@@ -161,6 +163,7 @@ const ConditionGroupItemConfig = () => {
                   defaultValue={condition.val || null}
                 />
               )}
+              {/* 如果是枚举类型 */}
               {condition.type == 'DICT' && (
                 <Select
                   style={{ width: 200 }}
@@ -173,6 +176,7 @@ const ConditionGroupItemConfig = () => {
                   defaultValue={condition.val || null}
                 />
               )}
+              {/* 既不是枚举也不是数字类型 */}
               {condition.type != 'DICT' && condition.type != 'NUMERIC' && (
                 <Input
                   style={{ width: 200 }}

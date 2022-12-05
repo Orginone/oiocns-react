@@ -22,15 +22,23 @@ export class FileSystemItem implements IFileSystemItem {
     this.name = target.name;
     this.isRoot = parent === undefined;
   }
-  findByName(name: string): IObjectItem {
-    for (const item of this.children) {
-      if (item.name === name) {
-        return item;
-      }
-    }
+  shareInfo(): model.FileItemShare {
+    return {
+      size: this.target.size,
+      name: this.target.name,
+      extension: this.target.extension,
+      shareLink:
+        location.origin + '/orginone/anydata/bucket/load/' + this.target.shareLink,
+      thumbnail: this.target.thumbnail,
+    };
+  }
+  get childrenData(): model.FileItemModel[] {
+    return this.children.map((item) => {
+      return item.target;
+    });
   }
   async rename(name: string): Promise<boolean> {
-    if (this.name != name && !this.findByName(name)) {
+    if (this.name != name && !(await this._findByName(name))) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
         name: name,
         shareDomain: 'user',
@@ -46,8 +54,9 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async create(name: string): Promise<boolean> {
-    if (!this.findByName(name)) {
+  async create(name: string): Promise<IObjectItem> {
+    const exist = await this._findByName(name);
+    if (!exist) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -55,11 +64,12 @@ export class FileSystemItem implements IFileSystemItem {
       });
       if (res.success && res.data) {
         this.target.hasSubDirectories = true;
-        this.children.push(new FileSystemItem(res.data, this));
-        return true;
+        const node = new FileSystemItem(res.data, this);
+        this.children.push(node);
+        return node;
       }
     }
-    return false;
+    return exist;
   }
   async delete(): Promise<boolean> {
     const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
@@ -103,11 +113,10 @@ export class FileSystemItem implements IFileSystemItem {
         operate: BucketOpreates.Move,
       });
       if (res.success) {
-        const index =
-          this.parent?.children.findIndex((item) => {
-            return item.key == this.key;
-          }) ?? -1;
-        if (index > -1) {
+        const index = this.parent?.children.findIndex((item) => {
+          return item.key == this.key;
+        });
+        if (index && index > -1) {
           this.parent?.children.splice(index, 1);
         }
         destination.target.hasSubDirectories = true;
@@ -132,9 +141,10 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async upload(name: string, file: Blob, onProgress: OnProgressType): Promise<void> {
-    if (!this.findByName(name)) {
-      onProgress?.apply(this, [0]);
+  async upload(name: string, file: Blob, p: OnProgressType): Promise<IObjectItem> {
+    const exist = await this._findByName(name);
+    if (!exist) {
+      p?.apply(this, [0]);
       let data: BucketOpreateModel = {
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -160,16 +170,21 @@ export class FileSystemItem implements IFileSystemItem {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
           return;
-        } else if (end === file.size && res.data) {
-          this.children.push(new FileSystemItem(res.data, this));
         }
         index++;
-        onProgress?.apply(this, [(end * 1.0) / file.size]);
+        if (end === file.size && res.data) {
+          const node = new FileSystemItem(res.data, this);
+          this.children.push(node);
+          p?.apply(this, [1]);
+          return node;
+        }
+        p?.apply(this, [(end * 1.0) / file.size]);
       }
     }
+    return exist;
   }
-  async download(path: string, onProgress: OnProgressType): Promise<void> {
-    // TODO
+  download(path: string, onProgress: OnProgressType): Promise<void> {
+    throw new Error('Method not implemented.');
   }
   /**
    * 格式化key,主要针对路径中的中文
@@ -201,6 +216,19 @@ export class FileSystemItem implements IFileSystemItem {
     });
   }
   /**
+   * 根据名称查询子文件系统项
+   * @param name 名称
+   */
+  private async _findByName(name: string): Promise<IObjectItem> {
+    await this.loadChildren();
+    for (const item of this.children) {
+      if (item.name === name) {
+        return item;
+      }
+    }
+    return;
+  }
+  /**
    * 根据新目录生成文件系统项
    * @param source 源
    * @param destination 目标
@@ -215,6 +243,7 @@ export class FileSystemItem implements IFileSystemItem {
         name: source.name,
         dateCreated: new Date(),
         dateModified: new Date(),
+        size: source.target.size,
         shareLink: source.target.shareLink,
         extension: source.target.extension,
         thumbnail: source.target.thumbnail,
@@ -231,3 +260,21 @@ export class FileSystemItem implements IFileSystemItem {
     return node;
   }
 }
+
+/** 根目录 */
+export const rootDir = new FileSystemItem(
+  {
+    key: '',
+    size: 0,
+    name: '根目录',
+    isDirectory: true,
+    extension: '',
+    thumbnail: '',
+    shareLink: '',
+    contentType: '',
+    hasSubDirectories: true,
+    dateCreated: new Date(),
+    dateModified: new Date(),
+  },
+  undefined,
+);

@@ -1,12 +1,4 @@
-/*
- * @Author: zhangqiang 1196217890@qq.com
- * @Date: 2022-11-16 17:46:20
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-19 16:21:11
- * @FilePath: /oiocns-react/src/pages/Setting/index.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import {
   ApartmentOutlined,
@@ -17,41 +9,49 @@ import {
   InfoCircleOutlined,
   SettingOutlined,
   SmileOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import BreadCrumb from '@/components/BreadCrumb';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from '@/routes/config';
-import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
-import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
-import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
+import { IRouteConfig } from 'typings/globelType';
+// import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
+// import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
+// import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
 
 import { MenuProps } from 'antd';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /* 信息中心菜单 */
 const infoMenuItems = [
   { label: '单位信息', key: 'info', icon: <InfoCircleOutlined /> },
   {
-    label: '部门设置',
+    label: '内设机构',
     key: 'dept',
     icon: <ApartmentOutlined />,
     children: [],
-    render: <TreeLeftDeptPage />,
-  },
-  {
-    label: '岗位设置',
-    key: 'position',
-    icon: <ApartmentOutlined />,
-    children: [],
-    render: <TreeLeftPosPage />,
+    render: <></>,
   },
   {
     label: '集团设置',
     key: 'group',
     icon: <FundOutlined />,
     children: [],
-    render: <TreeLeftGroupPage />,
+    render: <></>,
   },
+  {
+    label: '岗位设置',
+    key: 'position',
+    icon: <ApartmentOutlined />,
+    children: [],
+    render: <></>,
+  },
+  { label: '群组设置', key: 'cohort', icon: <TeamOutlined /> },
   { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
+];
+
+const userInfoMenuItems = [
+  { label: '好友设置', key: '/setting/friend', icon: <UserOutlined /> },
+  { label: '群组设置', key: '/setting/cohort', icon: <TeamOutlined /> },
 ];
 /* 自定义设置菜单 */
 const configMenuItems = [
@@ -63,10 +63,10 @@ const configMenuItems = [
   { label: '标准设置', key: 'standard', icon: <SettingOutlined /> },
   { label: '权限设置', key: 'auth', icon: <SettingOutlined /> },
 ];
-const muneItems: MenuProps[`items`] = [
+const muneItems = [
   {
     type: 'group',
-    label: '信息中心',
+    label: '组织设置',
     children: infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key })),
   },
   {
@@ -80,14 +80,23 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };
+  const [menus, setMenu] = useState(muneItems);
 
+  const changeMenu = () => {
+    let [_newMenu, ...other] = [...muneItems];
+    _newMenu.children = !userCtrl?.IsCompanySpace
+      ? userInfoMenuItems
+      : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
+    setMenu([{ ..._newMenu }, ...other]);
+  };
+  useEffect(() => {
+    const id = userCtrl.subscribe(changeMenu);
+    return () => {
+      userCtrl.unsubscribe(id);
+    };
+  }, []);
   return (
-    <ContentTemplate
-      siderMenuData={muneItems}
-      menuClick={toNext}
-      // sider={updataDom}
-      // contentTopLeft={contentTopLeft}
-    >
+    <ContentTemplate siderMenuData={menus as MenuProps['items']} menuClick={toNext}>
       {renderRoutes(route.routes)}
     </ContentTemplate>
   );

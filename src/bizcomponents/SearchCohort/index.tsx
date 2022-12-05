@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { schema } from '../../ts/base';
+import { schema } from '@/ts/base';
 import SearchInput from '../../../src/components/SearchInput';
 import styles from './index.module.less';
 import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CohortController from '../../ts/controller/cohort/index';
-import Person from '../../ts/core/target/person';
 import CohortCard from './SearchCohortCard';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 type CohortSearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
   setCohort: Function;
-  person: Person;
 };
 
 let tableProps: CohortSearchTableProps;
@@ -33,18 +31,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
           style={{ display: 'inline-block', paddingTop: '20px', paddingLeft: '13px' }}
           key={item.id}>
           <Row>
-            <CohortCard
-              className="card"
-              data={item}
-              key={item.id}
-              defaultKey={{
-                name: 'caption',
-                size: 'price',
-                type: 'sellAuth',
-                desc: 'remark',
-                creatTime: 'createTime',
-              }}
-            />
+            <CohortCard className="card" data={item} key={item.id} />
           </Row>
         </div>
       );
@@ -53,10 +40,8 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
 
   // 查询数据
   const getList = async (searchKey?: string) => {
-    const res = CohortController.searchCohort(props.person, searchKey ? searchKey : '');
-    console.log((await res).data.result);
-    setDataSource((await res).data.result || []);
-    console.log('输出值', dataSource);
+    const res = await userCtrl.User?.searchCohort(searchKey || '');
+    setDataSource(res?.data.result || []);
   };
 
   return (
@@ -64,7 +49,6 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
       <SearchInput
         value={searchKey}
         placeholder="请输入群组编码"
-        // extra={`找到${dataSource?.length}家单位`}
         onChange={(event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
@@ -76,7 +60,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
       />
       <div>{dataSource != [] && renderCardFun(dataSource)}</div>
       {searchKey && dataSource.length == 0 && (
-        <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的单位`} />
+        <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码的内容`} />
       )}
     </div>
   );

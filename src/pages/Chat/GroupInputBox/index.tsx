@@ -1,7 +1,8 @@
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
+import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
-import { Button, message, Popover } from 'antd';
+import { Button, message, Popover, Upload, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
 
@@ -17,7 +18,6 @@ interface Iprops {
 const Groupinputbox = (props: Iprops) => {
   const { writeContent } = props;
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
-
   /**
    * @description: 提交聊天内容
    * @return {*}
@@ -116,6 +116,31 @@ const Groupinputbox = (props: Iprops) => {
       }
     }
   };
+  /** 文件上传参数 */
+  const uploadProps: UploadProps = {
+    multiple: false,
+    showUploadList: false,
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith('image');
+      if (!isImage) {
+        message.error(`${file.name} 不是一个图片文件`);
+      }
+      return isImage;
+    },
+    async customRequest(options) {
+      const file = options.file as File;
+      const docDir = await docsCtrl.home?.create('沟通');
+      if (docDir && file) {
+        const result = await docsCtrl.upload(docDir.key, file.name, file);
+        if (result) {
+          await chatCtrl.chat?.sendMessage(
+            MessageType.Image,
+            JSON.stringify(result.shareInfo()),
+          );
+        }
+      }
+    },
+  };
 
   /**
    * @description: 设置光标到最后
@@ -164,13 +189,9 @@ const Groupinputbox = (props: Iprops) => {
             message.warning('功能暂未开放');
           }}
         />
-        <IconFont
-          className={inputboxStyle.icons_oneself}
-          type={'icon-wenjian'}
-          onClick={() => {
-            message.warning('功能暂未开放');
-          }}
-        />
+        <Upload {...uploadProps}>
+          <IconFont className={inputboxStyle.icons_oneself} type={'icon-wenjian'} />
+        </Upload>
         <IconFont
           className={inputboxStyle.icons_oneself}
           type={'icon-jietu'}

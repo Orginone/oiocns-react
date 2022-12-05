@@ -4,61 +4,61 @@ import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CohortConfigType } from 'typings/Cohort';
-import { cohortColumn } from '@/components/CardOrTableComp/config';
+import { cohortColumn } from './column';
+import { updateColumn } from './column/index';
 import cls from './index.module.less';
-import CohortService from '@/module/cohort/Cohort';
 import UpdateCohort from '@/bizcomponents/Cohort/UpdateCohort/index';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from '../../../bizcomponents/SearchCohort/index';
-import { Cohort } from '../../../module/org/index';
 import { useHistory } from 'react-router-dom';
-import PersonInfoEnty from '../../../ts/core/provider';
-import CohortEnty from '../../../ts/core/target/cohort';
-import CohortController from '../../../ts/controller/cohort/index';
 import ChangeCohort from './SearchCohortPerson/index';
 import CreateCohort from '../../../bizcomponents/Cohort/index';
 import { schema } from '../../../ts/base';
 import CohortCard from './CohortCard';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
-/**
- * 个人信息
- * @returns
- */
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import AddPostModal from '../../../bizcomponents/AddPositionModal';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { ICohort } from '@/ts/core/target/itarget';
+import { TargetType } from '@/ts/core/enum';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import Indentity from '@/bizcomponents/Indentity/index';
 const CohortConfig: React.FC = () => {
-  const service = new CohortService({
-    nameSpace: 'myCohort',
-  });
-  const Person = PersonInfoEnty.getPerson!;
-  console.log('实体信息', Person);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
-  const [item, setItem] = useState<CohortEnty>();
+  const [item, setItem] = useState<ICohort>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
   const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
   const [friend, setFriend] = useState<schema.XTarget>();
-  const [cohort, setcohort] = useState<Cohort>();
-  const [data, setData] = useState<CohortEnty[]>();
-  const [joinData, setJoinData] = useState<CohortEnty[]>();
+  const [cohort, setcohort] = useState<ICohort>();
+  const [data, setData] = useState<ICohort[]>();
+  const [joinData, setJoinData] = useState<ICohort[]>();
+  const [isSetPost, setIsSetPost] = useState<boolean>(false);
+  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
 
+  const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
-    CohortController.setCallBack(setData);
-    CohortController.setJoinCallBack(setJoinData);
     getData();
-    getJoinData();
-  }, []);
-  useEffect(() => {
-    console.log('发生变化');
-  }, [data]);
+  }, [chatKey]);
+
   const getData = async () => {
-    setData(await CohortController.getMyCohort());
+    setData(
+      (await userCtrl.getCohortList())?.filter(
+        (obj) => obj.target.belongId == userCtrl.Space?.target.id,
+      ),
+    );
+    setJoinData(
+      (await userCtrl.getCohortList())?.filter(
+        (obj) => obj.target.belongId != userCtrl.Space?.target.id,
+      ),
+    );
   };
-  const getJoinData = async () => {
-    setJoinData(await CohortController.getJoinCohort());
-  };
+
   /**
    * 根据id获取会话
    * @param id
@@ -67,28 +67,23 @@ const CohortConfig: React.FC = () => {
   const getChat = (id: string): IChat | undefined => {
     for (var i = 0; i < chatCtrl.groups.length; i++) {
       const group = chatCtrl.groups[i];
-      console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
         if (id == chat.target.id) {
-          console.log(chat);
           return chat;
         }
       }
     }
     return undefined;
   };
-
-  const renderOperation = (item: CohortEnty): CohortConfigType.OperationType[] => {
+  const renderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
     return [
       {
         key: 'enterChat',
         label: '进入会话',
         onClick: () => {
-          console.log('获取到会话控制器', chatCtrl);
           chatCtrl.setCurrent(getChat(item.target.id));
           history.push('/chat');
-          console.log('按钮事件', 'enterChat', item);
         },
       },
       {
@@ -97,7 +92,6 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           showModal();
           setItem(item);
-          console.log('按钮事件', 'inviteMembers', item);
         },
       },
       {
@@ -106,22 +100,28 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           setItem(item);
           setOpen(true);
-          console.log('按钮事件', 'updateCohort', item);
         },
       },
       {
         key: 'roleManage',
         label: '角色管理',
-        onClick: () => {
-          history.push({ pathname: '/person/Role', state: { cohortId: item.target.id } });
-          console.log('按钮事件', 'roleManage', item);
+        onClick: async () => {
+          await item.selectAuthorityTree(false);
+          setItem(item);
+          setIsSetPost(true);
         },
       },
       {
-        key: 'identityManage',
+        key: 'indentity',
         label: '身份管理',
-        onClick: () => {
-          console.log('按钮事件', 'identityManage');
+        onClick: async () => {
+          setItem(item);
+          setIsOpenIndentity(true);
+          setMemberData(
+            await (
+              await item?.getMember(false)!
+            ).filter((obj) => obj.id != userCtrl.Space.target.id),
+          );
         },
       },
       {
@@ -130,20 +130,30 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           setItem(item);
           setChangeIsModelOpen(true);
-          console.log('按钮事件', 'changePermission', item);
         },
       },
       {
         key: 'breakCohort',
         label: '解散群组',
         onClick: () => {
-          console.log(CohortController.deleteCohort(Person, item.target.id));
-          message.info('解散成功');
+          Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined />,
+            content: '是否确定解散该群组',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+              await userCtrl.Space.deleteCohort(item.target.id);
+              getData();
+              message.success('解散成功');
+            },
+          });
         },
       },
     ];
   };
-  const joinrenderOperation = (item: CohortEnty): CohortConfigType.OperationType[] => {
+
+  const joinrenderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
     return [
       {
         key: 'inviteMembers',
@@ -151,25 +161,22 @@ const CohortConfig: React.FC = () => {
         onClick: () => {
           showModal();
           setItem(item);
-          console.log('按钮事件', 'inviteMembers', item);
         },
       },
       {
         key: 'exitCohort',
         label: '退出群聊',
-        onClick: () => {
-          CohortController.quitCohort(Person, item.target.id);
+        onClick: async () => {
+          await userCtrl.Space.quitCohorts(item.target.id);
+          getData();
           message.info('退出成功');
-          console.log('按钮事件', 'exitCohort', item);
         },
       },
     ];
   };
-  const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {};
 
-  const handlePageChange = (page: number, pageSize: number) => {
+  const handlePageChange = (page: number) => {
     setPage(page);
-    getTableList({ page, pageSize });
   };
 
   const tableAlertRender = (selectedRowKeys: any[]) => {
@@ -184,33 +191,32 @@ const CohortConfig: React.FC = () => {
   //转移权限确认事件
   const changeHandleOk = async () => {
     setChangeIsModelOpen(false);
-    console.log(
-      CohortController.updateCohort(
-        item!,
-        item?.target.name!,
-        item?.target.code!,
-        item?.target.team?.remark!,
-        friend?.id!,
-      ),
-    );
-    console.log('获取到选中对象', friend);
+    await item?.update({
+      name: item.target.name,
+      code: item.target.code,
+      typeName: TargetType.Cohort,
+      teamRemark: item.target.team?.remark!,
+      belongId: item.target.belongId,
+      avatar: 'test', //头像
+    });
+    getData();
+    message.success('权限转移成功');
   };
   //邀请成员确认事件
   const handleOk = async () => {
     setIsModalOpen(false);
-    const res = CohortController.pullCohort(item!, [friend!]);
-    if ((await res).success) {
-      console.log(res);
+    const res = await item?.pullMember([friend!]);
+    if (res?.success) {
       message.success('邀请成功');
     } else {
-      message.error((await res).msg);
+      message.error(res?.msg);
     }
   };
   //申请加入群组确认事件
   const cohortHandleOk = async () => {
-    const data = await CohortController.joinCohort(Person, cohort?.id ? cohort.id : '');
-    if (!data.success) {
-      message.error(data.msg);
+    const data = await userCtrl.Space?.applyJoinCohort(cohort?.target.id!);
+    if (!data?.success) {
+      message.error(data?.msg);
     } else message.info('申请加入成功');
     setAddIsModalOpen(false);
   };
@@ -218,26 +224,23 @@ const CohortConfig: React.FC = () => {
   const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
-  const renderCardFun = (dataArr: CohortEnty[]): React.ReactNode[] => {
-    return dataArr.map((item: CohortEnty) => {
+  const renderCardFun = (
+    dataArr: ICohort[],
+    operaiton: (_item: ICohort) => CohortConfigType.OperationType[],
+  ): React.ReactNode[] => {
+    return dataArr.map((item: ICohort) => {
       return (
         <CohortCard
           className="card"
           data={item}
           key={item.target.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           onClick={() => console.log('按钮测试')}
-          operation={renderOperation}
+          operation={operaiton}
         />
       );
     });
   };
+
   return (
     <div>
       <Card>
@@ -262,8 +265,31 @@ const CohortConfig: React.FC = () => {
                 onOk={handleOk}
                 onCancel={() => setIsModalOpen(false)}
                 width="700px">
-                <Persons searchCallback={searchCallback} person={Person} />
+                <Persons searchCallback={searchCallback} />
               </Modal>
+
+              <Indentity
+                open={isOpenIndentity}
+                object={item!}
+                MemberData={memberData ? memberData : []}
+                onCancel={() => {
+                  setIsOpenIndentity(false);
+                }}
+              />
+
+              {item?.authorityTree && (
+                <AddPostModal
+                  title={'角色设置'}
+                  open={isSetPost}
+                  onOk={() => {
+                    setIsSetPost(false);
+                  }}
+                  handleOk={() => {
+                    setIsSetPost(false);
+                  }}
+                  datasource={item?.authorityTree}
+                />
+              )}
 
               <Modal
                 title="加入群组"
@@ -271,8 +297,9 @@ const CohortConfig: React.FC = () => {
                 onOk={cohortHandleOk}
                 onCancel={() => setAddIsModalOpen(false)}
                 width="1050px">
-                <AddCohort person={Person} setCohort={setcohort} />
+                <AddCohort setCohort={setcohort} />
               </Modal>
+
               {item && (
                 <UpdateCohort
                   key={item?.target.id}
@@ -283,18 +310,15 @@ const CohortConfig: React.FC = () => {
                     onCancel: () => setOpen(false),
                   }}
                   open={open}
-                  columns={service.getcolumn()}
+                  columns={updateColumn as any}
                   setOpen={setOpen}
                   item={item}
-                  getTableList={getTableList}
+                  callBack={getData}
                 />
               )}
 
-              <CreateCohort
-                Person={Person}
-                service={service}
-                getTableList={getTableList}
-              />
+              <CreateCohort callBack={getData} />
+
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>
@@ -309,7 +333,8 @@ const CohortConfig: React.FC = () => {
               label: `管理的`,
               key: '1',
               children: (
-                <CardOrTable<CohortEnty>
+                <CardOrTable<ICohort>
+                  id={chatKey}
                   childrenColumnName={'nochildren'}
                   dataSource={data!}
                   total={total}
@@ -318,8 +343,7 @@ const CohortConfig: React.FC = () => {
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
-                  renderCardContent={renderCardFun}
-                  operation={renderOperation}
+                  renderCardContent={(data) => renderCardFun(data, renderOperation)}
                   columns={cohortColumn as any}
                   onChange={handlePageChange}
                   rowKey={'id'}
@@ -330,7 +354,7 @@ const CohortConfig: React.FC = () => {
               label: `加入的`,
               key: '2',
               children: (
-                <CardOrTable<CohortEnty>
+                <CardOrTable<ICohort>
                   childrenColumnName={'nochildren'}
                   dataSource={joinData!}
                   total={total}
@@ -339,8 +363,7 @@ const CohortConfig: React.FC = () => {
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
-                  renderCardContent={renderCardFun}
-                  operation={joinrenderOperation}
+                  renderCardContent={(data) => renderCardFun(data, joinrenderOperation)}
                   columns={cohortColumn as any}
                   onChange={handlePageChange}
                   rowKey={'id'}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { TransferDirection } from 'antd/es/transfer';
-import { Divider, Modal, Transfer } from 'antd';
+import { Modal, Transfer } from 'antd';
 import cls from './index.module.less';
 
 type VisbleRangeType = {

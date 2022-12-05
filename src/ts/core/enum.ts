@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+
 /** 组织对象类型 */
 export enum TargetType {
   Group = '集团',
@@ -45,4 +46,20 @@ export enum CommonStatus {
 
 export enum ProductType {
   WebApp = 'web应用',
+}
+
+/**订单状态 */
+export enum OrderStatus {
+  Deliver = 102,
+  BuyerCancel = 220,
+  SellerCancel = 221,
+  RejectOrder = 222,
+}
+
+export enum TodoType {
+  FrientTodo = '好友申请',
+  OrgTodo = '组织审批',
+  OrderTodo = '订单管理',
+  MarketTodo = '市场管理',
+  ApplicationTodo = '应用待办',
 }

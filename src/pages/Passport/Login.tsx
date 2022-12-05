@@ -1,21 +1,25 @@
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
 
-import useStore from '../../store';
 import cls from './index.module.less';
 
 const PassportLogin: React.FC<RouteComponentProps> = (props) => {
-  const { login, loading } = useStore((state) => ({ ...state }));
+  const [loading, setLoading] = useState(false);
   return (
     <div>
       <Tabs size="large" items={[{ label: '账号密码登录', key: 'account' }]} />
       <Form
         onFinish={({ account, password }) => {
           if (account && password) {
-            return login(account, password).then((res: boolean) => {
-              res && props.history.push('/home');
+            setLoading(true);
+            return userCtrl.login(account, password).then((res) => {
+              setLoading(false);
+              if (res.success) {
+                props.history.push('/home');
+              }
             });
           }
           message.error('账号或密码错误，请重试！');

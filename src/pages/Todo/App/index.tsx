@@ -1,78 +1,88 @@
 // 应用待办
 import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import PageCard from '../components/PageCard';
-import { RouteComponentProps } from 'react-router-dom';
-import todoService, { tabStatus } from '@/ts/controller/todo';
-import sidebar from '@/ts/controller/todo/sidebar';
+import PageCard from '@/components/PageCard';
 import { ProColumns } from '@ant-design/pro-components';
-import {
-  XFlowInstanceItem,
-  XFlowTaskHistoryItem,
-  XFlowTaskItem,
-} from '@/ts/core/todo/interface';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { applicationTabs, statusMap, tableOperation } from '../components';
+import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import { resetParams } from '@/utils/tools';
+import { Tag } from 'antd';
 
-todoService.currentModel = 'application';
-type RouterParams = {
-  id: string;
+// 根据状态值渲染标签
+const renderItemStatus = (record: any) => {
+  const status = statusMap[record.status];
+  return <Tag color={status.color}>{status.text}</Tag>;
 };
-const AppTodo: React.FC<RouteComponentProps<RouterParams>> = (props) => {
-  const {
-    location,
-    match: {
-      params: { id },
-    },
-  } = props;
-  const [pageData, setpageData] = useState<any>();
+const AppTodo: React.FC = () => {
+  const [pageData, setpageData] = useState<IApprovalItem[] | IApplyItem[]>();
   const [activeKey, setActiveKey] = useState<string>('1');
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const columns: ProColumns<XFlowTaskItem | XFlowTaskHistoryItem | XFlowInstanceItem>[] =
-    [
-      {
-        title: '序号',
-        dataIndex: 'index',
-        valueType: 'index',
-        width: 60,
-      },
-      {
-        title: '申请人',
-        dataIndex: '1',
-      },
-      {
-        title: '事项',
-        dataIndex: '2',
-      },
-      {
-        title: '申请时间',
-        dataIndex: '3',
-        valueType: 'dateTime',
-      },
-    ];
-  const loadList = async () => {
-    if (todoService.applicationInstance) {
-      const list = await todoService.applicationList();
-      console.log(location.pathname, list);
+  const [total, setTotal] = useState<number>(0);
+  const columns: ProColumns<IApprovalItem>[] = [
+    { title: '序号', valueType: 'index', width: 60 },
+    { title: '当前流程', dataIndex: ['Data', 'flowInstance', 'title'] },
+    { title: '申请人', dataIndex: ['Data', 'createUser'] },
+    { title: '事项', dataIndex: ['Data', 'flowInstance', 'content'] },
+    {
+      title: '状态',
+      dataIndex: ['Data', 'status'],
+      render: (_, record) => renderItemStatus(record.Data),
+    },
+    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
+  ];
+  const applyColumns: ProColumns<IApplyItem>[] = [
+    { title: '序号', valueType: 'index', width: 60 },
+    { title: '当前流程', dataIndex: ['Data', 'title'] },
+    { title: '审核人', dataIndex: ['Data', 'title'] },
+    { title: '事项', dataIndex: ['Data', 'content'] },
+    {
+      title: '状态',
+      dataIndex: ['Data', 'status'],
+      render: (_, record) => renderItemStatus(record.Data),
+    },
+    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
+  ];
+  const loadList = async (page: number, pageSize: number) => {
+    if (todoCtrl.CurAppTodo) {
+      const code = {
+        '1': 'getTodoList',
+        '2': 'getDoList',
+        '3': 'getApplyList',
+        '4': 'getNoticeList',
+      };
+      const list = await todoCtrl.CurAppTodo[code[activeKey]](
+        activeKey === '3' ? resetParams({ page, pageSize }) : null,
+      );
+      console.log(code[activeKey], list);
       setpageData(list);
+      setTotal(list.length);
+    } else {
+      setpageData([]);
     }
     setNeedReload(false);
   };
   useEffect(() => {
-    todoService.activeStatus = activeKey as tabStatus;
-    sidebar.currentMenuId = id;
-    loadList();
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
-    <PageCard tabList={todoService.applicationTabs}>
+    <PageCard
+      tabList={applicationTabs}
+      activeTabKey={activeKey}
+      onTabChange={(key: string) => {
+        setActiveKey(key as string);
+      }}>
       {pageData && (
-        <CardOrTableComp
+        <CardOrTableComp<IApprovalItem | IApplyItem>
           dataSource={pageData}
-          rowKey={'id'}
-          columns={columns}
-          activeTabKey={activeKey}
-          onTabChange={(key: string) => {
-            setActiveKey(key as string);
-          }}
+          rowKey={(record) => record?.Data?.id || Math.random() * 10000}
+          columns={activeKey === '3' ? applyColumns : columns}
+          total={total}
+          onChange={loadList}
+          operation={(item: IApplyItem | IApprovalItem) =>
+            tableOperation(activeKey, item, setNeedReload)
+          }
         />
       )}
     </PageCard>

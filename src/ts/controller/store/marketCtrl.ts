@@ -1,117 +1,206 @@
-import { IPerson, ICompany } from './../../core/target/itarget';
-import { Market, BaseProduct } from '@/ts/core/market';
+import { Market } from '@/ts/core/market';
+import IMarket from '@/ts/core/market/imarket';
+import { IMTarget } from '@/ts/core/target/itarget';
 import BaseController from '../baseCtrl';
-import { PageRequest } from '@/ts/base/model';
-export class MarketController extends BaseController {
-  /** 人员/单位 */
-  private _target: IPerson | ICompany;
-  /** 当前操作的商店 */
-  private _curMarket: Market | undefined;
-  /** 当前操作的应用 */
-  private _curProd: BaseProduct | undefined;
-  /** 可用应用 */
-  private _usefulProds: BaseProduct[] | undefined;
+import { kernel } from '../../base';
+import { myColumns, marketColumns } from './config';
+import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { JOIN_SHOPING_CAR } from '@/constants/const';
+import { message } from 'antd';
 
-  constructor(target: IPerson | ICompany) {
+export enum MarketCallBackTypes {
+  'ApplyData' = 'ApplyData',
+}
+
+class MarketController extends BaseController {
+  /** 市场操作对象 */
+  private _target: IMTarget | undefined;
+  /** 当前操作的市场 */
+  private _curMarket: IMarket | undefined;
+  /** 当前展示 菜单 */
+  private _currentMenu = 'Public';
+  /** 判断当前所处页面类型,调用不同请求 */
+  public curPageType: 'app' | 'market' = 'market';
+  /** 触发页面渲染 callback */
+  public marketTableCallBack!: (data: any) => void;
+  /** 搜索到的商店 */
+  public searchMarket: any;
+  /** 所有的用户 */
+  public marketMenber: any;
+  /** 加入购物车商品 */
+  public JoinShopingCar: any[] = [];
+  /** 购物车商品列表 */
+  private _shopinglist: any[] = []; //缓存树形数据
+
+  constructor() {
     super();
-    this._target = target;
-    this._usefulProds = [];
+    this.searchMarket = [];
+    userCtrl.subscribePart([UserPartTypes.Space, UserPartTypes.User], async () => {
+      if (userCtrl.IsCompanySpace) {
+        this._target = userCtrl.Company;
+      } else {
+        this._target = userCtrl.User;
+      }
+      await this._target.getJoinMarkets();
+      this.changCallback();
+    });
+    /* 获取 历史缓存的 购物车商品列表 */
+    kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+      console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+      const { data = [] } = shoplist;
+
+      this._shopinglist = data || [];
+      this.changCallbackPart(MarketCallBackTypes.ApplyData);
+    });
   }
-  /** 获得所有市场 */
-  public get getMarkets() {
-    return this._target.getJoinMarkets();
+
+  /**
+   * @description: 获取购物车商品列表的方法
+   * @return {*}
+   */
+  public get shopinglist(): any[] {
+    return this._shopinglist;
   }
+
+  /** 市场操作对象 */
+  public get Market(): IMTarget {
+    if (this._target) {
+      return this._target;
+    } else {
+      return {} as IMTarget;
+    }
+  }
+
   /** 获取当前操作的市场 */
   public getCurrentMarket() {
     return this._curMarket;
   }
-  /** 获取购物车 */
-  public getStagings() {
-    return this._target.getStaging();
-  }
-  /** 获得所拥有的应用 */
-  public getOwnProduct() {
-    return this._target.getOwnProducts();
-  }
-  /** 获取当前操作的应用 */
-  public getCurrentProduct() {
-    return this._curProd;
-  }
+
   /** 切换市场 */
   public setCurrentMarket(market: Market) {
+    console.log('切换市场', market);
     this._curMarket = market;
+    this.getMember();
     this.changCallback();
-  }
-  /** 切换应用 */
-  public setCurrentProduct(prod: BaseProduct) {
-    this._curProd = prod;
-  }
-  // 购买
-  public buyApp() {}
-  /**
-   * 添加购物车
-   * @param id 商品Id
-   */
-  public async addCart(id: string) {
-    await this._target.stagingMerchandise(id);
-    this.changCallback();
-  }
-  /**
-   * 获取购买订单
-   * @param status 订单状态
-   * @param page 分页参数
-   * @returns
-   */
-  public async getBuyOrders(status: number, page: PageRequest) {
-    return await this._target.getBuyOrders(status, page);
-  }
-  /**
-   * 获取售卖订单
-   * @param status 订单状态
-   * @param page 分页参数
-   * @returns
-   */
-  public async getSellOrders(status: number, page: PageRequest) {
-    return await this._target.getSellOrders(status, page);
   }
 
   /**
-   * @description: 创建商店
+   * @desc: 切换侧边栏 触发 展示数据变化
+   * @param {any} menuItem
    * @return {*}
    */
-  public creatMarkrt = async (data: {
-    name: string;
-    code: string;
-    remark: string;
-    samrId: string;
-    ispublic: boolean;
-  }) => {
-    await this._target.createMarket(
-      data.name,
-      data.code,
-      data.remark,
-      data.samrId,
-      data.ispublic,
+  public async changeMenu(menuItem: any) {
+    this._curMarket = menuItem.node ?? new Market(menuItem); // 当前商店信息
+    // 点击重复 则判定为无效
+    if (this._currentMenu === menuItem.title) {
+      return;
+    }
+    this._currentMenu = menuItem.title;
+    console.log('当前页面类型', this.curPageType);
+    this.getStoreProduct(this.curPageType);
+  }
+
+  /**
+   * @desc: 获取表格头部展示数据
+   * @return {*}
+   */
+  public getColumns(pageKey?: string) {
+    switch (pageKey) {
+      case 'appInfo':
+      case 'myApp':
+        return myColumns;
+      case 'market':
+        return marketColumns;
+      default:
+        return [];
+    }
+    //TODO:待完善
+  }
+
+  /** 获取我的应用列表/商店-商品列表
+   * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
+   * @return {*}
+   */
+  public async getStoreProduct(type = 'app', params?: any) {
+    let Fun!: Function;
+    if (type === 'app') {
+      Fun = userCtrl.User!.getOwnProducts;
+      params = {};
+    } else {
+      Fun = this._curMarket!.getMerchandise;
+      params = { offset: 0, limit: 10, filter: '', ...params };
+    }
+    const res = await Fun(params);
+    console.log('获取数据', type, res);
+    if (Array.isArray(res)) {
+      this.marketTableCallBack([...res]);
+      return;
+    }
+    const { success, data } = res;
+    if (success) {
+      const { result = [] } = data;
+      this.marketTableCallBack([...result]);
+    }
+  }
+
+  /**
+   * @description: 获取市场里的所有用户
+   * @return {*}
+   */
+  public async getMember() {
+    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
+    }
+    console.log('获取市场里的所有用户', res);
+    return this.marketMenber;
+  }
+
+  /**
+   * @description: 移出市场里的成员
+   * @param {string} targetIds
+   * @return {*}
+   */
+  public removeMember = async (targetIds: string[]) => {
+    console.log('移出成员ID合集', targetIds);
+    const res = await this._curMarket?.removeMember(targetIds);
+    console.log('移出成员', res);
+  };
+
+  /**
+   * @description: 添加/删除 购物车
+   * @return {*}
+   */
+  public joinOrdeleApply = async (data: any) => {
+    if (this._shopinglist.length === 0) {
+      this._shopinglist.push(data);
+      message.success('已加入购物车');
+    } else if (this._shopinglist.some((item) => item.id === data?.id)) {
+      message.warning('您已添加该商品，请勿重复添加');
+      return;
+    } else {
+      this._shopinglist.push(data);
+      message.success('已加入购物车');
+    }
+    this.cacheJoinShopingCar(this._shopinglist);
+  };
+
+  /**
+   * 缓存 加入购物车的商品
+   * @param message 新消息，无则为空
+   */
+  public cacheJoinShopingCar = (data: any): void => {
+    this.changCallbackPart(MarketCallBackTypes.ApplyData);
+    kernel.anystore.set(
+      JOIN_SHOPING_CAR,
+      {
+        operation: 'replaceAll',
+        data: {
+          data: data || [],
+        },
+      },
+      'user',
     );
-    this.changCallback();
   };
-
-  /**
-   * @description: 删除商店
-   * @return {*}
-   */
-  public deleteMarket = async (id: string) => {
-    await this._target.deleteMarket(id);
-    this.changCallback();
-  };
-
-  /**
-   * @description: 退出商店
-   * @param {string} id
-   * @return {*}
-   */
-  public async quitMarket(id: string) {
-    await this._target.quitMarket(id);
-    this.changCallback();
-  }
 }
+export default new MarketController();

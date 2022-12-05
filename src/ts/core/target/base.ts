@@ -2,14 +2,17 @@ import consts from '../consts';
 import { TargetType } from '../enum';
 import { kernel, model, common, schema, faildResult } from '../../base';
 import Authority from './authority/authority';
-import Provider from '../provider';
 import { IAuthority } from './authority/iauthority';
-
-export default class BaseTarget {
+import { IIdentity } from './authority/iidentity';
+import { ITarget } from './itarget';
+import Identity from './authority/identity';
+export default class BaseTarget implements ITarget {
   public target: schema.XTarget;
   public subTypes: TargetType[];
   public pullTypes: TargetType[];
   public authorityTree: Authority | undefined;
+  public ownIdentitys: schema.XIdentity[];
+  public identitys: IIdentity[];
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -22,10 +25,64 @@ export default class BaseTarget {
     this.createTargetType = [];
     this.joinTargetType = [];
     this.searchTargetType = [];
+    this.ownIdentitys = [];
+    this.identitys = [];
+  }
+  async createIdentity(
+    params: Omit<model.IdentityModel, 'id' | 'belongId'>,
+  ): Promise<IIdentity | undefined> {
+    const res = await kernel.createIdentity({
+      ...params,
+      id: '0',
+      belongId: this.target.id,
+    });
+    if (res.success && res.data != undefined) {
+      const newItem = new Identity(res.data);
+      this.identitys.push(newItem);
+      return newItem;
+    }
+  }
+  async deleteIdentity(id: string): Promise<boolean> {
+    const index = this.identitys.findIndex((item) => {
+      return item.id === id;
+    });
+    if (index > -1) {
+      const res = await kernel.deleteIdentity({
+        id: id,
+        typeName: this.target.typeName,
+        belongId: this.target.id,
+      });
+      if (res.success) {
+        this.identitys = this.identitys.filter((obj) => {
+          return obj.id != id;
+        });
+      }
+      return res.success;
+    }
+    return false;
+  }
+  async getIdentitys(): Promise<IIdentity[]> {
+    if (this.identitys.length > 0) {
+      return this.identitys;
+    }
+    const res = await kernel.queryTargetIdentitys({
+      id: this.target.id,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+    });
+    if (res.success && res.data && res.data.result) {
+      this.identitys = res.data.result.map((item) => {
+        return new Identity(item);
+      });
+    }
+    return this.identitys;
   }
 
   protected async createSubTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     if (this.subTypes.includes(<TargetType>data.typeName)) {
       const res = await this.createTarget(data);
@@ -45,11 +102,12 @@ export default class BaseTarget {
   protected async deleteSubTarget(
     id: string,
     typeName: string,
+    spaceId: string,
   ): Promise<model.ResultType<any>> {
     return await kernel.deleteTarget({
       id: id,
       typeName: typeName,
-      belongId: Provider.spaceId,
+      belongId: spaceId,
     });
   }
 
@@ -96,12 +154,15 @@ export default class BaseTarget {
    */
   public async searchTargetByName(
     code: string,
-    typeName: TargetType,
-  ): Promise<model.ResultType<any>> {
-    if (this.searchTargetType.includes(typeName)) {
+    typeNames: TargetType[],
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    typeNames = this.searchTargetType.filter((a) => {
+      return typeNames.includes(a);
+    });
+    if (typeNames.length > 0) {
       return await kernel.searchTargetByName({
         name: code,
-        typeName: typeName,
+        typeNames: typeNames,
         page: {
           offset: 0,
           filter: code,
@@ -161,14 +222,9 @@ export default class BaseTarget {
       status,
     });
   }
-
-  /**
-   * 获取加入的组织
-   * @param data 请求参数
-   * @returns 请求结果
-   */
   protected async getjoinedTargets(
     typeNames: TargetType[],
+    spaceId: string = '0',
   ): Promise<model.ResultType<schema.XTargetArray>> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
@@ -182,7 +238,7 @@ export default class BaseTarget {
           filter: '',
           limit: common.Constants.MAX_UINT_16,
         },
-        spaceId: Provider.spaceId,
+        spaceId: spaceId,
         JoinTypeNames: typeNames,
       });
     }
@@ -236,13 +292,12 @@ export default class BaseTarget {
    * @returns
    */
   protected async createTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
         id: '0',
-        belongId: Provider.spaceId,
       });
     } else {
       return faildResult(consts.UnauthorizedError);
@@ -260,19 +315,19 @@ export default class BaseTarget {
    * @returns
    */
   protected async updateTarget(
-    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+    data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     let res = await kernel.updateTarget({
       ...data,
       id: this.target.id,
-      belongId: this.target.belongId,
       typeName: this.target.typeName,
     });
     if (res.success) {
       this.target.name = data.name;
       this.target.code = data.code;
+      this.target.belongId = data.belongId;
       if (this.target.team != undefined) {
         this.target.team.name = data.teamName;
         this.target.team.code = data.teamCode;
@@ -283,14 +338,39 @@ export default class BaseTarget {
   }
 
   /**
+   * 判断是否拥有该身份
+   * @param id 身份id
+   */
+  async judgeHasIdentity(id: string): Promise<boolean> {
+    if (this.ownIdentitys.length == 0) {
+      await this.getOwnIdentitys(true);
+    }
+    return this.ownIdentitys.find((a) => a.id == id) != undefined;
+  }
+
+  private async getOwnIdentitys(reload: boolean = false) {
+    if (!reload && this.ownIdentitys.length > 0) {
+      return this.ownIdentitys;
+    }
+    const res = await kernel.querySpaceIdentitys({ id: this.target.id });
+    if (res.success && res.data.result) {
+      this.ownIdentitys = res.data.result;
+    }
+    return this.ownIdentitys;
+  }
+
+  /**
    * 查询组织职权树
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(): Promise<IAuthority | undefined> {
-    if (this.authorityTree != undefined) {
+  public async selectAuthorityTree(
+    reload: boolean = false,
+  ): Promise<IAuthority | undefined> {
+    if (!reload && this.authorityTree != undefined) {
       return this.authorityTree;
     }
+    await this.getOwnIdentitys(reload);
     const res = await kernel.queryAuthorityTree({
       id: this.target.id,
       page: {
@@ -306,65 +386,10 @@ export default class BaseTarget {
   }
 
   protected loopBuildAuthority(auth: schema.XAuthority): Authority {
-    const authority = new Authority(auth);
+    const authority = new Authority(auth, this.target.id);
     auth.nodes?.forEach((a) => {
       authority.children.push(this.loopBuildAuthority(a));
     });
     return authority;
   }
-
-  // /**
-  //  * 查询当前空间赋予我该角色的组织
-  //  * @param id
-  //  * @returns
-  //  */
-  // public async queryTargetsByAuthority(
-  //   id: string,
-  // ): Promise<model.ResultType<schema.XTargetArray>> {
-  //   return await kernel.queryTargetsByAuthority({
-  //     spaceId: this.target.id,
-  //     authId: id,
-  //   });
-  // }
-
-  // /**
-  //  * 查询组织所有职权
-  //  * @returns
-  //  */
-  // public async getAllAuthoritys(): Promise<Authority[]> {
-  //   if (this.allAuthoritys.length > 0) {
-  //     return this.allAuthoritys;
-  //   }
-  //   const res = await kernel.queryTargetAuthoritys({
-  //     id: this.target.id,
-  //     page: {
-  //       offset: 0,
-  //       filter: '',
-  //       limit: common.Constants.MAX_UINT_16,
-  //     },
-  //   });
-  //   if (res.success) {
-  //     res.data.result?.forEach((auth) => {
-  //       this.allAuthoritys.push(new Authority(auth));
-  //     });
-  //   }
-  //   return this.allAuthoritys;
-  // }
-
-  // /**
-  //  * 查询当前空间下拥有的身份
-  //  * @returns
-  //  */
-  // public async getOwnIdentitys(): Promise<Identity[]> {
-  //   if (this.ownIdentitys.length > 0) {
-  //     return this.ownIdentitys;
-  //   }
-  //   const res = await kernel.querySpaceIdentitys({ id: this.target.id });
-  //   if (res.success) {
-  //     res.data.result?.forEach((auth) => {
-  //       this.ownIdentitys.push(new Identity(auth));
-  //     });
-  //   }
-  //   return this.ownIdentitys;
-  // }
 }

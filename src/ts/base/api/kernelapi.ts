@@ -3,6 +3,7 @@ import StoreHub from './storehub';
 import type * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
+import { logger } from '../common';
 /**
  * 奥集能内核api
  */
@@ -31,7 +32,7 @@ export default class KernelApi {
         try {
           methods.forEach((m) => m.apply(this, [res.data]));
         } catch (e) {
-          console.log(e);
+          logger.error(e as Error);
         }
       }
     });
@@ -45,7 +46,7 @@ export default class KernelApi {
             }
           })
           .catch((err) => {
-            console.log(err);
+            logger.error(err);
           });
       }
     });
@@ -1861,6 +1862,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 取消订单
+   * @param {model.ApprovalModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async cancelOrder(
+    params: model.ApprovalModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'market',
+      action: 'CancelOrder',
+      params: params,
+    });
+  }
+  /**
    * 取消订单详情
    * @param {model.ApprovalModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -2001,6 +2016,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 发布流程定义（包括创建、更新操作）
+   * @param {model.CreateDefineReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
+   */
+  public async publishDefine(
+    params: model.CreateDefineReq,
+  ): Promise<model.ResultType<schema.XFlowDefine>> {
+    return await this.request({
+      module: 'flow',
+      action: 'PublishDefine',
+      params: params,
+    });
+  }
+  /**
    * 创建流程实例(启动流程)
    * @param {model.FlowInstanceModel} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstance>} 请求结果
@@ -2090,6 +2119,20 @@ export default class KernelApi {
     return await this.request({
       module: 'flow',
       action: 'QueryDefine',
+      params: params,
+    });
+  }
+  /**
+   * 查询应用业务与定义的绑定关系
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
+   */
+  public async queryDefineRelation(
+    params: model.IdReq,
+  ): Promise<model.ResultType<schema.XFlowRelationArray>> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryDefineRelation',
       params: params,
     });
   }

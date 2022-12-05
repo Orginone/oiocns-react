@@ -1,12 +1,12 @@
 import { CommonStatus } from './../enum';
 import { common } from '@/ts/base';
-import Provider from '@/ts/core/provider';
 import { kernel, model, schema } from '../../base';
 import IResource from './iresource';
 import Resource from './resource';
 import IProduct from './iproduct';
 import IMerchandise from './imerchandise';
 import Merchandise from './merchandise';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 export default class Product implements IProduct {
   prod: schema.XProduct;
@@ -48,7 +48,9 @@ export default class Product implements IProduct {
     return await kernel.createSourceExtend({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       destIds,
       destType,
       teamId,
@@ -64,7 +66,9 @@ export default class Product implements IProduct {
       sourceType: '产品',
       destIds,
       destType,
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       teamId,
     });
   }
@@ -75,7 +79,9 @@ export default class Product implements IProduct {
     return await kernel.queryExtendBySource({
       sourceId: this.prod.id,
       sourceType: '产品',
-      spaceId: Provider.spaceId,
+      spaceId: userCtrl.IsCompanySpace
+        ? userCtrl.Company.target.id
+        : userCtrl.User.target.id,
       destType,
       teamId,
     });
@@ -108,7 +114,7 @@ export default class Product implements IProduct {
   public async unPublish(id: string): Promise<model.ResultType<any>> {
     const res = await kernel.deleteMerchandise({
       id,
-      belongId: Provider.spaceId,
+      belongId: userCtrl.Company.target.id,
     });
     if (res.success) {
       this.merchandises = this.merchandises.filter((a) => {

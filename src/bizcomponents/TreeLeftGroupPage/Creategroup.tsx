@@ -8,7 +8,6 @@ import {
   MoreOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import settingController from '@/ts/controller/setting';
 import cls from './index.module.less';
 
 const x = 3;
@@ -71,12 +70,11 @@ type CreateGroupPropsType = {
   createTitle: string;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({  createTitle }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({ createTitle }) => {
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverItemMes, setHoverItemMes] = useState<React.Key>();
-
 
   const onExpand = (newExpandedKeys: React.Key[]) => {
     setExpandedKeys(newExpandedKeys);
@@ -166,7 +164,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({  createTitle }) => {
   return (
     <div>
       {/* 要把这个值给到 group组件 */}
-      <Button className={cls.creatgroup} type="primary" onClick={() => settingController.trigger('isOpenModal')}>
+      <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
         {createTitle}
       </Button>
       {Array.isArray(treeData1) && treeData1.length > 0 ? (
@@ -185,9 +183,8 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({  createTitle }) => {
             switcherIcon={<DownOutlined />}
             autoExpandParent={autoExpandParent}
             treeData={treeData1}
-            onSelect={(e) => { 
-              if (e && e.length>0) {
-                settingController.trigger('createGroup', { id: e[0] })
+            onSelect={(e) => {
+              if (e && e.length > 0) {
               }
             }}
             showIcon={true}
@@ -201,10 +198,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({  createTitle }) => {
                   <span style={{ paddingRight: '8px' }}>{e?.title}</span>
                   {hoverItemMes === e.key ? (
                     <Space>
-                      <span
-                        onClick={() => {
-                          settingController.trigger('isOpenModal');
-                        }}>
+                      <span onClick={() => {}}>
                         <PlusOutlined />
                       </span>
                       <span>

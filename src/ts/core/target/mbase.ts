@@ -1,29 +1,34 @@
-import { common, faildResult, kernel, model, schema } from '../../base';
-import { Market, BaseProduct } from '../market';
+import { Product } from '@/ts/core/market';
+import { common, kernel, model, schema } from '../../base';
+import { Market } from '../market';
 import { TargetType } from '../enum';
 import { IMTarget } from './itarget';
-import BaseTarget from './base';
-import consts from '../consts';
+import FlowTarget from './flow';
+import IProduct from '../market/iproduct';
 
-export default class MarketTarget extends BaseTarget implements IMTarget {
+export default class MarketTarget extends FlowTarget implements IMTarget {
   joinedMarkets: Market[];
   publicMarkets: Market[];
-  ownProducts: BaseProduct[];
-  stagings: schema.XStaging[];
+  ownProducts: IProduct[];
   usefulProduct: schema.XProduct[];
   usefulResource: Map<string, schema.XResource[]>;
   joinMarketApplys: schema.XMarketRelation[];
+  protected extendTargetType: TargetType[];
 
   constructor(target: schema.XTarget) {
     super(target);
-    this.stagings = [];
     this.ownProducts = [];
     this.joinedMarkets = [];
     this.joinMarketApplys = [];
     this.usefulProduct = [];
     this.publicMarkets = [];
     this.usefulResource = new Map();
+    this.extendTargetType = [];
   }
+  /**
+   * @description: 根据编号查询市场
+   * @return {*}
+   */
   public async getMarketByCode(
     name: string,
   ): Promise<model.ResultType<schema.XMarketArray>> {
@@ -36,8 +41,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       },
     });
   }
-  public getOwnProducts = async (): Promise<BaseProduct[]> => {
-    if (this.ownProducts.length > 0) {
+  public async getOwnProducts(reload: boolean = false): Promise<IProduct[]> {
+    if (!reload && this.ownProducts.length > 0) {
       return this.ownProducts;
     }
     const res = await kernel.querySelfProduct({
@@ -48,58 +53,39 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
         limit: common.Constants.MAX_UINT_8,
       },
     });
-    if (res.success && res?.data?.result != undefined) {
-      res.data.result.forEach((product) => {
-        this.ownProducts.push(new BaseProduct(product));
+    if (res.success && res.data.result) {
+      this.ownProducts = res.data.result.map((a) => {
+        return new Product(a);
       });
     }
     return this.ownProducts;
-  };
-  public async getJoinMarkets(): Promise<Market[]> {
-    if (this.joinedMarkets.length > 0) {
+  }
+  public async getJoinMarkets(reload: boolean = false): Promise<Market[]> {
+    if (!reload && this.joinedMarkets.length > 0) {
       return this.joinedMarkets;
     }
     const res = await kernel.queryOwnMarket({
       id: this.target.id,
       page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
     });
-    if (res.success && res.data && res.data.result) {
-      res.data.result.forEach((market) => {
-        this.joinedMarkets.push(new Market(market));
+    if (res.success && res.data.result) {
+      this.joinedMarkets = res.data.result.map((a) => {
+        return new Market(a);
       });
     }
     return this.joinedMarkets;
   }
-  public async getPublicMarket(): Promise<Market[]> {
-    if (this.publicMarkets.length > 0) {
+  public async getPublicMarket(reload: boolean = false): Promise<Market[]> {
+    if (!reload && this.publicMarkets.length > 0) {
       return this.publicMarkets;
     }
     const res = await kernel.getPublicMarket();
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.publicMarkets.push(new Market(a));
+    if (res.success && res.data.result) {
+      this.publicMarkets = res.data.result.map((a) => {
+        return new Market(a);
       });
     }
     return this.publicMarkets;
-  }
-  public async getStaging(): Promise<schema.XStaging[]> {
-    if (this.stagings.length > 0) {
-      return this.stagings;
-    }
-    const res = await kernel.queryStaging({
-      id: this.target.id,
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
-    });
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        this.stagings.push(a);
-      });
-    }
-    return this.stagings;
   }
   public async getBuyOrders(
     status: number,
@@ -232,18 +218,24 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
    * @param  {model.MarketModel} 市场基础信息
    * @returns
    */
-  public async createMarket(
+  public async createMarket({
+    name,
+    code,
+    remark,
+    samrId,
+    ispublic = true,
+  }: {
     // 名称
-    name: string,
+    name: string;
     // 编号
-    code: string,
+    code: string;
     // 备注
-    remark: string,
+    remark: string;
     // 监管组织/个人
-    samrId: string,
+    samrId: string;
     // 产品类型名
-    ispublic: boolean = true,
-  ): Promise<model.ResultType<schema.XMarket>> {
+    ispublic: boolean;
+  }): Promise<model.ResultType<schema.XMarket>> {
     const res = await kernel.createMarket({
       name,
       code,
@@ -253,6 +245,8 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
+    console.log('创建市场的结果', res);
+
     if (res.success) {
       this.joinedMarkets.push(new Market(res.data!));
     }
@@ -295,46 +289,10 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
       belongId: this.target.id,
     });
     if (res.success) {
-      this.ownProducts.push(new BaseProduct(res.data!));
+      this.ownProducts.push(new Product(res.data!));
     }
     return res;
   };
-
-  public async stagingMerchandise(
-    id: string,
-  ): Promise<model.ResultType<schema.XStaging>> {
-    const stag = this.stagings.find((a) => {
-      a.merchandiseId == id;
-    });
-    if (stag == undefined) {
-      const res = await kernel.createStaging({
-        id: '0',
-        merchandiseId: id,
-        belongId: this.target.id,
-      });
-      return res;
-    }
-    return faildResult(consts.IsExistError);
-  }
-
-  public async deleteStaging(id: string): Promise<model.ResultType<any>> {
-    const stag = this.stagings.find((a) => {
-      a.id == id;
-    });
-    if (stag != undefined) {
-      const res = await kernel.deleteStaging({
-        id,
-        belongId: this.target.id,
-      });
-      if (res.success) {
-        this.stagings = this.stagings.filter((a) => {
-          a.id != id;
-        });
-      }
-      return res;
-    }
-    return faildResult(consts.NotFoundError);
-  }
   /**
    * 删除市场
    * @param id 市场Id
@@ -365,7 +323,7 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     });
     if (res.success) {
       this.ownProducts = this.ownProducts.filter((prod) => {
-        return prod.id != id;
+        return prod.prod.id != id;
       });
     }
     return res;
@@ -389,38 +347,34 @@ export default class MarketTarget extends BaseTarget implements IMTarget {
     return res;
   }
   /** 获得可用应用 */
-  protected async getUsefulProduct(typeNames: TargetType[]): Promise<schema.XProduct[]> {
-    if (this.usefulProduct.length > 0) {
+  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
+    if (!reload && this.usefulProduct.length > 0) {
       return this.usefulProduct;
     }
     const res = await kernel.queryUsefulProduct({
       spaceId: this.target.id,
-      typeNames,
+      typeNames: this.extendTargetType,
     });
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.usefulProduct = res.data.result;
     }
     return this.usefulProduct;
   }
   /** 获得可用资源 */
-  protected async getUsefulResource(
+  public async getUsefulResource(
     id: string,
-    typeNames: TargetType[],
+    reload: boolean = false,
   ): Promise<schema.XResource[]> {
-    if (this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
+    if (!reload && this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
       return this.usefulResource[id];
     }
     const res = await kernel.queryUsefulResource({
       productId: id,
       spaceId: this.target.id,
-      typeNames,
+      typeNames: this.extendTargetType,
     });
-    if (res.success) {
-      let resources;
-      res.data.result?.forEach((a) => {
-        resources.push(a);
-      });
-      this.usefulResource[id] = resources;
+    if (res.success && res.data.result) {
+      this.usefulResource[id] = res.data.result;
     }
     return this.usefulResource[id];
   }

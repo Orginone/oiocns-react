@@ -1,24 +1,27 @@
-import React, { useState, useRef, useEffect, createContext } from 'react';
-import { Route, useHistory } from 'react-router-dom';
-import Node from '@/bizcomponents/Flow/Process/Node';
+import React, { useRef, useEffect, createContext } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import DefaultProps, { useAppwfConfig } from '@/module/flow/flow';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { Modal } from 'antd';
-import { title } from 'process';
 type ProcessDesignProps = {
   [key: string]: any;
-  backTable: () => void;
+  conditionData: { name: string };
+  editorValue: string;
+  designData: any;
 };
-export const EventContext = createContext({} as { FlowSub: any });
+export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns
  */
-const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
+const ProcessDesign: React.FC<ProcessDesignProps> = ({
+  conditionData,
+  editorValue,
+  designData,
+}) => {
+  console.log('designData', designData);
   // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
@@ -27,7 +30,9 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   const setForm = useAppwfConfig((state: any) => state.setForm);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
   const setOldDesign = useAppwfConfig((state: any) => state.setOldDesign);
+
   const preview = () => {
+    console.log('design', design);
     previewRef.current?.preview(design);
   };
   const exit = () => {
@@ -35,33 +40,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
   };
   useEffect(() => {
     console.log('ProcessDesign第一次render...');
-    startDesign(obj);
-  }, []); //这里传递了空数组
-  // const defaultDesign = {
-  //   name: '新建流程',
-  //   code: 'code',
-  //   formId: null,
-  //   formName: '',
-  //   appId: '',
-  //   appName: '',
-  //   remainHours: 240,
-  //   resource: {
-  //     nodeId: 'ROOT',
-  //     parentId: null,
-  //     type: 'ROOT',
-  //     name: '发起人',
-  //     children: {},
-  //   },
-  //   remark: '备注说明',
-  // };
+    startDesign();
+  }, []);
+
   const defaultDesign = {
     name: '新建流程',
     code: 'code',
-    formId: null,
-    formName: '',
-    appId: '',
-    appName: '',
-    remainHours: 240,
+    remark: '',
+    belongId: '',
     resource: {
       nodeId: 'ROOT',
       parentId: null,
@@ -73,119 +59,29 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
         props: {},
         type: 'CONDITIONS',
         name: '条件分支',
-        children: {
-          nodeId: 'node_590719747331',
-          parentId: 'node_590719745693',
-          type: 'EMPTY',
-          children: {},
-        },
-        branches: [
-          {
-            nodeId: 'node_590719745789',
-            parentId: 'node_590719745693',
-            type: 'CONDITION',
-            conditions: [
-              {
-                pos: 1,
-                paramKey: 'price',
-                paramLabel: '金额',
-                key: 'LTE',
-                label: '≤',
-                type: 'NUMERIC',
-                val: 50000,
-                valLabel: '',
-              },
-              {
-                pos: 2,
-                paramKey: 'chulang',
-                paramLabel: '出让方式',
-                key: 'EQ',
-                label: '=',
-                type: 'DICT',
-                val: '01',
-                valLabel: '协议定价',
-              },
-            ],
-            name: '条件1',
-          },
-          {
-            nodeId: 'node_590719746648',
-            parentId: 'node_590719745693',
-            type: 'CONDITION',
-            conditions: [],
-            name: '条件2',
-          },
-        ],
+        // children: {
+        //   nodeId: 'node_590719747331',
+        //   parentId: 'node_590719745693',
+        //   type: 'EMPTY',
+        //   children: {},
+        // },
       },
     },
-    remark: '备注说明',
-  };
-  const obj = {
-    formId: '46547769841',
-    business: '商品上架审核',
-    field: [
-      {
-        name: '金额',
-        code: 'price',
-        type: 'NUMERIC',
-        customId: 1,
-        key: '价格',
-      },
-      {
-        name: '项目名称',
-        code: 'name',
-        type: 'STRING',
-        customId: 2,
-      },
-      {
-        name: '出让方式',
-        code: 'chulang',
-        type: 'DICT',
-        customId: 3,
-        dict: [
-          {
-            name: '协议定价',
-            code: '01',
-          },
-          {
-            name: '挂牌',
-            code: '02',
-          },
-          {
-            name: '拍卖',
-            code: '03',
-          },
-        ],
-      },
-    ],
-    customId: 1,
-    appId: '368453782260027392',
-    appName: '测试流程应用',
-    sourceId: '368453782268416000',
   };
 
-  const startDesign = async (obj: any) => {
+  const startDesign = async () => {
     let tempDesign;
-    setForm(obj);
-    let formFileds: any[] = obj.field;
-    formFileds = formFileds.map((item: any) => {
-      return {
-        label: item.name,
-        value: item.code,
-        type: item.type,
-        dict: item.dict?.map((el: any) => {
-          return { label: el.name, value: el.code };
-        }),
-      };
-    });
-
-    DefaultProps.setFormFields(formFileds);
-    if (obj.flow) {
-      tempDesign = JSON.parse(JSON.stringify(obj.flow));
+    console.log('editorValue', editorValue);
+    if (editorValue && editorValue !== '{}') {
+      tempDesign = JSON.parse(editorValue);
+      DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
     } else {
+      DefaultProps.setFormFields(conditionData?.labels);
+      defaultDesign.remark = JSON.stringify(conditionData?.labels);
+      defaultDesign.name = conditionData?.name;
       tempDesign = JSON.parse(JSON.stringify(defaultDesign));
     }
-    setOldDesign(tempDesign);
+    // setOldDesign(tempDesign);
     setDesign(tempDesign);
   };
 
@@ -194,11 +90,11 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
       <LayoutHeader
         OnPreview={preview}
         OnExit={exit}
-        backTable={() => {
-          backTable();
-        }}></LayoutHeader>
+        titleName={JSON.parse(editorValue)?.name || conditionData?.name}
+      />
       <div className={cls['container']}>
-        <EventContext.Provider value={{ FlowSub }}>
+        {/* conditionData */}
+        <EventContext.Provider value={{ FlowSub, conditionData }}>
           <div className={cls['layout-body']}>
             {activeSelect === 'processDesign' && (
               <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
@@ -206,11 +102,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ backTable }) => {
               </div>
             )}
           </div>
-          {/* <Modal open={isShowDialog} footer={null}  maskClosable={false} width="100vw"  closable={false} title={<LayoutHeader OnPreview={preview} OnExit={exit}></LayoutHeader>} style={{maxWidth: "100vw",top: 0,paddingBottom: 0}}  bodyStyle={{ height: "calc(100vh - 55px )", overflowY: "auto"}}  >
-    <div className={cls["layout-body"]}>
-        {activeSelect === 'processDesign' && <div><FormProcessDesign/></div>}
-    </div>
-		</Modal> */}
           <LayoutPreview ref={previewRef} />
         </EventContext.Provider>
       </div>

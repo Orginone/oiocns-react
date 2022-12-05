@@ -1,39 +1,36 @@
 /* eslint-disable no-unused-vars */
-import { Card, Button, Descriptions, Space } from 'antd';
+import ReactDOM from 'react-dom';
+import { Card, Button, Descriptions, Space, Modal, message } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
+
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { dataSource } from './datamock';
+import { initDatatype } from '@/ts/core/setting/isetting';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
-import AddPostModal from '@/bizcomponents/AddPositionModal';
 import AddDeptModal from './components/AddDeptModal';
+import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import TransferDepartment from './components/TransferDepartment';
 import LookApply from './components/LookApply';
-// import settingStore from '@/store/setting';
-import settingController from '@/ts/controller/setting';
-import { initDatatype } from '@/ts/core/setting/isetting';
-import { settingCtrl, SpaceType } from '@/ts/controller/setting/settingCtrl';
-
-/** 获取角色当前名称 */
-interface PositionBean {
-  key: string;
+import { RouteComponentProps } from 'react-router-dom';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import { XTarget } from '@/ts/base/schema';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
+import AssignPosts from './components/AssignPosts';
+import { schema } from '@/ts/base';
+type RouterParams = {
   id: string;
-  name: string;
-  code: string;
-  create: string;
-  createTime: string;
-  remark: string;
-}
-
+};
 /**
- * 岗位设置
+ * 岗位设置     @todo--------------------------- 待改造页面-----------------------------------
  * @returns
  */
-const SettingDept: React.FC = () => {
+const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
   const [isSetPost, setIsSetPost] = useState<boolean>(false); // 岗位设置
@@ -44,8 +41,23 @@ const SettingDept: React.FC = () => {
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false);
 
+  const [indentity, setIndentity] = useState<IIdentity>();
+  const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
+
   const [_currentPostion, setPosition] = useState<any>({});
-  //变更岗位
+  const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
+  const [person, setPerson] = useState<schema.XTarget[]>();
+
+  const treeContainer = document.getElementById('templateMenu');
+
+  const getDataList = async () => {
+    setIndentitys(await userCtrl.Company.getIdentitys());
+  };
+  useEffect(() => {
+    getDataList();
+  }, []);
+  //变更岗位 getOwnIdentitys
 
   // 操作内容渲染函数
   const renderOperation = (
@@ -55,7 +67,10 @@ const SettingDept: React.FC = () => {
       {
         key: 'remove',
         label: '移除人员',
-        onClick: () => {
+        onClick: async () => {
+          await indentity?.removeIdentity([item.id]);
+          getPersonData(indentity!);
+
           console.log('按钮事件', 'remove', item);
         },
       },
@@ -91,51 +106,51 @@ const SettingDept: React.FC = () => {
     setLookApplyOpen(false);
     setIsOpenModal(false);
   };
+
+  const [authTree, setauthTree] = useState<IAuthority>();
+  const [personData, setPersonData] = useState<XTarget[]>();
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
-  useEffect(() => {
-    settingController.addListen('isOpenModal', () => {
-      setIsCreateDept(true);
-      setIsOpenModal(true);
-    });
-    return settingController.remove('isOpenModal', () => {
-      setIsOpenModal(false);
-      setIsCreateDept(false);
-    });
-  }, []);
-
-  useEffect(() => {
-    settingController.addListen('isSetPost', () => {
-      setIsSetPost(true);
-    });
-    return settingController.remove('isSetPost', () => {
-      setIsSetPost(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   /**
    * 监听集团id发生变化，改变右侧数据
    * */
-  useEffect(() => {
-    settingController.addListen('createPosition', (e: { id: string }) => {
-      setIsCreateDept(true);
-      setSelectId(e.id);
-    });
-    return settingController.remove('createPosition', () => {
-      setSelectId('');
-      setIsCreateDept(false);
-    });
-  }, []);
+  useEffect(() => {}, []);
 
-  useEffect(() => {
-    initData();
-  }, [selectId]);
+  useEffect(() => {}, [selectId]);
 
-  const initData = async () => {
-    const resultData = await settingController.searchAllPersons(selectId);
-    console.log(resultData);
+  /**点击操作内容触发的事件 */
+  const handleMenuClick = (key: string, item: any) => {
+    switch (key) {
+      case 'new':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        break;
+      case '新增部门':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.target.target.id);
+        break;
+      case 'changeDept': //变更部门
+        setIsOpenModal(true);
+        break;
+      case 'updateDept':
+        setIsCreateDept(true);
+        setIsOpenModal(true);
+        setSelectId(item.id);
+        break;
+    }
+  };
+  const getPersonData = async (current: IIdentity) => {
+    setPersonData((await current.getIdentityTargets(TargetType.Person)).data.result);
+  };
+  // 选中树的时候操作
+  const setTreeCurrent = async (current: IIdentity) => {
+    getPersonData(current);
+    setIndentity(current);
   };
 
   // 标题tabs页
@@ -160,41 +175,67 @@ const SettingDept: React.FC = () => {
         <Button
           type="link"
           onClick={() => {
-            settingController.trigger('isOpenModal');
-            setIsCreateDept(false);
+            setIsOpenModal(true);
+            setIndentity(indentity);
           }}>
           编辑
         </Button>
-        <Button type="link">删除</Button>
+        <Button
+          type="link"
+          onClick={async () => {
+            Modal.confirm({
+              title: '提示',
+              content: '是否确认通过该申请',
+              onOk: async () => {
+                const res = await userCtrl.Company.deleteIdentity(indentity?.target.id!);
+                if (res) {
+                  message.success('删除成功');
+                  getDataList();
+                  setPersonData([]);
+                  setIndentity(undefined);
+                } else {
+                  message.error('删除失败');
+                }
+              },
+            });
+          }}>
+          删除
+        </Button>
       </div>
     </div>
   );
+
   // 岗位信息内容
   const content = (
     <div className={cls['company-dept-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="名称">管理员</Descriptions.Item>
-          <Descriptions.Item label="编码">super-admin</Descriptions.Item>
-          <Descriptions.Item label="创建人">小明</Descriptions.Item>
-          <Descriptions.Item label="创建时间">2022-11-17 15:34:57</Descriptions.Item>
+          <Descriptions.Item label="名称">{indentity?.target.name}</Descriptions.Item>
+          <Descriptions.Item label="编码">{indentity?.target.code}</Descriptions.Item>
+          <Descriptions.Item label="创建人">
+            {indentity?.target.createUser}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建时间">
+            {indentity?.target.createTime}
+          </Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            系统生成的对应组织的权责身份
+            {indentity?.target.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
     </div>
   );
-
+  const getMemberData = async () => {
+    setMemberData(await userCtrl.Company.getPersons(false));
+  };
   // 按钮
   const renderBtns = () => {
     return (
       <Space>
         <Button
           type="link"
-          onClick={() => {
-            console.log('指派岗位');
-            settingController.trigger('isSetPost');
+          onClick={async () => {
+            await getMemberData(), setIsOpenAssign(true);
           }}>
           指派岗位
         </Button>
@@ -216,7 +257,7 @@ const SettingDept: React.FC = () => {
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
-                dataSource={dataSource as any}
+                dataSource={personData as any}
                 rowKey={'id'}
                 operation={renderOperation}
                 columns={columns as any}
@@ -243,14 +284,35 @@ const SettingDept: React.FC = () => {
         title={isCreateDept ? '新增' : '编辑'}
         onOk={onOk}
         handleOk={handleOk}
+        defaultData={indentity!}
+        callback={setIndentity}
       />
       {/* 添加成员 */}
       <AddPersonModal
         title={'添加成员'}
-        open={isAddOpen}
+        open={false}
         onOk={onPersonalOk}
         handleOk={handleOk}
       />
+      <Modal
+        title="指派岗位"
+        open={isOpenAssign}
+        width={1300}
+        onOk={async () => {
+          setIsOpenAssign(false);
+          const ids = [];
+          for (const a of person ? person : []) {
+            ids.push(a.id);
+          }
+          await indentity?.giveIdentity(ids);
+          getPersonData(indentity!);
+          message.info('指派成功');
+        }}
+        onCancel={() => {
+          setIsOpenAssign(false);
+        }}>
+        <AssignPosts searchCallback={setPerson} memberData={memberData} />
+      </Modal>
       {/* 查看申请 */}
       <LookApply
         title={'查看申请'}
@@ -273,6 +335,20 @@ const SettingDept: React.FC = () => {
         onOk={handlePostOk}
         handleOk={onOk}
       />
+
+      {/* 左侧树 */}
+      {treeContainer
+        ? ReactDOM.createPortal(
+            <TreeLeftDeptPage
+              createTitle="新增"
+              setCurrent={setTreeCurrent}
+              handleMenuClick={handleMenuClick}
+              currentKey={indentitys.length > 0 ? indentitys[0].target.id : ''}
+              indentitys={indentitys}
+            />,
+            treeContainer,
+          )
+        : ''}
     </div>
   );
 };

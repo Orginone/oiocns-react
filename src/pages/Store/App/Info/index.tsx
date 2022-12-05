@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -8,31 +8,35 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
-import StoreContent from '@/ts/controller/store/content';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
-import Provider from '@/ts/core/provider';
-interface AppInfoType {
-  appId: string;
-}
+import { DestTypes } from '@/constants/const';
+// 根据以获取数据 动态产生tab
+const items = DestTypes.map((k) => {
+  return { tab: k.label, key: k.label };
+});
 
-const StoreAppInfo: React.FC<AppInfoType> = () => {
+const StoreAppInfo: React.FC = () => {
   // const BtnsList = ['编辑应用分配'];
+  const [list, setList] = useState<any>([]);
+  const [tabKey, setTabKey] = useState('组织');
   useEffect(() => {
-    console.log('{StoreContent.curProduct?._prod.version}', StoreContent.curProduct);
+    console.log('{SelfAppCtrl.curProduct?.prod.version}');
+    getExtend();
   }, []);
 
-  const history = useHistory();
-  // const handleBtnsClick = (item: { text: string }) => {
-  //   switch (item.text) {
-  //     case '编辑应用分配':
-  //       console.log('编辑应用分配编辑应用分配');
+  const getExtend = useCallback(async () => {
+    const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
+    console.log('请求分享/分配信息', tabKey, res);
+    setList(res?.data?.result ?? []);
+  }, [tabKey]);
 
-  //       break;
-  //     default:
-  //       console.log('点击事件未注册', item.text);
-  //       break;
-  //   }
-  // };
+  const history = useHistory();
+  function onTabChange(key: any) {
+    console.log('onTabChange', key);
+    setTabKey(key);
+    getExtend();
+  }
   const renderOperation = (
     item: MarketTypes.ProductType,
   ): MarketTypes.OperationType[] => {
@@ -70,16 +74,16 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={StoreContent.curProduct?._prod.name}
+          title={SelfAppCtrl.curProduct?.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{StoreContent.curProduct?._prod.remark}</p>
+              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
                 <span className="vision">
-                  版本号 ：{StoreContent.curProduct?._prod.version}
+                  版本号 ：{SelfAppCtrl.curProduct?.prod.version}
                 </span>
                 <span className="lastTime">
-                  订阅到期时间 ：{StoreContent.curProduct?._prod.createTime}
+                  订阅到期时间 ：{SelfAppCtrl.curProduct?.prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
@@ -99,22 +103,20 @@ const StoreAppInfo: React.FC<AppInfoType> = () => {
         </div>
       </Card>
       <div className={cls['page-content-table']}>
-        <AppShowComp
-          headerTitle="已分配单位"
-          queryFun={Provider.getPerson!.getOwnProducts}
-          list={[]}
-          columns={StoreContent.getColumns('appInfo')}
-          renderOperation={renderOperation}
-        />
-        {/* <AppShowComp
-          service={service}
-          toolBarRender={() => <BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          headerTitle="已分配单位"
-          columns={service.getMyappColumns()}
-          renderOperation={renderOperation}
-          searchParams={''}
-          style={{ paddingTop: 0 }}
-        /> */}
+        <Card
+          title="已共享信息"
+          tabList={items}
+          style={{ padding: 0 }}
+          onTabChange={onTabChange}>
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              showChangeBtn={false}
+              list={list}
+              columns={SelfAppCtrl.getColumns('shareInfo')}
+              renderOperation={renderOperation}
+            />
+          </div>
+        </Card>
       </div>
     </div>
   );

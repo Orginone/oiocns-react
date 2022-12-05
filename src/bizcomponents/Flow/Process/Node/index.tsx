@@ -42,10 +42,10 @@ type NodeProps = {
  * 添加的节点枚举
  * */
 export enum AddNodeType {
-  APPROVAL,
-  CC,
-  CONDITIONS,
-  CONCURRENTS,
+  'APPROVAL',
+  'CC',
+  'CONDITIONS',
+  'CONCURRENTS',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -60,8 +60,8 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  * @returns
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
-  console.log('props', props);
-  const delNode = () => {
+  const delNode = (e: React.MouseEvent) => {
+    e.preventDefault();
     props.onDelNode();
   };
   const select = () => {
@@ -74,13 +74,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       </div>
     </div>
   );
-  // const nodeHeader = (
-  //   <div className={cls['node-body-header']} style={{ backgroundColor: props.headerBgc }}>
-  //     <UserOutlined style={{ fontSize: '12px', paddingRight: '5px' }} />
-  //     <span className={cls['name']}>{props.title}</span>
-  //     {!props.isRoot && <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />}
-  //   </div>
-  // );
 
   const nodeHeader = (
     <div
@@ -96,33 +89,30 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />
       )}
-      {/* <span className={cls['name']}>{props.title}</span> */}
     </div>
   );
 
-  // const nodeContent = (
-  //   <div className={cls['node-body-content']} onClick={select}>
-  //     {!props.content && <span className={cls['placeholder']}>{props.placeholder}</span>}
-  //     {props.content && <span className={cls['name']}>{props.content}</span>}
-  //     <RightOutlined className={cls['node-body-rightOutlined']} />
-  //   </div>
-  // );
-
   const nodeContent = (
-    <div className={cls['node-body-right']} onClick={select}>
-      <div>
+    <div className={cls['node-body-right']}>
+      <div onClick={select}>
         <span className={cls['name-title']}>{props.title}</span>
       </div>
       <div>
         {!props.content && (
-          <span className={cls['placeholder']}>{props.placeholder}</span>
+          <span onClick={select} className={cls['placeholder']}>
+            {props.placeholder}
+          </span>
         )}
-        {props.content && <span className={cls['name-title']}>{props.content}</span>}
+        {props.content && (
+          <span onClick={select} className={cls['name-select-title']}>
+            {props.content}
+          </span>
+        )}
         {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
         {!props.isRoot && (
           <CloseOutlined
             className={cls['iconPosition']}
-            style={{ fontSize: '12px' }}
+            style={{ fontSize: '12px', display: 'block' }}
             onClick={delNode}
           />
         )}

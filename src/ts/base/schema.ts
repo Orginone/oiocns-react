@@ -1210,6 +1210,8 @@ export type XTarget = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 头像
+  avatar?: string;
   // 作为团队的影子
   team: XTeam | undefined;
   // 赋予该组织/个人创建的身份

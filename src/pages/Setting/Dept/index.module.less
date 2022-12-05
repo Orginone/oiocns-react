@@ -1,6 +1,8 @@
 .dept-content-box {
   background-color: #eff4f9;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .company-dept-title {
   display: flex;
@@ -8,72 +10,75 @@
 }
 
 .company-dept-content {
-  margin-bottom: 8px;
+  margin-bottom: 8px !important;
+
   :global {
-    .ogo-card {
-      .ogo-card-body {
-        padding: 12px 24px;
-        .ogo-descriptions-header {
-          margin-bottom: 6px;
-        }
-        .ogo-descriptions-view {
-          table {
-            tbody {
-              .ogo-descriptions-row {
-                .ogo-descriptions-item-label {
-                  padding: 5px 24px;
-                }
-                .ogo-descriptions-item-content {
-                  padding: 5px 24px;
-                }
-              }
-            }
-          }
-        }
+    .ogo-card-body {
+      padding: 20px;
+      color: #606266;
+      .ogo-descriptions-header {
+        margin-bottom: 8px;
       }
+      // .ogo-descriptions-view {
+      //   table {
+      //     tbody {
+      //       .ogo-descriptions-row {
+      //         .ogo-descriptions-item-label {
+      //           padding: 5px 24px;
+      //         }
+      //         .ogo-descriptions-item-content {
+      //           padding: 5px 24px;
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
     }
   }
 }
 .dept-wrap-pages {
-  height: calc(100% - 200px);
+  // height: calc(100% - 200px);
+  flex: 1;
+  overflow: hidden;
   :global {
     .ogo-card {
       height: 100%;
     }
     .ogo-card-body {
       padding: 0;
-      height: calc(100% - 60px);
+      height: calc(100% - 68px);
     }
   }
 }
 .pages-wrap {
-  :global {
-    .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
-      border: none;
-    }
+  flex: 1;
+  .page-content-table {
+    :global {
+      .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
+        border: none;
+      }
 
-    .ogo-card-head {
-      border: none;
-      padding: 0 24px;
-    }
+      .ogo-card-head {
+        border: none;
+        padding: 0 24px;
+      }
 
-    .ogo-tabs-nav::before {
-      border: none !important;
-    }
+      .ogo-tabs-nav::before {
+        border: none !important;
+      }
 
-    .ogo-card-body {
-      padding: 4px;
-    }
+      .ogo-card-body {
+        padding: 4px;
+      }
 
-    .ogo-tabs-tab {
-      padding: 7px 0 !important;
-      font-size: 13px !important;
+      .ogo-tabs-tab {
+        padding: 7px 0 !important;
+        font-size: 13px !important;
+      }
     }
   }
-
   .page-content-table {
     flex: 1;
-    height: calc(100% - 90px);
-    padding: 0 24px;
+    height: calc(100% - 48px);
   }
 }

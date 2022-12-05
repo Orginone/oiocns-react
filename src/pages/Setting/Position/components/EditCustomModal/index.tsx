@@ -8,15 +8,16 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  *
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
-import { ObjectManagerList } from '../../datamock';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 // import UploadAvatar from '../UploadAvatar';
-// import settingController from '@/ts/controller/setting';
 
 /* 
   编辑
@@ -28,6 +29,8 @@ interface Iprops {
   handleOk: () => void;
   handleCancel: () => void;
   selectId?: string;
+  defaultData: IIdentity;
+  callback: Function;
 }
 
 type DataItem = {
@@ -35,69 +38,81 @@ type DataItem = {
   state: string;
 };
 
-const columns: ProFormColumnsType<DataItem>[] = [
-  {
-    title: '岗位名称',
-    dataIndex: 'name',
-    initialValue: '',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '名称为必填项',
-        },
-      ],
-    },
-    width: 'm',
-  },
-  {
-    title: '岗位编号',
-    dataIndex: 'code',
-    initialValue: '',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '编码为必填项',
-        },
-      ],
-    },
-    width: 'm',
-  },
-  {
-    title: '所属身份',
-    dataIndex: 'belongTarget',
-    valueType: 'treeSelect',
-    width: 'm',
-    fieldProps: {
-      options: ObjectManagerList,
-      fieldNames: {
-        children: 'children',
-        label: 'name',
-        value: 'key',
-      },
-      showSearch: true,
-      filterTreeNode: true,
-      treeNodeFilterProp: 'name',
-      // multiple: true,
-      treeDefaultExpandAll: true,
-    },
-  },
-  {
-    title: '岗位简介',
-    dataIndex: 'remark',
-    valueType: 'textarea',
-    width: 'm',
-  },
-  {
-    valueType: 'divider',
-  },
-];
-
+// initialValues={item}
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId } = props;
-  useEffect(() => {}, []);
-
+  const { open, title, onOk, handleOk, handleCancel, selectId, callback, defaultData } =
+    props;
+  const [authTree, setAuthTree] = useState<IAuthority>();
+  useEffect(() => {
+    authTreeData();
+  }, []);
+  const authTreeData = async () => {
+    const res = await userCtrl.Company.selectAuthorityTree(false);
+    setAuthTree(res);
+  };
+  const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
+    const columns: ProFormColumnsType<IIdentity>[] = [
+      {
+        title: '岗位名称',
+        dataIndex: 'name',
+        initialValue: target ? target.target.name : '',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '名称为必填项',
+            },
+          ],
+        },
+        width: 'm',
+      },
+      {
+        title: '岗位编号',
+        dataIndex: 'code',
+        initialValue: target ? target.target.code : '',
+        formItemProps: {
+          rules: [
+            {
+              required: true,
+              message: '编码为必填项',
+            },
+          ],
+        },
+        width: 'm',
+      },
+      {
+        title: '所属身份',
+        dataIndex: 'id',
+        valueType: 'treeSelect',
+        width: 'm',
+        fieldProps: {
+          options: [authTree],
+          disabled: true,
+          fieldNames: {
+            children: 'children',
+            label: 'name',
+            value: 'id',
+          },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'name',
+          // multiple: true,
+          treeDefaultExpandAll: true,
+        },
+      },
+      {
+        title: '岗位简介',
+        dataIndex: 'remark',
+        valueType: 'textarea',
+        initialValue: target ? target.target.remark : '',
+        width: 'm',
+      },
+      {
+        valueType: 'divider',
+      },
+    ];
+    return columns;
+  };
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
@@ -108,14 +123,24 @@ const EditCustomModal = (props: Iprops) => {
         destroyOnClose={true}
         onCancel={() => handleOk()}
         footer={null}>
-        <BetaSchemaForm<DataItem>
+        <BetaSchemaForm<any>
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            console.log('finish===', values);
+            const res = await defaultData.updateIdentity(
+              values.name,
+              values.code,
+              values.remark,
+            );
+            if (res.success) {
+              callback();
+              message.success('修改成功');
+            } else {
+              message.error(res.msg);
+            }
             onOk();
           }}
-          columns={columns}
+          columns={getColumn(defaultData)}
         />
       </Modal>
     </div>

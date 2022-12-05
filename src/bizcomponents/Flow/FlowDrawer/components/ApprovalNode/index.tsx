@@ -1,33 +1,35 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
-import { Row, Button, Divider, Select, Col, Radio } from 'antd';
+import { SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import PersonCustomModal from '../PersonCustomModal';
 import cls from './index.module.less';
-import Provider from '@/ts/core/provider';
-import { useAppwfConfig } from '@/module/flow/flow';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+
 /**
  * @description: 审批对象
  * @return {*}
  */
 
-const { Option } = Select;
-
 const ApprovalNode = () => {
-  // const personObj = Provider.getPerson.getJoinedCohorts();
+  // const personObj = userCtrl.User.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-  const [value, setValue] = useState(1);
-  const onOk = () => {
+  const [selectPost, setSelectPost] = useState();
+  const [radioValue, setRadioValue] = useState(1);
+  const [processValue, setProcessValue] = useState(1);
+
+  const onOk = (params: any) => {
+    selectedNode.props.assignedUser = [{ name: params.node.name, id: params.node.id }];
+    setSelectedNode(selectedNode);
+    setSelectPost(params);
     setIsOpen(false);
   };
   const onCancel = () => {
     setIsOpen(false);
   };
-  const onChange = (e: RadioChangeEvent) => {
-    setValue(e.target.value);
-  };
+
   // 查询个人加入的群组
   // const getJoinedCohort = async () => {
   //   const JoinedCohortList = await personObj;
@@ -41,51 +43,58 @@ const ApprovalNode = () => {
         <SettingOutlined style={{ marginTop: '3px' }} />
         <span className={cls[`roval-node-title`]}>选择审批对象</span>
       </Row>
-      <Row>
-        {Provider.isUserSpace() && (
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              selectedNode.props.assignedType = 'DENTITY';
-              setSelectedNode(selectedNode);
-              setIsOpen(true);
-              // getJoinedCohort();
-            }}>
-            选择身份
-          </Button>
-        )}
-        {!Provider.isUserSpace() && (
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              selectedNode.props.assignedType = 'JOB';
-              setSelectedNode(selectedNode);
-              setIsOpen(true);
-              // getJoinedCohort();
-            }}>
-            选择岗位
-          </Button>
-        )}
-      </Row>
+      <Space>
+        <Button
+          type="primary"
+          shape="round"
+          size="small"
+          onClick={() => {
+            selectedNode.props.assignedType = 'JOB';
+            setSelectedNode(selectedNode);
+            setIsOpen(true);
+            // getJoinedCohort();
+          }}>
+          选择岗位
+        </Button>
+        {selectPost ? (
+          <span>
+            当前选择：<a>{selectPost?.node.name}</a>
+          </span>
+        ) : null}
+      </Space>
       <Divider />
       <div className={cls['roval-node-select']}>
         <Col className={cls['roval-node-select-col']}>👩‍👦‍👦 多人审批时审批方式</Col>
-        <Select
-          defaultValue={1}
-          // onChange={handleChange}
-          style={{ width: 400 }}>
-          <Option value={1}>会签（可同时审批，每个人必须同意）</Option>
-          <Option value={2}>或签（有一人同意即可）</Option>
-        </Select>
+        <Radio.Group
+          onChange={(e) => {
+            setRadioValue(e.target.value);
+          }}
+          style={{ paddingBottom: '10px' }}
+          value={radioValue}>
+          <Radio value={1}>全部（所有人必须同意）</Radio>
+          <Radio value={2}>会签（可同时审批，每个人必须同意）</Radio>
+        </Radio.Group>
+        {radioValue === 2 ? (
+          <Form.Item label="会签人数">
+            <InputNumber
+              onChange={(e) => {
+                selectedNode.props.num = e;
+              }}
+              placeholder="请设置会签人数"
+              addonBefore={<UserOutlined />}
+              style={{ width: '60%' }}
+            />
+          </Form.Item>
+        ) : null}
       </div>
       <div className={cls['roval-node-radiobtns']}>
         <Col className={cls['roval-node-select-col']}>🙅‍ 如果审批被驳回 👇</Col>
         <Row>
-          <Radio.Group onChange={onChange} value={value}>
+          <Radio.Group
+            onChange={() => {
+              setProcessValue(1);
+            }}
+            value={processValue}>
             <Radio value={1}>直接结束流程</Radio>
             <Radio value={2} disabled>
               驳回到上级审批节点

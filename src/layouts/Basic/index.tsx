@@ -1,11 +1,10 @@
 import { Layout } from 'antd';
 import React, { useEffect } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { IRouteConfig } from '@/routes/config';
-import useStore from '@/store';
+import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
-import Provider from '@/ts/core/provider';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type BasicLayoutProps = {
   route: IRouteConfig;
@@ -14,11 +13,8 @@ type BasicLayoutProps = {
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
-  const { getUserInfo } = useStore((state) => ({ ...state }));
   useEffect(() => {
-    if (Provider.getPerson) {
-      getUserInfo();
-    } else {
+    if (!userCtrl.Logined) {
       history.push('/passport/login');
     }
   }, []);

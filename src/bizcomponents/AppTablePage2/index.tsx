@@ -3,9 +3,8 @@ import cls from './index.module.less';
 
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
-import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
-import { BaseProduct } from '@/ts/core/market';
+import IProduct from '@/ts/core/market/iproduct';
 interface AppShowCompType {
   list: any[];
   queryFun?: Function;
@@ -15,6 +14,7 @@ interface AppShowCompType {
   renderOperation?: any; //渲染操作按钮
   headerTitle?: string; //表格头部文字
   style?: React.CSSProperties;
+  [key: string]: any;
 }
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
@@ -27,34 +27,29 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   toolBarRender,
   renderOperation,
   style,
+  ...rest
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [dataSource, setSataSource] = useState(list);
 
   const parentRef = useRef<any>(null); //父级容器Dom
-
   useEffect(() => {
-    if (!searchParams) {
+    if (!list?.length) {
       return;
     }
 
-    if (searchParams.status === '全部') {
+    if (!searchParams || searchParams.status === '全部') {
       setTotal(list.length);
-      setSataSource(list);
+      setSataSource([...list]);
     } else {
       const result = list.filter((item) => {
-        return item?._prod?.source === searchParams.status;
+        return item?.prod?.source === searchParams.status;
       });
       setTotal(result.length);
-      setSataSource(result);
+      setSataSource([...result]);
     }
-    //TODO: 其他条件 发出请求
-    // if (Object.keys(searchParams).length == 0) {
-    //   return;
-    // }
-    // getTableList(searchParams, '', true);
-  }, [searchParams]);
+  }, [searchParams, list]);
 
   /**
    * handlePageChage
@@ -65,17 +60,17 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: MarketTypes.ProductType[]): React.ReactNode[] => {
-    return dataArr.map((item: MarketTypes.ProductType) => {
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       return (
         <AppCard
           className="card"
           data={item}
-          key={item.id}
+          key={item.prod.id}
           defaultKey={{
-            name: 'caption',
+            name: 'name',
             size: 'price',
-            type: 'sellAuth',
+            type: 'source',
             desc: 'remark',
             creatTime: 'createTime',
           }}
@@ -86,10 +81,11 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<MarketTypes.ProductType>
+      <CardOrTable<IProduct>
         dataSource={dataSource}
         total={total}
         page={page}
+        // pageSize={2}
         stripe
         headerTitle={headerTitle}
         parentRef={parentRef}
@@ -97,8 +93,9 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: BaseProduct) => record._prod?.id || 'id'}
+        rowKey={(record: IProduct) => record.prod?.id || 'id'}
         toolBarRender={toolBarRender}
+        {...rest}
       />
     </div>
   );

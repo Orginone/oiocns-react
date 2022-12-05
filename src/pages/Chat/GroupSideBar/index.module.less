@@ -22,7 +22,7 @@
 .group_side_bar_wrap {
   width: 100%;
   height: calc(100vh - 280px);
-  padding: 0 10px 10px;
+  padding: 0 8px 8px;
   overflow-y: auto;
   &:hover ::-webkit-scrollbar {
     overflow: visible;
@@ -54,29 +54,37 @@
   .open_item {
     display: flex;
   }
+  .session_toping {
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #f0f0f0;
+  }
   .con_body_session {
     position: relative;
     display: flex;
     justify-content: space-between;
-    padding: 5px;
+    align-items: center;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
     &:hover,
     &.active {
-      color: #3e5ed8;
-      background-color: #ecf5ff;
+      // color: #3e5ed8;
+      background-color: #edeffc;
     }
-    border-bottom: 1px solid #dcdfe6;
+    // border-bottom: 1px solid #dcdfe6;
     .group_con_show {
       width: 100%;
+
       &.name {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: nowrap;
-        max-width: 180px;
+        max-width: 220px;
         &.label {
           font-size: 14px;
           font-weight: bold;
-          max-width: 140px;
+          max-width: 160px;
           text-overflow: ellipsis;
           overflow: hidden;
           white-space: nowrap;
@@ -85,20 +93,19 @@
           color: #9e9d9d;
           font-size: 12px;
           display: flex;
-          max-width: 50px;
+          max-width: 60px;
           transform: scale(0.8);
           justify-content: flex-end;
         }
       }
 
       &.msg {
-        max-width: 180px;
+        max-width: 200px;
         text-overflow: ellipsis;
-        max-height: 24px;
+        height: 20px;
         overflow: hidden;
         white-space: nowrap;
         font-size: 10px;
-        padding-top: 5px;
         color: #787878;
       }
     }
@@ -118,7 +125,7 @@
         color: var(--el-text-color);
 
         &.active {
-          color: #3e5ed8;
+          // color: #3e5ed8;
           border-bottom: none;
         }
       }
@@ -129,7 +136,7 @@
         padding: 5px;
         &:hover,
         &.active {
-          color: #3e5ed8;
+          // color: #3e5ed8;
           background-color: #ecf5ff;
         }
         border-bottom: 1px solid #dcdfe6;
@@ -145,7 +152,7 @@
         justify-content: space-between;
         align-items: center;
         flex-wrap: nowrap;
-        max-width: 180px;
+        max-width: 200px;
         &.label {
           font-size: 14px;
           font-weight: bold;
@@ -162,13 +169,12 @@
         }
       }
       &.msg {
-        max-width: 180px;
+        max-width: 200px;
         text-overflow: ellipsis;
         max-height: 24px;
         overflow: hidden;
         white-space: nowrap;
         font-size: 10px;
-        padding-top: 5px;
         color: #787878;
       }
     }

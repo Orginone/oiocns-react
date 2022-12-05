@@ -6,30 +6,26 @@ import { IconFont } from '@/components/IconFont';
 import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import StoreContent from '@/ts/controller/store/content';
-import StoreSidebar from '@/ts/controller/store/sidebar';
-interface AppInfoType {
-  appId: string;
-}
+import React from 'react';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+// import StoreSidebar from '@/ts/controller/store/sidebar';
 
 /*******
  * @desc: 应用上架
  */
-const AppPutaway: React.FC<AppInfoType> = () => {
+const AppPutaway: React.FC = () => {
   const history = useHistory();
-  const [marketData, setMarketData] = useState<any[]>([]);
+  // const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
-  const AppInfo = StoreContent.curProduct;
-  useEffect(() => {
-    StoreSidebar.getOwnMarket(false).then(() => {
-      setMarketData(StoreSidebar.marketFooterTree.appTreeData);
-    });
-  }, []);
+  const curProduct = SelfAppCtrl.curProduct;
+  // useEffect(() => {
+  //   StoreSidebar.getOwnMarket(false).then(() => {
+  //     setMarketData(StoreSidebar.marketFooterTree.appTreeData);
+  //   });
+  // }, []);
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
-
     //publish
     delete values.typeName;
     const params = {
@@ -40,7 +36,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
       price: values.price - 0 || 0,
       days: values.days || '0',
     };
-    const res = await AppInfo?.publish(params);
+    const res = await curProduct?.publish(params);
     if (res?.success) {
       message.success('应用上架成功');
       history.goBack();
@@ -72,14 +68,14 @@ const AppPutaway: React.FC<AppInfoType> = () => {
         <Meta
           avatar={<img className="appLogo" src={Appimg} alt="" />}
           style={{ display: 'flex' }}
-          title={AppInfo?._prod.name || '应用名称'}
+          title={curProduct?.prod.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{AppInfo?._prod.remark}</p>
+              <p className="app-info-con-desc">{curProduct?.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：{AppInfo?._prod.version}</span>
+                <span className="vision">版本号 ：{curProduct?.prod.version}</span>
                 <span className="lastTime">
-                  订阅到期时间 ：{AppInfo?._prod.createTime}
+                  订阅到期时间 ：{curProduct?.prod.createTime}
                 </span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
@@ -105,8 +101,8 @@ const AppPutaway: React.FC<AppInfoType> = () => {
           layout="horizontal"
           initialValues={{
             sellAuth: '使用权',
-            caption: AppInfo?._prod.name,
-            typeName: AppInfo?._prod.typeName,
+            caption: curProduct?.prod.name,
+            typeName: curProduct?.prod.typeName,
           }}
           form={form}
           autoComplete="off">
@@ -115,20 +111,20 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {marketData.map((item) => {
+              {/* {marketData.map((item) => {
                 return (
                   <Select.Option value={item.id} key={item.id}>
                     {item.title}
                   </Select.Option>
                 );
-              })}
+              })} */}
             </Select>
           </Form.Item>
-          <Form.Item label="上架应用" name="caption">
+          <Form.Item label="应用名称" name="caption">
             <Input />
           </Form.Item>
           <Form.Item label="应用类型" name="typeName">
-            <Input />
+            <Input readOnly />
           </Form.Item>
           <Form.Item label="应用权限" name="sellAuth">
             <Radio.Group>
@@ -143,7 +139,7 @@ const AppPutaway: React.FC<AppInfoType> = () => {
             <Input type="number" />
           </Form.Item>
           <Form.Item label="应用信息" name="information">
-            <TextArea rows={4} />
+            <TextArea showCount maxLength={300} rows={4} />
           </Form.Item>
         </Form>
       </div>

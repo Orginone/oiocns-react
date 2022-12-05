@@ -1,15 +1,14 @@
 import { kernel } from '../../base';
 import { CommonStatus, TargetType } from '../enum';
-import { model } from '../../base';
-import { XMarket, XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
+import { model, schema } from '../../base';
 import consts from '../consts';
 import IMarket from './imarket';
 
 export default class Market implements IMarket {
-  market: XMarket;
+  market: schema.XMarket;
   pullTypes: TargetType[];
 
-  constructor(store: XMarket) {
+  constructor(store: schema.XMarket) {
     this.market = store;
     this.pullTypes = [TargetType.Person, ...consts.CompanyTypes];
   }
@@ -56,7 +55,7 @@ export default class Market implements IMarket {
    */
   public async getMember(
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMarketRelationArray>> {
+  ): Promise<model.ResultType<schema.XMarketRelationArray>> {
     return await kernel.queryMarketMember({
       id: this.market.id,
       page: page,
@@ -69,7 +68,7 @@ export default class Market implements IMarket {
    */
   public async getJoinApply(
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMarketRelationArray>> {
+  ): Promise<model.ResultType<schema.XMarketRelationArray>> {
     return await kernel.queryJoinMarketApply({
       id: this.market.id,
       page,
@@ -118,7 +117,7 @@ export default class Market implements IMarket {
   }
   public getMerchandise = async (
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMerchandiseArray>> => {
+  ): Promise<model.ResultType<schema.XMerchandiseArray>> => {
     return await kernel.searchMerchandise({
       id: this.market.id,
       page: page,
@@ -132,7 +131,7 @@ export default class Market implements IMarket {
    */
   public async getMerchandiseApply(
     page: model.PageRequest,
-  ): Promise<model.ResultType<XMerchandiseArray>> {
+  ): Promise<model.ResultType<schema.XMerchandiseArray>> {
     return await kernel.queryMerchandiesApplyByManager({
       id: this.market.id,
       page: page,
@@ -164,6 +163,28 @@ export default class Market implements IMarket {
     return await kernel.deleteMerchandiseByManager({
       id: merchandiseId,
       belongId: belongId,
+    });
+  }
+
+  async createOrder(
+    // 存证ID
+    nftId: string,
+    // 名称
+    name: string,
+    // 编号
+    code: string,
+    // 创建组织/个人
+    spaceId: string,
+    // 商品ID集合
+    merchandiseIds: string[],
+  ): Promise<model.ResultType<schema.XOrder>> {
+    return await kernel.createOrder({
+      id: '0',
+      nftId,
+      name,
+      code,
+      belongId: spaceId,
+      merchandiseIds,
     });
   }
 }

@@ -2,19 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { ProColumns } from '@ant-design/pro-components';
 /* eslint-disable no-unused-vars */
 import cls from './index.module.less';
-
 import { Dropdown, Pagination } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
-
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MarketTypes } from 'typings/marketType';
 import { PageShowType } from 'typings/globelType';
-import { BaseProduct } from '@/ts/core/market';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string | ((record: BaseProduct) => string); //唯一key
+  rowKey: string | ((record: T) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -22,6 +19,7 @@ interface PageType<T> {
   columns?: ProColumns<any>[]; //表格头部数组
   total?: number; // 总条数 总数量
   page?: number; // 当前页
+  pageSize?: number;
   height?: number; //表格高度
   width?: number; //表格高度
   stripe?: boolean; // 斑马纹
@@ -44,6 +42,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   operation,
   total,
   page,
+  pageSize,
   height,
   width,
   parentRef,
@@ -56,8 +55,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
-  // console.log('dayin', dataSource);
-
   // 监听父级高度
   useEffect(() => {
     setTimeout(() => {

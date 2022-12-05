@@ -20,12 +20,11 @@ import {
   TeamOutlined,
   UnorderedListOutlined,
   UserOutlined,
-  VerifiedOutlined,
   WalletOutlined,
 } from '@ant-design/icons';
 import React from 'react';
-import { RouteConfig } from 'react-router-config';
 import { Redirect as RouterRedirect } from 'react-router-dom';
+import { IRouteConfig } from 'typings/globelType';
 
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
@@ -35,46 +34,30 @@ import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
 import BasicLayout from '@/layouts/Basic';
 
-export interface IRouteConfig extends RouteConfig {
-  // 路由路径
-  path: string;
-  // 路由组件
-  component?: any;
-  // 302 跳转
-  redirect?: string;
-  exact?: boolean;
-  // 路由信息
-  title: string;
-  // 元数据
-  meta?: any;
-  // 图标
-  icon?: string | React.ReactNode;
-  // 是否校验权限, false 为不校验, 不存在该属性或者为true 为校验, 子路由会继承父路由的 auth 属性
-  auth?: boolean;
-  // 子路由
-  routes?: IRouteConfig[];
-}
-
 /* 通行证 */
 const PassportRouter: IRouteConfig[] = [
   {
     path: '/passport/login',
     component: PassportLogin,
+    exact: true,
     title: '登录',
   },
   {
     path: '/passport/register',
     component: PassportRegister,
+    exact: true,
     title: '注册',
   },
   {
     path: '/passport/lock',
     component: PassportLock,
+    exact: true,
     title: '锁屏',
   },
   {
     path: '/passport/forget',
     component: PassportForget,
+    exact: true,
     title: '忘记密码',
   },
 ];
@@ -140,11 +123,11 @@ const TodoRouter: IRouteConfig[] = [
         ],
       },
       {
-        path: '/todo/app',
+        path: '/todo/app/:id',
         title: '应用上架',
         icon: <ShopOutlined />,
         hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/Store')),
+        component: React.lazy(() => import('@/pages/Todo/App')),
       },
       {
         path: '/todo/product',
@@ -167,7 +150,7 @@ const TodoRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Todo/Order')),
       },
       {
-        path: '/todo/:id',
+        path: '/todo/',
         title: '应用待办',
         icon: <UnorderedListOutlined />,
         hideInMenu: true,
@@ -255,9 +238,9 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
-    path: '/market/ShoppingCart',
+    path: '/market/shopingcar',
     title: '购物车',
-    component: React.lazy(() => import('@/pages/Store/Market/ShoppingCart/shoppingCart')),
+    component: React.lazy(() => import('@/pages/Store/Market/ShopingCar')),
   },
   {
     path: '/market',
@@ -318,13 +301,13 @@ const SettingRouter: IRouteConfig[] = [
       },
       {
         path: '/setting/dept/:id',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
       {
         path: '/setting/dept',
-        title: '部门设置',
+        title: '内设机构',
         icon: <ApartmentOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Dept')),
       },
@@ -351,6 +334,18 @@ const SettingRouter: IRouteConfig[] = [
         title: '集团设置',
         icon: 'icon-setting',
         component: React.lazy(() => import('@/pages/Setting/Group')),
+      },
+      {
+        path: '/setting/friend',
+        title: '好友设置',
+        icon: <UserOutlined />,
+        component: React.lazy(() => import('@/pages/Person/Friend')),
+      },
+      {
+        path: '/setting/cohort',
+        title: '群组设置',
+        icon: <TeamOutlined />,
+        component: React.lazy(() => import('@/pages/Person/Cohort')),
       },
       {
         path: '/setting/help',
@@ -426,30 +421,6 @@ const PersonRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Person/Passport')),
       },
       {
-        path: '/person/friend',
-        title: '好友设置',
-        icon: <UserOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Friend')),
-      },
-      {
-        path: '/person/cohort',
-        title: '群组设置',
-        icon: <TeamOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort')),
-      },
-      {
-        path: '/person/Role',
-        title: '角色管理',
-        // icon: <Outlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort/Role')),
-      },
-      {
-        path: '/person/CohortMemberList',
-        title: '群组详情界面',
-        // icon: <Outlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort/CohortMemberList')),
-      },
-      {
         path: '/person/wallet',
         title: '卡包设置',
         icon: <WalletOutlined />,
@@ -472,12 +443,6 @@ const PersonRouter: IRouteConfig[] = [
         title: '地址管理',
         icon: <HomeOutlined />,
         component: React.lazy(() => import('@/pages/Person/Address')),
-      },
-      {
-        path: '/person/certificate',
-        title: '证书管理',
-        icon: <VerifiedOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Certificate')),
       },
       {
         path: '/person/safe',
@@ -560,4 +525,24 @@ const Routers: IRouteConfig[] = [
   },
 ];
 
+interface rType {
+  path: string;
+  title: string;
+  routes?: rType[];
+}
+function handleInfo(routeArr: IRouteConfig[]): rType[] {
+  return routeArr.map((r: IRouteConfig) => {
+    let obj: rType = {
+      path: r.path,
+      title: r.title,
+    };
+    if (r.routes && r.routes?.length > 0) {
+      obj.routes = handleInfo(r.routes);
+    }
+    return obj;
+  });
+}
+// 处理 向外导出的 路由目录树 不携带组件信息
+
+export const routerInfo = handleInfo(Routers);
 export default Routers;

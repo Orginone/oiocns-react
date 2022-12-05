@@ -1,9 +1,9 @@
 import { Card, Modal } from 'antd';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
-import { BtnGroupDiv } from '@/components/CommonComp';
+import { BtnGroupDiv } from '@/components/BtnGroupComp';
 import PutawayComp from './Putaway';
 import ShareComp from '../components/ShareComp';
 import CreateApp from './CreatApp'; // 上架弹窗
@@ -12,131 +12,111 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { MarketTypes } from 'typings/marketType';
-import StoreContent from '@/ts/controller/store/content';
-import Provider from '@/ts/core/provider';
-import StoreSidebar from '@/ts/controller/store/sidebar';
-import { BaseProduct } from '@/ts/core/market';
-import DeleteCustomModal from '@/components/DeleteCustomModal';
-import { productCtrl } from '@/ts/controller/store/productCtrl';
-// const service = new MarketService({
-//   nameSpace: 'myApp',
-//   searchApi: Provider.getPerson.getJoinMarkets,
-//   createApi: API.product.register,
-//   deleteApi: API.product.delete,
-//   updateApi: API.product.update,
-// });
-type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
+import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
+import IProduct from '@/ts/core/market/iproduct';
+import TreeComp from '../Classify';
+// import DeleteCustomModal from '@/components/DeleteCustomModal';
+// import { productCtrl } from '@/ts/controller/store/productCtrl';
 
+type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
   const history = useHistory();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<IProduct[]>([]);
+  const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
-  const [productObj, setProductObj] = useState<any>({});
+  const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   useEffect(() => {
-    // storeContent.curPageType = 'myApps';
-    StoreContent.marketTableCallBack = setData;
-    StoreContent.getStoreProduct();
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
+      setData([...SelfAppCtrl.tableData]);
+    });
+    const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
+      console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
+      setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
+    });
+    // StoreSiderbar.changePageType('app');
+    SelfAppCtrl.querySelfApps();
+    return () => {
+      return SelfAppCtrl.unsubscribe([id, id2]);
+    };
   }, []);
   // 根据以获取数据 动态产生tab
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
-    data.forEach((v: any) => {
-      typeSet.add(v._prod.source);
+    data?.forEach((v: any) => {
+      typeSet.add(v.prod?.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
     });
   }, [data]);
 
-  const BtnsList = ['购买', '创建', '暂存'];
+  const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
     // console.log('按钮点击', item);
     switch (item.text) {
       case '购买':
-        StoreSidebar.changePageType('market');
-        // StoreSidebar.getTreeData();
         history.push('/market/shop');
         break;
       case '创建':
         history.push('/store/app/create');
         break;
-      case '暂存':
-        console.log('点击事件', '暂存');
-        break;
+
       default:
         console.log('点击事件未注册', item.text);
         break;
     }
   };
 
-  const onCheckeds = (type: string, checkedValus: any) => {
-    console.log('输出选择', type, checkedValus);
+  const RentlyApps = useMemo(() => {
+    let recentlyApps: IProduct[] = [];
+    recentlyAppIds?.forEach((id: string) => {
+      const prod = data.find((v) => {
+        return v.prod.id === id;
+      });
+      prod && recentlyApps.push(prod);
+    });
 
-    setCheckNodes({ type, checkedValus });
+    return recentlyApps;
+  }, [recentlyAppIds, data]);
+
+  const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
+    console.log('输出选择', teamId, type, checkedValus);
+
+    setCheckNodes({ teamId, type, checkedValus });
   };
-
-  /**
-   * @description: 移除确认
-   * @return {*}
-   */
-  const onOk = () => {
-    setIsDeleteOpen(false);
-    productCtrl.deleteProduct(productObj?._prod?.id);
-  };
-
-  /**
-   * @description: 取消确认
-   * @return {*}
-   */
-  const onCancel = () => {
-    setIsDeleteOpen(false);
-  };
-
   // 共享确认回调
   const submitShare = () => {
-    console.log(
-      '共享确认回调',
-      checkNodes,
-      // departHisData,
-      // authorData,
-      // personsData,
-      // personsHisData,
-      // identitysData,
-      // identitysHisData,
-    );
-
-    // setShowShareModal(false);
+    SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
+    setShowShareModal(false);
   };
-  const renderOperation = (item: BaseProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
     return [
       {
         key: 'open',
         label: '打开',
         onClick: () => {
-          history.push({ pathname: '/online', state: { appId: item._prod?.id } });
+          SelfAppCtrl.curProduct = item;
+          SelfAppCtrl.OpenApp(item);
+          history.push({ pathname: '/online', state: { appId: item.prod?.id } });
         },
       },
       {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          StoreContent.selectedProduct(item);
-          console.log('333', item._prod);
-
-          history.push({ pathname: '/store/app/info', state: { appId: item._prod?.id } });
+          SelfAppCtrl.curProduct = item;
+          history.push({ pathname: '/store/app/info' });
         },
       },
       {
         key: 'manage',
         label: '管理',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           history.push({
             pathname: '/store/app/manage',
-            state: { appId: item._prod?.id },
           });
         },
       },
@@ -144,10 +124,9 @@ const StoreApp: React.FC = () => {
         key: 'putaway',
         label: '上架',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          SelfAppCtrl.curProduct = item;
           history.push({
             pathname: '/store/app/putaway',
-            state: { appId: item._prod?.id },
           });
         },
       },
@@ -155,35 +134,36 @@ const StoreApp: React.FC = () => {
         key: 'share',
         label: '共享',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          setShareType('共享');
+          SelfAppCtrl.curProduct = item;
           setShowShareModal(true);
-        },
-      },
-      {
-        key: 'delete',
-        label: '移除',
-        onClick: () => {
-          StoreContent.selectedProduct(item);
-          setProductObj(item);
-          setIsDeleteOpen(true);
         },
       },
       {
         key: 'share2',
         label: '分配',
         onClick: () => {
-          StoreContent.selectedProduct(item);
+          setShareType('分配');
+          SelfAppCtrl.curProduct = item;
+          setShowShareModal(true);
         },
       },
+      // {
+      //   key: 'save',
+      //   label: '暂存',
+      //   onClick: () => {
+      //     SelfAppCtrl.curProduct = item;
+      //     history.push({
+      //       pathname: '/store/app/publish',
+      //     });
+      //   },
+      // },
       {
-        key: 'save',
-        label: '暂存',
+        key: 'delete',
+        label: <span style={{ color: 'red' }}>移除</span>,
         onClick: () => {
-          StoreContent.selectedProduct(item);
-          history.push({
-            pathname: '/store/app/publish',
-            state: { appId: item._prod?.id },
-          });
+          SelfAppCtrl.curProduct = item;
+          SelfAppCtrl.handleDeleteApp();
         },
       },
     ];
@@ -192,7 +172,7 @@ const StoreApp: React.FC = () => {
   const AppIndex = useMemo(() => {
     return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {<StoreRecent />}
+        {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />}
         <Card
           title="应用"
           className={cls['app-tabs']}
@@ -203,10 +183,9 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              queryFun={Provider.getPerson!.getOwnProducts}
               list={data}
               searchParams={{ status: statusKey }}
-              columns={StoreContent.getColumns('myApp')}
+              columns={SelfAppCtrl.getColumns('myApp')}
               renderOperation={renderOperation}
             />
           </div>
@@ -219,7 +198,7 @@ const StoreApp: React.FC = () => {
     <>
       {location.pathname === '/store/app' && AppIndex}
       <Modal
-        title="应用分享"
+        title={`应用${shareType}`}
         width={800}
         destroyOnClose={true}
         open={showShareModal}
@@ -231,40 +210,23 @@ const StoreApp: React.FC = () => {
           console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
-        <ShareComp onCheckeds={onCheckeds} />
+        <ShareComp shareType={shareType} onCheckeds={onCheckeds} />
       </Modal>
-      <DeleteCustomModal
+      {/* <DeleteCustomModal
         title="警告"
         open={isDeleteOpen}
         deleOrQuit="delete"
         onOk={onOk}
         onCancel={onCancel}
-        content={productObj?._prod?.name}
-      />
+        content={SelfAppCtrl.curProduct!.prod.name}
+      /> */}
       {/* 详情页面 /store/app/info*/}
-      <Route
-        exact
-        path="/store/app/info"
-        render={() => (
-          <AppInfo appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
-      <Route
-        exact
-        path="/store/app/publish"
-        render={() => (
-          <PublishList appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
-      <Route
-        exact
-        path="/store/app/manage"
-        render={() => <Manage appId={StoreContent.curProduct?._prod.id || ''} />}></Route>
+      <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
+      <Route exact path="/store/app/publish" render={() => <PublishList />}></Route>
+      <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
-      <Route
-        exact
-        path="/store/app/putaway"
-        render={() => (
-          <PutawayComp appId={StoreContent.curProduct?._prod.id || ''} />
-        )}></Route>
+      <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
+      <TreeComp />
     </>
   );
 };

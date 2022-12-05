@@ -1,19 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, List, Descriptions, Typography, Layout, Card, Input, Tag } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import {
+  Avatar,
+  List,
+  Descriptions,
+  Typography,
+  Layout,
+  Card,
+  Input,
+  Tag,
+  Modal,
+  message,
+} from 'antd';
+import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
 import cls from './index.module.less';
-import Cohort from '@/ts/core/target/cohort';
-import CohortController from '../../../../ts/controller/cohort/index';
-import FriendController from '../../../../ts/controller/friend';
 import { useHistory } from 'react-router-dom';
-import { schema } from '../../../../ts/base';
-import Provider from '@/ts/core/provider';
+import { schema } from '@/ts/base';
 import { IChat } from '@/ts/core/chat/ichat';
-import { chatCtrl } from '@/ts/controller/chat';
+import chatCtrl from '@/ts/controller/chat';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { ICohort } from '@/ts/core/target/itarget';
+import { TargetType } from '@/ts/core/enum';
 const ContainerHeight = 400;
 interface defaultObjType {
-  cohortData: Cohort;
+  cohortData: ICohort;
 }
 const { Title } = Typography;
 const { Search } = Input;
@@ -21,16 +31,24 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
   const [friendList, setFriendList] = useState<schema.XTarget[]>([]);
   const history = useHistory();
-
+  useEffect(() => {
+    getMemberData();
+    getFriendList();
+  }, []);
   /**获取群组下成员列表 */
   const getMemberData = async () => {
-    const res = await CohortController.getCohortPeronList(cohortData);
-    setMemberData(res);
+    const res = await cohortData.getMember(false);
+    setMemberData(res.filter((obj) => obj.id != userCtrl.Space?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {
-    const res = await FriendController.getMyFriend();
-    setFriendList(res);
+    const res = await userCtrl.User?.getFriends(false);
+    setFriendList(res!);
+  };
+  /**移除成员 */
+  const removeMember = async (ids: string[]) => {
+    await cohortData.removeMember(ids, TargetType.Person);
+    setMemberData(await cohortData.getMember(true));
   };
   /**
    * 获取操作列表
@@ -40,7 +58,25 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     const size: number = friendList.filter((obj) => obj.id == value.id).length;
     const action = [];
     if (size == 0) {
-      action.push(<a key="list-loadmore-more">添加好友</a>);
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() => {
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否申请添加好友',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                await userCtrl.User?.applyFriend(value);
+                message.success('发起申请成功');
+              },
+            });
+          }}>
+          添加好友
+        </a>,
+      );
     } else {
       action.push(
         <a key="list-loadmore-edit" onClick={() => enterChat(value.id)}>
@@ -48,8 +84,27 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == Provider.userId) {
-      action.push(<a key="list-loadmore-more">踢出群组</a>);
+    if (cohortData.target.belongId == userCtrl.User.target.id) {
+      action.push(<a key="list-loadmore-more">身份管理</a>);
+      action.push(
+        <a
+          key="list-loadmore-more"
+          onClick={() =>
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否踢出群组',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                await removeMember([value.id]);
+                message.success('操作成功');
+              },
+            })
+          }>
+          踢出群组
+        </a>,
+      );
     }
     return action;
   };
@@ -61,12 +116,9 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const getChat = (id: string): IChat | undefined => {
     for (var i = 0; i < chatCtrl.groups.length; i++) {
       const group = chatCtrl.groups[i];
-      console.log(group);
       for (var j = 0; j < group.chats.length; j++) {
         const chat = group.chats[j];
-        // console.log(chat);
         if (id == chat.target.id) {
-          console.log(chat);
           return chat;
         }
       }
@@ -116,18 +168,10 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     }
     return title;
   };
-
-  useEffect(() => {
-    getMemberData();
-    getFriendList();
-  }, []);
-
   const onSearch = async (value: string) => {
     if (value!) {
       await getMemberData();
       setMemberData(memberData.filter((obj) => obj.code === value));
-      console.log('目前的值', memberData);
-      console.log('1111', value);
     } else {
       await getMemberData();
     }
@@ -148,7 +192,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
 
           <div style={{ paddingBottom: '16px', textAlign: 'right' }}>
             <Search
-              placeholder="请输入人员名称"
+              placeholder="请输入用户编号"
               onSearch={onSearch}
               style={{ width: 200 }}
             />
@@ -166,9 +210,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
                   data={memberData}
                   height={ContainerHeight}
                   itemHeight={47}
-                  itemKey={'id'}
-                  // onScroll={onScroll}
-                >
+                  itemKey={'id'}>
                   {(item: schema.XTarget) => (
                     <List.Item key={item.id} actions={getAction(item)!}>
                       <List.Item.Meta

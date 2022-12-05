@@ -4,8 +4,9 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Link } from 'react-router-dom';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
+import BuyCustomModal from './BuyCustomModal';
 
 interface AppShowCompType {
   className: string;
@@ -28,6 +29,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [total, setTotal] = useState<number>(0);
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
   const [data, setData] = useState<any>({});
+  const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
   const parentRef = useRef<any>(null); //父级容器Dom
   useEffect(() => {
     setTotal(list?.length || 0);
@@ -60,6 +62,15 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const onClose = () => {
     setIsProduce(false);
   };
+
+  const onOk = () => {
+    setIsBuy(false);
+  };
+
+  const onCancel = () => {
+    setIsBuy(false);
+  };
+
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -67,16 +78,17 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     return [
       {
         key: 'buy',
-        label: '购买',
+        label: '立即购买',
         onClick: () => {
+          setIsBuy(true);
           console.log('按钮事件', 'buy', item);
         },
       },
       {
         key: 'toBuyCar',
-        label: <Link to="/market/ShoppingCart">加入购物车</Link>,
+        label: '加入购物车',
         onClick: () => {
-          console.log('按钮事件', 'toBuyCar', item);
+          marketCtrl.joinOrdeleApply(item);
         },
       },
       {
@@ -136,6 +148,13 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         title="应用详情"
         onClose={onClose}
         data={data}
+      />
+      <BuyCustomModal
+        open={isBuy}
+        title="确认订单"
+        onOk={onOk}
+        onCancel={onCancel}
+        content="此操作将生成交易订单。是否确认"
       />
     </div>
   );

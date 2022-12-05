@@ -1,32 +1,18 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
-import { ProductApprovalType } from '@/module/todo/typings';
 import { ProColumns } from '@ant-design/pro-table';
-import { Button, Space, Tag } from 'antd';
-import appService, { tabStatus } from '@/ts/controller/todo';
+import { Space, Tag } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { DataType } from 'typings/globelType';
+import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import { statusList, statusMap, tableOperation } from '../components';
+import { XRelation } from '@/ts/base/schema';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { resetParams } from '@/utils/tools';
 
-appService.currentModel = 'product';
-
-/**
- * 批量同意
- * @param ids  React.Key[] 选中的数据id数组
- */
-const handleApproveSelect = async (ids: React.Key[]) => {
-  // if (ids.length > 0) {
-  //   const { success } = await appService.approve(ids.toString());
-  //   if (success) {
-  //     message.success('添加成功！');
-  //   } else {
-  //     message.error('抱歉，提交失败');
-  //   }
-  // }
-};
 // 根据状态值渲染标签
-const renderItemStatus = (record: ProductApprovalType) => {
-  const status = appService.statusMap[record.status];
+const renderItemStatus = (record: XRelation) => {
+  const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
 
@@ -37,12 +23,12 @@ type TodoCommonTableProps = {};
  * @returns
  */
 const TodoStore: React.FC<TodoCommonTableProps> = () => {
-  const [activeKey, setActiveKey] = useState<string>(appService.activeStatus);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [pageData, setPageData] = useState<ProductApprovalType[]>([]);
+  const [activeKey, setActiveKey] = useState<string>('1');
+  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
   const [total, setPageTotal] = useState<number>(0);
+  const [current, setCurrent] = useState<number>(1);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const columns: ProColumns<ProductApprovalType>[] = [
+  const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -51,144 +37,111 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
     },
     {
       title: '市场名称',
-      dataIndex: 'name',
-      render: (_, record) => {
-        return record.market.name;
-      },
+      dataIndex: ['Data', 'market', 'name'],
     },
     {
       title: '应用名称',
-      dataIndex: 'code',
+      dataIndex: ['Data', 'product', 'name'],
       render: (_, record) => {
         return (
           <Space>
-            {record.product.name}
-            <Tag color="#5BD8A6">{record.product.source}</Tag>
+            {_}
+            <Tag color="#5BD8A6">{record.Data.product?.source}</Tag>
           </Space>
         );
       },
     },
     {
       title: '应用编号',
-      dataIndex: 'code',
-      render: (_, record) => {
-        return record.product.code;
-      },
+      dataIndex: ['Data', 'product', 'code'],
     },
     {
       title: '价格/使用期限',
-      dataIndex: 'code',
+      dataIndex: ['Data'],
       render: (_, record) => {
         return (
           <Space>
-            {record?.price || '0.00'}
-            <Tag>使用期：{record.days} 天</Tag>
+            {record?.Data?.price || '0.00'}
+            <Tag>使用期：{record.Data.days} 天</Tag>
           </Space>
         );
       },
     },
     {
       title: '应用类型',
-      dataIndex: 'code',
-      render: (_, record) => {
-        return record.product?.typeName;
-      },
+      dataIndex: ['Data', 'product', 'typeName'],
     },
     {
       title: '应用权限',
-      dataIndex: 'sellAuth',
-      render: (_, record) => {
-        return record.product.authority;
-      },
+      dataIndex: ['Data', 'product', 'authority'],
     },
     {
       title: '状态 ',
       dataIndex: 'status',
-      valueType: 'select',
       render: (_, record) => {
-        return renderItemStatus(record);
+        return renderItemStatus(record.Data);
       },
     },
-    // {
-    //   title: '申请人',
-    //   dataIndex: '',
-    //   render: (_, row) => {
-    //     return row.target.name;
-    //   },
-    // },
     {
       title: '申请时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
   ];
   // 获取申请/审核列表
-  const LoadList = () => {
-    setPageData([...appService.currentList]);
-    setPageTotal(appService.currentList.length);
-    setNeedReload(false);
+  const loadList = async (page: number, pageSize: number) => {
+    const listStatusCode = {
+      '1': 'getTodoList',
+      '2': 'getDoList',
+      '3': 'getApplyList',
+    };
+    setCurrent(page);
+    if (activeKey === '3') {
+      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](
+        resetParams({ page, pageSize }),
+      );
+      setPageData(data);
+      setPageTotal(data.length);
+    } else {
+      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
+      const list = data.slice((current - 1) * pageSize, pageSize * current);
+      setPageData(list);
+      setPageTotal(list.length);
+      setNeedReload(false);
+    }
   };
 
   useEffect(() => {
-    appService.activeStatus = activeKey as tabStatus;
-    LoadList();
-    setSelectedRowKeys([]);
+    setPageData([]);
+    setPageTotal(0);
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
     <PageCard
-      tabList={appService.statusList}
+      tabList={statusList}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
-      }}
-      tabBarExtraContent={
-        <Space>
-          <Button
-            key="approve"
-            type="primary"
-            onClick={() => handleApproveSelect(selectedRowKeys)}>
-            同意
-          </Button>
-          <Button key="2">拒绝</Button>
-          <Button key="3">打印</Button>
-        </Space>
-      }>
-      <CardOrTableComp
-        rowKey={'id'}
+      }}>
+      <CardOrTableComp<IApplyItem | IApprovalItem>
+        rowKey={(record) => record?.Data?.id}
         columns={columns}
         dataSource={pageData}
         total={total}
-        onChange={LoadList}
-        operation={(item: ProductApprovalType) =>
-          appService.tableOperation(item, setNeedReload)
+        page={current}
+        onChange={loadList}
+        operation={(item: IApplyItem | IApprovalItem) =>
+          tableOperation(activeKey, item, setNeedReload)
         }
         renderCardContent={(arr) => (
-          <TableItemCard<ProductApprovalType>
+          <TableItemCard<IApplyItem | IApprovalItem>
             data={arr}
-            statusType={(item) => renderItemStatus(item)}
+            statusType={(item) => renderItemStatus(item.Data)}
             targetOrTeam="product"
-            operation={(item) => appService.tableOperation(item, setNeedReload)}
+            operation={(item) => tableOperation(activeKey, item, setNeedReload)}
           />
         )}
-        rowSelection={{
-          onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-            console.log(
-              `selectedRowKeys: ${selectedRowKeys}`,
-              'selectedRows: ',
-              selectedRows,
-            );
-            setSelectedRowKeys(selectedRowKeys);
-          },
-        }}
-        tableAlertOptionRender={() => {
-          return (
-            <Space size={16}>
-              <a>批量同意</a>
-              <a>批量拒绝</a>
-            </Space>
-          );
-        }}
       />
     </PageCard>
   );

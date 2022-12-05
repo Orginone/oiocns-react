@@ -1,24 +1,23 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
-import todoService, { tabStatus } from '@/ts/controller/todo';
 import { Dropdown, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { XOrder, XOrderDetail } from '@/ts/base/schema';
-// import { chatCtrl as chat } from '@/ts/controller/chat';
-todoService.currentModel = 'order';
+
+import { IApprovalItem, IOrderApplyItem } from '@/ts/core/todo/itodo';
+import { orderOperation, orderTabs, statusMap } from '../components';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 // 根据状态值渲染标签
 const renderItemStatus = (record: { status: number }) => {
-  const status = todoService.statusMap[record.status];
+  const status = statusMap[record.status];
   return <Tag color={status.color}>{status.text}</Tag>;
 };
 /**采购订单详情表格 */
 const expandedRowRender = (
-  record: {
-    details: readonly XOrderDetail[] | undefined;
-  },
+  activeKey: string,
+  record: IOrderApplyItem,
   setNeedReload: Function,
 ) => {
   return (
@@ -46,7 +45,7 @@ const expandedRowRender = (
           title: '状态',
           dataIndex: 'status',
           key: 'status',
-          render: (_, record) => renderItemStatus(record),
+          render: (_, _record) => renderItemStatus(_record),
         },
         {
           title: '下单时间',
@@ -71,8 +70,9 @@ const expandedRowRender = (
           key: 'operation',
           valueType: 'option',
           render: (_, _record) => {
-            // console.log(record);
-            const menuItems = todoService.orderOperation(_record, setNeedReload);
+            console.log(record);
+            const menuItems = orderOperation(activeKey, record, setNeedReload, _record);
+            console.log(menuItems);
             if (menuItems.length > 0) {
               return (
                 <Dropdown menu={{ items: menuItems }}>
@@ -84,11 +84,11 @@ const expandedRowRender = (
           },
         },
       ]}
-      rowKey="id"
+      rowKey={(record) => record.id}
       headerTitle={false}
       search={false}
       options={false}
-      dataSource={record.details}
+      dataSource={record?.Data?.details}
       pagination={false}
     />
   );
@@ -100,10 +100,11 @@ const expandedRowRender = (
  */
 const TodoOrg: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('5');
-  const [pageData, setPageData] = useState<XOrder[] | XOrderDetail[]>();
+  const [pageData, setPageData] = useState<IOrderApplyItem[] | IApprovalItem[]>();
   const [total, setPageTotal] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [needReload, setNeedReload] = useState<boolean>(false);
-  const buyColumns: ProColumns<XOrder>[] = [
+  const buyColumns: ProColumns<IOrderApplyItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -112,24 +113,24 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '订单号',
-      dataIndex: 'code',
+      dataIndex: ['Data', 'code'],
     },
     {
       title: '应用名称',
-      dataIndex: 'name',
+      dataIndex: ['Data', 'name'],
     },
     {
       title: '订单总价',
-      dataIndex: 'price',
+      dataIndex: ['Data', 'price'],
       valueType: 'money',
     },
     {
       title: '下单时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
   ];
-  const saleColumns: ProColumns<XOrderDetail>[] = [
+  const saleColumns: ProColumns<IApprovalItem>[] = [
     {
       title: '序号',
       dataIndex: 'index',
@@ -138,52 +139,58 @@ const TodoOrg: React.FC = () => {
     },
     {
       title: '订单号',
-      dataIndex: ['order', 'code'],
+      dataIndex: ['Data', 'order', 'code'],
     },
     {
       title: '应用名称',
-      dataIndex: 'caption',
+      dataIndex: ['Data', 'caption'],
     },
     {
       title: '市场名称',
-      dataIndex: ['merchandise', 'marketId'],
+      dataIndex: ['Data', 'merchandise', 'marketId'],
       // valueType: 'radio',
       // valueEnum: chat.getName,
     },
     {
       title: '买家',
-      dataIndex: ['order', 'belongId'],
+      dataIndex: ['Data', 'order', 'belongId'],
       // valueType: 'radio',
       // valueEnum: chat.nameMap,
     },
     {
       title: '售卖权属',
-      dataIndex: 'sellAuth',
+      dataIndex: ['Data', 'sellAuth'],
     },
     {
       title: '使用期限',
-      dataIndex: 'days',
+      dataIndex: ['Data', 'days'],
+      render: (_, record) => {
+        return record.Data.days ? _ : '无期限';
+      },
     },
     {
       title: '价格',
-      dataIndex: 'price',
+      dataIndex: ['Data', 'price'],
       valueType: 'money',
+      render: (_, record) => {
+        return record.Data.price ? _ : '免费';
+      },
     },
     {
       title: '状态',
       dataIndex: 'status',
-      render: (_, record) => renderItemStatus(record),
+      render: (_, record) => renderItemStatus(record.Data),
     },
     {
       title: '下单时间',
-      dataIndex: 'createTime',
+      dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
     },
     {
       title: '商品状态',
-      dataIndex: ['merchandise', 'status'],
+      dataIndex: ['Data', 'merchandise'],
       render: (_, record) => {
-        return record.merchandise ? (
+        return record?.Data.merchandise ? (
           <Tag color="processing">在售</Tag>
         ) : (
           <Tag color="danger">已下架</Tag>
@@ -192,46 +199,47 @@ const TodoOrg: React.FC = () => {
     },
   ];
   // 获取订单列表;
-  const loadList = () => {
-    console.log(todoService.currentList);
-    setPageData([...todoService.currentList]);
-    setPageTotal(todoService.currentList.length);
+  const loadList = async (current: number, pageSize: number) => {
+    const code = { '6': 'getApplyList', '5': 'getTodoList' };
+    const currentList = await todoCtrl.OrderTodo[code[activeKey]](needReload);
+    setCurrentPage(current);
+    const list = currentList.slice((current - 1) * pageSize, pageSize * current);
+    setPageData(list);
+    setPageTotal(currentList.length);
     setNeedReload(false);
   };
 
   useEffect(() => {
-    todoService.activeStatus = activeKey as tabStatus;
-    loadList();
+    loadList(1, 10);
   }, [activeKey, needReload]);
 
   return (
     <PageCard
-      tabList={todoService.orderTabs}
+      tabList={orderTabs}
       activeTabKey={activeKey}
       onTabChange={(key: string) => {
         setActiveKey(key as string);
       }}>
       {pageData && (
-        <CardOrTableComp<XOrder | XOrderDetail>
+        <CardOrTableComp<IOrderApplyItem | IApprovalItem>
           showChangeBtn={false}
-          rowKey={'id'}
+          rowKey={(record) => record?.Data?.id}
           columns={activeKey == '5' ? saleColumns : buyColumns}
           dataSource={pageData}
           expandable={
             activeKey == '6'
               ? {
-                  defaultExpandAllRows: true,
+                  // defaultExpandAllRows: true,
                   indentSize: 0,
-                  expandedRowRender: (record: any) =>
-                    expandedRowRender(record, setNeedReload),
+                  expandedRowRender: (record: IOrderApplyItem) =>
+                    expandedRowRender(activeKey, record, setNeedReload),
                 }
               : ''
           }
+          page={currentPage}
           total={total}
           onChange={loadList}
-          operation={(item: XOrder | XOrderDetail) =>
-            todoService.orderOperation(item, setNeedReload)
-          }
+          operation={(item) => orderOperation(activeKey, item, setNeedReload)}
         />
       )}
     </PageCard>

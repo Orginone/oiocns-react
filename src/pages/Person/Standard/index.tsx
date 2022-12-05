@@ -1,3 +1,4 @@
+import { Card } from 'antd';
 import React from 'react';
 
 /**
@@ -5,7 +6,7 @@ import React from 'react';
  * @returns
  */
 const PersonStandard: React.FC = () => {
-  return <h2>标准设置</h2>;
+  return <Card>标准设置</Card>;
 };
 
 export default PersonStandard;

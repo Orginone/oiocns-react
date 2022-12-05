@@ -1,34 +1,35 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Button, Typography, Col } from 'antd';
-import React, { useState } from 'react';
+import { Avatar, Button, Col, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 import './index.less';
 import { schema } from '../../../ts/base';
-interface defaultObjType {
-  name: string;
-  size: number | string;
-  type: string;
-  desc: string;
-  creatTime: string | number;
-}
-const { Text } = Typography;
-interface AppCardType {
+import Cohort from '@/ts/core/target/cohort';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+interface CohortCardType {
   data: schema.XTarget; //props
   className?: string;
-  defaultKey?: defaultObjType; // 卡片字段 对应数据字段
-  // eslint-disable-next-line no-unused-vars
-  // eslint-disable-next-line no-unused-vars
 }
-const defaultObj = {
-  name: 'name', //名称
-  size: 'size', //大小
-  type: 'type', //是否免费
-  desc: 'desc', //描述
-  typeName: 'typeName', //应用类型
-  creatTime: 'creatTime', //上架时间
-};
 
-const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) => {
-  const {} = { ...defaultObj, ...defaultKey };
+const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    getname();
+  }, []);
+
+  const getname = async () => {
+    const cohort = new Cohort(data);
+    const res = (await cohort.getMember(false)).filter((obj) => obj.id === data.belongId);
+    setName(res[0].team?.name!);
+  };
+  const applyCohort = async (data: schema.XTarget) => {
+    const res = await userCtrl.Space?.applyJoinCohort(data.id);
+    if (res?.success) {
+      message.success('发起申请成功');
+    } else {
+      message.error(res?.msg);
+    }
+  };
   /**
    * @desc: 操作按钮区域
    * @param {any} item - 表格单条数据 data
@@ -56,26 +57,23 @@ const CohortListCard: React.FC<AppCardType> = ({ className, data, defaultKey }) 
       <div className={`customCardWrap ${className}`}>
         <Title />
         <ul className="card-content">
-          {/* <li className="card-content-type con">
-          {data[typeName] ? <Tag>{data[typeName]}</Tag> : ''}
-        </li> */}
           <li className="card-content-date">
-            创建于 {data.createTime || '--'}
             <span style={{ float: 'right' }} className="app-size">
-              归属:apex
+              归属:{name}
             </span>
           </li>
           <li className="card-content-date">我的身份:管理员</li>
+          <li className="card-content-date">群组编号:{data.code}</li>
+
           <li className="card-content-date">
-            群组编号:{data.code}
+            <span>创建于 {data.createTime || '--'} </span>
             <Button
               style={{ float: 'right', border: 'none' }}
               icon={
                 <UsergroupAddOutlined style={{ fontSize: '25px', color: '#808080' }} />
               }
-              // onClick={onClick}
+              onClick={() => applyCohort(data)}
             />
-            {/* <UsergroupAddOutlined style={{ float: 'right', fontSize: '25px' }} /> */}
           </li>
         </ul>
       </div>

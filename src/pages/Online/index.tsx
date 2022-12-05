@@ -2,8 +2,8 @@ import cls from './index.module.less';
 
 import React, { useRef, useEffect, useState } from 'react';
 import usePostMessage from '@/hooks/usePostMessage';
-import { useLocation } from 'react-router-dom';
-import AppService from '@/module/appstore/app';
+import { useHistory, useLocation } from 'react-router-dom';
+import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 
 const Index: React.FC = () => {
   const ifmRef = useRef<any>(null);
@@ -11,13 +11,16 @@ const Index: React.FC = () => {
   const {
     state: { appId },
   } = useLocation<any>();
-
+  const history = useHistory();
+  const Resources = selfAppCtrl.curProduct!.resource || [];
   useEffect(() => {
-    AppService.getResource(appId).then((res) => {
-      setLink(res[0].link);
-      usePostMessage(ifmRef, {}, link);
-    });
+    if (Resources.length === 0) {
+      console.error('资源信息有误');
+      return history.goBack();
+    }
+    setLink(Resources[0].resource.link);
   }, [appId]);
+  usePostMessage(ifmRef, {}, Resources[0].resource.link);
 
   return (
     <>

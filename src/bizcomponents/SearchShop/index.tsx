@@ -3,16 +3,14 @@ import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import CommonClass from '@/module/commonClass/BaseServiceClass';
-import API from '@/services';
 import { MarketTypes } from 'typings/marketType';
 type CompanySearchTableProps = {
   [key: string]: any;
 };
-const Service = new CommonClass({
-  nameSpace: 'searchShop',
-  searchApi: API.market.searchOwn,
-});
+// const Service = new CommonClass({
+//   nameSpace: 'searchShop',
+//   searchApi: API.market.searchOwn,
+// });
 // 单位卡片渲染
 
 const ShopCardList = (dataSource: MarketTypes.MarketType[]) => {
@@ -43,12 +41,12 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = () => {
   const [dataSource, setDataSource] = useState<MarketTypes.MarketType[]>([]);
   // 查询数据
   const getList = async (searchKey?: string) => {
-    await Service.getList({
-      filter: searchKey, // || '91330304254498785G',
-      page: 1,
-      pageSize: 10,
-    });
-    setDataSource(Service.List);
+    // await Service.getList({
+    //   filter: searchKey, // || '91330304254498785G',
+    //   page: 1,
+    //   pageSize: 10,
+    // });
+    // setDataSource(Service.List);
   };
 
   return (

@@ -3,24 +3,24 @@ import { Avatar, Button, Card, Descriptions } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
-import useStore from '@/store';
 
-import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
-import PersonInfoDepartment from './Department';
 import cls from './index.module.less';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import PersonInfoDepartment from './Department';
+import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
+import { IPerson } from '@/ts/core/target/itarget';
 
 /**
  * 个人信息
  * @returns
  */
 const PersonInfo: React.FC = () => {
-  const { user } = useStore((state) => ({ ...state }));
-
+  const user = userCtrl.User;
   const [showDepartment, setShowDepartment] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(user);
-  }, []);
+    // 用户修改的时候 ，处理代码 头像
+  }, ['', userCtrl.User]);
 
   // 信息标题
   const title = (
@@ -42,12 +42,14 @@ const PersonInfo: React.FC = () => {
     <div className={cls['person-info-info']}>
       <Card bordered={false}>
         <Descriptions title={title} column={2}>
-          <Descriptions.Item label="昵称">deom</Descriptions.Item>
+          <Descriptions.Item label="昵称">{user!.target.name}</Descriptions.Item>
           {/* <Descriptions.Item label="性别">{}</Descriptions.Item>
           <Descriptions.Item label="邮箱">{}</Descriptions.Item> */}
-          <Descriptions.Item label="联系方式">1388888888888</Descriptions.Item>
-          <Descriptions.Item label="联系地址" span={2}>
-            {user.motto}
+          <Descriptions.Item label="联系方式">
+            {user!.target.team?.code}
+          </Descriptions.Item>
+          <Descriptions.Item label="座右铭" span={2}>
+            {user!.target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>

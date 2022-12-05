@@ -7,7 +7,7 @@ import { TargetType } from '../enum';
 import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { ICompany, IPerson, ICohort } from './itarget';
+import { ICompany, IPerson, ICohort, SpaceType } from './itarget';
 import { schema, faildResult, kernel, common } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
@@ -32,30 +32,46 @@ export default class Person extends MarketTarget implements IPerson {
     this.joinedFriend = [];
     this.joinedCohort = [];
     this.joinedCompany = [];
+    this.extendTargetType = [TargetType.Cohort, TargetType.Person];
   }
-  public async update(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<XTarget>> {
+  public get spaceData(): SpaceType {
+    return {
+      id: this.target.id,
+      name: '个人空间',
+      icon: this.target.avatar,
+      typeName: this.target.typeName as TargetType,
+    };
+  }
+  public async searchCohort(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Cohort]);
+  }
+  public async searchPerson(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, [TargetType.Person]);
+  }
+  public async searchCompany(code: string): Promise<ResultType<schema.XTargetArray>> {
+    return await this.searchTargetByName(code, consts.CompanyTypes);
+  }
+  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
     return await super.updateTarget(data);
   }
-  public async getJoinedCohorts(): Promise<ICohort[]> {
-    if (this.joinedCohort.length > 0) {
+  public getJoinedCohorts = async (reload: boolean): Promise<ICohort[]> => {
+    if (!reload && this.joinedCohort.length > 0) {
       return this.joinedCohort;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort]);
     console.log('输出返回结果', res);
-    if (res.success) {
+    if (res.success && res.data.result) {
       console.log('进入了');
       this.joinedCohort = [];
-      res.data.result?.forEach((a) => {
-        this.joinedCohort.push(new Cohort(a));
+      this.joinedCohort = res.data.result.map((a) => {
+        return new Cohort(a);
       });
     }
     console.log('输出结果', this.joinedCohort);
     return this.joinedCohort;
-  }
-  public async getJoinedCompanys(): Promise<ICompany[]> {
-    if (this.joinedCompany.length > 0) {
+  };
+  public async getJoinedCompanys(reload: boolean = false): Promise<ICompany[]> {
+    if (!reload && this.joinedCompany.length > 0) {
       return this.joinedCompany;
     }
     const res = await this.getjoinedTargets(consts.CompanyTypes);
@@ -85,6 +101,7 @@ export default class Person extends MarketTarget implements IPerson {
       ...data,
       teamCode: data.code,
       teamName: data.name,
+      belongId: this.target.id,
     });
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
@@ -94,16 +111,17 @@ export default class Person extends MarketTarget implements IPerson {
     return res;
   }
   public async createCompany(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<any>> {
+    data: Omit<TargetModel, 'id'>,
+  ): Promise<ResultType<schema.XTarget>> {
+    data.belongId = this.target.id;
     if (!consts.CompanyTypes.includes(<TargetType>data.typeName)) {
       return faildResult('您无法创建该类型单位!');
     }
     if (!validIsSocialCreditCode(data.code)) {
       return faildResult('请填写正确的代码!');
     }
-    const tres = await this.searchTargetByName(data.code, <TargetType>data.typeName);
-    if (!tres.data) {
+    const tres = await this.searchTargetByName(data.code, consts.CompanyTypes);
+    if (!tres.data.result) {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;
@@ -119,7 +137,7 @@ export default class Person extends MarketTarget implements IPerson {
             break;
         }
         this.joinedCompany.push(company);
-        return company.pullMember([this.target]);
+        company.pullMember([this.target]);
       }
       return res;
     } else {
@@ -132,8 +150,10 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Cohort,
       belongId: this.target.id,
     });
+    console.log('过滤前', this.joinedCohort);
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((a) => a.target.id != id);
+      console.log('过滤后', this.joinedCohort);
     }
     return res;
   }
@@ -171,6 +191,7 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async quitCohorts(id: string): Promise<ResultType<any>> {
     const res = await this.cancelJoinTeam(id);
+
     if (res.success) {
       this.joinedCohort = this.joinedCohort.filter((cohort) => {
         return cohort.target.id != id;
@@ -195,12 +216,12 @@ export default class Person extends MarketTarget implements IPerson {
     });
     return res;
   }
-  public async getFriends(): Promise<schema.XTarget[]> {
-    if (this.joinedFriend.length > 0) {
+  public async getFriends(reload: boolean = false): Promise<schema.XTarget[]> {
+    if (!reload && this.joinedFriend.length > 0) {
       return this.joinedFriend;
     }
     const res = await this.getSubTargets([TargetType.Person]);
-    if (res.success && res.data.result != undefined) {
+    if (res.success && res.data.result) {
       this.joinedFriend = res.data.result;
     }
 
@@ -279,11 +300,14 @@ export default class Person extends MarketTarget implements IPerson {
       belongId: this.target.id,
     });
   }
-  public async getUsefulProduct(): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct([TargetType.Cohort, TargetType.Person]);
+  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
+    return super.getUsefulProduct(reload);
   }
-  public async getUsefulResource(id: string): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, [TargetType.Cohort, TargetType.Person]);
+  public async getUsefulResource(
+    id: string,
+    reload: boolean = false,
+  ): Promise<schema.XResource[]> {
+    return super.getUsefulResource(id, reload);
   }
   public async resetPassword(
     password: string,

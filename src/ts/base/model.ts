@@ -447,8 +447,8 @@ export type OrderModel = {
   code: string;
   // 创建组织/个人
   belongId: string;
-  // 商品ID
-  merchandiseId: string;
+  // 商品ID集合
+  merchandiseIds: string[];
 };
 
 export type OrderModelByStags = {
@@ -495,7 +495,7 @@ export type ProductModel = {
   // 名称
   name: string;
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 编号
   code: string;
   // 元数据Id
@@ -512,19 +512,19 @@ export type ProductModel = {
 
 export type ResourceModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 编号
   code: string;
   // 名称
   name: string;
   // 产品ID
-  productId: string;
+  productId?: string;
   // 访问私钥
   privateKey: string;
   // 入口地址
   link: string;
   // 流程项
-  flows: string;
+  flows?: string;
   // 组件
   components: string;
 };
@@ -674,7 +674,7 @@ export type NameTypeModel = {
   // 名称
   name: string;
   // 类型名
-  typeName: string;
+  typeNames: string[];
   // 分页
   page: PageRequest | undefined;
 };
@@ -755,6 +755,75 @@ export type FlowInstanceModel = {
   hook: string;
 };
 
+export type CreateDefineReq = {
+  // 唯一Id
+  Id: string;
+  // 名称
+  Name: string;
+  // 编号
+  Code: string;
+  // 备注
+  Remark: string;
+  // 节点信息
+  Resource: FlowNode;
+  // 归属Id
+  BelongId: string;
+};
+
+export type FlowNode = {
+  Id: string;
+  NodeId: string;
+  ParentId: string;
+  Type: string;
+  Name: string;
+  Desc: string;
+  Props: Prop;
+  Children: FlowNode;
+  Branches: Branche[];
+};
+
+export type Branche = {
+  Id: string;
+  NodeId: string;
+  ParentId: string;
+  Name: string;
+  Type: string;
+  Conditions: Condition[];
+  Children: FlowNode;
+};
+
+export type Condition = {
+  Pos: number;
+  ParamKey: string;
+  ParamLabel: string;
+  Key: string;
+  Label: string;
+  Type: string;
+  Val: string;
+  ValLabel: string;
+};
+
+export type Prop = {
+  AssignedType: string;
+  Mode: string;
+  AssignedUser: Assigned[];
+  Refuse: Refuse;
+  FriendDialogmode: boolean;
+  Num: number;
+};
+
+export type Assigned = {
+  Id: string;
+  Name: string;
+  Type: string;
+  OrgIds: string;
+};
+
+export type Refuse = {
+  Type: string;
+  Target: string;
+};
+
 export type FlowRelationModel = {
   //流程定义Id
   defineId: string;
@@ -786,19 +855,26 @@ export type ApprovalTaskReq = {
   comment: string;
 };
 /**
- * 文件系统项数据模型
+ * 文件系统项分享数据
  */
-export type FileItemModel = {
+export type FileItemShare = {
+  /** 完整路径 */
+  size: number;
   /** 名称 */
   name: string;
-  /** 完整路径 */
-  key: string;
   /** 共享链接 */
   shareLink: string;
   /** 拓展名 */
   extension: string;
   /** 缩略图 */
   thumbnail: string;
+};
+/**
+ * 文件系统项数据模型
+ */
+export type FileItemModel = {
+  /** 完整路径 */
+  key: string;
   /** 创建时间 */
   dateCreated: Date;
   /** 修改时间 */
@@ -809,7 +885,7 @@ export type FileItemModel = {
   isDirectory: boolean;
   /** 是否包含子目录 */
   hasSubDirectories: boolean;
-};
+} & FileItemShare;
 
 /** 桶支持的操作 */
 export enum BucketOpreates {
