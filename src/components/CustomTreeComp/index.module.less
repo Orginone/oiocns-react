@@ -5,7 +5,9 @@
     .ogo-tree .ogo-tree-treenode-draggable .ogo-tree-draggable-icon {
       display: none;
     }
-
+    :global(.ogo-input-affix-wrapper) {
+      border-radius: 20px;
+    }
     .ogo-tree .ogo-tree-node-content-wrapper.ogo-tree-node-selected {
       background-color: #f2f6fc;
     }
@@ -27,20 +29,7 @@
     .anticon {
       margin-right: 2px;
     }
-
-    // .ogo-tree-switcher-noop {
-    //   display: none;
-    // }
-    // .ogo-tree-node-content-wrapper{
-    //   padding-left: 10px !important;
-    // }
   }
-
-  // .container {
-  //   padding-left: 18px;
-  //   padding-right: 6px;
-  // }
-
   .top {
     height: 40px;
   }
@@ -55,19 +44,19 @@
   .treeTitleBox {
     display: flex;
     justify-content: space-between;
-    // margin-right: 6px;
     width: 100%;
-    &Label {
-    }
   }
 
   .titleIcon {
     &:nth-of-type(2) {
       font-size: 17px;
     }
-
     &:hover {
       color: @primary-color;
     }
+  }
+  .titleTag {
+    transform: scale(0.8);
+    margin-right: 0;
   }
 }
