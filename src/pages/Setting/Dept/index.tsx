@@ -18,7 +18,7 @@ import Department from '@/ts/core/target/department';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { RouteComponentProps } from 'react-router-dom';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-// import { IDepartment } from '@/ts/core/target/itarget';
+import IndentityModal from '@/bizcomponents/Indentity/index';
 
 /**
  * 内设机构
@@ -37,7 +37,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
   const [SelectDept, setSelectDept] = useState<schema.XTarget>();
   const [authorityTree, setAuthorityTree] = useState<IAuthority>();
-
+  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -218,6 +218,13 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           编辑
         </Button>
         <Button type="link">权限管理</Button>
+        <Button
+          type="link"
+          onClick={() => {
+            setIsOpenIndentity(true);
+          }}>
+          岗位设置
+        </Button>
       </div>
     </div>
   );
@@ -366,6 +373,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         handleMenuClick={handleMenuClick}
         currentKey={''}
       />
+      <IndentityModal open={isOpenIndentity} onCancel={() => setIsOpenIndentity(false)} />
     </div>
   );
 };

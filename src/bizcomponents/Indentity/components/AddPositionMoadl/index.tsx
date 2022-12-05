@@ -8,15 +8,22 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  *
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, message } from 'antd';
-import type { ProFormColumnsType } from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import {
+  IDepartment,
+  IPerson,
+  IGroup,
+  ICompany,
+  ICohort,
+} from '@/ts/core/target/itarget';
 // import UploadAvatar from '../UploadAvatar';
 
 /* 
@@ -27,35 +34,19 @@ interface Iprops {
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
-  handleCancel: () => void;
-  selectId?: string;
-  defaultData: IIdentity;
-  callback: Function;
+  authTree: IAuthority[] | undefined;
+  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
 }
-
-type DataItem = {
-  name: string;
-  state: string;
-};
-
-// initialValues={item}
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId, callback, defaultData } =
-    props;
-  const [authTree, setAuthTree] = useState<IAuthority>();
-  useEffect(() => {
-    authTreeData();
-  }, []);
-  const authTreeData = async () => {
-    const res = await userCtrl.Company.selectAuthorityTree(false);
-    setAuthTree(res);
-  };
-  const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
+  const { open, title, onOk, handleOk, authTree, reObject } = props;
+
+  useEffect(() => {}, []);
+  const getColumn = (): ProFormColumnsType<IIdentity>[] => {
+    console.log(authTree);
     const columns: ProFormColumnsType<IIdentity>[] = [
       {
         title: '岗位名称',
         dataIndex: 'name',
-        initialValue: target ? target.target.name : '',
         formItemProps: {
           rules: [
             {
@@ -69,7 +60,6 @@ const EditCustomModal = (props: Iprops) => {
       {
         title: '岗位编号',
         dataIndex: 'code',
-        initialValue: target ? target.target.code : '',
         formItemProps: {
           rules: [
             {
@@ -81,22 +71,21 @@ const EditCustomModal = (props: Iprops) => {
         width: 'm',
       },
       {
-        title: '所属身份',
-        dataIndex: 'id',
+        title: '所属角色',
+        key: 'authId',
+        dataIndex: 'authId',
+        width: 300,
         valueType: 'treeSelect',
-        width: 'm',
+        request: async () => authTree || [],
         fieldProps: {
-          options: [authTree],
-          disabled: true,
           fieldNames: {
-            children: 'children',
             label: 'name',
             value: 'id',
           },
           showSearch: true,
           filterTreeNode: true,
-          treeNodeFilterProp: 'name',
           // multiple: true,
+          treeNodeFilterProp: 'name',
           treeDefaultExpandAll: true,
         },
       },
@@ -104,7 +93,6 @@ const EditCustomModal = (props: Iprops) => {
         title: '岗位简介',
         dataIndex: 'remark',
         valueType: 'textarea',
-        initialValue: target ? target.target.remark : '',
         width: 'm',
       },
       {
@@ -127,20 +115,16 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            const res = await defaultData.updateIdentity(
-              values.name,
-              values.code,
-              values.remark,
-            );
-            if (res.success) {
-              callback();
-              message.success('修改成功');
-            } else {
-              message.error(res.msg);
-            }
+            await reObject.createIdentity({
+              name: values.name,
+              code: values.code,
+              remark: values.remark,
+              authId: values.authId,
+            });
+            message.success('操作成功');
             onOk();
           }}
-          columns={getColumn(defaultData)}
+          columns={getColumn()}
         />
       </Modal>
     </div>
