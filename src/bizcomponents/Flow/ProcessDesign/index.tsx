@@ -53,12 +53,12 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData, editorValu
         props: {},
         type: 'CONDITIONS',
         name: '条件分支',
-        children: {
-          nodeId: 'node_590719747331',
-          parentId: 'node_590719745693',
-          type: 'EMPTY',
-          children: {},
-        },
+        // children: {
+        //   nodeId: 'node_590719747331',
+        //   parentId: 'node_590719745693',
+        //   type: 'EMPTY',
+        //   children: {},
+        // },
       },
     },
   };
@@ -73,6 +73,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData, editorValu
     } else {
       DefaultProps.setFormFields(conditionData?.labels);
       defaultDesign.remark = JSON.stringify(conditionData?.labels);
+      defaultDesign.name = JSON.stringify(conditionData?.name);
       tempDesign = JSON.parse(JSON.stringify(defaultDesign));
     }
     // setOldDesign(tempDesign);

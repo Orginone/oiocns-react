@@ -106,19 +106,29 @@ const PersonCustomModal = (props: Iprops) => {
         setCenterTreeData(result ? result : []);
         break;
       }
-      case 4:
-        {
-          let action = 'getMember';
-          if (info.node.typeName === '集团') {
-            //集团下 查单位
-            action = 'getCompanys';
-          } else if (info.node.typeName === '部门') {
-            action = 'getPerson';
-          }
-          const res3 = await info?.node?.node[action]();
-          setCenterTreeData(res3 || []);
-        }
+      case 4: {
+        // let action = 'getMember';
+        // if (info.node.typeName === '集团') {
+        //   //集团下 查单位
+        //   action = 'getCompanys';
+        // } else if (info.node.typeName === '部门') {
+        //   action = 'getPerson';
+        // }
+        // const res3 = await info?.node?.node[action]();
+        // setCenterTreeData(res3 || []);
+        const res2 = await kernel.queryTargetIdentitys({
+          id: info.node.id,
+          page: {
+            limit: pageCurrent.limit,
+            offset: pageCurrent.offset,
+            filter: '',
+          },
+        });
+        console.log('res2', res2);
+        const { result = [] } = res2.data;
+        setCenterTreeData(result ? result : []);
         break;
+      }
       default:
         break;
     }
