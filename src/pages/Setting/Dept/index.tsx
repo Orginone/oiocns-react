@@ -71,7 +71,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         label: '移出部门',
         onClick: async () => {
           if (selectPerson && SelectDept) {
-            const { success } = await SelectDept.removePerson(item.id);
+            const { success } = await SelectDept.removePerson([item.id]);
             if (success) {
               message.success('添加成功');
               userCtrl.changCallback();
@@ -155,7 +155,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       }
     });
   };
-
   const onApplyOk = () => {
     setLookApplyOpen(false);
   };
@@ -235,7 +234,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           <CardOrTable<schema.XTarget>
             dataSource={dataSource}
             rowKey={'id'}
-            operation={(item: schema.XTarget) => renderOperation}
+            operation={renderOperation}
             columns={columns}
             parentRef={parentRef}
             showChangeBtn={false}
@@ -311,17 +310,19 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         handleOk={handleOk}
       />
       {/* 对象设置 */}
-      <AddPostModal
-        title={'权限设置'}
-        open={isSetPost}
-        onOk={() => {
-          setIsSetPost(false);
-        }}
-        handleOk={() => {
-          setIsSetPost(false);
-        }}
-        datasource={authorityTree}
-      />
+      {authorityTree && (
+        <AddPostModal
+          title={'权限设置'}
+          open={isSetPost}
+          onOk={() => {
+            setIsSetPost(false);
+          }}
+          handleOk={() => {
+            setIsSetPost(false);
+          }}
+          datasource={authorityTree}
+        />
+      )}
       {/* 左侧树 */}
       <TreeLeftDeptPage
         setCurrent={setTreeCurrent}
