@@ -85,7 +85,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: IDepartment | undefined, pid?: string) => {
-    if (!item) return;
     switch (key) {
       case 'new':
         setting.setCurrTreeDeptNode('');
@@ -94,6 +93,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         setIsOpenModal(true);
         break;
       case '新增部门':
+        if (!item) return;
         setEditDept(item);
         setCreateOrEdit('新增');
         setSelectId(item.target.id);
@@ -103,6 +103,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       case 'changeDept': //变更部门
         break;
       case 'updateDept': // 编辑部门
+        if (!item) return;
         setCreateOrEdit('编辑');
         setEditDept(item);
         setSelectId(item.target.id);
