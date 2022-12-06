@@ -288,8 +288,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       id: undefined,
       belongId: this.target.id,
     });
-    if (res.success) {
-      this.ownProducts.push(new Product(res.data!));
+    if (res.success && res.data) {
+      this.ownProducts.push(new Product(res.data));
     }
     return res;
   };
