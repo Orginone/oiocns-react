@@ -15,6 +15,7 @@ import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
+import BindModal from './BindModal';
 const { Header, Content } = Layout;
 
 /**
@@ -55,6 +56,9 @@ const SettingFlow: React.FC = () => {
     labels: [],
   });
 
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [bindAppMes, setBindAppMes] = useState({});
+
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -91,13 +95,19 @@ const SettingFlow: React.FC = () => {
       key: 'option',
       render: (text, record: FlowItem) => [
         <a
+          onClick={() => {
+            setIsOpenModal(true);
+            setBindAppMes(record);
+          }}>
+          绑定应用
+        </a>,
+        <a
           key="editor"
           onClick={() => {
             setTabType(TabType.PROCESSDESIGN);
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
             const editorDataMes = JSON.parse(record?.content || '{}');
-
             setConditionData({
               name: editorDataMes.name,
               labels: JSON.parse(editorDataMes.remark),
@@ -113,7 +123,6 @@ const SettingFlow: React.FC = () => {
               content: '确定删除当前流程吗',
               onOk: async () => {
                 const currentData = await userCtrl.Space.deleteDefine(record?.id);
-
                 if (currentData) {
                   initData();
                   message.success('删除成功');
@@ -304,6 +313,7 @@ const SettingFlow: React.FC = () => {
           </div>
         )}
       </Card>
+      <BindModal isOpen={isOpenModal} bindAppMes={bindAppMes} />
     </div>
   );
 };
