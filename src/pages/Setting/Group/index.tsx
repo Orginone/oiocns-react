@@ -248,13 +248,20 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       </div>
     </div>
   );
+
   // 集团信息内容
   const content = (
     <div className={cls['company-group-content']}>
       <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}>
+        <Descriptions
+          size="middle"
+          title={title}
+          bordered
+          column={2}
+          labelStyle={{ textAlign: 'center', color: '#606266' }}
+          contentStyle={{ textAlign: 'center', color: '#606266' }}>
           <Descriptions.Item label="集团名称" contentStyle={{ width: '30%' }}>
-            {currentGroup?.target.name}
+            <strong>{currentGroup?.target.name}</strong>
           </Descriptions.Item>
           <Descriptions.Item label="集团编码" contentStyle={{ width: '30%' }}>
             {currentGroup?.target.code}

@@ -59,16 +59,19 @@ type CreateGroupPropsType = {
   [key: string]: any;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({
-  createTitle,
-  handleMenuClick,
-  setCurrent,
-}) => {
+const Creategroup: React.FC<CreateGroupPropsType> = (
+  { createTitle, handleMenuClick, setCurrent },
+  { history },
+) => {
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    initData(false);
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    } else {
+      initData(false);
+    }
   }, [key]);
 
   const initData = async (reload: boolean) => {
