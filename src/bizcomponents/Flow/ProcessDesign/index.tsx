@@ -21,8 +21,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   editorValue,
   designData,
 }) => {
-  console.log('designData', designData);
-  // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
   const previewRef: any = useRef();
@@ -69,14 +67,16 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   const startDesign = async () => {
     let tempDesign;
-    console.log('editorValue', editorValue);
     if (editorValue && editorValue !== '{}') {
       tempDesign = JSON.parse(editorValue);
-      DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
+      if (conditionData?.labels) {
+        DefaultProps.setFormFields(conditionData?.labels);
+      } else {
+        DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
+      }
     } else {
       console.log('designData_____', designData);
       if (!designData) {
-        console.log('走这里了没');
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
         defaultDesign.name = conditionData?.name;

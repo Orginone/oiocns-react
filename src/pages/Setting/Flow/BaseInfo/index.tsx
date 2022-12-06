@@ -27,7 +27,6 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
       <ProForm
         layout="horizontal"
         onValuesChange={async () => {
-          console.log('await form.getFieldsValue()', await form.getFieldsValue());
           onChange(await form.getFieldsValue());
         }}
         form={form}
