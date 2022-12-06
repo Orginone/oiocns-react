@@ -1,15 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
-<<<<<<< HEAD
-
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { EventContext } from '../../../const';
-
-=======
-import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { deepClone } from '@/ts/base/common';
->>>>>>> personal/zhangqiang
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};

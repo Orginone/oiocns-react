@@ -4,11 +4,7 @@ import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-<<<<<<< HEAD
 import { EventContext } from '../const';
-=======
-
->>>>>>> personal/zhangqiang
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string; labels: [] };
