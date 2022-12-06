@@ -1,8 +1,6 @@
 import { schema, kernel, model, common } from '../../base';
 import { TargetType, MessageType } from '../enum';
-import { StringPako } from '@/utils/package';
 import { ChatCache, IChat } from './ichat';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -21,8 +19,9 @@ class BaseChat implements IChat {
   persons: schema.XTarget[];
   personCount: number;
   noReadCount: number;
+  userId: string;
   lastMessage: schema.XImMsg | undefined;
-  constructor(id: string, name: string, m: model.ChatModel) {
+  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     this.spaceId = id;
     this.spaceName = name;
     this.target = m;
@@ -32,6 +31,7 @@ class BaseChat implements IChat {
     this.chatId = m.id;
     this.noReadCount = 0;
     this.isToping = false;
+    this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
   }
   getCache(): ChatCache {
@@ -54,7 +54,7 @@ class BaseChat implements IChat {
     this.lastMessage = cache.lastMessage;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.spaceId === userCtrl.User.target.id) {
+    if (this.spaceId === this.userId) {
       const res = await kernel.anystore.remove(
         hisMsgCollName,
         {
@@ -71,7 +71,7 @@ class BaseChat implements IChat {
     return false;
   }
   async deleteMessage(id: string): Promise<boolean> {
-    if (this.spaceId === userCtrl.User.target.id!) {
+    if (this.spaceId === this.userId) {
       const res = await kernel.anystore.remove(
         hisMsgCollName,
         {
@@ -109,8 +109,8 @@ class BaseChat implements IChat {
       msgType: type,
       toId: this.target.id,
       spaceId: this.spaceId,
-      fromId: userCtrl.User.target.id!,
-      msgBody: StringPako.deflate(text),
+      fromId: this.userId,
+      msgBody: common.StringPako.deflate(text),
     });
     return res.success;
   }
@@ -119,7 +119,7 @@ class BaseChat implements IChat {
       if (msg.msgType === 'recall') {
         msg.showTxt = '撤回一条消息';
         msg.allowEdit = true;
-        msg.msgBody = StringPako.inflate(msg.msgBody);
+        msg.msgBody = common.StringPako.inflate(msg.msgBody);
         const index = this.messages.findIndex((m) => {
           return m.id === msg.id;
         });
@@ -127,7 +127,7 @@ class BaseChat implements IChat {
           this.messages[index] = msg;
         }
       } else {
-        msg.showTxt = StringPako.inflate(msg.msgBody);
+        msg.showTxt = common.StringPako.inflate(msg.msgBody);
         this.messages.push(msg);
       }
       this.noReadCount += noread ? 1 : 0;
@@ -139,7 +139,7 @@ class BaseChat implements IChat {
       if (item.chatId) {
         item.id = item.chatId;
       }
-      item.showTxt = StringPako.inflate(item.msgBody);
+      item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
   }
@@ -169,11 +169,11 @@ class BaseChat implements IChat {
  * 人员会话
  */
 class PersonChat extends BaseChat {
-  constructor(id: string, name: string, m: model.ChatModel) {
-    super(id, name, m);
+  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
+    super(id, name, m, userId);
   }
   override async moreMessage(filter: string): Promise<void> {
-    if (this.spaceId === userCtrl.User.target.id) {
+    if (this.spaceId === this.userId) {
       await this.loadCacheMessages();
     } else {
       let res = await kernel.queryFriendImMsgs({
@@ -196,11 +196,11 @@ class PersonChat extends BaseChat {
  * 群会话
  */
 class CohortChat extends BaseChat {
-  constructor(id: string, name: string, m: model.ChatModel) {
-    super(id, name, m);
+  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
+    super(id, name, m, userId);
   }
   override async moreMessage(filter: string): Promise<void> {
-    if (this.spaceId === userCtrl.User.target.id) {
+    if (this.spaceId === this.userId) {
       await this.loadCacheMessages();
     } else {
       const res = await kernel.queryCohortImMsgs({
@@ -237,10 +237,15 @@ class CohortChat extends BaseChat {
   }
 }
 
-export const CreateChat = (id: string, name: string, m: model.ChatModel): IChat => {
+export const CreateChat = (
+  id: string,
+  name: string,
+  m: model.ChatModel,
+  userId: string,
+): IChat => {
   if (m.typeName === TargetType.Person) {
-    return new PersonChat(id, name, m);
+    return new PersonChat(id, name, m, userId);
   } else {
-    return new CohortChat(id, name, m);
+    return new CohortChat(id, name, m, userId);
   }
 };

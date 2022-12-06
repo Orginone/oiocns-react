@@ -1,4 +1,3 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import consts from '../consts';
 import BaseTarget from './base';
 import { ResultType, TargetModel } from '@/ts/base/model';
@@ -45,7 +44,7 @@ export default class Group extends BaseTarget implements IGroup {
     if (!tres.data.result) {
       const res = await this.createTarget({
         ...data,
-        belongId: userCtrl.Company.target.id,
+        belongId: this.target.belongId,
       });
       if (res.success) {
         const group = new Group(res.data);
