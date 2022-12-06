@@ -30,7 +30,9 @@ class MarketController extends BaseController {
   /** 加入购物车商品 */
   public JoinShopingCar: any[] = [];
   /** 购物车商品列表 */
-  private _shopinglist: any[] = []; //缓存树形数据
+  private _shopinglist: any[] = [];
+  /** 购买商品的id合集 */
+  private _shopingIds: string[] = [];
 
   constructor() {
     super();
@@ -168,10 +170,11 @@ class MarketController extends BaseController {
   };
 
   /**
-   * @description: 添加/删除 购物车
+   * @description: 添加商品进购物车
+   * @param {any} data
    * @return {*}
    */
-  public joinOrdeleApply = async (data: any) => {
+  public joinApply = async (data: any) => {
     if (this._shopinglist.length === 0) {
       this._shopinglist.push(data);
       message.success('已加入购物车');
@@ -182,14 +185,57 @@ class MarketController extends BaseController {
       this._shopinglist.push(data);
       message.success('已加入购物车');
     }
-    this.cacheJoinShopingCar(this._shopinglist);
+    this.cacheJoinOrDeleShopingCar(this._shopinglist);
   };
 
   /**
-   * 缓存 加入购物车的商品
+   * @description: 删除购物车内的商品
+   * @param {any} data
+   * @return {*}
+   */
+  public deleApply = async (data: any) => {
+    if (this._shopinglist.length > 0) {
+      let arrs = this._shopinglist.filter(
+        (item) => !data.some((ele: any) => ele.id === item.id),
+      );
+      this._shopinglist = arrs;
+      this.cacheJoinOrDeleShopingCar(this._shopinglist);
+    }
+  };
+
+  /**
+   * @description: 购买商品
+   * @param {any} data
+   * @return {*}
+   */
+  public buyShoping = async (data: any) => {
+    data.forEach((item: any) => {
+      this._shopingIds.push(item?.id);
+    });
+    const res = await this._curMarket?.createOrder(
+      '',
+      'order',
+      'code',
+      userCtrl.Space?.target?.id,
+      this._shopingIds,
+    );
+    if (res?.code === 400) {
+      message.warning(res.msg);
+    } else if (res?.code === 200) {
+      let arrs = this._shopinglist.filter(
+        (item) => !data.some((ele: any) => ele.id === item.id),
+      );
+      this._shopinglist = arrs;
+      this.cacheJoinOrDeleShopingCar(this._shopinglist);
+      message.success('下单成功');
+    }
+  };
+
+  /**
+   * 缓存 加入/删除购物车的商品
    * @param message 新消息，无则为空
    */
-  public cacheJoinShopingCar = (data: any): void => {
+  public cacheJoinOrDeleShopingCar = (data: any): void => {
     this.changCallbackPart(MarketCallBackTypes.ApplyData);
     kernel.anystore.set(
       JOIN_SHOPING_CAR,
