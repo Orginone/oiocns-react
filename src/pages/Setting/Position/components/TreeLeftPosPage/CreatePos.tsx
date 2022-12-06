@@ -1,5 +1,4 @@
 import { Button } from 'antd';
-import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
@@ -8,7 +7,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-/*由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
@@ -17,21 +15,6 @@ type CreateGroupPropsType = {
   // 点击操作触发的事件
   indentitys: IIdentity[];
 };
-
-const items: DataNode[] = [
-  {
-    title: '管理员',
-    key: 'super-manager',
-    icon: <UserOutlined />,
-    children: [],
-  },
-  {
-    title: '管理员2',
-    key: 'super-manager2',
-    icon: <UserOutlined />,
-    children: [],
-  },
-];
 type target = {
   title: string;
   key: string;
@@ -68,8 +51,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     }
     return result;
   };
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
 
   const handleMenuClick = (key: string, data: target) => {
     // 触发内容去变化
@@ -111,12 +92,12 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           onClick={() => {
             setIsOpenModal(true);
           }}>
-          新增身份
+          新增岗位
         </Button>
         {positionList}
       </div>
       <AddPosttionModal
-        title={'新增身份'}
+        title={'新增岗位'}
         open={isOpenModal}
         onOk={close}
         handleOk={close}

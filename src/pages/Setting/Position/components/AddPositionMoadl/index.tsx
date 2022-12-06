@@ -66,34 +66,6 @@ const EditCustomModal = (props: Iprops) => {
         },
         width: 'm',
       },
-      {
-        title: '所属角色',
-        key: 'authId',
-        dataIndex: 'authId',
-        width: 300,
-        valueType: 'treeSelect',
-        request: async () => authTree || [],
-        fieldProps: {
-          fieldNames: {
-            label: 'name',
-            value: 'id',
-          },
-          showSearch: true,
-          filterTreeNode: true,
-          // multiple: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
-        },
-      },
-      {
-        title: '岗位简介',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        width: 'm',
-      },
-      {
-        valueType: 'divider',
-      },
     ];
     return columns;
   };
@@ -111,14 +83,7 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            await userCtrl.Company.createIdentity({
-              name: values.name,
-              code: values.code,
-              remark: values.remark,
-              authId: values.authId,
-            });
-            message.success('操作成功');
-            onOk();
+            console.log('fish================', values);
           }}
           columns={getColumn()}
         />

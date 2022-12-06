@@ -9,15 +9,12 @@
  *
  */
 import React, { useEffect, useState } from 'react';
-import { Modal, message } from 'antd';
+import { Modal } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
-// import UploadAvatar from '../UploadAvatar';
 
 /* 
   编辑
@@ -33,23 +30,10 @@ interface Iprops {
   callback: Function;
 }
 
-type DataItem = {
-  name: string;
-  state: string;
-};
-
-// initialValues={item}
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId, callback, defaultData } =
-    props;
-  const [authTree, setAuthTree] = useState<IAuthority>();
-  useEffect(() => {
-    authTreeData();
-  }, []);
-  const authTreeData = async () => {
-    const res = await userCtrl.Company.selectAuthorityTree(false);
-    setAuthTree(res);
-  };
+  const { open, title, onOk, handleOk, defaultData } = props;
+  useEffect(() => {}, []);
+
   const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
     const columns: ProFormColumnsType<IIdentity>[] = [
       {
@@ -81,33 +65,6 @@ const EditCustomModal = (props: Iprops) => {
         width: 'm',
       },
       {
-        title: '所属身份',
-        dataIndex: 'id',
-        valueType: 'treeSelect',
-        width: 'm',
-        fieldProps: {
-          options: [authTree],
-          disabled: true,
-          fieldNames: {
-            children: 'children',
-            label: 'name',
-            value: 'id',
-          },
-          showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'name',
-          // multiple: true,
-          treeDefaultExpandAll: true,
-        },
-      },
-      {
-        title: '岗位简介',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        initialValue: target ? target.target.remark : '',
-        width: 'm',
-      },
-      {
         valueType: 'divider',
       },
     ];
@@ -127,17 +84,7 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            const res = await defaultData.updateIdentity(
-              values.name,
-              values.code,
-              values.remark,
-            );
-            if (res.success) {
-              callback();
-              message.success('修改成功');
-            } else {
-              message.error(res.msg);
-            }
+            console.log('onfinsh====================', values);
             onOk();
           }}
           columns={getColumn(defaultData)}
