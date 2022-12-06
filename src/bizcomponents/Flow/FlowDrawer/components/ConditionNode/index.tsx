@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button } from 'antd';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import { Button, message } from 'antd';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import ConditionGroupItemConfig from '@/bizcomponents/Flow/FlowDrawer/components/ConditionGroupItemConfig';
 
 /**
@@ -14,16 +14,19 @@ const ConditionNode = () => {
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
-    console.timeLog('selectedNode.conditions', selectedNode.conditions);
-    selectedNode.conditions?.push({
-      pos: selectedNode.conditions.length + 1,
-      paramKey: '',
-      paramLabel: '',
-      key: '',
-      label: '',
-      type: 'NUMERIC',
-      val: null,
-    });
+    if (DefaultProps.getFormFields().length > 0) {
+      selectedNode.conditions?.push({
+        pos: selectedNode.conditions.length + 1,
+        paramKey: '',
+        paramLabel: '',
+        key: '',
+        label: '',
+        type: 'NUMERIC',
+        val: null,
+      });
+    } else {
+      message.warning('你还未设置条件，请到基本信息填写条件字段');
+    }
 
     setSelectedNode(selectedNode);
     setKey(key + 1);
@@ -31,7 +34,7 @@ const ConditionNode = () => {
 
   return (
     <div>
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <Button type="primary" onClick={addConditionGroup}>
           添加条件
         </Button>

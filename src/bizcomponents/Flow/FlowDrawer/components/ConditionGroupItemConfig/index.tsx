@@ -106,7 +106,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 // options={conditionData?.labels || []}
                 options={DefaultProps.getFormFields()}
                 onChange={(val, option) => {
-                  console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
                 }}
                 defaultValue={condition.paramKey || null}

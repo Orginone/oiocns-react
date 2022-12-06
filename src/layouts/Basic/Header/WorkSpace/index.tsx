@@ -27,6 +27,8 @@ const OrganizationalUnits = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
+  const [joinKey, setJoinKey] = useState<string>('');
+
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -223,15 +225,31 @@ const OrganizationalUnits = () => {
         open={showModal}
         bodyStyle={{ padding: 0 }}
         okText="确定加入"
-        onOk={() => {
-          console.log(`确定按钮`);
+        onOk={async () => {
+          // 加入单位
           setShowModal(false);
+          if (joinKey == '') {
+            message.error('请选中要加入的单位！');
+          } else {
+            let thisSelectKey = joinKey;
+            // code msg success
+            const responseObj = await userCtrl.User.applyJoinCompany(
+              thisSelectKey,
+              TargetType.Company,
+            );
+
+            if (responseObj.success) {
+              message.info('申请加入单位成功!');
+            } else {
+              message.error('申请加入单位失败：' + responseObj.msg);
+            }
+          }
         }}
         onCancel={() => {
           console.log(`取消按钮`);
           setShowModal(false);
         }}>
-        <SearchCompany />
+        <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey} />
       </Modal>
     </div>
   );
