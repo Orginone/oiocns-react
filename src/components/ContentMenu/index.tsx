@@ -24,8 +24,7 @@ interface MemuItemType {
   [key: string]: any;
 }
 /**检查当前路由是否是子路由，如果有则显示当前级菜单否则为主菜单 */
-const checkRoute = (hashPath: string, routeMenu: MemuItemType[]) => {
-  const currentPath = hashPath.replace('#', '');
+const checkRoute = (currentPath: string, routeMenu: MemuItemType[]) => {
   const current = routeMenu.find((n) => n.key === currentPath);
   if (current && !current.fathKey && current.render) return current; // 当前路由自定义子路由
   if (!current || !current.fathKey) return null; // 不是子路由
@@ -82,13 +81,17 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     if (props.location?.state?.refresh) {
       loadPrvMenu();
     }
-    setActiveMenu(location.hash.replace('#', ''));
-    const current = checkRoute(location.hash, menuFlat);
+    freshMenu(location.hash.replace('#', ''));
+  }, [location.hash, menuData]);
+  // 触发菜单是否刷新
+  const freshMenu = (newRouter: string) => {
+    setActiveMenu(newRouter);
+    const current = checkRoute(newRouter, menuFlat);
     setCurrent(current);
     if (menuData) {
       listenPrev(current);
     }
-  }, [location.hash, menuData]);
+  };
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
@@ -126,14 +129,17 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         listenPrev(current!);
       }
       if (nextRoute && nextRoute.key) {
-        props.history.push(nextRoute?.key);
+        if (location.hash.replace('#', '') !== nextRoute?.key) {
+          props.history.push(nextRoute?.key);
+        } else {
+          freshMenu(nextRoute?.key);
+        }
       }
     } else {
       if (current!.render) {
         listenPrev(current!);
         console.log('current!.key', current!.key);
         current!.key && props.history.push(current!.key);
-        // listenPrev({ fathKey: location.hash });
       }
     }
   };
