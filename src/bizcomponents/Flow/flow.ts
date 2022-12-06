@@ -1,5 +1,5 @@
 import create from 'zustand';
-
+import { Context, createContext } from 'react';
 // type appwfState = {
 //   nodeMap: Record<string, any>;
 //   isEdit: null;
@@ -43,6 +43,8 @@ export const CONDITION_PROPS: Approvalprops = {
   ],
   expression: '', //自定义表达式，灵活构建逻辑关系
 };
+
+export const EventContext: any = createContext({} as { FlowSub: any; conditionData: {} });
 
 //条件节点 条件数组
 export const CONDITION_CONDITIONS: Approvalprops = {
@@ -244,6 +246,7 @@ export const useAppwfConfig = create((set, get) => ({
 }));
 
 export default {
+  EventContext,
   APPROVAL_PROPS,
   CC_PROPS,
   DELAY_PROPS,

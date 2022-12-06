@@ -239,14 +239,15 @@ class SelfAppController extends Emitter {
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
+
     const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
     data.typeName = 'Web应用';
     const res = await Target.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
-      return true;
+
     }
-    return false;
+    return res;
   };
 
   /**
@@ -309,7 +310,7 @@ class SelfAppController extends Emitter {
         await this._curSpace.deleteProduct(this._curProduct!.prod.id);
         this.querySelfApps(true);
       },
-      onCancel() {},
+      onCancel() { },
     });
   }
 }

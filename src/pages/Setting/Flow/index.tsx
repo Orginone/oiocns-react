@@ -246,14 +246,7 @@ const SettingFlow: React.FC = () => {
                           {
                             title: stepTypeAndNameMaps[StepType.PROCESSMESS],
                           },
-                        ]}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
-                          if (StepType.BASEINFO === e) {
-                            setDesignData(design);
-                          }
-                        }}></Steps>
+                        ]}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (

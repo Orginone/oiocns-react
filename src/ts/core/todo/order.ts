@@ -1,9 +1,7 @@
 import consts from '../consts';
-import { faildResult } from '../../base';
-import { common } from '../../base';
 import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
-import { model, kernel, schema } from '../../base';
+import { model, kernel, schema, common } from '@/ts/base';
 
 export class OrderTodo implements ITodoGroup {
   name: string = '订单审批';
@@ -97,7 +95,7 @@ class ApprovalItem implements IApprovalItem {
     this._data = data;
     this._approvalCall = approvalCall;
   }
-  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
+  async pass(status: number, _: string): Promise<model.ResultType<any>> {
     const res = await kernel.deliverMerchandise({
       id: this._data.id,
       status,
@@ -107,7 +105,7 @@ class ApprovalItem implements IApprovalItem {
     }
     return res;
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(status: number, _: string): Promise<model.ResultType<any>> {
     const res = await kernel.cancelOrderDetail({
       id: this._data.id,
       status,
@@ -127,7 +125,7 @@ export class OrderApplyItem implements IOrderApplyItem {
     this._data = data;
   }
 
-  async cancel(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+  async cancel(status: number, _: string = ''): Promise<model.ResultType<any>> {
     return await kernel.cancelOrder({
       id: this._data.id,
       status,
@@ -136,7 +134,7 @@ export class OrderApplyItem implements IOrderApplyItem {
   async cancelItem(
     id: string,
     status: number,
-    remark: string = '',
+    _: string = '',
   ): Promise<model.ResultType<any>> {
     let detail = this._data.details?.find((a) => {
       return a.id == id;
@@ -163,12 +161,12 @@ export class OrderApplyItem implements IOrderApplyItem {
         return res;
       }
     }
-    return faildResult(consts.NotFoundError);
+    return model.badRequest(consts.NotFoundError);
   }
   async reject(
     id: string,
     status: number,
-    remark: string = '',
+    _: string = '',
   ): Promise<model.ResultType<any>> {
     return await kernel.rejectMerchandise({
       id,

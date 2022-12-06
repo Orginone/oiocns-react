@@ -71,10 +71,11 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
-  const routesMain = useMemo(() => routerInfo[2].routes, []);
+  const routesMain = useMemo(() => routerInfo[1].routes, []);
   const currentMacthRoute = routesMain
     ? routesMain.find((child) => child.path === props.match.path)
     : null;
+
   const menuFlat = menuData ? flatMenuData(menuData) : [];
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {

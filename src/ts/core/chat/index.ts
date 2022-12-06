@@ -6,10 +6,10 @@ import { IChatGroup } from './ichat';
  * 加载通讯录会话
  * @returns 会话接口数组
  */
-export const LoadChats = async (spaceId: string): Promise<IChatGroup[]> => {
+export const LoadChats = async (userId: string): Promise<IChatGroup[]> => {
   let groups: IChatGroup[] = [];
   const res = await kernel.queryImChats({
-    spaceId: spaceId,
+    spaceId: userId,
     cohortName: TargetType.Cohort,
     spaceTypeName: TargetType.Company,
   });
@@ -20,7 +20,7 @@ export const LoadChats = async (spaceId: string): Promise<IChatGroup[]> => {
         spaceName: item.name,
         isOpened: index === 0,
         chats: item.chats.map((c) => {
-          return CreateChat(item.id, item.name, c);
+          return CreateChat(item.id, item.name, c, userId);
         }),
       });
     });

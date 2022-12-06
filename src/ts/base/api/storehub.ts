@@ -2,7 +2,7 @@
 import * as signalR from '@microsoft/signalr';
 import { logger } from '../common';
 import { IDisposable } from '../common/lifecycle';
-import { ResultType } from '../model';
+import { badRequest, ResultType } from '../model';
 import { TxtHubProtocol } from '../protocol';
 /**
  * 存储层Hub
@@ -158,10 +158,10 @@ export default class StoreHub implements IDisposable {
             resolve(res);
           })
           .catch((err) => {
-            resolve({ success: false, data: {}, code: 400, msg: err });
+            resolve(badRequest(err?.Error()));
           });
       } else {
-        resolve({ success: false, data: {}, code: 400, msg: '' });
+        resolve(badRequest());
       }
     });
   }

@@ -1,9 +1,8 @@
 import React, { useRef, useEffect, createContext } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
-import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
-import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import DefaultProps, { useAppwfConfig, EventContext } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
   [key: string]: any;
@@ -11,7 +10,7 @@ type ProcessDesignProps = {
   editorValue: string;
   designData: any;
 };
-export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
+
 /**
  * 空节点
  * @returns
@@ -94,11 +93,13 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   return (
     <>
-      <LayoutHeader
-        OnPreview={preview}
-        OnExit={exit}
-        titleName={(editorValue && JSON.parse(editorValue)?.name) || conditionData?.name}
-      />
+      {/* <Button
+        onClick={() => {
+          preview();
+        }}>
+        测一下预览
+      </Button> */}
+      {/* <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} /> */}
       <div className={cls['container']}>
         {/* conditionData */}
         <EventContext.Provider value={{ FlowSub, conditionData }}>

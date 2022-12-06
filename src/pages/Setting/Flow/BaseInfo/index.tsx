@@ -96,14 +96,14 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
                   }}>
                   <ProFormGroup key="group">
                     <ProFormText
-                      name="value"
-                      label="字段名称"
-                      rules={[{ required: true, message: '请输入字段名称!' }]}
+                      name="label"
+                      label="枚举名称"
+                      rules={[{ required: true, message: '请输入枚举名称!' }]}
                     />
                     <ProFormText
-                      name="label"
-                      label="字段编号"
-                      rules={[{ required: true, message: '请输入字段编号!' }]}
+                      name="value"
+                      label="枚举值"
+                      rules={[{ required: true, message: '请输入枚举值!' }]}
                     />
                   </ProFormGroup>
                 </ProFormList>

@@ -1,5 +1,7 @@
-import type { ColumnsType } from 'antd/es/table';
-export const columns: ColumnsType<any> = [
+import { schema } from '@/ts/base';
+import { ProColumns } from '@ant-design/pro-components';
+
+export const columns: ProColumns<schema.XTarget>[] = [
   {
     title: '序号',
     fixed: 'left',

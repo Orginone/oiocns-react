@@ -44,9 +44,8 @@ const BreadCrumb = (props: any) => {
   // TODO 面包屑下拉菜单
   const items = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-    let menuItems = undefined;
     if (breadcrumbNameMap[url]?.routes) {
-      menuItems = breadcrumbNameMap[url].routes
+      breadcrumbNameMap[url].routes
         ?.filter((n: any) => !n.hideInMenu)
         .map((r) => {
           return {
