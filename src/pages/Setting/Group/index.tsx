@@ -48,7 +48,9 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
    */
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // currentGroup 刚来的时候选中
+  }, []);
 
   // 选中树的时候操作
   const setTreeCurrent = (current: schema.XTarget) => {
@@ -133,7 +135,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }
         }
       } else {
-        // currentGroup?.createSubGroup
         if (userCtrl.IsCompanySpace) {
           item.teamCode = item.code;
           item.teamName = item.name;
@@ -319,7 +320,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {/* 编辑集团 */}
       <EditCustomModal
         open={isopen}
-        title={id ? '请编辑集团信息' : '新建集团'}
+        title={selectId == 'update' ? '编辑集团信息' : '新建集团'}
         onOk={onOk}
         currentGroup={currentGroup}
         handleOk={handleOk}

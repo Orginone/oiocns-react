@@ -56,6 +56,7 @@ type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: schema.XTarget) => void;
   handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
+  [key: string]: any;
 };
 
 const Creategroup: React.FC<CreateGroupPropsType> = ({
