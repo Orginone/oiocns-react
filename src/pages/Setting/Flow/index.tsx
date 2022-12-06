@@ -86,11 +86,6 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      ellipsis: true,
-    },
-    {
       title: '操作',
       valueType: 'option',
       key: 'option',
