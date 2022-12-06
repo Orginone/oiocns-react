@@ -53,12 +53,18 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   // 选中树的时候操作
-  const setTreeCurrent = (current: schema.XTarget) => {
-    setId(current.id);
-    setCurrentGroup(new Group(current));
-    currentGroup?.getCompanys(false).then((e) => {
-      setDataSource(e);
-    });
+  const setTreeCurrent = (current: schema.XTarget | undefined) => {
+    if (current) {
+      setId(current.id);
+      setCurrentGroup(new Group(current));
+      currentGroup?.getCompanys(false).then((e) => {
+        setDataSource(e);
+      });
+    } else {
+      setId('');
+      setCurrentGroup(undefined);
+      setDataSource([]);
+    }
   };
 
   /**点击操作内容触发的事件 */
@@ -247,10 +253,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     <div className={cls['company-group-content']}>
       <Card bordered={false}>
         <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="集团名称">
+          <Descriptions.Item label="集团名称" contentStyle={{ width: '30%' }}>
             {currentGroup?.target.name}
           </Descriptions.Item>
-          <Descriptions.Item label="集团编码">
+          <Descriptions.Item label="集团编码" contentStyle={{ width: '30%' }}>
             {currentGroup?.target.code}
           </Descriptions.Item>
           <Descriptions.Item label="创建人">
