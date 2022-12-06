@@ -1,11 +1,10 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import consts from '../consts';
 import BaseTarget from './base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
 import { IGroup } from './itarget';
 import { TargetType } from '../enum';
-import { faildResult, kernel } from '@/ts/base';
+import { model, kernel } from '@/ts/base';
 
 export default class Group extends BaseTarget implements IGroup {
   subGroup: IGroup[];
@@ -45,7 +44,7 @@ export default class Group extends BaseTarget implements IGroup {
     if (!tres.data.result) {
       const res = await this.createTarget({
         ...data,
-        belongId: userCtrl.Company.target.id,
+        belongId: this.target.belongId,
       });
       if (res.success) {
         const group = new Group(res.data);
@@ -54,7 +53,7 @@ export default class Group extends BaseTarget implements IGroup {
       }
       return res;
     } else {
-      return faildResult('该集团已存在!');
+      return model.badRequest('该集团已存在!');
     }
   }
   public async deleteSubGroup(id: string): Promise<ResultType<any>> {
@@ -74,7 +73,7 @@ export default class Group extends BaseTarget implements IGroup {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async getCompanys(reload: boolean = false): Promise<XTarget[]> {
     if (!reload && this.companys.length > 0) {

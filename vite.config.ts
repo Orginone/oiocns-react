@@ -54,12 +54,12 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       proxy: createProxy(),
     },
     build: {
-      target: 'modules',
+      target: 'es5',
       outDir: 'dist', // 指定输出路径
-      assetsDir: 'static', // 指定生成静态资源的存放路径
+      assetsDir: 'assets', // 指定生成静态资源的存放路径
       minify: 'terser', // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
-      chunkSizeWarningLimit: 1024,
+      chunkSizeWarningLimit: 2048,
       terserOptions: {
         compress: {
           drop_console: VITE_DROP_CONSOLE, // 生产环境移除console
@@ -78,15 +78,15 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
           assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-          manualChunks(id) {
-            // if (id.includes('components')) {
-            //   // 把 components 文件里面的文件都打包到 components.js 中
-            //   return 'components'
-            // }
-            if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString();
-            }
-          },
+          // manualChunks(id) {
+          //   // if (id.includes('components')) {
+          //   //   // 把 components 文件里面的文件都打包到 components.js 中
+          //   //   return 'components'
+          //   // }
+          //   if (id.includes('node_modules')) {
+          //     return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          //   }
+          // },
         },
       },
     },

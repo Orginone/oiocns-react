@@ -278,6 +278,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     // 产品类型名
     typeName?: string;
   }): Promise<model.ResultType<schema.XProduct>> => {
+
     const res = await kernel.createProduct({
       name,
       code,
@@ -288,8 +289,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       id: undefined,
       belongId: this.target.id,
     });
-    if (res.success) {
-      this.ownProducts.push(new Product(res.data!));
+    if (res.success && res.data) {
+      this.ownProducts.push(new Product(res.data));
     }
     return res;
   };

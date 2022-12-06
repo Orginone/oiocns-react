@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space, message, Modal } from 'antd';
+import { Card, Button, Descriptions, Space, message, Modal, Tabs } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -16,15 +16,14 @@ import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
 import { ICompany, IGroup } from '@/ts/core/target/itarget';
 import Group from '@/ts/core/target/group';
-import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
-import { getUuid } from '@/utils/tools';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Company from '@/ts/core/target/company';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-// import IndentityManage from '../../../bizcomponents/Indentity'
+import PageCard from '@/components/PageCard';
+
 /**
  * 集团设置
  * @returns
@@ -39,9 +38,8 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   // const [statusKey, setStatusKey] = useState('merchandise');
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
-  const [dataSource, setDataSource] = useState<XTarget[]>();
+  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
   const [id, setId] = useState<string>('');
-  const [groupModalID, setGroupModalID] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
@@ -67,13 +65,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     console.log(key, item, '====');
     switch (key) {
       case 'new':
-        setGroupModalID(getUuid());
         setId('');
         setSelectId('new');
         setIsOpen(true);
         break;
       case '新增集团':
-        setGroupModalID(getUuid());
         setId(item.target.target.id);
         setCurrentGroup(item.target);
         setIsOpen(true);
@@ -173,9 +169,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     }
   };
   // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: schema.XTarget): MarketTypes.OperationType[] => {
     return [
       {
         key: 'publish',
@@ -299,29 +293,24 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   };
   //集团主体
   const deptCount = (
-    <div className={`${cls['group-wrap-pages']}`}>
-      <Card>
-        <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-          <Card
-            title={currentGroup?.target.name}
-            className={cls['app-tabs']}
-            extra={renderBtns()}
-            onTabChange={(key) => {
-              console.log('切换事件', key);
-            }}>
-            <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={dataSource as any}
-                rowKey={'key'}
-                operation={renderOperation}
-                columns={columns as any}
-                parentRef={parentRef}
-                showChangeBtn={false}
-              />
-            </div>
-          </Card>
+    <div className={cls['pages-wrap']}>
+      <PageCard
+        bordered={false}
+        tabList={TitleItems}
+        onTabChange={(key) => {}}
+        bodyStyle={{ paddingTop: 16 }}>
+        <div className={cls['page-content-table']} ref={parentRef}>
+          <Tabs items={[{ label: `全部`, key: '1' }]} tabBarExtraContent={renderBtns()} />
+          <CardOrTable<schema.XTarget>
+            dataSource={dataSource}
+            rowKey={'id'}
+            operation={renderOperation}
+            columns={columns}
+            parentRef={parentRef}
+            showChangeBtn={false}
+          />
         </div>
-      </Card>
+      </PageCard>
     </div>
   );
   return (

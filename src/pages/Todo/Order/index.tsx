@@ -23,35 +23,40 @@ const expandedRowRender = (
   return (
     <ProTable
       columns={[
-        { title: '商品名称', dataIndex: 'caption', key: 'caption' },
-        { title: '购买权属', dataIndex: 'sellAuth', key: 'sellAuth' },
-        { title: '使用期限', dataIndex: 'days', key: 'days' },
-        { title: '价格', dataIndex: 'price', key: 'price', valueType: 'money' },
+        { title: '商品名称', dataIndex: 'caption' },
+        { title: '购买权属', dataIndex: 'sellAuth' },
+        {
+          title: '使用期限',
+          dataIndex: 'days',
+          render: (_, record) => (record.days ? _ : '无期限'),
+        },
+        {
+          title: '价格',
+          dataIndex: 'price',
+          valueType: 'money',
+          render: (_, record) => (record.price ? _ : '免费'),
+        },
         {
           title: '市场名称',
           dataIndex: ['merchandise', 'marketId'],
-          key: 'marketId',
           // valueType: 'radio',
           // valueEnum: chat.nameMap,
         },
         {
           title: '卖家',
           dataIndex: 'sellerId',
-          key: 'sellerId',
           // valueType: 'radio',
           // valueEnum: chat.nameMap,
         },
         {
           title: '状态',
           dataIndex: 'status',
-          key: 'status',
           render: (_, _record) => renderItemStatus(_record),
         },
         {
           title: '下单时间',
           dataIndex: 'createTime',
           valueType: 'dateTime',
-          key: 'createTime',
         },
         {
           title: '商品状态',
@@ -60,7 +65,7 @@ const expandedRowRender = (
             return record.merchandise ? (
               <Tag color="processing">在售</Tag>
             ) : (
-              <Tag>已下架</Tag>
+              <Tag color="danger">已下架</Tag>
             );
           },
         },
@@ -164,17 +169,13 @@ const TodoOrg: React.FC = () => {
     {
       title: '使用期限',
       dataIndex: ['Data', 'days'],
-      render: (_, record) => {
-        return record.Data.days ? _ : '无期限';
-      },
+      render: (_, record) => (record.Data.days ? _ : '无期限'),
     },
     {
       title: '价格',
       dataIndex: ['Data', 'price'],
       valueType: 'money',
-      render: (_, record) => {
-        return record.Data.price ? _ : '免费';
-      },
+      render: (_, record) => (record.Data.price ? _ : '免费'),
     },
     {
       title: '状态',

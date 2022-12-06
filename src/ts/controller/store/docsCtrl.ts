@@ -61,6 +61,7 @@ class DocsController extends Emitter {
   }
   /**
    * 打开文件系统项
+   * 
    * @param key 唯一标识
    */
   public async open(key: string): Promise<void> {

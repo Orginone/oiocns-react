@@ -1,5 +1,5 @@
 // import routes from '.';
-import routes from './config';
+import routes from './index';
 import type { RouteComponentConfig as IRoute } from './index';
 import type { IRouteConfig } from '../../typings/globelType.d';
 /**

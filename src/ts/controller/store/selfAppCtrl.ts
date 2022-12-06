@@ -5,7 +5,7 @@ import { marketColumns, myColumns, shareInfoColumns } from './config';
 import { message, Modal } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
-const selfAppMenu = 'selfAppMenu';
+import { STORE_USER_MENU } from '@/constants/const'
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
 
@@ -129,7 +129,7 @@ class SelfAppController extends Emitter {
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
-    kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg<TreeType>) => {
+    kernel.anystore.subscribed(STORE_USER_MENU, 'user', (Msg: RecMsg<TreeType>) => {
       // console.log('订阅数据推送 自定义目录===>', Msg.data);
       const { data = defaultTreeData } = Msg;
       this._treeData = data;
@@ -165,7 +165,7 @@ class SelfAppController extends Emitter {
     this._treeData = data || defaultTreeData;
     this.changCallbackPart(SelfCallBackTypes.TreeData);
     kernel.anystore.set(
-      selfAppMenu,
+      STORE_USER_MENU,
       {
         operation: 'replaceAll',
         data: {
@@ -239,14 +239,15 @@ class SelfAppController extends Emitter {
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
+
     const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
     data.typeName = 'Web应用';
     const res = await Target.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
-      return true;
+
     }
-    return false;
+    return res;
   };
 
   /**
@@ -309,7 +310,7 @@ class SelfAppController extends Emitter {
         await this._curSpace.deleteProduct(this._curProduct!.prod.id);
         this.querySelfApps(true);
       },
-      onCancel() {},
+      onCancel() { },
     });
   }
 }

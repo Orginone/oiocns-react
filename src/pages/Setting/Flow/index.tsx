@@ -4,7 +4,6 @@ import cls from './index.module.less';
 import {
   RollbackOutlined,
   ExclamationCircleOutlined,
-  EyeOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
@@ -37,6 +36,7 @@ export enum TabType {
 
 type FlowItem = {
   content: string;
+  id: string;
 };
 
 /**
@@ -48,8 +48,8 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
-  const [editorValue, setEditorValue] = useState<string | null>();
-  const [designData, setDesignData] = useState();
+  const [editorValue, setEditorValue] = useState<string | null | undefined>();
+  const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
@@ -94,13 +94,19 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record) => [
+      render: (text, record: FlowItem) => [
         <a
           key="editor"
           onClick={() => {
             setTabType(TabType.PROCESSDESIGN);
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
+            const editorDataMes = JSON.parse(record?.content || '{}');
+            console.log(editorDataMes);
+            setConditionData({
+              name: editorDataMes.name,
+              labels: JSON.parse(editorDataMes.remark),
+            });
           }}>
           编辑
         </a>,
@@ -111,7 +117,7 @@ const SettingFlow: React.FC = () => {
               title: '提示',
               content: '确定删除当前流程吗',
               onOk: async () => {
-                const currentData = await userCtrl.Space.deleteDefine(record.id);
+                const currentData = await userCtrl.Space.deleteDefine(record?.id);
                 console.log('currentData', currentData);
                 if (currentData) {
                   initData();
@@ -143,10 +149,6 @@ const SettingFlow: React.FC = () => {
 
   const changeScale = (val: any) => {
     setScale(val);
-  };
-
-  const preview = () => {
-    // const design = useAppwfConfig((state: any) => state.design);
   };
 
   const publish = async () => {
@@ -219,6 +221,8 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
+                              setConditionData({ name: '', labels: [] });
+                              setDesignData(null);
                               setEditorValue(null);
                             },
                             onCancel() {},
@@ -231,6 +235,13 @@ const SettingFlow: React.FC = () => {
                     <div style={{ width: '300px' }}>
                       <Steps
                         current={currentStep}
+                        onChange={(e) => {
+                          setCurrentStep(e);
+                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
+                          if (StepType.BASEINFO === e) {
+                            setDesignData(design);
+                          }
+                        }}
                         items={[
                           {
                             title: stepTypeAndNameMaps[StepType.BASEINFO],
@@ -238,22 +249,11 @@ const SettingFlow: React.FC = () => {
                           {
                             title: stepTypeAndNameMaps[StepType.PROCESSMESS],
                           },
-                        ]}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                          setDesignData(design);
-                        }}></Steps>
+                        ]}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (
                         <Space>
-                          <Button
-                            className={cls['publish-preview']}
-                            size="small"
-                            onClick={preview}>
-                            <EyeOutlined />
-                            预览
-                          </Button>
                           <Button
                             className={cls['publis-issue']}
                             size="small"
