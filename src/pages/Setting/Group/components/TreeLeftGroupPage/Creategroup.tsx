@@ -145,6 +145,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         />
 
         <MarketClassifyTree
+          className={cls['docTree']}
           id={key}
           showIcon
           searchable

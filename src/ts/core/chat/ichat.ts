@@ -4,6 +4,8 @@ import { MessageType } from '../enum';
  * 会话接口
  */
 export interface IChat {
+  /** 用户ID */
+  userId: string;
   /** 唯一标识 */
   fullId: string;
   /** 会话Id */
