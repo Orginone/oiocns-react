@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-// import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { deepClone } from '@/ts/base/common';
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};
@@ -14,9 +14,9 @@ type ConditionGroupItemConfigProps = {};
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  // const conditionData: any = useContext(EventContext);
-  // console.log('conditionData', conditionData);
-  // console.log('selectedNode', selectedNode);
+  const design = useAppwfConfig((state: any) => state.design);
+
+  const remark = JSON.parse(design.remark || '{}');
   const [key, setKey] = useState(0);
 
   const paramChange = (paramKey: any, condition: any) => {
@@ -97,6 +97,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
               <DeleteOutlined />
             </div>
             <span className={cls['group-name']}>参数{index}</span>
+
             <div className={cls['group-cp']}>
               <Select
                 style={{ width: 150 }}
@@ -108,7 +109,15 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 onChange={(val, option) => {
                   paramChange(val, condition);
                 }}
-                defaultValue={condition.paramKey || null}
+                defaultValue={
+                  remark.find(
+                    (item: any) =>
+                      item.value === condition.paramKey &&
+                      item.label === condition.paramLabel,
+                  )
+                    ? condition.paramKey
+                    : null
+                }
               />
               {/* <Select
                 style={{ width: 100 }}
@@ -153,6 +162,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 />
               )}
               {/* 数字类型 */}
+              {/* {console.log('condition.paramKey', condition.val)} */}
               {condition.type == 'NUMERIC' && (
                 <InputNumber
                   style={{ width: 200 }}

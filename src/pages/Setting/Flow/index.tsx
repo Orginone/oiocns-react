@@ -290,6 +290,8 @@ const SettingFlow: React.FC = () => {
                         currentFormValue={conditionData}
                         onChange={(params) => {
                           setConditionData(params);
+                          design.remark = JSON.stringify(params.labels);
+                          setDesignData(design);
                         }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);

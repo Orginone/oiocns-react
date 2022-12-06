@@ -63,12 +63,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     if (editorValue && editorValue !== '{}') {
       tempDesign = designData || JSON.parse(editorValue);
       if (conditionData?.labels) {
+        // 编辑了之后值没有变
+        console.log('conditionData?.labels', conditionData?.labels);
+        tempDesign.remark = JSON.stringify(conditionData?.labels);
         DefaultProps.setFormFields(conditionData?.labels);
       } else {
         DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
       }
     } else {
-      console.log('designData_____', designData);
       if (!designData) {
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
