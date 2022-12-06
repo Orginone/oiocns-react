@@ -6,9 +6,9 @@ import {
   ClusterOutlined,
   HighlightOutlined,
 } from '@ant-design/icons';
-import React, { useContext } from 'react';
+import React, { Context, useContext } from 'react';
 import cls from './index.module.less';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { EventContext } from '@/bizcomponents/Flow/flow';
 type InsertButtonProps = {
   onInsertNode: Function;
   [key: string]: any;
@@ -19,7 +19,8 @@ type InsertButtonProps = {
  * @returns
  */
 const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
-  const { FlowSub } = useContext(EventContext);
+  // const { FlowSub } = useContext(EventContext);
+  const FlowSub: any = useContext(EventContext);
 
   // const FlowSub = useEventEmitter();
   const text = <span>添加流程节点</span>;
