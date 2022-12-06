@@ -239,6 +239,7 @@ const SettingFlow: React.FC = () => {
                           setCurrentStep(e);
                           /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
                           if (StepType.BASEINFO === e) {
+                            console.log('design', design);
                             setDesignData(design);
                           }
                         }}

@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
-import DefaultProps, { useAppwfConfig, EventContext } from '@/bizcomponents/Flow/flow';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 // import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
 import cls from './index.module.less';
 
@@ -14,9 +14,9 @@ type ConditionGroupItemConfigProps = {};
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  const conditionData: any = useContext(EventContext);
-  console.log('conditionData', conditionData);
-  console.log('selectedNode', selectedNode);
+  // const conditionData: any = useContext(EventContext);
+  // console.log('conditionData', conditionData);
+  // console.log('selectedNode', selectedNode);
   const [key, setKey] = useState(0);
 
   const paramChange = (paramKey: any, condition: any) => {
