@@ -42,7 +42,7 @@ export default class KernelApi {
           .invoke('TokenAuth', this._anystore.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
-              logger.info('kernelapi auth success!');
+              logger.info('连接到内核成功!');
             }
           })
           .catch((err) => {
