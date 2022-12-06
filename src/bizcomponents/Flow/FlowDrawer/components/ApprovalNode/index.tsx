@@ -24,6 +24,7 @@ const ApprovalNode = () => {
     selectedNode.props.assignedUser = [{ name: params.node.name, id: params.node.id }];
     setSelectedNode(selectedNode);
     setSelectPost(params);
+    setIsOpen(false);
   };
   const onCancel = () => {
     setIsOpen(false);

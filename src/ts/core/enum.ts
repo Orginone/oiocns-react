@@ -43,6 +43,12 @@ export enum CommonStatus {
   ApproveStartStatus = 100,
   RejectStartStatus = 200,
 }
+/** 域类型 */
+export enum DomainTypes {
+  User = 'user',
+  Company = 'company',
+  All = 'all',
+}
 
 export enum ProductType {
   WebApp = 'web应用',
@@ -63,3 +69,9 @@ export enum TodoType {
   MarketTodo = '市场管理',
   ApplicationTodo = '应用待办',
 }
+
+export const companyTypes = [
+  TargetType.Company,
+  TargetType.Hospital,
+  TargetType.University,
+];

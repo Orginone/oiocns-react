@@ -3,7 +3,6 @@ import cls from './index.module.less';
 
 type LayoutHeaderProps = {
   OnPreview: Function;
-  OnExit: Function;
   [key: string]: any;
   backTable?: () => void;
   titleName: string;

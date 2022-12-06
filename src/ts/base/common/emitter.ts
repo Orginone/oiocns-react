@@ -1,8 +1,6 @@
-import { generateUuid } from '../base/common';
-/**
- * 控制器基类
- */
-export default class BaseController {
+import { generateUuid } from './uuid';
+
+export class Emitter {
   private _refreshCallback: { [name: string]: (key: string) => void } = {};
   private _partRefreshCallback: {
     [name: string]: { [p: string]: (key: string) => void };

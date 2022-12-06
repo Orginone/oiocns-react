@@ -1,11 +1,10 @@
 import { ProductModel } from '@/ts/base/model';
-import IProduct from '@/ts/core/market/iproduct';
-import { IMTarget } from '@/ts/core/target/itarget';
-import { kernel } from '../../base';
-import BaseController from '../baseCtrl';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { DomainTypes, emitter, IMTarget, IProduct } from '@/ts/core';
+import { kernel } from '@/ts/base';
 import { marketColumns, myColumns, shareInfoColumns } from './config';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
+import { Emitter } from '@/ts/base/common';
+import userCtrl from '../setting/userCtrl';
 const selfAppMenu = 'selfAppMenu';
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
@@ -63,7 +62,7 @@ interface RecMsg<T> {
   UpdateTime: string;
   data: T[];
 }
-class SelfAppController extends BaseController {
+class SelfAppController extends Emitter {
   private _curSpace: IMTarget = userCtrl.User;
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
@@ -125,7 +124,7 @@ class SelfAppController extends BaseController {
   constructor() {
     super();
     /* 监听空间切换 */
-    userCtrl.subscribePart(UserPartTypes.Space, async () => {
+    emitter.subscribePart(DomainTypes.Company, async () => {
       this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
       this.resetData();
     });
@@ -297,6 +296,7 @@ class SelfAppController extends BaseController {
       console.error(msg);
     } else {
       console.log('共享成功');
+      message.success('共享成功');
     }
   }
   /**

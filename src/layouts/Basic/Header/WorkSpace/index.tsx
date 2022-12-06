@@ -16,8 +16,8 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
-import { TargetType } from '@/ts/core/enum';
-import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
+import { DomainTypes, TargetType } from '@/ts/core/enum';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 
 /* 组织单位头部左侧组件 */
@@ -27,6 +27,8 @@ const OrganizationalUnits = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
+  const [joinKey, setJoinKey] = useState<string>('');
+
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -72,10 +74,7 @@ const OrganizationalUnits = () => {
     );
   };
   useEffect(() => {
-    const id = userCtrl.subscribePart(
-      [UserPartTypes.Space, UserPartTypes.User],
-      refreshUI,
-    );
+    const id = userCtrl.subscribePart([DomainTypes.User, DomainTypes.Company], refreshUI);
     return () => {
       userCtrl.unsubscribe(id);
     };
@@ -102,7 +101,7 @@ const OrganizationalUnits = () => {
       <div
         className={`${styles.list} ${showMenu ? styles.active : ''}`}
         style={{
-          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 36) : 0,
+          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 56) : 0,
         }}>
         <div className={styles[`menu-list`]}>
           {menuList.map((n) => (
@@ -226,15 +225,31 @@ const OrganizationalUnits = () => {
         open={showModal}
         bodyStyle={{ padding: 0 }}
         okText="确定加入"
-        onOk={() => {
-          console.log(`确定按钮`);
+        onOk={async () => {
+          // 加入单位
           setShowModal(false);
+          if (joinKey == '') {
+            message.error('请选中要加入的单位！');
+          } else {
+            let thisSelectKey = joinKey;
+            // code msg success
+            const responseObj = await userCtrl.User.applyJoinCompany(
+              thisSelectKey,
+              TargetType.Company,
+            );
+
+            if (responseObj.success) {
+              message.info('申请加入单位成功!');
+            } else {
+              message.error('申请加入单位失败：' + responseObj.msg);
+            }
+          }
         }}
         onCancel={() => {
           console.log(`取消按钮`);
           setShowModal(false);
         }}>
-        <SearchCompany />
+        <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey} />
       </Modal>
     </div>
   );

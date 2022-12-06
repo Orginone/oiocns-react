@@ -4,9 +4,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
 import { MarketTypes } from 'typings/marketType';
 import type { ProColumns } from '@ant-design/pro-components';
-import { message } from 'antd';
-// import { Link } from 'react-router-dom';
-// import marketCtrl from '@/ts/controller/store/marketCtrl';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import BuyCustomModal from './BuyCustomModal';
 
@@ -32,7 +30,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
   const [data, setData] = useState<any>({});
   const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
-  const [messageApi, contextHolder] = message.useMessage();
   const parentRef = useRef<any>(null); //父级容器Dom
   useEffect(() => {
     setTotal(list?.length || 0);
@@ -74,12 +71,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     setIsBuy(false);
   };
 
-  const success = () => {
-    messageApi.open({
-      type: 'success',
-      content: '已加入购物车',
-    });
-  };
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -95,14 +86,9 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       },
       {
         key: 'toBuyCar',
-        // label: <Link to="/market/shopingcar">加入购物车</Link>,
         label: '加入购物车',
         onClick: () => {
-          console.log('按钮事件', 'toBuyCar', item);
-          success();
-          // marketCtrl.Market.stagingMerchandise(item.id).then((res) => {
-          //   console.log(res);
-          // });
+          marketCtrl.joinOrdeleApply(item);
         },
       },
       {
@@ -144,7 +130,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={`${cls['app-wrap']} ${className}`} ref={parentRef}>
-      {contextHolder}
       <CardOrTable
         dataSource={list}
         total={total}

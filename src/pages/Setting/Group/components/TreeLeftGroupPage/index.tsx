@@ -2,7 +2,6 @@ import React from 'react';
 import Creategroup from './Creategroup';
 import Joingroup from './Joingroup';
 import { useHistory } from 'react-router-dom';
-
 import cls from './index.module.less';
 
 type TreeLeftPageProps = {
@@ -15,7 +14,7 @@ type TreeLeftPageProps = {
 const TreeLeftPage: React.FC<TreeLeftPageProps> = ({
   isJoingroup = true,
   isCreategroup = true,
-  createTitle = ' 创建集团',
+  createTitle = '创建集团',
 }) => {
   const history = useHistory();
   return (

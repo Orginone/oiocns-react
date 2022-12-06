@@ -49,7 +49,7 @@
   ],
   "dependencies": {
     "@ant-design/icons": "^4.6.2",
-    "@ant-design/pro-components": "^2.3.14",
+    "@ant-design/pro-components": "^2.3.37",
     "@ant-design/pro-layout": "^7.1.4",
     "@icongo/im": "^1.1.2",
     "@microsoft/signalr": "^6.0.10",

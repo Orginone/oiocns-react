@@ -1,15 +1,18 @@
-import BaseController from '../baseCtrl';
-import { kernel, model, schema } from '../../base';
-import { ICohort, ICompany, ISpace, IPerson, SpaceType } from '../../core/target/itarget';
-import Person from '../../core/target/person';
-export enum UserPartTypes {
-  'User' = 'user',
-  'Space' = 'space',
-}
+import { Emitter } from '@/ts/base/common';
+import { kernel, model, schema } from '@/ts/base';
+import {
+  IPerson,
+  ICompany,
+  ISpace,
+  ICohort,
+  createPerson,
+  DomainTypes,
+  emitter,
+} from '@/ts/core';
 const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
 /** 用户控制器 */
-class UserController extends BaseController {
+class UserController extends Emitter {
   private _user: IPerson | undefined;
   private _curSpace: ICompany | undefined;
   /**构造方法 */
@@ -20,7 +23,8 @@ class UserController extends BaseController {
       this._loadUser(JSON.parse(userJson));
       this._curSpace = this._findCompany(sessionStorage.getItem(sessionSpaceName) || '');
       if (this._curSpace) {
-        this.changCallbackPart(UserPartTypes.Space);
+        this.changCallbackPart(DomainTypes.Company);
+        emitter.changCallbackPart(DomainTypes.Company);
       }
     }
   }
@@ -62,7 +66,8 @@ class UserController extends BaseController {
     } else {
       this._curSpace = this._findCompany(id);
     }
-    this.changCallbackPart(UserPartTypes.Space);
+    this.changCallbackPart(DomainTypes.Company);
+    emitter.changCallbackPart(DomainTypes.Company);
   }
   /**
    * 获取我的群组
@@ -127,9 +132,10 @@ class UserController extends BaseController {
 
   private async _loadUser(person: schema.XTarget): Promise<void> {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    this._user = new Person(person);
+    this._user = createPerson(person);
     await this._user.getJoinedCompanys(false);
-    this.changCallbackPart(UserPartTypes.User);
+    this.changCallbackPart(DomainTypes.User);
+    emitter.changCallbackPart(DomainTypes.User);
   }
 
   private _findCompany(id: string): ICompany | undefined {

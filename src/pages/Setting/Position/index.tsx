@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
-import { Card, Button, Descriptions, Space } from 'antd';
+import { Card, Button, Descriptions, Space, Modal, message } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import Title from 'antd/lib/typography/Title';
 
@@ -8,7 +8,6 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns } from './config';
-import { schema } from '@/ts/base';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import EditCustomModal from './components/EditCustomModal';
 import AddPersonModal from './components/AddPersonModal';
@@ -20,11 +19,15 @@ import { RouteComponentProps } from 'react-router-dom';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core/enum';
+import AssignPosts from './components/AssignPosts';
+import { schema } from '@/ts/base';
 type RouterParams = {
   id: string;
 };
 /**
- * 岗位设置    由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * 岗位设置     @todo--------------------------- 待改造页面-----------------------------------
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
@@ -37,11 +40,23 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [selectId, setSelectId] = useState<string>();
   const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [Transfer, setTransfer] = useState<boolean>(false);
+
   const [indentity, setIndentity] = useState<IIdentity>();
+  const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
 
   const [_currentPostion, setPosition] = useState<any>({});
+  const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
+  const [person, setPerson] = useState<schema.XTarget[]>();
 
   const treeContainer = document.getElementById('templateMenu');
+
+  const getDataList = async () => {
+    setIndentitys(await userCtrl.Company.getIdentitys());
+  };
+  useEffect(() => {
+    getDataList();
+  }, []);
   //变更岗位 getOwnIdentitys
 
   // 操作内容渲染函数
@@ -52,7 +67,10 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       {
         key: 'remove',
         label: '移除人员',
-        onClick: () => {
+        onClick: async () => {
+          await indentity?.removeIdentity([item.id]);
+          getPersonData(indentity!);
+
           console.log('按钮事件', 'remove', item);
         },
       },
@@ -126,9 +144,14 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         break;
     }
   };
-
+  const getPersonData = async (current: IIdentity) => {
+    setPersonData((await current.getIdentityTargets(TargetType.Person)).data.result);
+  };
   // 选中树的时候操作
-  const setTreeCurrent = (current: schema.XTarget) => {};
+  const setTreeCurrent = async (current: IIdentity) => {
+    getPersonData(current);
+    setIndentity(current);
+  };
 
   // 标题tabs页
   const TitleItems = [
@@ -157,10 +180,31 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           }}>
           编辑
         </Button>
-        <Button type="link">删除</Button>
+        <Button
+          type="link"
+          onClick={async () => {
+            Modal.confirm({
+              title: '提示',
+              content: '是否确认通过该申请',
+              onOk: async () => {
+                const res = await userCtrl.Company.deleteIdentity(indentity?.target.id!);
+                if (res) {
+                  message.success('删除成功');
+                  getDataList();
+                  setPersonData([]);
+                  setIndentity(undefined);
+                } else {
+                  message.error('删除失败');
+                }
+              },
+            });
+          }}>
+          删除
+        </Button>
       </div>
     </div>
   );
+
   // 岗位信息内容
   const content = (
     <div className={cls['company-dept-content']}>
@@ -181,12 +225,18 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       </Card>
     </div>
   );
-
+  const getMemberData = async () => {
+    setMemberData(await userCtrl.Company.getPersons(false));
+  };
   // 按钮
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {}}>
+        <Button
+          type="link"
+          onClick={async () => {
+            await getMemberData(), setIsOpenAssign(true);
+          }}>
           指派岗位
         </Button>
       </Space>
@@ -235,14 +285,34 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         onOk={onOk}
         handleOk={handleOk}
         defaultData={indentity!}
+        callback={setIndentity}
       />
       {/* 添加成员 */}
       <AddPersonModal
         title={'添加成员'}
-        open={isAddOpen}
+        open={false}
         onOk={onPersonalOk}
         handleOk={handleOk}
       />
+      <Modal
+        title="指派岗位"
+        open={isOpenAssign}
+        width={1300}
+        onOk={async () => {
+          setIsOpenAssign(false);
+          const ids = [];
+          for (const a of person ? person : []) {
+            ids.push(a.id);
+          }
+          await indentity?.giveIdentity(ids);
+          getPersonData(indentity!);
+          message.info('指派成功');
+        }}
+        onCancel={() => {
+          setIsOpenAssign(false);
+        }}>
+        <AssignPosts searchCallback={setPerson} memberData={memberData} />
+      </Modal>
       {/* 查看申请 */}
       <LookApply
         title={'查看申请'}
@@ -273,9 +343,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
               createTitle="新增"
               setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
-              currentKey={''}
-              callBack={setIndentity}
-              personCallBack={setPersonData}
+              currentKey={indentitys.length > 0 ? indentitys[0].target.id : ''}
+              indentitys={indentitys}
             />,
             treeContainer,
           )

@@ -2,7 +2,6 @@ import { kernel } from './../../base/index';
 import BaseTarget from './base';
 import { model, schema } from '../../base';
 import { ResultType } from '../../base/model';
-// import { IFlowTarget } from './itarget';
 
 export default class FlowTarget extends BaseTarget {
   defines: schema.XFlowDefine[] = [];
@@ -45,9 +44,11 @@ export default class FlowTarget extends BaseTarget {
   }
   async deleteDefine(id: string): Promise<ResultType<boolean>> {
     const res = await kernel.deleteDefine({ id });
-    this.defines = this.defines.filter((a) => {
-      return a.id == id;
-    });
+    if (res.success) {
+      this.defines = this.defines.filter((a) => {
+        return a.id != id;
+      });
+    }
     return res;
   }
   async createInstance(

@@ -1,4 +1,5 @@
-import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { DomainTypes } from '@/ts/core';
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +14,7 @@ const UserAvatar: React.FC = () => {
   const history = useHistory();
   const [user, setUser] = useState(userCtrl.User);
   useEffect(() => {
-    const id = userCtrl.subscribePart(UserPartTypes.User, () => {
+    const id = userCtrl.subscribePart(DomainTypes.User, () => {
       if (userCtrl.User) {
         setUser({ ...userCtrl.User });
       }

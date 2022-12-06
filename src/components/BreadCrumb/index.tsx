@@ -3,17 +3,16 @@ import React, { ReactNode, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { IRouteConfig } from 'typings/globelType';
 
-import routes from '../../routes/config';
+import { routerInfo } from '../../routes/config';
 import { IconFont } from '../IconFont';
 import cls from './index.module.less';
 
 const breadcrumbNameMap: Record<string, IRouteConfig> = {};
-
 /**
  * 遍历路由，初始化映射关系
- * @param routes 路由
+ * @param routerInfo 路由
  */
-const initMap = (routes: IRouteConfig[]) => {
+const initMap = (routes: any[]) => {
   routes.forEach((route) => {
     breadcrumbNameMap[route.path] = route;
     if (route.routes && route.routes.length > 0) {
@@ -36,7 +35,7 @@ const createIcon = (icon?: string | React.Component | ReactNode) => {
  * @returns
  */
 const BreadCrumb = (props: any) => {
-  useMemo(() => initMap(routes), []);
+  useMemo(() => initMap(routerInfo), []);
 
   const location = useLocation();
   const history = useHistory();
@@ -45,9 +44,8 @@ const BreadCrumb = (props: any) => {
   // TODO 面包屑下拉菜单
   const items = pathSnippets.map((_, index) => {
     const url = `/${pathSnippets.slice(0, index + 1).join('/')}`;
-    let menuItems = undefined;
     if (breadcrumbNameMap[url]?.routes) {
-      menuItems = breadcrumbNameMap[url].routes
+      breadcrumbNameMap[url].routes
         ?.filter((n: any) => !n.hideInMenu)
         .map((r) => {
           return {
