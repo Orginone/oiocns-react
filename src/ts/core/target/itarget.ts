@@ -27,6 +27,8 @@ export interface ITarget {
   ownIdentitys: schema.XIdentity[];
   /** 组织的身份 */
   identitys: IIdentity[];
+  /** 支持的单位类型申明 */
+  companyTypes: TargetType[];
   /**
    * 获取职权树
    * @param reload 是否强制刷新

@@ -528,6 +528,7 @@ const Routers: IRouteConfig[] = [
 interface rType {
   path: string;
   title: string;
+  icon?: string | React.ReactNode;
   routes?: rType[];
 }
 function handleInfo(routeArr: IRouteConfig[]): rType[] {
@@ -535,6 +536,7 @@ function handleInfo(routeArr: IRouteConfig[]): rType[] {
     let obj: rType = {
       path: r.path,
       title: r.title,
+      icon: r?.icon,
     };
     if (r.routes && r.routes?.length > 0) {
       obj.routes = handleInfo(r.routes);

@@ -2,7 +2,6 @@ import { kernel } from './../../base/index';
 import BaseTarget from './base';
 import { model, schema } from '../../base';
 import { ResultType } from '../../base/model';
-// import { IFlowTarget } from './itarget';
 
 export default class FlowTarget extends BaseTarget {
   defines: schema.XFlowDefine[] = [];
