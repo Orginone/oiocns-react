@@ -9,7 +9,6 @@ const Index: React.FC = () => {
     marketCtrl.marketTableCallBack = setData;
     marketCtrl.getStoreProduct('market');
   }, []);
-  console.log('hahahah', data);
 
   return (
     <>
