@@ -59,6 +59,8 @@ const SettingFlow: React.FC = () => {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [bindAppMes, setBindAppMes] = useState({});
 
+  const [dateData, setDateData] = useState(1);
+
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -98,6 +100,7 @@ const SettingFlow: React.FC = () => {
           onClick={() => {
             setIsOpenModal(true);
             setBindAppMes(record);
+            setDateData(dateData + 1);
           }}>
           绑定应用
         </a>,
@@ -313,7 +316,17 @@ const SettingFlow: React.FC = () => {
           </div>
         )}
       </Card>
-      <BindModal isOpen={isOpenModal} bindAppMes={bindAppMes} />
+      <BindModal
+        isOpen={isOpenModal}
+        bindAppMes={bindAppMes}
+        upDateData={dateData}
+        onOk={() => {
+          setIsOpenModal(false);
+        }}
+        onCancel={() => {
+          setIsOpenModal(false);
+        }}
+      />
     </div>
   );
 };
