@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { UserOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
@@ -89,12 +89,12 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       <div className={cls.topMes} style={{ marginRight: '25px' }}>
         <Button
           className={cls.creatgroup}
-          type="primary"
+          type="text"
+          icon={<PlusOutlined className={cls.addIcon} />}
           onClick={() => {
             setIsOpenModal(true);
-          }}>
-          新增身份
-        </Button>
+          }}
+        />
         {positionList}
       </div>
       <AddPosttionModal
