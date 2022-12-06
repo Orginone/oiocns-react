@@ -24,7 +24,7 @@ import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Company from '@/ts/core/target/company';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-
+// import IndentityManage from '../../../bizcomponents/Indentity'
 /**
  * 集团设置
  * @returns
@@ -44,6 +44,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [groupModalID, setGroupModalID] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
+  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
 
   const [selectId, setSelectId] = useState<string>('');
   /**
@@ -337,6 +338,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         handleCancel={handleCancel}
         selectId={selectId}
       />
+      {/* <IndentityManage open = {isOpenIndentity} object = {currentGroup!} MemberData = {}/> */}
       <Modal
         title="添加单位"
         open={isAddOpen}

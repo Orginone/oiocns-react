@@ -41,22 +41,28 @@ type IndentityManageType = {
  */
 const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
   const { open, object, MemberData, ...other } = props;
-  console.log(open, object, MemberData);
+
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [indentity, setIndentity] = useState<IIdentity>();
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
+  const [members, setMemberData] = useState<schema.XTarget[]>([]);
   const [person, setPerson] = useState<schema.XTarget[]>();
-  const [personData, setPersonData] = useState<XTarget[]>();
+  const [personData, setPersonData] = useState<XTarget[]>([]);
 
   const getDataList = async () => {
-    setIndentitys(await object?.getIdentitys());
+    const data = await object?.getIdentitys();
+    setIndentitys(data);
+    setTreeCurrent(data[0]);
   };
   useEffect(() => {
     if (open) {
+      console.log(111, MemberData);
       getDataList();
+      setMemberData([]);
+    } else {
+      setIndentity(undefined);
     }
   }, [open]);
 
@@ -96,15 +102,29 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
     console.log(key, item);
   };
   const getPersonData = async (current: IIdentity) => {
-    setPersonData((await current.getIdentityTargets(TargetType.Person)).data.result);
+    setPersonData(
+      (await current.getIdentityTargets(TargetType.Person)).data.result || [],
+    );
   };
   // 选中树的时候操作
   const setTreeCurrent = async (current: IIdentity) => {
-    getPersonData(current);
+    await getPersonData(current);
     setIndentity(current);
   };
   const getMemberData = async () => {
-    setMemberData(MemberData);
+    console.log('去重结果', uniq(MemberData, personData));
+    setMemberData(uniq(MemberData, personData));
+    console.log('1111111111', members);
+  };
+  const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
+    if (MemberData == []) {
+      return [];
+    }
+    let ids = arr2.map((item) => item.id);
+    console.log(ids);
+    return arr1.filter((el) => {
+      return !ids.includes(el.id);
+    });
   };
   // 岗位信息标题
   const title = (
@@ -175,7 +195,8 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
         <Button
           type="link"
           onClick={async () => {
-            await getMemberData(), setIsOpenAssign(true);
+            await getMemberData();
+            setIsOpenAssign(true);
           }}>
           指派岗位
         </Button>
@@ -262,7 +283,9 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
                 onCancel={() => {
                   setIsOpenAssign(false);
                 }}>
-                <AssignPosts searchCallback={setPerson} memberData={memberData} />
+                {isOpenAssign && (
+                  <AssignPosts searchCallback={setPerson} memberData={members} />
+                )}
               </Modal>
             </div>
           </Content>

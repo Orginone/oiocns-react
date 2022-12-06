@@ -14,6 +14,7 @@ interface indexType {
 const CohortPerson: React.FC<indexType> = (props) => {
   useEffect(() => {
     getTableList();
+    console.log('88888888888888', props.memberData);
   }, []);
 
   const [data, setData] = useState<schema.XTarget[]>([]);
