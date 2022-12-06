@@ -239,6 +239,13 @@ const SettingFlow: React.FC = () => {
                     <div style={{ width: '300px' }}>
                       <Steps
                         current={currentStep}
+                        onChange={(e) => {
+                          setCurrentStep(e);
+                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
+                          if (StepType.BASEINFO === e) {
+                            setDesignData(design);
+                          }
+                        }}
                         items={[
                           {
                             title: stepTypeAndNameMaps[StepType.BASEINFO],
