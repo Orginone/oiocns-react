@@ -1,17 +1,18 @@
-import React, { useRef, useEffect, createContext } from 'react';
+import React, { useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
+import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
   editorValue: string;
   designData: any;
 };
-export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
+// export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns

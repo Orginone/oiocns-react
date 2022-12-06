@@ -10,7 +10,7 @@ import {
 import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
 import React, { useContext } from 'react';
 import cls from './index.module.less';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { EventContext } from '../../const';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;

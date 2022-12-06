@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import React, { useContext } from 'react';
 import cls from './index.module.less';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { EventContext } from '../../const';
 type InsertButtonProps = {
   onInsertNode: Function;
   [key: string]: any;

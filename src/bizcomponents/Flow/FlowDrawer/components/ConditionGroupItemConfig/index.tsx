@@ -2,7 +2,7 @@ import React, { useState, useCallback, useContext } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { EventContext } from '../../../const';
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};
