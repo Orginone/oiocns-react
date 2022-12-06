@@ -26,7 +26,33 @@ export function createVitePlugins(viteEnv: string, isBuild: boolean) {
   ];
 
   // @vitejs/plugin-legacy
-  VITE_APP_LEGACY && isBuild && vitePlugins.push(legacy());
+  VITE_APP_LEGACY &&
+    isBuild &&
+    vitePlugins.push(
+      legacy({
+        targets: ['chrome 52'],
+        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+        renderLegacyChunks: true,
+        polyfills: [
+          'es.symbol',
+          'es.array.filter',
+          'es.promise',
+          'es.promise.finally',
+          'es/map',
+          'es/set',
+          'es.array.for-each',
+          'es.object.define-properties',
+          'es.object.define-property',
+          'es.object.get-own-property-descriptor',
+          'es.object.get-own-property-descriptors',
+          'es.object.keys',
+          'es.object.to-string',
+          'web.dom-collections.for-each',
+          'esnext.global-this',
+          'esnext.string.match-all',
+        ],
+      }),
+    );
 
   // vite-plugin-mock
   VITE_APP_MOCK && vitePlugins.push(configMockPlugin(isBuild));
