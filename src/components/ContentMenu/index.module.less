@@ -22,36 +22,45 @@
     font-size: 18px;
     padding-top: 4px;
   }
-  :global(.ogo-menu-item-group-title) {
-    padding-left: 0;
-  }
-  :global(.ogo-menu-sub.ogo-menu-inline) {
-    background: @component-background;
-  }
-  :global(.ogo-menu-item:hover),
-  :global(.ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected) {
-    color: @text-color;
-    background-color: @custom-menu-active-background;
-  }
-  :global(.ogo-menu-item),
-  :global(.ogo-menu-submenu-expand-icon),
-  :global(.ogo-menu-submenu-arrow),
-  :global(.ogo-menu-submenu) {
-    color: @system-menu-color;
-  }
-  :global(.ogo-menu-item:hover .ogo-menu-item-icon),
-  :global(.ogo-menu-item.ogo-menu-item-selected .ogo-menu-item-icon) {
-    color: @primary-color;
-  }
-  :global(.ogo-menu-vertical),
-  :global(.ogo-menu-inline) {
-    border: none;
-  }
-  :global(.ogo-menu-item-acitve),
-  :global(.ogo-menu-item-acitve:hover) {
-    color: @text-color;
-  }
-  :global(.ogo-menu-inline .ogo-menu-item-selected::after) {
-    opacity: 0;
+  :global {
+    .ogo-menu-item-group-title {
+      padding-left: 0;
+    }
+    .ogo-menu-sub.ogo-menu-inline {
+      background: @component-background;
+    }
+
+    .ogo-menu-item,
+    .ogo-menu-submenu-expand-icon,
+    .ogo-menu-submenu-arrow,
+    .ogo-menu-submenu .ogo-badge,
+    .ogo-menu-item .ogo-badge,
+    .ogo-menu-submenu {
+      color: @system-menu-color;
+    }
+    .ogo-menu-submenu-selected,
+    .ogo-menu-submenu-selected .ogo-badge,
+    .ogo-menu-item-selected .ogo-badge,
+    .ogo-menu-item:hover,
+    .ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected {
+      color: @text-color;
+      background-color: @custom-menu-active-background;
+    }
+    .ogo-menu-submenu-selected .ogo-menu-submenu-title .ogo-menu-item-icon,
+    .ogo-menu-item:hover .ogo-menu-item-icon,
+    .ogo-menu-item.ogo-menu-item-selected .ogo-menu-item-icon {
+      color: @primary-color;
+    }
+    .ogo-menu-vertical,
+    .ogo-menu-inline {
+      border: none;
+    }
+    .ogo-menu-item-acitve,
+    .ogo-menu-item-acitve:hover {
+      color: @text-color;
+    }
+    .ogo-menu-inline .ogo-menu-item-selected::after {
+      opacity: 0;
+    }
   }
 }

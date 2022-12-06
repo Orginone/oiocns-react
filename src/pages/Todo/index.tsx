@@ -97,10 +97,14 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     <ContentTemplate
       siderMenuData={todoMenu}
       menuClick={(item) => {
-        if (item.key.startsWith('/todo/app/')) {
+        if (item.key.startsWith('#/todo/app/')) {
           todoCtrl.setCurrentAppTodo(item.key.substring(10));
         }
-        history.push(item.key);
+        if (location.hash.replace('#', '') === item.key) {
+          history.replace(item.key);
+        } else {
+          history.push(item.key);
+        }
       }}
       contentTopLeft={
         todoCtrl.CurAppTodo
