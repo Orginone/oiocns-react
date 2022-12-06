@@ -7,7 +7,7 @@ import useEventEmitter from '@/hooks/useEventEmitter';
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
-  editorValue: string;
+  editorValue: string | null | undefined;
   designData: any;
 };
 

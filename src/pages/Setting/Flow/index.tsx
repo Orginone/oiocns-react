@@ -4,7 +4,6 @@ import cls from './index.module.less';
 import {
   RollbackOutlined,
   ExclamationCircleOutlined,
-  EyeOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
@@ -37,6 +36,7 @@ export enum TabType {
 
 type FlowItem = {
   content: string;
+  id: string;
 };
 
 /**
@@ -94,7 +94,7 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record) => [
+      render: (text, record: FlowItem) => [
         <a
           key="editor"
           onClick={() => {
@@ -149,10 +149,6 @@ const SettingFlow: React.FC = () => {
 
   const changeScale = (val: any) => {
     setScale(val);
-  };
-
-  const preview = () => {
-    // const design = useAppwfConfig((state: any) => state.design);
   };
 
   const publish = async () => {
@@ -258,13 +254,6 @@ const SettingFlow: React.FC = () => {
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (
                         <Space>
-                          {/* <Button
-                            className={cls['publish-preview']}
-                            size="small"
-                            onClick={preview}>
-                            <EyeOutlined />
-                            预览
-                          </Button> */}
                           <Button
                             className={cls['publis-issue']}
                             size="small"
