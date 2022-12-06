@@ -48,8 +48,8 @@ const SettingFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
-  const [editorValue, setEditorValue] = useState<string | null>();
-  const [designData, setDesignData] = useState();
+  const [editorValue, setEditorValue] = useState<string | null | undefined>();
+  const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
@@ -111,7 +111,7 @@ const SettingFlow: React.FC = () => {
               title: '提示',
               content: '确定删除当前流程吗',
               onOk: async () => {
-                const currentData = await userCtrl.Space.deleteDefine(record.id);
+                const currentData = await userCtrl.Space.deleteDefine(record?.id);
                 console.log('currentData', currentData);
                 if (currentData) {
                   initData();
@@ -219,6 +219,8 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
+                              setConditionData({ name: '', labels: [] });
+                              setDesignData(null);
                               setEditorValue(null);
                             },
                             onCancel() {},
@@ -241,19 +243,22 @@ const SettingFlow: React.FC = () => {
                         ]}
                         onChange={(e) => {
                           setCurrentStep(e);
-                          setDesignData(design);
+                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
+                          if (StepType.BASEINFO === e) {
+                            setDesignData(design);
+                          }
                         }}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (
                         <Space>
-                          <Button
+                          {/* <Button
                             className={cls['publish-preview']}
                             size="small"
                             onClick={preview}>
                             <EyeOutlined />
                             预览
-                          </Button>
+                          </Button> */}
                           <Button
                             className={cls['publis-issue']}
                             size="small"
