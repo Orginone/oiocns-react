@@ -1,12 +1,10 @@
-import { kernel, model } from '../../base';
-import { XMerchandise, XOrderDetailArray } from '../../base/schema';
-import { CommonStatus } from '../enum';
+import { kernel, model, schema } from '../../base';
 import IMerchandise from './imerchandise';
 
 export default class Merchandise implements IMerchandise {
-  merchandise: XMerchandise;
+  merchandise: schema.XMerchandise;
 
-  constructor(merchandise: XMerchandise) {
+  constructor(merchandise: schema.XMerchandise) {
     this.merchandise = merchandise;
   }
 
@@ -49,36 +47,16 @@ export default class Merchandise implements IMerchandise {
    */
   public async getSellOrder(
     page: model.PageRequest,
-  ): Promise<model.ResultType<XOrderDetailArray>> {
+  ): Promise<model.ResultType<schema.XOrderDetailArray>> {
     return await kernel.querySellOrderListByMerchandise({
       id: this.merchandise.id,
       page: page,
     });
   }
-
-  /**
-   * 交付订单中的商品
-   * @param detailId 订单ID
-   * @param status 交付状态
-   * @returns 交付结果
-   */
-  public async deliver(
-    detailId: string,
-    status: number = CommonStatus.ApproveStartStatus,
-  ): Promise<model.ResultType<any>> {
+  public async deliver(detailId: string, status: number): Promise<model.ResultType<any>> {
     return await kernel.deliverMerchandise({ id: detailId, status: status });
   }
-
-  /**
-   * 买方取消订单
-   * @param detailId 订单Id
-   * @param status 取消状态
-   * @returns
-   */
-  public async cancel(
-    detailId: string,
-    status: number = CommonStatus.RejectStartStatus,
-  ): Promise<model.ResultType<any>> {
+  public async cancel(detailId: string, status: number): Promise<model.ResultType<any>> {
     return await kernel.cancelOrderDetail({ id: detailId, status: status });
   }
 }

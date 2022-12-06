@@ -80,7 +80,7 @@ export default interface IMarket {
    * @param merchandiseId 下架商品ID
    * @returns 下架是否成功
    */
-  unPublish(merchandiseId: string, belongId: string): Promise<model.ResultType<any>>;
+  unPublish(merchandiseId: string): Promise<model.ResultType<any>>;
   /**
    * 下单
    * @param nftId 区块链Id
@@ -90,15 +90,10 @@ export default interface IMarket {
    * @param merchandiseIds 商品Id集合
    */
   createOrder(
-    // 存证ID
     nftId: string,
-    // 名称
     name: string,
-    // 编号
     code: string,
-    // 创建组织/个人
     spaceId: string,
-    // 商品ID集合
     merchandiseIds: string[],
   ): Promise<model.ResultType<any>>;
 }
