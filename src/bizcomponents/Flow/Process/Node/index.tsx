@@ -116,7 +116,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       </div>
     </div>
   );
-  console.log('props显著标志', props);
+
   const nodeError = (
     <div className={cls['node-error']}>
       {props.showError && (
