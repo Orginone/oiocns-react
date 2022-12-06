@@ -1,6 +1,6 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import TableHeaderOptions from '@/components/TableHeaderOptions';
-import PageCard from '../components/PageCard';
+import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-table';
 import { Space, Tag } from 'antd';

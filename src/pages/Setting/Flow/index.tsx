@@ -4,7 +4,6 @@ import cls from './index.module.less';
 import {
   RollbackOutlined,
   ExclamationCircleOutlined,
-  EyeOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
@@ -30,12 +29,15 @@ export const stepTypeAndNameMaps: Record<StepType, string> = {
   [StepType.PROCESSMESS]: '流程设计',
 };
 
-export enum EditorType {
-  'TABLEMES',
-  'PROCESSDESIGN',
+export enum TabType {
+  'TABLEMES', //表格
+  'PROCESSDESIGN', //流程
 }
 
-type FlowItem = {};
+type FlowItem = {
+  content: string;
+  id: string;
+};
 
 /**
  * 流程设置
@@ -44,14 +46,15 @@ type FlowItem = {};
 const SettingFlow: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
-  const [editorType, setEditorType] = useState<EditorType>(EditorType.TABLEMES);
+  const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
-
+  const [editorValue, setEditorValue] = useState<string | null | undefined>();
+  const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
     name: '',
     labels: [],
   });
-  // const form = useAppwfConfig((state: any) => state.form);
+
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -73,13 +76,8 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '绑定应用',
-      dataIndex: 'linkApp',
-      ellipsis: true,
-    },
-    {
       title: '创建人',
-      dataIndex: 'createPeople',
+      dataIndex: 'createUser',
       ellipsis: true,
     },
     {
@@ -96,20 +94,21 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: () => [
+      render: (text, record: FlowItem) => [
         <a
           key="editor"
           onClick={() => {
-            setEditorType(EditorType.PROCESSDESIGN);
+            setTabType(TabType.PROCESSDESIGN);
+            setCurrentStep(StepType.PROCESSMESS);
+            setEditorValue(record?.content);
+            const editorDataMes = JSON.parse(record?.content || '{}');
+            console.log(editorDataMes);
+            setConditionData({
+              name: editorDataMes.name,
+              labels: JSON.parse(editorDataMes.remark),
+            });
           }}>
           编辑
-        </a>,
-        <a
-          key="look"
-          onClick={() => {
-            setEditorType(EditorType.PROCESSDESIGN);
-          }}>
-          查看
         </a>,
         <a
           key="delete"
@@ -117,8 +116,13 @@ const SettingFlow: React.FC = () => {
             Modal.confirm({
               title: '提示',
               content: '确定删除当前流程吗',
-              onOk: () => {
-                message.success('删除成功');
+              onOk: async () => {
+                const currentData = await userCtrl.Space.deleteDefine(record?.id);
+                console.log('currentData', currentData);
+                if (currentData) {
+                  initData();
+                  message.success('删除成功');
+                }
               },
             });
           }}>
@@ -147,27 +151,22 @@ const SettingFlow: React.FC = () => {
     setScale(val);
   };
 
-  const preview = () => {
-    // const design = useAppwfConfig((state: any) => state.design);
-  };
-
   const publish = async () => {
-    design.BelongId = userCtrl.Space.target.id;
-    console.log('design', design);
+    design.belongId = userCtrl.Space.target.id;
     const result = await userCtrl.Space.publishDefine(design);
-    console.log(result);
     if (result.data) {
       message.success('添加成功');
+      setTabType(TabType.TABLEMES);
+      initData();
     } else {
       message.warning(result.msg);
     }
-    // message.warning('该功能尚未开放');
   };
 
   return (
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
-        {editorType === EditorType.TABLEMES ? (
+        {tabType === TabType.TABLEMES ? (
           <div>
             <Card title="流程列表" bordered={false}>
               <ProTable
@@ -180,7 +179,7 @@ const SettingFlow: React.FC = () => {
                     key="button"
                     type="primary"
                     onClick={() => {
-                      setEditorType(EditorType.PROCESSDESIGN);
+                      setTabType(TabType.PROCESSDESIGN);
                     }}>
                     新建
                   </Button>,
@@ -220,8 +219,11 @@ const SettingFlow: React.FC = () => {
                             okType: 'danger',
                             cancelText: '取消',
                             onOk() {
-                              setEditorType(EditorType.TABLEMES);
+                              setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
+                              setConditionData({ name: '', labels: [] });
+                              setDesignData(null);
+                              setEditorValue(null);
                             },
                             onCancel() {},
                           });
@@ -233,6 +235,13 @@ const SettingFlow: React.FC = () => {
                     <div style={{ width: '300px' }}>
                       <Steps
                         current={currentStep}
+                        onChange={(e) => {
+                          setCurrentStep(e);
+                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
+                          if (StepType.BASEINFO === e) {
+                            setDesignData(design);
+                          }
+                        }}
                         items={[
                           {
                             title: stepTypeAndNameMaps[StepType.BASEINFO],
@@ -240,21 +249,11 @@ const SettingFlow: React.FC = () => {
                           {
                             title: stepTypeAndNameMaps[StepType.PROCESSMESS],
                           },
-                        ]}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                        }}></Steps>
+                        ]}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (
                         <Space>
-                          <Button
-                            className={cls['publish-preview']}
-                            size="small"
-                            onClick={preview}>
-                            <EyeOutlined />
-                            预览
-                          </Button>
                           <Button
                             className={cls['publis-issue']}
                             size="small"
@@ -287,13 +286,20 @@ const SettingFlow: React.FC = () => {
                     {/* 基本信息组件 */}
                     {currentStep === StepType.BASEINFO ? (
                       <BaseInfo
+                        currentFormValue={conditionData}
+                        onChange={(params) => {
+                          setConditionData(params);
+                        }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
                           setConditionData(params);
                         }}
                       />
                     ) : (
-                      <ProcessDesign conditionData={conditionData}></ProcessDesign>
+                      <ProcessDesign
+                        designData={designData}
+                        editorValue={editorValue}
+                        conditionData={conditionData}></ProcessDesign>
                     )}
                   </Card>
                 </Content>

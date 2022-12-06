@@ -7,10 +7,12 @@ import { XTarget } from '@/ts/base/schema';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { schema } from '@/ts/base';
 
 type CompanySearchTableProps = {
   [key: string]: any;
   setJoinKey?: (key: string) => void;
+  setJoinTarget?: (target: schema.XTarget) => void;
 };
 
 let tableProps: CompanySearchTableProps;
@@ -68,6 +70,9 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
               const joinKey = res.data.result[0].id!;
               if (tableProps.setJoinKey) {
                 tableProps.setJoinKey(joinKey);
+              }
+              if (tableProps.setJoinTarget) {
+                tableProps.setJoinTarget(res.data.result[0]);
               }
             }
           }

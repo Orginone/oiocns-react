@@ -1,8 +1,10 @@
 import React, { useState, useCallback, useContext } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
+
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { EventContext } from '@/bizcomponents/Flow/ProcessDesign/index';
+import { EventContext } from '../../../const';
+
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};
@@ -14,7 +16,7 @@ type ConditionGroupItemConfigProps = {};
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  const { conditionData } = useContext(EventContext);
+  const conditionData: any = useContext(EventContext);
   console.log('conditionData', conditionData);
   console.log('selectedNode', selectedNode);
   const [key, setKey] = useState(0);
@@ -51,7 +53,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
 
   const valueChange = (value: any, condition: any) => {
     condition.val = String(value);
-    var filter = DefaultProps.getFormFields().filter(
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == condition.paramKey,
     );
     var dict = [];
@@ -73,7 +75,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   // );
 
   const dictory = useCallback((paramKey: any) => {
-    var filter = DefaultProps.getFormFields().filter(
+    var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == paramKey,
     );
 
@@ -85,7 +87,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
 
   return (
     <div>
-      {selectedNode.conditions.map((condition: any, index: number) => (
+      {selectedNode.conditions?.map((condition: any, index: number) => (
         <div key={index + '_g'} className={cls['group']}>
           <div className={cls['group-header']}>
             <div
@@ -106,7 +108,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 // options={conditionData?.labels || []}
                 options={DefaultProps.getFormFields()}
                 onChange={(val, option) => {
-                  console.log('选中的值为啥没有复现', option);
                   paramChange(val, condition);
                 }}
                 defaultValue={condition.paramKey || null}

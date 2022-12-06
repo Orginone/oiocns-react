@@ -8,6 +8,7 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { getUuid } from '@/utils/tools';
 import MarketClassifyTree from '@/components/CustomTreeComp';
+import { PlusOutlined } from '@ant-design/icons';
 
 const x = 3;
 const y = 2;
@@ -138,11 +139,13 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       <div className={cls.topMes}>
         <Button
           className={cls.creatgroup}
-          type="primary"
-          onClick={() => handleMenuClick('new', {})}>
-          {createTitle}
-        </Button>
+          type="text"
+          icon={<PlusOutlined className={cls.addIcon} />}
+          onClick={() => handleMenuClick('new', {})}
+        />
+
         <MarketClassifyTree
+          className={cls['docTree']}
           id={key}
           showIcon
           searchable

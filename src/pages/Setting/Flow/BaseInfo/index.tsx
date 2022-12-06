@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ProFormText,
   ProForm,
@@ -12,14 +12,23 @@ import { Form } from 'antd';
 import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: (params: any) => void;
+  currentFormValue: {};
+  onChange: (params: any) => void;
 };
 
-const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
+const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
+  useEffect(() => {
+    form.setFieldsValue(currentFormValue);
+  }, [currentFormValue]);
+
   return (
     <div className={cls['contentMes']}>
       <ProForm
         layout="horizontal"
+        onValuesChange={async () => {
+          onChange(await form.getFieldsValue());
+        }}
         form={form}
         onFinish={async (e) => {
           nextStep(e);
@@ -45,19 +54,19 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
           }}>
           <ProFormGroup key="group">
             <ProFormText
-              name="value"
+              name="label"
               label="字段名称"
               rules={[{ required: true, message: '请填写字段名称!' }]}
             />
             <ProFormText
-              name="label"
+              name="value"
               label="字段编号"
               rules={[{ required: true, message: '请填写字段编号!' }]}
             />
             <ProFormSelect
               name="type"
               label="字段类型"
-              request={async () => [
+              options={[
                 { label: '字符串', value: 'STRING' },
                 { label: '数字', value: 'NUMERIC' },
                 { label: '枚举', value: 'DICT' },
@@ -87,14 +96,14 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
                   }}>
                   <ProFormGroup key="group">
                     <ProFormText
-                      name="value"
-                      label="字段名称"
-                      rules={[{ required: true, message: '请输入字段名称!' }]}
+                      name="label"
+                      label="枚举名称"
+                      rules={[{ required: true, message: '请输入枚举名称!' }]}
                     />
                     <ProFormText
-                      name="label"
-                      label="字段编号"
-                      rules={[{ required: true, message: '请输入字段编号!' }]}
+                      name="value"
+                      label="枚举值"
+                      rules={[{ required: true, message: '请输入枚举值!' }]}
                     />
                   </ProFormGroup>
                 </ProFormList>

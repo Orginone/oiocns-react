@@ -1,12 +1,11 @@
 import { ProductModel } from '@/ts/base/model';
-import IProduct from '@/ts/core/market/iproduct';
-import { IMTarget } from '@/ts/core/target/itarget';
-import { kernel } from '../../base';
-import BaseController from '../baseCtrl';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { DomainTypes, emitter, IMTarget, IProduct } from '@/ts/core';
+import { kernel } from '@/ts/base';
 import { marketColumns, myColumns, shareInfoColumns } from './config';
 import { message, Modal } from 'antd';
-const selfAppMenu = 'selfAppMenu';
+import { Emitter } from '@/ts/base/common';
+import userCtrl from '../setting/userCtrl';
+import { STORE_USER_MENU } from '@/constants/const'
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
 
@@ -63,7 +62,7 @@ interface RecMsg<T> {
   UpdateTime: string;
   data: T[];
 }
-class SelfAppController extends BaseController {
+class SelfAppController extends Emitter {
   private _curSpace: IMTarget = userCtrl.User;
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
@@ -125,12 +124,12 @@ class SelfAppController extends BaseController {
   constructor() {
     super();
     /* 监听空间切换 */
-    userCtrl.subscribePart(UserPartTypes.Space, async () => {
+    emitter.subscribePart(DomainTypes.Company, async () => {
       this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
-    kernel.anystore.subscribed(selfAppMenu, 'user', (Msg: RecMsg<TreeType>) => {
+    kernel.anystore.subscribed(STORE_USER_MENU, 'user', (Msg: RecMsg<TreeType>) => {
       // console.log('订阅数据推送 自定义目录===>', Msg.data);
       const { data = defaultTreeData } = Msg;
       this._treeData = data;
@@ -166,7 +165,7 @@ class SelfAppController extends BaseController {
     this._treeData = data || defaultTreeData;
     this.changCallbackPart(SelfCallBackTypes.TreeData);
     kernel.anystore.set(
-      selfAppMenu,
+      STORE_USER_MENU,
       {
         operation: 'replaceAll',
         data: {
@@ -240,14 +239,15 @@ class SelfAppController extends BaseController {
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
+
     const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
     data.typeName = 'Web应用';
     const res = await Target.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
-      return true;
+
     }
-    return false;
+    return res;
   };
 
   /**
@@ -310,7 +310,7 @@ class SelfAppController extends BaseController {
         await this._curSpace.deleteProduct(this._curProduct!.prod.id);
         this.querySelfApps(true);
       },
-      onCancel() {},
+      onCancel() { },
     });
   }
 }

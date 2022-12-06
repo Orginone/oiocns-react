@@ -6,7 +6,7 @@ import { TargetType } from '../enum';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { faildResult, schema, kernel, common } from '@/ts/base';
+import { schema, kernel, common, model } from '@/ts/base';
 import { IGroup, ICompany, ICohort, IDepartment, IWorking, SpaceType } from './itarget';
 import Working from './working';
 /**
@@ -40,7 +40,7 @@ export default class Company extends MarketTarget implements ICompany {
     this.extendTargetType = [
       TargetType.Department,
       TargetType.Working,
-      ...consts.CompanyTypes,
+      ...this.companyTypes,
     ];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
     this.createTargetType = [
@@ -78,7 +78,7 @@ export default class Company extends MarketTarget implements ICompany {
       }
       return res;
     } else {
-      return faildResult('该集团已存在!');
+      return model.badRequest('该集团已存在!');
     }
   }
 
@@ -123,7 +123,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async removePerson(ids: string[]): Promise<ResultType<any>> {
     const res = await kernel.removeAnyOfTeamAndBelong({
       id: this.target.id,
-      teamTypes: [...consts.CompanyTypes, ...this.subTypes],
+      teamTypes: [...this.companyTypes, ...this.subTypes],
       targetIds: ids,
       targetType: TargetType.Person,
     });
@@ -157,7 +157,7 @@ export default class Company extends MarketTarget implements ICompany {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async deleteWorking(id: string): Promise<ResultType<any>> {
     const working = this.workings.find((working) => {
@@ -172,7 +172,7 @@ export default class Company extends MarketTarget implements ICompany {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async deleteGroup(id: string): Promise<ResultType<any>> {
     const group = this.joinedGroup.find((group) => {
@@ -191,7 +191,7 @@ export default class Company extends MarketTarget implements ICompany {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async deleteCohort(id: string): Promise<ResultType<any>> {
     let res = await kernel.deleteTarget({
@@ -231,7 +231,7 @@ export default class Company extends MarketTarget implements ICompany {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async getPersons(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!reload && this.person.length > 0) {
@@ -295,7 +295,7 @@ export default class Company extends MarketTarget implements ICompany {
     data: Omit<TargetModel, 'id'>,
   ): Promise<ResultType<schema.XTarget>> {
     if (!validIsSocialCreditCode(data.code)) {
-      return faildResult('请填写正确的代码!');
+      return model.badRequest('请填写正确的代码!');
     }
     return await super.updateTarget(data);
   }
@@ -306,7 +306,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (cohort == undefined) {
       return await this.applyJoin(id, TargetType.Cohort);
     }
-    return faildResult(consts.IsJoinedError);
+    return model.badRequest(consts.IsJoinedError);
   }
   public async applyJoinGroup(id: string): Promise<ResultType<any>> {
     const group = this.joinedGroup.find((group) => {
@@ -315,7 +315,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (group == undefined) {
       return await this.applyJoin(id, TargetType.Group);
     }
-    return faildResult(consts.IsJoinedError);
+    return model.badRequest(consts.IsJoinedError);
   }
   public async queryJoinApply(): Promise<ResultType<schema.XRelationArray>> {
     return await kernel.queryJoinTeamApply({

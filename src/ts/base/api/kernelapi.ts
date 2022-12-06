@@ -1,6 +1,6 @@
 import AnyStore from './anystore';
 import StoreHub from './storehub';
-import type * as model from '../model';
+import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
@@ -42,7 +42,7 @@ export default class KernelApi {
           .invoke('TokenAuth', this._anystore.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
-              console.debug('认证成功！');
+              logger.info('连接到内核成功!');
             }
           })
           .catch((err) => {
@@ -2225,6 +2225,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async request(req: model.ReqestType): Promise<model.ResultType<any>> {
+
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('Request', req);
     } else {
@@ -2286,6 +2287,6 @@ export default class KernelApi {
     if (res.data && (res.data as model.ResultType<any>)) {
       return res.data as model.ResultType<any>;
     }
-    return { success: false, data: {}, code: 400, msg: '' };
+    return model.badRequest();
   }
 }

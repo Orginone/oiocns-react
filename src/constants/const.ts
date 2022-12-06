@@ -1,5 +1,6 @@
-export const STORE_CUSTOM_MENU = 'STORE_CUSTOM_MENU';
-
+// 仓库我的应用 自定义 目录
+export const STORE_USER_MENU = 'STORE_USER_MENU';
+export const STORE_RECENTLY_APPS = 'STORE_RECENTLY_APPS';
 // 购物车
 export const JOIN_SHOPING_CAR = 'JOIN_SHOPING_CAR';
 

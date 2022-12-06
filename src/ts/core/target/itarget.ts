@@ -27,6 +27,8 @@ export interface ITarget {
   ownIdentitys: schema.XIdentity[];
   /** 组织的身份 */
   identitys: IIdentity[];
+  /** 支持的单位类型申明 */
+  companyTypes: TargetType[];
   /**
    * 获取职权树
    * @param reload 是否强制刷新
@@ -323,7 +325,7 @@ export interface ISpace extends IFlow {
   searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 群组操作 */
-export interface ICohort {
+export interface ICohort extends ITarget {
   /** 群组实体对象 */
   target: schema.XTarget;
   /** 职权树 */
@@ -602,8 +604,8 @@ export interface IGroup extends ITarget {
    * @param id 目标Id
    * @returns
    */
-  applyJoinGroup(id: string): Promise<ResultType<any>>;
   /**
+   applyJoinGroup(id: string): Promise<ResultType<any>>;
    * 创建子集团
    * @param data 子集团基本信息
    */
