@@ -4,6 +4,7 @@ type ApprovalNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  type: {};
   config: any;
   [key: string]: any;
 };
@@ -27,12 +28,14 @@ const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => 
       return null;
     }
   }, [props.config]);
+
   return (
     <Node
       title={props.config.name}
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      type={props?.config.type}
       showError={false}
       content={content}
       errorInfo="错误信息"
