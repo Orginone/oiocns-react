@@ -2225,6 +2225,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async request(req: model.ReqestType): Promise<model.ResultType<any>> {
+
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('Request', req);
     } else {

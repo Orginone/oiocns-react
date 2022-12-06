@@ -240,10 +240,7 @@ const SettingFlow: React.FC = () => {
                           {
                             title: stepTypeAndNameMaps[StepType.PROCESSMESS],
                           },
-                        ]}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                        }}></Steps>
+                        ]}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (

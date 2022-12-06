@@ -140,13 +140,13 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ conditionData }) => {
 
   return (
     <>
-      <Button
+      {/* <Button
         onClick={() => {
           preview();
         }}>
         测一下预览
-      </Button>
-      <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} />
+      </Button> */}
+      {/* <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} /> */}
       <div className={cls['container']}>
         {/* conditionData */}
         <EventContext.Provider value={{ FlowSub, conditionData }}>
