@@ -41,13 +41,11 @@ const GroupContent = (props: Iprops) => {
       });
     }
   };
-  useEffect(() => {
-    scrollEvent();
-  }, [messages]);
 
   useEffect(() => {
     if (chatCtrl.chat) {
       setMessages(chatCtrl.chat.messages);
+      scrollEvent();
     }
   }, [key]);
 
