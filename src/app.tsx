@@ -3,7 +3,7 @@ import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { BrowserRouter } from 'react-router-dom';
 
-import routes from '@/routes/config';
+import routes from '@/routes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './global.less';
 
