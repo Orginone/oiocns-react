@@ -102,7 +102,7 @@ const SettingFlow: React.FC = () => {
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
             const editorDataMes = JSON.parse(record?.content || '{}');
-            console.log(editorDataMes);
+
             setConditionData({
               name: editorDataMes.name,
               labels: JSON.parse(editorDataMes.remark),
@@ -118,7 +118,7 @@ const SettingFlow: React.FC = () => {
               content: '确定删除当前流程吗',
               onOk: async () => {
                 const currentData = await userCtrl.Space.deleteDefine(record?.id);
-                console.log('currentData', currentData);
+
                 if (currentData) {
                   initData();
                   message.success('删除成功');
@@ -142,7 +142,6 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
-      console.log('result', result);
       setDataSource(result);
     }
   };
@@ -239,7 +238,6 @@ const SettingFlow: React.FC = () => {
                           setCurrentStep(e);
                           /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
                           if (StepType.BASEINFO === e) {
-                            console.log('design', design);
                             setDesignData(design);
                           }
                         }}

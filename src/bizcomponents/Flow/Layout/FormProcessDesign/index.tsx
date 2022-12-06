@@ -23,7 +23,6 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
     setShowConfig(false);
   };
   const Selected = (node: any) => {
-    console.log('点击的node', node);
     setShowConfig(true);
     setSelectedNode(node);
   };

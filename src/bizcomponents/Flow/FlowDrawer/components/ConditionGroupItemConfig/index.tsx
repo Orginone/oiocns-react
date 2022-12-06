@@ -162,7 +162,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 />
               )}
               {/* 数字类型 */}
-              {/* {console.log('condition.paramKey', condition.val)} */}
               {condition.type == 'NUMERIC' && (
                 <InputNumber
                   style={{ width: 200 }}

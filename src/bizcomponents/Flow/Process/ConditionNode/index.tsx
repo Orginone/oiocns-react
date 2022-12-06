@@ -34,13 +34,6 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     const currentCondition = JSON.parse(design.remark);
-
-    // console.log('瞅瞅这这里的条件', currentCondition);
-    // console.log('渲染是不是也走这里______', conditions);
-
-    // 这里写渲染逻辑
-    // conditions[0]
-
     var text = '请设置条件';
     if (conditions && conditions.length > 0) {
       text = '';
