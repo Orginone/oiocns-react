@@ -64,7 +64,7 @@ const AppTodo: React.FC = () => {
   };
   useEffect(() => {
     loadList(1, 10);
-  }, [activeKey, needReload]);
+  }, [activeKey, needReload, location.pathname]);
 
   return (
     <PageCard
