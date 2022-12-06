@@ -39,7 +39,8 @@ const ConditionNode = () => {
           添加条件
         </Button>
       </div>
-      <ConditionGroupItemConfig />
+
+      {DefaultProps.getFormFields().length > 0 ? <ConditionGroupItemConfig /> : null}
     </div>
   );
 };
