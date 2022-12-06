@@ -19,6 +19,7 @@ export default class Group extends BaseTarget implements IGroup {
     this.subTypes = [TargetType.Group, ...this.companyTypes];
     this.joinTargetType = [TargetType.Group];
     this.pullTypes = this.companyTypes;
+    this.createTargetType = [TargetType.Group];
     this.searchTargetType = [...this.companyTypes, TargetType.Group];
   }
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
