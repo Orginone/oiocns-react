@@ -19,8 +19,6 @@ class MarketController extends Emitter {
   private _currentMenu = 'Public';
   /** 判断当前所处页面类型,调用不同请求 */
   public curPageType: 'app' | 'market' = 'market';
-  /** 触发页面渲染 callback */
-  public marketTableCallBack!: (data: any) => void;
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
@@ -41,6 +39,7 @@ class MarketController extends Emitter {
       } else {
         this._target = userCtrl.User;
       }
+      this._curMarket = (await this._target.getPublicMarket(false))[0];
       await this._target.getJoinMarkets();
       this.changCallback();
     });
@@ -97,7 +96,6 @@ class MarketController extends Emitter {
     }
     this._currentMenu = menuItem.title;
     console.log('当前页面类型', this.curPageType);
-    this.getStoreProduct(this.curPageType);
   }
 
   /**
@@ -115,32 +113,6 @@ class MarketController extends Emitter {
         return [];
     }
     //TODO:待完善
-  }
-
-  /** 获取我的应用列表/商店-商品列表
-   * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
-   * @return {*}
-   */
-  public async getStoreProduct(type = 'app', params?: any) {
-    let Fun!: Function;
-    if (type === 'app') {
-      Fun = userCtrl.User!.getOwnProducts;
-      params = {};
-    } else {
-      Fun = this._curMarket!.getMerchandise;
-      params = { offset: 0, limit: 10, filter: '', ...params };
-    }
-    const res = await Fun(params);
-    console.log('获取数据', type, res);
-    if (Array.isArray(res)) {
-      this.marketTableCallBack([...res]);
-      return;
-    }
-    const { success, data } = res;
-    if (success) {
-      const { result = [] } = data;
-      this.marketTableCallBack([...result]);
-    }
   }
 
   /**
