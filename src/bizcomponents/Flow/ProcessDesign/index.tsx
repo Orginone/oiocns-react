@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
-import LayoutHeader from '@/bizcomponents/Flow/Layout/LayoutHeader';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
@@ -22,8 +21,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   editorValue,
   designData,
 }) => {
-  console.log('designData', designData);
-  // const [activeSelect,setactiveSelect] = useState('processDesign')
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
   const previewRef: any = useRef();
@@ -70,14 +67,16 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   const startDesign = async () => {
     let tempDesign;
-    console.log('editorValue', editorValue);
     if (editorValue && editorValue !== '{}') {
       tempDesign = JSON.parse(editorValue);
-      DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
+      if (conditionData?.labels) {
+        DefaultProps.setFormFields(conditionData?.labels);
+      } else {
+        DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
+      }
     } else {
       console.log('designData_____', designData);
       if (!designData) {
-        console.log('走这里了没');
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
         defaultDesign.name = conditionData?.name;
@@ -95,11 +94,13 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   return (
     <>
-      <LayoutHeader
-        OnPreview={preview}
-        OnExit={exit}
-        titleName={(editorValue && JSON.parse(editorValue)?.name) || conditionData?.name}
-      />
+      {/* <Button
+        onClick={() => {
+          preview();
+        }}>
+        测一下预览
+      </Button> */}
+      {/* <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} /> */}
       <div className={cls['container']}>
         {/* conditionData */}
         <EventContext.Provider value={{ FlowSub, conditionData }}>

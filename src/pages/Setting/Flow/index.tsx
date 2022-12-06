@@ -101,6 +101,12 @@ const SettingFlow: React.FC = () => {
             setTabType(TabType.PROCESSDESIGN);
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
+            const editorDataMes = JSON.parse(record?.content || '{}');
+            console.log(editorDataMes);
+            setConditionData({
+              name: editorDataMes.name,
+              labels: JSON.parse(editorDataMes.remark),
+            });
           }}>
           编辑
         </a>,
@@ -240,14 +246,7 @@ const SettingFlow: React.FC = () => {
                           {
                             title: stepTypeAndNameMaps[StepType.PROCESSMESS],
                           },
-                        ]}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
-                          if (StepType.BASEINFO === e) {
-                            setDesignData(design);
-                          }
-                        }}></Steps>
+                        ]}></Steps>
                     </div>
                     <div className={cls['publish']}>
                       {currentStep === StepType.PROCESSMESS && (

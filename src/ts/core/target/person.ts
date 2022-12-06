@@ -8,7 +8,7 @@ import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { ICompany, IPerson, ICohort, SpaceType } from './itarget';
-import { schema, faildResult, kernel, common } from '@/ts/base';
+import { schema, model, kernel, common } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
 
@@ -111,10 +111,10 @@ export default class Person extends MarketTarget implements IPerson {
   ): Promise<ResultType<schema.XTarget>> {
     data.belongId = this.target.id;
     if (!this.companyTypes.includes(<TargetType>data.typeName)) {
-      return faildResult('您无法创建该类型单位!');
+      return model.badRequest('您无法创建该类型单位!');
     }
     if (!validIsSocialCreditCode(data.code)) {
-      return faildResult('请填写正确的代码!');
+      return model.badRequest('请填写正确的代码!');
     }
     const tres = await this.searchTargetByName(data.code, this.companyTypes);
     if (!tres.data.result) {
@@ -137,7 +137,7 @@ export default class Person extends MarketTarget implements IPerson {
       }
       return res;
     } else {
-      return faildResult('该单位已存在!');
+      return model.badRequest('该单位已存在!');
     }
   }
   public async deleteCohort(id: string): Promise<ResultType<any>> {
@@ -171,7 +171,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (cohort == undefined) {
       return await this.applyJoin(id, TargetType.Cohort);
     }
-    return faildResult(consts.IsJoinedError);
+    return model.badRequest(consts.IsJoinedError);
   }
   public async applyJoinCompany(
     id: string,
@@ -183,7 +183,7 @@ export default class Person extends MarketTarget implements IPerson {
     if (company == undefined) {
       return await this.applyJoin(id, typeName);
     }
-    return faildResult(consts.IsJoinedError);
+    return model.badRequest(consts.IsJoinedError);
   }
   public async quitCohorts(id: string): Promise<ResultType<any>> {
     const res = await this.cancelJoinTeam(id);
@@ -234,7 +234,7 @@ export default class Person extends MarketTarget implements IPerson {
       }
       return res;
     }
-    return faildResult(consts.IsExistError);
+    return model.badRequest(consts.IsExistError);
   }
   public async removeFriend(ids: string[]): Promise<ResultType<any>> {
     const res = await this.removeMember(ids, TargetType.Person);

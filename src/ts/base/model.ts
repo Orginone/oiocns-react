@@ -926,3 +926,11 @@ export type FileChunkData = {
   /** 分片数据 */
   data: number[];
 };
+
+/** 请求失败 */
+export const badRequest = (
+  msg: string = '请求失败',
+  code: number = 400,
+): ResultType<any> => {
+  return { success: false, msg: msg, code: code, data: false };
+};

@@ -36,6 +36,7 @@ export default class AnyStore {
         this._storeHub
           .invoke('TokenAuth', this.accessToken, 'user')
           .then(() => {
+            logger.info('连接到私有存储成功!');
             Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
               const key = fullKey.split('|')[0];
               const domain = fullKey.split('|')[1];

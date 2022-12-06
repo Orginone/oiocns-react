@@ -19,7 +19,8 @@ type InsertButtonProps = {
  * @returns
  */
 const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
-  const { FlowSub } = useContext(EventContext);
+  // const { FlowSub } = useContext(EventContext);
+  const FlowSub: any = useContext(EventContext);
 
   // const FlowSub = useEventEmitter();
   const text = <span>添加流程节点</span>;

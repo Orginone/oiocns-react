@@ -1,16 +1,13 @@
 import { Tooltip } from 'antd';
 import {
   TagOutlined,
-  UserOutlined,
   CloseOutlined,
-  RightOutlined,
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
-import React, { useContext } from 'react';
+import React from 'react';
 import cls from './index.module.less';
-import { EventContext } from '../../const';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;

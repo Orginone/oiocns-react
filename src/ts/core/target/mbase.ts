@@ -278,6 +278,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     // 产品类型名
     typeName?: string;
   }): Promise<model.ResultType<schema.XProduct>> => {
+
     const res = await kernel.createProduct({
       name,
       code,
