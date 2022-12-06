@@ -1,17 +1,16 @@
 import { kernel } from '@/ts/base';
 import { XImMsg } from '@/ts/base/schema';
-import { IChat, IChatGroup } from '@/ts/core/chat/ichat';
-import { LoadChats } from '@/ts/core/chat';
-import BaseController from '../baseCtrl';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
-import { TargetType } from '@/ts/core/enum';
+import { emitter, IChat, IChatGroup, LoadChats } from '@/ts/core';
+import userCtrl from '../setting/userCtrl';
+import { DomainTypes, TargetType } from '@/ts/core/enum';
+import { Emitter } from '@/ts/base/common';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
 /**
  * 会话控制器
  */
-class ChatController extends BaseController {
+class ChatController extends Emitter {
   private _tabIndex: string = '1';
   private _userId: string = '';
   private _groups: IChatGroup[] = [];
@@ -19,7 +18,7 @@ class ChatController extends BaseController {
   private _curChat: IChat | undefined;
   constructor() {
     super();
-    userCtrl.subscribePart(UserPartTypes.User, () => {
+    emitter.subscribePart(DomainTypes.User, () => {
       if (this._userId != userCtrl.User.target.id) {
         this._userId = userCtrl.User.target.id;
         setTimeout(async () => {

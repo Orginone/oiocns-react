@@ -1,7 +1,5 @@
-import { rootDir } from '../../core/store/filesys';
-import { IFileSystemItem, IObjectItem } from '../../core/store/ifilesys';
-import BaseController from '../baseCtrl';
-import userCtrl, { UserPartTypes } from '../setting/userCtrl';
+import { IFileSystemItem, IObjectItem, rootDir, DomainTypes, emitter } from '@/ts/core/';
+import { Emitter } from '@/ts/base/common';
 /** 任务模型 */
 export type TaskModel = {
   group: string;
@@ -14,7 +12,7 @@ const homeName = '主目录';
 /**
  * 文档控制器
  */
-class DocsController extends BaseController {
+class DocsController extends Emitter {
   private _curKey: string;
   private _home: IObjectItem;
   private _root: IFileSystemItem;
@@ -24,7 +22,7 @@ class DocsController extends BaseController {
     this._root = rootDir;
     this._taskList = [];
     this._curKey = this._root.key;
-    userCtrl.subscribePart(UserPartTypes.User, () => {
+    emitter.subscribePart(DomainTypes.User, () => {
       setTimeout(async () => {
         this._home = await this._root.create(homeName);
         this.changCallback();

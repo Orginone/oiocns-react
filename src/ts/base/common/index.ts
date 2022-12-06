@@ -1,5 +1,5 @@
-export { Callback } from './callback';
 export { CharCode } from './charCode';
+export { Emitter } from './emitter';
 export { formatSize } from './format';
 export type { IDisposable } from './lifecycle';
 export { sleep } from './lifecycle';
