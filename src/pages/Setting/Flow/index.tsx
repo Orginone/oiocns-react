@@ -86,11 +86,6 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      ellipsis: true,
-    },
-    {
       title: '操作',
       valueType: 'option',
       key: 'option',
@@ -102,7 +97,7 @@ const SettingFlow: React.FC = () => {
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
             const editorDataMes = JSON.parse(record?.content || '{}');
-            console.log(editorDataMes);
+
             setConditionData({
               name: editorDataMes.name,
               labels: JSON.parse(editorDataMes.remark),
@@ -118,7 +113,7 @@ const SettingFlow: React.FC = () => {
               content: '确定删除当前流程吗',
               onOk: async () => {
                 const currentData = await userCtrl.Space.deleteDefine(record?.id);
-                console.log('currentData', currentData);
+
                 if (currentData) {
                   initData();
                   message.success('删除成功');
@@ -142,7 +137,6 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
-      console.log('result', result);
       setDataSource(result);
     }
   };
@@ -289,6 +283,8 @@ const SettingFlow: React.FC = () => {
                         currentFormValue={conditionData}
                         onChange={(params) => {
                           setConditionData(params);
+                          design.remark = JSON.stringify(params.labels);
+                          setDesignData(design);
                         }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);

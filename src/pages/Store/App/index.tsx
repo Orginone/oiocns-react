@@ -196,7 +196,7 @@ const StoreApp: React.FC = () => {
 
   return (
     <>
-      {location.pathname === '/store/app' && AppIndex}
+      {location.hash === '#/store/app' && AppIndex}
       <Modal
         title={`应用${shareType}`}
         width={800}
