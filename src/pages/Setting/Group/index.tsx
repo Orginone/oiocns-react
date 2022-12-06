@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space, message } from 'antd';
+import { Card, Button, Descriptions, Space, message, Modal } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -14,12 +14,17 @@ import { RouteComponentProps } from 'react-router-dom';
 import TreeLeftGroupPage from './components/TreeLeftGroupPage/Creategroup';
 import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
-import { IGroup } from '@/ts/core/target/itarget';
+import { ICompany, IGroup } from '@/ts/core/target/itarget';
 import Group from '@/ts/core/target/group';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import { getUuid } from '@/utils/tools';
+import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
+import SearchCompany from '@/bizcomponents/SearchCompany';
+import Company from '@/ts/core/target/company';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
 /**
  * 集团设置
  * @returns
@@ -31,12 +36,16 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
-  const [statusKey, setStatusKey] = useState('merchandise');
+  // const [statusKey, setStatusKey] = useState('merchandise');
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
 
   const [dataSource, setDataSource] = useState<XTarget[]>();
   const [id, setId] = useState<string>('');
   const [groupModalID, setGroupModalID] = useState<string>('');
+  const [joinKey, setJoinKey] = useState<string>('');
+  const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
+
+  const [selectId, setSelectId] = useState<string>('');
   /**
    * @description: 监听点击事件，关闭弹窗 订阅
    * @return {*}
@@ -59,6 +68,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       case 'new':
         setGroupModalID(getUuid());
         setId('');
+        setSelectId('new');
         setIsOpen(true);
         break;
       case '新增集团':
@@ -66,6 +76,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         setId(item.target.target.id);
         setCurrentGroup(item.target);
         setIsOpen(true);
+        setSelectId('second');
         break;
       case 'changeGroup':
         break;
@@ -80,19 +91,43 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setLookApplyOpen(false);
   };
 
+  const handlePullOk = async () => {
+    setIsAddOpen(false);
+    if (joinKey == '') {
+      message.error('请选中要添加集团的单位！');
+    } else {
+      console.log(joinTarget);
+      const comp: ICompany = new Company(joinTarget!);
+      const res = await comp.applyJoinGroup(currentGroup?.target?.id!);
+      message.info(res.msg);
+    }
+  };
+  const handlePullCancel = () => {
+    setIsAddOpen(false);
+  };
+
+  const handleApplyCancel = () => {
+    setLookApplyOpen(false);
+  };
+  const handleApplyOk = async (item: any) => {
+    setLookApplyOpen(false);
+  };
+
+  const handleCancel = async () => {
+    setIsOpen(false);
+  };
+
   const handleOk = async (item: any) => {
     // 新增
     if (item) {
       console.log(item);
-      // currentGroup?.createSubGroup
-      if (userCtrl.IsCompanySpace) {
-        item.teamCode = item.code;
-        item.teamName = item.name;
-
-        item.typeName = TargetType.Group;
-        if (id != '') {
-          item.belongId = id;
-          const res = await currentGroup?.createSubGroup(item);
+      if (item.selectId == 'update') {
+        // 更新集团
+        if (userCtrl.IsCompanySpace) {
+          item.teamCode = item.code;
+          item.teamName = item.name;
+          item.typeName = TargetType.Group;
+          const res = await currentGroup?.update(item);
           if (res?.success) {
             message.info(res.msg);
             userCtrl.changCallback();
@@ -100,15 +135,33 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           } else {
             message.error(res?.msg);
           }
-        } else {
-          item.belongId = userCtrl.Company.target.id;
-          const res = await userCtrl.Company.createGroup(item);
-          if (res.success) {
-            message.info(res.msg);
-            userCtrl.changCallback();
-            setIsOpen(false);
+        }
+      } else {
+        // currentGroup?.createSubGroup
+        if (userCtrl.IsCompanySpace) {
+          item.teamCode = item.code;
+          item.teamName = item.name;
+
+          item.typeName = TargetType.Group;
+          if (id != '') {
+            const res = await currentGroup?.createSubGroup(item);
+            if (res?.success) {
+              message.info(res.msg);
+              userCtrl.changCallback();
+              setIsOpen(false);
+            } else {
+              message.error(res?.msg);
+            }
           } else {
-            message.error(res.msg);
+            item.belongId = userCtrl.Company.target.id;
+            const res = await userCtrl.Company.createGroup(item);
+            if (res.success) {
+              message.info(res.msg);
+              userCtrl.changCallback();
+              setIsOpen(false);
+            } else {
+              message.error(res.msg);
+            }
           }
         }
       }
@@ -153,6 +206,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       key: 'deptPerpeos',
     },
   ];
+
   // 集团信息标题
   const title = (
     <div className={cls['company-group-title']}>
@@ -163,11 +217,33 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setIsOpen(true);
+            if (currentGroup) {
+              setIsOpen(true);
+              setSelectId('update');
+            }
           }}>
           编辑
         </Button>
-        <Button type="link">删除</Button>
+        <Button
+          type="link"
+          onClick={() => {
+            if (currentGroup) {
+              Modal.confirm({
+                title: '确认',
+                icon: <ExclamationCircleOutlined />,
+                content: '删除部门？',
+                okText: '确认',
+                cancelText: '取消',
+                onOk: async () => {
+                  // 删除子部门
+                  // 如果是一级部门 Company 底下删除
+                  // 如果是二级集团 从父集团底下删除；
+                },
+              });
+            }
+          }}>
+          删除
+        </Button>
       </div>
     </div>
   );
@@ -206,7 +282,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            setIsAddOpen(false);
+            if (currentGroup != null) setIsAddOpen(true);
           }}>
           添加单位
         </Button>
@@ -230,7 +306,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
             className={cls['app-tabs']}
             extra={renderBtns()}
             onTabChange={(key) => {
-              setStatusKey(key);
               console.log('切换事件', key);
             }}>
             <div className={cls['page-content-table']} ref={parentRef}>
@@ -257,10 +332,42 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         open={isopen}
         title={id ? '请编辑集团信息' : '新建集团'}
         onOk={onOk}
-        handleCancel={handleOk}
+        currentGroup={currentGroup}
         handleOk={handleOk}
+        handleCancel={handleCancel}
+        selectId={selectId}
       />
-
+      <Modal
+        title="添加单位"
+        open={isAddOpen}
+        onOk={handlePullOk}
+        onCancel={handlePullCancel}
+        destroyOnClose={true}
+        width={500}>
+        <div>
+          <SearchCompany
+            joinKey={joinKey}
+            setJoinKey={setJoinKey}
+            setJoinTarget={setJoinTarget}></SearchCompany>
+        </div>
+      </Modal>
+      <Modal
+        title="查看申请记录"
+        destroyOnClose={true}
+        open={isLookApplyOpen}
+        onOk={handleApplyOk}
+        onCancel={handleApplyCancel}
+        bodyStyle={{ padding: 0 }}
+        footer={[
+          <Button key="ok" type="primary" onClick={handleApplyOk}>
+            知道了
+          </Button>,
+        ]}
+        width={900}>
+        <div>
+          <ApplyInfoService />
+        </div>
+      </Modal>
       {/* 左侧树 */}
       {treeContainer
         ? ReactDOM.createPortal(
