@@ -14,7 +14,6 @@ import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
-import { ObjectManagerList } from '../../datamock';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
@@ -31,6 +30,7 @@ interface Iprops {
   handleCancel: () => void;
   selectId?: string;
   defaultData: IIdentity;
+  callback: Function;
 }
 
 type DataItem = {
@@ -40,7 +40,8 @@ type DataItem = {
 
 // initialValues={item}
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, handleCancel, selectId, defaultData } = props;
+  const { open, title, onOk, handleOk, handleCancel, selectId, callback, defaultData } =
+    props;
   const [authTree, setAuthTree] = useState<IAuthority>();
   useEffect(() => {
     authTreeData();
@@ -50,7 +51,6 @@ const EditCustomModal = (props: Iprops) => {
     setAuthTree(res);
   };
   const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
-    console.log(222333444, authTree);
     const columns: ProFormColumnsType<IIdentity>[] = [
       {
         title: '岗位名称',
@@ -87,14 +87,15 @@ const EditCustomModal = (props: Iprops) => {
         width: 'm',
         fieldProps: {
           options: [authTree],
+          disabled: true,
           fieldNames: {
             children: 'children',
-            label: 'label',
+            label: 'name',
             value: 'id',
           },
           showSearch: true,
           filterTreeNode: true,
-          treeNodeFilterProp: 'label',
+          treeNodeFilterProp: 'name',
           // multiple: true,
           treeDefaultExpandAll: true,
         },
@@ -122,11 +123,21 @@ const EditCustomModal = (props: Iprops) => {
         destroyOnClose={true}
         onCancel={() => handleOk()}
         footer={null}>
-        <BetaSchemaForm<IIdentity>
+        <BetaSchemaForm<any>
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            console.log('finish===', values);
+            const res = await defaultData.updateIdentity(
+              values.name,
+              values.code,
+              values.remark,
+            );
+            if (res.success) {
+              callback();
+              message.success('修改成功');
+            } else {
+              message.error(res.msg);
+            }
             onOk();
           }}
           columns={getColumn(defaultData)}

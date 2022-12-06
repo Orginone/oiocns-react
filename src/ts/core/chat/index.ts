@@ -27,3 +27,5 @@ export const LoadChats = async (spaceId: string): Promise<IChatGroup[]> => {
   }
   return groups;
 };
+
+export type { IChat, IChatGroup } from './ichat';

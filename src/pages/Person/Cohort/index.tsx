@@ -23,6 +23,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import Indentity from '@/bizcomponents/Indentity/index';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -37,10 +38,14 @@ const CohortConfig: React.FC = () => {
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
+  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
+
   const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
     getData();
   }, [chatKey]);
+
   const getData = async () => {
     setData(
       (await userCtrl.getCohortList())?.filter(
@@ -71,7 +76,6 @@ const CohortConfig: React.FC = () => {
     }
     return undefined;
   };
-
   const renderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
     return [
       {
@@ -91,13 +95,6 @@ const CohortConfig: React.FC = () => {
         },
       },
       {
-        key: 'aaa',
-        label: '身份管理',
-        onClick: () => {
-          history.push('/setting/position/' + item.target.id);
-        },
-      },
-      {
         key: 'updateCohort',
         label: '修改群组',
         onClick: () => {
@@ -112,6 +109,19 @@ const CohortConfig: React.FC = () => {
           await item.selectAuthorityTree(false);
           setItem(item);
           setIsSetPost(true);
+        },
+      },
+      {
+        key: 'indentity',
+        label: '身份管理',
+        onClick: async () => {
+          setItem(item);
+          setIsOpenIndentity(true);
+          setMemberData(
+            await (
+              await item?.getMember(false)!
+            ).filter((obj) => obj.id != userCtrl.Space.target.id),
+          );
         },
       },
       {
@@ -214,7 +224,6 @@ const CohortConfig: React.FC = () => {
   const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
   };
-
   const renderCardFun = (
     dataArr: ICohort[],
     operaiton: (_item: ICohort) => CohortConfigType.OperationType[],
@@ -258,7 +267,16 @@ const CohortConfig: React.FC = () => {
                 width="700px">
                 <Persons searchCallback={searchCallback} />
               </Modal>
-              {/* 对象设置 */}
+
+              <Indentity
+                open={isOpenIndentity}
+                object={item!}
+                MemberData={memberData ? memberData : []}
+                onCancel={() => {
+                  setIsOpenIndentity(false);
+                }}
+              />
+
               {item?.authorityTree && (
                 <AddPostModal
                   title={'角色设置'}
@@ -272,6 +290,7 @@ const CohortConfig: React.FC = () => {
                   datasource={item?.authorityTree}
                 />
               )}
+
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
@@ -280,6 +299,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort setCohort={setcohort} />
               </Modal>
+
               {item && (
                 <UpdateCohort
                   key={item?.target.id}
@@ -298,6 +318,7 @@ const CohortConfig: React.FC = () => {
               )}
 
               <CreateCohort callBack={getData} />
+
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>

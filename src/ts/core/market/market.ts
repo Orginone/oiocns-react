@@ -1,7 +1,6 @@
 import { kernel } from '../../base';
-import { CommonStatus, TargetType } from '../enum';
+import { CommonStatus, TargetType, companyTypes } from '../enum';
 import { model, schema } from '../../base';
-import consts from '../consts';
 import IMarket from './imarket';
 
 export default class Market implements IMarket {
@@ -10,7 +9,7 @@ export default class Market implements IMarket {
 
   constructor(store: schema.XMarket) {
     this.market = store;
-    this.pullTypes = [TargetType.Person, ...consts.CompanyTypes];
+    this.pullTypes = [TargetType.Person, ...companyTypes];
   }
 
   /**

@@ -6,10 +6,10 @@ import CohortMemberList from '../CohortMemberList';
 import { ICohort } from '@/ts/core/target/itarget';
 import { CohortConfigType } from 'typings/Cohort';
 interface CohortCardType {
-  data: ICohort; //props
+  data: ICohort;
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: ICohort) => CohortConfigType.OperationType[]; //操作区域数据
+  operation?: (_item: ICohort) => CohortConfigType.OperationType[];
 }
 
 const CohortCardComp: React.FC<CohortCardType> = ({

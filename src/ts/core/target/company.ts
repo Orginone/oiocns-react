@@ -40,7 +40,7 @@ export default class Company extends MarketTarget implements ICompany {
     this.extendTargetType = [
       TargetType.Department,
       TargetType.Working,
-      ...consts.CompanyTypes,
+      ...this.companyTypes,
     ];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
     this.createTargetType = [
@@ -81,6 +81,29 @@ export default class Company extends MarketTarget implements ICompany {
       return faildResult('该集团已存在!');
     }
   }
+
+  /** 创建部门 */
+  public async createDepartment(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+    data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
+    data.teamName = data.teamName == '' ? data.name : data.teamName;
+    data.typeName = TargetType.Department;
+    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    if (res.success) {
+      this.departments.push(new Department(res.data));
+    }
+    return res;
+  }
+  /** 创建部门 */
+  public async createWorking(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+    data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
+    data.teamName = data.teamName == '' ? data.name : data.teamName;
+    data.typeName = TargetType.Working;
+    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    if (res.success) {
+      this.workings.push(new Working(res.data));
+    }
+    return res;
+  }
   public async createCohort(
     data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
   ): Promise<ResultType<any>> {
@@ -100,7 +123,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async removePerson(ids: string[]): Promise<ResultType<any>> {
     const res = await kernel.removeAnyOfTeamAndBelong({
       id: this.target.id,
-      teamTypes: [...consts.CompanyTypes, ...this.subTypes],
+      teamTypes: [...this.companyTypes, ...this.subTypes],
       targetIds: ids,
       targetType: TargetType.Person,
     });

@@ -16,8 +16,8 @@ import {
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
-import { TargetType } from '@/ts/core/enum';
-import userCtrl, { UserPartTypes } from '@/ts/controller/setting/userCtrl';
+import { DomainTypes, TargetType } from '@/ts/core/enum';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 
 /* 组织单位头部左侧组件 */
@@ -72,10 +72,7 @@ const OrganizationalUnits = () => {
     );
   };
   useEffect(() => {
-    const id = userCtrl.subscribePart(
-      [UserPartTypes.Space, UserPartTypes.User],
-      refreshUI,
-    );
+    const id = userCtrl.subscribePart([DomainTypes.User, DomainTypes.Company], refreshUI);
     return () => {
       userCtrl.unsubscribe(id);
     };
@@ -102,7 +99,7 @@ const OrganizationalUnits = () => {
       <div
         className={`${styles.list} ${showMenu ? styles.active : ''}`}
         style={{
-          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 36) : 0,
+          height: showMenu ? (menuList.length > 4 ? 280 : menuList.length * 56 + 56) : 0,
         }}>
         <div className={styles[`menu-list`]}>
           {menuList.map((n) => (

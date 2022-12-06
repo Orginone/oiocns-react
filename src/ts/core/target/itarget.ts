@@ -27,6 +27,8 @@ export interface ITarget {
   ownIdentitys: schema.XIdentity[];
   /** 组织的身份 */
   identitys: IIdentity[];
+  /** 支持的单位类型申明 */
+  companyTypes: TargetType[];
   /**
    * 获取职权树
    * @param reload 是否强制刷新
@@ -277,7 +279,6 @@ export interface IFlow {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
-
 export interface ISpace extends IFlow {
   /** 我加入的群组 */
   joinedCohort: ICohort[];
@@ -324,7 +325,7 @@ export interface ISpace extends IFlow {
   searchCohort(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 群组操作 */
-export interface ICohort {
+export interface ICohort extends ITarget {
   /** 群组实体对象 */
   target: schema.XTarget;
   /** 职权树 */
@@ -504,6 +505,10 @@ export interface ICompany extends IMTarget, ISpace, ITarget {
    * @returns 是否成功
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
+  /** 创建部门 */
+  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  /** 创建部门 */
+  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
   /**
    * 移除人员
    * @param ids 人员Id集合

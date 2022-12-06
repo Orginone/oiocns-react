@@ -1,5 +1,8 @@
 export const STORE_CUSTOM_MENU = 'STORE_CUSTOM_MENU';
 
+// 购物车
+export const JOIN_SHOPING_CAR = 'JOIN_SHOPING_CAR';
+
 // 分享分发 可选类型
 export const DestTypes = [
   {

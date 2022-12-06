@@ -2,21 +2,20 @@ import { Button } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
-import { schema } from '@/ts/base';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import { TargetType } from '@/ts/core/enum';
+import AddPosttionModal from '../AddPositionMoadl';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 /*由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
-  setCurrent: (current: schema.XTarget) => void;
+  setCurrent: (current: IIdentity) => void;
   handleMenuClick: (key: string, item: any) => void;
   // 点击操作触发的事件
-  callBack: Function;
-  personCallBack: Function;
+  indentitys: IIdentity[];
 };
 
 const items: DataNode[] = [
@@ -38,21 +37,22 @@ type target = {
   key: string;
   object: IIdentity;
 };
-const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
+const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   useEffect(() => {
-    getDataDetail();
+    getAuthTree();
   }, []);
-
+  const { indentitys, setCurrent } = props;
   const [selectMenu, setSelectMenu] = useState<string>('');
-  const [indentitys, setIndentitys] = useState<IIdentity[]>();
-  const getDataDetail = async () => {
-    setIndentitys(await userCtrl.Company.getIdentitys());
-    console.log(await userCtrl.Company.getIdentitys());
-    changeData(indentitys!);
-    // prop.callBack(indentitys![0]);
-    // prop.personCallBack(await indentitys![0].getIdentityTargets(TargetType.Person)[0]);
-  };
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [authTree, setAuthTree] = useState<IAuthority[]>();
 
+  const getAuthTree = async () => {
+    const data = await userCtrl.Company.selectAuthorityTree();
+    if (data) {
+      console.log(data.name);
+      setAuthTree([data]);
+    }
+  };
   const changeData = (target: IIdentity[]): target[] => {
     const result: target[] = [];
     if (target != undefined) {
@@ -75,12 +75,17 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
     // 触发内容去变化
     console.log('点击', key, data);
   };
-
-  const handleTitleClick = async (item: target) => {
+  const close = () => {
+    setIsOpenModal(false);
+  };
+  const onSelect = async (
+    selectKeys: string[],
+    info: { selected: boolean; node: { object: IIdentity } },
+  ) => {
     // 触发内容去变化
-    const res = await item.object.getIdentityTargets(TargetType.Person);
-    prop.personCallBack(res.data.result);
-    prop.callBack(item.object);
+    if (info.selected) {
+      setCurrent(info.node.object);
+    }
   };
 
   const menu = ['更改岗位名称', '删除'];
@@ -90,9 +95,9 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
       childIcon={<UserOutlined />}
       key={selectMenu}
       handleMenuClick={handleMenuClick}
-      handleTitleClick={handleTitleClick}
       treeData={changeData(indentitys!)}
       menu={menu}
+      onSelect={onSelect}
       title={'全部岗位'}
     />
   );
@@ -100,11 +105,23 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (prop) => {
   return (
     <div>
       <div className={cls.topMes}>
-        <Button className={cls.creatgroup} type="primary" onClick={() => {}}>
-          新增岗位
+        <Button
+          className={cls.creatgroup}
+          type="primary"
+          onClick={() => {
+            setIsOpenModal(true);
+          }}>
+          新增身份
         </Button>
         {positionList}
       </div>
+      <AddPosttionModal
+        title={'新增身份'}
+        open={isOpenModal}
+        onOk={close}
+        handleOk={close}
+        authTree={authTree}
+      />
     </div>
   );
 };

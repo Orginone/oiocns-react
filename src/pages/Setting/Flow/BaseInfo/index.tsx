@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ProFormText,
   ProForm,
@@ -12,14 +12,24 @@ import { Form } from 'antd';
 import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: (params: any) => void;
+  currentFormValue: {};
+  onChange: (params: any) => void;
 };
 
-const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
+const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
+  useEffect(() => {
+    form.setFieldsValue(currentFormValue);
+  }, [currentFormValue]);
+
   return (
     <div className={cls['contentMes']}>
       <ProForm
         layout="horizontal"
+        onValuesChange={async () => {
+          console.log('await form.getFieldsValue()', await form.getFieldsValue());
+          onChange(await form.getFieldsValue());
+        }}
         form={form}
         onFinish={async (e) => {
           nextStep(e);
@@ -57,7 +67,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep }) => {
             <ProFormSelect
               name="type"
               label="字段类型"
-              request={async () => [
+              options={[
                 { label: '字符串', value: 'STRING' },
                 { label: '数字', value: 'NUMERIC' },
                 { label: '枚举', value: 'DICT' },
