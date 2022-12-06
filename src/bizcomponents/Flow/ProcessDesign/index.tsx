@@ -76,6 +76,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     } else {
       console.log('designData_____', designData);
       if (!designData) {
+        console.log('走这里了没');
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
         defaultDesign.name = conditionData?.name;
