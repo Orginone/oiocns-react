@@ -4,7 +4,7 @@ import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
 import { IGroup } from './itarget';
 import { TargetType } from '../enum';
-import { faildResult, kernel } from '@/ts/base';
+import { model, kernel } from '@/ts/base';
 
 export default class Group extends BaseTarget implements IGroup {
   subGroup: IGroup[];
@@ -53,7 +53,7 @@ export default class Group extends BaseTarget implements IGroup {
       }
       return res;
     } else {
-      return faildResult('该集团已存在!');
+      return model.badRequest('该集团已存在!');
     }
   }
   public async deleteSubGroup(id: string): Promise<ResultType<any>> {
@@ -73,7 +73,7 @@ export default class Group extends BaseTarget implements IGroup {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async getCompanys(reload: boolean = false): Promise<XTarget[]> {
     if (!reload && this.companys.length > 0) {

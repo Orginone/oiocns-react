@@ -1,4 +1,4 @@
-import { common, faildResult, kernel, model, schema } from '@/ts/base';
+import { common, kernel, model, schema } from '@/ts/base';
 import { IAuthority } from './iauthority';
 import { AuthorityType } from '../../enum';
 import consts from '@/ts/core/consts';
@@ -76,7 +76,7 @@ export default class Authority implements IAuthority {
       }
       return res;
     }
-    return faildResult(consts.NotFoundError);
+    return model.badRequest(consts.NotFoundError);
   }
   public async createSubAuthority(
     name: string,
@@ -118,7 +118,7 @@ export default class Authority implements IAuthority {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
   public async updateAuthority(
     name: string,

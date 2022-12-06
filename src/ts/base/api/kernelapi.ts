@@ -1,6 +1,6 @@
 import AnyStore from './anystore';
 import StoreHub from './storehub';
-import type * as model from '../model';
+import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
@@ -42,7 +42,7 @@ export default class KernelApi {
           .invoke('TokenAuth', this._anystore.accessToken)
           .then((res: model.ResultType<any>) => {
             if (res.success) {
-              console.debug('认证成功！');
+              logger.info('kernelapi auth success!');
             }
           })
           .catch((err) => {
@@ -2286,6 +2286,6 @@ export default class KernelApi {
     if (res.data && (res.data as model.ResultType<any>)) {
       return res.data as model.ResultType<any>;
     }
-    return { success: false, data: {}, code: 400, msg: '' };
+    return model.badRequest();
   }
 }

@@ -1,6 +1,6 @@
 import consts from '../consts';
 import { companyTypes, TargetType } from '../enum';
-import { kernel, model, common, schema, faildResult } from '../../base';
+import { kernel, model, common, schema } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
@@ -98,7 +98,7 @@ export default class BaseTarget implements ITarget {
       }
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   protected async deleteSubTarget(
@@ -130,7 +130,7 @@ export default class BaseTarget implements ITarget {
       });
       return res;
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   protected async removeMember(
@@ -145,7 +145,7 @@ export default class BaseTarget implements ITarget {
         targetType: typeName,
       });
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -172,7 +172,7 @@ export default class BaseTarget implements ITarget {
         },
       });
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -193,7 +193,7 @@ export default class BaseTarget implements ITarget {
         targetType: this.target.typeName,
       });
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -244,7 +244,7 @@ export default class BaseTarget implements ITarget {
         JoinTypeNames: typeNames,
       });
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -280,7 +280,7 @@ export default class BaseTarget implements ITarget {
         targetIds: [this.target.id],
       });
     }
-    return faildResult(consts.UnauthorizedError);
+    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -302,7 +302,7 @@ export default class BaseTarget implements ITarget {
         id: '0',
       });
     } else {
-      return faildResult(consts.UnauthorizedError);
+      return model.badRequest(consts.UnauthorizedError);
     }
   }
 
