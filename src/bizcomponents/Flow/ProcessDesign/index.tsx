@@ -8,7 +8,7 @@ import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
-  editorValue: string;
+  editorValue: string | null | undefined;
   designData: any;
 };
 // export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
