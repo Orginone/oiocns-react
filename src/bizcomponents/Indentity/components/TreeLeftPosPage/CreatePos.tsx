@@ -91,6 +91,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           className={cls.creatgroup}
           type="text"
           icon={<PlusOutlined className={cls.addIcon} />}
+          style={{ marginTop: '5px' }}
           onClick={() => {
             setIsOpenModal(true);
           }}
