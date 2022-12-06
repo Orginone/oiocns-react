@@ -24,7 +24,8 @@ interface MemuItemType {
   [key: string]: any;
 }
 /**检查当前路由是否是子路由，如果有则显示当前级菜单否则为主菜单 */
-const checkRoute = (currentPath: string, routeMenu: MemuItemType[]) => {
+const checkRoute = (hashPath: string, routeMenu: MemuItemType[]) => {
+  const currentPath = hashPath.replace('#', '');
   const current = routeMenu.find((n) => n.key === currentPath);
   if (current && !current.fathKey && current.render) return current; // 当前路由自定义子路由
   if (!current || !current.fathKey) return null; // 不是子路由
@@ -68,27 +69,26 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const { data: menuData, width } = props; // 顶级主菜单
   const [current, setCurrent] = useState<MemuItemType | null>();
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
-  const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
+  const [activeMenu, setActiveMenu] = useState<string>(location.hash); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
   const routesMain = useMemo(() => routerInfo[1].routes, []);
   const currentMacthRoute = routesMain
     ? routesMain.find((child) => child.path === props.match.path)
     : null;
-
   const menuFlat = menuData ? flatMenuData(menuData) : [];
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     if (props.location?.state?.refresh) {
       loadPrvMenu();
     }
-    setActiveMenu(location.pathname);
-    const current = checkRoute(location.pathname, menuFlat);
+    setActiveMenu(location.hash.replace('#', ''));
+    const current = checkRoute(location.hash, menuFlat);
     setCurrent(current);
     if (menuData) {
       listenPrev(current);
     }
-  }, [location.pathname, menuData]);
+  }, [location.hash, menuData]);
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
@@ -122,7 +122,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     const current = menuFlat.find((n) => n.key === paths[0]);
     if (current!.children!.length > 0) {
       const nextRoute: any = current!.children![0];
-      if (nextRoute.key === location.pathname) {
+      if (nextRoute.key === location.hash) {
         listenPrev(current!);
       }
       if (nextRoute && nextRoute.key) {
@@ -133,7 +133,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         listenPrev(current!);
         console.log('current!.key', current!.key);
         current!.key && props.history.push(current!.key);
-        // listenPrev({ fathKey: location.pathname });
+        // listenPrev({ fathKey: location.hash });
       }
     }
   };
