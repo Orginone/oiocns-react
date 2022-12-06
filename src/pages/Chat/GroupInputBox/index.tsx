@@ -78,7 +78,7 @@ const Groupinputbox = (props: Iprops) => {
     let imgUrl = ``;
     let imgUrlss = [];
     for (let i = 1; i <= 36; i++) {
-      imgUrl = `/src/assets/emo/${i}.png`;
+      imgUrl = `/emo/${i}.png`;
       imgUrlss.push(imgUrl);
     }
     setImgUrls(imgUrlss);

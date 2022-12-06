@@ -3,7 +3,6 @@ import cls from './index.module.less';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
 import React from 'react';
@@ -66,7 +65,7 @@ const AppPutaway: React.FC = () => {
           />
         }>
         <Meta
-          avatar={<img className="appLogo" src={Appimg} alt="" />}
+          avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
           title={curProduct?.prod.name || '应用名称'}
           description={

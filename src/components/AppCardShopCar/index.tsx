@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { CheckCard } from '@ant-design/pro-components';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button, Dropdown } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { MarketTypes } from 'typings/marketType';
-import appImg from '@/assets/img/appLogo.png';
+import appImg from '/img/appLogo.png';
 
 interface Iprops {
   className?: string;
