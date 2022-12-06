@@ -145,6 +145,9 @@ const GroupSideBar: React.FC = () => {
           case MessageType.Voice:
             return '[语音]';
           default:
+            if (c.lastMessage.showTxt?.includes('<img>')) {
+              return '[图片]';
+            }
             return c.lastMessage.showTxt;
         }
       }
