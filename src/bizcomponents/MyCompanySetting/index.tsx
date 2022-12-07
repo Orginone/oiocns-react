@@ -3,15 +3,13 @@ import { ColumnsType } from 'antd/lib/table';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-
-import type * as schema from '@/ts/base/schema';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICompany, IPerson } from '@/ts/core/target/itarget';
-import ApplyInfoService from './ApplyInfo';
 import { MarketTypes } from 'typings/marketType';
 import { TargetType } from '@/ts/core/enum';
+import { useHistory } from 'react-router-dom';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -22,8 +20,9 @@ interface PersonInfoObj {
  * @returns
  */
 const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
+  const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [applyInfoOpen, setApplyInfoOpen] = useState(false);
+  // const [applyInfoOpen, setApplyInfoOpen] = useState(false);
 
   const [list, setList] = useState<ICompany[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -38,27 +37,27 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     props.setShowDepartment(false);
   }, []);
 
-  const showDepartment = () => {
-    props.setShowDepartment(true);
-  };
+  // const showDepartment = () => {
+  //   props.setShowDepartment(true);
+  // };
 
-  const showApplyModal = async () => {
-    setApplyInfoOpen(true);
-  };
+  // const showApplyModal = async () => {
+  //   setApplyInfoOpen(true);
+  // };
 
   const showModal = () => {
     setJoinKey('');
     setIsModalOpen(true);
   };
 
-  const handleApplyOk = () => {
-    setJoinKey('1');
-    setApplyInfoOpen(false);
-  };
+  // const handleApplyOk = () => {
+  //   setJoinKey('1');
+  //   setApplyInfoOpen(false);
+  // };
 
-  const handleApplyCancel = () => {
-    setApplyInfoOpen(false);
-  };
+  // const handleApplyCancel = () => {
+  //   setApplyInfoOpen(false);
+  // };
 
   const handleOk = async () => {
     setIsModalOpen(false);
@@ -203,7 +202,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
           {/* <Button type="link" onClick={showDepartment}>
             部门岗位
           </Button> */}
-          <Button type="link" onClick={showApplyModal}>
+          <Button type="link" onClick={() => history.push('/todo/org')}>
             查看申请记录
           </Button>
           <Button type="link" onClick={showModal}>
@@ -261,7 +260,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
         </div>
       </Modal>
 
-      <Modal
+      {/* <Modal
         title="查看申请记录"
         destroyOnClose={true}
         open={applyInfoOpen}
@@ -277,7 +276,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
         <div>
           <ApplyInfoService />
         </div>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

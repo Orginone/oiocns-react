@@ -38,6 +38,7 @@ export enum TabType {
 type FlowItem = {
   content: string;
   id: string;
+  name: string;
 };
 
 /**
@@ -51,13 +52,18 @@ const SettingFlow: React.FC = () => {
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
-  const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
+  const [conditionData, setConditionData] = useState<{
+    name: string;
+    labels: [{}];
+    Fields: string;
+  }>({
     name: '',
-    labels: [],
+    labels: [{}],
+    Fields: '',
   });
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [bindAppMes, setBindAppMes] = useState({});
+  const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
 
   const [dateData, setDateData] = useState(1);
 
@@ -74,11 +80,6 @@ const SettingFlow: React.FC = () => {
     {
       title: '流程名称',
       dataIndex: 'name',
-      ellipsis: true,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
       ellipsis: true,
     },
     {
@@ -114,6 +115,7 @@ const SettingFlow: React.FC = () => {
             setConditionData({
               name: editorDataMes.name,
               labels: JSON.parse(editorDataMes.remark),
+              Fields: editorDataMes.Fiels,
             });
           }}>
           编辑
@@ -227,7 +229,7 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
-                              setConditionData({ name: '', labels: [] });
+                              setConditionData({ name: '', labels: [{}], Fields: '' });
                               setDesignData(null);
                               setEditorValue(null);
                             },

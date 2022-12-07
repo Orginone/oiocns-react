@@ -7,7 +7,7 @@ import useEventEmitter from '@/hooks/useEventEmitter';
 import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
-  conditionData: { name: string; labels: [] };
+  conditionData: { name: string; Fields: string; labels: [{}] };
   editorValue: string | null | undefined;
   designData: any;
 };
@@ -36,6 +36,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     code: 'code',
     remark: '',
     belongId: '',
+    Fields: '',
     resource: {
       nodeId: 'ROOT',
       parentId: null,
@@ -65,6 +66,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
       if (conditionData?.labels) {
         // 编辑了之后值没有变
         tempDesign.remark = JSON.stringify(conditionData?.labels);
+        tempDesign.Fields = conditionData?.Fields;
         DefaultProps.setFormFields(conditionData?.labels);
       } else {
         DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
@@ -74,10 +76,12 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
         defaultDesign.name = conditionData?.name;
+        defaultDesign.Fields = conditionData?.Fields;
         tempDesign = JSON.parse(JSON.stringify(defaultDesign));
       } else {
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
+        defaultDesign.Fields = conditionData?.Fields;
         defaultDesign.name = conditionData?.name;
         tempDesign = designData;
       }
