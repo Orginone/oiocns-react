@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space, Dropdown } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -6,6 +6,7 @@ import {
   ExclamationCircleOutlined,
   SendOutlined,
   MinusOutlined,
+  EllipsisOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
@@ -16,6 +17,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import BindModal from './BindModal';
+
 const { Header, Content } = Layout;
 
 /**
@@ -38,6 +40,7 @@ export enum TabType {
 type FlowItem = {
   content: string;
   id: string;
+  name: string;
 };
 
 /**
@@ -51,13 +54,18 @@ const SettingFlow: React.FC = () => {
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
-  const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
+  const [conditionData, setConditionData] = useState<{
+    name: string;
+    labels: [{}];
+    Fields: string;
+  }>({
     name: '',
-    labels: [],
+    labels: [{}],
+    Fields: '',
   });
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [bindAppMes, setBindAppMes] = useState({});
+  const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
 
   const [dateData, setDateData] = useState(1);
 
@@ -77,11 +85,6 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      ellipsis: true,
-    },
-    {
       title: '创建人',
       dataIndex: 'createUser',
       ellipsis: true,
@@ -95,47 +98,79 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record: FlowItem) => [
-        <a
-          onClick={() => {
-            setIsOpenModal(true);
-            setBindAppMes(record);
-            setDateData(dateData + 1);
-          }}>
-          绑定应用
-        </a>,
-        <a
-          key="editor"
-          onClick={() => {
-            setTabType(TabType.PROCESSDESIGN);
-            setCurrentStep(StepType.PROCESSMESS);
-            setEditorValue(record?.content);
-            const editorDataMes = JSON.parse(record?.content || '{}');
-            setConditionData({
-              name: editorDataMes.name,
-              labels: JSON.parse(editorDataMes.remark),
-            });
-          }}>
-          编辑
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            Modal.confirm({
-              title: '提示',
-              content: '确定删除当前流程吗',
-              onOk: async () => {
-                const currentData = await userCtrl.Space.deleteDefine(record?.id);
-                if (currentData) {
-                  initData();
-                  message.success('删除成功');
-                }
-              },
-            });
-          }}>
-          删除
-        </a>,
-      ],
+      width: 100,
+      render: (text, record) => {
+        return (
+          <Dropdown
+            className={cls['operation-btn']}
+            menu={{
+              items: [
+                {
+                  key: '1',
+                  label: (
+                    <a
+                      key="bindApp"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        setIsOpenModal(true);
+                        setBindAppMes(record);
+                        setDateData(dateData + 1);
+                      }}>
+                      绑定应用
+                    </a>
+                  ),
+                },
+                {
+                  key: '2',
+                  label: (
+                    <a
+                      key="editor"
+                      onClick={() => {
+                        setTabType(TabType.PROCESSDESIGN);
+                        setCurrentStep(StepType.PROCESSMESS);
+                        setEditorValue(record?.content);
+                        const editorDataMes = JSON.parse(record?.content || '{}');
+                        setConditionData({
+                          name: editorDataMes.name,
+                          labels: JSON.parse(editorDataMes.remark),
+                          Fields: editorDataMes.Fiels,
+                        });
+                      }}>
+                      编辑
+                    </a>
+                  ),
+                },
+                {
+                  key: '3',
+                  label: (
+                    <a
+                      key="delete"
+                      onClick={() => {
+                        Modal.confirm({
+                          title: '提示',
+                          content: '确定删除当前流程吗',
+                          onOk: async () => {
+                            const currentData = await userCtrl.Space.deleteDefine(
+                              record?.id,
+                            );
+                            if (currentData.success) {
+                              initData();
+                              message.success('删除成功');
+                            }
+                          },
+                        });
+                      }}>
+                      删除
+                    </a>
+                  ),
+                },
+              ],
+            }}
+            key="key">
+            <EllipsisOutlined />
+          </Dropdown>
+        );
+      },
     },
   ];
 
@@ -158,7 +193,6 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
-    design.belongId = userCtrl.Space.target.id;
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
@@ -227,7 +261,7 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
-                              setConditionData({ name: '', labels: [] });
+                              setConditionData({ name: '', labels: [{}], Fields: '' });
                               setDesignData(null);
                               setEditorValue(null);
                             },

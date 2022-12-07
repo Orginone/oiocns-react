@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, Space, message, Modal, Tabs } from 'antd';
+import { Button, Space, message, Modal, Tabs, Typography } from 'antd';
 import { columns } from './config';
-import Title from 'antd/lib/typography/Title';
 import { MarketTypes } from 'typings/marketType';
 import type * as schema from '@/ts/base/schema';
 import TreeLeftDeptPage from './components/TreeLeftDeptPage';
@@ -36,7 +35,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [selectId, setSelectId] = useState<string>();
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增');
   const [Transfer, setTransfer] = useState<boolean>(false); //变更部门
-  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); //部门成员
+  const [deptMembers, setDeptMembers] = useState<schema.XTarget[]>([]); //部门成员
   const [SelectDept, setSelectDept] = useState<IDepartment>(); // 左侧树选中的当前部门对象
   const [selectPerson, setSelectPerson] = useState<schema.XTarget>(); // 当前要拉的人
   const [editDept, setEditDept] = useState<IDepartment>();
@@ -113,6 +112,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         setIsOpenModal(true);
         break;
       case '删除部门':
+        if (!item) return;
         Modal.confirm({
           title: '提示',
           icon: <ExclamationCircleOutlined />,
@@ -149,7 +149,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     setSelectId(current.target.id);
     setting.setCurrTreeDeptNode(current.target.id);
     current.getPerson(false).then((e) => {
-      setDataSource(e);
+      setDeptMembers(e);
     });
     current.selectAuthorityTree(false).then((auths) => {
       if (auths) {
@@ -238,7 +238,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         <div className={cls['page-content-table']} ref={parentRef}>
           <Tabs items={[{ label: `全部`, key: '1' }]} tabBarExtraContent={renderBtns()} />
           <CardOrTable<schema.XTarget>
-            dataSource={dataSource}
+            dataSource={deptMembers}
             rowKey={'id'}
             operation={renderOperation}
             columns={columns}
@@ -253,7 +253,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   return (
     <div className={cls[`dept-content-box`]}>
       <DeptDescription
-        title={<Title level={4}>部门信息</Title>}
+        title={<Typography.Title level={5}>部门信息</Typography.Title>}
         selectDept={SelectDept?.target}
         extra={[
           <Button
@@ -279,7 +279,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       <IndentityManage
         open={isIndentityOpen}
         object={SelectDept!}
-        MemberData={dataSource}
+        MemberData={deptMembers}
         onCancel={() => {
           setIsIndentityOpen(false);
         }}

@@ -90,7 +90,8 @@ const validIsSocialCreditCode = (code: string) => {
  */
 const showChatTime = (chatDate: moment.MomentInput) => {
   const cdate = moment(chatDate);
-  const days = moment().diff(cdate, 'day');
+  const date = moment(cdate.format('yyyy-MM-DD'));
+  const days = moment().diff(date, 'day');
   switch (days) {
     case 0:
       return cdate.format('H:mm');

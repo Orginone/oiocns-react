@@ -140,6 +140,18 @@ export default class Person extends MarketTarget implements IPerson {
       return model.badRequest('该单位已存在!');
     }
   }
+  public async createProduct(
+    data: Omit<model.ProductModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<schema.XProduct>> {
+    const res = await super.createProduct(data);
+    if (res.success) {
+      this.usefulProduct.push(res.data);
+      if (res.data.resource) {
+        this.usefulResource.set(res.data.id, res.data.resource);
+      }
+    }
+    return res;
+  }
   public async deleteCohort(id: string): Promise<ResultType<any>> {
     let res = await kernel.deleteTarget({
       id: id,
@@ -295,15 +307,6 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Person,
       belongId: this.target.id,
     });
-  }
-  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct(reload);
-  }
-  public async getUsefulResource(
-    id: string,
-    reload: boolean = false,
-  ): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, reload);
   }
   public async resetPassword(
     password: string,

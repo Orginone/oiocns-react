@@ -29,8 +29,8 @@ import PageCard from '@/components/PageCard';
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
+  const { history } = props;
   const treeContainer = document.getElementById('templateMenu');
-
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
@@ -295,11 +295,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }}>
           添加单位
         </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            setLookApplyOpen(true);
-          }}>
+        <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
         </Button>
       </Space>
