@@ -7,7 +7,6 @@ import { MarketTypes } from 'typings/marketType';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import Appimg from '@/assets/img/appLogo.png';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
@@ -72,7 +71,7 @@ const StoreAppInfo: React.FC = () => {
         }
         className="app-info">
         <Meta
-          avatar={<img className="appLogo" src={Appimg} alt="" />}
+          avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
           title={SelfAppCtrl.curProduct?.prod.name}
           description={

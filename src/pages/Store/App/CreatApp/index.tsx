@@ -26,10 +26,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
       ...values,
       resources: list,
     });
-    console.log('创建应用结果---------', res);
-    debugger;
     if (res.success) {
-      debugger;
       message.success('创建应用成功');
       history.goBack();
     }

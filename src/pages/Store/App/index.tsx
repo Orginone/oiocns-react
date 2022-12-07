@@ -178,6 +178,7 @@ const StoreApp: React.FC = () => {
           className={cls['app-tabs']}
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
+          activeTabKey={statusKey}
           onTabChange={(key) => {
             setStatusKey(key as ststusTypes);
           }}>
@@ -196,7 +197,7 @@ const StoreApp: React.FC = () => {
 
   return (
     <>
-      {location.pathname === '/store/app' && AppIndex}
+      {location.hash === '#/store/app' && AppIndex}
       <Modal
         title={`应用${shareType}`}
         width={800}

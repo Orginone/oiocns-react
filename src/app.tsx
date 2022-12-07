@@ -1,10 +1,9 @@
 import { ConfigProvider, Spin, message, notification } from 'antd';
 import React, { Suspense, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 
 import routes from '@/routes';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './global.less';
 
 // import enUS from 'antd/es/locale/en_US';
@@ -14,17 +13,6 @@ import 'moment/locale/zh-cn';
 import { logger, LoggerLevel } from './ts/base/common';
 
 moment.locale('cn');
-/**
- * React Query client
- */
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    },
-  },
-});
 
 message.config({
   prefixCls: 'ogo-message',
@@ -54,16 +42,14 @@ const App = () => {
     }
   };
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <ConfigProvider prefixCls="ogo" locale={locale}>
-          <Suspense fallback={<Spin size="large" className="layout__loading" />}>
-            {renderRoutes(routes)}
-          </Suspense>
-        </ConfigProvider>
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      </QueryClientProvider>
-    </BrowserRouter>
+    <HashRouter>
+      <ConfigProvider prefixCls="ogo" locale={locale}>
+        <Suspense fallback={<Spin size="large" className="layout__loading" />}>
+          {renderRoutes(routes)}
+        </Suspense>
+      </ConfigProvider>
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+    </HashRouter>
   );
 };
 

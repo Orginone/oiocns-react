@@ -7,13 +7,13 @@ import cls from './index.module.less';
 import { MarketTypes } from 'typings/marketType';
 import appImg from '/img/appLogo.png';
 
-interface BuyAppType {
+interface Iprops {
   className?: string;
   showBtn?: boolean; //是否展示按钮
   data: any; //数据源
   defaultKey?: any;
   shouOperation?: boolean; //是否展示 右上角操作按钮
-  handleBuyApp: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
+  // handleBuyApp?: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
   onClick?: (e?: Event) => void; //卡片点击事件
   operation?: (_item: MarketTypes.ProductType) => MarketTypes.OperationType[]; //操作区域数据
 }
@@ -25,7 +25,7 @@ const defaultObj = {
   typeName: 'typeName', //应用类型
   creatTime: 'creatTime', //上架时间
 };
-const Index: React.FC<BuyAppType> = (props) => {
+const AppCardShopCar: React.FC<Iprops> = (props) => {
   const {
     data,
     className,
@@ -34,7 +34,7 @@ const Index: React.FC<BuyAppType> = (props) => {
     defaultKey,
     onClick,
     operation,
-    handleBuyApp,
+    // handleBuyApp,
   } = props;
   const {
     name = 'name',
@@ -67,14 +67,9 @@ const Index: React.FC<BuyAppType> = (props) => {
             <Button
               className={cls.btn}
               shape="round"
-              onClick={() => handleBuyApp('join', data)}>
-              加入购物车
-            </Button>
-            <Button
-              className={cls.btn}
-              shape="round"
-              onClick={() => handleBuyApp('buy', data)}>
-              获取
+              // onClick={() => handleBuyApp('join', data)}
+            >
+              立即购买
             </Button>
           </p>
         ) : (
@@ -104,4 +99,4 @@ const Index: React.FC<BuyAppType> = (props) => {
   );
 };
 
-export default Index;
+export default AppCardShopCar;

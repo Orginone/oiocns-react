@@ -10,7 +10,6 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { IconFont } from '@/components/IconFont';
-import Appimg from '@/assets/img/appLogo.png';
 
 import { useHistory } from 'react-router-dom';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
@@ -28,7 +27,7 @@ const StoreAppInfo: React.FC = () => {
       </li>
       <li className={`${cls['con']} flex flex-direction-col`}>
         <span className={cls['con-label']}>应用图标</span>
-        <img className={cls['con-img']} src={Appimg} alt="" />
+        <img className={cls['con-img']} src="/img/appLogo.png" alt="" />
       </li>
       <li className={`${cls['con']} flex `}>
         <div className={cls['con-info']}>

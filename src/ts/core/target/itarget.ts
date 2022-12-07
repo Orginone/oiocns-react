@@ -1,7 +1,8 @@
+import { ProductType } from './../enum';
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
-import { Market } from '../market';
+import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
@@ -89,7 +90,7 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    * @returns 市场
    */
-  getPublicMarket(reload: boolean): Promise<Market[]>;
+  getPublicMarket(reload: boolean): Promise<IMarket[]>;
   /**
    * 查询我的产品/应用
    * @param params
@@ -187,7 +188,7 @@ export interface IMTarget {
     remark,
     resources,
     thingId,
-    typeName,
+    typeName = ProductType.WebApp,
   }: {
     // 名称
     name: string;

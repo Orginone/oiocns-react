@@ -8,7 +8,12 @@ import { LeftOutlined } from '@ant-design/icons';
  * @return {*}
  */
 
-const TitleButton: React.FC = () => {
+interface Iprops {
+  OnDeleApply: () => void;
+  OnBuyShoping: () => void;
+}
+
+const TitleButton: React.FC<Iprops> = ({ OnDeleApply, OnBuyShoping }) => {
   /**
    * @description: 返回按钮
    * @return {*}
@@ -36,7 +41,7 @@ const TitleButton: React.FC = () => {
         size="large"
         type="link"
         onClick={() => {
-          console.log('删除');
+          OnDeleApply();
         }}>
         删除
       </Button>
@@ -44,7 +49,7 @@ const TitleButton: React.FC = () => {
         size="large"
         type="link"
         onClick={() => {
-          console.log('购买');
+          OnBuyShoping();
         }}>
         购买
       </Button>

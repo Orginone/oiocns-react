@@ -1,17 +1,16 @@
 import React from 'react';
 import './index.less';
-import appLogo from '@/assets/img/appLogo.png';
 
 const dataSource = [
   {
     title: '资产监管平台',
-    url: appLogo,
+    url: '/img/appLogo.png',
     desc: '这是一段',
     key: 1,
   },
   {
     title: '资产管理应用',
-    url: appLogo,
+    url: '/img/appLogo.png',
     desc: '应用的说明',
     key: 4,
   },

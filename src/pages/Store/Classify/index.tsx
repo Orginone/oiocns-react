@@ -31,7 +31,6 @@ const StoreClassify: React.FC = () => {
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [treeData, setTreeData] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
-  const [curMenuKey, setCurMenuKey] = useState<string>(SelfAppCtrl.curMenuKey);
 
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TreeData, () => {
@@ -170,7 +169,6 @@ const StoreClassify: React.FC = () => {
     // 触发内容去变化
     console.log('点击', item);
     SelfAppCtrl.curMenuKey = item.key || item.id;
-    // StoreContent.changeMenu(item);
   };
   const domNode = document.getElementById('templateMenu');
   if (!domNode) return null;
