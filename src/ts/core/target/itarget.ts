@@ -241,7 +241,9 @@ export interface IFlow {
    * 发布流程定义（包含创建、更新）
    * @param data
    */
-  publishDefine(data: model.CreateDefineReq): Promise<ResultType<schema.XFlowDefine>>;
+  publishDefine(
+    data: Omit<model.CreateDefineReq, 'BelongId'>,
+  ): Promise<ResultType<schema.XFlowDefine>>;
   /**
    * 删除流程定义
    * @param id 流程定义Id
