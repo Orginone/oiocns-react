@@ -5,7 +5,6 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import {
   IDepartment,
   IPerson,
@@ -25,21 +24,14 @@ type target = {
   object: IIdentity;
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  useEffect(() => {
-    getAuthTree();
-  }, []);
   const { indentitys, setCurrent, reObject, currentKey } = props;
   const [selectMenu, setSelectMenu] = useState<string>(currentKey);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [authTree, setAuthTree] = useState<IAuthority[]>();
 
-  const getAuthTree = async () => {
-    const data = await reObject.selectAuthorityTree(false);
-    if (data) {
-      console.log(data.name);
-      setAuthTree([data]);
-    }
-  };
+  useEffect(() => {
+    setSelectMenu(currentKey);
+  }, [currentKey]);
+
   const changeData = (target: IIdentity[]): target[] => {
     const result: target[] = [];
     if (target != undefined) {
@@ -75,7 +67,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       selectedKeys={[selectMenu]}
       treeData={changeData(indentitys!)}
       onSelect={onSelect}
-      title={'全部岗位'}
+      title={'全部身份'}
     />
   );
   return (
@@ -92,11 +84,10 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
         {positionList}
       </div>
       <AddPosttionModal
-        title={'新增身份'}
+        title={'新增'}
         open={isOpenModal}
-        onOk={close}
+        handleCancel={close}
         handleOk={close}
-        authTree={authTree}
         reObject={reObject}
       />
     </div>

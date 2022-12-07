@@ -1,6 +1,5 @@
 import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import Title from 'antd/lib/typography/Title';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { schema } from '@/ts/base';
@@ -8,7 +7,7 @@ import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
 import { TargetType } from '@/ts/core/enum';
 import { columns } from './config';
-import EditIndentityModal from './components/EditIndentityModal';
+import EditIndentityModal from './components/AddPositionMoadl';
 import TreeLeftDeptPage from './components/TreeLeftPosPage';
 import AssignPosts from './components/AssignPosts';
 import cls from './index.module.less';
@@ -38,7 +37,7 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [members, setMembers] = useState<schema.XTarget[]>([]);
-  const [person, setPerson] = useState<schema.XTarget[]>();
+  const [currentPerson, setPerson] = useState<schema.XTarget[]>();
   const [personData, setPersonData] = useState<XTarget[]>([]);
   useEffect(() => {
     if (open) {
@@ -48,11 +47,21 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
       setIndentity(undefined);
     }
   }, [open]);
-  // 左侧岗位数据
+  // 左侧身份数据
   const getDataList = async () => {
     const data = await object?.getIdentitys();
     setIndentitys(data);
-    setTreeCurrent(data[0]);
+    if (
+      !indentity ||
+      data[0].id === indentity.id ||
+      data.findIndex((n) => n.id === indentity.id) === -1
+    ) {
+      setTreeCurrent(data[0]);
+    } else {
+      if (data[0].id !== indentity.id) {
+        setTreeCurrent(indentity);
+      }
+    }
   };
   // 加载 人员数据
   const getPersonData = async (current: IIdentity) => {
@@ -89,11 +98,6 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
     ];
   };
 
-  // /**点击操作内容触发的事件 */
-  // const handleMenuClick = (key: string, item: any) => {
-  //   console.log(key, item);
-  // };
-
   // 选中树的时候操作
   const setTreeCurrent = async (current: IIdentity) => {
     setIndentity(current);
@@ -109,7 +113,7 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
       return !ids.includes(el.id);
     });
   };
-  // 岗位操作
+  // 身份信息操作
   const buttons = [
     <Button
       key="edit"
@@ -146,48 +150,46 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
     </Button>,
   ];
 
-  // 岗位信息内容
+  // 身份信息内容
   const content = (
     <div className={cls['company-dept-content']}>
-      <Card bordered={false}>
-        <Descriptions
-          title={<Title level={5}>岗位信息</Title>}
-          bordered
-          column={2}
-          size="small"
-          labelStyle={{ textAlign: 'center' }}
-          contentStyle={{ textAlign: 'center' }}
-          extra={buttons}>
-          <Descriptions.Item label="名称">{indentity?.target.name}</Descriptions.Item>
-          <Descriptions.Item label="编码">{indentity?.target.code}</Descriptions.Item>
-          <Descriptions.Item label="创建人">
-            {indentity?.target.createUser}
-          </Descriptions.Item>
-          <Descriptions.Item label="创建时间">
-            {indentity?.target.createTime}
-          </Descriptions.Item>
-          <Descriptions.Item label="描述" span={2}>
-            {indentity?.target.remark}
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
+      <Descriptions
+        title="身份信息"
+        bordered
+        column={2}
+        size="small"
+        labelStyle={{ textAlign: 'center' }}
+        contentStyle={{ textAlign: 'center' }}
+        extra={buttons}>
+        <Descriptions.Item label="名称">{indentity?.target.name}</Descriptions.Item>
+        <Descriptions.Item label="编码">{indentity?.target.code}</Descriptions.Item>
+        <Descriptions.Item label="创建人">
+          {indentity?.target.createUser}
+        </Descriptions.Item>
+        <Descriptions.Item label="创建时间">
+          {indentity?.target.createTime}
+        </Descriptions.Item>
+        <Descriptions.Item label="描述" span={2}>
+          {indentity?.target.remark}
+        </Descriptions.Item>
+      </Descriptions>
     </div>
   );
   // 按钮
   const renderBtns = (
     <Button type="link" onClick={async () => setIsOpenAssign(true)}>
-      指派岗位
+      指派身份
     </Button>
   );
 
-  // 岗位信息标题
+  // 身份信息标题
 
-  //岗位主体
+  //身份主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card
-          title={'管理员'}
+          title={indentity?.target.name}
           className={cls['app-tabs']}
           extra={renderBtns}
           bordered={false}>
@@ -196,6 +198,7 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
               <CardOrTable
                 dataSource={personData as any}
                 rowKey={'id'}
+                total={personData.length || 0}
                 operation={renderOperation}
                 columns={columns as any}
                 parentRef={parentRef}
@@ -215,7 +218,7 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
       destroyOnClose
       bodyStyle={{ padding: 0 }}
       {...other}>
-      <Layout>
+      <Layout style={{ height: 682, overflow: 'hidden' }}>
         <Sider>
           <TreeLeftDeptPage
             setCurrent={setTreeCurrent}
@@ -230,32 +233,32 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
             {deptCount}
             {/* 编辑 */}
             <EditIndentityModal
-              handleCancel={() => {
+              title="编辑"
+              handleCancel={() => setIsOpenModal(false)}
+              open={isOpenModal}
+              handleOk={() => {
+                getDataList();
                 setIsOpenModal(false);
               }}
-              open={isOpenModal}
-              onOk={() => setIsOpenModal(false)}
-              handleOk={() => setIsOpenModal(false)}
-              defaultData={indentity!}
-              callback={getDataList}
+              editData={indentity!}
               reObject={object}
             />
             <Modal
-              title="指派岗位"
+              title="指派身份"
               open={isOpenAssign}
               width={900}
               destroyOnClose
+              onCancel={() => setIsOpenAssign(false)}
               onOk={async () => {
                 setIsOpenAssign(false);
                 const ids = [];
-                for (const a of person ? person : []) {
+                for (const a of currentPerson ? currentPerson : []) {
                   ids.push(a.id);
                 }
                 await indentity?.giveIdentity(ids);
                 getPersonData(indentity!);
                 message.success('指派成功');
-              }}
-              onCancel={() => setIsOpenAssign(false)}>
+              }}>
               <AssignPosts searchCallback={setPerson} memberData={members} />
             </Modal>
           </div>
