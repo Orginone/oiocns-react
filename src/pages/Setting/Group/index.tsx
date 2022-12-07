@@ -179,24 +179,24 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const renderOperation = (item: schema.XTarget): MarketTypes.OperationType[] => {
     return [
       {
-        key: 'publish',
+        key: 'changeNode',
         label: '调整节点',
         onClick: () => {
-          console.log('按钮事件', 'publish', item);
+          console.log('按钮事件', 'changeNode', item);
         },
       },
       {
-        key: 'share',
-        label: '岗位集团',
+        key: 'position',
+        label: '集团岗位',
         onClick: () => {
-          console.log('按钮事件', 'share', item);
+          console.log('按钮事件', 'position', item);
         },
       },
       {
-        key: 'detail',
+        key: 'remove',
         label: '移出集团',
         onClick: () => {
-          console.log('按钮事件', 'detail', item);
+          console.log('按钮事件', 'remove', item);
         },
       },
     ];
