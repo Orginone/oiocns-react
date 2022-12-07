@@ -8,13 +8,13 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  *
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Modal } from 'antd';
 import type { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import positionCtrl from '@/ts/controller/position/positionCtrl';
 
 /* 
   编辑
@@ -27,7 +27,7 @@ interface Iprops {
   handleCancel: () => void;
   selectId?: string;
   defaultData: any;
-  callback: Function;
+  // callback: Function;
 }
 
 const EditCustomModal = (props: Iprops) => {
@@ -39,7 +39,7 @@ const EditCustomModal = (props: Iprops) => {
       {
         title: '岗位名称',
         dataIndex: 'name',
-        // initialValue: target ? target.target.name : '',
+        initialValue: target ? target.name : '',
         formItemProps: {
           rules: [
             {
@@ -53,7 +53,7 @@ const EditCustomModal = (props: Iprops) => {
       {
         title: '岗位编号',
         dataIndex: 'code',
-        // initialValue: target ? target.target.code : '',
+        initialValue: target ? target.code : '',
         formItemProps: {
           rules: [
             {
@@ -84,7 +84,9 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            console.log('onfinsh====================', values);
+            defaultData.name = values.name;
+            defaultData.code = values.code;
+            positionCtrl.updatePosttion(defaultData);
             onOk();
           }}
           columns={getColumn(defaultData)}

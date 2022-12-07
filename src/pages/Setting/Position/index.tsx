@@ -6,7 +6,6 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { MarketTypes } from 'typings/marketType';
 import { columns, indentitycolumns } from './config';
-import EditCustomModal from './components/EditCustomModal';
 import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
 import { XTarget } from '@/ts/base/schema';
@@ -25,26 +24,30 @@ type RouterParams = {
 const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [selectId, setSelectId] = useState<string>();
-  const [isCreateDept, setIsCreateDept] = useState<boolean>(false);
   const [positions, setPositions] = useState<any[]>([]);
-
   const [_currentPostion, setPosition] = useState<any>({});
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
   const [person, setPerson] = useState<schema.XTarget[]>();
   const [personData, setPersonData] = useState<XTarget[]>();
   const [organization, setOrganization] = useState<any>();
-  const [indentitys, setIndentitys] = useState<any>();
-  const [addIndentitys, setIdIndentitys] = useState<any>();
-
+  const [indentitys, setIndentitys] = useState<any[]>();
+  const [addIndentitys, setAddIndentitys] = useState<any[]>();
   const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
     getPositions();
   }, []);
-
+  // useEffect(() => {
+  //   const id = positionCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
+  //     console.log('监听 岗位变化', positionCtrl.positionListData || []);
+  //     const arr = positionCtrl.positionListData || [];
+  //     setPositions([...arr]);
+  //   });
+  //   return () => {
+  //     return positionCtrl.unsubscribe(id);
+  //   };
+  // }, []);
   const getPositions = async () => {
     setPositions(positionCtrl.positionListData);
   };
@@ -70,9 +73,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     ];
   };
   // 操作内容渲染函数
-  const reRenderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const reRenderOperation = (item: any): any[] => {
     return [
       {
         key: 'update',
@@ -85,42 +86,44 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         key: 'remove',
         label: '删除',
         onClick: async () => {
+          const list = indentitys?.filter((obj) => obj.id != item.id);
+          positionCtrl.updatePosttion({
+            name: _currentPostion.name,
+            code: _currentPostion.code,
+            indentitys: list,
+          });
+          setIndentitys(list);
           console.log('按钮事件', 'remove', item);
         },
       },
     ];
   };
 
-  const onOk = () => {
-    setIsAddOpen(false);
-    setIsOpenModal(false);
-  };
-  const handleOk = () => {
-    setIsAddOpen(false);
-    setIsOpenModal(false);
-  };
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {};
   // 选中树的时候操作
   const setTreeCurrent = async (current: any) => {
+    /**保存选中的岗位 */
     setPosition(current);
+    /**保存选中的身份 */
     setIndentitys(current.indentitys);
   };
+  /**添加框内选中组织后的数据转换 */
   const onCheckeds = (team: any, type: string, checkedValus: any[]) => {
     setOrganization(team);
     const result = [];
     for (const a of checkedValus) {
       const data = {
         organization: team.name,
-        authId: a.authId,
+        id: a.id,
         name: a.name,
         remark: a.remark,
       };
       result.push(data);
     }
-    setIdIndentitys(result);
+    setAddIndentitys(result);
   };
-
+  /**头部 */
   const header = (
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -155,12 +158,13 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       </div>
     </div>
   );
-  const deptCount = (
+  /**人员列表 */
+  const personCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>待定岗位</strong>
+            <strong style={{ marginLeft: '20px', fontSize: 15 }}>岗位人员</strong>
             <Button
               className={cls.creatgroup}
               type="text"
@@ -191,20 +195,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   return (
     <div className={cls[`dept-content-box`]}>
       {header}
-      {deptCount}
-      {/* 编辑单位 */}
-      <EditCustomModal
-        handleCancel={() => {
-          setIsOpenModal(false);
-        }}
-        selectId={selectId}
-        open={isOpenModal}
-        title={isCreateDept ? '新增' : '编辑'}
-        onOk={onOk}
-        handleOk={handleOk}
-        defaultData={positions!}
-        callback={setPositions}
-      />
+      {personCount}
       <Modal
         title="添加身份"
         open={isAddOpen}
@@ -215,11 +206,13 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             indentitys: addIndentitys,
           };
           positionCtrl.updatePosttion(data);
+          setIndentitys(addIndentitys);
         }}
         onCancel={() => setIsAddOpen(false)}
         width="1050px">
         <IndentityManage shareType="" onCheckeds={onCheckeds} />
       </Modal>
+      {/**@todo 待确定使用 */}
       <Modal
         title="指派岗位"
         open={isOpenAssign}

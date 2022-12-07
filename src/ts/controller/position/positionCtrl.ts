@@ -71,10 +71,22 @@ class PostitonController extends Emitter {
    */
   public updatePosttion = (data: any): any => {
     console.log('数据进入', data);
+    console.log('原数据', this.positionList);
     const list = this.positionList.filter((obj) => obj.code != data.code);
+    console.log('1111111', list);
     this.positionList = list;
     console.log('过滤后', this.positionList);
     this.positionList.push(data);
+    this.cacheJoinOrDelePosition(this.positionList);
+  };
+  /**
+   * @description: 更新岗位
+   * @param {any} data
+   * @return {*}
+   */
+  public deletePosttion = (data: any): any => {
+    const list = this.positionList.filter((obj) => obj.code != data.code);
+    this.positionList = list;
     this.cacheJoinOrDelePosition(this.positionList);
   };
   // /**
@@ -105,7 +117,9 @@ class PostitonController extends Emitter {
         MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
         {
           operation: 'replaceAll',
-          data: data || [],
+          data: {
+            data: data || [],
+          },
         },
         'company',
       ),

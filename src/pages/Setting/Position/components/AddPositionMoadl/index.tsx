@@ -10,18 +10,13 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
-import {
-  ProForm,
-  ProFormColumnsType,
-  ProFormTreeSelect,
-} from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import positionCtrl from '@/ts/controller/position/positionCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import { getUuid } from '@/utils/tools';
 // import UploadAvatar from '../UploadAvatar';
 
 /* 
