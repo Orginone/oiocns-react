@@ -44,8 +44,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
-    console.log('申请加入商店成功', res);
+    await userCtrl.User!.applyJoinMarket(val[0]?.id);
   };
 
   /**
@@ -186,7 +185,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const handleMenuClick = (key: string, node: any) => {
-    console.log('handleMenuClick55', key, node);
     switch (key) {
       case '删除商店':
         handleDeleteShop(node);
@@ -201,13 +199,16 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       case '用户管理':
         history.push('/market/usermanagement');
         marketCtrl.setCurrentMarket(node?.node);
-        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
     }
   };
 
+  /**
+   * @description: 获取市场列表
+   * @return {*}
+   */
   const getTreeData = () => {
     return marketCtrl.Market.joinedMarkets.map((itemModel, index) => {
       let arrs = ['基础详情', '用户管理'];
