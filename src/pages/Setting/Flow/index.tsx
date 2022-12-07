@@ -15,6 +15,7 @@ import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
+import BindModal from './BindModal';
 const { Header, Content } = Layout;
 
 /**
@@ -55,6 +56,11 @@ const SettingFlow: React.FC = () => {
     labels: [],
   });
 
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [bindAppMes, setBindAppMes] = useState({});
+
+  const [dateData, setDateData] = useState(1);
+
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
@@ -86,15 +92,18 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      ellipsis: true,
-    },
-    {
       title: '操作',
       valueType: 'option',
       key: 'option',
       render: (text, record: FlowItem) => [
+        <a
+          onClick={() => {
+            setIsOpenModal(true);
+            setBindAppMes(record);
+            setDateData(dateData + 1);
+          }}>
+          绑定应用
+        </a>,
         <a
           key="editor"
           onClick={() => {
@@ -102,7 +111,6 @@ const SettingFlow: React.FC = () => {
             setCurrentStep(StepType.PROCESSMESS);
             setEditorValue(record?.content);
             const editorDataMes = JSON.parse(record?.content || '{}');
-            console.log(editorDataMes);
             setConditionData({
               name: editorDataMes.name,
               labels: JSON.parse(editorDataMes.remark),
@@ -118,7 +126,6 @@ const SettingFlow: React.FC = () => {
               content: '确定删除当前流程吗',
               onOk: async () => {
                 const currentData = await userCtrl.Space.deleteDefine(record?.id);
-                console.log('currentData', currentData);
                 if (currentData) {
                   initData();
                   message.success('删除成功');
@@ -142,7 +149,6 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     const result = await userCtrl.Space.getDefines(false);
     if (result) {
-      console.log('result', result);
       setDataSource(result);
     }
   };
@@ -289,6 +295,8 @@ const SettingFlow: React.FC = () => {
                         currentFormValue={conditionData}
                         onChange={(params) => {
                           setConditionData(params);
+                          design.remark = JSON.stringify(params.labels);
+                          setDesignData(design);
                         }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
@@ -308,6 +316,17 @@ const SettingFlow: React.FC = () => {
           </div>
         )}
       </Card>
+      <BindModal
+        isOpen={isOpenModal}
+        bindAppMes={bindAppMes}
+        upDateData={dateData}
+        onOk={() => {
+          setIsOpenModal(false);
+        }}
+        onCancel={() => {
+          setIsOpenModal(false);
+        }}
+      />
     </div>
   );
 };

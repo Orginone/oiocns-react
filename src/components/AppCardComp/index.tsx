@@ -2,9 +2,9 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { Avatar, Tag, Dropdown } from 'antd';
 import React from 'react';
 import './index.less';
-import AppLogo from '@/assets/img/appLogo.png';
+import AppLogo from '/img/appLogo.png';
 import { MarketTypes } from 'typings/marketType';
-import { BaseProduct } from '@/ts/core/market';
+import { IProduct } from '@/ts/core';
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -14,13 +14,13 @@ interface defaultObjType {
 }
 
 interface AppCardType {
-  data: BaseProduct; //props
+  data: IProduct; //props
   className?: string;
   defaultKey?: defaultObjType; // 卡片字段 对应数据字段
   // eslint-disable-next-line no-unused-vars
   onClick?: (event?: any) => void;
   // eslint-disable-next-line no-unused-vars
-  operation?: (_item: BaseProduct) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (_item: IProduct) => MarketTypes.OperationType[]; //操作区域数据
 }
 const defaultObj = {
   name: 'name', //名称

@@ -323,13 +323,13 @@ const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
     // ;
-    console.log('处理节点插入逻辑', type, parentNode);
+    // console.log('处理节点插入逻辑', type, parentNode);
 
     // ctx.refs['_root'].click()
     //缓存一下后面的节点
 
     let afterNode = parentNode.children;
-    console.log('afterNode', afterNode);
+    // console.log('afterNode', afterNode);
     //插入新节点
     parentNode.children = {
       nodeId: getRandomId(),

@@ -14,11 +14,8 @@ import {
   ICohort,
 } from '@/ts/core/target/itarget';
 type CreateGroupPropsType = {
-  createTitle: string;
   currentKey: string;
-  setCurrent: (current: IIdentity) => void;
-  handleMenuClick: (key: string, item: any) => void;
-  // 点击操作触发的事件
+  setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
   indentitys: IIdentity[];
   reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
 };
@@ -31,8 +28,8 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   useEffect(() => {
     getAuthTree();
   }, []);
-  const { indentitys, setCurrent, reObject } = props;
-  const [selectMenu, setSelectMenu] = useState<string>('');
+  const { indentitys, setCurrent, reObject, currentKey } = props;
+  const [selectMenu, setSelectMenu] = useState<string>(currentKey);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [authTree, setAuthTree] = useState<IAuthority[]>();
 
@@ -57,9 +54,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     return result;
   };
 
-  const handleMenuClick = (key: string, data: target) => {
-    console.log('点击', key, data);
-  };
   const close = () => {
     setIsOpenModal(false);
   };
@@ -67,6 +61,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     _: string[],
     info: { selected: boolean; node: { object: IIdentity } },
   ) => {
+    setSelectMenu(_.length > 0 ? _[0] : '');
     // 触发内容去变化
     if (info.selected) {
       setCurrent(info.node.object);
@@ -77,8 +72,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     <MarketClassifyTree
       searchable
       childIcon={<UserOutlined />}
-      key={selectMenu}
-      handleMenuClick={handleMenuClick}
+      selectedKeys={[selectMenu]}
       treeData={changeData(indentitys!)}
       onSelect={onSelect}
       title={'全部岗位'}
@@ -86,12 +80,11 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   );
   return (
     <div>
-      <div className={cls.topMes} style={{ marginRight: '25px' }}>
+      <div className={cls.topMes}>
         <Button
           className={cls.creatgroup}
           type="text"
           icon={<PlusOutlined className={cls.addIcon} />}
-          style={{ marginTop: '5px' }}
           onClick={() => {
             setIsOpenModal(true);
           }}

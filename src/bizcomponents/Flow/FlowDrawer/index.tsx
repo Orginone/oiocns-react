@@ -21,7 +21,7 @@ const FlowDrawer = (props: Iprops) => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const { open, onClose } = props;
   let Comp = null;
-  console.log('selectedNode', selectedNode);
+
   switch (selectedNode.type) {
     case 'ROOT':
       Comp = <RootNode />;

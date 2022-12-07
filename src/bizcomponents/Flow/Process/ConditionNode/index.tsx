@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
+import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+
 type ConditionNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
@@ -19,6 +21,7 @@ type ConditionNodeProps = {
 const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) => {
   const [showError, setShowError] = useState<boolean>(false);
   const [placeholder, setPlaceholder] = useState<string>('请设置条件');
+  const design = useAppwfConfig((state: any) => state.design);
   const delNode = () => {
     props.onDelNode();
   };
@@ -30,6 +33,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
+    const currentCondition = JSON.parse(design.remark);
     var text = '请设置条件';
     if (conditions && conditions.length > 0) {
       text = '';
@@ -41,6 +45,15 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
           ' 且 ';
       }
       text = text.substring(0, text.lastIndexOf(' 且 '));
+      /** 如果没有找到字段就报错 */
+      const getFindValue = currentCondition.find((item: any) => {
+        return (
+          item.label === conditions[0].paramLabel && item.value === conditions[0].paramKey
+        );
+      });
+      if (!getFindValue) {
+        setShowError(true);
+      }
     }
     return text;
   }, [props.config]);
@@ -64,6 +77,11 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
     <div className={cls['node-body-main-content']} onClick={select}>
       {!content && <span className={cls['placeholder']}>{placeholder}</span>}
       {content && <span className={cls['name']}>{content}</span>}
+      {showError ? (
+        <p style={{ color: 'red', paddingBottom: '10px' }}>
+          该条件已修改或则删除，请重新设置
+        </p>
+      ) : null}
     </div>
   );
   return (

@@ -18,7 +18,8 @@ export default class Group extends BaseTarget implements IGroup {
     this.joinedGroup = [];
     this.subTypes = [TargetType.Group, ...this.companyTypes];
     this.joinTargetType = [TargetType.Group];
-    this.pullTypes = this.companyTypes;
+    this.createTargetType = [TargetType.Group];
+    this.pullTypes = [...this.companyTypes, TargetType.Group];
     this.searchTargetType = [...this.companyTypes, TargetType.Group];
   }
   public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
@@ -49,7 +50,7 @@ export default class Group extends BaseTarget implements IGroup {
       if (res.success) {
         const group = new Group(res.data);
         this.subGroup.push(group);
-        return await group.pullMember([this.target]);
+        return await this.pullMember([res.data]);
       }
       return res;
     } else {

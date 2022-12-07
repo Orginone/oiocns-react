@@ -14,7 +14,6 @@ interface indexType {
 const CohortPerson: React.FC<indexType> = (props) => {
   useEffect(() => {
     getTableList();
-    console.log('88888888888888', props.memberData);
   }, []);
 
   const [data, setData] = useState<schema.XTarget[]>([]);
@@ -68,8 +67,8 @@ const CohortPerson: React.FC<indexType> = (props) => {
   ];
 
   return (
-    <>
-      <div style={{ paddingBottom: '16px' }}>
+    <div className={cls.tableBox}>
+      <div>
         <Input
           className={cls['search-person-input']}
           placeholder="请输入用户账号"
@@ -99,7 +98,7 @@ const CohortPerson: React.FC<indexType> = (props) => {
         columns={cohortColumn as any}
         rowKey={'id'}
       />
-    </>
+    </div>
   );
 };
 

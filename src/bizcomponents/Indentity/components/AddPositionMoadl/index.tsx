@@ -15,7 +15,6 @@ import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import {
   IDepartment,
@@ -39,68 +38,43 @@ interface Iprops {
 }
 const EditCustomModal = (props: Iprops) => {
   const { open, title, onOk, handleOk, authTree, reObject } = props;
-
-  useEffect(() => {}, []);
-  const getColumn = (): ProFormColumnsType<IIdentity>[] => {
-    console.log(authTree);
-    const columns: ProFormColumnsType<IIdentity>[] = [
-      {
-        title: '岗位名称',
-        dataIndex: 'name',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '名称为必填项',
-            },
-          ],
-        },
-        width: 'm',
+  const columns: ProFormColumnsType<IIdentity>[] = [
+    {
+      title: '岗位名称',
+      dataIndex: 'name',
+      formItemProps: {
+        rules: [{ required: true, message: '名称为必填项' }],
       },
-      {
-        title: '岗位编号',
-        dataIndex: 'code',
-        formItemProps: {
-          rules: [
-            {
-              required: true,
-              message: '编码为必填项',
-            },
-          ],
-        },
-        width: 'm',
+    },
+    {
+      title: '岗位编号',
+      dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '编码为必填项' }],
       },
-      {
-        title: '所属角色',
-        key: 'authId',
-        dataIndex: 'authId',
-        width: 300,
-        valueType: 'treeSelect',
-        request: async () => authTree || [],
-        fieldProps: {
-          fieldNames: {
-            label: 'name',
-            value: 'id',
-          },
-          showSearch: true,
-          filterTreeNode: true,
-          // multiple: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
-        },
+    },
+    {
+      title: '所属角色',
+      key: 'authId',
+      dataIndex: 'authId',
+      width: 'md',
+      valueType: 'treeSelect',
+      request: async () => authTree || [],
+      fieldProps: {
+        fieldNames: { label: 'name', value: 'id' },
+        showSearch: true,
+        filterTreeNode: true,
+        // multiple: true,
+        treeNodeFilterProp: 'name',
+        treeDefaultExpandAll: true,
       },
-      {
-        title: '岗位简介',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        width: 'm',
-      },
-      {
-        valueType: 'divider',
-      },
-    ];
-    return columns;
-  };
+    },
+    {
+      title: '岗位简介',
+      dataIndex: 'remark',
+      valueType: 'textarea',
+    },
+  ];
   return (
     <div className={cls['edit-custom-modal']}>
       <Modal
@@ -108,7 +82,7 @@ const EditCustomModal = (props: Iprops) => {
         open={open}
         getContainer={false}
         width={450}
-        destroyOnClose={true}
+        destroyOnClose
         onCancel={() => handleOk()}
         footer={null}>
         <BetaSchemaForm<any>
@@ -124,7 +98,7 @@ const EditCustomModal = (props: Iprops) => {
             message.success('操作成功');
             onOk();
           }}
-          columns={getColumn()}
+          columns={columns}
         />
       </Modal>
     </div>

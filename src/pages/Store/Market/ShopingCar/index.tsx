@@ -4,7 +4,10 @@ import CardOrTable from '@/components/CardOrTableComp';
 import TitleButton from './TitleButton';
 import cls from './index.module.less';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
+import AppCard from '@/components/AppCardShopCar';
+import { MarketTypes } from 'typings/marketType';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
+import BuyCustomModal from '@/bizcomponents/AppTableWithBuy/BuyCustomModal';
 
 /**
  * @description: 购物车
@@ -14,6 +17,12 @@ import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 const ShopingCar: React.FC = () => {
   const [selectedRowKey, setSelectedRowKey] = useState<any>([]); // 被选中的项
   const [shopList, setShopList] = useState<any>([]); // 购物车列表
+  const [isBuy, setIsBuy] = useState<boolean>(false);
+
+  /**
+   * @description: 订阅购物车数据变化
+   * @return {*}
+   */
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
       console.log('监听 购物车变化', marketCtrl.shopinglist || []);
@@ -78,11 +87,68 @@ const ShopingCar: React.FC = () => {
       setSelectedRowKey(selectedRows);
     },
   };
-  console.log('被勾选中的项', selectedRowKey);
+
+  /**
+   * @description: 从购物车中删除商品
+   * @return {*}
+   */
+  const OnDeleApply = async () => {
+    await marketCtrl.deleApply(selectedRowKey);
+  };
+
+  /**
+   * @description: 购买商品
+   * @return {*}
+   */
+  const OnBuyShoping = async () => {
+    await marketCtrl.buyShoping(selectedRowKey);
+    setIsBuy(false);
+  };
+
+  /**
+   * @description: 确认下单弹窗
+   * @return {*}
+   */
+  const OnCustomBuy = () => {
+    setIsBuy(true);
+  };
+
+  /**
+   * @description: 取消
+   * @return {*}
+   */
+  const OnCancel = () => {
+    setIsBuy(false);
+  };
+
+  /**
+   * @description: 卡片内容渲染函数
+   * @param {MarketTypes} dataArr
+   * @return {*}
+   */
+  const renderCardFun = (dataArr: MarketTypes.ProductType[]): React.ReactNode[] => {
+    return dataArr.map((item: MarketTypes.ProductType) => {
+      return (
+        <AppCard
+          className="card"
+          data={item}
+          key={item.id}
+          defaultKey={{
+            name: 'caption',
+            size: 'price',
+            type: 'sellAuth',
+            desc: 'remark',
+            creatTime: 'createTime',
+          }}
+          // operation={renderOperation}
+        />
+      );
+    });
+  };
 
   return (
     <React.Fragment>
-      <TitleButton />
+      <TitleButton OnDeleApply={OnDeleApply} OnBuyShoping={OnCustomBuy} />
       <div className={cls['shoping-car']}>
         <CardOrTable
           dataSource={shopList}
@@ -90,8 +156,19 @@ const ShopingCar: React.FC = () => {
           hideOperation={true}
           columns={columns as any}
           rowSelection={rowSelection}
+          tableAlertRender={false}
+          renderCardContent={renderCardFun}
         />
       </div>
+      <BuyCustomModal
+        title="确认订单"
+        content="此操作将生成交易订单。是否确认"
+        open={isBuy}
+        onOk={() => {
+          OnBuyShoping();
+        }}
+        onCancel={OnCancel}
+      />
     </React.Fragment>
   );
 };

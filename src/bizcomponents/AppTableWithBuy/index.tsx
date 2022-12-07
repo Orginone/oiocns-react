@@ -52,7 +52,11 @@ const AppShowComp: React.FC<AppShowCompType> = ({
    * @return {*}
    */
   const handleBuyAppFun = (type: 'buy' | 'join', selectItem: any) => {
-    console.log('购买', type, selectItem.name, selectItem.id);
+    if (type === 'join') {
+      marketCtrl.joinApply(selectItem);
+    } else {
+      setIsBuy(true);
+    }
   };
 
   /**
@@ -81,14 +85,13 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         label: '立即购买',
         onClick: () => {
           setIsBuy(true);
-          console.log('按钮事件', 'buy', item);
         },
       },
       {
         key: 'toBuyCar',
         label: '加入购物车',
         onClick: () => {
-          marketCtrl.joinOrdeleApply(item);
+          marketCtrl.joinApply(item);
         },
       },
       {
@@ -97,7 +100,6 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         onClick: () => {
           setIsProduce(true);
           setData(item);
-          console.log('详情详情详情详情', item);
         },
       },
     ];
