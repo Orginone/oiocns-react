@@ -20,6 +20,7 @@ import { IDepartment } from '@/ts/core/target/itarget';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import cls from './index.module.less';
+import IndentityManage from '../../../bizcomponents/Indentity';
 
 /**
  * 内设机构
@@ -39,6 +40,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [SelectDept, setSelectDept] = useState<IDepartment>(); // 左侧树选中的当前部门对象
   const [selectPerson, setSelectPerson] = useState<schema.XTarget>(); // 当前要拉的人
   const [editDept, setEditDept] = useState<IDepartment>();
+  const [isIndentityOpen, setIsIndentityOpen] = useState<boolean>(false);
   const [authorityTree, setAuthorityTree] = useState<IAuthority>();
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): MarketTypes.OperationType[] => {
@@ -209,7 +211,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {}}>
+        <Button
+          type="link"
+          onClick={() => {
+            setIsIndentityOpen(true);
+          }}>
           岗位设置
         </Button>
         <Button type="link" onClick={() => setIsAddOpen(true)}>
@@ -269,6 +275,14 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         open={isOpenModal}
         title={createOrEdit}
         handleOk={handleOk}
+      />
+      <IndentityManage
+        open={isIndentityOpen}
+        object={SelectDept!}
+        MemberData={dataSource}
+        onCancel={() => {
+          setIsIndentityOpen(false);
+        }}
       />
       {/* 添加成员*/}
       <Modal

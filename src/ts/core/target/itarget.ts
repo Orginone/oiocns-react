@@ -1,3 +1,4 @@
+import { ProductType } from './../enum';
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
@@ -187,7 +188,7 @@ export interface IMTarget {
     remark,
     resources,
     thingId,
-    typeName,
+    typeName = ProductType.WebApp,
   }: {
     // 名称
     name: string;

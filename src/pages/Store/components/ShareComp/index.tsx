@@ -86,6 +86,7 @@ const ShareRecent = (props: Iprops) => {
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
+  //获取左侧组织数据 个人空间-展示我的群组  ; 单位空间 - 分配
   const getLeftTree = async () => {
     let FunName: Function = userCtrl.User!.getJoinedCohorts;
     if (userCtrl.IsCompanySpace) {
@@ -376,7 +377,7 @@ const ShareRecent = (props: Iprops) => {
           <Input
             className={cls.leftInput}
             prefix={<SearchOutlined />}
-            placeholder="请输入部门"
+            placeholder="请设置关键字"
           />
           <div className={cls.leftContent}>
             <Tree

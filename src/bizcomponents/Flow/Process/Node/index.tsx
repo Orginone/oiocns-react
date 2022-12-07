@@ -75,9 +75,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const nodeHeader = (
     <div
       className={
-        props.title === '审批对象' ? cls['node-body-people'] : cls['node-body-left']
+        props.type === 'APPROVAL' ? cls['node-body-people'] : cls['node-body-left']
       }>
-      {props.title === '审批对象' ? (
+      {props.type === 'APPROVAL' ? (
         <UsergroupAddOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
@@ -142,7 +142,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
           <div
             className={
-              props.title === '审批对象' ? cls['nodeAproStyle'] : cls['nodeNewStyle']
+              props.type === 'APPROVAL' ? cls['nodeAproStyle'] : cls['nodeNewStyle']
             }>
             {nodeHeader}
             {nodeContent}
