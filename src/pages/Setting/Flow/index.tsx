@@ -182,7 +182,6 @@ const SettingFlow: React.FC = () => {
   };
 
   const handlePageChange = (page: number, pageSize: number) => {
-    debugger;
     setPage(page);
     setShowDataSource(dataSource.slice((page - 1) * pageSize, page * pageSize));
   };
