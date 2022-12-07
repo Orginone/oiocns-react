@@ -191,27 +191,9 @@ export interface IMTarget {
    * 创建应用
    * @param  {model.ProductModel} 产品基础信息
    */
-  createProduct({
-    name,
-    code,
-    remark,
-    resources,
-    thingId,
-    typeName,
-  }: {
-    // 名称
-    name: string;
-    // 编号
-    code: string;
-    // 备注
-    remark: string;
-    // 资源列
-    resources: model.ResourceModel[] | undefined;
-    // 元数据Id
-    thingId?: string;
-    // 产品类型名
-    typeName: string;
-  }): Promise<ResultType<schema.XProduct>>;
+  createProduct(
+    data: Omit<model.ProductModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<schema.XProduct>>;
   /**
    * 删除市场
    * @param id 市场Id
