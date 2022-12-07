@@ -15,7 +15,6 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
-import type { MenuProps } from 'antd';
 import BaseInfo from './BaseInfo';
 import BindModal from './BindModal';
 const { Header, Content } = Layout;
