@@ -16,6 +16,7 @@ import IndentityManage from '@/bizcomponents/AddIndentity';
 import positionCtrl, {
   PostitonCallBackTypes,
 } from '@/ts/controller/position/positionCtrl';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 type RouterParams = {
   id: string;
 };
@@ -36,10 +37,6 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [indentitys, setIndentitys] = useState<any[]>();
   const [addIndentitys, setAddIndentitys] = useState<any[]>();
   const treeContainer = document.getElementById('templateMenu');
-
-  // useEffect(() => {
-  //   getPositions();
-  // }, []);
   useEffect(() => {
     const id = positionCtrl.subscribePart(PostitonCallBackTypes.ApplyData, () => {
       console.log('监听 岗位变化', positionCtrl.positionListData || []);
@@ -50,6 +47,13 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       return positionCtrl.unsubscribe(id);
     };
   }, []);
+  useEffect(() => {
+    getMemberData();
+  }, []);
+  const getMemberData = async () => {
+    setMemberData(await userCtrl.Company.getPersons(false));
+    console.log('人员列表', person);
+  };
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
@@ -102,10 +106,12 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const handleMenuClick = (key: string, item: any) => {};
   // 选中树的时候操作
   const setTreeCurrent = async (current: any) => {
-    /**保存选中的岗位 */
+    /**保存当前选中的岗位 */
     setPosition(current);
-    /**保存选中的身份 */
+    /**保存当前选中的身份 */
     setIndentitys(current.indentitys);
+    /**保存当前选中岗位下的人员 */
+    setPerson(current.persons);
   };
   /**添加框内选中组织后的数据转换 */
   const onCheckeds = (team: any, type: string, checkedValus: any[]) => {
@@ -203,9 +209,11 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             name: _currentPostion.name,
             code: _currentPostion.code,
             indentitys: addIndentitys,
+            persons: _currentPostion.perons,
           };
           positionCtrl.updatePosttion(data);
           setIndentitys(addIndentitys);
+          setIsAddOpen(false);
         }}
         onCancel={() => setIsAddOpen(false)}
         width="1050px">
@@ -215,6 +223,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       <Modal
         title="指派岗位"
         open={isOpenAssign}
+        destroyOnClose={true}
         width={1300}
         onOk={async () => {
           setIsOpenAssign(false);

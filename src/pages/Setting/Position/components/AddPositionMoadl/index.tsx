@@ -82,7 +82,8 @@ const EditCustomModal = (props: Iprops) => {
             positionCtrl.joinApply({
               name: values.name,
               code: values.code,
-              indentity: [],
+              indentitys: [],
+              persons: [],
             });
             onOk();
             console.log(positionCtrl);
