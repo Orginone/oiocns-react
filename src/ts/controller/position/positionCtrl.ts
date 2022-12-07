@@ -86,8 +86,6 @@ class PostitonController extends Emitter {
    */
   public cacheJoinOrDelePosition = (data: any): void => {
     this.changCallbackPart(PostitonCallBackTypes.ApplyData);
-    console.log('进行存储', data);
-
     kernel.anystore.set(
       MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
       {

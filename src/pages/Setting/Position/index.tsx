@@ -26,16 +26,16 @@ type RouterParams = {
  */
 const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加成员
-  const [positions, setPositions] = useState<any[]>([]);
-  const [_currentPostion, setPosition] = useState<any>({});
+  const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
+  const [positions, setPositions] = useState<any[]>([]); //岗位列表
+  const [_currentPostion, setPosition] = useState<any>({}); //当前选中岗位
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
-  const [person, setPerson] = useState<schema.XTarget[]>();
-  const [personData, setPersonData] = useState<XTarget[]>();
-  const [organization, setOrganization] = useState<any>();
-  const [indentitys, setIndentitys] = useState<any[]>();
-  const [addIndentitys, setAddIndentitys] = useState<any[]>();
+  const [memberData, setMemberData] = useState<schema.XTarget[]>([]); //可分配人员列表
+  const [person, setPerson] = useState<schema.XTarget[]>(); //选中的待指派人员列表
+  const [personData, setPersonData] = useState<XTarget[]>(); //可选的指派人员列表
+  const [organization, setOrganization] = useState<any>(); //组织数据
+  const [indentitys, setIndentitys] = useState<any[]>(); //当前选中组织下身份数据
+  const [addIndentitys, setAddIndentitys] = useState<any[]>(); //待添加的身份数据集
   const treeContainer = document.getElementById('templateMenu');
   useEffect(() => {
     const id = positionCtrl.subscribePart(PostitonCallBackTypes.ApplyData, () => {
@@ -111,7 +111,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     /**保存当前选中的身份 */
     setIndentitys(current.indentitys);
     /**保存当前选中岗位下的人员 */
-    setPerson(current.persons);
+    setPersonData(current.persons);
   };
   /**添加框内选中组织后的数据转换 */
   const onCheckeds = (team: any, type: string, checkedValus: any[]) => {
