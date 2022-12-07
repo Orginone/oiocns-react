@@ -15,8 +15,6 @@ import { MarketTypes } from 'typings/marketType';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
-// import DeleteCustomModal from '@/components/DeleteCustomModal';
-// import { productCtrl } from '@/ts/controller/store/productCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
