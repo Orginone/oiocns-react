@@ -3,6 +3,8 @@ export const STORE_USER_MENU = 'STORE_USER_MENU';
 export const STORE_RECENTLY_APPS = 'STORE_RECENTLY_APPS';
 // 购物车
 export const JOIN_SHOPING_CAR = 'JOIN_SHOPING_CAR';
+//岗位
+export const MY_POSITION_LIST = 'POSITION';
 
 // 分享分发 可选类型
 export const DestTypes = [

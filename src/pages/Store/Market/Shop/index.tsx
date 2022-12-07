@@ -1,13 +1,18 @@
 import cls from './index.module.less';
 import React, { useEffect, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTableWithBuy';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
+import marketCtrl, { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 
 const Index: React.FC = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any>([]);
   useEffect(() => {
-    marketCtrl.marketTableCallBack = setData;
+    const id = marketCtrl.subscribePart(MarketCallBackTypes.MarketShop, () => {
+      setData([...marketCtrl.marketTableList]);
+    });
     marketCtrl.getStoreProduct();
+    return () => {
+      return marketCtrl.unsubscribe(id);
+    };
   }, []);
 
   return (

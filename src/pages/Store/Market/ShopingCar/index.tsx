@@ -8,6 +8,7 @@ import AppCard from '@/components/AppCardShopCar';
 import { MarketTypes } from 'typings/marketType';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import BuyCustomModal from '@/bizcomponents/AppTableWithBuy/BuyCustomModal';
+import { message } from 'antd';
 
 /**
  * @description: 购物车
@@ -25,7 +26,7 @@ const ShopingCar: React.FC = () => {
    */
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
-      console.log('监听 购物车变化', marketCtrl.shopinglist || []);
+      // console.log('监听 购物车变化', marketCtrl.shopinglist || []);
       const arr = marketCtrl.shopinglist || [];
       setShopList([...arr]);
     });
@@ -110,6 +111,10 @@ const ShopingCar: React.FC = () => {
    * @return {*}
    */
   const OnCustomBuy = () => {
+    if (selectedRowKey.length === 0) {
+      message.warning('请选择商品');
+      return;
+    }
     setIsBuy(true);
   };
 

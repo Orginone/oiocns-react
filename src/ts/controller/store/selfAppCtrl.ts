@@ -9,7 +9,7 @@ import { STORE_USER_MENU } from '@/constants/const';
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
 
-const defaultTreeData: TreeType[] = [
+const defaultCustomMenu: TreeType[] = [
   {
     title: '我的应用',
     key: 'app',
@@ -46,7 +46,7 @@ export type MenuOptTypes =
   | '删除';
 
 export enum SelfCallBackTypes {
-  'TreeData' = 'TreeData',
+  'CustomMenu' = 'CustomMenu',
   'TableData' = 'TableData',
   'Recently' = 'Recently',
 }
@@ -66,7 +66,7 @@ class SelfAppController extends Emitter {
   private _curSpace: IMTarget = userCtrl.User;
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
-  private _treeData!: TreeType[]; //缓存树形数据
+  private _customMenu!: TreeType[]; //缓存树形数据
   /* -----**应用功能区---------- */
   public breadcrumb: string[] = ['仓库', '我的应用']; //面包屑
   private _curProduct: IProduct | undefined = undefined;
@@ -100,8 +100,8 @@ class SelfAppController extends Emitter {
   public get tableData(): IProduct[] {
     return this.selfAppsData;
   }
-  public get treeData(): TreeType[] {
-    return this._treeData;
+  public get customMenu(): TreeType[] {
+    return this._customMenu;
   }
   public get MenuOpts(): string[] {
     return SelfAppController._MenuOpts;
@@ -131,9 +131,9 @@ class SelfAppController extends Emitter {
     /* 获取 历史缓存的 自定义目录 */
     kernel.anystore.subscribed(STORE_USER_MENU, 'user', (Msg: RecMsg<TreeType>) => {
       // console.log('订阅数据推送 自定义目录===>', Msg.data);
-      const { data = defaultTreeData } = Msg;
-      this._treeData = data;
-      this.changCallbackPart(SelfCallBackTypes.TreeData);
+      const { data = defaultCustomMenu } = Msg;
+      this._customMenu = data;
+      this.changCallbackPart(SelfCallBackTypes.CustomMenu);
     });
     kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: RecMsg<string>) => {
       // console.log('订阅数据推送 最近使用应用===>', Msg.data);
@@ -162,8 +162,8 @@ class SelfAppController extends Emitter {
     if (!data || !(data instanceof Array)) {
       return console.error('缓存自定义目录格式有误,请重试');
     }
-    this._treeData = data || defaultTreeData;
-    this.changCallbackPart(SelfCallBackTypes.TreeData);
+    this._customMenu = data || defaultCustomMenu;
+    this.changCallbackPart(SelfCallBackTypes.CustomMenu);
     kernel.anystore.set(
       STORE_USER_MENU,
       {
@@ -221,6 +221,7 @@ class SelfAppController extends Emitter {
     const list = await this._curSpace.getOwnProducts(reload);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData);
+    return list;
   }
 
   /**

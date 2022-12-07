@@ -8,6 +8,7 @@ import userCtrl from '../setting/userCtrl';
 
 export enum MarketCallBackTypes {
   'ApplyData' = 'ApplyData',
+  'MarketShop' = 'MarketShop',
 }
 
 class MarketController extends Emitter {
@@ -19,8 +20,8 @@ class MarketController extends Emitter {
   private _currentMenu = 'Public';
   /** 判断当前所处页面类型,调用不同请求 */
   public curPageType: 'app' | 'market' = 'market';
-  /** 触发页面渲染 callback */
-  public marketTableCallBack!: (data: any) => void;
+  /** 商店table列表 callback */
+  private _marketTableList: any[] = [];
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
@@ -47,9 +48,8 @@ class MarketController extends Emitter {
     });
     /* 获取 历史缓存的 购物车商品列表 */
     kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
-      console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+      // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
       const { data = [] } = shoplist;
-
       this._shopinglist = data || [];
       this.changCallbackPart(MarketCallBackTypes.ApplyData);
     });
@@ -61,6 +61,14 @@ class MarketController extends Emitter {
    */
   public get shopinglist(): any[] {
     return this._shopinglist;
+  }
+
+  /**
+   * @description: 获取市场商品列表
+   * @return {*}
+   */
+  public get marketTableList(): any[] {
+    return this._marketTableList;
   }
 
   /** 市场操作对象 */
@@ -126,14 +134,15 @@ class MarketController extends Emitter {
     params = { offset: 0, limit: 10, filter: '', ...params };
     const res = await this._curMarket!.getMerchandise(params);
     if (Array.isArray(res)) {
-      this.marketTableCallBack([...res]);
+      this._marketTableList = [...res];
       return;
     }
     const { success, data } = res;
     if (success) {
       const { result = [] } = data;
-      this.marketTableCallBack([...result]);
+      this._marketTableList = [...result];
     }
+    this.changCallbackPart(MarketCallBackTypes.MarketShop);
   }
 
   /**

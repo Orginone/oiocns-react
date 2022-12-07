@@ -172,13 +172,12 @@ export class FileSystemItem implements IFileSystemItem {
           return;
         }
         index++;
+        p?.apply(this, [end]);
         if (end === file.size && res.data) {
           const node = new FileSystemItem(res.data, this);
           this.children.push(node);
-          p?.apply(this, [1]);
           return node;
         }
-        p?.apply(this, [(end * 1.0) / file.size]);
       }
     }
     return exist;

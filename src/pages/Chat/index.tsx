@@ -48,9 +48,7 @@ const Chat: React.FC = () => {
           {/* 头部 */}
           <GroupHeader handleViewDetail={handleViewDetail} />
           {/* 聊天区域 */}
-          <div className={charsStyle.chart_content}>
-            <GroupContent handleReWrites={handleReWrites} />
-          </div>
+          <GroupContent handleReWrites={handleReWrites} />
           {/* 输入区域 */}
           <div className={charsStyle.chart_input}>
             <GroupInputBox writeContent={writeContent} />
