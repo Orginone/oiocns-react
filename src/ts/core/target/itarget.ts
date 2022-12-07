@@ -1,4 +1,3 @@
-import { ProductType } from './../enum';
 import { model, schema } from '@/ts/base';
 import { ResultType, TargetModel } from '@/ts/base/model';
 import { TargetType } from '../enum';
@@ -30,6 +29,16 @@ export interface ITarget {
   identitys: IIdentity[];
   /** 支持的单位类型申明 */
   companyTypes: TargetType[];
+  /** 子组织类型 */
+  subTypes: TargetType[];
+  /** 可以拉入的成员类型 */
+  pullTypes: TargetType[];
+  /** 可以创建的组织类型 */
+  createTargetType: TargetType[];
+  /** 可以加入的父组织类型 */
+  joinTargetType: TargetType[];
+  /** 可以查询的组织类型 */
+  searchTargetType: TargetType[];
   /**
    * 获取职权树
    * @param reload 是否强制刷新
@@ -188,7 +197,7 @@ export interface IMTarget {
     remark,
     resources,
     thingId,
-    typeName = ProductType.WebApp,
+    typeName,
   }: {
     // 名称
     name: string;
