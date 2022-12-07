@@ -5,7 +5,7 @@ import { marketColumns, myColumns, shareInfoColumns } from './config';
 import { message, Modal } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
-import { STORE_USER_MENU } from '@/constants/const'
+import { STORE_USER_MENU } from '@/constants/const';
 const RecentlyApps = 'RecentlyApps';
 const { confirm } = Modal;
 
@@ -221,6 +221,7 @@ class SelfAppController extends Emitter {
     const list = await this._curSpace.getOwnProducts(reload);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData);
+    return list;
   }
 
   /**
@@ -239,13 +240,11 @@ class SelfAppController extends Emitter {
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
-
     const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
     data.typeName = 'Web应用';
     const res = await Target.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
-
     }
     return res;
   };
@@ -310,7 +309,7 @@ class SelfAppController extends Emitter {
         await this._curSpace.deleteProduct(this._curProduct!.prod.id);
         this.querySelfApps(true);
       },
-      onCancel() { },
+      onCancel() {},
     });
   }
 }
