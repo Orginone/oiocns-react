@@ -29,6 +29,7 @@ class PostitonController extends Emitter {
       MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
       'company',
       (positionList: any) => {
+        console.log('00000', MY_POSITION_LIST + userCtrl.Space.target.id.toString());
         console.log('订阅数据推送 岗位列表===>', positionList.data);
         const { data = [] } = positionList;
         this.positionList = data || [];
@@ -104,9 +105,7 @@ class PostitonController extends Emitter {
         MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
         {
           operation: 'replaceAll',
-          data: {
-            data: data || [],
-          },
+          data: data || [],
         },
         'company',
       ),
