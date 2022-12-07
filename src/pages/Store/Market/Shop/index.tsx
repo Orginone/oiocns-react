@@ -7,9 +7,8 @@ const Index: React.FC = () => {
   const [data, setData] = useState([]);
   useEffect(() => {
     marketCtrl.marketTableCallBack = setData;
-    marketCtrl.getStoreProduct('market');
+    marketCtrl.getStoreProduct();
   }, []);
-  console.log('hahahah', data);
 
   return (
     <>

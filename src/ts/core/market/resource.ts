@@ -6,11 +6,9 @@ import IResource from './iresource';
  */
 export default class Resource implements IResource {
   resource: schema.XResource;
-
   constructor(source: schema.XResource) {
     this.resource = source;
   }
-
   public async createExtend(
     teamId: string,
     destIds: string[],

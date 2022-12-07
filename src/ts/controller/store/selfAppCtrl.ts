@@ -241,7 +241,6 @@ class SelfAppController extends Emitter {
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
     const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
-    data.typeName = 'Web应用';
     const res = await Target.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
