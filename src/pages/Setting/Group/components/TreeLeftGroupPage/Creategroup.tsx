@@ -54,30 +54,38 @@ generateList(defaultData);
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
-  setCurrent: (current: schema.XTarget) => void;
+  setCurrent: (current: schema.XTarget | undefined) => void;
   handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
+  [key: string]: any;
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({
-  createTitle,
-  handleMenuClick,
-  setCurrent,
-}) => {
+const Creategroup: React.FC<CreateGroupPropsType> = (
+  { createTitle, handleMenuClick, setCurrent },
+  { history },
+) => {
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    initData(false);
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    } else {
+      initData(false);
+    }
   }, [key]);
 
   const initData = async (reload: boolean) => {
     const data = await userCtrl?.Company?.getJoinedGroups(reload);
     // 创建的集团， 加入的集团
     if (data?.length) {
+      setCurrent(data[0].target);
       const tree = data.map((n: any) => {
         return createTeeDom(n);
       });
       setTreeData(tree);
+    } else {
+      setCurrent(undefined);
+      setTreeData([]);
     }
   };
   const createTeeDom = (n: IDepartment) => {

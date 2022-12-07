@@ -178,6 +178,7 @@ const StoreApp: React.FC = () => {
           className={cls['app-tabs']}
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
+          activeTabKey={statusKey}
           onTabChange={(key) => {
             setStatusKey(key as ststusTypes);
           }}>

@@ -12,7 +12,7 @@ export default interface IProduct {
   /**
    * 获取商品列表
    */
-  getMerchandises(): Promise<IMerchandise[]>;
+  getMerchandises(reload: boolean): Promise<IMerchandise[]>;
   /**
    * 拓展操作 应用分享
    * @param teamId 组织Id

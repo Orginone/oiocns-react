@@ -2,6 +2,7 @@ import React from 'react';
 // import cls from './index.module.less';
 import type { ProFormColumnsType, ProFormLayoutType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
+import { DataType } from 'typings/globelType';
 
 interface indexType<T> {
   layoutType: ProFormLayoutType; //props
