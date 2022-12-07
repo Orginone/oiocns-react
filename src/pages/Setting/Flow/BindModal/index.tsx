@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Modal, Form, message } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import {
   ProForm,
@@ -10,10 +10,9 @@ import {
 } from '@ant-design/pro-components';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { model } from '@/ts/base';
 type BindModalProps = {
   isOpen: boolean;
-  bindAppMes: {};
+  bindAppMes: { name: string; id: string };
   onOk: () => void;
   onCancel: () => void;
   upDateData: number;
@@ -27,31 +26,22 @@ const BindModal: React.FC<BindModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
-
-  useEffect(() => {
-    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
-      const currentData = SelfAppCtrl.tableData.map((item) => {
-        console.log(item.prod);
-        return {
-          value: item.prod.id,
-          label: item.prod.name,
-        };
-      });
-      setData(currentData);
-    });
-
-    return () => {
-      return SelfAppCtrl.unsubscribe([id]);
-    };
-  }, []);
+  const actionRef = useRef();
 
   useEffect(() => {
     initData();
   }, [upDateData]);
 
   const initData = async () => {
+    const tableData = await SelfAppCtrl.querySelfApps();
+    const currentData = tableData.map((item) => {
+      return {
+        value: item.prod.id,
+        label: item.prod.name,
+      };
+    });
+    setData(currentData);
     const currentValue = await userCtrl.Space.queryFlowRelation(false);
-    console.log('currentValue', currentValue);
     if (currentValue && currentValue.length > 0) {
       form.setFieldsValue({ labels: currentValue });
     }
@@ -85,7 +75,10 @@ const BindModal: React.FC<BindModalProps> = ({
         );
         Promise.all(newArr)
           .then((result) => {
-            console.log(result);
+            if (result) {
+              message.success('绑定成功');
+              initData();
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -95,7 +88,40 @@ const BindModal: React.FC<BindModalProps> = ({
       <ProForm layout="horizontal" submitter={false} form={form}>
         <ProFormList
           name="labels"
+          actionRef={actionRef}
           initialValue={[{}]}
+          actionGuard={{
+            beforeRemoveRow: async (index) => {
+              const row = actionRef.current?.get(index as number);
+              return new Promise((resolve) => {
+                if (row?.id) {
+                  Modal.confirm({
+                    title: '提示',
+                    content: '确定删除当前已绑定的应用?',
+                    onOk: () => {
+                      userCtrl.Space.unbindingFlowRelation({
+                        defineId: row?.defineId,
+                        productId: row.productId,
+                        functionCode: row.functionCode,
+                        SpaceId: userCtrl.Space.spaceData.id,
+                      }).then((result) => {
+                        console.log(result);
+                        if (result && result.code === 200) {
+                          message.success('解绑成功');
+                          resolve(true);
+                        } else {
+                          message.success('解绑失败');
+                          resolve(false);
+                        }
+                      });
+                    },
+                  });
+                } else {
+                  resolve(true);
+                }
+              });
+            },
+          }}
           deleteIconProps={{
             Icon: CloseCircleOutlined,
             tooltipText: '删除这个流程字段',

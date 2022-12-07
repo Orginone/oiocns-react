@@ -221,6 +221,7 @@ class SelfAppController extends Emitter {
     const list = await this._curSpace.getOwnProducts(reload);
     this.selfAppsData = list;
     this.changCallbackPart(SelfCallBackTypes.TableData);
+    return list;
   }
 
   /**

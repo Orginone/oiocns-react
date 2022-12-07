@@ -16,6 +16,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import BindModal from './BindModal';
+import AppShowComp from '@/bizcomponents/AppTablePage2';
 const { Header, Content } = Layout;
 
 /**

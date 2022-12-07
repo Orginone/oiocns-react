@@ -34,6 +34,7 @@ const EditCustomModal = (props: Iprops) => {
           await editDept.update({ ...editDept.target, ...value });
         }
       } else {
+        // 新增部门信息
         const newValue = {
           ...value,
           teamName: value.name,
