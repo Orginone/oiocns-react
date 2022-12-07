@@ -15,6 +15,7 @@ import { MarketTypes } from 'typings/marketType';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
+import MoveApp from './moveApp';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
@@ -226,6 +227,7 @@ const StoreApp: React.FC = () => {
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       <TreeComp />
+      <MoveApp appid={''} />
     </>
   );
 };
