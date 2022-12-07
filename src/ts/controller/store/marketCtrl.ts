@@ -122,17 +122,9 @@ class MarketController extends Emitter {
    * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
    * @return {*}
    */
-  public async getStoreProduct(type = 'app', params?: any) {
-    let Fun!: Function;
-    if (type === 'app') {
-      Fun = userCtrl.User!.getOwnProducts;
-      params = {};
-    } else {
-      Fun = this._curMarket!.getMerchandise;
-      params = { offset: 0, limit: 10, filter: '', ...params };
-    }
-    const res = await Fun(params);
-    console.log('获取数据', type, res);
+  public async getStoreProduct(params?: any) {
+    params = { offset: 0, limit: 10, filter: '', ...params };
+    const res = await this._curMarket!.getMerchandise(params);
     if (Array.isArray(res)) {
       this.marketTableCallBack([...res]);
       return;
