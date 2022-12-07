@@ -16,10 +16,7 @@ class PostitonController extends Emitter {
     super();
     this.positionList = [];
     emitter.subscribePart(DomainTypes.Company, async () => {
-      // this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
-      // this.resetData();
-      console.log('空间变', userCtrl.IsCompanySpace);
-      /* 获取 历史缓存的 购物车商品列表 */
+      /* 获取 历史缓存的 岗位列表 */
       if (userCtrl.IsCompanySpace) {
         kernel.anystore.subscribed(
           MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
@@ -84,7 +81,7 @@ class PostitonController extends Emitter {
   };
 
   /**
-   * 缓存 加入/删除购物车的商品
+   * 缓存 添加岗位
    * @param message 新消息，无则为空
    */
   public cacheJoinOrDelePosition = (data: any): void => {
