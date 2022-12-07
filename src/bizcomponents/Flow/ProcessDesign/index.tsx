@@ -4,7 +4,7 @@ import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { EventContext } from '../const';
+// import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
   conditionData: { name: string };
@@ -103,16 +103,16 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
       {/* <LayoutHeader OnPreview={preview} OnExit={exit} titleName={conditionData?.name} /> */}
       <div className={cls['container']}>
         {/* conditionData */}
-        <EventContext.Provider value={{ FlowSub, conditionData }}>
-          <div className={cls['layout-body']}>
-            {activeSelect === 'processDesign' && (
-              <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
-                <FormProcessDesign />
-              </div>
-            )}
-          </div>
-          <LayoutPreview ref={previewRef} />
-        </EventContext.Provider>
+        {/* <EventContext.Provider value={{ FlowSub, conditionData }}> */}
+        <div className={cls['layout-body']}>
+          {activeSelect === 'processDesign' && (
+            <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
+              <FormProcessDesign />
+            </div>
+          )}
+        </div>
+        <LayoutPreview ref={previewRef} />
+        {/* </EventContext.Provider> */}
       </div>
     </>
   );

@@ -3,7 +3,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input } from 'antd';
 
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import { EventContext } from '../../../const';
+// import { EventContext } from '../../../const';
 
 import cls from './index.module.less';
 
@@ -16,8 +16,8 @@ type ConditionGroupItemConfigProps = {};
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  const conditionData: any = useContext(EventContext);
-  console.log('conditionData', conditionData);
+  // const conditionData: any = useContext(EventContext);
+  // console.log('conditionData', conditionData);
   console.log('selectedNode', selectedNode);
   const [key, setKey] = useState(0);
 

@@ -6,9 +6,9 @@ import {
   ClusterOutlined,
   HighlightOutlined,
 } from '@ant-design/icons';
-import React, { useContext } from 'react';
+import React from 'react';
 import cls from './index.module.less';
-import { EventContext } from '../../const';
+// import { EventContext } from '../../const';
 type InsertButtonProps = {
   onInsertNode: Function;
   [key: string]: any;
@@ -20,7 +20,7 @@ type InsertButtonProps = {
  */
 const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
   // const { FlowSub } = useContext(EventContext);
-  const FlowSub: any = useContext(EventContext);
+  // const FlowSub: any = useContext(EventContext);
 
   // const FlowSub = useEventEmitter();
   const text = <span>添加流程节点</span>;
@@ -30,28 +30,28 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
    * */
   const addApprovalNode = () => {
     props.onInsertNode('APPROVAL');
-    FlowSub.emit('insertNode', 'APPROVAL');
+    // FlowSub.emit('insertNode', 'APPROVAL');
   };
   /**
    * 添加抄送节点
    * */
   const addCcNode = () => {
     props.onInsertNode('CC');
-    FlowSub.emit('insertNode', 'CC');
+    // FlowSub.emit('insertNode', 'CC');
   };
   /**
    * 添加条件审核
    * */
   const addConditionsNode = () => {
     props.onInsertNode('CONDITIONS');
-    FlowSub.emit('insertNode', 'CONDITIONS');
+    // FlowSub.emit('insertNode', 'CONDITIONS');
   };
   /**
    * 同时审核
    * */
   const addConcurrentsNode = () => {
     props.onInsertNode('CONCURRENTS');
-    FlowSub.emit('insertNode', 'CONCURRENTS');
+    // FlowSub.emit('insertNode', 'CONCURRENTS');
   };
 
   const content = (
