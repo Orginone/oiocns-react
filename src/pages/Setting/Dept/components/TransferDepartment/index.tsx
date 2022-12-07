@@ -1,116 +1,164 @@
-import React, { useState } from 'react';
-import { Modal, Select, Input, Collapse, Menu } from 'antd';
-import ClockCircleOutlined from '@ant-design/icons/ClockCircleOutlined';
-import type { MenuProps } from 'antd';
-import { data } from './moke';
-import cls from './index.module.less';
+import React, { useRef, useState } from 'react';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import SchemaForm from '@/components/SchemaForm';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { IDepartment } from '@/ts/core';
+import { message } from 'antd';
+import { XTarget } from '@/ts/base/schema';
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: () => void;
   handleOk: () => void;
+  onCancel: () => void;
+  OriginDept: IDepartment; //原部门
+  needTransferUser: XTarget; // 需要转移部门的人员
 }
-
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-  type?: 'group',
-): MenuItem {
-  return {
-    label,
-    key,
-    icon,
-    children,
-    type,
-  } as MenuItem;
-}
-
-const items: MenuProps['items'] = [
-  getItem('科室One', 'sub1', null, [
-    getItem('室 1', '1'),
-    getItem('室 2', '2'),
-    getItem('室 3', '3'),
-    getItem('室 4', '4'),
-  ]),
-
-  getItem('科室Two', 'sub2', null, [
-    getItem('室 5', '5'),
-    getItem('室 6', '6'),
-    getItem('Submenu', 'sub3', null, [getItem('室 7', '7'), getItem('室 8', '8')]),
-  ]),
-
-  getItem('科室Three', 'sub4', null, [
-    getItem('室 9', '9'),
-    getItem('室 10', '10'),
-    getItem('室 11', '11'),
-    getItem('室 12', '12'),
-  ]),
-];
-
-const rootSubmenuKeys = ['sub1', 'sub2', 'sub4']; //点击菜单，收起其他展开的所有菜单
 
 const TransferDepartment = (props: Iprops) => {
-  const { title, open, onOk, handleOk } = props;
-  function onChange() {
-    console.log(1);
-  }
-  const rm = (
-    <div>
-      <span className={cls['figure']}>财</span>浙江省财政厅
-    </div>
-  );
-  const menuClick: MenuProps['onClick'] = (e) => {
-    //菜单单击事件
-    console.log('click ', e);
-  };
-  const [openKeys, setOpenKeys] = useState(['sub1']);
-  const onOpenChange = (keys: any) => {
-    console.log(keys);
-
-    const latestOpenKey = keys.find((key: any) => openKeys.indexOf(key) === -1);
-    if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      setOpenKeys(keys);
-    } else {
-      setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+  const { title, open, handleOk, OriginDept, needTransferUser, onCancel } = props;
+  const formRef = useRef<ProFormInstance>();
+  const [newDept, setNewDept] = useState<IDepartment>();
+  const [reload] = useState<boolean>(false);
+  const loadTreeData = async (reload: boolean) => {
+    const createTeeDom: any = async (n: IDepartment) => {
+      const { target } = n;
+      let result: any = {
+        value: target.id,
+        label: target.name,
+        intans: n,
+        children: [],
+      };
+      const children = await n.getDepartments(reload);
+      if (children.length > 0) {
+        for (const child of children) {
+          if (child.target) {
+            result.children.push(await createTeeDom(child));
+          }
+        }
+      }
+      return result;
+    };
+    const depts = await userCtrl.Company.getDepartments(reload);
+    const data = [];
+    if (depts.length > 0) {
+      for (const child of depts) {
+        if (child.target) {
+          data.push(await createTeeDom(child));
+        }
+      }
     }
+    return data;
   };
+
+  // const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
+  //   list.map((node) => {
+  //     if (node.key === key) {
+  //       return {
+  //         ...node,
+  //         children,
+  //         isLeaf: children.length == 0,
+  //       };
+  //     }
+  //     if (node.children) {
+  //       return {
+  //         ...node,
+  //         children: updateTreeData(node.children, key, children),
+  //       };
+  //     }
+  //     return node;
+  //   });
+  // const loadDept = async ({ key, children, intans }: any) => {
+  //   if (children) {
+  //     return;
+  //   }
+  //   const deptChild: any[] = await intans.getDepartments();
+  //   setTreeData((origin) =>
+  //     updateTreeData(
+  //       origin,
+  //       key,
+  //       deptChild.map((n) => createTeeDom(n, intans.target.id)),
+  //     ),
+  //   );
+  // };
+
+  // const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
+  //   setSelectKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
+  //   await loadDept(info.node);
+  //   if (info.selected) {
+  //     setCurrent(info.node.intans);
+  //     setting.setCurrTreeDeptNode(info.node.intans.target.id);
+  //   }
+  // };
+  const columns: ProFormColumnsType<{ id: string }>[] = [
+    {
+      title: '人员名称',
+      dataIndex: 'username',
+      width: 'md',
+      colProps: { span: 24 },
+      fieldProps: {
+        readOnly: true,
+      },
+    },
+    {
+      title: '所属部门',
+      key: 'id',
+      dataIndex: 'id',
+      width: 'md',
+      colProps: { span: 24 },
+      valueType: 'treeSelect',
+      request: async () => loadTreeData(reload),
+      fieldProps: {
+        onSelect: (_: any, info: { intans: IDepartment }) => {
+          setNewDept(info.intans);
+        },
+        fieldNames: { label: 'label', value: 'value' },
+        showSearch: true,
+        filterTreeNode: true,
+        // multiple: true,
+        treeNodeFilterProp: 'name',
+        treeDefaultExpandAll: true,
+      },
+    },
+  ];
   return (
-    <Modal title={title} open={open} onOk={onOk} onCancel={handleOk}>
-      <p>部门</p>
-      <Select
-        // defaultValue="请选择"
-        placeholder="搜索部门和人员"
-        style={{
-          width: '100%',
-        }}
-        // onChange={handleChange}
-        options={data}
-      />
-      <div className={cls['ogo-input']}></div>
-      <Input
-        placeholder="搜索部门和人员"
-        prefix={<ClockCircleOutlined />}
-        className={cls['mods']}
-      />
-      <Collapse onChange={onChange} expandIconPosition="end">
-        <Collapse.Panel header={<>{rm}</>} key="1">
-          <Menu
-            openKeys={openKeys}
-            onOpenChange={onOpenChange}
-            onClick={menuClick}
-            style={{ width: '100%' }}
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            mode="inline"
-            items={items}
-          />
-        </Collapse.Panel>
-      </Collapse>
-    </Modal>
+    <SchemaForm<{ id: string }>
+      formRef={formRef}
+      title={title}
+      open={open}
+      width={520}
+      onOpenChange={(open: boolean) => {
+        if (open) {
+          formRef.current?.setFieldsValue({
+            id: OriginDept.target.id,
+            username: needTransferUser?.team?.name,
+          });
+        } else {
+          formRef.current?.resetFields();
+          onCancel();
+        }
+      }}
+      rowProps={{
+        gutter: [24, 0],
+      }}
+      layoutType="ModalForm"
+      onFinish={async (values) => {
+        if (values.id === OriginDept.target.id) {
+          onCancel();
+          return;
+        }
+        const { success } = await OriginDept.removePerson([needTransferUser.id]);
+        if (success) {
+          const res = await newDept?.pullPerson([needTransferUser]);
+          if (res?.success) {
+            message.success('操作成功');
+            handleOk();
+          } else {
+            message.error(res?.msg || '操作失败');
+            return false;
+          }
+        }
+      }}
+      columns={columns}></SchemaForm>
   );
 };
 export default TransferDepartment;

@@ -30,7 +30,7 @@ class UserController extends Emitter {
   }
   /** 是否已登录 */
   get Logined(): boolean {
-    return this._user != undefined;
+    return !!this._user?.target.id;
   }
   /** 是否为单位空间 */
   get IsCompanySpace(): boolean {

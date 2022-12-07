@@ -1,6 +1,7 @@
-import { BucketOpreateModel, ResultType } from '../model';
+import { badRequest, BucketOpreateModel, ResultType } from '../model';
 import StoreHub from './storehub';
 import { logger } from '../common';
+import axios from 'axios';
 
 /**
  * 任意数据存储类
@@ -10,6 +11,8 @@ export default class AnyStore {
   private _storeHub: StoreHub;
   // 单例
   private static _instance: AnyStore;
+  // axios实例
+  private readonly _axiosInstance = axios.create({});
   // 订阅回调字典
   private _subscribeCallbacks: Record<string, (data: any) => void>;
   // 获取accessToken
@@ -218,7 +221,10 @@ export default class AnyStore {
    * @returns {ResultType<T>} 移除异步结果
    */
   public async bucketOpreate<T>(data: BucketOpreateModel): Promise<ResultType<T>> {
-    return await this._storeHub.invoke('BucketOpreate', data);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('BucketOpreate', data);
+    }
+    return await this._restRequest('Bucket', 'Operate', data);
   }
   /**
    * 对象变更通知
@@ -236,5 +242,30 @@ export default class AnyStore {
         }
       }
     });
+  }
+  /**
+   * 使用rest请求后端
+   * @param methodName 方法
+   * @param data 参数
+   * @returns 返回结果
+   */
+  private async _restRequest(
+    controller: string,
+    methodName: string,
+    args: any,
+  ): Promise<ResultType<any>> {
+    const res = await this._axiosInstance({
+      method: 'post',
+      timeout: 2 * 1000,
+      url: '/orginone/anydata/' + controller + '/' + methodName,
+      headers: {
+        Authorization: this.accessToken,
+      },
+      data: args,
+    });
+    if (res.data && (res.data as ResultType<any>)) {
+      return res.data as ResultType<any>;
+    }
+    return badRequest();
   }
 }

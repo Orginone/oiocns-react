@@ -68,27 +68,30 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
   const { data: menuData, width } = props; // 顶级主菜单
   const [current, setCurrent] = useState<MemuItemType | null>();
   const [currentMenuData, setCurrentMenuData] = useState<ItemType[] | MemuItemType[]>(); // 当前显示的菜单
-  const [activeMenu, setActiveMenu] = useState<string>(location.pathname); // 当前选中的子菜单
+  const [activeMenu, setActiveMenu] = useState<string>(location.hash); // 当前选中的子菜单
   const [prevMenuData, setPrevMenuData] = useState<(ItemType[] | MemuItemType[])[]>([]);
   const [renderMenu, setRenderMenu] = useState<React.ReactDOM>();
   const routesMain = useMemo(() => routerInfo[1].routes, []);
   const currentMacthRoute = routesMain
     ? routesMain.find((child) => child.path === props.match.path)
     : null;
-
   const menuFlat = menuData ? flatMenuData(menuData) : [];
   /**当页面路径改变时，重新绘制相关的菜单*/
   useEffect(() => {
     if (props.location?.state?.refresh) {
       loadPrvMenu();
     }
-    setActiveMenu(location.pathname);
-    const current = checkRoute(location.pathname, menuFlat);
+    freshMenu(location.hash.replace('#', ''));
+  }, [location.hash, menuData]);
+  // 触发菜单是否刷新
+  const freshMenu = (newRouter: string) => {
+    setActiveMenu(newRouter);
+    const current = checkRoute(newRouter, menuFlat);
     setCurrent(current);
     if (menuData) {
       listenPrev(current);
     }
-  }, [location.pathname, menuData]);
+  };
   /**菜单点击事件 */
   const menuOnChange: MenuProps[`onClick`] = (e) => {
     setActiveMenu(e.key);
@@ -122,18 +125,21 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
     const current = menuFlat.find((n) => n.key === paths[0]);
     if (current!.children!.length > 0) {
       const nextRoute: any = current!.children![0];
-      if (nextRoute.key === location.pathname) {
+      if (nextRoute.key === location.hash) {
         listenPrev(current!);
       }
       if (nextRoute && nextRoute.key) {
-        props.history.push(nextRoute?.key);
+        if (location.hash.replace('#', '') !== nextRoute?.key) {
+          props.history.push(nextRoute?.key);
+        } else {
+          freshMenu(nextRoute?.key);
+        }
       }
     } else {
       if (current!.render) {
         listenPrev(current!);
         console.log('current!.key', current!.key);
         current!.key && props.history.push(current!.key);
-        // listenPrev({ fathKey: location.pathname });
       }
     }
   };

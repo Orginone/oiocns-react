@@ -1,5 +1,4 @@
 .dept-content-box {
-  background-color: #eff4f9;
   height: 100%;
 }
 .company-dept-title {
@@ -8,72 +7,39 @@
 }
 
 .company-dept-content {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  background-color: #fff;
+  padding: 16px 24px 24px 16px;
   :global {
-    .ogo-card {
-      .ogo-card-body {
-        padding: 12px 24px;
-        .ogo-descriptions-header {
-          margin-bottom: 6px;
-        }
-        .ogo-descriptions-view {
-          table {
-            tbody {
-              .ogo-descriptions-row {
-                .ogo-descriptions-item-label {
-                  padding: 5px 24px;
-                }
-                .ogo-descriptions-item-content {
-                  padding: 5px 24px;
-                }
-              }
-            }
-          }
-        }
-      }
+    .ogo-descriptions-header {
+      margin-bottom: 12px;
     }
   }
 }
 .dept-wrap-pages {
-  height: calc(100% - 200px);
+  height: calc(100% - 206px);
   :global {
     .ogo-card {
       height: 100%;
     }
     .ogo-card-body {
       padding: 0;
-      height: calc(100% - 60px);
+      height: calc(100% - 64px);
     }
   }
 }
 .pages-wrap {
+  height: 100%;
   :global {
-    .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
-      border: none;
-    }
-
     .ogo-card-head {
       border: none;
       padding: 0 24px;
     }
-
-    .ogo-tabs-nav::before {
-      border: none !important;
-    }
-
     .ogo-card-body {
-      padding: 4px;
-    }
-
-    .ogo-tabs-tab {
-      padding: 7px 0 !important;
-      font-size: 13px !important;
+      padding: 0 24px 16px 24px;
     }
   }
-
   .page-content-table {
-    flex: 1;
-    height: calc(100% - 90px);
-    padding: 0 24px;
+    height: 100%;
   }
 }

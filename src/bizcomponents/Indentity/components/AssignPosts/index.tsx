@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import CardOrTable from '@/components/CardOrTableComp';
-import type { ProColumns } from '@ant-design/pro-components';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 interface indexType {
   searchCallback: Function;
@@ -34,20 +34,9 @@ const CohortPerson: React.FC<indexType> = (props) => {
     }
   };
 
-  const cohortColumn: ProColumns<any>[] = [
-    {
-      title: '序号',
-      fixed: 'left',
-      dataIndex: 'index',
-      width: 50,
-      render: (_key: any, _record: any, index: number) => {
-        return index + 1;
-      },
-    },
-    {
-      title: '账号',
-      dataIndex: 'code',
-    },
+  const cohortColumn: ProColumns<schema.XTarget>[] = [
+    { title: '序号', valueType: 'index', width: 50 },
+    { title: '账号', dataIndex: 'code' },
     {
       title: '昵称',
       dataIndex: 'name',
@@ -67,8 +56,8 @@ const CohortPerson: React.FC<indexType> = (props) => {
   ];
 
   return (
-    <>
-      <div style={{ paddingBottom: '16px' }}>
+    <div className={cls.tableBox}>
+      <div>
         <Input
           className={cls['search-person-input']}
           placeholder="请输入用户账号"
@@ -81,24 +70,24 @@ const CohortPerson: React.FC<indexType> = (props) => {
           onChange={keyWordChange}
         />
       </div>
-      <CardOrTable<schema.XTarget>
-        dataSource={data}
-        total={10}
-        page={1}
-        rowSelection={{
-          onSelect: (record: any, selected: any, selectedRows: any) => {
-            console.log(record, selected, selectedRows);
-            props.searchCallback(selectedRows);
-          },
-        }}
-        tableAlertRender={false}
-        tableAlertOptionRender={false}
-        showChangeBtn={false}
-        hideOperation={true}
-        columns={cohortColumn as any}
-        rowKey={'id'}
-      />
-    </>
+      <div className={cls.tableContent}>
+        <ProTable<schema.XTarget>
+          dataSource={data}
+          rowSelection={{
+            onSelect: (record: any, selected: any, selectedRows: any) => {
+              console.log(record, selected, selectedRows);
+              props.searchCallback(selectedRows);
+            },
+          }}
+          cardProps={{ bodyStyle: { padding: 0 } }}
+          scroll={{ y: 300 }}
+          options={false}
+          search={false}
+          columns={cohortColumn}
+          rowKey={'id'}
+        />
+      </div>
+    </div>
   );
 };
 

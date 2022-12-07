@@ -62,9 +62,10 @@ const OrganizationalUnits = () => {
   };
 
   const refreshUI = () => {
-    const all: SpaceType[] = userCtrl.User.joinedCompany.map((item) => {
-      return item.spaceData;
-    });
+    const all: SpaceType[] =
+      userCtrl.User?.joinedCompany?.map((item) => {
+        return item.spaceData;
+      }) || [];
     all.unshift(userCtrl.User.spaceData);
     setCurrent(userCtrl.Space.spaceData);
     setMenuList(

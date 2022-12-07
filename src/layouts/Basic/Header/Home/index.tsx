@@ -2,7 +2,7 @@ import { Avatar } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import logo from '@/assets/img/logo.png';
+import logo from '/img/logo.png';
 
 /**
  * 首页导航

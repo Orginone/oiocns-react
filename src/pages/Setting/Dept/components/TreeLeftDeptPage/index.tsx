@@ -17,10 +17,14 @@ type CreateGroupPropsType = {
   handleMenuClick: (key: string, item: IDepartment | undefined, id?: string) => void; // 点击操作触发的事件
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurrent }) => {
+const Creategroup: React.FC<CreateGroupPropsType> = ({
+  handleMenuClick,
+  setCurrent,
+  currentKey,
+}) => {
   const [key] = useCtrlUpdate(userCtrl);
   const [treeData, setTreeData] = useState<any[]>([]);
-  const [currentKey, setCurrentKey] = useState<React.Key>('');
+  const [selectKey, setSelectKey] = useState<React.Key>(currentKey);
   const setting = SettingService.getInstance();
   const treeContainer = document.getElementById('templateMenu');
   useEffect(() => {
@@ -29,7 +33,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
         userCtrl.Company.departments = [];
       }
-      initData(false);
+      initData(true);
     }
     console.log(1111);
   }, [key]);
@@ -37,8 +41,14 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
   const initData = async (reload: boolean) => {
     const data = await userCtrl?.Company?.getDepartments(reload);
     if (data?.length) {
-      setCurrentKey(data[0].target.id);
-      setCurrent(data[0]);
+      if (currentKey && data[0].target.id !== currentKey) {
+        const currentContentDept = await setting.refItem(currentKey);
+        setCurrent(currentContentDept || data[0]);
+        setSelectKey(currentContentDept ? currentKey : data[0].target.id);
+      } else {
+        setSelectKey(data[0].target.id);
+        setCurrent(data[0]);
+      }
       const tree = data.map((n) => {
         return createTeeDom(n);
       });
@@ -93,7 +103,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
   };
 
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-    setCurrentKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
+    setSelectKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
     await loadDept(info.node);
     if (info.selected) {
       setCurrent(info.node.intans);
@@ -119,7 +129,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
           treeData={treeData}
           title={'内设机构'}
           menu={menu}
-          selectedKeys={[currentKey]}
+          selectedKeys={[selectKey]}
           loadData={loadDept}
           onSelect={onSelect}
         />

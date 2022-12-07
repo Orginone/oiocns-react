@@ -11,7 +11,7 @@ import { columns } from './config';
 // import AddPersonModal from '../Dept/components/AddPersonModal';
 // import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-import TreeLeftGroupPage from './components/TreeLeftGroupPage/Creategroup';
+import TreeLeftGroupPage from './components/TreeLeftGroupPage';
 import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
 import { ICompany, IGroup } from '@/ts/core/target/itarget';
@@ -29,34 +29,40 @@ import PageCard from '@/components/PageCard';
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
+  const { history } = props;
   const treeContainer = document.getElementById('templateMenu');
-
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   // const [statusKey, setStatusKey] = useState('merchandise');
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
-
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
   const [id, setId] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
+  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
 
   const [selectId, setSelectId] = useState<string>('');
-  /**
-   * @description: 监听点击事件，关闭弹窗 订阅
-   * @return {*}
-   */
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    }
+  }, []);
 
   // 选中树的时候操作
-  const setTreeCurrent = (current: schema.XTarget) => {
-    setId(current.id);
-    setCurrentGroup(new Group(current));
-    currentGroup?.getCompanys(false).then((e) => {
-      setDataSource(e);
-    });
+  const setTreeCurrent = (current: schema.XTarget | undefined) => {
+    if (current) {
+      setId(current.id);
+      setCurrentGroup(new Group(current));
+      currentGroup?.getCompanys(false).then((e) => {
+        setDataSource(e);
+      });
+    } else {
+      setId('');
+      setCurrentGroup(undefined);
+      setDataSource([]);
+    }
   };
 
   /**点击操作内容触发的事件 */
@@ -133,7 +139,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }
         }
       } else {
-        // currentGroup?.createSubGroup
         if (userCtrl.IsCompanySpace) {
           item.teamCode = item.code;
           item.teamName = item.name;
@@ -241,15 +246,22 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       </div>
     </div>
   );
+
   // 集团信息内容
   const content = (
     <div className={cls['company-group-content']}>
       <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}>
-          <Descriptions.Item label="集团名称">
-            {currentGroup?.target.name}
+        <Descriptions
+          size="middle"
+          title={title}
+          bordered
+          column={2}
+          labelStyle={{ textAlign: 'center', color: '#606266' }}
+          contentStyle={{ textAlign: 'center', color: '#606266' }}>
+          <Descriptions.Item label="集团名称" contentStyle={{ width: '30%' }}>
+            <strong>{currentGroup?.target.name}</strong>
           </Descriptions.Item>
-          <Descriptions.Item label="集团编码">
+          <Descriptions.Item label="集团编码" contentStyle={{ width: '30%' }}>
             {currentGroup?.target.code}
           </Descriptions.Item>
           <Descriptions.Item label="创建人">
@@ -280,11 +292,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }}>
           添加单位
         </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            setLookApplyOpen(true);
-          }}>
+        <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
         </Button>
       </Space>
@@ -319,13 +327,14 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {/* 编辑集团 */}
       <EditCustomModal
         open={isopen}
-        title={id ? '请编辑集团信息' : '新建集团'}
+        title={selectId == 'update' ? '编辑集团信息' : '新建集团'}
         onOk={onOk}
         currentGroup={currentGroup}
         handleOk={handleOk}
         handleCancel={handleCancel}
         selectId={selectId}
       />
+      {/* <IndentityManage open = {isOpenIndentity} object = {currentGroup!} MemberData = {}/> */}
       <Modal
         title="添加单位"
         open={isAddOpen}

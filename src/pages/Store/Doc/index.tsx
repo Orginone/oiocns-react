@@ -54,6 +54,7 @@ const StoreDoc: React.FC = () => {
       const file = options.file as File;
       if (docsCtrl.current && file) {
         docsCtrl.upload(docsCtrl.current.key, file.name, file);
+        setOpen(true);
       }
     },
   };

@@ -8,19 +8,18 @@ import {
   MinusOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
-import IProduct from '@/ts/core/market/iproduct';
 import CardOrTable from '@/components/CardOrTableComp';
-import FlowTarget from '@/ts/core/target/flow';
 import { XFlowDefine } from '@/ts/base/schema';
 import FlowCard from '@/components/FlowCardComp';
 import useWindowSize from '@/utils/windowsize';
+import BindModal from './BindModal';
+
 const { Header, Content } = Layout;
 
 /**
@@ -43,6 +42,7 @@ export enum TabType {
 type FlowItem = {
   content: string;
   id: string;
+  name: string;
 };
 
 /**
@@ -60,10 +60,20 @@ const SettingFlow: React.FC = () => {
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
-  const [conditionData, setConditionData] = useState<{ name: string; labels: [] }>({
+  const [conditionData, setConditionData] = useState<{
+    name: string;
+    labels: [{}];
+    Fields: string;
+  }>({
     name: '',
-    labels: [],
+    labels: [{}],
+    Fields: '',
   });
+
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
+
+  const [dateData, setDateData] = useState(1);
 
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -81,11 +91,6 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      ellipsis: true,
-    },
-    {
       title: '创建人',
       dataIndex: 'createUser',
       ellipsis: true,
@@ -100,46 +105,6 @@ const SettingFlow: React.FC = () => {
       dataIndex: 'remark',
       ellipsis: true,
     },
-    // {
-    //   title: '操作',
-    //   valueType: 'option',
-    //   key: 'option',
-    //   render: (text, record: FlowItem) => [
-    //     <a
-    //       key="editor"
-    //       onClick={() => {
-    //         setTabType(TabType.PROCESSDESIGN);
-    //         setCurrentStep(StepType.PROCESSMESS);
-    //         setEditorValue(record?.content);
-    //         const editorDataMes = JSON.parse(record?.content || '{}');
-    //         console.log(editorDataMes);
-    //         setConditionData({
-    //           name: editorDataMes.name,
-    //           labels: JSON.parse(editorDataMes.remark),
-    //         });
-    //       }}>
-    //       编辑
-    //     </a>,
-    //     <a
-    //       key="delete"
-    //       onClick={() => {
-    //         Modal.confirm({
-    //           title: '提示',
-    //           content: '确定删除当前流程吗',
-    //           onOk: async () => {
-    //             const currentData = await userCtrl.Space.deleteDefine(record?.id);
-    //             console.log('currentData', currentData);
-    //             if (currentData) {
-    //               initData();
-    //               message.success('删除成功');
-    //             }
-    //           },
-    //         });
-    //       }}>
-    //       删除
-    //     </a>,
-    //   ],
-    // },
   ];
 
   useEffect(() => {
@@ -153,7 +118,6 @@ const SettingFlow: React.FC = () => {
     setPage(0);
     const result = await userCtrl.Space.getDefines(reload ? true : false);
     if (result) {
-      console.log('result', result);
       setDataSource(result);
       setShowDataSource(result.slice(0, 10));
     }
@@ -164,7 +128,6 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
-    design.belongId = userCtrl.Space.target.id;
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
@@ -179,6 +142,15 @@ const SettingFlow: React.FC = () => {
   const renderOperation = (record: FlowItem): any[] => {
     return [
       {
+        key: 'bindApp',
+        label: '绑定应用',
+        onClick: () => {
+          setIsOpenModal(true);
+          setBindAppMes(record);
+          setDateData(dateData + 1);
+        },
+      },
+      {
         key: 'editor',
         label: '编辑',
         onClick: () => {
@@ -190,6 +162,7 @@ const SettingFlow: React.FC = () => {
           setConditionData({
             name: editorDataMes.name,
             labels: JSON.parse(editorDataMes.remark),
+            Fields: editorDataMes.Fiels,
           });
         },
       },
@@ -347,7 +320,7 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
-                              setConditionData({ name: '', labels: [] });
+                              setConditionData({ name: '', labels: [{}], Fields: '' });
                               setDesignData(null);
                               setEditorValue(null);
                             },
@@ -415,6 +388,8 @@ const SettingFlow: React.FC = () => {
                         currentFormValue={conditionData}
                         onChange={(params) => {
                           setConditionData(params);
+                          design.remark = JSON.stringify(params.labels);
+                          setDesignData(design);
                         }}
                         nextStep={(params) => {
                           setCurrentStep(StepType.PROCESSMESS);
@@ -434,6 +409,17 @@ const SettingFlow: React.FC = () => {
           </div>
         )}
       </Card>
+      <BindModal
+        isOpen={isOpenModal}
+        bindAppMes={bindAppMes}
+        upDateData={dateData}
+        onOk={() => {
+          setIsOpenModal(false);
+        }}
+        onCancel={() => {
+          setIsOpenModal(false);
+        }}
+      />
     </div>
   );
 };

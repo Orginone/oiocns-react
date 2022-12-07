@@ -18,7 +18,7 @@ let imgList: any[] = [];
 function getImgAssets() {
   for (let i = 1; i < 5; i++) {
     imgList.push({
-      url: new URL(`../../assets/img/banner/${i}.png`, import.meta.url).href,
+      url: `/img/banner/${i}.png`,
     });
   }
 }

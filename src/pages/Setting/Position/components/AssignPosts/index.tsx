@@ -11,7 +11,7 @@ interface indexType {
   memberData: schema.XTarget[];
 }
 
-const CohortPerson: React.FC<indexType> = (props) => {
+const SearchPerson: React.FC<indexType> = (props) => {
   useEffect(() => {
     getTableList();
   }, []);
@@ -102,4 +102,4 @@ const CohortPerson: React.FC<indexType> = (props) => {
   );
 };
 
-export default CohortPerson;
+export default SearchPerson;

@@ -6,6 +6,7 @@ import {
   ProFormList,
   ProFormSelect,
   ProFormDependency,
+  ProFormTextArea,
 } from '@ant-design/pro-components';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
@@ -39,11 +40,16 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
           placeholder="输入流程名称"
           rules={[{ required: true, message: '请输入流程名称!' }]}
         />
-
+        <ProFormTextArea
+          name="Fields"
+          label="备注信息"
+          placeholder="输入流程名称"
+          rules={[{ required: true, message: '请输入备注信息!' }]}
+        />
         <ProFormList
           name="labels"
           label="流程字段"
-          initialValue={[{}]}
+          initialValue={[{ label: '' }]}
           deleteIconProps={{
             Icon: CloseCircleOutlined,
             tooltipText: '删除这个流程字段',

@@ -88,6 +88,16 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
       ? userInfoMenuItems
       : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
     setMenu([{ ..._newMenu }, ...other]);
+
+    if (userCtrl?.IsCompanySpace) {
+      if (location.hash.endsWith('/friend')) {
+        history.push('/setting/info');
+      }
+    } else {
+      if (!location.hash.endsWith('/cohort')) {
+        history.push('/setting/friend');
+      }
+    }
   };
   useEffect(() => {
     const id = userCtrl.subscribe(changeMenu);

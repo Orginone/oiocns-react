@@ -6,7 +6,6 @@ import { Dropdown, Pagination } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { MarketTypes } from 'typings/marketType';
 import { PageShowType } from 'typings/globelType';
 
 interface PageType<T> {
@@ -25,7 +24,7 @@ interface PageType<T> {
   stripe?: boolean; // 斑马纹
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
-  operation?: (item: T) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (item: T) => any[]; //操作区域数据
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
@@ -84,7 +83,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       ...columns,
       {
         title: '操作',
-        width: 80,
+        width: 110,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
@@ -110,7 +109,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         className={cls['common-table']}
         columns={hideOperation ? columns : resetColumns}
         dataSource={dataSource}
-        scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
+        scroll={{ x: width && width > 100 ? width : 'auto', y: height || defaultHeight }}
         search={false}
         headerTitle={headerTitle}
         rowKey={rowKey || 'key'}
@@ -147,47 +146,45 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
    * @desc: 自定义表格 底部区域
    * @return {底部组件}
    */
-  const renderFooter = () => {
-    return (
-      <div className={cls['common-table-footer']}>
-        {/* 切换展示形式 */}
-        <div className={cls['btn-box']}>
-          {showChangeBtn ? (
-            <>
-              <IconFont
-                className={pageType === 'table' ? 'active' : ''}
-                type={'icon-chuangdanwei'}
-                onClick={() => {
-                  setPageType('table');
-                }}
-              />
-              <IconFont
-                className={pageType === 'card' ? 'active' : ''}
-                type={'icon-jianyingyong'}
-                onClick={() => {
-                  setPageType('card');
-                }}
-              />
-            </>
-          ) : (
-            ''
-          )}
-        </div>
-        {/* 翻页功能 */}
-        <Pagination
-          total={total || 0}
-          onChange={onChange}
-          current={page || 1}
-          showTotal={(total: number) => `共 ${total} 条`}
-          showSizeChanger
-        />
+  const TableFooter = (
+    <div className={cls['common-table-footer']}>
+      {/* 切换展示形式 */}
+      <div className={cls['btn-box']}>
+        {showChangeBtn ? (
+          <>
+            <IconFont
+              className={pageType === 'table' ? 'active' : ''}
+              type={'icon-chuangdanwei'}
+              onClick={() => {
+                setPageType('table');
+              }}
+            />
+            <IconFont
+              className={pageType === 'card' ? 'active' : ''}
+              type={'icon-jianyingyong'}
+              onClick={() => {
+                setPageType('card');
+              }}
+            />
+          </>
+        ) : (
+          ''
+        )}
       </div>
-    );
-  };
+      {/* 翻页功能 */}
+      <Pagination
+        total={total || 0}
+        onChange={onChange}
+        current={page || 1}
+        showTotal={(total: number) => `共 ${total} 条`}
+        showSizeChanger
+      />
+    </div>
+  );
 
   return (
     <div className={cls['common-table-wrap']} style={style}>
-      {renderTable} {renderFooter()}
+      {renderTable} {TableFooter}
     </div>
   );
 };

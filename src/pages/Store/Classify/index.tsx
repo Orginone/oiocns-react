@@ -29,15 +29,14 @@ const StoreClassify: React.FC = () => {
   // const [open, setOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
-  const [treeData, setTreeData] = useState<TreeType[]>([]);
+  const [customMenu, setCustomMenu] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
-  const [curMenuKey, setCurMenuKey] = useState<string>(SelfAppCtrl.curMenuKey);
 
   useEffect(() => {
-    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TreeData, () => {
-      console.log('监听,tree变化', SelfAppCtrl.treeData || []);
-      const arr = SelfAppCtrl.treeData || [];
-      setTreeData([...arr]);
+    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.CustomMenu, () => {
+      console.log('监听,tree变化', SelfAppCtrl.customMenu || []);
+      const arr = SelfAppCtrl.customMenu || [];
+      setCustomMenu([...arr]);
     });
     return () => {
       return SelfAppCtrl.unsubscribe(id);
@@ -64,7 +63,7 @@ const StoreClassify: React.FC = () => {
 
     setIsStoreOpen(false);
     // 数据缓存
-    SelfAppCtrl.cacheSelfMenu(treeData);
+    SelfAppCtrl.cacheSelfMenu(customMenu);
   };
   function findAimObj(isParent = false, id: string) {
     let aimObjet: any = undefined;
@@ -85,7 +84,7 @@ const StoreClassify: React.FC = () => {
         });
       }
     }
-    findParent(id, { children: treeData });
+    findParent(id, { children: customMenu });
     return aimObjet;
   }
   /*******
@@ -123,7 +122,7 @@ const StoreClassify: React.FC = () => {
       default:
         break;
     }
-    SelfAppCtrl.cacheSelfMenu(treeData);
+    SelfAppCtrl.cacheSelfMenu(customMenu);
   }
   const onCancel = () => {
     setIsStoreOpen(false);
@@ -170,13 +169,12 @@ const StoreClassify: React.FC = () => {
     // 触发内容去变化
     console.log('点击', item);
     SelfAppCtrl.curMenuKey = item.key || item.id;
-    // StoreContent.changeMenu(item);
   };
   const domNode = document.getElementById('templateMenu');
   if (!domNode) return null;
   return ReactDOM.createPortal(
     <>
-      {treeData && (
+      {customMenu && (
         <>
           <div className={cls.container}>
             <StoreClassifyTree
@@ -184,7 +182,7 @@ const StoreClassify: React.FC = () => {
               menu={SelfAppCtrl.MenuOpts}
               searchable
               isDirectoryTree
-              treeData={treeData}
+              treeData={customMenu}
               handleTitleClick={handleTitleClick}
               handleMenuClick={handleMenuClick}
             />

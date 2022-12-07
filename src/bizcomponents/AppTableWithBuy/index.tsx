@@ -31,6 +31,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   const [data, setData] = useState<any>({});
   const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
   const parentRef = useRef<any>(null); //父级容器Dom
+  const [nowBuy, setNowBuy] = useState<any>([]); // 立即购买
   useEffect(() => {
     setTotal(list?.length || 0);
   }, []);
@@ -67,11 +68,20 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     setIsProduce(false);
   };
 
-  const onOk = () => {
+  /**
+   * @description: 取消订单
+   * @return {*}
+   */
+  const onCancel = () => {
     setIsBuy(false);
   };
 
-  const onCancel = () => {
+  /**
+   * @description: 购买商品
+   * @return {*}
+   */
+  const OnBuyShoping = async () => {
+    await marketCtrl.buyShoping(nowBuy);
     setIsBuy(false);
   };
 
@@ -85,6 +95,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         label: '立即购买',
         onClick: () => {
           setIsBuy(true);
+          setNowBuy([item]);
         },
       },
       {
@@ -154,7 +165,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       <BuyCustomModal
         open={isBuy}
         title="确认订单"
-        onOk={onOk}
+        onOk={OnBuyShoping}
         onCancel={onCancel}
         content="此操作将生成交易订单。是否确认"
       />

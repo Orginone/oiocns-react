@@ -24,13 +24,13 @@ const ProductDetailModal: React.FC<Iprops> = ({ title, open, onClose, width, dat
           {data?.caption}
         </Descriptions.Item>
         <Descriptions.Item label="售卖价格" span={2}>
-          {data?.price ?? '-'} 元
+          {data?.price ? <>{`${data?.price}元`}</> : '免费'}
         </Descriptions.Item>
         <Descriptions.Item label="售卖权属">{data?.sellAuth}</Descriptions.Item>
-        <Descriptions.Item label="使用期限">不知道属性-天</Descriptions.Item>
+        <Descriptions.Item label="使用期限">-- 天</Descriptions.Item>
         <Descriptions.Item label="应用类型">{data?.product?.typeName}</Descriptions.Item>
-        <Descriptions.Item label="归属">不知道属性</Descriptions.Item>
-        <Descriptions.Item label="发起人">不知道属性</Descriptions.Item>
+        <Descriptions.Item label="归属">--</Descriptions.Item>
+        <Descriptions.Item label="发起人">--</Descriptions.Item>
         <Descriptions.Item label="创建时间">{data?.createTime}</Descriptions.Item>
         <Descriptions.Item label="应用描述" span={2}>
           {data?.product?.remark}

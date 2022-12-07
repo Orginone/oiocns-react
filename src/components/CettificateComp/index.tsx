@@ -1,8 +1,6 @@
-import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Tag, Dropdown, Menu, Card } from 'antd';
+import { Avatar, Menu, Card } from 'antd';
 import React from 'react';
 import './index.less';
-import AppLogo from '@/assets/img/appLogo.png';
 import { CertificateType } from '../../../typings/Certificate';
 interface defaultObjType {
   name: string;
@@ -61,7 +59,7 @@ const AppCardComp: React.FC<CertificatesType> = ({
   const Title = () => {
     return (
       <Card.Grid style={gridStyle}>
-        <Avatar className="card-title-left-logo" size={50} src={AppLogo} />
+        <Avatar className="card-title-left-logo" size={50} src="/img/appLogo.png" />
         <div>{data[name] || '--'}</div>
       </Card.Grid>
       // <div className="card-title flex" onClick={onClick}>

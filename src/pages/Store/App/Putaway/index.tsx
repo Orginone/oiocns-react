@@ -3,11 +3,11 @@ import cls from './index.module.less';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import Appimg from '@/assets/img/appLogo.png';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 // import StoreSidebar from '@/ts/controller/store/sidebar';
 
 /*******
@@ -15,14 +15,28 @@ import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
  */
 const AppPutaway: React.FC = () => {
   const history = useHistory();
-  // const [marketData, setMarketData] = useState<any[]>([]);
+  const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
   const curProduct = SelfAppCtrl.curProduct;
-  // useEffect(() => {
-  //   StoreSidebar.getOwnMarket(false).then(() => {
-  //     setMarketData(StoreSidebar.marketFooterTree.appTreeData);
-  //   });
-  // }, []);
+  useEffect(() => {
+    // const id = marketCtrl.subscribePart('MarketShop', () => {
+    //   console.log('监听数据', marketCtrl.marketTableList);
+    //   const arr = marketCtrl.marketTableList || [];
+    //   setMarketData([...arr]);
+    // });
+    // marketCtrl.getStoreProduct();
+    // return () => {
+    //   marketCtrl.unsubscribe(id);
+    // };
+    queryMarketList();
+  }, []);
+
+  async function queryMarketList() {
+    const arr = await marketCtrl.Market.getJoinMarkets(false);
+    console.log('是是是', arr);
+
+    setMarketData([...(arr || [])]);
+  }
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
@@ -36,20 +50,14 @@ const AppPutaway: React.FC = () => {
       price: values.price - 0 || 0,
       days: values.days || '0',
     };
+
     const res = await curProduct?.publish(params);
     if (res?.success) {
       message.success('应用上架成功');
       history.goBack();
     } else {
-      message.error('应用上架失败,请稍后重试');
+      message.error(res?.msg || '应用上架失败,请稍后重试');
     }
-
-    // caption: string,
-    // marketId: string,
-    // sellAuth: '所属权' | '使用权',
-    // information: string,
-    // price: number = 0,
-    // days: string = '0',
   };
 
   return (
@@ -66,7 +74,7 @@ const AppPutaway: React.FC = () => {
           />
         }>
         <Meta
-          avatar={<img className="appLogo" src={Appimg} alt="" />}
+          avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
           title={curProduct?.prod.name || '应用名称'}
           description={
@@ -111,13 +119,13 @@ const AppPutaway: React.FC = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {/* {marketData.map((item) => {
+              {marketData.map((item) => {
                 return (
-                  <Select.Option value={item.id} key={item.id}>
-                    {item.title}
+                  <Select.Option value={item.market.id} key={item.market.id}>
+                    {item.market.name}
                   </Select.Option>
                 );
-              })} */}
+              })}
             </Select>
           </Form.Item>
           <Form.Item label="应用名称" name="caption">

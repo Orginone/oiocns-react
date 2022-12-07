@@ -81,9 +81,9 @@ export default class Company extends MarketTarget implements ICompany {
       return model.badRequest('该集团已存在!');
     }
   }
-
-  /** 创建部门 */
-  public async createDepartment(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+  public async createDepartment(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<any>> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Department;
@@ -93,8 +93,9 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return res;
   }
-  /** 创建部门 */
-  public async createWorking(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+  public async createWorking(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<any>> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Working;
@@ -178,7 +179,7 @@ export default class Company extends MarketTarget implements ICompany {
     const group = this.joinedGroup.find((group) => {
       return group.target.id == id;
     });
-    if (group != undefined) {
+    if (group) {
       let res = await kernel.recursiveDeleteTarget({
         id: id,
         typeName: TargetType.Group,
@@ -343,14 +344,5 @@ export default class Company extends MarketTarget implements ICompany {
       typeName: TargetType.Company,
       belongId: this.target.id,
     });
-  }
-  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct(reload);
-  }
-  public async getUsefulResource(
-    id: string,
-    reload: boolean = false,
-  ): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, reload);
   }
 }
