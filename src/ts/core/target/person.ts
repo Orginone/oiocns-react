@@ -146,7 +146,9 @@ export default class Person extends MarketTarget implements IPerson {
     const res = await super.createProduct(data);
     if (res.success) {
       this.usefulProduct.push(res.data);
-      this.usefulResource.set(res.data.id, res.data.resource);
+      if (res.data.resource) {
+        this.usefulResource.set(res.data.id, res.data.resource);
+      }
     }
     return res;
   }
@@ -305,15 +307,6 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: TargetType.Person,
       belongId: this.target.id,
     });
-  }
-  public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
-    return super.getUsefulProduct(reload);
-  }
-  public async getUsefulResource(
-    id: string,
-    reload: boolean = false,
-  ): Promise<schema.XResource[]> {
-    return super.getUsefulResource(id, reload);
   }
   public async resetPassword(
     password: string,
