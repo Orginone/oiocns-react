@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, message } from 'antd';
-import cls from './index.module.less';
-import SettingService from '../../service';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
-import Department from '@/ts/core/target/department';
 import { IDepartment } from '@/ts/core/target/itarget';
+import cls from './index.module.less';
 const { TextArea } = Input;
 interface Iprops {
   title: string;
@@ -17,7 +15,6 @@ interface Iprops {
 }
 
 const EditCustomModal = (props: Iprops) => {
-  const setting = SettingService.getInstance();
   const { open, title, handleOk, handleCancel, editDept } = props;
   const [form] = Form.useForm();
   useEffect(() => {
@@ -25,27 +22,21 @@ const EditCustomModal = (props: Iprops) => {
       title !== '新增'
         ? form.setFieldsValue({
             ...editDept?.target,
-            remark: editDept?.target.team?.remark ?? '',
+            teamRemark: editDept?.target.team?.remark ?? '',
           })
         : form.resetFields();
     }
   }, [open]);
   const submitData = async () => {
     const value = await form.validateFields();
-    console.log(value);
     if (value) {
       // 编辑自己的部门信息
       if (title === '编辑') {
         if (editDept) {
-          const { typeName, id, belongId } = editDept.target;
           const { success, msg } = await editDept.update({
-            // ...editDept.target,
-            typeName,
-            id,
-            belongId,
+            ...editDept.target,
             teamName: value.name,
             teamCode: value.code,
-            team: { ...editDept.target.team, remark: value.remark },
             ...value,
           });
           if (success) {
@@ -65,35 +56,14 @@ const EditCustomModal = (props: Iprops) => {
           typeName: TargetType.Department,
           parentId: editDept ? editDept.target.id : '',
         };
-        // 查询是否重复创建
-        const dept = setting.getRoot as Department;
-        dept.searchTargetType = [TargetType.Department, TargetType.Company];
-        let datas = await dept.searchTargetByName(newValue.code, [TargetType.Department]);
-        if (!datas.success) {
-          message.error(datas.msg);
-          return;
-        }
-        if (datas?.data && datas.data?.total > 0) {
-          message.error('重复创建');
-          return;
-        }
-        datas = await dept.searchTargetByName(newValue.name, [TargetType.Department]);
-        if (!datas.success) {
-          message.error(datas.msg);
-          return;
-        }
-        if (datas?.data && datas.data?.total > 0) {
-          message.error('重复创建');
-          return;
-        }
-        let curentValue: any;
 
+        let curentValue: any;
         if (editDept) {
           // 新增下级部门信息
           curentValue = await editDept.createDepartment(newValue);
         } else {
           // 如果是一级部门， 就从根部门里面新增
-          curentValue = await setting.getRoot.createDepartment(newValue);
+          curentValue = await userCtrl.Company.createDepartment(newValue);
         }
         if (!curentValue.success) {
           message.error(curentValue.msg);
@@ -132,7 +102,7 @@ const EditCustomModal = (props: Iprops) => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="remark" label="描述">
+          <Form.Item name="teamRemark" label="描述">
             <TextArea
               placeholder="请输入部门描述"
               autoSize={{ minRows: 2, maxRows: 3 }}

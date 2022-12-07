@@ -84,7 +84,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       ...columns,
       {
         title: '操作',
-        width: 80,
+        width: 110,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
@@ -110,7 +110,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         className={cls['common-table']}
         columns={hideOperation ? columns : resetColumns}
         dataSource={dataSource}
-        scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
+        scroll={{ x: width && width > 100 ? width : 'auto', y: height || defaultHeight }}
         search={false}
         headerTitle={headerTitle}
         rowKey={rowKey || 'key'}
