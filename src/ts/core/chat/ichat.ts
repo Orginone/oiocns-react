@@ -41,7 +41,7 @@ export interface IChat {
    * 加载更多历史消息
    * @param filter 过滤条件
    */
-  moreMessage(filter: string): Promise<void>;
+  moreMessage(filter: string): Promise<number>;
   /**
    * 加载更多群成员
    * @param filter 过滤条件

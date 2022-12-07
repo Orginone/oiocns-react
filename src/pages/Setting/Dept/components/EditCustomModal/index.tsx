@@ -71,7 +71,7 @@ const EditCustomModal = (props: Iprops) => {
           curentValue = await editDept.createDepartment(newValue);
         } else {
           // 如果是一级部门， 就从根部门里面新增
-          curentValue = await setting.getRoot.createDepartment(newValue);
+          curentValue = await userCtrl.Company.createDepartment(newValue);
         }
         if (!curentValue.success) {
           message.error(curentValue.msg);

@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space, Dropdown } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -6,6 +6,7 @@ import {
   ExclamationCircleOutlined,
   SendOutlined,
   MinusOutlined,
+  EllipsisOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
@@ -96,48 +97,78 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      render: (text, record: FlowItem) => [
-        <a
-          onClick={() => {
-            setIsOpenModal(true);
-            setBindAppMes(record);
-            setDateData(dateData + 1);
-          }}>
-          绑定应用
-        </a>,
-        <a
-          key="editor"
-          onClick={() => {
-            setTabType(TabType.PROCESSDESIGN);
-            setCurrentStep(StepType.PROCESSMESS);
-            setEditorValue(record?.content);
-            const editorDataMes = JSON.parse(record?.content || '{}');
-            setConditionData({
-              name: editorDataMes.name,
-              labels: JSON.parse(editorDataMes.remark),
-              Fields: editorDataMes.Fiels,
-            });
-          }}>
-          编辑
-        </a>,
-        <a
-          key="delete"
-          onClick={() => {
-            Modal.confirm({
-              title: '提示',
-              content: '确定删除当前流程吗',
-              onOk: async () => {
-                const currentData = await userCtrl.Space.deleteDefine(record?.id);
-                if (currentData) {
-                  initData();
-                  message.success('删除成功');
-                }
-              },
-            });
-          }}>
-          删除
-        </a>,
-      ],
+      render: (text, record) => {
+        return (
+          <Dropdown
+            className={cls['operation-btn']}
+            menu={{
+              items: [
+                {
+                  key: '1',
+                  label: (
+                    <a
+                      key="bindApp"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        setIsOpenModal(true);
+                        setBindAppMes(record);
+                        setDateData(dateData + 1);
+                      }}>
+                      绑定应用
+                    </a>
+                  ),
+                },
+                {
+                  key: '2',
+                  label: (
+                    <a
+                      key="editor"
+                      onClick={() => {
+                        setTabType(TabType.PROCESSDESIGN);
+                        setCurrentStep(StepType.PROCESSMESS);
+                        setEditorValue(record?.content);
+                        const editorDataMes = JSON.parse(record?.content || '{}');
+                        setConditionData({
+                          name: editorDataMes.name,
+                          labels: JSON.parse(editorDataMes.remark),
+                          Fields: editorDataMes.Fiels,
+                        });
+                      }}>
+                      编辑
+                    </a>
+                  ),
+                },
+                {
+                  key: '3',
+                  label: (
+                    <a
+                      key="delete"
+                      onClick={() => {
+                        Modal.confirm({
+                          title: '提示',
+                          content: '确定删除当前流程吗',
+                          onOk: async () => {
+                            const currentData = await userCtrl.Space.deleteDefine(
+                              record?.id,
+                            );
+                            if (currentData) {
+                              initData();
+                              message.success('删除成功');
+                            }
+                          },
+                        });
+                      }}>
+                      删除
+                    </a>
+                  ),
+                },
+              ],
+            }}
+            key="key">
+            <EllipsisOutlined />
+          </Dropdown>
+        );
+      },
     },
   ];
 
