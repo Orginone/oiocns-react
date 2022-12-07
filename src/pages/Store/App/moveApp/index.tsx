@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from 'react';
 
-import cls from './index.module.less';
+// import cls from './index.module.less';
 import { Modal } from 'antd';
 
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 interface indexType {
-  appid: string; //props
+  appid?: string; //props
 }
 const Index: React.FC<indexType> = ({ appid }) => {
-  console.log('打印index', appid);
+  console.log('打印移动appid', appid);
   const [selectItem, setSelectItem] = useState('');
-  useEffect(() => {
-    console.log('是是是', selfAppCtrl.customMenu);
-  }, []);
   const handleOk = () => {
-    console.log('ok', selectItem);
+    console.log('ok', selectItem, '当前操作的应用', selfAppCtrl.curProduct);
   };
   const handleClickItem = ({ checked }: { checked: string[] }) => {
     console.log('事实上', checked);
