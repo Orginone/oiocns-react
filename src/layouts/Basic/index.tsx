@@ -14,17 +14,24 @@ type BasicLayoutProps = {
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
   useEffect(() => {
+    console.log('登录拦截', userCtrl.Logined);
     if (!userCtrl.Logined) {
-      history.push('/passport/login');
+      return history.push('/passport/login');
     }
   }, []);
 
   return (
     <Layout className={styles['page-layout']}>
-      {/* 公共头部 */}
-      <BasicHeader />
-      {/* 内容区域 */}
-      <Layout>{renderRoutes(route.routes)}</Layout>
+      {userCtrl.Logined ? (
+        <>
+          {/* 公共头部 */}
+          <BasicHeader />
+          {/* 内容区域 */}
+          <Layout>{renderRoutes(route.routes)}</Layout>
+        </>
+      ) : (
+        ''
+      )}
     </Layout>
   );
 };
