@@ -22,16 +22,38 @@ const EditCustomModal = (props: Iprops) => {
   const [form] = Form.useForm();
   useEffect(() => {
     if (open) {
-      title !== '新增' ? form.setFieldsValue(editDept?.target) : form.resetFields();
+      title !== '新增'
+        ? form.setFieldsValue({
+            ...editDept?.target,
+            remark: editDept?.target.team?.remark ?? '',
+          })
+        : form.resetFields();
     }
   }, [open]);
   const submitData = async () => {
     const value = await form.validateFields();
+    console.log(value);
     if (value) {
       // 编辑自己的部门信息
       if (title === '编辑') {
         if (editDept) {
-          await editDept.update({ ...editDept.target, ...value });
+          const { typeName, id, belongId } = editDept.target;
+          const { success, msg } = await editDept.update({
+            // ...editDept.target,
+            typeName,
+            id,
+            belongId,
+            teamName: value.name,
+            teamCode: value.code,
+            team: { ...editDept.target.team, remark: value.remark },
+            ...value,
+          });
+          if (success) {
+            message.success('更新信息成功');
+            handleOk();
+          } else {
+            message.error(msg);
+          }
         }
       } else {
         // 新增部门信息
@@ -90,7 +112,7 @@ const EditCustomModal = (props: Iprops) => {
         onOk={submitData}
         onCancel={() => handleCancel()}
         getContainer={false}
-        destroyOnClose={true}>
+        destroyOnClose>
         <Form form={form} layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
