@@ -23,47 +23,46 @@ interface Iprops {
 
 const GroupContent = (props: Iprops) => {
   const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
-  const [messages, setMessages] = useState(chatCtrl.chat?.messages ?? []);
+  const [messages, setMessages] = useState<XImMsg[]>([]);
   const { handleReWrites } = props;
-  const messageNodeRef = useRef<HTMLDivElement>(null); // dom节点
   const [selectId, setSelectId] = useState<string>('');
-
-  /**
-   * @description: 滚动到底部
-   * @return {*}
-   */
-  const scrollEvent = () => {
-    if (messageNodeRef.current) {
-      messageNodeRef.current.scrollIntoView({
-        behavior: 'auto',
-        block: 'end',
-        inline: 'start',
-      });
-    }
-  };
+  const body = useRef<HTMLDivElement>(null);
+  const locked = useRef(false);
 
   useEffect(() => {
     if (chatCtrl.chat) {
-      setMessages(chatCtrl.chat.messages);
-      scrollEvent();
+      setMessages([...chatCtrl.chat.messages]);
+      setTimeout(() => {
+        if (body && body.current) {
+          body.current.scrollTop = body.current.scrollHeight;
+        }
+      }, 10);
     }
   }, [key]);
 
-  const isShowTime = (index: number) => {
-    if (index == 0 && messages) return true;
-    return (
-      moment(messages[index].createTime).diff(messages[index - 1].createTime, 'minute') >
-      3
-    );
+  const isShowTime = (curDate: string, beforeDate: string) => {
+    if (beforeDate === '') return true;
+    return moment(curDate).diff(beforeDate, 'minute') > 3;
   };
-
-  /**
-   * @description: 重新编辑
-   * @param {string} txt
-   * @return {*}
-   */
-  const handleReWrite = (txt: string) => {
-    handleReWrites(txt);
+  // 滚动事件
+  const onScroll = async () => {
+    if (body.current && chatCtrl.chat && body.current.scrollTop < 10) {
+      if (locked.current === false) {
+        locked.current = true;
+        const scrollHeight = body.current.scrollHeight;
+        if ((await chatCtrl.chat.moreMessage('')) > 0) {
+          setMessages([...chatCtrl.chat.messages]);
+          setTimeout(() => {
+            locked.current = false;
+            if (body.current) {
+              body.current.scrollTop = body.current.scrollHeight - scrollHeight;
+            }
+          }, 10);
+        } else {
+          locked.current = false;
+        }
+      }
+    }
   };
   /**
    * 显示消息
@@ -95,96 +94,44 @@ const GroupContent = (props: Iprops) => {
   };
 
   return (
-    <div id={key} className={css.group_content_wrap}>
-      {messages.map((item, index: any) => {
-        return (
-          <React.Fragment key={item.fromId + index}>
-            {/* 聊天间隔时间3分钟则 显示时间 */}
-            {isShowTime(index) ? (
-              <div className={css.chats_space_Time}>
-                <span>{showChatTime(item.createTime)}</span>
-              </div>
-            ) : (
-              ''
-            )}
-            {/* 重新编辑 */}
-            {item.msgType === 'recall' ? (
-              <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
-                撤回了一条消息
-                {item.allowEdit ? (
-                  <span
-                    className={css.reWrite}
-                    onClick={() => {
-                      handleReWrite(item.msgBody);
-                    }}>
-                    重新编辑
-                  </span>
-                ) : (
-                  ''
-                )}
-              </div>
-            ) : (
-              ''
-            )}
-            {/* 左侧聊天内容显示 */}
-            {item.fromId !== chatCtrl.userId ? (
-              <div className={`${css.group_content_left} ${css.con}`}>
-                <Popover
-                  trigger="hover"
-                  overlayClassName={css.targerBoxClass}
-                  open={selectId == item.id}
-                  key={item.id}
-                  placement="bottom"
-                  onOpenChange={() => {
-                    setSelectId('');
-                  }}
-                  content={
-                    chatCtrl.chat?.spaceId === item.spaceId ? (
-                      <>
-                        <CopyToClipboard text={item.showTxt}>
-                          <Button type="text" style={{ color: '#3e5ed8' }}>
-                            复制
-                          </Button>
-                        </CopyToClipboard>
-                        <Button
-                          type="text"
-                          danger
-                          onClick={async () => {
-                            if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                              forceUpdate();
-                            }
-                          }}>
-                          删除
-                        </Button>
-                      </>
-                    ) : (
-                      ''
-                    )
-                  }>
-                  {item.msgType === 'recall' ? (
-                    ''
-                  ) : (
-                    <div
-                      className={css.con_body}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectId(item.id);
+    <div className={css.chart_content} ref={body} onScroll={onScroll}>
+      <div id={key} className={css.group_content_wrap}>
+        {messages.map((item, index: any) => {
+          return (
+            <React.Fragment key={item.fromId + index}>
+              {/* 聊天间隔时间3分钟则 显示时间 */}
+              {isShowTime(
+                item.createTime,
+                index > 0 ? messages[index - 1].createTime : '',
+              ) ? (
+                <div className={css.chats_space_Time}>
+                  <span>{showChatTime(item.createTime)}</span>
+                </div>
+              ) : (
+                ''
+              )}
+              {/* 重新编辑 */}
+              {item.msgType === 'recall' ? (
+                <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+                  撤回了一条消息
+                  {item.allowEdit ? (
+                    <span
+                      className={css.reWrite}
+                      onClick={() => {
+                        handleReWrites(item.msgBody);
                       }}>
-                      <HeadImg
-                        name={chatCtrl.getName(item.fromId)}
-                        label={''}
-                        isSquare={false}
-                      />
-                      <div className={`${css.con_content}`}>{viewMsg(item)}</div>
-                    </div>
+                      重新编辑
+                    </span>
+                  ) : (
+                    ''
                   )}
-                </Popover>
-              </div>
-            ) : (
-              <>
-                {/* 右侧聊天内容显示 */}
-                <div className={`${css.group_content_right} ${css.con}`}>
+                </div>
+              ) : (
+                ''
+              )}
+              {/* 左侧聊天内容显示 */}
+              {item.fromId !== chatCtrl.userId ? (
+                <div className={`${css.group_content_left} ${css.con}`}>
                   <Popover
                     trigger="hover"
                     overlayClassName={css.targerBoxClass}
@@ -195,24 +142,13 @@ const GroupContent = (props: Iprops) => {
                       setSelectId('');
                     }}
                     content={
-                      <>
-                        <CopyToClipboard text={item.showTxt}>
-                          <Button type="text" style={{ color: '#3e5ed8' }}>
-                            复制
-                          </Button>
-                        </CopyToClipboard>
-                        <Button type="text" style={{ color: '#3e5ed8' }}>
-                          转发
-                        </Button>
-                        <Button
-                          type="text"
-                          style={{ color: '#3e5ed8' }}
-                          onClick={async () => {
-                            await chatCtrl.chat?.reCallMessage(item.id);
-                          }}>
-                          撤回
-                        </Button>
-                        {item.spaceId === chatCtrl.chat?.spaceId ? (
+                      chatCtrl.chat?.spaceId === item.spaceId ? (
+                        <>
+                          <CopyToClipboard text={item.showTxt}>
+                            <Button type="text" style={{ color: '#3e5ed8' }}>
+                              复制
+                            </Button>
+                          </CopyToClipboard>
                           <Button
                             type="text"
                             danger
@@ -223,10 +159,10 @@ const GroupContent = (props: Iprops) => {
                             }}>
                             删除
                           </Button>
-                        ) : (
-                          ''
-                        )}
-                      </>
+                        </>
+                      ) : (
+                        ''
+                      )
                     }>
                     {item.msgType === 'recall' ? (
                       ''
@@ -238,23 +174,88 @@ const GroupContent = (props: Iprops) => {
                           e.stopPropagation();
                           setSelectId(item.id);
                         }}>
+                        <HeadImg
+                          name={chatCtrl.getName(item.fromId)}
+                          label={''}
+                          isSquare={false}
+                        />
                         <div className={`${css.con_content}`}>{viewMsg(item)}</div>
-                        <HeadImg name={chatCtrl.getName(item.fromId)} isSquare={false} />
                       </div>
                     )}
                   </Popover>
                 </div>
-              </>
-            )}
-          </React.Fragment>
-        );
-      })}
-      <div
-        ref={messageNodeRef}
-        style={{
-          clear: 'both',
-          width: '100%',
-        }}></div>
+              ) : (
+                <>
+                  {/* 右侧聊天内容显示 */}
+                  <div className={`${css.group_content_right} ${css.con}`}>
+                    <Popover
+                      trigger="hover"
+                      overlayClassName={css.targerBoxClass}
+                      open={selectId == item.id}
+                      key={item.id}
+                      placement="bottom"
+                      onOpenChange={() => {
+                        setSelectId('');
+                      }}
+                      content={
+                        <>
+                          <CopyToClipboard text={item.showTxt}>
+                            <Button type="text" style={{ color: '#3e5ed8' }}>
+                              复制
+                            </Button>
+                          </CopyToClipboard>
+                          <Button type="text" style={{ color: '#3e5ed8' }}>
+                            转发
+                          </Button>
+                          <Button
+                            type="text"
+                            style={{ color: '#3e5ed8' }}
+                            onClick={async () => {
+                              await chatCtrl.chat?.reCallMessage(item.id);
+                            }}>
+                            撤回
+                          </Button>
+                          {item.spaceId === chatCtrl.chat?.spaceId ? (
+                            <Button
+                              type="text"
+                              danger
+                              onClick={async () => {
+                                if (await chatCtrl.chat?.deleteMessage(item.id)) {
+                                  forceUpdate();
+                                }
+                              }}>
+                              删除
+                            </Button>
+                          ) : (
+                            ''
+                          )}
+                        </>
+                      }>
+                      {item.msgType === 'recall' ? (
+                        ''
+                      ) : (
+                        <div
+                          className={css.con_body}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectId(item.id);
+                          }}>
+                          <div className={`${css.con_content}`}>{viewMsg(item)}</div>
+                          <HeadImg
+                            name={chatCtrl.getName(item.fromId)}
+                            isSquare={false}
+                          />
+                        </div>
+                      )}
+                    </Popover>
+                  </div>
+                </>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 };
