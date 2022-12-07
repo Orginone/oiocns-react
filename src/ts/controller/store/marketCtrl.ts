@@ -154,7 +154,6 @@ class MarketController extends Emitter {
     if (res?.success) {
       this.marketMenber = res?.data?.result;
     }
-    console.log('获取市场里的所有用户', res);
     return this.marketMenber;
   }
 
@@ -164,9 +163,7 @@ class MarketController extends Emitter {
    * @return {*}
    */
   public removeMember = async (targetIds: string[]) => {
-    console.log('移出成员ID合集', targetIds);
-    const res = await this._curMarket?.removeMember(targetIds);
-    console.log('移出成员', res);
+    await this._curMarket?.removeMember(targetIds);
   };
 
   /**
