@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Form } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Modal, Form, message } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import {
   ProForm,
@@ -8,12 +8,13 @@ import {
   ProFormGroup,
   ProFormText,
 } from '@ant-design/pro-components';
-import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { model } from '@/ts/base';
+import cls from './index.module.less';
+
 type BindModalProps = {
   isOpen: boolean;
-  bindAppMes: {};
+  bindAppMes: { name: string; id: string };
   onOk: () => void;
   onCancel: () => void;
   upDateData: number;
@@ -27,33 +28,28 @@ const BindModal: React.FC<BindModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
-
-  useEffect(() => {
-    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
-      const currentData = SelfAppCtrl.tableData.map((item) => {
-        console.log(item.prod);
-        return {
-          value: item.prod.id,
-          label: item.prod.name,
-        };
-      });
-      setData(currentData);
-    });
-
-    return () => {
-      return SelfAppCtrl.unsubscribe([id]);
-    };
-  }, []);
+  const actionRef = useRef();
 
   useEffect(() => {
     initData();
   }, [upDateData]);
 
   const initData = async () => {
+    const tableData = await SelfAppCtrl.querySelfApps();
+    const currentData = tableData.map((item) => {
+      return {
+        value: item.prod.id,
+        label: item.prod.name,
+      };
+    });
+    setData(currentData);
     const currentValue = await userCtrl.Space.queryFlowRelation(false);
-    console.log('currentValue', currentValue);
+
     if (currentValue && currentValue.length > 0) {
-      form.setFieldsValue({ labels: currentValue });
+      const filterId = currentValue.filter((item) => {
+        return item.defineId === bindAppMes?.id;
+      });
+      form.setFieldsValue({ labels: filterId });
     }
   };
 
@@ -85,44 +81,87 @@ const BindModal: React.FC<BindModalProps> = ({
         );
         Promise.all(newArr)
           .then((result) => {
-            console.log(result);
+            if (result) {
+              message.success('绑定成功');
+              initData();
+            }
           })
           .catch((error) => {
-            console.log(error);
+            message.error(error);
           });
         onCancel();
       }}>
-      <ProForm layout="horizontal" submitter={false} form={form}>
-        <ProFormList
-          name="labels"
-          initialValue={[{}]}
-          deleteIconProps={{
-            Icon: CloseCircleOutlined,
-            tooltipText: '删除这个流程字段',
-          }}
-          copyIconProps={false}
-          creatorButtonProps={{
-            position: 'bottom',
-            creatorButtonText: '新增应用绑定',
-          }}>
-          <ProFormGroup key="group">
-            <ProFormSelect
-              name="productId"
-              width={280}
-              label="绑定应用（多选）"
-              // mode="multiple"
-              options={data}
-              placeholder="请选择要绑定的应用"
-              rules={[{ required: true, message: '请选择要绑定的应用!' }]}
-            />
-            <ProFormText
-              name="functionCode"
-              label="业务名称"
-              rules={[{ required: true, message: '请填写业务名称!' }]}
-            />
-          </ProFormGroup>
-        </ProFormList>
-      </ProForm>
+      {/* loading通过样式隐藏，没有相关的Api */}
+      <div className={cls.removeLoading}>
+        <ProForm layout="horizontal" submitter={false} form={form}>
+          <ProFormList
+            name="labels"
+            actionRef={actionRef}
+            initialValue={[{}]}
+            actionGuard={{
+              beforeRemoveRow: async (index) => {
+                const row = actionRef.current?.get(index as number);
+                return new Promise((resolve) => {
+                  /** 涉及到id的 调接口干掉*/
+                  if (row?.id) {
+                    Modal.confirm({
+                      title: '提示',
+                      content: '确定删除当前已绑定的应用?',
+                      onOk: () => {
+                        userCtrl.Space.unbindingFlowRelation({
+                          defineId: row?.defineId,
+                          productId: row.productId,
+                          functionCode: row.functionCode,
+                          SpaceId: userCtrl.Space.spaceData.id,
+                        }).then((result) => {
+                          if (result && result.code === 200) {
+                            message.success('解绑成功');
+                            resolve(true);
+                          } else {
+                            message.success('解绑失败');
+                            resolve(false);
+                          }
+                        });
+                      },
+                      onCancel: () => {
+                        resolve(false);
+                      },
+                    });
+                  } else {
+                    /** 不涉及到id的 直接干掉*/
+                    resolve(true);
+                  }
+                });
+              },
+            }}
+            deleteIconProps={{
+              Icon: CloseCircleOutlined,
+              tooltipText: '删除这个流程字段',
+            }}
+            copyIconProps={false}
+            creatorButtonProps={{
+              position: 'bottom',
+              creatorButtonText: '新增应用绑定',
+            }}>
+            <ProFormGroup key="group">
+              <ProFormSelect
+                name="productId"
+                width={280}
+                label="应用名称"
+                // mode="multiple"
+                options={data}
+                placeholder="请选择要绑定的应用"
+                rules={[{ required: true, message: '请选择要绑定的应用!' }]}
+              />
+              <ProFormText
+                name="functionCode"
+                label="业务名称"
+                rules={[{ required: true, message: '请填写业务名称!' }]}
+              />
+            </ProFormGroup>
+          </ProFormList>
+        </ProForm>
+      </div>
     </Modal>
   );
 };
