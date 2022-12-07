@@ -53,13 +53,11 @@ class PostitonController extends Emitter {
   public joinApply = (data: any): any => {
     if (this.positionList.length === 0) {
       this.positionList.push(data);
-      console.log('数据进入', data);
       message.success('添加岗位成功');
     } else if (this.positionList.some((item) => item.code === data?.code)) {
       message.warning('您已添加该岗位，请勿重复添加');
       return;
     } else {
-      this.positionList.push(data);
       message.success('添加岗位成功');
     }
     this.cacheJoinOrDelePosition(this.positionList);
@@ -70,17 +68,14 @@ class PostitonController extends Emitter {
    * @return {*}
    */
   public updatePosttion = (data: any): any => {
-    console.log('数据进入', data);
-    console.log('原数据', this.positionList);
     const list = this.positionList.filter((obj) => obj.code != data.code);
-    console.log('1111111', list);
     this.positionList = list;
-    console.log('过滤后', this.positionList);
     this.positionList.push(data);
     this.cacheJoinOrDelePosition(this.positionList);
+    message.success('更新岗位成功');
   };
   /**
-   * @description: 更新岗位
+   * @description: 删除岗位
    * @param {any} data
    * @return {*}
    */
@@ -88,21 +83,8 @@ class PostitonController extends Emitter {
     const list = this.positionList.filter((obj) => obj.code != data.code);
     this.positionList = list;
     this.cacheJoinOrDelePosition(this.positionList);
+    message.success('删除岗位成功');
   };
-  // /**
-  //  * @description: 删除购物车内的商品
-  //  * @param {any} data
-  //  * @return {*}
-  //  */
-  // public deleApply = async (data: any) => {
-  //   if (this._shopinglist.length > 0) {
-  //     let arrs = this._shopinglist.filter(
-  //       (item) => !data.some((ele: any) => ele.id === item.id),
-  //     );
-  //     this._shopinglist = arrs;
-  //     this.cacheJoinOrDeleShopingCar(this._shopinglist);
-  //   }
-  // };
 
   /**
    * 缓存 加入/删除购物车的商品
