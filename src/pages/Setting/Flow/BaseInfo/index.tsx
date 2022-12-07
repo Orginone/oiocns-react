@@ -36,7 +36,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
         }}>
         <ProFormText
           name="name"
-          label="业务信息"
+          label="流程名称"
           placeholder="输入流程名称"
           rules={[{ required: true, message: '请输入流程名称!' }]}
         />

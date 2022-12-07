@@ -48,6 +48,7 @@ const AddPostModal = (props: Iprops) => {
       title: '编码',
       dataIndex: 'code',
       key: 'code',
+      width: '18%',
     },
     {
       title: '是否公开',
@@ -61,7 +62,7 @@ const AddPostModal = (props: Iprops) => {
       title: '备注',
       dataIndex: 'remark',
       key: 'remark',
-      width: '25%',
+      width: '20%',
     },
   ];
 
@@ -84,13 +85,14 @@ const AddPostModal = (props: Iprops) => {
       open={open}
       onCancel={() => handleOk()}
       getContainer={false}
-      width={1100}
+      width={1020}
       footer={null}>
       <div className="site-card-wrapper">
         <Row gutter={24}>
           <CardOrTable
             dataSource={[datasource]}
             rowKey={'id'}
+            total={1}
             operation={renderOperation}
             columns={columns as any}
             parentRef={parentRef}

@@ -10,16 +10,12 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Modal, message } from 'antd';
-import {
-  ProForm,
-  ProFormColumnsType,
-  ProFormTreeSelect,
-} from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import positionCtrl from '@/ts/controller/position/positionCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 // import UploadAvatar from '../UploadAvatar';
 
@@ -66,34 +62,6 @@ const EditCustomModal = (props: Iprops) => {
         },
         width: 'm',
       },
-      {
-        title: '所属角色',
-        key: 'authId',
-        dataIndex: 'authId',
-        width: 300,
-        valueType: 'treeSelect',
-        request: async () => authTree || [],
-        fieldProps: {
-          fieldNames: {
-            label: 'name',
-            value: 'id',
-          },
-          showSearch: true,
-          filterTreeNode: true,
-          // multiple: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
-        },
-      },
-      {
-        title: '岗位简介',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        width: 'm',
-      },
-      {
-        valueType: 'divider',
-      },
     ];
     return columns;
   };
@@ -111,14 +79,14 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            await userCtrl.Company.createIdentity({
+            positionCtrl.joinApply({
               name: values.name,
               code: values.code,
-              remark: values.remark,
-              authId: values.authId,
+              indentitys: [],
+              persons: [],
             });
-            message.success('操作成功');
             onOk();
+            console.log(positionCtrl);
           }}
           columns={getColumn()}
         />
