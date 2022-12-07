@@ -5,7 +5,7 @@ export type TaskModel = {
   group: string;
   name: string;
   size: number;
-  process: number;
+  finished: number;
   createTime: Date;
 };
 const homeName = '主目录';
@@ -61,7 +61,7 @@ class DocsController extends Emitter {
   }
   /**
    * 打开文件系统项
-   * 
+   *
    * @param key 唯一标识
    */
   public async open(key: string): Promise<void> {
@@ -81,21 +81,27 @@ class DocsController extends Emitter {
    * @param file 文件内容
    * @returns 文件对象
    */
-  public async upload(key: string, name: string, file: Blob): Promise<IObjectItem> {
+  public async upload(
+    key: string,
+    name: string,
+    file: Blob,
+    callback?: Function,
+  ): Promise<IObjectItem> {
     const item = this.refItem(key);
     if (item) {
       const task: TaskModel = {
-        process: 0,
         name: name,
+        finished: 0,
         size: file.size,
         createTime: new Date(),
         group: item.name,
       };
       return await item.upload(name, file, (p) => {
-        task.process = p;
+        task.finished = p;
+        callback?.apply(this, [task]);
         if (p === 0) {
           this._taskList.push(task);
-        } else if (p === 1) {
+        } else if (p === file.size) {
           this.changCallback();
         }
         this.changCallbackPart('taskList');

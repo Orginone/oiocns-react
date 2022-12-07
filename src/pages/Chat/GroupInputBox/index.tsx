@@ -1,8 +1,8 @@
 import chatCtrl from '@/ts/controller/chat';
-import docsCtrl from '@/ts/controller/store/docsCtrl';
+import docsCtrl, { TaskModel } from '@/ts/controller/store/docsCtrl';
 import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
-import { Button, message, Popover, Upload, UploadProps } from 'antd';
+import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
 
@@ -17,6 +17,7 @@ interface Iprops {
 
 const Groupinputbox = (props: Iprops) => {
   const { writeContent } = props;
+  const [task, setTask] = useState<TaskModel>();
   const [imgUrls, setImgUrls] = useState<Array<string>>([]); // 表情图片
   /**
    * @description: 提交聊天内容
@@ -131,8 +132,16 @@ const Groupinputbox = (props: Iprops) => {
       const file = options.file as File;
       const docDir = await docsCtrl.home?.create('沟通');
       if (docDir && file) {
-        const result = await docsCtrl.upload(docDir.key, file.name, file);
+        const result = await docsCtrl.upload(
+          docDir.key,
+          file.name,
+          file,
+          (task: TaskModel) => {
+            setTask({ ...task });
+          },
+        );
         if (result) {
+          setTask(undefined);
           await chatCtrl.chat?.sendMessage(
             MessageType.Image,
             JSON.stringify(result.shareInfo()),
@@ -155,77 +164,87 @@ const Groupinputbox = (props: Iprops) => {
     // selection.addRange(range);
   };
 
-  return (
-    <div className={inputboxStyle.group_input_wrap}>
-      <div className={inputboxStyle.icons_box}>
-        <div style={{ marginTop: '4px' }}>
-          <Popover
-            trigger="click"
-            content={
-              <div className={inputboxStyle.qqface_wrap}>
-                {imgUrls.map((index) => {
-                  return (
-                    <div
-                      className={inputboxStyle.emoji_box}
-                      key={index}
-                      onClick={() => {
-                        handleImgChoosed(index);
-                      }}>
-                      <img className={inputboxStyle.emoji} src={`${index}`} alt="" />
-                    </div>
-                  );
-                })}
-              </div>
-            }>
-            <IconFont type={'icon-biaoqing'} className={inputboxStyle.icons_oneself} />
-          </Popover>
-        </div>
-        {/* <AudioOutlined  /> */}
+  const getMessage = () => {
+    if (task) {
+      const process = ((task.finished * 100.0) / task.size).toFixed(2);
+      return `${task.name}正在上传中${process}%...`;
+    }
+    return '';
+  };
 
-        <IconFont
-          className={inputboxStyle.icons_oneself}
-          type={'icon-maikefeng'}
-          onClick={() => {
-            message.warning('功能暂未开放');
-          }}
-        />
-        <Upload {...uploadProps}>
-          <IconFont className={inputboxStyle.icons_oneself} type={'icon-wenjian'} />
-        </Upload>
-        <IconFont
-          className={inputboxStyle.icons_oneself}
-          type={'icon-jietu'}
-          onClick={() => {
-            message.warning('功能暂未开放');
-          }}
-        />
-        <IconFont
-          className={inputboxStyle.icons_oneself}
-          type={'icon-shipin'}
-          onClick={() => {
-            message.warning('功能暂未开放');
-          }}
-        />
-      </div>
-      <div className={inputboxStyle.input_content}>
-        <div
-          id="insterHtml"
-          className={inputboxStyle.textarea}
-          contentEditable="true"
-          spellCheck="false"
-          //   ref="inputRef"
-          placeholder="请输入内容"
-          onKeyDown={keyDown}></div>
-        <div className={inputboxStyle.send_box}>
-          <Button
-            type="primary"
-            style={{ color: '#fff', border: 'none' }}
-            onClick={() => submit()}>
-            发送
-          </Button>
+  return (
+    <Spin tip={getMessage()} spinning={task != undefined}>
+      <div className={inputboxStyle.group_input_wrap}>
+        <div className={inputboxStyle.icons_box}>
+          <div style={{ marginTop: '4px' }}>
+            <Popover
+              trigger="click"
+              content={
+                <div className={inputboxStyle.qqface_wrap}>
+                  {imgUrls.map((index) => {
+                    return (
+                      <div
+                        className={inputboxStyle.emoji_box}
+                        key={index}
+                        onClick={() => {
+                          handleImgChoosed(index);
+                        }}>
+                        <img className={inputboxStyle.emoji} src={`${index}`} alt="" />
+                      </div>
+                    );
+                  })}
+                </div>
+              }>
+              <IconFont type={'icon-biaoqing'} className={inputboxStyle.icons_oneself} />
+            </Popover>
+          </div>
+          {/* <AudioOutlined  /> */}
+
+          <IconFont
+            className={inputboxStyle.icons_oneself}
+            type={'icon-maikefeng'}
+            onClick={() => {
+              message.warning('功能暂未开放');
+            }}
+          />
+          <Upload {...uploadProps}>
+            <IconFont className={inputboxStyle.icons_oneself} type={'icon-wenjian'} />
+          </Upload>
+          <IconFont
+            className={inputboxStyle.icons_oneself}
+            type={'icon-jietu'}
+            onClick={() => {
+              message.warning('功能暂未开放');
+            }}
+          />
+          <IconFont
+            className={inputboxStyle.icons_oneself}
+            type={'icon-shipin'}
+            onClick={() => {
+              message.warning('功能暂未开放');
+            }}
+          />
+        </div>
+        <div className={inputboxStyle.input_content}>
+          <div
+            id="insterHtml"
+            className={inputboxStyle.textarea}
+            contentEditable="true"
+            spellCheck="false"
+            //   ref="inputRef"
+            placeholder="请输入内容"
+            onKeyDown={keyDown}></div>
+          <div className={inputboxStyle.send_box}>
+            <Button
+              type="primary"
+              style={{ color: '#fff', border: 'none' }}
+              onClick={() => submit()}>
+              发送
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </Spin>
   );
 };
 
