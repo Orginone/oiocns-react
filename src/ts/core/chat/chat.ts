@@ -101,8 +101,9 @@ class BaseChat implements IChat {
   async morePerson(filter: string): Promise<void> {
     await common.sleep(0);
   }
-  moreMessage(filter: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async moreMessage(filter: string): Promise<number> {
+    await common.sleep(0);
+    return 0;
   }
   async sendMessage(type: MessageType, text: string): Promise<boolean> {
     let res = await kernel.createImMsg({
@@ -143,7 +144,7 @@ class BaseChat implements IChat {
       this.messages.unshift(item);
     });
   }
-  protected async loadCacheMessages(): Promise<void> {
+  protected async loadCacheMessages(): Promise<number> {
     const res = await kernel.anystore.aggregate(
       hisMsgCollName,
       {
@@ -161,7 +162,9 @@ class BaseChat implements IChat {
     );
     if (res && res.success && Array.isArray(res.data)) {
       this.loadMessages(res.data);
+      return res.data.length;
     }
+    return 0;
   }
 }
 
@@ -172,9 +175,9 @@ class PersonChat extends BaseChat {
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     super(id, name, m, userId);
   }
-  override async moreMessage(filter: string): Promise<void> {
+  override async moreMessage(filter: string): Promise<number> {
     if (this.spaceId === this.userId) {
-      await this.loadCacheMessages();
+      return await this.loadCacheMessages();
     } else {
       let res = await kernel.queryFriendImMsgs({
         id: this.target.id,
@@ -187,8 +190,10 @@ class PersonChat extends BaseChat {
       });
       if (res && res.success && Array.isArray(res.data)) {
         this.loadMessages(res.data);
+        return res.data.length;
       }
     }
+    return 0;
   }
 }
 
@@ -199,9 +204,9 @@ class CohortChat extends BaseChat {
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     super(id, name, m, userId);
   }
-  override async moreMessage(filter: string): Promise<void> {
+  override async moreMessage(filter: string): Promise<number> {
     if (this.spaceId === this.userId) {
-      await this.loadCacheMessages();
+      return await this.loadCacheMessages();
     } else {
       const res = await kernel.queryCohortImMsgs({
         id: this.target.id,
@@ -213,8 +218,10 @@ class CohortChat extends BaseChat {
       });
       if (res && res.success && Array.isArray(res.data)) {
         this.loadMessages(res.data);
+        return res.data.length;
       }
     }
+    return 0;
   }
   override async morePerson(filter: string): Promise<void> {
     let res = await kernel.querySubTargetById({
