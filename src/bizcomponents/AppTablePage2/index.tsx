@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
-
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
