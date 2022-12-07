@@ -11,7 +11,7 @@ import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
@@ -61,7 +61,6 @@ const StoreApp: React.FC = () => {
       case '创建':
         history.push('/store/app/create');
         break;
-
       default:
         console.log('点击事件未注册', item.text);
         break;
@@ -90,7 +89,7 @@ const StoreApp: React.FC = () => {
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
-  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): common.OperationType[] => {
     return [
       {
         key: 'open',

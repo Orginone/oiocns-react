@@ -3,7 +3,7 @@ import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
-import { MarketTypes } from 'typings/marketType';
+import { schema } from '@/ts/base';
 type CompanySearchTableProps = {
   [key: string]: any;
 };
@@ -13,7 +13,7 @@ type CompanySearchTableProps = {
 // });
 // 单位卡片渲染
 
-const ShopCardList = (dataSource: MarketTypes.MarketType[]) => {
+const ShopCardList = (dataSource: schema.XMarket[]) => {
   return (
     <Row gutter={16}>
       {dataSource.map((item) => (
@@ -38,7 +38,7 @@ const ShopCardList = (dataSource: MarketTypes.MarketType[]) => {
 */
 const CompanySearchList: React.FC<CompanySearchTableProps> = () => {
   const [searchKey, setSearchKey] = useState<string>();
-  const [dataSource, setDataSource] = useState<MarketTypes.MarketType[]>([]);
+  const [dataSource, setDataSource] = useState<schema.XMarket[]>([]);
   // 查询数据
   const getList = async (searchKey?: string) => {
     // await Service.getList({

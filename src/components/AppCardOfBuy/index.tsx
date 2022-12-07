@@ -4,8 +4,9 @@ import { CheckCard } from '@ant-design/pro-components';
 import { Button, Dropdown } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import appImg from '/img/appLogo.png';
+import { MarketTypes } from 'typings/marketType';
 
 interface BuyAppType {
   className?: string;
@@ -15,7 +16,7 @@ interface BuyAppType {
   shouOperation?: boolean; //是否展示 右上角操作按钮
   handleBuyApp: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
   onClick?: (e?: Event) => void; //卡片点击事件
-  operation?: (_item: MarketTypes.ProductType) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (_item: MarketTypes.ProductType) => common.OperationType[]; //操作区域数据
 }
 const defaultObj = {
   name: 'name', //名称

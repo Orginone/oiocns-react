@@ -3,7 +3,7 @@ import { Divider } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { CohortConfigType } from 'typings/Cohort';
+import { common } from 'typings/common';
 import { cohortColumn } from './column';
 import { updateColumn } from './column/index';
 import cls from './index.module.less';
@@ -76,7 +76,7 @@ const CohortConfig: React.FC = () => {
     }
     return undefined;
   };
-  const renderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
+  const renderOperation = (item: ICohort): common.OperationType[] => {
     return [
       {
         key: 'enterChat',
@@ -119,7 +119,7 @@ const CohortConfig: React.FC = () => {
           setIsOpenIndentity(true);
           setMemberData(
             await (
-              await item?.getMember(false)!
+              await item.getMember(false)!
             ).filter((obj) => obj.id != userCtrl.Space.target.id),
           );
         },
@@ -153,7 +153,7 @@ const CohortConfig: React.FC = () => {
     ];
   };
 
-  const joinrenderOperation = (item: ICohort): CohortConfigType.OperationType[] => {
+  const joinrenderOperation = (item: ICohort): common.OperationType[] => {
     return [
       {
         key: 'inviteMembers',
@@ -226,7 +226,7 @@ const CohortConfig: React.FC = () => {
   };
   const renderCardFun = (
     dataArr: ICohort[],
-    operaiton: (_item: ICohort) => CohortConfigType.OperationType[],
+    operaiton: (_item: ICohort) => common.OperationType[],
   ): React.ReactNode[] => {
     return dataArr.map((item: ICohort) => {
       return (

@@ -4,7 +4,7 @@ import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
 
 import CardOrTable from '@/components/CardOrTableComp';
-import { User } from 'typings/user';
+import { User } from 'typings/common';
 
 import cls from './index.module.less';
 

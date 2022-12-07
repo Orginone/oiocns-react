@@ -5,7 +5,7 @@ import { Card, Button, Descriptions, Space, message, Modal, Tabs } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { columns } from './config';
 // import { dataSource } from './datamock';
 // import AddPersonModal from '../Dept/components/AddPersonModal';
@@ -173,7 +173,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     }
   };
   // 操作内容渲染函数
-  const renderOperation = (item: schema.XTarget): MarketTypes.OperationType[] => {
+  const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
       {
         key: 'publish',

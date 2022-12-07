@@ -2,7 +2,7 @@ import { message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { User } from 'typings/user';
+import { common } from 'typings/common';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
 type ApplyInfoProps = {
@@ -30,7 +30,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
   const [total, setTotal] = useState<number>(10);
 
   // 操作内容
-  const renderOperation = (item: DataType): User.OperationType[] => {
+  const renderOperation = (item: DataType): common.OperationType[] => {
     return [
       {
         key: 'cancleApply',

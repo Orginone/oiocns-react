@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Modal, Tabs, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { RouteComponentProps } from 'react-router-dom';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IDepartment } from '@/ts/core/target/itarget';
@@ -38,7 +38,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   // const [isIndentityOpen, setIsIndentityOpen] = useState<boolean>(false);
   const [authorityTree, setAuthorityTree] = useState<IAuthority>();
   // 操作内容渲染函数
-  const renderOperation = (item: XTarget): MarketTypes.OperationType[] => {
+  const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
       {
         key: 'publish',
