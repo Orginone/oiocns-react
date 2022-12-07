@@ -11,7 +11,7 @@ import { columns } from './config';
 // import AddPersonModal from '../Dept/components/AddPersonModal';
 // import LookApply from '../Dept/components/LookApply';
 import { RouteComponentProps } from 'react-router-dom';
-import TreeLeftGroupPage from './components/TreeLeftGroupPage/Creategroup';
+import TreeLeftGroupPage from './components/TreeLeftGroupPage';
 import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
 import { ICompany, IGroup } from '@/ts/core/target/itarget';
@@ -37,7 +37,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   // const [statusKey, setStatusKey] = useState('merchandise');
   const [currentGroup, setCurrentGroup] = useState<IGroup>();
-
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
   const [id, setId] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
@@ -45,12 +44,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
 
   const [selectId, setSelectId] = useState<string>('');
-  /**
-   * @description: 监听点击事件，关闭弹窗 订阅
-   * @return {*}
-   */
   useEffect(() => {
-    // currentGroup 刚来的时候选中
+    if (!userCtrl.IsCompanySpace) {
+      history.push('/setting/info', { refresh: true });
+    }
   }, []);
 
   // 选中树的时候操作
