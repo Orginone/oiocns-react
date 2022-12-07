@@ -41,15 +41,15 @@ export const indentitycolumns: ColumnsType<any> = [
   },
   {
     title: '组织名称',
-    dataIndex: 'name',
+    dataIndex: 'organization',
   },
   {
     title: '业务',
-    dataIndex: 'business',
+    dataIndex: 'remark',
   },
   {
     title: '角色',
-    dataIndex: 'role',
+    dataIndex: 'name',
   },
   {
     title: '备注',

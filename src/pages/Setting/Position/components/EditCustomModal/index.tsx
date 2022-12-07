@@ -26,7 +26,7 @@ interface Iprops {
   handleOk: () => void;
   handleCancel: () => void;
   selectId?: string;
-  defaultData: IIdentity;
+  defaultData: any;
   callback: Function;
 }
 
@@ -34,12 +34,12 @@ const EditCustomModal = (props: Iprops) => {
   const { open, title, onOk, handleOk, defaultData } = props;
   useEffect(() => {}, []);
 
-  const getColumn = (target: IIdentity): ProFormColumnsType<IIdentity>[] => {
-    const columns: ProFormColumnsType<IIdentity>[] = [
+  const getColumn = (target: any): ProFormColumnsType<any>[] => {
+    const columns: ProFormColumnsType<any>[] = [
       {
         title: '岗位名称',
         dataIndex: 'name',
-        initialValue: target ? target.target.name : '',
+        // initialValue: target ? target.target.name : '',
         formItemProps: {
           rules: [
             {
@@ -53,7 +53,7 @@ const EditCustomModal = (props: Iprops) => {
       {
         title: '岗位编号',
         dataIndex: 'code',
-        initialValue: target ? target.target.code : '',
+        // initialValue: target ? target.target.code : '',
         formItemProps: {
           rules: [
             {

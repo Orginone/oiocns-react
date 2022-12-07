@@ -19,8 +19,9 @@ import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import positionCtrl from '@/ts/controller/position/positionCtrl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import { getUuid } from '@/utils/tools';
 // import UploadAvatar from '../UploadAvatar';
 
 /* 
@@ -83,7 +84,13 @@ const EditCustomModal = (props: Iprops) => {
           shouldUpdate={false}
           layoutType="Form"
           onFinish={async (values) => {
-            console.log('fish================', values);
+            positionCtrl.joinApply({
+              name: values.name,
+              code: values.code,
+              indentity: [],
+            });
+            onOk();
+            console.log(positionCtrl);
           }}
           columns={getColumn()}
         />

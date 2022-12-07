@@ -34,7 +34,7 @@ const ShareRecent = (props: Iprops) => {
   const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
   const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
   const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
-  const [selectedTeamId, setSelectedTeamId] = useState<string>('');
+  const [selectedTeam, setSelectedTeam] = useState<any>('');
   const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
     {} as any,
   );
@@ -49,13 +49,13 @@ const ShareRecent = (props: Iprops) => {
     setPersonsData([]);
     setIdentitysData([]);
     setCenterTreeData([]);
-    setSelectedTeamId('0');
+    setSelectedTeam('');
     setLeftTreeSelectedKeys([]);
   }, [radio]);
 
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (list: any) => {
-    onCheckeds && onCheckeds(selectedTeamId, '岗位', list);
+    onCheckeds && onCheckeds(selectedTeam, '岗位', identitysData);
   };
   const getLeftTree = async () => {
     let FunName: Function = userCtrl.User!.getJoinedCohorts;
@@ -82,11 +82,11 @@ const ShareRecent = (props: Iprops) => {
 
     hasSelectRecord?.list?.lenght &&
       selfAppCtrl.ShareProduct(
-        selectedTeamId,
+        selectedTeam,
         hasSelectRecord!.list,
         hasSelectRecord!.type,
       );
-    setSelectedTeamId(info.node.id);
+    setSelectedTeam(info.node);
     setDepartData([]);
     setAuthorData([]);
     setPersonsData([]);
@@ -169,7 +169,7 @@ const ShareRecent = (props: Iprops) => {
   };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, info);
+    console.log('onCheck', checkedKeys, identitysData);
     if (info.checked) {
       if (radio == 3) {
         handleBoxClick(personsHisData, personsData, info.node);
@@ -182,7 +182,8 @@ const ShareRecent = (props: Iprops) => {
       }
     }
     setHasSelectRecord({ type: '岗位', list: checkedKeys });
-    handelCheckedChange(checkedKeys);
+    handelCheckedChange(info.node);
+    console.log('onCheck', checkedKeys, identitysData);
   };
   // 点击删除
   // const delContent = (item: any) => {

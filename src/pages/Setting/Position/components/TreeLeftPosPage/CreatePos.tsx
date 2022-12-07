@@ -13,18 +13,18 @@ type CreateGroupPropsType = {
   setCurrent: (current: IIdentity) => void;
   handleMenuClick: (key: string, item: any) => void;
   // 点击操作触发的事件
-  indentitys: IIdentity[];
+  positions: IIdentity[];
 };
 type target = {
   title: string;
   key: string;
-  object: IIdentity;
+  object: IIdentity[];
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   useEffect(() => {
     getAuthTree();
   }, []);
-  const { indentitys, setCurrent } = props;
+  const { positions, setCurrent } = props;
   const [selectMenu, setSelectMenu] = useState<string>('');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [authTree, setAuthTree] = useState<IAuthority[]>();
@@ -36,13 +36,13 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       setAuthTree([data]);
     }
   };
-  const changeData = (target: IIdentity[]): target[] => {
+  const changeData = (target: any[]): target[] => {
     const result: target[] = [];
     if (target != undefined) {
       for (const a of target) {
         result.push({
-          title: a.target.name,
-          key: a.target.id,
+          title: a.name,
+          key: a.code,
           object: a,
         });
       }
@@ -76,7 +76,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       childIcon={<UserOutlined />}
       key={selectMenu}
       handleMenuClick={handleMenuClick}
-      treeData={changeData(indentitys!)}
+      treeData={changeData(positions)}
       menu={menu}
       onSelect={onSelect}
       title={'全部岗位'}

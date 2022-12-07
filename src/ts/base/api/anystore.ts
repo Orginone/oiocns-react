@@ -145,6 +145,7 @@ export default class AnyStore {
    * @returns {ResultType} 变更异步结果
    */
   public async set(key: string, setData: any, domain: string): Promise<ResultType<any>> {
+    console.log('redis接收到参数', setData, 'key', key);
     return await this._storeHub.invoke('Set', key, setData, domain);
   }
   /**
