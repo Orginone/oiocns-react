@@ -24,7 +24,7 @@ class PostitonController extends Emitter {
     //   await this._target.getJoinMarkets();
     //   this.changCallback();
     // });
-    /* 获取 历史缓存的 购物车商品列表 */
+    /* 获取 历史缓存的 岗位列表 */
     kernel.anystore.subscribed(
       MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
       'company',
@@ -58,7 +58,7 @@ class PostitonController extends Emitter {
       message.warning('您已添加该岗位，请勿重复添加');
       return;
     } else {
-      message.success('添加岗位成功');
+      this.positionList.push(data);
     }
     this.cacheJoinOrDelePosition(this.positionList);
   };
