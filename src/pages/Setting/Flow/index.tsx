@@ -89,6 +89,11 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
+      title: '备注',
+      dataIndex: 'Fields',
+      ellipsis: true,
+    },
+    {
       title: '创建时间',
       dataIndex: 'createTime',
       ellipsis: true,

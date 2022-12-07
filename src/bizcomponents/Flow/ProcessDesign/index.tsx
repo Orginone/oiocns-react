@@ -60,6 +60,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   const startDesign = async () => {
     let tempDesign;
+    console.log('conditionData', conditionData);
     /** 这里走编辑的逻辑 */
     if (editorValue && editorValue !== '{}') {
       tempDesign = designData || JSON.parse(editorValue);
