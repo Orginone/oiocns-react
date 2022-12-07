@@ -35,7 +35,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     name: '新建流程',
     code: 'code',
     remark: '',
-    belongId: '',
     Fields: '',
     resource: {
       nodeId: 'ROOT',

@@ -17,6 +17,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import BindModal from './BindModal';
+
 const { Header, Content } = Layout;
 
 /**
@@ -102,6 +103,7 @@ const SettingFlow: React.FC = () => {
       title: '操作',
       valueType: 'option',
       key: 'option',
+      width: 100,
       render: (text, record) => {
         return (
           <Dropdown
@@ -156,7 +158,7 @@ const SettingFlow: React.FC = () => {
                             const currentData = await userCtrl.Space.deleteDefine(
                               record?.id,
                             );
-                            if (currentData) {
+                            if (currentData.success) {
                               initData();
                               message.success('删除成功');
                             }
@@ -196,7 +198,6 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
-    design.belongId = userCtrl.Space.target.id;
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
