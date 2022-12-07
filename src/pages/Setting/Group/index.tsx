@@ -240,6 +240,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                   // 删除子部门
                   // 如果是一级部门 Company 底下删除
                   // 如果是二级集团 从父集团底下删除；
+                  if (currentGroup) {
+                    console.log(await currentGroup.getJoinedGroups(false));
+                    //.deleteSubGroup(currentGroup.target.id);
+                    // 一级加入的集团，
+                  }
                 },
               });
             }
