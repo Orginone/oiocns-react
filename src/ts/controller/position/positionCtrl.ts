@@ -3,6 +3,7 @@ import { MY_POSITION_LIST } from '@/constants/const';
 import { message } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
+import { DomainTypes, emitter } from '@/ts/core';
 
 export enum PostitonCallBackTypes {
   'ApplyData' = 'ApplyData',
@@ -14,28 +15,25 @@ class PostitonController extends Emitter {
   constructor() {
     super();
     this.positionList = [];
-    // emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-    //   if (userCtrl.IsCompanySpace) {
-    //     this._target = userCtrl.Company;
-    //   } else {
-    //     this._target = userCtrl.User;
-    //   }
-    //   this._curMarket = (await this._target.getPublicMarket(false))[0];
-    //   await this._target.getJoinMarkets();
-    //   this.changCallback();
-    // });
-    /* 获取 历史缓存的 购物车商品列表 */
-    kernel.anystore.subscribed(
-      MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
-      'company',
-      (positionList: any) => {
-        console.log('00000', MY_POSITION_LIST + userCtrl.Space.target.id.toString());
-        console.log('订阅数据推送 岗位列表===>', positionList.data);
-        const { data = [] } = positionList;
-        this.positionList = data || [];
-        this.changCallbackPart(PostitonCallBackTypes.ApplyData);
-      },
-    );
+    emitter.subscribePart(DomainTypes.Company, async () => {
+      // this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
+      // this.resetData();
+      console.log('空间变', userCtrl.IsCompanySpace);
+      /* 获取 历史缓存的 购物车商品列表 */
+      if (userCtrl.IsCompanySpace) {
+        kernel.anystore.subscribed(
+          MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
+          'company',
+          (positionList: any) => {
+            console.log('00000', MY_POSITION_LIST + userCtrl.Space.target.id.toString());
+            console.log('订阅数据推送 岗位列表===>', positionList);
+            const { data = [] } = positionList;
+            this.positionList = data || [];
+            this.changCallbackPart(PostitonCallBackTypes.ApplyData);
+          },
+        );
+      }
+    });
   }
 
   /**
@@ -111,18 +109,16 @@ class PostitonController extends Emitter {
   public cacheJoinOrDelePosition = (data: any): void => {
     this.changCallbackPart(PostitonCallBackTypes.ApplyData);
     console.log('进行存储', data);
-    console.log(
-      '操作结果',
-      kernel.anystore.set(
-        MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
-        {
-          operation: 'replaceAll',
-          data: {
-            data: data || [],
-          },
+
+    kernel.anystore.set(
+      MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
+      {
+        operation: 'replaceAll',
+        data: {
+          data: data || [],
         },
-        'company',
-      ),
+      },
+      'company',
     );
   };
 }

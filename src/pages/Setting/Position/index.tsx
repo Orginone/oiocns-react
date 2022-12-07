@@ -13,7 +13,9 @@ import AssignPosts from './components/AssignPosts';
 import { schema } from '@/ts/base';
 import { PlusOutlined } from '@ant-design/icons';
 import IndentityManage from '@/bizcomponents/AddIndentity';
-import positionCtrl from '@/ts/controller/position/positionCtrl';
+import positionCtrl, {
+  PostitonCallBackTypes,
+} from '@/ts/controller/position/positionCtrl';
 type RouterParams = {
   id: string;
 };
@@ -35,22 +37,19 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [addIndentitys, setAddIndentitys] = useState<any[]>();
   const treeContainer = document.getElementById('templateMenu');
 
-  useEffect(() => {
-    getPositions();
-  }, []);
   // useEffect(() => {
-  //   const id = positionCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
-  //     console.log('监听 岗位变化', positionCtrl.positionListData || []);
-  //     const arr = positionCtrl.positionListData || [];
-  //     setPositions([...arr]);
-  //   });
-  //   return () => {
-  //     return positionCtrl.unsubscribe(id);
-  //   };
+  //   getPositions();
   // }, []);
-  const getPositions = async () => {
-    setPositions(positionCtrl.positionListData);
-  };
+  useEffect(() => {
+    const id = positionCtrl.subscribePart(PostitonCallBackTypes.ApplyData, () => {
+      console.log('监听 岗位变化', positionCtrl.positionListData || []);
+      const arr = positionCtrl.positionListData || [];
+      setPositions([...arr]);
+    });
+    return () => {
+      return positionCtrl.unsubscribe(id);
+    };
+  }, []);
   // 操作内容渲染函数
   const renderOperation = (
     item: MarketTypes.ProductType,
