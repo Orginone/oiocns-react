@@ -124,6 +124,8 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
+    /**要发布的数据 */
+    console.log('design', design);
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.info('添加成功');
@@ -157,7 +159,6 @@ const SettingFlow: React.FC = () => {
           setCurrentStep(StepType.PROCESSMESS);
           setEditorValue(record?.content);
           const editorDataMes = JSON.parse(record?.content || '{}');
-
           setConditionData({
             name: editorDataMes.name,
             labels: JSON.parse(editorDataMes.remark),
