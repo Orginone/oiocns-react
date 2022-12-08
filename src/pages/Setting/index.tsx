@@ -76,7 +76,7 @@ const muneItems = [
   },
 ];
 
-const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
+const Setting: React.FC = ({ route, history }) => {
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };
@@ -88,14 +88,13 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
       ? userInfoMenuItems
       : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
     setMenu([{ ..._newMenu }, ...other]);
-
     if (userCtrl?.IsCompanySpace) {
       if (location.hash.endsWith('/friend')) {
-        history.push('/setting/info');
+        history.push({ pathname: '/setting/info' });
       }
     } else {
       if (!location.hash.endsWith('/cohort')) {
-        history.push('/setting/friend');
+        history.push({ pathname: '/setting/friend' });
       }
     }
   };

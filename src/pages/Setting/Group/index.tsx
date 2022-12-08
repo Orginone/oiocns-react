@@ -46,7 +46,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [selectId, setSelectId] = useState<string>('');
   useEffect(() => {
     if (!userCtrl.IsCompanySpace) {
-      history.push('/setting/info', { refresh: true });
+      history.push({ pathname: '/setting/info', state: { refresh: true } });
     }
   }, []);
 
