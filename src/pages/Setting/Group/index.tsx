@@ -128,12 +128,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           item.teamName = item.name;
           item.typeName = TargetType.Group;
           const res = await currentGroup?.update(item);
-          if (res?.success) {
-            message.info(res.msg);
+          const result = service.messageAlert(res!, '修改集团');
+          if (result) {
             userCtrl.changCallback();
             setIsOpen(false);
-          } else {
-            message.error(res?.msg);
           }
         }
       } else {
@@ -144,7 +142,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           item.typeName = TargetType.Group;
           if (id != '') {
             const res = await currentGroup?.createSubGroup(item);
-            const result = service.messageAlert(res!, '修改集团');
+            const result = service.messageAlert(res!, '新增集团');
             if (result) {
               userCtrl.changCallback();
               setIsOpen(false);
