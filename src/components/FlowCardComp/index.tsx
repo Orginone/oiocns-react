@@ -1,6 +1,6 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown, Modal } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Avatar, Dropdown } from 'antd';
+import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import flowLogo from '@/assets/img/flow.png';
 import './index.less';
@@ -17,8 +17,6 @@ const FlowCardComp: React.FC<FlowCardType> = ({
   onClick,
   operation,
 }) => {
-  useEffect(() => {}, []);
-
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -29,7 +27,6 @@ const FlowCardComp: React.FC<FlowCardType> = ({
             <div className="app-name">
               <span className="app-name-label">{data.name || '--'}</span>
             </div>
-            <span className="app-size">{data.remark || '--'}</span>
           </div>
         </div>
         <Dropdown
@@ -45,6 +42,10 @@ const FlowCardComp: React.FC<FlowCardType> = ({
   return (
     <div className={`customCardWrap ${className}`}>
       <Title />
+      <ul className="card-content">
+        <li className="card-content-desc con">{data.remark || '暂无描述'}</li>
+        <li className="card-content-date">创建于 {data.createTime}</li>
+      </ul>
     </div>
   );
 };
