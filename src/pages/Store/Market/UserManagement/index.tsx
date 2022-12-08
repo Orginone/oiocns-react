@@ -3,6 +3,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import cls from './index.module.less';
+import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import { columns } from './config';
 import { MarketTypes } from 'typings/marketType';
 
@@ -14,7 +15,7 @@ const UserManagement = () => {
   const [data, setData] = useState<any>([]); // 当前操作的商店对象
   const [dataSource, setDataSource] = useState<any>([]); // 商店内对应的用户信息
   useEffect(() => {
-    const id = marketCtrl.subscribe(() => {
+    const id = marketCtrl.subscribePart(MarketCallBackTypes.UserManagement, () => {
       setData(marketCtrl?.marketMenber);
     });
     return () => {
