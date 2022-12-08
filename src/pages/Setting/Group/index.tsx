@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Button, Descriptions, Space, message, Modal, Tabs, Dropdown } from 'antd';
+import { Card, Button, Descriptions, Space, message, Modal, Tabs } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -21,8 +21,9 @@ import { TargetType } from '@/ts/core/enum';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import Company from '@/ts/core/target/company';
-import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
+import service from './service';
 
 /**
  * 集团设置
@@ -41,7 +42,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [id, setId] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
-  const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
 
   const [selectId, setSelectId] = useState<string>('');
   useEffect(() => {
@@ -67,7 +67,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
-    console.log(key, item, '====');
     switch (key) {
       case 'new':
         setId('');
@@ -98,7 +97,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     if (joinKey == '') {
       message.error('请选中要添加集团的单位！');
     } else {
-      console.log(joinTarget);
       const comp: ICompany = new Company(joinTarget!);
       const res = await comp.applyJoinGroup(currentGroup?.target?.id!);
       message.info(res.msg);
@@ -120,19 +118,18 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   };
 
   const handleOk = async (item: any) => {
-    if (item && currentGroup) {
-      // 更新集团
+    // 新增
+    if (item) {
       if (item.selectId == 'update') {
         if (userCtrl.IsCompanySpace) {
           item.teamCode = item.code;
           item.teamName = item.name;
           item.typeName = TargetType.Group;
-          const res = await currentGroup.update(item);
-          if (res.success) {
-            message.success('更新集团成功!');
+          const res = await currentGroup?.update(item);
+          const result = service.messageAlert(res!, '修改集团');
+          if (result) {
             userCtrl.changCallback();
-          } else {
-            message.error('更新集团失败!' + res.msg);
+            setIsOpen(false);
           }
         }
       } else {
@@ -141,20 +138,19 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           item.teamName = item.name;
           item.typeName = TargetType.Group;
           if (id != '') {
-            const res = await currentGroup.createSubGroup(item);
-            if (res.success) {
-              message.success('新增子集团成功!');
+            const res = await currentGroup?.createSubGroup(item);
+            const result = service.messageAlert(res!, '新增集团');
+            if (result) {
               userCtrl.changCallback();
-            } else {
-              message.error('新增子集团失败!' + res.msg);
+              setIsOpen(false);
             }
           } else {
             const res = await userCtrl.Company.createGroup(item);
-            if (res.success) {
-              message.success('新增集团成功!');
+
+            const result = service.messageAlert(res!, '新增集团');
+            if (result) {
               userCtrl.changCallback();
-            } else {
-              message.error('新增集团失败!' + res.msg);
+              setIsOpen(false);
             }
           }
         }
@@ -170,23 +166,17 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {
         key: 'changeNode',
         label: '调整节点',
-        onClick: () => {
-          console.log('按钮事件', 'changeNode', item);
-        },
+        onClick: () => {},
       },
       {
-        key: 'position',
-        label: '集团岗位',
-        onClick: () => {
-          console.log('按钮事件', 'position', item);
-        },
+        key: 'share',
+        label: '岗位集团',
+        onClick: () => {},
       },
       {
         key: 'remove',
         label: '移出集团',
-        onClick: () => {
-          console.log('按钮事件', 'remove', item);
-        },
+        onClick: () => {},
       },
     ];
   };
@@ -226,9 +216,34 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                  // 删除子部门
-                  // 如果是一级部门 Company 底下删除
-                  // 如果是二级集团 从父集团底下删除；
+                  if (currentGroup) {
+                    // 判断是否一级部门
+                    const aGroup = await service.getSearchTopGroup(
+                      currentGroup.target.id,
+                    );
+                    if (aGroup) {
+                      const res = await userCtrl.Company.deleteGroup(aGroup.target.id);
+                      const result = service.messageAlert(res, '删除部门');
+                      if (result) {
+                        userCtrl.changCallback();
+                        setIsOpen(false);
+                      }
+                    } else {
+                      const parentGroup = await service.refParentItem(
+                        currentGroup.target.id,
+                      );
+                      if (parentGroup) {
+                        const res = await parentGroup.deleteSubGroup(
+                          currentGroup.target.id,
+                        );
+                        const result = service.messageAlert(res, '删除部门');
+                        if (result) {
+                          userCtrl.changCallback();
+                          setIsOpen(false);
+                        }
+                      }
+                    }
+                  }
                 },
               });
             }
