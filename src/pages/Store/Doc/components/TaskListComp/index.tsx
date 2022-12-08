@@ -41,7 +41,7 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
           group[index].tasks.unshift(item);
           group[index].count += 1;
           group[index].size += item.size;
-          group[index].finished += item.finished;
+          group[index].finished += item.finished === -1 ? item.size : item.finished;
           group[index].done += item.finished == item.size ? 1 : 0;
         } else {
           group.unshift({
@@ -87,7 +87,11 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
                     />
                     <div className={cls['mod_children_content']}>
                       <div className={cls.name}>{t.name}</div>
-                      <Progress percent={getProcess(t.finished, t.size)} width={70} />
+                      <Progress
+                        status={t.finished === -1 ? 'exception' : 'success'}
+                        percent={getProcess(t.finished, t.size)}
+                        width={70}
+                      />
                     </div>
                   </div>
                 );

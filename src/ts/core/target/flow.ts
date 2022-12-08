@@ -36,7 +36,7 @@ export default class FlowTarget extends BaseTarget {
       console.log('res', res);
       if (res.data.id) {
         this.defines = this.defines.filter((a) => {
-          return a.id !== res.data?.id;
+          return a.id != res.data?.id;
         });
       }
       this.defines.push(res.data);

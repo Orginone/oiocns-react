@@ -139,8 +139,8 @@ const Groupinputbox = (props: Iprops) => {
             setTask({ ...task });
           },
         );
+        setTask(undefined);
         if (result) {
-          setTask(undefined);
           await chatCtrl.chat?.sendMessage(
             MessageType.Image,
             JSON.stringify(result.shareInfo()),
@@ -152,6 +152,9 @@ const Groupinputbox = (props: Iprops) => {
 
   const getMessage = () => {
     if (task) {
+      if (task.finished === -1) {
+        return `${task.name}正在上传失败...`;
+      }
       const process = ((task.finished * 100.0) / task.size).toFixed(2);
       return `${task.name}正在上传中${process}%...`;
     }
