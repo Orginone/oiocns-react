@@ -1,4 +1,4 @@
-import { blobToNumberArray, generateUuid } from '@/ts/base/common';
+import { blobToDataUrl, generateUuid } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { model, kernel } from '../../base';
 import { IFileSystemItem, IObjectItem, OnProgressType } from './ifilesys';
@@ -158,18 +158,18 @@ export class FileSystemItem implements IFileSystemItem {
         if (end > file.size) {
           end = file.size;
         }
-        const dataArr = await blobToNumberArray(file.slice(start, end));
         data.fileItem = {
           index: index,
           uploadId: id,
           size: file.size,
-          data: dataArr,
-          dataUrl: '',
+          data: [],
+          dataUrl: await blobToDataUrl(file.slice(start, end)),
         };
         const res = await kernel.anystore.bucketOpreate<FileItemModel>(data);
         if (!res.success) {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
+          p?.apply(this, [-1]);
           return;
         }
         index++;

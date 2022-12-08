@@ -19,15 +19,6 @@ const AppPutaway: React.FC = () => {
   const [form] = Form.useForm();
   const curProduct = SelfAppCtrl.curProduct;
   useEffect(() => {
-    // const id = marketCtrl.subscribePart('MarketShop', () => {
-    //   console.log('监听数据', marketCtrl.marketTableList);
-    //   const arr = marketCtrl.marketTableList || [];
-    //   setMarketData([...arr]);
-    // });
-    // marketCtrl.getStoreProduct();
-    // return () => {
-    //   marketCtrl.unsubscribe(id);
-    // };
     marketCtrl.Market.getJoinMarkets(false).then((a) => {
       setMarketData(a);
     });

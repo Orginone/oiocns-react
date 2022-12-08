@@ -44,10 +44,10 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
           rules={[{ required: true, message: '请输入流程名称!' }]}
         />
         <ProFormTextArea
-          name="Fields"
+          name="fields"
           label="备注信息"
-          placeholder="输入流程名称"
-          rules={[{ required: true, message: '请输入备注信息!' }]}
+          placeholder="输入备注信息"
+          // rules={[{ required: true, message: '请输入备注信息!' }]}
         />
         <ProFormList
           name="labels"
@@ -85,7 +85,7 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
               rules={[{ required: true, message: '请选择类型!' }]}
             />
           </ProFormGroup>
-          <ProFormDependency key="remark" name={['type']}>
+          <ProFormDependency key="type" name={['type']}>
             {({ type }) => {
               if (type !== 'DICT') {
                 return false;

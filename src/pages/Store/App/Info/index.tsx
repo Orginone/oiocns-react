@@ -10,6 +10,7 @@ import { IconFont } from '@/components/IconFont';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
+import { MarketTypes } from 'typings/marketType';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };

@@ -207,7 +207,6 @@ class ChatController extends Emitter {
         }
       }
     }
-    return chat;
   }
   /**
    * 追加新会话

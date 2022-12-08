@@ -43,7 +43,7 @@ const FlowCardComp: React.FC<FlowCardType> = ({
     <div className={`customCardWrap ${className}`}>
       <Title />
       <ul className="card-content">
-        <li className="card-content-desc con">{data.remark || '暂无描述'}</li>
+        <li className="card-content-desc con">{data.fields || '暂无描述'}</li>
         <li className="card-content-date">创建于 {data.createTime}</li>
       </ul>
     </div>
