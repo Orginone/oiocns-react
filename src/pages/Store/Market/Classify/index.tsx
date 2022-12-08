@@ -4,7 +4,7 @@ import {
   FileTextFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Menu, Button, Row, Col } from 'antd';
+import { Menu, Button, Row, Col, message } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
@@ -32,7 +32,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    await marketCtrl.Market.createMarket({ ...formData });
+    const res = await marketCtrl.Market.createMarket({ ...formData });
+    if (res?.code === 400) {
+      message.warning(res?.msg);
+    } else if (res?.code === 200 && res?.success) {
+      message.success('创建成功');
+    }
     setIsAddOpen(false);
     forceUpdate();
   };
@@ -45,7 +50,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsJoinShop(false);
     setDataSource([]);
     const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
-    console.log('申请加入商店成功', res);
+    if (res?.code === 400) {
+      message.warning(res?.msg);
+    } else if (res?.code === 200 && res?.success) {
+      message.success('申请已发送');
+    }
   };
 
   /**
@@ -67,9 +76,15 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onDeleteOrQuitOk = async () => {
     setIsDeleteOpen(false);
     if (deleOrQuit === 'delete') {
-      await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+      const res = await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+      if (res?.code === 200 && res?.success) {
+        message.success('删除成功');
+      }
     } else {
-      await marketCtrl.Market.quitMarket(treeDataObj?.id);
+      const res = await marketCtrl.Market.quitMarket(treeDataObj?.id);
+      if (res?.code === 200 && res?.success) {
+        message.success('退出成功');
+      }
     }
     forceUpdate();
   };
@@ -186,7 +201,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const handleMenuClick = (key: string, node: any) => {
-    console.log('handleMenuClick55', key, node);
     switch (key) {
       case '删除商店':
         handleDeleteShop(node);
@@ -201,13 +215,16 @@ const MarketClassify: React.FC<any> = ({ history }) => {
       case '用户管理':
         history.push('/market/usermanagement');
         marketCtrl.setCurrentMarket(node?.node);
-        // StoreSiderbar.handleSelectMarket(node?.node);
         break;
       default:
         break;
     }
   };
 
+  /**
+   * @description: 获取市场列表
+   * @return {*}
+   */
   const getTreeData = () => {
     return marketCtrl.Market.joinedMarkets.map((itemModel, index) => {
       let arrs = ['基础详情', '用户管理'];

@@ -7,7 +7,7 @@ import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICompany, IPerson } from '@/ts/core/target/itarget';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { TargetType } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
 
@@ -157,7 +157,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   ];
 
   // 操作内容
-  const renderOperation = (item: ICompany): MarketTypes.OperationType[] => {
+  const renderOperation = (item: ICompany): common.OperationType[] => {
     return [
       {
         key: 'companyInfo',

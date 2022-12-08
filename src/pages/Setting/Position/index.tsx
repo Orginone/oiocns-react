@@ -4,7 +4,7 @@ import { Card, Modal, Button } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { columns, indentitycolumns } from './config';
 import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
@@ -17,6 +17,7 @@ import positionCtrl, {
   PostitonCallBackTypes,
 } from '@/ts/controller/position/positionCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { MarketTypes } from 'typings/marketType';
 type RouterParams = {
   id: string;
 };
@@ -55,9 +56,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     console.log('人员列表', person);
   };
   // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
         key: 'remove',

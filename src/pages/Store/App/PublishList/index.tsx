@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
-import { MarketTypes } from 'typings/marketType';
-// import useDebounce from '@/hooks/useDebounce';
+import { common } from 'typings/common';
 import { Button } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { IProduct } from '@/ts/core';
@@ -27,7 +26,7 @@ const PublishListComp: React.FC = () => {
     setPage(page);
   };
   // // 操作内容渲染函数
-  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): common.OperationType[] => {
     return [
       {
         key: 'detail',

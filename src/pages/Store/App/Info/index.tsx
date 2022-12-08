@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
@@ -36,9 +36,7 @@ const StoreAppInfo: React.FC = () => {
     setTabKey(key);
     getExtend();
   }
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
         key: 'publish',

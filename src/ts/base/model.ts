@@ -768,6 +768,8 @@ export type CreateDefineReq = {
   Resource: FlowNode;
   // 归属Id
   BelongId: string;
+  // 流程字段json
+  Fields?: string;
 };
 
 export type FlowNode = {

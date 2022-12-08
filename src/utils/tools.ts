@@ -136,8 +136,32 @@ const getUuid = () => {
   let uuid = s.join('');
   return uuid;
 };
+
+const findAimObj = (isParent = false, id: string, topParentData?: any[]) => {
+  let aimObjet: any = undefined;
+  function findItem(_id: string, parent: any) {
+    const data = parent.children;
+    if (aimObjet) {
+      return aimObjet;
+    }
+    const AimObj = data.find((v: any) => {
+      return v.id == _id;
+    });
+    if (AimObj) {
+      aimObjet = isParent ? parent : AimObj;
+      return;
+    } else {
+      data.forEach((child: any) => {
+        return findItem(_id, child);
+      });
+    }
+  }
+  findItem(id, { children: topParentData });
+  return aimObjet;
+};
 export {
   debounce,
+  findAimObj,
   getUuid,
   handleFormatDate,
   renderNum,

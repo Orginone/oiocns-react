@@ -2,11 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import type { ProColumns } from '@ant-design/pro-components';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import BuyCustomModal from './BuyCustomModal';
+import { MarketTypes } from 'typings/marketType';
 
 interface AppShowCompType {
   className: string;
@@ -86,9 +87,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
         key: 'buy',

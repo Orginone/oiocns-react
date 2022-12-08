@@ -96,6 +96,11 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
+      title: '备注',
+      dataIndex: 'Fields',
+      ellipsis: true,
+    },
+    {
       title: '创建时间',
       dataIndex: 'createTime',
       ellipsis: true,
@@ -114,12 +119,11 @@ const SettingFlow: React.FC = () => {
     };
   }, []);
 
-  const initData = async (reload?: string) => {
-    setPage(0);
-    const result = await userCtrl.Space.getDefines(reload ? true : false);
+  const initData = async () => {
+    const result = await userCtrl.Space.getDefines(false);
+    console.log('11', result);
     if (result) {
-      setDataSource(result);
-      setShowDataSource(result.slice(0, 10));
+      setDataSource([...result]);
     }
   };
 
@@ -131,8 +135,8 @@ const SettingFlow: React.FC = () => {
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
+      initData();
       setTabType(TabType.TABLEMES);
-      initData('true');
     } else {
       message.warning(result.msg);
     }

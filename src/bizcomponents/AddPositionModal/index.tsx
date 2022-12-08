@@ -5,7 +5,7 @@ import cls from './index.module.less';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import AddNewPosition from './AddNewPosition';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface Iprops {
@@ -66,7 +66,7 @@ const AddPostModal = (props: Iprops) => {
     },
   ];
 
-  const renderOperation = (item: IAuthority): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IAuthority): common.OperationType[] => {
     return [
       {
         key: 'addNew',

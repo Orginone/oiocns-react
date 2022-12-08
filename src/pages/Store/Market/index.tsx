@@ -16,7 +16,6 @@ interface PageType {
  */
 const Market: React.FC<PageType> = (props) => {
   const { route, history } = props;
-  // console.log(renderRoutes(route.routes));
   return (
     <ContentTemplate sider={<MarketClassify history={history} />} type="market">
       {renderRoutes(route.routes)}

@@ -28,35 +28,29 @@ const AppPutaway: React.FC = () => {
     // return () => {
     //   marketCtrl.unsubscribe(id);
     // };
-    queryMarketList();
+    marketCtrl.Market.getJoinMarkets(false).then((a) => {
+      setMarketData(a);
+    });
   }, []);
 
-  async function queryMarketList() {
-    const arr = await marketCtrl.Market.getJoinMarkets(false);
-    console.log('是是是', arr);
-
-    setMarketData([...(arr || [])]);
-  }
-
   const handleSubmit = async () => {
-    const values = await form.validateFields();
-    //publish
-    delete values.typeName;
-    const params = {
-      caption: values.caption,
-      marketId: values.marketId,
-      sellAuth: values.sellAuth,
-      information: values.information || '',
-      price: values.price - 0 || 0,
-      days: values.days || '0',
-    };
-
-    const res = await curProduct?.publish(params);
-    if (res?.success) {
-      message.success('应用上架成功');
-      history.goBack();
-    } else {
-      message.error(res?.msg || '应用上架失败,请稍后重试');
+    if (curProduct) {
+      const values = await form.validateFields();
+      delete values.typeName;
+      const res = await curProduct.publish({
+        caption: values.caption,
+        marketId: values.marketId,
+        sellAuth: values.sellAuth,
+        information: values.information || '',
+        price: values.price - 0 || 0,
+        days: values.days || '0',
+      });
+      if (res.success) {
+        message.success('应用上架成功');
+        history.goBack();
+      } else {
+        message.error(res.msg);
+      }
     }
   };
 
