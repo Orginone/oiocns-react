@@ -1,7 +1,7 @@
 import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { schema } from '@/ts/base';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
@@ -18,6 +18,7 @@ import {
   ICompany,
   ICohort,
 } from '@/ts/core/target/itarget';
+import { MarketTypes } from 'typings/marketType';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -75,9 +76,7 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
     }
   };
   // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
         key: 'remove',

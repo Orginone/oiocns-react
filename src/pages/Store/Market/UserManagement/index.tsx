@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import cls from './index.module.less';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import { columns } from './config';
+import { MarketTypes } from 'typings/marketType';
 
 /**
  * @description: 用户管理
@@ -30,17 +31,13 @@ const UserManagement = () => {
   }, [data]);
 
   // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
         key: 'detail',
         label: '移出',
         onClick: () => {
-          const targetIds: string[] = [];
-          targetIds.push(item?.id);
-          marketCtrl.removeMember(targetIds);
+          marketCtrl.removeMember([item.id]);
         },
       },
     ];
