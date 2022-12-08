@@ -89,7 +89,9 @@ class SelfAppController extends Emitter {
     '固定为常用',
     '删除',
   ];
-
+  public get curSpace(): IMTarget {
+    return this._curSpace;
+  }
   // 存储 我的应用原数据 提供过滤使用
   private selfAppsData: IProduct[] = [];
 
@@ -219,9 +221,13 @@ class SelfAppController extends Emitter {
    */
   public async querySelfApps(reload = false) {
     const list = await this._curSpace.getOwnProducts(reload);
-    this.selfAppsData = list;
+    const arr = list.map((v) => {
+      v['source'] = v.prod?.belongId === userCtrl.User!.target.id ? '创建的' : '分享的';
+      return v;
+    });
+    this.selfAppsData = arr;
     this.changCallbackPart(SelfCallBackTypes.TableData);
-    return list;
+    return arr;
   }
 
   /**
@@ -240,8 +246,7 @@ class SelfAppController extends Emitter {
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
   ): Promise<any> => {
-    const Target = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
-    const res = await Target.createProduct(data);
+    const res = await this._curSpace.createProduct(data);
     if (res.success) {
       this.querySelfApps(true);
     }
@@ -263,7 +268,6 @@ class SelfAppController extends Emitter {
    * @desc: 查询分享信息
    */
   public async queryProductExtend(destType: string, teamId: string) {
-    // console.log('查询分享信息', destType, teamId);
     if (!destType) {
       return;
     }
@@ -271,7 +275,6 @@ class SelfAppController extends Emitter {
       destType,
       teamId || '0',
     );
-    // console.log('分享信息', success, data, msg);
     if (!success) {
       console.error(msg);
       return [];
@@ -293,7 +296,6 @@ class SelfAppController extends Emitter {
     if (!success) {
       console.error(msg);
     } else {
-      console.log('共享成功');
       message.success('共享成功');
     }
   }
@@ -303,10 +305,14 @@ class SelfAppController extends Emitter {
    */
   public async handleDeleteApp() {
     confirm({
-      content: `确认删除《 ${this._curProduct!.prod.name} 》?`,
+      content: `确认移除《 ${this._curProduct!.prod.name} 》?`,
       onOk: async () => {
-        await this._curSpace.deleteProduct(this._curProduct!.prod.id);
+        const aa = await this._curSpace.deleteProduct(this._curProduct!.prod.id);
+
+        console.log('搜索', aa);
+
         this.querySelfApps(true);
+        message.success('移除成功');
       },
       onCancel() {},
     });

@@ -28,11 +28,13 @@ const StoreApp: React.FC = () => {
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
-      setData([...SelfAppCtrl.tableData]);
+      console.log('表格数据', SelfAppCtrl.tableData);
+
+      setData([...(SelfAppCtrl.tableData || [])]);
     });
     const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
       console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
-      setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
+      setRecentlyAppIds([...(SelfAppCtrl.recentlyUsedAppsIds || [])]);
     });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
@@ -44,7 +46,7 @@ const StoreApp: React.FC = () => {
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v.prod?.source);
+      typeSet.add(v.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
