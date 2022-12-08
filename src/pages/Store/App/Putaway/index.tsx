@@ -5,52 +5,38 @@ import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import React from 'react';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-// import StoreSidebar from '@/ts/controller/store/sidebar';
+import appCtrl from '@/ts/controller/store/appCtrl';
 
 /*******
  * @desc: 应用上架
  */
 const AppPutaway: React.FC = () => {
   const history = useHistory();
-  const [marketData, setMarketData] = useState<any[]>([]);
   const [form] = Form.useForm();
-  const curProduct = SelfAppCtrl.curProduct;
-  useEffect(() => {
-    // const id = marketCtrl.subscribePart('MarketShop', () => {
-    //   console.log('监听数据', marketCtrl.marketTableList);
-    //   const arr = marketCtrl.marketTableList || [];
-    //   setMarketData([...arr]);
-    // });
-    // marketCtrl.getStoreProduct();
-    // return () => {
-    //   marketCtrl.unsubscribe(id);
-    // };
-    marketCtrl.Market.getJoinMarkets(false).then((a) => {
-      setMarketData(a);
-    });
-  }, []);
+  if (!appCtrl.curProduct) {
+    history.goBack();
+    return <></>;
+  }
+  const prodInfo = appCtrl.curProduct.prod;
 
   const handleSubmit = async () => {
-    if (curProduct) {
-      const values = await form.validateFields();
-      delete values.typeName;
-      const res = await curProduct.publish({
-        caption: values.caption,
-        marketId: values.marketId,
-        sellAuth: values.sellAuth,
-        information: values.information || '',
-        price: values.price - 0 || 0,
-        days: values.days || '0',
-      });
-      if (res.success) {
-        message.success('应用上架成功');
-        history.goBack();
-      } else {
-        message.error(res.msg);
-      }
+    const values = await form.validateFields();
+    delete values.typeName;
+    const res = await appCtrl.curProduct!.publish({
+      caption: values.caption,
+      marketId: values.marketId,
+      sellAuth: values.sellAuth,
+      information: values.information || '',
+      price: values.price - 0 || 0,
+      days: values.days || '0',
+    });
+    if (res.success) {
+      message.success('应用上架成功');
+      history.goBack();
+    } else {
+      message.error(res.msg);
     }
   };
 
@@ -70,15 +56,13 @@ const AppPutaway: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
-          title={curProduct?.prod.name || '应用名称'}
+          title={prodInfo.name || '应用名称'}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{prodInfo.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：{curProduct?.prod.version}</span>
-                <span className="lastTime">
-                  订阅到期时间 ：{curProduct?.prod.createTime}
-                </span>
+                <span className="vision">版本号 ：{prodInfo.version}</span>
+                <span className="lastTime">订阅到期时间 ：{prodInfo.createTime}</span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
@@ -103,8 +87,8 @@ const AppPutaway: React.FC = () => {
           layout="horizontal"
           initialValues={{
             sellAuth: '使用权',
-            caption: curProduct?.prod.name,
-            typeName: curProduct?.prod.typeName,
+            caption: prodInfo.name,
+            typeName: prodInfo.typeName,
           }}
           form={form}
           autoComplete="off">
@@ -113,7 +97,7 @@ const AppPutaway: React.FC = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {marketData.map((item) => {
+              {marketCtrl.Market.joinedMarkets.map((item) => {
                 return (
                   <Select.Option value={item.market.id} key={item.market.id}>
                     {item.market.name}

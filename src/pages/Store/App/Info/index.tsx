@@ -1,39 +1,36 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
+import appCtrl from '@/ts/controller/store/appCtrl';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
 });
 
 const StoreAppInfo: React.FC = () => {
+  const history = useHistory();
+  if (!appCtrl.curProduct) {
+    history.goBack();
+    return <></>;
+  }
+  const curProd = appCtrl.curProduct;
   // const BtnsList = ['编辑应用分配'];
   const [list, setList] = useState<any>([]);
-  useEffect(() => {
-    console.log('{SelfAppCtrl.curProduct?.prod.version}');
-    getExtend('组织');
-  }, []);
 
-  const getExtend = async (tabKey: string) => {
-    console.log('事实上222', tabKey);
-
-    const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
-    console.log('请求分享/分配信息', tabKey, res);
-    setList(res?.data?.result ?? []);
+  const onTabChange = async (key: string) => {
+    const res = await curProd.queryExtend(key, '0');
+    if (res.success && res.data.result) {
+      setList(res.data.result);
+    }
   };
 
-  const history = useHistory();
-  function onTabChange(key: any) {
-    console.log('onTabChange', key);
-    getExtend(key);
-  }
+  onTabChange('组织');
 
   const menu = [{ key: '退订', label: '退订' }];
   return (
@@ -52,17 +49,13 @@ const StoreAppInfo: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
-          title={SelfAppCtrl.curProduct?.prod.name}
+          title={curProd.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{curProd.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">
-                  版本号 ：{SelfAppCtrl.curProduct?.prod.version}
-                </span>
-                <span className="lastTime">
-                  订阅到期时间 ：{SelfAppCtrl.curProduct?.prod.createTime}
-                </span>
+                <span className="vision">版本号 ：{curProd.prod.version}</span>
+                <span className="lastTime">订阅到期时间 ：{curProd.prod.createTime}</span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>

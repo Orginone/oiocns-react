@@ -23,6 +23,10 @@ class DocsController extends Emitter {
     this._taskList = [];
     this._curKey = this._root.key;
     emitter.subscribePart(DomainTypes.User, () => {
+      this._root = rootDir;
+      this._root.children = [];
+      this._taskList = [];
+      this._curKey = this._root.key;
       setTimeout(async () => {
         this._home = await this._root.create(homeName);
         this.changCallback();
