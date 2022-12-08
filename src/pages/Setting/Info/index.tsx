@@ -131,6 +131,8 @@ const SettingInfo: React.FC = () => {
           bordered
           size="middle"
           column={2}
+          labelStyle={{ textAlign: 'center' }}
+          contentStyle={{ textAlign: 'center' }}
           extra={[
             <Button type="link" key="edit" onClick={() => setActiveModal('edit')}>
               编辑
@@ -142,14 +144,18 @@ const SettingInfo: React.FC = () => {
               />
             </Dropdown>,
           ]}>
+          <Descriptions.Item label="单位名称">
+            <strong>{compinfo?.target.name}</strong>
+          </Descriptions.Item>
           <Descriptions.Item label="社会统一信用代码">
             {compinfo?.target.code}
           </Descriptions.Item>
-          <Descriptions.Item label="单位名称">{compinfo?.target.name}</Descriptions.Item>
           <Descriptions.Item label="单位法人">
             {compinfo?.target.belongId}
           </Descriptions.Item>
-          <Descriptions.Item label="联系方式">-</Descriptions.Item>
+          <Descriptions.Item label="团队简称">
+            {compinfo?.target.team?.name}
+          </Descriptions.Item>
           <Descriptions.Item label="单位简介" span={2}>
             {compinfo?.target.team?.remark}
           </Descriptions.Item>
@@ -207,7 +213,7 @@ const SettingInfo: React.FC = () => {
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && compinfo) {
-              const { success, msg } = await compinfo.pullMember(selectPerson);
+              const { success, msg } = await compinfo.pullPerson(selectPerson);
               if (success) {
                 message.success('添加成功');
                 userCtrl.changCallback();
