@@ -70,7 +70,6 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             indentitys: indentitys,
             persons: data,
           });
-          console.log('按钮事件', 'remove', item);
         },
       },
     ];
@@ -90,6 +89,10 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             persons: personData,
           });
           setIndentitys(list);
+          //移除岗位人员列表该身份
+          for (const a of personData!) {
+            new Indentity(item.obj).removeIdentity([a.id]);
+          }
           console.log('按钮事件', 'remove', item);
         },
       },
@@ -106,6 +109,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const handleMenuClick = (key: string, item: any) => {};
   // 选中树的时候操作
   const setTreeCurrent = async (current: any) => {
+    console.log('选中', current);
     /**获取指派人员列表 */
     getMemberData();
     /**保存当前选中的岗位 */
@@ -282,7 +286,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
               createTitle="新增岗位"
               setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
-              currentKey={''}
+              currentKey={'code'}
               positions={positions}
             />,
             treeContainer,

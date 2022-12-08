@@ -5,7 +5,6 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import positionCtrl from '@/ts/controller/position/positionCtrl';
 import EditCustomModal from '../EditCustomModal';
 type CreateGroupPropsType = {
