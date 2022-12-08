@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardOfBuy';
@@ -14,6 +14,7 @@ interface AppShowCompType {
   headerTitle: string;
   list: any[];
   queryFun: Function;
+  total?: number;
   // service: MarketServiceType;
   columns: ProColumns<any>[];
 }
@@ -24,18 +25,15 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   className,
   headerTitle,
   columns,
+  total,
 }) => {
   // const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
   const [data, setData] = useState<any>({});
   const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
   const parentRef = useRef<any>(null); //父级容器Dom
   const [nowBuy, setNowBuy] = useState<any>([]); // 立即购买
-  useEffect(() => {
-    setTotal(list?.length || 0);
-  }, []);
   /**
    * @desc: 页码切换函数
    * @param {number} page

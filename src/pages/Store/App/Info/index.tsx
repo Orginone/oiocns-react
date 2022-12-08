@@ -1,13 +1,16 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
+import { common } from 'typings/common';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
+import { MarketTypes } from 'typings/marketType';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
@@ -16,25 +19,42 @@ const items = DestTypes.map((k) => {
 const StoreAppInfo: React.FC = () => {
   // const BtnsList = ['编辑应用分配'];
   const [list, setList] = useState<any>([]);
+  const [tabKey, setTabKey] = useState('组织');
   useEffect(() => {
     console.log('{SelfAppCtrl.curProduct?.prod.version}');
-    getExtend('组织');
+    getExtend();
   }, []);
 
-  const getExtend = async (tabKey: string) => {
-    console.log('事实上222', tabKey);
-
+  const getExtend = useCallback(async () => {
     const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
     console.log('请求分享/分配信息', tabKey, res);
     setList(res?.data?.result ?? []);
-  };
+  }, [tabKey]);
 
   const history = useHistory();
   function onTabChange(key: any) {
     console.log('onTabChange', key);
-    getExtend(key);
+    setTabKey(key);
+    getExtend();
   }
-
+  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
+    return [
+      {
+        key: 'publish',
+        label: '下架',
+        onClick: () => {
+          console.log('按钮事件', 'publish');
+        },
+      },
+      {
+        key: 'share',
+        label: '共享',
+        onClick: () => {
+          console.log('按钮事件', 'share', item);
+        },
+      },
+    ];
+  };
   const menu = [{ key: '退订', label: '退订' }];
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -86,7 +106,14 @@ const StoreAppInfo: React.FC = () => {
           tabList={items}
           style={{ padding: 0 }}
           onTabChange={onTabChange}>
-          <div className={cls['page-content-table']}>{JSON.stringify(list)}</div>
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              showChangeBtn={false}
+              list={list}
+              columns={SelfAppCtrl.getColumns('shareInfo')}
+              renderOperation={renderOperation}
+            />
+          </div>
         </Card>
       </div>
     </div>

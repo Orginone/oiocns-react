@@ -168,6 +168,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const handleTitleClick = (item: any) => {
+    marketCtrl.setCurrentMarket(item?.node);
     // 触发内容去变化
     marketCtrl.changeMenu(item);
   };
