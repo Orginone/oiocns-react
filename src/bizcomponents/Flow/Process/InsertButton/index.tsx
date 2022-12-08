@@ -30,7 +30,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
    * */
   const addApprovalNode = () => {
     props.onInsertNode('APPROVAL');
-    FlowSub.emit('insertNode', 'APPROVAL');
+    FlowSub?.emit('insertNode', 'APPROVAL');
   };
   /**
    * 添加抄送节点

@@ -10,6 +10,7 @@ import {
 } from '@ant-design/pro-components';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
+import DefaultProps from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
 type BaseInfoProps = {
   nextStep: (params: any) => void;
@@ -28,7 +29,9 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
       <ProForm
         layout="horizontal"
         onValuesChange={async () => {
-          onChange(await form.getFieldsValue());
+          const currentValue = await form.getFieldsValue();
+          onChange(currentValue);
+          DefaultProps.setFormFields(currentValue?.labels);
         }}
         form={form}
         onFinish={async (e) => {

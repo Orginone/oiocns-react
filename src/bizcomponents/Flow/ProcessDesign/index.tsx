@@ -24,7 +24,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
   const previewRef: any = useRef();
-  // const design = useAppwfConfig((state: any) => state.design);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
 
   useEffect(() => {
@@ -59,7 +58,9 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   const startDesign = async () => {
     let tempDesign;
-    console.log('conditionData', conditionData);
+    console.log('传进来的条件conditionData', conditionData);
+    console.log('传进来的编辑数据', JSON.parse(editorValue));
+    console.log('正在进行操作的designData', designData);
     /** 这里走编辑的逻辑 */
     if (editorValue && editorValue !== '{}') {
       tempDesign = designData || JSON.parse(editorValue);

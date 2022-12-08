@@ -188,8 +188,9 @@ const SettingFlow: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.Space.getDefines(false);
+    console.log('11', result);
     if (result) {
-      setDataSource(result);
+      setDataSource([...result]);
     }
   };
 
@@ -201,8 +202,8 @@ const SettingFlow: React.FC = () => {
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
       message.success('添加成功');
-      setTabType(TabType.TABLEMES);
       initData();
+      setTabType(TabType.TABLEMES);
     } else {
       message.warning(result.msg);
     }
