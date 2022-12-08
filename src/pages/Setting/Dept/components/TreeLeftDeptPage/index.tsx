@@ -28,7 +28,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const setting = SettingService.getInstance();
   const treeContainer = document.getElementById('templateMenu');
   useEffect(() => {
-    // 如果新增部门，就需要重新初始化树TODO
     initData(true);
   }, [key]);
 

@@ -109,9 +109,10 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                   item.target.id,
                   userCtrl.Company.target.id,
                 );
+              } else {
+                message.error('删除失败!');
+                return;
               }
-              message.success('删除失败!');
-              return;
             } else {
               result = await userCtrl.Company.deleteDepartment(item.target.id);
             }
@@ -119,7 +120,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
               message.success(`删除${item.target.name}成功!`);
               userCtrl.changCallback();
             } else {
-              message.success('删除失败!' + result.msg);
+              message.error('删除失败!' + result.msg);
             }
           },
         });
