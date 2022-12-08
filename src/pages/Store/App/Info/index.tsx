@@ -7,7 +7,6 @@ import { common } from 'typings/common';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import { MarketTypes } from 'typings/marketType';
@@ -17,6 +16,12 @@ const items = DestTypes.map((k) => {
 });
 
 const StoreAppInfo: React.FC = () => {
+  const history = useHistory();
+  if (!appCtrl.curProduct) {
+    history.goBack();
+    return <></>;
+  }
+  const curProd = appCtrl.curProduct;
   // const BtnsList = ['编辑应用分配'];
   const [list, setList] = useState<any>([]);
   const [tabKey, setTabKey] = useState('组织');
@@ -72,17 +77,13 @@ const StoreAppInfo: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
-          title={SelfAppCtrl.curProduct?.prod.name}
+          title={curProd.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{curProd.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">
-                  版本号 ：{SelfAppCtrl.curProduct?.prod.version}
-                </span>
-                <span className="lastTime">
-                  订阅到期时间 ：{SelfAppCtrl.curProduct?.prod.createTime}
-                </span>
+                <span className="vision">版本号 ：{curProd.prod.version}</span>
+                <span className="lastTime">订阅到期时间 ：{curProd.prod.createTime}</span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
