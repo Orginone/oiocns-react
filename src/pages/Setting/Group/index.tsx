@@ -23,6 +23,7 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import Company from '@/ts/core/target/company';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
+import service from './service';
 
 /**
  * 集团设置
@@ -146,22 +147,19 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           item.typeName = TargetType.Group;
           if (id != '') {
             const res = await currentGroup?.createSubGroup(item);
-            if (res?.success) {
-              message.info(res.msg);
+            const result = service.messageAlert(res!, '修改集团');
+            if (result) {
               userCtrl.changCallback();
               setIsOpen(false);
-            } else {
-              message.error(res?.msg);
             }
           } else {
             item.belongId = userCtrl.Company.target.id;
             const res = await userCtrl.Company.createGroup(item);
-            if (res.success) {
-              message.info(res.msg);
+
+            const result = service.messageAlert(res!, '新增集团');
+            if (result) {
               userCtrl.changCallback();
               setIsOpen(false);
-            } else {
-              message.error(res.msg);
             }
           }
         }
@@ -234,13 +232,33 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                  // 删除子部门
-                  // 如果是一级部门 Company 底下删除
-                  // 如果是二级集团 从父集团底下删除；
                   if (currentGroup) {
-                    console.log(await currentGroup.getJoinedGroups(false));
-                    //.deleteSubGroup(currentGroup.target.id);
-                    // 一级加入的集团，
+                    // 判断是否一级部门
+                    const aGroup = await service.getSearchTopGroup(
+                      currentGroup.target.id,
+                    );
+                    if (aGroup) {
+                      const res = await userCtrl.Company.deleteGroup(aGroup.target.id);
+                      const result = service.messageAlert(res, '删除部门');
+                      if (result) {
+                        userCtrl.changCallback();
+                        setIsOpen(false);
+                      }
+                    } else {
+                      const parentGroup = await service.refParentItem(
+                        currentGroup.target.id,
+                      );
+                      if (parentGroup) {
+                        const res = await parentGroup.deleteSubGroup(
+                          currentGroup.target.id,
+                        );
+                        const result = service.messageAlert(res, '删除部门');
+                        if (result) {
+                          userCtrl.changCallback();
+                          setIsOpen(false);
+                        }
+                      }
+                    }
                   }
                 },
               });
