@@ -10,6 +10,9 @@ interface indexType {
 }
 const Index: React.FC<indexType> = ({ appid }) => {
   console.log('打印移动appid', appid);
+  if (!appid) {
+    return <></>;
+  }
   const [selectItem, setSelectItem] = useState('');
   const [bool, setbool] = useState(false);
   const handleOk = () => {

@@ -271,13 +271,15 @@ class SelfAppController extends Emitter {
     if (!destType) {
       return;
     }
+    console.log('分享信息', destType, teamId);
     let { success, data, msg } = await this._curProduct!.queryExtend(
       destType,
       teamId || '0',
     );
     if (!success) {
       console.error(msg);
-      return [];
+      // message.error(msg);
+      return false;
     } else {
       console.log('分享信息', data.result);
       return data.result;
@@ -307,12 +309,18 @@ class SelfAppController extends Emitter {
     confirm({
       content: `确认移除《 ${this._curProduct!.prod.name} 》?`,
       onOk: async () => {
-        const aa = await this._curSpace.deleteProduct(this._curProduct!.prod.id);
+        const res = await this._curSpace.deleteProduct(this._curProduct!.prod.id);
 
-        console.log('搜索', aa);
-
-        this.querySelfApps(true);
-        message.success('移除成功');
+        if (res.success) {
+          await this.querySelfApps(true);
+          this.selfAppsData = this.selfAppsData.filter((v) => {
+            return v.prod.id !== this._curProduct!.prod.id;
+          });
+          this.changCallbackPart(SelfCallBackTypes.TableData);
+          message.success('移除成功');
+        } else {
+          message.success(res?.msg);
+        }
       },
       onCancel() {},
     });
