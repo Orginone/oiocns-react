@@ -66,7 +66,7 @@ const EditCustomModal = (props: Iprops) => {
           message.success(`创建${value.name}成功!`);
           handleOk();
         } else {
-          message.error(res.msg);
+          message.error(`新增部门失败,${res.msg}`);
         }
       }
     }

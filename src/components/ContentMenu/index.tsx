@@ -82,7 +82,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       loadPrvMenu();
     }
     freshMenu(location.hash.replace('#', ''));
-  }, [location.hash, menuData]);
+  }, [props.location.pathname, menuData]);
   // 触发菜单是否刷新
   const freshMenu = (newRouter: string) => {
     setActiveMenu(newRouter);
@@ -107,6 +107,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
       // 说明当前为主菜单
       setPrevMenuData([]);
       setCurrentMenuData(menuData);
+      setRenderMenu(undefined);
       return;
     }
     if (current?.fathKey) {

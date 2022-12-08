@@ -10,6 +10,7 @@ import {
 } from '@ant-design/pro-components';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { schema } from '@/ts/base';
 import cls from './index.module.less';
 
 type BindModalProps = {
@@ -28,6 +29,7 @@ const BindModal: React.FC<BindModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
+  const [oldFormData, setOldFormData] = useState<schema.XFlowRelation[]>([]);
   const actionRef = useRef();
 
   useEffect(() => {
@@ -49,6 +51,7 @@ const BindModal: React.FC<BindModalProps> = ({
       const filterId = currentValue.filter((item) => {
         return item.defineId === bindAppMes?.id;
       });
+      setOldFormData(filterId);
       form.setFieldsValue({ labels: filterId });
     }
   };
@@ -65,31 +68,61 @@ const BindModal: React.FC<BindModalProps> = ({
       }}
       onOk={async () => {
         const curerntValue = await form.validateFields();
-
         const newArr: Promise<any>[] = [];
         curerntValue.labels.forEach(
-          (item: { productId: string; functionCode: string }) => {
-            newArr.push(
-              userCtrl.space.bindingFlowRelation({
-                defineId: bindAppMes?.id,
-                productId: item.productId,
-                functionCode: item.functionCode,
-                SpaceId: userCtrl.space.spaceData.id,
-              }),
-            );
+          (item: {
+            productId: string;
+            functionCode: string;
+            id: string;
+            defineId: string;
+          }) => {
+            // 如果没有id的 就是要绑定的
+            if (!item.id) {
+              newArr.push(
+                userCtrl.Space.bindingFlowRelation({
+                  defineId: bindAppMes?.id,
+                  productId: item.productId,
+                  functionCode: item.functionCode,
+                  SpaceId: userCtrl.Space.spaceData.id,
+                }),
+              );
+              // 如果有id 要看下有没有被编辑过
+            } else {
+              /** 找到旧值 */
+              const findData = oldFormData.find(
+                (innItem: { id: string }) => innItem.id === item.id,
+              );
+              /** 新旧值对比 */
+              if (
+                findData &&
+                findData.defineId === item.defineId &&
+                findData.functionCode === item.functionCode
+              ) {
+                newArr.push(
+                  userCtrl.Space.bindingFlowRelation({
+                    defineId: bindAppMes?.id,
+                    productId: findData.productId,
+                    functionCode: findData.functionCode,
+                    SpaceId: userCtrl.Space.spaceData.id,
+                  }),
+                );
+              }
+            }
           },
         );
-        Promise.all(newArr)
-          .then((result) => {
-            if (result) {
-              message.success('绑定成功');
-              initData();
-            }
-          })
-          .catch((error) => {
-            message.error(error);
-          });
-        onCancel();
+        if (newArr && newArr.length > 0) {
+          Promise.all(newArr)
+            .then((result) => {
+              if (result) {
+                message.success('绑定成功');
+                initData();
+              }
+            })
+            .catch((error) => {
+              message.error(error);
+            });
+          onCancel();
+        }
       }}>
       {/* loading通过样式隐藏，没有相关的Api */}
       <div className={cls.removeLoading}>
@@ -115,7 +148,7 @@ const BindModal: React.FC<BindModalProps> = ({
                           SpaceId: userCtrl.space.spaceData.id,
                         }).then((result) => {
                           if (result && result.code === 200) {
-                            message.success('解绑成功');
+                            message.info('解绑成功');
                             resolve(true);
                           } else {
                             message.success('解绑失败');

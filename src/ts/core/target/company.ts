@@ -128,7 +128,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Department;
-    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       const department = new Department(res.data, () => {
         this.departments = this.departments.filter((item) => {
@@ -145,7 +145,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Working;
-    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       const working = new Working(res.data, () => {
         this.workings = this.workings.filter((item) => {

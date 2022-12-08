@@ -49,7 +49,6 @@ const TransferDepartment = (props: Iprops) => {
     }
     return data;
   };
-
   const columns: ProFormColumnsType<{ id: string }>[] = [
     {
       title: '人员名称',

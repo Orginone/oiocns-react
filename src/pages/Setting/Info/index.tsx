@@ -1,31 +1,53 @@
-import { Button, Card, Descriptions, Dropdown, message, Modal, Tabs } from 'antd';
-import Title from 'antd/lib/typography/Title';
 import React, { useEffect, useState } from 'react';
-import cls from './index.module.less';
+import { Button, Card, Descriptions, Dropdown, message, Modal } from 'antd';
+import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import CardOrTable from '@/components/CardOrTableComp';
-import { ICompany } from '@/ts/core';
-import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import PageCard from '@/components/PageCard';
+import { ICompany, IProduct } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
-import { PersonColumns } from './config';
-// import { UserOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
+import { ApplicationColumns, PersonColumns } from './config';
+import CardOrTable from '@/components/CardOrTableComp';
+import PageCard from '@/components/PageCard';
+import IndentityManage from '@/bizcomponents/Indentity';
+import cls from './index.module.less';
+import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
+import EditInfo from './components/EditInfo';
 
+type ShowmodelType = 'addOne' | 'edit' | 'post' | 'transfer' | 'indentity' | '';
+type TabType = 'members' | 'application';
 /**
  * 单位信息
  * @returns
  */
 const SettingInfo: React.FC = () => {
+  const history = useHistory();
   const [key] = useCtrlUpdate(userCtrl);
   const [compinfo, setCompInfo] = useState<ICompany>();
+  const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
+  const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [persons, setPersons] = useState<schema.XTarget[]>([]); //部门成员
-  async () => {
+  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
+  const [ownProducts, setOwnProducts] = useState<IProduct[]>([]); //部门成员
+  const getMembers = async (reload: boolean) => {
     if (compinfo) {
-      setPersons(await compinfo.getPersons(false));
+      setPersons(await compinfo.getPersons(reload));
     }
   };
+  const getAppliction = async (reload: boolean) => {
+    if (compinfo) {
+      setOwnProducts(await compinfo.getOwnProducts(reload));
+    }
+  };
+  useEffect(() => {
+    if (userCtrl.Company) {
+      setCompInfo(userCtrl.Company);
+      getMembers(true);
+      getAppliction(true);
+    }
+  }, [key]);
+  console.log(ownProducts);
   const menu = [
     { key: 'auth', label: '认证' },
     {
@@ -58,11 +80,11 @@ const SettingInfo: React.FC = () => {
   const TitleItems = [
     {
       tab: `单位成员`,
-      key: 'deptPerpeos',
+      key: 'members',
     },
     {
       tab: `单位应用`,
-      key: 'deptApps',
+      key: 'application',
     },
   ];
 
@@ -74,7 +96,7 @@ const SettingInfo: React.FC = () => {
           身份设置
         </Button>
         <Button type="link" onClick={() => setActiveModal('addOne')}>
-          添加成员
+          邀请成员
         </Button>
         <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
@@ -106,36 +128,39 @@ const SettingInfo: React.FC = () => {
     }
   }, [key]);
 
-  // 信息标题
-  const title = (
-    <div className={cls['company-info-title']}>
-      <div>
-        <Title level={4}>当前单位</Title>
-        {/* <Avatar size={48} icon={<UserOutlined />} /> */}
-      </div>
-      <div>
-        <Button type="link">编辑</Button>
-        <Dropdown menu={{ items: menu }} placement="bottom">
-          <EllipsisOutlined
-            style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
-            rotate={90}
-          />
-        </Dropdown>
-      </div>
-    </div>
-  );
   return (
-    <div className={cls['company-info-content']}>
-      <Card bordered={false}>
-        <Descriptions title={title} bordered column={2}>
+    <div className={cls.companyContainer}>
+      <Card bordered={false} className={cls['company-info-content']}>
+        <Descriptions
+          title={'当前单位'}
+          bordered
+          size="middle"
+          column={2}
+          labelStyle={{ textAlign: 'center' }}
+          contentStyle={{ textAlign: 'center' }}
+          extra={[
+            <Button type="link" key="edit" onClick={() => setActiveModal('edit')}>
+              编辑
+            </Button>,
+            <Dropdown menu={{ items: menu }} placement="bottom" key="more">
+              <EllipsisOutlined
+                style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
+                rotate={90}
+              />
+            </Dropdown>,
+          ]}>
+          <Descriptions.Item label="单位名称">
+            <strong>{compinfo?.target.name}</strong>
+          </Descriptions.Item>
           <Descriptions.Item label="社会统一信用代码">
             {compinfo?.target.code}
           </Descriptions.Item>
-          <Descriptions.Item label="单位名称">{compinfo?.target.name}</Descriptions.Item>
           <Descriptions.Item label="单位法人">
             {compinfo?.target.belongId}
           </Descriptions.Item>
-          <Descriptions.Item label="联系方式">-</Descriptions.Item>
+          <Descriptions.Item label="团队简称">
+            {compinfo?.target.team?.name}
+          </Descriptions.Item>
           <Descriptions.Item label="单位简介" span={2}>
             {compinfo?.target.team?.remark}
           </Descriptions.Item>
@@ -145,21 +170,65 @@ const SettingInfo: React.FC = () => {
         <PageCard
           bordered={false}
           tabList={TitleItems}
-          onTabChange={(key) => {}}
-          bodyStyle={{ paddingTop: 16 }}>
+          onTabChange={(key) => {
+            setActiveTab(key as TabType);
+          }}
+          tabBarExtraContent={renderBtns()}>
           <div className={cls['page-content-table']}>
-            <Tabs tabBarExtraContent={renderBtns()} />
-            {compinfo && (
+            {activeTab === 'members' ? (
               <CardOrTable<schema.XTarget>
                 dataSource={persons}
+                total={persons?.length}
                 rowKey={'id'}
                 operation={renderOperation}
                 columns={PersonColumns}
                 showChangeBtn={false}
               />
+            ) : (
+              <CardOrTable<IProduct>
+                dataSource={ownProducts || []}
+                total={ownProducts.length}
+                rowKey={(record) => record.prod.id}
+                hideOperation={true}
+                columns={ApplicationColumns}
+                showChangeBtn={false}
+              />
             )}
           </div>
         </PageCard>
+        <IndentityManage
+          open={activeModal === 'indentity'}
+          object={compinfo!}
+          MemberData={persons}
+          onCancel={() => setActiveModal('')}
+        />
+        <EditInfo
+          title="编辑"
+          open={activeModal === 'edit'}
+          editData={compinfo?.target}
+          handleOk={() => setActiveModal('')}
+          handleCancel={() => setActiveModal('')}
+        />
+        {/* 邀请成员*/}
+        <Modal
+          title="邀请成员"
+          destroyOnClose
+          open={activeModal === 'addOne'}
+          width={1024}
+          onCancel={() => setActiveModal('')}
+          onOk={async () => {
+            if (selectPerson && compinfo) {
+              const { success, msg } = await compinfo.pullPerson(selectPerson);
+              if (success) {
+                message.success('添加成功');
+                userCtrl.changCallback();
+              } else {
+                message.error(msg);
+              }
+            }
+          }}>
+          <AssignPosts searchCallback={setSelectPerson} memberData={[]} />
+        </Modal>
       </div>
     </div>
   );

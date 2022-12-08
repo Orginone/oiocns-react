@@ -3,7 +3,6 @@ import { SearchOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
-import CardOrTable from '@/components/CardOrTableComp';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 interface indexType {
@@ -85,6 +84,7 @@ const CohortPerson: React.FC<indexType> = (props) => {
           search={false}
           columns={cohortColumn}
           rowKey={'id'}
+          tableAlertRender={false}
         />
       </div>
     </div>

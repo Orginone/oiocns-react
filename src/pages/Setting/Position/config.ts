@@ -13,16 +13,8 @@ export const columns: ColumnsType<any> = [
     dataIndex: 'name',
   },
   {
-    title: '所属部门',
-    dataIndex: 'dept',
-  },
-  {
     title: '姓名',
     dataIndex: ['team', 'name'],
-  },
-  {
-    title: '职务',
-    dataIndex: 'post',
   },
   {
     title: '手机号',
@@ -45,7 +37,7 @@ export const indentitycolumns: ColumnsType<any> = [
   },
   {
     title: '业务',
-    dataIndex: 'remark',
+    dataIndex: 'name',
   },
   {
     title: '角色',

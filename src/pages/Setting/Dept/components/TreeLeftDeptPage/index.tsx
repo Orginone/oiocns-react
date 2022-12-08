@@ -54,7 +54,10 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
       icon: target.avatar,
       isLeaf: false,
       intans: n,
-      children: child,
+      children:
+        n.departments.length > 0
+          ? n.departments.map((m) => createTreeDom(m, n.target.id))
+          : undefined,
       pid,
     };
   };

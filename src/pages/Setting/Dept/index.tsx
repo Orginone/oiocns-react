@@ -8,7 +8,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
-import SearchPerson from '@/bizcomponents/SearchPerson';
+import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import EditCustomModal from './components/EditCustomModal';
@@ -41,7 +41,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         key: 'changeDept',
         label: '变更部门',
         onClick: () => {
-          setSelectPerson(item);
+          setSelectPerson([item]);
           setActiveModal('transfer');
         },
       },
@@ -59,7 +59,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       },
     ];
   };
-
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: ITarget | undefined) => {
     switch (key) {
@@ -103,7 +102,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         });
     }
   };
-
   const handleOk = () => {
     setActiveModal('');
     // 处理刷新的功能

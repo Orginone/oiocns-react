@@ -11,7 +11,7 @@ import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
 import { common } from 'typings/common';
-import TreeComp from '../Classify';
+import TreeComp from './Classify';
 import MoveApp from './moveApp';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
@@ -129,6 +129,8 @@ const StoreApp: React.FC = () => {
   const getItems = () => {
     let typeSet = new Set(['全部']);
     appCtrl.products.forEach((v: any) => {
+      console.log('是是是', v);
+
       typeSet.add(v.source);
     });
     return Array.from(typeSet).map((k) => {
@@ -150,8 +152,8 @@ const StoreApp: React.FC = () => {
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={getItems()}
           activeTabKey={statusKey}
-          onTabChange={(key) => {
-            setStatusKey(key as ststusTypes);
+          onTabChange={(k) => {
+            setStatusKey(k as ststusTypes);
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp

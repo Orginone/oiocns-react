@@ -1,17 +1,19 @@
-import { Button, Card, Dropdown } from 'antd';
-import React, { useState } from 'react';
-import AppShowComp from '@/bizcomponents/AppTablePage2';
+import { Button, Card, Dropdown, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
-import { common } from 'typings/common';
-import { EllipsisOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  EllipsisOutlined,
+  PartitionOutlined,
+  SmileOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
-import { MarketTypes } from 'typings/marketType';
 import appCtrl from '@/ts/controller/store/appCtrl';
-import { shareInfoColumns } from '@/ts/controller/store/config';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
@@ -25,32 +27,37 @@ const StoreAppInfo: React.FC = () => {
   }
   const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
+  useEffect(() => {
+    console.log('{SelfAppCtrl.curProduct?.prod.version}');
+    onTabChange('组织');
+  }, []);
 
-  async function onTabChange(key: any) {
-    const res = await curProd.queryExtend(key, '0');
-    setList(res?.data?.result ?? []);
+  async function onTabChange(tabKey: any) {
+    const res = await curProd.queryExtend(tabKey, '0');
+    const showData = res?.data?.result?.map((v) => {
+      let obj: any = v;
+      switch (tabKey) {
+        case '组织':
+          obj.icon = <PartitionOutlined rotate={90} />;
+          break;
+        case '角色':
+          obj.icon = <TeamOutlined />;
+          break;
+        case '岗位':
+          obj.icon = <BankOutlined />;
+          break;
+        case '人员':
+          obj.icon = <SmileOutlined />;
+          break;
+
+        default:
+          break;
+      }
+      return obj;
+    });
+    setList(showData || []);
   }
 
-  onTabChange('组织');
-
-  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
-    return [
-      {
-        key: 'publish',
-        label: '下架',
-        onClick: () => {
-          console.log('按钮事件', 'publish');
-        },
-      },
-      {
-        key: 'share',
-        label: '共享',
-        onClick: () => {
-          console.log('按钮事件', 'share', item);
-        },
-      },
-    ];
-  };
   const menu = [{ key: '退订', label: '退订' }];
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -96,15 +103,17 @@ const StoreAppInfo: React.FC = () => {
         <Card
           title="已共享信息"
           tabList={items}
+          defaultActiveTabKey={'组织'}
           style={{ padding: 0 }}
           onTabChange={onTabChange}>
           <div className={cls['page-content-table']}>
-            <AppShowComp
-              showChangeBtn={false}
-              list={list}
-              columns={shareInfoColumns}
-              renderOperation={renderOperation}
-            />
+            {list.map((item: { icon: string; id: string; name: string }) => {
+              return (
+                <Tag icon={item?.icon || ''} key={item.id} color="#cad3e2">
+                  {item.name}
+                </Tag>
+              );
+            })}
           </div>
         </Card>
       </div>
