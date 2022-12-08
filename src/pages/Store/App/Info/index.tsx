@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -10,6 +10,8 @@ import { IconFont } from '@/components/IconFont';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import { MarketTypes } from 'typings/marketType';
+import appCtrl from '@/ts/controller/store/appCtrl';
+import { shareInfoColumns } from '@/ts/controller/store/config';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
@@ -22,26 +24,15 @@ const StoreAppInfo: React.FC = () => {
     return <></>;
   }
   const curProd = appCtrl.curProduct;
-  // const BtnsList = ['编辑应用分配'];
   const [list, setList] = useState<any>([]);
-  const [tabKey, setTabKey] = useState('组织');
-  useEffect(() => {
-    console.log('{SelfAppCtrl.curProduct?.prod.version}');
-    getExtend();
-  }, []);
 
-  const getExtend = useCallback(async () => {
-    const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
-    console.log('请求分享/分配信息', tabKey, res);
+  async function onTabChange(key: any) {
+    const res = await curProd.queryExtend(key, '0');
     setList(res?.data?.result ?? []);
-  }, [tabKey]);
-
-  const history = useHistory();
-  function onTabChange(key: any) {
-    console.log('onTabChange', key);
-    setTabKey(key);
-    getExtend();
   }
+
+  onTabChange('组织');
+
   const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
@@ -111,7 +102,7 @@ const StoreAppInfo: React.FC = () => {
             <AppShowComp
               showChangeBtn={false}
               list={list}
-              columns={SelfAppCtrl.getColumns('shareInfo')}
+              columns={shareInfoColumns}
               renderOperation={renderOperation}
             />
           </div>
