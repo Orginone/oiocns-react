@@ -192,9 +192,11 @@ const SettingInfo: React.FC = () => {
           onCancel={() => setActiveModal('')}
         />
         <EditInfo
+          title="编辑"
           open={activeModal === 'edit'}
-          object={compinfo}
-          onCancel={() => setActiveModal('')}
+          editData={compinfo?.target}
+          handleOk={() => setActiveModal('')}
+          handleCancel={() => setActiveModal('')}
         />
         {/* 邀请成员*/}
         <Modal

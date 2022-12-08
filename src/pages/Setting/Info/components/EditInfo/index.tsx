@@ -52,7 +52,7 @@ const EditCustomModal = (props: Iprops) => {
   };
   const columns: ProFormColumnsType<TargetModel>[] = [
     {
-      title: '图标',
+      title: '单位图标',
       dataIndex: 'avatar',
       colProps: { span: 24 },
       renderFormItem: () => {
@@ -78,6 +78,7 @@ const EditCustomModal = (props: Iprops) => {
     {
       title: '单位类型',
       dataIndex: 'typeName',
+      valueType: 'select',
       fieldProps: {
         options: [
           {
@@ -131,7 +132,7 @@ const EditCustomModal = (props: Iprops) => {
       formRef={formRef}
       title={title}
       open={open}
-      width={520}
+      width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (editData) {
@@ -156,20 +157,24 @@ const EditCustomModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (!editData) return;
-        const res = await userCtrl.User.createCompany(values);
-        if (res.success) {
-          message.success('创建单位成功');
-          userCtrl.setCurSpace(res.data.id);
+        if (editData) {
+          const res = await userCtrl.Company.update({
+            ...values,
+          });
+          if (res.success) {
+            message.success('更新信息成功');
+            handleOk();
+          } else {
+            message.error('更新信息失败：' + res?.msg);
+          }
         } else {
-          message.error('创建单位失败：' + res?.msg);
-        }
-        if (res.success) {
-          message.success('修改成功');
-          handleOk();
-        } else {
-          message.error(res.msg);
-          return false;
+          const res = await userCtrl.User.createCompany(values);
+          if (res.success) {
+            message.success('创建单位成功');
+            userCtrl.setCurSpace(res.data.id);
+          } else {
+            message.error('创建单位失败：' + res?.msg);
+          }
         }
       }}
       columns={columns}
