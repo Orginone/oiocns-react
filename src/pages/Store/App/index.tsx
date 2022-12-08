@@ -10,7 +10,7 @@ import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
-import StoreRecent from '../components/Recent';
+// import StoreRecent from '../components/Recent';
 import { common } from 'typings/common';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
@@ -21,7 +21,7 @@ type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配�
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState<IProduct[]>([]);
-  const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
+  // const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
@@ -32,14 +32,14 @@ const StoreApp: React.FC = () => {
 
       setData([...(SelfAppCtrl.tableData || [])]);
     });
-    const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
-      console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
-      setRecentlyAppIds([...(SelfAppCtrl.recentlyUsedAppsIds || [])]);
-    });
+    // const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
+    //   console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
+    //   setRecentlyAppIds([...(SelfAppCtrl.recentlyUsedAppsIds || [])]);
+    // });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
     return () => {
-      return SelfAppCtrl.unsubscribe([id, id2]);
+      return SelfAppCtrl.unsubscribe([id]);
     };
   }, []);
   // 根据以获取数据 动态产生tab
@@ -69,17 +69,17 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const RentlyApps = useMemo(() => {
-    let recentlyApps: IProduct[] = [];
-    recentlyAppIds?.forEach((id: string) => {
-      const prod = data.find((v) => {
-        return v.prod.id === id;
-      });
-      prod && recentlyApps.push(prod);
-    });
+  // const RentlyApps = useMemo(() => {
+  //   let recentlyApps: IProduct[] = [];
+  //   recentlyAppIds?.forEach((id: string) => {
+  //     const prod = data.find((v) => {
+  //       return v.prod.id === id;
+  //     });
+  //     prod && recentlyApps.push(prod);
+  //   });
 
-    return recentlyApps;
-  }, [recentlyAppIds, data]);
+  //   return recentlyApps;
+  // }, [recentlyAppIds, data]);
 
   const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
     console.log('输出选择', teamId, type, checkedValus);
@@ -172,9 +172,9 @@ const StoreApp: React.FC = () => {
   const AppIndex = useMemo(() => {
     return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />}
+        {/* {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />} */}
         <Card
-          title="应用"
+          title="我的应用"
           className={cls['app-tabs']}
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
