@@ -121,6 +121,17 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return res;
   }
+  public async pullPerson(targets: schema.XTarget[]): Promise<ResultType<any>> {
+    const res = await super.pullMember(targets);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        if (a.target != undefined) {
+          this.person.push(a.target);
+        }
+      });
+    }
+    return res;
+  }
   public async removePerson(ids: string[]): Promise<ResultType<any>> {
     const res = await kernel.removeAnyOfTeamAndBelong({
       id: this.target.id,

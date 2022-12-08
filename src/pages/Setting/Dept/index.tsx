@@ -19,6 +19,7 @@ import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import SettingService from './service';
 import cls from './index.module.less';
+import { model } from '@/ts/base';
 
 type ShowmodelType = 'addOne' | 'edit' | 'post' | 'transfer' | 'indentity' | '';
 /**
@@ -96,27 +97,29 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         Modal.confirm({
           title: '提示',
           icon: <ExclamationCircleOutlined />,
-          content: '是否确定删除该群组',
+          content: `是否确定删除${item.target.name}?`,
           okText: '确认',
           cancelText: '取消',
           onOk: async () => {
+            let result: model.ResultType<any>;
             if (pid) {
               const parent = await setting.refItem(pid);
-              let result = null;
               if (parent) {
                 result = await parent.deleteDepartment(
                   item.target.id,
                   userCtrl.Company.target.id,
                 );
-              } else {
-                result = await userCtrl.Company.deleteDepartment(item.target.id);
               }
-              if (result.success) {
-                message.success('删除成功');
-                userCtrl.changCallback();
-              } else {
-                message.success('删除失败');
-              }
+              message.success('删除失败!');
+              return;
+            } else {
+              result = await userCtrl.Company.deleteDepartment(item.target.id);
+            }
+            if (result.success) {
+              message.success(`删除${item.target.name}成功!`);
+              userCtrl.changCallback();
+            } else {
+              message.success('删除失败!' + result.msg);
             }
           },
         });

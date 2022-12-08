@@ -4,6 +4,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import { IDepartment } from '@/ts/core/target/itarget';
 import cls from './index.module.less';
+import { ResultType } from '@/ts/base/model';
 const { TextArea } = Input;
 interface Iprops {
   title: string;
@@ -40,10 +41,10 @@ const EditCustomModal = (props: Iprops) => {
             ...value,
           });
           if (success) {
-            message.success('更新信息成功');
+            message.success('更新信息成功!');
             handleOk();
           } else {
-            message.error(msg);
+            message.error('更新信息失败!' + msg);
           }
         }
       } else {
@@ -52,24 +53,22 @@ const EditCustomModal = (props: Iprops) => {
           ...value,
           teamName: value.name,
           teamCode: value.code,
-          belongId: userCtrl.Company?.target.id,
           typeName: TargetType.Department,
-          parentId: editDept ? editDept.target.id : '',
         };
 
-        let curentValue: any;
+        let res: ResultType<any>;
         if (editDept) {
           // 新增下级部门信息
-          curentValue = await editDept.createDepartment(newValue);
+          res = await editDept.createDepartment(newValue);
         } else {
           // 如果是一级部门， 就从根部门里面新增
-          curentValue = await userCtrl.Company.createDepartment(newValue);
+          res = await userCtrl.Company.createDepartment(newValue);
         }
-        if (!curentValue.success) {
-          message.error(`新增部门失败,${curentValue.msg}`);
-        } else {
-          message.success('新增部门成功');
+        if (res.success) {
+          message.success(`创建${value.name}成功!`);
           handleOk();
+        } else {
+          message.error(`新增部门失败,${res.msg}`);
         }
       }
     }

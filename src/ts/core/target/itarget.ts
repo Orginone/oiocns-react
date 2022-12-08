@@ -506,6 +506,11 @@ export interface ICompany extends ISpace, ITarget {
     data: Omit<model.TargetModel, 'id' | 'belongId'>,
   ): Promise<model.ResultType<any>>;
   /**
+   * 拉人进入单位
+   * @param targets 人员
+   */
+  pullPerson(targets: schema.XTarget[]): Promise<ResultType<any>>;
+  /**
    * 移除人员
    * @param ids 人员Id集合
    */
@@ -660,7 +665,9 @@ export interface IDepartment extends ITarget {
   /** 踢人 */
   removePerson(ids: string[]): Promise<model.ResultType<any>>;
   /** 创建子部门 */
-  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  createDepartment(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
   /** 删除子部门 */
   deleteDepartment(id: string, spaceId: string): Promise<model.ResultType<any>>;
   /** 创建工作组 */
