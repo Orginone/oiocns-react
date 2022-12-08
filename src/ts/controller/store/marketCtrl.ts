@@ -95,7 +95,6 @@ class MarketController extends Emitter {
 
   /** 切换市场 */
   public setCurrentMarket(market: IMarket) {
-    console.log('切换市场', market);
     this._curMarket = market;
     this.getMember();
     this.changCallback();
