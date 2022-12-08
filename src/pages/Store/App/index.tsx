@@ -110,16 +110,16 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/info' });
         },
       },
-      {
-        key: 'manage',
-        label: '管理',
-        onClick: () => {
-          SelfAppCtrl.curProduct = item;
-          history.push({
-            pathname: '/store/app/manage',
-          });
-        },
-      },
+      // {
+      //   key: 'manage',
+      //   label: '管理',
+      //   onClick: () => {
+      //     SelfAppCtrl.curProduct = item;
+      //     history.push({
+      //       pathname: '/store/app/manage',
+      //     });
+      //   },
+      // },
       {
         key: 'putaway',
         label: '上架',
