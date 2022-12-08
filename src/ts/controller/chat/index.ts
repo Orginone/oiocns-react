@@ -151,6 +151,7 @@ class ChatController extends Emitter {
   private async _initialization(): Promise<void> {
     this._groups = await LoadChats(this._userId);
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
+      this._chats = [];
       if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
           let lchat = this._refChat(item);
