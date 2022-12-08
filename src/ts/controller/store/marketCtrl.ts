@@ -1,7 +1,7 @@
 import { IMarket, IMTarget, createMarket, emitter, DomainTypes } from '@/ts/core';
 import { kernel } from '@/ts/base';
 import { myColumns, marketColumns } from './config';
-import { JOIN_SHOPING_CAR } from '@/constants/const';
+import { JOIN_SHOPING_CAR, USER_MANAGEMENT } from '@/constants/const';
 import { message } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
@@ -9,6 +9,7 @@ import userCtrl from '../setting/userCtrl';
 export enum MarketCallBackTypes {
   'ApplyData' = 'ApplyData',
   'MarketShop' = 'MarketShop',
+  'UserManagement' = 'UserManagement',
 }
 
 class MarketController extends Emitter {
@@ -20,8 +21,8 @@ class MarketController extends Emitter {
   private _currentMenu = 'Public';
   /** 判断当前所处页面类型,调用不同请求 */
   public curPageType: 'app' | 'market' = 'market';
-  /** 商店table列表 callback */
-  private _marketTableList: any[] = [];
+  /** 商店table数据 */
+  private _marketTableList: any = {};
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
@@ -53,6 +54,13 @@ class MarketController extends Emitter {
       this._shopinglist = data || [];
       this.changCallbackPart(MarketCallBackTypes.ApplyData);
     });
+    /* 获取 历史缓存的 商店用户管理成员 */
+    kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
+      // console.log('订阅数据推送 商店用户管理成员===>', managementlist?.data);
+      const { data = [] } = managementlist;
+      this.marketMenber = data || [];
+      this.changCallbackPart(MarketCallBackTypes.UserManagement);
+    });
   }
 
   /**
@@ -67,7 +75,7 @@ class MarketController extends Emitter {
    * @description: 获取市场商品列表
    * @return {*}
    */
-  public get marketTableList(): any[] {
+  public get marketTableList(): any {
     return this._marketTableList;
   }
 
@@ -104,7 +112,6 @@ class MarketController extends Emitter {
       return;
     }
     this._currentMenu = menuItem.title;
-    console.log('当前页面类型', this.curPageType);
     this.getStoreProduct(this.curPageType);
   }
 
@@ -129,33 +136,29 @@ class MarketController extends Emitter {
    * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
    * @return {*}
    */
-  public async getStoreProduct(params?: any) {
-    params = { offset: 0, limit: 10, filter: '', ...params };
-    const res = await this._curMarket!.getMerchandise(params);
-    if (Array.isArray(res)) {
-      this._marketTableList = [...res];
-      return;
-    }
-    const { success, data } = res;
-    if (success) {
-      const { result = [] } = data;
-      this._marketTableList = [...result];
+  public getStoreProduct = async (params?: any) => {
+    params = {
+      offset: (params?.page - 1) * params?.pageSize ?? 0,
+      limit: params?.pageSize ?? 10,
+      filter: '',
+    };
+    const res = await this._curMarket?.getMerchandise(params);
+    if (res?.code === 200 && res?.success) {
+      this._marketTableList = res?.data;
     }
     this.changCallbackPart(MarketCallBackTypes.MarketShop);
-  }
+  };
 
   /**
    * @description: 获取市场里的所有用户
    * @return {*}
    */
   public async getMember() {
-    if (this._curMarket) {
-      const res = await this._curMarket.getMember({ offset: 0, limit: 10, filter: '' });
-      if (res.success) {
-        this.marketMenber = res.data.result;
-      }
-      return this.marketMenber;
+    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
     }
+    this.cacheUserManagement(this.marketMenber);
   }
 
   /**
@@ -164,9 +167,19 @@ class MarketController extends Emitter {
    * @return {*}
    */
   public removeMember = async (targetIds: string[]) => {
-    console.log('移出成员ID合集', targetIds);
     const res = await this._curMarket?.removeMember(targetIds);
-    console.log('移出成员', res);
+    if (res?.code === 400) {
+      message.warning(res.msg);
+    } else if (res?.code === 200 && res?.success) {
+      if (this.marketMenber.length > 0) {
+        let arrs = this.marketMenber.filter((item: any) =>
+          targetIds.some((ele: any) => ele.id === item?.target?.id),
+        );
+        this.marketMenber = arrs;
+        this.cacheUserManagement(this.marketMenber);
+      }
+      message.success('移出成功');
+    }
   };
 
   /**
@@ -221,7 +234,7 @@ class MarketController extends Emitter {
     );
     if (res?.code === 400) {
       message.warning(res.msg);
-    } else if (res?.code === 200) {
+    } else if (res?.code === 200 && res?.success) {
       let arrs = this._shopinglist.filter(
         (item) => !data.some((ele: any) => ele.id === item.id),
       );
@@ -239,6 +252,24 @@ class MarketController extends Emitter {
     this.changCallbackPart(MarketCallBackTypes.ApplyData);
     kernel.anystore.set(
       JOIN_SHOPING_CAR,
+      {
+        operation: 'replaceAll',
+        data: {
+          data: data || [],
+        },
+      },
+      'user',
+    );
+  };
+
+  /**
+   * 缓存 商店用户管理成员
+   * @param message 新消息，无则为空
+   */
+  public cacheUserManagement = (data: any): void => {
+    this.changCallbackPart(MarketCallBackTypes.UserManagement);
+    kernel.anystore.set(
+      USER_MANAGEMENT,
       {
         operation: 'replaceAll',
         data: {

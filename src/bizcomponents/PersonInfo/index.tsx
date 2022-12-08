@@ -34,7 +34,7 @@ const PersonInfo: React.FC = () => {
       <div>
         <Space split={<Divider type="vertical" />}>
           <Forget />
-          <Button type="link">编辑信息</Button>
+          <Button type="link">编辑</Button>
         </Space>
       </div>
     </div>

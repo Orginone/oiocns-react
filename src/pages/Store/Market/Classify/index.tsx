@@ -4,7 +4,7 @@ import {
   FileTextFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Menu, Button, Row, Col } from 'antd';
+import { Menu, Button, Row, Col, message } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
@@ -32,7 +32,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    await marketCtrl.Market.createMarket({ ...formData });
+    const res = await marketCtrl.Market.createMarket({ ...formData });
+    if (res?.code === 400) {
+      message.warning(res?.msg);
+    } else if (res?.code === 200 && res?.success) {
+      message.success('创建成功');
+    }
     setIsAddOpen(false);
     forceUpdate();
   };
@@ -44,7 +49,12 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    await userCtrl.User!.applyJoinMarket(val[0]?.id);
+    const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
+    if (res?.code === 400) {
+      message.warning(res?.msg);
+    } else if (res?.code === 200 && res?.success) {
+      message.success('申请已发送');
+    }
   };
 
   /**
@@ -66,9 +76,15 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onDeleteOrQuitOk = async () => {
     setIsDeleteOpen(false);
     if (deleOrQuit === 'delete') {
-      await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+      const res = await marketCtrl.Market.deleteMarket(treeDataObj?.id);
+      if (res?.code === 200 && res?.success) {
+        message.success('删除成功');
+      }
     } else {
-      await marketCtrl.Market.quitMarket(treeDataObj?.id);
+      const res = await marketCtrl.Market.quitMarket(treeDataObj?.id);
+      if (res?.code === 200 && res?.success) {
+        message.success('退出成功');
+      }
     }
     forceUpdate();
   };
@@ -152,6 +168,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const handleTitleClick = (item: any) => {
+    marketCtrl.setCurrentMarket(item?.node);
     // 触发内容去变化
     marketCtrl.changeMenu(item);
   };

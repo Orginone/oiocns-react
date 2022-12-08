@@ -65,7 +65,7 @@ const BindModal: React.FC<BindModalProps> = ({
       }}
       onOk={async () => {
         const curerntValue = await form.validateFields();
-        console.log(curerntValue);
+
         const newArr: Promise<any>[] = [];
         curerntValue.labels.forEach(
           (item: { productId: string; functionCode: string }) => {
