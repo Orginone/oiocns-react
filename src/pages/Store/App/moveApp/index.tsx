@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 // import cls from './index.module.less';
 import { Modal } from 'antd';
 
-import StoreClassifyTree from '@/components/CustomTreeComp';
+import MenuTree from '@/components/CustomTreeComp';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 interface indexType {
   appid?: string; //props
 }
 const Index: React.FC<indexType> = ({ appid }) => {
   console.log('打印移动appid', appid);
+  if (!appid) {
+    return <></>;
+  }
   const [selectItem, setSelectItem] = useState('');
+  const [bool, setbool] = useState(false);
   const handleOk = () => {
     console.log('ok', selectItem, '当前操作的应用', selfAppCtrl.curProduct);
   };
@@ -21,8 +25,14 @@ const Index: React.FC<indexType> = ({ appid }) => {
   };
   return (
     <>
-      <Modal title="移动应用" open={false} onOk={handleOk} onCancel={() => {}}>
-        <StoreClassifyTree
+      <Modal
+        title="移动应用"
+        open={bool}
+        onOk={handleOk}
+        onCancel={() => {
+          setbool(false);
+        }}>
+        <MenuTree
           title={'目录'}
           checkable
           isDirectoryTree

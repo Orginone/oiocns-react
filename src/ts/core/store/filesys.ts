@@ -1,4 +1,4 @@
-import { generateUuid } from '@/ts/base/common';
+import { blobToDataUrl, generateUuid } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { model, kernel } from '../../base';
 import { IFileSystemItem, IObjectItem, OnProgressType } from './ifilesys';
@@ -158,17 +158,18 @@ export class FileSystemItem implements IFileSystemItem {
         if (end > file.size) {
           end = file.size;
         }
-        const buffer = await this._getNumberArray(file.slice(start, end));
         data.fileItem = {
           index: index,
           uploadId: id,
           size: file.size,
-          data: buffer,
+          data: [],
+          dataUrl: await blobToDataUrl(file.slice(start, end)),
         };
         const res = await kernel.anystore.bucketOpreate<FileItemModel>(data);
         if (!res.success) {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
+          p?.apply(this, [-1]);
           return;
         }
         index++;
@@ -202,17 +203,6 @@ export class FileSystemItem implements IFileSystemItem {
     } catch (err) {
       return '';
     }
-  }
-  /** 获取文件内容 */
-  private async _getNumberArray(file: Blob): Promise<number[]> {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = new Uint8Array(reader.result as ArrayBuffer);
-        resolve(Array.from<number>(result.values()));
-      };
-      reader.readAsArrayBuffer(file);
-    });
   }
   /**
    * 根据名称查询子文件系统项

@@ -10,7 +10,7 @@ export const myColumns: any = [
   },
   {
     title: '应用图标',
-    dataIndex: ['prod', 'id'],
+    dataIndex: ['prod', 'belongId'],
   },
   {
     title: '应用名称',
@@ -27,7 +27,7 @@ export const myColumns: any = [
   {
     title: '应用来源',
     ellipsis: true,
-    dataIndex: ['prod', 'source'],
+    dataIndex: ['source'],
   },
   {
     title: '创建时间',

@@ -53,21 +53,20 @@ const SettingFlow: React.FC = () => {
   const { height } = useWindowSize();
   const [page, setPage] = useState<number>(1);
 
-  const actionRef = useRef<ActionType>();
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
-  const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
+  const [allData, setAllData] = useState([]);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{
     name: string;
     labels: [{}];
-    Fields: string;
+    fields: string;
   }>({
     name: '',
     labels: [{}],
-    Fields: '',
+    fields: '',
   });
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
@@ -81,11 +80,6 @@ const SettingFlow: React.FC = () => {
 
   const columns: ProColumns<FlowItem>[] = [
     {
-      dataIndex: 'index',
-      valueType: 'indexBorder',
-      width: 48,
-    },
-    {
       title: '流程名称',
       dataIndex: 'name',
       ellipsis: true,
@@ -96,13 +90,15 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
+      title: '备注',
       ellipsis: true,
+      render: (text, record) => {
+        return <div>{JSON.parse(record.content || '{}').fields}</div>;
+      },
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
+      title: '创建时间',
+      dataIndex: 'createTime',
       ellipsis: true,
     },
   ];
@@ -114,12 +110,12 @@ const SettingFlow: React.FC = () => {
     };
   }, []);
 
-  const initData = async (reload?: string) => {
-    setPage(0);
-    const result = await userCtrl.Space.getDefines(reload ? true : false);
+  const initData = async () => {
+    const result = await userCtrl.Space.getDefines(false);
     if (result) {
-      setDataSource(result);
-      setShowDataSource(result.slice(0, 10));
+      // console.log('result', result);
+      setAllData(result);
+      setShowDataSource(result.slice((page - 1) * 1, 10));
     }
   };
 
@@ -130,11 +126,14 @@ const SettingFlow: React.FC = () => {
   const publish = async () => {
     const result = await userCtrl.Space.publishDefine(design);
     if (result.data) {
-      message.success('添加成功');
+      message.info('添加成功');
+      initData();
+      setDesignData(null);
+      setEditorValue(null);
       setTabType(TabType.TABLEMES);
-      initData('true');
     } else {
-      message.warning(result.msg);
+      message.error(result.msg);
+      return false;
     }
   };
   const parentRef = useRef<any>(null); //父级容器Dom
@@ -158,11 +157,11 @@ const SettingFlow: React.FC = () => {
           setCurrentStep(StepType.PROCESSMESS);
           setEditorValue(record?.content);
           const editorDataMes = JSON.parse(record?.content || '{}');
-          console.log(editorDataMes);
+
           setConditionData({
             name: editorDataMes.name,
             labels: JSON.parse(editorDataMes.remark),
-            Fields: editorDataMes.Fiels,
+            fields: editorDataMes.fields,
           });
         },
       },
@@ -171,7 +170,6 @@ const SettingFlow: React.FC = () => {
         label: '删除',
         onClick: async () => {
           const currentData = await userCtrl.Space.deleteDefine(record?.id);
-          console.log('currentData', currentData);
           if (currentData) {
             initData();
             message.success('删除成功');
@@ -183,7 +181,7 @@ const SettingFlow: React.FC = () => {
 
   const handlePageChange = (page: number, pageSize: number) => {
     setPage(page);
-    setShowDataSource(dataSource.slice((page - 1) * pageSize, page * pageSize));
+    setShowDataSource(allData.slice((page - 1) * pageSize, page * pageSize));
   };
 
   const renderCardFun = (dataArr: XFlowDefine[]): React.ReactNode[] => {
@@ -204,34 +202,11 @@ const SettingFlow: React.FC = () => {
       <Card bordered={false}>
         {tabType === TabType.TABLEMES ? (
           <div>
-            {/* <Card title="流程列表" type="inner" bordered={false}>
-              <ProTable
-                actionRef={actionRef}
-                columns={columns}
-                search={false}
-                dataSource={dataSource}
-                style={{ height: '40vh', overflow: 'auto' }}
-                pagination={{
-                  pageSize: 10,
-                  showQuickJumper: true,
-                }}
-                toolBarRender={() => [
-                  <Button
-                    key="button"
-                    type="primary"
-                    onClick={() => {
-                      setTabType(TabType.PROCESSDESIGN);
-                    }}>
-                    新建
-                  </Button>,
-                ]}
-              />
-            </Card> */}
             <Card title="流程列表" type="inner" bordered={false}>
               <div className={cls['app-wrap']} ref={parentRef}>
                 <CardOrTable<XFlowDefine>
                   dataSource={showDataSource}
-                  total={dataSource.length}
+                  total={allData.length}
                   pageSize={10}
                   page={page}
                   stripe
@@ -298,7 +273,6 @@ const SettingFlow: React.FC = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    marginBottom: '10px',
                   }}>
                   <div
                     style={{
@@ -319,7 +293,7 @@ const SettingFlow: React.FC = () => {
                             onOk() {
                               setTabType(TabType.TABLEMES);
                               setCurrentStep(StepType.BASEINFO);
-                              setConditionData({ name: '', labels: [{}], Fields: '' });
+                              setConditionData({ name: '', labels: [{}], fields: '' });
                               setDesignData(null);
                               setEditorValue(null);
                             },
