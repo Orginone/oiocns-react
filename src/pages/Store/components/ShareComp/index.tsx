@@ -242,6 +242,7 @@ const ShareRecent = (props: Iprops) => {
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys, info);
+    console.log('内容1111111111', info);
     if (info.checked) {
       if (radio == 2) {
         handleBoxClick(authorHisData, authorData, info.node);

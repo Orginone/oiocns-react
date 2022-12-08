@@ -26,7 +26,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   const [currentPostion, setCurrentPosition] = useState<any>();
   const [selectMenu, setSelectMenu] = useState<string>('');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [authTree, setAuthTree] = useState<IAuthority[]>();
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
   /**转化成树控件接收的数据格式 */
   const changeData = (target: any[]): target[] => {
@@ -102,7 +101,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
         open={isOpenModal}
         onOk={close}
         handleOk={close}
-        authTree={authTree}
       />
       <EditCustomModal
         handleCancel={() => {

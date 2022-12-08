@@ -8,15 +8,14 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  *
  */
-import React, { useEffect, useState } from 'react';
-import { Modal, message } from 'antd';
+import React, { useEffect } from 'react';
+import { Modal } from 'antd';
 import { ProFormColumnsType } from '@ant-design/pro-components';
 import { BetaSchemaForm } from '@ant-design/pro-components';
 
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import positionCtrl from '@/ts/controller/position/positionCtrl';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
 // import UploadAvatar from '../UploadAvatar';
 
 /* 
@@ -27,14 +26,12 @@ interface Iprops {
   open: boolean;
   onOk: () => void;
   handleOk: () => void;
-  authTree: IAuthority[] | undefined;
 }
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, authTree } = props;
+  const { open, title, onOk, handleOk } = props;
 
   useEffect(() => {}, []);
   const getColumn = (): ProFormColumnsType<IIdentity>[] => {
-    console.log(authTree);
     const columns: ProFormColumnsType<IIdentity>[] = [
       {
         title: '岗位名称',
