@@ -95,6 +95,7 @@ class MarketController extends Emitter {
 
   /** 切换市场 */
   public setCurrentMarket(market: IMarket) {
+    console.log('切换市场', market);
     this._curMarket = market;
     this.getMember();
     this.changCallback();
@@ -157,12 +158,9 @@ class MarketController extends Emitter {
    * @return {*}
    */
   public async getMember() {
-    if (this._curMarket) {
-      const res = await this._curMarket.getMember({ offset: 0, limit: 10, filter: '' });
-      if (res.success) {
-        this.marketMenber = res.data.result;
-      }
-      return this.marketMenber;
+    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
+    if (res?.success) {
+      this.marketMenber = res?.data?.result;
     }
     this.cacheUserManagement(this.marketMenber);
   }
