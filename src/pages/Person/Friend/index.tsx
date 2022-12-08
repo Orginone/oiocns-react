@@ -12,7 +12,7 @@ import { useHistory } from 'react-router-dom';
 
 interface OperationType {
   key: string;
-  label: string;
+  label: any;
   onClick: () => void;
 }
 const columns: ColumnsType<any> = [
@@ -94,8 +94,8 @@ const PersonFriend: React.FC = () => {
   const renderOperation = (item: schema.XTarget): OperationType[] => {
     return [
       {
-        key: 'enterChat',
-        label: '删除',
+        key: 'remove',
+        label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
           await userCtrl.User.removeFriend([item.id]);
           getData();

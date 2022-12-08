@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Progress } from 'antd';
 import cls from './index.module.less';
-import docsCtrl from '@/ts/controller/store/docsCtrl';
-
-export type TaskModel = {
-  group: string;
-  name: string;
-  size: number;
-  process: number;
-  createTime: Date;
-};
+import docsCtrl, { TaskModel } from '@/ts/controller/store/docsCtrl';
 
 type GroupTaskModel = {
   group: string;
   count: number;
   done: number;
-  process: number;
+  size: number;
+  finished: number;
   tasks: TaskModel[];
 };
 
@@ -47,25 +40,24 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
         if (index > -1) {
           group[index].tasks.unshift(item);
           group[index].count += 1;
-          group[index].process += item.process;
-          group[index].done += item.process == 1 ? 1 : 0;
+          group[index].size += item.size;
+          group[index].finished += item.finished === -1 ? item.size : item.finished;
+          group[index].done += item.finished == item.size ? 1 : 0;
         } else {
           group.unshift({
             count: 1,
-            process: item.process,
+            size: item.size,
+            finished: item.finished,
             group: item.group,
             tasks: [item],
-            done: item.process == 1 ? 1 : 0,
+            done: item.finished == item.size ? 1 : 0,
           });
         }
       });
-    return group.map((g) => {
-      g.process = g.process / g.tasks.length;
-      return g;
-    });
+    return group;
   };
-  const getProcess = (p: number) => {
-    return parseInt((p * 10000).toFixed(0)) / 100;
+  const getProcess = (f: number, s: number) => {
+    return parseInt(((f * 10000.0) / s).toFixed(0)) / 100;
   };
   return (
     <>
@@ -82,7 +74,7 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
                   {g.count}项被上传到[{g.group}]目录下
                 </div>
                 <div className={cls['mod']}>
-                  <Progress percent={getProcess(g.process)} width={90} />
+                  <Progress percent={getProcess(g.finished, g.size)} width={90} />
                 </div>
               </div>
               {g.tasks.map((t) => {
@@ -95,7 +87,11 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
                     />
                     <div className={cls['mod_children_content']}>
                       <div className={cls.name}>{t.name}</div>
-                      <Progress percent={getProcess(t.process)} width={70} />
+                      <Progress
+                        status={t.finished === -1 ? 'exception' : 'success'}
+                        percent={getProcess(t.finished, t.size)}
+                        width={70}
+                      />
                     </div>
                   </div>
                 );

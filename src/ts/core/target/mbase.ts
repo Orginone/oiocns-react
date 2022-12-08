@@ -205,41 +205,25 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     }
     return res;
   }
-  public createProduct = async ({
-    name,
-    code,
-    remark,
-    resources,
-    thingId,
-    typeName = ProductType.WebApp,
-  }: {
-    name: string;
-    code: string;
-    remark: string;
-    resources: model.ResourceModel[] | undefined;
-    thingId?: string;
-    typeName?: string;
-  }): Promise<model.ResultType<schema.XProduct>> => {
+  public async createProduct(
+    data: Omit<model.ProductModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<schema.XProduct>> {
     const res = await kernel.createProduct({
-      name,
-      code,
-      remark,
-      resources,
-      thingId,
+      ...data,
       typeName: ProductType.WebApp,
       id: undefined,
       belongId: this.target.id,
     });
     if (res.success && res.data) {
       let prod: IProduct;
-      switch (<ProductType>typeName) {
+      switch (<ProductType>data.typeName) {
         default:
           prod = new WebApp(res.data);
       }
       this.ownProducts.push(prod);
     }
     return res;
-  };
+  }
   public async deleteMarket(id: string): Promise<model.ResultType<boolean>> {
     const res = await kernel.deleteMarket({
       id,

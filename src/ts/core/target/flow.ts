@@ -29,17 +29,17 @@ export default class FlowTarget extends BaseTarget {
     return this.defineRelations;
   }
   async publishDefine(
-    data: model.CreateDefineReq,
+    data: Omit<model.CreateDefineReq, 'BelongId'>,
   ): Promise<ResultType<schema.XFlowDefine>> {
-    const res = await kernel.publishDefine(data);
+    const res = await kernel.publishDefine({ ...data, BelongId: this.target.id });
     if (res.success) {
       if (res.data.id) {
         this.defines = this.defines.filter((a) => {
-          return a.id == res.data?.id;
+          return a.id != res.data?.id;
         });
       }
+      this.defines.push(res.data);
     }
-    this.defines.push(res.data);
     return res;
   }
   async deleteDefine(id: string): Promise<ResultType<boolean>> {

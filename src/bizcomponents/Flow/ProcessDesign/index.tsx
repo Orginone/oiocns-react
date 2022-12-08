@@ -4,10 +4,10 @@ import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import useEventEmitter from '@/hooks/useEventEmitter';
-import { EventContext } from '../const';
+// import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
-  conditionData: { name: string; labels: [] };
+  conditionData: { name: string; Fields: string; labels: [{}] };
   editorValue: string | null | undefined;
   designData: any;
 };
@@ -24,7 +24,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
   const previewRef: any = useRef();
-  // const design = useAppwfConfig((state: any) => state.design);
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
 
   useEffect(() => {
@@ -35,7 +34,7 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     name: '新建流程',
     code: 'code',
     remark: '',
-    belongId: '',
+    Fields: '',
     resource: {
       nodeId: 'ROOT',
       parentId: null,
@@ -59,12 +58,16 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
 
   const startDesign = async () => {
     let tempDesign;
+    console.log('传进来的条件conditionData', conditionData);
+    console.log('传进来的编辑数据', JSON.parse(editorValue));
+    console.log('正在进行操作的designData', designData);
     /** 这里走编辑的逻辑 */
     if (editorValue && editorValue !== '{}') {
       tempDesign = designData || JSON.parse(editorValue);
       if (conditionData?.labels) {
         // 编辑了之后值没有变
         tempDesign.remark = JSON.stringify(conditionData?.labels);
+        tempDesign.Fields = conditionData?.Fields;
         DefaultProps.setFormFields(conditionData?.labels);
       } else {
         DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
@@ -74,10 +77,12 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
         defaultDesign.name = conditionData?.name;
+        defaultDesign.Fields = conditionData?.Fields;
         tempDesign = JSON.parse(JSON.stringify(defaultDesign));
       } else {
         DefaultProps.setFormFields(conditionData?.labels);
         defaultDesign.remark = JSON.stringify(conditionData?.labels);
+        defaultDesign.Fields = conditionData?.Fields;
         defaultDesign.name = conditionData?.name;
         tempDesign = designData;
       }
@@ -90,16 +95,16 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     <>
       <div className={cls['container']}>
         {/* conditionData */}
-        <EventContext.Provider value={{ FlowSub, conditionData }}>
-          <div className={cls['layout-body']}>
-            {activeSelect === 'processDesign' && (
-              <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
-                <FormProcessDesign />
-              </div>
-            )}
-          </div>
-          <LayoutPreview ref={previewRef} />
-        </EventContext.Provider>
+        {/* <EventContext.Provider value={{ FlowSub, conditionData }}> */}
+        <div className={cls['layout-body']}>
+          {activeSelect === 'processDesign' && (
+            <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
+              <FormProcessDesign />
+            </div>
+          )}
+        </div>
+        <LayoutPreview ref={previewRef} />
+        {/* </EventContext.Provider> */}
       </div>
     </>
   );

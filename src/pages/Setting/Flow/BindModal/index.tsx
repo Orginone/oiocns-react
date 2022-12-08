@@ -8,8 +8,10 @@ import {
   ProFormGroup,
   ProFormText,
 } from '@ant-design/pro-components';
-import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
+import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import cls from './index.module.less';
+
 type BindModalProps = {
   isOpen: boolean;
   bindAppMes: { name: string; id: string };
@@ -42,8 +44,12 @@ const BindModal: React.FC<BindModalProps> = ({
     });
     setData(currentData);
     const currentValue = await userCtrl.Space.queryFlowRelation(false);
+
     if (currentValue && currentValue.length > 0) {
-      form.setFieldsValue({ labels: currentValue });
+      const filterId = currentValue.filter((item) => {
+        return item.defineId === bindAppMes?.id;
+      });
+      form.setFieldsValue({ labels: filterId });
     }
   };
 
@@ -81,74 +87,81 @@ const BindModal: React.FC<BindModalProps> = ({
             }
           })
           .catch((error) => {
-            console.log(error);
+            message.error(error);
           });
         onCancel();
       }}>
-      <ProForm layout="horizontal" submitter={false} form={form}>
-        <ProFormList
-          name="labels"
-          actionRef={actionRef}
-          initialValue={[{}]}
-          actionGuard={{
-            beforeRemoveRow: async (index) => {
-              const row = actionRef.current?.get(index as number);
-              return new Promise((resolve) => {
-                if (row?.id) {
-                  Modal.confirm({
-                    title: '提示',
-                    content: '确定删除当前已绑定的应用?',
-                    onOk: () => {
-                      userCtrl.Space.unbindingFlowRelation({
-                        defineId: row?.defineId,
-                        productId: row.productId,
-                        functionCode: row.functionCode,
-                        SpaceId: userCtrl.Space.spaceData.id,
-                      }).then((result) => {
-                        console.log(result);
-                        if (result && result.code === 200) {
-                          message.success('解绑成功');
-                          resolve(true);
-                        } else {
-                          message.success('解绑失败');
-                          resolve(false);
-                        }
-                      });
-                    },
-                  });
-                } else {
-                  resolve(true);
-                }
-              });
-            },
-          }}
-          deleteIconProps={{
-            Icon: CloseCircleOutlined,
-            tooltipText: '删除这个流程字段',
-          }}
-          copyIconProps={false}
-          creatorButtonProps={{
-            position: 'bottom',
-            creatorButtonText: '新增应用绑定',
-          }}>
-          <ProFormGroup key="group">
-            <ProFormSelect
-              name="productId"
-              width={280}
-              label="绑定应用（多选）"
-              // mode="multiple"
-              options={data}
-              placeholder="请选择要绑定的应用"
-              rules={[{ required: true, message: '请选择要绑定的应用!' }]}
-            />
-            <ProFormText
-              name="functionCode"
-              label="业务名称"
-              rules={[{ required: true, message: '请填写业务名称!' }]}
-            />
-          </ProFormGroup>
-        </ProFormList>
-      </ProForm>
+      {/* loading通过样式隐藏，没有相关的Api */}
+      <div className={cls.removeLoading}>
+        <ProForm layout="horizontal" submitter={false} form={form}>
+          <ProFormList
+            name="labels"
+            actionRef={actionRef}
+            initialValue={[{}]}
+            actionGuard={{
+              beforeRemoveRow: async (index) => {
+                const row = actionRef.current?.get(index as number);
+                return new Promise((resolve) => {
+                  /** 涉及到id的 调接口干掉*/
+                  if (row?.id) {
+                    Modal.confirm({
+                      title: '提示',
+                      content: '确定删除当前已绑定的应用?',
+                      onOk: () => {
+                        userCtrl.Space.unbindingFlowRelation({
+                          defineId: row?.defineId,
+                          productId: row.productId,
+                          functionCode: row.functionCode,
+                          SpaceId: userCtrl.Space.spaceData.id,
+                        }).then((result) => {
+                          if (result && result.code === 200) {
+                            message.success('解绑成功');
+                            resolve(true);
+                          } else {
+                            message.success('解绑失败');
+                            resolve(false);
+                          }
+                        });
+                      },
+                      onCancel: () => {
+                        resolve(false);
+                      },
+                    });
+                  } else {
+                    /** 不涉及到id的 直接干掉*/
+                    resolve(true);
+                  }
+                });
+              },
+            }}
+            deleteIconProps={{
+              Icon: CloseCircleOutlined,
+              tooltipText: '删除这个流程字段',
+            }}
+            copyIconProps={false}
+            creatorButtonProps={{
+              position: 'bottom',
+              creatorButtonText: '新增应用绑定',
+            }}>
+            <ProFormGroup key="group">
+              <ProFormSelect
+                name="productId"
+                width={280}
+                label="应用名称"
+                // mode="multiple"
+                options={data}
+                placeholder="请选择要绑定的应用"
+                rules={[{ required: true, message: '请选择要绑定的应用!' }]}
+              />
+              <ProFormText
+                name="functionCode"
+                label="业务名称"
+                rules={[{ required: true, message: '请填写业务名称!' }]}
+              />
+            </ProFormGroup>
+          </ProFormList>
+        </ProForm>
+      </div>
     </Modal>
   );
 };

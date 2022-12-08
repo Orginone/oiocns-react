@@ -4,12 +4,8 @@ import { ProColumns } from '@ant-design/pro-table';
 export const columns: ProColumns<schema.XTarget>[] = [
   {
     title: '序号',
-    key: 'order',
-    fixed: 'left',
+    valueType: 'index',
     width: 50,
-    render: (_key: any, _record: any, index: number) => {
-      return index + 1;
-    },
   },
   {
     title: '账号',

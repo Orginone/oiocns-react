@@ -3,6 +3,7 @@ import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core/todo/itodo
 import { message } from 'antd';
 import { OrderStatus } from '@/ts/core/enum';
 import { XOrderDetail } from '@/ts/base/schema';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 /**
  * tabs 状态选项
@@ -60,6 +61,7 @@ const tableOperation = (
   const afterOperate = (success: boolean) => {
     if (success) {
       message.success(`操作成功`);
+      todoCtrl.changCallback();
       callback(true);
     } else {
       message.error(`操作失败`);
@@ -169,6 +171,7 @@ const orderOperation = (
     if (success) {
       message.success(`${name}成功`);
       callback(true);
+      todoCtrl.changCallback();
     } else {
       message.error(`${name}失败`);
     }

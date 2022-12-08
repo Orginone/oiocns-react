@@ -10,42 +10,43 @@ import CreateApp from './CreatApp'; // 上架弹窗
 import PublishList from './PublishList'; // 上架列表
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
-import StoreRecent from '../components/Recent';
-import { MarketTypes } from 'typings/marketType';
+// import StoreRecent from '../components/Recent';
+import { common } from 'typings/common';
 import SelfAppCtrl, { SelfCallBackTypes } from '@/ts/controller/store/selfAppCtrl';
 import IProduct from '@/ts/core/market/iproduct';
 import TreeComp from '../Classify';
-// import DeleteCustomModal from '@/components/DeleteCustomModal';
-// import { productCtrl } from '@/ts/controller/store/productCtrl';
+import MoveApp from './moveApp';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [data, setData] = useState<IProduct[]>([]);
-  const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
+  // const [recentlyAppIds, setRecentlyAppIds] = useState<string[]>([]);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   useEffect(() => {
     const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.TableData, () => {
-      setData([...SelfAppCtrl.tableData]);
+      console.log('表格数据', SelfAppCtrl.tableData);
+
+      setData([...(SelfAppCtrl.tableData || [])]);
     });
-    const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
-      console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
-      setRecentlyAppIds([...SelfAppCtrl.recentlyUsedAppsIds]);
-    });
+    // const id2 = SelfAppCtrl.subscribePart(SelfCallBackTypes.Recently, () => {
+    //   console.log('RecentlyRecently', SelfAppCtrl.recentlyUsedAppsIds);
+    //   setRecentlyAppIds([...(SelfAppCtrl.recentlyUsedAppsIds || [])]);
+    // });
     // StoreSiderbar.changePageType('app');
     SelfAppCtrl.querySelfApps();
     return () => {
-      return SelfAppCtrl.unsubscribe([id, id2]);
+      return SelfAppCtrl.unsubscribe([id]);
     };
   }, []);
   // 根据以获取数据 动态产生tab
   const items = useMemo(() => {
     let typeSet = new Set(['全部']);
     data?.forEach((v: any) => {
-      typeSet.add(v.prod?.source);
+      typeSet.add(v.source);
     });
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
@@ -62,24 +63,23 @@ const StoreApp: React.FC = () => {
       case '创建':
         history.push('/store/app/create');
         break;
-
       default:
         console.log('点击事件未注册', item.text);
         break;
     }
   };
 
-  const RentlyApps = useMemo(() => {
-    let recentlyApps: IProduct[] = [];
-    recentlyAppIds?.forEach((id: string) => {
-      const prod = data.find((v) => {
-        return v.prod.id === id;
-      });
-      prod && recentlyApps.push(prod);
-    });
+  // const RentlyApps = useMemo(() => {
+  //   let recentlyApps: IProduct[] = [];
+  //   recentlyAppIds?.forEach((id: string) => {
+  //     const prod = data.find((v) => {
+  //       return v.prod.id === id;
+  //     });
+  //     prod && recentlyApps.push(prod);
+  //   });
 
-    return recentlyApps;
-  }, [recentlyAppIds, data]);
+  //   return recentlyApps;
+  // }, [recentlyAppIds, data]);
 
   const onCheckeds = (teamId: string, type: string, checkedValus: any) => {
     console.log('输出选择', teamId, type, checkedValus);
@@ -91,7 +91,7 @@ const StoreApp: React.FC = () => {
     SelfAppCtrl.ShareProduct(checkNodes.teamId, checkNodes.checkedValus, checkNodes.type);
     setShowShareModal(false);
   };
-  const renderOperation = (item: IProduct): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): common.OperationType[] => {
     return [
       {
         key: 'open',
@@ -110,16 +110,16 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/info' });
         },
       },
-      {
-        key: 'manage',
-        label: '管理',
-        onClick: () => {
-          SelfAppCtrl.curProduct = item;
-          history.push({
-            pathname: '/store/app/manage',
-          });
-        },
-      },
+      // {
+      //   key: 'manage',
+      //   label: '管理',
+      //   onClick: () => {
+      //     SelfAppCtrl.curProduct = item;
+      //     history.push({
+      //       pathname: '/store/app/manage',
+      //     });
+      //   },
+      // },
       {
         key: 'putaway',
         label: '上架',
@@ -172,9 +172,9 @@ const StoreApp: React.FC = () => {
   const AppIndex = useMemo(() => {
     return (
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />}
+        {/* {RentlyApps.length > 0 && <StoreRecent dataSource={RentlyApps} />} */}
         <Card
-          title="应用"
+          title="我的应用"
           className={cls['app-tabs']}
           extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
           tabList={items}
@@ -228,6 +228,7 @@ const StoreApp: React.FC = () => {
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       <TreeComp />
+      <MoveApp appid={''} />
     </>
   );
 };

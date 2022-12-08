@@ -768,6 +768,8 @@ export type CreateDefineReq = {
   Resource: FlowNode;
   // 归属Id
   BelongId: string;
+  // 流程字段json
+  Fields?: string;
 };
 
 export type FlowNode = {
@@ -925,6 +927,8 @@ export type FileChunkData = {
   uploadId: string;
   /** 分片数据 */
   data: number[];
+  /** 分片数据编码字符串 */
+  dataUrl: string;
 };
 
 /** 请求失败 */

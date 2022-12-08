@@ -1,9 +1,7 @@
 import { Button, Card, Dropdown } from 'antd';
-import React, { useCallback, useEffect, useState } from 'react';
-import AppShowComp from '@/bizcomponents/AppTablePage2';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
-import { MarketTypes } from 'typings/marketType';
 import { EllipsisOutlined } from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
@@ -18,44 +16,25 @@ const items = DestTypes.map((k) => {
 const StoreAppInfo: React.FC = () => {
   // const BtnsList = ['编辑应用分配'];
   const [list, setList] = useState<any>([]);
-  const [tabKey, setTabKey] = useState('组织');
   useEffect(() => {
     console.log('{SelfAppCtrl.curProduct?.prod.version}');
-    getExtend();
+    getExtend('组织');
   }, []);
 
-  const getExtend = useCallback(async () => {
+  const getExtend = async (tabKey: string) => {
+    console.log('事实上222', tabKey);
+
     const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
     console.log('请求分享/分配信息', tabKey, res);
     setList(res?.data?.result ?? []);
-  }, [tabKey]);
+  };
 
   const history = useHistory();
   function onTabChange(key: any) {
     console.log('onTabChange', key);
-    setTabKey(key);
-    getExtend();
+    getExtend(key);
   }
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
-    return [
-      {
-        key: 'publish',
-        label: '下架',
-        onClick: () => {
-          console.log('按钮事件', 'publish');
-        },
-      },
-      {
-        key: 'share',
-        label: '共享',
-        onClick: () => {
-          console.log('按钮事件', 'share', item);
-        },
-      },
-    ];
-  };
+
   const menu = [{ key: '退订', label: '退订' }];
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -107,14 +86,7 @@ const StoreAppInfo: React.FC = () => {
           tabList={items}
           style={{ padding: 0 }}
           onTabChange={onTabChange}>
-          <div className={cls['page-content-table']}>
-            <AppShowComp
-              showChangeBtn={false}
-              list={list}
-              columns={SelfAppCtrl.getColumns('shareInfo')}
-              renderOperation={renderOperation}
-            />
-          </div>
+          <div className={cls['page-content-table']}>{JSON.stringify(list)}</div>
         </Card>
       </div>
     </div>
