@@ -66,9 +66,9 @@ const EditCustomModal = (props: Iprops) => {
           curentValue = await userCtrl.Company.createDepartment(newValue);
         }
         if (!curentValue.success) {
-          message.error(curentValue.msg);
+          message.error(`新增部门失败,${curentValue.msg}`);
         } else {
-          message.success(curentValue.msg);
+          message.success('新增部门成功');
           handleOk();
         }
       }
