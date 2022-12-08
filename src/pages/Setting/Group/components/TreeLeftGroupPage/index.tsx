@@ -85,7 +85,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       return;
     }
     const deptChild: any[] = await target.getSubGroups(false);
-    console.log(deptChild);
 
     setTreeData((origin) =>
       updateTreeData(

@@ -144,9 +144,7 @@ const JoinGroup: React.FC = () => {
         switcherIcon={<DownOutlined />}
         autoExpandParent={autoExpandParent}
         treeData={treeData}
-        onClick={(e) => {
-          console.log(e);
-        }}
+        onClick={(e) => {}}
         showIcon={true}
         titleRender={(e) => {
           return (

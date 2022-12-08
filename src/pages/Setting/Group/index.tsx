@@ -68,7 +68,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
-    console.log(key, item, '====');
     switch (key) {
       case 'new':
         setId('');
@@ -99,7 +98,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     if (joinKey == '') {
       message.error('请选中要添加集团的单位！');
     } else {
-      console.log(joinTarget);
       const comp: ICompany = new Company(joinTarget!);
       const res = await comp.applyJoinGroup(currentGroup?.target?.id!);
       message.info(res.msg);
@@ -123,7 +121,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const handleOk = async (item: any) => {
     // 新增
     if (item) {
-      console.log(item);
       if (item.selectId == 'update') {
         // 更新集团
         if (userCtrl.IsCompanySpace) {
@@ -176,23 +173,17 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {
         key: 'publish',
         label: '调整节点',
-        onClick: () => {
-          console.log('按钮事件', 'publish', item);
-        },
+        onClick: () => {},
       },
       {
         key: 'share',
         label: '岗位集团',
-        onClick: () => {
-          console.log('按钮事件', 'share', item);
-        },
+        onClick: () => {},
       },
       {
         key: 'detail',
         label: '移出集团',
-        onClick: () => {
-          console.log('按钮事件', 'detail', item);
-        },
+        onClick: () => {},
       },
     ];
   };
