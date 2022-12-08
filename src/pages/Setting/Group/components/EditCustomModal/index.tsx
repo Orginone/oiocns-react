@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import cls from './index.module.less';
 import { IGroup } from '@/ts/core/target/itarget';
