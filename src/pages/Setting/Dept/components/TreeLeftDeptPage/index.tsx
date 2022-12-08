@@ -43,24 +43,14 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         setSelectKey(data[0].target.id);
         setCurrent(data[0]);
       }
-      data.forEach((a) => loopLoadDepartment(a, reload));
-      setTreeData(
-        data.map((n) => {
-          return createTreeDom(n);
-        }),
-      );
+      const tree = data.map((n) => {
+        return createTreeDom(n);
+      });
+      setTreeData(tree);
     }
-  };
-
-  const loopLoadDepartment = async (n: IDepartment, reload: boolean) => {
-    const subDepartments = await n.getDepartments(reload);
-    subDepartments.forEach((a) => {
-      loopLoadDepartment(a, reload);
-    });
   };
   const createTreeDom: any = (n: IDepartment, pid?: string) => {
     const { target } = n;
-    const child = n.departments.map((m) => createTreeDom(m, target.id));
     return {
       key: target.id,
       title: target.name,
@@ -68,7 +58,10 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       icon: target.avatar,
       isLeaf: false,
       intans: n,
-      children: child,
+      children:
+        n.departments.length > 0
+          ? n.departments.map((m) => createTreeDom(m, n.target.id))
+          : undefined,
       pid,
     };
   };
