@@ -120,6 +120,10 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   };
   //去重方法
   const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
+    console.log(arr1, arr2);
+    if (arr2 == undefined) {
+      return arr1;
+    }
     if (arr1.length === 0) {
       return [];
     }
