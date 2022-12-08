@@ -15,12 +15,12 @@ import { IPerson } from '@/ts/core/target/itarget';
  * @returns
  */
 const PersonInfo: React.FC = () => {
-  const user = userCtrl.User;
+  const user = userCtrl.user;
   const [showDepartment, setShowDepartment] = useState<boolean>(false);
 
   useEffect(() => {
     // 用户修改的时候 ，处理代码 头像
-  }, ['', userCtrl.User]);
+  }, ['', userCtrl.user]);
 
   // 信息标题
   const title = (

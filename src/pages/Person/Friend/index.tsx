@@ -62,7 +62,7 @@ const PersonFriend: React.FC = () => {
   const history = useHistory();
 
   const getData = async () => {
-    setData(await userCtrl.User.getFriends(false));
+    setData(await userCtrl.user.getFriends(false));
   };
   const showModal = () => {
     setIsModalOpen(true);
@@ -73,7 +73,7 @@ const PersonFriend: React.FC = () => {
   const handleOk = async () => {
     setIsModalOpen(false);
     console.log(friend);
-    const res = await userCtrl.User.applyFriend(friend!);
+    const res = await userCtrl.user.applyFriend(friend!);
     // console.log(await userCtrl.User)
     console.log(res);
     if (res.success) {
@@ -97,7 +97,7 @@ const PersonFriend: React.FC = () => {
         key: 'remove',
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
-          await userCtrl.User.removeFriend([item.id]);
+          await userCtrl.user.removeFriend([item.id]);
           getData();
         },
       },

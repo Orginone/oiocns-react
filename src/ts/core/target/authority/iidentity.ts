@@ -1,12 +1,13 @@
-import { model, schema } from '../../../base';
-import { TargetType } from '../../enum';
+import { PageRequest } from '@/ts/base/model';
+import { model, schema } from '@/ts/base';
 
 export interface IIdentity {
   /** 实体对象 */
   target: schema.XIdentity;
   /** 当前身份Id */
   id: string;
-
+  /** 当前身份名称 */
+  name: string;
   /**
    * 更新身份
    * @param name 名称
@@ -20,23 +21,19 @@ export interface IIdentity {
     remark: string,
   ): Promise<model.ResultType<schema.XIdentity>>;
   /**
-   * 查询指定身份赋予的组织/人员
-   * @param targetType
-   * @returns
+   * 加载组织成员
+   * @param page 分页请求
    */
-  getIdentityTargets(
-    targetType: TargetType,
-  ): Promise<model.ResultType<schema.XTargetArray>>;
+  loadMembers(page: PageRequest): Promise<schema.XTargetArray>;
   /**
-   * 赋予组织个人身份
-   * @param targetIds 组织/个人Id集合
-   * @returns
+   * 拉取成员加入群组
+   * @param {string[]} ids 成员ID数组
    */
-  giveIdentity(targetIds: string[]): Promise<model.ResultType<any>>;
+  pullMembers(ids: string[]): Promise<boolean>;
   /**
-   * 移除赋予给组织/个人的身份
-   * @param targetIds 组织/个人Id集合
-   * @returns
+   * 移除群成员
+   * @param {string[]} ids 成员ID数组
+   * @param {TargetType} type 成员类型
    */
-  removeIdentity(targetIds: string[]): Promise<model.ResultType<any>>;
+  removeMembers(ids: string[]): Promise<boolean>;
 }

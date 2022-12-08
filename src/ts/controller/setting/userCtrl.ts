@@ -4,10 +4,10 @@ import {
   IPerson,
   ICompany,
   ISpace,
-  ICohort,
   createPerson,
   DomainTypes,
   emitter,
+  ITarget,
 } from '@/ts/core';
 const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
@@ -34,15 +34,15 @@ class UserController extends Emitter {
     }
   }
   /** 是否已登录 */
-  get Logined(): boolean {
+  get logined(): boolean {
     return !!this._user?.target.id;
   }
   /** 是否为单位空间 */
-  get IsCompanySpace(): boolean {
+  get isCompanySpace(): boolean {
     return this._curSpace != undefined;
   }
   /** 当前用户 */
-  get User(): IPerson {
+  get user(): IPerson {
     if (this._user) {
       return this._user;
     } else {
@@ -50,7 +50,7 @@ class UserController extends Emitter {
     }
   }
   /** 当前单位空间 */
-  get Company(): ICompany {
+  get company(): ICompany {
     if (this._curSpace) {
       return this._curSpace;
     } else {
@@ -58,7 +58,7 @@ class UserController extends Emitter {
     }
   }
   /** 当前空间对象 */
-  get Space(): ISpace {
+  get space(): ISpace {
     if (this._curSpace) {
       return this._curSpace;
     }
@@ -78,15 +78,14 @@ class UserController extends Emitter {
     this.changCallbackPart(DomainTypes.Company);
     emitter.changCallbackPart(DomainTypes.Company);
   }
-  /**
-   * 获取我的群组
-   * @returns 群组数据
-   */
-  public async getCohortList(): Promise<ICohort[]> {
+  /** 组织树 */
+  public async getTeamTree(): Promise<ITarget[]> {
     if (this._curSpace) {
-      return await this._curSpace.getJoinedCohorts(false);
+      const groups = await this._curSpace.getJoinedGroups(false);
+      return [this._curSpace, ...groups];
     } else {
-      return await this._user!.getJoinedCohorts(false);
+      const cohorts = await this._user!.getCohorts(false);
+      return [this._user!, ...cohorts];
     }
   }
   /**

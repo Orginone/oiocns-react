@@ -117,7 +117,7 @@ const StoreApp: React.FC = () => {
           Modal.confirm({
             content: `确认移除《 ${name} 》?`,
             async onOk() {
-              await userCtrl.Space.deleteProduct(id);
+              await userCtrl.space.deleteProduct(id);
               appCtrl.changCallback();
             },
           });

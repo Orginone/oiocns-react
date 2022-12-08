@@ -63,7 +63,7 @@ interface RecMsg<T> {
   data: T[];
 }
 class SelfAppController extends Emitter {
-  private _curSpace: IMTarget = userCtrl.User;
+  private _curSpace: IMTarget = userCtrl.user;
   /* -----**菜单数据区---------- */
   private _curMenuKey!: string; //当前选中菜单key
   private _customMenu!: TreeType[]; //缓存树形数据
@@ -127,7 +127,7 @@ class SelfAppController extends Emitter {
     super();
     /* 监听空间切换 */
     emitter.subscribePart(DomainTypes.Company, async () => {
-      this._curSpace = userCtrl.IsCompanySpace ? userCtrl.Company : userCtrl.User;
+      this._curSpace = userCtrl.isCompanySpace ? userCtrl.company : userCtrl.user;
       this.resetData();
     });
     /* 获取 历史缓存的 自定义目录 */
@@ -222,7 +222,7 @@ class SelfAppController extends Emitter {
   public async querySelfApps(reload = false) {
     const list = await this._curSpace.getOwnProducts(reload);
     const arr = list.map((v) => {
-      v['source'] = v.prod?.belongId === userCtrl.User!.target.id ? '创建的' : '分享的';
+      v['source'] = v.prod?.belongId === userCtrl.user!.target.id ? '创建的' : '分享的';
       return v;
     });
     this.selfAppsData = arr;

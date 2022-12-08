@@ -38,10 +38,10 @@ class MarketController extends Emitter {
     super();
     this.searchMarket = [];
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      if (userCtrl.IsCompanySpace) {
-        this._target = userCtrl.Company;
+      if (userCtrl.isCompanySpace) {
+        this._target = userCtrl.company;
       } else {
-        this._target = userCtrl.User;
+        this._target = userCtrl.user;
       }
       this._curMarket = (await this._target.getPublicMarket(true))[0];
       await this._target.getJoinMarkets();
@@ -229,7 +229,7 @@ class MarketController extends Emitter {
       '',
       'order',
       'code',
-      userCtrl.Space?.target?.id,
+      userCtrl.space?.target?.id,
       this._shopingIds,
     );
     if (res?.code === 400) {

@@ -64,7 +64,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         onChange={async (event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
-            const res = await userCtrl.User.searchCompany(event.target.value);
+            const res = await userCtrl.user.searchCompany(event.target.value);
             if (res.success && res.data && res.data.result) {
               setDataSource(res.data.result);
               const joinKey = res.data.result[0].id!;

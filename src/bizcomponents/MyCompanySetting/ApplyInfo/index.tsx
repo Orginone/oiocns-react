@@ -43,7 +43,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
   };
 
   const cancleApply = async (id: string) => {
-    const responseObj = await userCtrl.User.cancelJoinApply(id);
+    const responseObj = await userCtrl.user.cancelJoinApply(id);
     if (responseObj.success) {
       message.info('取消申请成功');
       getTableList();
@@ -54,7 +54,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
 
   const getTableList = async () => {
     let thisdata: DataType[] = [];
-    const { data } = await userCtrl.User.queryJoinApply();
+    const { data } = await userCtrl.user.queryJoinApply();
 
     data.result
       ? data.result.map((item: any, index: any) => {
@@ -79,7 +79,7 @@ const ApplyInfoService: React.FC<ApplyInfoProps> = () => {
 
   useEffect(() => {
     // 用户修改的时候 ，处理代码
-  }, [userCtrl.User]);
+  }, [userCtrl.user]);
 
   const columns: ColumnsType<DataType> = [
     {

@@ -72,8 +72,8 @@ class AppController extends Emitter {
 
   get spacies(): TreeType[] {
     if (this._caches.species) {
-      if (this._caches.species[userCtrl.Space.target.id]) {
-        return this._caches.species[userCtrl.Space.target.id];
+      if (this._caches.species[userCtrl.space.target.id]) {
+        return this._caches.species[userCtrl.space.target.id];
       }
     }
     return [];
@@ -94,7 +94,7 @@ class AppController extends Emitter {
   }
 
   private async _initialization() {
-    this._target = userCtrl.Space;
+    this._target = userCtrl.space;
     await this._target.getOwnProducts(true);
     this.changCallback();
     kernel.anystore.subscribed(AppStoreName, 'user', (data: AppCache) => {

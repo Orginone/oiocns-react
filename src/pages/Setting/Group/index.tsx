@@ -42,7 +42,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
 
   const [selectId, setSelectId] = useState<string>('');
   useEffect(() => {
-    if (!userCtrl.IsCompanySpace) {
+    if (!userCtrl.isCompanySpace) {
       history.push('/setting/info', { refresh: true });
     }
   }, []);
@@ -118,7 +118,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     // 新增
     if (item) {
       if (item.selectId == 'update') {
-        if (userCtrl.IsCompanySpace) {
+        if (userCtrl.isCompanySpace) {
           item.teamCode = item.code;
           item.teamName = item.name;
           item.typeName = TargetType.Group;
@@ -130,7 +130,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           }
         }
       } else {
-        if (userCtrl.IsCompanySpace) {
+        if (userCtrl.isCompanySpace) {
           item.teamCode = item.code;
           item.teamName = item.name;
           item.typeName = TargetType.Group;
@@ -142,7 +142,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
               setIsOpen(false);
             }
           } else {
-            const res = await userCtrl.Company.createGroup(item);
+            const res = await userCtrl.company.createGroup(item);
 
             const result = service.messageAlert(res!, '新增集团');
             if (result) {
@@ -219,7 +219,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                       currentGroup.target.id,
                     );
                     if (aGroup) {
-                      const res = await userCtrl.Company.deleteGroup(aGroup.target.id);
+                      const res = await userCtrl.company.deleteGroup(aGroup.target.id);
                       const result = service.messageAlert(res, '删除部门');
                       if (result) {
                         userCtrl.changCallback();

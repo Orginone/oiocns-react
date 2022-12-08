@@ -45,13 +45,10 @@ const OrganizationalUnits = () => {
   };
   const onSave = async () => {
     const values = await form.validateFields();
-    const res = await userCtrl.User.createCompany(values.company);
-    if (res.success) {
-      message.info('申请加入单位成功');
+    const company = await userCtrl.user.createCompany(values.company);
+    if (company) {
       setShowFormModal(false);
-      userCtrl.setCurSpace(res.data.id);
-    } else {
-      message.error('申请加入单位失败：' + res?.msg);
+      userCtrl.setCurSpace(company.id);
     }
   };
   const [form] = Form.useForm();
@@ -63,14 +60,14 @@ const OrganizationalUnits = () => {
 
   const refreshUI = () => {
     const all: SpaceType[] =
-      userCtrl.User?.joinedCompany?.map((item) => {
+      userCtrl.user?.joinedCompany?.map((item) => {
         return item.spaceData;
       }) || [];
-    all.unshift(userCtrl.User.spaceData);
-    setCurrent(userCtrl.Space.spaceData);
+    all.unshift(userCtrl.user.spaceData);
+    setCurrent(userCtrl.space.spaceData);
     setMenuList(
       all.filter((item) => {
-        return item.id != userCtrl.Space.spaceData.id;
+        return item.id != userCtrl.space.spaceData.id;
       }),
     );
   };
@@ -232,17 +229,8 @@ const OrganizationalUnits = () => {
           if (joinKey == '') {
             message.error('请选中要加入的单位！');
           } else {
-            let thisSelectKey = joinKey;
-            // code msg success
-            const responseObj = await userCtrl.User.applyJoinCompany(
-              thisSelectKey,
-              TargetType.Company,
-            );
-
-            if (responseObj.success) {
-              message.info('申请加入单位成功!');
-            } else {
-              message.error('申请加入单位失败：' + responseObj.msg);
+            if (await userCtrl.user.applyJoinCompany(joinKey, TargetType.Company)) {
+              message.success('已申请加入单位成功.');
             }
           }
         }}

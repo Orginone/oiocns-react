@@ -43,7 +43,7 @@ const BindModal: React.FC<BindModalProps> = ({
       };
     });
     setData(currentData);
-    const currentValue = await userCtrl.Space.queryFlowRelation(false);
+    const currentValue = await userCtrl.space.queryFlowRelation(false);
 
     if (currentValue && currentValue.length > 0) {
       const filterId = currentValue.filter((item) => {
@@ -70,11 +70,11 @@ const BindModal: React.FC<BindModalProps> = ({
         curerntValue.labels.forEach(
           (item: { productId: string; functionCode: string }) => {
             newArr.push(
-              userCtrl.Space.bindingFlowRelation({
+              userCtrl.space.bindingFlowRelation({
                 defineId: bindAppMes?.id,
                 productId: item.productId,
                 functionCode: item.functionCode,
-                SpaceId: userCtrl.Space.spaceData.id,
+                SpaceId: userCtrl.space.spaceData.id,
               }),
             );
           },
@@ -108,11 +108,11 @@ const BindModal: React.FC<BindModalProps> = ({
                       title: '提示',
                       content: '确定删除当前已绑定的应用?',
                       onOk: () => {
-                        userCtrl.Space.unbindingFlowRelation({
+                        userCtrl.space.unbindingFlowRelation({
                           defineId: row?.defineId,
                           productId: row.productId,
                           functionCode: row.functionCode,
-                          SpaceId: userCtrl.Space.spaceData.id,
+                          SpaceId: userCtrl.space.spaceData.id,
                         }).then((result) => {
                           if (result && result.code === 200) {
                             message.success('解绑成功');

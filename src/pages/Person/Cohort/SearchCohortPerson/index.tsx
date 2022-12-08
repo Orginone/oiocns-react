@@ -27,7 +27,7 @@ const CohortPerson: React.FC<indexType> = (props) => {
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
-      const res = await userCtrl.User?.searchPerson(e.target.value);
+      const res = await userCtrl.user?.searchPerson(e.target.value);
       if (res?.data.result != null) {
         setData([res.data.result[0]]);
       } else {

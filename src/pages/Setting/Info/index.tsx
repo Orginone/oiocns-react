@@ -40,10 +40,10 @@ const SettingInfo: React.FC = () => {
             okType: 'danger',
             cancelText: '取消',
             async onOk() {
-              const res = await userCtrl.User.quitCompany(compinfo?.target.id);
+              const res = await userCtrl.user.quitCompany(compinfo?.target.id);
               if (res.success) {
                 message.success(`退出${compinfo.target.name}单位成功!`);
-                userCtrl.setCurSpace(userCtrl.User.target.id);
+                userCtrl.setCurSpace(userCtrl.user.target.id);
               } else {
                 message.error('退出单位失败!' + res.msg);
               }
@@ -101,8 +101,8 @@ const SettingInfo: React.FC = () => {
     ];
   };
   useEffect(() => {
-    if (userCtrl.Company) {
-      setCompInfo(userCtrl.Company);
+    if (userCtrl.company) {
+      setCompInfo(userCtrl.company);
     }
   }, [key]);
 

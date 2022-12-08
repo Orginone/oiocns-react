@@ -3,86 +3,85 @@ import consts from '../consts';
 import Company from './company';
 import Hospital from './hospital';
 import MarketTarget from './mbase';
-import { TargetType } from '../enum';
+import { companyTypes, TargetType } from '../enum';
 import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { ICompany, IPerson, ICohort, SpaceType } from './itarget';
+import { ICompany, IPerson, ICohort, SpaceType, ITarget } from './itarget';
 import { schema, model, kernel, common } from '@/ts/base';
-import { ResultType, TargetModel } from '@/ts/base/model';
-import { XTarget } from '@/ts/base/schema';
+import { TargetModel } from '@/ts/base/model';
+import { logger, sleep } from '@/ts/base/common';
+import { IProduct } from '../market';
 
 export default class Person extends MarketTarget implements IPerson {
-  joinedFriend: schema.XTarget[];
-  joinedCohort: ICohort[];
-  joinedCompany: ICompany[];
+  joinedFriend: schema.XTarget[] = [];
+  cohorts: ICohort[] = [];
+  joinedCompany: ICompany[] = [];
+  subTeam: ITarget[] = [];
   constructor(target: schema.XTarget) {
     super(target);
 
-    this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...this.companyTypes];
-    this.subTypes = [];
-    this.pullTypes = [TargetType.Person];
-    this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...this.companyTypes];
-    this.createTargetType = [TargetType.Cohort, ...this.companyTypes];
+    this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...companyTypes];
+    this.subTeamTypes = [];
+    this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...companyTypes];
+    this.createTargetType = [TargetType.Cohort, ...companyTypes];
 
-    this.joinedFriend = [];
-    this.joinedCohort = [];
-    this.joinedCompany = [];
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
+  }
+  async loadSubTeam(_: boolean): Promise<ITarget[]> {
+    await sleep(0);
+    return [];
   }
   public get spaceData(): SpaceType {
     return {
-      id: this.target.id,
+      id: this.id,
       name: '个人空间',
       icon: this.target.avatar,
       typeName: this.target.typeName as TargetType,
     };
   }
-  public async searchCohort(code: string): Promise<ResultType<schema.XTargetArray>> {
+  public async searchCohort(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Cohort]);
   }
-  public async searchPerson(code: string): Promise<ResultType<schema.XTargetArray>> {
+  public async searchPerson(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Person]);
   }
-  public async searchCompany(code: string): Promise<ResultType<schema.XTargetArray>> {
-    return await this.searchTargetByName(code, this.companyTypes);
+  public async searchCompany(code: string): Promise<schema.XTargetArray> {
+    return await this.searchTargetByName(code, companyTypes);
   }
-  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
-    return await super.updateTarget(data);
+  public async update(data: Omit<TargetModel, 'id'>): Promise<IPerson> {
+    await super.updateTarget(data);
+    return this;
   }
-  public getJoinedCohorts = async (reload: boolean): Promise<ICohort[]> => {
-    if (!reload && this.joinedCohort.length > 0) {
-      return this.joinedCohort;
+  public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {
+    if (!reload && this.cohorts.length > 0) {
+      return this.cohorts;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort]);
-    console.log('输出返回结果', res);
+    const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
     if (res.success && res.data.result) {
-      console.log('进入了');
-      this.joinedCohort = [];
-      this.joinedCohort = res.data.result.map((a) => {
+      this.cohorts = res.data.result.map((a) => {
         return new Cohort(a);
       });
     }
-    console.log('输出结果', this.joinedCohort);
-    return this.joinedCohort;
+    return this.cohorts;
   };
   public async getJoinedCompanys(reload: boolean = false): Promise<ICompany[]> {
     if (!reload && this.joinedCompany.length > 0) {
       return this.joinedCompany;
     }
-    const res = await this.getjoinedTargets(this.companyTypes);
+    const res = await this.getjoinedTargets(companyTypes, this.id);
     if (res.success && res.data?.result) {
       this.joinedCompany = res.data.result.map((a) => {
         let company;
         switch (a.typeName) {
           case TargetType.University:
-            company = new University(a);
+            company = new University(a, this.id);
             break;
           case TargetType.Hospital:
-            company = new Hospital(a);
+            company = new Hospital(a, this.id);
             break;
           default:
-            company = new Company(a);
+            company = new Company(a, this.id);
             break;
         }
         return company;
@@ -91,138 +90,145 @@ export default class Person extends MarketTarget implements IPerson {
     return this.joinedCompany;
   }
   public async createCohort(
-    data: Omit<TargetModel, 'id' | 'belongId' | 'teamName' | 'teamCode'>,
-  ): Promise<ResultType<any>> {
+    avatar: string,
+    name: string,
+    code: string,
+    remark: string,
+  ): Promise<ICohort | undefined> {
     const res = await this.createTarget({
-      ...data,
-      teamCode: data.code,
-      teamName: data.name,
-      belongId: this.target.id,
+      code,
+      name,
+      avatar,
+      teamCode: code,
+      teamName: name,
+      belongId: this.id,
+      typeName: TargetType.Cohort,
+      teamRemark: remark,
     });
     if (res.success && res.data != undefined) {
       const cohort = new Cohort(res.data);
-      this.joinedCohort.push(cohort);
-      return cohort.pullMember([this.target]);
+      this.cohorts.push(cohort);
+      cohort.pullMember(this.target);
+      return cohort;
     }
-    return res;
   }
   public async createCompany(
     data: Omit<TargetModel, 'id'>,
-  ): Promise<ResultType<schema.XTarget>> {
-    data.belongId = this.target.id;
-    if (!this.companyTypes.includes(<TargetType>data.typeName)) {
-      return model.badRequest('您无法创建该类型单位!');
+  ): Promise<ICompany | undefined> {
+    data.belongId = this.id;
+    if (!companyTypes.includes(<TargetType>data.typeName)) {
+      logger.warn('您无法创建该类型单位!');
+      return;
     }
     if (!validIsSocialCreditCode(data.code)) {
-      return model.badRequest('请填写正确的代码!');
+      logger.warn('请填写正确的代码!');
+      return;
     }
-    const tres = await this.searchTargetByName(data.code, this.companyTypes);
-    if (!tres.data.result) {
+    const tres = await this.searchTargetByName(data.code, companyTypes);
+    if (!tres.result) {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;
         switch (<TargetType>data.typeName) {
           case TargetType.University:
-            company = new University(res.data);
+            company = new University(res.data, this.id);
             break;
           case TargetType.Hospital:
-            company = new Hospital(res.data);
+            company = new Hospital(res.data, this.id);
             break;
           default:
-            company = new Company(res.data);
+            company = new Company(res.data, this.id);
             break;
         }
         this.joinedCompany.push(company);
-        company.pullMember([this.target]);
+        company.pullMember(this.target);
+        return company;
       }
-      return res;
     } else {
-      return model.badRequest('该单位已存在!');
+      logger.warn(consts.IsExistError);
     }
   }
   public async createProduct(
     data: Omit<model.ProductModel, 'id' | 'belongId'>,
-  ): Promise<model.ResultType<schema.XProduct>> {
-    const res = await super.createProduct(data);
-    if (res.success) {
-      this.usefulProduct.push(res.data);
-      if (res.data.resource) {
-        this.usefulResource.set(res.data.id, res.data.resource);
+  ): Promise<IProduct | undefined> {
+    const prod = await super.createProduct(data);
+    if (prod) {
+      this.usefulProduct.push(prod.prod);
+      if (prod.prod.resource) {
+        this.usefulResource.set(prod.prod.id, prod.prod.resource);
       }
     }
-    return res;
+    return prod;
   }
-  public async deleteCohort(id: string): Promise<ResultType<any>> {
+  public async deleteCohort(id: string): Promise<boolean> {
     let res = await kernel.deleteTarget({
       id: id,
       typeName: TargetType.Cohort,
-      belongId: this.target.id,
+      belongId: this.id,
     });
-    console.log('过滤前', this.joinedCohort);
     if (res.success) {
-      this.joinedCohort = this.joinedCohort.filter((a) => a.target.id != id);
-      console.log('过滤后', this.joinedCohort);
+      this.cohorts = this.cohorts.filter((a) => a.id != id);
     }
-    return res;
+    return res.success;
   }
-  public async deleteCompany(id: string): Promise<ResultType<any>> {
+  public async deleteCompany(id: string): Promise<boolean> {
     let res = await kernel.deleteTarget({
       id: id,
       typeName: TargetType.Company,
-      belongId: this.target.id,
+      belongId: this.id,
     });
     if (res.success) {
-      this.joinedCompany = this.joinedCompany.filter((a) => a.target.id != id);
+      this.joinedCompany = this.joinedCompany.filter((a) => a.id != id);
     }
-    return res;
+    return res.success;
   }
-  public async applyJoinCohort(id: string): Promise<ResultType<any>> {
-    const cohort = this.joinedCohort.find((cohort) => {
-      return cohort.target.id == id;
+  public async applyJoinCohort(id: string): Promise<boolean> {
+    const cohort = this.cohorts.find((cohort) => {
+      return cohort.id == id;
     });
-    if (cohort == undefined) {
+    if (!cohort) {
       return await this.applyJoin(id, TargetType.Cohort);
     }
-    return model.badRequest(consts.IsJoinedError);
+    logger.warn(consts.IsJoinedError);
+    return false;
   }
-  public async applyJoinCompany(
-    id: string,
-    typeName: TargetType,
-  ): Promise<ResultType<any>> {
+  public async applyJoinCompany(id: string, typeName: TargetType): Promise<boolean> {
     const company = this.joinedCompany.find((company) => {
-      return company.target.id == id;
+      return company.id == id;
     });
-    if (company == undefined) {
+    if (!company) {
       return await this.applyJoin(id, typeName);
     }
-    return model.badRequest(consts.IsJoinedError);
+    logger.warn(consts.IsJoinedError);
+    return false;
   }
-  public async quitCohorts(id: string): Promise<ResultType<any>> {
+  public async quitCohorts(id: string): Promise<boolean> {
     const res = await this.cancelJoinTeam(id);
-
     if (res.success) {
-      this.joinedCohort = this.joinedCohort.filter((cohort) => {
-        return cohort.target.id != id;
+      this.cohorts = this.cohorts.filter((cohort) => {
+        return cohort.id != id;
       });
     }
-    return res;
+    return res.success;
   }
-  public async quitCompany(id: string): Promise<ResultType<any>> {
+  public async quitCompany(id: string): Promise<boolean> {
     const res = await kernel.exitAnyOfTeamAndBelong({
       id,
       teamTypes: [
         TargetType.JobCohort,
         TargetType.Department,
         TargetType.Cohort,
-        ...this.companyTypes,
+        ...companyTypes,
       ],
-      targetId: this.target.id,
+      targetId: this.id,
       targetType: TargetType.Person,
     });
-    this.joinedCompany = this.joinedCompany.filter((company) => {
-      return company.target.id != id;
-    });
-    return res;
+    if (res.success) {
+      this.joinedCompany = this.joinedCompany.filter((company) => {
+        return company.id != id;
+      });
+    }
+    return res.success;
   }
   public async getFriends(reload: boolean = false): Promise<schema.XTarget[]> {
     if (!reload && this.joinedFriend.length > 0) {
@@ -235,41 +241,39 @@ export default class Person extends MarketTarget implements IPerson {
 
     return this.joinedFriend;
   }
-  public async applyFriend(target: schema.XTarget): Promise<ResultType<any>> {
+  public async applyFriend(target: schema.XTarget): Promise<boolean> {
     const joinedTarget = this.joinedFriend.find((a) => {
       return a.id == target.id;
     });
     if (joinedTarget == undefined) {
-      const res = await this.pullMember([target]);
-      if (res.success) {
-        await this.applyJoin(target.id, TargetType.Person);
+      if (await this.pullMember(target)) {
+        return await this.applyJoin(target.id, TargetType.Person);
       }
-      return res;
     }
-    return model.badRequest(consts.IsExistError);
+    logger.warn(consts.IsExistError);
+    return false;
   }
-  public async removeFriend(ids: string[]): Promise<ResultType<any>> {
-    const res = await this.removeMember(ids, TargetType.Person);
-    if (res.success) {
+  public async removeFriend(ids: string[]): Promise<boolean> {
+    if (await this.removeMembers(ids, TargetType.Person)) {
       ids.forEach(async (id) => {
         await kernel.exitAnyOfTeam({
           id,
           teamTypes: [TargetType.Person],
-          targetId: this.target.id,
+          targetId: this.id,
           targetType: TargetType.Person,
         });
       });
-      for (var i = 0; i < ids.length; i++) {
-        const data = this.joinedFriend.filter((obj) => ids[i] != obj.id);
-        this.joinedFriend = data;
-      }
+      this.joinedFriend = this.joinedFriend.filter((item) => {
+        return !ids.includes(item.id);
+      });
+      return true;
     }
-    return res;
+    return false;
   }
   public async approvalFriendApply(
     relation: schema.XRelation,
     status: number,
-  ): Promise<ResultType<any>> {
+  ): Promise<boolean> {
     const res = await this.approvalJoinApply(relation.id, status);
     if (
       status >= CommonStatus.ApproveStartStatus &&
@@ -279,39 +283,40 @@ export default class Person extends MarketTarget implements IPerson {
     ) {
       this.joinedFriend.push(relation.target);
     }
-    return res;
+    return false;
   }
-  public async queryJoinApply(): Promise<ResultType<schema.XRelationArray>> {
-    return await kernel.queryJoinTeamApply({
-      id: this.target.id,
+  public async queryJoinApply(): Promise<schema.XRelationArray> {
+    const res = await kernel.queryJoinTeamApply({
+      id: this.id,
       page: {
         offset: 0,
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
     });
+    return res.data;
   }
-  public async queryJoinApproval(): Promise<ResultType<schema.XRelationArray>> {
-    return await kernel.queryTeamJoinApproval({
-      id: this.target.id,
+  public async queryJoinApproval(): Promise<schema.XRelationArray> {
+    const res = await kernel.queryTeamJoinApproval({
+      id: this.id,
       page: {
         offset: 0,
         filter: '',
         limit: common.Constants.MAX_UINT_16,
       },
     });
+    return res.data;
   }
-  public async cancelJoinApply(id: string): Promise<ResultType<any>> {
-    return await kernel.cancelJoinTeam({
+  public async cancelJoinApply(id: string): Promise<boolean> {
+    const res = await kernel.cancelJoinTeam({
       id,
       typeName: TargetType.Person,
-      belongId: this.target.id,
+      belongId: this.id,
     });
+    return res.success;
   }
-  public async resetPassword(
-    password: string,
-    privateKey: string,
-  ): Promise<ResultType<any>> {
-    return await kernel.resetPassword(this.target.code, password, privateKey);
+  public async resetPassword(password: string, privateKey: string): Promise<boolean> {
+    const res = await kernel.resetPassword(this.target.code, password, privateKey);
+    return res.success;
   }
 }

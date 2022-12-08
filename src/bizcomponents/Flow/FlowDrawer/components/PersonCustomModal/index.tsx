@@ -58,12 +58,12 @@ const PersonCustomModal = (props: Iprops) => {
   }, [radio]);
 
   const getLeftTree = async () => {
-    let FunName: Function = userCtrl.User!.getJoinedCohorts;
+    let FunName: Function = userCtrl.user!.getJoinedCohorts;
 
     FunName =
       shareType === '共享'
-        ? userCtrl.Company!.getJoinedGroups
-        : userCtrl.Company!.getDepartments;
+        ? userCtrl.company!.getJoinedGroups
+        : userCtrl.company!.getDepartments;
 
     const res = await FunName();
 

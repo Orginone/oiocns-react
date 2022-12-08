@@ -52,7 +52,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     getMemberData();
   }, []);
   const getMemberData = async () => {
-    setMemberData(await userCtrl.Company.getPersons(false));
+    setMemberData(await userCtrl.company.getPersons(false));
     console.log('人员列表', person);
   };
   // 操作内容渲染函数

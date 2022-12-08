@@ -1,4 +1,4 @@
-import { WebApp } from '@/ts/core/market';
+import { IMarket, WebApp } from '@/ts/core/market';
 import { common, kernel, model, schema } from '../../base';
 import { Market } from '../market';
 import { ProductType, TargetType } from '../enum';
@@ -25,17 +25,17 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     this.usefulResource = new Map();
     this.extendTargetType = [];
   }
-  public async getMarketByCode(
-    name: string,
-  ): Promise<model.ResultType<schema.XMarketArray>> {
-    return await kernel.queryMarketByCode({
-      id: '0',
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: name,
-      },
-    });
+  public async getMarketByCode(name: string): Promise<schema.XMarketArray> {
+    return (
+      await kernel.queryMarketByCode({
+        id: '0',
+        page: {
+          offset: 0,
+          limit: common.Constants.MAX_UINT_16,
+          filter: name,
+        },
+      })
+    ).data;
   }
   public async getOwnProducts(reload: boolean = false): Promise<IProduct[]> {
     if (!reload && this.ownProducts.length > 0) {
@@ -89,35 +89,37 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
   public async getBuyOrders(
     status: number,
     page: model.PageRequest,
-  ): Promise<model.ResultType<schema.XOrderArray>> {
-    return await kernel.queryBuyOrderList({
-      id: this.target.id,
-      status,
-      page,
-    });
+  ): Promise<schema.XOrderArray> {
+    return (
+      await kernel.queryBuyOrderList({
+        id: this.target.id,
+        status,
+        page,
+      })
+    ).data;
   }
   public async getSellOrders(
     status: number,
     page: model.PageRequest,
-  ): Promise<model.ResultType<schema.XOrderDetailArray>> {
+  ): Promise<schema.XOrderDetailArray> {
     const res = await kernel.querySellOrderList({
       id: this.target.id,
       status,
       page,
     });
-    return res;
+    return res.data;
   }
-  public async queryJoinMarketApproval(): Promise<
-    model.ResultType<schema.XMarketRelationArray>
-  > {
-    return await kernel.queryJoinApproval({
-      id: this.target.id,
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
-    });
+  public async queryJoinMarketApproval(): Promise<schema.XMarketRelationArray> {
+    return (
+      await kernel.queryJoinApproval({
+        id: this.target.id,
+        page: {
+          offset: 0,
+          limit: common.Constants.MAX_UINT_16,
+          filter: '',
+        },
+      })
+    ).data;
   }
   public async getJoinMarketApplys(): Promise<schema.XMarketRelation[]> {
     if (this.joinMarketApplys.length > 0) {
@@ -136,10 +138,10 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     }
     return this.joinMarketApplys;
   }
-  public async applyJoinMarket(id: string): Promise<model.ResultType<any>> {
-    return await kernel.applyJoinMarket({ id: id, belongId: this.target.id });
+  public async applyJoinMarket(id: string): Promise<boolean> {
+    return (await kernel.applyJoinMarket({ id: id, belongId: this.target.id })).success;
   }
-  public async cancelJoinMarketApply(id: string): Promise<model.ResultType<any>> {
+  public async cancelJoinMarketApply(id: string): Promise<boolean> {
     const res = await kernel.cancelJoinMarket({
       id,
       typeName: this.target.typeName,
@@ -150,31 +152,25 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
         return apply.id != id;
       });
     }
-    return res;
+    return res.success;
   }
-  public async queryPublicApproval(): Promise<
-    model.ResultType<schema.XMerchandiseArray>
-  > {
-    return await kernel.queryPublicApproval({
-      id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
-    });
+  public async queryPublicApproval(): Promise<schema.XMerchandiseArray> {
+    return (
+      await kernel.queryPublicApproval({
+        id: this.target.typeName == TargetType.Person ? '0' : this.target.id,
+        page: {
+          offset: 0,
+          limit: common.Constants.MAX_UINT_16,
+          filter: '',
+        },
+      })
+    ).data;
   }
-  public async approvalJoinMarketApply(
-    id: string,
-    status: number,
-  ): Promise<model.ResultType<boolean>> {
-    return kernel.approvalJoinApply({ id, status });
+  public async approvalJoinMarketApply(id: string, status: number): Promise<boolean> {
+    return (await kernel.approvalJoinApply({ id, status })).success;
   }
-  public async approvalPublishApply(
-    id: string,
-    status: number,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.approvalMerchandise({ id, status });
+  public async approvalPublishApply(id: string, status: number): Promise<boolean> {
+    return (await kernel.approvalMerchandise({ id, status })).success;
   }
   public async createMarket({
     name,
@@ -188,7 +184,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     remark: string;
     samrId: string;
     ispublic: boolean;
-  }): Promise<model.ResultType<schema.XMarket>> {
+  }): Promise<IMarket | undefined> {
     const res = await kernel.createMarket({
       name,
       code,
@@ -198,16 +194,15 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       public: ispublic,
       belongId: this.target.id,
     });
-    console.log('创建市场的结果', res);
-
     if (res.success) {
-      this.joinedMarkets.push(new Market(res.data!));
+      const market = new Market(res.data);
+      this.joinedMarkets.push(market);
+      return market;
     }
-    return res;
   }
   public async createProduct(
     data: Omit<model.ProductModel, 'id' | 'belongId'>,
-  ): Promise<model.ResultType<schema.XProduct>> {
+  ): Promise<IProduct | undefined> {
     const res = await kernel.createProduct({
       ...data,
       typeName: ProductType.WebApp,
@@ -221,10 +216,10 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
           prod = new WebApp(res.data);
       }
       this.ownProducts.push(prod);
+      return prod;
     }
-    return res;
   }
-  public async deleteMarket(id: string): Promise<model.ResultType<boolean>> {
+  public async deleteMarket(id: string): Promise<boolean> {
     const res = await kernel.deleteMarket({
       id,
       belongId: this.target.id,
@@ -233,10 +228,11 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
         return market.market.id != id;
       });
+      return true;
     }
-    return res;
+    return false;
   }
-  public async deleteProduct(id: string): Promise<model.ResultType<boolean>> {
+  public async deleteProduct(id: string): Promise<boolean> {
     const res = await kernel.deleteProduct({
       id,
       belongId: this.target.id,
@@ -245,10 +241,11 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       this.ownProducts = this.ownProducts.filter((prod) => {
         return prod.prod.id != id;
       });
+      return true;
     }
-    return res;
+    return false;
   }
-  public async quitMarket(id: string): Promise<model.ResultType<any>> {
+  public async quitMarket(id: string): Promise<boolean> {
     const res = await kernel.quitMarket({
       id,
       belongId: this.target.id,
@@ -257,8 +254,9 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
         return market.market.id != id;
       });
+      return true;
     }
-    return res;
+    return false;
   }
   public async getUsefulProduct(reload: boolean = false): Promise<schema.XProduct[]> {
     if (!reload && this.usefulProduct.length > 0) {

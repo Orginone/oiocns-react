@@ -19,8 +19,8 @@ class ChatController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart(DomainTypes.User, () => {
-      if (this._userId != userCtrl.User.target.id) {
-        this._userId = userCtrl.User.target.id;
+      if (this._userId != userCtrl.user.target.id) {
+        this._userId = userCtrl.user.target.id;
         setTimeout(async () => {
           await this._initialization();
         }, 500);

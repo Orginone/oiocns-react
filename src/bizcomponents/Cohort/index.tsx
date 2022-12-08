@@ -27,7 +27,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
   const [form] = Form.useForm();
   const onSave = async () => {
     const values = await form.validateFields();
-    const res = await userCtrl.Space?.createCohort({
+    const res = await userCtrl.space?.createCohort({
       name: values.cohort.name,
       code: values.cohort.code,
       typeName: TargetType.Cohort,

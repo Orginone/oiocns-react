@@ -14,15 +14,15 @@ type BasicLayoutProps = {
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
   useEffect(() => {
-    console.log('登录拦截', userCtrl.Logined);
-    if (!userCtrl.Logined) {
+    console.log('登录拦截', userCtrl.logined);
+    if (!userCtrl.logined) {
       return history.push('/passport/login');
     }
   }, []);
 
   return (
     <Layout className={styles['page-layout']}>
-      {userCtrl.Logined ? (
+      {userCtrl.logined ? (
         <>
           {/* 公共头部 */}
           <BasicHeader />

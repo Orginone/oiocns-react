@@ -24,15 +24,15 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (userCtrl.IsCompanySpace) {
+    if (userCtrl.isCompanySpace) {
       initData(false);
     }
   }, [key]);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.Company?.getJoinedGroups(reload);
+    const data = await userCtrl?.company?.getJoinedGroups(reload);
     // 虚拟的ROOT节点， 作为树的根节点
-    let visualGroup = new Group(deepClone(userCtrl?.Company?.target));
+    let visualGroup = new Group(deepClone(userCtrl?.company?.target));
     // 创建的集团， 加入的集团
     if (data?.length) {
       visualGroup.subGroup = data;

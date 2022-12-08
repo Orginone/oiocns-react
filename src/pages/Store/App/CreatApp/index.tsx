@@ -22,7 +22,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
         flows: n.flows ? JSON.stringify(n.flows) : undefined,
       };
     });
-    const res = await userCtrl.Space.createProduct({
+    const res = await userCtrl.space.createProduct({
       ...values,
       resources: list,
     });

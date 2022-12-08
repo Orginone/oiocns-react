@@ -17,9 +17,9 @@ class PostitonController extends Emitter {
     this.positionList = [];
     emitter.subscribePart(DomainTypes.Company, async () => {
       /* 获取 历史缓存的 岗位列表 */
-      if (userCtrl.IsCompanySpace) {
+      if (userCtrl.isCompanySpace) {
         kernel.anystore.subscribed(
-          MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
+          MY_POSITION_LIST + userCtrl.space.target.id.toString(),
           'company',
           (positionList: any) => {
             console.log('订阅数据推送 岗位列表===>', positionList);
@@ -87,7 +87,7 @@ class PostitonController extends Emitter {
   public cacheJoinOrDelePosition = (data: any): void => {
     this.changCallbackPart(PostitonCallBackTypes.ApplyData);
     kernel.anystore.set(
-      MY_POSITION_LIST + userCtrl.Space.target.id.toString(),
+      MY_POSITION_LIST + userCtrl.space.target.id.toString(),
       {
         operation: 'replaceAll',
         data: {
