@@ -12,6 +12,8 @@ dist-ssr
 *.local
 .vscode
 
+*.icloud
+
 # yarn
 yarn.lock
 yarn-error.log
