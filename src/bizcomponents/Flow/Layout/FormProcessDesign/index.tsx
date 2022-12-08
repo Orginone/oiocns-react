@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Drawer, Table } from 'antd';
+import { Drawer, message, Table } from 'antd';
 import ProcessTree from '@/bizcomponents/Flow/Process/ProcessTree';
 import cls from './index.module.less';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
@@ -18,9 +18,22 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
   const [dialogTableVisible, setDialogTableVisible] = useState(false);
   const [flowRecords, setFlowRecords] = useState([]);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const scale = useAppwfConfig((state: any) => state.scale);
   const close = () => {
-    setShowConfig(false);
+    console.log('selectedNode', selectedNode);
+    /** 判断是否全部填写 */
+    const isAllFill = (selectedNode.conditions || []).some((item) => {
+      return !item.paramLabel || !item.label || !item.val;
+    });
+    console.log('isAllFill', isAllFill);
+    if (isAllFill) {
+      message.warning('请补充未填写的字段');
+    } else {
+      message.success('条件补充成功');
+      setShowConfig(false);
+      setSelectedNode([]);
+    }
   };
   const Selected = (node: any) => {
     setShowConfig(true);

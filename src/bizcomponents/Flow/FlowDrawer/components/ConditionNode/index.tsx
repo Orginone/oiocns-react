@@ -28,7 +28,6 @@ const ConditionNode = () => {
     } else {
       message.warning('你还未设置条件，请到基本信息填写条件字段');
     }
-
     setSelectedNode(selectedNode);
     setKey(key + 1);
   };

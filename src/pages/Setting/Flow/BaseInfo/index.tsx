@@ -46,8 +46,8 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
         <ProFormTextArea
           name="fields"
           label="备注信息"
-          placeholder="输入流程名称"
-          rules={[{ required: true, message: '请输入备注信息!' }]}
+          placeholder="输入备注信息"
+          // rules={[{ required: true, message: '请输入备注信息!' }]}
         />
         <ProFormList
           name="labels"
