@@ -44,7 +44,6 @@ export default interface IProduct {
    * @returns
    */
   queryExtend(
-    spaceId: string,
     destType: string,
     teamId?: string,
   ): Promise<model.ResultType<model.IdNameArray>>;

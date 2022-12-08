@@ -1,14 +1,24 @@
 @import (reference) '~antd/es/style/themes/variable';
 
-.company-info-container {
-  background-color: @background-color-base;
-}
-
-.company-info-title {
+.companyContainer {
+  background-color: #eff4f9;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 .company-info-content {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  :global {
+    .ogo-card-body {
+      padding: 20px;
+      color: #606266;
+      .ogo-descriptions-header {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+.pages-wrap {
+  flex: 1;
 }

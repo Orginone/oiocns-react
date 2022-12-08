@@ -28,19 +28,12 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const setting = SettingService.getInstance();
   const treeContainer = document.getElementById('templateMenu');
   useEffect(() => {
-    // 如果新增部门，就需要重新初始化树TODO
-    if (userCtrl?.Company) {
-      if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
-        userCtrl.Company.departments = [];
-      }
-      initData(true);
-    }
-    console.log(1111);
+    initData(true);
   }, [key]);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.Company?.getDepartments(reload);
-    if (data?.length) {
+    const data = await userCtrl.Company.getDepartments(reload);
+    if (data.length > 0) {
       if (currentKey && data[0].target.id !== currentKey) {
         const currentContentDept = await setting.refItem(currentKey);
         setCurrent(currentContentDept || data[0]);
@@ -50,12 +43,12 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         setCurrent(data[0]);
       }
       const tree = data.map((n) => {
-        return createTeeDom(n);
+        return createTreeDom(n);
       });
       setTreeData(tree);
     }
   };
-  const createTeeDom: any = (n: IDepartment, pid?: string) => {
+  const createTreeDom: any = (n: IDepartment, pid?: string) => {
     const { target } = n;
     return {
       key: target.id,
@@ -66,7 +59,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       intans: n,
       children:
         n.departments.length > 0
-          ? n.departments.map((m) => createTeeDom(m, n.target.id))
+          ? n.departments.map((m) => createTreeDom(m, n.target.id))
           : undefined,
       pid,
     };
@@ -97,7 +90,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       updateTreeData(
         origin,
         key,
-        deptChild.map((n) => createTeeDom(n, intans.target.id)),
+        deptChild.map((n) => createTreeDom(n, intans.target.id)),
       ),
     );
   };

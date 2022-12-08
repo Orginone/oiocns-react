@@ -11,7 +11,7 @@ interface Iprops {
   handleOk: () => void;
   onCancel: () => void;
   OriginDept: IDepartment; //原部门
-  needTransferUser: XTarget; // 需要转移部门的人员
+  needTransferUser: XTarget | undefined; // 需要转移部门的人员
 }
 
 const TransferDepartment = (props: Iprops) => {
@@ -49,46 +49,6 @@ const TransferDepartment = (props: Iprops) => {
     }
     return data;
   };
-
-  // const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
-  //   list.map((node) => {
-  //     if (node.key === key) {
-  //       return {
-  //         ...node,
-  //         children,
-  //         isLeaf: children.length == 0,
-  //       };
-  //     }
-  //     if (node.children) {
-  //       return {
-  //         ...node,
-  //         children: updateTreeData(node.children, key, children),
-  //       };
-  //     }
-  //     return node;
-  //   });
-  // const loadDept = async ({ key, children, intans }: any) => {
-  //   if (children) {
-  //     return;
-  //   }
-  //   const deptChild: any[] = await intans.getDepartments();
-  //   setTreeData((origin) =>
-  //     updateTreeData(
-  //       origin,
-  //       key,
-  //       deptChild.map((n) => createTeeDom(n, intans.target.id)),
-  //     ),
-  //   );
-  // };
-
-  // const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-  //   setSelectKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
-  //   await loadDept(info.node);
-  //   if (info.selected) {
-  //     setCurrent(info.node.intans);
-  //     setting.setCurrTreeDeptNode(info.node.intans.target.id);
-  //   }
-  // };
   const columns: ProFormColumnsType<{ id: string }>[] = [
     {
       title: '人员名称',
@@ -146,15 +106,17 @@ const TransferDepartment = (props: Iprops) => {
           onCancel();
           return;
         }
-        const { success } = await OriginDept.removePerson([needTransferUser.id]);
-        if (success) {
-          const res = await newDept?.pullPerson([needTransferUser]);
-          if (res?.success) {
-            message.success('操作成功');
-            handleOk();
-          } else {
-            message.error(res?.msg || '操作失败');
-            return false;
+        if (needTransferUser) {
+          const { success } = await OriginDept.removePerson([needTransferUser.id]);
+          if (success) {
+            const res = await newDept?.pullPerson([needTransferUser]);
+            if (res?.success) {
+              message.success('操作成功');
+              handleOk();
+            } else {
+              message.error(res?.msg || '操作失败');
+              return false;
+            }
           }
         }
       }}

@@ -87,7 +87,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Department;
-    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       this.departments.push(new Department(res.data));
     }
@@ -99,7 +99,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     data.typeName = TargetType.Working;
-    const res = await this.createTarget({ ...data, belongId: this.target.id });
+    const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       this.workings.push(new Working(res.data));
     }
@@ -118,6 +118,17 @@ export default class Company extends MarketTarget implements ICompany {
       const cohort = new Cohort(res.data);
       this.joinedCohort.push(cohort);
       return cohort.pullMember([this.target]);
+    }
+    return res;
+  }
+  public async pullPerson(targets: schema.XTarget[]): Promise<ResultType<any>> {
+    const res = await super.pullMember(targets);
+    if (res.success) {
+      res.data.result?.forEach((a) => {
+        if (a.target != undefined) {
+          this.person.push(a.target);
+        }
+      });
     }
     return res;
   }

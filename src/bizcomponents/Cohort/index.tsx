@@ -1,4 +1,4 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
@@ -27,15 +27,19 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
   const [form] = Form.useForm();
   const onSave = async () => {
     const values = await form.validateFields();
-    console.log(values); //2.表单验证并获取表单值
-    await userCtrl.Space?.createCohort({
+    const res = await userCtrl.Space?.createCohort({
       name: values.cohort.name,
       code: values.cohort.code,
       typeName: TargetType.Cohort,
       teamRemark: values.cohort.remark,
-      avatar: 'test', //头像})
+      avatar: 'cohort',
     });
-    callBack();
+    if (res.success) {
+      message.success('创建群组成功!');
+      callBack();
+    } else {
+      message.error('创建群组失败! ' + res.msg);
+    }
     setIsModalOpen(false);
   };
   return (

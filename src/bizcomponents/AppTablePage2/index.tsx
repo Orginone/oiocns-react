@@ -43,7 +43,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       setSataSource([...list]);
     } else {
       const result = list.filter((item) => {
-        return item?.prod?.source === searchParams.status;
+        return item?.source === searchParams.status;
       });
       setTotal(result.length);
       setSataSource([...result]);

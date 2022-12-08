@@ -3,13 +3,15 @@ import type { TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
-import { IDepartment } from '@/ts/core/target/itarget';
+import { IGroup } from '@/ts/core/target/itarget';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { getUuid } from '@/utils/tools';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import { PlusOutlined } from '@ant-design/icons';
-
+import service from '../../service';
+import Group from '@/ts/core/target/group';
+import { deepClone } from '@/ts/base/common';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: schema.XTarget | undefined) => void;
@@ -29,20 +31,26 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
 
   const initData = async (reload: boolean) => {
     const data = await userCtrl?.Company?.getJoinedGroups(reload);
-
+    // 虚拟的ROOT节点， 作为树的根节点
+    let visualGroup = new Group(deepClone(userCtrl?.Company?.target));
     // 创建的集团， 加入的集团
     if (data?.length) {
+      visualGroup.subGroup = data;
+      service.setRoot(visualGroup);
       setCurrent(data[0].target);
       const tree = data.map((n: any) => {
         return createTeeDom(n);
       });
       setTreeData(tree);
     } else {
+      visualGroup.subGroup = [];
+      service.setRoot(visualGroup);
       setCurrent(undefined);
       setTreeData([]);
     }
   };
-  const createTeeDom = (n: IDepartment) => {
+  /** 创建节点 */
+  const createTeeDom = (n: IGroup) => {
     const { target } = n;
     return {
       key: target.id + getUuid(),
@@ -53,6 +61,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       target: n,
     };
   };
+
   const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
     list.map((node) => {
       if (node.key === key) {
@@ -76,7 +85,6 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
       return;
     }
     const deptChild: any[] = await target.getSubGroups(false);
-    console.log(deptChild);
 
     setTreeData((origin) =>
       updateTreeData(

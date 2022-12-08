@@ -14,6 +14,7 @@ const ConditionNode = () => {
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
+    console.log('DefaultProps.getFormFields', DefaultProps.getFormFields());
     if (DefaultProps.getFormFields().length > 0) {
       selectedNode.conditions?.push({
         pos: selectedNode.conditions.length + 1,
@@ -27,7 +28,6 @@ const ConditionNode = () => {
     } else {
       message.warning('你还未设置条件，请到基本信息填写条件字段');
     }
-
     setSelectedNode(selectedNode);
     setKey(key + 1);
   };

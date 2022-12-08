@@ -19,6 +19,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   const [key, setKey] = useState(0);
 
   const paramChange = (paramKey: any, condition: any) => {
+    console.log('这里操作之后值没拜年', condition);
     for (let field of DefaultProps.getFormFields()) {
       if (field.value == paramKey) {
         condition.paramKey = paramKey;
@@ -32,6 +33,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
           condition.key = null;
           condition.label = '';
         }
+        console.log('1');
         condition.val = null;
         condition.valLabel = '';
         setKey(key + 1);
@@ -66,11 +68,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     }
   };
 
-  // const conditionKeys = useCallback(
-  //   (type: any) => DefaultProps.getConditionKeys(type),
-  //   [],
-  // );
-
   const dictory = useCallback((paramKey: any) => {
     var filter = DefaultProps.getFormFields()?.filter(
       (item: any) => item.value == paramKey,
@@ -88,7 +85,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
         <div key={index + '_g'} className={cls['group']}>
           <div className={cls['group-header']}>
             <div
-              onClick={(e) => {
+              onClick={() => {
                 selectedNode.conditions.splice(index, 1);
                 setSelectedNode(selectedNode);
                 setKey(key + 1);
@@ -105,7 +102,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                 // 需要选择的参数
                 // options={conditionData?.labels || []}
                 options={DefaultProps.getFormFields()}
-                onChange={(val, option) => {
+                onChange={(val) => {
                   paramChange(val, condition);
                 }}
                 defaultValue={

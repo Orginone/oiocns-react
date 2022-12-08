@@ -21,11 +21,16 @@ class UserController extends Emitter {
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
-      this._curSpace = this._findCompany(sessionStorage.getItem(sessionSpaceName) || '');
-      if (this._curSpace) {
-        this.changCallbackPart(DomainTypes.Company);
-        emitter.changCallbackPart(DomainTypes.Company);
-      }
+      setTimeout(async () => {
+        await this._user?.getJoinedCompanys();
+        this._curSpace = this._findCompany(
+          sessionStorage.getItem(sessionSpaceName) || '',
+        );
+        if (this._curSpace) {
+          this.changCallbackPart(DomainTypes.Company);
+          emitter.changCallbackPart(DomainTypes.Company);
+        }
+      }, 10);
     }
   }
   /** 是否已登录 */
@@ -63,8 +68,12 @@ class UserController extends Emitter {
   public setCurSpace(id: string) {
     if (id === this._user!.target.id) {
       this._curSpace = undefined;
+      sessionStorage.setItem(sessionSpaceName, '');
     } else {
       this._curSpace = this._findCompany(id);
+      if (this._curSpace) {
+        sessionStorage.setItem(sessionSpaceName, id);
+      }
     }
     this.changCallbackPart(DomainTypes.Company);
     emitter.changCallbackPart(DomainTypes.Company);
@@ -133,6 +142,7 @@ class UserController extends Emitter {
   private async _loadUser(person: schema.XTarget): Promise<void> {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = createPerson(person);
+    this._curSpace = undefined;
     await this._user.getJoinedCompanys(false);
     this.changCallbackPart(DomainTypes.User);
     emitter.changCallbackPart(DomainTypes.User);
