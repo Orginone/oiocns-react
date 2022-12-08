@@ -17,9 +17,9 @@ export function blobToDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      resolve(reader.result as string);
+      resolve(btoa(reader.result as string));
     };
-    reader.readAsDataURL(file);
+    reader.readAsBinaryString(file);
   });
 }
 
