@@ -4,13 +4,11 @@ import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
-import { Product } from '@/ts/core/market';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel } from '@/ts/base';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 interface Iprops {
-  curProduct?: Product;
   shareType: '分配' | '共享';
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
 }
@@ -32,6 +30,7 @@ const DestTypes = [
     label: '人员',
   },
 ];
+//个人空间-展示我的群组  ; 单位空间 - 分配
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
   const [isCompanySpace] = useState<boolean>(userCtrl.IsCompanySpace); //是否工作空间
@@ -86,7 +85,7 @@ const ShareRecent = (props: Iprops) => {
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
-  //获取左侧组织数据 个人空间-展示我的群组  ; 单位空间 - 分配
+  //获取左侧组织数据
   const getLeftTree = async () => {
     let FunName: Function = userCtrl.User!.getJoinedCohorts;
     if (userCtrl.IsCompanySpace) {
@@ -97,12 +96,20 @@ const ShareRecent = (props: Iprops) => {
     }
     const res = await FunName();
     console.log('共享获取组织', res);
-    const ShowList = res?.map((item: { target: any }) => {
+    let ShowList = res?.map((item: { target: any }) => {
       return {
         ...item.target,
         node: item,
       };
     });
+    console.log('是是是', ShowList);
+
+    !userCtrl.IsCompanySpace &&
+      ShowList.unshift({
+        ...userCtrl.User.target,
+        name: '我的好友',
+        node: userCtrl.User,
+      });
 
     setLeftTreeData([...ShowList]);
   };
@@ -164,6 +171,8 @@ const ShareRecent = (props: Iprops) => {
             action = 'getCompanys';
           } else if (info.node.typeName === '部门') {
             action = 'getPerson';
+          } else if (info.node.typeName === '人员') {
+            action = 'getFriends';
           }
           console.log('输出,typeName', info.node.typeName);
           const res3 = await info?.node?.node[action]();
