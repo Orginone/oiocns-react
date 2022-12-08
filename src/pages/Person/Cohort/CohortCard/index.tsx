@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import './index.less';
 import CohortMemberList from '../CohortMemberList';
 import { ICohort } from '@/ts/core/target/itarget';
-import { CohortConfigType } from 'typings/Cohort';
+import { common } from 'typings/common';
 interface CohortCardType {
   data: ICohort;
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: ICohort) => CohortConfigType.OperationType[];
+  operation?: (_item: ICohort) => common.OperationType[];
 }
 
 const CohortCardComp: React.FC<CohortCardType> = ({

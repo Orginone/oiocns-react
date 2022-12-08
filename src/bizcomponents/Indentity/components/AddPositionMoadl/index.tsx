@@ -1,21 +1,6 @@
-/*
- * @Author: zhangqiang 1196217890@qq.com
- * @Date: 2022-11-14 16:43:05
- * @LastEditors: zhangqiang 1196217890@qq.com
- * @LastEditTime: 2022-11-21 09:51:54
- * @FilePath: /oiocns-react/src/pages/Setting/Dept/components/EditCustomModal/index.tsx
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
- * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- *
- */
-import React, { useEffect } from 'react';
-import { Modal, message } from 'antd';
-import { ProFormColumnsType } from '@ant-design/pro-components';
-import { BetaSchemaForm } from '@ant-design/pro-components';
-
-import cls from './index.module.less';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import React, { useRef } from 'react';
+import { message } from 'antd';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import {
   IDepartment,
   IPerson,
@@ -23,7 +8,9 @@ import {
   ICompany,
   ICohort,
 } from '@/ts/core/target/itarget';
-// import UploadAvatar from '../UploadAvatar';
+import SchemaForm from '@/components/SchemaForm';
+import { XIdentity } from '@/ts/base/schema';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
 
 /* 
   编辑
@@ -31,23 +18,24 @@ import {
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: () => void;
+  handleCancel: () => void;
   handleOk: () => void;
-  authTree: IAuthority[] | undefined;
+  editData?: IIdentity;
   reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
 }
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, onOk, handleOk, authTree, reObject } = props;
-  const columns: ProFormColumnsType<IIdentity>[] = [
+  const { open, title, handleOk, reObject, editData, handleCancel } = props;
+  const formRef = useRef<ProFormInstance>();
+  const columns: ProFormColumnsType<XIdentity>[] = [
     {
-      title: '岗位名称',
+      title: '身份名称',
       dataIndex: 'name',
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
       },
     },
     {
-      title: '岗位编号',
+      title: '身份编号',
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '编码为必填项' }],
@@ -55,12 +43,16 @@ const EditCustomModal = (props: Iprops) => {
     },
     {
       title: '所属角色',
-      key: 'authId',
       dataIndex: 'authId',
-      width: 'md',
+      colProps: { span: 24 },
       valueType: 'treeSelect',
-      request: async () => authTree || [],
+      formItemProps: { rules: [{ required: true, message: '所属角色为必填项' }] },
+      request: async () => {
+        const data = await reObject.selectAuthorityTree(false);
+        return data ? [data] : [];
+      },
       fieldProps: {
+        disabled: title === '编辑',
         fieldNames: { label: 'name', value: 'id' },
         showSearch: true,
         filterTreeNode: true,
@@ -69,39 +61,74 @@ const EditCustomModal = (props: Iprops) => {
         treeDefaultExpandAll: true,
       },
     },
+
     {
-      title: '岗位简介',
+      title: '身份简介',
       dataIndex: 'remark',
       valueType: 'textarea',
+      colProps: { span: 24 },
     },
   ];
+
   return (
-    <div className={cls['edit-custom-modal']}>
-      <Modal
-        title={title}
-        open={open}
-        getContainer={false}
-        width={450}
-        destroyOnClose
-        onCancel={() => handleOk()}
-        footer={null}>
-        <BetaSchemaForm<any>
-          shouldUpdate={false}
-          layoutType="Form"
-          onFinish={async (values) => {
-            await reObject.createIdentity({
-              name: values.name,
-              code: values.code,
-              remark: values.remark,
-              authId: values.authId,
+    // <div className={cls['edit-custom-modal']}>
+    <SchemaForm<XIdentity>
+      formRef={formRef}
+      title={title}
+      open={open}
+      width={520}
+      onOpenChange={(open: boolean) => {
+        if (open) {
+          if (editData) {
+            formRef.current?.setFieldsValue({
+              ...editData.target,
+              authId: editData.target.authId,
             });
-            message.success('操作成功');
-            onOk();
-          }}
-          columns={columns}
-        />
-      </Modal>
-    </div>
+          }
+        } else {
+          formRef.current?.resetFields();
+        }
+      }}
+      modalProps={{
+        onCancel: () => handleCancel(),
+      }}
+      rowProps={{
+        gutter: [24, 0],
+      }}
+      layoutType="ModalForm"
+      onFinish={async (values) => {
+        if (title === '新增') {
+          const res = await reObject.createIdentity({
+            name: values.name,
+            code: values.code,
+            remark: values.remark,
+            authId: values.authId,
+          });
+          if (res) {
+            message.success('新增成功');
+            handleOk();
+          } else {
+            message.error('新增失败');
+            return false;
+          }
+        } else {
+          if (!editData) return;
+          const res = await editData.updateIdentity(
+            values.name,
+            values.code,
+            values.remark,
+          );
+          if (res.success) {
+            message.success('修改成功');
+            handleOk();
+          } else {
+            message.error(res.msg);
+            return false;
+          }
+        }
+      }}
+      columns={columns}
+    />
   );
 };
 

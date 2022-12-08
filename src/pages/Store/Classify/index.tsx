@@ -5,21 +5,15 @@ import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import AppDetail from '@/components/AppDetail'; // 新建商店
-import { getUuid } from '@/utils/tools';
-// import useStore from '@/store';
-// import StoreContent from '@/ts/controller/store/content';
+import { getUuid, findAimObj } from '@/utils/tools';
+
 import ReactDOM from 'react-dom';
 import SelfAppCtrl, {
   TreeType,
   MenuOptTypes,
   SelfCallBackTypes,
 } from '@/ts/controller/store/selfAppCtrl';
-// const items = [
-//   { label: '应用', key: 'app', icon: 'AppstoreOutlined' }, // 菜单项务必填写 key
-//   { label: '文档', key: 'doc', icon: 'FileTextOutlined' },
-//   { label: '数据', key: 'data', icon: 'FundOutlined' },
-//   { label: '资源', key: 'src', icon: 'DatabaseOutlined'},
-// ];
+
 let selectMenuInfo: any = {},
   modalType = '';
 const { confirm } = Modal;
@@ -48,7 +42,7 @@ const StoreClassify: React.FC = () => {
    */
   const newMenuFormSubmit = async () => {
     let { title } = await newMenuForm.validateFields();
-    let obj: any = findAimObj(false, selectMenuInfo.id);
+    let obj: any = findAimObj(false, selectMenuInfo.id, customMenu);
     if (modalType === '新增子级') {
       let newObj = {
         id: getUuid(),
@@ -65,28 +59,7 @@ const StoreClassify: React.FC = () => {
     // 数据缓存
     SelfAppCtrl.cacheSelfMenu(customMenu);
   };
-  function findAimObj(isParent = false, id: string) {
-    let aimObjet: any = undefined;
-    function findParent(_id: string, parent: any) {
-      const data = parent.children;
-      if (aimObjet) {
-        return aimObjet;
-      }
-      const AimObj = data.find((v: any) => {
-        return v.id == _id;
-      });
-      if (AimObj) {
-        aimObjet = isParent ? parent : AimObj;
-        return;
-      } else {
-        data.forEach((child: any) => {
-          return findParent(_id, child);
-        });
-      }
-    }
-    findParent(id, { children: customMenu });
-    return aimObjet;
-  }
+
   /*******
    * @desc: 删除一个自定义目录
    * @param {string} name
@@ -105,7 +78,7 @@ const StoreClassify: React.FC = () => {
     switch (type) {
       case '删除':
         {
-          const obj = findAimObj(true, id);
+          const obj = findAimObj(true, id, customMenu);
           const newData = obj.children.filter((v: any) => {
             return v.id !== id;
           });
@@ -114,7 +87,7 @@ const StoreClassify: React.FC = () => {
         break;
       case '重命名':
         {
-          const obj = findAimObj(false, id);
+          const obj = findAimObj(false, id, customMenu);
           obj.title = '修改名称';
         }
         break;

@@ -1,65 +1,41 @@
 import { Button } from 'antd';
-import type { DataNode } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-/*由于对接他人页面不熟悉，要边开发边去除冗余代码，勿删!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+import positionCtrl from '@/ts/controller/position/positionCtrl';
+import EditCustomModal from '../EditCustomModal';
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
   setCurrent: (current: IIdentity) => void;
   handleMenuClick: (key: string, item: any) => void;
-  // 点击操作触发的事件
-  indentitys: IIdentity[];
+  positions: any[];
 };
-
-const items: DataNode[] = [
-  {
-    title: '管理员',
-    key: 'super-manager',
-    icon: <UserOutlined />,
-    children: [],
-  },
-  {
-    title: '管理员2',
-    key: 'super-manager2',
-    icon: <UserOutlined />,
-    children: [],
-  },
-];
 type target = {
   title: string;
   key: string;
-  object: IIdentity;
+  object: any;
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  useEffect(() => {
-    getAuthTree();
-  }, []);
-  const { indentitys, setCurrent } = props;
+  useEffect(() => {}, []);
+  const { positions, setCurrent } = props;
+  const [currentPostion, setCurrentPosition] = useState<any>();
   const [selectMenu, setSelectMenu] = useState<string>('');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [authTree, setAuthTree] = useState<IAuthority[]>();
-
-  const getAuthTree = async () => {
-    const data = await userCtrl.Company.selectAuthorityTree();
-    if (data) {
-      console.log(data.name);
-      setAuthTree([data]);
-    }
-  };
-  const changeData = (target: IIdentity[]): target[] => {
+  const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
+  /**转化成树控件接收的数据格式 */
+  const changeData = (target: any[]): target[] => {
     const result: target[] = [];
     if (target != undefined) {
       for (const a of target) {
         result.push({
-          title: a.target.name,
-          key: a.target.id,
+          title: a.name,
+          key: a.code,
           object: a,
         });
       }
@@ -68,16 +44,22 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     }
     return result;
   };
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
-
+  /**树的操作按钮 */
   const handleMenuClick = (key: string, data: target) => {
-    // 触发内容去变化
-    console.log('点击', key, data);
+    if (key === '删除') {
+      positionCtrl.deletePosttion(data.object);
+    }
+    if (key === '更改岗位名称') {
+      setCurrentPosition(data.object);
+      setIsOpenEditModal(true);
+      // positionCtrl.updatePosttion(data.object);
+    }
+    console.log(data);
   };
   const close = () => {
     setIsOpenModal(false);
   };
+  /**选中树的回调 */
   const onSelect = async (
     selectKeys: string[],
     info: { selected: boolean; node: { object: IIdentity } },
@@ -95,7 +77,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       childIcon={<UserOutlined />}
       key={selectMenu}
       handleMenuClick={handleMenuClick}
-      treeData={changeData(indentitys!)}
+      treeData={changeData(positions)}
       menu={menu}
       onSelect={onSelect}
       title={'全部岗位'}
@@ -111,16 +93,30 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           onClick={() => {
             setIsOpenModal(true);
           }}>
-          新增身份
+          新增岗位
         </Button>
         {positionList}
       </div>
       <AddPosttionModal
-        title={'新增身份'}
+        title={'新增岗位'}
         open={isOpenModal}
         onOk={close}
         handleOk={close}
         authTree={authTree}
+      />
+      <EditCustomModal
+        handleCancel={() => {
+          setIsOpenModal(false);
+        }}
+        open={isOpenEditModal}
+        title={'编辑'}
+        onOk={() => {
+          setIsOpenEditModal(false);
+        }}
+        handleOk={() => {
+          setIsOpenEditModal(false);
+        }}
+        defaultData={currentPostion}
       />
     </div>
   );

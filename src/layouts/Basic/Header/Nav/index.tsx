@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /**
  * 顶部导航
@@ -44,7 +45,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'setting',
-      path: '/setting/info',
+      path: userCtrl.IsCompanySpace ? '/setting/info' : '/setting/friend',
       title: '设置',
       icon: 'icon-setting',
       count: 0,
@@ -59,6 +60,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       return todoCtrl.unsubscribe(id);
     };
   }, []);
+
   return (
     <div className={cls['header-nav-container']}>
       <Space size={30}>

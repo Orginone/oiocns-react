@@ -271,7 +271,7 @@ export interface IFlow {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
-export interface ISpace extends IFlow {
+export interface ISpace extends IFlow, IMTarget {
   /** 我加入的群组 */
   joinedCohort: ICohort[];
   /** 空间类型数据 */
@@ -373,7 +373,7 @@ export interface ICohort extends ITarget {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson extends IMTarget, ISpace, ITarget {
+export interface IPerson extends ISpace, ITarget {
   /** 我的好友 */
   joinedFriend: schema.XTarget[];
   /** 我加入的单位 */
@@ -470,7 +470,7 @@ export interface IPerson extends IMTarget, ISpace, ITarget {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany extends IMTarget, ISpace, ITarget {
+export interface ICompany extends ISpace, ITarget {
   /** 子组织类型 */
   subTypes: TargetType[];
   /** 单位人员 */

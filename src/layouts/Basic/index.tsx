@@ -27,7 +27,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
           {/* 公共头部 */}
           <BasicHeader />
           {/* 内容区域 */}
-          <Layout>{renderRoutes(route.routes)}</Layout>
+          <Layout className={styles['main-content']}>{renderRoutes(route.routes)}</Layout>
         </>
       ) : (
         ''

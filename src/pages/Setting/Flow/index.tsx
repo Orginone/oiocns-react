@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space, Dropdown } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -6,16 +6,18 @@ import {
   ExclamationCircleOutlined,
   SendOutlined,
   MinusOutlined,
-  EllipsisOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { ProTable } from '@ant-design/pro-components';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
+import CardOrTable from '@/components/CardOrTableComp';
+import { XFlowDefine } from '@/ts/base/schema';
+import FlowCard from '@/components/FlowCardComp';
+import useWindowSize from '@/utils/windowsize';
 import BindModal from './BindModal';
 
 const { Header, Content } = Layout;
@@ -48,10 +50,14 @@ type FlowItem = {
  * @returns
  */
 const SettingFlow: React.FC = () => {
+  const { height } = useWindowSize();
+  const [page, setPage] = useState<number>(1);
+
   const actionRef = useRef<ActionType>();
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [dataSource, setDataSource] = useState<schema.XFlowDefine[]>([]);
+  const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{
@@ -100,82 +106,9 @@ const SettingFlow: React.FC = () => {
       ellipsis: true,
     },
     {
-      title: '操作',
-      valueType: 'option',
-      key: 'option',
-      width: 100,
-      render: (text, record) => {
-        return (
-          <Dropdown
-            className={cls['operation-btn']}
-            menu={{
-              items: [
-                {
-                  key: '1',
-                  label: (
-                    <a
-                      key="bindApp"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        setIsOpenModal(true);
-                        setBindAppMes(record);
-                        setDateData(dateData + 1);
-                      }}>
-                      绑定应用
-                    </a>
-                  ),
-                },
-                {
-                  key: '2',
-                  label: (
-                    <a
-                      key="editor"
-                      onClick={() => {
-                        setTabType(TabType.PROCESSDESIGN);
-                        setCurrentStep(StepType.PROCESSMESS);
-                        setEditorValue(record?.content);
-                        const editorDataMes = JSON.parse(record?.content || '{}');
-                        setConditionData({
-                          name: editorDataMes.name,
-                          labels: JSON.parse(editorDataMes.remark),
-                          Fields: editorDataMes.Fiels,
-                        });
-                      }}>
-                      编辑
-                    </a>
-                  ),
-                },
-                {
-                  key: '3',
-                  label: (
-                    <a
-                      key="delete"
-                      onClick={() => {
-                        Modal.confirm({
-                          title: '提示',
-                          content: '确定删除当前流程吗',
-                          onOk: async () => {
-                            const currentData = await userCtrl.Space.deleteDefine(
-                              record?.id,
-                            );
-                            if (currentData.success) {
-                              initData();
-                              message.success('删除成功');
-                            }
-                          },
-                        });
-                      }}>
-                      删除
-                    </a>
-                  ),
-                },
-              ],
-            }}
-            key="key">
-            <EllipsisOutlined />
-          </Dropdown>
-        );
-      },
+      title: '备注',
+      dataIndex: 'remark',
+      ellipsis: true,
     },
   ];
 
@@ -208,18 +141,84 @@ const SettingFlow: React.FC = () => {
       message.warning(result.msg);
     }
   };
+  const parentRef = useRef<any>(null); //父级容器Dom
+
+  const renderOperation = (record: FlowItem): any[] => {
+    return [
+      {
+        key: 'bindApp',
+        label: '绑定应用',
+        onClick: () => {
+          setIsOpenModal(true);
+          setBindAppMes(record);
+          setDateData(dateData + 1);
+        },
+      },
+      {
+        key: 'editor',
+        label: '编辑',
+        onClick: () => {
+          setTabType(TabType.PROCESSDESIGN);
+          setCurrentStep(StepType.PROCESSMESS);
+          setEditorValue(record?.content);
+          const editorDataMes = JSON.parse(record?.content || '{}');
+          console.log(editorDataMes);
+          setConditionData({
+            name: editorDataMes.name,
+            labels: JSON.parse(editorDataMes.remark),
+            Fields: editorDataMes.Fiels,
+          });
+        },
+      },
+      {
+        key: 'delete',
+        label: '删除',
+        onClick: async () => {
+          const currentData = await userCtrl.Space.deleteDefine(record?.id);
+          console.log('currentData', currentData);
+          if (currentData) {
+            initData();
+            message.success('删除成功');
+          }
+        },
+      },
+    ];
+  };
+
+  const handlePageChange = (page: number, pageSize: number) => {
+    setPage(page);
+    setShowDataSource(dataSource.slice((page - 1) * pageSize, page * pageSize));
+  };
+
+  const renderCardFun = (dataArr: XFlowDefine[]): React.ReactNode[] => {
+    return dataArr.map((item: XFlowDefine) => {
+      return (
+        <FlowCard
+          className="card"
+          data={item}
+          key={item.id}
+          onClick={() => console.log('按钮测试')}
+          operation={renderOperation}></FlowCard>
+      );
+    });
+  };
 
   return (
     <div className={cls['company-top-content']}>
       <Card bordered={false}>
         {tabType === TabType.TABLEMES ? (
           <div>
-            <Card title="流程列表" bordered={false}>
+            {/* <Card title="流程列表" type="inner" bordered={false}>
               <ProTable
                 actionRef={actionRef}
                 columns={columns}
                 search={false}
                 dataSource={dataSource}
+                style={{ height: '40vh', overflow: 'auto' }}
+                pagination={{
+                  pageSize: 10,
+                  showQuickJumper: true,
+                }}
                 toolBarRender={() => [
                   <Button
                     key="button"
@@ -231,6 +230,63 @@ const SettingFlow: React.FC = () => {
                   </Button>,
                 ]}
               />
+            </Card> */}
+            <Card title="流程列表" type="inner" bordered={false}>
+              <div className={cls['app-wrap']} ref={parentRef}>
+                <CardOrTable<XFlowDefine>
+                  dataSource={showDataSource}
+                  total={dataSource.length}
+                  pageSize={10}
+                  page={page}
+                  stripe
+                  parentRef={parentRef}
+                  renderCardContent={renderCardFun}
+                  operation={renderOperation}
+                  columns={columns}
+                  height={0.38 * height}
+                  onChange={handlePageChange}
+                  rowKey={(record: XFlowDefine) => record.id || 'id'}
+                  toolBarRender={() => [
+                    <Button
+                      key="button"
+                      type="primary"
+                      onClick={() => {
+                        setTabType(TabType.PROCESSDESIGN);
+                      }}>
+                      新建
+                    </Button>,
+                  ]}
+                />
+              </div>
+            </Card>
+            <Card title="模板列表" type="inner" bordered={false}>
+              <div className={cls['app-wrap']} ref={parentRef}>
+                {/* <CardOrTable<XFlowDefine>
+                  dataSource={dataSource}
+                  total={dataSource.length}
+                  page={6}
+                  stripe
+                  parentRef={parentRef}
+                  renderCardContent={renderCardFun}
+                  operation={renderOperation}
+                  columns={columns}
+                  height={0.2 * height}
+                  onChange={handlePageChange}
+                  rowKey={(record: XFlowDefine) => record.id || 'id'}
+                  toolBarRender={() => [
+                    <Button
+                      key="button"
+                      type="primary"
+                      onClick={() => {
+                        setTabType(TabType.PROCESSDESIGN);
+                      }}>
+                      新建
+                    </Button>,
+
+                    <span>编辑分组</span>,
+                  ]}
+                /> */}
+              </div>
             </Card>
           </div>
         ) : (

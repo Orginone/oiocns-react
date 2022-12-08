@@ -5,7 +5,7 @@ import cls from './index.module.less';
 import { initDatatype } from '@/ts/core/setting/isetting';
 import AddNewPosition from './AddNewPosition';
 import CardOrTable from '@/components/CardOrTableComp';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface Iprops {
@@ -48,6 +48,7 @@ const AddPostModal = (props: Iprops) => {
       title: '编码',
       dataIndex: 'code',
       key: 'code',
+      width: '18%',
     },
     {
       title: '是否公开',
@@ -61,11 +62,11 @@ const AddPostModal = (props: Iprops) => {
       title: '备注',
       dataIndex: 'remark',
       key: 'remark',
-      width: '25%',
+      width: '20%',
     },
   ];
 
-  const renderOperation = (item: IAuthority): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IAuthority): common.OperationType[] => {
     return [
       {
         key: 'addNew',
@@ -84,13 +85,14 @@ const AddPostModal = (props: Iprops) => {
       open={open}
       onCancel={() => handleOk()}
       getContainer={false}
-      width={1100}
+      width={1020}
       footer={null}>
       <div className="site-card-wrapper">
         <Row gutter={24}>
           <CardOrTable
             dataSource={[datasource]}
             rowKey={'id'}
+            total={1}
             operation={renderOperation}
             columns={columns as any}
             parentRef={parentRef}

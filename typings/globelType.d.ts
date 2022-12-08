@@ -1,30 +1,18 @@
 import { RouteConfig } from 'react-router-config';
 
-type MenuItemType = {
-  id?: string;
-  name: string;
-  icon: string;
-  path: string;
-  type?: string;
-  fixed?: boolean;
-  key?: string | unknown;
-  bottom?: boolean | unknown;
-};
-
 interface DataType {
   [key: string]: any;
 }
 
 type PageShowType = 'table' | 'card'; //数据页面展示形式 表格 / 卡片
 
-
 /**
  * 前端业务分页结果的数据类型
  */
-export type PageData<P = {}> = {
+export type PageData<T> = {
   success: boolean;
   total: number;
-  data: P[];
+  data: T[];
   msg?: string;
 };
 interface IRouteConfig extends RouteConfig {
