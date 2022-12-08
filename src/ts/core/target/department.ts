@@ -84,10 +84,12 @@ export default class Department extends BaseTarget implements IDepartment {
     }
     return res;
   }
-  public async createDepartment(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+  public async createDepartment(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<ResultType<any>> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    const res = await super.createSubTarget(data);
+    const res = await super.createSubTarget({ ...data, belongId: this.target.belongId });
     if (res.success) {
       this.departments.push(new Department(res.data));
     }
