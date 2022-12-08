@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
-import { MarketTypes } from 'typings/marketType';
-// import useDebounce from '@/hooks/useDebounce';
+import { common } from 'typings/common';
 import { Button } from 'antd';
 import { useLocation } from 'react-router-dom';
+import { IProduct } from '@/ts/core';
 
 const PublishListComp: React.FC = () => {
-  const [list, setList] = useState<MarketTypes.ProductType[]>([]);
+  const [list, setList] = useState<IProduct[]>([]);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const { state } = useLocation();
@@ -26,9 +26,7 @@ const PublishListComp: React.FC = () => {
     setPage(page);
   };
   // // 操作内容渲染函数
-  const renderOperation = (
-    item: MarketTypes.ProductType,
-  ): MarketTypes.OperationType[] => {
+  const renderOperation = (item: IProduct): common.OperationType[] => {
     return [
       {
         key: 'detail',
@@ -47,13 +45,13 @@ const PublishListComp: React.FC = () => {
     ];
   };
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: MarketTypes.ProductType[]): React.ReactNode[] => {
-    return dataArr.map((item: MarketTypes.ProductType) => {
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       return (
         <AppCard
           className="card"
           data={item}
-          key={item.id}
+          key={item.prod.id}
           defaultKey={{
             name: 'caption',
             size: 'price',
@@ -68,7 +66,7 @@ const PublishListComp: React.FC = () => {
   };
   return (
     <div className={cls['appPublish-wrap']} ref={parentRef}>
-      <CardOrTable<MarketTypes.ProductType>
+      <CardOrTable<IProduct>
         dataSource={list}
         total={total}
         page={page}

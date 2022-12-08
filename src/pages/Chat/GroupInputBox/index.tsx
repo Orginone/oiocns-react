@@ -105,7 +105,6 @@ const Groupinputbox = (props: Iprops) => {
       if (!value?.includes('<div><br></div>')) {
         doc.innerHTML += '<div><br></div>';
       }
-      setFocus();
     } else if (e.keyCode == 13) {
       //用户点击了enter触发
       e.preventDefault(); // 阻止浏览器默认换行操作
@@ -149,19 +148,6 @@ const Groupinputbox = (props: Iprops) => {
         }
       }
     },
-  };
-
-  /**
-   * @description: 设置光标到最后
-   * @return {*}
-   */
-  const setFocus = () => {
-    // let selection = window.getSelection();
-    // let range = document.createRange();
-    // range.selectNodeContents(inputRef.value);
-    // range.collapse(false);
-    // selection.removeAllRanges();
-    // selection.addRange(range);
   };
 
   const getMessage = () => {

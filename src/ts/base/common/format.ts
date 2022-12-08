@@ -12,7 +12,28 @@ export function formatSize(size: number, unit: string = ''): string {
   }
   return size + unit;
 }
+/** 将文件读成url */
+export function blobToDataUrl(file: Blob): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
+/** 将文件读成字节数组 */
+export function blobToNumberArray(file: Blob): Promise<number[]> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const arr = new Uint8Array(reader.result as ArrayBuffer);
+      resolve(Array.from<number>(arr.values()));
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
 import pako from 'pako';
 
 /** 字符串压缩解压缩 */

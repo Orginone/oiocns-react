@@ -3,7 +3,7 @@ import { Avatar, Tag, Dropdown } from 'antd';
 import React from 'react';
 import './index.less';
 import AppLogo from '/img/appLogo.png';
-import { MarketTypes } from 'typings/marketType';
+import { common } from 'typings/common';
 import { IProduct } from '@/ts/core';
 interface defaultObjType {
   name: string;
@@ -20,7 +20,7 @@ interface AppCardType {
   // eslint-disable-next-line no-unused-vars
   onClick?: (event?: any) => void;
   // eslint-disable-next-line no-unused-vars
-  operation?: (_item: IProduct) => MarketTypes.OperationType[]; //操作区域数据
+  operation?: (_item: IProduct) => common.OperationType[]; //操作区域数据
 }
 const defaultObj = {
   name: 'name', //名称

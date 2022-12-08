@@ -46,6 +46,7 @@ const App = () => {
       <ConfigProvider prefixCls="ogo" locale={locale}>
         <Suspense fallback={<Spin size="large" className="layout__loading" />}>
           {renderRoutes(routes)}
+          <div className="DialogTempalte" id="DialogTempalte"></div>
         </Suspense>
       </ConfigProvider>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}

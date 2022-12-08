@@ -17,7 +17,6 @@ export type SpaceType = {
   /** 图标 */
   icon?: string;
 };
-
 export interface ITarget {
   /** 实体对象 */
   target: schema.XTarget;
@@ -67,7 +66,6 @@ export interface ITarget {
    */
   deleteIdentity(id: string): Promise<boolean>;
 }
-
 /** 市场相关操作方法 */
 export interface IMTarget {
   /** 我加入的市场 */
@@ -243,7 +241,9 @@ export interface IFlow {
    * 发布流程定义（包含创建、更新）
    * @param data
    */
-  publishDefine(data: model.CreateDefineReq): Promise<ResultType<schema.XFlowDefine>>;
+  publishDefine(
+    data: Omit<model.CreateDefineReq, 'BelongId'>,
+  ): Promise<ResultType<schema.XFlowDefine>>;
   /**
    * 删除流程定义
    * @param id 流程定义Id
@@ -271,7 +271,7 @@ export interface IFlow {
     params: model.FlowRelationModel,
   ): Promise<model.ResultType<boolean>>;
 }
-export interface ISpace extends IFlow {
+export interface ISpace extends IFlow, IMTarget {
   /** 我加入的群组 */
   joinedCohort: ICohort[];
   /** 空间类型数据 */
@@ -373,7 +373,7 @@ export interface ICohort extends ITarget {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 人员操作 */
-export interface IPerson extends IMTarget, ISpace, ITarget {
+export interface IPerson extends ISpace, ITarget {
   /** 我的好友 */
   joinedFriend: schema.XTarget[];
   /** 我加入的单位 */
@@ -470,7 +470,7 @@ export interface IPerson extends IMTarget, ISpace, ITarget {
   searchPerson(code: string): Promise<ResultType<schema.XTargetArray>>;
 }
 /** 单位操作 */
-export interface ICompany extends IMTarget, ISpace, ITarget {
+export interface ICompany extends ISpace, ITarget {
   /** 子组织类型 */
   subTypes: TargetType[];
   /** 单位人员 */
@@ -498,14 +498,23 @@ export interface ICompany extends IMTarget, ISpace, ITarget {
    */
   createGroup(data: Omit<TargetModel, 'id' | 'belongId'>): Promise<ResultType<any>>;
   /** 创建部门 */
-  createDepartment(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  createDepartment(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
   /** 创建部门 */
-  createWorking(data: Omit<model.TargetModel, 'id'>): Promise<model.ResultType<any>>;
+  createWorking(
+    data: Omit<model.TargetModel, 'id' | 'belongId'>,
+  ): Promise<model.ResultType<any>>;
   /**
    * 移除人员
    * @param ids 人员Id集合
    */
   removePerson(ids: string[]): Promise<ResultType<any>>;
+  /**
+   * 删除集团
+   * @param id 集团Id
+   */
+  deleteGroup(id: string): Promise<ResultType<any>>;
   /**
    * 删除子部门
    * @param id 部门Id

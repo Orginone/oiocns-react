@@ -58,7 +58,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
           }
         }}
       />
-      <div>{dataSource != [] && renderCardFun(dataSource)}</div>
+      <div>{renderCardFun(dataSource)}</div>
       {searchKey && dataSource.length == 0 && (
         <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码的内容`} />
       )}
