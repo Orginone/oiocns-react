@@ -312,10 +312,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         destroyOnClose={true}
         width={500}>
         <div>
-          <SearchCompany
-            joinKey={joinKey}
-            setJoinKey={setJoinKey}
-            setJoinTarget={setJoinTarget}></SearchCompany>
+          <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey}></SearchCompany>
         </div>
       </Modal>
       <Modal
