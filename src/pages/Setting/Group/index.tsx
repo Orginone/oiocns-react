@@ -27,7 +27,6 @@ import TransferGroup from './components/TransferGroup';
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
-  const [current, setCurrent] = useState<ITarget>();
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
 
@@ -36,6 +35,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [joinKey, setJoinKey] = useState<string>('');
   const [title, setTitle] = useState<string>('');
+  const [current, setCurrent] = useState<ITarget>();
   const [selectCompany, setSelectCompany] = useState<schema.XTarget>(); // 选中的要拉的人
 
   useEffect(() => {
@@ -43,15 +43,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       history.push('/setting/info', { refresh: true });
     }
   }, []);
-
-  // 选中树的时候操作
-  const setTreeCurrent = (current: ITarget | undefined) => {
-    if (current) {
-      setCurrent(current);
-    } else {
-      setCurrent(undefined);
-    }
-  };
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
@@ -303,10 +294,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                   tabBarExtraContent={renderBtns()}
                 />
                 <CardOrTable<schema.XTarget>
-                  param={current}
                   rowKey={'id'}
                   dataSource={[]}
-                  request={async (page: PageRequest) => {
+                  params={current}
+                  request={async (page) => {
                     return await current.loadMembers(page);
                   }}
                   operation={renderOperation}
@@ -354,7 +345,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         ? ReactDOM.createPortal(
             <GroupTree
               current={current}
-              setCurrent={setTreeCurrent}
+              setCurrent={(item) => setCurrent(item)}
               handleMenuClick={handleMenuClick}
             />,
             treeContainer,
