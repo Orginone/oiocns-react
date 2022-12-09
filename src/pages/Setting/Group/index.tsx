@@ -11,7 +11,8 @@ import { RouteComponentProps } from 'react-router-dom';
 import TreeLeftGroupPage from './components/TreeLeftGroupPage';
 import { schema, model } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
-import { IGroup } from '@/ts/core/target/itarget';
+import { ICompany, IGroup, ITarget } from '@/ts/core/target/itarget';
+import Group from '@/ts/core/target/group';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
@@ -25,17 +26,17 @@ import PageCard from '@/components/PageCard';
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
+  const [current, setCurrent] = useState<ITarget>();
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
 
   const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑部门
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
-
-  const [currentGroup, setCurrentGroup] = useState<IGroup>(); // 选中部门
-  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); // 单位的分页
-  const [selectId, setSelectId] = useState<string>(''); // 操作内容
-  const [joinKey, setJoinKey] = useState<string>(''); // 选中的单位
+  // const [statusKey, setStatusKey] = useState('merchandise');
+  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
+  const [id, setId] = useState<string>('');
+  const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
 
   useEffect(() => {
