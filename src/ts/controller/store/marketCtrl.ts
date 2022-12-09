@@ -26,7 +26,7 @@ class MarketController extends Emitter {
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
-  public marketMenber: any;
+  public marketMenber: any = {};
   /** 加入购物车商品 */
   public JoinShopingCar: any[] = [];
   /** 购物车商品列表 */
@@ -38,13 +38,13 @@ class MarketController extends Emitter {
     super();
     this.searchMarket = [];
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      if (userCtrl.isCompanySpace) {
-        this._target = userCtrl.company;
+      if (userCtrl.IsCompanySpace) {
+        this._target = userCtrl.Company;
       } else {
-        this._target = userCtrl.user;
+        this._target = userCtrl!.User;
       }
-      this._curMarket = (await this._target.getPublicMarket(true))[0];
-      await this._target.getJoinMarkets();
+      this._curMarket = (await this._target!.getPublicMarket(true))[0];
+      await this!._target?.getJoinMarkets();
       /* 获取 历史缓存的 购物车商品列表 */
       kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
         // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
@@ -60,6 +60,21 @@ class MarketController extends Emitter {
         this.changCallbackPart(MarketCallBackTypes.UserManagement);
       });
       this.changCallback();
+
+      /* 获取 历史缓存的 购物车商品列表 */
+      kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+        // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+        const { data = [] } = shoplist;
+        this._shopinglist = data || [];
+        this.changCallbackPart(MarketCallBackTypes.ApplyData);
+      });
+
+      /* 获取 历史缓存的 商店用户管理成员 */
+      kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
+        // console.log('订阅数据推送 商店用户管理成员===>', managementlist?.data);
+        this.marketMenber = managementlist?.data || {};
+        this.changCallbackPart(MarketCallBackTypes.UserManagement);
+      });
     });
   }
 
@@ -153,13 +168,18 @@ class MarketController extends Emitter {
    * @description: 获取市场里的所有用户
    * @return {*}
    */
-  public async getMember() {
-    const res = await this._curMarket?.getMember({ offset: 0, limit: 10, filter: '' });
-    if (res?.success) {
-      this.marketMenber = res?.data?.result;
+  public getMember = async (params?: any) => {
+    params = {
+      offset: (params?.page - 1) * params?.pageSize ?? 0,
+      limit: params?.pageSize ?? 10,
+      filter: params?.filter ?? '',
+    };
+    const res = await this._curMarket?.getMember({ ...params });
+    if (res?.code === 200 && res?.success) {
+      this.marketMenber = res?.data;
     }
     this.cacheUserManagement(this.marketMenber);
-  }
+  };
 
   /**
    * @description: 移出市场里的成员
@@ -212,6 +232,7 @@ class MarketController extends Emitter {
         (item) => !data.some((ele: any) => ele.id === item.id),
       );
       this._shopinglist = arrs;
+      message.success('移出成功');
       this.cacheJoinOrDeleShopingCar(this._shopinglist);
     }
   };
@@ -229,7 +250,7 @@ class MarketController extends Emitter {
       '',
       'order',
       'code',
-      userCtrl.space?.target?.id,
+      userCtrl.Space?.target?.id,
       this._shopingIds,
     );
     if (res?.code === 400) {
