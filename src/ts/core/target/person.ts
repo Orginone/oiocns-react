@@ -60,8 +60,8 @@ export default class Person extends MarketTarget implements IPerson {
       return this.cohorts;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
-    if (res.success && res.data.result) {
-      this.cohorts = res.data.result.map((a) => {
+    if (res && res.result) {
+      this.cohorts = res.result.map((a) => {
         return new Cohort(a);
       });
     }
@@ -72,8 +72,8 @@ export default class Person extends MarketTarget implements IPerson {
       return this.joinedCompany;
     }
     const res = await this.getjoinedTargets(companyTypes, this.id);
-    if (res.success && res.data?.result) {
-      this.joinedCompany = res.data.result.map((a) => {
+    if (res && res.result) {
+      this.joinedCompany = res.result.map((a) => {
         let company;
         switch (a.typeName) {
           case TargetType.University:
