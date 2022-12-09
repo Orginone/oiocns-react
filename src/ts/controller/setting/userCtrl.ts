@@ -100,7 +100,7 @@ class UserController extends Emitter {
     return result;
   }
   /** 加载组织树 */
-  public buildTargetTree(targets: ITarget[]) {
+  public buildTargetTree(targets: ITarget[], menus?: (item: ITarget) => any[]) {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
@@ -108,7 +108,9 @@ class UserController extends Emitter {
           id: item.id,
           name: item.name,
           item: item,
-          children: this.buildTargetTree(item.subTeam),
+          isLeaf: false,
+          menus: menus ? menus(item) : [],
+          children: this.buildTargetTree(item.subTeam, menus),
         });
       }
     }

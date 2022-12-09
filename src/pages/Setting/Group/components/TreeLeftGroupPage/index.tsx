@@ -1,134 +1,122 @@
 import { Button } from 'antd';
 import type { TreeProps } from 'antd/es/tree';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import * as im from 'react-icons/im';
+
 import cls from './index.module.less';
-import { schema } from '@/ts/base';
-import { IGroup } from '@/ts/core/target/itarget';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import StoreClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { getUuid } from '@/utils/tools';
-import MarketClassifyTree from '@/components/CustomTreeComp';
+import { ITarget } from '@/ts/core/target/itarget';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { PlusOutlined } from '@ant-design/icons';
-import service from '../../service';
-import Group from '@/ts/core/target/group';
-import { deepClone } from '@/ts/base/common';
+import ReactDOM from 'react-dom';
+import { ImOffice } from 'react-icons/im';
+
 type CreateGroupPropsType = {
-  currentKey: string;
-  setCurrent: (current: schema.XTarget | undefined) => void;
-  handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
-  [key: string]: any;
+  current: ITarget | undefined;
+  setCurrent: (current: ITarget) => void;
+  handleMenuClick: (key: string, item: ITarget | undefined, id?: string) => void; // 点击操作触发的事件
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurrent }) => {
+const DepartTree: React.FC<CreateGroupPropsType> = ({
+  handleMenuClick,
+  setCurrent,
+  current,
+}) => {
   const [key] = useCtrlUpdate(userCtrl);
-  const [treeData, setTreeData] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
+  const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
-    if (userCtrl.isCompanySpace) {
-      initData(false);
-    }
-  }, [key]);
+    loadTeamTree();
+  }, []);
 
-  const initData = async (reload: boolean) => {
-    const data = await userCtrl?.company?.getJoinedGroups(reload);
-    // 虚拟的ROOT节点， 作为树的根节点
-    let visualGroup = new Group(deepClone(userCtrl?.company?.target));
-    // 创建的集团， 加入的集团
-    if (data?.length) {
-      visualGroup.subGroup = data;
-      service.setRoot(visualGroup);
-      setCurrent(data[0].target);
-      const tree = data.map((n: any) => {
-        return createTeeDom(n);
+  /** 加载右侧菜单 */
+  const loadMenus = (item: ITarget) => {
+    const result = [];
+    item.subTeamTypes.forEach((i) => {
+      result.push({
+        key: 'new' + i,
+        icon: <ImOffice />,
+        label: '新建' + i,
       });
-      setTreeData(tree);
-    } else {
-      visualGroup.subGroup = [];
-      service.setRoot(visualGroup);
-      setCurrent(undefined);
-      setTreeData([]);
-    }
-  };
-  /** 创建节点 */
-  const createTeeDom = (n: IGroup) => {
-    const { target } = n;
-    return {
-      key: target.id + getUuid(),
-      title: target.name,
-      icon: target.avatar,
-      // children: [],
-      isLeaf: false,
-      target: n,
-    };
-  };
-
-  const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
-    list.map((node) => {
-      if (node.key === key) {
-        return {
-          ...node,
-          children,
-          isLeaf: children.length == 0,
-        };
-      }
-      if (node.children) {
-        return {
-          ...node,
-          children: updateTreeData(node.children, key, children),
-        };
-      }
-      return node;
     });
-
-  const loadDept = async ({ key, children, target }: any) => {
-    if (children) {
-      return;
-    }
-    const deptChild: any[] = await target.getSubGroups(false);
-
-    setTreeData((origin) =>
-      updateTreeData(
-        origin,
-        key,
-        deptChild.map((n) => createTeeDom(n)),
-      ),
+    result.push(
+      {
+        key: '刷新',
+        icon: <im.ImSpinner9 />,
+        label: '刷新子组织',
+      },
+      {
+        key: '删除',
+        icon: <im.ImBin />,
+        label: '删除' + item.name,
+      },
     );
+    return result;
   };
 
-  const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
-    selectedKeys;
-    if (info.selected) {
-      setCurrent(info.node.target.target);
+  const loadTeamTree = async () => {
+    const targets = await userCtrl.company.getJoinedGroups();
+    setData(buildTargetTree(targets));
+  };
+
+  /** 加载组织树 */
+  const buildTargetTree = (targets: ITarget[]) => {
+    const result: any[] = [];
+    if (targets) {
+      for (const item of targets) {
+        result.push({
+          key: item.id,
+          title: item.name,
+          item: item,
+          isLeaf: false,
+          menus: loadMenus(item),
+          icon: <ImOffice />,
+          children: buildTargetTree(item.subTeam),
+        });
+      }
+    }
+    return result;
+  };
+
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const item: ITarget = info.node.item;
+    if (item) {
+      await item.loadSubTeam();
+      loadTeamTree();
+      setCurrent(item);
     }
   };
 
-  const menu = ['新增集团'];
-
-  return (
-    <div>
-      <div className={cls.topMes}>
+  // const menu = ['新增部门', '删除部门'];
+  return treeContainer ? (
+    ReactDOM.createPortal(
+      <div id={key} className={cls.topMes}>
         <Button
           className={cls.creatgroup}
-          type="text"
           icon={<PlusOutlined className={cls.addIcon} />}
-          onClick={() => handleMenuClick('new', {})}
+          type="text"
+          onClick={() => handleMenuClick('new', undefined)}
         />
-
-        <MarketClassifyTree
-          className={cls['docTree']}
-          id={key}
-          showIcon
+        <StoreClassifyTree
+          className={cls.docTree}
+          title={'内设机构'}
+          isDirectoryTree
+          menu={'menus'}
           searchable
-          handleMenuClick={handleMenuClick}
-          treeData={treeData}
-          title={'集团管理'}
-          menu={menu}
-          loadData={loadDept}
+          showIcon
+          treeData={data}
+          selectedKeys={[current?.id]}
           onSelect={onSelect}
+          handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
         />
-      </div>
-    </div>
+      </div>,
+      treeContainer,
+    )
+  ) : (
+    <></>
   );
 };
 
-export default Creategroup;
+export default DepartTree;

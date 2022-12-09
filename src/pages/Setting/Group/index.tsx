@@ -9,18 +9,16 @@ import { common } from 'typings/common';
 import { columns } from './config';
 import { RouteComponentProps } from 'react-router-dom';
 import TreeLeftGroupPage from './components/TreeLeftGroupPage';
-import { schema } from '@/ts/base';
+import { schema, model } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
-import { ICompany, IGroup } from '@/ts/core/target/itarget';
+import { ICompany, IGroup, ITarget } from '@/ts/core/target/itarget';
 import Group from '@/ts/core/target/group';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import Company from '@/ts/core/target/company';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
-import service from './service';
 
 /**
  * 集团设置
@@ -28,19 +26,19 @@ import service from './service';
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
+  const [current, setCurrent] = useState<ITarget>();
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [isopen, setIsOpen] = useState<boolean>(false); // 编辑
+
+  const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑部门
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   // const [statusKey, setStatusKey] = useState('merchandise');
-  const [currentGroup, setCurrentGroup] = useState<IGroup>();
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
   const [id, setId] = useState<string>('');
   const [joinKey, setJoinKey] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
 
-  const [selectId, setSelectId] = useState<string>('');
   useEffect(() => {
     if (!userCtrl.isCompanySpace) {
       history.push('/setting/info', { refresh: true });
@@ -48,15 +46,23 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   // 选中树的时候操作
-  const setTreeCurrent = (current: schema.XTarget | undefined) => {
+  const setTreeCurrent = (current: IGroup | undefined) => {
     if (current) {
-      setId(current.id);
-      setCurrentGroup(new Group(current));
-      currentGroup?.getCompanys(false).then((e) => {
-        setDataSource(e);
-      });
+      setCurrentGroup(current);
+      currentGroup
+        ?.loadMembers({
+          offset: 1,
+          limit: 10,
+          filter: '',
+        })
+        .then((e) => {
+          if (e && e.result) {
+            setDataSource(e.result);
+          } else {
+            setDataSource([]);
+          }
+        });
     } else {
-      setId('');
       setCurrentGroup(undefined);
       setDataSource([]);
     }
@@ -66,17 +72,16 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
       case 'new':
-        setId('');
         setSelectId('new');
         setIsOpen(true);
         break;
       case '新增集团':
-        setId(item.target.target.id);
         setCurrentGroup(item.target);
         setIsOpen(true);
         setSelectId('second');
         break;
-      case 'changeGroup':
+      case '刷新':
+        item.target.loadSubTeam(true);
         break;
       case 'updateGroup':
         break;
@@ -94,9 +99,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     if (joinKey == '') {
       message.error('请选中要添加集团的单位！');
     } else {
-      const comp: ICompany = new Company(joinTarget!);
-      const res = await comp.applyJoinGroup(currentGroup?.target?.id!);
-      message.info(res.msg);
+      // console.log
     }
   };
   const handlePullCancel = () => {
@@ -115,40 +118,36 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   };
 
   const handleOk = async (item: any) => {
-    // 新增
     if (item) {
       if (item.selectId == 'update') {
-        if (userCtrl.isCompanySpace) {
+        if (userCtrl.isCompanySpace && currentGroup) {
           item.teamCode = item.code;
           item.teamName = item.name;
           item.typeName = TargetType.Group;
-          const res = await currentGroup?.update(item);
-          const result = service.messageAlert(res!, '修改集团');
-          if (result) {
+          const group = await currentGroup.update(item);
+          if (group) {
+            message.info('修改部门成功！');
             userCtrl.changCallback();
             setIsOpen(false);
           }
         }
       } else {
-        if (userCtrl.isCompanySpace) {
-          item.teamCode = item.code;
-          item.teamName = item.name;
-          item.typeName = TargetType.Group;
-          if (id != '') {
-            const res = await currentGroup?.createSubGroup(item);
-            const result = service.messageAlert(res!, '新增集团');
-            if (result) {
-              userCtrl.changCallback();
-              setIsOpen(false);
-            }
-          } else {
-            const res = await userCtrl.company.createGroup(item);
-
-            const result = service.messageAlert(res!, '新增集团');
-            if (result) {
-              userCtrl.changCallback();
-              setIsOpen(false);
-            }
+        item.teamCode = item.code;
+        item.teamName = item.name;
+        item.typeName = TargetType.Group;
+        if (selectId === 'second') {
+          const group = await currentGroup?.createSubGroup(item);
+          if (group) {
+            message.info('创建部门成功！');
+            userCtrl.changCallback();
+            setIsOpen(false);
+          }
+        } else if (selectId === 'new') {
+          const group = await userCtrl.company.createGroup(item);
+          if (group) {
+            message.info('创建部门成功！');
+            userCtrl.changCallback();
+            setIsOpen(false);
           }
         }
       }
@@ -157,6 +156,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setLookApplyOpen(false);
     setIsOpen(false);
   };
+
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
@@ -214,31 +214,13 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                 cancelText: '取消',
                 onOk: async () => {
                   if (currentGroup) {
-                    // 判断是否一级部门
-                    const aGroup = await service.getSearchTopGroup(
-                      currentGroup.target.id,
-                    );
-                    if (aGroup) {
-                      const res = await userCtrl.company.deleteGroup(aGroup.target.id);
-                      const result = service.messageAlert(res, '删除部门');
-                      if (result) {
-                        userCtrl.changCallback();
-                        setIsOpen(false);
-                      }
+                    const isSuccess = await currentGroup.delete();
+                    const operate = '删除集团';
+                    if (isSuccess) {
+                      message.info(`${operate}成功！`);
+                      userCtrl.changCallback();
                     } else {
-                      const parentGroup = await service.refParentItem(
-                        currentGroup.target.id,
-                      );
-                      if (parentGroup) {
-                        const res = await parentGroup.deleteSubGroup(
-                          currentGroup.target.id,
-                        );
-                        const result = service.messageAlert(res, '删除部门');
-                        if (result) {
-                          userCtrl.changCallback();
-                          setIsOpen(false);
-                        }
-                      }
+                      message.error(`${operate}失败！`);
                     }
                   }
                 },

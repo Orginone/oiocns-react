@@ -210,7 +210,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             setCurrent={setTreeCurrent}
             currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
-            current={current}
+            // reObject={object}
           />
         </Sider>
         <Content style={{ paddingLeft: 4 }}>
@@ -227,7 +227,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 setIsOpenModal(false);
               }}
               editData={indentity!}
-              current={current}
+              // reObject={object}
             />
             <Modal
               title="指派身份"
