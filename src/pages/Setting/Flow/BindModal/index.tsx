@@ -46,11 +46,12 @@ const BindModal: React.FC<BindModalProps> = ({
     });
     setData(currentData);
     const currentValue = await userCtrl.space.queryFlowRelation(false);
-
+    console.log('currentValue', currentValue, bindAppMes?.id);
     if (currentValue && currentValue.length > 0) {
       const filterId = currentValue.filter((item) => {
         return item.defineId === bindAppMes?.id;
       });
+      console.log('filterId', filterId);
       setOldFormData(filterId);
       form.setFieldsValue({ labels: filterId });
     }
@@ -95,8 +96,8 @@ const BindModal: React.FC<BindModalProps> = ({
               /** 新旧值对比 */
               if (
                 findData &&
-                findData.defineId === item.defineId &&
-                findData.functionCode === item.functionCode
+                (findData.defineId !== item.defineId ||
+                  findData.functionCode !== item.functionCode)
               ) {
                 newArr.push(
                   userCtrl.space.bindingFlowRelation({
