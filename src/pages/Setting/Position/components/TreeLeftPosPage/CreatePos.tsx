@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
 import positionCtrl from '@/ts/controller/position/positionCtrl';
 import EditCustomModal from '../EditCustomModal';
+import { XIdentity } from '@/ts/base/schema';
 type CreateGroupPropsType = {
   createTitle: string;
   currentKey: string;
-  setCurrent: (current: IIdentity) => void;
+  setCurrent: (current: PositionType) => void;
   handleMenuClick: (key: string, item: any) => void;
   positions: any[];
 };
@@ -18,6 +18,12 @@ type target = {
   title: string;
   key: string;
   object: any;
+};
+
+export type PositionType = {
+  name: string;
+  code: string;
+  indentitys: XIdentity[];
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   useEffect(() => {}, []);
@@ -60,7 +66,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   /**选中树的回调 */
   const onSelect = async (
     selectKeys: string[],
-    info: { selected: boolean; node: { object: IIdentity } },
+    info: { selected: boolean; node: { object: PositionType } },
   ) => {
     // 触发内容去变化
     if (info.selected) {
