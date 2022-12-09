@@ -48,12 +48,13 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       await setTreeCurrent(data[0]);
     }
   };
+  const loadMember = (pageIndex, pageSize) => {};
   // 加载 人员数据
   const getPersonData = async (current: IIdentity) => {
-    const res = await current.getIdentityTargets(TargetType.Person);
-    if (res?.data?.result) {
-      setPersonData(res.data.result);
-      setMembers(uniq(MemberData, res.data.result));
+    const res = await current.loadMembers();
+    if (res?.result) {
+      setPersonData(res.result);
+      setMembers(uniq(MemberData, res.result));
     } else {
       setPersonData([]);
       setMembers(MemberData);
@@ -72,7 +73,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             okText: '确认',
             cancelText: '取消',
             onOk: async () => {
-              await indentity?.removeIdentity([item.id]);
+              await indentity?.removeMembers([item.id]);
               getPersonData(indentity!);
             },
           });
@@ -117,7 +118,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
           okText: '确认',
           cancelText: '取消',
           onOk: async () => {
-            const success = await object?.deleteIdentity(indentity?.target.id!);
+            const success = await current?.deleteIdentity(indentity?.target?.id!);
             if (success) {
               message.success('删除成功');
               getDataList();
@@ -207,7 +208,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             setCurrent={setTreeCurrent}
             currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
-            reObject={object}
+            reObject={current}
           />
         </Sider>
         <Content style={{ paddingLeft: 4 }}>
@@ -224,7 +225,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 setIsOpenModal(false);
               }}
               editData={indentity!}
-              reObject={object}
+              reObject={current}
             />
             <Modal
               title="指派身份"
@@ -242,7 +243,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchCallback={setPerson} memberData={members} />
+              <AssignPosts searchFn={setPerson} memberData={members} />
             </Modal>
           </div>
         </Content>

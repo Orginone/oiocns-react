@@ -5,18 +5,12 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
   indentitys: IIdentity[];
-  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
+  reObject: ITarget;
 };
 type target = {
   title: string;

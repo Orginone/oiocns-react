@@ -1,13 +1,7 @@
 import React, { useRef } from 'react';
 import { message } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 import SchemaForm from '@/components/SchemaForm';
 import { XIdentity } from '@/ts/base/schema';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
@@ -21,7 +15,7 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: () => void;
   editData?: IIdentity;
-  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
+  reObject: ITarget;
 }
 const EditCustomModal = (props: Iprops) => {
   const { open, title, handleOk, reObject, editData, handleCancel } = props;
