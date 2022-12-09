@@ -27,6 +27,7 @@ class ApplicationTodo implements ITodoGroup {
     return this._todoList.length;
   }
   async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
+    console.log('getTodoList');
     if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
