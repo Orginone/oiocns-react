@@ -26,6 +26,7 @@ const UpdateCohort: React.FC<indexType> = ({
   columns,
   open,
   callBack,
+  modalprops,
   ...otherConfig
 }) => {
   return (

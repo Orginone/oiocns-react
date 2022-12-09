@@ -45,18 +45,18 @@ export default class Merchandise implements IMerchandise {
    * @param page 分页参数
    * @returns 交易情况
    */
-  public async getSellOrder(
-    page: model.PageRequest,
-  ): Promise<model.ResultType<schema.XOrderDetailArray>> {
-    return await kernel.querySellOrderListByMerchandise({
-      id: this.merchandise.id,
-      page: page,
-    });
+  public async getSellOrder(page: model.PageRequest): Promise<schema.XOrderDetailArray> {
+    return (
+      await kernel.querySellOrderListByMerchandise({
+        id: this.merchandise.id,
+        page: page,
+      })
+    ).data;
   }
-  public async deliver(detailId: string, status: number): Promise<model.ResultType<any>> {
-    return await kernel.deliverMerchandise({ id: detailId, status: status });
+  public async deliver(detailId: string, status: number): Promise<boolean> {
+    return (await kernel.deliverMerchandise({ id: detailId, status: status })).success;
   }
-  public async cancel(detailId: string, status: number): Promise<model.ResultType<any>> {
-    return await kernel.cancelOrderDetail({ id: detailId, status: status });
+  public async cancel(detailId: string, status: number): Promise<boolean> {
+    return (await kernel.cancelOrderDetail({ id: detailId, status: status })).success;
   }
 }
