@@ -182,6 +182,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
                   menu={{
                     items: renderMenu(node),
                     onClick: ({ key }) => {
+                      setVisibleMenu(false);
                       handleMenuClick && handleMenuClick(key, node);
                     },
                   }}

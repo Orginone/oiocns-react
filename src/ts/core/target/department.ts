@@ -32,6 +32,15 @@ export default class Department extends BaseTarget implements IDepartment {
     return [...this.departments, ...this.workings];
   }
 
+  public async create(data: TargetModel): Promise<ITarget | undefined> {
+    switch (data.typeName as TargetType) {
+      case TargetType.Department:
+        return this.createDepartment(data);
+      case TargetType.Working:
+        return this.createWorking(data);
+    }
+  }
+
   async delete(): Promise<boolean> {
     const res = await this.deleteTarget();
     if (res.success) {

@@ -5,16 +5,14 @@ import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget } from '@/ts/core';
 import { resetParams } from '@/utils/tools';
 interface indexType {
   searchFn: Function;
-  current: ITarget;
   memberData: schema.XTarget[];
 }
 
 const MemberList: React.FC<indexType> = (props) => {
-  const { current, searchFn } = props;
+  const { searchFn } = props;
   useEffect(() => {
     getTableList(1, 10);
   }, []);
@@ -23,7 +21,7 @@ const MemberList: React.FC<indexType> = (props) => {
   const [value, setValue] = useState<string>();
   const [page, setPage] = useState<number>(1);
   const getTableList = async (page: number, pageSize: number) => {
-    const data = await current.loadMembers(resetParams({ page, pageSize }));
+    const data = await userCtrl.space.loadMembers(resetParams({ page, pageSize }));
     if (data.total > 0 && data.result) {
       setData(data.result);
     } else {
@@ -88,7 +86,7 @@ const MemberList: React.FC<indexType> = (props) => {
           request={async (params) => {
             const { pageIndex, pageSize } = params;
             setPage(pageIndex);
-            const res = await current.loadMembers(
+            const res = await userCtrl.space.loadMembers(
               resetParams({ page: pageIndex, pageSize }),
             );
             if (res.result) {

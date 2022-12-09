@@ -7,53 +7,52 @@ import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
 import { TargetType } from '@/ts/core';
 
 type CreateGroupPropsType = {
+  key: string;
   current: ITarget | undefined;
   setCurrent: (current: ITarget) => void;
-  handleMenuClick: (key: string, item: ITarget | undefined, id?: string) => void; // 点击操作触发的事件
+  handleMenuClick: (key: string, item: ITarget | undefined) => void;
 };
 
 const DepartTree: React.FC<CreateGroupPropsType> = ({
+  key,
   handleMenuClick,
   setCurrent,
   current,
 }) => {
-  const [key] = useCtrlUpdate(userCtrl);
   const [data, setData] = useState<any[]>([]);
   const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
     loadTeamTree();
-  }, []);
+  }, [current]);
 
   /** 加载右侧菜单 */
   const loadMenus = (item: ITarget) => {
-    const result = [];
-    item.subTeamTypes.forEach((i) => {
-      result.push({
-        key: 'new' + i,
-        icon: getIcon(i),
-        label: '新建' + i,
-      });
-    });
-    result.push(
+    return [
+      {
+        key: '新建|' + item.subTeamTypes.join('|'),
+        icon: <im.ImPlus />,
+        label: '新建',
+        item: item,
+      },
       {
         key: '刷新',
         icon: <im.ImSpinner9 />,
-        label: '刷新子组织',
+        label: '刷新',
+        item: item,
       },
       {
         key: '删除',
         icon: <im.ImBin />,
-        label: '删除' + item.name,
+        label: '删除',
+        item: item,
       },
-    );
-    return result;
+    ];
   };
 
   const loadTeamTree = async () => {
@@ -70,7 +69,7 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
           key: item.id,
           title: item.name,
           item: item,
-          isLeaf: false,
+          isLeaf: item.subTeam.length === 0,
           menus: loadMenus(item),
           icon: getIcon(item.teamName as TargetType),
           children: buildTargetTree(item.subTeam),
@@ -106,7 +105,10 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
           className={cls.creatgroup}
           icon={<PlusOutlined className={cls.addIcon} />}
           type="text"
-          onClick={() => handleMenuClick('new', undefined)}
+          onClick={() => {
+            const key = '新建|' + userCtrl.company.subTeamTypes.join('|');
+            handleMenuClick(key, undefined);
+          }}
         />
         <StoreClassifyTree
           className={cls.docTree}

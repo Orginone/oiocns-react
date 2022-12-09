@@ -1,16 +1,17 @@
-.group-content-box {
+.dept-content-box {
   background-color: #eff4f9;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.company-group-title {
+.company-dept-title {
   display: flex;
   justify-content: space-between;
 }
 
-.company-group-content {
+.company-dept-content {
   margin-bottom: 8px !important;
+
   :global {
     .ogo-card-body {
       padding: 20px;
@@ -21,8 +22,7 @@
     }
   }
 }
-
-.group-wrap-pages {
+.dept-wrap-pages {
   // height: calc(100% - 200px);
   flex: 1;
   overflow: hidden;
@@ -64,7 +64,8 @@
     }
   }
   .page-content-table {
-    flex: 1;
-    height: calc(100% - 48px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 }

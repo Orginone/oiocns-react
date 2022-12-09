@@ -72,6 +72,19 @@ export default class Company extends MarketTarget implements ICompany {
     return this.cohorts;
   };
 
+  public async create(data: TargetModel): Promise<ITarget | undefined> {
+    switch (data.typeName as TargetType) {
+      case TargetType.Department:
+        return this.createDepartment(data);
+      case TargetType.Working:
+        return this.createWorking(data);
+      case TargetType.Group:
+        return this.createGroup(data);
+      case TargetType.Cohort:
+        return this.createGroup(data);
+    }
+  }
+
   public async createCohort(
     avatar: string,
     name: string,

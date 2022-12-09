@@ -240,7 +240,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchFn={setPerson} memberData={members} current={current} />
+              <AssignPosts searchFn={setPerson} memberData={members} />
             </Modal>
           </div>
         </Content>

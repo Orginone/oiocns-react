@@ -4,6 +4,7 @@ import { IGroup, ITarget, TargetParam } from './itarget';
 import { companyTypes, TargetType } from '../enum';
 import { kernel } from '@/ts/base';
 import { logger } from '@/ts/base/common';
+import { TargetModel } from '@/ts/base/model';
 
 export default class Group extends BaseTarget implements IGroup {
   subGroup: IGroup[];
@@ -24,6 +25,13 @@ export default class Group extends BaseTarget implements IGroup {
   async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getSubGroups(reload);
     return this.subGroup;
+  }
+
+  public async create(data: TargetModel): Promise<ITarget | undefined> {
+    switch (data.typeName as TargetType) {
+      case TargetType.Group:
+        return this.createSubGroup(data);
+    }
   }
 
   async delete(): Promise<boolean> {
