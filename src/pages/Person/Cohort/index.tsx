@@ -255,7 +255,7 @@ const CohortConfig: React.FC = () => {
                 width="700px">
                 <Persons searchCallback={searchCallback} />
               </Modal>
-
+              {/**身份管理 */}
               <Indentity
                 open={isOpenIndentity}
                 current={item!}
@@ -263,7 +263,6 @@ const CohortConfig: React.FC = () => {
                   setIsOpenIndentity(false);
                 }}
               />
-
               {item?.authorityTree && (
                 <AddPostModal
                   title={'角色设置'}
@@ -274,7 +273,6 @@ const CohortConfig: React.FC = () => {
                   current={item}
                 />
               )}
-
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
@@ -283,7 +281,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort setCohort={setcohort} />
               </Modal>
-
+              {/**修改群组 */}
               {item && (
                 <UpdateCohort
                   key={item?.target.id}
@@ -291,7 +289,6 @@ const CohortConfig: React.FC = () => {
                   title="修改群组"
                   modalprops={{
                     destroyOnClose: true,
-                    onCancel: () => setOpen(false),
                   }}
                   open={open}
                   columns={updateColumn as any}
@@ -300,6 +297,7 @@ const CohortConfig: React.FC = () => {
                   callBack={getData}
                 />
               )}
+              {/**创建群组 */}
               <CreateCohort callBack={getData} />
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组

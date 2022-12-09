@@ -42,35 +42,38 @@ export default class WebApp implements IProduct {
     teamId: string,
     destIds: string[],
     destType: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.createSourceExtend({
-      sourceId: this.prod.id,
-      sourceType: '产品',
-      spaceId: this.prod.belongId,
-      destIds,
-      destType,
-      teamId,
-    });
+  ): Promise<boolean> {
+    return (
+      await kernel.createSourceExtend({
+        sourceId: this.prod.id,
+        sourceType: '产品',
+        spaceId: this.prod.belongId,
+        destIds,
+        destType,
+        teamId,
+      })
+    ).success;
   }
   public async deleteExtend(
     teamId: string,
     destIds: string[],
     destType: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.deleteSourceExtend({
-      sourceId: this.prod.id,
-      sourceType: '产品',
-      destIds,
-      destType,
-      spaceId: this.prod.belongId,
-      teamId,
-    });
+  ): Promise<boolean> {
+    return (
+      await kernel.deleteSourceExtend({
+        sourceId: this.prod.id,
+        sourceType: '产品',
+        destIds,
+        destType,
+        spaceId: this.prod.belongId,
+        teamId,
+      })
+    ).success;
   }
   public async queryExtend(
     destType: string,
     teamId: string = '0',
   ): Promise<model.IdNameArray> {
-    teamId = teamId ?? '0';
     return (
       await kernel.queryExtendBySource({
         sourceId: this.prod.id,
@@ -88,7 +91,7 @@ export default class WebApp implements IProduct {
     information: string;
     price: number;
     days: string;
-  }): Promise<model.ResultType<any>> {
+  }): Promise<boolean> {
     const res = await kernel.createMerchandise({
       id: '0',
       caption: params.caption,
@@ -104,9 +107,9 @@ export default class WebApp implements IProduct {
         this.merchandises.push(new Merchandise(res.data));
       }
     }
-    return res;
+    return res.success;
   }
-  public async unPublish(id: string): Promise<model.ResultType<any>> {
+  public async unPublish(id: string): Promise<boolean> {
     const res = await kernel.deleteMerchandise({
       id,
       belongId: this.prod.belongId,
@@ -116,7 +119,7 @@ export default class WebApp implements IProduct {
         return a.merchandise.id != id;
       });
     }
-    return res;
+    return res.success;
   }
   public async update(
     name: string,
@@ -124,7 +127,7 @@ export default class WebApp implements IProduct {
     typeName: string,
     remark: string,
     resources: model.ResourceModel[],
-  ): Promise<model.ResultType<any>> {
+  ): Promise<boolean> {
     const res = await kernel.updateProduct({
       id: this.prod.id,
       name,
@@ -145,6 +148,6 @@ export default class WebApp implements IProduct {
         this.resource.push(new Resource(a));
       });
     }
-    return res;
+    return res.success;
   }
 }
