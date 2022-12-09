@@ -18,7 +18,7 @@ type CreateGroupPropsType = {
   handleMenuClick: (key: string, item: ITarget | undefined, id?: string) => void; // 点击操作触发的事件
 };
 
-const DepartTree: React.FC<CreateGroupPropsType> = ({
+const GroupTree: React.FC<CreateGroupPropsType> = ({
   handleMenuClick,
   setCurrent,
   current,
@@ -119,4 +119,4 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   );
 };
 
-export default DepartTree;
+export default GroupTree;
