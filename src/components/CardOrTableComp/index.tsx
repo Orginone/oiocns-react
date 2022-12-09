@@ -68,7 +68,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
         // console.log('展示高度', _height);
-        setDefaultHeight(_height > 100 ? _height - (headerTitle ? 164 : 116) : 100);
+        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
       }
     }, 50);
   }, [parentRef]);
@@ -149,9 +149,11 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             };
           }
         }}
-        tableRender={(props, defaultDom) => {
+        tableRender={(props: any, defaultDom) => {
           return pageType === 'table' ? (
-            !showChangeBtn ? (
+            !showChangeBtn ||
+            !props.action.datasource ||
+            props.action.datasource.length === 0 ? (
               defaultDom
             ) : (
               [defaultDom, TableFooter]
@@ -163,7 +165,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                 className={cls['common-card']}
                 style={{
                   height:
-                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
+                    defaultHeight !== 'auto' ? defaultHeight + 70 + 'px' : defaultHeight,
                 }}>
                 {renderCardContent && renderCardContent(dataSource)}
               </div>

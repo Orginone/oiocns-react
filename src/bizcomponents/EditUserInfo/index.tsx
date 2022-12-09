@@ -1,13 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { message, Upload, UploadProps, Image } from 'antd';
 import { nanoid, ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core';
 import SchemaForm from '@/components/SchemaForm';
 import { XTarget } from '@/ts/base/schema';
 import { PlusOutlined } from '@ant-design/icons';
@@ -20,7 +14,7 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: () => void;
   editData?: XTarget;
-  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
+  reObject: ITarget;
 }
 /*
   编辑
@@ -132,10 +126,8 @@ const EditCustomModal = (props: Iprops) => {
         } else {
           formRef.current?.resetFields();
           setImage(undefined);
+          handleCancel();
         }
-      }}
-      modalprops={{
-        onCancel: () => handleCancel(),
       }}
       rowProps={{
         gutter: [24, 0],
@@ -144,11 +136,11 @@ const EditCustomModal = (props: Iprops) => {
       onFinish={async (values) => {
         if (!editData) return;
         const res = await reObject.update({ ...values });
-        if (res.success) {
+        if (res) {
           message.success('修改成功');
           handleOk();
         } else {
-          message.error(res.msg);
+          message.error('修改失败');
           return false;
         }
       }}
