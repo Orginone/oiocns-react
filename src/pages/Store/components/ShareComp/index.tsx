@@ -5,7 +5,6 @@ import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { kernel } from '@/ts/base';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { ITarget } from '@/ts/core';
 interface Iprops {
@@ -59,13 +58,13 @@ const ShareRecent = (props: Iprops) => {
     setTimeout(async () => {
       if (appCtrl.curProduct) {
         if (shareType === '共享') {
-          setLeftTreeData(await userCtrl.getTeamTree());
+          setLeftTreeData(loadTree(await userCtrl.getTeamTree()));
         } else {
           if (userCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
           }
-          setLeftTreeData(await userCtrl.getTeamTree(false));
+          setLeftTreeData(loadTree(await userCtrl.getTeamTree(false)));
         }
         await appCtrl.curProduct.queryExtend('组织', '');
       }
@@ -82,6 +81,20 @@ const ShareRecent = (props: Iprops) => {
     queryExtend();
   }, [radio]);
 
+  const loadTree = (targets: ITarget[]) => {
+    const result: any[] = [];
+    if (targets) {
+      for (const item of targets) {
+        result.push({
+          id: item.id,
+          name: item.name,
+          item: item,
+          children: loadTree(item.subTeam),
+        });
+      }
+    }
+    return result;
+  };
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
@@ -352,7 +365,7 @@ const ShareRecent = (props: Iprops) => {
               fieldNames={{
                 title: 'name',
                 key: 'id',
-                children: 'subTeam',
+                children: 'children',
               }}
               selectedKeys={leftTreeSelectedKeys}
               onSelect={onSelect}

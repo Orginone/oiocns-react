@@ -10,7 +10,6 @@ import Working from './working';
  */
 export default class Department extends BaseTarget implements IDepartment {
   workings: IWorking[];
-  subTeam: ITarget[];
   person: schema.XTarget[];
   departments: IDepartment[];
   private _onDeleted: Function;
@@ -18,12 +17,14 @@ export default class Department extends BaseTarget implements IDepartment {
   constructor(target: schema.XTarget, onDeleted: Function) {
     super(target);
     this.person = [];
-    this.subTeam = [];
     this.workings = [];
     this.departments = [];
     this._onDeleted = onDeleted;
     this.subTeamTypes = [TargetType.Department, TargetType.Working];
     this.createTargetType = [TargetType.Department, TargetType.Working];
+  }
+  public get subTeam(): ITarget[] {
+    return [...this.departments, ...this.workings];
   }
   async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getDepartments(reload);

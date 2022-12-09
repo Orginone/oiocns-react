@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, message } from 'antd';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
-import { ITarget } from '@/ts/core/target/itarget';
+import { ICompany, IDepartment, ITarget } from '@/ts/core/target/itarget';
 import cls from './index.module.less';
-import { ResultType } from '@/ts/base/model';
 const { TextArea } = Input;
 interface Iprops {
   title: string;
@@ -54,20 +52,12 @@ const EditCustomModal = (props: Iprops) => {
           typeName: TargetType.Department,
         };
 
-        let res: ResultType<any>;
-        if (editDept) {
-          // 新增下级部门信息
-          res = await editDept.createDepartment(newValue);
+        if (current as ICompany) {
+          await (current as ICompany).createDepartment(newValue);
         } else {
-          // 如果是一级部门， 就从根部门里面新增
-          res = await userCtrl.company.createDepartment(newValue);
+          await (current as IDepartment).createDepartment(newValue);
         }
-        if (res.success) {
-          message.success(`创建${value.name}成功!`);
-          handleOk();
-        } else {
-          message.error(`新增部门失败,${res.msg}`);
-        }
+        handleOk();
       }
     }
   };

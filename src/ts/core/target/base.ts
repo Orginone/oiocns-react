@@ -12,7 +12,6 @@ export default class BaseTarget implements ITarget {
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
-  public subTeam: ITarget[] = [];
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
@@ -29,6 +28,10 @@ export default class BaseTarget implements ITarget {
   }
   public get teamName(): string {
     return this.target.team!.name;
+  }
+
+  public get subTeam(): ITarget[] {
+    return [];
   }
 
   constructor(target: schema.XTarget) {
