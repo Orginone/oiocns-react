@@ -168,34 +168,29 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </Button>
   );
 
-  // 身份信息标题
-
   //身份主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        <Card
-          title={indentity?.target.name}
-          className={cls['app-tabs']}
-          extra={renderBtns}
-          bordered={false}>
-          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-            <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={personData as any}
-                rowKey={'id'}
-                total={personData.length || 0}
-                operation={renderOperation}
-                columns={columns as any}
-                parentRef={parentRef}
-                showChangeBtn={false}
-              />
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Card
+        title={indentity?.target.name}
+        className={cls['app-tabs']}
+        extra={renderBtns}
+        bordered={false}>
+        <div className={cls['page-content-table']} ref={parentRef}>
+          <CardOrTable
+            dataSource={personData as any}
+            rowKey={'id'}
+            total={personData.length || 0}
+            operation={renderOperation}
+            columns={columns as any}
+            parentRef={parentRef}
+            showChangeBtn={false}
+          />
+        </div>
+      </Card>
     </div>
   );
+
   return (
     <Modal
       open={open}
@@ -210,7 +205,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             setCurrent={setTreeCurrent}
             currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
-            // reObject={object}
+            current={current}
           />
         </Sider>
         <Content style={{ paddingLeft: 4 }}>
@@ -227,7 +222,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 setIsOpenModal(false);
               }}
               editData={indentity!}
-              // reObject={object}
+              current={current}
             />
             <Modal
               title="指派身份"
