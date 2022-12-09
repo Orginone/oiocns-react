@@ -16,7 +16,6 @@ interface Iprops {
 }
 
 const ProductDetailModal: React.FC<Iprops> = ({ title, open, onClose, width, data }) => {
-  console.log('应用详情属性', data);
   const content = (
     <Card bordered={false}>
       <Descriptions bordered column={2}>
