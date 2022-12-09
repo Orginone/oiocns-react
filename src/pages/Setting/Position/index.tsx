@@ -12,7 +12,7 @@ import AssignPosts from './components/AssignPosts';
 import { schema } from '@/ts/base';
 import { PlusOutlined } from '@ant-design/icons';
 import Indentity from '@/ts/core/target/authority/identity';
-import IndentityManage from '@/bizcomponents/IndentityManage';
+import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
 import positionCtrl, {
   PostitonCallBackTypes,
 } from '@/ts/controller/position/positionCtrl';
@@ -141,18 +141,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   //   });
   // };
   /**添加框内选中组织后的数据转换 */
-  const onCheckeds = (team: any, type: string, checkedValus: any[]) => {
-    const result = [];
-    for (const a of checkedValus) {
-      const data = {
-        organization: team.name,
-        id: a.id,
-        name: a.name,
-        remark: a.remark,
-        obj: a.props.data,
-      };
-      result.push(data);
-    }
+  const onCheckeds = (result: ResultType[]) => {
     setAddIndentitys(result);
   };
 
@@ -259,7 +248,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         }}
         onCancel={() => setIsAddOpen(false)}
         width="1050px">
-        <IndentityManage shareType="" onCheckeds={onCheckeds} />
+        <IndentityManage onCheckeds={onCheckeds} />
       </Modal>
       <Modal
         title="指派岗位"

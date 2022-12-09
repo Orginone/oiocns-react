@@ -1,351 +1,175 @@
 /* eslint-disable no-unused-vars */
 import { SearchOutlined } from '@ant-design/icons';
-import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
-import React, { useState, useEffect, Key } from 'react';
+import * as im from 'react-icons/im';
+import { Input, Tree, TreeProps } from 'antd';
+import StoreClassifyTree from '@/components/CustomTreeComp';
+import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-// import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { kernel } from '@/ts/base';
-import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import { ITarget, TargetType } from '@/ts/core';
+import { XIdentity, XTarget } from '@/ts/base/schema';
+import { generateUuid } from '@/ts/base/common';
+export type ResultType = {
+  id: string;
+  target: XTarget;
+  identitys: XIdentity[];
+};
 interface Iprops {
-  onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
-  shareType: string;
+  onCheckeds?: (selects: ResultType[]) => void;
 }
-const DestTypes = [
-  {
-    value: 3,
-    label: '岗位',
-  },
-];
 const ShareRecent = (props: Iprops) => {
-  const { onCheckeds, shareType } = props;
-  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
+  const [key, setKey] = useState<string>('');
+  const [data, setData] = useState<any[]>([]);
+  const [identitys, setIdentitys] = useState<any[]>([]);
+  const [current, setCurrent] = useState<ResultType>();
+  const [resultData, setResultData] = useState<ResultType[]>([]);
 
-  const [radio, setRadio] = useState<number>(3); //分配类型
-  const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
-  const [leftTreeData, setLeftTreeData] = useState<any>([]);
-  const [centerTreeData, setCenterTreeData] = useState<any>([]);
-  const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
-  const [departHisData, setDepartHisData] = useState<any[]>([]); // radio=1 历史数据
-  const [authorData, setAuthorData] = useState<any[]>([]); // raido=2 数据
-  const [personsData, setPersonsData] = useState<any[]>([]); //raido=3 数据
-  const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
-  const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
-  const [selectedTeam, setSelectedTeam] = useState<any>('');
-  const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
-    {} as any,
-  );
-
-  useEffect(() => {
-    getLeftTree();
-  }, []);
-  useEffect(() => {
-    setDepartData([]);
-    setAuthorData([]);
-    setPersonsData([]);
-    setIdentitysData([]);
-    setCenterTreeData([]);
-    setSelectedTeam('');
-    setLeftTreeSelectedKeys([]);
-  }, [radio]);
-
-  // 修改选中 提交修改selectAuthorityTree
-  const handelCheckedChange = (list: any) => {
-    onCheckeds && onCheckeds(selectedTeam, '岗位', personsData);
+  const loadTeamTree = async () => {
+    const targets = await userCtrl.space.loadSubTeam(false);
+    setData(buildTargetTree(targets));
   };
-  const getLeftTree = async () => {
-    let FunName: Function = userCtrl.user!.getJoinedCohorts;
-    if (userCtrl.isCompanySpace) {
-      FunName =
-        shareType === '共享'
-          ? userCtrl.company!.getJoinedGroups
-          : userCtrl.company!.getDepartments;
-    }
-    const res = await FunName();
-    console.log('共享获取组织', res);
-    const ShowList = res?.map((item: { target: any }) => {
-      return {
-        ...item.target,
-        node: item,
-      };
-    });
 
-    setLeftTreeData([...ShowList]);
-  };
-  const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-    console.log('selected', selectedKeys, info);
-    setLeftTreeSelectedKeys(selectedKeys);
-
-    hasSelectRecord?.list?.lenght &&
-      selfAppCtrl.ShareProduct(
-        selectedTeam,
-        hasSelectRecord!.list,
-        hasSelectRecord!.type,
-      );
-    setSelectedTeam(info.node);
-    setDepartData([]);
-    setAuthorData([]);
-    setPersonsData([]);
-    setIdentitysData([]);
-    setCenterTreeData([]);
-
-    switch (radio) {
-      case 3: {
-        // 岗位 --职权树
-
-        const res2 = await kernel.queryTargetIdentitys({
-          id: info.node.id,
-          page: {
-            limit: pageCurrent.limit,
-            offset: pageCurrent.offset,
-            filter: '',
-          },
+  /** 加载组织树 */
+  const buildTargetTree = (targets: ITarget[]) => {
+    const result: any[] = [];
+    if (targets) {
+      for (const item of targets) {
+        result.push({
+          key: item.id,
+          title: item.name,
+          item: item,
+          isLeaf: false,
+          icon: getIcon(item.teamName as TargetType),
+          children: buildTargetTree(item.subTeam),
         });
-
-        const { result = [] } = res2.data;
-        console.log('输出,岗位', res2);
-        setCenterTreeData(result ? result : []);
-        break;
       }
+    }
+    return result;
+  };
+
+  const getIcon = (type: TargetType) => {
+    switch (type) {
+      case TargetType.Working:
+        return <im.ImUsers />;
       default:
-        break;
+        return <im.ImTree />;
     }
   };
-  // 左侧树点击事件
-  const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    console.log('点击左侧', checkedKeys, info);
-    if (info.checked) {
-      let result = departHisData.some((item: any) => {
-        return item.id == info.node.id;
-      });
-      for (let i = 0; i < departData.length; i++) {
-        if (departData[i].id == info.node.id) {
-          if (info.node.type == 'add') {
-            return;
-          } else if (info.node.type == 'has') {
-            return;
-          }
-        }
-      }
-      if (result) {
-        if (info.node.type == 'del') {
-          info.node.type = 'has';
-          departData.forEach((el: any) => {
-            if (el.id == info.node.id) {
-              el.type = 'has';
-            }
-          });
-          return;
-        } else {
-          info.node.type = 'has';
-          departData.push(info.node);
-        }
-      } else {
-        info.node.type = 'add';
-        departData.push(info.node);
-      }
-    } else {
-      let result = departHisData.some((item: any) => {
-        return item.id == info.node.id;
-      });
-      departData.forEach((el: any, index: number) => {
-        if (el.id == info.node.id) {
-          if (result) {
-            el.type = 'del';
-            info.node.type = 'del';
-          } else {
-            departData.splice(index, 1);
-          }
-        }
-      });
-    }
-    handelCheckedChange(checkedKeys);
 
-    setDepartData([...departData]);
+  useEffect(() => {
+    loadTeamTree();
+  }, []);
+
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const item: ITarget = info.node.item;
+    if (item) {
+      const index = resultData.findIndex((i) => {
+        return i.id === item.id;
+      });
+      if (index > -1) {
+        setCurrent(resultData[index]);
+      } else {
+        const newItem: ResultType = {
+          id: item.id,
+          target: item.target,
+          identitys: [],
+        };
+        resultData.push(newItem);
+        setResultData(resultData);
+        setCurrent(newItem);
+      }
+      await item.loadSubTeam();
+      loadTeamTree();
+      const result = (await item.getIdentitys()).map((i) => {
+        return {
+          title: i.name,
+          key: i.id,
+          data: i.target,
+        };
+      });
+      setIdentitys(result);
+    }
+    setKey(generateUuid());
   };
   // 中间树形点击事件
-  const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
-    if (info.checked) {
-      if (radio == 3) {
-        console.log('444555', personsData);
-        handleBoxClick(personsHisData, personsData, info.node);
-        setIdentitysData(personsData);
-      }
-    } else {
-      if (radio == 3) {
-        handleBoxCancelClick(personsHisData, personsData, info.node);
-        setIdentitysData(personsData);
-      }
-    }
-    setHasSelectRecord({ type: '岗位', list: checkedKeys });
-    handelCheckedChange(info.node);
-    setIdentitysData(personsData);
-
-    console.log('onCheck', checkedKeys, identitysData);
+  const onCheck: TreeProps['onCheck'] = (_, info) => {
+    changedChecked(info.node.key as string, info.checked);
   };
-  // 点击删除
-  // const delContent = (item: any) => {
-  //   if (item.type == 'del') {
-  //     return;
-  //   } else if (item.type == 'add') {
-  //     departData.forEach((el: any, index: number) => {
-  //       if (el.id == item.id) {
-  //         departData.splice(index, 1);
-  //         leftTree.value.setChecked(item.id, false);
-  //       }
-  //     });
-  //   } else {
-  //     departData.forEach((el: any, index: number) => {
-  //       if (el.id == item.id) {
-  //         el.type = 'del';
-  //         leftTree.value.setChecked(el.id, false);
-  //       }
-  //     });
-  //   }
-  // };
 
-  const handleBoxCancelClick = (hisData: any, dataList: any, data: any) => {
-    let result = hisData.some((item: any) => {
-      return item.id == data.id;
-    });
-    dataList.forEach((el: any, index: number) => {
-      if (el.id == data.id) {
-        if (result) {
-          data.type = 'del';
-          el.type = 'del';
-        } else {
-          dataList.splice(index, 1);
+  const changedChecked = (key: string, add: boolean) => {
+    if (current) {
+      for (const item of identitys) {
+        if (item.key === key) {
+          if (add) {
+            current.identitys.push(item.data);
+          } else {
+            current.identitys = current.identitys.filter((i: any) => {
+              return i.id != item.key;
+            });
+          }
+          setKey(generateUuid());
+          props.onCheckeds?.apply(this, [resultData]);
         }
       }
-    });
+    }
   };
-  const handleBoxClick = (hisData: any, dataList: any, data: any) => {
-    let result = hisData.some((item: any) => {
-      return item.id == data.id;
-    });
-    for (let i = 0; i < dataList.length; i++) {
-      if (dataList[i].id == data.id) {
-        if (data.type == 'add') {
-          return;
-        } else if (data.type == 'has') {
-          return;
-        }
+
+  const getSelectData = () => {
+    const result = [];
+    for (const item of resultData) {
+      for (const id of item.identitys) {
+        result.push({
+          id: id.id,
+          name: id.name,
+          type: 'add',
+        });
       }
     }
+    return result;
+  };
 
-    if (result) {
-      data.type = 'has';
-      dataList.forEach((el: any) => {
-        if (el.id == data.id) {
-          el.type = 'has';
-        }
-      });
-    } else {
-      data.type = 'add';
-      dataList.push(data);
+  const getSelectKeys = () => {
+    if (current) {
+      return current.identitys.map((item) => item.id);
     }
+    return [];
   };
 
   return (
     <div className={cls.layout}>
-      {/* {shareType === '分配' ? (
-        <div className={cls.top}>
-          <p className={cls['top-label']}>分配集团:</p>
-          <Select
-            style={{ minWidth: 160 }}
-            onChange={handleCompanyChange}
-            options={CompanyList.map((comp) => {
-              return {
-                value: comp.target.id,
-                label: comp.target.name,
-              };
-            })}
-          />
-        </div>
-      ) : (
-        ''
-      )} */}
-      <div className={cls.top}>
-        <p className={cls['top-label']}>形式：</p>
-        <Radio.Group
-          onChange={(e: RadioChangeEvent) => {
-            setRadio(e.target.value);
-          }}
-          value={radio}>
-          {DestTypes.map((item) => {
-            return (
-              <Radio value={item.value} key={item.value}>
-                按
-                {userCtrl.isCompanySpace && shareType === '共享' && item.label === '人员'
-                  ? '单位'
-                  : userCtrl.isCompanySpace &&
-                    shareType === '共享' &&
-                    item.label === '组织'
-                  ? '集团'
-                  : item.label}
-              </Radio>
-            );
-          })}
-        </Radio.Group>
-      </div>
       <div className={cls.content}>
-        <div style={{ width: radio !== 1 ? '33%' : '50%' }} className={cls.left}>
-          <Input
-            className={cls.leftInput}
-            prefix={<SearchOutlined />}
-            placeholder="请输入部门"
+        <div className={cls.leftContent}>
+          <StoreClassifyTree
+            className={cls.docTree}
+            title={'内设机构'}
+            isDirectoryTree
+            menu={'menus'}
+            searchable
+            showIcon
+            treeData={data}
+            onSelect={onSelect}
           />
-          <div className={cls.leftContent}>
+        </div>
+        <div className={cls.center}>
+          <Input
+            className={cls.centerInput}
+            prefix={<SearchOutlined />}
+            placeholder="搜索"
+          />
+          <div id={key} className={cls.centerContent}>
             <Tree
-              checkable={radio !== 1 ? false : true}
-              fieldNames={{
-                title: 'name',
-                key: 'id',
-                children: 'children',
-              }}
-              selectedKeys={leftTreeSelectedKeys}
-              onSelect={onSelect}
-              onCheck={handleCheckChange}
-              treeData={leftTreeData}
+              checkable
+              autoExpandParent={true}
+              onCheck={onCheck}
+              treeData={identitys}
+              checkedKeys={getSelectKeys()}
             />
           </div>
         </div>
-        {radio !== 1 ? (
-          <div className={cls.center}>
-            <Input
-              className={cls.centerInput}
-              prefix={<SearchOutlined />}
-              placeholder="搜索"
-            />
-            <div className={cls.centerContent}>
-              <Tree
-                checkable
-                autoExpandParent={true}
-                fieldNames={{
-                  title: 'name',
-                  key: 'id',
-                  children: 'nodes',
-                }}
-                onCheck={onCheck}
-                treeData={centerTreeData}
-              />
-            </div>
-          </div>
-        ) : (
-          ''
-        )}
-        <div style={{ width: radio !== 1 ? '33%' : '50%' }} className={cls.right}>
+        <div id={key} style={{ width: '33%' }} className={cls.right}>
           <ShareShowComp
-            departData={
-              radio == 1
-                ? departData
-                : radio == 2
-                ? authorData
-                : radio == 3
-                ? personsData
-                : identitysData
-            }
+            departData={getSelectData()}
             deleteFuc={() => {}}></ShareShowComp>
         </div>
       </div>
