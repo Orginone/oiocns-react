@@ -1,15 +1,33 @@
-@import '~antd/es/style/themes/variable';
+.cardContainer {
+  display: flex;
+  overflow: hidden;
+  background-color: @component-background;
+  padding: @padding-xs;
+  margin-bottom: @margin-xs;
+  transition: all 0.6s;
+  height: 148px;
+  min-height: 150px;
+  border-radius: @border-radius-base;
+}
 
-.buyCard {
-  width: 260px;
+.cardContainer:hover {
+  overflow-x: auto;
+}
+
+.card {
+  flex-shrink: 0;
+  height: 120px;
+  border-radius: @item-card-radius;
+  border-color: @border-color-base;
   background-color: #fff;
-  border-color: @border-color-base !important;
-  transition: all 0.3s ease 0.1s;
-  margin-bottom: 10px;
 
   &::after {
     display: none;
     border-color: @border-color-base;
+  }
+
+  &:hover {
+    background-color: #fff;
   }
 
   :global {
@@ -23,64 +41,16 @@
       justify-content: space-between;
     }
 
-    .app-desc {
-      height: 37px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box; //将对象作为弹性伸缩盒子模型显示。
-      -webkit-box-orient: vertical; // 从上到下垂直排列子元素
-      -webkit-line-clamp: 2; //显示的行数
+    .ogo-pro-checkcard-checked {
+      background-color: #fff !important;
     }
   }
 
-  .operationBtn {
-    font-size: 24px;
-    height: max-content;
-    transition: all 0.3s ease 0.1s;
-
-    &:hover {
-      transform: scale(1.2);
-    }
+  :global(.ogo-avatar-square) {
+    border-radius: 16px;
   }
 
-  .nameLabel {
-  }
-
-  .cardTitle {
-    display: flex;
-    flex-direction: column;
-
-    .version {
-      color: #c0c4cc;
-      font-size: 12px;
-      margin: 14px 0 0 9px;
-    }
-  }
-
-  .btnBox {
-    display: flex;
-    justify-content: flex-end;
-    margin: 0;
-
-    .btn {
-      font-size: 12px;
-      // height: 24px;
-      // line-height: 24px;
-      padding: 2px 14px;
-      height: max-content;
-      margin-left: 10px;
-      border-color: #a1b7ef;
-      color: #154ad8;
-      font-weight: 550;
-      transform: scale(0.95);
-
-      &:hover {
-        color: #fff;
-        border-color: #154ad8;
-        background: #154ad8;
-        text-shadow: 0 -1px 0 rgb(0 0 0 / 12%);
-        box-shadow: 0 2px 0 rgb(0 0 0 / 5%);
-      }
-    }
+  .decription {
+    font-size: 12px;
   }
 }
