@@ -3,7 +3,7 @@ import cls from './index.module.less';
 import LayoutPreview from '@/bizcomponents/Flow/Layout/LayoutPreview';
 import FormProcessDesign from '@/bizcomponents/Flow/Layout/FormProcessDesign';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import useEventEmitter from '@/hooks/useEventEmitter';
+
 // import { EventContext } from '../const';
 type ProcessDesignProps = {
   [key: string]: any;
@@ -11,7 +11,6 @@ type ProcessDesignProps = {
   editorValue: string | null | undefined;
   designData: any;
 };
-// export const EventContext = createContext({} as { FlowSub: any; conditionData: {} });
 /**
  * 空节点
  * @returns
@@ -21,7 +20,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   editorValue,
   designData,
 }) => {
-  const FlowSub = useEventEmitter();
   const activeSelect = 'processDesign';
   const previewRef: any = useRef();
   const setDesign = useAppwfConfig((state: any) => state.setDesign);
@@ -64,12 +62,14 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
     /** 这里走编辑的逻辑 */
     if (editorValue && editorValue !== '{}') {
       tempDesign = designData || JSON.parse(editorValue);
+      /**如果操作过基本信息 */
       if (conditionData?.labels) {
         // 编辑了之后值没有变
         tempDesign.remark = JSON.stringify(conditionData?.labels);
         tempDesign.fields = conditionData?.fields;
         tempDesign.name = conditionData.name;
         DefaultProps.setFormFields(conditionData?.labels);
+        /**没操作过 */
       } else {
         DefaultProps.setFormFields(JSON.parse(tempDesign?.remark));
       }
@@ -82,10 +82,10 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
         tempDesign = JSON.parse(JSON.stringify(defaultDesign));
       } else {
         DefaultProps.setFormFields(conditionData?.labels);
-        defaultDesign.remark = JSON.stringify(conditionData?.labels);
-        defaultDesign.fields = conditionData?.fields;
-        defaultDesign.name = conditionData?.name;
-        tempDesign = defaultDesign;
+        designData.remark = JSON.stringify(conditionData?.labels);
+        designData.fields = conditionData?.fields;
+        designData.name = conditionData?.name;
+        tempDesign = designData;
       }
     }
     // setOldDesign(tempDesign);
