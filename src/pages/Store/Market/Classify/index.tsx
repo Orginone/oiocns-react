@@ -33,9 +33,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    */
   const onOk = async (formData: any) => {
     const res = await marketCtrl.Market.createMarket({ ...formData });
-    if (res?.code === 400) {
-      message.warning(res?.msg);
-    } else if (res?.code === 200 && res?.success) {
+    if (res?.code === 200 && res?.success) {
       message.success('创建成功');
     }
     setIsAddOpen(false);
@@ -50,9 +48,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setIsJoinShop(false);
     setDataSource([]);
     const res = await userCtrl.user!.applyJoinMarket(val[0]?.id);
-    if (res?.code === 400) {
-      message.warning(res?.msg);
-    } else if (res?.code === 200 && res?.success) {
+    if (res?.code === 200 && res?.success) {
       message.success('申请已发送');
     }
   };
@@ -65,7 +61,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onChange = async (val: any) => {
     const res = await marketCtrl.Market.getMarketByCode(val.target.value);
     if (res?.success) {
-      setDataSource(res.data.result);
+      setDataSource(res?.data?.result);
     }
   };
 
