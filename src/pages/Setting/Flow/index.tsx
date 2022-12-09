@@ -105,14 +105,12 @@ const SettingFlow: React.FC = () => {
   ];
 
   useEffect(() => {
-    const id = userCtrl.subscribe(initData);
-    return () => {
-      userCtrl.unsubscribe(id);
-    };
+    initData();
   }, []);
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
+    console.log('result', result);
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
@@ -126,6 +124,7 @@ const SettingFlow: React.FC = () => {
   const publish = async () => {
     /**要发布的数据 */
     const currentData = deepClone(design);
+    console.log('数据发布', currentData);
     if (currentData.belongId) {
       delete currentData.belongId;
     }

@@ -20,7 +20,6 @@ type ConditionNodeProps = {
  */
 const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) => {
   const [showError, setShowError] = useState<boolean>(false);
-  const [placeholder, setPlaceholder] = useState<string>('请设置条件');
   const design = useAppwfConfig((state: any) => state.design);
   const delNode = () => {
     props.onDelNode();
@@ -46,12 +45,20 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
       }
       text = text.substring(0, text.lastIndexOf(' 且 '));
       /** 如果没有找到字段就报错 */
-      const getFindValue = currentCondition.find((item: any) => {
-        return (
-          item.label === conditions[0].paramLabel && item.value === conditions[0].paramKey
-        );
-      });
-      if (!getFindValue) {
+
+      /** conditions中的每一项 在currentCondition中都要存在 如果不存在就报错 */
+      const getFindValue = conditions.find(
+        (item: { paramLabel: string; paramKey: string }) => {
+          const findData = currentCondition.find(
+            (innItem: { label: string; value: string }) => {
+              return item.paramLabel !== innItem.label || innItem.value !== item.paramKey;
+            },
+          );
+          return typeof findData !== 'undefined';
+        },
+      );
+      console.log('getFindValue', getFindValue);
+      if (getFindValue) {
         setShowError(true);
       }
     }
@@ -75,7 +82,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   );
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
-      {!content && <span className={cls['placeholder']}>{placeholder}</span>}
+      {!content && <span className={cls['placeholder']}>请设置条件</span>}
       {content && <span className={cls['name']}>{content}</span>}
       {showError ? (
         <p style={{ color: 'red', paddingBottom: '10px' }}>
