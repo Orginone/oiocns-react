@@ -70,6 +70,7 @@ export default class WebApp implements IProduct {
     destType: string,
     teamId?: string,
   ): Promise<model.IdNameArray> {
+    teamId = teamId ?? '0';
     return (
       await kernel.queryExtendBySource({
         sourceId: this.prod.id,
