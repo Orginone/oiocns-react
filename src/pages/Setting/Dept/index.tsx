@@ -39,7 +39,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     return [
       {
         key: 'changeDept',
-        label: '变更部门',
+        label: '变更' + item.typeName,
         onClick: () => {
           setSelectPerson(item);
           setActiveModal('transfer');
@@ -47,7 +47,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       },
       {
         key: 'moveOne',
-        label: '移出部门',
+        label: '移出' + item.typeName,
         onClick: async () => {
           if (selectPerson && current) {
             if (await current.removeMember(item)) {
@@ -111,7 +111,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `部门成员`,
+      tab: current?.target.typeName ?? '机构' + `成员`,
       key: 'deptPerpeos',
     },
     {
@@ -142,7 +142,9 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       {current ? (
         <>
           <DeptDescription
-            title={<Typography.Title level={5}>部门信息</Typography.Title>}
+            title={
+              <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
+            }
             selectDept={current.target}
             extra={[
               <Button
@@ -168,12 +170,16 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                   tabBarExtraContent={renderBtns()}
                 />
                 <CardOrTable<XTarget>
-                  dataSource={[]}
                   rowKey={'id'}
+                  params={current}
+                  request={async (page) => {
+                    return await current.loadMembers(page);
+                  }}
                   operation={renderOperation}
                   columns={columns}
                   parentRef={parentRef}
                   showChangeBtn={false}
+                  dataSource={[]}
                 />
               </div>
             </PageCard>

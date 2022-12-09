@@ -288,8 +288,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                   rowKey={'id'}
                   dataSource={[]}
                   request={async (page: PageRequest) => {
-                    console.log(page);
-                    await current.loadMembers(page);
+                    return await current.loadMembers(page);
                   }}
                   operation={renderOperation}
                   columns={columns}
@@ -303,7 +302,6 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       ) : (
         ''
       )}
-
       <Modal
         title="添加单位"
         open={activeModal === 'addCompany'}
