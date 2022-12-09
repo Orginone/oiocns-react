@@ -201,11 +201,7 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts
-            searchFn={setSelectPerson}
-            memberData={[]}
-            current={userCtrl.company}
-          />
+          <AssignPosts searchFn={setSelectPerson} current={userCtrl.company} />
         </Modal>
       </div>
     </div>

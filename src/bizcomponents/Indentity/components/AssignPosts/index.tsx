@@ -10,7 +10,6 @@ import { resetParams } from '@/utils/tools';
 interface indexType {
   searchFn: Function;
   current: ITarget;
-  memberData: schema.XTarget[];
 }
 
 const MemberList: React.FC<indexType> = (props) => {

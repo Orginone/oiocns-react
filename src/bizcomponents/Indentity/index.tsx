@@ -29,13 +29,11 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   const [indentity, setIndentity] = useState<IIdentity>();
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [members, setMembers] = useState<schema.XTarget[]>([]);
   const [currentPerson, setPerson] = useState<schema.XTarget[]>();
   const [personData, setPersonData] = useState<XTarget[]>([]);
   useEffect(() => {
     if (open) {
       getDataList();
-      setMembers([]);
     } else {
       setIndentity(undefined);
     }
@@ -59,15 +57,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       //加载身份下的成员
       setPersonData(res.result);
       //加载可指派成员
-      setMembers(
-        (
-          await current.loadMembers({
-            offset: 0,
-            filter: '',
-            limit: 65535,
-          })
-        ).result!,
-      );
     } else {
       setPersonData([]);
     }
@@ -168,29 +157,34 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </Button>
   );
 
+  // 身份信息标题
+
   //身份主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
-      <Card
-        title={indentity?.target.name}
-        className={cls['app-tabs']}
-        extra={renderBtns}
-        bordered={false}>
-        <div className={cls['page-content-table']} ref={parentRef}>
-          <CardOrTable
-            dataSource={personData as any}
-            rowKey={'id'}
-            total={personData.length || 0}
-            operation={renderOperation}
-            columns={columns as any}
-            parentRef={parentRef}
-            showChangeBtn={false}
-          />
-        </div>
-      </Card>
+      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+        <Card
+          title={indentity?.target.name}
+          className={cls['app-tabs']}
+          extra={renderBtns}
+          bordered={false}>
+          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+            <div className={cls['page-content-table']} ref={parentRef}>
+              <CardOrTable
+                dataSource={personData as any}
+                rowKey={'id'}
+                total={personData.length || 0}
+                operation={renderOperation}
+                columns={columns as any}
+                parentRef={parentRef}
+                showChangeBtn={false}
+              />
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
-
   return (
     <Modal
       open={open}
@@ -240,7 +234,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchFn={setPerson} memberData={members} current={current} />
+              <AssignPosts searchFn={setPerson} current={current} />
             </Modal>
           </div>
         </Content>
