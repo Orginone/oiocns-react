@@ -112,7 +112,7 @@ const SettingFlow: React.FC = () => {
   }, []);
 
   const initData = async () => {
-    const result = await userCtrl.Space.getDefines(false);
+    const result = await userCtrl.space.getDefines(false);
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
@@ -129,15 +129,17 @@ const SettingFlow: React.FC = () => {
     if (currentData.belongId) {
       delete currentData.belongId;
     }
-    const result = await userCtrl.Space.publishDefine(currentData);
-    if (result.data) {
-      message.info(result.data.id ? '编辑成功' : '发布成功');
+    const result = await userCtrl.space.publishDefine(currentData);
+    console.log(result);
+    debugger;
+    if (result) {
+      message.info(result.id ? '编辑成功' : '发布成功');
       initData();
       setDesignData(null);
       setEditorValue(null);
       setTabType(TabType.TABLEMES);
     } else {
-      message.error(result.msg);
+      message.error('没读到数据');
       return false;
     }
   };
@@ -174,7 +176,7 @@ const SettingFlow: React.FC = () => {
         label: '删除',
         style: { color: 'red' },
         onClick: async () => {
-          const currentData = await userCtrl.Space.deleteDefine(record?.id);
+          const currentData = await userCtrl.space.deleteDefine(record?.id);
           if (currentData) {
             initData();
             message.success('删除成功');
