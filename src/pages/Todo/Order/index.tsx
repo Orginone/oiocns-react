@@ -28,7 +28,7 @@ const expandedRowRender = (
         {
           title: '使用期限',
           dataIndex: 'days',
-          render: (_, record) => (record.days ? _ : '无期限'),
+          render: (_, record) => (record.days ? _ : '永久'),
         },
         {
           title: '价格',
@@ -121,13 +121,14 @@ const TodoOrg: React.FC = () => {
       dataIndex: ['Data', 'code'],
     },
     {
-      title: '应用名称',
+      title: '订单名称',
       dataIndex: ['Data', 'name'],
     },
     {
       title: '订单总价',
       dataIndex: ['Data', 'price'],
       valueType: 'money',
+      render: (_, record) => (record.Data.price ? _ : '免费'),
     },
     {
       title: '下单时间',
@@ -147,7 +148,7 @@ const TodoOrg: React.FC = () => {
       dataIndex: ['Data', 'order', 'code'],
     },
     {
-      title: '应用名称',
+      title: '商品名称',
       dataIndex: ['Data', 'caption'],
     },
     {
@@ -169,7 +170,7 @@ const TodoOrg: React.FC = () => {
     {
       title: '使用期限',
       dataIndex: ['Data', 'days'],
-      render: (_, record) => (record.Data.days ? _ : '无期限'),
+      render: (_, record) => (record.Data.days ? record.Data.days + '天' : '永久'),
     },
     {
       title: '价格',
@@ -183,11 +184,6 @@ const TodoOrg: React.FC = () => {
       render: (_, record) => renderItemStatus(record.Data),
     },
     {
-      title: '下单时间',
-      dataIndex: ['Data', 'createTime'],
-      valueType: 'dateTime',
-    },
-    {
       title: '商品状态',
       dataIndex: ['Data', 'merchandise'],
       render: (_, record) => {
@@ -197,6 +193,11 @@ const TodoOrg: React.FC = () => {
           <Tag color="danger">已下架</Tag>
         );
       },
+    },
+    {
+      title: '下单时间',
+      dataIndex: ['Data', 'createTime'],
+      valueType: 'dateTime',
     },
   ];
   // 获取订单列表;

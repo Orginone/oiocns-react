@@ -42,6 +42,14 @@ export default class Person extends MarketTarget implements IPerson {
       typeName: this.target.typeName as TargetType,
     };
   }
+  public async create(data: TargetModel): Promise<ITarget | undefined> {
+    switch (data.typeName as TargetType) {
+      case TargetType.Company:
+        return this.createCompany(data);
+      case TargetType.Cohort:
+        return this.createCohort(data.avatar, data.name, data.code, data.teamRemark);
+    }
+  }
   public async searchCohort(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Cohort]);
   }

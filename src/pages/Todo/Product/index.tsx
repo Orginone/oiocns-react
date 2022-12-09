@@ -36,36 +36,47 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       width: 60,
     },
     {
-      title: '市场名称',
+      title: '市场',
       dataIndex: ['Data', 'market', 'name'],
+      render: (_, record) => {
+        return (
+          <Space>
+            {_}
+            <Tag>{record.Data.market?.code}</Tag>
+          </Space>
+        );
+      },
     },
     {
-      title: '应用名称',
+      title: '商品名称',
+      dataIndex: ['Data', 'caption'],
+    },
+    {
+      title: '说明',
+      dataIndex: ['Data', 'information'],
+    },
+    {
+      title: '应用',
       dataIndex: ['Data', 'product', 'name'],
       render: (_, record) => {
         return (
           <Space>
             {_}
-            <Tag color="#5BD8A6">{record.Data.product?.source}</Tag>
+            <Tag>{record.Data.product?.code}</Tag>
           </Space>
         );
       },
     },
     {
-      title: '应用编号',
-      dataIndex: ['Data', 'product', 'code'],
+      title: '价格',
+      dataIndex: ['Data', 'price'],
+      valueType: 'money',
+      render: (_, record) => (record.Data.price ? _ : '免费'),
     },
     {
-      title: '价格/使用期限',
-      dataIndex: ['Data'],
-      render: (_, record) => {
-        return (
-          <Space>
-            {record?.Data?.price || '0.00'}
-            <Tag>使用期：{record.Data.days} 天</Tag>
-          </Space>
-        );
-      },
+      title: '使用期限',
+      dataIndex: ['Data', 'days'],
+      render: (_, record) => (record.Data.days ? record.Data.days + ' 天' : '永久'),
     },
     {
       title: '应用类型',

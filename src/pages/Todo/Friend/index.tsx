@@ -60,15 +60,15 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       },
     },
     {
+      title: '申请人',
+      dataIndex: ['Data', 'target', 'name'],
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       render: (_, record) => {
         return renderItemStatus(record.Data);
       },
-    },
-    {
-      title: '申请人',
-      dataIndex: ['Data', 'target', 'name'],
     },
     {
       title: '申请时间',

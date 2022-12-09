@@ -8,17 +8,15 @@ import {
   Row,
   Space,
   Typography,
-  Form,
-  Input,
-  Select,
   message,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
-import { DomainTypes, TargetType } from '@/ts/core/enum';
+import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
+import CreateTeamModal from '@/bizcomponents/CreateTeam';
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits = () => {
@@ -28,30 +26,6 @@ const OrganizationalUnits = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
   const [joinKey, setJoinKey] = useState<string>('');
-
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
-  };
-  const validateMessages = {
-    required: '群组名称不能为空',
-    types: {
-      email: '${label} is not a valid email!',
-      number: '${label} is not a valid number!',
-    },
-    number: {
-      range: '${label} must be between ${min} and ${max}',
-    },
-  };
-  const onSave = async () => {
-    const values = await form.validateFields();
-    const company = await userCtrl.user.createCompany(values.company);
-    if (company) {
-      setShowFormModal(false);
-      userCtrl.setCurSpace(company.id);
-    }
-  };
-  const [form] = Form.useForm();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     userCtrl.setCurSpace(item.id);
@@ -134,88 +108,21 @@ const OrganizationalUnits = () => {
           </Col>
         </Row>
       </div>
-      <Modal
-        title="创建单位"
-        width={670}
-        destroyOnClose={true}
+      <CreateTeamModal
+        title={'新建'}
         open={showFormModal}
-        bodyStyle={{ padding: 0 }}
-        okText="确定"
-        onOk={() => {
-          // console.log(`确定按钮`);
-          onSave();
-        }}
-        onCancel={() => {
-          console.log(`取消按钮`);
+        handleCancel={function (): void {
           setShowFormModal(false);
-        }}>
-        <Form
-          {...layout}
-          name="nest-messages"
-          labelAlign="left"
-          labelCol={{ span: 7 }}
-          wrapperCol={{ span: 20 }}
-          layout="horizontal"
-          validateMessages={validateMessages}
-          form={form}>
-          <Form.Item
-            name={['company', 'teamName']}
-            label="单位名称"
-            rules={[{ required: true, message: '单位名称不能为空' }]}>
-            <Input placeholder="请输入单位名称" />
-          </Form.Item>
-          <Form.Item
-            name={['company', 'typeName']}
-            label="单位类型"
-            rules={[{ required: true, message: '单位类型不能为空' }]}>
-            <Select
-              placeholder="请选择单位类型"
-              options={[
-                {
-                  value: TargetType.Company,
-                  label: TargetType.Company,
-                },
-                {
-                  value: TargetType.University,
-                  label: TargetType.University,
-                },
-                {
-                  value: TargetType.Hospital,
-                  label: TargetType.Hospital,
-                },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item
-            name={['company', 'code']}
-            label="社会信用统一代码"
-            rules={[{ required: true, message: '社会信用代码不能为空' }]}>
-            <Input placeholder="请输入社会信用统一代码" />
-          </Form.Item>
-          <Form.Item
-            name={['company', 'name']}
-            label="团队简称"
-            rules={[{ required: true, message: '团队简称不能为空' }]}>
-            <Input placeholder="请输入团队简称" />
-          </Form.Item>
-          <Form.Item
-            name={['company', 'teamCode']}
-            label="团队标识"
-            rules={[{ required: true, message: '团队标识不能为空' }]}>
-            <Input placeholder="请输入团队标识" />
-          </Form.Item>
-          <Form.Item
-            name={['company', 'teamRemark']}
-            label="团队信息备注"
-            rules={[
-              { required: true, message: '请输入团队信息备注' },
-              { message: '团队信息备注内容不能超过200字符', max: 200 },
-            ]}>
-            <Input.TextArea placeholder="请输入团队信息备注" />
-          </Form.Item>
-          <Form.Item></Form.Item>
-        </Form>
-      </Modal>
+        }}
+        handleOk={(item) => {
+          if (item) {
+            userCtrl.setCurSpace(item.id);
+            setShowFormModal(false);
+          }
+        }}
+        current={userCtrl.user}
+        typeNames={companyTypes}
+      />
       <Modal
         title="加入单位"
         width={670}

@@ -1,7 +1,8 @@
-import { model, schema } from '@/ts/base';
+import { model } from '@/ts/base';
+import { XMerchandise, XOrderDetailArray } from '@/ts/base/schema';
 export default interface IMerchandise {
   /** 商品实例 */
-  merchandise: schema.XMerchandise;
+  merchandise: XMerchandise;
   /**
    * 更新商品信息
    * @param merchandise 商品信息
@@ -19,7 +20,7 @@ export default interface IMerchandise {
    * @param page 分页参数
    * @returns 交易情况
    */
-  getSellOrder(page: model.PageRequest): Promise<schema.XOrderDetailArray>;
+  getSellOrder(page: model.PageRequest): Promise<XOrderDetailArray>;
   /**
    * 交付订单中的商品
    * @param detailId 订单ID

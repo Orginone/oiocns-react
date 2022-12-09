@@ -44,7 +44,12 @@ export interface ITarget {
   /** 子组织 */
   subTeam: ITarget[];
   /**
-   * 更新集团
+   * 新增
+   * @param data 集团基本信息
+   */
+  create(data: TargetModel): Promise<ITarget | undefined>;
+  /**
+   * 更新
    * @param data 集团基本信息
    */
   update(data: TargetParam): Promise<ITarget>;
