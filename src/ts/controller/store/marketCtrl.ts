@@ -166,9 +166,7 @@ class MarketController extends Emitter {
    */
   public removeMember = async (targetIds: string[]) => {
     const res = await this._curMarket?.removeMember(targetIds);
-    if (res?.code === 400) {
-      message.warning(res.msg);
-    } else if (res?.code === 200 && res?.success) {
+    if (res?.code === 200 && res?.success) {
       if (this.marketMenber.length > 0) {
         let arrs = this.marketMenber.filter((item: any) =>
           targetIds.some((ele: any) => ele.id === item?.target?.id),
@@ -231,9 +229,7 @@ class MarketController extends Emitter {
       userCtrl.space.id,
       this._shopingIds,
     );
-    if (res?.code === 400) {
-      message.warning(res.msg);
-    } else if (res?.code === 200 && res?.success) {
+    if (res?.code === 200 && res?.success) {
       let arrs = this._shopinglist.filter(
         (item) => !data.some((ele: any) => ele.id === item.id),
       );
