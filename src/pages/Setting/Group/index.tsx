@@ -19,6 +19,7 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
+import { PageRequest } from '@/ts/base/model';
 
 /**
  * 集团设置
@@ -30,10 +31,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
 
-  const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑部门
+  const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑集团
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [joinKey, setJoinKey] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
 
   useEffect(() => {
@@ -56,13 +58,19 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     switch (key) {
       case 'new':
         setIsOpen(true);
+        setTitle('新建集团');
         break;
-      case '新增集团':
-        setCurrent(item.target);
+      case '新建集团':
+        setCurrent(item);
+        setTitle('新建子组织');
         setIsOpen(true);
         break;
       case '刷新':
-        item.target.loadSubTeam(true);
+        setCurrent(item);
+        current?.loadSubTeam(true);
+        break;
+      case '删除':
+        deleteGroup();
         break;
       case 'updateGroup':
         break;
@@ -92,37 +100,50 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setIsOpen(false);
   };
 
+  const deleteGroup = async () => {
+    if (current) {
+      Modal.confirm({
+        title: '确认',
+        icon: <ExclamationCircleOutlined />,
+        content: `删除集团${current.name}？`,
+        okText: '确认',
+        cancelText: '取消',
+        onOk: async () => {
+          if (await (current as IGroup).delete()) {
+            message.info(`删除成功！`);
+            userCtrl.changCallback();
+          }
+        },
+      });
+    }
+  };
+
   const handleOk = async (item: any) => {
     if (item) {
-      if (item.selectId == 'update') {
+      item.teamCode = item.code;
+      item.teamName = item.name;
+      item.typeName = TargetType.Group;
+      if (title == '编辑') {
         if (userCtrl.isCompanySpace && current) {
-          item.teamCode = item.code;
-          item.teamName = item.name;
-          item.typeName = TargetType.Group;
           const group = await current.update(item);
           if (group) {
-            message.info('修改部门成功！');
+            message.info('修改集团成功！');
             userCtrl.changCallback();
             setIsOpen(false);
           }
         }
-      } else {
-        item.teamCode = item.code;
-        item.teamName = item.name;
-        item.typeName = TargetType.Group;
-        // if (selectId === 'second') {
-        //   if (await (current as IGroup).createSubGroup(item)) {
-        //     message.info('创建部门成功！');
-        //     userCtrl.changCallback();
-        //     setIsOpen(false);
-        //   }
-        // } else if (selectId === 'new') {
-        //   if (await userCtrl.company.createGroup(item)) {
-        //     message.info('创建部门成功！');
-        //     userCtrl.changCallback();
-        //     setIsOpen(false);
-        //   }
-        // }
+      } else if (title == '新建集团') {
+        if (await userCtrl.company.createGroup(item)) {
+          message.info('创建集团成功！');
+          userCtrl.changCallback();
+          setIsOpen(false);
+        }
+      } else if (title == '新建子组织') {
+        if (await (current as IGroup).createSubGroup(item)) {
+          message.info('创建集团成功！');
+          userCtrl.changCallback();
+          setIsOpen(false);
+        }
       }
     }
     setLookApplyOpen(false);
@@ -158,7 +179,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   ];
 
   // 集团信息标题
-  const title = (
+  const titlePanel = (
     <div className={cls['company-group-title']}>
       <div>
         <Title level={4}>节点信息</Title>
@@ -168,6 +189,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
           type="link"
           onClick={() => {
             if (current) {
+              setTitle('编辑');
               setIsOpen(true);
             }
           }}>
@@ -176,21 +198,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            if (current) {
-              Modal.confirm({
-                title: '确认',
-                icon: <ExclamationCircleOutlined />,
-                content: '删除集团？',
-                okText: '确认',
-                cancelText: '取消',
-                onOk: async () => {
-                  if (await (current as IGroup).delete()) {
-                    message.info(`$删除成功！`);
-                    userCtrl.changCallback();
-                  }
-                },
-              });
-            }
+            deleteGroup();
           }}>
           删除
         </Button>
@@ -204,7 +212,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       <Card bordered={false}>
         <Descriptions
           size="middle"
-          title={title}
+          title={titlePanel}
           bordered
           column={2}
           labelStyle={{ textAlign: 'center', color: '#606266' }}
@@ -257,7 +265,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
             current={current}
             handleOk={handleOk}
             handleCancel={handleCancel}
-            title={''}
+            title={title}
           />
           <IndentityManage
             open={activeModal === 'indentity'}
@@ -279,7 +287,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                   param={current}
                   rowKey={'id'}
                   dataSource={[]}
-                  request={async (page) => await current.loadMembers(page)}
+                  request={async (page: PageRequest) => {
+                    console.log(page);
+                    await current.loadMembers(page);
+                  }}
                   operation={renderOperation}
                   columns={columns}
                   parentRef={parentRef}
@@ -292,7 +303,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       ) : (
         ''
       )}
-      {/* <IndentityManage open = {isOpenIndentity} object = {currentGroup!} MemberData = {}/> */}
+
       <Modal
         title="添加单位"
         open={activeModal === 'addCompany'}
@@ -301,10 +312,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         destroyOnClose={true}
         width={500}>
         <div>
-          <SearchCompany
-            joinKey={joinKey}
-            setJoinKey={setJoinKey}
-            setJoinTarget={setJoinTarget}></SearchCompany>
+          <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey}></SearchCompany>
         </div>
       </Modal>
       <Modal

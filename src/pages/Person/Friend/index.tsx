@@ -62,7 +62,8 @@ const PersonFriend: React.FC = () => {
   const history = useHistory();
 
   const getData = async () => {
-    setData(await userCtrl.user.getFriends(false));
+    const res = await userCtrl.user.loadMembers({ offset: 0, filter: '', limit: 65535 });
+    setData(res.result!);
   };
   const showModal = () => {
     setIsModalOpen(true);
@@ -73,14 +74,8 @@ const PersonFriend: React.FC = () => {
   const handleOk = async () => {
     setIsModalOpen(false);
     console.log(friend);
-    const res = await userCtrl.user.applyFriend(friend!);
-    // console.log(await userCtrl.User)
-    console.log(res);
-    if (res.success) {
-      message.success('已发起好友申请');
-    } else {
-      message.error(res.msg);
-    }
+    await userCtrl.user.applyFriend(friend!);
+    message.success('发起成功');
   };
 
   const handleCancel = () => {
@@ -97,7 +92,7 @@ const PersonFriend: React.FC = () => {
         key: 'remove',
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
-          await userCtrl.user.removeFriend([item.id]);
+          await userCtrl.user.removeMember(item);
           getData();
         },
       },
@@ -142,14 +137,6 @@ const PersonFriend: React.FC = () => {
         width={500}>
         <div>{<SearchPerson searchCallback={searchCallback}></SearchPerson>}</div>
       </Modal>
-      <LookApply
-        title={'查看申请'}
-        open={isLookApplyOpen}
-        onOk={onApplyOk}
-        handleOk={() => {
-          setLookApplyOpen(false);
-        }}
-      />
     </div>
   );
 };

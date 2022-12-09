@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Row, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import cls from './index.module.less';
@@ -31,12 +31,17 @@ const AddPostModal = (props: Iprops) => {
   const parentRef = useRef<any>(null);
   const [operateOpen, setOperateOpen] = useState<boolean>(false);
   const [item, setItem] = useState<IAuthority>();
-
+  const [authTree, setAuthTree] = useState<IAuthority>();
+  useEffect(() => {
+    getTree();
+  }, []);
   const onHandleOk = () => {
-    console.log('onHandleOk');
     setOperateOpen(false);
   };
-
+  const getTree = async () => {
+    console.log('接收对象', current);
+    setAuthTree(await current.selectAuthorityTree());
+  };
   const columns: ColumnsType<DataType> = [
     {
       title: '名称',
@@ -84,22 +89,25 @@ const AddPostModal = (props: Iprops) => {
       open={open}
       onCancel={() => handleOk()}
       getContainer={false}
+      destroyOnClose={true}
       width={1020}
       footer={null}>
       <div className="site-card-wrapper">
         <Row gutter={24}>
-          <CardOrTable
-            dataSource={[current.selectAuthorityTree(false)]}
-            rowKey={'id'}
-            total={1}
-            operation={renderOperation}
-            columns={columns as any}
-            parentRef={parentRef}
-            showChangeBtn={false}
-            pagination={false}
-            defaultExpandAllRows={true}
-            childrenColumnName={'children'}
-          />
+          {authTree != undefined && (
+            <CardOrTable
+              dataSource={[authTree!]}
+              rowKey={'id'}
+              total={1}
+              operation={renderOperation}
+              columns={columns as any}
+              parentRef={parentRef}
+              showChangeBtn={false}
+              pagination={false}
+              defaultExpandAllRows={true}
+              childrenColumnName={'children'}
+            />
+          )}
         </Row>
       </div>
     </Modal>

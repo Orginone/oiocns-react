@@ -58,9 +58,9 @@ export default class FlowTarget extends BaseTarget {
   ): Promise<schema.XFlowRelation> {
     const res = await kernel.createFlowRelation(data);
     if (res.success) {
-      this.defineRelations = this.defineRelations.filter((a) => {
-        a.productId != data.productId || a.functionCode != data.functionCode;
-      });
+      this.defineRelations = this.defineRelations.filter(
+        (a) => a.productId != data.productId || a.functionCode != data.functionCode,
+      );
       this.defineRelations.push(res.data);
     }
     return res.data;
@@ -68,9 +68,9 @@ export default class FlowTarget extends BaseTarget {
   async unbindingFlowRelation(data: model.FlowRelationModel): Promise<boolean> {
     const res = await kernel.deleteFlowRelation(data);
     if (res.success) {
-      this.defineRelations = this.defineRelations.filter((a) => {
-        a.productId != data.productId || a.functionCode != data.functionCode;
-      });
+      this.defineRelations = this.defineRelations.filter(
+        (a) => a.productId != data.productId || a.functionCode != data.functionCode,
+      );
     }
     return res.success;
   }
