@@ -265,7 +265,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
-    const res = await this.getjoinedTargets([TargetType.Group], this.id);
+    const res = await this.getjoinedTargets([TargetType.Group], this.userId);
     if (res.success && res.data.result) {
       this.joinedGroup = res.data.result.map((a) => {
         return new Group(a, () => {
