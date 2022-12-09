@@ -33,7 +33,7 @@ const StoreAppInfo: React.FC = () => {
   }, []);
 
   async function onTabChange(tabKey: any) {
-    const res = await curProd.queryExtend(tabKey, '0');
+    const res = await curProd.queryExtend(tabKey);
     const showData = res.result?.map((v) => {
       let obj: any = v;
       switch (tabKey) {

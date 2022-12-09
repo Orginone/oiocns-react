@@ -68,7 +68,7 @@ export default class WebApp implements IProduct {
   }
   public async queryExtend(
     destType: string,
-    teamId?: string,
+    teamId: string = '0',
   ): Promise<model.IdNameArray> {
     teamId = teamId ?? '0';
     return (

@@ -53,7 +53,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (!reload && this.cohorts.length > 0) {
       return this.cohorts;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
+    const res = await this.getjoinedTargets([TargetType.Cohort], this.id, this.userId);
     if (res.success && res.data.result) {
       this.cohorts = res.data.result.map((a) => {
         return new Cohort(a);

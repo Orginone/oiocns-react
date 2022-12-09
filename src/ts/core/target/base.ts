@@ -270,13 +270,14 @@ export default class BaseTarget implements ITarget {
   protected async getjoinedTargets(
     typeNames: TargetType[],
     spaceId: string,
+    userId?: string,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
     });
     if (typeNames.length > 0) {
       return await kernel.queryJoinedTargetById({
-        id: this.target.id,
+        id: userId || this.target.id,
         typeName: this.target.typeName,
         page: {
           offset: 0,
