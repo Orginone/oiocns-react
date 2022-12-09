@@ -4,6 +4,7 @@ export enum LoggerLevel {
   info = '信息',
   warn = '警告',
   error = '错误',
+  unauth = '登录过期',
 }
 
 export type MessageType = string | Error | undefined | Object;
@@ -23,6 +24,10 @@ class Logger {
   error(message: MessageType): void {
     console.error(message);
     this._callback(LoggerLevel.error, message);
+  }
+  unauth(): void {
+    console.warn('登录已过期');
+    this._callback(LoggerLevel.error, '登录已过期');
   }
   private _callback(level: LoggerLevel, message: MessageType): void {
     if (this.onLogger) {

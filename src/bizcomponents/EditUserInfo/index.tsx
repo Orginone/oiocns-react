@@ -22,7 +22,7 @@ interface Iprops {
   editData?: XTarget;
   reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
 }
-/* 
+/*
   编辑
 */
 const EditCustomModal = (props: Iprops) => {
@@ -134,7 +134,7 @@ const EditCustomModal = (props: Iprops) => {
           setImage(undefined);
         }
       }}
-      modalProps={{
+      modalprops={{
         onCancel: () => handleCancel(),
       }}
       rowProps={{

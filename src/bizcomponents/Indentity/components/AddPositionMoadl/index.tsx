@@ -6,7 +6,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { XIdentity } from '@/ts/base/schema';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 
-/* 
+/*
   编辑
 */
 interface Iprops {
@@ -83,7 +83,7 @@ const EditCustomModal = (props: Iprops) => {
           formRef.current?.resetFields();
         }
       }}
-      modalProps={{
+      modalprops={{
         onCancel: () => handleCancel(),
       }}
       rowProps={{

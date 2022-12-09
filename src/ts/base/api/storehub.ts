@@ -155,10 +155,22 @@ export default class StoreHub implements IDisposable {
         this._connection
           .invoke(methodName, ...args)
           .then((res: ResultType<any>) => {
+            if (!res.success) {
+              if (res.code === 401) {
+                logger.unauth();
+              } else {
+                logger.warn('操作失败,' + res.msg);
+              }
+            }
             resolve(res);
           })
           .catch((err) => {
-            resolve(badRequest(err?.Error()));
+            let msg = '请求异常';
+            if (err && err.Error) {
+              msg += ',' + err.Error();
+            }
+            logger.warn(msg);
+            resolve(badRequest(msg));
           });
       } else {
         resolve(badRequest());

@@ -10,7 +10,6 @@ export default class Group extends BaseTarget implements IGroup {
   private _onDeleted: Function;
   constructor(target: XTarget, onDeleted: Function) {
     super(target);
-    this.subTeam = [];
     this.subGroup = [];
     this._onDeleted = onDeleted;
     this.memberTypes = companyTypes;
@@ -18,6 +17,9 @@ export default class Group extends BaseTarget implements IGroup {
     this.joinTargetType = [TargetType.Group];
     this.createTargetType = [TargetType.Group];
     this.searchTargetType = [...companyTypes, TargetType.Group];
+  }
+  public get subTeam(): ITarget[] {
+    return this.subGroup;
   }
   async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getSubGroups(reload);

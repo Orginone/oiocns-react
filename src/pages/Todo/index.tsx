@@ -11,12 +11,12 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { Badge, BadgeProps, Breadcrumb, MenuProps } from 'antd';
+import { Badge, Breadcrumb, MenuProps } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { TargetType } from '@/ts/core/enum';
 
 const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
-  const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>();
+  const [todoMenu, setTodoMenu] = useState<MenuProps[`items`]>([]);
   const [key] = useCtrlUpdate(todoCtrl);
 
   // 加载左侧平台待办菜单数据
@@ -28,14 +28,21 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     const pcount = await todoCtrl.PublishTodo.getCount();
     const ocount = await todoCtrl.OrderTodo.getCount();
     let newtodos = [];
-    const getBadgeProps = (count: number) => {
-      return { size: 'small', offset: [10, 0], count: count } as BadgeProps;
+    const getLabel = (count: number, name: string) => {
+      if (count > 0) {
+        return (
+          <Badge size="small" offset={[10, 0]} count={count}>
+            {name}
+          </Badge>
+        );
+      }
+      return name;
     };
     for (const m of todoCtrl.AppTodo) {
       const count = await m.getCount();
       newtodos.push({
         key: '/todo/app/' + m.id,
-        label: <Badge {...getBadgeProps(count)}>{m.name}</Badge>,
+        label: getLabel(count, m.name),
         icon: <FundOutlined />,
       });
     }
@@ -45,34 +52,34 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
         label: '平台待办',
         children: [
           {
-            label: <Badge {...getBadgeProps(friend.length)}>好友申请</Badge>,
+            label: getLabel(friend.length, '好友申请'),
             key: '/todo/friend',
             icon: <UserOutlined />,
           },
           {
-            label: <Badge {...getBadgeProps(orgCount - friend.length)}>组织审核</Badge>,
+            label: getLabel(orgCount - friend.length, '组织审核'),
             key: '/todo/org',
             icon: <AuditOutlined />,
           },
           {
-            label: <Badge {...getBadgeProps(pcount + mcount)}>商店审核</Badge>,
+            label: getLabel(pcount + mcount, '商店审核'),
             key: 'appAndStore',
             icon: <ShopOutlined />,
             children: [
               {
-                label: <Badge {...getBadgeProps(pcount)}>上架审核</Badge>,
+                label: getLabel(pcount, '上架审核'),
                 key: '/todo/product',
                 icon: <ShopOutlined />,
               },
               {
-                label: <Badge {...getBadgeProps(mcount)}>加入商店</Badge>,
+                label: getLabel(mcount, '加入商店'),
                 key: '/todo/store',
                 icon: <ShopOutlined />,
               },
             ],
           },
           {
-            label: <Badge {...getBadgeProps(ocount)}>订单管理</Badge>,
+            label: getLabel(ocount, '订单管理'),
             key: '/todo/order',
             icon: <UnorderedListOutlined />,
           },
@@ -86,11 +93,7 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     ]);
   };
   useEffect(() => {
-    setTimeout(async () => {
-      if (todoCtrl.OrgTodo) {
-        await loadLeftMenus();
-      }
-    }, 10);
+    loadLeftMenus();
   }, [key]);
 
   return (

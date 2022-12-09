@@ -46,7 +46,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
           open={showCreateModal}
           title="创建应用"
           onFinish={handleCreateApp}
-          modalProps={{
+          modalprops={{
             destroyOnClose: true,
             onCancel: () => setShowCreateModal(false),
           }}

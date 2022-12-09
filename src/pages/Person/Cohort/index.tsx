@@ -288,7 +288,7 @@ const CohortConfig: React.FC = () => {
                   key={item?.target.id}
                   layoutType="ModalForm"
                   title="修改群组"
-                  modalProps={{
+                  modalprops={{
                     destroyOnClose: true,
                     onCancel: () => setOpen(false),
                   }}
