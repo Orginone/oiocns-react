@@ -26,8 +26,8 @@ const SearchPerson: React.FC<indexType> = (props) => {
     setValue(e.target.value);
     if (e.target.value) {
       const res = await userCtrl.user?.searchPerson(e.target.value);
-      if (res?.data.result != null) {
-        setData([res.data.result[0]]);
+      if (res?.result != null) {
+        setData([res.result[0]]);
       } else {
         getTableList();
       }

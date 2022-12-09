@@ -32,7 +32,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]); //可分配人员列表
   const [persons, setPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
-  const [personData, setPersonData] = useState<schema.XTarget[]>(); //岗位人员列表
+  const [personData, setPersonData] = useState<schema.XTarget[]>([]); //岗位人员列表
   const [indentitys, setIndentitys] = useState<any[]>(); //当前选中组织下身份数据
   const [addIndentitys, setAddIndentitys] = useState<any[]>(); //待添加的身份数据集
   const treeContainer = document.getElementById('templateMenu');
@@ -50,11 +50,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   //当前岗位成员变更，可指派人员进行变更
   useEffect(() => {
     getMemberData();
-  }, []);
-  const getMemberData = async () => {
-    setMemberData(await userCtrl.company.getPersons(false));
-    console.log('人员列表', person);
-  };
+  }, [personData]);
+
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
@@ -63,7 +60,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         label: '移出岗位',
         onClick: () => {
           for (const a of indentitys!) {
-            new Indentity(a.obj).removeIdentity([item.id]);
+            new Indentity(a.obj).removeMembers([item.id]);
           }
           const data = personData?.filter((obj) => obj.id != item.id)!;
           setPersonData(data);
@@ -94,7 +91,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           setIndentitys(list);
           //移除岗位人员列表该身份
           for (const a of personData!) {
-            new Indentity(item.obj).removeIdentity([a.id]);
+            new Indentity(item.obj).removeMembers([a.id]);
           }
           console.log('按钮事件', 'remove', item);
         },
@@ -123,22 +120,26 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     setPersonData(current.persons);
   };
   const getMemberData = async () => {
-    setMemberData(uniq(await userCtrl.Company.getPersons(false), personData!));
+    setMemberData(
+      await (
+        await userCtrl.space.loadMembers({ offset: 0, filter: '', limit: 65535 })
+      ).result!,
+    );
   };
   //去重方法
-  const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
-    console.log(arr1, arr2);
-    if (arr2 == undefined) {
-      return arr1;
-    }
-    if (arr1.length === 0) {
-      return [];
-    }
-    let ids = arr2.map((item) => item.id);
-    return arr1.filter((el) => {
-      return !ids.includes(el.id);
-    });
-  };
+  // const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
+  //   console.log(arr1, arr2);
+  //   if (arr2 == undefined) {
+  //     return arr1;
+  //   }
+  //   if (arr1.length === 0) {
+  //     return [];
+  //   }
+  //   let ids = arr2.map((item) => item.id);
+  //   return arr1.filter((el) => {
+  //     return !ids.includes(el.id);
+  //   });
+  // };
   /**添加框内选中组织后的数据转换 */
   const onCheckeds = (team: any, type: string, checkedValus: any[]) => {
     const result = [];
@@ -167,7 +168,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             <Button
               className={cls.creatgroup}
               type="text"
-              icon={<PlusOutlined className={cls.addIcon} />}
+              icon={<PlusOutlined />}
               style={{ float: 'right' }}
               onClick={() => {
                 setIsAddOpen(true);
@@ -192,7 +193,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   );
   /**人员列表 */
   const personCount = (
-    <div className={`${cls['dept-wrap-pages']}`}>
+    <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '10px' }}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
@@ -200,7 +201,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             <Button
               className={cls.creatgroup}
               type="text"
-              icon={<PlusOutlined className={cls.addIcon} />}
+              icon={<PlusOutlined />}
               style={{ float: 'right' }}
               onClick={() => {
                 setIsOpenAssign(true);
@@ -227,7 +228,15 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       </div>
     </div>
   );
-
+  //获取最终待添加身份
+  const getResultIndentity = () => {
+    let ids = addIndentitys!.map((item) => item.id);
+    return indentitys!
+      .filter((el) => {
+        return !ids.includes(el.id);
+      })
+      .concat(addIndentitys);
+  };
   return (
     <div className={cls[`dept-content-box`]}>
       {header}
@@ -240,12 +249,12 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           const data = {
             name: _currentPostion.name,
             code: _currentPostion.code,
-            indentitys: addIndentitys?.concat(indentitys),
+            indentitys: getResultIndentity(),
             persons: _currentPostion.perons,
           };
-          _currentPostion.indentitys = addIndentitys?.concat(indentitys);
           positionCtrl.updatePosttion(data);
-          setIndentitys(addIndentitys?.concat(indentitys));
+          //更新页面身份
+          setIndentitys(getResultIndentity());
           setIsAddOpen(false);
         }}
         onCancel={() => setIsAddOpen(false)}
@@ -264,7 +273,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             ids.push(b.id);
           }
           for (const a of indentitys!) {
-            new Indentity(a.obj).giveIdentity(ids);
+            new Indentity(a.obj).pullMembers(ids);
           }
           const data = {
             name: _currentPostion.name,
@@ -273,7 +282,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
             persons: persons?.concat(personData!),
           };
           positionCtrl.updatePosttion(data);
-          setPersonData(persons?.concat(personData!));
+          //更新页面人员
+          setPersonData(persons!.concat(personData!));
           console.log('当前岗位成员', personData);
         }}
         onCancel={() => {
