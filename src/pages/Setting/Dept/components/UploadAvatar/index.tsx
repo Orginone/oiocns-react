@@ -50,7 +50,6 @@ const UploadAvatar: React.FC<PostsProps> = (props) => {
       if (file) {
         const uuid = getUuid();
         const result = docsCtrl.upload(uuid, file.name, file);
-        console.log(result);
         // if (result && result.target && result!.target.thumbnail!.length > 0) {
         //   const uploadFile: avatarUpload = {
         //     uid: uuid,

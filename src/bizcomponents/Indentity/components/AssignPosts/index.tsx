@@ -8,7 +8,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { resetParams } from '@/utils/tools';
 interface indexType {
   searchFn: Function;
-  memberData: schema.XTarget[];
 }
 
 const MemberList: React.FC<indexType> = (props) => {
