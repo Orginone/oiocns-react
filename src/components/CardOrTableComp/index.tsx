@@ -143,9 +143,9 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             };
           }
         }}
-        tableRender={(props: any, defaultDom) => {
+        tableRender={(props, defaultDom) => {
           return pageType === 'table' ? (
-            props?.action?.dataSource && props?.action?.dataSource.length === 0 ? (
+            !showChangeBtn ? (
               defaultDom
             ) : (
               [defaultDom, TableFooter]
