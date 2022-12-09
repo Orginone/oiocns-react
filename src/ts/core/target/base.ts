@@ -270,24 +270,25 @@ export default class BaseTarget implements ITarget {
   protected async getjoinedTargets(
     typeNames: TargetType[],
     spaceId: string,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
+  ): Promise<schema.XTargetArray | undefined> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
     });
     if (typeNames.length > 0) {
-      return await kernel.queryJoinedTargetById({
-        id: this.target.id,
-        typeName: this.target.typeName,
-        page: {
-          offset: 0,
-          filter: '',
-          limit: common.Constants.MAX_UINT_16,
-        },
-        spaceId: spaceId,
-        JoinTypeNames: typeNames,
-      });
+      return (
+        await kernel.queryJoinedTargetById({
+          id: this.target.id,
+          typeName: this.target.typeName,
+          page: {
+            offset: 0,
+            filter: '',
+            limit: common.Constants.MAX_UINT_16,
+          },
+          spaceId: spaceId,
+          JoinTypeNames: typeNames,
+        })
+      ).data;
     }
-    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**

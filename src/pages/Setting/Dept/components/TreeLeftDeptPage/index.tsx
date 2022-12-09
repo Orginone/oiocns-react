@@ -1,14 +1,16 @@
 import { Button } from 'antd';
 import type { TreeProps } from 'antd/es/tree';
 import React, { useEffect, useState } from 'react';
+import * as im from 'react-icons/im';
 
 import cls from './index.module.less';
-import MarketClassifyTree from '@/components/CustomTreeComp';
+import StoreClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
+import { TargetType } from '@/ts/core';
 
 type CreateGroupPropsType = {
   current: ITarget | undefined;
@@ -26,36 +28,77 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
-    setTimeout(async () => {
-      setData(loadTree(await userCtrl.space.loadSubTeam(false)));
-    }, 0);
+    loadTeamTree();
   }, []);
 
-  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
-    const item: ITarget = info.node.item;
-    if (item) {
-      console.log(await item.loadSubTeam());
-      setData(loadTree(await userCtrl.space.loadSubTeam(false)));
-      setCurrent(item);
-    }
+  /** 加载右侧菜单 */
+  const loadMenus = (item: ITarget) => {
+    const result = [];
+    item.subTeamTypes.forEach((i) => {
+      result.push({
+        key: 'new' + i,
+        icon: getIcon(i),
+        label: '新建' + i,
+      });
+    });
+    result.push(
+      {
+        key: '刷新',
+        icon: <im.ImSpinner9 />,
+        label: '刷新子组织',
+      },
+      {
+        key: '删除',
+        icon: <im.ImBin />,
+        label: '删除' + item.name,
+      },
+    );
+    return result;
   };
 
-  const loadTree = (targets: ITarget[]) => {
+  const loadTeamTree = async () => {
+    const targets = await userCtrl.space.loadSubTeam(false);
+    setData(buildTargetTree(targets));
+  };
+
+  /** 加载组织树 */
+  const buildTargetTree = (targets: ITarget[]) => {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
         result.push({
-          id: item.id,
-          name: item.name,
+          key: item.id,
+          title: item.name,
           item: item,
-          children: loadTree(item.subTeam),
+          isLeaf: false,
+          menus: loadMenus(item),
+          icon: getIcon(item.teamName as TargetType),
+          children: buildTargetTree(item.subTeam),
         });
       }
     }
     return result;
   };
 
-  const menu = ['新增部门', '删除部门'];
+  const getIcon = (type: TargetType) => {
+    switch (type) {
+      case TargetType.Working:
+        return <im.ImUsers />;
+      default:
+        return <im.ImTree />;
+    }
+  };
+
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const item: ITarget = info.node.item;
+    if (item) {
+      await item.loadSubTeam();
+      loadTeamTree();
+      setCurrent(item);
+    }
+  };
+
+  // const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
       <div id={key} className={cls.topMes}>
@@ -65,21 +108,17 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
           type="text"
           onClick={() => handleMenuClick('new', undefined)}
         />
-        <MarketClassifyTree
+        <StoreClassifyTree
           className={cls.docTree}
-          showIcon
-          searchable
-          handleMenuClick={(key, node) => handleMenuClick(key, node.intans, node.pid)}
-          treeData={data}
           title={'内设机构'}
-          menu={menu}
+          isDirectoryTree
+          menu={'menus'}
+          searchable
+          showIcon
+          treeData={data}
           selectedKeys={[current?.id]}
           onSelect={onSelect}
-          fieldNames={{
-            title: 'name',
-            key: 'id',
-            children: 'children',
-          }}
+          handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
         />
       </div>,
       treeContainer,

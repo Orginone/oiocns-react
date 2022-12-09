@@ -1,6 +1,7 @@
 import IProduct from '@/ts/core/market/iproduct';
 import {
   EllipsisOutlined,
+  SendOutlined,
   SettingOutlined,
   UnorderedListOutlined,
 } from '@ant-design/icons';
@@ -20,27 +21,30 @@ const moreMenu: MenuProps = {
   },
   items: [
     {
+      label: '打开',
+      key: 'open',
+      icon: <SendOutlined />,
+    },
+    {
       label: '详情',
-      key: '1',
+      key: 'info',
       icon: <UnorderedListOutlined />,
     },
     {
       label: '管理',
-      key: '2',
+      key: 'manage',
       icon: <SettingOutlined />,
     },
   ],
 };
 
 const StoreRecent: React.FC<Props> = ({ dataSource }) => {
-  console.log('试试', dataSource);
-
   return (
-    <div className={cls.cardContainer}>
+    <div className={''}>
       {dataSource.map((item) => {
         return (
           <CheckCard
-            className={cls.card}
+            className={cls.buyCard}
             key={item.prod.id}
             avatar={imgSrc}
             title={item.prod.name}
@@ -52,9 +56,8 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
                 {item.prod.remark}
               </Typography.Paragraph>
             }
-            style={{ width: 260, height: 120 }}
             extra={
-              <Dropdown placement="bottomRight" menu={moreMenu}>
+              <Dropdown placement="bottomLeft" menu={moreMenu}>
                 <EllipsisOutlined
                   style={{ fontSize: 22, color: 'rgba(0,0,0,0.5)' }}
                   onClick={(e) => e.stopPropagation()}

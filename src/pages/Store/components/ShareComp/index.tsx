@@ -32,12 +32,10 @@ const DestTypes = [
 //个人空间-展示我的群组  ; 单位空间 - 分配
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
-  const [isCompanySpace] = useState<boolean>(userCtrl.isCompanySpace); //是否工作空间
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
   const [radio, setRadio] = useState<number>(1); //分配类型
-  const [pageCurrent, setPageCurrent] = useState({ filter: '', limit: 1000, offset: 0 });
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
@@ -58,15 +56,15 @@ const ShareRecent = (props: Iprops) => {
     setTimeout(async () => {
       if (appCtrl.curProduct) {
         if (shareType === '共享') {
-          setLeftTreeData(loadTree(await userCtrl.getTeamTree()));
+          setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree()));
         } else {
           if (userCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
           }
-          setLeftTreeData(loadTree(await userCtrl.getTeamTree(false)));
+          setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree(false)));
         }
-        await appCtrl.curProduct.queryExtend('组织', '');
+        await appCtrl.curProduct.queryExtend('组织');
       }
     }, 10);
   }, []);
@@ -81,20 +79,6 @@ const ShareRecent = (props: Iprops) => {
     queryExtend();
   }, [radio]);
 
-  const loadTree = (targets: ITarget[]) => {
-    const result: any[] = [];
-    if (targets) {
-      for (const item of targets) {
-        result.push({
-          id: item.id,
-          name: item.name,
-          item: item,
-          children: loadTree(item.subTeam),
-        });
-      }
-    }
-    return result;
-  };
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
@@ -313,23 +297,6 @@ const ShareRecent = (props: Iprops) => {
 
   return (
     <div className={cls.layout}>
-      {/* {shareType === '分配' ? (
-        <div className={cls.top}>
-          <p className={cls['top-label']}>分配集团:</p>
-          <Select
-            style={{ minWidth: 160 }}
-            onChange={handleCompanyChange}
-            options={CompanyList.map((comp) => {
-              return {
-                value: comp.target.id,
-                label: comp.target.name,
-              };
-            })}
-          />
-        </div>
-      ) : (
-        ''
-      )} */}
       <div className={cls.top}>
         <p className={cls['top-label']}>{props.shareType}形式：</p>
         <Radio.Group
@@ -340,13 +307,7 @@ const ShareRecent = (props: Iprops) => {
           {DestTypes.map((item) => {
             return (
               <Radio value={item.value} key={item.value}>
-                按
-                {isCompanySpace && shareType === '共享' && item.label === '人员'
-                  ? '单位'
-                  : isCompanySpace && shareType === '共享' && item.label === '组织'
-                  ? '集团'
-                  : item.label}
-                {props.shareType}
+                按{item.label} {props.shareType}
               </Radio>
             );
           })}

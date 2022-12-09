@@ -183,6 +183,7 @@ const CohortConfig: React.FC = () => {
       teamCode: item.target.code,
       typeName: TargetType.Cohort,
       teamRemark: item.target.team?.remark!,
+      // belongId:friend?.id, //待开放参数
       avatar: 'test', //头像
     });
     getData();

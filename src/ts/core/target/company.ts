@@ -53,7 +53,17 @@ export default class Company extends MarketTarget implements ICompany {
     if (!reload && this.cohorts.length > 0) {
       return this.cohorts;
     }
-    const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
+    const res = await kernel.queryJoinedTargetById({
+      id: this.userId,
+      typeName: TargetType.Person,
+      page: {
+        offset: 0,
+        filter: '',
+        limit: common.Constants.MAX_UINT_16,
+      },
+      spaceId: this.id,
+      JoinTypeNames: [TargetType.Cohort],
+    });
     if (res.success && res.data.result) {
       this.cohorts = res.data.result.map((a) => {
         return new Cohort(a);
@@ -274,8 +284,8 @@ export default class Company extends MarketTarget implements ICompany {
       return this.joinedGroup;
     }
     const res = await this.getjoinedTargets([TargetType.Group], this.userId);
-    if (res.success && res.data.result) {
-      this.joinedGroup = res.data.result.map((a) => {
+    if (res && res.result) {
+      this.joinedGroup = res.result.map((a) => {
         return new Group(a, () => {
           this.joinedGroup = this.joinedGroup.filter((item) => {
             return item.id != a.id;
