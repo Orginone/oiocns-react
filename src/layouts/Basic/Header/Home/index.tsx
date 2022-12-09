@@ -2,8 +2,6 @@ import { Avatar } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import logo from '/img/logo.png';
-
 /**
  * 首页导航
  * @returns
@@ -11,7 +9,7 @@ import logo from '/img/logo.png';
 const HeaderHome: React.FC = () => {
   return (
     <Link to="/home">
-      <Avatar shape="square" src={logo} alt="首页" size={22} />
+      <Avatar shape="square" src="/img/logo/logo3.jpg" alt="首页" size={22} />
     </Link>
   );
 };
