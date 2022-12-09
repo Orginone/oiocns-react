@@ -227,7 +227,7 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts searchCallback={setSelectPerson} memberData={[]} />
+          <AssignPosts searchFn={setSelectPerson} memberData={[]} />
         </Modal>
       </div>
     </div>

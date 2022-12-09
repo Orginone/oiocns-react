@@ -48,6 +48,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       await setTreeCurrent(data[0]);
     }
   };
+  const loadMember = (pageIndex, pageSize) => {};
   // 加载 人员数据
   const getPersonData = async (current: IIdentity) => {
     const res = await current.loadMembers({
@@ -245,7 +246,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchCallback={setPerson} memberData={members} />
+              <AssignPosts searchFn={setPerson} memberData={members} />
             </Modal>
           </div>
         </Content>
