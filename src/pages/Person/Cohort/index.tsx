@@ -39,7 +39,6 @@ const CohortConfig: React.FC = () => {
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
-  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
 
   const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
@@ -114,15 +113,6 @@ const CohortConfig: React.FC = () => {
         onClick: async () => {
           setItem(item);
           setIsOpenIndentity(true);
-          setMemberData(
-            (
-              await item.loadMembers({
-                offset: 0,
-                filter: '',
-                limit: 65535,
-              })
-            ).result?.filter((obj) => obj.id != userCtrl.space.target.id)!,
-          );
         },
       },
       {
@@ -193,6 +183,7 @@ const CohortConfig: React.FC = () => {
       teamCode: item.target.code,
       typeName: TargetType.Cohort,
       teamRemark: item.target.team?.remark!,
+      // belongId:friend?.id, //待开放参数
       avatar: 'test', //头像
     });
     getData();
@@ -298,7 +289,7 @@ const CohortConfig: React.FC = () => {
                   key={item?.target.id}
                   layoutType="ModalForm"
                   title="修改群组"
-                  modalProps={{
+                  modalprops={{
                     destroyOnClose: true,
                     onCancel: () => setOpen(false),
                   }}

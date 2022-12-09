@@ -17,7 +17,6 @@ export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  subTeam: ITarget[] = [];
   constructor(target: schema.XTarget) {
     super(target);
 
@@ -27,6 +26,9 @@ export default class Person extends MarketTarget implements IPerson {
     this.createTargetType = [TargetType.Cohort, ...companyTypes];
 
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
+  }
+  public get subTeam(): ITarget[] {
+    return [];
   }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);
@@ -58,8 +60,8 @@ export default class Person extends MarketTarget implements IPerson {
       return this.cohorts;
     }
     const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
-    if (res.success && res.data.result) {
-      this.cohorts = res.data.result.map((a) => {
+    if (res && res.result) {
+      this.cohorts = res.result.map((a) => {
         return new Cohort(a);
       });
     }
@@ -70,8 +72,8 @@ export default class Person extends MarketTarget implements IPerson {
       return this.joinedCompany;
     }
     const res = await this.getjoinedTargets(companyTypes, this.id);
-    if (res.success && res.data?.result) {
-      this.joinedCompany = res.data.result.map((a) => {
+    if (res && res.result) {
+      this.joinedCompany = res.result.map((a) => {
         let company;
         switch (a.typeName) {
           case TargetType.University:

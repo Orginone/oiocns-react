@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import type { TreeProps } from 'antd/es/tree';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
@@ -22,82 +22,21 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   current,
 }) => {
   const [key] = useCtrlUpdate(userCtrl);
-  const [selectKey, setSelectKey] = useState<React.Key>(currentKey);
-  const setting = SettingService.getInstance();
+  const [data, setData] = useState<any[]>([]);
   const treeContainer = document.getElementById('templateMenu');
 
-  const initData = async (reload: boolean) => {
-    const data = await userCtrl.company.loadSubTeam(reload);
-    if (data.length > 0) {
-      if (currentKey && data[0].target.id !== currentKey) {
-        const currentContentDept = await setting.refItem(currentKey);
-        setCurrent(currentContentDept || data[0]);
-        setSelectKey(currentContentDept ? currentKey : data[0].target.id);
-      } else {
-        setSelectKey(data[0].target.id);
-        setCurrent(data[0]);
-      }
-      return data.map((n) => {
-        return createTreeDom(n);
-      });
-    }
-    return [];
-  };
+  useEffect(() => {
+    setTimeout(async () => {
+      setData(userCtrl.buildTargetTree(await userCtrl.space.loadSubTeam(false)));
+    }, 0);
+  }, []);
 
-  const createTreeDom: any = (n: ITarget, pid?: string) => {
-    const { target } = n;
-    const child = n.subTeam.map((m) => createTreeDom(m, target.id));
-    return {
-      key: target.id,
-      title: target.name,
-      tag: { color: '#8ba5ec', txt: target.typeName },
-      icon: target.avatar,
-      isLeaf: false,
-      intans: n,
-      children:
-        n.departments.length > 0
-          ? n.departments.map((m) => createTreeDom(m, n.target.id))
-          : undefined,
-      pid,
-    };
-  };
-  const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
-    list.map((node) => {
-      if (node.key === key) {
-        return {
-          ...node,
-          children,
-          isLeaf: children.length == 0,
-        };
-      }
-      if (node.children) {
-        return {
-          ...node,
-          children: updateTreeData(node.children, key, children),
-        };
-      }
-      return node;
-    });
-  const loadDept = async ({ key, children, intans }: any) => {
-    if (children) {
-      return;
-    }
-    const deptChild: any[] = await intans.getDepartments();
-    setTreeData((origin) =>
-      updateTreeData(
-        origin,
-        key,
-        deptChild.map((n) => createTreeDom(n, intans.target.id)),
-      ),
-    );
-  };
-
-  const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-    setSelectKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
-    await loadDept(info.node);
-    if (info.selected) {
-      setCurrent(info.node.intans);
-      setting.setCurrTreeDeptNode(info.node.intans.target.id);
+  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
+    const item: ITarget = info.node.item;
+    if (item) {
+      console.log(await item.loadSubTeam());
+      setData(userCtrl.buildTargetTree(await userCtrl.space.loadSubTeam(false)));
+      setCurrent(item);
     }
   };
 
@@ -116,12 +55,16 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
           showIcon
           searchable
           handleMenuClick={(key, node) => handleMenuClick(key, node.intans, node.pid)}
-          treeData={initData(false)}
+          treeData={data}
           title={'内设机构'}
           menu={menu}
-          selectedKeys={[selectKey]}
-          loadData={loadDept}
+          selectedKeys={[current?.id]}
           onSelect={onSelect}
+          fieldNames={{
+            title: 'name',
+            key: 'id',
+            children: 'children',
+          }}
         />
       </div>,
       treeContainer,

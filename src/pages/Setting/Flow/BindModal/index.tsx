@@ -13,7 +13,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import cls from './index.module.less';
 
-type BindModalProps = {
+type Bindmodalprops = {
   isOpen: boolean;
   bindAppMes: { name: string; id: string };
   onOk: () => void;
@@ -21,7 +21,7 @@ type BindModalProps = {
   upDateData: number;
 };
 
-const BindModal: React.FC<BindModalProps> = ({
+const BindModal: React.FC<Bindmodalprops> = ({
   bindAppMes,
   isOpen,
   onCancel,

@@ -125,14 +125,13 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
-  // 根据以获取数据 动态产生tab
+  // 根据权限从已获取数据 动态产生tab
   const getItems = () => {
     let typeSet = new Set(['全部']);
     appCtrl.products.forEach((v: any) => {
-      console.log('是是是', v);
-
-      typeSet.add(v.source);
+      v.source && typeSet.add(v.source);
     });
+
     return Array.from(typeSet).map((k) => {
       return { tab: k, key: k };
     });

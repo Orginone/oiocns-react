@@ -12,7 +12,6 @@ export default class BaseTarget implements ITarget {
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
-  public subTeam: ITarget[] = [];
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
@@ -29,6 +28,10 @@ export default class BaseTarget implements ITarget {
   }
   public get teamName(): string {
     return this.target.team!.name;
+  }
+
+  public get subTeam(): ITarget[] {
+    return [];
   }
 
   constructor(target: schema.XTarget) {
@@ -267,24 +270,25 @@ export default class BaseTarget implements ITarget {
   protected async getjoinedTargets(
     typeNames: TargetType[],
     spaceId: string,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
+  ): Promise<schema.XTargetArray | undefined> {
     typeNames = typeNames.filter((a) => {
       return this.joinTargetType.includes(a);
     });
     if (typeNames.length > 0) {
-      return await kernel.queryJoinedTargetById({
-        id: this.target.id,
-        typeName: this.target.typeName,
-        page: {
-          offset: 0,
-          filter: '',
-          limit: common.Constants.MAX_UINT_16,
-        },
-        spaceId: spaceId,
-        JoinTypeNames: typeNames,
-      });
+      return (
+        await kernel.queryJoinedTargetById({
+          id: this.target.id,
+          typeName: this.target.typeName,
+          page: {
+            offset: 0,
+            filter: '',
+            limit: common.Constants.MAX_UINT_16,
+          },
+          spaceId: spaceId,
+          JoinTypeNames: typeNames,
+        })
+      ).data;
     }
-    return model.badRequest(consts.UnauthorizedError);
   }
 
   /**
@@ -336,6 +340,7 @@ export default class BaseTarget implements ITarget {
   protected async createTarget(
     data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
+    console.log('进入数据', data);
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,

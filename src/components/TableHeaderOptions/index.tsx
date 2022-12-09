@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Space, Modal, ModalProps, Checkbox, Row, Col } from 'antd';
+import { Button, Space, Modal, modalprops, Checkbox, Row, Col } from 'antd';
 import SearchInput from '../SearchInput';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
@@ -117,7 +117,7 @@ const createUserHeaderData = <T extends DataType>(
   }
   return newSetttingColumns;
 };
-interface TableHeaderOptionsProps<T> extends ModalProps {
+interface TableHeaderOptionsProps<T> extends modalprops {
   plainOptions: ProColumns<T>[];
   handleOk: (data: any[]) => void;
 }

@@ -26,7 +26,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
       ...values,
       resources: list,
     });
-    if (res.success) {
+    if (res) {
       message.success('创建应用成功');
       history.goBack();
     }
@@ -46,7 +46,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
           open={showCreateModal}
           title="创建应用"
           onFinish={handleCreateApp}
-          modalProps={{
+          modalprops={{
             destroyOnClose: true,
             onCancel: () => setShowCreateModal(false),
           }}

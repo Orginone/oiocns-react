@@ -32,6 +32,7 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
       values.cohort.code,
       values.cohort.remark,
     );
+    console.log('创建结果', res);
     if (res) {
       message.success('创建群组成功!');
       callBack();

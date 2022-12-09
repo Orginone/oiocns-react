@@ -10,7 +10,6 @@ import './global.less';
 import zhCN from 'antd/es/locale/zh_CN';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { logger, LoggerLevel } from './ts/base/common';
 
 moment.locale('cn');
 
@@ -28,19 +27,6 @@ notification.config({
 
 const App = () => {
   const [locale] = useState(zhCN);
-  logger.onLogger = (level, msg) => {
-    switch (level) {
-      case LoggerLevel.info:
-        message.info(msg);
-        break;
-      case LoggerLevel.warn:
-        message.warn(msg);
-        break;
-      case LoggerLevel.error:
-        message.error(msg);
-        break;
-    }
-  };
   return (
     <HashRouter>
       <ConfigProvider prefixCls="ogo" locale={locale}>
