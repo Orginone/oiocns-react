@@ -40,7 +40,7 @@ const EditCustomModal = (props: Iprops) => {
               <Form.Item
                 name="name"
                 label="集团名称"
-                initialValue={current?.name}
+                initialValue={title == '编辑' ? current?.name : ''}
                 rules={[{ required: true, message: '请输入集团名称!' }]}>
                 <Input placeholder="请输入集团名称" />
               </Form.Item>
@@ -49,7 +49,7 @@ const EditCustomModal = (props: Iprops) => {
               <Form.Item
                 name="code"
                 label="集团编号"
-                initialValue={current?.target.code}
+                initialValue={title == '编辑' ? current?.target.code : ''}
                 rules={[{ required: true, message: '请输入集团编号!' }]}>
                 <Input placeholder="请输入集团编号" />
               </Form.Item>
@@ -59,7 +59,7 @@ const EditCustomModal = (props: Iprops) => {
             <Col span={24}>
               <Form.Item
                 name="teamRemark"
-                initialValue={current?.target.team?.remark}
+                initialValue={title == '编辑' ? current?.target.team?.remark : ''}
                 label="描述"
                 rules={[{ required: true, message: '请输入集团描述!' }]}>
                 <TextArea
