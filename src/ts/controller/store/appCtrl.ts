@@ -53,21 +53,17 @@ class AppController extends Emitter {
   }
 
   get alwaysUseApps(): IProduct[] {
-    if (this._caches && this._caches.alwaysUseIds) {
-      return this._caches.alwaysUseIds
-        .map((id) => {
-          if (this._target) {
-            for (const item of this._target.ownProducts) {
-              if (item.prod.id === id) {
-                return item;
-              }
-            }
+    const result: IProduct[] = [];
+    if (this._caches && this._target && this._caches.alwaysUseIds) {
+      for (const id of this._caches.alwaysUseIds) {
+        for (const item of this._target.ownProducts) {
+          if (item.prod.id === id) {
+            result.push(item);
           }
-          return {} as IProduct;
-        })
-        .filter((item) => item);
+        }
+      }
     }
-    return [];
+    return result;
   }
 
   get spacies(): TreeType[] {

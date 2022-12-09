@@ -38,13 +38,8 @@ class MarketController extends Emitter {
     super();
     this.searchMarket = [];
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      if (userCtrl.IsCompanySpace) {
-        this._target = userCtrl.Company;
-      } else {
-        this._target = userCtrl!.User;
-      }
-      this._curMarket = (await this._target!.getPublicMarket(true))[0];
-      await this!._target?.getJoinMarkets();
+      this._target = userCtrl.space;
+      await this._target.getJoinMarkets();
       /* 获取 历史缓存的 购物车商品列表 */
       kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
         // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
@@ -250,7 +245,7 @@ class MarketController extends Emitter {
       '',
       'order',
       'code',
-      userCtrl.Space?.target?.id,
+      userCtrl.space.id,
       this._shopingIds,
     );
     if (res?.code === 400) {

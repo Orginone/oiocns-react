@@ -79,14 +79,41 @@ class UserController extends Emitter {
     emitter.changCallbackPart(DomainTypes.Company);
   }
   /** 组织树 */
-  public async getTeamTree(): Promise<ITarget[]> {
+  public async getTeamTree(isShare: boolean = true): Promise<ITarget[]> {
+    const result: any[] = [];
     if (this._curSpace) {
-      const groups = await this._curSpace.getJoinedGroups(false);
-      return [this._curSpace, ...groups];
+      result.push({
+        ...this.space.target,
+        item: this.space,
+        hasChildren: true,
+      });
+      if (isShare) {
+        const groups = await this._curSpace.getJoinedGroups(false);
+        groups.forEach((item) => {
+          result.push({
+            ...item.target,
+            item: item,
+            hasChildren: true,
+          });
+        });
+      }
     } else {
       const cohorts = await this._user!.getCohorts(false);
-      return [this._user!, ...cohorts];
+      result.push({
+        ...this.user.target,
+        name: '我的好友',
+        item: this.user,
+        hasChildren: false,
+      });
+      cohorts.forEach((item) => {
+        result.push({
+          ...item.target,
+          item: item,
+          hasChildren: false,
+        });
+      });
     }
+    return result;
   }
   /**
    * 登录

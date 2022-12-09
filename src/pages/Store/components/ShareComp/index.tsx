@@ -4,10 +4,10 @@ import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
-// import { productCtrl } from '@/ts/controller/store/productCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { kernel } from '@/ts/base';
-import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
+import { ITarget } from '@/ts/core';
 interface Iprops {
   shareType: '分配' | '共享';
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
@@ -56,19 +56,20 @@ const ShareRecent = (props: Iprops) => {
   let recordShareInfo = new Map();
 
   useEffect(() => {
-    if (isCompanySpace) {
-      if (shareType === '共享') {
-        // 获取共享的集团列表
-        // queryCompanys();
-      } else {
-        // 获取应用资源
-        const resource = selfAppCtrl.curProduct!.resource || [];
-        setResourceList(resource);
+    setTimeout(async () => {
+      if (appCtrl.curProduct) {
+        if (shareType === '共享') {
+          setLeftTreeData(await userCtrl.getTeamTree());
+        } else {
+          if (userCtrl.isCompanySpace) {
+            const resource = appCtrl.curProduct.resource || [];
+            setResourceList(resource);
+          }
+          setLeftTreeData(await userCtrl.getTeamTree(false));
+        }
+        await appCtrl.curProduct.queryExtend('组织', '');
       }
-    } else {
-      queryExtend('组织', '');
-    }
-    getLeftTree();
+    }, 10);
   }, []);
   useEffect(() => {
     setDepartData([]);
@@ -85,53 +86,26 @@ const ShareRecent = (props: Iprops) => {
   const handelCheckedChange = (list: any) => {
     onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
   };
-  //获取左侧组织数据
-  const getLeftTree = async () => {
-    let FunName: Function = userCtrl.user!.getJoinedCohorts;
-    if (userCtrl.isCompanySpace) {
-      FunName =
-        shareType === '共享'
-          ? userCtrl.company!.getJoinedGroups
-          : userCtrl.company!.getDepartments;
-    }
-    const res = await FunName();
-    console.log('共享获取组织', res);
-    let ShowList = res?.map((item: { target: any }) => {
-      return {
-        ...item.target,
-        node: item,
-      };
-    });
-    console.log('是是是', ShowList);
-
-    !userCtrl.isCompanySpace &&
-      ShowList.unshift({
-        ...userCtrl.user.target,
-        name: '我的好友',
-        node: userCtrl.user,
-      });
-
-    setLeftTreeData([...ShowList]);
-  };
   const queryExtend = async (type?: string, teamId?: string) => {
     const _type = type || DestTypes[radio - 1].label;
     const _teamId = teamId || selectedTeamId || '0';
     let curData = recordShareInfo.has(_type) ? recordShareInfo.get(_type) : {};
-    curData[_teamId] = await selfAppCtrl.queryProductExtend(_type, _teamId);
+    curData[_teamId] = await appCtrl.curProduct?.queryExtend(_type, _teamId);
     recordShareInfo.set(_type, curData);
     console.log('请求分配列表', teamId, curData[_teamId]);
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
+    const item: ITarget = info.node.item;
     console.log('selected', selectedKeys, info);
     setLeftTreeSelectedKeys(selectedKeys);
 
     hasSelectRecord?.list?.lenght &&
-      selfAppCtrl.ShareProduct(
+      appCtrl.curProduct?.createExtend(
         selectedTeamId,
         hasSelectRecord!.list,
         hasSelectRecord!.type,
       );
-    setSelectedTeamId(info.node.id);
+    setSelectedTeamId(item.id);
     setDepartData([]);
     setAuthorData([]);
     setPersonsData([]);
@@ -140,46 +114,29 @@ const ShareRecent = (props: Iprops) => {
 
     switch (radio) {
       case 2: {
-        const res = await userCtrl.user!.selectAuthorityTree();
-
+        /** 职权 */
+        const res = await item.selectAuthorityTree();
         let data = handleTreeData(res, info.node.id);
         setCenterTreeData([data]);
         break;
       }
       case 3: {
-        // 岗位 --职权树
-
-        const res2 = await kernel.queryTargetIdentitys({
-          id: info.node.id,
-          page: {
-            limit: pageCurrent.limit,
-            offset: pageCurrent.offset,
-            filter: '',
-          },
-        });
-
-        const { result = [] } = res2.data;
-        console.log('输出,岗位', res2);
-        setCenterTreeData(result ? result : []);
+        /** 身份 */
+        setCenterTreeData(await item.getIdentitys());
         break;
       }
       case 4:
         {
-          let action = 'getMember';
-          if (info.node.typeName === '集团') {
-            //集团下 查单位
-            action = 'getCompanys';
-          } else if (info.node.typeName === '部门') {
-            action = 'getPerson';
-          } else if (info.node.typeName === '人员') {
-            action = 'getFriends';
-          }
-          console.log('输出,typeName', info.node.typeName);
-          const res3 = await info?.node?.node[action]();
-
-          console.log('输出,获取人员', info.node.typeName, res3);
-
-          setCenterTreeData(res3 || []);
+          /** TODO 分页查询成员 */
+          setCenterTreeData(
+            (
+              await item.loadMembers({
+                limit: 10000,
+                offset: 0,
+                filter: '',
+              })
+            ).result,
+          );
         }
         break;
       default:
@@ -395,7 +352,7 @@ const ShareRecent = (props: Iprops) => {
               fieldNames={{
                 title: 'name',
                 key: 'id',
-                children: 'children',
+                children: 'subTeam',
               }}
               selectedKeys={leftTreeSelectedKeys}
               onSelect={onSelect}

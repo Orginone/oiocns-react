@@ -43,10 +43,7 @@ export default interface IProduct {
    * @param teamId 组织Id
    * @returns
    */
-  queryExtend(
-    destType: string,
-    teamId?: string,
-  ): Promise<model.ResultType<model.IdNameArray>>;
+  queryExtend(destType: string, teamId?: string): Promise<model.IdNameArray>;
 
   /**
    * 上架商品
