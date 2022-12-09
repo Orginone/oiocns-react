@@ -99,16 +99,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     setIndentity(current);
     await getPersonData(current);
   };
-  // 去除已经选上的数据
-  const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
-    if (arr1.length === 0) {
-      return [];
-    }
-    let ids = arr2.map((item) => item.id);
-    return arr1.filter((el) => {
-      return !ids.includes(el.id);
-    });
-  };
   // 身份信息操作
   const buttons = [
     <Button
