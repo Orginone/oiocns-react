@@ -12,6 +12,7 @@ import AssignPosts from './components/AssignPosts';
 import cls from './index.module.less';
 import { ITarget } from '@/ts/core';
 import { MarketTypes } from 'typings/marketType';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -48,16 +49,26 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       await setTreeCurrent(data[0]);
     }
   };
-  // 加载 人员数据
-  const getPersonData = async (current: IIdentity) => {
-    const res = await current.loadMembers({
+  // 点击选中加载
+  const getPersonData = async (currentIndentity: IIdentity) => {
+    const res = await currentIndentity.loadMembers({
       offset: 0,
       filter: '',
       limit: 65535,
     });
     if (res?.result) {
+      //加载身份下的成员
       setPersonData(res.result);
-      setMembers(res.result);
+      //加载可指派成员
+      setMembers(
+        (
+          await current.loadMembers({
+            offset: 0,
+            filter: '',
+            limit: 65535,
+          })
+        ).result!,
+      );
     } else {
       setPersonData([]);
     }
