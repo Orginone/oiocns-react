@@ -21,7 +21,7 @@ interface Iprops {
   handleOk: () => void;
   editData?: XTarget;
 }
-/* 
+/*
   编辑
 */
 const EditCustomModal = (props: Iprops) => {
@@ -196,7 +196,7 @@ const EditCustomModal = (props: Iprops) => {
           setImage([]);
         }
       }}
-      modalProps={{
+      modalprops={{
         onCancel: () => handleCancel(),
       }}
       rowProps={{

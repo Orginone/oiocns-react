@@ -1,4 +1,4 @@
-import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
+import { Card, Button, Descriptions, Modal, message, Layout, modalprops } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
@@ -23,7 +23,7 @@ type IndentityManageType = {
  * 身份设置
  * @returns
  */
-const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
+const SettingIdentity: React.FC<IndentityManageType & modalprops> = (props) => {
   const { open, current, ...other } = props;
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
