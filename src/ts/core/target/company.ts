@@ -37,8 +37,13 @@ export default class Company extends MarketTarget implements ICompany {
     this.joinedGroup = [];
     this.subTeamTypes = [TargetType.Department, TargetType.Working];
     this.extendTargetType = [TargetType.Department, TargetType.Working, ...companyTypes];
-    this.joinTargetType = [TargetType.Group];
-    this.createTargetType = [TargetType.Department, TargetType.Working, TargetType.Group];
+    this.joinTargetType = [TargetType.Group, TargetType.Cohort];
+    this.createTargetType = [
+      TargetType.Department,
+      TargetType.Working,
+      TargetType.Group,
+      TargetType.Cohort,
+    ];
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
   public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {

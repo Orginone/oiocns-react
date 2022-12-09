@@ -39,7 +39,6 @@ const CohortConfig: React.FC = () => {
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
-  const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
 
   const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
@@ -114,15 +113,6 @@ const CohortConfig: React.FC = () => {
         onClick: async () => {
           setItem(item);
           setIsOpenIndentity(true);
-          setMemberData(
-            (
-              await item.loadMembers({
-                offset: 0,
-                filter: '',
-                limit: 65535,
-              })
-            ).result?.filter((obj) => obj.id != userCtrl.space.target.id)!,
-          );
         },
       },
       {

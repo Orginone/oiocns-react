@@ -336,6 +336,7 @@ export default class BaseTarget implements ITarget {
   protected async createTarget(
     data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
+    console.log('进入数据', data);
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
