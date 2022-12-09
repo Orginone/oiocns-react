@@ -17,7 +17,6 @@ export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  subTeam: ITarget[] = [];
   constructor(target: schema.XTarget) {
     super(target);
 
@@ -27,6 +26,9 @@ export default class Person extends MarketTarget implements IPerson {
     this.createTargetType = [TargetType.Cohort, ...companyTypes];
 
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
+  }
+  public get subTeam(): ITarget[] {
+    return [];
   }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);

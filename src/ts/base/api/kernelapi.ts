@@ -2284,7 +2284,15 @@ export default class KernelApi {
       data: args,
     });
     if (res.data && (res.data as model.ResultType<any>)) {
-      return res.data as model.ResultType<any>;
+      const result = res.data as model.ResultType<any>;
+      if (!result.success) {
+        if (result.code === 401) {
+          logger.unauth();
+        } else {
+          logger.warn('操作失败,' + result.msg);
+        }
+      }
+      return result;
     }
     return model.badRequest();
   }

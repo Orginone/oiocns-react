@@ -3,7 +3,6 @@ import React from 'react';
 import { Modal } from 'antd';
 import { useState } from 'react';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { TargetType } from '@/ts/core/enum';
 
 interface CohortServiceType {
   callBack: Function;
@@ -27,18 +26,17 @@ const CreateCohort: React.FC<CohortServiceType> = ({ callBack }) => {
   const [form] = Form.useForm();
   const onSave = async () => {
     const values = await form.validateFields();
-    const res = await userCtrl.space?.createCohort({
-      name: values.cohort.name,
-      code: values.cohort.code,
-      typeName: TargetType.Cohort,
-      teamRemark: values.cohort.remark,
-      avatar: 'cohort',
-    });
-    if (res.success) {
+    const res = await userCtrl.space?.createCohort(
+      'cohort',
+      values.cohort.name,
+      values.cohort.code,
+      values.cohort.remark,
+    );
+    if (res) {
       message.success('创建群组成功!');
       callBack();
     } else {
-      message.error('创建群组失败! ' + res.msg);
+      message.error('创建群组失败! ');
     }
     setIsModalOpen(false);
   };

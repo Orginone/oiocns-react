@@ -8,7 +8,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
-import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import EditCustomModal from './components/EditCustomModal';
@@ -17,6 +16,7 @@ import DepartTree from './components/TreeLeftDeptPage';
 import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import cls from './index.module.less';
+import SearchPerson from '@/bizcomponents/SearchPerson';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
@@ -41,7 +41,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         key: 'changeDept',
         label: '变更部门',
         onClick: () => {
-          setSelectPerson([item]);
+          setSelectPerson(item);
           setActiveModal('transfer');
         },
       },
@@ -168,7 +168,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                   tabBarExtraContent={renderBtns()}
                 />
                 <CardOrTable<XTarget>
-                  dataSource={deptMembers}
+                  dataSource={[]}
                   rowKey={'id'}
                   operation={renderOperation}
                   columns={columns}
