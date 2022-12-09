@@ -373,6 +373,7 @@ export default class BaseTarget implements ITarget {
       id: this.target.id,
       typeName: this.target.typeName,
     });
+    console.log('更新结果', res);
     if (res.success) {
       this.target.name = data.name;
       this.target.code = data.code;

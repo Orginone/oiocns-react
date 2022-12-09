@@ -1,13 +1,7 @@
 import React, { useRef } from 'react';
 import { message } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 import SchemaForm from '@/components/SchemaForm';
 import { XIdentity } from '@/ts/base/schema';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
@@ -21,10 +15,10 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: () => void;
   editData?: IIdentity;
-  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
+  current: ITarget;
 }
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, reObject, editData, handleCancel } = props;
+  const { open, title, handleOk, current, editData, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<XIdentity>[] = [
     {
@@ -48,7 +42,7 @@ const EditCustomModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '所属角色为必填项' }] },
       request: async () => {
-        const data = await reObject.selectAuthorityTree(false);
+        const data = await current.selectAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {
@@ -98,7 +92,7 @@ const EditCustomModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (title === '新增') {
-          const res = await reObject.createIdentity({
+          const res = await current.createIdentity({
             name: values.name,
             code: values.code,
             remark: values.remark,

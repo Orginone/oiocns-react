@@ -40,16 +40,17 @@ const UpdateCohort: React.FC<indexType> = ({
         onFinish={async (values: ICohort) => {
           const res = await item.update({
             name: values.target.name,
+            teamName: values.target.name,
+            teamCode: values.target.code,
             code: values.target.code,
             typeName: TargetType.Cohort,
             teamRemark: values.target.team?.remark!,
-            belongId: item.target.belongId,
-            avatar: 'test', //头像
+            avatar: 'cohort', //头像
           });
-          if (res.success) {
+          if (res) {
             message.success('修改成功');
           } else {
-            message.error(res.msg);
+            message.error('修改失败');
           }
 
           setOpen(false);

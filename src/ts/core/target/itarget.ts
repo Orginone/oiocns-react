@@ -421,6 +421,11 @@ export interface IPerson extends ISpace, ITarget {
    * @param code 人员编号
    */
   searchPerson(code: string): Promise<schema.XTargetArray>;
+  /**
+   * 发起好友申请
+   * @param target 人员
+   */
+  applyFriend(target: schema.XTarget): Promise<boolean>;
 }
 /** 单位操作 */
 export interface ICompany extends ISpace, ITarget {
