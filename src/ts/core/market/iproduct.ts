@@ -20,11 +20,7 @@ export default interface IProduct {
    * @param destType 目标类型
    * @returns
    */
-  createExtend(
-    teamId: string,
-    destIds: string[],
-    destType: string,
-  ): Promise<model.ResultType<any>>;
+  createExtend(teamId: string, destIds: string[], destType: string): Promise<boolean>;
   /**
    * 取消应用分享
    * @param teamId 组织Id
@@ -32,11 +28,7 @@ export default interface IProduct {
    * @param destType 目标类型
    * @returns
    */
-  deleteExtend(
-    teamId: string,
-    destIds: string[],
-    destType: string,
-  ): Promise<model.ResultType<any>>;
+  deleteExtend(teamId: string, destIds: string[], destType: string): Promise<boolean>;
   /**
    * 查询拓展 (应用分享)
    * @param destType 目标类型
@@ -62,13 +54,13 @@ export default interface IProduct {
     information: string;
     price: number;
     days: string;
-  }): Promise<model.ResultType<any>>;
+  }): Promise<boolean>;
   /**
    * 下架商品
    * @param merchandiseId 下架商品ID
    * @returns 下架是否成功
    */
-  unPublish(merchandiseId: string): Promise<model.ResultType<any>>;
+  unPublish(merchandiseId: string): Promise<boolean>;
   /**
    * 更新应用
    * @param name 应用名称
@@ -83,5 +75,5 @@ export default interface IProduct {
     typeName: string,
     remark: string,
     resources: model.ResourceModel[],
-  ): Promise<model.ResultType<any>>;
+  ): Promise<boolean>;
 }
