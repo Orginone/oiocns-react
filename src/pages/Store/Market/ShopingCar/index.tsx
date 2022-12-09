@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import CardOrTable from '@/components/CardOrTableComp';
 import TitleButton from './TitleButton';
@@ -19,6 +19,7 @@ const ShopingCar: React.FC = () => {
   const [selectedRowKey, setSelectedRowKey] = useState<any>([]); // 被选中的项
   const [shopList, setShopList] = useState<any>([]); // 购物车列表
   const [isBuy, setIsBuy] = useState<boolean>(false);
+  const parentRef = useRef<any>(null); // 获取table表格父级高度
 
   /**
    * @description: 订阅购物车数据变化
@@ -30,6 +31,7 @@ const ShopingCar: React.FC = () => {
       const arr = marketCtrl.shopinglist || [];
       setShopList([...arr]);
     });
+
     return () => {
       return marketCtrl.unsubscribe(id);
     };
@@ -84,7 +86,7 @@ const ShopingCar: React.FC = () => {
   const rowSelection = {
     type: 'checkbox',
     hideSelectAll: true,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
+    onChange: (_selectedRowKeys: React.Key[], selectedRows: any[]) => {
       setSelectedRowKey(selectedRows);
     },
   };
@@ -95,6 +97,7 @@ const ShopingCar: React.FC = () => {
    */
   const OnDeleApply = async () => {
     await marketCtrl.deleApply(selectedRowKey);
+    setSelectedRowKey([]);
   };
 
   /**
@@ -154,7 +157,7 @@ const ShopingCar: React.FC = () => {
   return (
     <React.Fragment>
       <TitleButton OnDeleApply={OnDeleApply} OnBuyShoping={OnCustomBuy} />
-      <div className={cls['shoping-car']}>
+      <div ref={parentRef} className={cls['shoping-car']}>
         <CardOrTable
           dataSource={shopList}
           rowKey={'id'}
@@ -163,6 +166,7 @@ const ShopingCar: React.FC = () => {
           rowSelection={rowSelection}
           tableAlertRender={false}
           renderCardContent={renderCardFun}
+          parentRef={parentRef}
         />
       </div>
       <BuyCustomModal
