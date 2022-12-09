@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import cls from './index.module.less';
-import { IGroup } from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 
 interface Iprops {
   title: string;
@@ -9,8 +9,7 @@ interface Iprops {
   onOk: () => void;
   handleOk: (item: any) => void;
   handleCancel: () => void;
-  selectId?: string;
-  currentGroup?: IGroup;
+  current: ITarget | undefined;
   [key: string]: any;
 }
 
@@ -19,7 +18,7 @@ const { TextArea } = Input;
 const EditCustomModal = (props: Iprops) => {
   // const [thisGroup, setThisGroup] = useState<IGroup>();
 
-  const { open, title, handleOk, handleCancel, currentGroup, selectId } = props;
+  const { open, title, handleOk, handleCancel, current } = props;
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
@@ -41,9 +40,7 @@ const EditCustomModal = (props: Iprops) => {
               <Form.Item
                 name="name"
                 label="集团名称"
-                initialValue={
-                  selectId == 'update' && currentGroup ? currentGroup?.target.name : ''
-                }
+                initialValue={title == '编辑' ? current?.name : ''}
                 rules={[{ required: true, message: '请输入集团名称!' }]}>
                 <Input placeholder="请输入集团名称" />
               </Form.Item>
@@ -52,9 +49,7 @@ const EditCustomModal = (props: Iprops) => {
               <Form.Item
                 name="code"
                 label="集团编号"
-                initialValue={
-                  selectId == 'update' && currentGroup ? currentGroup?.target.code : ''
-                }
+                initialValue={title == '编辑' ? current?.target.code : ''}
                 rules={[{ required: true, message: '请输入集团编号!' }]}>
                 <Input placeholder="请输入集团编号" />
               </Form.Item>
@@ -64,11 +59,7 @@ const EditCustomModal = (props: Iprops) => {
             <Col span={24}>
               <Form.Item
                 name="teamRemark"
-                initialValue={
-                  selectId == 'update' && currentGroup
-                    ? currentGroup?.target.team?.remark
-                    : ''
-                }
+                initialValue={title == '编辑' ? current?.target.team?.remark : ''}
                 label="描述"
                 rules={[{ required: true, message: '请输入集团描述!' }]}>
                 <TextArea
@@ -85,7 +76,6 @@ const EditCustomModal = (props: Iprops) => {
                 onClick={async () => {
                   const value = await form.validateFields();
                   if (value) {
-                    value.selectId = selectId;
                     handleOk(value);
                   }
                 }}>

@@ -98,6 +98,7 @@ const newPosition = (props: Iprops) => {
           } else {
             message.error(res.msg);
           }
+          handleOk();
         }}
         columns={columns}
       />

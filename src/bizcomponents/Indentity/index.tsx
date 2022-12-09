@@ -99,16 +99,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     setIndentity(current);
     await getPersonData(current);
   };
-  // 去除已经选上的数据
-  const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
-    if (arr1.length === 0) {
-      return [];
-    }
-    let ids = arr2.map((item) => item.id);
-    return arr1.filter((el) => {
-      return !ids.includes(el.id);
-    });
-  };
   // 身份信息操作
   const buttons = [
     <Button
@@ -178,34 +168,29 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </Button>
   );
 
-  // 身份信息标题
-
   //身份主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        <Card
-          title={indentity?.target.name}
-          className={cls['app-tabs']}
-          extra={renderBtns}
-          bordered={false}>
-          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-            <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={personData as any}
-                rowKey={'id'}
-                total={personData.length || 0}
-                operation={renderOperation}
-                columns={columns as any}
-                parentRef={parentRef}
-                showChangeBtn={false}
-              />
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Card
+        title={indentity?.target.name}
+        className={cls['app-tabs']}
+        extra={renderBtns}
+        bordered={false}>
+        <div className={cls['page-content-table']} ref={parentRef}>
+          <CardOrTable
+            dataSource={personData as any}
+            rowKey={'id'}
+            total={personData.length || 0}
+            operation={renderOperation}
+            columns={columns as any}
+            parentRef={parentRef}
+            showChangeBtn={false}
+          />
+        </div>
+      </Card>
     </div>
   );
+
   return (
     <Modal
       open={open}

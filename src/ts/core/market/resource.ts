@@ -13,40 +13,46 @@ export default class Resource implements IResource {
     teamId: string,
     destIds: string[],
     destType: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.createSourceExtend({
-      sourceId: this.resource.id,
-      sourceType: '资源',
-      destIds,
-      destType,
-      spaceId: this.resource.product!.belongId,
-      teamId,
-    });
+  ): Promise<boolean> {
+    return (
+      await kernel.createSourceExtend({
+        sourceId: this.resource.id,
+        sourceType: '资源',
+        destIds,
+        destType,
+        spaceId: this.resource.product!.belongId,
+        teamId,
+      })
+    ).success;
   }
   public async deleteExtend(
     teamId: string,
     destIds: string[],
     destType: string,
-  ): Promise<model.ResultType<any>> {
-    return await kernel.deleteSourceExtend({
-      sourceId: this.resource.id,
-      sourceType: '资源',
-      destIds,
-      destType,
-      spaceId: this.resource.product!.belongId,
-      teamId,
-    });
+  ): Promise<boolean> {
+    return (
+      await kernel.deleteSourceExtend({
+        sourceId: this.resource.id,
+        sourceType: '资源',
+        destIds,
+        destType,
+        spaceId: this.resource.product!.belongId,
+        teamId,
+      })
+    ).success;
   }
   public async queryExtend(
     destType: string,
     teamId?: string,
-  ): Promise<model.ResultType<model.IdNameArray>> {
-    return await kernel.queryExtendBySource({
-      sourceId: this.resource.id,
-      sourceType: '资源',
-      spaceId: this.resource.product!.belongId,
-      destType,
-      teamId,
-    });
+  ): Promise<model.IdNameArray> {
+    return (
+      await kernel.queryExtendBySource({
+        sourceId: this.resource.id,
+        sourceType: '资源',
+        spaceId: this.resource.product!.belongId,
+        destType,
+        teamId,
+      })
+    ).data;
   }
 }

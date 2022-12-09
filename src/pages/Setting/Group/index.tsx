@@ -8,16 +8,18 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { columns } from './config';
 import { RouteComponentProps } from 'react-router-dom';
-import TreeLeftGroupPage from './components/TreeLeftGroupPage';
-import { schema, model } from '@/ts/base';
+import GroupTree from './components/TreeLeftGroupPage';
+import { schema } from '@/ts/base';
 import EditCustomModal from './components/EditCustomModal';
-import { IGroup } from '@/ts/core/target/itarget';
+import { IGroup, ITarget } from '@/ts/core/target/itarget';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
 import ApplyInfoService from '@/bizcomponents/MyCompanySetting/ApplyInfo';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
+import IndentityManage from '@/bizcomponents/Indentity';
+import { PageRequest } from '@/ts/base/model';
 
 /**
  * 集团设置
@@ -25,17 +27,15 @@ import PageCard from '@/components/PageCard';
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
+  const [current, setCurrent] = useState<ITarget>();
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
 
-  const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑部门
-  const [isAddOpen, setIsAddOpen] = useState<boolean>(false); // 添加单位
+  const [isopen, setIsOpen] = useState<boolean>(false); // 新增编辑集团
+  const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
-
-  const [currentGroup, setCurrentGroup] = useState<IGroup>(); // 选中部门
-  const [dataSource, setDataSource] = useState<schema.XTarget[]>([]); // 单位的分页
-  const [selectId, setSelectId] = useState<string>(''); // 操作内容
-  const [joinKey, setJoinKey] = useState<string>(''); // 选中的单位
+  const [joinKey, setJoinKey] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
   const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
 
   useEffect(() => {
@@ -45,25 +45,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   // 选中树的时候操作
-  const setTreeCurrent = (current: IGroup | undefined) => {
+  const setTreeCurrent = (current: ITarget | undefined) => {
     if (current) {
-      setCurrentGroup(current);
-      currentGroup
-        ?.loadMembers({
-          offset: 1,
-          limit: 10,
-          filter: '',
-        })
-        .then((e) => {
-          if (e && e.result) {
-            setDataSource(e.result);
-          } else {
-            setDataSource([]);
-          }
-        });
+      setCurrent(current);
     } else {
-      setCurrentGroup(undefined);
-      setDataSource([]);
+      setCurrent(undefined);
     }
   };
 
@@ -71,16 +57,20 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const handleMenuClick = (key: string, item: any) => {
     switch (key) {
       case 'new':
-        setSelectId('new');
         setIsOpen(true);
+        setTitle('新建集团');
         break;
-      case '新增集团':
-        setCurrentGroup(item.target);
+      case '新建集团':
+        setCurrent(item);
+        setTitle('新建子组织');
         setIsOpen(true);
-        setSelectId('second');
         break;
       case '刷新':
-        item.target.loadSubTeam(true);
+        setCurrent(item);
+        current?.loadSubTeam(true);
+        break;
+      case '删除':
+        deleteGroup();
         break;
       case 'updateGroup':
         break;
@@ -89,20 +79,14 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
 
   const onOk = () => {
     setIsOpen(false);
-    setIsAddOpen(false);
     setLookApplyOpen(false);
   };
 
   const handlePullOk = async () => {
-    setIsAddOpen(false);
-    if (joinKey == '') {
-      message.error('请选中要添加集团的单位！');
-    } else {
-      // console.log
+    setActiveModal('');
+    if (joinKey.length > 0 && current) {
+      await current.pullMembers([joinKey], TargetType.Company);
     }
-  };
-  const handlePullCancel = () => {
-    setIsAddOpen(false);
   };
 
   const handleApplyCancel = () => {
@@ -116,42 +100,52 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     setIsOpen(false);
   };
 
+  const deleteGroup = async () => {
+    if (current) {
+      Modal.confirm({
+        title: '确认',
+        icon: <ExclamationCircleOutlined />,
+        content: `删除集团${current.name}？`,
+        okText: '确认',
+        cancelText: '取消',
+        onOk: async () => {
+          if (await (current as IGroup).delete()) {
+            message.info(`删除成功！`);
+            userCtrl.changCallback();
+          }
+        },
+      });
+    }
+  };
+
   const handleOk = async (item: any) => {
     if (item) {
-      if (item.selectId == 'update') {
-        if (userCtrl.isCompanySpace && currentGroup) {
-          item.teamCode = item.code;
-          item.teamName = item.name;
-          item.typeName = TargetType.Group;
-          const group = await currentGroup.update(item);
+      item.teamCode = item.code;
+      item.teamName = item.name;
+      item.typeName = TargetType.Group;
+      if (title == '编辑') {
+        if (userCtrl.isCompanySpace && current) {
+          const group = await current.update(item);
           if (group) {
-            message.info('修改部门成功！');
+            message.info('修改集团成功！');
             userCtrl.changCallback();
             setIsOpen(false);
           }
         }
-      } else {
-        item.teamCode = item.code;
-        item.teamName = item.name;
-        item.typeName = TargetType.Group;
-        if (selectId === 'second') {
-          const group = await currentGroup?.createSubGroup(item);
-          if (group) {
-            message.info('创建部门成功！');
-            userCtrl.changCallback();
-            setIsOpen(false);
-          }
-        } else if (selectId === 'new') {
-          const group = await userCtrl.company.createGroup(item);
-          if (group) {
-            message.info('创建部门成功！');
-            userCtrl.changCallback();
-            setIsOpen(false);
-          }
+      } else if (title == '新建集团') {
+        if (await userCtrl.company.createGroup(item)) {
+          message.info('创建集团成功！');
+          userCtrl.changCallback();
+          setIsOpen(false);
+        }
+      } else if (title == '新建子组织') {
+        if (await (current as IGroup).createSubGroup(item)) {
+          message.info('创建集团成功！');
+          userCtrl.changCallback();
+          setIsOpen(false);
         }
       }
     }
-    setIsAddOpen(false);
     setLookApplyOpen(false);
     setIsOpen(false);
   };
@@ -185,7 +179,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   ];
 
   // 集团信息标题
-  const title = (
+  const titlePanel = (
     <div className={cls['company-group-title']}>
       <div>
         <Title level={4}>节点信息</Title>
@@ -194,9 +188,9 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            if (currentGroup) {
+            if (current) {
+              setTitle('编辑');
               setIsOpen(true);
-              setSelectId('update');
             }
           }}>
           编辑
@@ -204,27 +198,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         <Button
           type="link"
           onClick={() => {
-            if (currentGroup) {
-              Modal.confirm({
-                title: '确认',
-                icon: <ExclamationCircleOutlined />,
-                content: '删除集团？',
-                okText: '确认',
-                cancelText: '取消',
-                onOk: async () => {
-                  if (currentGroup) {
-                    const isSuccess = await currentGroup.delete();
-                    const operate = '删除集团';
-                    if (isSuccess) {
-                      message.info(`${operate}成功！`);
-                      userCtrl.changCallback();
-                    } else {
-                      message.error(`${operate}失败！`);
-                    }
-                  }
-                },
-              });
-            }
+            deleteGroup();
           }}>
           删除
         </Button>
@@ -238,25 +212,25 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       <Card bordered={false}>
         <Descriptions
           size="middle"
-          title={title}
+          title={titlePanel}
           bordered
           column={2}
           labelStyle={{ textAlign: 'center', color: '#606266' }}
           contentStyle={{ textAlign: 'center', color: '#606266' }}>
           <Descriptions.Item label="集团名称" contentStyle={{ width: '30%' }}>
-            <strong>{currentGroup?.target.name}</strong>
+            <strong>{current?.target.name}</strong>
           </Descriptions.Item>
           <Descriptions.Item label="集团编码" contentStyle={{ width: '30%' }}>
-            {currentGroup?.target.code}
+            {current?.target.code}
           </Descriptions.Item>
           <Descriptions.Item label="创建人">
-            {currentGroup?.target.createUser}
+            {current?.target.createUser}
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
-            {currentGroup?.target.createTime}
+            {current?.target.createTime}
           </Descriptions.Item>
           <Descriptions.Item label="描述" span={2}>
-            {currentGroup?.target.team?.remark}
+            {current?.target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -267,15 +241,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const renderBtns = () => {
     return (
       <Space>
-        <Button type="link" onClick={() => {}}>
-          集团岗位
+        <Button type="link" onClick={() => setActiveModal('indentity')}>
+          身份设置
         </Button>
-        <Button
-          type="link"
-          onClick={() => {
-            if (currentGroup != null) setIsAddOpen(true);
-          }}>
-          添加单位
+        <Button type="link" onClick={() => setActiveModal('addCompany')}>
+          添加成员
         </Button>
         <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
@@ -283,56 +253,66 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       </Space>
     );
   };
-
-  //集团主体
-  const deptCount = (
-    <div className={cls['pages-wrap']}>
-      <PageCard
-        bordered={false}
-        tabList={TitleItems}
-        onTabChange={(key) => {}}
-        bodyStyle={{ paddingTop: 16 }}>
-        <div className={cls['page-content-table']} ref={parentRef}>
-          <Tabs items={[{ label: `全部`, key: '1' }]} tabBarExtraContent={renderBtns()} />
-          <CardOrTable<schema.XTarget>
-            dataSource={dataSource}
-            rowKey={'id'}
-            operation={renderOperation}
-            columns={columns}
-            parentRef={parentRef}
-            showChangeBtn={false}
-          />
-        </div>
-      </PageCard>
-    </div>
-  );
   return (
     <div className={cls[`group-content-box`]}>
-      {content}
-      {deptCount}
       {/* 编辑集团 */}
-      <EditCustomModal
-        open={isopen}
-        title={selectId == 'update' ? '编辑集团信息' : '新建集团'}
-        onOk={onOk}
-        currentGroup={currentGroup}
-        handleOk={handleOk}
-        handleCancel={handleCancel}
-        selectId={selectId}
-      />
-      {/* <IndentityManage open = {isOpenIndentity} object = {currentGroup!} MemberData = {}/> */}
+      {current ? (
+        <>
+          {content}
+          <EditCustomModal
+            open={isopen}
+            onOk={onOk}
+            current={current}
+            handleOk={handleOk}
+            handleCancel={handleCancel}
+            title={title}
+          />
+          <IndentityManage
+            open={activeModal === 'indentity'}
+            current={current}
+            onCancel={() => setActiveModal('')}
+          />
+          <div className={cls['pages-wrap']}>
+            <PageCard
+              bordered={false}
+              tabList={TitleItems}
+              onTabChange={(key) => {}}
+              bodyStyle={{ paddingTop: 16 }}>
+              <div className={cls['page-content-table']} ref={parentRef}>
+                <Tabs
+                  items={[{ label: `全部`, key: '1' }]}
+                  tabBarExtraContent={renderBtns()}
+                />
+                <CardOrTable<schema.XTarget>
+                  param={current}
+                  rowKey={'id'}
+                  dataSource={[]}
+                  request={async (page: PageRequest) => {
+                    console.log(page);
+                    await current.loadMembers(page);
+                  }}
+                  operation={renderOperation}
+                  columns={columns}
+                  parentRef={parentRef}
+                  showChangeBtn={false}
+                />
+              </div>
+            </PageCard>
+          </div>
+        </>
+      ) : (
+        ''
+      )}
+
       <Modal
         title="添加单位"
-        open={isAddOpen}
+        open={activeModal === 'addCompany'}
         onOk={handlePullOk}
-        onCancel={handlePullCancel}
+        onCancel={() => setActiveModal('')}
         destroyOnClose={true}
         width={500}>
         <div>
-          <SearchCompany
-            joinKey={joinKey}
-            setJoinKey={setJoinKey}
-            setJoinTarget={setJoinTarget}></SearchCompany>
+          <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey}></SearchCompany>
         </div>
       </Modal>
       <Modal
@@ -355,11 +335,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
       {/* 左侧树 */}
       {treeContainer
         ? ReactDOM.createPortal(
-            <TreeLeftGroupPage
-              createTitle="新增"
+            <GroupTree
+              current={current}
               setCurrent={setTreeCurrent}
               handleMenuClick={handleMenuClick}
-              currentKey={''}
             />,
             treeContainer,
           )

@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { ProColumns } from '@ant-design/pro-components';
-/* eslint-disable no-unused-vars */
+import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown, Pagination } from 'antd';
+import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
@@ -28,6 +27,11 @@ interface PageType<T> {
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
+  request?: (params: { page: number; pageSize: number }) => Promise<{
+    data: T[];
+    success: boolean;
+    total: number;
+  }>;
   [key: string]: any; // 其他属性方法
 }
 
@@ -50,17 +54,19 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   onChange,
   renderCardContent,
   headerTitle,
+  request,
   ...rest
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
+
   // 监听父级高度
   useEffect(() => {
     setTimeout(() => {
       if (parentRef?.current) {
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
-        console.log('展示高度', _height);
+        // console.log('展示高度', _height);
         setDefaultHeight(_height > 100 ? _height - (headerTitle ? 164 : 116) : 100);
       }
     }, 50);
@@ -104,22 +110,62 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   }, [columns, operation]);
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
-    return pageType === 'table' ? (
-      <ProTable
+    return (
+      <ProTable //pageType === 'table' ? (
         className={cls['common-table']}
         columns={hideOperation ? columns : resetColumns}
-        dataSource={dataSource}
         scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
         search={false}
         headerTitle={headerTitle}
         rowKey={rowKey || 'key'}
-        pagination={false}
+        pagination={{
+          defaultPageSize: 10,
+          size: 'default',
+          showSizeChanger: true,
+          showTotal: (total: number) => `共 ${total} 条`,
+        }}
         options={false}
-        // options={{
-        //   setting: {
-        //     listsHeight: 400,
-        //   },
-        // }}
+        params={dataSource}
+        request={async (params) => {
+          // console.log(params);
+          const { current: pageIndex = 1, pageSize = 10 } = params;
+          if (request) {
+            const data = await request({
+              page: pageIndex || 1,
+              pageSize: pageSize || 10,
+            });
+            return data;
+          } else {
+            return {
+              data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
+              total,
+              success: true,
+            };
+          }
+        }}
+        tableRender={(props, defaultDom) => {
+          return pageType === 'table' ? (
+            !showChangeBtn ? (
+              defaultDom
+            ) : (
+              [defaultDom, TableFooter]
+            )
+          ) : (
+            <>
+              {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
+              <div
+                className={cls['common-card']}
+                style={{
+                  height:
+                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
+                }}>
+                {renderCardContent && renderCardContent(dataSource)}
+              </div>
+              <div style={{ height: 64 }}></div>
+              {TableFooter}
+            </>
+          );
+        }}
         rowClassName={
           stripe
             ? (_record: any, index: number) => {
@@ -129,25 +175,26 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         }
         {...rest}
       />
-    ) : (
-      <>
-        {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
-        <div
-          className={cls['common-card']}
-          style={{
-            height: defaultHeight !== 'auto' ? defaultHeight + 57 + 'px' : defaultHeight,
-          }}>
-          {renderCardContent && renderCardContent(dataSource)}
-        </div>
-      </>
     );
+    // ) : (
+    //   <>
+    //     {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
+    //     <div
+    //       className={cls['common-card']}
+    //       style={{
+    //         height: defaultHeight !== 'auto' ? defaultHeight + 57 + 'px' : defaultHeight,
+    //       }}>
+    //       {renderCardContent && renderCardContent(dataSource)}
+    //     </div>
+    //   </>
+    // );
   }, [pageType, dataSource, operation, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
    * @return {底部组件}
    */
   const TableFooter = (
-    <div className={cls['common-table-footer']}>
+    <div className={cls['common-table-footer']} key="pagetype">
       {/* 切换展示形式 */}
       <div className={cls['btn-box']}>
         {showChangeBtn ? (
@@ -172,19 +219,23 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         )}
       </div>
       {/* 翻页功能 */}
-      <Pagination
-        total={total || 0}
-        onChange={onChange}
+      {/* <Pagination
+        total={tableTotal || 0}
+        onChange={(page, pageSize) => {
+          setTablePage({ page, pageSize });
+          onChange && onChange(page, pageSize);
+        }}
         current={page || 1}
         showTotal={(total: number) => `共 ${total} 条`}
         showSizeChanger
-      />
+      /> */}
     </div>
   );
 
   return (
     <div className={cls['common-table-wrap']} style={style}>
-      {renderTable} {TableFooter}
+      {renderTable}
+      {/* {TableFooter} */}
     </div>
   );
 };
