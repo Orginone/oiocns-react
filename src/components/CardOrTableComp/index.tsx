@@ -66,7 +66,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       if (parentRef?.current) {
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
-        console.log('展示高度', _height);
+        // console.log('展示高度', _height);
         setDefaultHeight(_height > 100 ? _height - (headerTitle ? 164 : 116) : 100);
       }
     }, 50);
@@ -127,7 +127,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         options={false}
         params={dataSource}
         request={async (params) => {
-          console.log(params);
+          // console.log(params);
           const { current: pageIndex = 1, pageSize = 10 } = params;
           if (request) {
             const data = await request({
