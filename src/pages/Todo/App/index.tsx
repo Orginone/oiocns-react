@@ -29,19 +29,19 @@ const AppTodo: React.FC = () => {
       dataIndex: ['Data', 'status'],
       render: (_, record) => renderItemStatus(record.Data),
     },
-    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: ['Data', 'createTime'], valueType: 'dateTime' },
   ];
   const applyColumns: ProColumns<IApplyItem>[] = [
     { title: '序号', valueType: 'index', width: 60 },
-    { title: '当前流程', dataIndex: ['Data', 'title'] },
-    { title: '审核人', dataIndex: ['Data', 'title'] },
+    { title: '标题', dataIndex: ['Data', 'title'] },
+    // { title: '审核人', dataIndex: ['Data', 'title'] },
     { title: '事项', dataIndex: ['Data', 'content'] },
     {
       title: '状态',
       dataIndex: ['Data', 'status'],
       render: (_, record) => renderItemStatus(record.Data),
     },
-    { title: '更新时间', dataIndex: ['Data', 'updateTime'], valueType: 'dateTime' },
+    { title: '创建时间', dataIndex: ['Data', 'createTime'], valueType: 'dateTime' },
   ];
   const loadList = async (page: number, pageSize: number) => {
     if (todoCtrl.CurAppTodo) {
@@ -63,7 +63,13 @@ const AppTodo: React.FC = () => {
     setNeedReload(false);
   };
   useEffect(() => {
-    loadList(1, 10);
+    loadList(1, 10); //监听
+    const id = todoCtrl.subscribePart('CurAppTodo', () => {
+      loadList(1, 10); //监听
+    });
+    return () => {
+      return todoCtrl.unsubscribe(id);
+    };
   }, [activeKey, needReload, location.pathname]);
 
   return (
