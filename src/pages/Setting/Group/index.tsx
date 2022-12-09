@@ -20,14 +20,13 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import { PageRequest } from '@/ts/base/model';
-
+import TransferGroup from './components/TransferGroup';
 /**
  * 集团设置
  * @returns
  */
 const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
-  const [current, setCurrent] = useState<ITarget>();
   const treeContainer = document.getElementById('templateMenu');
   const parentRef = useRef<any>(null); //父级容器Dom
 
@@ -36,22 +35,14 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
   const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
   const [joinKey, setJoinKey] = useState<string>('');
   const [title, setTitle] = useState<string>('');
-  const [joinTarget, setJoinTarget] = useState<schema.XTarget>();
+  const [current, setCurrent] = useState<ITarget>();
+  const [selectCompany, setSelectCompany] = useState<schema.XTarget>(); // 选中的要拉的人
 
   useEffect(() => {
     if (!userCtrl.isCompanySpace) {
       history.push('/setting/info', { refresh: true });
     }
   }, []);
-
-  // 选中树的时候操作
-  const setTreeCurrent = (current: ITarget | undefined) => {
-    if (current) {
-      setCurrent(current);
-    } else {
-      setCurrent(undefined);
-    }
-  };
 
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {
@@ -118,6 +109,11 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     }
   };
 
+  const handleTransferOk = () => {
+    setActiveModal('');
+    userCtrl.changCallback();
+  };
+
   const handleOk = async (item: any) => {
     if (item) {
       item.teamCode = item.code;
@@ -155,18 +151,24 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
     return [
       {
         key: 'changeNode',
-        label: '调整节点',
-        onClick: () => {},
+        label: '变更集团',
+        onClick: () => {
+          setSelectCompany(item);
+          setActiveModal('transfer');
+        },
       },
-      {
-        key: 'share',
-        label: '岗位集团',
-        onClick: () => {},
-      },
+
       {
         key: 'remove',
         label: '移出集团',
-        onClick: () => {},
+        onClick: async () => {
+          if (selectCompany && current) {
+            if (await current.removeMember(item)) {
+              message.success('移出成功');
+              userCtrl.changCallback();
+            }
+          }
+        },
       },
     ];
   };
@@ -272,6 +274,14 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
             current={current}
             onCancel={() => setActiveModal('')}
           />
+          <TransferGroup
+            title={'转移集团'}
+            open={activeModal === 'transfer'}
+            handleOk={handleTransferOk}
+            onCancel={() => setActiveModal('')}
+            current={current}
+            needTransferUser={selectCompany!}
+          />
           <div className={cls['pages-wrap']}>
             <PageCard
               bordered={false}
@@ -284,10 +294,10 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
                   tabBarExtraContent={renderBtns()}
                 />
                 <CardOrTable<schema.XTarget>
-                  param={current}
                   rowKey={'id'}
                   dataSource={[]}
-                  request={async (page: PageRequest) => {
+                  params={current}
+                  request={async (page) => {
                     return await current.loadMembers(page);
                   }}
                   operation={renderOperation}
@@ -335,7 +345,7 @@ const SettingGroup: React.FC<RouteComponentProps> = (props) => {
         ? ReactDOM.createPortal(
             <GroupTree
               current={current}
-              setCurrent={setTreeCurrent}
+              setCurrent={(item) => setCurrent(item)}
               handleMenuClick={handleMenuClick}
             />,
             treeContainer,
