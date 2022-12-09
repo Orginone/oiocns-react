@@ -14,6 +14,7 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import EditInfo from './components/EditInfo';
+import { resetParams } from '@/utils/tools';
 
 type ShowmodelType = 'addOne' | 'edit' | 'post' | 'transfer' | 'indentity' | '';
 type TabType = 'members' | 'application';
@@ -27,27 +28,19 @@ const SettingInfo: React.FC = () => {
   const [compinfo, setCompInfo] = useState<ICompany>();
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
-  const [persons, setPersons] = useState<schema.XTarget[]>([]); //部门成员
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
   const [ownProducts, setOwnProducts] = useState<IProduct[]>([]); //部门成员
-  const getMembers = async (reload: boolean) => {
-    if (compinfo) {
-      setPersons(await compinfo.getPersons(reload));
-    }
-  };
   const getAppliction = async (reload: boolean) => {
     if (compinfo) {
       setOwnProducts(await compinfo.getOwnProducts(reload));
     }
   };
   useEffect(() => {
-    if (userCtrl.Company) {
-      setCompInfo(userCtrl.Company);
-      getMembers(true);
+    if (userCtrl.company) {
+      setCompInfo({ ...userCtrl.company });
       getAppliction(true);
     }
   }, [key]);
-  console.log(ownProducts);
   const menu = [
     { key: 'auth', label: '认证' },
     {
@@ -62,12 +55,12 @@ const SettingInfo: React.FC = () => {
             okType: 'danger',
             cancelText: '取消',
             async onOk() {
-              const res = await userCtrl.user.quitCompany(compinfo?.target.id);
-              if (res.success) {
+              const success = await userCtrl.user.quitCompany(compinfo?.target.id);
+              if (success) {
                 message.success(`退出${compinfo.target.name}单位成功!`);
                 userCtrl.setCurSpace(userCtrl.user.target.id);
               } else {
-                message.error('退出单位失败!' + res.msg);
+                message.error('退出单位失败!');
               }
             },
             onCancel() {},
@@ -177,18 +170,31 @@ const SettingInfo: React.FC = () => {
           <div className={cls['page-content-table']}>
             {activeTab === 'members' ? (
               <CardOrTable<schema.XTarget>
-                dataSource={persons}
-                total={persons?.length}
+                dataSource={[]}
+                key="member"
                 rowKey={'id'}
+                params={{ id: compinfo?.target.id }}
+                request={async (params) => {
+                  const { page, pageSize } = params;
+                  const res = await compinfo?.loadMembers(
+                    resetParams({ page, pageSize }),
+                  );
+                  return {
+                    data: res?.result || [],
+                    total: res?.total || 0,
+                    success: true,
+                  };
+                }}
                 operation={renderOperation}
                 columns={PersonColumns}
                 showChangeBtn={false}
               />
             ) : (
               <CardOrTable<IProduct>
+                key="product"
                 dataSource={ownProducts || []}
                 total={ownProducts.length}
-                rowKey={(record) => record.prod.id}
+                rowKey={'id'}
                 hideOperation={true}
                 columns={ApplicationColumns}
                 showChangeBtn={false}
@@ -198,8 +204,7 @@ const SettingInfo: React.FC = () => {
         </PageCard>
         <IndentityManage
           open={activeModal === 'indentity'}
-          object={compinfo!}
-          MemberData={persons}
+          current={compinfo!}
           onCancel={() => setActiveModal('')}
         />
         <EditInfo
@@ -218,16 +223,23 @@ const SettingInfo: React.FC = () => {
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && compinfo) {
-              const { success, msg } = await compinfo.pullPerson(selectPerson);
+              const success = await compinfo.pullMembers(
+                selectPerson.map((n) => n.id),
+                selectPerson[0].typeName,
+              );
               if (success) {
                 message.success('添加成功');
                 userCtrl.changCallback();
               } else {
-                message.error(msg);
+                message.error('添加失败');
               }
             }
           }}>
-          <AssignPosts searchFn={setSelectPerson} memberData={[]} />
+          <AssignPosts
+            searchFn={setSelectPerson}
+            memberData={[]}
+            current={userCtrl.company}
+          />
         </Modal>
       </div>
     </div>

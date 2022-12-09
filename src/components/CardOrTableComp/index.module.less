@@ -52,9 +52,13 @@
     .ogo-pro-card-body {
       padding: 0;
     }
+    .ogo-table-cell-fix-right {
+      background: transparent;
+    }
 
     .ogo-pro {
       flex: 1;
+      position: relative;
     }
   }
 }
@@ -64,6 +68,9 @@
 }
 
 // 卡片布局
+.common-card-content {
+  position: relative;
+}
 .common-card {
   flex: 1;
   box-sizing: border-box;
@@ -71,13 +78,17 @@
   flex-wrap: wrap;
   align-content: flex-start;
   overflow-y: auto;
+  padding-bottom: 10px;
 }
 
 .common-table-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 10px 0px 0;
+  // display: flex;
+  // justify-content: space-between;
+  // align-items: center;
+  margin-top: -49px;
+  z-index: 1;
+  position: relative;
+  width: 100px;
 }
 
 .stripe {
