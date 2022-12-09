@@ -12,7 +12,6 @@ import AssignPosts from './components/AssignPosts';
 import cls from './index.module.less';
 import { ITarget } from '@/ts/core';
 import { MarketTypes } from 'typings/marketType';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
