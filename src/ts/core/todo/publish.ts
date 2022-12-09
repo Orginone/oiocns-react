@@ -22,17 +22,17 @@ class PublishTodo implements ITodoGroup {
     await this.getApprovalList();
     return this._todoList;
   }
-  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
+  async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getApprovalList();
     return this._doList;
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
@@ -81,7 +81,7 @@ class PublishTodo implements ITodoGroup {
       let rejectfun = (s: schema.XMerchandise) => {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
-      let reRejectfun = (s: schema.XMerchandise) => {};
+      let reRejectfun = (_: schema.XMerchandise) => {};
       this._doList = res.data.result
         .filter((a) => {
           return a.status >= CommonStatus.RejectStartStatus;
@@ -115,7 +115,7 @@ class ApprovalItem implements IApprovalItem {
     this._passCall = passCall;
     this._rejectCall = rejectCall;
   }
-  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
+  async pass(status: number, _: string): Promise<boolean> {
     const res = await kernel.approvalMerchandise({
       id: this._data.id,
       status,
@@ -123,9 +123,9 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._passCall.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(status: number, _: string): Promise<boolean> {
     const res = await kernel.approvalMerchandise({
       id: this._data.id,
       status,
@@ -133,7 +133,7 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._rejectCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
 }
 class ApplyItem implements IApplyItem {
@@ -146,7 +146,7 @@ class ApplyItem implements IApplyItem {
     this._data = data;
     this._cancelCall = cancelCall;
   }
-  async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
+  async cancel(_status: number, _remark: string): Promise<boolean> {
     const res = await kernel.deleteMerchandise({
       id: this._data.id,
       belongId: '0',
@@ -154,7 +154,7 @@ class ApplyItem implements IApplyItem {
     if (res.success) {
       this._cancelCall.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
 }
 
