@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { APPFUNS } from '@/services';
 
 export default function (iframeRef: any, appInfo: any, link: string) {
-  console.log('ifream', appInfo, link);
   let funcs = {};
   useEffect(() => {
     // 加载app可用urls
@@ -35,6 +34,8 @@ export default function (iframeRef: any, appInfo: any, link: string) {
     if (!message.data.sendId) {
       return;
     }
+    console.log('ifream', appInfo, link);
+
     console.log('平台接受消息', message.data);
     ((msg: any) => {
       setTimeout(async () => {
@@ -45,7 +46,7 @@ export default function (iframeRef: any, appInfo: any, link: string) {
         } catch (ex) {
           result.exception = ex;
         } finally {
-          iframeRef.contentWindow!.postMessage(result, link);
+          iframeRef.current.contentWindow.postMessage(result, link);
         }
       });
     })(message);

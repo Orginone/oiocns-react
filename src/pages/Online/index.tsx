@@ -20,7 +20,7 @@ const Index: React.FC = () => {
     }
     setLink(Resources[0].resource.link);
   }, [appId]);
-  usePostMessage(ifmRef, {}, Resources[0].resource.link);
+  usePostMessage(ifmRef, appCtrl.curProduct?.prod, Resources[0].resource.link);
 
   return (
     <>
