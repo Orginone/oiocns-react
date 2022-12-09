@@ -63,7 +63,7 @@ const OrganizationalUnits = () => {
   };
 
   return (
-    <div className={styles.menu} onMouseLeave={() => setShowMenu(true)}>
+    <div className={styles.menu} onMouseLeave={() => setShowMenu(false)}>
       <Space onClick={() => setShowMenu(!showMenu)} className={styles['current-item']}>
         {current && loadItem(current)}
         <CaretDownOutlined
