@@ -46,12 +46,10 @@ const BindModal: React.FC<Bindmodalprops> = ({
     });
     setData(currentData);
     const currentValue = await userCtrl.space.queryFlowRelation(false);
-    console.log('currentValue', currentValue, bindAppMes?.id);
     if (currentValue && currentValue.length > 0) {
       const filterId = currentValue.filter((item) => {
         return item.defineId === bindAppMes?.id;
       });
-      console.log('filterId', filterId);
       setOldFormData(filterId);
       form.setFieldsValue({ labels: filterId });
     }
@@ -183,6 +181,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
               <ProFormSelect
                 name="productId"
                 width={280}
+                disabled
                 label="应用名称"
                 // mode="multiple"
                 options={data}
