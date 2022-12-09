@@ -13,10 +13,13 @@ import { MarketTypes } from 'typings/marketType';
  */
 const UserManagement = () => {
   const [data, setData] = useState<any>([]); // 当前操作的商店对象
+  const [total, setTotal] = useState<number>(0); // 总数
   const [dataSource, setDataSource] = useState<any>([]); // 商店内对应的用户信息
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.UserManagement, () => {
-      setData(marketCtrl?.marketMenber);
+      const { total = 0, result = [] } = marketCtrl!.marketMenber;
+      setData(result);
+      setTotal(total);
     });
     return () => {
       marketCtrl.unsubscribe(id);
@@ -30,7 +33,11 @@ const UserManagement = () => {
     setDataSource(arr);
   }, [data]);
 
-  // 操作内容渲染函数
+  /**
+   * @description: 操作内容渲染函数
+   * @param {MarketTypes} item
+   * @return {*}
+   */
   const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
     return [
       {
@@ -43,6 +50,16 @@ const UserManagement = () => {
     ];
   };
 
+  /**
+   * @desc: 页码切换函数
+   * @param {number} page
+   * @param {number} pageSize
+   * @return {*}
+   */
+  const handlePageChange = (page: number, pageSize: number, filter?: string) => {
+    marketCtrl.getMember({ page, pageSize, filter });
+  };
+
   return (
     <div className={cls['user-management']}>
       <CardOrTable
@@ -52,6 +69,8 @@ const UserManagement = () => {
         columns={columns as any}
         headerTitle="用户管理"
         operation={renderOperation}
+        total={total}
+        onChange={handlePageChange}
       />
     </div>
   );
