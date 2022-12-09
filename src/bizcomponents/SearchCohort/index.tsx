@@ -41,7 +41,7 @@ const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
   // 查询数据
   const getList = async (searchKey?: string) => {
     const res = await userCtrl.user?.searchCohort(searchKey || '');
-    setDataSource(res?.data.result || []);
+    setDataSource(res?.result || []);
   };
 
   return (
