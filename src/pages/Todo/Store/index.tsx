@@ -52,18 +52,22 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       width: 60,
     },
     {
-      title: '市场名称',
+      title: '市场',
       dataIndex: ['Data', 'market', 'name'],
+      render: (_, record) => {
+        return (
+          <Space>
+            {_}
+            <Tag>{record.Data.market?.code}</Tag>
+          </Space>
+        );
+      },
     },
     {
-      title: '市场编码',
-      dataIndex: ['Data', 'market', 'code'],
+      title: '申请组织',
+      dataIndex: '',
       render: (_, row) => {
-        return (
-          <Typography.Paragraph copyable={{ text: row?.Data.market.code }}>
-            {_}
-          </Typography.Paragraph>
-        );
+        return row.Data.target ? row.Data.target.name : '本人';
       },
     },
     {
@@ -75,14 +79,6 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       },
     },
     {
-      title: '申请人',
-      dataIndex: '',
-      hideInTable: activeKey === '2',
-      render: (_, row) => {
-        return row.Data.target ? row.Data.target.name : '本人';
-      },
-    },
-    {
       title: '申请时间',
       dataIndex: ['Data', 'createTime'],
       valueType: 'dateTime',
@@ -90,7 +86,7 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
   ];
 
   // 获取申请/审核列表
-  const loadList = async (page: number, pageSize: number) => {
+  const loadList = async (_page: number, _pageSize: number) => {
     const listStatusCode = {
       '1': 'getTodoList',
       '2': 'getDoList',

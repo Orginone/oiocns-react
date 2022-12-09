@@ -93,14 +93,20 @@ const Todo: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history 
     ]);
   };
   useEffect(() => {
-    loadLeftMenus();
+    if (todoCtrl.OrgTodo) {
+      // 添加判断是为了避免刷新爆红
+      loadLeftMenus();
+    }
+    if (!todoCtrl.CurAppTodo && location.hash.startsWith('#/todo/app/')) {
+      todoCtrl.setCurrentAppTodo(location.hash.substring(11));
+    }
   }, [key]);
 
   return (
     <ContentTemplate
       siderMenuData={todoMenu}
       menuClick={(item) => {
-        if (item.key.startsWith('#/todo/app/')) {
+        if (item.key.startsWith('/todo/app/')) {
           todoCtrl.setCurrentAppTodo(item.key.substring(10));
         }
         if (location.hash.replace('#', '') === item.key) {
