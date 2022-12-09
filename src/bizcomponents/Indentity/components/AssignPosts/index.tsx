@@ -5,34 +5,42 @@ import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { ITarget } from '@/ts/core';
+import { resetParams } from '@/utils/tools';
 interface indexType {
-  searchCallback: Function;
+  searchFn: Function;
+  current: ITarget;
   memberData: schema.XTarget[];
 }
 
-const CohortPerson: React.FC<indexType> = (props) => {
+const MemberList: React.FC<indexType> = (props) => {
+  const { current, searchFn } = props;
   useEffect(() => {
-    getTableList();
+    getTableList(1, 10);
   }, []);
 
   const [data, setData] = useState<schema.XTarget[]>([]);
-
   const [value, setValue] = useState<string>();
-  const getTableList = async () => {
-    setData(props.memberData);
+  const [page, setPage] = useState<number>(1);
+  const getTableList = async (page: number, pageSize: number) => {
+    const data = await current.loadMembers(resetParams({ page, pageSize }));
+    if (data.total > 0 && data.result) {
+      setData(data.result);
+    } else {
+      setData([]);
+    }
   };
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
       const res = await userCtrl.user?.searchPerson(e.target.value);
-      if (res?.data.result != null) {
-        setData([res.data.result[0]]);
+      if (res?.total > 0 && res.result) {
+        setData([res.result[0]]);
       } else {
-        getTableList();
+        getTableList(page, 10);
       }
     }
   };
-
   const cohortColumn: ProColumns<schema.XTarget>[] = [
     { title: '序号', valueType: 'index', width: 50 },
     { title: '账号', dataIndex: 'code' },
@@ -53,7 +61,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
       dataIndex: ['team', 'remark'],
     },
   ];
-
   return (
     <div className={cls.tableBox}>
       <div>
@@ -75,8 +82,19 @@ const CohortPerson: React.FC<indexType> = (props) => {
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
               console.log(record, selected, selectedRows);
-              props.searchCallback(selectedRows);
+              searchFn(selectedRows);
             },
+          }}
+          request={async (params) => {
+            const { pageIndex, pageSize } = params;
+            setPage(pageIndex);
+            const res = await current.loadMembers(
+              resetParams({ page: pageIndex, pageSize }),
+            );
+            if (res.result) {
+              return { data: res.result, total: res.total, success: true };
+            }
+            return { data: [], total: 0, success: true };
           }}
           cardProps={{ bodyStyle: { padding: 0 } }}
           scroll={{ y: 300 }}
@@ -91,4 +109,4 @@ const CohortPerson: React.FC<indexType> = (props) => {
   );
 };
 
-export default CohortPerson;
+export default MemberList;

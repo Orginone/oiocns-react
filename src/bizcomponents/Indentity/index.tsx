@@ -256,7 +256,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchCallback={setPerson} memberData={members} />
+              <AssignPosts searchFn={setPerson} memberData={members} current={current} />
             </Modal>
           </div>
         </Content>
