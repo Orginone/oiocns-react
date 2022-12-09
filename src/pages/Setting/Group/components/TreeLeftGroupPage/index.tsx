@@ -2,19 +2,16 @@ import { Button } from 'antd';
 import type { TreeProps } from 'antd/es/tree';
 import React, { useState, useEffect } from 'react';
 import cls from './index.module.less';
-import { schema } from '@/ts/base';
 import { IGroup } from '@/ts/core/target/itarget';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { getUuid } from '@/utils/tools';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import { PlusOutlined } from '@ant-design/icons';
-import service from '../../service';
-import Group from '@/ts/core/target/group';
-import { deepClone } from '@/ts/base/common';
+
 type CreateGroupPropsType = {
   currentKey: string;
-  setCurrent: (current: schema.XTarget | undefined) => void;
+  setCurrent: (current: IGroup | undefined) => void;
   handleMenuClick: (key: string, item: any) => void; // 点击操作触发的事件
   [key: string]: any;
 };
@@ -25,32 +22,26 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
 
   useEffect(() => {
     if (userCtrl.isCompanySpace) {
-      initData(false);
+      initData(true);
     }
   }, [key]);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.company?.getJoinedGroups(reload);
-    // 虚拟的ROOT节点， 作为树的根节点
-    let visualGroup = new Group(deepClone(userCtrl?.company?.target));
+    const data = await userCtrl?.company.getJoinedGroups(reload);
     // 创建的集团， 加入的集团
     if (data?.length) {
-      visualGroup.subGroup = data;
-      service.setRoot(visualGroup);
-      setCurrent(data[0].target);
+      setCurrent(data[0]);
       const tree = data.map((n: any) => {
-        return createTeeDom(n);
+        return createTreeDom(n);
       });
       setTreeData(tree);
     } else {
-      visualGroup.subGroup = [];
-      service.setRoot(visualGroup);
       setCurrent(undefined);
       setTreeData([]);
     }
   };
   /** 创建节点 */
-  const createTeeDom = (n: IGroup) => {
+  const createTreeDom = (n: IGroup) => {
     const { target } = n;
     return {
       key: target.id + getUuid(),
@@ -84,13 +75,12 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
     if (children) {
       return;
     }
-    const deptChild: any[] = await target.getSubGroups(false);
-
+    const deptChild: IGroup[] = await target.loadSubTeam(false);
     setTreeData((origin) =>
       updateTreeData(
         origin,
         key,
-        deptChild.map((n) => createTeeDom(n)),
+        deptChild.map((n) => createTreeDom(n)),
       ),
     );
   };
@@ -98,11 +88,11 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({ handleMenuClick, setCurre
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info: any) => {
     selectedKeys;
     if (info.selected) {
-      setCurrent(info.node.target.target);
+      setCurrent(info.node.target);
     }
   };
 
-  const menu = ['新增集团'];
+  const menu = ['新增集团', '刷新'];
 
   return (
     <div>
