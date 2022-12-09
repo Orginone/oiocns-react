@@ -32,8 +32,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    const res = await marketCtrl.Market.createMarket({ ...formData });
-    if (res?.code === 200 && res?.success) {
+    if (await marketCtrl.Market.createMarket({ ...formData })) {
       message.success('创建成功');
     }
     setIsAddOpen(false);
@@ -47,8 +46,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    const res = await userCtrl.user!.applyJoinMarket(val[0]?.id);
-    if (res?.code === 200 && res?.success) {
+    if (await userCtrl.user.applyJoinMarket(val[0]?.id)) {
       message.success('申请已发送');
     }
   };
@@ -59,10 +57,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const onChange = async (val: any) => {
-    const res = await marketCtrl.Market.getMarketByCode(val.target.value);
-    if (res?.success) {
-      setDataSource(res?.data?.result);
-    }
+    setDataSource((await marketCtrl.Market.getMarketByCode(val.target.value)).result);
   };
 
   /**
@@ -72,13 +67,11 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onDeleteOrQuitOk = async () => {
     setIsDeleteOpen(false);
     if (deleOrQuit === 'delete') {
-      const res = await marketCtrl.Market.deleteMarket(treeDataObj?.id);
-      if (res?.code === 200 && res?.success) {
+      if (await marketCtrl.Market.deleteMarket(treeDataObj?.id)) {
         message.success('删除成功');
       }
     } else {
-      const res = await marketCtrl.Market.quitMarket(treeDataObj?.id);
-      if (res?.code === 200 && res?.success) {
+      if (await marketCtrl.Market.quitMarket(treeDataObj?.id)) {
         message.success('退出成功');
       }
     }
@@ -124,7 +117,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   ];
 
   const handleChange = (path: string) => {
-    console.log('是是是', path);
     if (path === '/market/shop') {
       marketCtrl.changeMenu('market');
     }

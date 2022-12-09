@@ -78,7 +78,6 @@ class ApplicationTodo implements ITodoGroup {
   }
   async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: ApplyItem[] = [];
-
     const res = await kernel.queryInstance({
       productId: this._id,
       status: 0,
@@ -104,19 +103,19 @@ class ApprovalItem implements IApprovalItem {
   get Data(): schema.XFlowTask {
     return this._data;
   }
-  async pass(status: number, comment: string = ''): Promise<model.ResultType<any>> {
+  async pass(status: number, comment: string = ''): Promise<boolean> {
     const res = await kernel.approvalTask({ id: this._data.id, status, comment });
     if (res.success) {
       this._completeFun.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, comment: string): Promise<model.ResultType<any>> {
+  async reject(status: number, comment: string): Promise<boolean> {
     const res = await kernel.approvalTask({ id: this._data.id, status, comment });
     if (res.success) {
       this._completeFun.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
 }
 class NoticeItem implements IApprovalItem {
@@ -129,14 +128,14 @@ class NoticeItem implements IApprovalItem {
   get Data(): schema.XFlowTaskHistory {
     return this._data;
   }
-  async pass(status: number, comment: string = ''): Promise<model.ResultType<any>> {
+  async pass(status: number, comment: string = ''): Promise<boolean> {
     const res = await kernel.approvalTask({ id: this._data.id, status, comment });
     if (res.success) {
       this._passCall.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(_status: number, _remark: string): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }
@@ -145,10 +144,10 @@ class CompleteItem implements IApprovalItem {
   constructor(data: schema.XFlowTaskHistory) {
     this._data = data;
   }
-  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
+  async pass(_status: number, _remark: string): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(_status: number, _remark: string): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
   get Data(): schema.XFlowTaskHistory {
@@ -164,10 +163,12 @@ class ApplyItem implements IApplyItem {
   get Data(): schema.XFlowInstance {
     return this._data;
   }
-  async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
-    return await kernel.deleteInstance({
-      id: this._data.id,
-    });
+  async cancel(_status: number, _remark: string): Promise<boolean> {
+    return (
+      await kernel.deleteInstance({
+        id: this._data.id,
+      })
+    ).success;
   }
 }
 
@@ -175,7 +176,6 @@ class ApplyItem implements IApplyItem {
 export const loadAppTodo = async () => {
   const appTodo: ITodoGroup[] = [];
   const res = await kernel.queryApprovalProduct();
-  console.log('queryApprovalProduct', res);
   if (res.success) {
     res.data.forEach((a) => {
       appTodo.push(new ApplicationTodo(a.id, a.name));

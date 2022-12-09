@@ -245,12 +245,12 @@ class SelfAppController extends Emitter {
    */
   public createProduct = async (
     data: Omit<ProductModel, 'id' | 'belongId'>,
-  ): Promise<any> => {
-    const res = await this._curSpace.createProduct(data);
-    if (res.success) {
+  ): Promise<IProduct | undefined> => {
+    const prod = await this._curSpace.createProduct(data);
+    if (prod) {
       this.querySelfApps(true);
     }
-    return res;
+    return prod;
   };
 
   /**
@@ -271,33 +271,13 @@ class SelfAppController extends Emitter {
     if (!destType) {
       return;
     }
-    console.log('分享信息', destType, teamId);
-    let { success, data, msg } = await this._curProduct!.queryExtend(
-      destType,
-      teamId || '0',
-    );
-    if (!success) {
-      console.error(msg);
-      // message.error(msg);
-      return false;
-    } else {
-      console.log('分享信息', data.result);
-      return data.result;
-    }
+    return (await this._curProduct!.queryExtend(destType, teamId)).result;
   }
   /**
    * @desc: 分享应用
    */
   public async ShareProduct(teamId: string, destIds: string[], destType: string) {
-    let { success, msg } = await this._curProduct!.createExtend(
-      teamId,
-      destIds,
-      destType,
-    );
-
-    if (!success) {
-      console.error(msg);
-    } else {
+    if (await this._curProduct!.createExtend(teamId, destIds, destType)) {
       message.success('共享成功');
     }
   }
@@ -309,17 +289,13 @@ class SelfAppController extends Emitter {
     confirm({
       content: `确认移除《 ${this._curProduct!.prod.name} 》?`,
       onOk: async () => {
-        const res = await this._curSpace.deleteProduct(this._curProduct!.prod.id);
-
-        if (res.success) {
+        if (await this._curSpace.deleteProduct(this._curProduct!.prod.id)) {
           await this.querySelfApps(true);
           this.selfAppsData = this.selfAppsData.filter((v) => {
             return v.prod.id !== this._curProduct!.prod.id;
           });
           this.changCallbackPart(SelfCallBackTypes.TableData);
           message.success('移除成功');
-        } else {
-          message.success(res?.msg);
         }
       },
       onCancel() {},

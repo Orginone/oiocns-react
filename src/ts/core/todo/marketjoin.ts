@@ -22,7 +22,7 @@ class MarketJoinTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getApplyList(page?: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
       id: '0',
@@ -47,14 +47,14 @@ class MarketJoinTodo implements ITodoGroup {
     await this.getJoinApproval();
     return this._todoList;
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getJoinApproval();
     return this._doList;
   }
-  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
+  async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
   private async getJoinApproval() {
@@ -113,7 +113,7 @@ class ApprovalItem implements IApprovalItem {
     this._passCall = passCall;
     this._rejectCall = rejectCall;
   }
-  async pass(status: number, remark: string): Promise<model.ResultType<any>> {
+  async pass(status: number, _: string): Promise<boolean> {
     const res = await kernel.approvalJoinApply({
       id: this._data.id,
       status,
@@ -121,9 +121,9 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._passCall.apply(this, [this._data.id]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(status: number, _: string): Promise<boolean> {
     const res = await kernel.approvalJoinApply({
       id: this._data.id,
       status,
@@ -131,7 +131,7 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._rejectCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
 }
 class ApplyItem implements IApplyItem {
@@ -142,12 +142,14 @@ class ApplyItem implements IApplyItem {
   constructor(data: schema.XMarketRelation) {
     this._data = data;
   }
-  async cancel(status: number, remark: string): Promise<model.ResultType<any>> {
-    return await kernel.cancelJoinMarket({
-      id: this._data.id,
-      belongId: '0',
-      typeName: '',
-    });
+  async cancel(_status: number, _remark: string): Promise<boolean> {
+    return (
+      await kernel.cancelJoinMarket({
+        id: this._data.id,
+        belongId: '0',
+        typeName: '',
+      })
+    ).success;
   }
 }
 

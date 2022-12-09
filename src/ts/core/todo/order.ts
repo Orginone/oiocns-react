@@ -1,3 +1,4 @@
+import { logger } from '@/ts/base/common';
 import consts from '../consts';
 import { CommonStatus, TodoType } from '../enum';
 import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
@@ -24,14 +25,14 @@ export class OrderTodo implements ITodoGroup {
   async getNoticeList(): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getApprovalList();
     return this._doList;
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IOrderApplyItem[] = [];
     const res = await kernel.queryBuyOrderList({
       id: '0',
@@ -95,7 +96,7 @@ class ApprovalItem implements IApprovalItem {
     this._data = data;
     this._approvalCall = approvalCall;
   }
-  async pass(status: number, _: string): Promise<model.ResultType<any>> {
+  async pass(status: number, _: string): Promise<boolean> {
     const res = await kernel.deliverMerchandise({
       id: this._data.id,
       status,
@@ -103,9 +104,9 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._approvalCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, _: string): Promise<model.ResultType<any>> {
+  async reject(status: number, _: string): Promise<boolean> {
     const res = await kernel.cancelOrderDetail({
       id: this._data.id,
       status,
@@ -113,7 +114,7 @@ class ApprovalItem implements IApprovalItem {
     if (res.success) {
       this._approvalCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
 }
 export class OrderApplyItem implements IOrderApplyItem {
@@ -125,17 +126,15 @@ export class OrderApplyItem implements IOrderApplyItem {
     this._data = data;
   }
 
-  async cancel(status: number, _: string = ''): Promise<model.ResultType<any>> {
-    return await kernel.cancelOrder({
-      id: this._data.id,
-      status,
-    });
+  async cancel(status: number, _: string = ''): Promise<boolean> {
+    return (
+      await kernel.cancelOrder({
+        id: this._data.id,
+        status,
+      })
+    ).success;
   }
-  async cancelItem(
-    id: string,
-    status: number,
-    _: string = '',
-  ): Promise<model.ResultType<any>> {
+  async cancelItem(id: string, status: number, _: string = ''): Promise<boolean> {
     let detail = this._data.details?.find((a) => {
       return a.id == id;
     });
@@ -148,8 +147,8 @@ export class OrderApplyItem implements IOrderApplyItem {
         });
         if (res.success) {
           detail.status = status;
+          return true;
         }
-        return res;
       } else {
         res = await kernel.cancelOrderDetail({
           id: this._data.id,
@@ -157,21 +156,20 @@ export class OrderApplyItem implements IOrderApplyItem {
         });
         if (res.success) {
           detail.status = status;
+          return true;
         }
-        return res;
       }
     }
-    return model.badRequest(consts.NotFoundError);
+    logger.warn(consts.NotFoundError);
+    return false;
   }
-  async reject(
-    id: string,
-    status: number,
-    _: string = '',
-  ): Promise<model.ResultType<any>> {
-    return await kernel.rejectMerchandise({
-      id,
-      status,
-    });
+  async reject(id: string, status: number, _: string = ''): Promise<boolean> {
+    return (
+      await kernel.rejectMerchandise({
+        id,
+        status,
+      })
+    ).success;
   }
 }
 

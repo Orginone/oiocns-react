@@ -40,18 +40,18 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   }, []);
 
   useEffect(() => {
-    const currentCondtions = DefaultProps.getFormFields(); //所有的条件
+    // const currentCondtions = DefaultProps.getFormFields(); //所有的条件
     /** 干掉条件不存在的 */
-    const filterResult = selectedNode.conditions.filter(
-      (item: { paramKey: string; paramLabel: string }) => {
-        const findData = currentCondtions.find((innItem) => {
-          return innItem.value === item.paramKey && innItem.label === item.paramLabel;
-        });
+    // const filterResult = selectedNode.conditions.filter(
+    //   (item: { paramKey: string; paramLabel: string }) => {
+    //     const findData = currentCondtions.find((innItem) => {
+    //       return innItem.value === item.paramKey && innItem.label === item.paramLabel;
+    //     });
 
-        return typeof findData !== 'undefined';
-      },
-    );
-    form.setFieldsValue({ allContent: filterResult });
+    //     return typeof findData !== 'undefined';
+    //   },
+    // );
+    form.setFieldsValue({ allContent: selectedNode.conditions });
     setCurretEditorValue([...selectedNode.conditions]);
     const paramKey = selectedNode.conditions.map((item: conditionType) => {
       return item.paramKey;

@@ -7,7 +7,6 @@ import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { ICompany, ITarget } from '@/ts/core';
-import { deepClone } from '@/ts/base/common';
 interface Iprops {
   shareType: '分配' | '共享';
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
@@ -44,14 +43,11 @@ const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
         children: updateTreeData(node.children, key, children),
       };
     }
-    console.log('事实上', node);
-
     return node;
   });
 //个人空间-展示我的群组  ; 单位空间 - 分配
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
-  const [keyNum, setKeyNum] = useState<number>(0);
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
@@ -159,13 +155,6 @@ const ShareRecent = (props: Iprops) => {
       default:
         break;
     }
-    if (info.selected) {
-      console.log('菜市场上次', info.node.children);
-
-      if (info.node.children?.length === 0) {
-        onLoadData(info.node);
-      }
-    }
   };
   const handleTreeData = (node: any, belongId: string) => {
     node.disabled = !(node.belongId && node.belongId == belongId);
@@ -232,7 +221,6 @@ const ShareRecent = (props: Iprops) => {
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys, info);
-    console.log('内容1111111111', info);
     if (info.checked) {
       if (radio == 2) {
         handleBoxClick(authorHisData, authorData, info.node);
@@ -355,7 +343,8 @@ const ShareRecent = (props: Iprops) => {
           {DestTypes.map((item) => {
             return (
               <Radio value={item.value} key={item.value}>
-                按{item.label} {props.shareType}
+                按{item.label}
+                {props.shareType}
               </Radio>
             );
           })}
@@ -371,7 +360,6 @@ const ShareRecent = (props: Iprops) => {
           <div className={cls.leftContent}>
             <Tree
               checkable={radio !== 1 ? false : true}
-              key={keyNum}
               loadData={onLoadData}
               fieldNames={{
                 title: 'name',

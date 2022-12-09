@@ -80,7 +80,6 @@ const EditCustomModal = (props: Iprops) => {
               name: values.name,
               code: values.code,
               indentitys: [],
-              persons: [],
             });
             onOk();
             console.log(positionCtrl);

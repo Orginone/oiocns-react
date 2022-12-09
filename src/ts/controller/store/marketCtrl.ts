@@ -135,10 +135,7 @@ class MarketController extends Emitter {
       limit: params?.pageSize ?? 10,
       filter: '',
     };
-    const res = await this._curMarket?.getMerchandise(params);
-    if (res?.code === 200 && res?.success) {
-      this._marketTableList = res?.data;
-    }
+    this._marketTableList = await this._curMarket?.getMerchandise(params);
     this.changCallbackPart(MarketCallBackTypes.MarketShop);
   };
 
@@ -152,10 +149,7 @@ class MarketController extends Emitter {
       limit: params?.pageSize ?? 10,
       filter: params?.filter ?? '',
     };
-    const res = await this._curMarket?.getMember({ ...params });
-    if (res?.code === 200 && res?.success) {
-      this.marketMenber = res?.data;
-    }
+    this.marketMenber = await this._curMarket?.getMember({ ...params });
     this.cacheUserManagement(this.marketMenber);
   };
 
@@ -165,8 +159,7 @@ class MarketController extends Emitter {
    * @return {*}
    */
   public removeMember = async (targetIds: string[]) => {
-    const res = await this._curMarket?.removeMember(targetIds);
-    if (res?.code === 200 && res?.success) {
+    if (await this._curMarket?.removeMember(targetIds)) {
       if (this.marketMenber.length > 0) {
         let arrs = this.marketMenber.filter((item: any) =>
           targetIds.some((ele: any) => ele.id === item?.target?.id),
@@ -222,14 +215,15 @@ class MarketController extends Emitter {
     data.forEach((item: any) => {
       this._shopingIds.push(item?.id);
     });
-    const res = await this._curMarket?.createOrder(
-      '',
-      'order',
-      'code',
-      userCtrl.space.id,
-      this._shopingIds,
-    );
-    if (res?.code === 200 && res?.success) {
+    if (
+      await this._curMarket?.createOrder(
+        '',
+        'order',
+        'code',
+        userCtrl.space.id,
+        this._shopingIds,
+      )
+    ) {
       let arrs = this._shopinglist.filter(
         (item) => !data.some((ele: any) => ele.id === item.id),
       );

@@ -76,7 +76,7 @@ const tableOperation = (
           onClick: () =>
             (item as IApprovalItem)
               .pass(CommonStatus.ApproveStartStatus, '')
-              .then(({ success }) => {
+              .then((success) => {
                 afterOperate(success);
               }),
         },
@@ -84,9 +84,11 @@ const tableOperation = (
           key: 'refuse',
           label: '拒绝',
           onClick: () =>
-            (item as IApprovalItem).reject(200, '').then(({ success }) => {
-              afterOperate(success);
-            }),
+            (item as IApprovalItem)
+              .reject(CommonStatus.RejectStartStatus, '')
+              .then((success) => {
+                afterOperate(success);
+              }),
         },
       ];
     case '2':
@@ -97,7 +99,7 @@ const tableOperation = (
           onClick: () =>
             (item as IApprovalItem)
               .pass(CommonStatus.ApproveStartStatus, '')
-              .then(({ success }) => {
+              .then((success) => {
                 afterOperate(success);
               }),
         },
@@ -110,7 +112,7 @@ const tableOperation = (
           onClick: () =>
             (item as IApplyItem)
               .cancel(CommonStatus.RejectStartStatus, '')
-              .then(({ success }) => {
+              .then((success) => {
                 afterOperate(success);
               }),
         },
@@ -123,7 +125,7 @@ const tableOperation = (
           onClick: () =>
             (item as IApprovalItem)
               .pass(CommonStatus.ApproveStartStatus, '')
-              .then(({ success }) => {
+              .then((success) => {
                 afterOperate(success);
               }),
         },
@@ -197,11 +199,11 @@ const orderOperation = (
         if (activeStatus == '5') {
           (data as IApprovalItem)
             .reject(OrderStatus.SellerCancel, '')
-            .then(({ success }) => afterOperate(success, '取消订单'));
+            .then((success) => afterOperate(success, '取消订单'));
         } else if (_record) {
           (data as IOrderApplyItem)
             .cancelItem(_record?.id, OrderStatus.BuyerCancel, '')
-            .then(({ success }) => afterOperate(success, '取消订单'));
+            .then((success) => afterOperate(success, '取消订单'));
         }
       },
     });
@@ -210,7 +212,7 @@ const orderOperation = (
         key: 'approve',
         label: '确认交付',
         onClick: () => {
-          (data as IApprovalItem).pass(OrderStatus.Deliver, '').then(({ success }) => {
+          (data as IApprovalItem).pass(OrderStatus.Deliver, '').then((success) => {
             afterOperate(success, '确认交付');
           });
         },
@@ -223,7 +225,7 @@ const orderOperation = (
       onClick: () => {
         (data as IOrderApplyItem)
           .reject(_record.id, OrderStatus.RejectOrder, '')
-          .then(({ success }) => {
+          .then((success) => {
             afterOperate(success, '退货退款');
           });
       },
