@@ -757,73 +757,73 @@ export type FlowInstanceModel = {
 
 export type CreateDefineReq = {
   // 唯一Id
-  Id: string;
+  id: string;
   // 名称
-  Name: string;
+  name: string;
   // 编号
-  Code: string;
+  code: string;
   // 备注
-  Remark: string;
+  remark: string;
   // 节点信息
-  Resource: FlowNode;
+  resource: FlowNode;
   // 归属Id
-  BelongId: string;
+  belongId: string;
   // 流程字段json
-  Fields?: string;
+  fields?: string;
 };
 
 export type FlowNode = {
-  Id: string;
-  NodeId: string;
-  ParentId: string;
-  Type: string;
-  Name: string;
-  Desc: string;
-  Props: Prop;
-  Children: FlowNode;
-  Branches: Branche[];
+  id: string;
+  nodeId: string;
+  parentId: string;
+  type: string;
+  name: string;
+  desc: string;
+  props: Prop;
+  children: FlowNode;
+  branches: Branche[];
 };
 
 export type Branche = {
-  Id: string;
-  NodeId: string;
-  ParentId: string;
-  Name: string;
-  Type: string;
-  Conditions: Condition[];
-  Children: FlowNode;
+  id: string;
+  nodeId: string;
+  parentId: string;
+  name: string;
+  type: string;
+  conditions: Condition[];
+  children: FlowNode;
 };
 
 export type Condition = {
-  Pos: number;
-  ParamKey: string;
-  ParamLabel: string;
-  Key: string;
-  Label: string;
-  Type: string;
-  Val: string;
-  ValLabel: string;
+  pos: number;
+  paramKey: string;
+  paramLabel: string;
+  key: string;
+  label: string;
+  type: string;
+  val: string;
+  valLabel: string;
 };
 
 export type Prop = {
-  AssignedType: string;
-  Mode: string;
-  AssignedUser: Assigned[];
-  Refuse: Refuse;
-  FriendDialogmode: boolean;
-  Num: number;
+  assignedType: string;
+  mode: string;
+  assignedUser: Assigned[];
+  refuse: Refuse;
+  friendDialogmode: boolean;
+  num: number;
 };
 
 export type Assigned = {
-  Id: string;
-  Name: string;
-  Type: string;
-  OrgIds: string;
+  id: string;
+  name: string;
+  type: string;
+  orgIds: string;
 };
 
 export type Refuse = {
-  Type: string;
-  Target: string;
+  type: string;
+  target: string;
 };
 
 export type FlowRelationModel = {
@@ -834,7 +834,7 @@ export type FlowRelationModel = {
   // 功能标识编号
   functionCode: string;
   // 空间Id
-  SpaceId: string;
+  spaceId: string;
 };
 
 export type FlowReq = {

@@ -157,14 +157,24 @@ const SettingFlow: React.FC = () => {
         key: 'editor',
         label: '编辑',
         onClick: () => {
-          setTabType(TabType.PROCESSDESIGN);
-          setCurrentStep(StepType.PROCESSMESS);
-          setEditorValue(record?.content);
-          const editorDataMes = JSON.parse(record?.content || '{}');
-          setConditionData({
-            name: editorDataMes.name,
-            labels: JSON.parse(editorDataMes.remark),
-            fields: editorDataMes.fields,
+          Modal.confirm({
+            title: '与该流程相关的未完成待办将会重置，是否确定编辑?',
+            icon: <ExclamationCircleOutlined />,
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+              setTabType(TabType.PROCESSDESIGN);
+              setCurrentStep(StepType.PROCESSMESS);
+              setEditorValue(record?.content);
+              const editorDataMes = JSON.parse(record?.content || '{}');
+              setConditionData({
+                name: editorDataMes.name,
+                labels: JSON.parse(editorDataMes.remark),
+                fields: editorDataMes.fields,
+              });
+            },
+            onCancel() {},
           });
         },
       },
