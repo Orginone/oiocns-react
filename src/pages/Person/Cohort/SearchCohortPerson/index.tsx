@@ -21,15 +21,21 @@ const CohortPerson: React.FC<indexType> = (props) => {
 
   const [value, setValue] = useState<string>();
   const getTableList = async () => {
-    const res = await props.cohort.getMember(false);
-    setData(res);
+    const res = await (
+      await props.cohort.loadMembers({
+        offset: 0,
+        filter: '',
+        limit: 65535,
+      })
+    ).result;
+    setData(res!);
   };
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
       const res = await userCtrl.user?.searchPerson(e.target.value);
-      if (res?.data.result != null) {
-        setData([res.data.result[0]]);
+      if (res?.result != null) {
+        setData([res.result[0]]);
       } else {
         getTableList();
       }

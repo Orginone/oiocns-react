@@ -20,7 +20,7 @@ import { IChat } from '@/ts/core/chat/ichat';
 import chatCtrl from '@/ts/controller/chat';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
-import { TargetType } from '@/ts/core/enum';
+import { XTarget } from '@/ts/base/schema';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: ICohort;
@@ -37,18 +37,18 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   }, []);
   /**获取群组下成员列表 */
   const getMemberData = async () => {
-    const res = await cohortData.getMember(false);
-    setMemberData(res.filter((obj) => obj.id != userCtrl.space?.target.id));
+    const res = await cohortData.loadMembers({ offset: 0, filter: '', limit: 65535 });
+    setMemberData(res.result!.filter((obj) => obj.id != userCtrl.space?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {
-    const res = await userCtrl.user?.getFriends(false);
-    setFriendList(res!);
+    const res = await userCtrl.user?.loadMembers({ offset: 0, filter: '', limit: 65535 });
+    setFriendList(res.result!);
   };
   /**移除成员 */
-  const removeMember = async (ids: string[]) => {
-    await cohortData.removeMember(ids, TargetType.Person);
-    setMemberData(await cohortData.getMember(true));
+  const removeMember = async (target: XTarget) => {
+    await cohortData.removeMember(target);
+    getMemberData();
   };
   /**
    * 获取操作列表
@@ -97,7 +97,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: async () => {
-                await removeMember([value.id]);
+                await removeMember(value);
                 message.success('操作成功');
               },
             })

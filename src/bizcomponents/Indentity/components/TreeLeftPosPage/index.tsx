@@ -5,18 +5,12 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
   indentitys: IIdentity[];
-  reObject: IDepartment | IPerson | IGroup | ICompany | ICohort;
+  current: ITarget;
 };
 type target = {
   title: string;
@@ -24,7 +18,7 @@ type target = {
   object: IIdentity;
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  const { indentitys, setCurrent, reObject, currentKey } = props;
+  const { indentitys, setCurrent, current, currentKey } = props;
   const [selectMenu, setSelectMenu] = useState<string>(currentKey);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
@@ -88,7 +82,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
         open={isOpenModal}
         handleCancel={close}
         handleOk={close}
-        reObject={reObject}
+        current={current}
       />
     </div>
   );

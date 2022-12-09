@@ -10,7 +10,7 @@ import EditIndentityModal from './components/AddPositionMoadl';
 import TreeLeftDeptPage from './components/TreeLeftPosPage';
 import AssignPosts from './components/AssignPosts';
 import cls from './index.module.less';
-import { ITarget, TargetType } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 import { MarketTypes } from 'typings/marketType';
 
 const { Sider, Content } = Layout;
@@ -50,13 +50,16 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   };
   // 加载 人员数据
   const getPersonData = async (current: IIdentity) => {
-    const res = await current.getIdentityTargets(TargetType.Person);
-    if (res?.data?.result) {
-      setPersonData(res.data.result);
-      setMembers(uniq(MemberData, res.data.result));
+    const res = await current.loadMembers({
+      offset: 0,
+      filter: '',
+      limit: 65535,
+    });
+    if (res?.result) {
+      setPersonData(res.result);
+      setMembers(res.result);
     } else {
       setPersonData([]);
-      setMembers(MemberData);
     }
   };
   // 操作内容渲染函数
@@ -72,7 +75,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             okText: '确认',
             cancelText: '取消',
             onOk: async () => {
-              await indentity?.removeIdentity([item.id]);
+              await indentity?.removeMembers([item.id]);
               getPersonData(indentity!);
             },
           });
@@ -117,7 +120,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
           okText: '确认',
           cancelText: '取消',
           onOk: async () => {
-            const success = await object?.deleteIdentity(indentity?.target.id!);
+            const success = await current?.deleteIdentity(indentity?.target.id!);
             if (success) {
               message.success('删除成功');
               getDataList();
@@ -207,7 +210,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             setCurrent={setTreeCurrent}
             currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
-            reObject={object}
+            current={current}
           />
         </Sider>
         <Content style={{ paddingLeft: 4 }}>
@@ -224,7 +227,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 setIsOpenModal(false);
               }}
               editData={indentity!}
-              reObject={object}
+              current={current}
             />
             <Modal
               title="指派身份"
@@ -238,7 +241,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 for (const a of currentPerson ? currentPerson : []) {
                   ids.push(a.id);
                 }
-                await indentity?.giveIdentity(ids);
+                await indentity?.pullMembers(ids);
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
