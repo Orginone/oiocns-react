@@ -15,12 +15,11 @@ import appCtrl from '@/ts/controller/store/appCtrl';
 const AppPutaway: React.FC = () => {
   const history = useHistory();
   const [form] = Form.useForm();
-  const curProduct = SelfAppCtrl.curProduct;
-  useEffect(() => {
-    marketCtrl.Market.getJoinMarkets(false).then((a) => {
-      setMarketData(a);
-    });
-  }, []);
+  if (!appCtrl.curProduct) {
+    history.goBack();
+    return <></>;
+  }
+  const prodInfo = appCtrl.curProduct.prod;
 
   const handleSubmit = async () => {
     const values = await form.validateFields();
@@ -98,7 +97,7 @@ const AppPutaway: React.FC = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {marketCtrl.Market.joinedMarkets.map((item) => {
+              {marketCtrl.Market.joinedMarkets?.map((item) => {
                 return (
                   <Select.Option value={item.market.id} key={item.market.id}>
                     {item.market.name}
