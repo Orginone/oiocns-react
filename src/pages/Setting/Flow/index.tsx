@@ -112,7 +112,7 @@ const SettingFlow: React.FC = () => {
   }, []);
 
   const initData = async () => {
-    const result = await userCtrl.space.getDefines(false);
+    const result = await userCtrl.Space.getDefines(false);
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
@@ -129,7 +129,7 @@ const SettingFlow: React.FC = () => {
     if (currentData.belongId) {
       delete currentData.belongId;
     }
-    const result = await userCtrl.space.publishDefine(currentData);
+    const result = await userCtrl.Space.publishDefine(currentData);
     if (result.data) {
       message.info(result.data.id ? '编辑成功' : '发布成功');
       initData();
@@ -141,7 +141,7 @@ const SettingFlow: React.FC = () => {
       return false;
     }
   };
-  const parentRef = useRef<any>(null); //父级容器Dom
+  const parentRef = useRef<any>(null);
 
   const renderOperation = (record: FlowItem): any[] => {
     return [
@@ -174,7 +174,7 @@ const SettingFlow: React.FC = () => {
         label: '删除',
         style: { color: 'red' },
         onClick: async () => {
-          const currentData = await userCtrl.space.deleteDefine(record?.id);
+          const currentData = await userCtrl.Space.deleteDefine(record?.id);
           if (currentData) {
             initData();
             message.success('删除成功');
@@ -235,6 +235,7 @@ const SettingFlow: React.FC = () => {
                 />
               </div>
             </Card>
+            {/* 这里后面写模版列表，暂时隐藏 */}
             <Card title="模板列表" type="inner" bordered={false}>
               <div className={cls['app-wrap']} ref={parentRef}>
                 {/* <CardOrTable<XFlowDefine>
