@@ -130,8 +130,6 @@ const SettingFlow: React.FC = () => {
       delete currentData.belongId;
     }
     const result = await userCtrl.space.publishDefine(currentData);
-    console.log(result);
-    debugger;
     if (result) {
       message.info(result.id ? '编辑成功' : '发布成功');
       initData();
