@@ -45,7 +45,7 @@ const BindModal: React.FC<BindModalProps> = ({
       };
     });
     setData(currentData);
-    const currentValue = await userCtrl.Space.queryFlowRelation(false);
+    const currentValue = await userCtrl.space.queryFlowRelation(false);
 
     if (currentValue && currentValue.length > 0) {
       const filterId = currentValue.filter((item) => {
@@ -79,11 +79,11 @@ const BindModal: React.FC<BindModalProps> = ({
             // 如果没有id的 就是要绑定的
             if (!item.id) {
               newArr.push(
-                userCtrl.Space.bindingFlowRelation({
+                userCtrl.space.bindingFlowRelation({
                   defineId: bindAppMes?.id,
                   productId: item.productId,
                   functionCode: item.functionCode,
-                  SpaceId: userCtrl.Space.spaceData.id,
+                  SpaceId: userCtrl.space.spaceData.id,
                 }),
               );
               // 如果有id 要看下有没有被编辑过
@@ -99,11 +99,11 @@ const BindModal: React.FC<BindModalProps> = ({
                 findData.functionCode === item.functionCode
               ) {
                 newArr.push(
-                  userCtrl.Space.bindingFlowRelation({
+                  userCtrl.space.bindingFlowRelation({
                     defineId: bindAppMes?.id,
                     productId: findData.productId,
                     functionCode: findData.functionCode,
-                    SpaceId: userCtrl.Space.spaceData.id,
+                    SpaceId: userCtrl.space.spaceData.id,
                   }),
                 );
               }
@@ -141,20 +141,22 @@ const BindModal: React.FC<BindModalProps> = ({
                       title: '提示',
                       content: '确定删除当前已绑定的应用?',
                       onOk: () => {
-                        userCtrl.Space.unbindingFlowRelation({
-                          defineId: row?.defineId,
-                          productId: row.productId,
-                          functionCode: row.functionCode,
-                          SpaceId: userCtrl.Space.spaceData.id,
-                        }).then((result) => {
-                          if (result && result.code === 200) {
-                            message.info('解绑成功');
-                            resolve(true);
-                          } else {
-                            message.success('解绑失败');
-                            resolve(false);
-                          }
-                        });
+                        userCtrl.space
+                          .unbindingFlowRelation({
+                            defineId: row?.defineId,
+                            productId: row.productId,
+                            functionCode: row.functionCode,
+                            SpaceId: userCtrl.space.spaceData.id,
+                          })
+                          .then((result) => {
+                            if (result) {
+                              message.info('解绑成功');
+                              resolve(true);
+                            } else {
+                              message.success('解绑失败');
+                              resolve(false);
+                            }
+                          });
                       },
                       onCancel: () => {
                         resolve(false);

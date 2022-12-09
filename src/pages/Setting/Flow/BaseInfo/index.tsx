@@ -17,7 +17,7 @@ type BaseInfoProps = {
   currentFormValue: {};
   onChange: (params: any) => void;
 };
-
+/** 傻瓜组件，只负责读取状态 */
 const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
   useEffect(() => {
