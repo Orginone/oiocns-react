@@ -34,9 +34,6 @@ export default function (iframeRef: any, appInfo: any, link: string) {
     if (!message.data.sendId) {
       return;
     }
-    console.log('ifream', appInfo, link);
-
-    console.log('平台接受消息', message.data);
     ((msg: any) => {
       setTimeout(async () => {
         let result: any = { sendId: msg.data.sendId, from: 'orginone' };
