@@ -13,7 +13,7 @@ import { PageLoading } from '@ant-design/pro-layout';
 const { Header } = Layout;
 
 const BasicHeader: React.FC = () => {
-  if (!userCtrl.User) return <PageLoading />;
+  if (!userCtrl.user) return <PageLoading />;
   return (
     <Header className={cls[`basic-header`]}>
       <OrganizationalUnits />

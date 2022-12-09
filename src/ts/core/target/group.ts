@@ -1,63 +1,62 @@
-import consts from '../consts';
 import BaseTarget from './base';
-import { ResultType, TargetModel } from '@/ts/base/model';
 import { XTarget } from '@/ts/base/schema';
-import { IGroup } from './itarget';
-import { TargetType } from '../enum';
-import { model, kernel } from '@/ts/base';
+import { IGroup, ITarget, TargetParam } from './itarget';
+import { companyTypes, TargetType } from '../enum';
+import { kernel } from '@/ts/base';
+import { logger } from '@/ts/base/common';
 
 export default class Group extends BaseTarget implements IGroup {
   subGroup: IGroup[];
-  companys: XTarget[];
-  joinedGroup: XTarget[];
-
-  constructor(target: XTarget) {
+  private _onDeleted: Function;
+  constructor(target: XTarget, onDeleted: Function) {
     super(target);
+    this.subTeam = [];
     this.subGroup = [];
-    this.companys = [];
-    this.joinedGroup = [];
-    this.subTypes = [TargetType.Group, ...this.companyTypes];
+    this._onDeleted = onDeleted;
+    this.memberTypes = companyTypes;
+    this.subTeamTypes = [TargetType.Group];
     this.joinTargetType = [TargetType.Group];
     this.createTargetType = [TargetType.Group];
-    this.pullTypes = [...this.companyTypes, TargetType.Group];
-    this.searchTargetType = [...this.companyTypes, TargetType.Group];
+    this.searchTargetType = [...companyTypes, TargetType.Group];
   }
-  public async update(data: Omit<TargetModel, 'id'>): Promise<ResultType<XTarget>> {
-    return await super.updateTarget({ ...data, belongId: this.target.belongId });
+  async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
+    await this.getSubGroups(reload);
+    return this.subGroup;
   }
-  public getJoinedGroups = async (reload: boolean = false): Promise<XTarget[]> => {
-    if (!reload && this.joinedGroup.length > 0) {
-      return this.joinedGroup;
+
+  async delete(): Promise<boolean> {
+    const res = await this.deleteTarget();
+    if (res.success) {
+      this._onDeleted?.apply(this, []);
     }
-    const res = await super.getjoinedTargets([TargetType.Group]);
-    if (res.success && res.data.result) {
-      this.joinedGroup = res.data.result;
-    }
-    return this.joinedGroup;
-  };
-  public async applyJoinGroup(id: string): Promise<ResultType<any>> {
+    return res.success;
+  }
+
+  public async applyJoinGroup(id: string): Promise<boolean> {
     return super.applyJoin(id, TargetType.Group);
   }
-  public async createSubGroup(
-    data: Omit<TargetModel, 'id' | 'belongId'>,
-  ): Promise<ResultType<any>> {
+  public async createSubGroup(data: TargetParam): Promise<IGroup | undefined> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
-    if (!tres.data.result) {
+    if (!tres.result) {
       const res = await this.createTarget({
         ...data,
         belongId: this.target.belongId,
       });
       if (res.success) {
-        const group = new Group(res.data);
+        const group = new Group(res.data, () => {
+          this.subGroup = this.subGroup.filter((item) => {
+            return item.id != group.id;
+          });
+        });
         this.subGroup.push(group);
-        return await this.pullMember([res.data]);
+        await this.pullSubTeam(group.target);
+        return group;
       }
-      return res;
     } else {
-      return model.badRequest('该集团已存在!');
+      logger.warn('该集团已存在');
     }
   }
-  public async deleteSubGroup(id: string): Promise<ResultType<any>> {
+  public async deleteSubGroup(id: string): Promise<boolean> {
     const group = this.subGroup.find((group) => {
       return group.target.id == id;
     });
@@ -71,20 +70,10 @@ export default class Group extends BaseTarget implements IGroup {
         this.subGroup = this.subGroup.filter((group) => {
           return group.target.id != id;
         });
+        return true;
       }
-      return res;
     }
-    return model.badRequest(consts.UnauthorizedError);
-  }
-  public async getCompanys(reload: boolean = false): Promise<XTarget[]> {
-    if (!reload && this.companys.length > 0) {
-      return this.companys;
-    }
-    const res = await this.getSubTargets(this.companyTypes);
-    if (res.success && res.data.result) {
-      this.companys = res.data.result;
-    }
-    return this.companys;
+    return false;
   }
   public async getSubGroups(reload: boolean = false): Promise<IGroup[]> {
     if (!reload && this.subGroup.length > 0) {
@@ -93,7 +82,11 @@ export default class Group extends BaseTarget implements IGroup {
     const res = await this.getSubTargets([TargetType.Group]);
     if (res.success && res.data.result) {
       this.subGroup = res.data.result.map((a) => {
-        return new Group(a);
+        return new Group(a, () => {
+          this.subGroup = this.subGroup.filter((item) => {
+            return item.id != a.id;
+          });
+        });
       });
     }
     return this.subGroup;

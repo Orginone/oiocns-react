@@ -1,46 +1,34 @@
 import { Button } from 'antd';
 import type { TreeProps } from 'antd/es/tree';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import SettingService from '../../service';
-import { IDepartment } from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
 
 type CreateGroupPropsType = {
-  currentKey: string;
-  setCurrent: (current: IDepartment) => void;
-  handleMenuClick: (key: string, item: IDepartment | undefined, id?: string) => void; // 点击操作触发的事件
+  current: ITarget | undefined;
+  setCurrent: (current: ITarget) => void;
+  handleMenuClick: (key: string, item: ITarget | undefined, id?: string) => void; // 点击操作触发的事件
 };
 
-const Creategroup: React.FC<CreateGroupPropsType> = ({
+const DepartTree: React.FC<CreateGroupPropsType> = ({
   handleMenuClick,
   setCurrent,
-  currentKey,
+  current,
 }) => {
   const [key] = useCtrlUpdate(userCtrl);
-  const [treeData, setTreeData] = useState<any[]>([]);
   const [selectKey, setSelectKey] = useState<React.Key>(currentKey);
   const setting = SettingService.getInstance();
   const treeContainer = document.getElementById('templateMenu');
-  useEffect(() => {
-    // 如果新增部门，就需要重新初始化树TODO
-    if (userCtrl?.Company) {
-      if (userCtrl?.Company.departments && userCtrl?.Company.departments.length > 0) {
-        userCtrl.Company.departments = [];
-      }
-      initData(true);
-    }
-    console.log(1111);
-  }, [key]);
 
   const initData = async (reload: boolean) => {
-    const data = await userCtrl?.Company?.getDepartments(reload);
-    if (data?.length) {
+    const data = await userCtrl.company.loadSubTeam(reload);
+    if (data.length > 0) {
       if (currentKey && data[0].target.id !== currentKey) {
         const currentContentDept = await setting.refItem(currentKey);
         setCurrent(currentContentDept || data[0]);
@@ -49,14 +37,16 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
         setSelectKey(data[0].target.id);
         setCurrent(data[0]);
       }
-      const tree = data.map((n) => {
-        return createTeeDom(n);
+      return data.map((n) => {
+        return createTreeDom(n);
       });
-      setTreeData(tree);
     }
+    return [];
   };
-  const createTeeDom: any = (n: IDepartment, pid?: string) => {
+
+  const createTreeDom: any = (n: ITarget, pid?: string) => {
     const { target } = n;
+    const child = n.subTeam.map((m) => createTreeDom(m, target.id));
     return {
       key: target.id,
       title: target.name,
@@ -66,7 +56,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       intans: n,
       children:
         n.departments.length > 0
-          ? n.departments.map((m) => createTeeDom(m, n.target.id))
+          ? n.departments.map((m) => createTreeDom(m, n.target.id))
           : undefined,
       pid,
     };
@@ -97,7 +87,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
       updateTreeData(
         origin,
         key,
-        deptChild.map((n) => createTeeDom(n, intans.target.id)),
+        deptChild.map((n) => createTreeDom(n, intans.target.id)),
       ),
     );
   };
@@ -114,7 +104,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
-      <div className={cls.topMes}>
+      <div id={key} className={cls.topMes}>
         <Button
           className={cls.creatgroup}
           icon={<PlusOutlined className={cls.addIcon} />}
@@ -126,7 +116,7 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
           showIcon
           searchable
           handleMenuClick={(key, node) => handleMenuClick(key, node.intans, node.pid)}
-          treeData={treeData}
+          treeData={initData(false)}
           title={'内设机构'}
           menu={menu}
           selectedKeys={[selectKey]}
@@ -141,4 +131,4 @@ const Creategroup: React.FC<CreateGroupPropsType> = ({
   );
 };
 
-export default Creategroup;
+export default DepartTree;

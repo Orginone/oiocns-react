@@ -38,11 +38,11 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   /**获取群组下成员列表 */
   const getMemberData = async () => {
     const res = await cohortData.getMember(false);
-    setMemberData(res.filter((obj) => obj.id != userCtrl.Space?.target.id));
+    setMemberData(res.filter((obj) => obj.id != userCtrl.space?.target.id));
   };
   /**获取好友列表 */
   const getFriendList = async () => {
-    const res = await userCtrl.User?.getFriends(false);
+    const res = await userCtrl.user?.getFriends(false);
     setFriendList(res!);
   };
   /**移除成员 */
@@ -69,7 +69,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               okText: '确认',
               cancelText: '取消',
               onOk: async () => {
-                await userCtrl.User?.applyFriend(value);
+                await userCtrl.user?.applyFriend(value);
                 message.success('发起申请成功');
               },
             });
@@ -84,7 +84,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
         </a>,
       );
     }
-    if (cohortData.target.belongId == userCtrl.User.target.id) {
+    if (cohortData.target.belongId == userCtrl.user.target.id) {
       action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
         <a

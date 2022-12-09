@@ -51,7 +51,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = () => {
         extra={`找到${dataSource?.length}家商店`}
         onChange={(event) => {
           if (event.target.value) {
-            userCtrl.Space.getMarketByCode(event.target.value).then((a) => {
+            userCtrl.space.getMarketByCode(event.target.value).then((a) => {
               setDataSource(a.data.result || []);
             });
           } else {

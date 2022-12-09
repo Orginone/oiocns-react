@@ -2,8 +2,7 @@ import { TargetModel } from './../../base/model';
 import BaseTarget from '@/ts/core/target/base';
 import { TargetType } from '../enum';
 import { schema } from '../../base';
-import { IDepartment, IWorking } from './itarget';
-import { ResultType } from '@/ts/base/model';
+import { IDepartment, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
 
 /**
@@ -11,35 +10,35 @@ import Working from './working';
  */
 export default class Department extends BaseTarget implements IDepartment {
   workings: IWorking[];
+  subTeam: ITarget[];
   person: schema.XTarget[];
   departments: IDepartment[];
+  private _onDeleted: Function;
 
-  constructor(target: schema.XTarget) {
+  constructor(target: schema.XTarget, onDeleted: Function) {
     super(target);
     this.person = [];
+    this.subTeam = [];
     this.workings = [];
     this.departments = [];
-
-    this.pullTypes = [TargetType.Person];
-    this.subTypes = [TargetType.Department, TargetType.Working];
+    this._onDeleted = onDeleted;
+    this.subTeamTypes = [TargetType.Department, TargetType.Working];
     this.createTargetType = [TargetType.Department, TargetType.Working];
   }
+  async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
+    await this.getDepartments(reload);
+    await this.getWorkings(reload);
+    return [...this.departments, ...this.workings];
+  }
 
-  public async update(
-    data: Omit<TargetModel, 'id'>,
-  ): Promise<ResultType<schema.XTarget>> {
-    return await super.updateTarget(data);
-  }
-  public async getPerson(reload: boolean = false): Promise<schema.XTarget[]> {
-    if (!reload && this.person.length > 0) {
-      return this.person;
+  async delete(): Promise<boolean> {
+    const res = await this.deleteTarget();
+    if (res.success) {
+      this._onDeleted?.apply(this, []);
     }
-    const res = await super.getSubTargets([TargetType.Person]);
-    if (res.success && res.data.result) {
-      this.person = res.data.result;
-    }
-    return this.person;
+    return res.success;
   }
+
   public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
     if (!reload && this.departments.length > 0) {
       return this.departments;
@@ -47,7 +46,11 @@ export default class Department extends BaseTarget implements IDepartment {
     const res = await super.getSubTargets([TargetType.Department]);
     if (res.success && res.data.result) {
       this.departments = res.data.result.map((a) => {
-        return new Department(a);
+        return new Department(a, () => {
+          this.departments = this.departments.filter((i) => {
+            return i.id != a.id;
+          });
+        });
       });
     }
     return this.departments;
@@ -59,65 +62,71 @@ export default class Department extends BaseTarget implements IDepartment {
     const res = await super.getSubTargets([TargetType.Working]);
     if (res.success && res.data.result) {
       this.workings = res.data.result.map((a) => {
-        return new Working(a);
+        return new Working(a, () => {
+          this.workings = this.workings.filter((i) => {
+            return i.id != a.id;
+          });
+        });
       });
     }
     return this.workings;
   }
-  public async pullPerson(targets: schema.XTarget[]): Promise<ResultType<any>> {
-    const res = await super.pullMember(targets);
-    if (res.success) {
-      res.data.result?.forEach((a) => {
-        if (a.target != undefined) {
-          this.person.push(a.target);
-        }
-      });
-    }
-    return res;
-  }
-  public async removePerson(ids: string[]): Promise<ResultType<any>> {
-    const res = await super.removeMember(ids, TargetType.Person);
-    if (res.success) {
-      this.person = this.person.filter((a) => {
-        return !ids.includes(a.id);
-      });
-    }
-    return res;
-  }
-  public async createDepartment(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+
+  public async createDepartment(data: TargetParam): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    const res = await super.createSubTarget(data);
+    const res = await super.createSubTarget({ ...data, belongId: this.target.belongId });
     if (res.success) {
-      this.departments.push(new Department(res.data));
+      const department = new Department(res.data, () => {
+        this.departments = this.departments.filter((i) => {
+          return i.id != department.id;
+        });
+      });
+      this.departments.push(department);
+      return department;
     }
-    return res;
   }
-  public async deleteDepartment(id: string, spaceId: string): Promise<ResultType<any>> {
-    const res = await super.deleteSubTarget(id, TargetType.Department, spaceId);
+
+  public async deleteDepartment(id: string): Promise<boolean> {
+    const res = await super.deleteSubTarget(
+      id,
+      TargetType.Department,
+      this.target.belongId,
+    );
     if (res.success) {
       this.departments = this.departments.filter((a) => {
         return a.target.id != id;
       });
+      return true;
     }
-    return res;
+    return false;
   }
-  public async createWorking(data: Omit<TargetModel, 'id'>): Promise<ResultType<any>> {
+
+  public async createWorking(
+    data: Omit<TargetModel, 'id'>,
+  ): Promise<IWorking | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     const res = await super.createSubTarget(data);
     if (res.success) {
-      this.workings.push(new Working(res.data));
+      const working = new Working(res.data, () => {
+        this.workings = this.workings.filter((i) => {
+          return i.id != working.id;
+        });
+      });
+      this.workings.push(working);
+      return working;
     }
-    return res;
   }
-  public async deleteWorking(id: string, spaceId: string): Promise<ResultType<any>> {
-    const res = await super.deleteSubTarget(id, TargetType.Working, spaceId);
+
+  public async deleteWorking(id: string): Promise<boolean> {
+    const res = await super.deleteSubTarget(id, TargetType.Working, this.target.belongId);
     if (res.success) {
       this.workings = this.workings.filter((a) => {
         return a.target.id != id;
       });
+      return true;
     }
-    return res;
+    return false;
   }
 }

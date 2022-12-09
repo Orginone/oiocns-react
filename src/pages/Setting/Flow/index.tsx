@@ -9,9 +9,10 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -55,7 +56,7 @@ const SettingFlow: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
-  const [allData, setAllData] = useState([]);
+  const [allData, setAllData] = useState<schema.XFlowDefine[]>([]);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
@@ -111,9 +112,8 @@ const SettingFlow: React.FC = () => {
   }, []);
 
   const initData = async () => {
-    const result = await userCtrl.Space.getDefines(false);
+    const result = await userCtrl.space.getDefines(false);
     if (result) {
-      // console.log('result', result);
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
     }
@@ -124,9 +124,14 @@ const SettingFlow: React.FC = () => {
   };
 
   const publish = async () => {
-    const result = await userCtrl.Space.publishDefine(design);
+    /**要发布的数据 */
+    const currentData = deepClone(design);
+    if (currentData.belongId) {
+      delete currentData.belongId;
+    }
+    const result = await userCtrl.space.publishDefine(currentData);
     if (result.data) {
-      message.info('添加成功');
+      message.info(result.data.id ? '编辑成功' : '发布成功');
       initData();
       setDesignData(null);
       setEditorValue(null);
@@ -157,7 +162,6 @@ const SettingFlow: React.FC = () => {
           setCurrentStep(StepType.PROCESSMESS);
           setEditorValue(record?.content);
           const editorDataMes = JSON.parse(record?.content || '{}');
-
           setConditionData({
             name: editorDataMes.name,
             labels: JSON.parse(editorDataMes.remark),
@@ -168,8 +172,9 @@ const SettingFlow: React.FC = () => {
       {
         key: 'delete',
         label: '删除',
+        style: { color: 'red' },
         onClick: async () => {
-          const currentData = await userCtrl.Space.deleteDefine(record?.id);
+          const currentData = await userCtrl.space.deleteDefine(record?.id);
           if (currentData) {
             initData();
             message.success('删除成功');

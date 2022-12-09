@@ -29,16 +29,13 @@ const ShareRecent = (props: Iprops) => {
   const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
   const [departHisData, setDepartHisData] = useState<any[]>([]); // radio=1 历史数据
   const [authorData, setAuthorData] = useState<any[]>([]); // raido=2 数据
-  const [authorHisData, setAuthorHisData] = useState<any[]>([]); //raido=2 历史数据
   const [personsData, setPersonsData] = useState<any[]>([]); //raido=3 数据
   const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
   const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
-  const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
   const [selectedTeam, setSelectedTeam] = useState<any>('');
   const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
     {} as any,
   );
-  let recordShareInfo = new Map();
 
   useEffect(() => {
     getLeftTree();
@@ -55,15 +52,15 @@ const ShareRecent = (props: Iprops) => {
 
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (list: any) => {
-    onCheckeds && onCheckeds(selectedTeam, '岗位', identitysData);
+    onCheckeds && onCheckeds(selectedTeam, '岗位', personsData);
   };
   const getLeftTree = async () => {
-    let FunName: Function = userCtrl.User!.getJoinedCohorts;
-    if (userCtrl.IsCompanySpace) {
+    let FunName: Function = userCtrl.user!.getJoinedCohorts;
+    if (userCtrl.isCompanySpace) {
       FunName =
         shareType === '共享'
-          ? userCtrl.Company!.getJoinedGroups
-          : userCtrl.Company!.getDepartments;
+          ? userCtrl.company!.getJoinedGroups
+          : userCtrl.company!.getDepartments;
     }
     const res = await FunName();
     console.log('共享获取组织', res);
@@ -169,9 +166,9 @@ const ShareRecent = (props: Iprops) => {
   };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
-    console.log('onCheck', checkedKeys, identitysData);
     if (info.checked) {
       if (radio == 3) {
+        console.log('444555', personsData);
         handleBoxClick(personsHisData, personsData, info.node);
         setIdentitysData(personsData);
       }
@@ -183,6 +180,8 @@ const ShareRecent = (props: Iprops) => {
     }
     setHasSelectRecord({ type: '岗位', list: checkedKeys });
     handelCheckedChange(info.node);
+    setIdentitysData(personsData);
+
     console.log('onCheck', checkedKeys, identitysData);
   };
   // 点击删除
@@ -278,9 +277,9 @@ const ShareRecent = (props: Iprops) => {
             return (
               <Radio value={item.value} key={item.value}>
                 按
-                {userCtrl.IsCompanySpace && shareType === '共享' && item.label === '人员'
+                {userCtrl.isCompanySpace && shareType === '共享' && item.label === '人员'
                   ? '单位'
-                  : userCtrl.IsCompanySpace &&
+                  : userCtrl.isCompanySpace &&
                     shareType === '共享' &&
                     item.label === '组织'
                   ? '集团'

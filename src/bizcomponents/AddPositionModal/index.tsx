@@ -2,18 +2,17 @@ import React, { useState, useRef } from 'react';
 import { Modal, Row, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import cls from './index.module.less';
-import { initDatatype } from '@/ts/core/setting/isetting';
 import AddNewPosition from './AddNewPosition';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import { ITarget } from '@/ts/core';
 
 interface Iprops {
   title: string;
   open: boolean;
-  onOk: (checkJob: initDatatype, checkUser: initDatatype[]) => void;
   handleOk: () => void;
-  datasource: IAuthority;
+  current: ITarget;
 }
 interface DataType {
   key: React.ReactNode;
@@ -28,7 +27,7 @@ interface DataType {
 }
 
 const AddPostModal = (props: Iprops) => {
-  const { title, open, handleOk, datasource } = props;
+  const { title, open, handleOk, current } = props;
   const parentRef = useRef<any>(null);
   const [operateOpen, setOperateOpen] = useState<boolean>(false);
   const [item, setItem] = useState<IAuthority>();
@@ -90,7 +89,7 @@ const AddPostModal = (props: Iprops) => {
       <div className="site-card-wrapper">
         <Row gutter={24}>
           <CardOrTable
-            dataSource={[datasource]}
+            dataSource={[current.selectAuthorityTree(false)]}
             rowKey={'id'}
             total={1}
             operation={renderOperation}

@@ -41,26 +41,40 @@ class MarketController extends Emitter {
       if (userCtrl.IsCompanySpace) {
         this._target = userCtrl.Company;
       } else {
-        this._target = userCtrl.User;
+        this._target = userCtrl!.User;
       }
-      this._curMarket = (await this._target.getPublicMarket(false))[0];
-      await this._target.getJoinMarkets();
+      this._curMarket = (await this._target!.getPublicMarket(true))[0];
+      await this!._target?.getJoinMarkets();
+      /* 获取 历史缓存的 购物车商品列表 */
+      kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+        // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+        const { data = [] } = shoplist;
+        this._shopinglist = data || [];
+        this.changCallbackPart(MarketCallBackTypes.ApplyData);
+      });
+      /* 获取 历史缓存的 商店用户管理成员 */
+      kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
+        // console.log('订阅数据推送 商店用户管理成员===>', managementlist?.data);
+        const { data = [] } = managementlist;
+        this.marketMenber = data || [];
+        this.changCallbackPart(MarketCallBackTypes.UserManagement);
+      });
       this.changCallback();
-    });
 
-    /* 获取 历史缓存的 购物车商品列表 */
-    kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
-      // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
-      const { data = [] } = shoplist;
-      this._shopinglist = data || [];
-      this.changCallbackPart(MarketCallBackTypes.ApplyData);
-    });
+      /* 获取 历史缓存的 购物车商品列表 */
+      kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+        // console.log('订阅数据推送 购物车商品列表===>', shoplist.data);
+        const { data = [] } = shoplist;
+        this._shopinglist = data || [];
+        this.changCallbackPart(MarketCallBackTypes.ApplyData);
+      });
 
-    /* 获取 历史缓存的 商店用户管理成员 */
-    kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
-      // console.log('订阅数据推送 商店用户管理成员===>', managementlist?.data);
-      this.marketMenber = managementlist?.data || {};
-      this.changCallbackPart(MarketCallBackTypes.UserManagement);
+      /* 获取 历史缓存的 商店用户管理成员 */
+      kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
+        // console.log('订阅数据推送 商店用户管理成员===>', managementlist?.data);
+        this.marketMenber = managementlist?.data || {};
+        this.changCallbackPart(MarketCallBackTypes.UserManagement);
+      });
     });
   }
 

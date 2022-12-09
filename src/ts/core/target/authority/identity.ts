@@ -1,21 +1,34 @@
-import { schema, model, kernel, common } from '../../../base';
+import { schema, model, kernel } from '@/ts/base';
 import { TargetType } from '../../enum';
 import { IIdentity } from './iidentity';
 
 export default class Identity implements IIdentity {
-  private readonly _identity: schema.XIdentity;
-  constructor(identity: schema.XIdentity) {
-    this._identity = identity;
-  }
-  public get target(): schema.XIdentity {
-    return this._identity;
-  }
+  readonly target: schema.XIdentity;
+
   public get id(): string {
-    return this._identity.id;
+    return this.target.id;
   }
 
-  public async giveIdentity(targetIds: string[]): Promise<model.ResultType<any>> {
-    return await kernel.giveIdentity({ id: this._identity.id, targetIds });
+  public get name(): string {
+    return this.target.name;
+  }
+  constructor(identity: schema.XIdentity) {
+    this.target = identity;
+  }
+  async loadMembers(page: model.PageRequest): Promise<schema.XTargetArray> {
+    return (
+      await kernel.queryIdentityTargets({
+        id: this.id,
+        targetType: TargetType.Person,
+        page: page,
+      })
+    ).data;
+  }
+  async pullMembers(ids: string[]): Promise<boolean> {
+    return (await kernel.giveIdentity({ id: this.id, targetIds: ids })).success;
+  }
+  async removeMembers(ids: string[]): Promise<boolean> {
+    return (await kernel.removeIdentity({ id: this.id, targetIds: ids })).success;
   }
 
   public async updateIdentity(
@@ -27,37 +40,16 @@ export default class Identity implements IIdentity {
       name,
       code,
       remark,
-      id: this._identity.id,
-      authId: this._identity.authId,
-      belongId: this._identity.belongId,
+      id: this.target.id,
+      authId: this.target.authId,
+      belongId: this.target.belongId,
     });
     if (res.success) {
-      this._identity.name = name;
-      this._identity.code = code;
-      this._identity.remark = remark;
-      this._identity.updateTime = res.data?.updateTime;
+      this.target.name = name;
+      this.target.code = code;
+      this.target.remark = remark;
+      this.target.updateTime = res.data?.updateTime;
     }
     return res;
-  }
-
-  public async getIdentityTargets(
-    targetType: TargetType,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await kernel.queryIdentityTargets({
-      id: this._identity.id,
-      targetType: targetType,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    });
-  }
-
-  public async removeIdentity(targetIds: string[]): Promise<model.ResultType<any>> {
-    return await kernel.removeIdentity({
-      id: this._identity.id,
-      targetIds,
-    });
   }
 }

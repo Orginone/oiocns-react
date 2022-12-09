@@ -49,7 +49,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const onJoinOk = async (val: any) => {
     setIsJoinShop(false);
     setDataSource([]);
-    const res = await userCtrl.User!.applyJoinMarket(val[0]?.id);
+    const res = await userCtrl.user!.applyJoinMarket(val[0]?.id);
     if (res?.code === 400) {
       message.warning(res?.msg);
     } else if (res?.code === 200 && res?.success) {
@@ -229,7 +229,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const getTreeData = () => {
     return marketCtrl.Market.joinedMarkets.map((itemModel, index) => {
       let arrs = ['基础详情', '用户管理'];
-      if (itemModel.market.belongId === userCtrl.User.target.id) {
+      if (itemModel.market.belongId === userCtrl.user.target.id) {
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');

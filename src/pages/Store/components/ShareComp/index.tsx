@@ -33,7 +33,7 @@ const DestTypes = [
 //个人空间-展示我的群组  ; 单位空间 - 分配
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
-  const [isCompanySpace] = useState<boolean>(userCtrl.IsCompanySpace); //是否工作空间
+  const [isCompanySpace] = useState<boolean>(userCtrl.isCompanySpace); //是否工作空间
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
@@ -87,12 +87,12 @@ const ShareRecent = (props: Iprops) => {
   };
   //获取左侧组织数据
   const getLeftTree = async () => {
-    let FunName: Function = userCtrl.User!.getJoinedCohorts;
-    if (userCtrl.IsCompanySpace) {
+    let FunName: Function = userCtrl.user!.getJoinedCohorts;
+    if (userCtrl.isCompanySpace) {
       FunName =
         shareType === '共享'
-          ? userCtrl.Company!.getJoinedGroups
-          : userCtrl.Company!.getDepartments;
+          ? userCtrl.company!.getJoinedGroups
+          : userCtrl.company!.getDepartments;
     }
     const res = await FunName();
     console.log('共享获取组织', res);
@@ -104,11 +104,11 @@ const ShareRecent = (props: Iprops) => {
     });
     console.log('是是是', ShowList);
 
-    !userCtrl.IsCompanySpace &&
+    !userCtrl.isCompanySpace &&
       ShowList.unshift({
-        ...userCtrl.User.target,
+        ...userCtrl.user.target,
         name: '我的好友',
-        node: userCtrl.User,
+        node: userCtrl.user,
       });
 
     setLeftTreeData([...ShowList]);
@@ -140,7 +140,7 @@ const ShareRecent = (props: Iprops) => {
 
     switch (radio) {
       case 2: {
-        const res = await userCtrl.User!.selectAuthorityTree();
+        const res = await userCtrl.user!.selectAuthorityTree();
 
         let data = handleTreeData(res, info.node.id);
         setCenterTreeData([data]);
@@ -251,6 +251,7 @@ const ShareRecent = (props: Iprops) => {
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info) => {
     console.log('onCheck', checkedKeys, info);
+    console.log('内容1111111111', info);
     if (info.checked) {
       if (radio == 2) {
         handleBoxClick(authorHisData, authorData, info.node);

@@ -2,27 +2,27 @@ import React, { useEffect } from 'react';
 import { Modal, Form, Input, Row, Col, message } from 'antd';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core/enum';
-import { IDepartment } from '@/ts/core/target/itarget';
+import { ITarget } from '@/ts/core/target/itarget';
 import cls from './index.module.less';
+import { ResultType } from '@/ts/base/model';
 const { TextArea } = Input;
 interface Iprops {
   title: string;
   open: boolean;
   handleOk: () => void;
   handleCancel: () => void;
-  selectId?: string;
-  editDept?: IDepartment;
+  current: ITarget;
 }
 
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, handleCancel, editDept } = props;
+  const { open, title, handleOk, handleCancel, current } = props;
   const [form] = Form.useForm();
   useEffect(() => {
     if (open) {
       title !== '新增'
         ? form.setFieldsValue({
-            ...editDept?.target,
-            teamRemark: editDept?.target.team?.remark ?? '',
+            ...current.target,
+            teamRemark: current.target.team?.remark ?? '',
           })
         : form.resetFields();
     }
@@ -32,19 +32,18 @@ const EditCustomModal = (props: Iprops) => {
     if (value) {
       // 编辑自己的部门信息
       if (title === '编辑') {
-        if (editDept) {
-          const { success, msg } = await editDept.update({
-            ...editDept.target,
+        if (
+          await current.update({
+            ...current.target,
             teamName: value.name,
             teamCode: value.code,
             ...value,
-          });
-          if (success) {
-            message.success('更新信息成功');
-            handleOk();
-          } else {
-            message.error(msg);
-          }
+          })
+        ) {
+          message.success('更新信息成功!');
+          handleOk();
+        } else {
+          message.error('更新信息失败!');
         }
       } else {
         // 新增部门信息
@@ -52,24 +51,22 @@ const EditCustomModal = (props: Iprops) => {
           ...value,
           teamName: value.name,
           teamCode: value.code,
-          belongId: userCtrl.Company?.target.id,
           typeName: TargetType.Department,
-          parentId: editDept ? editDept.target.id : '',
         };
 
-        let curentValue: any;
+        let res: ResultType<any>;
         if (editDept) {
           // 新增下级部门信息
-          curentValue = await editDept.createDepartment(newValue);
+          res = await editDept.createDepartment(newValue);
         } else {
           // 如果是一级部门， 就从根部门里面新增
-          curentValue = await userCtrl.Company.createDepartment(newValue);
+          res = await userCtrl.company.createDepartment(newValue);
         }
-        if (!curentValue.success) {
-          message.error(curentValue.msg);
-        } else {
-          message.success(curentValue.msg);
+        if (res.success) {
+          message.success(`创建${value.name}成功!`);
           handleOk();
+        } else {
+          message.error(`新增部门失败,${res.msg}`);
         }
       }
     }

@@ -66,7 +66,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     } else {
       let thisSelectKey = joinKey;
       // code msg success
-      const responseObj = await userCtrl.User.applyJoinCompany(
+      const responseObj = await userCtrl.user.applyJoinCompany(
         thisSelectKey,
         TargetType.Company,
       );
@@ -85,7 +85,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
 
   const setTabName = async (key: string) => {
     // 1 2 3
-    const person: IPerson = userCtrl.User;
+    const person: IPerson = userCtrl.user;
     const joinCompanys = await person.getJoinedCompanys(false);
     // console.log(joinCompanys);
     if (parseInt(key) == 2) {
@@ -131,7 +131,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
    */
   const getTableList = async (req = {}, searchKey = '', isGofirst = false) => {
     console.log(req, searchKey, isGofirst);
-    const person: IPerson = userCtrl.User;
+    const person: IPerson = userCtrl.user;
     const joinCompanys = await person.getJoinedCompanys(false);
     console.log(joinCompanys);
     setList(joinCompanys);

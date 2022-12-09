@@ -29,10 +29,10 @@ const DeptDescription = (props: {
         </Descriptions.Item>
         <Descriptions.Item label="部门编码">{selectDept?.code || ''}</Descriptions.Item>
         <Descriptions.Item label="所属单位">
-          {userCtrl.Company.target.name || ''}
+          {userCtrl.company.target.name || ''}
         </Descriptions.Item>
         <Descriptions.Item label="单位编码">
-          {userCtrl.Company.target.code || ''}
+          {userCtrl.company.target.code || ''}
         </Descriptions.Item>
 
         <Descriptions.Item label="创建人">

@@ -1,38 +1,61 @@
-import { Button, Card, Dropdown } from 'antd';
+import { Button, Card, Dropdown, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 // import { BtnGroupDiv } from '@/components/CommonComp';
-import { EllipsisOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  EllipsisOutlined,
+  PartitionOutlined,
+  SmileOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
+import appCtrl from '@/ts/controller/store/appCtrl';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
 });
 
 const StoreAppInfo: React.FC = () => {
-  // const BtnsList = ['编辑应用分配'];
+  const history = useHistory();
+  if (!appCtrl.curProduct) {
+    history.goBack();
+    return <></>;
+  }
+  const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
   useEffect(() => {
     console.log('{SelfAppCtrl.curProduct?.prod.version}');
-    getExtend('组织');
+    onTabChange('组织');
   }, []);
 
-  const getExtend = async (tabKey: string) => {
-    console.log('事实上222', tabKey);
+  async function onTabChange(tabKey: any) {
+    const res = await curProd.queryExtend(tabKey, '0');
+    const showData = res?.data?.result?.map((v) => {
+      let obj: any = v;
+      switch (tabKey) {
+        case '组织':
+          obj.icon = <PartitionOutlined rotate={90} />;
+          break;
+        case '角色':
+          obj.icon = <TeamOutlined />;
+          break;
+        case '岗位':
+          obj.icon = <BankOutlined />;
+          break;
+        case '人员':
+          obj.icon = <SmileOutlined />;
+          break;
 
-    const res = await SelfAppCtrl.curProduct?.queryExtend(tabKey, '0');
-    console.log('请求分享/分配信息', tabKey, res);
-    setList(res?.data?.result ?? []);
-  };
-
-  const history = useHistory();
-  function onTabChange(key: any) {
-    console.log('onTabChange', key);
-    getExtend(key);
+        default:
+          break;
+      }
+      return obj;
+    });
+    setList(showData || []);
   }
 
   const menu = [{ key: '退订', label: '退订' }];
@@ -52,17 +75,13 @@ const StoreAppInfo: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
-          title={SelfAppCtrl.curProduct?.prod.name}
+          title={curProd.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{SelfAppCtrl.curProduct?.prod.remark}</p>
+              <p className="app-info-con-desc">{curProd.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">
-                  版本号 ：{SelfAppCtrl.curProduct?.prod.version}
-                </span>
-                <span className="lastTime">
-                  订阅到期时间 ：{SelfAppCtrl.curProduct?.prod.createTime}
-                </span>
+                <span className="vision">版本号 ：{curProd.prod.version}</span>
+                <span className="lastTime">订阅到期时间 ：{curProd.prod.createTime}</span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
@@ -84,9 +103,18 @@ const StoreAppInfo: React.FC = () => {
         <Card
           title="已共享信息"
           tabList={items}
+          defaultActiveTabKey={'组织'}
           style={{ padding: 0 }}
           onTabChange={onTabChange}>
-          <div className={cls['page-content-table']}>{JSON.stringify(list)}</div>
+          <div className={cls['page-content-table']}>
+            {list.map((item: { icon: string; id: string; name: string }) => {
+              return (
+                <Tag icon={item?.icon || ''} key={item.id} color="#cad3e2">
+                  {item.name}
+                </Tag>
+              );
+            })}
+          </div>
         </Card>
       </div>
     </div>

@@ -12,11 +12,11 @@ import cls from './index.module.less';
  */
 const UserAvatar: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState(userCtrl.User);
+  const [user, setUser] = useState(userCtrl.user);
   useEffect(() => {
     const id = userCtrl.subscribePart(DomainTypes.User, () => {
-      if (userCtrl.User) {
-        setUser({ ...userCtrl.User });
+      if (userCtrl.user) {
+        setUser({ ...userCtrl.user });
       }
     });
     return () => {

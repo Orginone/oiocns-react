@@ -14,10 +14,6 @@ import {
 } from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from 'typings/globelType';
-// import TreeLeftDeptPage from '@/bizcomponents/TreeLeftDeptPage';
-// import TreeLeftGroupPage from '@/bizcomponents/TreeLeftGroupPage';
-// import TreeLeftPosPage from '@/bizcomponents/TreeLeftPosPage';
-
 import { MenuProps } from 'antd';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 
@@ -76,7 +72,7 @@ const muneItems = [
   },
 ];
 
-const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, history }) => {
+const Setting: React.FC = ({ route, history }) => {
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };
@@ -84,18 +80,18 @@ const Setting: React.FC<{ route: IRouteConfig; history: any }> = ({ route, histo
 
   const changeMenu = () => {
     let [_newMenu, ...other] = [...muneItems];
-    _newMenu.children = !userCtrl?.IsCompanySpace
+    _newMenu.children = !userCtrl.isCompanySpace
       ? userInfoMenuItems
       : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
     setMenu([{ ..._newMenu }, ...other]);
 
-    if (userCtrl?.IsCompanySpace) {
+    if (userCtrl.isCompanySpace) {
       if (location.hash.endsWith('/friend')) {
-        history.push('/setting/info');
+        history.push({ pathname: '/setting/info' });
       }
     } else {
       if (!location.hash.endsWith('/cohort')) {
-        history.push('/setting/friend');
+        history.push({ pathname: '/setting/friend' });
       }
     }
   };

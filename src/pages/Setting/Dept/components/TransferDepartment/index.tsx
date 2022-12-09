@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IDepartment } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 import { message } from 'antd';
 import { XTarget } from '@/ts/base/schema';
 interface Iprops {
@@ -10,17 +10,17 @@ interface Iprops {
   open: boolean;
   handleOk: () => void;
   onCancel: () => void;
-  OriginDept: IDepartment; //原部门
+  current: ITarget; //原部门
   needTransferUser: XTarget; // 需要转移部门的人员
 }
 
 const TransferDepartment = (props: Iprops) => {
-  const { title, open, handleOk, OriginDept, needTransferUser, onCancel } = props;
+  const { title, open, handleOk, current, needTransferUser, onCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const [newDept, setNewDept] = useState<IDepartment>();
+  const [newDept, setNewDept] = useState<ITarget>();
   const [reload] = useState<boolean>(false);
   const loadTreeData = async (reload: boolean) => {
-    const createTeeDom: any = async (n: IDepartment) => {
+    const createTeeDom: any = async (n: ITarget) => {
       const { target } = n;
       let result: any = {
         value: target.id,
@@ -28,7 +28,7 @@ const TransferDepartment = (props: Iprops) => {
         intans: n,
         children: [],
       };
-      const children = await n.getDepartments(reload);
+      const children = await n.loadSubTeam(reload);
       if (children.length > 0) {
         for (const child of children) {
           if (child.target) {
@@ -38,7 +38,7 @@ const TransferDepartment = (props: Iprops) => {
       }
       return result;
     };
-    const depts = await userCtrl.Company.getDepartments(reload);
+    const depts = await userCtrl.company.loadSubTeam(reload);
     const data = [];
     if (depts.length > 0) {
       for (const child of depts) {
@@ -49,46 +49,6 @@ const TransferDepartment = (props: Iprops) => {
     }
     return data;
   };
-
-  // const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
-  //   list.map((node) => {
-  //     if (node.key === key) {
-  //       return {
-  //         ...node,
-  //         children,
-  //         isLeaf: children.length == 0,
-  //       };
-  //     }
-  //     if (node.children) {
-  //       return {
-  //         ...node,
-  //         children: updateTreeData(node.children, key, children),
-  //       };
-  //     }
-  //     return node;
-  //   });
-  // const loadDept = async ({ key, children, intans }: any) => {
-  //   if (children) {
-  //     return;
-  //   }
-  //   const deptChild: any[] = await intans.getDepartments();
-  //   setTreeData((origin) =>
-  //     updateTreeData(
-  //       origin,
-  //       key,
-  //       deptChild.map((n) => createTeeDom(n, intans.target.id)),
-  //     ),
-  //   );
-  // };
-
-  // const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
-  //   setSelectKey(selectedKeys.length > 0 ? selectedKeys[0] : '');
-  //   await loadDept(info.node);
-  //   if (info.selected) {
-  //     setCurrent(info.node.intans);
-  //     setting.setCurrTreeDeptNode(info.node.intans.target.id);
-  //   }
-  // };
   const columns: ProFormColumnsType<{ id: string }>[] = [
     {
       title: '人员名称',
@@ -108,7 +68,7 @@ const TransferDepartment = (props: Iprops) => {
       valueType: 'treeSelect',
       request: async () => loadTreeData(reload),
       fieldProps: {
-        onSelect: (_: any, info: { intans: IDepartment }) => {
+        onSelect: (_: any, info: { intans: ITarget }) => {
           setNewDept(info.intans);
         },
         fieldNames: { label: 'label', value: 'value' },
@@ -129,7 +89,7 @@ const TransferDepartment = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (open) {
           formRef.current?.setFieldsValue({
-            id: OriginDept.target.id,
+            id: current.target.id,
             username: needTransferUser?.team?.name,
           });
         } else {
@@ -142,19 +102,18 @@ const TransferDepartment = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (values.id === OriginDept.target.id) {
+        if (values.id === current.target.id) {
           onCancel();
           return;
         }
-        const { success } = await OriginDept.removePerson([needTransferUser.id]);
-        if (success) {
-          const res = await newDept?.pullPerson([needTransferUser]);
-          if (res?.success) {
-            message.success('操作成功');
-            handleOk();
-          } else {
-            message.error(res?.msg || '操作失败');
-            return false;
+        if (newDept) {
+          if (await current.removeMember(needTransferUser)) {
+            if (await newDept.pullMember(needTransferUser)) {
+              message.success('操作成功');
+              handleOk();
+            } else {
+              return false;
+            }
           }
         }
       }}

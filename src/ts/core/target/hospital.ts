@@ -3,9 +3,9 @@ import { TargetType } from '../enum';
 import Company from './company';
 
 export default class Hospital extends Company {
-  constructor(target: schema.XTarget) {
-    super(target);
-    this.subTypes = [
+  constructor(target: schema.XTarget, userId: string) {
+    super(target, userId);
+    this.subTeamTypes = [
       TargetType.Group,
       TargetType.JobCohort,
       TargetType.Office,

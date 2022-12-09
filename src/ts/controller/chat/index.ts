@@ -19,8 +19,8 @@ class ChatController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart(DomainTypes.User, () => {
-      if (this._userId != userCtrl.User.target.id) {
-        this._userId = userCtrl.User.target.id;
+      if (this._userId != userCtrl.user.target.id) {
+        this._userId = userCtrl.user.target.id;
         setTimeout(async () => {
           await this._initialization();
         }, 500);
@@ -151,6 +151,7 @@ class ChatController extends Emitter {
   private async _initialization(): Promise<void> {
     this._groups = await LoadChats(this._userId);
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
+      this._chats = [];
       if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
           let lchat = this._refChat(item);

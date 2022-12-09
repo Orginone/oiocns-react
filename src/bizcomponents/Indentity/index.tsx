@@ -5,33 +5,25 @@ import { common } from 'typings/common';
 import { schema } from '@/ts/base';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
-import { TargetType } from '@/ts/core/enum';
 import { columns } from './config';
 import EditIndentityModal from './components/AddPositionMoadl';
 import TreeLeftDeptPage from './components/TreeLeftPosPage';
 import AssignPosts from './components/AssignPosts';
 import cls from './index.module.less';
-import {
-  IDepartment,
-  IPerson,
-  IGroup,
-  ICompany,
-  ICohort,
-} from '@/ts/core/target/itarget';
+import { ITarget, TargetType } from '@/ts/core';
 import { MarketTypes } from 'typings/marketType';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
   open: boolean;
-  object: IDepartment | IPerson | IGroup | ICompany | ICohort;
-  MemberData: schema.XTarget[]; // 当前可分配的人员数据
+  current: ITarget;
 };
 /**
  * 身份设置
  * @returns
  */
-const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
-  const { open, object, MemberData, ...other } = props;
+const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
+  const { open, current, ...other } = props;
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [indentity, setIndentity] = useState<IIdentity>();
@@ -50,18 +42,10 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
   }, [open]);
   // 左侧身份数据
   const getDataList = async () => {
-    const data = await object?.getIdentitys();
+    const data = await current.getIdentitys();
     setIndentitys(data);
-    if (
-      !indentity ||
-      data[0].id === indentity.id ||
-      data.findIndex((n) => n.id === indentity.id) === -1
-    ) {
-      setTreeCurrent(data[0]);
-    } else {
-      if (data[0].id !== indentity.id) {
-        setTreeCurrent(indentity);
-      }
+    if (!indentity && data.length > 0) {
+      await setTreeCurrent(data[0]);
     }
   };
   // 加载 人员数据
@@ -267,4 +251,4 @@ const SettingDept: React.FC<IndentityManageType & ModalProps> = (props) => {
   );
 };
 
-export default SettingDept;
+export default SettingIdentity;
