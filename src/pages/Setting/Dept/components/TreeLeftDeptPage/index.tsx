@@ -27,7 +27,7 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
 
   useEffect(() => {
     setTimeout(async () => {
-      setData(loadTree(await userCtrl.space.loadSubTeam(false)));
+      setData(userCtrl.buildTargetTree(await userCtrl.space.loadSubTeam(false)));
     }, 0);
   }, []);
 
@@ -35,24 +35,9 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
     const item: ITarget = info.node.item;
     if (item) {
       console.log(await item.loadSubTeam());
-      setData(loadTree(await userCtrl.space.loadSubTeam(false)));
+      setData(userCtrl.buildTargetTree(await userCtrl.space.loadSubTeam(false)));
       setCurrent(item);
     }
-  };
-
-  const loadTree = (targets: ITarget[]) => {
-    const result: any[] = [];
-    if (targets) {
-      for (const item of targets) {
-        result.push({
-          id: item.id,
-          name: item.name,
-          item: item,
-          children: loadTree(item.subTeam),
-        });
-      }
-    }
-    return result;
   };
 
   const menu = ['新增部门', '删除部门'];

@@ -82,36 +82,35 @@ class UserController extends Emitter {
   public async getTeamTree(isShare: boolean = true): Promise<ITarget[]> {
     const result: any[] = [];
     if (this._curSpace) {
-      result.push({
-        ...this.space.target,
-        item: this.space,
-        hasChildren: true,
-      });
+      result.push(this.space);
       if (isShare) {
         const groups = await this._curSpace.getJoinedGroups(false);
-        groups.forEach((item) => {
-          result.push({
-            ...item.target,
-            item: item,
-            hasChildren: true,
-          });
-        });
+        result.push(...groups);
       }
     } else {
-      const cohorts = await this._user!.getCohorts(false);
       result.push({
-        ...this.user.target,
-        name: '我的好友',
-        item: this.user,
-        hasChildren: false,
+        ...this.user,
+        target: {
+          name: '我的好友',
+        },
       });
-      cohorts.forEach((item) => {
+      const cohorts = await this._user!.getCohorts(false);
+      result.push(...cohorts);
+    }
+    return result;
+  }
+  /** 加载组织树 */
+  public buildTargetTree(targets: ITarget[]) {
+    const result: any[] = [];
+    if (targets) {
+      for (const item of targets) {
         result.push({
-          ...item.target,
+          id: item.id,
+          name: item.name,
           item: item,
-          hasChildren: false,
+          children: this.buildTargetTree(item.subTeam),
         });
-      });
+      }
     }
     return result;
   }
