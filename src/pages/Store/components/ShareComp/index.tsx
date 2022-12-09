@@ -6,7 +6,8 @@ import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import appCtrl from '@/ts/controller/store/appCtrl';
-import { ITarget } from '@/ts/core';
+import { ICompany, ITarget } from '@/ts/core';
+import { deepClone } from '@/ts/base/common';
 interface Iprops {
   shareType: '分配' | '共享';
   onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
@@ -29,9 +30,28 @@ const DestTypes = [
     label: '人员',
   },
 ];
+const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
+  list.map((node) => {
+    if (node.id === key) {
+      return {
+        ...node,
+        children,
+      };
+    }
+    if (node.children) {
+      return {
+        ...node,
+        children: updateTreeData(node.children, key, children),
+      };
+    }
+    console.log('事实上', node);
+
+    return node;
+  });
 //个人空间-展示我的群组  ; 单位空间 - 分配
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
+  const [keyNum, setKeyNum] = useState<number>(0);
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
@@ -139,6 +159,13 @@ const ShareRecent = (props: Iprops) => {
       default:
         break;
     }
+    if (info.selected) {
+      console.log('菜市场上次', info.node.children);
+
+      if (info.node.children?.length === 0) {
+        onLoadData(info.node);
+      }
+    }
   };
   const handleTreeData = (node: any, belongId: string) => {
     node.disabled = !(node.belongId && node.belongId == belongId);
@@ -152,7 +179,7 @@ const ShareRecent = (props: Iprops) => {
   };
   // 左侧树点击事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    console.log('点击左侧', checkedKeys, info);
+    console.log('点击左侧', checkedKeys, info, info.checked);
     if (info.checked) {
       let result = departHisData.some((item: any) => {
         return item.id == info.node.id;
@@ -295,6 +322,27 @@ const ShareRecent = (props: Iprops) => {
     }
   };
 
+  const onLoadData = ({ id, children, item }: any) => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise<void>(async (resolve) => {
+      if (children?.length > 0) {
+        resolve();
+        return;
+      }
+      const company: ICompany = item;
+      const dept = await company.getDepartments(false);
+      const arr =
+        dept?.map((v) => {
+          return {
+            ...v.target,
+            item: v,
+          };
+        }) || [];
+      setLeftTreeData((origin: any) => updateTreeData(origin, id, arr));
+      resolve();
+    });
+  };
+
   return (
     <div className={cls.layout}>
       <div className={cls.top}>
@@ -323,11 +371,14 @@ const ShareRecent = (props: Iprops) => {
           <div className={cls.leftContent}>
             <Tree
               checkable={radio !== 1 ? false : true}
+              key={keyNum}
+              loadData={onLoadData}
               fieldNames={{
                 title: 'name',
                 key: 'id',
                 children: 'children',
               }}
+              autoExpandParent={true}
               selectedKeys={leftTreeSelectedKeys}
               onSelect={onSelect}
               onCheck={handleCheckChange}
