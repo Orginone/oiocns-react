@@ -28,7 +28,7 @@ export type PositionType = {
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   useEffect(() => {}, []);
   const { positions, setCurrent } = props;
-  const [currentPostion, setCurrentPosition] = useState<any>();
+  const [currentPostion, setCurrentPosition] = useState<PositionType>();
   const [selectMenu, setSelectMenu] = useState<string>('');
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
@@ -56,9 +56,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     if (key === '更改岗位名称') {
       setCurrentPosition(data.object);
       setIsOpenEditModal(true);
-      // positionCtrl.updatePosttion(data.object);
     }
-    console.log(data);
   };
   const close = () => {
     setIsOpenModal(false);

@@ -14,7 +14,12 @@ const ConditionNode = () => {
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
-    if (DefaultProps.getFormFields().length > 0) {
+    console.log('DefaultProps.getFormFields()', DefaultProps.getFormFields());
+    if (
+      DefaultProps.getFormFields() &&
+      DefaultProps.getFormFields().length > 0 &&
+      JSON.stringify(DefaultProps.getFormFields()[0]) !== '{}'
+    ) {
       selectedNode.conditions?.push({
         pos: selectedNode.conditions.length + 1,
         paramKey: '',

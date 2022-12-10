@@ -7,7 +7,7 @@ import chatCtrl from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
 import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
-import { MessageType, TargetType } from '@/ts/core/enum';
+import { MessageType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
@@ -162,11 +162,9 @@ const GroupSideBar: React.FC = () => {
             chatCtrl.isCurrent(child) ? sideStyle.active : ''
           } ${child.isToping ? sideStyle.session_toping : ''}`}
           onContextMenu={(e: any) => handleContextClick(e, child)}>
-          <TeamIcon
-            typeName={child.target.typeName as string}
-            // avatar={item.avatar}
-            size={18}
-          />
+          <div style={{ fontSize: 26, color: '#888', width: 42 }}>
+            <TeamIcon typeName={child.target.typeName} avatar={child.avatar} size={32} />
+          </div>
           {child.noReadCount > 0 ? (
             <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>
               <span>{child.noReadCount}</span>
@@ -183,11 +181,6 @@ const GroupSideBar: React.FC = () => {
               <div
                 className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.label}`}>
                 {child.target.name}
-                {child.target.typeName != TargetType.Person ? (
-                  <imIcon.ImBubbles color="#aaa" />
-                ) : (
-                  ''
-                )}
               </div>
               <div
                 className={`${sideStyle.group_con_show} ${sideStyle.name} ${sideStyle.time}`}>

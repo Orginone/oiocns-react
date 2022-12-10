@@ -25,6 +25,7 @@ interface PageType<T> {
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
   operation?: (item: T) => any[]; //操作区域数据
+
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
@@ -69,8 +70,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       if (parentRef?.current) {
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
-        console.log('展示高度', _height);
-        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 106) : 200);
+        // console.log('展示高度', _height);
+        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
       }
     }, 50);
   }, [parentRef]);

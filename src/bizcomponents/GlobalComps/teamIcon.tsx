@@ -59,7 +59,7 @@ const TeamIcon = (info: teamTypeInfo) => {
     case TargetType.Cohort:
       return <im.ImBubbles />;
     case TargetType.Person:
-      return <im.ImUser />;
+      return <im.ImUserTie />;
     default:
       return <im.ImSvg />;
   }
