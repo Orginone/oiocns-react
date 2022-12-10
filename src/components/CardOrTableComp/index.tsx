@@ -6,6 +6,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { PageShowType } from 'typings/globelType';
+import { PageRequest } from '@/ts/base/model';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
@@ -27,14 +28,13 @@ interface PageType<T> {
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
-  request?: (params: { offset: number; limit: number; filter: string }) =>
-    | Promise<{
-        result: T[] | undefined;
-        offset: number;
-        limit: number;
-        total: number;
-      }>
-    | undefined;
+  request?: (params: PageRequest & { [key: string]: any }) => Promise<{
+    result: T[] | undefined;
+    offset: number;
+    limit: number;
+    total: number;
+  }>;
+
   [key: string]: any; // 其他属性方法
 }
 
@@ -128,38 +128,47 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
-        params={{ id: nanoid(), filter: '' }}
+        params={{ tableid: nanoid(), filter: '' }}
         request={async (params) => {
-          // console.log(params);
-          const { current: pageIndex = 1, pageSize = 10, filter = '' } = params;
+          const {
+            current: pageIndex = 1,
+            pageSize = 10,
+            filter = '',
+            // eslint-disable-next-line no-unused-vars
+            tableid,
+            // eslint-disable-next-line no-unused-vars
+            keyword,
+            ...other
+          } = params;
           if (request) {
-            const res = await request({
+            const page: PageRequest = {
               filter: filter,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
-            });
-
+            };
+            console.log(other ? { ...other, page } : page);
+            const res = await request(other ? { ...other, ...page } : page);
             return {
-              total: res?.total || 0,
-              data: res?.result || [],
+              total: res.total || 0,
+              data: res.result || [],
               success: true,
             };
           } else {
             return {
               data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
-              total,
+              total: total ?? dataSource.length,
               success: true,
             };
           }
         }}
-        tableRender={(props: any, defaultDom, { table }) => {
+        tableRender={(props: any, defaultDom) => {
           return pageType === 'table' ? (
             !showChangeBtn ||
             !props.action.datasource ||
             props.action.datasource.length === 0 ? (
-              table
+              defaultDom
             ) : (
-              [table, TableFooter]
+              [defaultDom, TableFooter]
             )
           ) : (
             <>
