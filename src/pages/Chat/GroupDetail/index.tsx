@@ -1,10 +1,14 @@
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Col, Row, Typography } from 'antd';
-import React from 'react';
+import { Button, Checkbox, Col, Row, Typography, message } from 'antd';
+import React, { useState } from 'react';
 import HeadImg from '@/components/headImg/headImg';
 import detailStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import InviteMembers from '@/components/InviteMembers';
+import RemoveMember from '@/components/RemoveMember';
+import { schema } from '@/ts/base';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /**
  * @description:  个人、群聊详情
@@ -12,7 +16,62 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
  */
 
 const Groupdetail = () => {
-  const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
+  const [key, forceUpdate] = useCtrlUpdate(chatCtrl); // 刷新页面
+  const [open, setOpen] = useState<boolean>(false); // 邀请弹窗开关
+  const [removeOpen, setRemoveOpen] = useState<boolean>(false); // 移出弹窗开关
+  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
+  const [removePerosn, setRemovePerosn] = useState<any>();
+
+  /**
+   * @description: 邀请确认
+   * @return {*}
+   */
+  const onOk = async () => {
+    if (selectPerson && userCtrl.user) {
+      let ids: string[] = [];
+      selectPerson.forEach((item) => {
+        ids.push(item?.id);
+      });
+      const success = await userCtrl.user.pullMembers(ids, selectPerson[0].typeName);
+      if (success) {
+        message.success('添加成功');
+        userCtrl.changCallback();
+      } else {
+        message.error('添加失败');
+      }
+    }
+    setOpen(false);
+  };
+
+  /**
+   * @description: 移除确认
+   * @return {*}
+   */
+  const onRemoveOk = async () => {
+    setRemoveOpen(false);
+    if (selectPerson && userCtrl.user) {
+      let ids: string[] = [];
+      selectPerson.forEach((item) => {
+        ids.push(item?.id);
+      });
+      const success = await userCtrl.user.removeMembers(ids, selectPerson[0].typeName);
+      if (success) {
+        message.success('移除成功');
+        userCtrl.changCallback();
+      } else {
+        message.error('移除失败');
+      }
+    }
+  };
+
+  /**
+   * @description: 取消
+   * @return {*}
+   */
+  const onCancel = () => {
+    setOpen(false);
+    setRemoveOpen(false);
+  };
   /**
    * @description: 头像
    * @return {*}
@@ -54,12 +113,18 @@ const Groupdetail = () => {
         <>
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
-            onClick={() => {}}>
+            onClick={() => {
+              setOpen(true);
+              setRemovePerosn(undefined);
+            }}>
             +
           </div>
           <div
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
-            onClick={() => {}}>
+            onClick={() => {
+              setRemoveOpen(true);
+              setRemovePerosn(chatCtrl.chat?.persons);
+            }}>
             -
           </div>
         </>
@@ -160,6 +225,22 @@ const Groupdetail = () => {
           ''
         )}
       </div>
+      {/* 邀请成员 */}
+      <InviteMembers
+        open={open}
+        onOk={onOk}
+        onCancel={onCancel}
+        title="邀请成员"
+        setSelectPerson={setSelectPerson}
+      />
+      <RemoveMember
+        title="移出成员"
+        open={removeOpen}
+        onOk={onRemoveOk}
+        onCancel={onCancel}
+        setSelectPerson={setSelectPerson}
+        personData={removePerosn}
+      />
     </>
   );
 };

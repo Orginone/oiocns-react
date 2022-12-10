@@ -8,10 +8,11 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import CardOrTableComp from '@/components/CardOrTableComp';
 interface indexType {
   searchFn: Function;
+  personData?: any;
 }
 
 const MemberList: React.FC<indexType> = (props) => {
-  const { searchFn } = props;
+  const { searchFn, personData } = props;
   const [searchValue, setSearchValue] = useState<string>('');
   const keyWordChange = async (e: any) => {
     const int = setTimeout(() => {
@@ -63,9 +64,13 @@ const MemberList: React.FC<indexType> = (props) => {
               searchFn(selectedRows);
             },
           }}
-          dataSource={[]}
+          dataSource={personData ?? []}
           params={{ filter: searchValue }}
-          request={async (params) => await userCtrl.space.loadMembers(params)}
+          request={
+            personData
+              ? undefined
+              : async (params) => await userCtrl.space.loadMembers(params)
+          }
           hideOperation={true}
           scroll={{ y: 300 }}
           columns={cohortColumn}

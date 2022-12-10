@@ -27,12 +27,14 @@ interface PageType<T> {
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
-  request?: (params: { offset: number; limit: number; filter: string }) => Promise<{
-    result: T[] | undefined;
-    offset: number;
-    limit: number;
-    total: number;
-  }>;
+  request?: (params: { offset: number; limit: number; filter: string }) =>
+    | Promise<{
+        result: T[] | undefined;
+        offset: number;
+        limit: number;
+        total: number;
+      }>
+    | undefined;
   [key: string]: any; // 其他属性方法
 }
 
@@ -138,8 +140,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             });
 
             return {
-              total: res.total || 0,
-              data: res.result || [],
+              total: res?.total || 0,
+              data: res?.result || [],
               success: true,
             };
           } else {
