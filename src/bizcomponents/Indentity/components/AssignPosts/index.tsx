@@ -8,10 +8,12 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { resetParams } from '@/utils/tools';
 interface indexType {
   searchFn: Function;
+  personData?: any;
 }
 
 const MemberList: React.FC<indexType> = (props) => {
-  const { searchFn } = props;
+  const { searchFn, personData } = props;
+
   useEffect(() => {
     getTableList(1, 10);
   }, []);
@@ -27,6 +29,7 @@ const MemberList: React.FC<indexType> = (props) => {
       setData([]);
     }
   };
+
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
     if (e.target.value) {
@@ -75,7 +78,7 @@ const MemberList: React.FC<indexType> = (props) => {
       </div>
       <div className={cls.tableContent}>
         <ProTable<schema.XTarget>
-          dataSource={data}
+          dataSource={personData ?? data}
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
               console.log(record, selected, selectedRows);
