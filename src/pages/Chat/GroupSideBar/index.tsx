@@ -1,7 +1,7 @@
 import * as imIcon from 'react-icons/im';
 import { Input, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
-import HeadImg from '@/components/headImg/headImg';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import sideStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
@@ -162,7 +162,11 @@ const GroupSideBar: React.FC = () => {
             chatCtrl.isCurrent(child) ? sideStyle.active : ''
           } ${child.isToping ? sideStyle.session_toping : ''}`}
           onContextMenu={(e: any) => handleContextClick(e, child)}>
-          <HeadImg name={child.target.name} label={child.target.label} />
+          <TeamIcon
+            typeName={child.target.name as string}
+            // avatar={item.avatar}
+            size={18}
+          />
           {child.noReadCount > 0 ? (
             <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>
               <span>{child.noReadCount}</span>

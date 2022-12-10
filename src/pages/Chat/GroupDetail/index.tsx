@@ -1,7 +1,7 @@
 import { DownOutlined, RightOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Col, Row, Typography, message } from 'antd';
 import React, { useState } from 'react';
-import HeadImg from '@/components/headImg/headImg';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import detailStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
@@ -79,7 +79,11 @@ const Groupdetail = () => {
   const heads = (
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
-        <HeadImg name={chatCtrl.chat?.target.name} label={''} imgWidth={38} />
+        <TeamIcon
+          typeName={chatCtrl.chat?.target.name as string}
+          // avatar={item.avatar}
+          size={18}
+        />
       </Col>
       <Col span={20}>
         <h4 className={detailStyle.title}>
@@ -104,7 +108,11 @@ const Groupdetail = () => {
       {chatCtrl.chat?.persons.map((item: any) => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
-            <HeadImg name={item.name} label={''} />
+            <TeamIcon
+              typeName={chatCtrl.chat?.target.name as string}
+              // avatar={item.avatar}
+              size={18}
+            />
             <Typography className={detailStyle.img_list_con_name}>{item.name}</Typography>
           </div>
         );
@@ -233,6 +241,7 @@ const Groupdetail = () => {
         title="邀请成员"
         setSelectPerson={setSelectPerson}
       />
+      {/* 移出成员 */}
       <RemoveMember
         title="移出成员"
         open={removeOpen}
