@@ -42,7 +42,7 @@ const ShareRecent = (props: Iprops) => {
           title: item.name,
           item: item,
           isLeaf: item.subTeam.length === 0,
-          icon: getIcon(item.teamName as TargetType),
+          icon: getIcon(item.target.typeName as TargetType),
           children: buildTargetTree(item.subTeam),
         });
       }
@@ -52,10 +52,10 @@ const ShareRecent = (props: Iprops) => {
 
   const getIcon = (type: TargetType) => {
     switch (type) {
-      case TargetType.Working:
-        return <im.ImUsers />;
-      default:
+      case TargetType.Group:
         return <im.ImTree />;
+      default:
+        return <im.ImOffice />;
     }
   };
 
@@ -163,24 +163,20 @@ const ShareRecent = (props: Iprops) => {
           />
         </div>
         <div className={cls.center}>
-          <Input
-            className={cls.centerInput}
-            prefix={<SearchOutlined />}
-            placeholder="搜索"
+          <StoreClassifyTree
+            className={cls.docTree}
+            searchable
+            showIcon
+            checkable={props.multiple}
+            multiple={props.multiple}
+            autoExpandParent={true}
+            onCheck={onCheck}
+            onSelect={(_: any, info: any) => {
+              props.onChecked?.apply(this, [getIdentityItem(info.node.key)]);
+            }}
+            treeData={identitys}
+            checkedKeys={getSelectKeys()}
           />
-          <div id={key} className={cls.centerContent}>
-            <Tree
-              checkable={props.multiple}
-              multiple={props.multiple}
-              autoExpandParent={true}
-              onCheck={onCheck}
-              onSelect={(_, info) => {
-                props.onChecked?.apply(this, [getIdentityItem(info.node.key)]);
-              }}
-              treeData={identitys}
-              checkedKeys={getSelectKeys()}
-            />
-          </div>
         </div>
         {props.multiple ? (
           <div id={key} style={{ width: '33%' }} className={cls.right}>

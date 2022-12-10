@@ -12,8 +12,8 @@ import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
+import CreateTeamModel from '@/bizcomponents/CreateTeam';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
-import EditInfo from './components/EditInfo';
 
 type ShowmodelType =
   | 'addOne'
@@ -183,12 +183,16 @@ const SettingInfo: React.FC = () => {
           current={userCtrl.space}
           onCancel={() => setActiveModal('')}
         />
-        <EditInfo
+        <CreateTeamModel
           title="编辑"
           open={activeModal === 'edit'}
-          editData={info}
-          handleOk={() => setActiveModal('')}
+          current={userCtrl.company}
+          handleOk={() => {
+            setActiveModal('');
+            userCtrl.changCallback();
+          }}
           handleCancel={() => setActiveModal('')}
+          typeNames={[userCtrl.company.target.typeName]}
         />
         {/* 邀请成员*/}
         <Modal
@@ -211,7 +215,7 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts searchFn={setSelectPerson} current={userCtrl.company} />
+          <AssignPosts searchFn={setSelectPerson} />
         </Modal>
       </div>
     </div>

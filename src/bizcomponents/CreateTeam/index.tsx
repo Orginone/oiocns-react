@@ -3,7 +3,7 @@ import { message, Upload, UploadProps, Image, Button, Space } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
-import { TargetModel } from '@/ts/base/model';
+import { FileItemShare, TargetModel } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
 
 interface Iprops {
@@ -20,7 +20,7 @@ interface Iprops {
 const EditCustomModal = (props: Iprops) => {
   const { open, title, handleOk, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const [avatar, setAvatar] = useState<any>({});
+  const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -38,11 +38,7 @@ const EditCustomModal = (props: Iprops) => {
       if (docDir && file) {
         const result = await docsCtrl.upload(docDir.key, file.name, file);
         if (result) {
-          const shareInfo = result.shareInfo();
-          setAvatar({
-            thumbUrl: shareInfo.thumbnail,
-            url: shareInfo.shareLink,
-          });
+          setAvatar(result.shareInfo());
         }
       }
     },
@@ -55,7 +51,11 @@ const EditCustomModal = (props: Iprops) => {
       renderFormItem: () => {
         return (
           <Space>
-            {avatar ? <Image src={avatar.thumbUrl} preview={{ src: avatar.url }} /> : ''}
+            {avatar ? (
+              <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
+            ) : (
+              ''
+            )}
             <Upload {...uploadProps}>
               <Button type="link">上传图标</Button>
             </Upload>
