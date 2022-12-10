@@ -238,7 +238,7 @@ const ShareRecent = (props: Iprops) => {
       }
     }
     setHasSelectRecord({ type: DestTypes[radio - 1].label, list: checkedKeys });
-    // handelCheckedChange(checkedKeys);
+    handelCheckedChange(checkedKeys);
   };
   // 点击删除
   const handelDel = (id: string) => {
@@ -261,67 +261,6 @@ const ShareRecent = (props: Iprops) => {
           return v !== id;
         }),
       );
-    }
-  };
-  // const delContent = (item: any) => {
-  //   if (item.type == 'del') {
-  //     return;
-  //   } else if (item.type == 'add') {
-  //     departData.forEach((el: any, index: number) => {
-  //       if (el.id == item.id) {
-  //         departData.splice(index, 1);
-  //         leftTree.value.setChecked(item.id, false);
-  //       }
-  //     });
-  //   } else {
-  //     departData.forEach((el: any, index: number) => {
-  //       if (el.id == item.id) {
-  //         el.type = 'del';
-  //         leftTree.value.setChecked(el.id, false);
-  //       }
-  //     });
-  //   }
-  // };
-
-  const handleBoxCancelClick = (hisData: any, dataList: any, data: any) => {
-    let result = hisData.some((item: any) => {
-      return item.id == data.id;
-    });
-    dataList.forEach((el: any, index: number) => {
-      if (el.id == data.id) {
-        if (result) {
-          data.type = 'del';
-          el.type = 'del';
-        } else {
-          dataList.splice(index, 1);
-        }
-      }
-    });
-  };
-  const handleBoxClick = (hisData: any, dataList: any, data: any) => {
-    let result = hisData.some((item: any) => {
-      return item.id == data.id;
-    });
-    for (let i = 0; i < dataList.length; i++) {
-      if (dataList[i].id == data.id) {
-        if (data.type == 'add') {
-          return;
-        } else if (data.type == 'has') {
-          return;
-        }
-      }
-    }
-
-    if (result) {
-      data.type = 'has';
-      dataList.forEach((el: any) => {
-        if (el.id == data.id) {
-          el.type = 'has';
-        }
-      });
-    } else {
-      data.type = 'add';
-      dataList.push(data);
     }
   };
 
