@@ -17,7 +17,7 @@ const OrganizationalUnits = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
-  const [searchCallback, setSearchCallback] = useState<XTarget>();
+  const [searchCallback, setSearchCallback] = useState<XTarget[]>();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     userCtrl.setCurSpace(item.id);
@@ -123,9 +123,12 @@ const OrganizationalUnits = () => {
         onOk={async () => {
           // 加入单位
           setShowModal(false);
-          if (searchCallback) {
+          if (searchCallback && searchCallback.length > 0) {
             if (
-              await userCtrl.user.applyJoinCompany(searchCallback.id, TargetType.Company)
+              await userCtrl.user.applyJoinCompany(
+                searchCallback[0].id,
+                TargetType.Company,
+              )
             ) {
               message.success('已申请加入单位成功.');
             }

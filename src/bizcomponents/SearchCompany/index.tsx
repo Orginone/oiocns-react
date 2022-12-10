@@ -21,7 +21,7 @@ type CompanySearchTableProps = {
   [key: string]: any;
   // 需要搜索的类型
   searchType: TargetType;
-  searchCallback: (target: XTarget) => void;
+  searchCallback: (target: XTarget[]) => void;
 };
 
 type PersonInfoCardProps = {
@@ -148,7 +148,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
             // 个人 查询公司 查询人， 公司查询集团
             if (res.total && res.result) {
               setDataSource(res.result);
-              tableProps.searchCallback(res.result[0]);
+              tableProps.searchCallback(res.result);
             } else {
               setDataSource([]);
             }

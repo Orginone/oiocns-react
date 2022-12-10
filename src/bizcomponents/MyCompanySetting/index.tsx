@@ -29,7 +29,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
 
-  const [searchCallback, setSearchCallback] = useState<XTarget>();
+  const [searchCallback, setSearchCallback] = useState<XTarget[]>();
 
   useEffect(() => {
     getTableList();
@@ -61,8 +61,8 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
 
   const handleOk = async () => {
     setIsModalOpen(false);
-    if (searchCallback) {
-      let thisSelectKey = searchCallback.id;
+    if (searchCallback && searchCallback.length > 0) {
+      let thisSelectKey = searchCallback[0].id;
       if (await userCtrl.user.applyJoinCompany(thisSelectKey, TargetType.Company)) {
         message.success('已申请加入单位成功.');
       }

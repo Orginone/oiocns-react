@@ -3,7 +3,7 @@ import { Button, Card, Descriptions, Dropdown, message, Modal } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IProduct } from '@/ts/core';
+import { IProduct, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
@@ -13,7 +13,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import CreateTeamModel from '@/bizcomponents/CreateTeam';
-import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import SearchCompany from '@/bizcomponents/SearchCompany';
 
 type ShowmodelType =
   | 'addOne'
@@ -33,7 +33,7 @@ const SettingInfo: React.FC = () => {
   const [key] = useCtrlUpdate(userCtrl);
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
-  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
+  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
   const info = userCtrl.company.target;
   const menu = [
     { key: 'auth', label: '认证' },
@@ -215,7 +215,31 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} />
+          {/* <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} /> */}
+          <SearchCompany
+            searchCallback={setSelectPerson}
+            searchType={TargetType.Person}
+          />
+        </Modal>
+        {/* 申请加入集团*/}
+        <Modal
+          title="申请加入集团"
+          destroyOnClose
+          open={activeModal === 'joinGroup'}
+          width={600}
+          onCancel={() => setActiveModal('')}
+          onOk={async () => {
+            if (selectPerson && userCtrl.company) {
+              const success = await userCtrl.company.applyJoinGroup(selectPerson[0].id);
+              if (success) {
+                message.success('添加成功');
+                userCtrl.changCallback();
+              } else {
+                message.error('添加失败');
+              }
+            }
+          }}>
+          <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
         </Modal>
       </div>
     </div>
