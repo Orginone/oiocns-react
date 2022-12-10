@@ -1,7 +1,7 @@
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import { Breadcrumb, Modal } from 'antd';
 import React, { useState } from 'react';
-import HeadImg from '@/components/headImg/headImg';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import QrCodeCustom from '@/components/qrCode';
 import headerStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
@@ -57,7 +57,11 @@ const Groupheader = (props: Iprops) => {
     <>
       <div id={key} className={headerStyle.group_header_wrap}>
         <div className={`${headerStyle.user} ${headerStyle.flex}`}>
-          <HeadImg name={chatCtrl.chat?.target.name} label={''} />
+          <TeamIcon
+            typeName={chatCtrl.chat?.target.name as string}
+            // avatar={item.avatar}
+            size={18}
+          />
           <div>
             <div className={`${headerStyle.flex} ${headerStyle.user_info_top}`}>
               <div className={`${headerStyle.user_info_top_name}`}>

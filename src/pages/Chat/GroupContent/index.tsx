@@ -3,7 +3,7 @@ import { Button, Popover, Image, Spin } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import HeadImg from '@/components/headImg/headImg';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import css from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
@@ -173,10 +173,10 @@ const GroupContent = (props: Iprops) => {
                             e.stopPropagation();
                             setSelectId(item.id);
                           }}>
-                          <HeadImg
-                            name={chatCtrl.getName(item.fromId)}
-                            label={''}
-                            isSquare={false}
+                          <TeamIcon
+                            typeName={chatCtrl.getName(item.fromId)}
+                            // avatar={item.avatar}
+                            size={18}
                           />
                           <div className={`${css.con_content}`}>{viewMsg(item)}</div>
                         </div>
@@ -241,9 +241,10 @@ const GroupContent = (props: Iprops) => {
                               setSelectId(item.id);
                             }}>
                             <div className={`${css.con_content}`}>{viewMsg(item)}</div>
-                            <HeadImg
-                              name={chatCtrl.getName(item.fromId)}
-                              isSquare={false}
+                            <TeamIcon
+                              typeName={chatCtrl.getName(item.fromId)}
+                              // avatar={item.avatar}
+                              size={18}
                             />
                           </div>
                         )}

@@ -115,7 +115,6 @@ const SettingFlow: React.FC = () => {
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
-      console.log('result', result);
       setBindAppMes(result[0]);
     }
   };
