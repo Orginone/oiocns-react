@@ -17,8 +17,8 @@ export type SpaceType = {
   name: string;
   /** 类型 */
   typeName: TargetType;
-  /** 图标 */
-  icon?: string;
+  /** 头像 */
+  avatar?: FileItemShare;
 };
 export interface ITarget {
   /** 唯一标识 */
@@ -29,6 +29,8 @@ export interface ITarget {
   teamName: string;
   /** 实体对象 */
   target: schema.XTarget;
+  /** 类型 */
+  typeName: TargetType;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 拥有的身份 */

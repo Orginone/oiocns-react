@@ -9,17 +9,17 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
-import { TargetType } from '@/ts/core';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 type CreateGroupPropsType = {
-  key: string;
+  id: string;
   current: ITarget | undefined;
   setCurrent: (current: ITarget) => void;
   handleMenuClick: (key: string, item: ITarget | undefined) => void;
 };
 
 const DepartTree: React.FC<CreateGroupPropsType> = ({
-  key,
+  id,
   handleMenuClick,
   setCurrent,
   current,
@@ -70,26 +70,11 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
         item: item,
         isLeaf: item.subTeam.length === 0,
         menus: loadMenus(item),
-        icon: getIcon(item.teamName as TargetType),
+        icon: <TeamIcon typeName={item.target.typeName} avatar={item.avatar} />,
         children: buildTargetTree(item.subTeam),
       });
     }
     return result;
-  };
-
-  const getIcon = (type: TargetType) => {
-    switch (type) {
-      case TargetType.Department:
-        return <im.ImLibrary />;
-      case TargetType.Laboratory:
-        return <im.ImBriefcase />;
-      case TargetType.Office:
-        return <im.ImBriefcase />;
-      case TargetType.Working:
-        return <im.ImUsers />;
-      default:
-        return <im.ImLibrary />;
-    }
   };
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
@@ -104,7 +89,7 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   // const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
-      <div id={key} className={cls.topMes}>
+      <div id={id} className={cls.topMes}>
         <Button
           className={cls.creatgroup}
           icon={<PlusOutlined className={cls.addIcon} />}

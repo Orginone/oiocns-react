@@ -59,6 +59,13 @@ const EditCustomModal = (props: Iprops) => {
             <Upload {...uploadProps}>
               <Button type="link">上传图标</Button>
             </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除图标
+              </Button>
+            ) : (
+              ''
+            )}
           </Space>
         );
       },

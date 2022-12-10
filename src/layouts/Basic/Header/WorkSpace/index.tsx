@@ -1,15 +1,5 @@
 import { CaretDownOutlined } from '@ant-design/icons';
-import {
-  Avatar,
-  Button,
-  Col,
-  Divider,
-  Modal,
-  Row,
-  Space,
-  Typography,
-  message,
-} from 'antd';
+import { Button, Col, Divider, Modal, Row, Space, Typography, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
@@ -17,6 +7,7 @@ import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits = () => {
@@ -54,9 +45,7 @@ const OrganizationalUnits = () => {
   const loadItem = (data: SpaceType) => {
     return (
       <Space>
-        <Avatar src={data?.icon} className={styles.avatar} size={32}>
-          {data?.name?.substring(0, 1)}
-        </Avatar>
+        <TeamIcon typeName={data.typeName} avatar={data.avatar} size={26} />
         <Typography.Text className={styles['space-list']}>{data?.name}</Typography.Text>
       </Space>
     );

@@ -9,6 +9,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 type CreateGroupPropsType = {
   key: string;
@@ -70,7 +71,7 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
           item: item,
           isLeaf: item.subTeam.length === 0,
           menus: loadMenus(item),
-          icon: <im.ImTree />,
+          icon: <TeamIcon avatar={item.avatar} typeName={item.typeName} />,
           children: buildTargetTree(item.subTeam),
         });
       }
