@@ -61,29 +61,35 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     };
   }, []);
 
+  const getLinkItem = (item: any) => {
+    return (
+      <Link
+        key={item.path}
+        to={item.path}
+        title={item.title}
+        className={`${
+          location.hash.startsWith('#' + item.fath)
+            ? `${cls['active-icon']}`
+            : `${cls['un-active-icon']}`
+        }`}>
+        {typeof item.icon !== 'string' ? item.icon : <IconFont type={item.icon} />}
+      </Link>
+    );
+  };
+
   return (
     <div className={cls['header-nav-container']}>
       <Space size={30}>
         {navs.map((item) => {
-          return (
-            <Badge key={item.key} count={item.count} size="small">
-              <Link
-                key={item.path}
-                to={item.path}
-                title={item.title}
-                className={`${
-                  location.hash.startsWith('#' + item.fath)
-                    ? `${cls['active-icon']}`
-                    : `${cls['un-active-icon']}`
-                }`}>
-                {typeof item.icon !== 'string' ? (
-                  item.icon
-                ) : (
-                  <IconFont type={item.icon} />
-                )}
-              </Link>
-            </Badge>
-          );
+          if (item.count > 0) {
+            return (
+              <Badge key={item.key} count={item.count} size="small">
+                getLinkItem(item)
+              </Badge>
+            );
+          } else {
+            return getLinkItem(item);
+          }
         })}
       </Space>
     </div>

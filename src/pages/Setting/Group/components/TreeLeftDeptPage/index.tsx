@@ -9,7 +9,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
-import { TargetType } from '@/ts/core';
 
 type CreateGroupPropsType = {
   key: string;
@@ -71,21 +70,12 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
           item: item,
           isLeaf: item.subTeam.length === 0,
           menus: loadMenus(item),
-          icon: getIcon(item.teamName as TargetType),
+          icon: <im.ImTree />,
           children: buildTargetTree(item.subTeam),
         });
       }
     }
     return result;
-  };
-
-  const getIcon = (type: TargetType) => {
-    switch (type) {
-      case TargetType.Working:
-        return <im.ImUsers />;
-      default:
-        return <im.ImTree />;
-    }
   };
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {

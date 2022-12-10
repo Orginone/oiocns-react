@@ -1,7 +1,6 @@
 import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
 import { Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
-import type { DataNode } from 'antd/es/tree';
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
 
 interface TreeType {
@@ -24,24 +23,8 @@ interface TreeType {
   };
   [key: string]: any; // 其他属性方法
 }
-const { DirectoryTree } = Tree;
-// const getParentKey = (key: React.Key, tree: DataNode[]): React.Key => {
-//   console.log('获取父级key', key!);
-//   let parentKey: React.Key;
-//   for (let i = 0; i < tree.length; i++) {
-//     const node = tree[i];
-//     if (node[fieldNames.children]) {
-//       if (node[fieldNames.children].some((item) => item.key === key)) {
-//         parentKey = node.key;
-//       } else if (getParentKey(key, node[fieldNames.children])) {
-//         parentKey = getParentKey(key, node[fieldNames.children]);
-//       }
-//     }
-//   }
-//   console.log('获取父级', parentKey!);
 
-//   return parentKey!;
-// };
+const { DirectoryTree } = Tree;
 const StoreClassifyTree: React.FC<TreeType> = ({
   isDirectoryTree = false,
   title,
@@ -60,9 +43,39 @@ const StoreClassifyTree: React.FC<TreeType> = ({
 }) => {
   const [mouseOverItem, setMouseOverItem] = useState<any>({});
   const [searchValue, setSearchValue] = useState<string>('');
-  // const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  // const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [visibleMenu, setVisibleMenu] = useState(false);
+  const [visibleData, setVisibleData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (searchValue && searchValue.length > 0) {
+      setVisibleData(loopFilterTree(treeData, searchValue));
+    } else {
+      setVisibleData(treeData);
+    }
+  }, [treeData, searchValue]);
+
+  const loopFilterTree = (data: any[], filter: string) => {
+    const result: any[] = [];
+    for (const item of data) {
+      const newItem = { ...item };
+      let exsit = false;
+      const title: string = newItem[fieldNames['title']];
+      if (title) {
+        exsit = title.includes(filter);
+      }
+      const children: any[] = item[fieldNames['children']];
+      if (children && Array.isArray(children)) {
+        const result = loopFilterTree(children, filter);
+        exsit = exsit || result.length > 0;
+        newItem[fieldNames['children']] = result;
+      }
+      if (exsit) {
+        result.push(newItem);
+      }
+    }
+    return result;
+  };
+
   // 树形控件 更多操作
   const renderMenu: (data: any) => MenuProps['items'] = (data) => {
     if (menu === 'menus') {
@@ -91,54 +104,8 @@ const StoreClassifyTree: React.FC<TreeType> = ({
    */
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    const newExpandedKeys = resetTreeData.map((item: any) => {
-      if (item[fieldNames.title].indexOf(value) > 0) {
-        // return getParentKey(item.key, treeData);
-      }
-      return null;
-    });
-    // .filter(
-    //   (item: any, i: any, self: string | any[]) => item && self.indexOf(item) === i,
-    // );
-    // 自动展示匹配项
-    console.log('newExpandedKeys', newExpandedKeys);
-
-    // setExpandedKeys(newExpandedKeys as React.Key[]);
     setSearchValue(value);
-    // setAutoExpandParent(true);
   };
-  const resetTreeData = useMemo(() => {
-    const loop = (data: DataNode[]): DataNode[] =>
-      data?.map((item) => {
-        const strTitle = item[fieldNames.title] || '';
-        const index = strTitle.indexOf(searchValue);
-        const beforeStr = strTitle.substring(0, index);
-        const afterStr = strTitle.slice(index + searchValue.length);
-        const searchTitle =
-          index > -1 ? (
-            <span>
-              {beforeStr}
-              <span style={{ color: 'red' }}>{searchValue}</span>
-              {afterStr}
-            </span>
-          ) : (
-            ''
-          );
-        if (item[fieldNames.children]) {
-          return {
-            ...item,
-            searchTitle,
-            [fieldNames.children]: loop(item[fieldNames.children]),
-          };
-        }
-
-        return {
-          ...item,
-        };
-      });
-
-    return loop(treeData);
-  }, [searchValue, treeData]);
 
   const renderTreeTitle = (node: any) => {
     return (
@@ -215,7 +182,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {searchable && (
         <div className={cls.title}>
-          <Input prefix={<SearchOutlined />} onChange={onChange} placeholder="搜索分类" />
+          <Input prefix={<SearchOutlined />} onChange={onChange} placeholder="搜索内容" />
         </div>
       )}
       {isDirectoryTree ? (
@@ -225,7 +192,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           onRightClick={() => {
             setVisibleMenu(true);
           }}
-          treeData={treeData}
+          treeData={visibleData}
           {...rest}
         />
       ) : (
@@ -235,7 +202,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           onRightClick={() => {
             setVisibleMenu(true);
           }}
-          treeData={resetTreeData}
+          treeData={visibleData}
           {...rest}
         />
       )}
