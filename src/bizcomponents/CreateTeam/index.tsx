@@ -143,6 +143,7 @@ const EditCustomModal = (props: Iprops) => {
           }
         } else {
           formRef.current?.resetFields();
+          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           setAvatar(undefined);
           handleCancel();
         }

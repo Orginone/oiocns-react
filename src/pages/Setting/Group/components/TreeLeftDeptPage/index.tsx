@@ -12,14 +12,12 @@ import ReactDOM from 'react-dom';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 type CreateGroupPropsType = {
-  key: string;
   current: ITarget | undefined;
   setCurrent: (current: ITarget) => void;
   handleMenuClick: (key: string, item: ITarget | undefined) => void;
 };
 
 const GroupTree: React.FC<CreateGroupPropsType> = ({
-  key,
   handleMenuClick,
   setCurrent,
   current,
@@ -91,14 +89,14 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
   // const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
-      <div id={key} className={cls.topMes}>
+      <div className={cls.topMes}>
         <Button
           className={cls.creatgroup}
           icon={<PlusOutlined className={cls.addIcon} />}
           type="text"
           onClick={() => {
-            const key = '新建|集团';
-            handleMenuClick(key, undefined);
+            const id = '新建|集团';
+            handleMenuClick(id, undefined);
           }}
         />
         <StoreClassifyTree
@@ -111,7 +109,7 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
           treeData={data}
           selectedKeys={[current?.id]}
           onSelect={onSelect}
-          handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
+          handleMenuClick={(id, node) => handleMenuClick(id, node.item)}
         />
       </div>,
       treeContainer,

@@ -109,7 +109,7 @@ const SettingInfo: React.FC = () => {
   };
 
   return (
-    <div id={key} className={cls.companyContainer}>
+    <div key={key} className={cls.companyContainer}>
       <Card bordered={false} className={cls['company-info-content']}>
         <Descriptions
           title={'当前单位'}
