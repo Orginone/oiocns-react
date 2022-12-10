@@ -27,9 +27,6 @@ export default class Person extends MarketTarget implements IPerson {
 
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
   }
-  public get subTeam(): ITarget[] {
-    return [];
-  }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);
     return [];

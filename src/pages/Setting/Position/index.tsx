@@ -238,7 +238,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         }}
         onCancel={() => setIsAddOpen(false)}
         width="1050px">
-        <IndentityManage onCheckeds={onCheckeds} />
+        <IndentityManage multiple={true} onCheckeds={onCheckeds} />
       </Modal>
       <Modal
         title="指派岗位"
