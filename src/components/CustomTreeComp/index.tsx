@@ -18,7 +18,7 @@ interface TreeType {
   className?: any; // 树的css
   fieldNames?: {
     title: string;
-    key: string | ((_record: any) => string);
+    key: string;
     children: string;
   };
   [key: string]: any; // 其他属性方法
@@ -45,7 +45,6 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   const [searchValue, setSearchValue] = useState<string>('');
   const [visibleMenu, setVisibleMenu] = useState(false);
   const [visibleData, setVisibleData] = useState<any[]>([]);
-
   useEffect(() => {
     if (searchValue && searchValue.length > 0) {
       setVisibleData(loopFilterTree(treeData, searchValue));
@@ -192,6 +191,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
           onRightClick={() => {
             setVisibleMenu(true);
           }}
+          fieldNames={fieldNames}
           treeData={visibleData}
           {...rest}
         />
@@ -199,6 +199,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         <Tree
           className={className}
           titleRender={menu ? renderTreeTitle : undefined}
+          fieldNames={fieldNames}
           onRightClick={() => {
             setVisibleMenu(true);
           }}
