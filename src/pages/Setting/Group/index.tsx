@@ -251,20 +251,13 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             open={activeModal === 'addOne'}
             onCancel={() => setActiveModal('')}
             onOk={async () => {
-              // 判断是一级集团还是二级集团
-              if (isTopGroup) {
-                if (current && selectPerson && selectPerson.length > 0) {
-                  if (await current.pullMember(selectPerson[0])) {
-                    message.success('添加成功');
-                    handleOk();
-                  }
-                }
-              } else {
-                if (getTopGroup && selectPerson && selectPerson.length > 0) {
-                  if (await current.pullMember(selectPerson[0])) {
-                    message.success('添加成功');
-                    handleOk();
-                  }
+              if (selectPerson && selectPerson.length > 0) {
+                const ids = selectPerson.map((e) => {
+                  return e.id;
+                });
+                if (await current.pullMembers(ids, TargetType.Person)) {
+                  message.success('添加成功');
+                  handleOk();
                 }
               }
             }}>
