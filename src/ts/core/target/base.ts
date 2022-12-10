@@ -8,7 +8,7 @@ import { ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
-import { TargetModel } from '@/ts/base/model';
+import { FileItemShare, TargetModel } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
@@ -33,6 +33,13 @@ export default class BaseTarget implements ITarget {
 
   public get subTeam(): ITarget[] {
     return [];
+  }
+
+  public get avatar(): FileItemShare | undefined {
+    if (this.target.avatar) {
+      return JSON.parse(this.target.avatar);
+    }
+    return undefined;
   }
 
   constructor(target: schema.XTarget) {

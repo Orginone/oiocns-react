@@ -1,9 +1,10 @@
 import { TargetModel } from './../../base/model';
 import BaseTarget from '@/ts/core/target/base';
-import { TargetType } from '../enum';
+import { departmentTypes, TargetType } from '../enum';
 import { schema } from '../../base';
 import { IDepartment, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
+import { logger } from '@/ts/base/common';
 
 /**
  * 部门的元操作
@@ -20,8 +21,8 @@ export default class Department extends BaseTarget implements IDepartment {
     this.workings = [];
     this.departments = [];
     this._onDeleted = onDeleted;
-    this.subTeamTypes = [TargetType.Department, TargetType.Working];
-    this.createTargetType = [TargetType.Department, TargetType.Working];
+    this.subTeamTypes = [...departmentTypes, TargetType.Working];
+    this.createTargetType = [...departmentTypes, TargetType.Working];
   }
   public get subTeam(): ITarget[] {
     return [...this.departments, ...this.workings];
@@ -34,6 +35,9 @@ export default class Department extends BaseTarget implements IDepartment {
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
+      case TargetType.Office:
+      case TargetType.Section:
+      case TargetType.Laboratory:
       case TargetType.Department:
         return this.createDepartment(data);
       case TargetType.Working:
@@ -53,7 +57,7 @@ export default class Department extends BaseTarget implements IDepartment {
     if (!reload && this.departments.length > 0) {
       return this.departments;
     }
-    const res = await super.getSubTargets([TargetType.Department]);
+    const res = await super.getSubTargets(departmentTypes);
     if (res.success && res.data.result) {
       this.departments = res.data.result.map((a) => {
         return new Department(a, () => {
@@ -85,6 +89,10 @@ export default class Department extends BaseTarget implements IDepartment {
   public async createDepartment(data: TargetParam): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
+    if (!departmentTypes.indexOf(data.typeName as TargetType)) {
+      logger.warn('不支持该机构');
+      return;
+    }
     const res = await super.createSubTarget({ ...data, belongId: this.target.belongId });
     if (res.success) {
       const department = new Department(res.data, () => {

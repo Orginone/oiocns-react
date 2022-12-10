@@ -1,7 +1,7 @@
 import Group from './group';
 import consts from '../consts';
 import MarketTarget from './mbase';
-import { companyTypes, TargetType } from '../enum';
+import { companyTypes, departmentTypes, TargetType } from '../enum';
 import { TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
@@ -35,14 +35,14 @@ export default class Company extends MarketTarget implements ICompany {
 
     this.departments = [];
     this.joinedGroup = [];
-    this.subTeamTypes = [TargetType.Department, TargetType.Working];
-    this.extendTargetType = [TargetType.Department, TargetType.Working, ...companyTypes];
+    this.subTeamTypes = [...departmentTypes, TargetType.Working];
+    this.extendTargetType = [...departmentTypes, TargetType.Working, ...companyTypes];
     this.joinTargetType = [TargetType.Group, TargetType.Cohort];
     this.createTargetType = [
-      TargetType.Department,
       TargetType.Working,
       TargetType.Group,
       TargetType.Cohort,
+      ...departmentTypes,
     ];
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
@@ -74,6 +74,9 @@ export default class Company extends MarketTarget implements ICompany {
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
+      case TargetType.Office:
+      case TargetType.Section:
+      case TargetType.Laboratory:
       case TargetType.Department:
         return this.createDepartment(data);
       case TargetType.Working:
@@ -131,7 +134,7 @@ export default class Company extends MarketTarget implements ICompany {
     return {
       id: this.target.id,
       name: this.target.team!.name,
-      icon: this.target.avatar,
+      icon: this.avatar?.thumbnail,
       typeName: this.target.typeName as TargetType,
     };
   }
@@ -158,7 +161,10 @@ export default class Company extends MarketTarget implements ICompany {
   ): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    data.typeName = TargetType.Department;
+    if (!departmentTypes.indexOf(data.typeName as TargetType)) {
+      logger.warn('不支持该机构');
+      return;
+    }
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       const department = new Department(res.data, () => {
@@ -192,7 +198,11 @@ export default class Company extends MarketTarget implements ICompany {
       return department.target.id == id;
     });
     if (department != undefined) {
-      let res = await this.deleteSubTarget(id, TargetType.Department, this.target.id);
+      let res = await this.deleteSubTarget(
+        id,
+        department.target.typeName,
+        this.target.id,
+      );
       if (res.success) {
         this.departments = this.departments.filter((department) => {
           return department.target.id != id;
@@ -264,7 +274,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (!reload && this.departments.length > 0) {
       return this.departments;
     }
-    const res = await this.getSubTargets([TargetType.Department]);
+    const res = await this.getSubTargets(departmentTypes);
     if (res.success && res.data.result) {
       this.departments = res.data.result.map((a) => {
         return new Department(a, () => {
