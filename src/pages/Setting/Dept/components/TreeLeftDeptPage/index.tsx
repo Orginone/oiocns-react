@@ -81,10 +81,14 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
 
   const getIcon = (type: TargetType) => {
     switch (type) {
+      case TargetType.Department:
+        return <im.ImLibrary />;
+      case TargetType.Office:
+        return <im.ImBriefcase />;
       case TargetType.Working:
         return <im.ImUsers />;
       default:
-        return <im.ImTree />;
+        return <im.ImLibrary />;
     }
   };
 
