@@ -1,4 +1,4 @@
-import { Card, Modal } from 'antd';
+import { Card, message, Modal } from 'antd';
 import React, { useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
@@ -171,13 +171,14 @@ const StoreApp: React.FC = () => {
         destroyOnClose={true}
         open={showShareModal}
         okText="确定"
-        onOk={() => {
+        onOk={async () => {
           if (appCtrl.curProduct) {
-            appCtrl.curProduct.createExtend(
+            const success = await appCtrl.curProduct.createExtend(
               checkNodes.teamId,
-              checkNodes.checkedValus,
+              checkNodes.checkedValues,
               checkNodes.type,
             );
+            success && message.success('分享成功');
             setShowShareModal(false);
           }
         }}
