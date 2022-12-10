@@ -35,6 +35,7 @@ interface PageType<T> {
     limit: number;
     total: number;
   }>;
+
   [key: string]: any; // 其他属性方法
 }
 
@@ -133,8 +134,10 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           const {
             current: pageIndex = 1,
             pageSize = 10,
-            filter = '', // eslint-disable-next-line no-unused-vars
-            tableid, // eslint-disable-next-line no-unused-vars
+            filter = '',
+            // eslint-disable-next-line no-unused-vars
+            tableid,
+            // eslint-disable-next-line no-unused-vars
             keyword,
             ...other
           } = params;
@@ -144,6 +147,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
+            console.log(other ? { ...other, page } : page);
             const res = await request(other ? { ...other, ...page } : page);
             return {
               total: res.total || 0,

@@ -5,6 +5,7 @@ import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
   open: boolean;
@@ -110,10 +111,7 @@ const UserInfoEditModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          setAvatar(undefined);
-          if (userCtrl.user.target.avatar) {
-            setAvatar(JSON.parse(userCtrl.user.target.avatar));
-          }
+          setAvatar(parseAvatar(userCtrl.user.target.avatar));
           formRef.current?.setFieldsValue({
             ...userCtrl.user.target,
             teamName: userCtrl.user.target.team?.name,

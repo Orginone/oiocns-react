@@ -115,7 +115,6 @@ const SettingFlow: React.FC = () => {
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
-      console.log('result', result);
       setBindAppMes(result[0]);
     }
   };
@@ -216,7 +215,7 @@ const SettingFlow: React.FC = () => {
 
   return (
     <div className={cls['company-top-content']}>
-      <Card>流程设置</Card>
+      {/* <Card>流程设置</Card> */}
       {tabType === TabType.TABLEMES ? (
         <div>
           <Card bordered={false}>

@@ -1,16 +1,19 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin } from 'antd';
+import { Button, Popover, Image, Spin, Typography } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import HeadImg from '@/components/headImg/headImg';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import css from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
 import { XImMsg } from '@/ts/base/schema';
-import { MessageType } from '@/ts/core/enum';
+import { MessageType, TargetType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { IChat } from '@/ts/core';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { parseAvatar } from '@/ts/base';
 
 /**
  * @description: 聊天区域
@@ -66,11 +69,11 @@ const GroupContent = (props: Iprops) => {
    * 显示消息
    * @param msg 消息
    */
-  const viewMsg = (item: XImMsg) => {
+  const parseMsg = (item: XImMsg) => {
     switch (item.msgType) {
       case MessageType.Image:
         // eslint-disable-next-line no-case-declarations
-        const img: FileItemShare = JSON.parse(item.showTxt);
+        const img: FileItemShare = parseAvatar(item.showTxt);
         return (
           <>
             <div className={`${css.con_content_link}`}></div>
@@ -88,6 +91,49 @@ const GroupContent = (props: Iprops) => {
               dangerouslySetInnerHTML={{ __html: item.showTxt }}></div>
           </>
         );
+    }
+  };
+
+  const viewMsg = (item: XImMsg, right: boolean = false) => {
+    if (right) {
+      return (
+        <>
+          <div className={`${css.con_content}`}>{parseMsg(item)}</div>
+          <div style={{ fontSize: 28, color: '#888', paddingLeft: 10 }}>
+            <TeamIcon
+              preview
+              typeName={userCtrl.user.typeName}
+              avatar={userCtrl.user.avatar}
+              size={36}
+            />
+          </div>
+        </>
+      );
+    } else {
+      let name = '';
+      let avatar = undefined;
+      if (chatCtrl.chat!.target.typeName === TargetType.Person) {
+        name = chatCtrl.chat!.target.name;
+        avatar = chatCtrl.chat!.avatar;
+      } else {
+        for (const iterator of chatCtrl.chat!.persons) {
+          if (iterator.id === item.fromId) {
+            name = iterator.name;
+            avatar = parseAvatar(iterator.avatar);
+          }
+        }
+      }
+      return (
+        <>
+          <div style={{ fontSize: 28, color: '#888', paddingRight: 10 }}>
+            <TeamIcon preview typeName={TargetType.Person} avatar={avatar} size={36} />
+          </div>
+          <div className={`${css.con_content}`}>
+            <div className={`${css.name}`}>{name}</div>
+            {parseMsg(item)}
+          </div>
+        </>
+      );
     }
   };
 
@@ -173,12 +219,7 @@ const GroupContent = (props: Iprops) => {
                             e.stopPropagation();
                             setSelectId(item.id);
                           }}>
-                          <HeadImg
-                            name={chatCtrl.getName(item.fromId)}
-                            label={''}
-                            isSquare={false}
-                          />
-                          <div className={`${css.con_content}`}>{viewMsg(item)}</div>
+                          {viewMsg(item)}
                         </div>
                       )}
                     </Popover>
@@ -240,11 +281,7 @@ const GroupContent = (props: Iprops) => {
                               e.stopPropagation();
                               setSelectId(item.id);
                             }}>
-                            <div className={`${css.con_content}`}>{viewMsg(item)}</div>
-                            <HeadImg
-                              name={chatCtrl.getName(item.fromId)}
-                              isSquare={false}
-                            />
+                            {viewMsg(item, true)}
                           </div>
                         )}
                       </Popover>
