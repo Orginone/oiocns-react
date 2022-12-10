@@ -85,7 +85,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       );
     }
     if (cohortData.target.belongId == userCtrl.user.target.id) {
-      action.push(<a key="list-loadmore-more">身份管理</a>);
+      // action.push(<a key="list-loadmore-more">身份管理</a>);
       action.push(
         <a
           key="list-loadmore-more"
@@ -214,7 +214,13 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
                   {(item: schema.XTarget) => (
                     <List.Item key={item.id} actions={getAction(item)!}>
                       <List.Item.Meta
-                        avatar={<Avatar src={'https://joeschmoe.io/api/v1/random'} />}
+                        avatar={
+                          <Avatar
+                            src={
+                              'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg'
+                            }
+                          />
+                        }
                         title={getTitle(item)!}
                         description={item.team?.remark}
                       />

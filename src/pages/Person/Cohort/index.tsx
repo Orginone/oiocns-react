@@ -9,7 +9,7 @@ import { updateColumn } from './column/index';
 import cls from './index.module.less';
 import UpdateCohort from './UpdateCohort';
 import Persons from '../../../bizcomponents/SearchPerson/index';
-import AddCohort from '../../../bizcomponents/SearchCohort/index';
+import AddCohort from './SearchCohort/index';
 import { useHistory } from 'react-router-dom';
 import ChangeCohort from './SearchCohortPerson/index';
 import CreateCohort from './CreateCohort/index';
@@ -222,7 +222,6 @@ const CohortConfig: React.FC = () => {
           className="card"
           data={item}
           key={item.target.id}
-          onClick={() => console.log('按钮测试')}
           operation={operaiton}
         />
       );

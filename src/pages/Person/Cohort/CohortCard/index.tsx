@@ -1,4 +1,4 @@
-import { EllipsisOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
@@ -8,16 +8,10 @@ import { common } from 'typings/common';
 interface CohortCardType {
   data: ICohort;
   className?: string;
-  onClick?: (event?: any) => void;
   operation?: (_item: ICohort) => common.OperationType[];
 }
 
-const CohortCardComp: React.FC<CohortCardType> = ({
-  className,
-  data,
-  onClick,
-  operation,
-}) => {
+const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [name, setName] = useState('');
 
@@ -40,9 +34,17 @@ const CohortCardComp: React.FC<CohortCardType> = ({
 
   const Title = () => {
     return (
-      <div className="card-title flex" onClick={onClick}>
+      <div
+        className="card-title flex"
+        onClick={() => {
+          setIsModalOpen(true);
+        }}>
         <div className="card-title-left">
-          <Avatar src="https://joeschmoe.io/api/v1/random" size={60} />
+          <Avatar
+            src="https://gw.alipayobjects.com/zos/rmsportal/kZzEzemZyKLKFsojXItE.png"
+            // icon={<TeamOutlined />}
+            size={60}
+          />
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.target.name || '--'}</span>
@@ -50,12 +52,14 @@ const CohortCardComp: React.FC<CohortCardType> = ({
             <span className="app-size">{data.target.team?.remark || '--'}</span>
           </div>
         </div>
-        <Dropdown
-          className="card-title-extra"
-          menu={{ items: operation && operation(data) }}
-          placement="bottom">
-          <EllipsisOutlined rotate={90} />
-        </Dropdown>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Dropdown
+            className="card-title-extra"
+            menu={{ items: operation && operation(data) }}
+            placement="bottom">
+            <EllipsisOutlined rotate={90} />
+          </Dropdown>
+        </div>
       </div>
     );
   };
