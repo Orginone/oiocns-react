@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget } from '@/ts/core';
+import { IGroup, ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -17,6 +17,7 @@ import cls from './index.module.less';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import SearchCompany from '@/bizcomponents/SearchCompany';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
@@ -31,7 +32,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增集团模态框标题
-  const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
+  const [selectPerson, setSelectPerson] = useState<XTarget[]>([]); // 选中的要拉的人
   const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
     setCurrent(undefined);
   });
@@ -92,7 +93,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       }
     }
   };
-
   const handleOk = () => {
     setActiveModal('');
     forceUpdate();
@@ -202,14 +202,18 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             open={activeModal === 'addOne'}
             onCancel={() => setActiveModal('')}
             onOk={async () => {
-              if (selectPerson) {
-                if (await current.pullMember(selectPerson)) {
+              // 判断是一级集团还是二级集团
+              if (current && selectPerson && selectPerson.length > 0) {
+                if (await current.pullMember(selectPerson[0])) {
                   message.success('添加成功');
                   handleOk();
                 }
               }
             }}>
-            <SearchPerson searchCallback={setSelectPerson} />
+            <SearchCompany
+              searchCallback={setSelectPerson}
+              searchType={TargetType.Company}
+            />
           </Modal>
           {/* 变更集团 */}
           <TransferDepartment
