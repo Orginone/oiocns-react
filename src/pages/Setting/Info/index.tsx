@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Card, Descriptions, Dropdown, message, Modal } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IProduct, TargetType } from '@/ts/core';
+import { IGroup, IProduct, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
-import { ApplicationColumns, PersonColumns } from './config';
+import { CompanyColumn, PersonColumns } from './config';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -34,7 +34,16 @@ const SettingInfo: React.FC = () => {
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
+  const [dataSource, setDataSource] = useState<IGroup[]>([]); // 加入的集团
   const info = userCtrl.company.target;
+
+  useEffect(() => {
+    userCtrl.company.getJoinedGroups(true).then((e) => {
+      setDataSource(e);
+      console.log(e);
+    });
+  }, [key]);
+
   const menu = [
     { key: 'auth', label: '认证' },
     {
@@ -166,13 +175,14 @@ const SettingInfo: React.FC = () => {
                 showChangeBtn={false}
               />
             ) : (
-              <CardOrTable<IProduct>
-                key="product"
-                dataSource={[]}
-                total={0}
+              <CardOrTable<IGroup>
+                key="groups"
                 rowKey={'id'}
+                pagination={false}
+                defaultExpandAllRows={true}
+                dataSource={dataSource}
                 hideOperation={true}
-                columns={ApplicationColumns}
+                columns={CompanyColumn}
                 showChangeBtn={false}
               />
             )}
@@ -208,6 +218,7 @@ const SettingInfo: React.FC = () => {
                 selectPerson[0].typeName,
               );
               if (success) {
+                setActiveModal('');
                 message.success('添加成功');
                 userCtrl.changCallback();
               } else {
@@ -234,6 +245,7 @@ const SettingInfo: React.FC = () => {
               if (success) {
                 message.success('添加成功');
                 userCtrl.changCallback();
+                setActiveModal('');
               } else {
                 message.error('添加失败');
               }
