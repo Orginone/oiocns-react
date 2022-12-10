@@ -2,8 +2,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
-import React, { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import PersonInfoDepartment from './Department';
 import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
@@ -18,11 +17,6 @@ const PersonInfo: React.FC = () => {
   const user = userCtrl.user;
   const [showDepartment, setShowDepartment] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-
-  useEffect(() => {
-    // 用户修改的时候 ，处理代码 头像
-  }, ['', userCtrl.user]);
-
   // 信息标题
   const title = (
     <div className={cls['person-info-title']}>
@@ -30,7 +24,7 @@ const PersonInfo: React.FC = () => {
         <Title level={4}>
           <strong>当前用户</strong>
         </Title>
-        <Avatar size={48} icon={<UserOutlined />} />
+        <Avatar size={48} src={userCtrl.user.avatar?.thumbnail || <UserOutlined />} />
       </div>
       <div>
         <Button type="link" onClick={() => setShowEditModal(true)}>
@@ -81,8 +75,7 @@ const PersonInfo: React.FC = () => {
         title={'修改信息'}
         handleCancel={() => setShowEditModal(false)}
         handleOk={() => setShowEditModal(false)}
-        editData={userCtrl.user.target}
-        reObject={userCtrl.user}
+        current={userCtrl.user}
       />
     </div>
   );

@@ -151,7 +151,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             title={
               <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
             }
-            selectDept={current.target}
+            selectDept={current}
             extra={[
               <Button
                 key="edit"

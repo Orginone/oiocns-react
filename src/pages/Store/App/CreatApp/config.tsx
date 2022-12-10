@@ -4,6 +4,7 @@ import cls from './index.module.less';
 import React from 'react';
 import { Space } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import { ProductType } from '@/ts/core';
 
 type Resources = {
   name: string;
@@ -49,16 +50,6 @@ const valueEnum = {
     status: 'Processing',
   },
 };
-const valueEnumType = {
-  1: { text: '枚举' },
-  2: {
-    text: '字符串',
-    status: 'Error',
-  },
-  3: {
-    text: '数字',
-  },
-};
 
 type DataItem = {
   name: string;
@@ -90,24 +81,23 @@ const baseColumns: ProFormColumnsType<DataItem> = {
       title: '应用名称',
       dataIndex: 'name',
       formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: '此项为必填项',
-          },
-        ],
+        rules: [{ required: true, message: '此项为必填项' }],
       },
       width: 'md',
     },
     {
       title: '应用编码',
       dataIndex: 'code',
-      // width: 'md',
       colProps: { span: 12 },
+      formItemProps: {
+        rules: [{ required: true, message: '此项为必填项' }],
+      },
     },
     {
       title: '应用类型',
       dataIndex: 'typeName',
+      valueType: 'select',
+      valueEnum: ProductType,
       colProps: { span: 24 },
     },
     {
@@ -124,12 +114,12 @@ const baseColumns: ProFormColumnsType<DataItem> = {
  * 业务信息+ 流程字段 +字段类型为枚举时的Columns
  */
 const flows: ProFormColumnsType<Flows> = {
-  title: groupTitle(`流程信息`),
+  title: groupTitle(`业务信息`),
   valueType: 'formList',
   dataIndex: 'flows',
   width: '100%',
-  colProps: { span: 24 },
-  tooltip: '流程信息',
+  colProps: { md: 24 },
+  tip: '创建应用成功后，可根据业务信息与流程绑定。',
   fieldProps: {
     // 新增按钮样式配置
     creatorButtonProps: {
@@ -138,12 +128,12 @@ const flows: ProFormColumnsType<Flows> = {
       creatorButtonText: '',
       block: false,
       className: cls.addFormListBtn2,
-      title: '添加新流程',
+      title: '添加新业务',
     },
     copyIconProps: false,
     deleteIconProps: {
       Icon: CloseCircleOutlined,
-      tooltipText: '删除该流程',
+      tooltipText: '删除该业务',
     },
     itemRender: ({ listDom, action }: any, { record, index }: any) => {
       //
@@ -151,7 +141,7 @@ const flows: ProFormColumnsType<Flows> = {
         <ProCard
           bordered
           extra={action}
-          title={record?.name || `流程${index + 1}`}
+          title={record?.business || `业务${index + 1}`}
           style={{
             marginBlockEnd: 8,
           }}>
@@ -164,109 +154,7 @@ const flows: ProFormColumnsType<Flows> = {
     {
       title: '业务信息',
       dataIndex: 'business',
-      colProps: { span: 12 },
-    },
-    {
-      valueType: 'formList',
-      dataIndex: 'field',
-      colProps: { span: 24 },
-      fieldProps: {
-        // 新增按钮样式配置
-        creatorButtonProps: {
-          // type: 'text',
-          position: 'top',
-          creatorButtonText: '添加流程字段',
-          block: false,
-          className: cls.addFormListBtn,
-        },
-        copyIconProps: false,
-        itemRender: ({ listDom, action }: any, { record, index }: any) => {
-          // console.log(record);
-          return (
-            <ProCard
-              bordered
-              extra={action}
-              title={record?.name || `字段${index + 1}`}
-              style={{
-                marginBlockEnd: 8,
-              }}>
-              {listDom}
-            </ProCard>
-          );
-        },
-      },
-      columns: [
-        {
-          valueType: 'group',
-          colProps: { span: 24 },
-          columns: [
-            {
-              title: '字段名称',
-              colProps: { span: 12 },
-              dataIndex: 'name',
-            },
-            {
-              title: '字段编号',
-              colProps: { span: 12 },
-              dataIndex: 'code',
-            },
-            {
-              title: '字段类型',
-              colProps: { span: 12 },
-              dataIndex: 'type',
-              valueType: 'select',
-              valueEnum: valueEnumType,
-            },
-            {
-              valueType: 'dependency',
-              name: ['type'],
-              columns: ({ type }: { type: string }) => {
-                return (type === '1' ? [valueTypeColumns] : []) as any;
-              },
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-/**
- * 流程信息相关Columns:
- * 字段为枚举类型时的枚举Columns
- */
-const valueTypeColumns: ProFormColumnsType<Field> = {
-  title: '字段枚举配置',
-  dataIndex: 'emnunList',
-  valueType: 'formList',
-  colProps: { span: 24 },
-  fieldProps: {
-    copyIconProps: false,
-    // 新增按钮样式配置
-    creatorButtonProps: {
-      // type: 'text',
-      position: 'top',
-      creatorButtonText: '添加新枚举',
-      block: false,
-      className: cls.addFormListBtn2,
-    },
-  },
-  columns: [
-    {
-      dataIndex: 'emnunItem',
-      valueType: 'group',
-      colProps: { span: 24 },
-      columns: [
-        {
-          title: '枚举名称',
-          colProps: { span: 8 },
-          dataIndex: 'componentAddress',
-        },
-        {
-          title: '枚举值',
-          colProps: { span: 8 },
-          dataIndex: 'componentWidth',
-        },
-      ],
+      width: 'md',
     },
   ],
 };
@@ -280,7 +168,6 @@ const componentsColumns: ProFormColumnsType<Components> = {
   dataIndex: 'components',
   width: '100%',
   colProps: { md: 24 },
-
   fieldProps: {
     // 新增按钮样式配置
     creatorButtonProps: {
