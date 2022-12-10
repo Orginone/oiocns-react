@@ -67,8 +67,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       if (parentRef?.current) {
         let _height = parentRef.current.offsetHeight;
         // let width = parentRef.current.offsetWidth;
-        // console.log('展示高度', _height);
-        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
+        console.log('展示高度', _height);
+        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 106) : 200);
       }
     }, 50);
   }, [parentRef]);

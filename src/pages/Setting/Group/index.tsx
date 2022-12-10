@@ -11,7 +11,7 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import GroupTree from './components/TreeLeftDeptPage';
-import Description from './components/Description';
+import GroupDescription from './components/Description';
 import { columns } from './config';
 import cls from './index.module.less';
 import SearchPerson from '@/bizcomponents/SearchPerson';
@@ -144,11 +144,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       />
       {current ? (
         <>
-          <Description
+          <GroupDescription
             title={
               <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
             }
-            selectDept={current.target}
+            selectGroup={current}
             extra={[
               <Button
                 key="edit"

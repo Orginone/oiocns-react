@@ -1,10 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { message, Upload, UploadProps, Image } from 'antd';
-import { nanoid, ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { message, Upload, UploadProps, Image, Space, Button, Avatar } from 'antd';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import { ITarget } from '@/ts/core';
 import SchemaForm from '@/components/SchemaForm';
-import { XTarget } from '@/ts/base/schema';
-import { PlusOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 
@@ -13,21 +12,21 @@ interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: () => void;
-  editData?: XTarget;
-  reObject: ITarget;
+  current: ITarget;
 }
 /*
   编辑
 */
 const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, reObject, editData, handleCancel } = props;
+  const { open, title, handleOk, current, handleCancel } = props;
+  const editData = current.target;
   const formRef = useRef<ProFormInstance>();
-  const [image, setImage] = useState<FileItemShare>();
+  const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
     maxCount: 1,
-    listType: 'picture-card',
+    listType: 'text',
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image');
       if (!isImage) {
@@ -37,15 +36,11 @@ const EditCustomModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('图片');
-      console.log(file.name);
+      const docDir = await docsCtrl.home?.create('头像');
       if (docDir && file) {
-        const result = await docsCtrl.upload(docDir.key, nanoid() + file.name, file);
-        console.log('img', result);
+        const result = await docsCtrl.upload(docDir.key, file.name, file);
         if (result) {
-          const img: FileItemShare = result.shareInfo();
-          setImage(img);
-          formRef.current?.setFieldValue('avatar', img);
+          setAvatar(result.shareInfo());
         }
       }
     },
@@ -57,13 +52,22 @@ const EditCustomModal = (props: Iprops) => {
       colProps: { span: 24 },
       renderFormItem: () => {
         return (
-          <Upload {...uploadProps}>
-            {image ? (
-              <Image src={image.thumbnail} preview={{ src: image.shareLink }} />
-            ) : (
-              <PlusOutlined />
-            )}
-          </Upload>
+          <Space>
+            <Avatar
+              size={64}
+              style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
+              src={
+                avatar ? (
+                  <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
+                ) : (
+                  <UserOutlined style={{ fontSize: 16 }} />
+                )
+              }
+            />
+            <Upload {...uploadProps}>
+              <Button type="link">上传头像</Button>
+            </Upload>
+          </Space>
         );
       },
       formItemProps: {},
@@ -78,9 +82,9 @@ const EditCustomModal = (props: Iprops) => {
     {
       title: '账号',
       dataIndex: 'code',
-      //   fieldProps: {
-      //     disabled: true,
-      //   },
+      fieldProps: {
+        disabled: true,
+      },
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
       },
@@ -115,7 +119,9 @@ const EditCustomModal = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (open) {
           if (editData) {
-            editData.avatar ? setImage(JSON.parse(editData.avatar)) : setImage(undefined);
+            if (editData.avatar) {
+              setAvatar(JSON.parse(editData.avatar));
+            }
             formRef.current?.setFieldsValue({
               ...editData,
               teamName: editData?.team?.name,
@@ -125,7 +131,7 @@ const EditCustomModal = (props: Iprops) => {
           }
         } else {
           formRef.current?.resetFields();
-          setImage(undefined);
+          setAvatar(undefined);
           handleCancel();
         }
       }}
@@ -135,7 +141,9 @@ const EditCustomModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (!editData) return;
-        const res = await reObject.update({ ...values });
+        values.avatar = JSON.stringify(avatar);
+        console.log(values);
+        const res = await current.update({ ...values });
         if (res) {
           message.success('修改成功');
           handleOk();

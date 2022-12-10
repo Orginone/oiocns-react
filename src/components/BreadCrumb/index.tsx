@@ -23,6 +23,7 @@ const initMap = (routes: any[]) => {
 
 // 根据数据类型渲染icon
 const createIcon = (icon?: string | React.Component | ReactNode) => {
+  if (!icon) return '';
   return typeof icon == 'string' ? (
     <IconFont type={(icon as string) || ''} className={cls['comp-breadcrumb-icon']} />
   ) : (
@@ -70,6 +71,7 @@ const BreadCrumb = (props: any) => {
           };
         });
     }
+    console.log(breadcrumbNameMap[url]);
     return (
       breadcrumbNameMap[url]?.title && (
         <Breadcrumb.Item

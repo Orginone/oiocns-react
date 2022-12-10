@@ -1,19 +1,18 @@
 import React from 'react';
-import { Card, Descriptions } from 'antd';
-
+import { Avatar, Card, Descriptions, Space } from 'antd';
+import { ITarget } from '@/ts/core';
 import cls from '../../index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { schema } from '@/ts/base';
 /**
  * @description: 部门信息内容
  * @return {*}
  */
 const DeptDescription = (props: {
   title: any;
-  selectDept: schema.XTarget | undefined;
+  selectDept: ITarget | undefined;
   extra: any;
 }) => {
   const { title, selectDept, extra } = props;
+  const deptInfo = selectDept?.target;
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
@@ -25,24 +24,18 @@ const DeptDescription = (props: {
         labelStyle={{ textAlign: 'center', color: '#606266' }}
         contentStyle={{ textAlign: 'center', color: '#606266' }}>
         <Descriptions.Item label="部门名称">
-          <strong> {selectDept?.name || ''}</strong>
+          <Space>
+            {selectDept?.avatar && <Avatar src={selectDept?.avatar?.thumbnail} />}
+            <strong>{deptInfo?.name}</strong>
+          </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="部门编码">{selectDept?.code || ''}</Descriptions.Item>
-        <Descriptions.Item label="所属单位">
-          {userCtrl.company.target.name || ''}
-        </Descriptions.Item>
-        <Descriptions.Item label="单位编码">
-          {userCtrl.company.target.code || ''}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="创建人">
-          {selectDept?.createUser || ''}
-        </Descriptions.Item>
+        <Descriptions.Item label="部门编码">{deptInfo?.code || ''}</Descriptions.Item>
+        <Descriptions.Item label="创建人">{deptInfo?.createUser || ''}</Descriptions.Item>
         <Descriptions.Item label="创建时间">
-          {selectDept?.createTime || ''}
+          {deptInfo?.createTime || ''}
         </Descriptions.Item>
         <Descriptions.Item label="描述" span={2}>
-          {selectDept?.team?.remark}
+          {deptInfo?.team?.remark}
         </Descriptions.Item>
       </Descriptions>
     </Card>

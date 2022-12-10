@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
-import { Button, Card, Descriptions, Dropdown, message, Modal } from 'antd';
+import React, { useRef, useState } from 'react';
+import {
+  Avatar,
+  Button,
+  Card,
+  Descriptions,
+  Dropdown,
+  message,
+  Modal,
+  Space,
+} from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -24,6 +33,7 @@ type TabType = 'members' | 'application';
 const SettingInfo: React.FC = () => {
   const history = useHistory();
   const [key] = useCtrlUpdate(userCtrl);
+  const parentRef = useRef<any>(null);
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
@@ -120,10 +130,13 @@ const SettingInfo: React.FC = () => {
             </Dropdown>,
           ]}>
           <Descriptions.Item label="单位名称">
-            <strong>{info.name}</strong>
+            <Space>
+              <Avatar src={userCtrl.company?.avatar?.thumbnail} />
+              <strong>{info.name}</strong>
+            </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
           <Descriptions.Item label="单位法人">{info.belongId}</Descriptions.Item>
+          <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
           <Descriptions.Item label="团队简称">{info.team?.name}</Descriptions.Item>
           <Descriptions.Item label="单位简介" span={2}>
             {info.team?.remark}
@@ -138,7 +151,7 @@ const SettingInfo: React.FC = () => {
             setActiveTab(key as TabType);
           }}
           tabBarExtraContent={renderBtns()}>
-          <div className={cls['page-content-table']}>
+          <div className={cls['page-content-table']} ref={parentRef}>
             {activeTab === 'members' ? (
               <CardOrTable<schema.XTarget>
                 dataSource={[]}
@@ -151,6 +164,7 @@ const SettingInfo: React.FC = () => {
                     filter: '',
                   });
                 }}
+                parentRef={parentRef}
                 operation={renderOperation}
                 columns={PersonColumns}
                 showChangeBtn={false}
