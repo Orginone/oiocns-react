@@ -177,7 +177,10 @@ const SettingInfo: React.FC = () => {
           title="编辑"
           open={activeModal === 'edit'}
           current={userCtrl.company}
-          handleOk={() => setActiveModal('')}
+          handleOk={() => {
+            setActiveModal('');
+            userCtrl.changCallback();
+          }}
           handleCancel={() => setActiveModal('')}
           typeNames={[userCtrl.company.target.typeName]}
         />
