@@ -136,6 +136,7 @@ const EditCustomModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
+          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           if (title === '编辑') {
             setAvatar(undefined);
             if (current.target.avatar) {
@@ -150,7 +151,6 @@ const EditCustomModal = (props: Iprops) => {
           }
         } else {
           formRef.current?.resetFields();
-          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           setAvatar(undefined);
           handleCancel();
         }
