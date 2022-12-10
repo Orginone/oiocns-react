@@ -37,6 +37,9 @@ const UpdateCohort: React.FC<indexType> = ({
         open={open}
         width={500}
         initialValues={item}
+        modalProps={{
+          onCancel: () => setOpen(false),
+        }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values: ICohort) => {
           const res = await item.update({
@@ -53,7 +56,6 @@ const UpdateCohort: React.FC<indexType> = ({
           } else {
             message.error('修改失败');
           }
-
           setOpen(false);
           callBack();
         }}
