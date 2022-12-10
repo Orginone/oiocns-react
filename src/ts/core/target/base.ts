@@ -1,6 +1,6 @@
 import consts from '../consts';
 import { TargetType } from '../enum';
-import { kernel, model, common, schema } from '../../base';
+import { kernel, model, common, schema, parseAvatar } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
@@ -37,14 +37,7 @@ export default class BaseTarget implements ITarget {
   }
 
   public get avatar(): FileItemShare | undefined {
-    if (this.target.avatar) {
-      try {
-        return JSON.parse(this.target.avatar);
-      } catch {
-        return undefined;
-      }
-    }
-    return undefined;
+    return parseAvatar(this.target.avatar);
   }
 
   constructor(target: schema.XTarget) {

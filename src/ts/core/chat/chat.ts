@@ -1,4 +1,5 @@
-import { schema, kernel, model, common } from '../../base';
+import { FileItemShare } from '@/ts/base/model';
+import { schema, kernel, model, common, parseAvatar } from '../../base';
 import { TargetType, MessageType } from '../enum';
 import { ChatCache, IChat } from './ichat';
 
@@ -34,6 +35,11 @@ class BaseChat implements IChat {
     this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
   }
+
+  public get avatar(): FileItemShare | undefined {
+    return parseAvatar(this.target.photo);
+  }
+
   getCache(): ChatCache {
     return {
       chatId: this.chatId,

@@ -53,34 +53,39 @@ const Groupheader = (props: Iprops) => {
     setIsModalOpen(false);
   };
 
+  if (chatCtrl.chat === undefined) {
+    return '';
+  }
   return (
     <>
       <div id={key} className={headerStyle.group_header_wrap}>
         <div className={`${headerStyle.user} ${headerStyle.flex}`}>
-          <TeamIcon
-            typeName={chatCtrl.chat?.target.name as string}
-            // avatar={item.avatar}
-            size={18}
-          />
+          <div style={{ fontSize: 26, color: '#888', width: 42 }}>
+            <TeamIcon
+              typeName={chatCtrl.chat.target.typeName}
+              avatar={chatCtrl.chat.avatar}
+              size={32}
+            />
+          </div>
           <div>
             <div className={`${headerStyle.flex} ${headerStyle.user_info_top}`}>
               <div className={`${headerStyle.user_info_top_name}`}>
-                {chatCtrl.chat?.target.name}
-                {chatCtrl.chat?.target.typeName !== '人员' ? (
-                  <span>({chatCtrl.chat?.personCount ?? 0 > 0})</span>
+                {chatCtrl.chat.target.name}
+                {chatCtrl.chat.target.typeName !== '人员' ? (
+                  <span>({chatCtrl.chat.personCount ?? 0 > 0})</span>
                 ) : (
                   ''
                 )}
                 <Breadcrumb>
-                  <Breadcrumb.Item>{chatCtrl.chat?.spaceName}</Breadcrumb.Item>
-                  <Breadcrumb.Item>{chatCtrl.chat?.target.label}</Breadcrumb.Item>
+                  <Breadcrumb.Item>{chatCtrl.chat.spaceName}</Breadcrumb.Item>
+                  <Breadcrumb.Item>{chatCtrl.chat.target.label}</Breadcrumb.Item>
                 </Breadcrumb>
               </div>
             </div>
           </div>
         </div>
         <span className={headerStyle.btn_box}>
-          {chatCtrl.chat?.target.typeName !== '人员' ? (
+          {chatCtrl.chat.target.typeName !== '人员' ? (
             <PlusOutlined
               style={{ fontSize: '20px', marginRight: '8px' }}
               onClick={handleAddFun}
@@ -98,8 +103,8 @@ const Groupheader = (props: Iprops) => {
         onCancel={handleCancel}
         getContainer={false}>
         <div>方式一：共享二维码，邀请好友</div>
-        <div className="QrDiv" key={chatCtrl.chat?.target.id}>
-          <QrCodeCustom qrText={chatCtrl.chat?.target.name} />
+        <div className="QrDiv" key={chatCtrl.chat.target.id}>
+          <QrCodeCustom qrText={chatCtrl.chat.target.name} />
         </div>
         <div>方式二：共享链接，邀请好友</div>
         <div className="share-link">展示链接...</div>
