@@ -5,7 +5,7 @@ import { companyTypes, TargetType } from '../enum';
 import { TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { schema, kernel, common } from '@/ts/base';
+import { schema, kernel, common, model } from '@/ts/base';
 import {
   IGroup,
   ICompany,
@@ -307,6 +307,9 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.joinedGroup;
+  }
+  public async getStationMember(data: model.IdArrayReq): Promise<schema.XTargetArray> {
+    return (await kernel.QueryStationTargets(data)).data;
   }
   public async update(data: TargetParam): Promise<ICompany> {
     if (!validIsSocialCreditCode(data.code)) {
