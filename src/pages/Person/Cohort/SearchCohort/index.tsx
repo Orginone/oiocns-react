@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { schema } from '@/ts/base';
-import SearchInput from '../../../src/components/SearchInput';
+import SearchInput from '../../../../components/SearchInput';
 import styles from './index.module.less';
 import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';

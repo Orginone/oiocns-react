@@ -24,7 +24,14 @@ import cls from './index.module.less';
 import CreateTeamModel from '@/bizcomponents/CreateTeam';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 
-type ShowmodelType = 'addOne' | 'edit' | 'post' | 'transfer' | 'indentity' | '';
+type ShowmodelType =
+  | 'addOne'
+  | 'edit'
+  | 'post'
+  | 'transfer'
+  | 'indentity'
+  | 'joinGroup'
+  | '';
 type TabType = 'members' | 'application';
 /**
  * 单位信息
@@ -85,6 +92,9 @@ const SettingInfo: React.FC = () => {
         </Button>
         <Button type="link" onClick={() => setActiveModal('addOne')}>
           邀请成员
+        </Button>
+        <Button type="link" onClick={() => setActiveModal('joinGroup')}>
+          加入集团
         </Button>
         <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
