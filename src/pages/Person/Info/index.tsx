@@ -1,6 +1,6 @@
 import { Button, Card, Descriptions } from 'antd';
 import Layout from 'antd/lib/layout/layout';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import PersonInfoDepartment from './Department';
@@ -21,7 +21,12 @@ const PersonInfo: React.FC = () => {
   const title = (
     <div className={cls['person-info-title']}>
       <div style={{ fontSize: 100 }}>
-        <TeamIcon avatar={userCtrl.user.avatar} typeName="人员" size={100} />
+        <TeamIcon
+          avatar={userCtrl.user.avatar}
+          typeName="人员"
+          size={100}
+          preview={true}
+        />
       </div>
       <div>
         <Button type="link" onClick={() => setShowEditModal(true)}>
