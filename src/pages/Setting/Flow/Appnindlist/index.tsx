@@ -22,12 +22,16 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
   const initData = async () => {
     console.log('bindAppMes', bindAppMes);
     const result = await userCtrl.space.getDefines(false);
-    const currentValue = await userCtrl.space.queryFlowRelation(false);
-    if (currentValue && currentValue.length > 0) {
-      const filterId = currentValue.filter((item) => {
-        return item.defineId === result[0].id;
-      });
-      setAppDataList(filterId);
+    console.log(result);
+    if (result && result.length > 0 && bindAppMes.id) {
+      const currentValue = await userCtrl.space.queryFlowRelation(false);
+      if (currentValue && currentValue.length > 0) {
+        const filterId = currentValue.filter((item) => {
+          return item.defineId === (bindAppMes?.id || result[0].id);
+        });
+        setAppDataList(filterId);
+        console.log(filterId);
+      }
     }
   };
 
@@ -49,11 +53,11 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
                   actions={[
                     <SettingOutlined key="setting" />,
                     <EditOutlined key="edit" />,
-                    <EllipsisOutlined key="ellipsis" />,
+                    <a key="text">解绑</a>,
                   ]}>
                   <Meta
                     avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                    title={item.prod?.name}
+                    title={item.id}
                     description={item.prod?.remark || '暂无描述'}
                   />
                 </Card>
