@@ -22,12 +22,15 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
   const initData = async () => {
     console.log('bindAppMes', bindAppMes);
     const result = await userCtrl.space.getDefines(false);
-    const currentValue = await userCtrl.space.queryFlowRelation(false);
-    if (currentValue && currentValue.length > 0) {
-      const filterId = currentValue.filter((item) => {
-        return item.defineId === result[0].id;
-      });
-      setAppDataList(filterId);
+    if (result && result.length > 0 && bindAppMes.id) {
+      const currentValue = await userCtrl.space.queryFlowRelation(false);
+      if (currentValue && currentValue.length > 0) {
+        const filterId = currentValue.filter((item) => {
+          return item.defineId === (bindAppMes?.id || result[0].id);
+        });
+        setAppDataList(filterId);
+        console.log(filterId);
+      }
     }
   };
 
