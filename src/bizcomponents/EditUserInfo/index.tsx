@@ -1,32 +1,27 @@
 import React, { useRef, useState } from 'react';
-import { message, Upload, UploadProps, Image, Space, Button, Avatar } from 'antd';
+import { message, Upload, UploadProps, Image, Button, Space } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { ITarget } from '@/ts/core';
 import SchemaForm from '@/components/SchemaForm';
-import { UserOutlined } from '@ant-design/icons';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 interface Iprops {
-  title: string;
   open: boolean;
   handleCancel: () => void;
-  handleOk: () => void;
-  current: ITarget;
+  handleOk: Function;
 }
 /*
   编辑
 */
-const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, current, handleCancel } = props;
-  const editData = current.target;
+const UserInfoEditModal = (props: Iprops) => {
+  const { open, handleOk, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
     maxCount: 1,
-    listType: 'text',
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image');
       if (!isImage) {
@@ -53,58 +48,55 @@ const EditCustomModal = (props: Iprops) => {
       renderFormItem: () => {
         return (
           <Space>
-            <Avatar
-              size={64}
-              style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
-              src={
-                avatar ? (
-                  <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
-                ) : (
-                  <UserOutlined style={{ fontSize: 16 }} />
-                )
-              }
-            />
+            {avatar ? (
+              <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
+            ) : (
+              ''
+            )}
             <Upload {...uploadProps}>
               <Button type="link">上传头像</Button>
             </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除头像
+              </Button>
+            ) : (
+              ''
+            )}
           </Space>
         );
-      },
-      formItemProps: {},
-    },
-    {
-      title: '昵称',
-      dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '账号',
-      dataIndex: 'code',
-      fieldProps: {
-        disabled: true,
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
       },
     },
     {
       title: '姓名',
       dataIndex: 'teamName',
       formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
+        rules: [{ required: true, message: '姓名为必填项' }],
+      },
+    },
+    {
+      title: '账号',
+      dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '账号为必填项' }],
+      },
+    },
+    {
+      title: '呢称',
+      dataIndex: 'name',
+      formItemProps: {
+        rules: [{ required: true, message: '呢称为必填项' }],
       },
     },
     {
       title: '手机号',
       dataIndex: 'teamCode',
       formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
+        rules: [{ required: true, message: '手机号为必填项' }],
       },
     },
     {
-      title: '座右铭',
+      title: '左右铭',
       dataIndex: 'teamRemark',
       valueType: 'textarea',
       colProps: { span: 24 },
@@ -113,22 +105,21 @@ const EditCustomModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       formRef={formRef}
-      title={title}
+      title="更新个人信息"
       open={open}
-      width={520}
+      width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (editData) {
-            if (editData.avatar) {
-              setAvatar(JSON.parse(editData.avatar));
-            }
-            formRef.current?.setFieldsValue({
-              ...editData,
-              teamName: editData?.team?.name,
-              teamCode: editData?.team?.code,
-              teamRemark: editData?.team?.remark,
-            });
+          setAvatar(undefined);
+          if (userCtrl.user.target.avatar) {
+            setAvatar(JSON.parse(userCtrl.user.target.avatar));
           }
+          formRef.current?.setFieldsValue({
+            ...userCtrl.user.target,
+            teamName: userCtrl.user.target.team?.name,
+            teamCode: userCtrl.user.target.team?.code,
+            teamRemark: userCtrl.user.target.team?.remark,
+          });
         } else {
           formRef.current?.resetFields();
           setAvatar(undefined);
@@ -140,21 +131,12 @@ const EditCustomModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (!editData) return;
         values.avatar = JSON.stringify(avatar);
-        console.log(values);
-        const res = await current.update({ ...values });
-        if (res) {
-          message.success('修改成功');
-          handleOk();
-        } else {
-          message.error('修改失败');
-          return false;
-        }
+        userCtrl.user.update(values);
+        handleOk();
       }}
-      columns={columns}
-    />
+      columns={columns}></SchemaForm>
   );
 };
 
-export default EditCustomModal;
+export default UserInfoEditModal;
