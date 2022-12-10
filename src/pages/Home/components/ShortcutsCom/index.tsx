@@ -1,9 +1,7 @@
 import './index.less';
-
 import { SendOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import React from 'react';
-
 import CardWidthTitle from '@/components/CardWidthTitle';
 
 interface ShortcutsComType {
@@ -26,7 +24,10 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
             className="shortcuts-btn"
             key={item.label}
             size="large"
-            icon={item.icon}>
+            icon={item.icon}
+            onClick={() => {
+              console.log('1111', item);
+            }}>
             {item.label}
           </Button>
         );

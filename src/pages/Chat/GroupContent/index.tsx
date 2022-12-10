@@ -174,7 +174,7 @@ const GroupContent = (props: Iprops) => {
                             setSelectId(item.id);
                           }}>
                           <TeamIcon
-                            typeName={chatCtrl.getName(item.fromId)}
+                            typeName={chatCtrl.chat?.target.typeName as string}
                             // avatar={item.avatar}
                             size={18}
                           />
@@ -242,7 +242,7 @@ const GroupContent = (props: Iprops) => {
                             }}>
                             <div className={`${css.con_content}`}>{viewMsg(item)}</div>
                             <TeamIcon
-                              typeName={chatCtrl.getName(item.fromId)}
+                              typeName={chatCtrl.chat?.target.typeName as string}
                               // avatar={item.avatar}
                               size={18}
                             />

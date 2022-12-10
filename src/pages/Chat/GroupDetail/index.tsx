@@ -80,7 +80,7 @@ const Groupdetail = () => {
     <Row style={{ paddingBottom: '12px' }}>
       <Col span={4}>
         <TeamIcon
-          typeName={chatCtrl.chat?.target.name as string}
+          typeName={chatCtrl.chat?.target.typeName as string}
           // avatar={item.avatar}
           size={18}
         />
@@ -109,7 +109,7 @@ const Groupdetail = () => {
         return (
           <div key={item.id} title={item.name} className={detailStyle.show_persons}>
             <TeamIcon
-              typeName={chatCtrl.chat?.target.name as string}
+              typeName={item?.typeName}
               // avatar={item.avatar}
               size={18}
             />

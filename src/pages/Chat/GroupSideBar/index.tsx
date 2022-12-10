@@ -163,7 +163,7 @@ const GroupSideBar: React.FC = () => {
           } ${child.isToping ? sideStyle.session_toping : ''}`}
           onContextMenu={(e: any) => handleContextClick(e, child)}>
           <TeamIcon
-            typeName={child.target.name as string}
+            typeName={child.target.typeName as string}
             // avatar={item.avatar}
             size={18}
           />
