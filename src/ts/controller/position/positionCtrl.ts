@@ -62,9 +62,11 @@ class PostitonController extends Emitter {
    * @return {*}
    */
   public updatePosttion = (data: any): any => {
-    const list = this.positionList.filter((obj) => obj.code != data.code);
-    this.positionList = list;
-    this.positionList.push(data);
+    this.positionList.map((item, index) => {
+      if (item.code == data.code) {
+        this.positionList[index] = data;
+      }
+    });
     this.cacheJoinOrDelePosition(this.positionList);
     message.success('更新岗位成功');
   };

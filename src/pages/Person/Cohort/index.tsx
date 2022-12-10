@@ -240,6 +240,7 @@ const CohortConfig: React.FC = () => {
                 title="转移权限"
                 open={changeIsModelOpen}
                 onOk={changeHandleOk}
+                destroyOnClose={true}
                 onCancel={() => setChangeIsModelOpen(false)}
                 width="1050px">
                 <ChangeCohort cohort={item!} searchCallback={searchCallback} />

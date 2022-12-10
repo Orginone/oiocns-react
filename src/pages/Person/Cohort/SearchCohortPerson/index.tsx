@@ -69,8 +69,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
       </div>
       <CardOrTable<schema.XTarget>
         dataSource={[]}
-        total={10}
-        page={1}
         width={400}
         rowSelection={{
           type: 'radio',
@@ -80,13 +78,7 @@ const CohortPerson: React.FC<indexType> = (props) => {
           },
         }}
         params={{ filter: value }}
-        request={(page) => {
-          return props.cohort.loadMembers({
-            limit: page.limit,
-            offset: page.offset,
-            filter: '',
-          });
-        }}
+        request={(page) => props.cohort.loadMembers(page)}
         tableAlertRender={false}
         tableAlertOptionRender={false}
         showChangeBtn={false}
