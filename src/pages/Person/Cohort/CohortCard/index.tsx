@@ -40,11 +40,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
           setIsModalOpen(true);
         }}>
         <div className="card-title-left">
-          <Avatar
-            src="https://gw.alipayobjects.com/zos/rmsportal/kZzEzemZyKLKFsojXItE.png"
-            // icon={<TeamOutlined />}
-            size={60}
-          />
+          <Avatar src={data.avatar ? data.avatar.thumbnail : ''} size={60} />
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.target.name || '--'}</span>

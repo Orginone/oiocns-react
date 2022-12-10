@@ -14,19 +14,7 @@ interface indexType {
 const CohortPerson: React.FC<indexType> = (props) => {
   useEffect(() => {}, []);
 
-  // const [data, setData] = useState<schema.XTarget[]>([]);
-
   const [value, setValue] = useState<string>('');
-  // const getTableList = async () => {
-  //   const res = await (
-  //     await props.cohort.loadMembers({
-  //       offset: 0,
-  //       filter: '',
-  //       limit: 65535,
-  //     })
-  //   ).result;
-  //   setData(res!);
-  // };
 
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
@@ -86,7 +74,6 @@ const CohortPerson: React.FC<indexType> = (props) => {
         width={400}
         rowSelection={{
           type: 'radio',
-
           onSelect: (record: any, selected: any, selectedRows: any) => {
             console.log(record, selected, selectedRows);
             props.searchCallback(record);

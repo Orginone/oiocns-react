@@ -8,7 +8,7 @@ import { common } from 'typings/common';
 import { columns, indentitycolumns } from './config';
 import TreeLeftDeptPage, { PositionType } from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
-import AssignPosts from './components/AssignPosts';
+import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
 import { PlusOutlined } from '@ant-design/icons';
 import Indentity from '@/ts/core/target/authority/identity';
@@ -269,7 +269,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         onCancel={() => {
           setIsOpenAssign(false);
         }}>
-        <AssignPosts searchCallback={setPersons} memberData={memberData} />
+        <AssignPosts searchFn={setPersons} />
       </Modal>
 
       {/* 左侧树 */}

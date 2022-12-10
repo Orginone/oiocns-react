@@ -11,7 +11,7 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import GroupTree from './components/TreeLeftDeptPage';
-import Description from './components/Description';
+import GroupDescription from './components/Description';
 import { columns } from './config';
 import cls from './index.module.less';
 import SearchPerson from '@/bizcomponents/SearchPerson';
@@ -30,7 +30,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [current, setCurrent] = useState<ITarget>();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
-  const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
+  const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增集团模态框标题
   const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
   const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
     setCurrent(undefined);
@@ -80,10 +80,10 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             }
           }
           break;
-        case 'changeDept': //变更部门
+        case 'changeDept': //变更集团
           setActiveModal('transfer');
           break;
-        case '编辑': // 编辑部门
+        case '编辑': // 编辑集团
           if (!item) return;
           setCreateOrEdit(item.target.typeName);
           setEdit(item);
@@ -146,11 +146,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       />
       {current ? (
         <>
-          <Description
+          <GroupDescription
             title={
               <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
             }
-            selectDept={current.target}
+            selectGroup={current}
             extra={[
               <Button
                 key="edit"
@@ -189,7 +189,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
               </div>
             </PageCard>
           </div>
-          {/* 编辑部门 */}
+          {/* 身份设置 */}
           <IndentityManage
             open={activeModal === 'indentity'}
             current={current}
@@ -211,9 +211,9 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             }}>
             <SearchPerson searchCallback={setSelectPerson} />
           </Modal>
-          {/* 变更部门 */}
+          {/* 变更集团 */}
           <TransferDepartment
-            title={'转移部门'}
+            title={'转移集团'}
             open={activeModal === 'transfer'}
             handleOk={handleOk}
             onCancel={() => setActiveModal('')}

@@ -56,10 +56,6 @@ export default class Person extends MarketTarget implements IPerson {
   public async searchCompany(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, companyTypes);
   }
-  public async update(data: Omit<TargetModel, 'id'>): Promise<IPerson> {
-    await super.updateTarget(data);
-    return this;
-  }
   public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {
     if (!reload && this.cohorts.length > 0) {
       return this.cohorts;
