@@ -116,7 +116,6 @@ const MemberList: React.FC<indexType> = (props) => {
           dataSource={data}
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
-              // console.log(record, selected, selectedRows);
               searchFn(selectedRows);
             },
           }}
@@ -140,7 +139,6 @@ const MemberList: React.FC<indexType> = (props) => {
             source.target.typeName == TargetType.Department ? personColumn : companyColumn
           }
           rowKey={'id'}
-          tableAlertRender={false}
         />
       </div>
     </div>

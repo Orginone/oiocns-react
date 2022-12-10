@@ -56,9 +56,9 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       {
         key: 'remove',
         label: '移出岗位',
-        onClick: () => {
+        onClick: async () => {
           for (const a of _currentPostion?.indentitys!) {
-            new Indentity(a).removeMembers([item.id]);
+            await new Indentity(a).removeMembers([item.id]);
           }
           reload();
         },
@@ -252,12 +252,11 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         onOk={async () => {
           setIsOpenAssign(false);
           const ids = [];
-          console.log('已选中数据', persons);
           for (const a of persons!) {
             ids.push(a.id);
           }
           for (const b of _currentPostion?.indentitys!) {
-            new Indentity(b).pullMembers(ids);
+            await new Indentity(b).pullMembers(ids);
           }
           reload();
         }}
