@@ -9,7 +9,7 @@ interface indexType {
   appid?: string; //props
 }
 const Index: React.FC<indexType> = ({ appid }) => {
-  console.log('打印移动appid', appid);
+  // console.log('打印移动appid', appid);
   if (!appid) {
     return <></>;
   }

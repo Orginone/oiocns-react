@@ -1,4 +1,4 @@
-import { Card, Modal } from 'antd';
+import { Card, message, Modal } from 'antd';
 import React, { useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
@@ -161,7 +161,27 @@ const StoreApp: React.FC = () => {
       </div>
     );
   }, [key, statusKey]);
-
+  const handleSubmitShare = async () => {
+    if (appCtrl.curProduct) {
+      if (checkNodes?.createList?.length > 0) {
+        const success = await appCtrl.curProduct?.createExtend(
+          checkNodes.teamId,
+          checkNodes.createList,
+          checkNodes.type,
+        );
+        success && message.success('操作成功');
+      }
+      if (checkNodes?.delList?.length > 0) {
+        const success = await appCtrl.curProduct?.deleteExtend(
+          checkNodes.teamId,
+          checkNodes.delList,
+          checkNodes.type,
+        );
+        success && message.success('操作成功');
+      }
+      setShowShareModal(false);
+    }
+  };
   return (
     <>
       {location.hash === '#/store/app' && AppIndex}
@@ -171,24 +191,14 @@ const StoreApp: React.FC = () => {
         destroyOnClose={true}
         open={showShareModal}
         okText="确定"
-        onOk={() => {
-          if (appCtrl.curProduct) {
-            appCtrl.curProduct.createExtend(
-              checkNodes.teamId,
-              checkNodes.checkedValus,
-              checkNodes.type,
-            );
-            setShowShareModal(false);
-          }
-        }}
+        onOk={handleSubmitShare}
         onCancel={() => {
-          console.log(`取消按钮`);
           setShowShareModal(false);
         }}>
         <ShareComp
           shareType={shareType}
-          onCheckeds={(teamId, type, checkedValues) => {
-            setCheckNodes({ teamId, type, checkedValues });
+          onCheckeds={(teamId, type, createList, delList) => {
+            setCheckNodes({ teamId, type, createList, delList });
           }}
         />
       </Modal>

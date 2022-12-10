@@ -43,16 +43,17 @@ export default class WebApp implements IProduct {
     destIds: string[],
     destType: string,
   ): Promise<boolean> {
-    return (
-      await kernel.createSourceExtend({
-        sourceId: this.prod.id,
-        sourceType: '产品',
-        spaceId: this.prod.belongId,
-        destIds,
-        destType,
-        teamId,
-      })
-    ).success;
+    let rs = await kernel.createSourceExtend({
+      sourceId: this.prod.id,
+      sourceType: '产品',
+      spaceId: this.prod.belongId,
+      destIds,
+      destType,
+      teamId,
+    });
+    console.log('chungjian1', destIds, rs);
+
+    return rs.success;
   }
   public async deleteExtend(
     teamId: string,

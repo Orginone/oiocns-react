@@ -10,7 +10,12 @@ import { ICompany, ITarget } from '@/ts/core';
 import CustomTree from '@/components/CustomTreeComp';
 interface Iprops {
   shareType: '分配' | '共享';
-  onCheckeds?: (teamId: string, type: string, checkedValus: any) => void;
+  onCheckeds?: (
+    teamId: string,
+    type: string,
+    createList: string[],
+    delList: string[],
+  ) => void;
 }
 const DestTypes = [
   {
@@ -69,9 +74,11 @@ const ShareRecent = (props: Iprops) => {
   // const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
   // const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
   const [selectedTeamId, setSelectedTeamId] = useState<string>('');
-  const [hasSelectRecord, setHasSelectRecord] = useState<{ list: any; type: string }>(
-    {} as any,
-  );
+  const [hasSelectRecord, setHasSelectRecord] = useState<{
+    createList: string[];
+    delList: string[];
+    type: string;
+  }>({} as any);
   let recordShareInfo = new Map();
 
   useEffect(() => {
@@ -103,8 +110,9 @@ const ShareRecent = (props: Iprops) => {
   }, [radio]);
 
   // 修改选中 提交修改selectAuthorityTree
-  const handelCheckedChange = (list: any) => {
-    onCheckeds && onCheckeds(selectedTeamId, DestTypes[radio - 1].label, list);
+  const handelCheckedChange = (createList: string[], delList: string[]) => {
+    onCheckeds &&
+      onCheckeds(selectedTeamId, DestTypes[radio - 1].label, createList, delList);
   };
   const queryExtend = async (type?: string, teamId?: string) => {
     const _type = type || DestTypes[radio - 1].label;
@@ -118,7 +126,6 @@ const ShareRecent = (props: Iprops) => {
     recordShareInfo.set(_type, curData);
     setShowData(result);
     originalSelected = result.map((v) => v.id) || [];
-    console.log('初始化', originalSelected);
 
     if (radio === 1) {
       setLeftCheckedKeys([...originalSelected]);
@@ -126,19 +133,26 @@ const ShareRecent = (props: Iprops) => {
       setCenterCheckedKeys([...originalSelected]);
     }
 
-    console.log('请求分配列表', result, curData[_teamId]);
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     const item: ITarget = info.node.item;
-    console.log('selected', selectedKeys, info);
+    // console.log('selected', selectedKeys, info);
     setLeftTreeSelectedKeys(selectedKeys);
+    if (hasSelectRecord?.type) {
+      hasSelectRecord?.createList.length > 0 &&
+        appCtrl.curProduct?.createExtend(
+          selectedTeamId,
+          hasSelectRecord.createList,
+          hasSelectRecord.type,
+        );
+      hasSelectRecord?.delList.length > 0 &&
+        appCtrl.curProduct?.deleteExtend(
+          selectedTeamId,
+          hasSelectRecord.delList,
+          hasSelectRecord.type,
+        );
+    }
 
-    hasSelectRecord?.list?.lenght &&
-      appCtrl.curProduct?.createExtend(
-        selectedTeamId,
-        hasSelectRecord!.list,
-        hasSelectRecord!.type,
-      );
     setSelectedTeamId(item.id);
     setCenterTreeData([]);
 
@@ -184,7 +198,7 @@ const ShareRecent = (props: Iprops) => {
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    console.log('点击左侧', checkedKeys, info, info.checked);
+    // console.log('点击左侧', checkedKeys, info, info.checked);
     Array.isArray(checkedKeys) && setLeftCheckedKeys(checkedKeys);
     // 是否原始 分配数据
     const isOriginal = originalSelected.includes(info.node.id);
@@ -195,25 +209,31 @@ const ShareRecent = (props: Iprops) => {
       name: info.node.name,
       type: 'has',
     };
+    let newShowData = [...newArr];
     if (info.checked) {
       obj.type = isOriginal ? 'has' : 'add';
-      setShowData([...newArr, obj]);
+      newShowData = [...newArr, obj];
     } else {
       if (isOriginal) {
         obj.type = 'del';
-        setShowData([...newArr, obj]);
-      } else {
-        setShowData([...newArr]);
+        newShowData = [...newArr, obj];
       }
     }
-
-    handelCheckedChange(checkedKeys);
+    setShowData(newShowData);
+    let createList = newShowData.filter((v) => v.type === 'add').map((i) => i.id); //需要创建
+    let delList = newShowData.filter((v) => v.type === 'del').map((i) => i.id); //需要删除
+    setHasSelectRecord({
+      type: DestTypes[radio - 1].label,
+      createList,
+      delList,
+    });
+    handelCheckedChange(createList, delList);
 
     // setDepartData([...departData]);
   };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info: any) => {
-    console.log('onCheck', checkedKeys, info);
+    // console.log('onCheck', checkedKeys, info);
     if (Array.isArray(checkedKeys)) {
       setCenterCheckedKeys(checkedKeys);
     }
@@ -227,27 +247,44 @@ const ShareRecent = (props: Iprops) => {
       name: info.node.name,
       type: 'has',
     };
+
+    let newShowData = [...newArr];
     if (info.checked) {
       obj.type = isOriginal ? 'has' : 'add';
-      setShowData([...newArr, obj]);
+      newShowData = [...newArr, obj];
     } else {
       if (isOriginal) {
         obj.type = 'del';
-        setShowData([...newArr, obj]);
-      } else {
-        setShowData([...newArr]);
+        newShowData = [...newArr, obj];
       }
     }
-    setHasSelectRecord({ type: DestTypes[radio - 1].label, list: checkedKeys });
-    handelCheckedChange(checkedKeys);
+    setShowData(newShowData);
+    let createList = newShowData.filter((v) => v.type === 'add').map((i) => i.id); //需要创建
+    let delList = newShowData.filter((v) => v.type === 'del').map((i) => i.id); //需要删除
+    setHasSelectRecord({
+      type: DestTypes[radio - 1].label,
+      createList,
+      delList,
+    });
+    handelCheckedChange(createList, delList);
   };
   // 点击删除
   const handelDel = (id: string) => {
-    console.log('ss', showData, id);
+    const isOriginal = originalSelected.includes(id);
+    let arr = [];
+    if (isOriginal) {
+      arr = showData.map((v) => {
+        if (v.id === id) {
+          v.type = 'del';
+        }
+        return v;
+      });
+    } else {
+      arr = showData.filter((v) => {
+        return v.id !== id;
+      });
+    }
 
-    const arr = showData.filter((v) => {
-      return v.id !== id;
-    });
     setShowData(arr);
 
     if (radio == 1) {
@@ -263,6 +300,10 @@ const ShareRecent = (props: Iprops) => {
         }),
       );
     }
+    let createList = showData.filter((v) => v.type === 'add').map((i) => i.id); //需要创建
+    let delList = showData.filter((v) => v.type === 'del').map((i) => i.id); //需要删除
+
+    handelCheckedChange(createList, delList);
   };
 
   const onLoadData = ({ id, children, item }: any) => {
