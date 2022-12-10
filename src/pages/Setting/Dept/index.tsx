@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget } from '@/ts/core';
+import { ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -14,7 +14,8 @@ import DepartTree from './components/TreeLeftDeptPage';
 import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import cls from './index.module.less';
-import SearchPerson from '@/bizcomponents/SearchPerson';
+// import SearchPerson from '@/bizcomponents/SearchPerson';
+import AssignPosts from '@/bizcomponents/AssignPostCompany';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
@@ -31,7 +32,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
-  const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
+  const [selectPerson, setSelectPerson] = useState<XTarget[]>([]); // 选中的要拉的人
   const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
     setCurrent(undefined);
   });
@@ -43,7 +44,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         key: 'changeDept',
         label: '变更' + item.typeName,
         onClick: () => {
-          setSelectPerson(item);
+          setSelectPerson([item]);
           setActiveModal('transfer');
         },
       },
@@ -199,18 +200,22 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           {/* 添加成员*/}
           <Modal
             title="添加成员"
+            width={1024}
             destroyOnClose
             open={activeModal === 'addOne'}
             onCancel={() => setActiveModal('')}
             onOk={async () => {
-              if (selectPerson) {
-                if (await current.pullMember(selectPerson)) {
+              if (selectPerson && selectPerson.length > 0) {
+                const ids = selectPerson.map((e) => {
+                  return e.id;
+                });
+                if (await current.pullMembers(ids, TargetType.Person)) {
                   message.success('添加成功');
                   handleOk();
                 }
               }
             }}>
-            <SearchPerson searchCallback={setSelectPerson} />
+            <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} />
           </Modal>
           {/* 变更部门 */}
           <TransferDepartment
