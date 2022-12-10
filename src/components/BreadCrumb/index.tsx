@@ -66,7 +66,7 @@ const BreadCrumb = (props: any) => {
                     </Space>
                   ),
                 }))
-              : null,
+              : [],
           };
         });
     }

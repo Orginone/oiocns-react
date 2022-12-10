@@ -26,13 +26,16 @@ interface ICanDelete {
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
-  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [current, setCurrent] = useState<ITarget>();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
   const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
+    setCurrent(undefined);
+  });
+
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
