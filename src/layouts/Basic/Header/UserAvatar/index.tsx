@@ -1,8 +1,7 @@
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { DomainTypes } from '@/ts/core';
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import cls from './index.module.less';
@@ -12,17 +11,6 @@ import cls from './index.module.less';
  */
 const UserAvatar: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState(userCtrl.user);
-  useEffect(() => {
-    const id = userCtrl.subscribePart(DomainTypes.User, () => {
-      if (userCtrl.user) {
-        setUser({ ...userCtrl.user });
-      }
-    });
-    return () => {
-      userCtrl.unsubscribe(id);
-    };
-  }, []);
   /**
    * 下拉菜单项
    */
@@ -59,11 +47,14 @@ const UserAvatar: React.FC = () => {
 
   return (
     <Dropdown menu={menuItems} placement="bottomLeft">
-      {user && user.target.avatar ? (
-        <Avatar src={user?.target?.avatar} alt={user.target.name} size={28}></Avatar>
+      {userCtrl.user.avatar ? (
+        <Avatar
+          src={userCtrl.user.avatar.thumbnail}
+          alt={userCtrl.user.name}
+          size={28}></Avatar>
       ) : (
-        <Avatar className={cls['header-user-avatar']} alt={user?.target.name}>
-          {user?.target?.name?.substring(0, 1)}
+        <Avatar className={cls['header-user-avatar']} alt={userCtrl.user.name}>
+          {userCtrl.user.name?.substring(0, 1)}
         </Avatar>
       )}
     </Dropdown>

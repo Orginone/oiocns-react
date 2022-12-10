@@ -63,28 +63,32 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[]) => {
     const result: any[] = [];
-    if (targets) {
-      for (const item of targets) {
-        result.push({
-          key: item.id,
-          title: item.name,
-          item: item,
-          isLeaf: item.subTeam.length === 0,
-          menus: loadMenus(item),
-          icon: getIcon(item.teamName as TargetType),
-          children: buildTargetTree(item.subTeam),
-        });
-      }
+    for (const item of targets) {
+      result.push({
+        key: item.id,
+        title: item.name,
+        item: item,
+        isLeaf: item.subTeam.length === 0,
+        menus: loadMenus(item),
+        icon: getIcon(item.teamName as TargetType),
+        children: buildTargetTree(item.subTeam),
+      });
     }
     return result;
   };
 
   const getIcon = (type: TargetType) => {
     switch (type) {
+      case TargetType.Department:
+        return <im.ImLibrary />;
+      case TargetType.Laboratory:
+        return <im.ImBriefcase />;
+      case TargetType.Office:
+        return <im.ImBriefcase />;
       case TargetType.Working:
         return <im.ImUsers />;
       default:
-        return <im.ImTree />;
+        return <im.ImLibrary />;
     }
   };
 
