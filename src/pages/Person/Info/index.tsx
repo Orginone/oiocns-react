@@ -2,8 +2,7 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import Title from 'antd/lib/typography/Title';
-import React, { useState, useEffect } from 'react';
-
+import React, { useState } from 'react';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import PersonInfoDepartment from './Department';
 import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';

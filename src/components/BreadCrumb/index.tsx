@@ -71,7 +71,6 @@ const BreadCrumb = (props: any) => {
           };
         });
     }
-    console.log(breadcrumbNameMap[url]);
     return (
       breadcrumbNameMap[url]?.title && (
         <Breadcrumb.Item

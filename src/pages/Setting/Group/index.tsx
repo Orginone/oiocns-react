@@ -31,7 +31,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const [current, setCurrent] = useState<ITarget>();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
-  const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
+  const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增集团模态框标题
   const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
@@ -78,10 +78,10 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             }
           }
           break;
-        case 'changeDept': //变更部门
+        case 'changeDept': //变更集团
           setActiveModal('transfer');
           break;
-        case '编辑': // 编辑部门
+        case '编辑': // 编辑集团
           if (!item) return;
           setCreateOrEdit(item.target.typeName);
           setEdit(item);
@@ -187,7 +187,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
               </div>
             </PageCard>
           </div>
-          {/* 编辑部门 */}
+          {/* 身份设置 */}
           <IndentityManage
             open={activeModal === 'indentity'}
             current={current}
@@ -209,9 +209,9 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             }}>
             <SearchPerson searchCallback={setSelectPerson} />
           </Modal>
-          {/* 变更部门 */}
+          {/* 变更集团 */}
           <TransferDepartment
-            title={'转移部门'}
+            title={'转移集团'}
             open={activeModal === 'transfer'}
             handleOk={handleOk}
             onCancel={() => setActiveModal('')}

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ProColumns } from '@ant-design/pro-components';
+import { nanoid, ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
@@ -126,20 +126,21 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
-        params={dataSource}
+        params={{ id: nanoid(), filter: '' }}
         request={async (params) => {
           // console.log(params);
-          const { current: pageIndex = 1, pageSize = 10 } = params;
+          const { current: pageIndex = 1, pageSize = 10, filter = '' } = params;
           if (request) {
             const res = await request({
-              filter: '',
+              filter: filter,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             });
+
             return {
-              total: res.total,
-              data: res.result ?? [],
-              success: res.result != undefined,
+              total: res.total || 0,
+              data: res.result || [],
+              success: true,
             };
           } else {
             return {
@@ -149,14 +150,14 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             };
           }
         }}
-        tableRender={(props: any, defaultDom) => {
+        tableRender={(props: any, defaultDom, { table }) => {
           return pageType === 'table' ? (
             !showChangeBtn ||
             !props.action.datasource ||
             props.action.datasource.length === 0 ? (
-              defaultDom
+              table
             ) : (
-              [defaultDom, TableFooter]
+              [table, TableFooter]
             )
           ) : (
             <>

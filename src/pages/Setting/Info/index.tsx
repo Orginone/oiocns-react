@@ -117,7 +117,6 @@ const SettingInfo: React.FC = () => {
       },
     ];
   };
-
   return (
     <div id={key} className={cls.companyContainer}>
       <Card bordered={false} className={cls['company-info-content']}>
@@ -141,7 +140,9 @@ const SettingInfo: React.FC = () => {
           ]}>
           <Descriptions.Item label="单位名称">
             <Space>
-              <Avatar src={userCtrl.company?.avatar?.thumbnail} />
+              {userCtrl.company?.avatar && (
+                <Avatar src={userCtrl.company?.avatar?.thumbnail} />
+              )}
               <strong>{info.name}</strong>
             </Space>
           </Descriptions.Item>
