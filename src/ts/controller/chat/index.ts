@@ -147,11 +147,6 @@ class ChatController extends Emitter {
       this.changCallback();
     }
   }
-  /** 重新载入通讯录 */
-  public async reloadChats(): Promise<void> {
-    this._groups = await LoadChats(this._userId);
-    this.setCurrent(this._curChat);
-  }
   /** 初始化 */
   private async _initialization(): Promise<void> {
     this._groups = await LoadChats(this._userId);
@@ -170,6 +165,10 @@ class ChatController extends Emitter {
     });
     kernel.on('RecvMsg', (data) => {
       this._recvMessage(data);
+    });
+    kernel.on('ChatRefresh', async () => {
+      this._groups = await LoadChats(this._userId);
+      this.setCurrent(this._curChat);
     });
   }
   /**
