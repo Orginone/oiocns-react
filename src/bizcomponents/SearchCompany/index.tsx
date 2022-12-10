@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { SmileOutlined } from '@ant-design/icons';
-import { Avatar, Typography, Card, List, Result, Row, Col, Descriptions } from 'antd';
+import { Result, Row, Col, Descriptions } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import Person from '@/ts/core/target/person';
+import Company from '@/ts/core/target/company';
 
 type CompanySearchTableProps = {
   [key: string]: any;
@@ -84,7 +87,16 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       bordered={false}
       style={{ width: '100%', marginTop: '0px' }}
       className={`${styles.card}`}
-      avatar={<Avatar src="https://joeschmoe.io/api/v1/random" size="large" />}
+      avatar={
+        <div style={{ fontSize: 100 }}>
+          <TeamIcon
+            avatar={new Person(person).avatar}
+            typeName="人员"
+            size={100}
+            preview={true}
+          />
+        </div>
+      }
       title={person.name}
       value={person.id}
       key={person.id}
@@ -109,7 +121,16 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       bordered={false}
       style={{ width: '100%', marginTop: '0px' }}
       className={`${styles.card}`}
-      avatar={<Avatar src="https://joeschmoe.io/api/v1/random" size="large" />}
+      avatar={
+        <div style={{ fontSize: 60 }}>
+          <TeamIcon
+            avatar={new Company(person, person.id).avatar}
+            typeName="单位"
+            size={100}
+            preview={true}
+          />
+        </div>
+      }
       title={person.name}
       value={person.id}
       description={
