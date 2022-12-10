@@ -17,6 +17,7 @@ import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import { XTarget } from '@/ts/base/schema';
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits = () => {
@@ -25,7 +26,7 @@ const OrganizationalUnits = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
-  const [joinKey, setJoinKey] = useState<string>('');
+  const [searchCallback, setSearchCallback] = useState<XTarget>();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     userCtrl.setCurSpace(item.id);
@@ -133,10 +134,10 @@ const OrganizationalUnits = () => {
         onOk={async () => {
           // 加入单位
           setShowModal(false);
-          if (joinKey == '') {
-            message.error('请选中要加入的单位！');
-          } else {
-            if (await userCtrl.user.applyJoinCompany(joinKey, TargetType.Company)) {
+          if (searchCallback) {
+            if (
+              await userCtrl.user.applyJoinCompany(searchCallback.id, TargetType.Company)
+            ) {
               message.success('已申请加入单位成功.');
             }
           }
@@ -145,7 +146,10 @@ const OrganizationalUnits = () => {
           console.log(`取消按钮`);
           setShowModal(false);
         }}>
-        <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey} />
+        <SearchCompany
+          searchCallback={setSearchCallback}
+          searchType={TargetType.Company}
+        />
       </Modal>
     </div>
   );

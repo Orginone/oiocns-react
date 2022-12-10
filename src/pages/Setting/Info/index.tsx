@@ -64,12 +64,12 @@ const SettingInfo: React.FC = () => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `单位成员`,
+      tab: `单位的成员`,
       key: 'members',
     },
     {
-      tab: `单位应用`,
-      key: 'application',
+      tab: `加入的集团`,
+      key: 'groups',
     },
   ];
 
