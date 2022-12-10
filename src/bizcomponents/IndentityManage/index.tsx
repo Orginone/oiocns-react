@@ -152,7 +152,7 @@ const ShareRecent = (props: Iprops) => {
   return (
     <div id={key} className={cls.layout}>
       <div className={cls.content}>
-        <div className={cls.leftContent}>
+        <div className={`${props.multiple ? cls.leftContent : cls.newLeftContent}`}>
           <StoreClassifyTree
             className={cls.docTree}
             isDirectoryTree
@@ -162,7 +162,7 @@ const ShareRecent = (props: Iprops) => {
             onSelect={onSelect}
           />
         </div>
-        <div className={cls.center}>
+        <div className={`${props.multiple ? cls.center : cls.newCenter}`}>
           <StoreClassifyTree
             className={cls.docTree}
             searchable
@@ -179,7 +179,10 @@ const ShareRecent = (props: Iprops) => {
           />
         </div>
         {props.multiple ? (
-          <div id={key} style={{ width: '33%' }} className={cls.right}>
+          <div
+            id={key}
+            style={{ width: `${props.multiple ? '33%' : '50%'}` }}
+            className={cls.right}>
             <ShareShowComp
               departData={getSelectData()}
               deleteFuc={(id: string) => {
