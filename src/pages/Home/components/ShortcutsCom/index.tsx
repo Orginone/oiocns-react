@@ -15,6 +15,17 @@ const btns = [
   { label: '逛商场', icon: <SendOutlined /> },
   { label: '添数据', icon: <SendOutlined /> },
 ];
+const onShortClick = (item: string) => {
+  console.log('123456', item);
+  switch (item) {
+    case '加好友':
+      break;
+
+    default:
+      break;
+  }
+};
+
 const BannerCom: React.FC<ShortcutsComType> = () => {
   return (
     <CardWidthTitle className="shortcuts-wrap" title={'快捷入口'}>
@@ -27,6 +38,7 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
             icon={item.icon}
             onClick={() => {
               console.log('1111', item);
+              onShortClick(item?.label);
             }}>
             {item.label}
           </Button>
