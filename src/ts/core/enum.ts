@@ -75,3 +75,10 @@ export const companyTypes = [
   TargetType.Hospital,
   TargetType.University,
 ];
+
+export const departmentTypes = [
+  TargetType.Office,
+  TargetType.Section,
+  TargetType.Laboratory,
+  TargetType.Department,
+];

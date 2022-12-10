@@ -1,5 +1,5 @@
 import { model, schema } from '@/ts/base';
-import { PageRequest, TargetModel } from '@/ts/base/model';
+import { FileItemShare, PageRequest, TargetModel } from '@/ts/base/model';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetType } from '../enum';
 import { IMarket, Market } from '../market';
@@ -41,8 +41,10 @@ export interface ITarget {
   joinTargetType: TargetType[];
   /** 可以查询的组织类型 */
   searchTargetType: TargetType[];
-  /** 子组织 */
+  /** 缓存内的子组织 */
   subTeam: ITarget[];
+  /** 头像 */
+  avatar: FileItemShare | undefined;
   /**
    * 新增
    * @param data 集团基本信息
