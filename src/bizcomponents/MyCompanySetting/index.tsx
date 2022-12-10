@@ -62,9 +62,12 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const handleOk = async () => {
     setIsModalOpen(false);
     if (searchCallback && searchCallback.length > 0) {
-      let thisSelectKey = searchCallback[0].id;
-      if (await userCtrl.user.applyJoinCompany(thisSelectKey, TargetType.Company)) {
-        message.success('已申请加入单位成功.');
+      if (searchCallback && searchCallback.length > 0) {
+        searchCallback.forEach(async (user) => {
+          if (await userCtrl.user.applyJoinCompany(user.id, TargetType.Company)) {
+            message.success('已申请加入单位成功.');
+          }
+        });
       }
     }
   };
