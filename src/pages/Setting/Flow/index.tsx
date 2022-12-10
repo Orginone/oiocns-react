@@ -112,10 +112,10 @@ const SettingFlow: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
-
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
+      console.log('result', result);
       setBindAppMes(result[0]);
     }
   };
