@@ -255,14 +255,16 @@ const SettingInfo: React.FC = () => {
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && userCtrl.company) {
-              const success = await userCtrl.company.applyJoinGroup(selectPerson[0].id);
-              if (success) {
-                message.success('添加成功');
-                userCtrl.changCallback();
-                setActiveModal('');
-              } else {
-                message.error('添加失败');
-              }
+              selectPerson.forEach(async (group) => {
+                const success = await userCtrl.company.applyJoinGroup(group.id);
+                if (success) {
+                  message.success('添加成功');
+                  userCtrl.changCallback();
+                  setActiveModal('');
+                } else {
+                  message.error('添加失败');
+                }
+              });
             }
           }}>
           <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
