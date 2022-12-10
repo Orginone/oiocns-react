@@ -211,6 +211,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   );
   //获取最终待添加身份
   const getResultIndentity = () => {
+    console.log(addIndentitys, _currentPostion);
     let ids = addIndentitys!.map((item) => item.id);
     return _currentPostion
       ?.indentitys!.filter((el) => {
@@ -220,8 +221,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   };
   return (
     <div className={cls[`dept-content-box`]}>
-      {header}
-      {personCount}
+      {_currentPostion && header}
+      {_currentPostion && personCount}
       <Modal
         title="添加身份"
         open={isAddOpen}

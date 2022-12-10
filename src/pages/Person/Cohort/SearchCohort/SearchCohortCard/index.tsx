@@ -2,7 +2,7 @@ import { UsergroupAddOutlined } from '@ant-design/icons';
 import { Avatar, Button, Col, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
-import { schema } from '../../../ts/base';
+import { schema } from '../../../../../ts/base';
 import Cohort from '@/ts/core/target/cohort';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 interface CohortCardType {
@@ -25,8 +25,10 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
     setName(res[0].team?.name!);
   };
   const applyCohort = async (data: schema.XTarget) => {
-    await userCtrl.user?.applyJoinCohort(data.id);
-    message.success('发起申请成功');
+    const res = await userCtrl.user?.applyJoinCohort(data.id);
+    if (res) {
+      message.success('发起申请成功');
+    }
   };
   /**
    * @desc: 操作按钮区域
@@ -38,7 +40,10 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
     return (
       <div className="card-title flex">
         <div className="card-title-left">
-          <Avatar src="https://joeschmoe.io/api/v1/random" size={60} />
+          <Avatar
+            src="https://gw.alipayobjects.com/zos/rmsportal/kZzEzemZyKLKFsojXItE.png"
+            size={60}
+          />
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.name || '--'}</span>
