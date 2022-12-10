@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TargetType } from '@/ts/core';
 import * as im from 'react-icons/im';
 import { FileItemShare } from '@/ts/base/model';
-import { Avatar } from 'antd';
+import { Avatar, Image } from 'antd';
 import { AvatarSize } from 'antd/lib/avatar/SizeContext';
 
 interface teamTypeInfo {
@@ -13,8 +13,29 @@ interface teamTypeInfo {
 
 /** 组织图标 */
 const TeamIcon = (info: teamTypeInfo) => {
+  const [preview, setPreview] = useState(false);
   if (info.avatar) {
-    return <Avatar size={info.size ?? 22} src={info.avatar.thumbnail} />;
+    return (
+      <div style={{ cursor: 'pointer' }} title="点击预览">
+        <Image
+          style={{ display: 'none' }}
+          preview={{
+            visible: preview,
+            src: info.avatar.shareLink,
+            onVisibleChange: (value) => {
+              setPreview(value);
+            },
+          }}
+        />
+        <Avatar
+          size={info.size ?? 22}
+          src={info.avatar.thumbnail}
+          onClick={() => {
+            setPreview(true);
+          }}
+        />
+      </div>
+    );
   }
   switch (info.typeName) {
     case TargetType.Group:

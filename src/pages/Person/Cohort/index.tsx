@@ -21,7 +21,7 @@ import { TargetType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
-import CreateTeam from '@/bizcomponents/CreateTeam/index';
+import EditCustomModal from '@/bizcomponents/CreateTeam/index';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -93,6 +93,7 @@ const CohortConfig: React.FC = () => {
         label: '修改群组',
         onClick: () => {
           setItem(item);
+          setIsOpenCreate(true);
           setIsFlag('编辑');
         },
       },
@@ -278,7 +279,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort setCohort={setcohort} />
               </Modal>
-              <CreateTeam
+              <EditCustomModal
                 title={isFlag}
                 open={isOpenCreate}
                 handleCancel={() => setIsOpenCreate(false)}

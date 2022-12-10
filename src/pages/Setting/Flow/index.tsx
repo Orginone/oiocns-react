@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space, Avatar } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -20,6 +20,7 @@ import { XFlowDefine } from '@/ts/base/schema';
 import FlowCard from '@/components/FlowCardComp';
 import useWindowSize from '@/utils/windowsize';
 import BindModal from './BindModal';
+import Appbindlist from './Appnindlist';
 
 const { Header, Content } = Layout;
 
@@ -74,6 +75,7 @@ const SettingFlow: React.FC = () => {
   const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
 
   const [dateData, setDateData] = useState(1);
+  const [rowId, setRowId] = useState<string>('');
 
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -110,10 +112,11 @@ const SettingFlow: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
-
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
+      console.log('result', result);
+      setBindAppMes(result[0]);
     }
   };
 
@@ -148,7 +151,6 @@ const SettingFlow: React.FC = () => {
         label: '绑定应用',
         onClick: () => {
           setIsOpenModal(true);
-          setBindAppMes(record);
           setDateData(dateData + 1);
         },
       },
@@ -224,6 +226,17 @@ const SettingFlow: React.FC = () => {
                 total={allData.length}
                 pageSize={10}
                 page={page}
+                rowClassName={(recorId: any) => {
+                  return recorId.id === rowId ? cls.rowClass : '';
+                }}
+                onRow={(record: any) => {
+                  return {
+                    onClick: () => {
+                      setRowId(record.id);
+                      setBindAppMes(record);
+                    }, // 点击行
+                  };
+                }}
                 stripe
                 parentRef={parentRef}
                 renderCardContent={renderCardFun}
@@ -246,35 +259,7 @@ const SettingFlow: React.FC = () => {
             </div>
           </Card>
           {/* 这里后面写模版列表，暂时隐藏 */}
-          <Card title="模版列表" bordered={false}>
-            <div className={cls['app-wrap']} ref={parentRef}>
-              {/* <CardOrTable<XFlowDefine>
-                  dataSource={dataSource}
-                  total={dataSource.length}
-                  page={6}
-                  stripe
-                  parentRef={parentRef}
-                  renderCardContent={renderCardFun}
-                  operation={renderOperation}
-                  columns={columns}
-                  height={0.2 * height}
-                  onChange={handlePageChange}
-                  rowKey={(record: XFlowDefine) => record.id || 'id'}
-                  toolBarRender={() => [
-                    <Button
-                      key="button"
-                      type="primary"
-                      onClick={() => {
-                        setTabType(TabType.PROCESSDESIGN);
-                      }}>
-                      新建
-                    </Button>,
-
-                    <span>编辑分组</span>,
-                  ]}
-                /> */}
-            </div>
-          </Card>
+          <Appbindlist bindAppMes={bindAppMes} />
         </div>
       ) : (
         <div className={cls['company-info-content']}>
