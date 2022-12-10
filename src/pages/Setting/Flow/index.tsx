@@ -216,7 +216,7 @@ const SettingFlow: React.FC = () => {
 
   return (
     <div className={cls['company-top-content']}>
-      <Card>流程设置</Card>
+      {/* <Card>流程设置</Card> */}
       {tabType === TabType.TABLEMES ? (
         <div>
           <Card bordered={false}>

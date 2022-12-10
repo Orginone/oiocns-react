@@ -47,6 +47,8 @@ const updateTreeData = (list: any[], key: React.Key, children: any[]): any[] =>
     return node;
   });
 //个人空间-只有共享 展示我的群组/好友  ; 单位空间 - 共享/分配 集团单位 部门
+let originalSelected: any[] = []; //存储当前选择 以获分配数据
+
 const ShareRecent = (props: Iprops) => {
   const { onCheckeds, shareType } = props;
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
@@ -58,7 +60,6 @@ const ShareRecent = (props: Iprops) => {
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [showData, setShowData] = useState<any[]>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>([]);
-  let originalSelected: any[] = []; //存储当前选择 以获分配数据
   // const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
   // const [departHisData, setDepartHisData] = useState<any[]>([]); // radio=1 历史数据
   // const [authorData, setAuthorData] = useState<any[]>([]); // raido=2 数据
