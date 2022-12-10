@@ -19,27 +19,34 @@
 .dept-wrap-pages {
   height: calc(100% - 206px);
   :global {
+    .ogo-card-head {
+      border: none;
+    }
     .ogo-card {
       height: 100%;
     }
     .ogo-card-body {
-      padding: 0;
+      // padding: 0;
+      padding-top: 0;
       height: calc(100% - 64px);
-    }
-  }
-}
-.pages-wrap {
-  height: 100%;
-  :global {
-    .ogo-card-head {
-      border: none;
-      padding: 0 24px;
-    }
-    .ogo-card-body {
-      padding: 0 24px 16px 24px;
     }
   }
   .page-content-table {
     height: 100%;
   }
 }
+// .pages-wrap {
+//   height: 100%;
+//   :global {
+//     .ogo-card-head {
+//       border: none;
+//       padding: 0 24px;
+//     }
+//     .ogo-card-body {
+//       padding: 0 24px 16px 24px;
+//     }
+//   }
+//   .page-content-table {
+//     height: 100%;
+//   }
+// }

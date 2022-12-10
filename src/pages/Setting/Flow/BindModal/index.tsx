@@ -46,7 +46,6 @@ const BindModal: React.FC<Bindmodalprops> = ({
     });
     setData(currentData);
     const currentValue = await userCtrl.space.queryFlowRelation(false);
-    console.log('currentValue', currentValue, bindAppMes?.id);
     if (currentValue && currentValue.length > 0) {
       const filterId = currentValue.filter((item) => {
         return item.defineId === bindAppMes?.id;
@@ -84,7 +83,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                   defineId: bindAppMes?.id,
                   productId: item.productId,
                   functionCode: item.functionCode,
-                  SpaceId: userCtrl.space.spaceData.id,
+                  spaceId: userCtrl.space.spaceData.id,
                 }),
               );
               // 如果有id 要看下有没有被编辑过
@@ -104,7 +103,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                     defineId: bindAppMes?.id,
                     productId: findData.productId,
                     functionCode: findData.functionCode,
-                    SpaceId: userCtrl.space.spaceData.id,
+                    spaceId: userCtrl.space.spaceData.id,
                   }),
                 );
               }
@@ -147,7 +146,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                             defineId: row?.defineId,
                             productId: row.productId,
                             functionCode: row.functionCode,
-                            SpaceId: userCtrl.space.spaceData.id,
+                            spaceId: userCtrl.space.spaceData.id,
                           })
                           .then((result) => {
                             if (result) {

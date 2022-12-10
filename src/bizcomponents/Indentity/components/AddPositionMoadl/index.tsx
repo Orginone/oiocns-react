@@ -50,7 +50,6 @@ const EditCustomModal = (props: Iprops) => {
         fieldNames: { label: 'name', value: 'id' },
         showSearch: true,
         filterTreeNode: true,
-        // multiple: true,
         treeNodeFilterProp: 'name',
         treeDefaultExpandAll: true,
       },
@@ -65,7 +64,6 @@ const EditCustomModal = (props: Iprops) => {
   ];
 
   return (
-    // <div className={cls['edit-custom-modal']}>
     <SchemaForm<XIdentity>
       formRef={formRef}
       title={title}
@@ -74,17 +72,12 @@ const EditCustomModal = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (open) {
           if (editData) {
-            formRef.current?.setFieldsValue({
-              ...editData.target,
-              authId: editData.target.authId,
-            });
+            formRef.current?.setFieldsValue({ ...editData.target });
           }
         } else {
           formRef.current?.resetFields();
+          handleCancel();
         }
-      }}
-      modalprops={{
-        onCancel: () => handleCancel(),
       }}
       rowProps={{
         gutter: [24, 0],

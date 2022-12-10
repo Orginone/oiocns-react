@@ -6,40 +6,30 @@ import { schema } from '@/ts/base';
 import CardOrTable from '@/components/CardOrTableComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { ICohort } from '@/ts/core/target/itarget';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 interface indexType {
   searchCallback: Function;
   cohort: ICohort;
 }
 
 const CohortPerson: React.FC<indexType> = (props) => {
-  useEffect(() => {
-    getTableList();
-  }, []);
+  useEffect(() => {}, []);
 
-  const [data, setData] = useState<schema.XTarget[]>([]);
+  // const [data, setData] = useState<schema.XTarget[]>([]);
 
-  const [value, setValue] = useState<string>();
-  const getTableList = async () => {
-    const res = await (
-      await props.cohort.loadMembers({
-        offset: 0,
-        filter: '',
-        limit: 65535,
-      })
-    ).result;
-    setData(res!);
-  };
+  const [value, setValue] = useState<string>('');
+  // const getTableList = async () => {
+  //   const res = await (
+  //     await props.cohort.loadMembers({
+  //       offset: 0,
+  //       filter: '',
+  //       limit: 65535,
+  //     })
+  //   ).result;
+  //   setData(res!);
+  // };
+
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
-    if (e.target.value) {
-      const res = await userCtrl.user?.searchPerson(e.target.value);
-      if (res?.result != null) {
-        setData([res.result[0]]);
-      } else {
-        getTableList();
-      }
-    }
   };
 
   const cohortColumn: ProColumns<any>[] = [
@@ -90,15 +80,25 @@ const CohortPerson: React.FC<indexType> = (props) => {
         />
       </div>
       <CardOrTable<schema.XTarget>
-        dataSource={data}
+        dataSource={[]}
         total={10}
         page={1}
+        width={400}
         rowSelection={{
           type: 'radio',
+
           onSelect: (record: any, selected: any, selectedRows: any) => {
             console.log(record, selected, selectedRows);
             props.searchCallback(record);
           },
+        }}
+        params={{ filter: value }}
+        request={(page) => {
+          return props.cohort.loadMembers({
+            limit: page.limit,
+            offset: page.offset,
+            filter: '',
+          });
         }}
         tableAlertRender={false}
         tableAlertOptionRender={false}

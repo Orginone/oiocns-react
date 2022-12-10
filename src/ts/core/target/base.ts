@@ -8,6 +8,7 @@ import { ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
+import { TargetModel } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
@@ -351,6 +352,11 @@ export default class BaseTarget implements ITarget {
     }
   }
 
+  async create(data: TargetModel): Promise<ITarget | undefined> {
+    await sleep(0);
+    return;
+  }
+
   async update(data: TargetParam): Promise<ITarget> {
     await this.updateTarget({
       ...data,
@@ -378,10 +384,10 @@ export default class BaseTarget implements ITarget {
       id: this.target.id,
       typeName: this.target.typeName,
     });
-    console.log('更新结果', res);
     if (res.success) {
       this.target.name = data.name;
       this.target.code = data.code;
+      this.target.avatar = data.avatar;
       this.target.belongId = data.belongId;
       if (this.target.team != undefined) {
         this.target.team.name = data.teamName;

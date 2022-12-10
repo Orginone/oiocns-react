@@ -45,6 +45,28 @@ const StoreApp: React.FC = () => {
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
     const id = item.prod.id;
+    const shareArr = [
+      {
+        key: 'share',
+        label: '共享',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          setShareType('共享');
+          setShowShareModal(true);
+        },
+      },
+    ];
+    if (userCtrl.isCompanySpace) {
+      shareArr.push({
+        key: 'share2',
+        label: '分配',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          setShareType('分配');
+          setShowShareModal(true);
+        },
+      });
+    }
     return [
       {
         key: 'open',
@@ -82,34 +104,7 @@ const StoreApp: React.FC = () => {
           });
         },
       },
-      {
-        key: 'share',
-        label: '共享',
-        onClick: () => {
-          appCtrl.setCurProduct(id);
-          setShareType('共享');
-          setShowShareModal(true);
-        },
-      },
-      {
-        key: 'share2',
-        label: '分配',
-        onClick: () => {
-          appCtrl.setCurProduct(id);
-          setShareType('分配');
-          setShowShareModal(true);
-        },
-      },
-      // {
-      //   key: 'save',
-      //   label: '暂存',
-      //   onClick: () => {
-      //     SelfAppCtrl.curProduct = item;
-      //     history.push({
-      //       pathname: '/store/app/publish',
-      //     });
-      //   },
-      // },
+      ...shareArr,
       {
         key: 'delete',
         label: <span style={{ color: 'red' }}>移除</span>,

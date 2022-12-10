@@ -141,7 +141,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     if (size != 0) {
       title.push(
         <div>
-          <a href="https://ant.design">{value.name}</a>
+          <a href="">{value.name}</a>
           <span style={{ paddingLeft: '5px' }}>{value.code}</span>
           <span>
             <Tag color="green" style={{ marginLeft: '10px' }}>
@@ -156,7 +156,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     } else {
       title.push(
         <div>
-          <a href="https://ant.design">{value.name}</a>
+          <a href="">{value.name}</a>
           <span style={{ paddingLeft: '5px' }}>{value.code}</span>
           <span>
             <Tag color="green" style={{ marginLeft: '10px' }}>

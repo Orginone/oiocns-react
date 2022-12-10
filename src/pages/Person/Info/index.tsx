@@ -63,7 +63,6 @@ const PersonInfo: React.FC = () => {
   return (
     <div className={cls['person-info-container']}>
       <Layout className={cls.container}>{content}</Layout>
-
       <Layout className={cls.container}>
         <Card bordered={false}>
           <div className={cls['person-info-company']}>
@@ -82,8 +81,8 @@ const PersonInfo: React.FC = () => {
         title={'修改信息'}
         handleCancel={() => setShowEditModal(false)}
         handleOk={() => setShowEditModal(false)}
-        editData={userCtrl.User.target}
-        reObject={userCtrl.User}
+        editData={userCtrl.user.target}
+        reObject={userCtrl.user}
       />
     </div>
   );

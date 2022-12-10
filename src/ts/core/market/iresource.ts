@@ -10,11 +10,7 @@ export default interface IResource {
    * @param destType 目标类型
    * @returns
    */
-  createExtend(
-    teamId: string,
-    destIds: string[],
-    destType: string,
-  ): Promise<model.ResultType<any>>;
+  createExtend(teamId: string, destIds: string[], destType: string): Promise<boolean>;
   /**
    * 取消资源分发
    * @param teamId 组织Id
@@ -22,11 +18,7 @@ export default interface IResource {
    * @param destType 目标类型
    * @returns
    */
-  deleteExtend(
-    teamId: string,
-    destIds: string[],
-    destType: string,
-  ): Promise<model.ResultType<any>>;
+  deleteExtend(teamId: string, destIds: string[], destType: string): Promise<boolean>;
   /**
    * 查询资源分发
    * @param sourceId 资源Id
@@ -34,8 +26,5 @@ export default interface IResource {
    * @param teamId 组织Id
    * @returns
    */
-  queryExtend(
-    destType: string,
-    teamId?: string,
-  ): Promise<model.ResultType<model.IdNameArray>>;
+  queryExtend(destType: string, teamId?: string): Promise<model.IdNameArray>;
 }

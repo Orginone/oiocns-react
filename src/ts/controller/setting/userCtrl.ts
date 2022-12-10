@@ -88,12 +88,7 @@ class UserController extends Emitter {
         result.push(...groups);
       }
     } else {
-      result.push({
-        ...this.user,
-        target: {
-          name: '我的好友',
-        },
-      });
+      result.push(this.user);
       const cohorts = await this._user!.getCohorts(false);
       result.push(...cohorts);
     }
@@ -102,17 +97,15 @@ class UserController extends Emitter {
   /** 加载组织树 */
   public buildTargetTree(targets: ITarget[], menus?: (item: ITarget) => any[]) {
     const result: any[] = [];
-    if (targets) {
-      for (const item of targets) {
-        result.push({
-          id: item.id,
-          name: item.name,
-          item: item,
-          isLeaf: false,
-          menus: menus ? menus(item) : [],
-          children: this.buildTargetTree(item.subTeam, menus),
-        });
-      }
+    for (const item of targets) {
+      result.push({
+        id: item.id,
+        item: item,
+        isLeaf: item.subTeam.length == 0,
+        menus: menus ? menus(item) : [],
+        name: item === this.user ? '我的好友' : item.name,
+        children: this.buildTargetTree(item.subTeam, menus),
+      });
     }
     return result;
   }

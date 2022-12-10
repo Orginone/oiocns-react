@@ -1,35 +1,34 @@
 import { schema } from '@/ts/base';
-import { ProColumns } from '@ant-design/pro-components';
+import { ProColumns } from '@ant-design/pro-table';
 
 export const columns: ProColumns<schema.XTarget>[] = [
   {
     title: '序号',
-    fixed: 'left',
+    valueType: 'index',
     width: 50,
-    render: (_key: any, _record: any, index: number) => {
-      return index + 1;
-    },
   },
   {
-    title: '名称',
-    dataIndex: 'name',
-  },
-  {
-    title: '信用代码',
+    title: '账号',
     dataIndex: 'code',
+    key: 'code',
   },
   {
-    title: '代码',
-    key: 'sellAuth',
+    title: '昵称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '姓名',
+    key: 'realName',
     render: (_key: any, _record: any, index: number) => {
-      return _record.team?.code;
+      return _record.team.name;
     },
   },
   {
-    title: '简介',
-    key: 'remark',
+    title: '手机号',
+    key: 'mobilephone',
     render: (_key: any, _record: any, index: number) => {
-      return _record.team?.remark;
+      return _record.team.code;
     },
   },
 ];

@@ -105,14 +105,12 @@ const SettingFlow: React.FC = () => {
   ];
 
   useEffect(() => {
-    const id = userCtrl.subscribe(initData);
-    return () => {
-      userCtrl.unsubscribe(id);
-    };
+    initData();
   }, []);
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
+
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
@@ -164,18 +162,20 @@ const SettingFlow: React.FC = () => {
             okText: '确认',
             okType: 'danger',
             cancelText: '取消',
-            onOk() {
+            onOk: () => {
               setTabType(TabType.PROCESSDESIGN);
               setCurrentStep(StepType.PROCESSMESS);
               setEditorValue(record?.content);
               const editorDataMes = JSON.parse(record?.content || '{}');
               setConditionData({
                 name: editorDataMes.name,
-                labels: JSON.parse(editorDataMes.remark),
+                labels: JSON.parse(editorDataMes.remark || '{}'),
                 fields: editorDataMes.fields,
               });
+              return new Promise<any>((resolve) => {
+                resolve(true);
+              });
             },
-            onCancel() {},
           });
         },
       },

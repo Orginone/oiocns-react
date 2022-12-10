@@ -22,17 +22,17 @@ class OrgTodo implements ITodoGroup {
     await this.getApprovalList();
     return this._todoList;
   }
-  async getNoticeList(refresh: boolean = false): Promise<IApprovalItem[]> {
+  async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(page?: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
     if (this._doList.length > 0) {
       return this._doList;
     }
     await this.getApprovalList();
     return this._doList;
   }
-  async getApplyList(page?: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     if (this._applyList.length > 0) {
       return this._applyList;
     }
@@ -81,7 +81,7 @@ class OrgTodo implements ITodoGroup {
       let rejectfun = (s: schema.XRelation) => {
         this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
       };
-      let reRejectfun = (s: schema.XRelation) => {};
+      let reRejectfun = (_: schema.XRelation) => {};
       this._doList = res.data.result
         .filter((a) => {
           return a.status >= CommonStatus.RejectStartStatus;
@@ -116,19 +116,19 @@ class ApprovalItem implements IApprovalItem {
   get Data(): schema.XRelation {
     return this._data;
   }
-  async pass(status: number, remark: string = ''): Promise<model.ResultType<any>> {
+  async pass(status: number, _: string = ''): Promise<boolean> {
     const res = await kernel.joinTeamApproval({ id: this._data.id, status });
     if (res.success) {
       this._passCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
-  async reject(status: number, remark: string): Promise<model.ResultType<any>> {
+  async reject(status: number, _: string): Promise<boolean> {
     const res = await kernel.joinTeamApproval({ id: this._data.id, status });
     if (res.success) {
       this._rejectCall.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
 }
 
@@ -142,7 +142,7 @@ class ApplyItem implements IApplyItem {
   get Data(): schema.XRelation {
     return this._data;
   }
-  async cancel(status?: number, remark?: string): Promise<model.ResultType<any>> {
+  async cancel(_status: number, _remark?: string): Promise<boolean> {
     const res = await kernel.cancelJoinTeam({
       id: this._data.id,
       typeName: '',
@@ -151,7 +151,7 @@ class ApplyItem implements IApplyItem {
     if (res.success) {
       this._cancelFun.apply(this, [this._data]);
     }
-    return res;
+    return res.success;
   }
 }
 

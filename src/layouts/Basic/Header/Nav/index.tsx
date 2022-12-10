@@ -72,7 +72,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
                 to={item.path}
                 title={item.title}
                 className={`${
-                  location.pathname.includes(item.fath)
+                  location.hash.startsWith('#' + item.fath)
                     ? `${cls['active-icon']}`
                     : `${cls['un-active-icon']}`
                 }`}>

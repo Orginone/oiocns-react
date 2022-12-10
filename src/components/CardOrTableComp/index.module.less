@@ -20,7 +20,9 @@
       color: @white-color;
     }
   }
-
+  .stripe {
+    background: #f9fafe;
+  }
   :global {
     .ogo-pro-card .ogo-pro-card-body {
       padding-inline: 0;
@@ -53,8 +55,12 @@
       padding: 0;
     }
 
+    .stripe > .option {
+      background: #f9fafe !important;
+    }
     .ogo-pro {
       flex: 1;
+      position: relative;
     }
   }
 }
@@ -64,6 +70,9 @@
 }
 
 // 卡片布局
+.common-card-content {
+  position: relative;
+}
 .common-card {
   flex: 1;
   box-sizing: border-box;
@@ -71,17 +80,17 @@
   flex-wrap: wrap;
   align-content: flex-start;
   overflow-y: auto;
+  padding-bottom: 10px;
 }
 
 .common-table-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 10px 0px 0;
-}
-
-.stripe {
-  background-color: #f9fafe;
+  // display: flex;
+  // justify-content: space-between;
+  // align-items: center;
+  margin-top: -49px;
+  z-index: 1;
+  position: relative;
+  width: 100px;
 }
 
 .btn-box {

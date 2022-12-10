@@ -27,9 +27,6 @@ export default class Person extends MarketTarget implements IPerson {
 
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
   }
-  public get subTeam(): ITarget[] {
-    return [];
-  }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);
     return [];
@@ -41,6 +38,14 @@ export default class Person extends MarketTarget implements IPerson {
       icon: this.target.avatar,
       typeName: this.target.typeName as TargetType,
     };
+  }
+  public async create(data: TargetModel): Promise<ITarget | undefined> {
+    switch (data.typeName as TargetType) {
+      case TargetType.Company:
+        return this.createCompany(data);
+      case TargetType.Cohort:
+        return this.createCohort(data.avatar, data.name, data.code, data.teamRemark);
+    }
   }
   public async searchCohort(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Cohort]);

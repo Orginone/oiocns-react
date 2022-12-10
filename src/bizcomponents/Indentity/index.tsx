@@ -29,13 +29,11 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   const [indentity, setIndentity] = useState<IIdentity>();
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [members, setMembers] = useState<schema.XTarget[]>([]);
   const [currentPerson, setPerson] = useState<schema.XTarget[]>();
   const [personData, setPersonData] = useState<XTarget[]>([]);
   useEffect(() => {
     if (open) {
       getDataList();
-      setMembers([]);
     } else {
       setIndentity(undefined);
     }
@@ -59,15 +57,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       //加载身份下的成员
       setPersonData(res.result);
       //加载可指派成员
-      setMembers(
-        (
-          await current.loadMembers({
-            offset: 0,
-            filter: '',
-            limit: 65535,
-          })
-        ).result!,
-      );
     } else {
       setPersonData([]);
     }
@@ -98,16 +87,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   const setTreeCurrent = async (current: IIdentity) => {
     setIndentity(current);
     await getPersonData(current);
-  };
-  // 去除已经选上的数据
-  const uniq = (arr1: schema.XTarget[], arr2: schema.XTarget[]): schema.XTarget[] => {
-    if (arr1.length === 0) {
-      return [];
-    }
-    let ids = arr2.map((item) => item.id);
-    return arr1.filter((el) => {
-      return !ids.includes(el.id);
-    });
   };
   // 身份信息操作
   const buttons = [
@@ -255,7 +234,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 getPersonData(indentity!);
                 message.success('指派成功');
               }}>
-              <AssignPosts searchFn={setPerson} memberData={members} current={current} />
+              <AssignPosts searchFn={setPerson} />
             </Modal>
           </div>
         </Content>

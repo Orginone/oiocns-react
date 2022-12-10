@@ -27,16 +27,16 @@ export interface IApprovalItem {
   /** 获得审批内容 */
   Data: any;
   /**@pass 通过 */
-  pass(status: number, remark: string): Promise<model.ResultType<any>>;
+  pass(status: number, remark: string): Promise<boolean>;
   /**@reject 拒绝 */
-  reject(status: number, remark: string): Promise<model.ResultType<any>>;
+  reject(status: number, remark: string): Promise<boolean>;
 }
 /** 申请项 */
 export interface IApplyItem {
   /** 获得审批内容 */
   Data: any;
   /**@cancel 取消 */
-  cancel(status: number, remark: string): Promise<model.ResultType<any>>;
+  cancel(status: number, remark: string): Promise<boolean>;
 }
 
 export interface IOrderApplyItem extends IApplyItem {
@@ -47,11 +47,11 @@ export interface IOrderApplyItem extends IApplyItem {
    * @param status 状态
    * @param remark 备注
    */
-  cancelItem(id: string, status: number, remark: string): Promise<model.ResultType<any>>;
+  cancelItem(id: string, status: number, remark: string): Promise<boolean>;
   /**
    * 退货退款订单详情项
    * @param status 状态
    * @param remark 备注
    */
-  reject(id: string, status: number, remark: string): Promise<model.ResultType<any>>;
+  reject(id: string, status: number, remark: string): Promise<boolean>;
 }

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Button, message, Modal, Tabs, Typography } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
@@ -10,28 +9,28 @@ import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
-import EditCustomModal from './components/EditCustomModal';
 import TransferDepartment from './components/TransferDepartment';
 import DepartTree from './components/TreeLeftDeptPage';
 import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import cls from './index.module.less';
 import SearchPerson from '@/bizcomponents/SearchPerson';
+import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
 }
-
-type ShowmodelType = 'addOne' | 'edit' | 'post' | 'transfer' | 'indentity' | '';
 /**
  * 内设机构
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [current, setCurrent] = useState<ITarget>();
   const [edit, setEdit] = useState<ITarget>();
-  const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
+  const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
   const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
   // 操作内容渲染函数
@@ -39,7 +38,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     return [
       {
         key: 'changeDept',
-        label: '变更部门',
+        label: '变更' + item.typeName,
         onClick: () => {
           setSelectPerson(item);
           setActiveModal('transfer');
@@ -47,7 +46,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       },
       {
         key: 'moveOne',
-        label: '移出部门',
+        label: '移出' + item.typeName,
         onClick: async () => {
           if (selectPerson && current) {
             if (await current.removeMember(item)) {
@@ -60,58 +59,47 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     ];
   };
   /**点击操作内容触发的事件 */
-  const handleMenuClick = (key: string, item: ITarget | undefined) => {
-    switch (key) {
-      case 'new':
-        setEdit(undefined);
-        setCreateOrEdit('新增');
-        setActiveModal('edit');
-        break;
-      case '新增部门':
-        if (!item) return;
-        setEdit(item);
-        setCreateOrEdit('新增');
-        setActiveModal('edit');
-        break;
-      case 'changeDept': //变更部门
-        setActiveModal('transfer');
-        break;
-      case 'updateDept': // 编辑部门
-        if (!item) return;
-        setCreateOrEdit('编辑');
-        setEdit(item);
-        setActiveModal('edit');
-        break;
-      case '删除部门':
-        if (!item) return;
-        Modal.confirm({
-          title: '提示',
-          icon: <ExclamationCircleOutlined />,
-          content: `是否确定删除${item.target.name}?`,
-          okText: '确认',
-          cancelText: '取消',
-          onOk: async () => {
-            const idelete = item as unknown as ICanDelete;
-            if (idelete && (await idelete.delete())) {
-              message.success(`删除${item.target.name}成功!`);
-              userCtrl.changCallback();
-            } else {
-              message.error(`删除${item.target.name}失败!`);
+  const handleMenuClick = async (key: string, item: ITarget | undefined) => {
+    if (key.startsWith('新建')) {
+      setEdit(item);
+      setCreateOrEdit(key.substring(3));
+      setActiveModal('新建');
+    } else if (item) {
+      switch (key) {
+        case '刷新':
+          await item.loadSubTeam(true);
+          forceUpdate();
+          break;
+        case '删除':
+          if (item as unknown as ICanDelete) {
+            if (await (item as unknown as ICanDelete).delete()) {
+              setCurrent(undefined);
+              forceUpdate();
             }
-          },
-        });
+          }
+          break;
+        case 'changeDept': //变更部门
+          setActiveModal('transfer');
+          break;
+        case '编辑': // 编辑部门
+          if (!item) return;
+          setCreateOrEdit(item.target.typeName);
+          setEdit(item);
+          setActiveModal('编辑');
+          break;
+      }
     }
   };
+
   const handleOk = () => {
     setActiveModal('');
-    // 处理刷新的功能
-    userCtrl.changCallback();
+    forceUpdate();
   };
 
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `部门成员`,
+      tab: current?.target.typeName ?? '机构' + `成员`,
       key: 'deptPerpeos',
     },
     {
@@ -139,16 +127,33 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
 
   return (
     <div className={cls[`dept-content-box`]}>
+      <CreateTeamModal
+        title={activeModal}
+        open={['新建', '编辑'].includes(activeModal)}
+        handleCancel={function (): void {
+          setActiveModal('');
+        }}
+        handleOk={(newItem) => {
+          if (newItem) {
+            forceUpdate();
+            setActiveModal('');
+          }
+        }}
+        current={edit || userCtrl.company}
+        typeNames={createOrEdit.split('|')}
+      />
       {current ? (
         <>
           <DeptDescription
-            title={<Typography.Title level={5}>部门信息</Typography.Title>}
+            title={
+              <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
+            }
             selectDept={current.target}
             extra={[
               <Button
                 key="edit"
                 type="link"
-                onClick={() => handleMenuClick('updateDept', current)}>
+                onClick={() => handleMenuClick('编辑', current)}>
                 编辑
               </Button>,
               <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
@@ -168,24 +173,21 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                   tabBarExtraContent={renderBtns()}
                 />
                 <CardOrTable<XTarget>
-                  dataSource={[]}
                   rowKey={'id'}
+                  params={current}
+                  request={async (page) => {
+                    return await current.loadMembers(page);
+                  }}
                   operation={renderOperation}
                   columns={columns}
                   parentRef={parentRef}
                   showChangeBtn={false}
+                  dataSource={[]}
                 />
               </div>
             </PageCard>
           </div>
           {/* 编辑部门 */}
-          <EditCustomModal
-            handleCancel={() => setActiveModal('')}
-            current={edit || userCtrl.company}
-            open={activeModal === 'edit'}
-            title={createOrEdit}
-            handleOk={handleOk}
-          />
           <IndentityManage
             open={activeModal === 'indentity'}
             current={current}
@@ -229,6 +231,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       )}
       {/* 左侧树 */}
       <DepartTree
+        key={key}
         current={current}
         handleMenuClick={handleMenuClick}
         setCurrent={(item) => setCurrent(item)}
