@@ -13,7 +13,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import CreateTeamModel from '@/bizcomponents/CreateTeam';
-import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
+import AssignPosts from '@/bizcomponents/AssignPostCompany';
 
 type ShowmodelType =
   | 'addOne'
@@ -215,7 +215,7 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts searchFn={setSelectPerson} />
+          <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} />
         </Modal>
       </div>
     </div>
