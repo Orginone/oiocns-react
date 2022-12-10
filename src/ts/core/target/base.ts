@@ -37,7 +37,11 @@ export default class BaseTarget implements ITarget {
 
   public get avatar(): FileItemShare | undefined {
     if (this.target.avatar) {
-      return JSON.parse(this.target.avatar);
+      try {
+        return JSON.parse(this.target.avatar);
+      } catch {
+        return undefined;
+      }
     }
     return undefined;
   }

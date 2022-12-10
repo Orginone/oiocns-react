@@ -40,10 +40,8 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
     return (
       <div className="card-title flex">
         <div className="card-title-left">
-          <Avatar
-            src="https://gw.alipayobjects.com/zos/rmsportal/kZzEzemZyKLKFsojXItE.png"
-            size={60}
-          />
+          <Avatar src={new Cohort(data).avatar?.thumbnail} size={60} />
+
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.name || '--'}</span>
