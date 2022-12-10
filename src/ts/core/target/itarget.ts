@@ -41,7 +41,7 @@ export interface ITarget {
   joinTargetType: TargetType[];
   /** 可以查询的组织类型 */
   searchTargetType: TargetType[];
-  /** 子组织 */
+  /** 缓存内的子组织 */
   subTeam: ITarget[];
   /**
    * 新增

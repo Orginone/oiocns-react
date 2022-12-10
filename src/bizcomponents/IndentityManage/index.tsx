@@ -16,6 +16,8 @@ export type ResultType = {
   identitys: XIdentity[];
 };
 interface Iprops {
+  multiple: boolean;
+  onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
 const ShareRecent = (props: Iprops) => {
@@ -26,7 +28,7 @@ const ShareRecent = (props: Iprops) => {
   const [resultData, setResultData] = useState<ResultType[]>([]);
 
   const loadTeamTree = async () => {
-    const targets = await userCtrl.space.loadSubTeam(false);
+    const targets = await userCtrl.getTeamTree();
     setData(buildTargetTree(targets));
   };
 
@@ -39,7 +41,7 @@ const ShareRecent = (props: Iprops) => {
           key: item.id,
           title: item.name,
           item: item,
-          isLeaf: false,
+          isLeaf: item.subTeam.length === 0,
           icon: getIcon(item.teamName as TargetType),
           children: buildTargetTree(item.subTeam),
         });
@@ -94,25 +96,27 @@ const ShareRecent = (props: Iprops) => {
   };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (_, info) => {
-    changedChecked(info.node.key as string, info.checked);
+    const item = getIdentityItem(info.node.key);
+    if (current && item) {
+      if (info.checked) {
+        current.identitys.push(item.data);
+      } else {
+        current.identitys = current.identitys.filter((i: any) => {
+          return i.id != item.key;
+        });
+      }
+      setKey(generateUuid());
+      props.onCheckeds?.apply(this, [resultData]);
+    }
   };
 
-  const changedChecked = (key: string, add: boolean) => {
-    if (current) {
-      for (const item of identitys) {
-        if (item.key === key) {
-          if (add) {
-            current.identitys.push(item.data);
-          } else {
-            current.identitys = current.identitys.filter((i: any) => {
-              return i.id != item.key;
-            });
-          }
-          setKey(generateUuid());
-          props.onCheckeds?.apply(this, [resultData]);
-        }
+  const getIdentityItem = (key: string | number) => {
+    for (const item of identitys) {
+      if (item.key === key) {
+        return item;
       }
     }
+    return undefined;
   };
 
   const getSelectData = () => {
@@ -136,15 +140,22 @@ const ShareRecent = (props: Iprops) => {
     return [];
   };
 
+  const deleteItem = (id: string) => {
+    for (const item of resultData) {
+      item.identitys = item.identitys.filter((i) => {
+        return i.id != id;
+      });
+    }
+    setKey(generateUuid());
+  };
+
   return (
-    <div className={cls.layout}>
+    <div id={key} className={cls.layout}>
       <div className={cls.content}>
         <div className={cls.leftContent}>
           <StoreClassifyTree
             className={cls.docTree}
-            title={'内设机构'}
             isDirectoryTree
-            menu={'menus'}
             searchable
             showIcon
             treeData={data}
@@ -159,19 +170,29 @@ const ShareRecent = (props: Iprops) => {
           />
           <div id={key} className={cls.centerContent}>
             <Tree
-              checkable
+              checkable={props.multiple}
+              multiple={props.multiple}
               autoExpandParent={true}
               onCheck={onCheck}
+              onSelect={(_, info) => {
+                props.onChecked?.apply(this, [getIdentityItem(info.node.key)]);
+              }}
               treeData={identitys}
               checkedKeys={getSelectKeys()}
             />
           </div>
         </div>
-        <div id={key} style={{ width: '33%' }} className={cls.right}>
-          <ShareShowComp
-            departData={getSelectData()}
-            deleteFuc={() => {}}></ShareShowComp>
-        </div>
+        {props.multiple ? (
+          <div id={key} style={{ width: '33%' }} className={cls.right}>
+            <ShareShowComp
+              departData={getSelectData()}
+              deleteFuc={(id: string) => {
+                deleteItem(id);
+              }}></ShareShowComp>
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );

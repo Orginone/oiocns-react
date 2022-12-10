@@ -1,4 +1,4 @@
-import { ITarget, IWorking } from './itarget';
+import { IWorking } from './itarget';
 import { schema } from '../../base';
 import BaseTarget from './base';
 import { TargetType } from '../enum';
@@ -12,9 +12,6 @@ export default class Working extends BaseTarget implements IWorking {
   constructor(target: XTarget, onDeleted: Function) {
     super(target);
     this._onDeleted = onDeleted;
-  }
-  public get subTeam(): ITarget[] {
-    return [];
   }
   async delete(): Promise<boolean> {
     const res = await this.deleteTarget();

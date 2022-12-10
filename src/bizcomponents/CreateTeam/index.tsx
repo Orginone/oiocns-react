@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space } from 'antd';
-import { nanoid, ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { TargetModel } from '@/ts/base/model';
@@ -34,13 +34,14 @@ const EditCustomModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('图片');
+      const docDir = await docsCtrl.home?.create('头像');
       if (docDir && file) {
-        const result = await docsCtrl.upload(docDir.key, nanoid() + file.name, file);
+        const result = await docsCtrl.upload(docDir.key, file.name, file);
         if (result) {
+          const shareInfo = result.shareInfo();
           setAvatar({
-            thumbUrl: result.target.thumbnail,
-            url: result.target.shareLink,
+            thumbUrl: shareInfo.thumbnail,
+            url: shareInfo.shareLink,
           });
         }
       }

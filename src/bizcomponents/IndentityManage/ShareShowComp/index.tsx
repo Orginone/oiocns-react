@@ -3,7 +3,7 @@ import React from 'react';
 import cls from './index.module.less';
 type ShareShowRecentProps = {
   departData: any[];
-  deleteFuc: () => void;
+  deleteFuc: (id: string) => void;
 };
 const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
   console.log('所选数据', props.departData);
@@ -22,7 +22,12 @@ const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
               key={el.id}
               className={cls.row}>
               <div>{el.name}</div>
-              <CloseCircleOutlined className={cls.closeIcon} />
+              <CloseCircleOutlined
+                className={cls.closeIcon}
+                onClick={() => {
+                  props?.deleteFuc.apply(this, [el.id]);
+                }}
+              />
             </div>
           );
         })}
