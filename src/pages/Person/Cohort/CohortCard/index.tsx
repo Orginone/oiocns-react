@@ -1,4 +1,4 @@
-import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
+import { EllipsisOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
@@ -29,7 +29,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
     const res = (
       await data.loadMembers({ offset: 0, filter: '', limit: 65535 })
     ).result!.filter((obj) => obj.id === data.target.belongId);
-    setName(res[0].team?.name!);
+    setName(res[0].team?.name ?? '');
   };
 
   const Title = () => {

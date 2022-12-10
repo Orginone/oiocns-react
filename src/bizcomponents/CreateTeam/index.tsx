@@ -59,6 +59,13 @@ const EditCustomModal = (props: Iprops) => {
             <Upload {...uploadProps}>
               <Button type="link">上传图标</Button>
             </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除图标
+              </Button>
+            ) : (
+              ''
+            )}
           </Space>
         );
       },
@@ -136,6 +143,7 @@ const EditCustomModal = (props: Iprops) => {
           }
         } else {
           formRef.current?.resetFields();
+          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           setAvatar(undefined);
           handleCancel();
         }

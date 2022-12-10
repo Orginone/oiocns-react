@@ -17,8 +17,8 @@ export type SpaceType = {
   name: string;
   /** 类型 */
   typeName: TargetType;
-  /** 图标 */
-  icon?: string;
+  /** 头像 */
+  avatar?: FileItemShare;
 };
 export interface ITarget {
   /** 唯一标识 */
@@ -29,6 +29,8 @@ export interface ITarget {
   teamName: string;
   /** 实体对象 */
   target: schema.XTarget;
+  /** 类型 */
+  typeName: TargetType;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
   /** 拥有的身份 */
@@ -499,6 +501,12 @@ export interface ICompany extends ISpace, ITarget {
    * @return {*} 查询到的群组
    */
   getJoinedGroups(reload?: boolean): Promise<IGroup[]>;
+  /**
+   * 根据岗位下的身份查询成员
+   * @param data 身份ID集合及分页参数
+   * @return {*} 成员列表
+   */
+  getStationMember(data: model.IdArrayReq): Promise<XTargetArray>;
   /**
    * 申请加入集团
    * @param id 目标Id

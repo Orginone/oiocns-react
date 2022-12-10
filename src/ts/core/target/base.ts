@@ -10,6 +10,7 @@ import { logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
+  public typeName: TargetType;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
@@ -49,6 +50,7 @@ export default class BaseTarget implements ITarget {
     this.searchTargetType = [];
     this.ownIdentitys = [];
     this.identitys = [];
+    this.typeName = target.typeName as TargetType;
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({

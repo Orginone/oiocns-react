@@ -20,17 +20,16 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const scale = useAppwfConfig((state: any) => state.scale);
-  const close = () => {
-    console.log('selectedNode', selectedNode);
+
+  const closeItem = () => {
     /** 判断是否全部填写 */
     const isAllFill = (selectedNode.conditions || []).some((item) => {
       return !item.paramLabel || !item.label || !item.val;
     });
-    console.log('isAllFill', isAllFill);
+
     if (isAllFill) {
       message.warning('请补充未填写的字段');
     } else {
-      message.success('条件补充成功');
       setShowConfig(false);
       setSelectedNode([]);
     }
@@ -39,15 +38,12 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
     setShowConfig(true);
     setSelectedNode(node);
   };
-
-  // 抽屉
-  const configDrawer = <FlowDrawer open={showConfig} onClose={close} />;
   return (
     <div>
       <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
         <ProcessTree OnSelectedNode={Selected} />
       </div>
-      {configDrawer}
+      <FlowDrawer open={showConfig} onClose={() => closeItem()} />
       <Drawer
         open={dialogTableVisible}
         title="详情"

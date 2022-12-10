@@ -20,24 +20,21 @@ interface Iprops {
 const FlowDrawer = (props: Iprops) => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const { open, onClose } = props;
+
   let Comp = null;
 
   switch (selectedNode.type) {
     case 'ROOT':
       Comp = <RootNode />;
-      // setDafaultTitle(title?title:'发起人')
       break;
     case 'APPROVAL':
       Comp = <ApprovalNode />;
-      // setDafaultTitle(title?title:'审批对象')
       break;
     case 'CC':
       Comp = <CcNode />;
-      // setDafaultTitle(title?title:'抄送对象')
       break;
     case 'CONDITION':
       Comp = <ConditionNode />;
-      // setDafaultTitle(title?title:'条件')
       break;
   }
 
@@ -46,9 +43,9 @@ const FlowDrawer = (props: Iprops) => {
       title={<EditTitle />}
       placement="right"
       open={open}
-      onClose={onClose}
+      onClose={() => onClose()}
       width={600}>
-      <>{Comp && Comp}</>
+      <>{Comp}</>
     </Drawer>
   );
 };

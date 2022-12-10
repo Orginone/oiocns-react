@@ -1067,6 +1067,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 根据岗位下的身份查询成员
+   * @param {model.IdArrayReq} params 请求参数
+   * @returns {model.ResultType<schema.XTargetArray>} 请求结果
+   */
+  public async QueryStationTargets(
+    params: model.IdArrayReq,
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryStationTargets',
+      params: params,
+    });
+  }
+  /**
    * 查询在当前空间拥有角色的组织
    * @param {model.SpaceAuthReq} params 请求参数
    * @returns {model.ResultType<schema.XTargetArray>} 请求结果
