@@ -35,7 +35,7 @@ export default class Person extends MarketTarget implements IPerson {
     return {
       id: this.id,
       name: '个人空间',
-      icon: this.avatar?.thumbnail,
+      avatar: this.avatar,
       typeName: this.target.typeName as TargetType,
     };
   }
@@ -55,10 +55,6 @@ export default class Person extends MarketTarget implements IPerson {
   }
   public async searchCompany(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, companyTypes);
-  }
-  public async update(data: Omit<TargetModel, 'id'>): Promise<IPerson> {
-    await super.updateTarget(data);
-    return this;
   }
   public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {
     if (!reload && this.cohorts.length > 0) {

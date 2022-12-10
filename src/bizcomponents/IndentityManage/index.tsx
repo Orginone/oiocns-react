@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
-import { SearchOutlined } from '@ant-design/icons';
 import * as im from 'react-icons/im';
-import { Input, Tree, TreeProps } from 'antd';
+import { TreeProps } from 'antd';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
@@ -10,6 +9,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget, TargetType } from '@/ts/core';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
+import TeamIcon from '../GlobalComps/teamIcon';
 export type ResultType = {
   id: string;
   target: XTarget;
@@ -42,7 +42,9 @@ const ShareRecent = (props: Iprops) => {
           title: item.name,
           item: item,
           isLeaf: item.subTeam.length === 0,
-          icon: getIcon(item.target.typeName as TargetType),
+          icon: (
+            <TeamIcon typeName={item.target.typeName} avatar={item.avatar} size={18} />
+          ),
           children: buildTargetTree(item.subTeam),
         });
       }
@@ -152,7 +154,7 @@ const ShareRecent = (props: Iprops) => {
   return (
     <div id={key} className={cls.layout}>
       <div className={cls.content}>
-        <div className={cls.leftContent}>
+        <div className={`${props.multiple ? cls.leftContent : cls.newLeftContent}`}>
           <StoreClassifyTree
             className={cls.docTree}
             isDirectoryTree
@@ -162,7 +164,7 @@ const ShareRecent = (props: Iprops) => {
             onSelect={onSelect}
           />
         </div>
-        <div className={cls.center}>
+        <div className={`${props.multiple ? cls.center : cls.newCenter}`}>
           <StoreClassifyTree
             className={cls.docTree}
             searchable
@@ -179,7 +181,10 @@ const ShareRecent = (props: Iprops) => {
           />
         </div>
         {props.multiple ? (
-          <div id={key} style={{ width: '33%' }} className={cls.right}>
+          <div
+            id={key}
+            style={{ width: `${props.multiple ? '33%' : '50%'}` }}
+            className={cls.right}>
             <ShareShowComp
               departData={getSelectData()}
               deleteFuc={(id: string) => {

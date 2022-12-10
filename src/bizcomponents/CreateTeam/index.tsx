@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { message, Upload, UploadProps, Image, Button, Space } from 'antd';
+import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
+import { BankOutlined } from '@ant-design/icons';
 
 interface Iprops {
   title: string;
@@ -51,14 +52,27 @@ const EditCustomModal = (props: Iprops) => {
       renderFormItem: () => {
         return (
           <Space>
-            {avatar ? (
-              <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
-            ) : (
-              ''
-            )}
+            <Avatar
+              size={64}
+              style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
+              src={
+                avatar ? (
+                  <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
+                ) : (
+                  <BankOutlined style={{ fontSize: 16 }} />
+                )
+              }
+            />
             <Upload {...uploadProps}>
               <Button type="link">上传图标</Button>
             </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除图标
+              </Button>
+            ) : (
+              ''
+            )}
           </Space>
         );
       },
@@ -122,6 +136,7 @@ const EditCustomModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
+          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           if (title === '编辑') {
             setAvatar(undefined);
             if (current.target.avatar) {

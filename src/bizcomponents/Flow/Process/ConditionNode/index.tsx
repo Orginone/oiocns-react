@@ -45,16 +45,18 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
       }
       text = text.substring(0, text.lastIndexOf(' 且 '));
       /** 如果没有找到字段就报错 */
-
+      // console.log('conditions', conditions);
+      // console.log('currentCondition', currentCondition);
       /** conditions中的每一项 在currentCondition中都要存在 如果不存在就报错 */
       const getFindValue = conditions.find(
         (item: { paramLabel: string; paramKey: string }) => {
           const findData = currentCondition.find(
             (innItem: { label: string; value: string }) => {
-              return item.paramLabel !== innItem.label || innItem.value !== item.paramKey;
+              return item.paramLabel === innItem.label && innItem.value === item.paramKey;
             },
           );
-          return typeof findData !== 'undefined';
+          /**能找到说明是可以的 */
+          return typeof findData === 'undefined';
         },
       );
       console.log('getFindValue', getFindValue);

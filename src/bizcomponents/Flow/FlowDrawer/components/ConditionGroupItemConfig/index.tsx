@@ -40,7 +40,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   }, []);
 
   useEffect(() => {
-    // const currentCondtions = DefaultProps.getFormFields(); //所有的条件
+    // const = DefaultProps.getFormFields(); //所有的条件
     /** 干掉条件不存在的 */
     // const filterResult = selectedNode.conditions.filter(
     //   (item: { paramKey: string; paramLabel: string }) => {
@@ -51,8 +51,8 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     //     return typeof findData !== 'undefined';
     //   },
     // );
+    // console.log('selectedNode.conditions', selectedNode.conditions);
     form.setFieldsValue({ allContent: selectedNode.conditions });
-    setCurretEditorValue([...selectedNode.conditions]);
     const paramKey = selectedNode.conditions.map((item: conditionType) => {
       return item.paramKey;
     });
@@ -72,12 +72,12 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             item.val = currentValue.allContent[index].val;
             item.paramKey = currentValue.allContent[index].paramKey;
             /**这里临时存一个数组,用来判断新旧值是否发生变化，然后清空值 */
-            if (paramKeyArr[index] !== currentValue.allContent[index].paramKey) {
-              currentValue.allContent[index].val = '';
-              form.setFieldsValue({
-                allContent: [...currentValue.allContent],
-              });
-            }
+            // if (paramKeyArr[index] !== currentValue.allContent[index].paramKey) {
+            //   currentValue.allContent[index].val = '';
+            //   form.setFieldsValue({
+            //     allContent: [...currentValue.allContent],
+            //   });
+            // }
             /**当前数组得替换一下 */
             newArr.push(currentValue.allContent[index].paramKey);
             setParamKeyArr(newArr);
@@ -86,7 +86,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             const findCon = currentCondtions.find((innItem) => {
               return innItem.value === currentValue.allContent[index].paramKey;
             });
-
             item.paramLabel = findCon ? findCon?.label : '';
             item.type = findCon ? findCon?.type : '';
             item.key = currentValue.allContent[index].key;
@@ -112,7 +111,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
           });
           setCurretEditorValue([...selectedNode.conditions]);
         }}>
-        {curretEditorValue?.map((condition: any, index: number) => (
+        {[...selectedNode.conditions]?.map((condition: any, index: number) => (
           <div key={index + '_g'} className={cls['group']}>
             <div className={cls['group-header']}>
               <div

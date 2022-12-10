@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space, Avatar } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -20,6 +20,7 @@ import { XFlowDefine } from '@/ts/base/schema';
 import FlowCard from '@/components/FlowCardComp';
 import useWindowSize from '@/utils/windowsize';
 import BindModal from './BindModal';
+import Appbindlist from './Appnindlist';
 
 const { Header, Content } = Layout;
 
@@ -74,6 +75,7 @@ const SettingFlow: React.FC = () => {
   const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
 
   const [dateData, setDateData] = useState(1);
+  const [rowId, setRowId] = useState<string>('');
 
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -110,10 +112,11 @@ const SettingFlow: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
-
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
+      console.log('result', result);
+      setBindAppMes(result[0]);
     }
   };
 
@@ -148,7 +151,6 @@ const SettingFlow: React.FC = () => {
         label: '绑定应用',
         onClick: () => {
           setIsOpenModal(true);
-          setBindAppMes(record);
           setDateData(dateData + 1);
         },
       },
@@ -214,190 +216,172 @@ const SettingFlow: React.FC = () => {
 
   return (
     <div className={cls['company-top-content']}>
-      <Card bordered={false}>
-        {tabType === TabType.TABLEMES ? (
-          <div>
-            <Card title="流程列表" type="inner" bordered={false}>
-              <div className={cls['app-wrap']} ref={parentRef}>
-                <CardOrTable<XFlowDefine>
-                  dataSource={showDataSource}
-                  total={allData.length}
-                  pageSize={10}
-                  page={page}
-                  stripe
-                  parentRef={parentRef}
-                  renderCardContent={renderCardFun}
-                  operation={renderOperation}
-                  columns={columns}
-                  height={0.38 * height}
-                  onChange={handlePageChange}
-                  rowKey={(record: XFlowDefine) => record.id || 'id'}
-                  toolBarRender={() => [
-                    <Button
-                      key="button"
-                      type="primary"
-                      onClick={() => {
-                        setTabType(TabType.PROCESSDESIGN);
-                      }}>
-                      新建
-                    </Button>,
-                  ]}
-                />
-              </div>
-            </Card>
-            {/* 这里后面写模版列表，暂时隐藏 */}
-            <Card title="模板列表" type="inner" bordered={false}>
-              <div className={cls['app-wrap']} ref={parentRef}>
-                {/* <CardOrTable<XFlowDefine>
-                  dataSource={dataSource}
-                  total={dataSource.length}
-                  page={6}
-                  stripe
-                  parentRef={parentRef}
-                  renderCardContent={renderCardFun}
-                  operation={renderOperation}
-                  columns={columns}
-                  height={0.2 * height}
-                  onChange={handlePageChange}
-                  rowKey={(record: XFlowDefine) => record.id || 'id'}
-                  toolBarRender={() => [
-                    <Button
-                      key="button"
-                      type="primary"
-                      onClick={() => {
-                        setTabType(TabType.PROCESSDESIGN);
-                      }}>
-                      新建
-                    </Button>,
-
-                    <span>编辑分组</span>,
-                  ]}
-                /> */}
-              </div>
-            </Card>
-          </div>
-        ) : (
-          <div className={cls['company-info-content']}>
-            <Card bordered={false}>
-              <Layout>
-                <Header
+      {/* <Card>流程设置</Card> */}
+      {tabType === TabType.TABLEMES ? (
+        <div>
+          <Card bordered={false}>
+            <div className={cls['app-wrap']} ref={parentRef}>
+              <CardOrTable<XFlowDefine>
+                dataSource={showDataSource}
+                total={allData.length}
+                pageSize={10}
+                page={page}
+                rowClassName={(recorId: any) => {
+                  return recorId.id === rowId ? cls.rowClass : '';
+                }}
+                onRow={(record: any) => {
+                  return {
+                    onClick: () => {
+                      setRowId(record.id);
+                      setBindAppMes(record);
+                    }, // 点击行
+                  };
+                }}
+                stripe
+                parentRef={parentRef}
+                renderCardContent={renderCardFun}
+                operation={renderOperation}
+                columns={columns}
+                height={0.38 * height}
+                onChange={handlePageChange}
+                rowKey={(record: XFlowDefine) => record.id || 'id'}
+                toolBarRender={() => [
+                  <Button
+                    key="button"
+                    type="primary"
+                    onClick={() => {
+                      setTabType(TabType.PROCESSDESIGN);
+                    }}>
+                    新建
+                  </Button>,
+                ]}
+              />
+            </div>
+          </Card>
+          {/* 这里后面写模版列表，暂时隐藏 */}
+          <Appbindlist bindAppMes={bindAppMes} />
+        </div>
+      ) : (
+        <div className={cls['company-info-content']}>
+          <Card bordered={false}>
+            <Layout>
+              <Header
+                style={{
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 100,
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <div
                   style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 100,
                     width: '100%',
                     display: 'flex',
-                    justifyContent: 'center',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}>
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                    <div>
-                      <Button
-                        onClick={() => {
-                          Modal.confirm({
-                            title: '未发布的内容将不会被保存，是否直接退出?',
-                            icon: <ExclamationCircleOutlined />,
-                            okText: '确认',
-                            okType: 'danger',
-                            cancelText: '取消',
-                            onOk() {
-                              setTabType(TabType.TABLEMES);
-                              setCurrentStep(StepType.BASEINFO);
-                              setConditionData({ name: '', labels: [{}], fields: '' });
-                              setDesignData(null);
-                              setEditorValue(null);
-                            },
-                            onCancel() {},
-                          });
-                        }}>
-                        <RollbackOutlined />
-                        返回
-                      </Button>
-                    </div>
-                    <div style={{ width: '300px' }}>
-                      <Steps
-                        current={currentStep}
-                        onChange={(e) => {
-                          setCurrentStep(e);
-                          /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
-                          if (StepType.BASEINFO === e) {
-                            setDesignData(design);
-                          }
-                        }}
-                        items={[
-                          {
-                            title: stepTypeAndNameMaps[StepType.BASEINFO],
+                  <div>
+                    <Button
+                      onClick={() => {
+                        Modal.confirm({
+                          title: '未发布的内容将不会被保存，是否直接退出?',
+                          icon: <ExclamationCircleOutlined />,
+                          okText: '确认',
+                          okType: 'danger',
+                          cancelText: '取消',
+                          onOk() {
+                            setTabType(TabType.TABLEMES);
+                            setCurrentStep(StepType.BASEINFO);
+                            setConditionData({ name: '', labels: [{}], fields: '' });
+                            setDesignData(null);
+                            setEditorValue(null);
                           },
-                          {
-                            title: stepTypeAndNameMaps[StepType.PROCESSMESS],
-                          },
-                        ]}></Steps>
-                    </div>
-                    <div className={cls['publish']}>
-                      {currentStep === StepType.PROCESSMESS && (
-                        <Space>
-                          <Button
-                            className={cls['publis-issue']}
-                            size="small"
-                            type="primary"
-                            onClick={publish}>
-                            <SendOutlined />
-                            发布
-                          </Button>
-                          <Button
-                            className={cls['scale']}
-                            size="small"
-                            disabled={scale <= 40}
-                            onClick={() => changeScale(scale - 10)}>
-                            <MinusOutlined />
-                          </Button>
-                          <span>{scale}%</span>
-                          <Button
-                            size="small"
-                            disabled={scale >= 150}
-                            onClick={() => changeScale(scale + 10)}>
-                            <PlusOutlined />
-                          </Button>
-                        </Space>
-                      )}
-                    </div>
+                          onCancel() {},
+                        });
+                      }}>
+                      <RollbackOutlined />
+                      返回
+                    </Button>
                   </div>
-                </Header>
-                <Content>
-                  <Card bordered={false}>
-                    {/* 基本信息组件 */}
-                    {currentStep === StepType.BASEINFO ? (
-                      <BaseInfo
-                        currentFormValue={conditionData}
-                        onChange={(params) => {
-                          setConditionData(params);
-                          design.remark = JSON.stringify(params.labels);
+                  <div style={{ width: '300px' }}>
+                    <Steps
+                      current={currentStep}
+                      onChange={(e) => {
+                        setCurrentStep(e);
+                        /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
+                        if (StepType.BASEINFO === e) {
                           setDesignData(design);
-                        }}
-                        nextStep={(params) => {
-                          setCurrentStep(StepType.PROCESSMESS);
-                          setConditionData(params);
-                        }}
-                      />
-                    ) : (
-                      <ProcessDesign
-                        designData={designData}
-                        editorValue={editorValue}
-                        conditionData={conditionData}></ProcessDesign>
+                        }
+                      }}
+                      items={[
+                        {
+                          title: stepTypeAndNameMaps[StepType.BASEINFO],
+                        },
+                        {
+                          title: stepTypeAndNameMaps[StepType.PROCESSMESS],
+                        },
+                      ]}></Steps>
+                  </div>
+                  <div className={cls['publish']}>
+                    {currentStep === StepType.PROCESSMESS && (
+                      <Space>
+                        <Button
+                          className={cls['publis-issue']}
+                          size="small"
+                          type="primary"
+                          onClick={publish}>
+                          <SendOutlined />
+                          发布
+                        </Button>
+                        <Button
+                          className={cls['scale']}
+                          size="small"
+                          disabled={scale <= 40}
+                          onClick={() => changeScale(scale - 10)}>
+                          <MinusOutlined />
+                        </Button>
+                        <span>{scale}%</span>
+                        <Button
+                          size="small"
+                          disabled={scale >= 150}
+                          onClick={() => changeScale(scale + 10)}>
+                          <PlusOutlined />
+                        </Button>
+                      </Space>
                     )}
-                  </Card>
-                </Content>
-              </Layout>
-            </Card>
-          </div>
-        )}
-      </Card>
+                  </div>
+                </div>
+              </Header>
+              <Content>
+                <Card bordered={false}>
+                  {/* 基本信息组件 */}
+                  {currentStep === StepType.BASEINFO ? (
+                    <BaseInfo
+                      currentFormValue={conditionData}
+                      onChange={(params) => {
+                        setConditionData(params);
+                        design.remark = JSON.stringify(params.labels);
+                        setDesignData(design);
+                      }}
+                      nextStep={(params) => {
+                        setCurrentStep(StepType.PROCESSMESS);
+                        setConditionData(params);
+                      }}
+                    />
+                  ) : (
+                    <ProcessDesign
+                      designData={designData}
+                      editorValue={editorValue}
+                      conditionData={conditionData}></ProcessDesign>
+                  )}
+                </Card>
+              </Content>
+            </Layout>
+          </Card>
+        </div>
+      )}
       <BindModal
         isOpen={isOpenModal}
         bindAppMes={bindAppMes}

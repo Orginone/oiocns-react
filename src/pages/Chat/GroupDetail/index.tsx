@@ -233,7 +233,6 @@ const Groupdetail = () => {
         title="邀请成员"
         setSelectPerson={setSelectPerson}
       />
-      移出成员
       <RemoveMember
         title="移出成员"
         open={removeOpen}

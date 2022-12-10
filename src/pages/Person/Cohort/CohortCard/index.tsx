@@ -1,10 +1,11 @@
-import { EllipsisOutlined, TeamOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown, Modal } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { Dropdown, Modal } from 'antd';
 import React, { useState, useEffect } from 'react';
 import './index.less';
 import CohortMemberList from '../CohortMemberList';
 import { ICohort } from '@/ts/core/target/itarget';
 import { common } from 'typings/common';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 interface CohortCardType {
   data: ICohort;
   className?: string;
@@ -29,7 +30,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
     const res = (
       await data.loadMembers({ offset: 0, filter: '', limit: 65535 })
     ).result!.filter((obj) => obj.id === data.target.belongId);
-    setName(res[0].team?.name!);
+    setName(res[0].team?.name ?? '');
   };
 
   const Title = () => {
@@ -40,11 +41,9 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
           setIsModalOpen(true);
         }}>
         <div className="card-title-left">
-          <Avatar
-            src="https://gw.alipayobjects.com/zos/rmsportal/kZzEzemZyKLKFsojXItE.png"
-            // icon={<TeamOutlined />}
-            size={60}
-          />
+          <div style={{ fontSize: 60 }}>
+            <TeamIcon avatar={data.avatar} typeName="群组" size={60} />
+          </div>
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.target.name || '--'}</span>
