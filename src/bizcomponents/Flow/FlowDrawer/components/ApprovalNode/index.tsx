@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber } from 'antd';
-import type { RadioChangeEvent } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
+import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
+// import PersonCustomModal from '../PersonCustomModal';
+import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 
@@ -110,12 +110,28 @@ const ApprovalNode = () => {
   return (
     <div className={cls[`app-roval-node`]}>
       {rovalnode}
-      <PersonCustomModal
+      <Modal
+        title="添加身份"
         open={isOpen}
-        title={'选择岗位'}
-        onOk={onOk}
-        onCancel={onCancel}
-      />
+        destroyOnClose={true}
+        onOk={() => {
+          // const data: PositionType = {
+          //   name: _currentPostion?.name!,
+          //   code: _currentPostion?.code!,
+          //   indentitys: getResultIndentity()!,
+          // };
+          // positionCtrl.updatePosttion(data);
+          // setTreeCurrent(data);
+          // setIsAddOpen(false);
+        }}
+        onCancel={() => setIsOpen(false)}
+        width="1050px">
+        <IndentityManage
+          onCheckeds={(params) => {
+            console.log(params);
+          }}
+        />
+      </Modal>
     </div>
   );
 };
