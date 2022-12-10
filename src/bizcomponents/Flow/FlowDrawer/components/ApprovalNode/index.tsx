@@ -15,120 +15,112 @@ const ApprovalNode = () => {
   // const personObj = userCtrl.User.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-  const [selectPost, setSelectPost] = useState();
+  const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
   const [processValue, setProcessValue] = useState(1);
+  const [currentData, setCurrentData] = useState<{
+    data: { id: string; name: string };
+    title: string;
+    key: string;
+  }>({ title: '', key: '', data: { id: '', name: '' } });
 
-  const onOk = (params: any) => {
-    selectedNode.props.assignedUser = [{ name: params.node.name, id: params.node.id }];
+  const onOk = () => {
+    selectedNode.props.assignedUser = [
+      { name: currentData.data.name, id: currentData.data.id },
+    ];
     setSelectedNode(selectedNode);
-    setSelectPost(params);
-    setIsOpen(false);
+    setIsApprovalOpen(false);
   };
   const onCancel = () => {
-    setIsOpen(false);
+    setIsApprovalOpen(false);
   };
 
-  // 查询个人加入的群组
-  // const getJoinedCohort = async () => {
-  //   const JoinedCohortList = await personObj;
-  //   console.log('444', JoinedCohortList);
-  // };
-
-  // 选择审批对象
-  const rovalnode = (
-    <div className={cls[`roval-node`]}>
-      <Row>
-        <SettingOutlined style={{ marginTop: '3px' }} />
-        <span className={cls[`roval-node-title`]}>选择审批对象</span>
-      </Row>
-      <Space>
-        <Button
-          type="primary"
-          shape="round"
-          size="small"
-          onClick={() => {
-            selectedNode.props.assignedType = 'JOB';
-            setSelectedNode(selectedNode);
-            setIsOpen(true);
-            // getJoinedCohort();
-          }}>
-          选择岗位
-        </Button>
-        {selectPost ? (
-          <span>
-            当前选择：<a>{selectPost?.node.name}</a>
-          </span>
-        ) : null}
-      </Space>
-      <Divider />
-      <div className={cls['roval-node-select']}>
-        <Col className={cls['roval-node-select-col']}>👩‍👦‍👦 多人审批时审批方式</Col>
-        <Radio.Group
-          onChange={(e) => {
-            setRadioValue(e.target.value);
-          }}
-          style={{ paddingBottom: '10px' }}
-          value={radioValue}>
-          <Radio value={1}>全部（所有人必须同意）</Radio>
-          <Radio value={2}>会签（可同时审批，每个人必须同意）</Radio>
-        </Radio.Group>
-        {radioValue === 2 ? (
-          <Form.Item label="会签人数">
-            <InputNumber
-              onChange={(e) => {
-                selectedNode.props.num = e;
-              }}
-              placeholder="请设置会签人数"
-              addonBefore={<UserOutlined />}
-              style={{ width: '60%' }}
-            />
-          </Form.Item>
-        ) : null}
-      </div>
-      <div className={cls['roval-node-radiobtns']}>
-        <Col className={cls['roval-node-select-col']}>🙅‍ 如果审批被驳回 👇</Col>
-        <Row>
-          <Radio.Group
-            onChange={() => {
-              setProcessValue(1);
-            }}
-            value={processValue}>
-            <Radio value={1}>直接结束流程</Radio>
-            <Radio value={2} disabled>
-              驳回到上级审批节点
-            </Radio>
-            <Radio value={3} disabled>
-              驳回到指定节点
-            </Radio>
-          </Radio.Group>
-        </Row>
-      </div>
-    </div>
-  );
   return (
     <div className={cls[`app-roval-node`]}>
-      {rovalnode}
+      <div className={cls[`roval-node`]}>
+        <Row style={{ marginBottom: '10px' }}>
+          <SettingOutlined style={{ marginTop: '3px' }} />
+          <span className={cls[`roval-node-title`]}>选择审批对象</span>
+        </Row>
+        <Space>
+          <Button
+            type="primary"
+            shape="round"
+            size="small"
+            onClick={() => {
+              selectedNode.props.assignedType = 'JOB';
+              setSelectedNode(selectedNode);
+              setIsApprovalOpen(true);
+              // getJoinedCohort();
+            }}>
+            选择身份
+          </Button>
+          {currentData?.title ? (
+            <span>
+              当前选择：<a>{currentData?.title}</a>
+            </span>
+          ) : null}
+        </Space>
+        <Divider />
+        <div className={cls['roval-node-select']}>
+          <Col className={cls['roval-node-select-col']}>👩‍👦‍👦 多人审批时审批方式</Col>
+          <Radio.Group
+            onChange={(e) => {
+              setRadioValue(e.target.value);
+            }}
+            style={{ paddingBottom: '10px' }}
+            value={radioValue}>
+            <Radio value={1}>全部（所有人必须同意）</Radio>
+            <Radio value={2}>会签（可同时审批，每个人必须同意）</Radio>
+          </Radio.Group>
+          {radioValue === 2 ? (
+            <Form.Item label="会签人数">
+              <InputNumber
+                onChange={(e) => {
+                  selectedNode.props.num = e;
+                }}
+                placeholder="请设置会签人数"
+                addonBefore={<UserOutlined />}
+                style={{ width: '60%' }}
+              />
+            </Form.Item>
+          ) : null}
+        </div>
+        <div className={cls['roval-node-radiobtns']}>
+          <Col className={cls['roval-node-select-col']}>🙅‍ 如果审批被驳回 👇</Col>
+          <Row>
+            <Radio.Group
+              onChange={() => {
+                setProcessValue(1);
+              }}
+              value={processValue}>
+              <Radio value={1}>直接结束流程</Radio>
+              <Radio value={2} disabled>
+                驳回到上级审批节点
+              </Radio>
+              <Radio value={3} disabled>
+                驳回到指定节点
+              </Radio>
+            </Radio.Group>
+          </Row>
+        </div>
+      </div>
       <Modal
         title="添加身份"
-        open={isOpen}
+        key="addApproval"
+        open={isApprovalOpen}
         destroyOnClose={true}
-        onOk={() => {
-          // const data: PositionType = {
-          //   name: _currentPostion?.name!,
-          //   code: _currentPostion?.code!,
-          //   indentitys: getResultIndentity()!,
-          // };
-          // positionCtrl.updatePosttion(data);
-          // setTreeCurrent(data);
-          // setIsAddOpen(false);
-        }}
-        onCancel={() => setIsOpen(false)}
-        width="1050px">
+        onOk={() => onOk()}
+        onCancel={() => onCancel()}
+        width="650px">
         <IndentityManage
-          onCheckeds={(params) => {
-            console.log(params);
+          multiple={false}
+          onChecked={(params: any) => {
+            selectedNode.props.assignedUser = [
+              { name: params.data.name, id: params.data.id },
+            ];
+            setSelectedNode(selectedNode);
+            setCurrentData(params);
           }}
         />
       </Modal>
