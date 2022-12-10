@@ -6,6 +6,7 @@ import { Avatar, Image } from 'antd';
 import { AvatarSize } from 'antd/lib/avatar/SizeContext';
 
 interface teamTypeInfo {
+  preview?: boolean;
   size?: AvatarSize;
   avatar?: FileItemShare;
   typeName: TargetType | string;
@@ -17,16 +18,18 @@ const TeamIcon = (info: teamTypeInfo) => {
   if (info.avatar) {
     return (
       <div style={{ cursor: 'pointer' }} title="点击预览">
-        <Image
-          style={{ display: 'none' }}
-          preview={{
-            visible: preview,
-            src: info.avatar.shareLink,
-            onVisibleChange: (value) => {
-              setPreview(value);
-            },
-          }}
-        />
+        {info.preview && (
+          <Image
+            style={{ display: 'none' }}
+            preview={{
+              visible: preview,
+              src: info.avatar.shareLink,
+              onVisibleChange: (value) => {
+                setPreview(value);
+              },
+            }}
+          />
+        )}
         <Avatar
           size={info.size ?? 22}
           src={info.avatar.thumbnail}
