@@ -34,15 +34,13 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
 
     if (result && result.length > 0 && bindAppMes.id) {
       const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
-      debugger;
       if (currentValue && currentValue.length > 0) {
         //遍历获取当前流程
-
         const filterIdData = currentValue.filter((item) => {
           return item.defineId === (bindAppMes?.id || result[0].id);
         });
         // 获取的值有限 循环拿应用name和remark
-        const getResult = filterIdData.map((item) => {
+        const getResult = filterIdData.map((item: any) => {
           const findAppId = needData.find((innerItem) => innerItem.id === item.productId);
           item.name = findAppId?.name;
           item.remark = findAppId?.remark;
@@ -86,7 +84,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
                                   defineId: item?.defineId,
                                   productId: item.productId,
                                   functionCode: item.functionCode,
-                                  SpaceId: userCtrl.space.id,
+                                  spaceId: userCtrl.space.id,
                                 })
                                 .then((result) => {
                                   if (result) {
