@@ -65,14 +65,6 @@ const ShareRecent = (props: Iprops) => {
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
   const [showData, setShowData] = useState<any[]>([]);
   const [centerCheckedKeys, setCenterCheckedKeys] = useState<Key[]>([]);
-  // const [departData, setDepartData] = useState<any[]>([]); // raido=1 数据
-  // const [departHisData, setDepartHisData] = useState<any[]>([]); // radio=1 历史数据
-  // const [authorData, setAuthorData] = useState<any[]>([]); // raido=2 数据
-  // const [authorHisData, setAuthorHisData] = useState<any[]>([]); //raido=2 历史数据
-  // const [personsData, setPersonsData] = useState<any[]>([]); //raido=3 数据
-  // const [personsHisData, setPersonsHisData] = useState<any[]>([]); //raido=3 历史数据
-  // const [identitysData, setIdentitysData] = useState<any[]>([]); //raido=4 数据
-  // const [identitysHisData, setIdentitysHisData] = useState<any[]>([]); //raido=4 历史数据
   const [selectedTeamId, setSelectedTeamId] = useState<string>('');
   const [hasSelectRecord, setHasSelectRecord] = useState<{
     createList: string[];
@@ -90,6 +82,7 @@ const ShareRecent = (props: Iprops) => {
           if (userCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
+            console.log('资源数据', resource);
           }
           setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree(false)));
         }
@@ -98,10 +91,6 @@ const ShareRecent = (props: Iprops) => {
     }, 10);
   }, []);
   useEffect(() => {
-    // setDepartData([]);
-    // setAuthorData([]);
-    // setPersonsData([]);
-    // setIdentitysData([]);
     setShowData([]);
     setCenterTreeData([]);
     setSelectedTeamId('0');
@@ -132,7 +121,6 @@ const ShareRecent = (props: Iprops) => {
     } else {
       setCenterCheckedKeys([...originalSelected]);
     }
-
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     const item: ITarget = info.node.item;
@@ -228,8 +216,6 @@ const ShareRecent = (props: Iprops) => {
       delList,
     });
     handelCheckedChange(createList, delList);
-
-    // setDepartData([...departData]);
   };
   // 中间树形点击事件
   const onCheck: TreeProps['onCheck'] = (checkedKeys, info: any) => {
@@ -326,9 +312,27 @@ const ShareRecent = (props: Iprops) => {
       resolve();
     });
   };
-
+  //resourceList
   return (
     <div className={cls.layout}>
+      <div className={cls.top}>
+        <p className={cls['top-label']}>应用资源：</p>
+        <Radio.Group
+          onChange={(e: RadioChangeEvent) => {
+            const obj = resourceList.find((v) => v.resource.id === e.target.value);
+            console.log('测试', e.target.value, obj);
+
+            // setRadio(e.target.value);
+          }}>
+          {resourceList.map((item) => {
+            return (
+              <Radio value={item.resource.id} key={item.resource.id}>
+                {item.resource.name}
+              </Radio>
+            );
+          })}
+        </Radio.Group>
+      </div>
       <div className={cls.top}>
         <p className={cls['top-label']}>{props.shareType}形式：</p>
         <Radio.Group

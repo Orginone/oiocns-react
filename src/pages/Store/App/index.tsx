@@ -1,5 +1,5 @@
 import { Card, message, Modal } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -18,7 +18,7 @@ import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { myColumns } from '@/ts/controller/store/config';
-import { IProduct } from '@/ts/core';
+import { XProduct } from '@/ts/base/schema';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
@@ -44,8 +44,8 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const renderOperation = (item: IProduct): common.OperationType[] => {
-    const id = item.prod.id;
+  const renderOperation = (item: XProduct): common.OperationType[] => {
+    const id = item.id;
     const shareArr = [
       {
         key: 'share',
@@ -85,14 +85,7 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/info' });
         },
       },
-      {
-        key: 'publish',
-        label: '上架列表',
-        onClick: () => {
-          appCtrl.setCurProduct(id);
-          history.push({ pathname: '/store/app/publish' });
-        },
-      },
+
       // {
       //   key: 'manage',
       //   label: '管理',
@@ -111,6 +104,14 @@ const StoreApp: React.FC = () => {
           history.push({
             pathname: '/store/app/putaway',
           });
+        },
+      },
+      {
+        key: 'publish',
+        label: '上架列表',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          history.push({ pathname: '/store/app/publish' });
         },
       },
       ...shareArr,
@@ -141,35 +142,33 @@ const StoreApp: React.FC = () => {
     });
   };
   // 应用首页dom
-  const AppIndex = useMemo(() => {
-    return (
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {appCtrl.alwaysUseApps.length > 0 ? (
-          <StoreRecent dataSource={appCtrl.alwaysUseApps} />
-        ) : (
-          ''
-        )}
-        <Card
-          title="我的应用"
-          className={cls['app-tabs']}
-          extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          tabList={getItems()}
-          activeTabKey={statusKey}
-          onTabChange={(k) => {
-            setStatusKey(k as ststusTypes);
-          }}>
-          <div className={cls['page-content-table']}>
-            <AppShowComp
-              list={appCtrl.products}
-              searchParams={{ status: statusKey }}
-              columns={myColumns}
-              renderOperation={renderOperation}
-            />
-          </div>
-        </Card>
-      </div>
-    );
-  }, [key, statusKey]);
+  const AppIndex = (
+    <div key={key} className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+      {appCtrl.alwaysUseApps.length > 0 ? (
+        <StoreRecent dataSource={appCtrl.alwaysUseApps} />
+      ) : (
+        ''
+      )}
+      <Card
+        title="我的应用"
+        className={cls['app-tabs']}
+        extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
+        tabList={getItems()}
+        activeTabKey={statusKey}
+        onTabChange={(k) => {
+          setStatusKey(k as ststusTypes);
+        }}>
+        <div className={cls['page-content-table']}>
+          <AppShowComp
+            list={appCtrl.products}
+            searchParams={{ status: statusKey }}
+            columns={myColumns}
+            renderOperation={renderOperation}
+          />
+        </div>
+      </Card>
+    </div>
+  );
   const handleSubmitShare = async () => {
     if (appCtrl.curProduct) {
       if (checkNodes?.createList?.length > 0) {

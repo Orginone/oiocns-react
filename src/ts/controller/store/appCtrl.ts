@@ -43,11 +43,12 @@ class AppController extends Emitter {
 
   get curProduct(): IProduct | undefined {
     if (this._target) {
-      for (const item of this._target.ownProducts) {
-        if (item.prod.id === this._curProdId) {
-          return item;
-        }
-      }
+      // for (const item of this._target.ownProducts) {
+      //   if (item.prod.id === this._curProdId) {
+      //     return item;
+      //   }
+      // }
+      return this._target.ownProducts.find((v) => v.prod.id);
     }
     return undefined;
   }
