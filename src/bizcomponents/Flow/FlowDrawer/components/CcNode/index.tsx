@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Row, Button } from 'antd';
-import PersonCustomModal from '../PersonCustomModal';
+import { Row, Button, Modal } from 'antd';
+import IndentityManage from '@/bizcomponents/IndentityManage';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
 
@@ -12,17 +12,25 @@ import cls from './index.module.less';
 const CcNode = () => {
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectPost, setSelectPost] = useState();
-  const onOk = (params: any) => {
-    selectedNode.props.assignedUser = [{ name: params.node.name, id: params.node.id }];
+  const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
+  const [currentData, setCurrentData] = useState<{
+    data: { id: string; name: string };
+    title: string;
+    key: string;
+  }>({ title: '', key: '', data: { id: '', name: '' } });
+
+  const onOk = () => {
+    selectedNode.props.assignedUser = [
+      { name: currentData.data.name, id: currentData.data.id },
+    ];
     setSelectedNode(selectedNode);
-    setSelectPost(params);
-    setIsOpen(false);
+    setIsApprovalOpen(false);
   };
+
   const onCancel = () => {
-    setIsOpen(false);
+    setIsApprovalOpen(false);
   };
+
   // 选择抄送对象
   const rovalnode = (
     <div className={cls[`roval-node`]}>
@@ -32,13 +40,13 @@ const CcNode = () => {
           shape="round"
           size="small"
           onClick={() => {
-            setIsOpen(true);
+            setIsApprovalOpen(true);
           }}>
           选择抄送对象
         </Button>
-        {selectPost ? (
+        {currentData?.title ? (
           <span>
-            当前选择：<a>{selectPost?.node.name}</a>
+            当前选择：<a>{currentData?.title}</a>
           </span>
         ) : null}
       </Row>
@@ -47,12 +55,25 @@ const CcNode = () => {
   return (
     <div className={cls[`app-roval-node`]}>
       {rovalnode}
-      <PersonCustomModal
-        open={isOpen}
-        title={'选择岗位'}
-        onOk={onOk}
-        onCancel={onCancel}
-      />
+      <Modal
+        title="添加身份"
+        key="addApproval"
+        open={isApprovalOpen}
+        destroyOnClose={true}
+        onOk={() => onOk()}
+        onCancel={() => onCancel()}
+        width="650px">
+        <IndentityManage
+          multiple={false}
+          onChecked={(params: any) => {
+            selectedNode.props.assignedUser = [
+              { name: params.data.name, id: params.data.id },
+            ];
+            setSelectedNode(selectedNode);
+            setCurrentData(params);
+          }}
+        />
+      </Modal>
     </div>
   );
 };
