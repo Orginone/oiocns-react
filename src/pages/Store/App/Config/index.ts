@@ -107,20 +107,37 @@ export const shareInfoColumns: any = [
 
 export const AppPublishColumns: any = [
   {
+    title: '商店名称',
+    ellipsis: true,
+    dataIndex: ['merchandise', 'market', 'name'],
+  },
+  {
+    title: '商店所有人',
+    ellipsis: true,
+    dataIndex: ['merchandise', 'market', 'belongId'],
+  },
+  {
     title: '应用名称',
-    dataIndex: 'name',
+    dataIndex: ['merchandise', 'caption'],
   },
   {
     title: '版本号',
-    dataIndex: 'visible',
+    dataIndex: ['merchandise', 'version'],
   },
   {
-    title: '应用类型',
-    dataIndex: 'typeName',
+    title: '售卖类型',
+    dataIndex: ['merchandise', 'sellAuth'],
   },
   {
-    title: '应用来源',
-    ellipsis: true,
-    dataIndex: 'source',
+    title: '售卖价格',
+    dataIndex: ['merchandise', 'prise'],
+    render: (_key: any, _record: any) => {
+      return _record.prise || '免费';
+    },
+  },
+  {
+    title: '更新时间',
+    width: 160,
+    dataIndex: ['merchandise', 'updateTime'],
   },
 ];
