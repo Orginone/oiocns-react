@@ -1,10 +1,11 @@
 import {
   AppstoreFilled,
   DatabaseFilled,
+  EllipsisOutlined,
   FileTextFilled,
   FundFilled,
 } from '@ant-design/icons';
-import { Menu, Button, Row, Col, message } from 'antd';
+import { Button, Row, Col, message, Dropdown, Drawer, Menu } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
@@ -15,6 +16,7 @@ import JoinOtherShop from './JoinOtherShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import UserManagement from '../UserManagement';
 
 const MarketClassify: React.FC<any> = ({ history }) => {
   const [key, forceUpdate] = useCtrlUpdate(marketCtrl);
@@ -23,9 +25,10 @@ const MarketClassify: React.FC<any> = ({ history }) => {
   const [isJoinShop, setIsJoinShop] = useState<boolean>(false); // 加入商店
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false); // 删除商店
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false); // 基础详情
+  const [userOpen, setUserOpen] = useState<boolean>(false); // 基础详情
   const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
   const [dataSource, setDataSource] = useState<any>([]); // table数据
-
+  const [selectMenu, setSelectMenu] = useState<string>('0-0');
   /**
    * @description: 创建商店
    * @param {any} formData
@@ -89,11 +92,6 @@ const MarketClassify: React.FC<any> = ({ history }) => {
     setDataSource([]);
   };
 
-  const onClose = () => {
-    setIsDetailOpen(false);
-  };
-
-  const [selectMenu, setSelectMenu] = useState<string>('');
   const items = [
     {
       label: '开放市场',
@@ -129,25 +127,22 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const ClickBtn = (
-    <>
-      <Row>
-        <Col>商店分类</Col>
-      </Row>
-      <Button
-        type="link"
-        onClick={() => {
-          setIsAddOpen(true);
-        }}>
-        创建商店
-      </Button>
-      <Button
-        type="link"
-        onClick={() => {
-          setIsJoinShop(true);
-        }}>
-        加入商店
-      </Button>
-    </>
+    <Row justify="space-between" align="middle">
+      <Col>商店分类</Col>
+      <Col>
+        <Button type="text">
+          <Dropdown
+            menu={{
+              items: [
+                { label: '创建商店', key: 'add', onClick: () => setIsAddOpen(true) },
+                { label: '加入商店', key: 'join', onClick: () => setIsJoinShop(true) },
+              ],
+            }}>
+            <EllipsisOutlined />
+          </Dropdown>
+        </Button>
+      </Col>
+    </Row>
   );
 
   /*******
@@ -156,6 +151,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
    * @return {*}
    */
   const handleTitleClick = (item: any) => {
+    setSelectMenu(item.key);
     marketCtrl.setCurrentMarket(item?.node);
     // 触发内容去变化
     marketCtrl.changeMenu(item);
@@ -202,7 +198,7 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         setTreeDataObj(node);
         break;
       case '用户管理':
-        history.push('/market/usermanagement');
+        setUserOpen(true);
         marketCtrl.setCurrentMarket(node?.node);
         break;
       default:
@@ -236,16 +232,18 @@ const MarketClassify: React.FC<any> = ({ history }) => {
 
   return (
     <div id={key} className={cls.container}>
-      <div className={cls.subTitle}>常用分类</div>
+      {/* <div className={cls.subTitle}>常用分类</div>
       <Menu
         mode="inline"
         items={items}
         defaultOpenKeys={['openMarket']}
         onClick={({ key }) => handleChange(key)}
-      />
+      /> */}
       <MarketClassifyTree
-        key={selectMenu}
-        handleTitleClick={handleTitleClick}
+        parentIcon={<AppstoreFilled />}
+        childIcon={<AppstoreFilled />}
+        selectedKeys={[selectMenu]}
+        onSelect={(_, info: any) => handleTitleClick(info.node)}
         handleMenuClick={handleMenuClick}
         treeData={getTreeData()}
         menu={'menus'}
@@ -264,8 +262,15 @@ const MarketClassify: React.FC<any> = ({ history }) => {
         title={treeDataObj.title}
         nodeDetail={treeDataObj?.node?.market}
         open={isDetailOpen}
-        onClose={onClose}
+        onClose={() => setIsDetailOpen(false)}
       />
+      <Drawer
+        title="用户管理"
+        width={'75%'}
+        open={userOpen}
+        onClose={() => setUserOpen(false)}>
+        <UserManagement />
+      </Drawer>
       <JoinOtherShop
         title="搜索商店"
         open={isJoinShop}

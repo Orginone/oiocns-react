@@ -15,6 +15,7 @@ interface AppShowCompType {
   list: any[];
   queryFun: Function;
   total?: number;
+  currentPage?: number;
   // service: MarketServiceType;
   columns: ProColumns<any>[];
 }
@@ -26,9 +27,10 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   headerTitle,
   columns,
   total,
+  currentPage,
 }) => {
   // const [list, setList] = useState<MarketTypes.ProductType[]>([]);
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(currentPage || 1);
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
   const [data, setData] = useState<any>({});
   const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
@@ -41,7 +43,8 @@ const AppShowComp: React.FC<AppShowCompType> = ({
    * @return {*}
    */
   const handlePageChange = (page: number, pageSize: number) => {
-    setPage(page);
+    // setPage(page);
+    console.log('开始', page);
     queryFun({ page, pageSize });
   };
 
@@ -149,7 +152,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         renderCardContent={renderCardFun}
         operation={renderOperation}
         columns={columns}
-        page={page}
+        page={currentPage || page}
         onChange={handlePageChange}
         rowKey={'id'}
       />

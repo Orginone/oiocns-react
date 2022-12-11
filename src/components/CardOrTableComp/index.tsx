@@ -153,11 +153,20 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               success: true,
             };
           } else {
-            return {
-              data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
-              total: total ?? dataSource.length,
-              success: true,
-            };
+            if (page !== pageIndex && onChange) {
+              await onChange(pageIndex, pageSize);
+              return {
+                total: 0,
+                data: [],
+                success: false,
+              };
+            } else {
+              return {
+                data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
+                total: total ?? dataSource.length,
+                success: true,
+              };
+            }
           }
         }}
         tableRender={(props: any, defaultDom) => {

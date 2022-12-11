@@ -6,6 +6,11 @@ import marketCtrl, { MarketCallBackTypes } from '@/ts/controller/store/marketCtr
 const Index: React.FC = () => {
   const [data, setData] = useState<any>([]);
   const [total, setTotal] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const queryFun = async (params) => {
+    setPage(params.page);
+    await marketCtrl.getStoreProduct(params);
+  };
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.MarketShop, () => {
       const { total = 0, result = [] } = marketCtrl.marketTableList;
@@ -19,16 +24,15 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <AppShowComp
-        headerTitle="共享仓库"
-        className={cls['market-public-wrap']}
-        list={data}
-        total={total}
-        columns={marketCtrl.getColumns('market')}
-        queryFun={marketCtrl.getStoreProduct}
-      />
-    </>
+    <AppShowComp
+      headerTitle="共享仓库"
+      className={cls['market-public-wrap']}
+      list={data}
+      total={total}
+      currentPage={page}
+      columns={marketCtrl.getColumns('market')}
+      queryFun={queryFun}
+    />
   );
 };
 
