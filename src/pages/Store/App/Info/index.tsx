@@ -1,6 +1,7 @@
-import { Button, Card, Dropdown, Tag } from 'antd';
+import { Button, Card, Dropdown, Form, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
+import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
 import {
   BankOutlined,
@@ -14,36 +15,56 @@ import { IconFont } from '@/components/IconFont';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import appCtrl from '@/ts/controller/store/appCtrl';
+import SchemaForm from '@/components/SchemaForm';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
 });
+let sourceColumn = sourceColumns;
 
 const StoreAppInfo: React.FC = () => {
+  const [createAppForm] = Form.useForm<Record<string, any>>();
+
+  const [columns, setColumns] = useState<any>(sourceColumns);
+  const [key, setKey] = useState<number>(1);
+
   const history = useHistory();
   if (!appCtrl.curProduct) {
-    history.goBack();
+    history.push('/store/app');
     return <></>;
   }
   const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
   useEffect(() => {
-    console.log('{SelfAppCtrl.curProduct?.prod.version}');
     onTabChange('组织');
+    sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
+      let obj = {
+        // id: item.id,
+        name: item.name,
+        code: item.code,
+        link: item.link,
+        components: item.components && JSON.parse(item.components),
+        flows: item.flows && JSON.parse(item.flows),
+      };
+      return obj;
+    });
+
+    setColumns({ ...sourceColumn });
+    setKey(key + 2);
   }, []);
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
-    const showData = res.result?.map((v) => {
+    const showData = res?.result?.map((v) => {
       let obj: any = v;
       switch (tabKey) {
         case '组织':
           obj.icon = <PartitionOutlined rotate={90} />;
           break;
-        case '角色':
+        case '职权':
           obj.icon = <TeamOutlined />;
           break;
-        case '岗位':
+        case '身份':
           obj.icon = <BankOutlined />;
           break;
         case '人员':
@@ -116,6 +137,25 @@ const StoreAppInfo: React.FC = () => {
             })}
           </div>
         </Card>
+        {/* 应用信息 */}
+        <SchemaForm<DataItem>
+          style={{ padding: '20px' }}
+          form={createAppForm}
+          layoutType="Form"
+          open={true}
+          key={key}
+          title="应用资源信息"
+          onFinish={() => {}}
+          modalprops={{
+            destroyOnClose: true,
+          }}
+          columns={[columns as DataItem]}
+          submitter={{
+            render: () => {
+              return <></>;
+            },
+          }}
+        />
       </div>
     </div>
   );

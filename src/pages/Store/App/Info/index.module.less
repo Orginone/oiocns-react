@@ -1,3 +1,5 @@
+@import '~antd/es/style/themes/variable';
+
 .pages-wrap {
   position: absolute;
   left: 0;
@@ -86,5 +88,53 @@
     .ogo-pro-table-list-toolbar-container {
       padding-top: 0 !important;
     }
+  }
+
+  // 表单区域
+
+  .site-page-header {
+    position: sticky;
+  }
+
+  .formContent {
+    width: 750px;
+    margin: auto;
+  }
+
+  .RouterBackBtn {
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .new-store-title {
+    //   margin-bottom: @margin-lg;
+    .new-store-title-before {
+      background-color: @primary-color;
+      width: 4px;
+      height: 17px;
+      border-radius: 1px;
+    }
+
+    .new-store-info {
+      // font-weight: bold;
+      text-shadow: @btn-text-shadow;
+      font-size: @font-size-lg;
+      color: @text-color;
+    }
+  }
+
+  .addFormListBtn,
+  .addFormListBtn2 {
+    display: none;
+    // width: 32px;
+    // position: absolute;
+    // right: 0;
+    // top: -60px;
+    // color: #909399;
+  }
+
+  .addFormListBtn2 {
+    display: none;
+    top: -36px;
   }
 }

@@ -10,14 +10,15 @@ const { Meta } = Card;
 
 type AppBindListprops = {
   bindAppMes: { name: string; id: string };
+  upDateInit: number;
 };
 
-const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
+const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
 
   useEffect(() => {
     initData();
-  }, [bindAppMes]);
+  }, [bindAppMes, upDateInit]);
 
   const initData = async () => {
     const tableData = await SelfAppCtrl.querySelfApps();
@@ -29,21 +30,26 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
       };
     });
 
-    const result = await userCtrl.space.getDefines(false);
+    const result = await userCtrl.space.getDefines(false); //流程列表
 
     if (result && result.length > 0 && bindAppMes.id) {
-      const currentValue = await userCtrl.space.queryFlowRelation(false);
+      const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
       if (currentValue && currentValue.length > 0) {
+        //遍历获取当前流程
         const filterIdData = currentValue.filter((item) => {
           return item.defineId === (bindAppMes?.id || result[0].id);
         });
-        const getResult = filterIdData.map((item) => {
+        // 获取的值有限 循环拿应用name和remark
+        const getResult = filterIdData.map((item: any) => {
           const findAppId = needData.find((innerItem) => innerItem.id === item.productId);
           item.name = findAppId?.name;
           item.remark = findAppId?.remark;
           return item;
         });
-        setAppDataList(getResult);
+        console.log('getResult', getResult);
+        setAppDataList([...getResult]);
+      } else {
+        setAppDataList([]);
       }
     }
   };
@@ -78,7 +84,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
                                   defineId: item?.defineId,
                                   productId: item.productId,
                                   functionCode: item.functionCode,
-                                  SpaceId: userCtrl.space.id,
+                                  spaceId: userCtrl.space.id,
                                 })
                                 .then((result) => {
                                   if (result) {

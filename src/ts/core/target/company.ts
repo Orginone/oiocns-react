@@ -5,7 +5,7 @@ import { companyTypes, departmentTypes, TargetType } from '../enum';
 import { TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { schema, kernel, common, model } from '@/ts/base';
+import { schema, kernel, common } from '@/ts/base';
 import {
   IGroup,
   ICompany,
@@ -15,14 +15,17 @@ import {
   ITarget,
   TargetParam,
   ICohort,
+  IStation,
 } from './itarget';
 import Working from './working';
+import Station from './station';
 import { logger } from '@/ts/base/common';
 import Cohort from './cohort';
 /**
  * 公司的元操作
  */
 export default class Company extends MarketTarget implements ICompany {
+  stations: IStation[] = [];
   departments: IDepartment[] = [];
   joinedGroup: IGroup[] = [];
   userId: string;
@@ -32,7 +35,7 @@ export default class Company extends MarketTarget implements ICompany {
   constructor(target: schema.XTarget, userId: string) {
     super(target);
     this.userId = userId;
-    this.subTeamTypes = [...departmentTypes, TargetType.Working];
+    this.subTeamTypes = [...departmentTypes, TargetType.Working, TargetType.Station];
     this.extendTargetType = [...this.subTeamTypes, ...companyTypes];
     this.joinTargetType = [TargetType.Group];
     this.createTargetType = [...this.subTeamTypes, TargetType.Group, TargetType.Cohort];
@@ -70,6 +73,8 @@ export default class Company extends MarketTarget implements ICompany {
         return this.createGroup(data);
       case TargetType.Working:
         return this.createWorking(data);
+      case TargetType.Station:
+        return this.createStation(data);
       case TargetType.Cohort:
         return this.createCohort(data.avatar, data.name, data.code, data.teamRemark);
       default:
@@ -165,6 +170,23 @@ export default class Company extends MarketTarget implements ICompany {
       return department;
     }
   }
+  public async createStation(
+    data: Omit<TargetModel, 'id' | 'belongId'>,
+  ): Promise<IStation | undefined> {
+    data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
+    data.teamName = data.teamName == '' ? data.name : data.teamName;
+    data.typeName = TargetType.Station;
+    const res = await this.createSubTarget({ ...data, belongId: this.target.id });
+    if (res.success) {
+      const station = new Station(res.data, () => {
+        this.stations = this.stations.filter((item) => {
+          return item.id != station.id;
+        });
+      });
+      this.stations.push(station);
+      return station;
+    }
+  }
   public async createWorking(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<IWorking | undefined> {
@@ -184,17 +206,29 @@ export default class Company extends MarketTarget implements ICompany {
   }
   public async deleteDepartment(id: string): Promise<boolean> {
     const department = this.departments.find((department) => {
-      return department.target.id == id;
+      return department.id == id;
     });
-    if (department != undefined) {
-      let res = await this.deleteSubTarget(
-        id,
-        department.target.typeName,
-        this.target.id,
-      );
+    if (department) {
+      let res = await this.deleteSubTarget(id, department.target.typeName, this.id);
       if (res.success) {
         this.departments = this.departments.filter((department) => {
-          return department.target.id != id;
+          return department.id != id;
+        });
+      }
+      return res.success;
+    }
+    logger.warn(consts.UnauthorizedError);
+    return false;
+  }
+  public async deleteStation(id: string): Promise<boolean> {
+    const station = this.stations.find((department) => {
+      return department.id == id;
+    });
+    if (station) {
+      let res = await this.deleteSubTarget(id, station.target.typeName, this.id);
+      if (res.success) {
+        this.stations = this.stations.filter((station) => {
+          return station.id != id;
         });
       }
       return res.success;
@@ -204,13 +238,13 @@ export default class Company extends MarketTarget implements ICompany {
   }
   public async deleteWorking(id: string): Promise<boolean> {
     const working = this.workings.find((working) => {
-      return working.target.id == id;
+      return working.id == id;
     });
-    if (working != undefined) {
-      let res = await this.deleteSubTarget(id, TargetType.Working, this.target.id);
+    if (working) {
+      let res = await this.deleteSubTarget(id, TargetType.Working, this.id);
       if (res.success) {
         this.workings = this.workings.filter((working) => {
-          return working.target.id != id;
+          return working.id != id;
         });
       }
       return res.success;
@@ -259,7 +293,7 @@ export default class Company extends MarketTarget implements ICompany {
     logger.warn(consts.UnauthorizedError);
     return false;
   }
-  public getDepartments = async (reload: boolean = false): Promise<IDepartment[]> => {
+  public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
     if (!reload && this.departments.length > 0) {
       return this.departments;
     }
@@ -274,7 +308,23 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.departments;
-  };
+  }
+  public async getStations(reload?: boolean): Promise<IStation[]> {
+    if (!reload && this.stations.length > 0) {
+      return this.stations;
+    }
+    const res = await this.getSubTargets([TargetType.Station]);
+    if (res.success && res.data.result) {
+      this.stations = res.data.result.map((a) => {
+        return new Station(a, () => {
+          this.stations = this.stations.filter((item) => {
+            return item.id != a.id;
+          });
+        });
+      });
+    }
+    return this.stations;
+  }
   public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
     if (!reload && this.workings.length > 0) {
       return this.workings;
@@ -306,9 +356,6 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.joinedGroup;
-  }
-  public async getStationMember(data: model.IdArrayReq): Promise<schema.XTargetArray> {
-    return (await kernel.QueryStationTargets(data)).data;
   }
   public async update(data: TargetParam): Promise<ICompany> {
     if (!validIsSocialCreditCode(data.code)) {

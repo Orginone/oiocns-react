@@ -44,9 +44,7 @@ const Groupdetail = () => {
       selectPerson.forEach((item) => {
         ids.push(item?.id);
       });
-      if ((await findCohort())?.pullMembers(ids, selectPerson[0].typeName)) {
-        await chatCtrl.reloadChats();
-      }
+      (await findCohort())?.pullMembers(ids, selectPerson[0].typeName);
     }
     setOpen(false);
   };
@@ -62,9 +60,7 @@ const Groupdetail = () => {
       selectPerson.forEach((item) => {
         ids.push(item?.id);
       });
-      if ((await findCohort())?.removeMembers(ids, selectPerson[0].typeName)) {
-        await chatCtrl.reloadChats();
-      }
+      (await findCohort())?.removeMembers(ids, selectPerson[0].typeName);
     }
   };
 

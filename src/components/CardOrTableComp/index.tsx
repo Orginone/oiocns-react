@@ -10,7 +10,7 @@ import { PageRequest } from '@/ts/base/model';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string | ((record: T) => string); //唯一key
+  rowKey: string | ((record: T, index?: number) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -63,7 +63,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
-
   // 监听父级高度
   useEffect(() => {
     setTimeout(() => {
@@ -137,17 +136,15 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             filter = '',
             // eslint-disable-next-line no-unused-vars
             tableid,
-            // eslint-disable-next-line no-unused-vars
-            keyword,
+            keyword = '',
             ...other
           } = params;
           if (request) {
             const page: PageRequest = {
-              filter: filter,
+              filter: filter || keyword,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
-            console.log(other ? { ...other, page } : page);
             const res = await request(other ? { ...other, ...page } : page);
             return {
               total: res.total || 0,

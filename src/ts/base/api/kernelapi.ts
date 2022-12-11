@@ -745,6 +745,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 拉身份加入组织
+   * @param {model.TeamPullModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async PullIdentityToTeam(
+    params: model.TeamPullModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'target',
+      action: 'PullIdentityToTeam',
+      params: params,
+    });
+  }
+  /**
    * 取消申请加入组织/个人
    * @param {model.IdReqModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -769,6 +783,20 @@ export default class KernelApi {
     return await this.request({
       module: 'target',
       action: 'RemoveAnyOfTeam',
+      params: params,
+    });
+  }
+  /**
+   * 从组织身份集中剔除身份
+   * @param {model.GiveIdentityModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async removeTeamIdentity(
+    params: model.GiveIdentityModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'target',
+      action: 'RemoveTeamIdentity',
       params: params,
     });
   }
@@ -1039,6 +1067,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询组织容器下的身份集
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
+   */
+  public async queryTeamIdentitys(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XIdentityArray>> {
+    return await this.request({
+      module: 'target',
+      action: 'QueryTeamIdentitys',
+      params: params,
+    });
+  }
+  /**
    * 查询职权身份
    * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XIdentityArray>} 请求结果
@@ -1063,20 +1105,6 @@ export default class KernelApi {
     return await this.request({
       module: 'target',
       action: 'QueryIdentityTargets',
-      params: params,
-    });
-  }
-  /**
-   * 根据岗位下的身份查询成员
-   * @param {model.IdArrayReq} params 请求参数
-   * @returns {model.ResultType<schema.XTargetArray>} 请求结果
-   */
-  public async QueryStationTargets(
-    params: model.IdArrayReq,
-  ): Promise<model.ResultType<schema.XTargetArray>> {
-    return await this.request({
-      module: 'target',
-      action: 'QueryStationTargets',
       params: params,
     });
   }
