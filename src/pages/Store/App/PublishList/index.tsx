@@ -1,12 +1,55 @@
 import CardOrTable from '@/components/CardOrTableComp';
 import { IconFont } from '@/components/IconFont';
-import { Card, message, Modal } from 'antd';
+import { Card, message, Modal, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { AppPublishColumns } from '../Config';
+// import { AppPublishColumns } from '../Config';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 interface indexType {}
+const columns: any = [
+  {
+    title: '商品名称',
+    ellipsis: true,
+    dataIndex: ['merchandise', 'caption'],
+  },
+  { title: '购买权属', dataIndex: ['merchandise', 'sellAuth'] },
+  {
+    title: '使用期限',
+    dataIndex: ['merchandise', 'days'],
+    render: (_: any, record: { days: any }) => (record.days ? _ : '永久'),
+  },
+  {
+    title: '价格',
+    dataIndex: ['merchandise', 'price'],
+    valueType: 'money',
+    render: (_: any, record: { price: any }) => (record.price ? _ : '免费'),
+  },
+  {
+    title: '市场名称',
+    dataIndex: ['merchandise', 'market', 'name'],
+    render: (_: any, record: any) => {
+      return _ ? _ : record.merchandise.marketId;
+    },
+  },
+  {
+    title: '更新时间',
+    dataIndex: ['merchandise', 'updateTime'],
+    width: 180,
+    valueType: 'dateTime',
+  },
+  {
+    title: '商品状态',
+    dataIndex: ['merchandise', 'status'],
+    render: (_: any, record: { merchandise: any }) => {
+      return record.merchandise ? (
+        <Tag color="processing">在售</Tag>
+      ) : (
+        <Tag color="danger">已下架</Tag>
+      );
+    },
+  },
+];
 const PublishComp: React.FC<indexType> = () => {
   const [dataSource, setDataSource] = useState<any[]>([]);
   const history = useHistory();
@@ -20,6 +63,8 @@ const PublishComp: React.FC<indexType> = () => {
   }, []);
   const getData = async (reload = false) => {
     let res = await appCtrl.curProduct?.getMerchandises(reload);
+    console.log('sad', res);
+
     setDataSource([...(res || [])]);
   };
   const renderOperation = (item: any): any => {
@@ -71,7 +116,7 @@ const PublishComp: React.FC<indexType> = () => {
           total={10}
           stripe
           operation={renderOperation}
-          columns={AppPublishColumns}
+          columns={columns}
         />
       </Card>
     </>
