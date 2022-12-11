@@ -16,7 +16,7 @@ const AppPutaway: React.FC = () => {
   const history = useHistory();
   const [form] = Form.useForm();
   if (!appCtrl.curProduct) {
-    history.goBack();
+    history.push('/store/app');
     return <></>;
   }
   const prodInfo = appCtrl.curProduct.prod;
@@ -32,11 +32,11 @@ const AppPutaway: React.FC = () => {
       price: values.price - 0 || 0,
       days: values.days || '0',
     });
-    if (res.success) {
+    if (res) {
       message.success('应用上架成功');
       history.goBack();
     } else {
-      message.error(res.msg);
+      message.error('应用上架失败,请重试');
     }
   };
 

@@ -16,11 +16,11 @@ export const DestTypes = [
   },
   {
     value: 2,
-    label: '角色',
+    label: '职权',
   },
   {
     value: 3,
-    label: '岗位',
+    label: '身份',
   },
   {
     value: 4,

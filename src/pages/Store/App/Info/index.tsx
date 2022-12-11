@@ -22,7 +22,7 @@ const items = DestTypes.map((k) => {
 const StoreAppInfo: React.FC = () => {
   const history = useHistory();
   if (!appCtrl.curProduct) {
-    history.goBack();
+    history.push('/store/app');
     return <></>;
   }
   const curProd = appCtrl.curProduct;
@@ -34,16 +34,16 @@ const StoreAppInfo: React.FC = () => {
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
-    const showData = res.result?.map((v) => {
+    const showData = res?.result?.map((v) => {
       let obj: any = v;
       switch (tabKey) {
         case '组织':
           obj.icon = <PartitionOutlined rotate={90} />;
           break;
-        case '角色':
+        case '职权':
           obj.icon = <TeamOutlined />;
           break;
-        case '岗位':
+        case '身份':
           obj.icon = <BankOutlined />;
           break;
         case '人员':
@@ -55,6 +55,8 @@ const StoreAppInfo: React.FC = () => {
       }
       return obj;
     });
+    console.log('分享数据', res);
+
     setList(showData || []);
   }
 
