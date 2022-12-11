@@ -69,13 +69,15 @@ export const marketColumns: any = [
   {
     title: '价格',
     dataIndex: 'price',
+    valueType: 'money',
     render: (_text: string, record: any) => {
-      return record?.price === undefined ? '免费' : record?.price;
+      return record?.price === undefined ? '免费' : _text;
     },
   },
 
   {
     title: '创建时间',
+    valueType: 'dateTime',
     dataIndex: 'createTime',
   },
 

@@ -113,6 +113,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   }, [columns, operation]);
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
+    console.log(dataSource);
     return (
       <ProTable //pageType === 'table' ? (
         className={cls['common-table']}
@@ -125,6 +126,10 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           defaultPageSize: 10,
           size: 'default',
           showSizeChanger: true,
+          defaultCurrent: page,
+          onChange: (current) => {
+            console.log(current);
+          },
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
@@ -136,13 +141,12 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             filter = '',
             // eslint-disable-next-line no-unused-vars
             tableid,
-            // eslint-disable-next-line no-unused-vars
-            keyword,
+            keyword = '',
             ...other
           } = params;
           if (request) {
             const page: PageRequest = {
-              filter: filter,
+              filter: filter || keyword,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
@@ -153,33 +157,24 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               success: true,
             };
           } else {
-            if (page !== pageIndex && onChange) {
-              await onChange(pageIndex, pageSize);
-              return {
-                total: 0,
-                data: [],
-                success: false,
-              };
-            } else {
-              return {
-                data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
-                total: total ?? dataSource.length,
-                success: true,
-              };
-            }
+            return {
+              data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
+              total: total ?? dataSource.length,
+              success: true,
+            };
           }
         }}
         tableRender={(props: any, defaultDom) => {
           return pageType === 'table' ? (
             !showChangeBtn ||
-            !props.action.datasource ||
-            props.action.datasource.length === 0 ? (
+            !props.action.dataSource ||
+            props.action.dataSource.length === 0 ? (
               defaultDom
             ) : (
               [defaultDom, TableFooter]
             )
           ) : (
-            <>
+            <div key="card">
               {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
               <div
                 className={cls['common-card']}
@@ -187,11 +182,14 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                   height:
                     defaultHeight !== 'auto' ? defaultHeight + 70 + 'px' : defaultHeight,
                 }}>
-                {renderCardContent && renderCardContent(dataSource)}
+                {renderCardContent &&
+                  renderCardContent(
+                    dataSource.length !== 0 ? dataSource : props.action.dataSource,
+                  )}
               </div>
               <div style={{ height: 64 }}></div>
               {TableFooter}
-            </>
+            </div>
           );
         }}
         rowClassName={
