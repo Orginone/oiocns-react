@@ -223,7 +223,7 @@ const SettingInfo: React.FC = () => {
           title="邀请成员"
           destroyOnClose
           open={activeModal === 'addOne'}
-          width={1024}
+          width={900}
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && userCtrl.company) {
