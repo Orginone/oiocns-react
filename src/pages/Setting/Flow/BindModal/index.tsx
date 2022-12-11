@@ -19,6 +19,7 @@ type Bindmodalprops = {
   onOk: () => void;
   onCancel: () => void;
   upDateData: number;
+  noticeBaseInfo: () => void;
 };
 
 const BindModal: React.FC<Bindmodalprops> = ({
@@ -26,6 +27,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
   isOpen,
   onCancel,
   upDateData,
+  noticeBaseInfo, //通知兄弟组件事件
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
@@ -82,7 +84,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                   defineId: bindAppMes?.id,
                   productId: item.productId,
                   functionCode: item.functionCode,
-                  SpaceId: userCtrl.space.id,
+                  spaceId: userCtrl.space.id,
                 }),
               );
               // 如果有id 要看下有没有被编辑过
@@ -102,7 +104,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                     defineId: bindAppMes?.id,
                     productId: findData.productId,
                     functionCode: findData.functionCode,
-                    SpaceId: userCtrl.space.id,
+                    spaceId: userCtrl.space.id,
                   }),
                 );
               }
@@ -113,7 +115,9 @@ const BindModal: React.FC<Bindmodalprops> = ({
           Promise.all(newArr)
             .then((result) => {
               if (result) {
+                /** 在这里要通知兄弟组件刷新 */
                 message.success('绑定成功');
+                noticeBaseInfo();
                 initData();
               }
             })
@@ -145,11 +149,13 @@ const BindModal: React.FC<Bindmodalprops> = ({
                             defineId: row?.defineId,
                             productId: row.productId,
                             functionCode: row.functionCode,
-                            SpaceId: userCtrl.space.id,
+                            spaceId: userCtrl.space.id,
                           })
                           .then((result) => {
                             if (result) {
                               message.info('解绑成功');
+                              /** 在这里要通知兄弟组件刷新 */
+                              noticeBaseInfo();
                               resolve(true);
                             } else {
                               message.success('解绑失败');
