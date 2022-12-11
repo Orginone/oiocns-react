@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Space, Modal, message } from 'antd';
+import { Card, Avatar, Space, Modal, message, Empty, Button } from 'antd';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import AppLogo from '/img/appLogo.png';
 
 import cls from './index.module.less';
+import BindModal from '../BindModal';
 
 const { Meta } = Card;
 
@@ -15,6 +16,7 @@ type AppBindListprops = {
 
 const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   useEffect(() => {
     initData();
@@ -55,15 +57,9 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
   };
 
   return (
-    <Card
-      title={
-        <span>
-          当前流程：<a>{bindAppMes?.name}</a>
-        </span>
-      }
-      bordered={false}>
+    <Card bordered={false}>
       <Space className={cls.appwrap}>
-        {appDataList &&
+        {appDataList.length > 0 &&
           appDataList.map((item: any) => {
             return (
               <div key={item?.id}>
@@ -77,6 +73,8 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
                         if (item?.id) {
                           Modal.confirm({
                             title: '提示',
+                            okText: '确认',
+                            cancelText: '取消',
                             content: '确定删除当前已绑定的应用?',
                             onOk: () => {
                               userCtrl.space
@@ -110,8 +108,30 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
               </div>
             );
           })}
-        {!(appDataList.length > 0) ? '暂无数据' : null}
+        {appDataList.length == 0 && (
+          <Empty>
+            <Button
+              type="primary"
+              onClick={() => {
+                setIsOpenModal(true);
+              }}>
+              {'立即绑定'}
+            </Button>
+          </Empty>
+        )}
       </Space>
+      <BindModal
+        noticeBaseInfo={() => {}}
+        isOpen={isOpenModal}
+        bindAppMes={bindAppMes}
+        upDateData={0}
+        onOk={() => {
+          setIsOpenModal(false);
+        }}
+        onCancel={() => {
+          setIsOpenModal(false);
+        }}
+      />
     </Card>
   );
 };
