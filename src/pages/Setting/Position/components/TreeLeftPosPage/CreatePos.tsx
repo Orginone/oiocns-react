@@ -6,9 +6,6 @@ import cls from './index.module.less';
 
 import { XIdentity } from '@/ts/base/schema';
 import { IStation } from '@/ts/core/target/itarget';
-import CreateTeam from '@/bizcomponents/CreateTeam';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { TargetType } from '@/ts/core';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IStation) => void;
@@ -28,8 +25,7 @@ export type PositionType = {
   indentitys: XIdentity[];
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  const { positions, setCurrent, handleMenuClick, currentKey, reload } = props;
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const { positions, setCurrent, handleMenuClick } = props;
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -73,7 +69,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           className={cls.creatgroup}
           type="primary"
           onClick={() => {
-            setIsOpenModal(true);
+            handleMenuClick('新建', {});
           }}>
           新增岗位
         </Button>
@@ -83,22 +79,11 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           handleMenuClick={handleMenuClick}
           treeData={data}
           menu={menu}
-          selectedKeys={[currentKey]}
+          // selectedKeys={[currentKey]}
           onSelect={onSelect}
           title={'全部岗位'}
         />
       </div>
-      <CreateTeam
-        handleCancel={() => setIsOpenModal(false)}
-        open={isOpenModal}
-        title={'新增'}
-        current={userCtrl.company}
-        typeNames={[TargetType.Station]}
-        handleOk={async () => {
-          setIsOpenModal(false);
-          reload();
-        }}
-      />
     </div>
   );
 };

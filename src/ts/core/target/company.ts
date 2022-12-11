@@ -179,7 +179,7 @@ export default class Company extends MarketTarget implements ICompany {
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       const station = new Station(res.data, () => {
-        this.workings = this.workings.filter((item) => {
+        this.stations = this.stations.filter((item) => {
           return item.id != station.id;
         });
       });

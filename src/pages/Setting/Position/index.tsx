@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
-import { Card, Modal, Button, Space } from 'antd';
+import { Card, Modal, Button, Space, message } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { columns, indentitycolumns } from './config';
-import TreeLeftDeptPage, { PositionType } from './components/TreeLeftPosPage/CreatePos';
+import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
@@ -31,12 +31,12 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
   const [positions, setPositions] = useState<IStation[]>([]); //岗位列表
   const [_currentPostion, setCurrentPosition] = useState<IStation>(); //当前选中岗位
+  const [editPostion, setEditPosition] = useState<IStation>(); //当前需要编辑的岗位
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [persons, setPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
   const [addIndentitys, setAddIndentitys] = useState<XIdentity[]>(); //待添加的身份数据集
-  const [IndentityIds, setIndentityIds] = useState<string[]>(); //待添加的身份ID集合
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false); // 编辑岗位模态框
-  const [isFlag, setIsFlag] = useState<string>(''); // 编辑岗位模态框
+  const [isFlag, setIsFlag] = useState<string>(''); // title
 
   const treeContainer = document.getElementById('templateMenu');
   //监听
@@ -58,10 +58,26 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         key: 'remove',
         label: '移出岗位',
         onClick: async () => {
-          for (const a of _currentPostion?.identitys!) {
-            a.removeMembers([item.id]);
-          }
-          reload();
+          Modal.confirm({
+            title: '提示',
+            content: '是否确认移出岗位',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+              const res = await _currentPostion!.removeMembers(
+                [item.id],
+                TargetType.Person,
+              );
+              reload();
+              indentityReload();
+              if (res) {
+                message.success('删除成功');
+                indentityReload();
+              } else {
+                message.error('删除失败');
+              }
+            },
+          });
         },
       },
     ];
@@ -73,8 +89,22 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         key: 'remove',
         label: '删除',
         onClick: async () => {
-          await _currentPostion?.removeIdentitys([item.id]);
-          indentityReload();
+          Modal.confirm({
+            title: '提示',
+            content: '是否确认删除',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+              const res = await _currentPostion?.removeIdentitys([item.id]);
+              indentityReload();
+              if (res) {
+                message.success('删除成功');
+                indentityReload();
+              } else {
+                message.error('删除失败');
+              }
+            },
+          });
           console.log('按钮事件', 'remove', item);
         },
       },
@@ -85,35 +115,32 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     console.log(item);
     switch (key) {
       case '删除':
-        item.object.delete();
+        await item.object.delete();
+        await getPositions();
+        setCurrentPosition(undefined);
         break;
       case '更改岗位名称':
         setIsFlag('编辑');
         setIsOpenEditModal(true);
-        setCurrentPosition(item.object);
+        setEditPosition(item.object);
         break;
-      case '新增':
-        setIsFlag('新增');
+      case '新建':
+        setIsFlag('新建');
         setIsOpenEditModal(true);
-        setCurrentPosition(item.object);
+        setEditPosition(undefined);
+        break;
     }
   };
   // 选中树的时候操作
   const setTreeCurrent = async (current: IStation) => {
-    setCurrentPosition(current);
     /**保存当前选中的岗位 */
     setCurrentPosition(current);
-    const indentityIds: string[] = [];
-    current.identitys.map((item) => {
-      indentityIds.push(item.id);
-    });
-    //保存当前岗位id
-    setIndentityIds(indentityIds);
   };
   //刷新表格
   const reload = () => {
     actionRef.current?.reload();
   };
+  //刷新表格
   const indentityReload = () => {
     IndentityActionRef.current?.reload();
   };
@@ -155,8 +182,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
                 rowKey={'id'}
                 operation={reRenderOperation}
                 actionRef={IndentityActionRef}
-                request={(page) => {
-                  return _currentPostion!.loadIdentitys({
+                request={async (page) => {
+                  return await _currentPostion!.loadIdentitys({
                     limit: page.limit,
                     offset: page.offset,
                     filter: '',
@@ -199,11 +226,26 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
                     <Space size={16}>
                       <a
                         onClick={() => {
-                          for (const a of _currentPostion?.identitys!) {
-                            a.removeMembers(selectedRowKeys.selectedRowKeys);
-                            reload();
-                          }
-                          actionRef.current?.clearSelected!();
+                          Modal.confirm({
+                            title: '提示',
+                            content: '是否确认删除',
+                            okText: '确认',
+                            cancelText: '取消',
+                            onOk: async () => {
+                              const res = await _currentPostion?.removeMembers(
+                                selectedRowKeys.selectedRowKeys,
+                                TargetType.Person,
+                              );
+                              reload();
+                              actionRef.current?.clearSelected!();
+                              if (res) {
+                                message.success('删除成功');
+                                indentityReload();
+                              } else {
+                                message.error('删除失败');
+                              }
+                            },
+                          });
                         }}>
                         批量删除
                       </a>
@@ -211,8 +253,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
                   );
                 }}
                 operation={renderOperation}
-                request={(page) => {
-                  return _currentPostion!.loadMembers({
+                request={async (page) => {
+                  return await _currentPostion!.loadMembers({
                     limit: page.limit,
                     offset: page.offset,
                     filter: '',
@@ -273,8 +315,8 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       <CreateTeam
         handleCancel={() => setIsOpenEditModal(false)}
         open={isOpenEditModal}
-        title={'编辑'}
-        current={_currentPostion!}
+        title={isFlag}
+        current={editPostion || userCtrl.company}
         typeNames={[TargetType.Station]}
         handleOk={async () => {
           setIsOpenEditModal(false);
