@@ -135,6 +135,7 @@ const SettingFlow: React.FC = () => {
     const result = await userCtrl.space.publishDefine(currentData);
     if (result) {
       message.info(result.id ? '编辑成功' : '发布成功');
+      // 清理数据
       initData();
       setDesignData(null);
       setEditorValue(null);
@@ -235,7 +236,7 @@ const SettingFlow: React.FC = () => {
                     onClick: () => {
                       setRowId(record.id);
                       setBindAppMes(record);
-                    }, // 点击行
+                    },
                   };
                 }}
                 stripe
