@@ -5,6 +5,7 @@ import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { XProduct } from '@/ts/base/schema';
 interface AppShowCompType {
+  tkey: string;
   list: any[];
   queryFun?: Function;
   searchParams?: any | { status: ststusTypes };
@@ -18,6 +19,7 @@ interface AppShowCompType {
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const AppShowComp: React.FC<AppShowCompType> = ({
+  tkey,
   queryFun,
   list,
   searchParams,
