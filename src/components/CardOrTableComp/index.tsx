@@ -102,6 +102,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                 <Dropdown
                   className={cls['operation-btn']}
                   menu={{ items: menu(record) }}
+                  trigger={['click']}
                   key="key">
                   <EllipsisOutlined />
                 </Dropdown>,
