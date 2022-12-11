@@ -113,20 +113,20 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
 
   /**头部 */
   const header = current && (
-    <div className={`${cls['dept-wrap-pages']}`} style={{ height: '400px' }}>
+    <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
             <Button
               className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
+              type="link"
               style={{ float: 'right' }}
               onClick={() => {
                 setIsOpenIdentityModal(true);
-              }}
-            />
+              }}>
+              添加身份
+            </Button>
           </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
@@ -163,14 +163,14 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>岗位人员</strong>
             <Button
               className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
+              type="link"
               style={{ float: 'right' }}
               onClick={() => {
                 setSelectPersons([]);
                 setIsOpenPerson(true);
-              }}
-            />
+              }}>
+              添加成员
+            </Button>
           </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
