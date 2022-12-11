@@ -52,7 +52,9 @@ const AppTodo: React.FC = () => {
         '4': 'getNoticeList',
       };
       const list = await todoCtrl.CurAppTodo[code[activeKey]](
-        activeKey === '3' ? resetParams({ page, pageSize }) : null,
+        activeKey === '3'
+          ? resetParams({ page, pageSize })
+          : { offect: 0, limit: 10, filter: '' },
       );
       console.log(code[activeKey], list);
       setpageData(list);
