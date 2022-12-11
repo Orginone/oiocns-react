@@ -10,7 +10,6 @@ import TreeLeftDeptPage from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
-import { PlusOutlined } from '@ant-design/icons';
 import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { XIdentity } from '@/ts/base/schema';
@@ -133,7 +132,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   };
   // 选中树的时候操作
   const setTreeCurrent = async (current: IStation) => {
-    /**保存当前选中的岗位 */
+    //保存当前选中的岗位
     setCurrentPosition(current);
   };
   //刷新表格
@@ -161,33 +160,34 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
-          <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>
-              {_currentPostion ? _currentPostion.name : ''}
-            </strong>
-            <Button
-              className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
-              style={{ float: 'right' }}
-              onClick={() => {
-                setIsAddOpen(true);
-              }}
-            />
-          </div>
+          <div className={cls.topMes} style={{ marginRight: '25px' }}></div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
+                toolBarRender={() => [
+                  <Button
+                    className={cls.creatgroup}
+                    style={{ float: 'right' }}
+                    type="primary"
+                    onClick={() => {
+                      setIsAddOpen(true);
+                    }}>
+                    添加
+                  </Button>,
+                ]}
+                headerTitle={_currentPostion ? _currentPostion.name : ''}
                 dataSource={[]}
                 rowKey={'id'}
                 operation={reRenderOperation}
                 actionRef={IndentityActionRef}
+                options={{
+                  reload: false,
+                  density: false,
+                  setting: false,
+                  search: true,
+                }}
                 request={async (page) => {
-                  return await _currentPostion!.loadIdentitys({
-                    limit: page.limit,
-                    offset: page.offset,
-                    filter: '',
-                  });
+                  return await _currentPostion!.loadIdentitys(page);
                 }}
                 columns={indentitycolumns as any}
                 parentRef={parentRef}
@@ -204,21 +204,10 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '10px' }}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
-          <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>岗位人员</strong>
-            <Button
-              className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
-              style={{ float: 'right' }}
-              onClick={() => {
-                setIsOpenAssign(true);
-              }}
-            />
-          </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
+                headerTitle={'岗位人员'}
                 dataSource={[] as any}
                 rowKey={'id'}
                 tableAlertOptionRender={(selectedRowKeys: any) => {
@@ -252,13 +241,26 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
                     </Space>
                   );
                 }}
+                toolBarRender={() => [
+                  <Button
+                    className={cls.creatgroup}
+                    type="primary"
+                    style={{ float: 'right' }}
+                    onClick={() => {
+                      setIsOpenAssign(true);
+                    }}>
+                    添加
+                  </Button>,
+                ]}
+                options={{
+                  reload: false,
+                  density: false,
+                  setting: false,
+                  search: true,
+                }}
                 operation={renderOperation}
                 request={async (page) => {
-                  return await _currentPostion!.loadMembers({
-                    limit: page.limit,
-                    offset: page.offset,
-                    filter: '',
-                  });
+                  return await _currentPostion!.loadMembers(page);
                 }}
                 actionRef={actionRef}
                 columns={columns as any}

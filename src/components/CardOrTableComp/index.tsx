@@ -136,13 +136,12 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             filter = '',
             // eslint-disable-next-line no-unused-vars
             tableid,
-            // eslint-disable-next-line no-unused-vars
-            keyword,
+            keyword = '',
             ...other
           } = params;
           if (request) {
             const page: PageRequest = {
-              filter: filter,
+              filter: filter || keyword,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
