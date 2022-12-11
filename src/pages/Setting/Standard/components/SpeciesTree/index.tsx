@@ -10,7 +10,7 @@ import { ISpeciesItem } from '@/ts/core';
 
 type CreateGroupPropsType = {
   tkey: string;
-  current: ISpeciesItem;
+  current: ISpeciesItem | undefined;
   setCurrent: (item: ISpeciesItem) => void;
   handleMenuClick: (key: string, item: ISpeciesItem) => void;
 };
@@ -91,7 +91,7 @@ const SpeciesTree: React.FC<CreateGroupPropsType> = ({
           menu={'menus'}
           searchable
           showIcon
-          selectedKeys={[current.id]}
+          selectedKeys={[current?.id]}
           treeData={data}
           onSelect={onSelect}
           handleMenuClick={(id, node) => handleMenuClick(id, node.item)}

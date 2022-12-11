@@ -34,6 +34,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
     switch (key) {
       case '删除分类':
         await item.delete();
+        forceUpdate();
         return;
     }
     setModalType(key);
@@ -106,7 +107,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                 />
                 <CardOrTable<XAttribute>
                   rowKey={'id'}
-                  params={current}
+                  params={key}
                   request={async (page) => {
                     return await loadAttrs(page);
                   }}
@@ -150,15 +151,15 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
             }}
             current={current}
           />
-          {/* 左侧分类树 */}
-          <SpeciesTree
-            tkey={key}
-            current={current}
-            handleMenuClick={handleMenuClick}
-            setCurrent={setCurrent}
-          />
         </>
       )}
+      {/* 左侧分类树 */}
+      <SpeciesTree
+        tkey={key}
+        current={current}
+        handleMenuClick={handleMenuClick}
+        setCurrent={setCurrent}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { nanoid, ProColumns } from '@ant-design/pro-components';
+import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
@@ -137,7 +137,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
-        params={{ tableid: nanoid(), filter: '' }}
         request={async (params) => {
           const {
             current: pageIndex = 1,

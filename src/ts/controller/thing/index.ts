@@ -18,7 +18,7 @@ class ThingController extends Emitter {
             await this.loadTeamSpecies(userCtrl.company.id);
           }
         }
-      }, 500);
+      }, 100);
     });
   }
   /** 组织的分类根 */
