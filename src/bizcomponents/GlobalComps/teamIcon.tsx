@@ -15,7 +15,7 @@ interface teamTypeInfo {
 /** 组织图标 */
 const TeamIcon = (info: teamTypeInfo) => {
   const [preview, setPreview] = useState(false);
-  if (info.avatar) {
+  if (info.avatar && info.avatar.thumbnail) {
     return (
       <div style={{ cursor: 'pointer' }} title="点击预览">
         {info.preview && (
@@ -48,6 +48,8 @@ const TeamIcon = (info: teamTypeInfo) => {
     case TargetType.Section:
     case TargetType.Department:
       return <im.ImLibrary />;
+    case TargetType.College:
+      return <im.ImTrophy />;
     case TargetType.Laboratory:
       return <im.ImJoomla />;
     case TargetType.Office:

@@ -7,6 +7,7 @@ export enum TargetType {
   Cohort = '群组',
   Company = '单位',
   College = '学院',
+  Major = '专业',
   Section = '科室',
   Office = '办事处',
   Hospital = '医院',
@@ -83,7 +84,6 @@ export const departmentTypes = [
   TargetType.Laboratory,
   TargetType.JobCohort,
   TargetType.Department,
-  TargetType.College,
 ];
 
 export const subDepartmentTypes = [

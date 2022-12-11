@@ -236,7 +236,7 @@ class CohortChat extends BaseChat {
       subTypeNames: [TargetType.Person],
       page: {
         offset: this.persons.length,
-        limit: 13,
+        limit: 1000,
         filter: filter,
       },
     });

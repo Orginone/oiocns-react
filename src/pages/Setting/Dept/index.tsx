@@ -65,7 +65,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         key: 'changeDept',
         label: '变更' + item.typeName,
         onClick: () => {
-          setSelectPerson(item);
+          setSelectPerson([item]);
           setActiveModal('transfer');
         },
       },
@@ -277,7 +277,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             handleOk={handleOk}
             onCancel={() => setActiveModal('')}
             current={current}
-            needTransferUser={selectPerson!}
+            needTransferUser={selectPerson[0]}
           />
           {/* 对象设置 */}
           <AddPostModal

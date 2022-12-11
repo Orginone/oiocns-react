@@ -151,6 +151,7 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
+              tkey={key}
               list={appCtrl.products}
               searchParams={{ status: statusKey }}
               columns={myColumns}
