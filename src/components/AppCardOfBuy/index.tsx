@@ -6,8 +6,7 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { common } from 'typings/common';
 import appImg from '/img/appLogo.png';
-import { MarketTypes } from 'typings/marketType';
-
+import { XMerchandise } from '@/ts/base/schema';
 interface BuyAppType {
   className?: string;
   showBtn?: boolean; //是否展示按钮
@@ -16,7 +15,7 @@ interface BuyAppType {
   shouOperation?: boolean; //是否展示 右上角操作按钮
   handleBuyApp: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
   onClick?: (e?: Event) => void; //卡片点击事件
-  operation?: (_item: MarketTypes.ProductType) => common.OperationType[]; //操作区域数据
+  operation?: (_item: XMerchandise) => common.OperationType[]; //操作区域数据
 }
 const defaultObj = {
   name: 'name', //名称

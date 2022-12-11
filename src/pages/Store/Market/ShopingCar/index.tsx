@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import CardOrTable from '@/components/CardOrTableComp';
-import TitleButton from './TitleButton';
-import cls from './index.module.less';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '@/components/AppCardShopCar';
 import { MarketTypes } from 'typings/marketType';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
-import BuyCustomModal from '@/bizcomponents/AppTableWithBuy/BuyCustomModal';
-import { message } from 'antd';
+import BuyCustomModal from '../components/BuyCustomModal';
+import { message, Space } from 'antd';
+import cls from './index.module.less';
 
 /**
  * @description: 购物车
@@ -84,6 +83,7 @@ const ShopingCar: React.FC = () => {
    * @return {*}
    */
   const rowSelection = {
+    alwaysShowAlert: true,
     type: 'checkbox',
     hideSelectAll: true,
     onChange: (_selectedRowKeys: React.Key[], selectedRows: any[]) => {
@@ -96,6 +96,10 @@ const ShopingCar: React.FC = () => {
    * @return {*}
    */
   const OnDeleApply = async () => {
+    if (selectedRowKey.length === 0) {
+      message.warning('没有需要删除的商品');
+      return;
+    }
     await marketCtrl.deleApply(selectedRowKey);
     setSelectedRowKey([]);
   };
@@ -156,7 +160,6 @@ const ShopingCar: React.FC = () => {
 
   return (
     <React.Fragment>
-      <TitleButton OnDeleApply={OnDeleApply} OnBuyShoping={OnCustomBuy} />
       <div ref={parentRef} className={cls['shoping-car']}>
         <CardOrTable
           dataSource={shopList}
@@ -164,7 +167,15 @@ const ShopingCar: React.FC = () => {
           hideOperation={true}
           columns={columns as any}
           rowSelection={rowSelection}
-          tableAlertRender={false}
+          alwaysShowAlert={true}
+          tableAlertOptionRender={() => {
+            return (
+              <Space size={16}>
+                <a onClick={OnDeleApply}>删除</a>
+                <a onClick={OnCustomBuy}>购买</a>
+              </Space>
+            );
+          }}
           renderCardContent={renderCardFun}
           parentRef={parentRef}
         />

@@ -13,6 +13,7 @@ import Share from './Share';
 import Storage from './Storage';
 
 import { TOOBAR_TYPE } from '@/constants/content_template';
+import ShopingCar from '@/pages/Store/Market/ShopingCar';
 
 type ShareDrawFormType = {
   onClose: () => void;
@@ -26,12 +27,18 @@ const toobarComponentMaps: Record<TOOBAR_TYPE, JSX.Element> = {
   [TOOBAR_TYPE.SHARE]: <Share />,
   [TOOBAR_TYPE.COMMEMNT]: <Comment />,
   [TOOBAR_TYPE.STORAGE]: <Storage />,
+  [TOOBAR_TYPE.SHOPCARD]: <ShopingCar />,
 };
 
 const ShareDrawForm: React.FC<ShareDrawFormType> = (props) => {
   const { onClose, open, title, placement = 'right', type } = props;
   return (
-    <Drawer title={title} width={460} placement={placement} onClose={onClose} open={open}>
+    <Drawer
+      title={title}
+      width={type !== TOOBAR_TYPE.SHOPCARD ? 460 : '75%'}
+      placement={placement}
+      onClose={onClose}
+      open={open}>
       {toobarComponentMaps[type]}
     </Drawer>
   );
