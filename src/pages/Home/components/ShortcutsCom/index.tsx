@@ -2,7 +2,7 @@ import './index.less';
 import { SendOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
 import React, { useState } from 'react';
-import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { companyTypes } from '@/ts/core/enum';
 import { schema } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting/userCtrl';

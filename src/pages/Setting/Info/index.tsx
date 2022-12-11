@@ -21,7 +21,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
-import CreateTeamModel from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 
 type ShowmodelType =
@@ -210,7 +210,7 @@ const SettingInfo: React.FC = () => {
           current={userCtrl.space}
           onCancel={() => setActiveModal('')}
         />
-        <CreateTeamModel
+        <CreateTeamModal
           title="编辑"
           open={activeModal === 'edit'}
           current={userCtrl.company}
