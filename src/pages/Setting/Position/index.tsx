@@ -124,7 +124,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
               onClick={() => {
                 setIsOpenIdentityModal(true);
               }}>
-              添加
+              添加身份
             </Button>
           </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -198,7 +198,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                       setSelectPersons([]);
                       setIsOpenPerson(true);
                     }}>
-                    添加
+                    指派人员
                   </Button>,
                 ]}
                 options={{
