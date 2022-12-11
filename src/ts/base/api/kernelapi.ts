@@ -751,7 +751,7 @@ export default class KernelApi {
    */
   public async PullIdentityToTeam(
     params: model.TeamPullModel,
-  ): Promise<model.ResultType<schema.XRelationArray>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'target',
       action: 'PullIdentityToTeam',
