@@ -20,6 +20,7 @@ const CcNode = () => {
   }>({ title: '', key: '', data: { id: '', name: '' } });
 
   const onOk = () => {
+    console.log('selectedNode.props', selectedNode.props);
     selectedNode.props.assignedUser = [
       { name: currentData.data.name, id: currentData.data.id },
     ];
@@ -34,7 +35,7 @@ const CcNode = () => {
   // 选择抄送对象
   const rovalnode = (
     <div className={cls[`roval-node`]}>
-      <Row>
+      <div style={{ marginBottom: '10px' }}>
         <Button
           type="primary"
           shape="round"
@@ -44,12 +45,14 @@ const CcNode = () => {
           }}>
           选择抄送对象
         </Button>
+      </div>
+      <div>
         {currentData?.title ? (
           <span>
             当前选择：<a>{currentData?.title}</a>
           </span>
         ) : null}
-      </Row>
+      </div>
     </div>
   );
   return (

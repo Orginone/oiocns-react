@@ -126,6 +126,7 @@ const SettingFlow: React.FC = () => {
   const publish = async () => {
     /**要发布的数据 */
     const currentData = deepClone(design);
+    console.log('currentData', currentData);
     if (currentData.belongId) {
       delete currentData.belongId;
     }
@@ -137,7 +138,6 @@ const SettingFlow: React.FC = () => {
       setEditorValue(null);
       setTabType(TabType.TABLEMES);
     } else {
-      message.error('没读到数据');
       return false;
     }
   };
