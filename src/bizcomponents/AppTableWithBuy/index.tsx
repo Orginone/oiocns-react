@@ -15,6 +15,7 @@ interface AppShowCompType {
   list: any[];
   queryFun: Function;
   total?: number;
+  tableRequest?: any;
   // service: MarketServiceType;
   columns: ProColumns<any>[];
 }
@@ -26,6 +27,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   headerTitle,
   columns,
   total,
+  tableRequest,
 }) => {
   // const [list, setList] = useState<MarketTypes.ProductType[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -89,7 +91,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     return [
       {
         key: 'buy',
-        label: '立即购买',
+        label: '购买',
         onClick: () => {
           setIsBuy(true);
           setNowBuy([item]);
@@ -97,7 +99,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       },
       {
         key: 'toBuyCar',
-        label: '加入购物车',
+        label: '暂存',
         onClick: () => {
           marketCtrl.joinApply(item);
         },
@@ -148,10 +150,11 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
-        columns={columns}
+        columns={marketCtrl.getColumns('market')}
         page={page}
         onChange={handlePageChange}
         rowKey={'id'}
+        // request={(params) => tableRequest(params)}
       />
       <ProductDetailModal
         open={isProduce}

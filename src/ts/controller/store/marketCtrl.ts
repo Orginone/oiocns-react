@@ -218,8 +218,8 @@ class MarketController extends Emitter {
     if (
       await this._curMarket?.createOrder(
         '',
-        'order',
-        'code',
+        data[0].caption + (data.length > 1 ? `...等${data.length}件商品` : ''),
+        new Date().getTime().toString().substring(0, 13),
         userCtrl.space.id,
         this._shopingIds,
       )
