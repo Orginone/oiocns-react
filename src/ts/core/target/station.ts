@@ -64,7 +64,7 @@ export default class Station extends BaseTarget implements IStation {
       targetIds: ids,
     });
     if (res.success) {
-      this._identitys = this._identitys.filter((a) => ids.includes(a.id));
+      this._identitys = this._identitys.filter((a) => !ids.includes(a.id));
       return true;
     }
     return false;
