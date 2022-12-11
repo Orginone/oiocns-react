@@ -90,7 +90,7 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
     ];
   };
   /**点击操作内容触发的事件 */
-  const handleMenuClick = (key: string, item: any) => {};
+  const handleMenuClick = (_key: string, _item: any) => {};
   // 选中树的时候操作
   const setTreeCurrent = async (current: PositionType) => {
     setPosition(current);

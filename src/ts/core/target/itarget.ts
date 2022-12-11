@@ -49,12 +49,12 @@ export interface ITarget {
   avatar: FileItemShare | undefined;
   /**
    * 新增
-   * @param data 集团基本信息
+   * @param data
    */
   create(data: TargetModel): Promise<ITarget | undefined>;
   /**
    * 更新
-   * @param data 集团基本信息
+   * @param data
    */
   update(data: TargetParam): Promise<ITarget>;
   /**
@@ -458,7 +458,9 @@ export interface ICompany extends ISpace, ITarget {
   createGroup(data: TargetParam): Promise<IGroup | undefined>;
   /** 创建部门 */
   createDepartment(data: TargetParam): Promise<IDepartment | undefined>;
-  /** 创建部门 */
+  /** 创建岗位 */
+  createStation(data: TargetParam): Promise<IStation | undefined>;
+  /** 创建工作组 */
   createWorking(data: TargetParam): Promise<IWorking | undefined>;
   /**
    * 删除集团
@@ -471,6 +473,12 @@ export interface ICompany extends ISpace, ITarget {
    * @returns
    */
   deleteDepartment(id: string): Promise<boolean>;
+  /**
+   * 删除岗位
+   * @param id 岗位Id
+   * @returns
+   */
+  deleteStation(id: string): Promise<boolean>;
   /**
    * 删除工作组
    * @param id 工作组Id
@@ -490,6 +498,11 @@ export interface ICompany extends ISpace, ITarget {
    */
   getDepartments(reload?: boolean): Promise<IDepartment[]>;
   /**
+   * 获取单位下的岗位
+   * @param reload 是否强制刷新
+   */
+  getStations(reload?: boolean): Promise<IStation[]>;
+  /**
    * 获取组织下的工作组（单位、部门、工作组）
    * @param reload 是否强制刷新
    * @returns 返回好友列表
@@ -501,12 +514,6 @@ export interface ICompany extends ISpace, ITarget {
    * @return {*} 查询到的群组
    */
   getJoinedGroups(reload?: boolean): Promise<IGroup[]>;
-  /**
-   * 根据岗位下的身份查询成员
-   * @param data 身份ID集合及分页参数
-   * @return {*} 成员列表
-   */
-  getStationMember(data: model.IdArrayReq): Promise<XTargetArray>;
   /**
    * 申请加入集团
    * @param id 目标Id
@@ -595,4 +602,26 @@ export interface IWorking extends ITarget {
   searchPerson(code: string): Promise<schema.XTargetArray>;
   /** 删除 */
   delete(): Promise<boolean>;
+}
+
+export interface IStation extends ITarget {
+  /**
+   * 查询人员
+   * @param code 人员编号
+   */
+  searchPerson(code: string): Promise<schema.XTargetArray>;
+  /** 删除 */
+  delete(): Promise<boolean>;
+  /** 加载岗位下的身份 */
+  loadIdentitys(page: PageRequest): Promise<schema.XIdentityArray>;
+  /**
+   * 添加岗位身份
+   * @param {string[]} ids 身份ID数组
+   */
+  pullIdentitys(ids: string[]): Promise<boolean>;
+  /**
+   * 移除岗位身份
+   * @param {string[]} ids 身份ID数组
+   */
+  removeIdentitys(ids: string[]): Promise<boolean>;
 }

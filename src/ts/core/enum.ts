@@ -16,6 +16,7 @@ export enum TargetType {
   Research = '研究所',
   JobCohort = '工作群',
   Laboratory = '实验室',
+  Station = '岗位',
 }
 
 /** 消息类型 */
