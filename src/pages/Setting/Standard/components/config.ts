@@ -26,6 +26,12 @@ export const columns: ProColumns<schema.XAttribute>[] = [
     width: 150,
   },
   {
+    title: '特性分类',
+    dataIndex: 'speciesId',
+    key: 'speciesId',
+    width: 150,
+  },
+  {
     title: '共享组织',
     dataIndex: 'belongId',
     key: 'belongId',

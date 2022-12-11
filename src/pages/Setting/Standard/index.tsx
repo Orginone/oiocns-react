@@ -17,10 +17,10 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { PageRequest } from '@/ts/base/model';
 
 /**
- * 内设机构
+ * 标准设定
  * @returns
  */
-const SettingDept: React.FC<RouteComponentProps> = () => {
+const SettingStandrad: React.FC<RouteComponentProps> = () => {
   const [modalType, setModalType] = useState('');
   const [current, setCurrent] = useState<INullSpeciesItem>();
   const [editData, setEditData] = useState<XAttribute>();
@@ -78,6 +78,20 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
     );
   };
 
+  const findSpecesName = (species: INullSpeciesItem, id: string) => {
+    if (species) {
+      if (species.id == id) {
+        return species.name;
+      }
+      for (const item of species.children) {
+        if (findSpecesName(item, id) != id) {
+          return item.name;
+        }
+      }
+    }
+    return id;
+  };
+
   const loadAttrs = async (page: PageRequest) => {
     const res = await current!.loadAttrs(userCtrl.space.id, page);
     if (res && res.result) {
@@ -86,13 +100,14 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
         if (team) {
           item.belongId = team.name;
         }
+        item.speciesId = findSpecesName(thingCtrl.teamSpecies, item.speciesId);
       }
     }
     return res;
   };
 
   return (
-    <div id={key} className={cls[`dept-content-box`]}>
+    <div className={cls[`dept-content-box`]}>
       {current && (
         <>
           {/** 分类基本信息 */}
@@ -107,7 +122,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                 />
                 <CardOrTable<XAttribute>
                   rowKey={'id'}
-                  params={key}
+                  params={[key, current]}
                   request={async (page) => {
                     return await loadAttrs(page);
                   }}
@@ -164,4 +179,4 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
   );
 };
 
-export default SettingDept;
+export default SettingStandrad;
