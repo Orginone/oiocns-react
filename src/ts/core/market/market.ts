@@ -2,7 +2,7 @@ import IMarket from './imarket';
 import { kernel } from '../../base';
 import { model, schema } from '../../base';
 import { TargetType, companyTypes } from '../enum';
-import { XMarketRelationArray, XMerchandiseArray, XOrder } from '@/ts/base/schema';
+import { XMarketRelationArray, XMerchandiseArray } from '@/ts/base/schema';
 
 export default class Market implements IMarket {
   market: schema.XMarket;
@@ -102,23 +102,5 @@ export default class Market implements IMarket {
         belongId: this.market.belongId,
       })
     ).success;
-  }
-  public async createOrder(
-    nftId: string,
-    name: string,
-    code: string,
-    spaceId: string,
-    merchandiseIds: string[],
-  ): Promise<XOrder> {
-    return (
-      await kernel.createOrder({
-        id: '0',
-        nftId,
-        name,
-        code,
-        belongId: spaceId,
-        merchandiseIds,
-      })
-    ).data;
   }
 }

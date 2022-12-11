@@ -266,6 +266,21 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    */
   getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
+  /**
+   * 下单
+   * @param nftId 区块链Id
+   * @param name 订单名称
+   * @param code 订单编号
+   * @param spaceId 空间Id
+   * @param merchandiseIds 商品Id集合
+   */
+  createOrder(
+    nftId: string,
+    name: string,
+    code: string,
+    spaceId: string,
+    merchandiseIds: string[],
+  ): Promise<schema.XOrder>;
 }
 export interface IFlow {
   /** 流程定义 */

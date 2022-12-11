@@ -8,23 +8,23 @@ import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
 type modalType = 'create' | 'join' | 'detail' | 'users' | '';
-const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
-  selectMarket,
-}) => {
-  const [key, forceUpdate] = useCtrlUpdate(marketCtrl);
+interface Iprops {
+  tkey: string;
+  current: IMarket | undefined;
+  setCurrent: (current: IMarket) => void;
+}
+const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const [activeModal, setActiveModal] = useState<modalType>('');
-  const [treeDataObj, setTreeDataObj] = useState<any>({}); // 被选中的树节点
+  const [editMarket, setEditMarket] = useState<IMarket>(); // 被选中的树节点
   const [dataSource, setDataSource] = useState<any>([]); // table数据
-  const [selectMenu, setSelectMenu] = useState<string>('0-0');
   const [treeData, setTreeData] = useState<any[]>([]);
+
   useEffect(() => {
     getTreeData();
-    return () => {};
-  }, [userCtrl.space]);
+  }, [props.current, props.tkey]);
 
   /**
    * @description: 创建商店
@@ -32,11 +32,11 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    if (await marketCtrl.Market.createMarket({ ...formData })) {
-      message.success('创建成功');
+    const market = await marketCtrl.Market.createMarket({ ...formData });
+    if (market) {
+      props.setCurrent(market);
     }
     setActiveModal('');
-    forceUpdate();
   };
 
   /**
@@ -96,33 +96,20 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
     </Row>
   );
 
-  /*******
-   * @desc: 点击目录 触发事件
-   * @param {any} item
-   * @return {*}
-   */
-  const handleTitleClick = (item: any) => {
-    setSelectMenu(item.key);
-    selectMarket(item?.node);
-    marketCtrl.setCurrentMarket(item?.node);
-    // 触发内容去变化
-    marketCtrl.changeMenu(item);
-  };
-
   /**
    * @description: 目录更多操作 触发事件
    * @param {string} key
-   * @param {any} node
+   * @param {IMarket} node
    * @return {*}
    */
-  const handleMenuClick = (key: string, node: any) => {
+  const handleMenuClick = (key: string, node: IMarket) => {
     switch (key) {
       case '删除商店':
         Modal.confirm({
           title: '提示',
           content: '是否确认删除',
           onOk: async () => {
-            if (await marketCtrl.Market.deleteMarket(node?.id)) {
+            if (await marketCtrl.Market.deleteMarket(node.market.id)) {
               message.success('删除成功');
             }
           },
@@ -133,7 +120,7 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
           title: '提示',
           content: '是否确认退出',
           onOk: async () => {
-            if (await marketCtrl.Market.quitMarket(treeDataObj?.id)) {
+            if (await marketCtrl.Market.quitMarket(node.market.id)) {
               message.success('退出成功');
             }
           },
@@ -141,12 +128,11 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
         break;
       case '基础详情':
         setActiveModal('detail');
-        setTreeDataObj(node);
+        setEditMarket(node);
         break;
       case '用户管理':
         setActiveModal('users');
-        setTreeDataObj(node);
-        marketCtrl.setCurrentMarket(node?.node);
+        setEditMarket(node);
         break;
       default:
         break;
@@ -158,22 +144,17 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
    * @return {*}
    */
   const getTreeData = () => {
-    const data = userCtrl.space.joinedMarkets.map((itemModel, index) => {
+    const data = marketCtrl.Market.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
       if (itemModel.market.belongId === userCtrl.user.target.id) {
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');
       }
-      if (index === 0) {
-        selectMarket(itemModel);
-      }
-      console.log(itemModel);
       return {
         title: itemModel.market.name,
-        key: `0-${index}`,
-        id: itemModel.market.id,
-        node: itemModel,
+        key: itemModel.market.id,
+        item: itemModel,
         tag:
           itemModel.market.belongId === userCtrl.user.target.id
             ? {
@@ -183,21 +164,21 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
             : null,
         children: [],
         belongId: itemModel.market.belongId,
-        menus: arrs,
+        menus: itemModel.market.belongId ? arrs : undefined,
       };
     });
     setTreeData(data);
   };
 
   return (
-    <div id={key} className={cls.treeContainer}>
+    <div className={cls.treeContainer}>
       <LeftOutlined className={cls.backicon} onClick={() => history.go(-1)} />
       <MarketClassifyTree
         parentIcon={<AppstoreFilled />}
         childIcon={<AppstoreFilled style={{ color: '#a6aec7' }} />}
-        selectedKeys={[selectMenu]}
-        onSelect={(_: any, info: any) => handleTitleClick(info.node)}
-        handleMenuClick={handleMenuClick}
+        selectedKeys={[props.current?.market.id]}
+        onSelect={(_: any, info: any) => props.setCurrent(info.node.item)}
+        handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
         treeData={treeData}
         menu={'menus'}
         title={ClickBtn}
@@ -208,19 +189,23 @@ const MarketClassify: React.FC<{ selectMarket: (item: IMarket) => void }> = ({
         onOk={onOk}
         onCancel={onCancel}
       />
-      <DetailDrawer
-        title={treeDataObj.title}
-        nodeDetail={treeDataObj?.node?.market}
-        open={activeModal === 'detail'}
-        onClose={() => setActiveModal('')}
-      />
-      <Drawer
-        title="用户管理"
-        width={'75%'}
-        open={activeModal === 'users'}
-        onClose={() => setActiveModal('')}>
-        <UserManagement />
-      </Drawer>
+      {editMarket && (
+        <>
+          <DetailDrawer
+            title={editMarket.market.name}
+            nodeDetail={editMarket.market}
+            open={activeModal === 'detail'}
+            onClose={() => setActiveModal('')}
+          />
+          <Drawer
+            title="用户管理"
+            width={'75%'}
+            open={activeModal === 'users'}
+            onClose={() => setActiveModal('')}>
+            <UserManagement current={editMarket} tkey={props.tkey} />
+          </Drawer>
+        </>
+      )}
       <JoinOtherShop
         title="搜索商店"
         open={activeModal === 'join'}

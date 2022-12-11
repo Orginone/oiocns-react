@@ -79,19 +79,4 @@ export default interface IMarket {
    * @returns 下架是否成功
    */
   unPublish(merchandiseId: string): Promise<boolean>;
-  /**
-   * 下单
-   * @param nftId 区块链Id
-   * @param name 订单名称
-   * @param code 订单编号
-   * @param spaceId 空间Id
-   * @param merchandiseIds 商品Id集合
-   */
-  createOrder(
-    nftId: string,
-    name: string,
-    code: string,
-    spaceId: string,
-    merchandiseIds: string[],
-  ): Promise<schema.XOrder>;
 }

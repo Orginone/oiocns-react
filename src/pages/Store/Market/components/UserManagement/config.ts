@@ -1,6 +1,7 @@
+import { XMarketRelation } from '@/ts/base/schema';
 import type { ColumnsType } from 'antd/es/table';
 
-export const columns: ColumnsType<any> = [
+export const columns: ColumnsType<XMarketRelation> = [
   {
     title: '序号',
     fixed: 'left',
@@ -11,18 +12,18 @@ export const columns: ColumnsType<any> = [
   },
   {
     title: '类型',
-    dataIndex: 'typeName',
+    dataIndex: ['target', 'typeName'],
   },
   {
     title: '编码',
-    dataIndex: 'code',
+    dataIndex: ['target', 'code'],
   },
   {
     title: '名称',
-    dataIndex: 'name',
+    dataIndex: ['target', 'name'],
   },
   {
     title: '创建时间',
-    dataIndex: 'createTime',
+    dataIndex: ['target', 'createTime'],
   },
 ];
