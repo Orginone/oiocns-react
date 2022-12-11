@@ -19,6 +19,7 @@ type Bindmodalprops = {
   onOk: () => void;
   onCancel: () => void;
   upDateData: number;
+  noticeBaseInfo: () => void;
 };
 
 const BindModal: React.FC<Bindmodalprops> = ({
@@ -26,6 +27,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
   isOpen,
   onCancel,
   upDateData,
+  noticeBaseInfo, //通知兄弟组件事件
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
@@ -113,7 +115,9 @@ const BindModal: React.FC<Bindmodalprops> = ({
           Promise.all(newArr)
             .then((result) => {
               if (result) {
+                /** 在这里要通知兄弟组件刷新 */
                 message.success('绑定成功');
+                noticeBaseInfo();
                 initData();
               }
             })
@@ -150,6 +154,8 @@ const BindModal: React.FC<Bindmodalprops> = ({
                           .then((result) => {
                             if (result) {
                               message.info('解绑成功');
+                              /** 在这里要通知兄弟组件刷新 */
+                              noticeBaseInfo();
                               resolve(true);
                             } else {
                               message.success('解绑失败');
