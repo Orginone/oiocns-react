@@ -82,7 +82,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                   defineId: bindAppMes?.id,
                   productId: item.productId,
                   functionCode: item.functionCode,
-                  SpaceId: userCtrl.space.id,
+                  spaceId: userCtrl.space.id,
                 }),
               );
               // 如果有id 要看下有没有被编辑过
@@ -102,7 +102,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                     defineId: bindAppMes?.id,
                     productId: findData.productId,
                     functionCode: findData.functionCode,
-                    SpaceId: userCtrl.space.id,
+                    spaceId: userCtrl.space.id,
                   }),
                 );
               }
@@ -145,7 +145,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                             defineId: row?.defineId,
                             productId: row.productId,
                             functionCode: row.functionCode,
-                            SpaceId: userCtrl.space.id,
+                            spaceId: userCtrl.space.id,
                           })
                           .then((result) => {
                             if (result) {
