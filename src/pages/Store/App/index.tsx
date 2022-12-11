@@ -13,6 +13,7 @@ import StoreRecent from '../components/Recent';
 import { common } from 'typings/common';
 import TreeComp from './Classify';
 import MoveApp from './moveApp';
+import PublishComp from './PublishList';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -82,6 +83,14 @@ const StoreApp: React.FC = () => {
         onClick: () => {
           appCtrl.setCurProduct(id);
           history.push({ pathname: '/store/app/info' });
+        },
+      },
+      {
+        key: 'publish',
+        label: '上架列表',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          history.push({ pathname: '/store/app/publish' });
         },
       },
       // {
@@ -202,18 +211,11 @@ const StoreApp: React.FC = () => {
           }}
         />
       </Modal>
-      {/* <DeleteCustomModal
-        title="警告"
-        open={isDeleteOpen}
-        deleOrQuit="delete"
-        onOk={onOk}
-        onCancel={onCancel}
-        content={SelfAppCtrl.curProduct!.prod.name}
-      /> */}
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
+      <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       <TreeComp />
       <MoveApp appid={''} />

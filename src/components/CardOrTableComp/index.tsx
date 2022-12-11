@@ -10,7 +10,7 @@ import { PageRequest } from '@/ts/base/model';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
-  rowKey: string | ((record: T) => string); //唯一key
+  rowKey: string | ((record: T, index?: number) => string); //唯一key
   parentRef?: any; // 父级容器ref-用于计算高度
   defaultPageType?: PageShowType; //当前展示类型 card: 卡片; list: 列表
   showChangeBtn?: boolean; //是否展示 图列切换按钮
@@ -92,7 +92,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       ...columns,
       {
         title: '操作',
-        width: 110,
+        width: 80,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
@@ -102,6 +102,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                 <Dropdown
                   className={cls['operation-btn']}
                   menu={{ items: menu(record) }}
+                  trigger={['click']}
                   key="key">
                   <EllipsisOutlined />
                 </Dropdown>,

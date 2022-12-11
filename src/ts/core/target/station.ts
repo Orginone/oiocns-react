@@ -1,15 +1,15 @@
-import { PageRequest } from '@/ts/base/model';
 import { IStation } from './itarget';
-import { kernel, schema } from '../../base';
+import { common, kernel, schema } from '../../base';
 import BaseTarget from './base';
 import { TargetType } from '../enum';
-import { XTarget } from '@/ts/base/schema';
+import { XIdentity, XTarget } from '@/ts/base/schema';
 
 /**
  * 工作组的元操作
  */
 export default class Station extends BaseTarget implements IStation {
   private _onDeleted: Function;
+  private _identitys: XIdentity[] = [];
   constructor(target: XTarget, onDeleted: Function) {
     super(target);
     this._onDeleted = onDeleted;
@@ -25,29 +25,48 @@ export default class Station extends BaseTarget implements IStation {
     return await this.searchTargetByName(code, [TargetType.Person]);
   }
   /** 加载岗位下的身份 */
-  public async loadIdentitys(page: PageRequest): Promise<schema.XIdentityArray> {
+  public async loadIdentitys(reload: boolean = false): Promise<XIdentity[]> {
+    if (!reload && this._identitys) {
+      return this._identitys;
+    }
     const res = await kernel.queryTeamIdentitys({
-      page: page,
       id: this.id,
+      page: {
+        offset: 0,
+        limit: common.Constants.MAX_UINT_16,
+        filter: '',
+      },
     });
-    return res.data;
+    if (res.success && res.data.result) {
+      this._identitys = res.data.result;
+    }
+    return this._identitys;
   }
-  public async pullIdentitys(ids: string[]): Promise<boolean> {
-    return (
-      await kernel.PullIdentityToTeam({
+  public async pullIdentitys(identitys: XIdentity[]): Promise<boolean> {
+    identitys = identitys.filter((a) => !this._identitys.includes(a));
+    if (identitys.length > 0) {
+      const res = await kernel.PullIdentityToTeam({
         id: this.id,
-        targetIds: ids,
+        targetIds: identitys.map((a) => a.id),
         targetType: '',
         teamTypes: [this.target.typeName],
-      })
-    ).success;
+      });
+      if (res.success) {
+        this._identitys.push(...identitys);
+        return true;
+      }
+    }
+    return false;
   }
   public async removeIdentitys(ids: string[]): Promise<boolean> {
-    return (
-      await kernel.removeTeamIdentity({
-        id: this.target.id,
-        targetIds: ids,
-      })
-    ).success;
+    const res = await kernel.removeTeamIdentity({
+      id: this.target.team!.id,
+      targetIds: ids,
+    });
+    if (res.success) {
+      this._identitys = this._identitys.filter((a) => ids.includes(a.id));
+      return true;
+    }
+    return false;
   }
 }

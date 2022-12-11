@@ -91,7 +91,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     return [
       {
         key: 'buy',
-        label: '立即购买',
+        label: '购买',
         onClick: () => {
           setIsBuy(true);
           setNowBuy([item]);
@@ -99,7 +99,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       },
       {
         key: 'toBuyCar',
-        label: '加入购物车',
+        label: '暂存',
         onClick: () => {
           marketCtrl.joinApply(item);
         },

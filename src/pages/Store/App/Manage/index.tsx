@@ -1,9 +1,9 @@
-import { Card, Dropdown, Tag, Tooltip } from 'antd';
+import { Card, Dropdown, Tag } from 'antd';
 import React from 'react';
 import cls from './index.module.less';
+import AppBase from '../../components/AppBaseInfo';
 import {
   CheckCircleOutlined,
-  EditOutlined,
   EllipsisOutlined,
   SendOutlined,
   TwitterOutlined,
@@ -12,48 +12,11 @@ import {
 import { IconFont } from '@/components/IconFont';
 
 import { useHistory } from 'react-router-dom';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
 
 const StoreAppInfo: React.FC = () => {
   const history = useHistory();
-  const RenderBaseInfo = (
-    <ul className={`${cls['base-info']} flex flex-direction-col`}>
-      <li className={`${cls['con']} flex `}>
-        <div className={cls['con-title']}>{SelfAppCtrl.curProduct?.prod.name}</div>
-        <EditOutlined
-          className={cls['con-name-edit-btn']}
-          style={{ fontSize: '1.5em' }}
-        />
-      </li>
-      <li className={`${cls['con']} flex flex-direction-col`}>
-        <span className={cls['con-label']}>应用图标</span>
-        <img className={cls['con-img']} src="/img/appLogo.png" alt="" />
-      </li>
-      <li className={`${cls['con']} flex `}>
-        <div className={cls['con-info']}>
-          <span className={cls['con-label']}>应用曾用名</span>
-          <Tooltip title="prompt text">
-            <div className={cls['con-name']}> {SelfAppCtrl.curProduct?.prod.name}</div>
-          </Tooltip>
-        </div>
-        <div className={cls['con-info']}>
-          <span className={cls['con-label']}>应用描述</span>
-          <Tooltip title={''}>
-            <div className={cls['con-name']}>{SelfAppCtrl.curProduct?.prod.remark}</div>
-          </Tooltip>
-        </div>
-      </li>
-      <li className={`${cls['con']} ${cls['endBox']} flex `}>
-        <p style={{ marginRight: '14px' }}>
-          创建人：<span>{SelfAppCtrl.curProduct?.prod.createUser}</span>
-        </p>
-        <p>
-          创建时间：<span>{SelfAppCtrl.curProduct?.prod.createTime}</span>
-        </p>
-      </li>
-    </ul>
-  );
-  console.log('SelfAppCtrl.curProduct', SelfAppCtrl.curProduct);
+  console.log('appCtrl.curProduct', appCtrl.curProduct);
 
   const renderManageInfo = () => {
     return (
@@ -85,7 +48,6 @@ const StoreAppInfo: React.FC = () => {
 
   const userCard = (userInfo: any) => {
     const { userList = [], roleName = '应用角色' } = userInfo;
-    console.log('菜市场', userList);
 
     return (
       <ul className={`${cls['user-card']} flex flex-direction-col`}>
@@ -136,7 +98,7 @@ const StoreAppInfo: React.FC = () => {
             />
           </Dropdown>
         }>
-        {RenderBaseInfo}
+        {<AppBase props={[]} />}
       </Card>
       <Card className="manage-info-wrap" title={'应用管理'}>
         {renderManageInfo()}

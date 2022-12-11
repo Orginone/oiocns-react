@@ -3,7 +3,6 @@ import { ProCard } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import React from 'react';
 import { Space } from 'antd';
-import { CloseCircleOutlined } from '@ant-design/icons';
 import { ProductType } from '@/ts/core';
 
 type Resources = {
@@ -80,18 +79,14 @@ const baseColumns: ProFormColumnsType<DataItem> = {
     {
       title: '应用名称',
       dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '此项为必填项' }],
-      },
+      formItemProps: {},
       width: 'md',
     },
     {
       title: '应用编码',
       dataIndex: 'code',
       colProps: { span: 12 },
-      formItemProps: {
-        rules: [{ required: true, message: '此项为必填项' }],
-      },
+      formItemProps: {},
     },
     {
       title: '应用类型',
@@ -117,6 +112,7 @@ const flows: ProFormColumnsType<Flows> = {
   title: groupTitle(`业务信息`),
   valueType: 'formList',
   dataIndex: 'flows',
+  readonly: true,
   width: '100%',
   colProps: { md: 24 },
   tip: '创建应用成功后，可根据业务信息与流程绑定。',
@@ -131,29 +127,32 @@ const flows: ProFormColumnsType<Flows> = {
       title: '添加新业务',
     },
     copyIconProps: false,
-    deleteIconProps: {
-      Icon: CloseCircleOutlined,
-      tooltipText: '删除该业务',
-    },
-    itemRender: ({ listDom, action }: any, { record, index }: any) => {
-      //
-      return (
-        <ProCard
-          bordered
-          extra={action}
-          title={record?.business || `业务${index + 1}`}
-          style={{
-            marginBlockEnd: 8,
-          }}>
-          {listDom}
-        </ProCard>
-      );
-    },
+    deleteIconProps: false,
+
+    // deleteIconProps: {
+    //   Icon: CloseCircleOutlined,
+    //   tooltipText: '删除该业务',
+    // },
+    // itemRender: ({ listDom, action }: any, { record, index }: any) => {
+    //   //
+    //   return (
+    //     <ProCard
+    //       bordered
+    //       extra={action}
+    //       title={record?.business || `业务${index + 1}`}
+    //       style={{
+    //         marginBlockEnd: 8,
+    //       }}>
+    //       {listDom}
+    //     </ProCard>
+    //   );
+    // },
   },
   columns: [
     {
       title: '业务信息',
       dataIndex: 'business',
+      readonly: true,
       width: 'md',
     },
   ],
@@ -169,7 +168,7 @@ const componentsColumns: ProFormColumnsType<Components> = {
   width: '100%',
   colProps: { md: 24 },
   fieldProps: {
-    // 新增按钮样式配置
+    // // 新增按钮样式配置
     creatorButtonProps: {
       type: 'text',
       position: 'top',
@@ -178,9 +177,7 @@ const componentsColumns: ProFormColumnsType<Components> = {
       className: cls.addFormListBtn2,
     },
     copyIconProps: false,
-    deleteIconProps: {
-      tooltipText: '删除该组组件信息',
-    },
+    deleteIconProps: false,
   },
   columns: [
     {
@@ -192,6 +189,7 @@ const componentsColumns: ProFormColumnsType<Components> = {
         {
           title: '组件名称',
           dataIndex: 'name',
+          readonly: true,
           width: 'md',
           colProps: { span: 8 },
         },
@@ -199,17 +197,20 @@ const componentsColumns: ProFormColumnsType<Components> = {
         {
           title: '组件宽度',
           width: 'md',
+          readonly: true,
           colProps: { span: 8 },
           dataIndex: 'width',
         },
         {
           title: '组件高度',
           width: 'md',
+          readonly: true,
           colProps: { span: 8 },
           dataIndex: 'height',
         },
         {
           title: '链接地址',
+          readonly: true,
           colProps: { span: 24 },
           dataIndex: 'url',
         },
@@ -227,10 +228,11 @@ const sourceColumns: ProFormColumnsType<Resources> = {
   title: groupTitle(`资源信息`),
   valueType: 'formList',
   dataIndex: 'resources',
+  readonly: true,
   colProps: { md: 24 },
   initialValue: [{ name: '', code: '', link: '' }],
-
   fieldProps: {
+    copyIconProps: false,
     // 新增按钮样式配置
     creatorButtonProps: {
       type: 'text',
@@ -239,6 +241,7 @@ const sourceColumns: ProFormColumnsType<Resources> = {
       block: false,
       className: cls.addFormListBtn2,
     },
+    deleteIconProps: false,
     // convertValue: (value) => JSON.parse(value),
     itemRender: ({ listDom, action }: any, { record, index }: any) => {
       return (
@@ -253,65 +256,36 @@ const sourceColumns: ProFormColumnsType<Resources> = {
         </ProCard>
       );
     },
-    rules: [
-      {
-        required: true,
-        validator: async (_: any, value: string | any[]) => {
-          console.log(value);
-          if (value && value.length > 0) {
-            return;
-          }
-          throw new Error('至少要有一项资源信息！');
-        },
-      },
-    ],
   },
   columns: [
     {
       dataIndex: 'sourceBase',
       valueType: 'group',
       width: 'md',
+      readonly: true,
       colProps: { md: 24 },
       rowProps: { gutter: 48 },
       columns: [
         {
           title: '资源名称',
           dataIndex: 'name',
+          readonly: true,
           colProps: { span: 12 },
-          formItemProps: {
-            rules: [
-              {
-                required: true,
-                message: '此项为必填项',
-              },
-            ],
-          },
+          formItemProps: {},
         },
         {
           title: '资源编码',
           colProps: { span: 12 },
+          readonly: true,
           dataIndex: 'code',
-          formItemProps: {
-            rules: [
-              {
-                required: true,
-                message: '此项为必填项',
-              },
-            ],
-          },
+          formItemProps: {},
         },
         {
           title: '资源地址',
+          readonly: true,
           colProps: { span: 24 },
           dataIndex: 'link',
-          formItemProps: {
-            rules: [
-              {
-                required: true,
-                message: '此项为必填项',
-              },
-            ],
-          },
+          formItemProps: {},
         },
       ],
     },

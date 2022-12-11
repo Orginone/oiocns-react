@@ -1,14 +1,13 @@
 import { Button } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { UserOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
-
-import { XIdentity } from '@/ts/base/schema';
 import { IStation } from '@/ts/core/target/itarget';
 import CreateTeam from '@/bizcomponents/CreateTeam';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core';
+
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IStation) => void;
@@ -16,46 +15,19 @@ type CreateGroupPropsType = {
   positions: any[];
   reload: () => void;
 };
-type target = {
-  title: string;
-  key: string;
-  object: IStation;
-};
-
-export type PositionType = {
-  name: string;
-  code: string;
-  indentitys: XIdentity[];
-};
-const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
+const StationTree: React.FC<CreateGroupPropsType> = (props) => {
+  const menu = ['编辑', '删除'];
   const { positions, setCurrent, handleMenuClick, currentKey, reload } = props;
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
-    changeData(positions);
+    setData([...positions]);
   }, [positions]);
-  /**转化成树控件接收的数据格式 */
-  const changeData = async (target: any[]) => {
-    const result: target[] = [];
-    if (target != undefined) {
-      for (const a of target) {
-        result.push({
-          title: a.name,
-          key: a.id,
-          object: a,
-        });
-      }
-    } else {
-      console.log('空值');
-    }
-    console.log(result);
-    setData([...result]);
-  };
 
   /**选中树的回调 */
   const onSelect = async (
-    selectKeys: string[],
+    _: string[],
     info: { selected: boolean; node: { object: IStation } },
   ) => {
     // 触发内容去变化
@@ -64,19 +36,17 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     }
   };
 
-  const menu = ['更改岗位名称', '删除'];
-
   return (
     <div>
       <div className={cls.topMes}>
         <Button
           className={cls.creatgroup}
-          type="primary"
+          icon={<PlusOutlined className={cls.addIcon} />}
+          type="text"
           onClick={() => {
             setIsOpenModal(true);
-          }}>
-          新增岗位
-        </Button>
+          }}
+        />
         <MarketClassifyTree
           searchable
           childIcon={<UserOutlined />}
@@ -85,13 +55,13 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           menu={menu}
           selectedKeys={[currentKey]}
           onSelect={onSelect}
-          title={'全部岗位'}
+          title={'岗位列表'}
         />
       </div>
       <CreateTeam
         handleCancel={() => setIsOpenModal(false)}
         open={isOpenModal}
-        title={'新增'}
+        title={'新增|岗位'}
         current={userCtrl.company}
         typeNames={[TargetType.Station]}
         handleOk={async () => {
@@ -103,4 +73,4 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   );
 };
 
-export default CreatePosition;
+export default StationTree;
