@@ -104,3 +104,23 @@ export const shareInfoColumns: any = [
     dataIndex: 'name',
   },
 ];
+
+export const AppPublishColumns: any = [
+  {
+    title: '应用名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '版本号',
+    dataIndex: 'visible',
+  },
+  {
+    title: '应用类型',
+    dataIndex: 'typeName',
+  },
+  {
+    title: '应用来源',
+    ellipsis: true,
+    dataIndex: 'source',
+  },
+];
