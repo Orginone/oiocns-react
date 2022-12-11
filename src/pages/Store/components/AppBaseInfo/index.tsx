@@ -1,16 +1,13 @@
 import cls from './index.module.less';
 
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { EditOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
-interface indexType {
-  props: []; //props
-}
-const Index: React.FC<indexType> = ({ props }) => {
-  console.log('打印index', props);
-  const history = useHistory();
+interface indexType {}
+const Index: React.FC<indexType> = () => {
+  // const history = useHistory();
   const prod = appCtrl.curProduct?.prod || {
     name: '--',
     remark: '--',

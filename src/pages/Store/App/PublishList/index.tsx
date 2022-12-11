@@ -4,6 +4,7 @@ import { Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { AppPublishColumns } from '../Config';
+import AppBase from '../../components/AppBaseInfo';
 interface indexType {
   props: []; //props
 }
@@ -24,19 +25,18 @@ const PublishComp: React.FC<indexType> = () => {
   return (
     <>
       <Card
-        bordered={false}
-        className={'PublishWrap'}
+        className="base-info-wrap"
         title={
-          <div className="flex">
-            <IconFont
-              type="icon-jiantou-left"
-              onClick={() => {
-                history.goBack();
-              }}
-            />
-            <span>应用上架列表</span>
-          </div>
+          <IconFont
+            type="icon-jiantou-left"
+            onClick={() => {
+              history.goBack();
+            }}
+          />
         }>
+        {<AppBase />}
+      </Card>
+      <Card bordered={false}>
         <CardOrTable
           dataSource={dataSource}
           rowKey={'id'}
