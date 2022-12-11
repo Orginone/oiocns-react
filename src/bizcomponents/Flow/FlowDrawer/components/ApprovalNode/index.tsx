@@ -31,6 +31,7 @@ const ApprovalNode = () => {
     setSelectedNode(selectedNode);
     setIsApprovalOpen(false);
   };
+
   const onCancel = () => {
     setIsApprovalOpen(false);
   };

@@ -63,7 +63,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
-
   // 监听父级高度
   useEffect(() => {
     setTimeout(() => {
@@ -137,17 +136,15 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             filter = '',
             // eslint-disable-next-line no-unused-vars
             tableid,
-            // eslint-disable-next-line no-unused-vars
-            keyword,
+            keyword = '',
             ...other
           } = params;
           if (request) {
             const page: PageRequest = {
-              filter: filter,
+              filter: filter || keyword,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
-            console.log(other ? { ...other, page } : page);
             const res = await request(other ? { ...other, ...page } : page);
             return {
               total: res.total || 0,

@@ -123,7 +123,7 @@ const PersonFriend: React.FC = () => {
       {top}
       <CardOrTable
         dataSource={data}
-        total={data.length}
+        total={data?.length}
         operation={renderOperation}
         columns={columns as any}
         rowKey={'id'}

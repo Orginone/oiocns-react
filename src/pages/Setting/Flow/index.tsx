@@ -76,6 +76,7 @@ const SettingFlow: React.FC = () => {
 
   const [dateData, setDateData] = useState(1);
   const [rowId, setRowId] = useState<string>('');
+  const [dataMes, setUpdataMes] = useState(1); //强制刷新
 
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
@@ -115,7 +116,8 @@ const SettingFlow: React.FC = () => {
     if (result) {
       setAllData(result);
       setShowDataSource(result.slice((page - 1) * 1, 10));
-      setBindAppMes(result[0]);
+      setBindAppMes(result[0] || {});
+      setRowId(result[0]?.id || '');
     }
   };
 
@@ -126,18 +128,19 @@ const SettingFlow: React.FC = () => {
   const publish = async () => {
     /**要发布的数据 */
     const currentData = deepClone(design);
+    console.log('currentData', currentData);
     if (currentData.belongId) {
       delete currentData.belongId;
     }
     const result = await userCtrl.space.publishDefine(currentData);
     if (result) {
       message.info(result.id ? '编辑成功' : '发布成功');
+      // 清理数据
       initData();
       setDesignData(null);
       setEditorValue(null);
       setTabType(TabType.TABLEMES);
     } else {
-      message.error('没读到数据');
       return false;
     }
   };
@@ -233,7 +236,7 @@ const SettingFlow: React.FC = () => {
                     onClick: () => {
                       setRowId(record.id);
                       setBindAppMes(record);
-                    }, // 点击行
+                    },
                   };
                 }}
                 stripe
@@ -258,7 +261,7 @@ const SettingFlow: React.FC = () => {
             </div>
           </Card>
           {/* 这里后面写模版列表，暂时隐藏 */}
-          <Appbindlist bindAppMes={bindAppMes} />
+          <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
         </div>
       ) : (
         <div className={cls['company-info-content']}>
@@ -385,6 +388,9 @@ const SettingFlow: React.FC = () => {
         isOpen={isOpenModal}
         bindAppMes={bindAppMes}
         upDateData={dateData}
+        noticeBaseInfo={() => {
+          setUpdataMes(dataMes + 1);
+        }}
         onOk={() => {
           setIsOpenModal(false);
         }}
