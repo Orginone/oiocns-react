@@ -164,6 +164,7 @@ const StoreApp: React.FC = () => {
             searchParams={{ status: statusKey }}
             columns={myColumns}
             renderOperation={renderOperation}
+            tkey={key}
           />
         </div>
       </Card>

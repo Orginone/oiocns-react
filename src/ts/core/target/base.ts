@@ -162,7 +162,7 @@ export default class BaseTarget implements ITarget {
   protected async createSubTarget(
     data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
-    if (this.subTeamTypes.includes(data.typeName as TargetType)) {
+    if (this.createTargetType.includes(data.typeName as TargetType)) {
       const res = await this.createTarget(data);
       if (res.success) {
         await kernel.pullAnyToTeam({
