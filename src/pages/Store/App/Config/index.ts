@@ -137,7 +137,8 @@ export const AppPublishColumns: any = [
   },
   {
     title: '更新时间',
-    width: 160,
+    width: 180,
+    valueType: 'dateTime',
     dataIndex: ['merchandise', 'updateTime'],
   },
 ];
