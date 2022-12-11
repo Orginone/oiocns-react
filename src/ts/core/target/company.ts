@@ -35,7 +35,7 @@ export default class Company extends MarketTarget implements ICompany {
   constructor(target: schema.XTarget, userId: string) {
     super(target);
     this.userId = userId;
-    this.subTeamTypes = [...departmentTypes, TargetType.Working];
+    this.subTeamTypes = [...departmentTypes, TargetType.Working, TargetType.Station];
     this.extendTargetType = [...this.subTeamTypes, ...companyTypes];
     this.joinTargetType = [TargetType.Group];
     this.createTargetType = [...this.subTeamTypes, TargetType.Group, TargetType.Cohort];

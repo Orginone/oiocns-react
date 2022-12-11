@@ -147,7 +147,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
             };
-            console.log(other ? { ...other, page } : page);
             const res = await request(other ? { ...other, ...page } : page);
             return {
               total: res.total || 0,

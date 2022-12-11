@@ -33,7 +33,7 @@ export const indentitycolumns: ColumnsType<any> = [
   },
   {
     title: '组织名称',
-    dataIndex: ['belong', 'name'],
+    dataIndex: 'id',
   },
   {
     title: '业务',

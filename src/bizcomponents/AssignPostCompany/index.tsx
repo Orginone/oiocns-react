@@ -10,7 +10,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { resetParams } from '@/utils/tools';
 import { schema } from '@/ts/base';
-import { ICompany, IPerson, ITarget, TargetType } from '@/ts/core';
+import { ITarget, TargetType } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 // import userCtrl from '@/ts/controller/setting/userCtrl';
 

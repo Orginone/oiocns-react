@@ -3,21 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
-import AddPosttionModal from '../AddPositionMoadl';
-import positionCtrl from '@/ts/controller/position/positionCtrl';
-import EditCustomModal from '../EditCustomModal';
+
 import { XIdentity } from '@/ts/base/schema';
+import { IStation } from '@/ts/core/target/itarget';
+import CreateTeam from '@/bizcomponents/CreateTeam';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core';
 type CreateGroupPropsType = {
-  createTitle: string;
   currentKey: string;
-  setCurrent: (current: PositionType) => void;
+  setCurrent: (current: IStation) => void;
   handleMenuClick: (key: string, item: any) => void;
   positions: any[];
+  reload: () => void;
 };
 type target = {
   title: string;
   key: string;
-  object: any;
+  object: IStation;
 };
 
 export type PositionType = {
@@ -26,45 +28,35 @@ export type PositionType = {
   indentitys: XIdentity[];
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  useEffect(() => {}, []);
-  const { positions, setCurrent } = props;
-  const [currentPostion, setCurrentPosition] = useState<PositionType>();
-  const [selectMenu, setSelectMenu] = useState<string>('');
+  const { positions, setCurrent, handleMenuClick, currentKey, reload } = props;
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false);
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    changeData(positions);
+  }, [positions]);
   /**转化成树控件接收的数据格式 */
-  const changeData = (target: any[]): target[] => {
+  const changeData = async (target: any[]) => {
     const result: target[] = [];
     if (target != undefined) {
       for (const a of target) {
         result.push({
           title: a.name,
-          key: a.code,
+          key: a.id,
           object: a,
         });
       }
     } else {
       console.log('空值');
     }
-    return result;
+    console.log(result);
+    setData([...result]);
   };
-  /**树的操作按钮 */
-  const handleMenuClick = (key: string, data: target) => {
-    if (key === '删除') {
-      positionCtrl.deletePosttion(data.object);
-    }
-    if (key === '更改岗位名称') {
-      setCurrentPosition(data.object);
-      setIsOpenEditModal(true);
-    }
-  };
-  const close = () => {
-    setIsOpenModal(false);
-  };
+
   /**选中树的回调 */
   const onSelect = async (
     selectKeys: string[],
-    info: { selected: boolean; node: { object: PositionType } },
+    info: { selected: boolean; node: { object: IStation } },
   ) => {
     // 触发内容去变化
     if (info.selected) {
@@ -73,18 +65,6 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   };
 
   const menu = ['更改岗位名称', '删除'];
-  const positionList = (
-    <MarketClassifyTree
-      searchable
-      childIcon={<UserOutlined />}
-      key={selectMenu}
-      handleMenuClick={handleMenuClick}
-      treeData={changeData(positions)}
-      menu={menu}
-      onSelect={onSelect}
-      title={'全部岗位'}
-    />
-  );
 
   return (
     <div>
@@ -97,27 +77,27 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           }}>
           新增岗位
         </Button>
-        {positionList}
+        <MarketClassifyTree
+          searchable
+          childIcon={<UserOutlined />}
+          handleMenuClick={handleMenuClick}
+          treeData={data}
+          menu={menu}
+          selectedKeys={[currentKey]}
+          onSelect={onSelect}
+          title={'全部岗位'}
+        />
       </div>
-      <AddPosttionModal
-        title={'新增岗位'}
+      <CreateTeam
+        handleCancel={() => setIsOpenModal(false)}
         open={isOpenModal}
-        onOk={close}
-        handleOk={close}
-      />
-      <EditCustomModal
-        handleCancel={() => {
+        title={'新增'}
+        current={userCtrl.company}
+        typeNames={[TargetType.Station]}
+        handleOk={async () => {
           setIsOpenModal(false);
+          reload();
         }}
-        open={isOpenEditModal}
-        title={'编辑'}
-        onOk={() => {
-          setIsOpenEditModal(false);
-        }}
-        handleOk={() => {
-          setIsOpenEditModal(false);
-        }}
-        defaultData={currentPostion}
       />
     </div>
   );
