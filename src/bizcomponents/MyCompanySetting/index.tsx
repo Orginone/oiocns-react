@@ -10,6 +10,7 @@ import { ICompany, IPerson } from '@/ts/core/target/itarget';
 import { common } from 'typings/common';
 import { TargetType } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
+import { XTarget } from '@/ts/base/schema';
 
 interface PersonInfoObj {
   setShowDepartment: (isbool: boolean) => void; // 控制是否显示公司
@@ -28,7 +29,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
 
-  const [joinKey, setJoinKey] = useState<string>('');
+  const [searchCallback, setSearchCallback] = useState<XTarget[]>();
 
   useEffect(() => {
     getTableList();
@@ -46,7 +47,6 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
   // };
 
   const showModal = () => {
-    setJoinKey('');
     setIsModalOpen(true);
   };
 
@@ -61,20 +61,13 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
 
   const handleOk = async () => {
     setIsModalOpen(false);
-    if (joinKey == '') {
-      message.error('请选中要加入的单位！');
-    } else {
-      let thisSelectKey = joinKey;
-      // code msg success
-      const responseObj = await userCtrl.user.applyJoinCompany(
-        thisSelectKey,
-        TargetType.Company,
-      );
-
-      if (responseObj.success) {
-        message.info('申请加入单位成功!');
-      } else {
-        message.error('申请加入单位失败：' + responseObj.msg);
+    if (searchCallback && searchCallback.length > 0) {
+      if (searchCallback && searchCallback.length > 0) {
+        searchCallback.forEach(async (user) => {
+          if (await userCtrl.user.applyJoinCompany(user.id, TargetType.Company)) {
+            message.success('已申请加入单位成功.');
+          }
+        });
       }
     }
   };
@@ -256,7 +249,10 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
         onCancel={handleCancel}
         width={500}>
         <div>
-          <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey}></SearchCompany>
+          <SearchCompany
+            searchCallback={setSearchCallback}
+            searchType={TargetType.Company}
+          />
         </div>
       </Modal>
 

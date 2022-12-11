@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ProColumns } from '@ant-design/pro-components';
+import { nanoid, ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { Dropdown } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { PageShowType } from 'typings/globelType';
+import { PageRequest } from '@/ts/base/model';
 
 interface PageType<T> {
   dataSource: T[]; // 展示数据源
@@ -24,15 +25,17 @@ interface PageType<T> {
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
   operation?: (item: T) => any[]; //操作区域数据
+
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
-  request?: (params: { offset: number; limit: number; filter: string }) => Promise<{
+  request?: (params: PageRequest & { [key: string]: any }) => Promise<{
     result: T[] | undefined;
     offset: number;
     limit: number;
     total: number;
   }>;
+
   [key: string]: any; // 其他属性方法
 }
 
@@ -125,25 +128,35 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
-        params={dataSource}
+        params={{ tableid: nanoid(), filter: '' }}
         request={async (params) => {
-          // console.log(params);
-          const { current: pageIndex = 1, pageSize = 10 } = params;
+          const {
+            current: pageIndex = 1,
+            pageSize = 10,
+            filter = '',
+            // eslint-disable-next-line no-unused-vars
+            tableid,
+            // eslint-disable-next-line no-unused-vars
+            keyword,
+            ...other
+          } = params;
           if (request) {
-            const res = await request({
-              filter: '',
+            const page: PageRequest = {
+              filter: filter,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,
-            });
+            };
+            console.log(other ? { ...other, page } : page);
+            const res = await request(other ? { ...other, ...page } : page);
             return {
-              total: res.total,
-              data: res.result ?? [],
-              success: res.result != undefined,
+              total: res.total || 0,
+              data: res.result || [],
+              success: true,
             };
           } else {
             return {
               data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
-              total,
+              total: total ?? dataSource.length,
               success: true,
             };
           }

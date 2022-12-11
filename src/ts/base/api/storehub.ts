@@ -168,8 +168,8 @@ export default class StoreHub implements IDisposable {
             let msg = '请求异常';
             if (err && err.Error) {
               msg += ',' + err.Error();
+              logger.warn(msg);
             }
-            logger.warn(msg);
             resolve(badRequest(msg));
           });
       } else {

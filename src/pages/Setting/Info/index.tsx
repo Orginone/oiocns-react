@@ -1,19 +1,28 @@
-import React, { useState } from 'react';
-import { Button, Card, Descriptions, Dropdown, message, Modal } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
+import {
+  Avatar,
+  Button,
+  Card,
+  Descriptions,
+  Dropdown,
+  message,
+  Modal,
+  Space,
+} from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IProduct } from '@/ts/core';
+import { IGroup, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
-import { ApplicationColumns, PersonColumns } from './config';
+import { CompanyColumn, PersonColumns } from './config';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import CreateTeamModel from '@/bizcomponents/CreateTeam';
-import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import SearchCompany from '@/bizcomponents/SearchCompany';
 
 type ShowmodelType =
   | 'addOne'
@@ -31,10 +40,19 @@ type TabType = 'members' | 'application';
 const SettingInfo: React.FC = () => {
   const history = useHistory();
   const [key] = useCtrlUpdate(userCtrl);
+  const parentRef = useRef<any>(null);
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
-  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
+  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
+  const [dataSource, setDataSource] = useState<IGroup[]>([]); // 加入的集团
   const info = userCtrl.company.target;
+
+  useEffect(() => {
+    userCtrl.company.getJoinedGroups(true).then((e) => {
+      setDataSource(e);
+    });
+  }, [key]);
+
   const menu = [
     { key: 'auth', label: '认证' },
     {
@@ -64,12 +82,12 @@ const SettingInfo: React.FC = () => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `单位成员`,
+      tab: `单位的成员`,
       key: 'members',
     },
     {
-      tab: `单位应用`,
-      key: 'application',
+      tab: `加入的集团`,
+      key: 'groups',
     },
   ];
 
@@ -107,9 +125,8 @@ const SettingInfo: React.FC = () => {
       },
     ];
   };
-
   return (
-    <div id={key} className={cls.companyContainer}>
+    <div key={key} className={cls.companyContainer}>
       <Card bordered={false} className={cls['company-info-content']}>
         <Descriptions
           title={'当前单位'}
@@ -130,10 +147,15 @@ const SettingInfo: React.FC = () => {
             </Dropdown>,
           ]}>
           <Descriptions.Item label="单位名称">
-            <strong>{info.name}</strong>
+            <Space>
+              {userCtrl.company?.avatar && (
+                <Avatar src={userCtrl.company?.avatar?.thumbnail} />
+              )}
+              <strong>{info.name}</strong>
+            </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
           <Descriptions.Item label="单位法人">{info.belongId}</Descriptions.Item>
+          <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
           <Descriptions.Item label="团队简称">{info.team?.name}</Descriptions.Item>
           <Descriptions.Item label="单位简介" span={2}>
             {info.team?.remark}
@@ -148,7 +170,7 @@ const SettingInfo: React.FC = () => {
             setActiveTab(key as TabType);
           }}
           tabBarExtraContent={renderBtns()}>
-          <div className={cls['page-content-table']}>
+          <div className={cls['page-content-table']} ref={parentRef}>
             {activeTab === 'members' ? (
               <CardOrTable<schema.XTarget>
                 dataSource={[]}
@@ -161,18 +183,20 @@ const SettingInfo: React.FC = () => {
                     filter: '',
                   });
                 }}
+                parentRef={parentRef}
                 operation={renderOperation}
                 columns={PersonColumns}
                 showChangeBtn={false}
               />
             ) : (
-              <CardOrTable<IProduct>
-                key="product"
-                dataSource={[]}
-                total={0}
+              <CardOrTable<IGroup>
+                key="groups"
                 rowKey={'id'}
+                pagination={false}
+                defaultExpandAllRows={true}
+                dataSource={dataSource}
                 hideOperation={true}
-                columns={ApplicationColumns}
+                columns={CompanyColumn}
                 showChangeBtn={false}
               />
             )}
@@ -208,6 +232,7 @@ const SettingInfo: React.FC = () => {
                 selectPerson[0].typeName,
               );
               if (success) {
+                setActiveModal('');
                 message.success('添加成功');
                 userCtrl.changCallback();
               } else {
@@ -215,7 +240,34 @@ const SettingInfo: React.FC = () => {
               }
             }
           }}>
-          <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} />
+          {/* <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} /> */}
+          <SearchCompany
+            searchCallback={setSelectPerson}
+            searchType={TargetType.Person}
+          />
+        </Modal>
+        {/* 申请加入集团*/}
+        <Modal
+          title="申请加入集团"
+          destroyOnClose
+          open={activeModal === 'joinGroup'}
+          width={600}
+          onCancel={() => setActiveModal('')}
+          onOk={async () => {
+            if (selectPerson && userCtrl.company) {
+              selectPerson.forEach(async (group) => {
+                const success = await userCtrl.company.applyJoinGroup(group.id);
+                if (success) {
+                  message.success('添加成功');
+                  userCtrl.changCallback();
+                  setActiveModal('');
+                } else {
+                  message.error('添加失败');
+                }
+              });
+            }
+          }}>
+          <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
         </Modal>
       </div>
     </div>

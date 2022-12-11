@@ -5,14 +5,11 @@ import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { cohortColumn } from './column';
-import { updateColumn } from './column/index';
 import cls from './index.module.less';
-import UpdateCohort from './UpdateCohort';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import AddCohort from './SearchCohort/index';
 import { useHistory } from 'react-router-dom';
 import ChangeCohort from './SearchCohortPerson/index';
-import CreateCohort from './CreateCohort/index';
 import { schema } from '../../../ts/base';
 import CohortCard from './CohortCard';
 import chatCtrl from '@/ts/controller/chat';
@@ -24,10 +21,10 @@ import { TargetType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
+import EditCustomModal from '@/bizcomponents/CreateTeam/index';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [open, setOpen] = useState<boolean>(false);
   const [item, setItem] = useState<ICohort>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
@@ -39,7 +36,8 @@ const CohortConfig: React.FC = () => {
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
-
+  const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false);
+  const [isFlag, setIsFlag] = useState<string>('');
   const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
     getData();
@@ -95,7 +93,8 @@ const CohortConfig: React.FC = () => {
         label: '修改群组',
         onClick: () => {
           setItem(item);
-          setOpen(true);
+          setIsOpenCreate(true);
+          setIsFlag('编辑');
         },
       },
       {
@@ -241,6 +240,7 @@ const CohortConfig: React.FC = () => {
                 title="转移权限"
                 open={changeIsModelOpen}
                 onOk={changeHandleOk}
+                destroyOnClose={true}
                 onCancel={() => setChangeIsModelOpen(false)}
                 width="1050px">
                 <ChangeCohort cohort={item!} searchCallback={searchCallback} />
@@ -280,24 +280,27 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort setCohort={setcohort} />
               </Modal>
-              {/**修改群组 */}
-              {item && (
-                <UpdateCohort
-                  key={item?.target.id}
-                  layoutType="ModalForm"
-                  title="修改群组"
-                  modalprops={{
-                    destroyOnClose: true,
-                  }}
-                  open={open}
-                  columns={updateColumn as any}
-                  setOpen={setOpen}
-                  item={item}
-                  callBack={getData}
-                />
-              )}
-              {/**创建群组 */}
-              <CreateCohort callBack={getData} />
+              <EditCustomModal
+                title={isFlag}
+                open={isOpenCreate}
+                handleCancel={() => setIsOpenCreate(false)}
+                handleOk={(item) => {
+                  if (item) {
+                    getData();
+                    setIsOpenCreate(false);
+                  }
+                }}
+                current={item || userCtrl.space}
+                typeNames={[TargetType.Cohort]}
+              />
+              <Button
+                type="link"
+                onClick={() => {
+                  setIsOpenCreate(true);
+                  setIsFlag('新建');
+                }}>
+                创建群组
+              </Button>
               <Button type="link" onClick={() => setAddIsModalOpen(true)}>
                 加入群组
               </Button>

@@ -79,6 +79,17 @@ export const companyTypes = [
 export const departmentTypes = [
   TargetType.Office,
   TargetType.Section,
+  TargetType.Research,
   TargetType.Laboratory,
+  TargetType.JobCohort,
   TargetType.Department,
+  TargetType.College,
+];
+
+export const subDepartmentTypes = [
+  TargetType.Office,
+  TargetType.Section,
+  TargetType.Laboratory,
+  TargetType.JobCohort,
+  TargetType.Research,
 ];

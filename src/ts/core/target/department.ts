@@ -1,6 +1,6 @@
 import { TargetModel } from './../../base/model';
 import BaseTarget from '@/ts/core/target/base';
-import { departmentTypes, TargetType } from '../enum';
+import { departmentTypes, subDepartmentTypes, TargetType } from '../enum';
 import { schema } from '../../base';
 import { IDepartment, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
@@ -21,8 +21,12 @@ export default class Department extends BaseTarget implements IDepartment {
     this.workings = [];
     this.departments = [];
     this._onDeleted = onDeleted;
-    this.subTeamTypes = [...departmentTypes, TargetType.Working];
-    this.createTargetType = [...departmentTypes, TargetType.Working];
+    if ([TargetType.Department, TargetType.College].includes(this.typeName)) {
+      this.subTeamTypes = [...subDepartmentTypes, TargetType.Working];
+    } else {
+      this.subTeamTypes = [TargetType.JobCohort, TargetType.Working];
+    }
+    this.createTargetType = [...this.subTeamTypes];
   }
   public get subTeam(): ITarget[] {
     return [...this.departments, ...this.workings];
@@ -35,13 +39,10 @@ export default class Department extends BaseTarget implements IDepartment {
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
-      case TargetType.Office:
-      case TargetType.Section:
-      case TargetType.Laboratory:
-      case TargetType.Department:
-        return this.createDepartment(data);
       case TargetType.Working:
         return this.createWorking(data);
+      default:
+        return this.createDepartment(data);
     }
   }
 
@@ -89,7 +90,7 @@ export default class Department extends BaseTarget implements IDepartment {
   public async createDepartment(data: TargetParam): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    if (!departmentTypes.indexOf(data.typeName as TargetType)) {
+    if (!this.subTeamTypes.includes(data.typeName as TargetType)) {
       logger.warn('不支持该机构');
       return;
     }

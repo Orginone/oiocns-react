@@ -81,7 +81,7 @@ class ChatController extends Emitter {
    */
   public async setCurrent(chat: IChat | undefined): Promise<void> {
     this._tabIndex = '1';
-    this._curChat = this._refChat(chat);
+    this._curChat = this.findChat(chat);
     if (this._curChat) {
       this._curChat.noReadCount = 0;
       await this._curChat.moreMessage('');
@@ -154,7 +154,7 @@ class ChatController extends Emitter {
       this._chats = [];
       if ((data?.chats?.length ?? 0) > 0) {
         for (let item of data.chats) {
-          let lchat = this._refChat(item);
+          let lchat = this.findChat(item);
           if (lchat) {
             lchat.loadCache(item);
             this._appendChats(lchat);
@@ -165,6 +165,10 @@ class ChatController extends Emitter {
     });
     kernel.on('RecvMsg', (data) => {
       this._recvMessage(data);
+    });
+    kernel.on('ChatRefresh', async () => {
+      this._groups = await LoadChats(this._userId);
+      this.setCurrent(this._curChat);
     });
   }
   /**
@@ -198,7 +202,7 @@ class ChatController extends Emitter {
    * @param chat 拷贝会话
    * @returns 引用会话
    */
-  private _refChat(chat: IChat | undefined): IChat | undefined {
+  public findChat(chat: IChat | undefined): IChat | undefined {
     if (chat) {
       for (const item of this._groups) {
         for (const c of item.chats) {

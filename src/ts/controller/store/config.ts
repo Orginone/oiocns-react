@@ -27,11 +27,12 @@ export const myColumns: any = [
   {
     title: '应用来源',
     ellipsis: true,
-    dataIndex: ['source'],
+    dataIndex: ['prod', 'source'],
   },
   {
     title: '创建时间',
     width: 200,
+    valueType: 'dateTime',
     dataIndex: ['prod', 'createTime'],
   },
   {

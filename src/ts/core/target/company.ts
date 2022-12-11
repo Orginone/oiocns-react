@@ -5,7 +5,7 @@ import { companyTypes, departmentTypes, TargetType } from '../enum';
 import { TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { schema, kernel, common } from '@/ts/base';
+import { schema, kernel, common, model } from '@/ts/base';
 import {
   IGroup,
   ICompany,
@@ -23,8 +23,8 @@ import Cohort from './cohort';
  * 公司的元操作
  */
 export default class Company extends MarketTarget implements ICompany {
-  departments: IDepartment[];
-  joinedGroup: IGroup[];
+  departments: IDepartment[] = [];
+  joinedGroup: IGroup[] = [];
   userId: string;
   cohorts: ICohort[] = [];
   workings: IWorking[] = [];
@@ -32,18 +32,10 @@ export default class Company extends MarketTarget implements ICompany {
   constructor(target: schema.XTarget, userId: string) {
     super(target);
     this.userId = userId;
-
-    this.departments = [];
-    this.joinedGroup = [];
     this.subTeamTypes = [...departmentTypes, TargetType.Working];
-    this.extendTargetType = [...departmentTypes, TargetType.Working, ...companyTypes];
-    this.joinTargetType = [TargetType.Group, TargetType.Cohort];
-    this.createTargetType = [
-      TargetType.Working,
-      TargetType.Group,
-      TargetType.Cohort,
-      ...departmentTypes,
-    ];
+    this.extendTargetType = [...this.subTeamTypes, ...companyTypes];
+    this.joinTargetType = [TargetType.Group];
+    this.createTargetType = [...this.subTeamTypes, TargetType.Group, TargetType.Cohort];
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
   public get subTeam(): ITarget[] {
@@ -74,17 +66,14 @@ export default class Company extends MarketTarget implements ICompany {
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
-      case TargetType.Office:
-      case TargetType.Section:
-      case TargetType.Laboratory:
-      case TargetType.Department:
-        return this.createDepartment(data);
-      case TargetType.Working:
-        return this.createWorking(data);
       case TargetType.Group:
         return this.createGroup(data);
+      case TargetType.Working:
+        return this.createWorking(data);
       case TargetType.Cohort:
-        return this.createGroup(data);
+        return this.createCohort(data.avatar, data.name, data.code, data.teamRemark);
+      default:
+        return this.createDepartment(data);
     }
   }
 
@@ -134,7 +123,7 @@ export default class Company extends MarketTarget implements ICompany {
     return {
       id: this.target.id,
       name: this.target.team!.name,
-      icon: this.avatar?.thumbnail,
+      avatar: this.avatar,
       typeName: this.target.typeName as TargetType,
     };
   }
@@ -161,7 +150,7 @@ export default class Company extends MarketTarget implements ICompany {
   ): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    if (!departmentTypes.indexOf(data.typeName as TargetType)) {
+    if (!departmentTypes.includes(data.typeName as TargetType)) {
       logger.warn('不支持该机构');
       return;
     }
@@ -317,6 +306,9 @@ export default class Company extends MarketTarget implements ICompany {
       });
     }
     return this.joinedGroup;
+  }
+  public async getStationMember(data: model.IdArrayReq): Promise<schema.XTargetArray> {
+    return (await kernel.QueryStationTargets(data)).data;
   }
   public async update(data: TargetParam): Promise<ICompany> {
     if (!validIsSocialCreditCode(data.code)) {

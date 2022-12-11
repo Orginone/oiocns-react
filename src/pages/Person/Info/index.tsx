@@ -1,14 +1,13 @@
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Card, Descriptions } from 'antd';
+import { Button, Card, Descriptions } from 'antd';
 import Layout from 'antd/lib/layout/layout';
-import Title from 'antd/lib/typography/Title';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import PersonInfoDepartment from './Department';
 import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
-import EditUserInfo from '@/bizcomponents/EditUserInfo';
+import UserInfoEditModal from '@/bizcomponents/EditUserInfo';
 import cls from './index.module.less';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 /**
  * 个人信息
@@ -18,19 +17,16 @@ const PersonInfo: React.FC = () => {
   const user = userCtrl.user;
   const [showDepartment, setShowDepartment] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-
-  useEffect(() => {
-    // 用户修改的时候 ，处理代码 头像
-  }, ['', userCtrl.user]);
-
   // 信息标题
   const title = (
     <div className={cls['person-info-title']}>
-      <div>
-        <Title level={4}>
-          <strong>当前用户</strong>
-        </Title>
-        <Avatar size={48} icon={<UserOutlined />} />
+      <div style={{ fontSize: 100 }}>
+        <TeamIcon
+          avatar={userCtrl.user.avatar}
+          typeName="人员"
+          size={100}
+          preview={true}
+        />
       </div>
       <div>
         <Button type="link" onClick={() => setShowEditModal(true)}>
@@ -76,13 +72,13 @@ const PersonInfo: React.FC = () => {
           </div>
         </Card>
       </Layout>
-      <EditUserInfo
+      <UserInfoEditModal
         open={showEditModal}
-        title={'修改信息'}
         handleCancel={() => setShowEditModal(false)}
-        handleOk={() => setShowEditModal(false)}
-        editData={userCtrl.user.target}
-        reObject={userCtrl.user}
+        handleOk={() => {
+          setShowEditModal(false);
+          userCtrl.changCallback();
+        }}
       />
     </div>
   );

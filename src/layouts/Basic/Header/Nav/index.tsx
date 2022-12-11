@@ -84,7 +84,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
           if (item.count > 0) {
             return (
               <Badge key={item.key} count={item.count} size="small">
-                getLinkItem(item)
+                {getLinkItem(item)}
               </Badge>
             );
           } else {

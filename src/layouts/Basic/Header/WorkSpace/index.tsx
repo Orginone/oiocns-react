@@ -1,15 +1,5 @@
 import { CaretDownOutlined } from '@ant-design/icons';
-import {
-  Avatar,
-  Button,
-  Col,
-  Divider,
-  Modal,
-  Row,
-  Space,
-  Typography,
-  message,
-} from 'antd';
+import { Button, Col, Divider, Modal, Row, Space, Typography, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
@@ -17,6 +7,8 @@ import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import { XTarget } from '@/ts/base/schema';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 /* 组织单位头部左侧组件 */
 const OrganizationalUnits = () => {
@@ -25,7 +17,7 @@ const OrganizationalUnits = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
-  const [joinKey, setJoinKey] = useState<string>('');
+  const [searchCallback, setSearchCallback] = useState<XTarget[]>();
   // 选中组织单位后进行空间切换
   const handleClickMenu = async (item: SpaceType) => {
     userCtrl.setCurSpace(item.id);
@@ -54,9 +46,7 @@ const OrganizationalUnits = () => {
   const loadItem = (data: SpaceType) => {
     return (
       <Space>
-        <Avatar src={data?.icon} className={styles.avatar} size={32}>
-          {data?.name?.substring(0, 1)}
-        </Avatar>
+        <TeamIcon typeName={data.typeName} avatar={data.avatar} size={26} />
         <Typography.Text className={styles['space-list']}>{data?.name}</Typography.Text>
       </Space>
     );
@@ -133,19 +123,21 @@ const OrganizationalUnits = () => {
         onOk={async () => {
           // 加入单位
           setShowModal(false);
-          if (joinKey == '') {
-            message.error('请选中要加入的单位！');
-          } else {
-            if (await userCtrl.user.applyJoinCompany(joinKey, TargetType.Company)) {
-              message.success('已申请加入单位成功.');
-            }
+          if (searchCallback && searchCallback.length > 0) {
+            searchCallback.forEach(async (user) => {
+              if (await userCtrl.user.applyJoinCompany(user.id, TargetType.Company)) {
+                message.success('已申请加入单位成功.');
+              }
+            });
           }
         }}
         onCancel={() => {
-          console.log(`取消按钮`);
           setShowModal(false);
         }}>
-        <SearchCompany joinKey={joinKey} setJoinKey={setJoinKey} />
+        <SearchCompany
+          searchCallback={setSearchCallback}
+          searchType={TargetType.Company}
+        />
       </Modal>
     </div>
   );

@@ -14,19 +14,7 @@ interface indexType {
 const CohortPerson: React.FC<indexType> = (props) => {
   useEffect(() => {}, []);
 
-  // const [data, setData] = useState<schema.XTarget[]>([]);
-
   const [value, setValue] = useState<string>('');
-  // const getTableList = async () => {
-  //   const res = await (
-  //     await props.cohort.loadMembers({
-  //       offset: 0,
-  //       filter: '',
-  //       limit: 65535,
-  //     })
-  //   ).result;
-  //   setData(res!);
-  // };
 
   const keyWordChange = async (e: any) => {
     setValue(e.target.value);
@@ -81,25 +69,16 @@ const CohortPerson: React.FC<indexType> = (props) => {
       </div>
       <CardOrTable<schema.XTarget>
         dataSource={[]}
-        total={10}
-        page={1}
         width={400}
         rowSelection={{
           type: 'radio',
-
           onSelect: (record: any, selected: any, selectedRows: any) => {
             console.log(record, selected, selectedRows);
             props.searchCallback(record);
           },
         }}
         params={{ filter: value }}
-        request={(page) => {
-          return props.cohort.loadMembers({
-            limit: page.limit,
-            offset: page.offset,
-            filter: '',
-          });
-        }}
+        request={(page) => props.cohort.loadMembers(page)}
         tableAlertRender={false}
         tableAlertOptionRender={false}
         showChangeBtn={false}

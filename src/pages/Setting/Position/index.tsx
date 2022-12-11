@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 import ReactDOM from 'react-dom';
-import { Card, Modal, Button } from 'antd';
-import React, { useState, useRef, useEffect } from 'react';
+import { Card, Modal, Button, Space } from 'antd';
+import React, { useState, useRef, useEffect, Key } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { columns, indentitycolumns } from './config';
 import TreeLeftDeptPage, { PositionType } from './components/TreeLeftPosPage/CreatePos';
 import { RouteComponentProps } from 'react-router-dom';
-import AssignPosts from './components/AssignPosts';
+import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
 import { PlusOutlined } from '@ant-design/icons';
 import Indentity from '@/ts/core/target/authority/identity';
@@ -18,6 +18,8 @@ import positionCtrl, {
 } from '@/ts/controller/position/positionCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { XIdentity } from '@/ts/base/schema';
+import { ActionType } from '@ant-design/pro-table';
+
 type RouterParams = {
   id: string;
 };
@@ -31,10 +33,10 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
   const [positions, setPositions] = useState<any[]>([]); //岗位列表
   const [_currentPostion, setPosition] = useState<PositionType>(); //当前选中岗位
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [memberData, setMemberData] = useState<schema.XTarget[]>([]); //可分配人员列表
   const [persons, setPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
-  const [personData, setPersonData] = useState<schema.XTarget[]>([]); //岗位人员列表
   const [addIndentitys, setAddIndentitys] = useState<XIdentity[]>(); //待添加的身份数据集
+  const [IndentityIds, setIndentityIds] = useState<string[]>(); //待添加的身份ID集合
+
   const treeContainer = document.getElementById('templateMenu');
   //监听
   useEffect(() => {
@@ -47,29 +49,18 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
       return positionCtrl.unsubscribe(id);
     };
   }, []);
-  //当前岗位成员变更，可指派人员进行变更
-  useEffect(() => {
-    getMemberData();
-  }, [personData]);
-
+  const actionRef = useRef<ActionType>();
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
       {
         key: 'remove',
         label: '移出岗位',
-        onClick: () => {
-          // for (const a of indentitys!) {
-          //   new Indentity(a.obj).removeMembers([item.id]);
-          // }
-          // const data = personData?.filter((obj) => obj.id != item.id)!;
-          // setPersonData(data);
-          // positionCtrl.updatePosttion({
-          //   name: _currentPostion.name,
-          //   code: _currentPostion.code,
-          //   indentitys: indentitys,
-          //   persons: data,
-          // });
+        onClick: async () => {
+          for (const a of _currentPostion?.indentitys!) {
+            await new Indentity(a).removeMembers([item.id]);
+          }
+          reload();
         },
       },
     ];
@@ -89,40 +80,32 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           };
           positionCtrl.updatePosttion(data);
           setTreeCurrent(data!);
-          console.log('对象数据', new Indentity(item));
           //移除岗位人员列表该身份
-          for (const a of personData!) {
-            new Indentity(item).removeMembers([a.id]);
-          }
+          // for (const a of personData!) {
+          //   new Indentity(item).removeMembers([a.id]);
+          // }
           console.log('按钮事件', 'remove', item);
         },
       },
     ];
   };
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log('selectedRowKeys changed: ', newSelectedRowKeys);
-  };
-
-  const getCheckboxProps = (record: any) => {
-    record;
-  };
   /**点击操作内容触发的事件 */
   const handleMenuClick = (key: string, item: any) => {};
   // 选中树的时候操作
   const setTreeCurrent = async (current: PositionType) => {
-    console.log('选中', current);
     setPosition(current);
-    /**获取指派人员列表 */
-    getMemberData();
     /**保存当前选中的岗位 */
     setPosition(current);
+    const indentityIds: string[] = [];
+    current.indentitys.map((item) => {
+      indentityIds.push(item.id);
+    });
+    //保存当前岗位id
+    setIndentityIds(indentityIds);
   };
-  const getMemberData = async () => {
-    setMemberData(
-      await (
-        await userCtrl.space.loadMembers({ offset: 0, filter: '', limit: 65535 })
-      ).result!,
-    );
+  //刷新表格
+  const reload = () => {
+    actionRef.current?.reload();
   };
   /**添加框内选中组织后的数据转换 */
   const onCheckeds = (result: ResultType[]) => {
@@ -133,7 +116,6 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         identityData.push(obj);
       });
     });
-    console.log('输出结果', identityData);
     setAddIndentitys(identityData);
   };
 
@@ -192,16 +174,37 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
-                dataSource={personData as any}
+                dataSource={[] as any}
                 rowKey={'id'}
+                tableAlertOptionRender={(selectedRowKeys: any) => {
+                  return (
+                    <Space size={16}>
+                      <a
+                        onClick={() => {
+                          for (const a of _currentPostion?.indentitys!) {
+                            new Indentity(a).removeMembers(
+                              selectedRowKeys.selectedRowKeys,
+                            );
+                            reload();
+                          }
+                          actionRef.current?.clearSelected!();
+                        }}>
+                        批量删除
+                      </a>
+                    </Space>
+                  );
+                }}
                 operation={renderOperation}
+                params={{ ids: IndentityIds }}
+                request={async (params: any) => {
+                  const { ids, ...page } = params;
+                  return await userCtrl.company.getStationMember({ ids, page });
+                }}
+                actionRef={actionRef}
                 columns={columns as any}
                 parentRef={parentRef}
                 showChangeBtn={false}
-                rowSelection={{
-                  onChange: onSelectChange,
-                  getCheckboxProps: getCheckboxProps,
-                }}
+                rowSelection={{}}
               />
             </div>
           </div>
@@ -248,28 +251,19 @@ const SettingDept: React.FC<RouteComponentProps<RouterParams>> = () => {
         width={1300}
         onOk={async () => {
           setIsOpenAssign(false);
-          // const ids = [];
-          // for (const b of persons!) {
-          //   ids.push(b.id);
-          // }
-          // for (const a of indentitys!) {
-          //   new Indentity(a.obj).pullMembers(ids);
-          // }
-          // const data = {
-          //   name: _currentPostion.name,
-          //   code: _currentPostion.code,
-          //   indentitys: _currentPostion.indentitys,
-          //   persons: persons?.concat(personData!),
-          // };
-          // positionCtrl.updatePosttion('');
-          // //更新页面人员
-          // setPersonData(persons!.concat(personData!));
-          // console.log('当前岗位成员', personData);
+          const ids = [];
+          for (const a of persons!) {
+            ids.push(a.id);
+          }
+          for (const b of _currentPostion?.indentitys!) {
+            await new Indentity(b).pullMembers(ids);
+          }
+          reload();
         }}
         onCancel={() => {
           setIsOpenAssign(false);
         }}>
-        <AssignPosts searchCallback={setPersons} memberData={memberData} />
+        <AssignPosts searchFn={setPersons} />
       </Modal>
 
       {/* 左侧树 */}

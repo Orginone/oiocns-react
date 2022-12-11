@@ -51,7 +51,7 @@ const MemberList: React.FC<indexType> = (props) => {
         } else {
           getTableList(page, 10);
         }
-      } else if (source.target.typeName == TargetType.Company) {
+      } else if (source.target.typeName == TargetType.Department) {
         res = await userCtrl.user.searchPerson(e.target.value);
         if (res?.total > 0 && res.result) {
           setData([res.result[0]]);
@@ -116,7 +116,6 @@ const MemberList: React.FC<indexType> = (props) => {
           dataSource={data}
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
-              // console.log(record, selected, selectedRows);
               searchFn(selectedRows);
             },
           }}
@@ -137,10 +136,9 @@ const MemberList: React.FC<indexType> = (props) => {
           search={false}
           columns={
             // 判断是公司还是集团
-            source.target.typeName == TargetType.Company ? personColumn : companyColumn
+            source.target.typeName == TargetType.Department ? personColumn : companyColumn
           }
           rowKey={'id'}
-          tableAlertRender={false}
         />
       </div>
     </div>

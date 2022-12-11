@@ -34,6 +34,19 @@ export const PersonColumns: ProColumns<schema.XTarget>[] = [
   },
 ];
 
+export const CompanyColumn: ProColumns<schema.XTarget>[] = [
+  { title: '序号', valueType: 'index', width: 50 },
+  { title: '单位名称', dataIndex: 'name' },
+  {
+    title: '社会统一信用代码',
+    dataIndex: ['target', 'code'],
+  },
+  {
+    title: '单位简介',
+    dataIndex: ['target', 'team', 'remark'],
+  },
+];
+
 export const ApplicationColumns: ProColumns<IProduct>[] = [
   {
     title: '序号',

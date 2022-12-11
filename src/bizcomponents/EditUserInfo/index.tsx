@@ -1,33 +1,28 @@
 import React, { useRef, useState } from 'react';
-import { message, Upload, UploadProps, Image } from 'antd';
-import { nanoid, ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { ITarget } from '@/ts/core';
+import { message, Upload, UploadProps, Image, Button, Space } from 'antd';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { XTarget } from '@/ts/base/schema';
-import { PlusOutlined } from '@ant-design/icons';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
+import userCtrl from '@/ts/controller/setting/userCtrl';
+import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
-  title: string;
   open: boolean;
   handleCancel: () => void;
-  handleOk: () => void;
-  editData?: XTarget;
-  reObject: ITarget;
+  handleOk: Function;
 }
 /*
   编辑
 */
-const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, reObject, editData, handleCancel } = props;
+const UserInfoEditModal = (props: Iprops) => {
+  const { open, handleOk, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const [image, setImage] = useState<FileItemShare>();
+  const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
     maxCount: 1,
-    listType: 'picture-card',
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image');
       if (!isImage) {
@@ -37,15 +32,11 @@ const EditCustomModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('图片');
-      console.log(file.name);
+      const docDir = await docsCtrl.home?.create('头像');
       if (docDir && file) {
-        const result = await docsCtrl.upload(docDir.key, nanoid() + file.name, file);
-        console.log('img', result);
+        const result = await docsCtrl.upload(docDir.key, file.name, file);
         if (result) {
-          const img: FileItemShare = result.shareInfo();
-          setImage(img);
-          formRef.current?.setFieldValue('avatar', img);
+          setAvatar(result.shareInfo());
         }
       }
     },
@@ -57,50 +48,56 @@ const EditCustomModal = (props: Iprops) => {
       colProps: { span: 24 },
       renderFormItem: () => {
         return (
-          <Upload {...uploadProps}>
-            {image ? (
-              <Image src={image.thumbnail} preview={{ src: image.shareLink }} />
+          <Space>
+            {avatar ? (
+              <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
             ) : (
-              <PlusOutlined />
+              ''
             )}
-          </Upload>
+            <Upload {...uploadProps}>
+              <Button type="link">上传头像</Button>
+            </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除头像
+              </Button>
+            ) : (
+              ''
+            )}
+          </Space>
         );
-      },
-      formItemProps: {},
-    },
-    {
-      title: '昵称',
-      dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
-      },
-    },
-    {
-      title: '账号',
-      dataIndex: 'code',
-      //   fieldProps: {
-      //     disabled: true,
-      //   },
-      formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
       },
     },
     {
       title: '姓名',
       dataIndex: 'teamName',
       formItemProps: {
-        rules: [{ required: true, message: '名称为必填项' }],
+        rules: [{ required: true, message: '姓名为必填项' }],
+      },
+    },
+    {
+      title: '账号',
+      dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '账号为必填项' }],
+      },
+    },
+    {
+      title: '呢称',
+      dataIndex: 'name',
+      formItemProps: {
+        rules: [{ required: true, message: '呢称为必填项' }],
       },
     },
     {
       title: '手机号',
       dataIndex: 'teamCode',
       formItemProps: {
-        rules: [{ required: true, message: '编码为必填项' }],
+        rules: [{ required: true, message: '手机号为必填项' }],
       },
     },
     {
-      title: '座右铭',
+      title: '左右铭',
       dataIndex: 'teamRemark',
       valueType: 'textarea',
       colProps: { span: 24 },
@@ -109,23 +106,21 @@ const EditCustomModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       formRef={formRef}
-      title={title}
+      title="更新个人信息"
       open={open}
-      width={520}
+      width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (editData) {
-            editData.avatar ? setImage(JSON.parse(editData.avatar)) : setImage(undefined);
-            formRef.current?.setFieldsValue({
-              ...editData,
-              teamName: editData?.team?.name,
-              teamCode: editData?.team?.code,
-              teamRemark: editData?.team?.remark,
-            });
-          }
+          setAvatar(parseAvatar(userCtrl.user.target.avatar));
+          formRef.current?.setFieldsValue({
+            ...userCtrl.user.target,
+            teamName: userCtrl.user.target.team?.name,
+            teamCode: userCtrl.user.target.team?.code,
+            teamRemark: userCtrl.user.target.team?.remark,
+          });
         } else {
           formRef.current?.resetFields();
-          setImage(undefined);
+          setAvatar(undefined);
           handleCancel();
         }
       }}
@@ -134,19 +129,12 @@ const EditCustomModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (!editData) return;
-        const res = await reObject.update({ ...values });
-        if (res) {
-          message.success('修改成功');
-          handleOk();
-        } else {
-          message.error('修改失败');
-          return false;
-        }
+        values.avatar = JSON.stringify(avatar);
+        userCtrl.user.update(values);
+        handleOk();
       }}
-      columns={columns}
-    />
+      columns={columns}></SchemaForm>
   );
 };
 
-export default EditCustomModal;
+export default UserInfoEditModal;

@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Modal, Tabs, Typography } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget } from '@/ts/core';
+import { IDepartment, ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -14,9 +14,11 @@ import DepartTree from './components/TreeLeftDeptPage';
 import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import cls from './index.module.less';
-import SearchPerson from '@/bizcomponents/SearchPerson';
+// import SearchPerson from '@/bizcomponents/SearchPerson';
 import CreateTeamModal from '@/bizcomponents/CreateTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import SearchCompany from '@/bizcomponents/SearchCompany';
+import AssignPosts from '@/bizcomponents/AssignPostCompany';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
@@ -26,13 +28,36 @@ interface ICanDelete {
  * @returns
  */
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
-  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [current, setCurrent] = useState<ITarget>();
+  const [isTopDept, setTopDept] = useState<boolean>(); // 是否是一级部门
+  const [getTopDept, setGetTopDept] = useState<IDepartment>(); // 二级三级部门反查一级部门
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
-  const [selectPerson, setSelectPerson] = useState<XTarget>(); // 选中的要拉的人
+  const [selectPerson, setSelectPerson] = useState<XTarget[]>([]); // 选中的要拉的人
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
+    setCurrent(undefined);
+  });
+
+  useEffect(() => {
+    if (current) {
+      isTop(current.id).then(async (isBoolean) => {
+        // 判断是否是一级部门
+        setTopDept(isBoolean);
+        if (!isBoolean) {
+          // 如果是二级部门，反向查询获取一级部门
+          const Depts = await userCtrl.company.getDepartments(false);
+          for (const dept of Depts) {
+            const findDept = _search(dept, current.id);
+            if (findDept) {
+              setGetTopDept(dept);
+            }
+          }
+        }
+      });
+    }
+  }, [current]);
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
@@ -89,6 +114,31 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           break;
       }
     }
+  };
+
+  const _search = (item: IDepartment, key: string): IDepartment | undefined => {
+    if (item.id === key) {
+      return item;
+    }
+    for (const i of item.departments) {
+      const res = _search(i, key);
+      if (res) {
+        return res;
+      }
+    }
+  };
+
+  // 判断是否是一级部门
+  const isTop = async (groupid: string) => {
+    let isTop: boolean = false;
+    const groups = await userCtrl.company.getDepartments(false);
+    for (const group of groups) {
+      if (group.id == groupid) {
+        isTop = true;
+        break;
+      }
+    }
+    return isTop;
   };
 
   const handleOk = () => {
@@ -148,7 +198,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             title={
               <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
             }
-            selectDept={current.target}
+            selectDept={current}
             extra={[
               <Button
                 key="edit"
@@ -196,18 +246,29 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           {/* 添加成员*/}
           <Modal
             title="添加成员"
+            width={1024}
             destroyOnClose
             open={activeModal === 'addOne'}
             onCancel={() => setActiveModal('')}
             onOk={async () => {
-              if (selectPerson) {
-                if (await current.pullMember(selectPerson)) {
+              if (selectPerson && selectPerson.length > 0) {
+                const ids = selectPerson.map((e) => {
+                  return e.id;
+                });
+                if (await current.pullMembers(ids, TargetType.Person)) {
                   message.success('添加成功');
                   handleOk();
                 }
               }
             }}>
-            <SearchPerson searchCallback={setSelectPerson} />
+            {isTopDept ? (
+              <SearchCompany
+                searchCallback={setSelectPerson}
+                searchType={TargetType.Person}
+              />
+            ) : (
+              <AssignPosts searchFn={setSelectPerson} source={getTopDept as ITarget} />
+            )}
           </Modal>
           {/* 变更部门 */}
           <TransferDepartment

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Space } from 'antd';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { Card, Avatar, Space, Modal, message } from 'antd';
 import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import AppLogo from '/img/appLogo.png';
 
 import cls from './index.module.less';
 
@@ -20,14 +20,31 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
   }, [bindAppMes]);
 
   const initData = async () => {
-    console.log('bindAppMes', bindAppMes);
+    const tableData = await SelfAppCtrl.querySelfApps();
+    const needData = tableData.map((item) => {
+      return {
+        name: item.prod.name,
+        id: item.prod.id,
+        remark: item.prod.remark,
+      };
+    });
+
     const result = await userCtrl.space.getDefines(false);
-    const currentValue = await userCtrl.space.queryFlowRelation(false);
-    if (currentValue && currentValue.length > 0) {
-      const filterId = currentValue.filter((item) => {
-        return item.defineId === result[0].id;
-      });
-      setAppDataList(filterId);
+
+    if (result && result.length > 0 && bindAppMes.id) {
+      const currentValue = await userCtrl.space.queryFlowRelation(false);
+      if (currentValue && currentValue.length > 0) {
+        const filterIdData = currentValue.filter((item) => {
+          return item.defineId === (bindAppMes?.id || result[0].id);
+        });
+        const getResult = filterIdData.map((item) => {
+          const findAppId = needData.find((innerItem) => innerItem.id === item.productId);
+          item.name = findAppId?.name;
+          item.remark = findAppId?.remark;
+          return item;
+        });
+        setAppDataList(getResult);
+      }
     }
   };
 
@@ -43,18 +60,45 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
         {appDataList &&
           appDataList.map((item: any) => {
             return (
-              <div key={item.prod?.id}>
+              <div key={item?.id}>
                 <Card
                   style={{ width: 300 }}
                   actions={[
-                    <SettingOutlined key="setting" />,
-                    <EditOutlined key="edit" />,
-                    <EllipsisOutlined key="ellipsis" />,
+                    <a
+                      key="text"
+                      onClick={() => {
+                        /** 涉及到id的 调接口干掉*/
+                        if (item?.id) {
+                          Modal.confirm({
+                            title: '提示',
+                            content: '确定删除当前已绑定的应用?',
+                            onOk: () => {
+                              userCtrl.space
+                                .unbindingFlowRelation({
+                                  defineId: item?.defineId,
+                                  productId: item.productId,
+                                  functionCode: item.functionCode,
+                                  SpaceId: userCtrl.space.id,
+                                })
+                                .then((result) => {
+                                  if (result) {
+                                    message.info('解绑成功');
+                                    initData();
+                                  } else {
+                                    message.success('解绑失败');
+                                  }
+                                });
+                            },
+                          });
+                        }
+                      }}>
+                      解绑
+                    </a>,
                   ]}>
                   <Meta
-                    avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                    title={item.prod?.name}
-                    description={item.prod?.remark || '暂无描述'}
+                    avatar={<Avatar src={AppLogo} shape="square" />}
+                    title={item?.name}
+                    description={item?.remark || '暂无描述'}
                   />
                 </Card>
               </div>

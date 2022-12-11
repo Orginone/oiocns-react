@@ -1,6 +1,6 @@
 import consts from '../consts';
 import { TargetType } from '../enum';
-import { kernel, model, common, schema } from '../../base';
+import { kernel, model, common, schema, parseAvatar } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
@@ -10,6 +10,7 @@ import { logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
+  public typeName: TargetType;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
@@ -36,10 +37,7 @@ export default class BaseTarget implements ITarget {
   }
 
   public get avatar(): FileItemShare | undefined {
-    if (this.target.avatar) {
-      return JSON.parse(this.target.avatar);
-    }
-    return undefined;
+    return parseAvatar(this.target.avatar);
   }
 
   constructor(target: schema.XTarget) {
@@ -49,6 +47,7 @@ export default class BaseTarget implements ITarget {
     this.searchTargetType = [];
     this.ownIdentitys = [];
     this.identitys = [];
+    this.typeName = target.typeName as TargetType;
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
