@@ -1,6 +1,6 @@
 import { model, schema } from '@/ts/base';
 import { FileItemShare, PageRequest, TargetModel } from '@/ts/base/model';
-import { XTarget, XTargetArray } from '@/ts/base/schema';
+import { XIdentity, XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetType } from '../enum';
 import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
@@ -613,12 +613,12 @@ export interface IStation extends ITarget {
   /** 删除 */
   delete(): Promise<boolean>;
   /** 加载岗位下的身份 */
-  loadIdentitys(page: PageRequest): Promise<schema.XIdentityArray>;
+  loadIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /**
    * 添加岗位身份
-   * @param {string[]} ids 身份ID数组
+   * @param {string[]} identitys 身份数组
    */
-  pullIdentitys(ids: string[]): Promise<boolean>;
+  pullIdentitys(identitys: XIdentity[]): Promise<boolean>;
   /**
    * 移除岗位身份
    * @param {string[]} ids 身份ID数组
