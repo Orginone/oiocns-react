@@ -120,13 +120,13 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
             <Button
               className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
+              type="primary"
               style={{ float: 'right' }}
               onClick={() => {
                 setIsOpenIdentityModal(true);
-              }}
-            />
+              }}>
+              添加
+            </Button>
           </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
@@ -155,26 +155,14 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
     </div>
   );
   /**人员列表 */
-  const personCount = current && (
+  const personCount = (
     <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '10px' }}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
-          <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>岗位人员</strong>
-            <Button
-              className={cls.creatgroup}
-              type="text"
-              icon={<PlusOutlined />}
-              style={{ float: 'right' }}
-              onClick={() => {
-                setSelectPersons([]);
-                setIsOpenPerson(true);
-              }}
-            />
-          </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
+                headerTitle={'岗位人员'}
                 dataSource={[] as any}
                 rowKey={'id'}
                 tableAlertOptionRender={(selectedRowKeys: any) => {
@@ -182,25 +170,47 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                     <Space size={16}>
                       <a
                         onClick={() => {
-                          current?.removeMembers(
-                            selectedRowKeys.selectedRowKeys,
-                            TargetType.Person,
-                          );
-                          actionRef.current?.reload();
-                          actionRef.current?.clearSelected!();
+                          Modal.confirm({
+                            title: '提示',
+                            content: '是否确认删除',
+                            okText: '确认',
+                            cancelText: '取消',
+                            onOk: async () => {
+                              await current?.removeMembers(
+                                selectedRowKeys.selectedRowKeys,
+                                TargetType.Person,
+                              );
+                              actionRef.current?.reload();
+                              actionRef.current?.clearSelected!();
+                            },
+                          });
                         }}>
                         批量删除
                       </a>
                     </Space>
                   );
                 }}
+                toolBarRender={() => [
+                  <Button
+                    className={cls.creatgroup}
+                    type="primary"
+                    style={{ float: 'right' }}
+                    onClick={() => {
+                      setSelectPersons([]);
+                      setIsOpenPerson(true);
+                    }}>
+                    添加
+                  </Button>,
+                ]}
+                options={{
+                  reload: false,
+                  density: false,
+                  setting: false,
+                  search: true,
+                }}
                 operation={personOperation}
-                request={(page) => {
-                  return current!.loadMembers({
-                    limit: page.limit,
-                    offset: page.offset,
-                    filter: '',
-                  });
+                request={async (page) => {
+                  return await current!.loadMembers(page);
                 }}
                 actionRef={actionRef}
                 columns={columns as any}
@@ -217,8 +227,8 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
 
   return (
     <div className={cls[`dept-content-box`]}>
-      {header}
-      {personCount}
+      {current && header}
+      {current && personCount}
       <Modal
         title="添加身份"
         open={isOpenSelectIdentityModal}
