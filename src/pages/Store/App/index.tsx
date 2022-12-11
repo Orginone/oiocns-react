@@ -18,7 +18,7 @@ import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { myColumns } from '@/ts/controller/store/config';
-import { XProduct } from '@/ts/base/schema';
+import { IProduct } from '@/ts/core';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
@@ -44,8 +44,8 @@ const StoreApp: React.FC = () => {
     }
   };
 
-  const renderOperation = (item: XProduct): common.OperationType[] => {
-    const id = item.id;
+  const renderOperation = (item: IProduct): common.OperationType[] => {
+    const id = item.prod.id;
     const shareArr = [
       {
         key: 'share',

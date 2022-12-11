@@ -5,6 +5,7 @@ import './index.less';
 import AppLogo from '/img/appLogo.png';
 import { common } from 'typings/common';
 import { XProduct } from '@/ts/base/schema';
+import { IProduct } from '@/ts/core';
 interface defaultObjType {
   name: string;
   size: number | string;
@@ -14,13 +15,13 @@ interface defaultObjType {
 }
 
 interface AppCardType {
-  data: XProduct; //props
+  data: IProduct; //props
   className?: string;
   defaultKey?: defaultObjType; // 卡片字段 对应数据字段
   // eslint-disable-next-line no-unused-vars
   onClick?: (event?: any) => void;
   // eslint-disable-next-line no-unused-vars
-  operation?: (_item: XProduct) => common.OperationType[]; //操作区域数据
+  operation?: (_item: IProduct) => common.OperationType[]; //操作区域数据
 }
 const defaultObj = {
   name: 'name', //名称

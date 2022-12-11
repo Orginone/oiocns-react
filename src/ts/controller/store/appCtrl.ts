@@ -48,7 +48,7 @@ class AppController extends Emitter {
       //     return item;
       //   }
       // }
-      return this._target.ownProducts.find((v) => v.prod.id);
+      return this._target.ownProducts.find((v) => v.prod.id == this._curProdId);
     }
     return undefined;
   }
