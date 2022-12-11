@@ -16,7 +16,6 @@ import { IStation } from '@/ts/core/target/itarget';
 import CreateTeam from '@/bizcomponents/CreateTeam';
 import { TargetType } from '@/ts/core';
 import ReactDOM from 'react-dom';
-import { PlusOutlined } from '@ant-design/icons';
 /**
  * 岗位设置
  * @returns
