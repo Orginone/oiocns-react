@@ -74,9 +74,16 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
         key: 'remove',
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
-          if (await current?.removeIdentitys([item.id])) {
-            IndentityActionRef.current?.reload();
-          }
+          Modal.confirm({
+            content: '是否移除该身份？',
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+              if (await current?.removeIdentitys([item.id])) {
+                IndentityActionRef.current?.reload();
+              }
+            },
+          });
         },
       },
     ];
@@ -90,10 +97,17 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
         setCurrent(item.object);
         break;
       case '删除':
-        if (await (item.object as IStation).delete()) {
-          setCurrent(undefined);
-          loadStations(false);
-        }
+        Modal.confirm({
+          content: '是否删除该岗位？',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: async () => {
+            if (await (item.object as IStation).delete()) {
+              setCurrent(undefined);
+              loadStations(false);
+            }
+          },
+        });
         break;
     }
   };
@@ -114,12 +128,12 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
   const header = current && (
     <div className={`${cls['dept-wrap-pages']}`} style={{ height: '400px' }}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        <Card className={cls['app-tabs']} bordered={false}>
+        <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
             <Button
               className={cls.creatgroup}
-              type="primary"
+              type="link"
               style={{ float: 'right' }}
               onClick={() => {
                 setIsOpenIdentityModal(true);
@@ -170,8 +184,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                       <a
                         onClick={() => {
                           Modal.confirm({
-                            title: '提示',
-                            content: '是否确认删除',
+                            content: '是否将人员从该岗位移出？',
                             okText: '确认',
                             cancelText: '取消',
                             onOk: async () => {
@@ -191,14 +204,15 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
                 }}
                 toolBarRender={() => [
                   <Button
+                    key={'addperson'}
                     className={cls.creatgroup}
-                    type="primary"
+                    type="link"
                     style={{ float: 'right' }}
                     onClick={() => {
                       setSelectPersons([]);
                       setIsOpenPerson(true);
                     }}>
-                    指派人员
+                    添加人员
                   </Button>,
                 ]}
                 options={{

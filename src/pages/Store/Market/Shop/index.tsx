@@ -21,7 +21,7 @@ const Index: React.FC = () => {
   return (
     <>
       <AppShowComp
-        headerTitle="共享仓库"
+        headerTitle={marketCtrl.getCurrentMarket()?.market.name || '共享仓库'}
         className={cls['market-public-wrap']}
         list={data}
         total={total}
