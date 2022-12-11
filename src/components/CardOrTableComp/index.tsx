@@ -92,7 +92,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       ...columns,
       {
         title: '操作',
-        width: 110,
+        width: 80,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
