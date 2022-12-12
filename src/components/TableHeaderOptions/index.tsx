@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Space, Modal, modalprops, Checkbox, Row, Col } from 'antd';
+import { Button, Space, Modal, ModalProps, Checkbox, Row, Col } from 'antd';
 import SearchInput from '../SearchInput';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
@@ -10,6 +10,7 @@ import type { SortEnd } from 'react-sortable-hoc';
 import { arrayMoveImmutable } from 'array-move';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import styles from './index.module.less';
+import { DataType } from 'typings/globelType';
 
 type AlignDicretion = 'center' | 'right' | 'left';
 interface settingOption {
@@ -117,14 +118,14 @@ const createUserHeaderData = <T extends DataType>(
   }
   return newSetttingColumns;
 };
-interface TableHeaderOptionsProps<T> extends modalprops {
+interface TableHeaderOptionsProps<T> extends ModalProps {
   plainOptions: ProColumns<T>[];
   handleOk: (data: any[]) => void;
 }
 /**  显示列
  *
  */
-const TableHeaderOptions = <T extends DataType>({
+const TableHeaderOptions = <T extends ModalProps>({
   open,
   onCancel,
   plainOptions,
