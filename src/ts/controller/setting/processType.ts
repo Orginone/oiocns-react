@@ -65,6 +65,92 @@ export type nodeType = {
   nodeId: string;
   name: string;
   conditions: conditiondType[];
+  props: { assignedUser: {}; assignedType: {}; num: number | null };
+};
+
+export const defalutDesignValue = {
+  name: '',
+  code: 'code',
+  remark: '',
+  fields: '',
+  resource: {
+    nodeId: 'ROOT',
+    parentId: null,
+    type: 'ROOT',
+    name: '发起人',
+    children: {
+      nodeId: 'node_590719745693',
+      parentId: 'ROOT',
+      props: {},
+      type: 'CONDITIONS',
+      name: '条件分支',
+    },
+  },
+};
+
+export const getConditionKeys: (type: string) => any[] = (type: string) => {
+  var keys: any[] = [];
+  switch (type) {
+    case 'NUMERIC':
+      keys = [
+        { value: 'EQ', label: '=' },
+        { value: 'GT', label: '>' },
+        { value: 'GTE', label: '≥' },
+        { value: 'LT', label: '<' },
+        { value: 'LTE', label: '≤' },
+        { value: 'NEQ', label: '≠' },
+      ];
+      break;
+    case 'STRING':
+    case 'DICT':
+      keys = [
+        { value: 'EQ', label: '=' },
+        { value: 'NEQ', label: '≠' },
+      ];
+      break;
+  }
+  return keys;
+};
+
+export const getResource: (resource: any, toInt: boolean) => any = (
+  resource: any,
+  toInt: boolean,
+) => {
+  var str = JSON.stringify(resource);
+  if (str.indexOf('NUMERIC') <= -1) {
+    return resource;
+  }
+  var res = JSON.parse(JSON.stringify(resource));
+  for (let key in res) {
+    if (key == 'type' && res['type'] == 'NUMERIC' && res['val']) {
+      if (typeof res['val'] == 'string' && toInt) {
+        let errorStr = res['val'].replace('"', '').replace('"', '').replace('" ', '');
+        res['val'] = parseInt(errorStr);
+      }
+      if (typeof res['val'] == 'number' && !toInt) {
+        res['val'] = res['val'] + '';
+      }
+    }
+    if (key == 'conditions' && res['conditions'] && res['conditions'].length > 0) {
+      for (let i = 0; i < res['conditions'].length; i++) {
+        res['conditions'][i] = getResource(res['conditions'][i], toInt);
+      }
+    }
+    if (key == 'assignedUser' && res['assignedUser'] && res['assignedUser'].length > 0) {
+      for (let i = 0; i < res['assignedUser'].length; i++) {
+        res['assignedUser'][i] = getResource(res['assignedUser'][i], toInt);
+      }
+    }
+    if (key == 'branches' && res['branches'] && res['branches'].length > 0) {
+      for (let i = 0; i < res['branches'].length; i++) {
+        res['branches'][i] = getResource(res['branches'][i], toInt);
+      }
+    }
+    if (key == 'children' && res['children']) {
+      res['children'] = getResource(res['children'], toInt);
+    }
+  }
+  return res;
 };
 
 //审批节点默认属性

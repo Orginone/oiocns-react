@@ -10,7 +10,6 @@ import {
 } from '@ant-design/pro-components';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Form } from 'antd';
-import DefaultProps from '@/bizcomponents/Flow/flow';
 import ProcessCtrl from '@/ts/controller/setting/processCtrl';
 import { optionType } from '@/ts/controller/setting/processType';
 import cls from './index.module.less';
@@ -22,6 +21,7 @@ type BaseInfoProps = {
 /** 傻瓜组件，只负责读取状态 */
 const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
+
   useEffect(() => {
     form.setFieldsValue(currentFormValue);
   }, [currentFormValue]);
@@ -33,7 +33,6 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
         onValuesChange={async () => {
           const currentValue = await form.getFieldsValue();
           onChange(currentValue);
-          DefaultProps.setFormFields(currentValue?.labels);
           ProcessCtrl.setCondtionData(currentValue);
         }}
         form={form}

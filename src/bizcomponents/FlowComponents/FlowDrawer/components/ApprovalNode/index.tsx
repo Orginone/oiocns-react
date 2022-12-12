@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
-// import PersonCustomModal from '../PersonCustomModal';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import processCtrl from '@/ts/controller/setting/processCtrl';
 
 /**
  * @description: 审批对象
@@ -12,10 +11,7 @@ import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
  */
 
 const ApprovalNode = () => {
-  // const personObj = userCtrl.User.getJoinedCohorts();
-  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
-
+  const selectedNode = processCtrl.currentNode;
   const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
   const [processValue, setProcessValue] = useState(1);
@@ -29,7 +25,7 @@ const ApprovalNode = () => {
     selectedNode.props.assignedUser = [
       { name: currentData.data.name, id: currentData.data.id },
     ];
-    setSelectedNode(selectedNode);
+    processCtrl.setCurrentNode(selectedNode);
     setIsApprovalOpen(false);
   };
 
@@ -51,9 +47,8 @@ const ApprovalNode = () => {
             size="small"
             onClick={() => {
               selectedNode.props.assignedType = 'JOB';
-              setSelectedNode(selectedNode);
+              processCtrl.setCurrentNode(selectedNode);
               setIsApprovalOpen(true);
-              // getJoinedCohort();
             }}>
             选择身份
           </Button>
@@ -78,7 +73,7 @@ const ApprovalNode = () => {
           {radioValue === 2 ? (
             <Form.Item label="会签人数">
               <InputNumber
-                onChange={(e) => {
+                onChange={(e: number | null) => {
                   selectedNode.props.num = e;
                 }}
                 placeholder="请设置会签人数"
@@ -121,7 +116,7 @@ const ApprovalNode = () => {
             selectedNode.props.assignedUser = [
               { name: params.data.name, id: params.data.id },
             ];
-            setSelectedNode(selectedNode);
+            processCtrl.setCurrentNode(selectedNode);
             setCurrentData(params);
           }}
         />

@@ -1,12 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input, Form } from 'antd';
-import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import DefaultProps from '@/bizcomponents/Flow/flow';
 import processCtrl from '@/ts/controller/setting/processCtrl';
+import { ConditionCallBackTypes } from '@/ts/controller/setting/processCtrl';
 import {
   nodeType,
   conditionDataType,
   conditiondType,
+  getConditionKeys,
 } from '@/ts/controller/setting/processType';
 import cls from './index.module.less';
 
@@ -40,6 +42,21 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     return [];
   }, []);
 
+  const refreshUI = () => {
+    setCurrentOpNode(processCtrl.currentNode);
+    form.setFieldsValue({ allContent: processCtrl.currentNode?.conditions || [] });
+  };
+
+  useEffect(() => {
+    const id = processCtrl.subscribePart(
+      ConditionCallBackTypes.CurrentOperateNode,
+      refreshUI,
+    );
+    return () => {
+      processCtrl.unsubscribe(id);
+    };
+  }, []);
+
   useEffect(() => {
     // const = DefaultProps.getFormFields(); //所有的条件
     /** 干掉条件不存在的 */
@@ -66,7 +83,6 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
         form={form}
         onValuesChange={async () => {
           const currentValue = await form.getFieldsValue();
-          const currentCondtions = DefaultProps.getFormFields(); //所有的条件
           const newArr: string[] = []; // 重置当前条件 不然会越来越多 给不上值
           currentOpNode?.conditions.map((item: conditiondType, index: number) => {
             /** 怎么知道paramKey有没有变化 */
@@ -84,7 +100,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             setParamKeyArr(newArr);
             item.type = currentValue.allContent[index].type;
             /**当前条件查找，填写paramLabel */
-            const findCon = currentCondtions.find((innItem) => {
+            const findCon = (currentConditions?.labels || []).find((innItem) => {
               return innItem.value === currentValue.allContent[index].paramKey;
             });
             item.paramLabel = findCon ? findCon?.label : '';
@@ -92,7 +108,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             item.key = currentValue.allContent[index].key;
             if (findCon) {
               /** 大于小于条件查找 */
-              const conkeys = DefaultProps.getConditionKeys(findCon.type).find(
+              const conkeys = getConditionKeys(findCon.type).find(
                 (innItem: { value: string; label: string }) => {
                   return innItem.value === currentValue.allContent[index].key;
                 },

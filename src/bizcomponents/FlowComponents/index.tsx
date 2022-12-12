@@ -12,7 +12,6 @@ type ProcessDesignProps = {
 };
 
 const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
-  console.log('processCtrl.scale', processCtrl.scale);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentNode, setCurrentNode] = useState<{ type: AddNodeType }>({
     type: AddNodeType.APPROVAL,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Row, Button, Modal } from 'antd';
+import { Button, Modal } from 'antd';
+import processCtrl from '@/ts/controller/setting/processCtrl';
 import IndentityManage from '@/bizcomponents/IndentityManage';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import cls from './index.module.less';
 
 /**
@@ -10,8 +10,7 @@ import cls from './index.module.less';
  */
 
 const CcNode = () => {
-  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+  const selectedNode = processCtrl.currentNode;
   const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
   const [currentData, setCurrentData] = useState<{
     data: { id: string; name: string };
@@ -20,11 +19,10 @@ const CcNode = () => {
   }>({ title: '', key: '', data: { id: '', name: '' } });
 
   const onOk = () => {
-    console.log('selectedNode.props', selectedNode.props);
     selectedNode.props.assignedUser = [
       { name: currentData.data.name, id: currentData.data.id },
     ];
-    setSelectedNode(selectedNode);
+    processCtrl.setCurrentNode(selectedNode);
     setIsApprovalOpen(false);
   };
 
@@ -72,7 +70,7 @@ const CcNode = () => {
             selectedNode.props.assignedUser = [
               { name: params.data.name, id: params.data.id },
             ];
-            setSelectedNode(selectedNode);
+            processCtrl.setCurrentNode(selectedNode);
             setCurrentData(params);
           }}
         />

@@ -29,17 +29,14 @@ type ProcessTreeProps = {
 
 const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }) => {
   const [key, setKey] = useState(0);
-  console.log('editorValue', editorValue);
-  /**组件渲染中变更dom   共享状态*/
-  let design = useAppwfConfig((state: any) => state.design);
 
+  /**组件渲染中变更dom   共享状态*/
+  let design = processCtrl.currentTreeDesign;
   let currentDom = design.resource;
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
-
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
-  console.log('nodeMap', nodeMap);
 
   const getDomTree = (h: any, node: any) => {
     if (!node || !node.nodeId) {
@@ -216,7 +213,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
 
   // id映射到map，用来向上遍历
   const toMapping = (node: any) => {
-    console.log('这个儿是什么嘞', node);
     if (node && node.nodeId) {
       addNodeMap({ nodeId: node.nodeId, node: node });
     }
@@ -326,7 +322,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   };
   //选中一个节点
   const selectNode = (node: any) => {
-    // console.log('选中一个节点selectedNode', node);
     onSelectedNode(node);
   };
   //处理节点插入逻辑
@@ -338,7 +333,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
     //缓存一下后面的节点
 
     let afterNode = parentNode.children;
-    // console.log('afterNode', afterNode);
     //插入新节点
     parentNode.children = {
       nodeId: getRandomId(),

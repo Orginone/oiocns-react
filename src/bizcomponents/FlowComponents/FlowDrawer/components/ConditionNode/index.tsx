@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Button, message } from 'antd';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import ProcessCtrl, { ConditionCallBackTypes } from '@/ts/controller/setting/processCtrl';
 import { conditionDataType, dataType } from '@/ts/controller/setting/processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
@@ -17,7 +16,6 @@ const ConditionNode = () => {
     labels: [],
   });
   const refreshUI = () => {
-    console.log('监听的条件', ProcessCtrl.conditionData);
     setConditionData(ProcessCtrl.conditionData);
   };
 
@@ -31,8 +29,6 @@ const ConditionNode = () => {
     };
   }, []);
 
-  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
@@ -49,7 +45,6 @@ const ConditionNode = () => {
     } else {
       message.warning('你还未设置条件，请到基本信息填写条件字段');
     }
-    setSelectedNode(selectedNode);
     ProcessCtrl.setCurrentNode(ProcessCtrl.currentNode);
     setKey(key + 1);
   };
@@ -61,7 +56,6 @@ const ConditionNode = () => {
           添加条件
         </Button>
       </div>
-
       {conditionData.labels.length > 0 ? <ConditionGroupItemConfig /> : null}
     </div>
   );

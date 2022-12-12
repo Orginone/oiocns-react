@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Space, Modal, message, Empty, Button } from 'antd';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import AppLogo from '/img/appLogo.png';
 
@@ -23,7 +23,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
   }, [bindAppMes, upDateInit]);
 
   const initData = async () => {
-    const tableData = await SelfAppCtrl.querySelfApps();
+    const tableData = appCtrl.products;
     const needData = tableData.map((item) => {
       return {
         name: item.prod.name,

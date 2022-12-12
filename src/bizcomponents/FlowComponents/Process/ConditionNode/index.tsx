@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import processCtrl from '@/ts/controller/setting/processCtrl';
 
 type ConditionNodeProps = {
   onInsertNode: Function;
@@ -20,7 +20,7 @@ type ConditionNodeProps = {
  */
 const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) => {
   const [showError, setShowError] = useState<boolean>(false);
-  const design = useAppwfConfig((state: any) => state.design);
+
   const delNode = () => {
     props.onDelNode();
   };
@@ -32,9 +32,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
-    const currentCondition = JSON.parse(
-      design.remark === '备注说明' ? '{}' : design.remark,
-    );
+    const currentCondition = processCtrl.conditionData.labels;
     var text = '请设置条件';
     if (conditions && conditions.length > 0) {
       text = '';
@@ -46,10 +44,6 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
           ' 且 ';
       }
       text = text.substring(0, text.lastIndexOf(' 且 '));
-      /** 如果没有找到字段就报错 */
-      // console.log('conditions', conditions);
-      // console.log('currentCondition', currentCondition);
-      /** conditions中的每一项 在currentCondition中都要存在 如果不存在就报错 */
       const getFindValue = conditions.find(
         (item: { paramLabel: string; paramKey: string }) => {
           const findData = currentCondition.find(

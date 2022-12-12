@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Typography } from 'antd';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import processCtrl from '@/ts/controller/setting/processCtrl';
 
 /**
  * @description: 编辑名称
@@ -8,13 +8,10 @@ import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
  */
 
 const EditTitle: React.FC = () => {
-  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const [key, setKey] = useState(0);
-
   const setEditTitle = (e: any) => {
-    selectedNode.name = e;
-    setSelectedNode(selectedNode);
+    processCtrl.currentNode.name = e;
+    processCtrl.setCurrentNode(processCtrl.currentNode);
     setKey(key + 1);
   };
   return (
@@ -22,7 +19,7 @@ const EditTitle: React.FC = () => {
       editable={{ onChange: setEditTitle }}
       level={5}
       style={{ margin: 0 }}>
-      {selectedNode.name}
+      {processCtrl?.currentNode?.name}
     </Typography.Title>
   );
 };

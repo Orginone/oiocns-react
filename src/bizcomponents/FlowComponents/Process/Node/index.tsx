@@ -5,7 +5,7 @@ import {
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
+import InsertButton from '../InsertButton';
 import React from 'react';
 import cls from './index.module.less';
 type NodeProps = {

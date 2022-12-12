@@ -1,5 +1,10 @@
 import { Emitter } from '@/ts/base/common';
-import { conditionDataType, nodeType } from './processType';
+import {
+  conditionDataType,
+  nodeType,
+  AddNodeType,
+  defalutDesignValue,
+} from './processType';
 
 export enum ConditionCallBackTypes {
   'ConditionsData' = 'ConditionsData', // 监听当前操作的条件数据
@@ -11,11 +16,23 @@ class ProcessController extends Emitter {
   /** 流程图大小*/
   private _scale: number = 100;
   private _conditionData: conditionDataType;
-  private _currentNode: nodeType | undefined;
-  private _currentTreeDesign: any;
+  private _currentNode: nodeType;
+  private _currentTreeDesign: any = defalutDesignValue;
   constructor() {
     super();
     this._conditionData = { name: '', fields: '', labels: [] };
+    this._currentNode = {
+      type: AddNodeType.APPROVAL,
+      parentId: '',
+      nodeId: '',
+      name: '',
+      conditions: [],
+      props: {
+        assignedUser: {},
+        assignedType: {},
+        num: 0,
+      },
+    };
   }
   public get scale() {
     return this._scale;
@@ -36,7 +53,7 @@ class ProcessController extends Emitter {
     this.changCallbackPart(ConditionCallBackTypes.ConditionsData);
   }
   // 设置当前操作的节点
-  public setCurrentNode(currentNode: nodeType | undefined) {
+  public setCurrentNode(currentNode: nodeType) {
     this._currentNode = currentNode;
     this.changCallbackPart(ConditionCallBackTypes.CurrentOperateNode);
   }
