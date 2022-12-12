@@ -26,21 +26,21 @@ export const indentitycolumns: ColumnsType<any> = [
   {
     title: '序号',
     fixed: 'left',
-    width: 50,
+    width: 60,
     render: (_key: any, _record: any, index: number) => {
       return index + 1;
     },
   },
   {
-    title: '组织名称',
-    dataIndex: ['belong', 'name'],
+    title: 'ID',
+    dataIndex: 'id',
   },
   {
-    title: '业务',
+    title: '身份名称',
     dataIndex: 'name',
   },
   {
-    title: '角色',
+    title: '职权',
     dataIndex: 'name',
   },
   {

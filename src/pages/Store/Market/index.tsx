@@ -4,7 +4,6 @@ import React from 'react';
 import { renderRoutes } from 'react-router-config';
 import ContentTemplate from '@/components/ContentTemplate';
 import { IRouteConfig } from 'typings/globelType';
-import MarketClassify from './Classify';
 interface PageType {
   route: IRouteConfig;
   history: any;
@@ -15,9 +14,9 @@ interface PageType {
  * @return {*}
  */
 const Market: React.FC<PageType> = (props) => {
-  const { route, history } = props;
+  const { route } = props;
   return (
-    <ContentTemplate sider={<MarketClassify history={history} />} type="market">
+    <ContentTemplate sider={<div></div>} type="market">
       {renderRoutes(route.routes)}
     </ContentTemplate>
   );

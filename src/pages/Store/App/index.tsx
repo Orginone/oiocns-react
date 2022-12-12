@@ -1,5 +1,5 @@
 import { Card, message, Modal } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -13,6 +13,7 @@ import StoreRecent from '../components/Recent';
 import { common } from 'typings/common';
 import TreeComp from './Classify';
 import MoveApp from './moveApp';
+import PublishComp from './PublishList';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -84,6 +85,7 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/info' });
         },
       },
+
       // {
       //   key: 'manage',
       //   label: '管理',
@@ -102,6 +104,14 @@ const StoreApp: React.FC = () => {
           history.push({
             pathname: '/store/app/putaway',
           });
+        },
+      },
+      {
+        key: 'publish',
+        label: '上架列表',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          history.push({ pathname: '/store/app/publish' });
         },
       },
       ...shareArr,
@@ -132,35 +142,34 @@ const StoreApp: React.FC = () => {
     });
   };
   // 应用首页dom
-  const AppIndex = useMemo(() => {
-    return (
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        {appCtrl.alwaysUseApps.length > 0 ? (
-          <StoreRecent dataSource={appCtrl.alwaysUseApps} />
-        ) : (
-          ''
-        )}
-        <Card
-          title="我的应用"
-          className={cls['app-tabs']}
-          extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-          tabList={getItems()}
-          activeTabKey={statusKey}
-          onTabChange={(k) => {
-            setStatusKey(k as ststusTypes);
-          }}>
-          <div className={cls['page-content-table']}>
-            <AppShowComp
-              list={appCtrl.products}
-              searchParams={{ status: statusKey }}
-              columns={myColumns}
-              renderOperation={renderOperation}
-            />
-          </div>
-        </Card>
-      </div>
-    );
-  }, [key, statusKey]);
+  const AppIndex = (
+    <div key={key} className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+      {appCtrl.alwaysUseApps.length > 0 ? (
+        <StoreRecent dataSource={appCtrl.alwaysUseApps} />
+      ) : (
+        ''
+      )}
+      <Card
+        title="我的应用"
+        className={cls['app-tabs']}
+        extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
+        tabList={getItems()}
+        activeTabKey={statusKey}
+        onTabChange={(k) => {
+          setStatusKey(k as ststusTypes);
+        }}>
+        <div className={cls['page-content-table']}>
+          <AppShowComp
+            list={appCtrl.products}
+            searchParams={{ status: statusKey }}
+            columns={myColumns}
+            renderOperation={renderOperation}
+            tkey={key}
+          />
+        </div>
+      </Card>
+    </div>
+  );
   const handleSubmitShare = async () => {
     if (appCtrl.curProduct) {
       if (checkNodes?.createList?.length > 0) {
@@ -202,18 +211,11 @@ const StoreApp: React.FC = () => {
           }}
         />
       </Modal>
-      {/* <DeleteCustomModal
-        title="警告"
-        open={isDeleteOpen}
-        deleOrQuit="delete"
-        onOk={onOk}
-        onCancel={onCancel}
-        content={SelfAppCtrl.curProduct!.prod.name}
-      /> */}
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
       <Route exact path="/store/app/create" component={CreateApp}></Route>
+      <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       <TreeComp />
       <MoveApp appid={''} />

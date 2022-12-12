@@ -1,4 +1,4 @@
-import { Card, Layout, Steps, Button, Modal, message, Space, Avatar } from 'antd';
+import { Card, Layout, Steps, Button, Modal, message, Space } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import {
@@ -32,15 +32,16 @@ export enum StepType {
   'BASEINFO',
   'PROCESSMESS',
 }
-export const stepTypeAndNameMaps: Record<StepType, string> = {
-  [StepType.BASEINFO]: '基本信息',
-  [StepType.PROCESSMESS]: '流程设计',
-};
 
 export enum TabType {
   'TABLEMES', //表格
   'PROCESSDESIGN', //流程
 }
+
+export const stepTypeAndNameMaps: Record<StepType, string> = {
+  [StepType.BASEINFO]: '基本信息',
+  [StepType.PROCESSMESS]: '流程设计',
+};
 
 type FlowItem = {
   content: string;
@@ -97,7 +98,7 @@ const SettingFlow: React.FC = () => {
     {
       title: '备注',
       ellipsis: true,
-      render: (text, record) => {
+      render: (_, record) => {
         return <div>{JSON.parse(record.content || '{}').fields}</div>;
       },
     },
@@ -122,6 +123,14 @@ const SettingFlow: React.FC = () => {
     }
   };
 
+  const clearFrom = () => {
+    setDesignData(null);
+    setEditorValue(null);
+    setTabType(TabType.TABLEMES);
+    setCurrentStep(StepType.BASEINFO);
+    setConditionData({ name: '', labels: [{}], fields: '' });
+  };
+
   const changeScale = (val: any) => {
     setScale(val);
   };
@@ -137,14 +146,13 @@ const SettingFlow: React.FC = () => {
     if (result) {
       message.info(result.id ? '编辑成功' : '发布成功');
       // 清理数据
-      initData();
-      setDesignData(null);
-      setEditorValue(null);
-      setTabType(TabType.TABLEMES);
+      await initData();
+      clearFrom();
     } else {
       return false;
     }
   };
+
   const parentRef = useRef<any>(null);
 
   const renderOperation = (record: FlowItem): any[] => {
@@ -165,8 +173,8 @@ const SettingFlow: React.FC = () => {
             title: '与该流程相关的未完成待办将会重置，是否确定编辑?',
             icon: <ExclamationCircleOutlined />,
             okText: '确认',
-            okType: 'danger',
             cancelText: '取消',
+            okType: 'danger',
             onOk: () => {
               setTabType(TabType.PROCESSDESIGN);
               setCurrentStep(StepType.PROCESSMESS);
@@ -189,8 +197,7 @@ const SettingFlow: React.FC = () => {
         label: '删除',
         style: { color: 'red' },
         onClick: async () => {
-          const currentData = await userCtrl.space.deleteDefine(record?.id);
-          if (currentData) {
+          if (await userCtrl.space.deleteDefine(record.id)) {
             initData();
             message.success('删除成功');
           }
@@ -295,11 +302,7 @@ const SettingFlow: React.FC = () => {
                           okType: 'danger',
                           cancelText: '取消',
                           onOk() {
-                            setTabType(TabType.TABLEMES);
-                            setCurrentStep(StepType.BASEINFO);
-                            setConditionData({ name: '', labels: [{}], fields: '' });
-                            setDesignData(null);
-                            setEditorValue(null);
+                            clearFrom();
                           },
                           onCancel() {},
                         });

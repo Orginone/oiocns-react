@@ -1,6 +1,6 @@
 import { model, schema } from '@/ts/base';
 import { FileItemShare, PageRequest, TargetModel } from '@/ts/base/model';
-import { XTarget, XTargetArray } from '@/ts/base/schema';
+import { XIdentity, XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetType } from '../enum';
 import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
@@ -266,6 +266,21 @@ export interface IMTarget {
    * @param reload 是否强制刷新
    */
   getUsefulResource(id: string, reload: boolean): Promise<schema.XResource[]>;
+  /**
+   * 下单
+   * @param nftId 区块链Id
+   * @param name 订单名称
+   * @param code 订单编号
+   * @param spaceId 空间Id
+   * @param merchandiseIds 商品Id集合
+   */
+  createOrder(
+    nftId: string,
+    name: string,
+    code: string,
+    spaceId: string,
+    merchandiseIds: string[],
+  ): Promise<schema.XOrder>;
 }
 export interface IFlow {
   /** 流程定义 */
@@ -613,12 +628,12 @@ export interface IStation extends ITarget {
   /** 删除 */
   delete(): Promise<boolean>;
   /** 加载岗位下的身份 */
-  loadIdentitys(page: PageRequest): Promise<schema.XIdentityArray>;
+  loadIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /**
    * 添加岗位身份
-   * @param {string[]} ids 身份ID数组
+   * @param {string[]} identitys 身份数组
    */
-  pullIdentitys(ids: string[]): Promise<boolean>;
+  pullIdentitys(identitys: XIdentity[]): Promise<boolean>;
   /**
    * 移除岗位身份
    * @param {string[]} ids 身份ID数组

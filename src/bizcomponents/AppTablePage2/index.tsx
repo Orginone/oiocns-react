@@ -3,8 +3,9 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
-import IProduct from '@/ts/core/market/iproduct';
+import { XProduct } from '@/ts/base/schema';
 interface AppShowCompType {
+  tkey: string;
   list: any[];
   queryFun?: Function;
   searchParams?: any | { status: ststusTypes };
@@ -18,6 +19,7 @@ interface AppShowCompType {
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const AppShowComp: React.FC<AppShowCompType> = ({
+  tkey,
   queryFun,
   list,
   searchParams,
@@ -30,42 +32,49 @@ const AppShowComp: React.FC<AppShowCompType> = ({
 }) => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [dataSource, setSataSource] = useState(list);
+  // const [dataSource, setSataSource] = useState<any[]>([]);
 
   const parentRef = useRef<any>(null); //父级容器Dom
   useEffect(() => {
-    if (!list?.length) {
-      return;
-    }
+    // setSataSource([...list.map((v) => v.prod)]);
+    setTotal(list.length);
+  }, [list]);
 
-    if (!searchParams || searchParams.status === '全部') {
-      setTotal(list.length);
-      setSataSource([...list]);
-    } else {
-      const result = list.filter((item) => {
-        return item?.source === searchParams.status;
-      });
-      setTotal(result.length);
-      setSataSource([...result]);
-    }
-  }, [searchParams, list]);
+  // useEffect(() => {
+  //   if (!list?.length) {
+  //     return;
+  //   }
+
+  //   if (!searchParams || searchParams.status === '全部') {
+  //     setTotal(list.length);
+  //     setSataSource([...list]);
+  //   } else {
+  //     const result = list.filter((item) => {
+  //       return item?.source === searchParams.status;
+  //     });
+  //     setTotal(result.length);
+  //     setSataSource([...result]);
+  //   }
+  // }, [searchParams, list]);
 
   /**
    * handlePageChage
    */
   const handlePageChange = (page: number, pageSize: number) => {
     setPage(page);
-    queryFun && queryFun({ page, pageSize });
+    console.log('切换页码', page, pageSize);
+
+    // queryFun && queryFun({ page, pageSize });
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
-    return dataArr.map((item: IProduct) => {
+  const renderCardFun = (dataArr: XProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: XProduct) => {
       return (
         <AppCard
           className="card"
           data={item}
-          key={item.prod.id}
+          key={item.id}
           defaultKey={{
             name: 'name',
             size: 'price',
@@ -80,8 +89,8 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<IProduct>
-        dataSource={dataSource}
+      <CardOrTable<XProduct>
+        dataSource={list}
         total={total}
         page={page}
         // pageSize={2}
@@ -92,7 +101,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: IProduct) => record.prod?.id || 'id'}
+        rowKey={(record: any) => record.id}
         toolBarRender={toolBarRender}
         {...rest}
       />
@@ -100,4 +109,4 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   );
 };
 
-export default AppShowComp;
+export default React.memo(AppShowComp);

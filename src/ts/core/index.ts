@@ -30,6 +30,8 @@ export type {
   ITarget,
   IWorking,
 } from './target/itarget';
+export type { INullSpeciesItem, ISpeciesItem } from './thing';
+export { loadSpeciesTree } from './thing';
 export type { IApplyItem, IApprovalItem, IOrderApplyItem, ITodoGroup } from './todo';
 export {
   loadAppTodo,

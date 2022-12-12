@@ -1,4 +1,4 @@
-import { IMarket, IMTarget, createMarket, emitter, DomainTypes } from '@/ts/core';
+import { IMTarget, emitter, DomainTypes } from '@/ts/core';
 import { kernel } from '@/ts/base';
 import { myColumns, marketColumns } from './config';
 import { JOIN_SHOPING_CAR, USER_MANAGEMENT } from '@/constants/const';
@@ -15,10 +15,6 @@ export enum MarketCallBackTypes {
 class MarketController extends Emitter {
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
-  /** 当前操作的市场 */
-  private _curMarket: IMarket | undefined;
-  /** 当前展示 菜单 */
-  private _currentMenu = 'Public';
   /** 判断当前所处页面类型,调用不同请求 */
   public curPageType: 'app' | 'market' = 'market';
   /** 商店table数据 */
@@ -81,33 +77,6 @@ class MarketController extends Emitter {
     }
   }
 
-  /** 获取当前操作的市场 */
-  public getCurrentMarket() {
-    return this._curMarket;
-  }
-
-  /** 切换市场 */
-  public setCurrentMarket(market: IMarket) {
-    this._curMarket = market;
-    this.getMember();
-    this.changCallback();
-  }
-
-  /**
-   * @desc: 切换侧边栏 触发 展示数据变化
-   * @param {any} menuItem
-   * @return {*}
-   */
-  public async changeMenu(menuItem: any) {
-    this._curMarket = menuItem.node ?? createMarket(menuItem); // 当前商店信息
-    // 点击重复 则判定为无效
-    if (this._currentMenu === menuItem.title) {
-      return;
-    }
-    this._currentMenu = menuItem.title;
-    this.getStoreProduct(this.curPageType);
-  }
-
   /**
    * @desc: 获取表格头部展示数据
    * @return {*}
@@ -124,52 +93,6 @@ class MarketController extends Emitter {
     }
     //TODO:待完善
   }
-
-  /** 获取我的应用列表/商店-商品列表
-   * @desc: 获取主体展示数据 --根据currentMenu 判断请求 展示内容
-   * @return {*}
-   */
-  public getStoreProduct = async (params?: any) => {
-    params = {
-      offset: (params?.page - 1) * params?.pageSize ?? 0,
-      limit: params?.pageSize ?? 10,
-      filter: '',
-    };
-    this._marketTableList = await this._curMarket?.getMerchandise(params);
-    this.changCallbackPart(MarketCallBackTypes.MarketShop);
-  };
-
-  /**
-   * @description: 获取市场里的所有用户
-   * @return {*}
-   */
-  public getMember = async (params?: any) => {
-    params = {
-      offset: (params?.page - 1) * params?.pageSize ?? 0,
-      limit: params?.pageSize ?? 10,
-      filter: params?.filter ?? '',
-    };
-    this.marketMenber = await this._curMarket?.getMember({ ...params });
-    this.cacheUserManagement(this.marketMenber);
-  };
-
-  /**
-   * @description: 移出市场里的成员
-   * @param {string} targetIds
-   * @return {*}
-   */
-  public removeMember = async (targetIds: string[]) => {
-    if (await this._curMarket?.removeMember(targetIds)) {
-      if (this.marketMenber.length > 0) {
-        let arrs = this.marketMenber.filter((item: any) =>
-          targetIds.some((ele: any) => ele.id === item?.target?.id),
-        );
-        this.marketMenber = arrs;
-        this.cacheUserManagement(this.marketMenber);
-      }
-      message.success('移出成功');
-    }
-  };
 
   /**
    * @description: 添加商品进购物车
@@ -216,10 +139,10 @@ class MarketController extends Emitter {
       this._shopingIds.push(item?.id);
     });
     if (
-      await this._curMarket?.createOrder(
+      await this._target?.createOrder(
         '',
-        'order',
-        'code',
+        data[0].caption + (data.length > 1 ? `...等${data.length}件商品` : ''),
+        new Date().getTime().toString().substring(0, 13),
         userCtrl.space.id,
         this._shopingIds,
       )

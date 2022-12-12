@@ -143,7 +143,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         <div className={cls.treeTitleBoxBtns} onClick={(e: any) => e.stopPropagation()}>
           {mouseOverItem.key === node.key ? (
             <>
-              {menu ? (
+              {menu && node[menu as string] ? (
                 <Dropdown
                   menu={{
                     items: renderMenu(node),

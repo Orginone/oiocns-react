@@ -31,14 +31,21 @@ export default class Company extends MarketTarget implements ICompany {
   userId: string;
   cohorts: ICohort[] = [];
   workings: IWorking[] = [];
+  departmentTypes: TargetType[] = [];
 
   constructor(target: schema.XTarget, userId: string) {
     super(target);
     this.userId = userId;
-    this.subTeamTypes = [...departmentTypes, TargetType.Working];
+    this.departmentTypes = departmentTypes;
+    this.subTeamTypes = [...this.departmentTypes, TargetType.Working];
     this.extendTargetType = [...this.subTeamTypes, ...companyTypes];
     this.joinTargetType = [TargetType.Group];
-    this.createTargetType = [...this.subTeamTypes, TargetType.Group, TargetType.Cohort];
+    this.createTargetType = [
+      ...this.subTeamTypes,
+      TargetType.Station,
+      TargetType.Group,
+      TargetType.Cohort,
+    ];
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
   public get subTeam(): ITarget[] {
@@ -119,7 +126,7 @@ export default class Company extends MarketTarget implements ICompany {
   public async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getWorkings(reload);
     await this.getDepartments(reload);
-    return [...this.departments, ...this.cohorts];
+    return [...this.departments, ...this.workings];
   }
   public async searchGroup(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Group]);
@@ -155,7 +162,7 @@ export default class Company extends MarketTarget implements ICompany {
   ): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
     data.teamName = data.teamName == '' ? data.name : data.teamName;
-    if (!departmentTypes.includes(data.typeName as TargetType)) {
+    if (!this.departmentTypes.includes(data.typeName as TargetType)) {
       logger.warn('不支持该机构');
       return;
     }
@@ -179,7 +186,7 @@ export default class Company extends MarketTarget implements ICompany {
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
       const station = new Station(res.data, () => {
-        this.workings = this.workings.filter((item) => {
+        this.stations = this.stations.filter((item) => {
           return item.id != station.id;
         });
       });
@@ -297,7 +304,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (!reload && this.departments.length > 0) {
       return this.departments;
     }
-    const res = await this.getSubTargets(departmentTypes);
+    const res = await this.getSubTargets(this.departmentTypes);
     if (res.success && res.data.result) {
       this.departments = res.data.result.map((a) => {
         return new Department(a, () => {

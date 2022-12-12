@@ -13,92 +13,113 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from 'typings/globelType';
 import { MenuProps } from 'antd';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { emitter } from '@/ts/core';
 
 /* 信息中心菜单 */
 const infoMenuItems = [
-  { label: '单位信息', key: 'info', icon: <InfoCircleOutlined /> },
+  {
+    label: '单位信息',
+    space: 'company',
+    key: '/setting/info',
+    icon: <InfoCircleOutlined />,
+  },
   {
     label: '内设机构',
-    key: 'dept',
+    key: '/setting/dept',
+    space: 'company',
     icon: <ApartmentOutlined />,
     children: [],
     render: <></>,
   },
   {
     label: '集团设置',
-    key: 'group',
+    key: '/setting/group',
+    space: 'company',
     icon: <FundOutlined />,
     children: [],
     render: <></>,
   },
   {
     label: '岗位设置',
-    key: 'position',
+    key: '/setting/position',
+    space: 'company',
     icon: <ApartmentOutlined />,
     children: [],
     render: <></>,
   },
-  { label: '群组设置', key: 'cohort', icon: <TeamOutlined /> },
-  { label: '帮助中心', key: 'help', icon: <SmileOutlined /> },
+  { label: '个人信息', space: 'user', key: '/person/info', icon: <UserOutlined /> },
+  { label: '好友设置', space: 'user', key: '/setting/friend', icon: <UserOutlined /> },
+  { label: '群组设置', space: 'all', key: '/setting/cohort', icon: <TeamOutlined /> },
+  { label: '帮助中心', space: 'all', key: '/setting/help', icon: <SmileOutlined /> },
 ];
 
-const userInfoMenuItems = [
-  { label: '好友设置', key: '/setting/friend', icon: <UserOutlined /> },
-  { label: '群组设置', key: '/setting/cohort', icon: <TeamOutlined /> },
-];
 /* 自定义设置菜单 */
 const configMenuItems = [
-  { label: '单位首页', key: 'homeset', icon: <HomeOutlined /> },
-  { label: '数据设置', key: 'data', icon: <SettingOutlined /> },
-  { label: '资源设置', key: 'src', icon: <SettingOutlined /> },
-  { label: '应用设置', key: 'app', icon: <AppstoreOutlined /> },
-  { label: '流程设置', key: 'flow', icon: <ForkOutlined /> },
-  { label: '标准设置', key: 'standard', icon: <SettingOutlined /> },
-  { label: '权限设置', key: 'auth', icon: <SettingOutlined /> },
-];
-const muneItems = [
   {
-    type: 'group',
-    label: '组织设置',
-    children: infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key })),
+    label: '标准制定',
+    key: '/setting/standard',
+    space: 'company',
+    icon: <SettingOutlined />,
+    children: [],
+    render: <></>,
   },
+  { label: '流程设置', key: '/setting/flow', space: 'company', icon: <ForkOutlined /> },
   {
-    type: 'group',
-    label: '配置中心',
-    children: configMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key })),
+    label: '单位首页',
+    key: '/setting/homeset',
+    space: 'company',
+    icon: <HomeOutlined />,
   },
+  { label: '数据设置', key: '/setting/data', space: 'all', icon: <SettingOutlined /> },
+  { label: '资源设置', key: '/setting/src', space: 'all', icon: <SettingOutlined /> },
+  { label: '应用设置', key: '/setting/app', space: 'all', icon: <AppstoreOutlined /> },
+  { label: '权限设置', key: '/setting/auth', space: 'all', icon: <SettingOutlined /> },
 ];
 
-const Setting: React.FC = ({ route, history }) => {
+const getMenuItems = (spaces: string[]) => {
+  return [
+    {
+      type: 'group',
+      label: '组织设置',
+      children: infoMenuItems.filter((i) => {
+        return spaces.includes(i.space);
+      }),
+    },
+    {
+      type: 'group',
+      label: '配置中心',
+      children: configMenuItems.filter((i) => {
+        return spaces.includes(i.space);
+      }),
+    },
+  ];
+};
+
+const Setting: React.FC<any> = ({ route, history }: { route: any; history: any }) => {
   const toNext = (e: any) => {
     history.push(`${e.key}`);
   };
-  const [menus, setMenu] = useState(muneItems);
+  const [menus, setMenu] = useState(getMenuItems(['all', 'user']));
 
   const changeMenu = () => {
-    let [_newMenu, ...other] = [...muneItems];
-    _newMenu.children = !userCtrl.isCompanySpace
-      ? userInfoMenuItems
-      : infoMenuItems.map((n) => ({ ...n, key: '/setting/' + n.key }));
-    setMenu([{ ..._newMenu }, ...other]);
-
     if (userCtrl.isCompanySpace) {
+      setMenu(getMenuItems(['all', 'company']));
       if (location.hash.endsWith('/friend')) {
         history.push({ pathname: '/setting/info' });
       }
     } else {
+      setMenu(getMenuItems(['all', 'user']));
       if (!location.hash.endsWith('/cohort')) {
         history.push({ pathname: '/setting/friend' });
       }
     }
   };
   useEffect(() => {
-    const id = userCtrl.subscribe(changeMenu);
+    const id = emitter.subscribe(changeMenu);
     return () => {
-      userCtrl.unsubscribe(id);
+      emitter.unsubscribe(id);
     };
   }, []);
   return (

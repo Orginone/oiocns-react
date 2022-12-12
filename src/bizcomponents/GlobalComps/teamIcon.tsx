@@ -15,7 +15,7 @@ interface teamTypeInfo {
 /** 组织图标 */
 const TeamIcon = (info: teamTypeInfo) => {
   const [preview, setPreview] = useState(false);
-  if (info.avatar) {
+  if (info.avatar && info.avatar.thumbnail) {
     return (
       <div style={{ cursor: 'pointer' }} title="点击预览">
         {info.preview && (
@@ -40,29 +40,48 @@ const TeamIcon = (info: teamTypeInfo) => {
       </div>
     );
   }
+  let icon;
   switch (info.typeName) {
     case TargetType.Group:
-      return <im.ImTree />;
+      icon = <im.ImTree />;
+      break;
     case TargetType.Company:
-      return <im.ImOffice />;
+      icon = <im.ImOffice />;
+      break;
     case TargetType.Section:
     case TargetType.Department:
       return <im.ImLibrary />;
+    case TargetType.College:
+      return <im.ImTrophy />;
     case TargetType.Laboratory:
-      return <im.ImJoomla />;
+      icon = <im.ImJoomla />;
+      break;
     case TargetType.Office:
-      return <im.ImBriefcase />;
+      icon = <im.ImBriefcase />;
+      break;
     case TargetType.Research:
-      return <im.ImFlickr4 />;
+      icon = <im.ImFlickr4 />;
+      break;
     case TargetType.Working:
-      return <im.ImUsers />;
+      icon = <im.ImUsers />;
+      break;
     case TargetType.Cohort:
-      return <im.ImBubbles />;
+      icon = <im.ImBubbles />;
+      break;
     case TargetType.Person:
-      return <im.ImUserTie />;
+      icon = <im.ImUserTie />;
+      break;
     default:
-      return <im.ImSvg />;
+      icon = <im.ImSvg />;
+      break;
   }
+  return (
+    <Avatar
+      size={info.size ?? 24}
+      icon={icon}
+      style={{ background: 'transparent', color: '#606060' }}
+    />
+  );
 };
 
 export default TeamIcon;

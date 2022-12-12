@@ -126,7 +126,7 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     console.log(req, searchKey, isGofirst);
     const person: IPerson = userCtrl.user;
     const joinCompanys = await person.getJoinedCompanys(false);
-    console.log(joinCompanys);
+    // console.log(joinCompanys);
     setList(joinCompanys);
     setTotal(joinCompanys.length);
   };

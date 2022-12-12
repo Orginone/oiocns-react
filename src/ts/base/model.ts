@@ -57,6 +57,8 @@ export type IdReq = {
 export type NameModel = {
   // 结果
   name: string;
+  // 图片
+  photo: string;
 };
 
 export type IdReqModel = {

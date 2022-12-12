@@ -73,7 +73,7 @@ const Groupdetail = () => {
     setRemoveOpen(false);
   };
   if (chatCtrl.chat === undefined) {
-    return '';
+    return <></>;
   }
   /**
    * @description: 头像

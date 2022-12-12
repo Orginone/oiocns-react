@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Button, Popover, Image, Spin, Typography } from 'antd';
+import { Button, Popover, Image, Spin } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -11,7 +11,6 @@ import { XImMsg } from '@/ts/base/schema';
 import { MessageType, TargetType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IChat } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { parseAvatar } from '@/ts/base';
 

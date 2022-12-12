@@ -54,7 +54,7 @@ const Groupheader = (props: Iprops) => {
   };
 
   if (chatCtrl.chat === undefined) {
-    return '';
+    return <></>;
   }
   return (
     <>

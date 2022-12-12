@@ -30,7 +30,9 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
     const res = (
       await data.loadMembers({ offset: 0, filter: '', limit: 65535 })
     ).result!.filter((obj) => obj.id === data.target.belongId);
-    setName(res[0].team?.name ?? '');
+    if (res.length > 0) {
+      setName(res[0].team?.name ?? '');
+    }
   };
 
   const Title = () => {

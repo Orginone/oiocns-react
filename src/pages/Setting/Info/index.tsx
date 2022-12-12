@@ -45,6 +45,9 @@ const SettingInfo: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
   const [dataSource, setDataSource] = useState<IGroup[]>([]); // 加入的集团
+  if (!userCtrl.isCompanySpace) {
+    history.goBack();
+  }
   const info = userCtrl.company.target;
 
   useEffect(() => {
@@ -223,7 +226,7 @@ const SettingInfo: React.FC = () => {
           title="邀请成员"
           destroyOnClose
           open={activeModal === 'addOne'}
-          width={1024}
+          width={900}
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && userCtrl.company) {

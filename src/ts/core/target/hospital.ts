@@ -6,11 +6,11 @@ export default class Hospital extends Company {
   constructor(target: schema.XTarget, userId: string) {
     super(target, userId);
     this.subTeamTypes = [
-      TargetType.Group,
       TargetType.JobCohort,
       TargetType.Office,
       TargetType.Working,
       TargetType.Section,
+      TargetType.Station,
       TargetType.Laboratory,
     ];
   }

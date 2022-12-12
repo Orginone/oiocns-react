@@ -236,11 +236,6 @@ const StoreRouter: IRouteConfig[] = [
 /* 市场 */
 const MarketRouter: IRouteConfig[] = [
   {
-    path: '/market/shopingcar',
-    title: '购物车',
-    component: React.lazy(() => import('@/pages/Store/Market/ShopingCar')),
-  },
-  {
     path: '/market',
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
@@ -251,28 +246,6 @@ const MarketRouter: IRouteConfig[] = [
         title: '应用市场',
         icon: 'icon-message',
         component: React.lazy(() => import('@/pages/Store/Market/Shop')),
-      },
-      {
-        path: '/market/docx',
-        title: '文档市场',
-        icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Store/Market/Docx')),
-      },
-      {
-        path: '/market/data',
-        title: '数据市场',
-        component: React.lazy(() => import('@/pages/Store/Market/Data')),
-      },
-      {
-        path: '/market/publicProperty',
-        title: '公物仓',
-        component: React.lazy(() => import('@/pages/Store/Market/PublicProperty')),
-      },
-      {
-        path: '/market/usermanagement',
-        title: '用户管理',
-        icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Store/Market/UserManagement')),
       },
       {
         path: '/market',

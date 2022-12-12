@@ -26,6 +26,9 @@ export default class Department extends BaseTarget implements IDepartment {
     } else {
       this.subTeamTypes = [TargetType.JobCohort, TargetType.Working];
     }
+    if (this.typeName === TargetType.College) {
+      this.subTeamTypes.unshift(TargetType.Major);
+    }
     this.createTargetType = [...this.subTeamTypes];
   }
   public get subTeam(): ITarget[] {

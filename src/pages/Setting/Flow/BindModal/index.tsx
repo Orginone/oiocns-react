@@ -142,6 +142,8 @@ const BindModal: React.FC<Bindmodalprops> = ({
                   if (row?.id) {
                     Modal.confirm({
                       title: '提示',
+                      okText: '确认',
+                      cancelText: '取消',
                       content: '确定删除当前已绑定的应用?',
                       onOk: () => {
                         userCtrl.space

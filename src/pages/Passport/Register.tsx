@@ -1,3 +1,4 @@
+import { RegisterType } from '@/ts/base/model';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
@@ -6,22 +7,13 @@ import { Link, useHistory } from 'react-router-dom';
 
 import cls from './index.module.less';
 
-type RegisterReq = {
-  account?: string;
-  password?: string;
-  nickName?: string;
-  name?: string;
-  phone?: string;
-  motto?: string;
-};
-
 const { Step } = Steps;
 
 const steps = ['账户验证', '填写信息'];
 
 const PassportRegister: React.FC = () => {
   const [current, setCurrent] = useState(0);
-  const [body, setBody] = useState<RegisterReq>({});
+  const [body, setBody] = useState<RegisterType>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState<String>();
   const history = useHistory();
@@ -47,36 +39,35 @@ const PassportRegister: React.FC = () => {
       return;
     }
     setCurrent(current + 1);
-    setBody({ ...body, ...{ account: val.account, password } });
+    setBody({ account: val.account, password } as RegisterType);
   };
 
   // 注册
   const registerAction = async (val: any) => {
+    if (body === undefined) return;
     if (!/^[\u4e00-\u9fa5]{2,8}$/.test(val.name)) {
       message.warn('请输入正确的姓名');
       return;
     }
+    body.name = val.name;
     if (!/(^1[3|4|5|7|8|9]\d{9}$)|(^09\d{8}$)/.test(val.phone)) {
       message.warn('请输入正确的手机号');
       return;
     }
+    body.phone = val.phone;
     if (val.nickName && val.nickName.trim() === '') {
       message.warn('请输入正确的昵称');
       return;
     }
-    if (val.nickName && val.motto.trim() === '') {
+    body.nickName = val.nickName;
+    if (val.motto.trim() === '') {
       message.warn('请输入正确的座右铭');
       return;
     }
+    body.motto = val.motto;
+    body.avatar = '';
     // 请求
-    const res = await userCtrl.register(
-      val.name,
-      val.motto,
-      val.phone,
-      body.account ?? '',
-      body.password ?? '',
-      val.nickName,
-    );
+    const res = await userCtrl.register(body);
     if (res.success) {
       message.success('注册成功！');
       setPrivateKey(res.data.privateKey);

@@ -1,7 +1,6 @@
 import { Col, Layout, MenuProps, Row, Space } from 'antd';
 import React, { useState } from 'react';
 import { IRouteConfig } from 'typings/globelType';
-import { Link } from 'react-router-dom';
 import BreadCrumbBox from '../BreadCrumb';
 import ContentMenu from '../ContentMenu';
 import { TOOBAR_TYPE, toobarTypeAndNameMaps } from '@/constants/content_template';
@@ -92,10 +91,12 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
                   {toobarTypeAndNameMaps[TOOBAR_TYPE.COMMEMNT]}
                 </a>
                 {type === 'market' ? (
-                  <a>
-                    <Link to="/market/shopingcar">
-                      {toobarTypeAndNameMaps[TOOBAR_TYPE.STORAGE]}
-                    </Link>
+                  <a
+                    onClick={() => {
+                      setCurrentType(TOOBAR_TYPE.SHOPCARD);
+                      setOpen(true);
+                    }}>
+                    {toobarTypeAndNameMaps[TOOBAR_TYPE.SHOPCARD]}
                   </a>
                 ) : (
                   <a
