@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { CheckCard } from '@ant-design/pro-components';
-import { Button, Dropdown } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Modal } from 'antd';
+import { CheckCircleOutlined, EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import appImg from '/img/appLogo.png';
-import BuyCustomModal from '@/bizcomponents/AppTableWithBuy/BuyCustomModal';
 import { MarketTypes } from 'typings/marketType';
 
 interface Iprops {
@@ -47,25 +46,6 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
     typeName = 'typeName',
     creatTime = 'creatTime',
   } = { ...defaultObj, ...defaultKey };
-  const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
-  const [nowBuy, setNowBuy] = useState<any>([]); // 立即购买
-
-  /**
-   * @description: 购买商品
-   * @return {*}
-   */
-  const OnBuyShoping = async () => {
-    await marketCtrl.buyShoping(nowBuy);
-    setIsBuy(false);
-  };
-
-  /**
-   * @description: 取消订单
-   * @return {*}
-   */
-  const onCancel = () => {
-    setIsBuy(false);
-  };
 
   function renderName() {
     return (
@@ -92,8 +72,12 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
               className={cls.btn}
               shape="round"
               onClick={() => {
-                setIsBuy(true);
-                setNowBuy([data]);
+                Modal.confirm({
+                  title: '确认订单',
+                  content: '此操作将生成交易订单。是否确认',
+                  icon: <CheckCircleOutlined className={cls['buy-icon']} />,
+                  onOk: async () => await marketCtrl.buyShoping([data]),
+                });
               }}>
               立即购买
             </Button>
@@ -121,13 +105,6 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
         className={`${cls.buyCard} ${className}`}
         description={renderDesc()}
         onClick={onClick}
-      />
-      <BuyCustomModal
-        open={isBuy}
-        title="确认订单"
-        onOk={OnBuyShoping}
-        onCancel={onCancel}
-        content="此操作将生成交易订单。是否确认"
       />
     </>
   );

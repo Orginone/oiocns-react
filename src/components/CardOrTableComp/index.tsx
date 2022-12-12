@@ -117,7 +117,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   }, [columns, operation]);
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
-    console.log(dataSource);
     return (
       <ProTable //pageType === 'table' ? (
         className={cls['common-table']}
@@ -178,16 +177,19 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             props.action.dataSource.length === 0 ? (
               defaultDom
             ) : (
-              [defaultDom, TableFooter]
+              <div>
+                {defaultDom}
+                {TableFooter}
+              </div>
             )
           ) : (
-            <div key="card">
+            <>
               {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
               <div
                 className={cls['common-card']}
                 style={{
                   height:
-                    defaultHeight !== 'auto' ? defaultHeight + 70 + 'px' : defaultHeight,
+                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>
                 {renderCardContent &&
                   renderCardContent(
@@ -196,7 +198,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               </div>
               <div style={{ height: 64 }}></div>
               {TableFooter}
-            </div>
+            </>
           );
         }}
         rowClassName={

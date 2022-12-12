@@ -272,7 +272,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort />
               </Modal>
-              <EditCustomModal
+              <CreateTeamModal
                 title={isFlag}
                 open={isOpenCreate}
                 handleCancel={() => setIsOpenCreate(false)}

@@ -417,6 +417,8 @@ export type MarketModel = {
   remark: string;
   // 是否公开
   public: boolean;
+  // 图片
+  photo: string;
 };
 
 export type MerchandiseModel = {

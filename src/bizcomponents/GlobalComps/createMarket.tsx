@@ -3,24 +3,20 @@ import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
-import { FileItemShare, TargetModel } from '@/ts/base/model';
-import { ITarget } from '@/ts/core';
+import { FileItemShare, MarketModel } from '@/ts/base/model';
 import { BankOutlined } from '@ant-design/icons';
-import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
-  title: string;
   open: boolean;
+  title: string;
   handleCancel: () => void;
-  handleOk: (newItem: ITarget | undefined) => void;
-  current: ITarget;
-  typeNames: string[];
+  handleOk: (data: MarketModel) => void;
 }
 /*
   编辑
 */
-const EditCustomModal = (props: Iprops) => {
-  const { open, title, handleOk, current, handleCancel } = props;
+const CreateMarketModal = (props: Iprops) => {
+  const { open, title, handleOk, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
@@ -36,7 +32,7 @@ const EditCustomModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('头像');
+      const docDir = await docsCtrl.home?.create('图片');
       if (docDir && file) {
         const result = await docsCtrl.upload(docDir.key, file.name, file);
         if (result) {
@@ -45,9 +41,9 @@ const EditCustomModal = (props: Iprops) => {
       }
     },
   };
-  const columns: ProFormColumnsType<TargetModel>[] = [
+  const columns: ProFormColumnsType<MarketModel>[] = [
     {
-      title: '图标',
+      title: '图片',
       dataIndex: 'avatar',
       colProps: { span: 24 },
       renderFormItem: () => {
@@ -65,11 +61,11 @@ const EditCustomModal = (props: Iprops) => {
               }
             />
             <Upload {...uploadProps}>
-              <Button type="link">上传图标</Button>
+              <Button type="link">上传图片</Button>
             </Upload>
             {avatar ? (
               <Button type="link" onClick={() => setAvatar(undefined)}>
-                清除图标
+                清除图片
               </Button>
             ) : (
               ''
@@ -79,75 +75,58 @@ const EditCustomModal = (props: Iprops) => {
       },
     },
     {
-      title: '名称',
-      dataIndex: 'teamName',
-      formItemProps: {
-        rules: [{ required: true, message: '单位名称为必填项' }],
-      },
-    },
-    {
-      title: '团队类型',
-      dataIndex: 'typeName',
-      valueType: 'select',
-      fieldProps: {
-        options: props.typeNames.map((i) => {
-          return {
-            value: i,
-            label: i,
-          };
-        }),
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '类型为必填项' }],
-      },
-    },
-    {
-      title: '团队代码',
-      dataIndex: 'code',
-      formItemProps: {
-        rules: [{ required: true, message: '团队代码为必填项' }],
-      },
-    },
-    {
-      title: '团队简称',
+      title: '商店名称',
       dataIndex: 'name',
       formItemProps: {
-        rules: [{ required: true, message: '团队简称为必填项' }],
+        rules: [{ required: true, message: '商店名称为必填项' }],
       },
     },
     {
-      title: '团队标识',
-      dataIndex: 'teamCode',
+      title: '商店代码',
+      dataIndex: 'code',
       formItemProps: {
-        rules: [{ required: true, message: '团队标识为必填项' }],
+        rules: [{ required: true, message: '商店代码为必填项' }],
       },
     },
     {
-      title: '团队信息备注',
-      dataIndex: 'teamRemark',
+      title: '是否开放',
+      dataIndex: 'public',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '公开',
+          },
+          {
+            value: false,
+            label: '不公开',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '是否公开为必填项' }],
+      },
+    },
+    {
+      title: '联系电话',
+      dataIndex: 'phone',
+    },
+    {
+      title: '商店简介',
+      dataIndex: 'remark',
       valueType: 'textarea',
       colProps: { span: 24 },
     },
   ];
   return (
-    <SchemaForm<TargetModel>
+    <SchemaForm<MarketModel>
       formRef={formRef}
       title={title}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
-          if (title === '编辑') {
-            setAvatar(parseAvatar(current.target.avatar));
-            formRef.current?.setFieldsValue({
-              ...current.target,
-              teamName: current.target.team?.name,
-              teamCode: current.target.team?.code,
-              teamRemark: current.target.team?.remark,
-            });
-          }
-        } else {
+        if (!open) {
           formRef.current?.resetFields();
           setAvatar(undefined);
           handleCancel();
@@ -158,15 +137,11 @@ const EditCustomModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        values.avatar = JSON.stringify(avatar);
-        if (title === '编辑') {
-          handleOk(await current.update(values));
-        } else {
-          handleOk(await current.create(values));
-        }
+        values.photo = JSON.stringify(avatar);
+        handleOk(values);
       }}
       columns={columns}></SchemaForm>
   );
 };
 
-export default EditCustomModal;
+export default CreateMarketModal;
