@@ -13,7 +13,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { XIdentity } from '@/ts/base/schema';
 import { ActionType } from '@ant-design/pro-table';
 import { IStation } from '@/ts/core/target/itarget';
-import CreateTeam from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { TargetType } from '@/ts/core';
 import ReactDOM from 'react-dom';
 /**
@@ -281,7 +281,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
         }}>
         <AssignPosts searchFn={setSelectPersons} />
       </Modal>
-      <CreateTeam
+      <CreateTeamModal
         handleCancel={() => setIsOpenEditModal(false)}
         open={isOpenEditModal}
         title={'编辑'}

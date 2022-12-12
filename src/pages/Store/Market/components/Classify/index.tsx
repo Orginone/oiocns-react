@@ -3,7 +3,7 @@ import { Button, Row, Col, message, Dropdown, Drawer, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
-import NewStoreModal from '@/components/NewStoreModal';
+import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
@@ -111,6 +111,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           onOk: async () => {
             if (await marketCtrl.Market.deleteMarket(node.market.id)) {
               message.success('删除成功');
+              marketCtrl.changCallback();
             }
           },
         });
@@ -122,6 +123,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           onOk: async () => {
             if (await marketCtrl.Market.quitMarket(node.market.id)) {
               message.success('退出成功');
+              marketCtrl.changCallback();
             }
           },
         });
@@ -146,7 +148,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const getTreeData = () => {
     const data = marketCtrl.Market.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
-      if (itemModel.market.belongId === userCtrl.user.target.id) {
+      if (itemModel.market.belongId === userCtrl.space.id) {
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');
@@ -183,11 +185,11 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         menu={'menus'}
         title={ClickBtn}
       />
-      <NewStoreModal
+      <CreateMarketModal
         title="创建商店"
         open={activeModal === 'create'}
-        onOk={onOk}
-        onCancel={onCancel}
+        handleOk={onOk}
+        handleCancel={onCancel}
       />
       {editMarket && (
         <>

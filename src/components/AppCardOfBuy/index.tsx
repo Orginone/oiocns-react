@@ -5,7 +5,7 @@ import { Button, Dropdown } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { common } from 'typings/common';
-import appImg from '/img/appLogo.png';
+import appImg from '/img/appLogo.svg';
 import { XMerchandise } from '@/ts/base/schema';
 interface BuyAppType {
   className?: string;

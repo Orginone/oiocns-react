@@ -5,6 +5,7 @@ import './index.less';
 import { schema } from '../../../../../ts/base';
 import Cohort from '@/ts/core/target/cohort';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 interface CohortCardType {
   data: schema.XTarget; //props
   className?: string;
@@ -40,7 +41,9 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
     return (
       <div className="card-title flex">
         <div className="card-title-left">
-          <Avatar src={new Cohort(data).avatar?.thumbnail} size={60} />
+          <div style={{ fontSize: 60 }}>
+            <TeamIcon avatar={new Cohort(data).avatar} typeName="群组" size={60} />
+          </div>
 
           <div className="card-title-left-info">
             <div className="app-name">

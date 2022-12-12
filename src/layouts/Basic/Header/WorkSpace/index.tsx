@@ -6,7 +6,7 @@ import styles from './index.module.less';
 import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { SpaceType } from '@/ts/core/target/itarget';
-import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 

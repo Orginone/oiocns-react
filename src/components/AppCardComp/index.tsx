@@ -4,7 +4,6 @@ import React from 'react';
 import './index.less';
 import AppLogo from '/img/appLogo.png';
 import { common } from 'typings/common';
-import { XProduct } from '@/ts/base/schema';
 import { IProduct } from '@/ts/core';
 interface defaultObjType {
   name: string;
