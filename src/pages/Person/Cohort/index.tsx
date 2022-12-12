@@ -21,6 +21,7 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
 import EditCustomModal from '@/bizcomponents/CreateTeam/index';
+import AddCohort from './SearchCohort';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
