@@ -194,6 +194,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       <div className={cls['person-info-company']}>
         <div id="scrollableDiv" className={cls['person-list']}>
           <List
+            key={'id'}
             header={
               <Row justify="space-between" align="middle">
                 <Col>
