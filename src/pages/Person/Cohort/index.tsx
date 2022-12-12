@@ -31,7 +31,6 @@ const CohortConfig: React.FC = () => {
   const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
   const [friend, setFriend] = useState<schema.XTarget>();
-  const [cohort, setcohort] = useState<ICohort>();
   const [data, setData] = useState<ICohort[]>();
   const [joinData, setJoinData] = useState<ICohort[]>();
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
@@ -198,14 +197,7 @@ const CohortConfig: React.FC = () => {
       message.error('邀请失败');
     }
   };
-  //申请加入群组确认事件
-  const cohortHandleOk = async () => {
-    const data = await userCtrl.user?.applyJoinCohort(cohort?.target.id!);
-    if (!data) {
-      message.error('申请失败');
-    } else message.info('申请加入成功');
-    setAddIsModalOpen(false);
-  };
+
   //保存选中人员数据
   const searchCallback = (person: schema.XTarget) => {
     setFriend(person);
@@ -275,10 +267,10 @@ const CohortConfig: React.FC = () => {
               <Modal
                 title="加入群组"
                 open={addIsModalOpen}
-                onOk={cohortHandleOk}
+                onOk={() => setAddIsModalOpen(false)}
                 onCancel={() => setAddIsModalOpen(false)}
                 width="1050px">
-                <AddCohort setCohort={setcohort} />
+                <AddCohort />
               </Modal>
               <EditCustomModal
                 title={isFlag}
