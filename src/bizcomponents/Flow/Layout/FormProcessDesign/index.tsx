@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Drawer, message, Table } from 'antd';
+import { message } from 'antd';
 import ProcessTree from '@/bizcomponents/Flow/Process/ProcessTree';
 import cls from './index.module.less';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
@@ -13,10 +13,7 @@ type FormProcessDesignProps = {
  * @returns
  */
 const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
-  const { Column } = Table;
   const [showConfig, setShowConfig] = useState(false);
-  const [dialogTableVisible, setDialogTableVisible] = useState(false);
-  const [flowRecords, setFlowRecords] = useState([]);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const scale = useAppwfConfig((state: any) => state.scale);
@@ -44,17 +41,6 @@ const FormProcessDesign: React.FC<FormProcessDesignProps> = () => {
         <ProcessTree OnSelectedNode={Selected} />
       </div>
       <FlowDrawer open={showConfig} onClose={() => closeItem()} />
-      <Drawer
-        open={dialogTableVisible}
-        title="详情"
-        getContainer={false}
-        destroyOnClose={true}>
-        <Table dataSource={flowRecords}>
-          <Column dataIndex="target" key="target" title="审批人" />
-          <Column dataIndex="createTime" key="createTime" title="时间" />
-          <Column dataIndex="comment" key="comment" title="审批意见" />
-        </Table>
-      </Drawer>
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
+import NewProcessDesign from '@/bizcomponents/FlowComponents';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
@@ -373,10 +374,13 @@ const SettingFlow: React.FC = () => {
                       }}
                     />
                   ) : (
-                    <ProcessDesign
-                      designData={designData}
-                      editorValue={editorValue}
-                      conditionData={conditionData}></ProcessDesign>
+                    <div>
+                      <ProcessDesign
+                        designData={designData}
+                        editorValue={editorValue}
+                        conditionData={conditionData}></ProcessDesign>
+                      <NewProcessDesign />
+                    </div>
                   )}
                 </Card>
               </Content>

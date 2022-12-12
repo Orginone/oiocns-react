@@ -44,12 +44,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
         props: {},
         type: 'CONDITIONS',
         name: '条件分支',
-        // children: {
-        //   nodeId: 'node_590719747331',
-        //   parentId: 'node_590719745693',
-        //   type: 'EMPTY',
-        //   children: {},
-        // },
       },
     },
   };
@@ -95,8 +89,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
   return (
     <>
       <div className={cls['container']}>
-        {/* conditionData */}
-        {/* <EventContext.Provider value={{ FlowSub, conditionData }}> */}
         <div className={cls['layout-body']}>
           {activeSelect === 'processDesign' && (
             <div style={{ height: 'calc(100vh - 250px )', overflowY: 'auto' }}>
@@ -105,7 +97,6 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({
           )}
         </div>
         <LayoutPreview ref={previewRef} />
-        {/* </EventContext.Provider> */}
       </div>
     </>
   );
