@@ -59,12 +59,10 @@ const PublishComp: React.FC<indexType> = () => {
       history.push('/store/app');
       return;
     }
-    getData();
+    getPublishData();
   }, []);
-  const getData = async (reload = false) => {
+  const getPublishData = async (reload = false) => {
     let res = await appCtrl.curProduct?.getMerchandises(reload);
-    console.log('sad', res);
-
     setDataSource([...(res || [])]);
   };
   const renderOperation = (item: any): any => {
@@ -83,7 +81,7 @@ const PublishComp: React.FC<indexType> = () => {
               const success = await appCtrl.curProduct!.unPublish(item.merchandise.id);
               if (success) {
                 message.success('商品下架成功');
-                getData(true);
+                getPublishData(true);
               } else {
                 message.warn('商品下架失败,请稍后重试');
               }

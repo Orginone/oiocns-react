@@ -1,3 +1,4 @@
+import { STORE_USER_MENU } from '@/constants/const';
 import { kernel } from '@/ts/base';
 import { Emitter } from '@/ts/base/common';
 import { DomainTypes, emitter, IMTarget, IProduct } from '@/ts/core';
@@ -10,7 +11,16 @@ export interface TreeType {
   id: string;
   children: TreeType[];
 }
-
+interface SpeciesType {
+  spaceId: string;
+  species: TreeType[];
+}
+interface RecMsg<T> {
+  Key: string;
+  Name: string;
+  UpdateTime: string;
+  data: T;
+}
 export interface AppCache {
   alwaysUseIds: string[];
   species?: {
@@ -18,12 +28,39 @@ export interface AppCache {
     species: TreeType[];
   };
 }
+const defaultCustomCategory: TreeType[] = [
+  {
+    title: '应用',
+    key: 'app',
+    id: '1',
+    children: [],
+  },
+  {
+    title: '文档',
+    key: 'doc',
+    id: '2',
+    children: [],
+  },
+  // {
+  //   title: '数据',
+  //   key: 'data',
+  //   id: '3',
+  //   children: [],
+  // },
+  // {
+  //   title: '资源',
+  //   key: 'assets',
+  //   id: '4',
+  //   children: [],
+  // },
+];
 
 class AppController extends Emitter {
   private _curProdId: string;
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
   private _caches: AppCache;
+  private _customMenus: SpeciesType = { spaceId: '', species: [] };
   constructor() {
     super();
     this._curProdId = '';
@@ -32,6 +69,11 @@ class AppController extends Emitter {
     };
     emitter.subscribePart([DomainTypes.User, DomainTypes.Company], () => {
       setTimeout(async () => {
+        let spaceId = userCtrl.isCompanySpace
+          ? userCtrl.space.target.id
+          : userCtrl.user.target.id;
+        this._customMenus.spaceId = spaceId;
+
         await this._initialization();
       }, 200);
     });
@@ -43,11 +85,6 @@ class AppController extends Emitter {
 
   get curProduct(): IProduct | undefined {
     if (this._target) {
-      // for (const item of this._target.ownProducts) {
-      //   if (item.prod.id === this._curProdId) {
-      //     return item;
-      //   }
-      // }
       return this._target.ownProducts.find((v) => v.prod.id == this._curProdId);
     }
     return undefined;
@@ -68,12 +105,12 @@ class AppController extends Emitter {
   }
 
   get spacies(): TreeType[] {
-    if (this._caches.species) {
-      if (this._caches.species[userCtrl.space.target.id]) {
-        return this._caches.species[userCtrl.space.target.id];
-      }
-    }
-    return [];
+    // if (this._caches.species) {
+    //   if (this._caches.species[userCtrl.space.target.id]) {
+    //     return this._caches.species[userCtrl.space.target.id];
+    //   }
+    // }
+    return this._customMenus.species || [];
   }
 
   public setCurProduct(id?: string, cache: boolean = false): void {
@@ -98,11 +135,26 @@ class AppController extends Emitter {
       if (data.alwaysUseIds) {
         this._caches.alwaysUseIds = data.alwaysUseIds;
       }
-      if (data.species) {
-        this._caches.species = data.species;
-      }
+      // if (data.species) {
+      //   this._caches.species = data.species;
+      // } else {
+      //   let spaceId = userCtrl.isCompanySpace
+      //     ? userCtrl.space.target.id
+      //     : userCtrl.user.target.id;
+      //   this._caches.species = { spaceId, species: defaultCustomCategory };
+      // }
       this.changCallback();
     });
+    /* 获取 历史缓存的 自定义目录 */
+    kernel.anystore.subscribed(
+      STORE_USER_MENU + this._customMenus.spaceId,
+      'user',
+      (Msg: RecMsg<SpeciesType>) => {
+        const { data } = Msg;
+        this._customMenus.species = data?.species || defaultCustomCategory;
+        this.changCallbackPart(STORE_USER_MENU);
+      },
+    );
   }
 
   private _cacheUserData(): void {
@@ -111,6 +163,29 @@ class AppController extends Emitter {
       {
         operation: 'replaceAll',
         data: this._caches,
+      },
+      'user',
+    );
+  }
+
+  /**
+   * 缓存自定义目录
+   * @param message 新消息，无则为空
+   */
+  public cacheCustomMenu(data: TreeType[]): void {
+    console.log('缓存触发', data);
+    if (!Array.isArray(data)) {
+      return console.error('缓存自定义目录格式有误,请重试');
+    }
+    this._customMenus.species = data || defaultCustomCategory;
+    this.changCallbackPart(STORE_USER_MENU);
+    kernel.anystore.set(
+      STORE_USER_MENU + this._customMenus.spaceId,
+      {
+        operation: 'replaceAll',
+        data: {
+          data: this._customMenus,
+        },
       },
       'user',
     );
