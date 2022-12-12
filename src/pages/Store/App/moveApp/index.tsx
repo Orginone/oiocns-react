@@ -4,22 +4,21 @@ import React, { useState } from 'react';
 import { Modal } from 'antd';
 
 import MenuTree from '@/components/CustomTreeComp';
-import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
 interface indexType {
-  appid?: string; //props
+  visible: boolean; //props
+  setVisible: Function;
 }
-const Index: React.FC<indexType> = ({ appid }) => {
+const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
   // console.log('打印移动appid', appid);
-  if (!appid) {
+  if (!appCtrl.curProduct) {
     return <></>;
   }
   const [selectItem, setSelectItem] = useState('');
-  const [bool, setbool] = useState(false);
   const handleOk = () => {
-    console.log('ok', selectItem, '当前操作的应用', selfAppCtrl.curProduct);
+    console.log('ok', selectItem, '当前操作的应用', appCtrl.curProduct, appCtrl.spacies);
   };
   const handleClickItem = ({ checked }: { checked: string[] }) => {
-    console.log('事实上', checked);
     setSelectItem(checked[1] || '');
     console.log('ok', selectItem);
   };
@@ -27,10 +26,12 @@ const Index: React.FC<indexType> = ({ appid }) => {
     <>
       <Modal
         title="移动应用"
-        open={bool}
+        open={visible}
         onOk={handleOk}
+        destroyOnClose
         onCancel={() => {
-          setbool(false);
+          setSelectItem('');
+          setVisible(false);
         }}>
         <MenuTree
           title={'目录'}
@@ -40,7 +41,7 @@ const Index: React.FC<indexType> = ({ appid }) => {
           onCheck={handleClickItem}
           checkedKeys={[selectItem]}
           autoExpandParent={true}
-          treeData={selfAppCtrl.customMenu}
+          treeData={appCtrl.spacies}
         />
       </Modal>
     </>

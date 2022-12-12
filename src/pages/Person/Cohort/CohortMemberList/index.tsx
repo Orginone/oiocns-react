@@ -192,9 +192,8 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
       </Descriptions>
 
       <div className={cls['person-info-company']}>
-        <div id="scrollableDiv" className={cls['person-list']}>
+        <div className={cls['person-list']}>
           <List
-            key={'id'}
             header={
               <Row justify="space-between" align="middle">
                 <Col>
@@ -205,7 +204,6 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
                     placeholder="请输入用户编号"
                     onSearch={async (value) => {
                       setSearchValue(value);
-
                       await getMemberData(1, 10, value);
                     }}
                     style={{ width: 200 }}
@@ -218,7 +216,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
               data={memberData}
               height={ContainerHeight}
               itemHeight={47}
-              itemKey={'id'}>
+              itemKey="id">
               {(item: schema.XTarget) => (
                 <List.Item key={item.id} actions={getAction(item)!}>
                   <List.Item.Meta

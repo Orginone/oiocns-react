@@ -1,5 +1,5 @@
 import { Card, message, Modal } from 'antd';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
@@ -26,6 +26,7 @@ const StoreApp: React.FC = () => {
   const [key] = useCtrlUpdate(appCtrl);
   const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [moveModal, setMoveModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
 
@@ -90,7 +91,6 @@ const StoreApp: React.FC = () => {
       //   key: 'manage',
       //   label: '管理',
       //   onClick: () => {
-      //     SelfAppCtrl.curProduct = item;
       //     history.push({
       //       pathname: '/store/app/manage',
       //     });
@@ -114,13 +114,21 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/publish' });
         },
       },
+      {
+        key: 'moveTo',
+        label: '移动至',
+        onClick: () => {
+          appCtrl.setCurProduct(id);
+          setMoveModal(true);
+        },
+      },
       ...shareArr,
       {
         key: 'delete',
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: () => {
           Modal.confirm({
-            content: `确认移除《 ${name} 》?`,
+            content: `确认移除《 ${item.prod.name} 》?`,
             async onOk() {
               await userCtrl.space.deleteProduct(id);
               appCtrl.changCallback();
@@ -142,34 +150,39 @@ const StoreApp: React.FC = () => {
     });
   };
   // 应用首页dom
-  const AppIndex = (
-    <div key={key} className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-      {appCtrl.alwaysUseApps.length > 0 ? (
-        <StoreRecent dataSource={appCtrl.alwaysUseApps} />
-      ) : (
-        ''
-      )}
-      <Card
-        title="我的应用"
-        className={cls['app-tabs']}
-        extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
-        tabList={getItems()}
-        activeTabKey={statusKey}
-        onTabChange={(k) => {
-          setStatusKey(k as ststusTypes);
-        }}>
-        <div className={cls['page-content-table']}>
-          <AppShowComp
-            list={appCtrl.products}
-            searchParams={{ status: statusKey }}
-            columns={myColumns}
-            renderOperation={renderOperation}
-            tkey={key}
-          />
-        </div>
-      </Card>
-    </div>
-  );
+  const AppIndex = useMemo(() => {
+    return (
+      <div
+        key={key}
+        className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
+        {appCtrl.alwaysUseApps.length > 0 ? (
+          <StoreRecent dataSource={appCtrl.alwaysUseApps} />
+        ) : (
+          ''
+        )}
+        <Card
+          title="我的应用"
+          className={cls['app-tabs']}
+          extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
+          tabList={getItems()}
+          activeTabKey={statusKey}
+          onTabChange={(k) => {
+            setStatusKey(k as ststusTypes);
+          }}>
+          <div className={cls['page-content-table']}>
+            <AppShowComp
+              list={appCtrl.products}
+              searchParams={{ status: statusKey }}
+              columns={myColumns}
+              renderOperation={renderOperation}
+              tkey={key}
+            />
+          </div>
+        </Card>
+      </div>
+    );
+  }, [key]);
+  // 提交分享
   const handleSubmitShare = async () => {
     if (appCtrl.curProduct) {
       if (checkNodes?.createList?.length > 0) {
@@ -218,7 +231,7 @@ const StoreApp: React.FC = () => {
       <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       <TreeComp />
-      <MoveApp appid={''} />
+      <MoveApp visible={moveModal} setVisible={setMoveModal} />
     </>
   );
 };

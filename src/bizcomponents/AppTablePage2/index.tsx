@@ -3,7 +3,7 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
-import { XProduct } from '@/ts/base/schema';
+import { IProduct } from '@/ts/core';
 interface AppShowCompType {
   tkey: string;
   list: any[];
@@ -44,7 +44,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   //   if (!list?.length) {
   //     return;
   //   }
-
+  // 根据权限 判断 应用来源
   //   if (!searchParams || searchParams.status === '全部') {
   //     setTotal(list.length);
   //     setSataSource([...list]);
@@ -68,13 +68,13 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
 
   // 卡片内容渲染函数
-  const renderCardFun = (dataArr: XProduct[]): React.ReactNode[] => {
-    return dataArr.map((item: XProduct) => {
+  const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
+    return dataArr.map((item: IProduct) => {
       return (
         <AppCard
           className="card"
           data={item}
-          key={item.id}
+          key={item.prod.id}
           defaultKey={{
             name: 'name',
             size: 'price',
@@ -89,7 +89,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   };
   return (
     <div className={cls['app-wrap']} ref={parentRef} style={style}>
-      <CardOrTable<XProduct>
+      <CardOrTable<IProduct>
         dataSource={list}
         total={total}
         page={page}
@@ -101,7 +101,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         operation={renderOperation}
         columns={columns}
         onChange={handlePageChange}
-        rowKey={(record: any) => record.id}
+        rowKey={(record: any) => record?.prod?.id}
         toolBarRender={toolBarRender}
         {...rest}
       />

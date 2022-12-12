@@ -15,16 +15,12 @@ export enum MarketCallBackTypes {
 class MarketController extends Emitter {
   /** 市场操作对象 */
   private _target: IMTarget | undefined;
-  /** 判断当前所处页面类型,调用不同请求 */
-  public curPageType: 'app' | 'market' = 'market';
   /** 商店table数据 */
   private _marketTableList: any = {};
   /** 搜索到的商店 */
   public searchMarket: any;
   /** 所有的用户 */
   public marketMenber: any = {};
-  /** 加入购物车商品 */
-  public JoinShopingCar: any[] = [];
   /** 购物车商品列表 */
   private _shopinglist: any[] = [];
 
