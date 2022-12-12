@@ -61,7 +61,7 @@ const SettingFlow: React.FC = () => {
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [allData, setAllData] = useState<schema.XFlowDefine[]>([]);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
-  const [designData, setDesignData] = useState<{} | null>();
+
   const [conditionData, setConditionData] = useState<{
     name: string;
     labels: [{}];
@@ -123,7 +123,6 @@ const SettingFlow: React.FC = () => {
   };
 
   const clearForm = () => {
-    setDesignData(null);
     processCtrl.setProcessDesignTree(defalutDesignValue);
     processCtrl.setCondtionData({
       name: '',
