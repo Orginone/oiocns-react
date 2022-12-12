@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { schema } from '@/ts/base';
 import SearchInput from '../../../../components/SearchInput';
 import styles from './index.module.less';

@@ -20,7 +20,7 @@ import { TargetType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
-import EditCustomModal from '@/bizcomponents/CreateTeam/index';
+import EditCustomModal from '@/bizcomponents/GlobalComps/createTeam';
 import AddCohort from './SearchCohort';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
@@ -272,7 +272,7 @@ const CohortConfig: React.FC = () => {
                 width="1050px">
                 <AddCohort />
               </Modal>
-              <CreateTeamModal
+              <EditCustomModal
                 title={isFlag}
                 open={isOpenCreate}
                 handleCancel={() => setIsOpenCreate(false)}
