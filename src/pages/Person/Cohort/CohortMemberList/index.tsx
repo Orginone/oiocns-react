@@ -4,12 +4,12 @@ import {
   List,
   Descriptions,
   Typography,
-  Layout,
-  Card,
   Input,
   Tag,
   Modal,
   message,
+  Row,
+  Col,
 } from 'antd';
 import { UserOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import VirtualList from 'rc-virtual-list';
@@ -21,6 +21,7 @@ import chatCtrl from '@/ts/controller/chat';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
 import { XTarget } from '@/ts/base/schema';
+import Person from '@/ts/core/target/person';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: ICohort;
@@ -30,15 +31,23 @@ const { Search } = Input;
 const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   const [memberData, setMemberData] = useState<schema.XTarget[]>([]);
   const [friendList, setFriendList] = useState<schema.XTarget[]>([]);
+  const [currentPage, setCurrnentPage] = useState<number>(1);
+  const [searchValue, setSearchValue] = useState<string>('');
   const history = useHistory();
   useEffect(() => {
-    getMemberData();
+    getMemberData(1, 10);
     getFriendList();
   }, []);
   /**获取群组下成员列表 */
-  const getMemberData = async () => {
-    const res = await cohortData.loadMembers({ offset: 0, filter: '', limit: 65535 });
-    setMemberData(res.result!.filter((obj) => obj.id != userCtrl.space?.target.id));
+  const getMemberData = async (pageIndex: number, pageSize: number, filter = '') => {
+    const res = await cohortData.loadMembers({
+      offset: (pageIndex - 1) * pageSize,
+      filter: filter,
+      limit: pageSize,
+    });
+    setCurrnentPage(pageIndex);
+    const saveData = res.result!.filter((obj) => obj.id != userCtrl.space?.target.id);
+    setMemberData(pageIndex !== 1 ? [...memberData, ...saveData] : saveData);
   };
   /**获取好友列表 */
   const getFriendList = async () => {
@@ -48,7 +57,7 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   /**移除成员 */
   const removeMember = async (target: XTarget) => {
     await cohortData.removeMember(target);
-    getMemberData();
+    getMemberData(1, 10);
   };
   /**
    * 获取操作列表
@@ -168,70 +177,61 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
     }
     return title;
   };
-  const onSearch = async (value: string) => {
-    if (value!) {
-      await getMemberData();
-      setMemberData(memberData.filter((obj) => obj.code === value));
-    } else {
-      await getMemberData();
+
+  const onListScroll = async (e: React.UIEvent<HTMLElement, UIEvent>) => {
+    if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === ContainerHeight) {
+      await getMemberData(currentPage + 1, 10, searchValue);
     }
   };
-
   return (
     <div>
-      <Card>
-        <Descriptions title="群组详情" layout="vertical" bordered>
-          <Descriptions.Item label="群组名称">奥能集团项目交流群</Descriptions.Item>
-          <Descriptions.Item label="群组编号">AoNengJiTuan</Descriptions.Item>
-          <Descriptions.Item label="群组简介">react项目开发人员</Descriptions.Item>
-        </Descriptions>
-      </Card>
-      <Layout style={{ paddingTop: '7px' }}>
-        <Card bordered={false}>
-          <Title level={5}>成员列表</Title>
+      <Descriptions title="群组详情" bordered size="small" column={2}>
+        <Descriptions.Item label="群组名称">奥能集团项目交流群</Descriptions.Item>
+        <Descriptions.Item label="群组编号">AoNengJiTuan</Descriptions.Item>
+        <Descriptions.Item label="群组简介">react项目开发人员</Descriptions.Item>
+      </Descriptions>
 
-          <div style={{ paddingBottom: '16px', textAlign: 'right' }}>
-            <Search
-              placeholder="请输入用户编号"
-              onSearch={onSearch}
-              style={{ width: 200 }}
-            />
-          </div>
-          <div className={cls['person-info-company']}>
-            <div
-              id="scrollableDiv"
-              style={{
-                height: 400,
-                overflow: 'auto',
-                paddingTop: '10px',
-              }}>
-              <List>
-                <VirtualList
-                  data={memberData}
-                  height={ContainerHeight}
-                  itemHeight={47}
-                  itemKey={'id'}>
-                  {(item: schema.XTarget) => (
-                    <List.Item key={item.id} actions={getAction(item)!}>
-                      <List.Item.Meta
-                        avatar={
-                          <Avatar
-                            src={
-                              'https://gw.alipayobjects.com/zos/antfincdn/efFD%24IOql2/weixintupian_20170331104822.jpg'
-                            }
-                          />
-                        }
-                        title={getTitle(item)!}
-                        description={item.team?.remark}
-                      />
-                    </List.Item>
-                  )}
-                </VirtualList>
-              </List>
-            </div>
-          </div>
-        </Card>
-      </Layout>
+      <div className={cls['person-info-company']}>
+        <div id="scrollableDiv" className={cls['person-list']}>
+          <List
+            key={'id'}
+            header={
+              <Row justify="space-between" align="middle">
+                <Col>
+                  <Title level={5}>成员列表</Title>
+                </Col>
+                <Col>
+                  <Search
+                    placeholder="请输入用户编号"
+                    onSearch={async (value) => {
+                      setSearchValue(value);
+
+                      await getMemberData(1, 10, value);
+                    }}
+                    style={{ width: 200 }}
+                  />
+                </Col>
+              </Row>
+            }>
+            <VirtualList
+              onScroll={onListScroll}
+              data={memberData}
+              height={ContainerHeight}
+              itemHeight={47}
+              itemKey={'id'}>
+              {(item: schema.XTarget) => (
+                <List.Item key={item.id} actions={getAction(item)!}>
+                  <List.Item.Meta
+                    avatar={<Avatar src={new Person(item).avatar?.thumbnail} />}
+                    title={getTitle(item)!}
+                    description={item.team?.remark}
+                  />
+                </List.Item>
+              )}
+            </VirtualList>
+          </List>
+        </div>
+      </div>
     </div>
   );
 };

@@ -7,7 +7,6 @@ import { common } from 'typings/common';
 import { cohortColumn } from './column';
 import cls from './index.module.less';
 import Persons from '../../../bizcomponents/SearchPerson/index';
-import AddCohort from './SearchCohort/index';
 import { useHistory } from 'react-router-dom';
 import ChangeCohort from './SearchCohortPerson/index';
 import { schema } from '../../../ts/base';
@@ -21,7 +20,8 @@ import { TargetType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
+import EditCustomModal from '@/bizcomponents/CreateTeam/index';
+import AddCohort from './SearchCohort';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
@@ -134,7 +134,7 @@ const CohortConfig: React.FC = () => {
             cancelText: '取消',
             onOk: async () => {
               await userCtrl.space.deleteCohort(item.target.id);
-              getData();
+              await getData();
               message.success('解散成功');
             },
           });
@@ -158,7 +158,7 @@ const CohortConfig: React.FC = () => {
         label: '退出群聊',
         onClick: async () => {
           await userCtrl.user.quitCohorts(item.target.id);
-          getData();
+          await getData();
           message.info('退出成功');
         },
       },
@@ -185,7 +185,7 @@ const CohortConfig: React.FC = () => {
       // belongId:friend?.id, //待开放参数
       avatar: 'test', //头像
     });
-    getData();
+    await getData();
     message.success('权限转移成功');
   };
   //邀请成员确认事件
@@ -284,9 +284,9 @@ const CohortConfig: React.FC = () => {
                 title={isFlag}
                 open={isOpenCreate}
                 handleCancel={() => setIsOpenCreate(false)}
-                handleOk={(item) => {
+                handleOk={async (item) => {
                   if (item) {
-                    getData();
+                    await getData();
                     setIsOpenCreate(false);
                   }
                 }}
@@ -314,11 +314,11 @@ const CohortConfig: React.FC = () => {
             {
               label: `管理的`,
               key: '1',
-              children: (
+              children: data ? (
                 <CardOrTable<ICohort>
                   id={chatKey}
                   childrenColumnName={'nochildren'}
-                  dataSource={data!}
+                  dataSource={data}
                   total={total}
                   page={page}
                   rowSelection={{}}
@@ -329,12 +329,14 @@ const CohortConfig: React.FC = () => {
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />
+              ) : (
+                ''
               ),
             },
             {
               label: `加入的`,
               key: '2',
-              children: (
+              children: joinData ? (
                 <CardOrTable<ICohort>
                   childrenColumnName={'nochildren'}
                   dataSource={joinData!}
@@ -348,6 +350,8 @@ const CohortConfig: React.FC = () => {
                   onChange={handlePageChange}
                   rowKey={'id'}
                 />
+              ) : (
+                ''
               ),
             },
           ]}
