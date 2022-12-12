@@ -5,9 +5,9 @@ import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '@/components/AppCardShopCar';
 import { MarketTypes } from 'typings/marketType';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
-import BuyCustomModal from '../components/BuyCustomModal';
-import { message, Space } from 'antd';
+import { message, Modal, Space } from 'antd';
 import cls from './index.module.less';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 /**
  * @description: 购物车
@@ -17,7 +17,6 @@ import cls from './index.module.less';
 const ShopingCar: React.FC = () => {
   const [selectedRowKey, setSelectedRowKey] = useState<any>([]); // 被选中的项
   const [shopList, setShopList] = useState<any>([]); // 购物车列表
-  const [isBuy, setIsBuy] = useState<boolean>(false);
   const parentRef = useRef<any>(null); // 获取table表格父级高度
 
   /**
@@ -105,15 +104,6 @@ const ShopingCar: React.FC = () => {
   };
 
   /**
-   * @description: 购买商品
-   * @return {*}
-   */
-  const OnBuyShoping = async () => {
-    await marketCtrl.buyShoping(selectedRowKey);
-    setIsBuy(false);
-  };
-
-  /**
    * @description: 确认下单弹窗
    * @return {*}
    */
@@ -122,15 +112,12 @@ const ShopingCar: React.FC = () => {
       message.warning('请选择商品');
       return;
     }
-    setIsBuy(true);
-  };
-
-  /**
-   * @description: 取消
-   * @return {*}
-   */
-  const OnCancel = () => {
-    setIsBuy(false);
+    Modal.confirm({
+      title: '确认订单',
+      content: '此操作将生成交易订单。是否确认',
+      icon: <CheckCircleOutlined className={cls['buy-icon']} />,
+      onOk: async () => await marketCtrl.buyShoping(selectedRowKey),
+    });
   };
 
   /**
@@ -139,23 +126,26 @@ const ShopingCar: React.FC = () => {
    * @return {*}
    */
   const renderCardFun = (dataArr: MarketTypes.ProductType[]): React.ReactNode[] => {
-    return dataArr.map((item: MarketTypes.ProductType) => {
-      return (
-        <AppCard
-          className="card"
-          data={item}
-          key={item.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
-          // operation={renderOperation}
-        />
-      );
-    });
+    if (dataArr) {
+      return dataArr.map((item: MarketTypes.ProductType) => {
+        return (
+          <AppCard
+            className="card"
+            data={item}
+            key={item.id}
+            defaultKey={{
+              name: 'caption',
+              size: 'price',
+              type: 'sellAuth',
+              desc: 'remark',
+              creatTime: 'createTime',
+            }}
+            // operation={renderOperation}
+          />
+        );
+      });
+    }
+    return <></>;
   };
 
   return (
@@ -167,6 +157,8 @@ const ShopingCar: React.FC = () => {
           hideOperation={true}
           columns={columns as any}
           rowSelection={rowSelection}
+          defaultPageType="card"
+          showBtn="false"
           alwaysShowAlert={true}
           tableAlertOptionRender={() => {
             return (
@@ -180,15 +172,6 @@ const ShopingCar: React.FC = () => {
           parentRef={parentRef}
         />
       </div>
-      <BuyCustomModal
-        title="确认订单"
-        content="此操作将生成交易订单。是否确认"
-        open={isBuy}
-        onOk={() => {
-          OnBuyShoping();
-        }}
-        onCancel={OnCancel}
-      />
     </React.Fragment>
   );
 };
