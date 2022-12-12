@@ -177,16 +177,19 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             props.action.dataSource.length === 0 ? (
               defaultDom
             ) : (
-              [defaultDom, TableFooter]
+              <div>
+                {defaultDom}
+                {TableFooter}
+              </div>
             )
           ) : (
-            <div key="card">
+            <>
               {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
               <div
                 className={cls['common-card']}
                 style={{
                   height:
-                    defaultHeight !== 'auto' ? defaultHeight + 70 + 'px' : defaultHeight,
+                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>
                 {renderCardContent &&
                   renderCardContent(
@@ -195,7 +198,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               </div>
               <div style={{ height: 64 }}></div>
               {TableFooter}
-            </div>
+            </>
           );
         }}
         rowClassName={
