@@ -57,7 +57,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
   const [currentType, setCurrentType] = useState<TOOBAR_TYPE>(TOOBAR_TYPE.STORAGE);
 
   return (
-    <Layout className={`${className}`} style={{ height: '100%' }}>
+    <Layout className={`${className}`} style={{ height: '100%', position: 'relative' }}>
       {(sider || siderMenuData) && (
         <ContentMenu data={siderMenuData} menuClick={menuClick} menuSelect={menuSelect}>
           {sider && sider}
@@ -112,15 +112,15 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
           </Row>
         )}
         <Content className={cls.content}>{content || children}</Content>
-        <RightToobar
-          onClose={() => {
-            setOpen(false);
-          }}
-          title={toobarTypeAndNameMaps[currentType]}
-          type={currentType}
-          open={open}
-        />
       </Layout>
+      <RightToobar
+        onClose={() => {
+          setOpen(false);
+        }}
+        title={toobarTypeAndNameMaps[currentType]}
+        type={currentType}
+        open={open}
+      />
     </Layout>
   );
 };

@@ -27,8 +27,6 @@ class MarketController extends Emitter {
   public JoinShopingCar: any[] = [];
   /** 购物车商品列表 */
   private _shopinglist: any[] = [];
-  /** 购买商品的id合集 */
-  private _shopingIds: string[] = [];
 
   constructor() {
     super();
@@ -118,12 +116,9 @@ class MarketController extends Emitter {
    * @param {any} data
    * @return {*}
    */
-  public deleApply = async (data: any) => {
+  public deleApply = async (ids: string[]) => {
     if (this._shopinglist.length > 0) {
-      let arrs = this._shopinglist.filter(
-        (item) => !data.some((ele: any) => ele.id === item.id),
-      );
-      this._shopinglist = arrs;
+      this._shopinglist = this._shopinglist.filter((item) => !ids.includes(item.id));
       message.success('移出成功');
       this.cacheJoinOrDeleShopingCar(this._shopinglist);
     }
@@ -134,25 +129,22 @@ class MarketController extends Emitter {
    * @param {any} data
    * @return {*}
    */
-  public buyShoping = async (data: any) => {
-    data.forEach((item: any) => {
-      this._shopingIds.push(item?.id);
-    });
-    if (
-      await this._target?.createOrder(
-        '',
-        data[0].caption + (data.length > 1 ? `...等${data.length}件商品` : ''),
-        new Date().getTime().toString().substring(0, 13),
-        userCtrl.space.id,
-        this._shopingIds,
-      )
-    ) {
-      let arrs = this._shopinglist.filter(
-        (item) => !data.some((ele: any) => ele.id === item.id),
-      );
-      this._shopinglist = arrs;
-      this.cacheJoinOrDeleShopingCar(this._shopinglist);
-      message.success('下单成功');
+  public buyShoping = async (ids: string[]) => {
+    if (ids.length > 0) {
+      const firstProd = this._shopinglist.find((n) => n.id === ids[0]);
+      if (
+        await this._target?.createOrder(
+          '',
+          firstProd.caption + (ids.length > 1 ? `...等${ids.length}件商品` : ''),
+          new Date().getTime().toString().substring(0, 13),
+          userCtrl.space.id,
+          ids,
+        )
+      ) {
+        this._shopinglist = this._shopinglist.filter((item) => !ids.includes(item.id));
+        this.cacheJoinOrDeleShopingCar(this._shopinglist);
+        message.success('下单成功');
+      }
     }
   };
 

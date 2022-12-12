@@ -6,19 +6,17 @@ import AppCard from '@/components/AppCardOfBuy';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
-import BuyCustomModal from '../components/BuyCustomModal';
 import MarketClassify from '../components/Classify';
 import ReactDOM from 'react-dom';
 import { XMerchandise } from '@/ts/base/schema';
 import { Modal } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
   const [detail, setDetail] = useState<XMerchandise>(); // 查看详情
-  const [isBuy, setIsBuy] = useState<boolean>(false); // 立即购买弹窗
-  const [nowBuy, setNowBuy] = useState<any>([]); // 立即购买
   const parentRef = useRef<any>(null); //父级容器Dom
   const treeContainer = document.getElementById('templateMenu');
   const [key] = useCtrlUpdate(marketCtrl);
@@ -45,11 +43,16 @@ const AppShowComp: React.FC = () => {
    * @param {XMerchandise} selectItem
    * @return {*}
    */
-  const handleBuyAppFun = (type: 'buy' | 'join', selectItem: any) => {
+  const handleBuyAppFun = (type: 'buy' | 'join', selectItem: XMerchandise) => {
     if (type === 'join') {
       marketCtrl.joinApply(selectItem);
     } else {
-      setIsBuy(true);
+      Modal.confirm({
+        title: '确认订单',
+        content: '此操作将生成交易订单。是否确认',
+        icon: <CheckCircleOutlined className={cls['buy-icon']} />,
+        onOk: async () => await marketCtrl.buyShoping([selectItem]),
+      });
     }
   };
 
@@ -61,22 +64,22 @@ const AppShowComp: React.FC = () => {
     setIsProduce(false);
   };
 
-  /**
-   * @description: 取消订单
-   * @return {*}
-   */
-  const onCancel = () => {
-    setIsBuy(false);
-  };
+  // /**
+  //  * @description: 取消订单
+  //  * @return {*}
+  //  */
+  // const onCancel = () => {
+  //   setIsBuy(false);
+  // };
 
-  /**
-   * @description: 购买商品
-   * @return {*}
-   */
-  const OnBuyShoping = async () => {
-    await marketCtrl.buyShoping(nowBuy);
-    setIsBuy(false);
-  };
+  // /**
+  //  * @description: 购买商品
+  //  * @return {*}
+  //  */
+  // const OnBuyShoping = async () => {
+  //   await marketCtrl.buyShoping(nowBuy);
+  //   setIsBuy(false);
+  // };
 
   // 操作内容渲染函数
   const renderOperation = (item: XMerchandise): common.OperationType[] => {
@@ -85,8 +88,8 @@ const AppShowComp: React.FC = () => {
         key: 'buy',
         label: '立即购买',
         onClick: () => {
-          setIsBuy(true);
-          setNowBuy([item]);
+          handleBuyAppFun('buy', item);
+          // setNowBuy([item]);
         },
       },
       {
@@ -140,6 +143,7 @@ const AppShowComp: React.FC = () => {
             desc: 'remark',
             creatTime: 'createTime',
           }}
+          showOperation={true}
           operation={renderOperation}
           handleBuyApp={handleBuyAppFun}
         />
@@ -167,13 +171,13 @@ const AppShowComp: React.FC = () => {
         onClose={onClose}
         data={detail}
       />
-      <BuyCustomModal
+      {/* <BuyCustomModal
         open={isBuy}
         title="确认订单"
         onOk={OnBuyShoping}
         onCancel={onCancel}
         content="此操作将生成交易订单。是否确认"
-      />
+      /> */}
 
       {treeContainer
         ? ReactDOM.createPortal(

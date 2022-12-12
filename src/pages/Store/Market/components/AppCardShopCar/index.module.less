@@ -4,10 +4,24 @@
   background-color: transparent;
   border-color: @border-color-base !important;
   transition: all 0.3s ease 0.1s;
-
+  border-radius: 10px;
+  width: 100%;
+  padding-left: 40px;
+  margin-right: 0;
   &::after {
-    display: none;
-    border-color: @border-color-base;
+    inset-block-start: calc(50% - 10px);
+    inset-inline-start: 16px;
+    border-radius: 50%;
+    // background-color: #154ad8;
+    padding: 6px;
+    box-shadow: 0 0 0 2px #7291e7;
+    border-inline: none;
+    border-block: none;
+    border: 2px solid #fff;
+    content: '';
+    width: 0;
+    height: 0;
+    position: absolute;
   }
 
   :global {
@@ -39,9 +53,6 @@
     &:hover {
       transform: scale(1.2);
     }
-  }
-
-  .nameLabel {
   }
 
   .cardTitle {

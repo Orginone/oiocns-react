@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { nanoid, ProColumns } from '@ant-design/pro-components';
+import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown } from 'antd';
+import { Dropdown, Pagination, Result } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
@@ -124,7 +124,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
         search={false}
         headerTitle={headerTitle}
-        rowKey={rowKey || 'key'}
+        rowKey={rowKey}
         pagination={{
           defaultPageSize: 10,
           size: 'default',
@@ -136,14 +136,12 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
-        params={{ tableid: nanoid(), filter: '' }}
+        params={{ filter: '' }}
         request={async (params) => {
           const {
             current: pageIndex = 1,
             pageSize = 10,
             filter = '',
-            // eslint-disable-next-line no-unused-vars
-            tableid,
             keyword = '',
             ...other
           } = params;
@@ -170,7 +168,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             };
           }
         }}
-        tableRender={(props: any, defaultDom) => {
+        tableRender={(props: any, defaultDom, { toolbar, table }) => {
+          console.log(table);
           return pageType === 'table' ? (
             !showChangeBtn ||
             !props.action.dataSource ||
@@ -185,19 +184,27 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           ) : (
             <>
               {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
+              {toolbar}
               <div
                 className={cls['common-card']}
                 style={{
                   height:
                     defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>
-                {renderCardContent &&
+                {renderCardContent ? (
                   renderCardContent(
                     dataSource.length !== 0 ? dataSource : props.action.dataSource,
-                  )}
+                  )
+                ) : (
+                  <Result subTitle="暂无卡片配置"></Result>
+                )}
               </div>
               <div style={{ height: 64 }}></div>
               {TableFooter}
+              <Pagination
+                {...props.pagination}
+                style={{ float: 'right', marginTop: -28 }}
+              />
             </>
           );
         }}

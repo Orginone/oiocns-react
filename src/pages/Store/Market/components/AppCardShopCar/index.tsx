@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import { CheckCard } from '@ant-design/pro-components';
-import { Button, Dropdown, Modal } from 'antd';
+import { Button, Dropdown, Modal, Typography } from 'antd';
 import { CheckCircleOutlined, EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import appImg from '/img/appLogo.png';
+import appImg from '/img/appLogo.svg';
 import { MarketTypes } from 'typings/marketType';
 
 interface Iprops {
@@ -36,16 +36,8 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
     defaultKey,
     onClick,
     operation,
-    // handleBuyApp,
   } = props;
-  const {
-    name = 'name',
-    size = 'size',
-    type = 'type',
-    desc = 'desc',
-    typeName = 'typeName',
-    creatTime = 'creatTime',
-  } = { ...defaultObj, ...defaultKey };
+  const { name = 'name', desc = 'desc' } = { ...defaultObj, ...defaultKey };
 
   function renderName() {
     return (
@@ -68,7 +60,7 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
         <p className="app-desc">{data[desc] || '暂无描述'}</p>
         {showBtn ? (
           <p className={cls.btnBox}>
-            <Button
+            {/* <Button
               className={cls.btn}
               shape="round"
               onClick={() => {
@@ -80,7 +72,7 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
                 });
               }}>
               立即购买
-            </Button>
+            </Button> */}
           </p>
         ) : (
           ''
@@ -92,21 +84,26 @@ const AppCardShopCar: React.FC<Iprops> = (props) => {
     return (
       <div className={cls.cardTitle}>
         <img style={{ width: 60, height: 60 }} src={appImg} alt="" />
-        <span className={cls.version}>V 0.0.1</span>
+        {/* <span className={cls.version}>V 0.0.1</span> */}
       </div>
     );
   }
 
   return (
-    <>
-      <CheckCard
-        avatar={renderTitle()}
-        title={renderName()}
-        className={`${cls.buyCard} ${className}`}
-        description={renderDesc()}
-        onClick={onClick}
-      />
-    </>
+    <CheckCard
+      size="small"
+      bordered={false}
+      avatar={renderTitle()}
+      title={renderName()}
+      className={`${cls.buyCard} ${className}`}
+      description={
+        <Typography.Paragraph type="secondary" ellipsis={{ rows: 2 }}>
+          {data[desc] || '暂无描述'}
+        </Typography.Paragraph>
+      }
+      onClick={onClick}
+      value={data.id}
+    />
   );
 };
 
