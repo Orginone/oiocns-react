@@ -15,7 +15,7 @@ import GroupDescription from './components/Description';
 import { columns } from './config';
 import cls from './index.module.less';
 // import SearchPerson from '@/bizcomponents/SearchPerson';
-import CreateTeamModal from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import AssignPosts from '@/bizcomponents/AssignPostCompany';

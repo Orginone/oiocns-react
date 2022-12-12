@@ -4,7 +4,7 @@ import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IStation } from '@/ts/core/target/itarget';
-import CreateTeam from '@/bizcomponents/CreateTeam';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { TargetType } from '@/ts/core';
 
@@ -58,7 +58,7 @@ const StationTree: React.FC<CreateGroupPropsType> = (props) => {
           title={'岗位列表'}
         />
       </div>
-      <CreateTeam
+      <CreateTeamModal
         handleCancel={() => setIsOpenModal(false)}
         open={isOpenModal}
         title={'新增|岗位'}
