@@ -117,7 +117,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   }, [columns, operation]);
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
-    console.log(dataSource);
     return (
       <ProTable //pageType === 'table' ? (
         className={cls['common-table']}
@@ -221,7 +220,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
     //     </div>
     //   </>
     // );
-  }, [pageType, dataSource, operation, resetColumns, defaultHeight]);
+  }, [pageType, dataSource, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
    * @return {底部组件}
