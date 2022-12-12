@@ -32,7 +32,6 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
         layout="horizontal"
         onValuesChange={async () => {
           const currentValue = await form.getFieldsValue();
-
           onChange(currentValue);
           DefaultProps.setFormFields(currentValue?.labels);
           ProcessCtrl.setCondtionData(currentValue);

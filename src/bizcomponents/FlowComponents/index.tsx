@@ -20,14 +20,15 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
   const [scale, setScale] = useState<number>(100);
 
   const refreshUI = () => {
-    setScale(110);
+    setScale(processCtrl.scale);
   };
   useEffect(() => {
-    const id = processCtrl.subscribePart(ConditionCallBackTypes.ProcessData, refreshUI);
+    const id = processCtrl.subscribePart(ConditionCallBackTypes.Scale, refreshUI);
     return () => {
       processCtrl.unsubscribe(id);
     };
   }, []);
+
   return (
     <div className={cls['container']}>
       <div className={cls['layout-body']}>
@@ -37,6 +38,8 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
             <ProcessTree
               editorValue={editorValue || '{}'}
               onSelectedNode={(params) => {
+                processCtrl.setCurrentNode(params);
+                //设置当前操作的节点，后续都是对当前节点的操作
                 setCurrentNode(params);
                 setIsOpen(true);
               }}
@@ -48,7 +51,9 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
       <FlowDrawer
         isOpenFlow={isOpen}
         selectNodeType={currentNode?.type}
-        onClose={() => {}}
+        onClose={() => {
+          setIsOpen(false);
+        }}
       />
     </div>
   );

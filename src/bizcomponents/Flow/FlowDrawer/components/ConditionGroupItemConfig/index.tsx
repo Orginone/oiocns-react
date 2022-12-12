@@ -53,7 +53,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     // );
     // console.log('selectedNode.conditions', selectedNode.conditions);
     form.setFieldsValue({ allContent: selectedNode.conditions });
-    const paramKey = selectedNode.conditions.map((item: conditionType) => {
+    const paramKey = (selectedNode.conditions || []).map((item: conditionType) => {
       return item.paramKey;
     });
     setParamKeyArr(paramKey);

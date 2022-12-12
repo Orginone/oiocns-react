@@ -1,15 +1,18 @@
 import { Emitter } from '@/ts/base/common';
-import { conditionDataType } from './processType';
+import { conditionDataType, nodeType } from './processType';
 
 export enum ConditionCallBackTypes {
-  'ProcessData' = 'ProcessData',
+  'ConditionsData' = 'ConditionsData', // 监听当前操作的条件数据
+  'CurrentOperateNode' = 'CurrentOperateNode', //监听当前操作节点
+  'Scale' = 'Scale', //监听大小
 }
 
 class ProcessController extends Emitter {
   /** 流程图大小*/
   private _scale: number = 100;
   private _conditionData: conditionDataType;
-  private _currentNode: any;
+  private _currentNode: nodeType | undefined;
+  private _currentTreeDesign: any;
   constructor() {
     super();
     this._conditionData = { name: '', fields: '', labels: [] };
@@ -24,21 +27,26 @@ class ProcessController extends Emitter {
   public get currentNode() {
     return this._currentNode;
   }
+  public get currentTreeDesign() {
+    return this._currentTreeDesign;
+  }
   // 设置当前操作的条件数据
   public setCondtionData(conditionData: conditionDataType) {
-    console.log(conditionData);
     this._conditionData = conditionData;
-    this.changCallbackPart(ConditionCallBackTypes.ProcessData);
+    this.changCallbackPart(ConditionCallBackTypes.ConditionsData);
   }
   // 设置当前操作的节点
-  public setCurrentNode(currentNode: any) {
+  public setCurrentNode(currentNode: nodeType | undefined) {
     this._currentNode = currentNode;
-    this.changCallbackPart(ConditionCallBackTypes.ProcessData);
+    this.changCallbackPart(ConditionCallBackTypes.CurrentOperateNode);
   }
   // 设置大小
   public setScale(scale: number) {
     this._scale = scale;
-    this.changCallbackPart(ConditionCallBackTypes.ProcessData);
+    this.changCallbackPart(ConditionCallBackTypes.Scale);
+  }
+  public setProcessDesignTree(currentTreeDesign: any) {
+    this._currentTreeDesign = currentTreeDesign;
   }
 }
 

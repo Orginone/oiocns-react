@@ -15,6 +15,7 @@ const ApprovalNode = () => {
   // const personObj = userCtrl.User.getJoinedCohorts();
   const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
   const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+
   const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
   const [processValue, setProcessValue] = useState(1);

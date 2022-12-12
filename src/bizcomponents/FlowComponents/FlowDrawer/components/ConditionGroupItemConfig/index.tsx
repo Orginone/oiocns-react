@@ -2,20 +2,15 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input, Form } from 'antd';
 import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import processCtrl from '@/ts/controller/setting/processCtrl';
+import {
+  nodeType,
+  conditionDataType,
+  conditiondType,
+} from '@/ts/controller/setting/processType';
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};
-
-type conditionType = {
-  val: string;
-  paramKey: string;
-  type: string;
-  paramLabel: string;
-  pos: number;
-  valLabel: string;
-  label: String;
-  key: string;
-};
 
 /**
  * @description: 条件
@@ -23,10 +18,16 @@ type conditionType = {
  */
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const [form] = Form.useForm();
-  const [curretEditorValue, setCurretEditorValue] = useState<conditionType[]>([]);
+  const [curretEditorValue, setCurretEditorValue] = useState<conditiondType[]>([]);
+  const [currentOpNode, setCurrentOpNode] = useState<nodeType>();
+  const [currentConditions, setCurrentConditions] = useState<conditionDataType>();
   const [paramKeyArr, setParamKeyArr] = useState<string[]>([]);
-  const selectedNode = useAppwfConfig((state: any) => state.selectedNode);
-  const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
+
+  useEffect(() => {
+    setCurrentOpNode(processCtrl.currentNode);
+    setCurrentConditions(processCtrl.conditionData);
+  }, []);
+
   const [key, setKey] = useState(0);
   const dictory = useCallback((paramKey: any) => {
     var filter = DefaultProps.getFormFields()?.filter(
@@ -52,8 +53,8 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     //   },
     // );
     // console.log('selectedNode.conditions', selectedNode.conditions);
-    form.setFieldsValue({ allContent: selectedNode.conditions });
-    const paramKey = selectedNode.conditions.map((item: conditionType) => {
+    form.setFieldsValue({ allContent: currentOpNode?.conditions || [] });
+    const paramKey = (currentOpNode?.conditions || []).map((item: conditiondType) => {
       return item.paramKey;
     });
     setParamKeyArr(paramKey);
@@ -67,7 +68,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
           const currentValue = await form.getFieldsValue();
           const currentCondtions = DefaultProps.getFormFields(); //所有的条件
           const newArr: string[] = []; // 重置当前条件 不然会越来越多 给不上值
-          selectedNode.conditions.map((item: conditionType, index: number) => {
+          currentOpNode?.conditions.map((item: conditiondType, index: number) => {
             /** 怎么知道paramKey有没有变化 */
             item.val = currentValue.allContent[index].val;
             item.paramKey = currentValue.allContent[index].paramKey;
@@ -109,15 +110,15 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
               }
             }
           });
-          setCurretEditorValue([...selectedNode.conditions]);
+          setCurretEditorValue([...(currentOpNode?.conditions || [])]);
         }}>
-        {[...selectedNode.conditions]?.map((condition: any, index: number) => (
+        {[...(currentOpNode?.conditions || [])]?.map((condition: any, index: number) => (
           <div key={index + '_g'} className={cls['group']}>
             <div className={cls['group-header']}>
               <div
                 onClick={() => {
-                  selectedNode.conditions.splice(index, 1);
-                  setSelectedNode(selectedNode);
+                  currentOpNode?.conditions.splice(index, 1);
+                  setCurrentOpNode(currentOpNode);
                   setKey(key + 1);
                 }}>
                 <DeleteOutlined />
@@ -130,7 +131,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                     style={{ width: 150 }}
                     placeholder="请选择参数"
                     allowClear
-                    options={DefaultProps.getFormFields()}
+                    options={currentConditions?.labels}
                   />
                 </Form.Item>
 

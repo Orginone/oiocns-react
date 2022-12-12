@@ -10,9 +10,9 @@ import {
 } from '@ant-design/icons';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import type { ProColumns } from '@ant-design/pro-components';
-import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
-// import NewProcessDesign from '@/bizcomponents/FlowComponents';
+import NewProcessDesign from '@/bizcomponents/FlowComponents';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import processCtrl from '@/ts/controller/setting/processCtrl';
 import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
@@ -131,8 +131,8 @@ const SettingFlow: React.FC = () => {
     setConditionData({ name: '', labels: [{}], fields: '' });
   };
 
-  const changeScale = (val: any) => {
-    setScale(val);
+  const changeScale = (val: number) => {
+    processCtrl.setScale(val);
   };
 
   const publish = async () => {
@@ -345,14 +345,14 @@ const SettingFlow: React.FC = () => {
                           className={cls['scale']}
                           size="small"
                           disabled={scale <= 40}
-                          onClick={() => changeScale(scale - 10)}>
+                          onClick={() => changeScale(processCtrl.scale - 10)}>
                           <MinusOutlined />
                         </Button>
                         <span>{scale}%</span>
                         <Button
                           size="small"
                           disabled={scale >= 150}
-                          onClick={() => changeScale(scale + 10)}>
+                          onClick={() => changeScale(processCtrl.scale + 10)}>
                           <PlusOutlined />
                         </Button>
                       </Space>
@@ -378,11 +378,11 @@ const SettingFlow: React.FC = () => {
                     />
                   ) : (
                     <div>
-                      <ProcessDesign
+                      {/* <ProcessDesign
                         designData={designData}
                         editorValue={editorValue}
-                        conditionData={conditionData}></ProcessDesign>
-                      {/* <NewProcessDesign /> */}
+                        conditionData={conditionData}></ProcessDesign> */}
+                      <NewProcessDesign />
                     </div>
                   )}
                 </Card>

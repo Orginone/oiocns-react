@@ -1,24 +1,16 @@
 import React, { useState } from 'react';
 import Node from '@/bizcomponents/Flow/Process/Node';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import DefaultProps, { useAppwfConfig } from '@/bizcomponents/Flow/flow';
 import { message } from 'antd';
-import Root from '../Process/RootNode';
-import Approval from '../Process/ApprovalNode';
-import Cc from '../Process/CcNode';
-import Concurrent from '../Process/ConcurrentNode';
-import Condition from '../Process/ConditionNode';
-import Empty from '../Process/EmptyNode';
+import Root from '@/bizcomponents/Flow/Process/RootNode';
+import Approval from '@/bizcomponents/Flow/Process/ApprovalNode';
+import Cc from '@/bizcomponents/Flow/Process/CcNode';
+import Concurrent from '@/bizcomponents/Flow/Process/ConcurrentNode';
+import Condition from '@/bizcomponents/Flow/Process/ConditionNode';
+import Empty from '@/bizcomponents/Flow/Process/EmptyNode';
 import cls from './index.module.less';
-import {
-  APPROVAL_PROPS,
-  CC_PROPS,
-  DELAY_PROPS,
-  TRIGGER_PROPS,
-} from '@/ts/controller/setting/processType';
-import processCtrl from '@/ts/controller/setting/processCtrl';
 type ProcessTreeProps = {
-  onSelectedNode: (params: any) => void;
-  editorValue: string;
+  OnSelectedNode: Function;
   [key: string]: any;
 };
 
@@ -27,20 +19,19 @@ type ProcessTreeProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }) => {
+const ProcessTree: React.FC<ProcessTreeProps> = (props: ProcessTreeProps) => {
   const [key, setKey] = useState(0);
-  console.log('editorValue', editorValue);
+
   /**组件渲染中变更dom   共享状态*/
-
   let design = useAppwfConfig((state: any) => state.design);
-
   let dom = design.resource;
-
+  // console.log('dom', dom);
+  // const setDesign = useAppwfConfig((state: any) => state.setDesign);
+  // const setSelectedNode = useAppwfConfig((state: any) => state.setSelectedNode);
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
 
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
-  console.log('nodeMap', nodeMap);
 
   const getDomTree = (h: any, node: any) => {
     if (!node || !node.nodeId) {
@@ -217,7 +208,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
 
   // id映射到map，用来向上遍历
   const toMapping = (node: any) => {
-    console.log('这个儿是什么嘞', node);
     if (node && node.nodeId) {
       addNodeMap({ nodeId: node.nodeId, node: node });
     }
@@ -328,7 +318,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   //选中一个节点
   const selectNode = (node: any) => {
     // console.log('选中一个节点selectedNode', node);
-    onSelectedNode(node);
+    props.OnSelectedNode(node);
   };
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
@@ -396,11 +386,11 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   };
   const insertApprovalNode = (parentNode: any) => {
     parentNode.children.name = '审批对象';
-    parentNode.children.props = deepCopy(APPROVAL_PROPS);
+    parentNode.children.props = deepCopy(DefaultProps.APPROVAL_PROPS);
   };
   const insertCcNode = (parentNode: any) => {
     parentNode.children.name = '抄送对象';
-    parentNode.children.props = deepCopy(CC_PROPS);
+    parentNode.children.props = deepCopy(DefaultProps.CC_PROPS);
   };
   const insertConditionsNode = (parentNode: any) => {
     parentNode.children.name = '条件分支';
@@ -459,11 +449,11 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   };
   const insertDelayNode = (parentNode: any) => {
     parentNode.children.name = '延时处理';
-    parentNode.children.props = deepCopy(DELAY_PROPS);
+    parentNode.children.props = deepCopy(DefaultProps.DELAY_PROPS);
   };
   const insertTriggerNode = (parentNode: any) => {
     parentNode.children.name = '触发器';
-    parentNode.children.props = deepCopy(TRIGGER_PROPS);
+    parentNode.children.props = deepCopy(DefaultProps.TRIGGER_PROPS);
   };
   const getBranchEndNode: any = (conditionNode: any) => {
     if (!conditionNode.children || !conditionNode.children.nodeId) {
