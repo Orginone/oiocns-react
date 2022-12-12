@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
+import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import processCtrl from '@/ts/controller/setting/processCtrl';

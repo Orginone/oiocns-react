@@ -1,5 +1,5 @@
 import React from 'react';
-import Node from '@/bizcomponents/Flow/Process/Node';
+import Node from '../Node';
 
 type RootNodeProps = {
   onInsertNode: Function;

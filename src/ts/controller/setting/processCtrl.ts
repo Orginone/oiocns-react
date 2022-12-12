@@ -18,6 +18,7 @@ class ProcessController extends Emitter {
   private _conditionData: conditionDataType;
   private _currentNode: nodeType;
   private _currentTreeDesign: any = defalutDesignValue;
+  private _nodeMap: any = new Map();
   constructor() {
     super();
     this._conditionData = { name: '', fields: '', labels: [] };
@@ -37,7 +38,6 @@ class ProcessController extends Emitter {
   public get scale() {
     return this._scale;
   }
-
   public get conditionData() {
     return this._conditionData;
   }
@@ -46,6 +46,9 @@ class ProcessController extends Emitter {
   }
   public get currentTreeDesign() {
     return this._currentTreeDesign;
+  }
+  public get nodeMap() {
+    return this._nodeMap;
   }
   // 设置当前操作的条件数据
   public setCondtionData(conditionData: conditionDataType) {
@@ -65,6 +68,12 @@ class ProcessController extends Emitter {
   public setProcessDesignTree(currentTreeDesign: any) {
     this._currentTreeDesign = currentTreeDesign;
   }
+  // addNodeMap({ nodeId: node.nodeId, node: node });
+  // addNodeMap: async (data: any) =>
+  // set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) })),
+  // public  addNodeMap(data:any) {
+  //   set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) }))
+  // }
 }
 
 export default new ProcessController();

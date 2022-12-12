@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input, Form } from 'antd';
-import DefaultProps from '@/bizcomponents/Flow/flow';
 import processCtrl from '@/ts/controller/setting/processCtrl';
 import { ConditionCallBackTypes } from '@/ts/controller/setting/processCtrl';
 import {
@@ -32,9 +31,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
 
   const [key, setKey] = useState(0);
   const dictory = useCallback((paramKey: any) => {
-    var filter = DefaultProps.getFormFields()?.filter(
-      (item: any) => item.value == paramKey,
-    );
+    var filter = currentConditions?.labels.filter((item: any) => item.value == paramKey);
 
     if (filter && filter.length > 0) {
       return filter[0].dict.filter((item: any) => item.label && item.value);

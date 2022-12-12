@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Node from '@/bizcomponents/Flow/Process/Node';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
+import Node from '../Process/Node';
+import { useAppwfConfig } from '../flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
 import Approval from '../Process/ApprovalNode';
@@ -27,7 +27,7 @@ type ProcessTreeProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }) => {
+const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
   const [key, setKey] = useState(0);
 
   /**组件渲染中变更dom   共享状态*/
@@ -35,8 +35,11 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   let currentDom = design.resource;
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
+  // const addNodeMap = processCtrl.nodeMap;
+
   /**组件渲染中变更nodeMap  共享状态*/
-  var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
+  // var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
+  const nodeMap = processCtrl.nodeMap;
 
   const getDomTree = (h: any, node: any) => {
     if (!node || !node.nodeId) {
@@ -215,6 +218,10 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   const toMapping = (node: any) => {
     if (node && node.nodeId) {
       addNodeMap({ nodeId: node.nodeId, node: node });
+      console.log(
+        'addNodeMap({ nodeId: node.nodeId, node: node });',
+        addNodeMap({ nodeId: node.nodeId, node: node }),
+      );
     }
   };
   const insertCoverLine = (h: any, index: any, doms: any, branches: any) => {

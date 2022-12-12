@@ -1,5 +1,5 @@
 import React from 'react';
-import InsertButton from '@/bizcomponents/Flow/Process/InsertButton';
+import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 type ConcurrentNodeProps = {
