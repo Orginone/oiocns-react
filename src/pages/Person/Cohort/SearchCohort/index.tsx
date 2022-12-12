@@ -6,24 +6,15 @@ import { Result, Row } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 import CohortCard from './SearchCohortCard';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-type CohortSearchTableProps = {
-  [key: string]: any;
-  setJoinKey?: (key: string) => void;
-  setCohort: Function;
-};
-
-let tableProps: CohortSearchTableProps;
 
 /*
+
   弹出框表格查询
 */
-const CohortSearchList: React.FC<CohortSearchTableProps> = (props) => {
+const CohortSearchList: React.FC = () => {
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<schema.XTarget[]>([]);
 
-  useEffect(() => {
-    tableProps = props;
-  }, []);
   const renderCardFun = (dataArr: schema.XTarget[]): React.ReactNode[] => {
     return dataArr.map((item: schema.XTarget) => {
       return (
