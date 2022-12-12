@@ -128,8 +128,6 @@ class AppController extends Emitter {
   }
 
   private async _initialization() {
-    console.log('变化');
-
     this._target = userCtrl.space;
     await this._target.getOwnProducts(true);
     this.changCallback();
@@ -153,8 +151,6 @@ class AppController extends Emitter {
       'user',
       (Msg: RecMsg<SpeciesType>) => {
         const { data } = Msg;
-        console.log('定义目录', STORE_USER_MENU + this._customMenus.spaceId, Msg);
-
         this._customMenus.species = data?.species || defaultCustomCategory;
         this.changCallbackPart(STORE_USER_MENU);
       },

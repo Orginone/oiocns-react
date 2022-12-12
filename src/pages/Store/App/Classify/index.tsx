@@ -34,10 +34,7 @@ const StoreClassify: React.FC = () => {
   const [newMenuForm] = Form.useForm();
   useEffect(() => {
     const id = appCtrl.subscribePart(STORE_USER_MENU, () => {
-      const arr = appCtrl.spacies || [];
-      console.log('监听,tree变化', arr);
-
-      setCustomMenu([...arr]);
+      setCustomMenu([...appCtrl.spacies]);
     });
     return () => {
       return appCtrl.unsubscribe(id);
