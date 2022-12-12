@@ -31,10 +31,9 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   const [key, setKey] = useState(0);
   console.log('editorValue', editorValue);
   /**组件渲染中变更dom   共享状态*/
-
   let design = useAppwfConfig((state: any) => state.design);
 
-  let dom = design.resource;
+  let currentDom = design.resource;
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
 
@@ -611,7 +610,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode, editorValue }
   const getTree = () => {
     nodeMap.clear();
 
-    let processTrees = getDomTree(React.createElement, dom);
+    let processTrees = getDomTree(React.createElement, currentDom);
     //插入末端节点
     processTrees.push(
       React.createElement(
