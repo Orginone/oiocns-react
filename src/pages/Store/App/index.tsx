@@ -113,7 +113,7 @@ const StoreApp: React.FC = () => {
           appCtrl.setCurProduct(id);
           history.push({ pathname: '/store/app/publish' });
         },
-      }, //setMoveModal
+      },
       {
         key: 'moveTo',
         label: '移动至',
