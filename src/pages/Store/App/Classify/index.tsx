@@ -8,15 +8,22 @@ import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid, findAimObj } from '@/utils/tools';
 
 import ReactDOM from 'react-dom';
-import SelfAppCtrl, {
-  TreeType,
-  MenuOptTypes,
-  SelfCallBackTypes,
-} from '@/ts/controller/store/selfAppCtrl';
+import appCtrl, { TreeType } from '@/ts/controller/store/appCtrl';
+import { STORE_USER_MENU } from '@/constants/const';
 
 let selectMenuInfo: any = {},
   modalType = '';
 const { confirm } = Modal;
+/* 菜单列表 */
+const MenuOpts = [
+  '新增子级',
+  '重命名',
+  '创建副本',
+  '拷贝链接',
+  '移动到',
+  '固定为常用',
+  '删除',
+];
 //自定义树
 const StoreClassify: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -25,15 +32,15 @@ const StoreClassify: React.FC = () => {
   const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [customMenu, setCustomMenu] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
-
   useEffect(() => {
-    const id = SelfAppCtrl.subscribePart(SelfCallBackTypes.CustomMenu, () => {
-      console.log('监听,tree变化', SelfAppCtrl.customMenu || []);
-      const arr = SelfAppCtrl.customMenu || [];
+    const id = appCtrl.subscribePart(STORE_USER_MENU, () => {
+      const arr = appCtrl.spacies || [];
+      console.log('监听,tree变化', arr);
+
       setCustomMenu([...arr]);
     });
     return () => {
-      return SelfAppCtrl.unsubscribe(id);
+      return appCtrl.unsubscribe(id);
     };
   }, []);
 
@@ -57,7 +64,7 @@ const StoreClassify: React.FC = () => {
 
     setIsStoreOpen(false);
     // 数据缓存
-    SelfAppCtrl.cacheSelfMenu(customMenu);
+    appCtrl.cacheCustomMenu(customMenu);
   };
 
   /*******
@@ -95,7 +102,7 @@ const StoreClassify: React.FC = () => {
       default:
         break;
     }
-    SelfAppCtrl.cacheSelfMenu(customMenu);
+    appCtrl.cacheCustomMenu(customMenu);
   }
   const onCancel = () => {
     setIsStoreOpen(false);
@@ -108,7 +115,7 @@ const StoreClassify: React.FC = () => {
    * @param {object} param1
    * @return {*}
    */
-  const handleMenuClick = (key: string | MenuOptTypes, data: any) => {
+  const handleMenuClick = (key: string, data: any) => {
     console.log('目录更多操作', key, data);
     selectMenuInfo = data;
     modalType = key;
@@ -141,7 +148,6 @@ const StoreClassify: React.FC = () => {
   const handleTitleClick = (item: TreeType) => {
     // 触发内容去变化
     console.log('点击', item);
-    SelfAppCtrl.curMenuKey = item.key || item.id;
   };
   const domNode = document.getElementById('templateMenu');
   if (!domNode) return null;
@@ -152,7 +158,7 @@ const StoreClassify: React.FC = () => {
           <div className={cls.container}>
             <StoreClassifyTree
               title={'我的分类'}
-              menu={SelfAppCtrl.MenuOpts}
+              menu={MenuOpts}
               searchable
               isDirectoryTree
               treeData={customMenu}
