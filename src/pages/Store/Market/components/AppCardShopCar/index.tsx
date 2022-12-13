@@ -1,11 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React from 'react';
 import { CheckCard } from '@ant-design/pro-components';
-import { Button, Dropdown, Modal, Typography } from 'antd';
-import { CheckCircleOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Dropdown, Typography } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { common } from 'typings/common';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 import appImg from '/img/appLogo.svg';
 import { MarketTypes } from 'typings/marketType';
 

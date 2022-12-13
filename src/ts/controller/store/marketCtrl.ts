@@ -4,6 +4,7 @@ import { JOIN_SHOPING_CAR, USER_MANAGEMENT } from '@/constants/const';
 import { message } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
+import { XMerchandise } from '@/ts/base/schema';
 
 export enum MarketCallBackTypes {
   'ApplyData' = 'ApplyData',
@@ -71,28 +72,11 @@ class MarketController extends Emitter {
   }
 
   /**
-   * @desc: 获取表格头部展示数据
-   * @return {*}
-   */
-  // public getColumns(pageKey?: string) {
-  //   switch (pageKey) {
-  //     case 'appInfo':
-  //     case 'myApp':
-  //       return myColumns;
-  //     case 'market':
-  //       return marketColumns;
-  //     default:
-  //       return [];
-  //   }
-  //   //TODO:待完善
-  // }
-
-  /**
    * @description: 添加商品进购物车
-   * @param {any} data
+   * @param {XMerchandise} data
    * @return {*}
    */
-  public joinApply = async (data: any) => {
+  public joinApply = async (data: XMerchandise) => {
     if (this._shopinglist.length === 0) {
       this._shopinglist.push(data);
       message.success('已加入购物车');

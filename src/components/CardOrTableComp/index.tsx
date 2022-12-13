@@ -118,7 +118,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
     return (
-      <ProTable //pageType === 'table' ? (
+      <ProTable
         className={cls['common-table']}
         columns={hideOperation ? columns : resetColumns}
         scroll={{ x: width && width > 100 ? width : 1000, y: height || defaultHeight }}
@@ -152,6 +152,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               offset: (pageIndex - 1) * pageSize,
             };
             const res = await request(other ? { ...other, ...page } : page);
+            console.log(res);
             if (res) {
               return {
                 total: res.total || 0,
@@ -168,8 +169,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             };
           }
         }}
-        tableRender={(props: any, defaultDom, { toolbar, table }) => {
-          console.log(table);
+        tableRender={(props: any, defaultDom, { toolbar }) => {
           return pageType === 'table' ? (
             !showChangeBtn ||
             !props.action.dataSource ||
@@ -183,7 +183,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             )
           ) : (
             <>
-              {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
               {toolbar}
               <div
                 className={cls['common-card']}
@@ -218,18 +217,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         {...rest}
       />
     );
-    // ) : (
-    //   <>
-    //     {headerTitle ? <div className="card-title">{headerTitle}</div> : ''}
-    //     <div
-    //       className={cls['common-card']}
-    //       style={{
-    //         height: defaultHeight !== 'auto' ? defaultHeight + 57 + 'px' : defaultHeight,
-    //       }}>
-    //       {renderCardContent && renderCardContent(dataSource)}
-    //     </div>
-    //   </>
-    // );
   }, [pageType, dataSource, resetColumns, defaultHeight]);
   /**
    * @desc: 自定义表格 底部区域
@@ -277,7 +264,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   return (
     <div className={cls['common-table-wrap']} style={style}>
       {renderTable}
-      {/* {TableFooter} */}
     </div>
   );
 };

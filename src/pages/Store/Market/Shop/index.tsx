@@ -9,7 +9,7 @@ import ProductDetailModal from '@/components/ProductDetailModal';
 import MarketClassify from '../components/Classify';
 import ReactDOM from 'react-dom';
 import { XMerchandise } from '@/ts/base/schema';
-import { Modal } from 'antd';
+import { message, Modal } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
 import { CheckCircleOutlined } from '@ant-design/icons';
@@ -52,35 +52,10 @@ const AppShowComp: React.FC = () => {
         title: '确认订单',
         content: '此操作将生成交易订单。是否确认',
         icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-        onOk: async () => await marketCtrl.buyShoping([selectItem]),
+        onOk: async () => await marketCtrl.buyShoping([selectItem.id]),
       });
     }
   };
-
-  /**
-   * @description: 关闭详情
-   * @return {*}
-   */
-  const onClose = () => {
-    setIsProduce(false);
-  };
-
-  // /**
-  //  * @description: 取消订单
-  //  * @return {*}
-  //  */
-  // const onCancel = () => {
-  //   setIsBuy(false);
-  // };
-
-  // /**
-  //  * @description: 购买商品
-  //  * @return {*}
-  //  */
-  // const OnBuyShoping = async () => {
-  //   await marketCtrl.buyShoping(nowBuy);
-  //   setIsBuy(false);
-  // };
 
   // 操作内容渲染函数
   const renderOperation = (item: XMerchandise): common.OperationType[] => {
@@ -90,7 +65,6 @@ const AppShowComp: React.FC = () => {
         label: '立即购买',
         onClick: () => {
           handleBuyAppFun('buy', item);
-          // setNowBuy([item]);
         },
       },
       {
@@ -115,8 +89,13 @@ const AppShowComp: React.FC = () => {
           Modal.confirm({
             title: '提示',
             content: '是否确认下架《' + item.caption + '》商品',
-            onOk: () => {
-              current?.unPublish(item.id);
+            onOk: async () => {
+              if (await current?.unPublish(item.id)) {
+                message.success('下架' + item.caption + '》商品成功');
+              } else {
+                message.success('下架失败');
+              }
+              marketCtrl.changCallback();
             },
           });
           setDetail(item);
@@ -154,6 +133,7 @@ const AppShowComp: React.FC = () => {
   return (
     <div className={`${cls['app-wrap']} ${cls['market-public-wrap']}`} ref={parentRef}>
       <CardOrTable<XMerchandise>
+        key={key}
         dataSource={[]}
         stripe
         headerTitle={current?.market.name}
@@ -162,6 +142,7 @@ const AppShowComp: React.FC = () => {
         operation={renderOperation}
         columns={marketColumns}
         rowKey={'id'}
+        params={{ id: current?.market.id }}
         request={async (page) => {
           return await current?.getMerchandise(page);
         }}
@@ -169,17 +150,9 @@ const AppShowComp: React.FC = () => {
       <ProductDetailModal
         open={isProduce}
         title="应用详情"
-        onClose={onClose}
+        onClose={() => setIsProduce(false)}
         data={detail}
       />
-      {/* <BuyCustomModal
-        open={isBuy}
-        title="确认订单"
-        onOk={OnBuyShoping}
-        onCancel={onCancel}
-        content="此操作将生成交易订单。是否确认"
-      /> */}
-
       {treeContainer
         ? ReactDOM.createPortal(
             <MarketClassify tkey={key} current={current} setCurrent={setCurrent} />,
