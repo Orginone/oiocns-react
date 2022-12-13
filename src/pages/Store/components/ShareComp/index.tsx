@@ -134,21 +134,26 @@ const ShareRecent = (props: Iprops) => {
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     const item: ITarget = info.node.item;
-    // console.log('selected', selectedKeys, info);
+    console.log('selected', selectedKeys, info);
     setLeftTreeSelectedKeys(selectedKeys);
     if (hasSelectRecord?.type) {
-      hasSelectRecord?.createList.length > 0 &&
-        appCtrl.curProduct?.createExtend(
+      let Target = curResourceId ? getCurResource() : appCtrl.curProduct;
+      if (hasSelectRecord?.createList.length > 0) {
+        let res = await Target.createExtend(
           selectedTeamId,
           hasSelectRecord.createList,
           hasSelectRecord.type,
         );
-      hasSelectRecord?.delList.length > 0 &&
-        appCtrl.curProduct?.deleteExtend(
+        console.log('新增', Target, res);
+      }
+      if (hasSelectRecord?.delList.length > 0) {
+        let res = await Target.deleteExtend(
           selectedTeamId,
           hasSelectRecord.delList,
           hasSelectRecord.type,
         );
+        console.log('减少', Target, res);
+      }
     }
 
     setSelectedTeamId(item.id);

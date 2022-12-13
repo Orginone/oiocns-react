@@ -9,6 +9,8 @@ export interface TreeType {
   title: string;
   key: string;
   id: string;
+  // type: 'app' | 'docx' | 'assets' | 'data'; //可扩展
+  items: string[];
   children: TreeType[];
 }
 interface SpeciesType {
@@ -33,12 +35,14 @@ const defaultCustomCategory: TreeType[] = [
     title: '应用',
     key: 'app',
     id: '1',
+    items: [],
     children: [],
   },
   {
     title: '文档',
     key: 'doc',
     id: '2',
+    items: [],
     children: [],
   },
   // {
@@ -151,7 +155,10 @@ class AppController extends Emitter {
       'user',
       (Msg: RecMsg<SpeciesType>) => {
         const { data } = Msg;
-        this._customMenus.species = data?.species || defaultCustomCategory;
+        this._customMenus.species =
+          Array.isArray(data?.species) && data.species.length > 0
+            ? data.species
+            : defaultCustomCategory;
         this.changCallbackPart(STORE_USER_MENU);
       },
     );

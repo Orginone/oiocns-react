@@ -52,6 +52,7 @@ const StoreClassify: React.FC = () => {
         id: getUuid(),
         key: `${selectMenuInfo?.key}-${selectMenuInfo?.children?.length || '01'}`,
         title: title,
+        items: [],
         children: [],
       };
       obj.children.push(newObj);
@@ -83,10 +84,16 @@ const StoreClassify: React.FC = () => {
       case '删除':
         {
           const obj = findAimObj(true, id, customMenu);
+          console.log('删除', obj);
+
           const newData = obj.children.filter((v: any) => {
             return v.id !== id;
           });
           obj.children = newData;
+          if (!obj?.id) {
+            appCtrl.cacheCustomMenu(newData);
+            return;
+          }
         }
         break;
       case '重命名':
@@ -99,6 +106,8 @@ const StoreClassify: React.FC = () => {
       default:
         break;
     }
+    console.log('湿哒哒43', customMenu);
+
     appCtrl.cacheCustomMenu(customMenu);
   }
   const onCancel = () => {
