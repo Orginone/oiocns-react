@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import Title from 'antd/lib/typography/Title';
@@ -8,6 +8,8 @@ import { schema } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import { useHistory } from 'react-router-dom';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { emitter } from '@/ts/core';
 
 interface OperationType {
   key: string;
@@ -50,19 +52,12 @@ const columns: ColumnsType<any> = [
  * @returns
  */
 const PersonFriend: React.FC = () => {
+  const [key, forceUpdate] = useCtrlUpdate(emitter);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friend, setFriend] = useState<schema.XTarget>();
-  const [data, setData] = useState<schema.XTarget[]>([]);
 
-  useEffect(() => {
-    getData();
-  }, []);
   const history = useHistory();
 
-  const getData = async () => {
-    const res = await userCtrl.user.loadMembers({ offset: 0, filter: '', limit: 65535 });
-    setData(res.result!);
-  };
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -88,7 +83,7 @@ const PersonFriend: React.FC = () => {
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
           await userCtrl.user.removeMember(item);
-          getData();
+          forceUpdate();
         },
       },
     ];
@@ -117,8 +112,12 @@ const PersonFriend: React.FC = () => {
     <div className={cls['person-friend-container']}>
       {top}
       <CardOrTable
-        dataSource={data}
-        total={data?.length}
+        dataSource={[]}
+        total={0}
+        params={key}
+        request={async (page) => {
+          return await userCtrl.user.loadMembers(page);
+        }}
         operation={renderOperation}
         columns={columns as any}
         rowKey={'id'}

@@ -13,10 +13,8 @@ class ThingController extends Emitter {
     this._species = new Map();
     emitter.subscribePart([DomainTypes.Company], () => {
       setTimeout(async () => {
-        if (this._teamId != userCtrl.company.id) {
-          if (userCtrl.isCompanySpace) {
-            await this.loadTeamSpecies(userCtrl.company.id);
-          }
+        if (this._teamId != userCtrl.space.id) {
+          await this.loadTeamSpecies(userCtrl.space.id);
         }
       }, 100);
     });

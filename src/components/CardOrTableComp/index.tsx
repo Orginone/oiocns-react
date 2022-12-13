@@ -131,7 +131,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showSizeChanger: true,
           defaultCurrent: page,
           onChange: (current) => {
-            console.log(current);
+            // console.log(current);
           },
           showTotal: (total: number) => `共 ${total} 条`,
         }}
@@ -152,7 +152,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               offset: (pageIndex - 1) * pageSize,
             };
             const res = await request(other ? { ...other, ...page } : page);
-            console.log(res);
             if (res) {
               return {
                 total: res.total || 0,

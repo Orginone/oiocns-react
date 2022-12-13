@@ -37,12 +37,22 @@ export interface ISpeciesItem {
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
   /**
+   * 更新标准分类项
+   * @param data 创建参数
+   */
+  update(data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>): Promise<ISpeciesItem>;
+  /**
    * 创建分类特性项
    * @param data 创建参数
    */
   createAttr(
     data: Omit<AttributeModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
+  /**
+   * 更新分类特性项
+   * @param data 创建参数
+   */
+  updateAttr(data: Omit<AttributeModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
   /**
    * 删除分类特性项
    * @param id 特性项id

@@ -16,18 +16,21 @@ const UserAvatar: React.FC = () => {
    */
   const menuItems: MenuProps = {
     onClick: (info) => {
-      if (info.key) {
-        if (info.key === '/passport/login') {
+      switch (info.key) {
+        case '/passport/login':
           sessionStorage.clear();
-        }
-        history.push(info.key);
+          break;
+        case '/setting/user':
+          userCtrl.setCurSpace(userCtrl.user.id);
+          break;
       }
+      history.push(info.key);
     },
     items: [
       {
-        key: '/person/info',
+        key: '/setting/user',
         icon: <UserOutlined />,
-        label: '个人中心',
+        label: '个人设置',
       },
       {
         type: 'divider' as const,

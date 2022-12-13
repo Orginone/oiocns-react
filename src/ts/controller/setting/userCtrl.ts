@@ -67,7 +67,7 @@ class UserController extends Emitter {
   }
   /** 设置当前空间 */
   public setCurSpace(id: string) {
-    if (id === this._user!.target.id) {
+    if (id === this._user!.id) {
       this._curSpace = undefined;
       sessionStorage.setItem(sessionSpaceName, '');
     } else {

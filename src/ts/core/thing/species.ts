@@ -73,6 +73,24 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return;
   }
+  async update(
+    data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>,
+  ): Promise<ISpeciesItem> {
+    const res = await kernel.updateSpecies({
+      ...data,
+      id: this.id,
+      code: this.target.code,
+      parentId: this.target.parentId,
+    });
+    if (res.success) {
+      this.target.name = data.name;
+      this.target.public = data.public;
+      this.target.authId = data.authId;
+      this.target.belongId = data.belongId;
+      this.target.remark = data.remark;
+    }
+    return this;
+  }
   async delete(): Promise<boolean> {
     const res = await kernel.deleteSpecies({
       id: this.id,
@@ -94,6 +112,16 @@ export class SpeciesItem implements ISpeciesItem {
       speciesId: this.id,
       speciesCode: this.target.code,
       ...data,
+    });
+    return res.success;
+  }
+  async updateAttr(
+    data: Omit<AttributeModel, 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean> {
+    const res = await kernel.updateAttribute({
+      ...data,
+      speciesId: this.target.id,
+      speciesCode: this.target.code,
     });
     return res.success;
   }

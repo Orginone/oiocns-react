@@ -338,11 +338,6 @@ export const routerInfo = [
             title: '语言设置',
             icon: '',
           },
-          {
-            path: '/person/standard',
-            title: '标准设置',
-            icon: '',
-          },
         ],
       },
       {

@@ -56,7 +56,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
       request: async () => {
-        const data = await userCtrl.company.selectAuthorityTree(false);
+        const data = await userCtrl.space.selectAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {
@@ -119,10 +119,11 @@ const SpeciesModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
+        values = { ...current.target, ...values };
         if (title.includes('新增')) {
           handleOk(await current.create(values));
         } else {
-          handleOk(undefined);
+          handleOk(await current.update(values));
         }
       }}
       columns={columns}></SchemaForm>

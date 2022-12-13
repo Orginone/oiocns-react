@@ -1,6 +1,8 @@
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { TargetType } from '@/ts/core';
 import { LockOutlined } from '@ant-design/icons';
-import { Avatar, Button, Form, Input, message } from 'antd';
+import { Button, Form, Input } from 'antd';
 import React from 'react';
 
 import cls from './index.module.less';
@@ -10,15 +12,19 @@ const PassportLock: React.FC = () => {
   return (
     <div>
       <Form
-        onFinish={async ({ account, password }) => {
-          if (account && password) {
-            await userCtrl.login(account, password);
+        onFinish={async ({ password }) => {
+          const account = userCtrl.user.target.code;
+          if (password && (await userCtrl.login(account, password))) {
+            history.back();
           }
-          message.error('锁屏密码错误，请重试！');
         }}>
         <Form.Item>
           <div className={cls.avatar}>
-            <Avatar size="large"></Avatar>
+            <TeamIcon
+              size={80}
+              avatar={userCtrl.user.avatar}
+              typeName={TargetType.Person}
+            />
           </div>
         </Form.Item>
         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>

@@ -3,7 +3,6 @@ import Layout from 'antd/lib/layout/layout';
 import React, { useState } from 'react';
 
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import PersonInfoDepartment from './Department';
 import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
 import UserInfoEditModal from '@/bizcomponents/EditUserInfo';
 import cls from './index.module.less';
@@ -15,7 +14,6 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
  */
 const PersonInfo: React.FC = () => {
   const user = userCtrl.user;
-  const [showDepartment, setShowDepartment] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   // 信息标题
   const title = (
@@ -62,13 +60,7 @@ const PersonInfo: React.FC = () => {
       <Layout className={cls.container}>
         <Card bordered={false}>
           <div className={cls['person-info-company']}>
-            {showDepartment ? (
-              <PersonInfoDepartment
-                setShowDepartment={setShowDepartment}></PersonInfoDepartment>
-            ) : (
-              <PersonInfoCompany
-                setShowDepartment={setShowDepartment}></PersonInfoCompany>
-            )}
+            <PersonInfoCompany />
           </div>
         </Card>
       </Layout>

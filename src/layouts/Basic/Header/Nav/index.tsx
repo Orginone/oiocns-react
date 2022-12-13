@@ -45,7 +45,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'setting',
-      path: userCtrl.isCompanySpace ? '/setting/info' : '/setting/friend',
+      path: userCtrl.isCompanySpace ? '/setting/info' : '/setting/user',
       title: '设置',
       icon: 'icon-setting',
       count: 0,

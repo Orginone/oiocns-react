@@ -94,6 +94,7 @@ const SpeciesTree: React.FC<CreateGroupPropsType> = ({
           selectedKeys={[current?.id]}
           treeData={data}
           onSelect={onSelect}
+          defaultExpandAll
           handleMenuClick={(id, node) => handleMenuClick(id, node.item)}
         />
       </div>,

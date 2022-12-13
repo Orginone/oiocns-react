@@ -9,9 +9,9 @@ import { columns } from './config';
 import EditIndentityModal from './components/AddPositionMoadl';
 import TreeLeftDeptPage from './components/TreeLeftPosPage';
 import AssignPosts from './components/AssignPosts';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { ITarget } from '@/ts/core';
-import { MarketTypes } from 'typings/marketType';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -30,7 +30,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
   const [currentPerson, setPerson] = useState<schema.XTarget[]>();
-  const [personData, setPersonData] = useState<XTarget[]>([]);
+  const [key, forceUpdate] = useObjectUpdate(indentity);
   useEffect(() => {
     if (open) {
       getDataList();
@@ -46,23 +46,8 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       await setTreeCurrent(data[0]);
     }
   };
-  // 点击选中加载
-  const getPersonData = async (currentIndentity: IIdentity) => {
-    const res = await currentIndentity.loadMembers({
-      offset: 0,
-      filter: '',
-      limit: 65535,
-    });
-    if (res?.result) {
-      //加载身份下的成员
-      setPersonData(res.result);
-      //加载可指派成员
-    } else {
-      setPersonData([]);
-    }
-  };
   // 操作内容渲染函数
-  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
+  const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
       {
         key: 'remove',
@@ -75,7 +60,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             cancelText: '取消',
             onOk: async () => {
               await indentity?.removeMembers([item.id]);
-              getPersonData(indentity!);
+              forceUpdate();
             },
           });
         },
@@ -86,7 +71,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   // 选中树的时候操作
   const setTreeCurrent = async (current: IIdentity) => {
     setIndentity(current);
-    await getPersonData(current);
   };
   // 身份信息操作
   const buttons = [
@@ -113,7 +97,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             if (success) {
               message.success('删除成功');
               getDataList();
-              setPersonData([]);
               setIndentity(undefined);
             } else {
               message.error('删除失败');
@@ -170,10 +153,14 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
           bordered={false}>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={personData as any}
+              <CardOrTable<XTarget>
+                dataSource={[]}
                 rowKey={'id'}
-                total={personData.length || 0}
+                total={0}
+                params={key}
+                request={async (page) => {
+                  return await indentity?.loadMembers(page);
+                }}
                 operation={renderOperation}
                 columns={columns as any}
                 parentRef={parentRef}
@@ -231,8 +218,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                   ids.push(a.id);
                 }
                 await indentity?.pullMembers(ids);
-                getPersonData(indentity!);
-                message.success('指派成功');
+                forceUpdate();
               }}>
               <AssignPosts searchFn={setPerson} />
             </Modal>

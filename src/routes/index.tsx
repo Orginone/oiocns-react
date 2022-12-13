@@ -307,22 +307,64 @@ const SettingRouter: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Setting/Group')),
       },
       {
+        path: '/setting/user',
+        title: '个人信息',
+        icon: <InfoCircleOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/User')),
+      },
+      {
         path: '/setting/friend',
         title: '好友设置',
         icon: <UserOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Friend')),
+        component: React.lazy(() => import('@/pages/Setting/Friend')),
       },
       {
         path: '/setting/cohort',
         title: '群组设置',
         icon: <TeamOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Cohort')),
+        component: React.lazy(() => import('@/pages/Setting/Cohort')),
+      },
+      {
+        path: '/setting/passport',
+        title: '通行设置',
+        icon: <IdcardOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Passport')),
+      },
+      {
+        path: '/setting/wallet',
+        title: '卡包设置',
+        icon: <WalletOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Wallet')),
       },
       {
         path: '/setting/help',
         title: '帮助中心',
         icon: <SmileOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Help')),
+      },
+      {
+        path: '/setting/message',
+        title: '消息设置',
+        icon: <MessageOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Message')),
+      },
+      {
+        path: '/setting/theme',
+        title: '主题设置',
+        icon: <GiftOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Theme')),
+      },
+      {
+        path: '/setting/lang',
+        title: '语言设置',
+        icon: <GlobalOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Lang')),
+      },
+      {
+        path: '/setting/home',
+        title: '首页设置',
+        icon: <HomeOutlined />,
+        component: React.lazy(() => import('@/pages/Setting/Home')),
       },
       {
         path: '/setting/homeset',
@@ -341,7 +383,7 @@ const SettingRouter: IRouteConfig[] = [
         path: '/setting/src',
         title: '资源设置',
         icon: 'icon-setting',
-        component: React.lazy(() => import('@/pages/Setting/Src')),
+        component: React.lazy(() => import('@/pages/Setting/Resource')),
       },
       {
         path: '/setting/app',
@@ -367,83 +409,17 @@ const SettingRouter: IRouteConfig[] = [
         icon: <SettingOutlined />,
         component: React.lazy(() => import('@/pages/Setting/Auth')),
       },
-    ],
-  },
-];
-
-/* 个人 */
-const PersonRouter: IRouteConfig[] = [
-  {
-    path: '/person',
-    title: '我的',
-    icon: <UserOutlined />,
-    component: React.lazy(() => import('@/pages/Person')),
-    routes: [
       {
-        path: '/person/info',
-        title: '个人信息',
-        icon: <InfoCircleOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Info')),
-      },
-      {
-        path: '/person/passport',
-        title: '通行设置',
-        icon: <IdcardOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Passport')),
-      },
-      {
-        path: '/person/wallet',
-        title: '卡包设置',
-        icon: <WalletOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Wallet')),
-      },
-      {
-        path: '/person/homeset',
-        title: '首页设置',
-        icon: <HomeOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Homeset')),
-      },
-      {
-        path: '/person/help',
-        title: '帮助中心',
-        icon: <SmileOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Help')),
-      },
-      {
-        path: '/person/address',
+        path: '/setting/address',
         title: '地址管理',
         icon: <HomeOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Address')),
+        component: React.lazy(() => import('@/pages/Setting/Address')),
       },
       {
-        path: '/person/safe',
+        path: '/setting/safe',
         title: '安全管理',
         icon: <SafetyOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Safe')),
-      },
-      {
-        path: '/person/message',
-        title: '消息设置',
-        icon: <MessageOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Message')),
-      },
-      {
-        path: '/person/theme',
-        title: '主题设置',
-        icon: <GiftOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Theme')),
-      },
-      {
-        path: '/person/lang',
-        title: '语言设置',
-        icon: <GlobalOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Lang')),
-      },
-      {
-        path: '/person/standard',
-        title: '标准设置',
-        icon: <DatabaseOutlined />,
-        component: React.lazy(() => import('@/pages/Person/Standard')),
+        component: React.lazy(() => import('@/pages/Setting/Safe')),
       },
     ],
   },
@@ -475,7 +451,6 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...SettingRouter,
-      ...PersonRouter,
       {
         path: '/online',
         title: '第三方应用',

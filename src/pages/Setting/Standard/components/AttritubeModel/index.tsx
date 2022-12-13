@@ -49,7 +49,6 @@ const SpeciesModal = (props: Iprops) => {
         showSearch: true,
         filterTreeNode: true,
         treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
       },
     },
     {
@@ -145,10 +144,11 @@ const SpeciesModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
+        values = { ...data, ...values };
         if (title.includes('新增')) {
           handleOk(await current.createAttr(values));
         } else {
-          handleOk(false);
+          handleOk(await current.updateAttr(values));
         }
       }}
       columns={columns}></SchemaForm>
