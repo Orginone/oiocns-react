@@ -154,15 +154,13 @@ const SettingInfo: React.FC = () => {
               {userCtrl.company?.avatar && (
                 <Avatar src={userCtrl.company?.avatar?.thumbnail} />
               )}
-              <strong>{info.name}</strong>
+              <strong>{info.team?.name}</strong>
             </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="单位法人">{info.belongId}</Descriptions.Item>
           <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
-          <Descriptions.Item label="团队简称">{info.team?.name}</Descriptions.Item>
-          <Descriptions.Item label="单位简介" span={2}>
-            {info.team?.remark}
-          </Descriptions.Item>
+          <Descriptions.Item label="团队简称">{info.name}</Descriptions.Item>
+          <Descriptions.Item label="团队代号">{info.team?.code}</Descriptions.Item>
+          <Descriptions.Item label="单位简介">{info.team?.remark}</Descriptions.Item>
         </Descriptions>
       </Card>
       <div className={cls['pages-wrap']}>
