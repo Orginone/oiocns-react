@@ -65,7 +65,7 @@ class TodoController extends Emitter {
     this._orgTodo;
   };
   /** 获取总的待办数量 */
-  public async TaskCount(): Promise<number> {
+  public async getTaskCount(): Promise<number> {
     let sum = 0;
     sum += (await this._orgTodo?.getCount()) ?? 0;
     sum += (await this._marketTodo?.getCount()) ?? 0;

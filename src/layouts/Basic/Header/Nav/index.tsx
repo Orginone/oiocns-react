@@ -54,7 +54,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   ];
   useEffect(() => {
     const id = todoCtrl.subscribe(async () => {
-      setTaskNum(await todoCtrl.TaskCount());
+      setTaskNum(await todoCtrl.getTaskCount());
     });
     return () => {
       return todoCtrl.unsubscribe(id);

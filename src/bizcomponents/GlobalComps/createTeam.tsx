@@ -20,7 +20,6 @@ interface Iprops {
   编辑
 */
 const CreateTeamModal = (props: Iprops) => {
-  const { open, title, handleOk, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
@@ -82,11 +81,11 @@ const CreateTeamModal = (props: Iprops) => {
       title: '名称',
       dataIndex: 'teamName',
       formItemProps: {
-        rules: [{ required: true, message: '单位名称为必填项' }],
+        rules: [{ required: true, message: '名称为必填项' }],
       },
     },
     {
-      title: '团队类型',
+      title: '类型',
       dataIndex: 'typeName',
       valueType: 'select',
       fieldProps: {
@@ -102,28 +101,28 @@ const CreateTeamModal = (props: Iprops) => {
       },
     },
     {
-      title: '团队代码',
+      title: '代码',
       dataIndex: 'code',
       formItemProps: {
-        rules: [{ required: true, message: '团队代码为必填项' }],
+        rules: [{ required: true, message: '代码为必填项' }],
       },
     },
     {
-      title: '团队简称',
+      title: '简称',
       dataIndex: 'name',
       formItemProps: {
-        rules: [{ required: true, message: '团队简称为必填项' }],
+        rules: [{ required: true, message: '简称为必填项' }],
       },
     },
     {
-      title: '团队标识',
+      title: '标识',
       dataIndex: 'teamCode',
       formItemProps: {
-        rules: [{ required: true, message: '团队标识为必填项' }],
+        rules: [{ required: true, message: '标识为必填项' }],
       },
     },
     {
-      title: '团队信息备注',
+      title: '信息备注',
       dataIndex: 'teamRemark',
       valueType: 'textarea',
       colProps: { span: 24 },
@@ -132,25 +131,25 @@ const CreateTeamModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       formRef={formRef}
-      title={title}
-      open={open}
+      title={props.title}
+      open={props.open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
           formRef.current?.setFieldValue('typeName', props.typeNames[0]);
-          if (title === '编辑') {
-            setAvatar(parseAvatar(current.target.avatar));
+          if (props.title === '编辑') {
+            setAvatar(parseAvatar(props.current.target.avatar));
             formRef.current?.setFieldsValue({
-              ...current.target,
-              teamName: current.target.team?.name,
-              teamCode: current.target.team?.code,
-              teamRemark: current.target.team?.remark,
+              ...props.current.target,
+              teamName: props.current.target.team?.name,
+              teamCode: props.current.target.team?.code,
+              teamRemark: props.current.target.team?.remark,
             });
           }
         } else {
           formRef.current?.resetFields();
           setAvatar(undefined);
-          handleCancel();
+          props.handleCancel();
         }
       }}
       rowProps={{
@@ -159,10 +158,10 @@ const CreateTeamModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         values.avatar = JSON.stringify(avatar);
-        if (title === '编辑') {
-          handleOk(await current.update(values));
+        if (props.title === '编辑') {
+          props.handleOk(await props.current.update(values));
         } else {
-          handleOk(await current.create(values));
+          props.handleOk(await props.current.create(values));
         }
       }}
       columns={columns}></SchemaForm>
