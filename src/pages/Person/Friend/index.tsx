@@ -54,7 +54,6 @@ const PersonFriend: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friend, setFriend] = useState<schema.XTarget>();
   const [data, setData] = useState<schema.XTarget[]>([]);
-  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
 
   useEffect(() => {
     getData();
@@ -67,9 +66,6 @@ const PersonFriend: React.FC = () => {
   };
   const showModal = () => {
     setIsModalOpen(true);
-  };
-  const onApplyOk = () => {
-    setLookApplyOpen(false);
   };
   const handleOk = async () => {
     setIsModalOpen(false);

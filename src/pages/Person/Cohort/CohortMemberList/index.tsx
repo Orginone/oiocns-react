@@ -186,9 +186,11 @@ const MemberList: React.FC<defaultObjType> = ({ cohortData }) => {
   return (
     <div>
       <Descriptions title="群组详情" bordered size="small" column={2}>
-        <Descriptions.Item label="群组名称">奥能集团项目交流群</Descriptions.Item>
-        <Descriptions.Item label="群组编号">AoNengJiTuan</Descriptions.Item>
-        <Descriptions.Item label="群组简介">react项目开发人员</Descriptions.Item>
+        <Descriptions.Item label="群组名称">{cohortData.target.name}</Descriptions.Item>
+        <Descriptions.Item label="群组编号">{cohortData.target.code}</Descriptions.Item>
+        <Descriptions.Item label="群组简介">
+          {cohortData.target.typeName}
+        </Descriptions.Item>
       </Descriptions>
 
       <div className={cls['person-info-company']}>
