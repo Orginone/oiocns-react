@@ -3,6 +3,7 @@ import React from 'react';
 import styles from './index.module.less';
 import moment from 'moment';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
+import { EllipsisOutlined } from '@ant-design/icons';
 const { Meta } = Card;
 interface TableItemCardProps<T> {
   data: T[];
@@ -35,7 +36,7 @@ const TableItemCard = <T extends IApplyItem | IApprovalItem>(
                 </Avatar>
               }
               title={
-                <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Space>
                     <span className={styles['card-title']}>
                       {item[targetOrTeam].name}
@@ -43,11 +44,11 @@ const TableItemCard = <T extends IApplyItem | IApprovalItem>(
                     {statusType && statusType(instans)}
                   </Space>
                   {operation && (
-                    <Dropdown.Button
-                      type="text"
+                    <Dropdown
                       menu={{ items: operation(instans) }}
-                      className={styles['drop-down']}
-                    />
+                      className={styles['drop-down']}>
+                      <EllipsisOutlined />
+                    </Dropdown>
                   )}
                 </div>
               }

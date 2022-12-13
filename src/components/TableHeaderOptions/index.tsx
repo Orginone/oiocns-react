@@ -125,7 +125,7 @@ interface TableHeaderOptionsProps<T> extends ModalProps {
 /**  显示列
  *
  */
-const TableHeaderOptions = <T extends ModalProps>({
+const TableHeaderOptions = <T extends DataType>({
   open,
   onCancel,
   plainOptions,
