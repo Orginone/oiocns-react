@@ -15,6 +15,7 @@ interface Iprops {
     type: string,
     createList: string[],
     delList: string[],
+    selectedResourceId: string | null,
   ) => void;
 }
 const DestTypes = [
@@ -80,25 +81,34 @@ const ShareRecent = (props: Iprops) => {
       if (appCtrl.curProduct) {
         if (shareType === '共享') {
           setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree()));
+          await appCtrl.curProduct.queryExtend('组织');
         } else {
           if (userCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
             if (resource?.length > 0) {
+              let res = await resource[0].queryExtend('组织');
+              setShowData([...(res.result || [])]);
               setCurResourceId(resource[0].resource.id);
             }
           }
           setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree(false)));
         }
-        await appCtrl.curProduct.queryExtend('组织');
       }
     }, 10);
   }, []);
   useEffect(() => {
+    // 展示区置空
     setShowData([]);
+    // 左侧树置空
     setCenterTreeData([]);
-    setSelectedTeamId('0');
+    // 左侧树 选中置空
     setLeftTreeSelectedKeys([]);
+    // 当前所选组织置空
+    setSelectedTeamId('0');
+    //中间树 选中置空
+    setCenterCheckedKeys([]);
+    // 重新请求 已分享/分配数据
     queryExtend();
   }, [radio]);
 
@@ -108,7 +118,13 @@ const ShareRecent = (props: Iprops) => {
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (createList: string[], delList: string[]) => {
     onCheckeds &&
-      onCheckeds(selectedTeamId, DestTypes[radio - 1].label, createList, delList);
+      onCheckeds(
+        selectedTeamId,
+        DestTypes[radio - 1].label,
+        createList,
+        delList,
+        curResourceId,
+      );
   };
   // 获取已分享数据
   const queryExtend = async (type?: string, teamId?: string) => {
@@ -117,6 +133,9 @@ const ShareRecent = (props: Iprops) => {
     let curData = recordShareInfo.has(_type) ? recordShareInfo.get(_type) : {};
     // 判断是资源分配 还是 应用共享
     let Target = curResourceId ? getCurResource() : appCtrl.curProduct;
+    if (!Target) {
+      return;
+    }
     const { result = [] } = (await Target.queryExtend(_type, _teamId)) || {
       result: [],
     };
@@ -124,6 +143,7 @@ const ShareRecent = (props: Iprops) => {
 
     recordShareInfo.set(_type, curData);
     setShowData(result);
+    // 设置最初 选中记录
     originalSelected = result.map((v: any) => v.id) || [];
 
     if (radio === 1) {
@@ -134,7 +154,6 @@ const ShareRecent = (props: Iprops) => {
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     const item: ITarget = info.node.item;
-    console.log('selected', selectedKeys, info);
     setLeftTreeSelectedKeys(selectedKeys);
     if (hasSelectRecord?.type) {
       let Target = curResourceId ? getCurResource() : appCtrl.curProduct;
@@ -144,7 +163,7 @@ const ShareRecent = (props: Iprops) => {
           hasSelectRecord.createList,
           hasSelectRecord.type,
         );
-        console.log('新增', Target, res);
+        console.log('新增', res);
       }
       if (hasSelectRecord?.delList.length > 0) {
         let res = await Target.deleteExtend(
@@ -152,7 +171,7 @@ const ShareRecent = (props: Iprops) => {
           hasSelectRecord.delList,
           hasSelectRecord.type,
         );
-        console.log('减少', Target, res);
+        console.log('减少', res);
       }
     }
 

@@ -25,8 +25,6 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
           Array.isArray(item?.items) &&
           item.items.some((v: string) => v === curProdID)
         ) {
-          console.log('名中', item);
-
           parendIds.push(item.id);
         }
         if (item.children) {
@@ -35,7 +33,6 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
       });
     }
     findHasId(appCtrl.spacies);
-    originalIds = parendIds;
     setSelectItem(parendIds);
   }, [visible === true]);
   const handleOk = () => {
@@ -50,7 +47,6 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
             item['items'] = [curProdID];
           }
         } else {
-
           Array.isArray(item?.items)
             ? (item.items = item.items.filter((v: string) => v !== curProdID))
             : (item['items'] = []);
@@ -62,13 +58,10 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
     }
     setAppid(appCtrl.spacies);
 
-    console.log('ok', appCtrl.spacies);
-
     // 数据缓存
     appCtrl.cacheCustomMenu(appCtrl.spacies);
   };
   const handleClickItem = ({ checked }: { checked: string[] }) => {
-
     setSelectItem(checked);
   };
   return (

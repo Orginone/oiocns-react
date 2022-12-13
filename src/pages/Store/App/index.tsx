@@ -18,7 +18,7 @@ import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { myColumns } from '@/ts/controller/store/config';
-import { IProduct } from '@/ts/core';
+import { IProduct, IResource } from '@/ts/core';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
@@ -145,9 +145,11 @@ const StoreApp: React.FC = () => {
       v.source && typeSet.add(v.source);
     });
 
-    return Array.from(typeSet).map((k) => {
-      return { tab: k, key: k };
-    });
+    return Array.from(typeSet)
+      .filter(Boolean)
+      .map((k) => {
+        return { tab: k, key: k };
+      });
   };
   // 应用首页dom
   const AppIndex = useMemo(() => {
@@ -182,26 +184,41 @@ const StoreApp: React.FC = () => {
       </div>
     );
   }, [key]);
+  const getCurResource = () => {
+    return appCtrl.curProduct?.resource?.find(
+      (R: IResource) => R.resource.id === checkNodes.resourceId,
+    );
+  };
   // 提交分享
   const handleSubmitShare = async () => {
     if (appCtrl.curProduct) {
+      const target = checkNodes.resourceId ? getCurResource() : appCtrl.curProduct;
+      if (!target) {
+        setShowShareModal(false);
+        return;
+      }
       if (checkNodes?.createList?.length > 0) {
-        const success = await appCtrl.curProduct?.createExtend(
+        const success = await target.createExtend(
           checkNodes.teamId,
           checkNodes.createList,
           checkNodes.type,
         );
-        success && message.success('操作成功');
+        success &&
+          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
       }
       if (checkNodes?.delList?.length > 0) {
-        const success = await appCtrl.curProduct?.deleteExtend(
+        const success = await target.deleteExtend(
           checkNodes.teamId,
           checkNodes.delList,
           checkNodes.type,
         );
-        success && message.success('操作成功');
+        success &&
+          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
       }
-      setShowShareModal(false);
+      // 用户主动关闭 弹窗
+      // setShowShareModal(false);
+    } else {
+      // setShowShareModal(false);
     }
   };
   return (
@@ -219,8 +236,8 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp
           shareType={shareType}
-          onCheckeds={(teamId, type, createList, delList) => {
-            setCheckNodes({ teamId, type, createList, delList });
+          onCheckeds={(teamId, type, createList, delList, resourceId) => {
+            setCheckNodes({ teamId, type, createList, delList, resourceId });
           }}
         />
       </Modal>

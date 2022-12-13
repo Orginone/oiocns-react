@@ -90,6 +90,7 @@ const StoreClassify: React.FC = () => {
             return v.id !== id;
           });
           obj.children = newData;
+          // 处理 顶级目录删除
           if (!obj?.id) {
             appCtrl.cacheCustomMenu(newData);
             return;
@@ -153,7 +154,7 @@ const StoreClassify: React.FC = () => {
    */
   const handleTitleClick = (item: TreeType) => {
     // 触发内容去变化
-    console.log('点击', item);
+    console.log('点击', item, item.items);
   };
   const domNode = document.getElementById('templateMenu');
   if (!domNode) return null;
