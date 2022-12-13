@@ -164,7 +164,7 @@ const StoreApp: React.FC = () => {
     } else {
       return appCtrl.products;
     }
-  }, [appShowIdlimit]);
+  }, [appShowIdlimit, key]);
 
   // 应用首页dom
   const AppIndex = useMemo(() => {
