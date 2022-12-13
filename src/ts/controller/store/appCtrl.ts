@@ -10,8 +10,10 @@ export interface TreeType {
   key: string;
   id: string;
   // type: 'app' | 'docx' | 'assets' | 'data'; //可扩展
+  type?: string;
   items: string[];
   children: TreeType[];
+  icon?: any;
 }
 interface SpeciesType {
   spaceId: string;
