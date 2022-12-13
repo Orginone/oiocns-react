@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import SearchSjopComp from '@/bizcomponents/SearchShop';
 import cls from './index.module.less';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import AppDetail from '@/components/AppDetail'; // 新建商店
 import { getUuid, findAimObj } from '@/utils/tools';
 
 import ReactDOM from 'react-dom';
@@ -15,21 +14,15 @@ let selectMenuInfo: any = {},
   modalType = '';
 const { confirm } = Modal;
 /* 菜单列表 */
-const MenuOpts = [
-  '新增子级',
-  '重命名',
-  '创建副本',
-  '拷贝链接',
-  '移动到',
-  '固定为常用',
-  '删除',
-];
+const MenuOpts = ['新增子级', '重命名', '创建副本', '拷贝链接', '固定为常用', '删除'];
+interface StoreClassifyType {
+  onClassifySelect: (_appids: string[]) => void;
+}
 //自定义树
-const StoreClassify: React.FC = () => {
+const StoreClassify: React.FC<StoreClassifyType> = ({ onClassifySelect }) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   // const [open, setOpen] = useState<boolean>(false);
   const [isStoreOpen, setIsStoreOpen] = useState<boolean>(false); // 新建商店弹窗
-  const [isAppDetailOpen, setisAppDetailOpen] = useState<boolean>(false); // 新建商店弹窗
   const [customMenu, setCustomMenu] = useState<TreeType[]>([]);
   const [newMenuForm] = Form.useForm();
   useEffect(() => {
@@ -84,8 +77,6 @@ const StoreClassify: React.FC = () => {
       case '删除':
         {
           const obj = findAimObj(true, id, customMenu);
-          console.log('删除', obj);
-
           const newData = obj.children.filter((v: any) => {
             return v.id !== id;
           });
@@ -107,14 +98,8 @@ const StoreClassify: React.FC = () => {
       default:
         break;
     }
-    console.log('湿哒哒43', customMenu);
-
     appCtrl.cacheCustomMenu(customMenu);
   }
-  const onCancel = () => {
-    setIsStoreOpen(false);
-    setisAppDetailOpen(false);
-  };
 
   /*******
    * @desc: 目录更多操作 触发事件
@@ -147,15 +132,6 @@ const StoreClassify: React.FC = () => {
         break;
     }
   };
-  /*******
-   * @desc: 点击目录 触发事件
-   * @param {any} item
-   * @return {*}
-   */
-  const handleTitleClick = (item: TreeType) => {
-    // 触发内容去变化
-    console.log('点击', item, item.items);
-  };
   const domNode = document.getElementById('templateMenu');
   if (!domNode) return null;
   return ReactDOM.createPortal(
@@ -169,7 +145,9 @@ const StoreClassify: React.FC = () => {
               searchable
               isDirectoryTree
               treeData={customMenu}
-              handleTitleClick={handleTitleClick}
+              handleTitleClick={(item: TreeType) => {
+                onClassifySelect(item.items || []);
+              }}
               handleMenuClick={handleMenuClick}
             />
           </div>
@@ -197,11 +175,9 @@ const StoreClassify: React.FC = () => {
             open={isStoreOpen}
             okText="确定"
             onOk={() => {
-              console.log(`确定按钮`);
               newMenuFormSubmit();
             }}
             onCancel={() => {
-              console.log(`取消按钮`);
               setIsStoreOpen(false);
             }}>
             <Form form={newMenuForm} autoComplete="off">
@@ -212,7 +188,6 @@ const StoreClassify: React.FC = () => {
               </Form.Item>
             </Form>
           </Modal>
-          <AppDetail open={isAppDetailOpen} onCancel={onCancel} />
         </>
       )}
     </>,

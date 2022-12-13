@@ -29,6 +29,7 @@ const StoreApp: React.FC = () => {
   const [moveModal, setMoveModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
+  const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
 
   const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
@@ -151,6 +152,20 @@ const StoreApp: React.FC = () => {
         return { tab: k, key: k };
       });
   };
+  const handleSelectClassify = (appids: string[]) => {
+    console.log('当前分类下的appids', appids);
+    setAppShowIdlimit([...appids]);
+  };
+  const showData = useMemo(() => {
+    if (appShowIdlimit.length > 0) {
+      return appCtrl.products.filter((app) => {
+        return appShowIdlimit.includes(app.prod.id);
+      });
+    } else {
+      return appCtrl.products;
+    }
+  }, [appShowIdlimit]);
+
   // 应用首页dom
   const AppIndex = useMemo(() => {
     return (
@@ -173,17 +188,16 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              list={appCtrl.products}
+              list={showData}
               searchParams={{ status: statusKey }}
               columns={myColumns}
               renderOperation={renderOperation}
-              tkey={key}
             />
           </div>
         </Card>
       </div>
     );
-  }, [key]);
+  }, [key, showData]);
   const getCurResource = () => {
     return appCtrl.curProduct?.resource?.find(
       (R: IResource) => R.resource.id === checkNodes.resourceId,
@@ -247,7 +261,7 @@ const StoreApp: React.FC = () => {
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
-      <TreeComp />
+      <TreeComp onClassifySelect={handleSelectClassify} />
       <MoveApp visible={moveModal} setVisible={setMoveModal} />
     </>
   );
