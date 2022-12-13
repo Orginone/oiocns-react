@@ -11,6 +11,7 @@ import { statusList, tableOperation, statusMap } from '../components';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import { XRelation } from '@/ts/base/schema';
 import { TargetType } from '@/ts/core/enum';
+import { PageRequest } from '@/ts/base/model';
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: XRelation) => {
@@ -35,8 +36,6 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
   const [needReload, setNeedReload] = useState<boolean>(false);
   const [openHeaderSetting, setOpenHeaderSetting] = useState<boolean>(false);
-  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
-  const [total, setPageTotal] = useState<number>(0);
   const [newColumns, setNColumns] = useState<ProColumns<IApplyItem | IApprovalItem>[]>();
   const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
@@ -77,7 +76,7 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
     },
   ];
   // 获取申请/审核列表
-  const loadList = async (page: number, pageSize: number) => {
+  const loadList = async (page: PageRequest) => {
     const listStatusCode = {
       '1': 'getTodoList',
       '2': 'getDoList',
@@ -90,19 +89,18 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       (n: IApprovalItem | IApplyItem) =>
         n.Data.team.target.typeName === TargetType.Person,
     );
-    console.log(list);
-    setPageData(list);
-    setPageTotal(list.length);
     setNeedReload(false);
+    return {
+      total: list.length || 0,
+      result: list || [],
+      offset: 0,
+      limit: list.length,
+    };
   };
   useEffect(() => {
-    setPageData([]);
-    setPageTotal(0);
-    loadList(1, 10);
     setNColumns(columns);
-  }, [activeKey, needReload]);
+  }, [needReload]);
   const handleOk = (data: any[]) => {
-    console.log(data);
     setNColumns([...data]);
   };
   return (
@@ -129,11 +127,10 @@ const TodoFriend: React.FC<TodoCommonTableProps> = () => {
       />
       <CardOrTableComp<IApplyItem | IApprovalItem>
         rowKey={(record: IApplyItem | IApprovalItem) => record.Data?.id}
-        // bordered={false}
+        dataSource={[]}
         columns={newColumns}
-        dataSource={pageData}
-        total={total}
-        onChange={loadList}
+        params={{ activeKey, needReload }}
+        request={async (page) => await loadList(page)}
         operation={(item: IApplyItem | IApprovalItem) =>
           tableOperation(activeKey, item, setNeedReload)
         }

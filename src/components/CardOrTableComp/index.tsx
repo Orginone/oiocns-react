@@ -163,7 +163,10 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             return { total: 0, data: [], success: true };
           } else {
             return {
-              data: dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex),
+              data:
+                dataSource.length > 0
+                  ? dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex)
+                  : [],
               total: total ?? dataSource.length,
               success: true,
             };

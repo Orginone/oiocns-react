@@ -3,12 +3,12 @@ import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-table';
 import { Space, Tag } from 'antd';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import { statusList, statusMap, tableOperation } from '../components';
 import { XRelation } from '@/ts/base/schema';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { resetParams } from '@/utils/tools';
+import { PageRequest } from '@/ts/base/model';
 
 // 根据状态值渲染标签
 const renderItemStatus = (record: XRelation) => {
@@ -24,9 +24,6 @@ type TodoCommonTableProps = {};
  */
 const TodoStore: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
-  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
-  const [total, setPageTotal] = useState<number>(0);
-  const [current, setCurrent] = useState<number>(1);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
@@ -100,33 +97,31 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
     },
   ];
   // 获取申请/审核列表
-  const loadList = async (page: number, pageSize: number) => {
+  const loadList = async (page: PageRequest) => {
     const listStatusCode = {
       '1': 'getTodoList',
       '2': 'getDoList',
       '3': 'getApplyList',
     };
-    setCurrent(page);
+    setNeedReload(false);
     if (activeKey === '3') {
-      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](
-        resetParams({ page, pageSize }),
-      );
-      setPageData(data);
-      setPageTotal(data.length);
+      const list = await todoCtrl.PublishTodo[listStatusCode[activeKey]](page);
+      return {
+        total: list.length || 0,
+        result: list || [],
+        offset: 0,
+        limit: list.length,
+      };
     } else {
-      const data = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
-      const list = data.slice((current - 1) * pageSize, pageSize * current);
-      setPageData(list);
-      setPageTotal(list.length);
-      setNeedReload(false);
+      const list = await todoCtrl.PublishTodo[listStatusCode[activeKey]](needReload);
+      return {
+        total: list.length || 0,
+        result: list || [],
+        offset: 0,
+        limit: list.length,
+      };
     }
   };
-
-  useEffect(() => {
-    setPageData([]);
-    setPageTotal(0);
-    loadList(1, 10);
-  }, [activeKey, needReload]);
 
   return (
     <PageCard
@@ -138,10 +133,9 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       <CardOrTableComp<IApplyItem | IApprovalItem>
         rowKey={(record) => record?.Data?.id}
         columns={columns}
-        dataSource={pageData}
-        total={total}
-        page={current}
-        onChange={loadList}
+        dataSource={[]}
+        params={{ activeKey, needReload }}
+        request={async (page) => await loadList(page)}
         operation={(item: IApplyItem | IApprovalItem) =>
           tableOperation(activeKey, item, setNeedReload)
         }
