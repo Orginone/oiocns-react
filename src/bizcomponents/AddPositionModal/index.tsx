@@ -90,7 +90,7 @@ const AddPostModal = (props: Iprops) => {
       onCancel={() => handleOk()}
       getContainer={false}
       destroyOnClose={true}
-      width={1020}
+      width={1100}
       footer={null}>
       <div className="site-card-wrapper">
         <Row gutter={24}>

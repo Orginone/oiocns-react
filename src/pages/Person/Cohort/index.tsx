@@ -182,7 +182,7 @@ const CohortConfig: React.FC = () => {
       typeName: TargetType.Cohort,
       teamRemark: item.target.team?.remark!,
       // belongId:friend?.id, //待开放参数
-      avatar: 'test', //头像
+      avatar: item.target.avatar!, //头像
     });
     await getData();
     message.success('权限转移成功');

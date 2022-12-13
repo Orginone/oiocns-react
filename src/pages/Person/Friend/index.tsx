@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import LookApply from '../../Setting/Dept/components/LookApply';
 import cls from './index.module.less';
 import Title from 'antd/lib/typography/Title';
 import { Modal, Button, message } from 'antd';
@@ -54,7 +53,6 @@ const PersonFriend: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [friend, setFriend] = useState<schema.XTarget>();
   const [data, setData] = useState<schema.XTarget[]>([]);
-  const [isLookApplyOpen, setLookApplyOpen] = useState<boolean>(false); //查看申请
 
   useEffect(() => {
     getData();
@@ -67,9 +65,6 @@ const PersonFriend: React.FC = () => {
   };
   const showModal = () => {
     setIsModalOpen(true);
-  };
-  const onApplyOk = () => {
-    setLookApplyOpen(false);
   };
   const handleOk = async () => {
     setIsModalOpen(false);
