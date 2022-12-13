@@ -124,8 +124,13 @@ const OrganizationalUnits = () => {
           // 加入单位
           setShowModal(false);
           if (searchCallback && searchCallback.length > 0) {
-            searchCallback.forEach(async (user) => {
-              if (await userCtrl.user.applyJoinCompany(user.id, TargetType.Company)) {
+            searchCallback.forEach(async (company) => {
+              if (
+                await userCtrl.user.applyJoinCompany(
+                  company.id,
+                  company.typeName as TargetType,
+                )
+              ) {
                 message.success('已申请加入单位成功.');
               }
             });

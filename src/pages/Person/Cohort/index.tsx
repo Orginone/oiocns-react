@@ -207,7 +207,7 @@ const CohortConfig: React.FC = () => {
     dataArr: ICohort[],
     operaiton: (_item: ICohort) => common.OperationType[],
   ): React.ReactNode[] => {
-    return dataArr.map((item: ICohort) => {
+    return dataArr?.map((item: ICohort) => {
       return (
         <CohortCard
           className="card"
