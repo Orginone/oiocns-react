@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button, message, Modal, Tabs, Typography } from 'antd';
+import { Button, Modal, Tabs, Typography } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
@@ -19,6 +19,7 @@ import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
@@ -30,6 +31,7 @@ interface ICanDelete {
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [current, setCurrent] = useState<ITarget>();
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [isTopGroup, setTopGroup] = useState<boolean>(); // 是否是一级集团
   const [getTopGroup, setGetTopGroup] = useState<IGroup>(); // 二级三级集团反查一级集团
   const [edit, setEdit] = useState<ITarget>();
@@ -62,21 +64,12 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
       {
-        key: 'changeDept',
-        label: '变更' + item.typeName,
-        onClick: () => {
-          setSelectPerson([item]);
-          setActiveModal('transfer');
-        },
-      },
-      {
         key: 'moveOne',
         label: '移出' + item.typeName,
         onClick: async () => {
-          if (selectPerson && current) {
+          if (current) {
             if (await current.removeMember(item)) {
-              message.success('移出成功');
-              userCtrl.changCallback();
+              tforceUpdate();
             }
           }
         },
@@ -139,11 +132,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       }
     }
     return isTop;
-  };
-
-  const handleOk = () => {
-    setActiveModal('');
-    forceUpdate();
   };
 
   // 标题tabs页
@@ -224,7 +212,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                 />
                 <CardOrTable<XTarget>
                   rowKey={'id'}
-                  params={current}
+                  params={tkey}
                   request={async (page) => {
                     return await current.loadMembers(page);
                   }}
@@ -251,15 +239,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             open={activeModal === 'addOne'}
             onCancel={() => setActiveModal('')}
             onOk={async () => {
-              if (selectPerson && selectPerson.length > 0) {
-                const ids = selectPerson.map((e) => {
-                  return e.id;
-                });
-                if (await current.pullMembers(ids, TargetType.Person)) {
-                  message.success('添加成功');
-                  handleOk();
-                }
+              for (const target of selectPerson) {
+                await current.pullMember(target);
               }
+              tforceUpdate();
+              setActiveModal('');
             }}>
             {isTopGroup ? (
               <SearchCompany
@@ -275,7 +259,10 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           <TransferDepartment
             title={'转移集团'}
             open={activeModal === 'transfer'}
-            handleOk={handleOk}
+            handleOk={() => {
+              tforceUpdate();
+              setActiveModal('');
+            }}
             onCancel={() => setActiveModal('')}
             current={current}
             needTransferUser={selectPerson[0]}
@@ -284,7 +271,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           <AddPostModal
             title={'权限设置'}
             open={activeModal === 'post'}
-            handleOk={handleOk}
+            handleOk={() => setActiveModal('')}
             current={current}
           />
         </>

@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, message, Modal, Tabs, Typography } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IDepartment, ITarget, TargetType } from '@/ts/core';
+import { ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -17,8 +17,8 @@ import cls from './index.module.less';
 // import SearchPerson from '@/bizcomponents/SearchPerson';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import SearchCompany from '@/bizcomponents/SearchCompany';
 import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface ICanDelete {
   delete(): Promise<boolean>;
@@ -30,8 +30,7 @@ interface ICanDelete {
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [current, setCurrent] = useState<ITarget>();
-  const [isTopDept, setTopDept] = useState<boolean>(); // 是否是一级部门
-  const [getTopDept, setGetTopDept] = useState<IDepartment>(); // 二级三级部门反查一级部门
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
@@ -40,24 +39,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
     setCurrent(undefined);
   });
 
-  useEffect(() => {
-    if (current) {
-      isTop(current.id).then(async (isBoolean) => {
-        // 判断是否是一级部门
-        setTopDept(isBoolean);
-        if (!isBoolean) {
-          // 如果是二级部门，反向查询获取一级部门
-          const Depts = await userCtrl.company.getDepartments(false);
-          for (const dept of Depts) {
-            const findDept = _search(dept, current.id);
-            if (findDept) {
-              setGetTopDept(dept);
-            }
-          }
-        }
-      });
-    }
-  }, [current]);
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
@@ -114,36 +95,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           break;
       }
     }
-  };
-
-  const _search = (item: IDepartment, key: string): IDepartment | undefined => {
-    if (item.id === key) {
-      return item;
-    }
-    for (const i of item.departments) {
-      const res = _search(i, key);
-      if (res) {
-        return res;
-      }
-    }
-  };
-
-  // 判断是否是一级部门
-  const isTop = async (groupid: string) => {
-    let isTop: boolean = false;
-    const groups = await userCtrl.company.getDepartments(false);
-    for (const group of groups) {
-      if (group.id == groupid) {
-        isTop = true;
-        break;
-      }
-    }
-    return isTop;
-  };
-
-  const handleOk = () => {
-    setActiveModal('');
-    forceUpdate();
   };
 
   // 标题tabs页
@@ -224,7 +175,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                 />
                 <CardOrTable<XTarget>
                   rowKey={'id'}
-                  params={current}
+                  params={tkey}
                   request={async (page) => {
                     return await current.loadMembers(page);
                   }}
@@ -256,25 +207,21 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                   return e.id;
                 });
                 if (await current.pullMembers(ids, TargetType.Person)) {
-                  message.success('添加成功');
-                  handleOk();
+                  tforceUpdate();
+                  setActiveModal('');
                 }
               }
             }}>
-            {isTopDept ? (
-              <SearchCompany
-                searchCallback={setSelectPerson}
-                searchType={TargetType.Person}
-              />
-            ) : (
-              <AssignPosts searchFn={setSelectPerson} source={getTopDept as ITarget} />
-            )}
+            <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} />
           </Modal>
           {/* 变更部门 */}
           <TransferDepartment
             title={'转移部门'}
             open={activeModal === 'transfer'}
-            handleOk={handleOk}
+            handleOk={() => {
+              tforceUpdate();
+              setActiveModal('');
+            }}
             onCancel={() => setActiveModal('')}
             current={current}
             needTransferUser={selectPerson[0]}
@@ -283,7 +230,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
           <AddPostModal
             title={'权限设置'}
             open={activeModal === 'post'}
-            handleOk={handleOk}
+            handleOk={() => setActiveModal('')}
             current={current}
           />
         </>
