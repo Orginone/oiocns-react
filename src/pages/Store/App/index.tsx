@@ -17,7 +17,7 @@ import PublishComp from './PublishList';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { myColumns } from '@/ts/controller/store/config';
+import { myColumns } from './Config';
 import { IProduct, IResource } from '@/ts/core';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
