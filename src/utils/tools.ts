@@ -123,6 +123,18 @@ const handleFormatDate = (timeStr: string) => {
   return formatDate(timeStr, 'H:mm');
 };
 
+let count = 1;
+// key: 当前填写字符,key0:记录初始字符, hasKeys:已存在的key数组
+const getNewKeyWithString: any = (key: string, key0: string, hasKeys: string[]) => {
+  if (hasKeys.includes(key)) {
+    count++;
+    return getNewKeyWithString(`${key0}(${count})`, key0, hasKeys);
+  } else {
+    count = 1;
+    return key;
+  }
+};
+
 const getUuid = () => {
   let s = [];
   let hexDigits: any = '0123456789abcdef';
@@ -162,6 +174,7 @@ const findAimObj = (isParent = false, id: string, topParentData?: any[]) => {
 export {
   debounce,
   findAimObj,
+  getNewKeyWithString,
   getUuid,
   handleFormatDate,
   renderNum,
