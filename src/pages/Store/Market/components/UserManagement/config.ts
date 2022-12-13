@@ -1,14 +1,11 @@
 import { XMarketRelation } from '@/ts/base/schema';
-import type { ColumnsType } from 'antd/es/table';
+import { ProColumns } from '@ant-design/pro-components';
 
-export const columns: ColumnsType<XMarketRelation> = [
+export const columns: ProColumns<XMarketRelation>[] = [
   {
     title: '序号',
-    fixed: 'left',
+    valueType: 'index',
     width: 50,
-    render: (_key: any, _record: any, index: number) => {
-      return index + 1;
-    },
   },
   {
     title: '类型',

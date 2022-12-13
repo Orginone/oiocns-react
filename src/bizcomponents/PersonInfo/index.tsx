@@ -2,12 +2,10 @@ import { UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Card, Descriptions, Space } from 'antd';
 import { Typography, Divider, Collapse } from 'antd';
 import React, { useState } from 'react';
-import PersonInfoEnty from '@/ts/core/provider';
 import Layout from 'antd/lib/layout/layout';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import Forget from '../Password/Forget';
-const Person = PersonInfoEnty.getPerson;
 const PersonInfo: React.FC = () => {
   const { Title } = Typography;
   const { Panel } = Collapse;
@@ -43,10 +41,10 @@ const PersonInfo: React.FC = () => {
     <Layout className={cls.container}>
       <Card bordered={false}>
         <Descriptions title={title} column={2}>
-          <Descriptions.Item label="姓名">{Person?.target.name}</Descriptions.Item>
+          <Descriptions.Item label="姓名">待定</Descriptions.Item>
           <Descriptions.Item label="性别">待定</Descriptions.Item>
           <Descriptions.Item label="邮箱">待定</Descriptions.Item>
-          <Descriptions.Item label="联系方式">{Person?.target.code}</Descriptions.Item>
+          <Descriptions.Item label="联系方式">待定</Descriptions.Item>
           <Descriptions.Item label="家庭地址" span={2}>
             No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China
           </Descriptions.Item>
