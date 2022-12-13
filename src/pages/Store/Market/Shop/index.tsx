@@ -13,6 +13,7 @@ import { Modal } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
 import { CheckCircleOutlined } from '@ant-design/icons';
+import { marketColumns } from '../../App/Config';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
@@ -159,7 +160,7 @@ const AppShowComp: React.FC = () => {
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
-        columns={marketCtrl.getColumns('market')}
+        columns={marketColumns}
         rowKey={'id'}
         request={async (page) => {
           return await current?.getMerchandise(page);

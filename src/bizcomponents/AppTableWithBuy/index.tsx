@@ -8,6 +8,7 @@ import marketCtrl from '@/ts/controller/store/marketCtrl';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import BuyCustomModal from './BuyCustomModal';
 import { MarketTypes } from 'typings/marketType';
+import { marketColumns } from '../../pages/Store/App/Config';
 
 interface AppShowCompType {
   className: string;
@@ -150,7 +151,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
-        columns={marketCtrl.getColumns('market')}
+        columns={marketColumns}
         page={page}
         onChange={handlePageChange}
         rowKey={'id'}

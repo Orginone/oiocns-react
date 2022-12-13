@@ -1,6 +1,5 @@
 import { IMTarget, emitter, DomainTypes } from '@/ts/core';
 import { kernel } from '@/ts/base';
-import { myColumns, marketColumns } from './config';
 import { JOIN_SHOPING_CAR, USER_MANAGEMENT } from '@/constants/const';
 import { message } from 'antd';
 import { Emitter } from '@/ts/base/common';
@@ -75,18 +74,18 @@ class MarketController extends Emitter {
    * @desc: 获取表格头部展示数据
    * @return {*}
    */
-  public getColumns(pageKey?: string) {
-    switch (pageKey) {
-      case 'appInfo':
-      case 'myApp':
-        return myColumns;
-      case 'market':
-        return marketColumns;
-      default:
-        return [];
-    }
-    //TODO:待完善
-  }
+  // public getColumns(pageKey?: string) {
+  //   switch (pageKey) {
+  //     case 'appInfo':
+  //     case 'myApp':
+  //       return myColumns;
+  //     case 'market':
+  //       return marketColumns;
+  //     default:
+  //       return [];
+  //   }
+  //   //TODO:待完善
+  // }
 
   /**
    * @description: 添加商品进购物车

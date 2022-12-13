@@ -1,7 +1,6 @@
 import { ProductModel } from '@/ts/base/model';
 import { DomainTypes, emitter, IMTarget, IProduct } from '@/ts/core';
 import { kernel } from '@/ts/base';
-import { marketColumns, myColumns, shareInfoColumns } from './config';
 import { message, Modal } from 'antd';
 import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting/userCtrl';
@@ -202,19 +201,19 @@ class SelfAppController extends Emitter {
    * @desc: 获取表格头部展示数据
    * @return {*}
    */
-  public getColumns(pageKey?: string) {
-    switch (pageKey) {
-      case 'shareInfo':
-        return shareInfoColumns;
-      case 'myApp':
-        return myColumns;
-      case 'market':
-        return marketColumns;
-      default:
-        return [];
-    }
-    //TODO:待完善
-  }
+  // public getColumns(pageKey?: string) {
+  //   switch (pageKey) {
+  //     case 'shareInfo':
+  //       return shareInfoColumns;
+  //     case 'myApp':
+  //       return myColumns;
+  //     case 'market':
+  //       return marketColumns;
+  //     default:
+  //       return [];
+  //   }
+  //   //TODO:待完善
+  // }
   /**
    * @desc: 获取我的应用列表
    * @return {IProduct[]} 应用列表
