@@ -44,7 +44,7 @@ const CohortCardComp: React.FC<CohortCardType> = ({ className, data, operation }
         }}>
         <div className="card-title-left">
           <div style={{ fontSize: 60 }}>
-            <TeamIcon avatar={data.avatar} typeName="群组" size={60} />
+            <TeamIcon share={data.shareInfo} size={60} />
           </div>
           <div className="card-title-left-info">
             <div className="app-name">

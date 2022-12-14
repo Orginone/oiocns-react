@@ -135,7 +135,7 @@ export default class Company extends MarketTarget implements ICompany {
     return {
       id: this.target.id,
       name: this.target.team!.name,
-      avatar: this.avatar,
+      share: this.shareInfo,
       typeName: this.target.typeName as TargetType,
     };
   }

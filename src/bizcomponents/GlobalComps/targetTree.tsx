@@ -38,7 +38,7 @@ const TargetTree = (props: Iprops) => {
         isLeaf: item.subTeam.length === 0,
         title: item === userCtrl.user ? '我的好友' : item.name,
         menus: props.loadMenus ? props.loadMenus(item) : undefined,
-        icon: <TeamIcon avatar={item.avatar} typeName={item.typeName} />,
+        icon: <TeamIcon share={item.shareInfo} />,
         children: buildTargetTree(item.subTeam),
       });
     }

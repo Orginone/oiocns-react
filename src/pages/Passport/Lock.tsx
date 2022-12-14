@@ -1,6 +1,5 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { TargetType } from '@/ts/core';
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import React from 'react';
@@ -20,11 +19,7 @@ const PassportLock: React.FC = () => {
         }}>
         <Form.Item>
           <div className={cls.avatar}>
-            <TeamIcon
-              size={80}
-              avatar={userCtrl.user.avatar}
-              typeName={TargetType.Person}
-            />
+            <TeamIcon share={userCtrl.user.shareInfo} size={80} />
           </div>
         </Form.Item>
         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>

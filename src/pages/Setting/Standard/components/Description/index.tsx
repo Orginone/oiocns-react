@@ -12,11 +12,11 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 const Description = (info: { current: ISpeciesItem; extra: any }) => {
   const [data, setData] = useState(info.current);
   useEffect(() => {
-    userCtrl.findTeamInfoById(data.target.belongId).then((res) => {
-      info.current.loadInfo(res).then((item) => {
+    info.current
+      .loadInfo(userCtrl.findTeamInfoById(data.target.belongId))
+      .then((item) => {
         setData(item);
       });
-    });
   }, [info.current]);
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
@@ -32,7 +32,7 @@ const Description = (info: { current: ISpeciesItem; extra: any }) => {
           <Space>
             {data.belongInfo ? (
               <>
-                <TeamIcon avatar={data.belongInfo} typeName="单位" />
+                <TeamIcon share={data.belongInfo} />
                 <strong>{data.belongInfo.name}</strong>
               </>
             ) : (

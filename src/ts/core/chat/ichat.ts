@@ -1,4 +1,4 @@
-import { FileItemShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { schema, model } from '../../base';
 import { MessageType } from '../enum';
 /**
@@ -29,8 +29,8 @@ export interface IChat {
   persons: schema.XTarget[];
   /** 最后一条消息 */
   lastMessage: schema.XImMsg | undefined;
-  /** 头像 */
-  avatar: FileItemShare | undefined;
+  /** 共享信息 */
+  shareInfo: TargetShare;
   /**
    * 获取会话缓存
    */

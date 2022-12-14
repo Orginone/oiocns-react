@@ -1,5 +1,6 @@
 import consts from '../consts';
 import { TargetType } from '../enum';
+import { appendTarget } from './targetMap';
 import { kernel, model, common, schema, parseAvatar } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
@@ -8,7 +9,7 @@ import { ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
-import { FileItemShare, TargetModel } from '@/ts/base/model';
+import { TargetModel, TargetShare } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
   public key: string;
   public typeName: TargetType;
@@ -37,8 +38,13 @@ export default class BaseTarget implements ITarget {
     return [];
   }
 
-  public get avatar(): FileItemShare | undefined {
-    return parseAvatar(this.target.avatar);
+  public get shareInfo(): TargetShare {
+    const result: TargetShare = {
+      name: this.teamName,
+      typeName: this.typeName,
+    };
+    result.avatar = parseAvatar(this.target.avatar);
+    return result;
   }
 
   constructor(target: schema.XTarget) {
@@ -50,6 +56,7 @@ export default class BaseTarget implements ITarget {
     this.ownIdentitys = [];
     this.identitys = [];
     this.typeName = target.typeName as TargetType;
+    appendTarget(target);
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
@@ -58,6 +65,7 @@ export default class BaseTarget implements ITarget {
       typeNames: [this.target.typeName],
       subTypeNames: this.memberTypes,
     });
+    appendTarget(res.data);
     return res.data;
   }
   async pullMember(target: XTarget): Promise<boolean> {
@@ -222,6 +230,7 @@ export default class BaseTarget implements ITarget {
           limit: common.Constants.MAX_UINT_16,
         },
       });
+      appendTarget(res.data);
       return res.data;
     }
     logger.warn(consts.UnauthorizedError);

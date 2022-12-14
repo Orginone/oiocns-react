@@ -863,6 +863,17 @@ export type ApprovalTaskReq = {
 /**
  * 文件系统项分享数据
  */
+export type TargetShare = {
+  /** 名称 */
+  name: string;
+  /** 类型 */
+  typeName: string;
+  /** 头像 */
+  avatar?: FileItemShare;
+};
+/**
+ * 文件系统项分享数据
+ */
 export type FileItemShare = {
   /** 完整路径 */
   size: number;

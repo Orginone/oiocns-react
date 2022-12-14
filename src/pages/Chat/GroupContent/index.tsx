@@ -8,7 +8,7 @@ import css from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
 import { XImMsg } from '@/ts/base/schema';
-import { MessageType, TargetType } from '@/ts/core/enum';
+import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
@@ -99,36 +99,19 @@ const GroupContent = (props: Iprops) => {
         <>
           <div className={`${css.con_content}`}>{parseMsg(item)}</div>
           <div style={{ fontSize: 28, color: '#888', paddingLeft: 10 }}>
-            <TeamIcon
-              preview
-              typeName={userCtrl.user.typeName}
-              avatar={userCtrl.user.avatar}
-              size={36}
-            />
+            <TeamIcon share={userCtrl.user.shareInfo} preview size={36} />
           </div>
         </>
       );
     } else {
-      let name = '';
-      let avatar = undefined;
-      if (chatCtrl.chat!.target.typeName === TargetType.Person) {
-        name = chatCtrl.chat!.target.name;
-        avatar = chatCtrl.chat!.avatar;
-      } else {
-        for (const iterator of chatCtrl.chat!.persons) {
-          if (iterator.id === item.fromId) {
-            name = iterator.name;
-            avatar = parseAvatar(iterator.avatar);
-          }
-        }
-      }
+      const share = userCtrl.findTeamInfoById(item.fromId);
       return (
         <>
           <div style={{ fontSize: 28, color: '#888', paddingRight: 10 }}>
-            <TeamIcon preview typeName={TargetType.Person} avatar={avatar} size={36} />
+            <TeamIcon preview share={share} size={36} />
           </div>
           <div className={`${css.con_content}`}>
-            <div className={`${css.name}`}>{name}</div>
+            <div className={`${css.name}`}>{share.name}</div>
             {parseMsg(item)}
           </div>
         </>

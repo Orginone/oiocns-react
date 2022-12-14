@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-import * as im from 'react-icons/im';
 import { TreeProps } from 'antd';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget, TargetType } from '@/ts/core';
+import { ITarget } from '@/ts/core';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
@@ -42,23 +41,12 @@ const ShareRecent = (props: Iprops) => {
           title: item.name,
           item: item,
           isLeaf: item.subTeam.length === 0,
-          icon: (
-            <TeamIcon typeName={item.target.typeName} avatar={item.avatar} size={18} />
-          ),
+          icon: <TeamIcon share={item.shareInfo} size={18} />,
           children: buildTargetTree(item.subTeam),
         });
       }
     }
     return result;
-  };
-
-  const getIcon = (type: TargetType) => {
-    switch (type) {
-      case TargetType.Group:
-        return <im.ImTree />;
-      default:
-        return <im.ImOffice />;
-    }
   };
 
   useEffect(() => {

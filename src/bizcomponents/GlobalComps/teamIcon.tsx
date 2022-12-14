@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { TargetType } from '@/ts/core';
 import * as im from 'react-icons/im';
-import { FileItemShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { Avatar, Image } from 'antd';
 import { AvatarSize } from 'antd/lib/avatar/SizeContext';
 
 interface teamTypeInfo {
   preview?: boolean;
   size?: AvatarSize;
-  avatar?: FileItemShare;
-  typeName: TargetType | string;
+  share: TargetShare;
 }
 
 /** 组织图标 */
 const TeamIcon = (info: teamTypeInfo) => {
   const [preview, setPreview] = useState(false);
-  if (info.avatar && info.avatar.thumbnail) {
+  if (info.share.avatar && info.share.avatar.thumbnail) {
     return (
       <div style={{ cursor: 'pointer' }} title="点击预览">
         {info.preview && (
@@ -23,7 +22,7 @@ const TeamIcon = (info: teamTypeInfo) => {
             style={{ display: 'none' }}
             preview={{
               visible: preview,
-              src: info.avatar.shareLink,
+              src: info.share.avatar.shareLink,
               onVisibleChange: (value) => {
                 setPreview(value);
               },
@@ -32,7 +31,7 @@ const TeamIcon = (info: teamTypeInfo) => {
         )}
         <Avatar
           size={info.size ?? 22}
-          src={info.avatar.thumbnail}
+          src={info.share.avatar.thumbnail}
           onClick={() => {
             setPreview(true);
           }}
@@ -41,7 +40,7 @@ const TeamIcon = (info: teamTypeInfo) => {
     );
   }
   let icon;
-  switch (info.typeName) {
+  switch (info.share.typeName) {
     case TargetType.Group:
       icon = <im.ImTree />;
       break;

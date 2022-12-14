@@ -1,6 +1,7 @@
-import { FileItemShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { schema, kernel, model, common, parseAvatar } from '../../base';
 import { TargetType, MessageType } from '../enum';
+import { appendShare, appendTarget } from '../target/targetMap';
 import { ChatCache, IChat } from './ichat';
 
 // 历史会话存储集合名称
@@ -34,10 +35,16 @@ class BaseChat implements IChat {
     this.isToping = false;
     this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
+    appendShare(m.id, this.shareInfo);
   }
 
-  public get avatar(): FileItemShare | undefined {
-    return parseAvatar(this.target.photo);
+  public get shareInfo(): TargetShare {
+    const result: TargetShare = {
+      name: this.target.name,
+      typeName: this.target.typeName,
+    };
+    result.avatar = parseAvatar(this.target.photo);
+    return result;
   }
 
   getCache(): ChatCache {
@@ -240,8 +247,9 @@ class CohortChat extends BaseChat {
         filter: filter,
       },
     });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
+    if (res.success && res.data && res.data.result) {
+      appendTarget(res.data.result);
+      res.data.result.forEach((item) => {
         item.name = item.team?.name ?? item.name;
         this.persons.push(item);
       });

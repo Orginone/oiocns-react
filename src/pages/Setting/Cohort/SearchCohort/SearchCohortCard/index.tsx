@@ -1,5 +1,5 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Button, Col, message } from 'antd';
+import { Button, Col, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './index.less';
 import { schema } from '../../../../../ts/base';
@@ -42,7 +42,7 @@ const CohortListCard: React.FC<CohortCardType> = ({ className, data }) => {
       <div className="card-title flex">
         <div className="card-title-left">
           <div style={{ fontSize: 60 }}>
-            <TeamIcon avatar={new Cohort(data).avatar} typeName="群组" size={60} />
+            <TeamIcon share={new Cohort(data).shareInfo} size={60} />
           </div>
 
           <div className="card-title-left-info">

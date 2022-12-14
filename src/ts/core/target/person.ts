@@ -35,7 +35,7 @@ export default class Person extends MarketTarget implements IPerson {
     return {
       id: this.id,
       name: '个人空间',
-      avatar: this.avatar,
+      share: this.shareInfo,
       typeName: this.target.typeName as TargetType,
     };
   }

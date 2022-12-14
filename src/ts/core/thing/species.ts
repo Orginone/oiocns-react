@@ -1,10 +1,5 @@
 import { kernel, parseAvatar, schema } from '../../base';
-import {
-  AttributeModel,
-  FileItemShare,
-  PageRequest,
-  SpeciesModel,
-} from '../../base/model';
+import { AttributeModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -16,7 +11,7 @@ export class SpeciesItem implements ISpeciesItem {
   target: schema.XSpecies;
   parent: INullSpeciesItem;
   children: ISpeciesItem[];
-  belongInfo: FileItemShare | undefined;
+  belongInfo: TargetShare;
   constructor(target: schema.XSpecies, parent: INullSpeciesItem) {
     this.children = [];
     this.target = target;
@@ -29,6 +24,7 @@ export class SpeciesItem implements ISpeciesItem {
         this.children.push(new SpeciesItem(item, this));
       }
     }
+    this.belongInfo = { name: this.target.belongId, typeName: '未知' };
   }
   async loadAttrs(id: string, page: PageRequest): Promise<schema.XAttributeArray> {
     const res = await kernel.querySpeciesAttrs({
@@ -43,17 +39,17 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadInfo(info: FileItemShare | undefined): Promise<ISpeciesItem> {
-    if (info) {
+  async loadInfo(info: TargetShare): Promise<ISpeciesItem> {
+    if (info.typeName != '未知') {
       this.belongInfo = info;
     }
     if (!this.belongInfo && this.target.belongId) {
       const res = await kernel.queryNameBySnowId(this.target.belongId);
       if (res.success && res.data) {
-        this.belongInfo = { name: res.data.name } as FileItemShare;
+        this.belongInfo = { name: res.data.name, typeName: '未知' } as TargetShare;
         const avator = parseAvatar(res.data.photo);
         if (avator) {
-          this.belongInfo = { ...avator, name: res.data.name };
+          this.belongInfo = { ...avator, name: res.data.name, typeName: '未知' };
         }
       }
     }
@@ -129,7 +125,7 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.deleteAttribute({
       id: id,
       typeName: '',
-      belongId: '',
+      belongId: '0',
     });
     return res.success;
   }

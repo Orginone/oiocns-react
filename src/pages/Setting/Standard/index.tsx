@@ -15,6 +15,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { PageRequest } from '@/ts/base/model';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 /**
  * 标准设定
@@ -23,6 +24,7 @@ import { PageRequest } from '@/ts/base/model';
 const SettingStandrad: React.FC<RouteComponentProps> = () => {
   const [modalType, setModalType] = useState('');
   const [current, setCurrent] = useState<INullSpeciesItem>();
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XAttribute>();
   const [key, forceUpdate] = useCtrlUpdate(thingCtrl, () => {
     setCurrent(thingCtrl.teamSpecies);
@@ -56,7 +58,7 @@ const SettingStandrad: React.FC<RouteComponentProps> = () => {
         label: '删除特性',
         onClick: async () => {
           await current?.deleteAttr(item.id);
-          forceUpdate();
+          tforceUpdate();
         },
       },
     ];
@@ -96,7 +98,7 @@ const SettingStandrad: React.FC<RouteComponentProps> = () => {
     const res = await current!.loadAttrs(userCtrl.space.id, page);
     if (res && res.result) {
       for (const item of res.result) {
-        const team = await userCtrl.findTeamInfoById(item.belongId);
+        const team = userCtrl.findTeamInfoById(item.belongId);
         if (team) {
           item.belongId = team.name;
         }
@@ -122,7 +124,7 @@ const SettingStandrad: React.FC<RouteComponentProps> = () => {
                 />
                 <CardOrTable<XAttribute>
                   rowKey={'id'}
-                  params={[key, current]}
+                  params={tkey}
                   request={async (page) => {
                     return await loadAttrs(page);
                   }}
@@ -161,7 +163,7 @@ const SettingStandrad: React.FC<RouteComponentProps> = () => {
             handleOk={function (success: boolean): void {
               setModalType('');
               if (success) {
-                forceUpdate();
+                tforceUpdate();
               }
             }}
             current={current}

@@ -1,5 +1,5 @@
 import { model, schema } from '@/ts/base';
-import { FileItemShare, PageRequest, TargetModel } from '@/ts/base/model';
+import { PageRequest, TargetModel, TargetShare } from '@/ts/base/model';
 import { XIdentity, XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetType } from '../enum';
 import { IMarket, Market } from '../market';
@@ -18,7 +18,7 @@ export type SpaceType = {
   /** 类型 */
   typeName: TargetType;
   /** 头像 */
-  avatar?: FileItemShare;
+  share: TargetShare;
 };
 export interface ITarget {
   /** 唯一标识 */
@@ -47,8 +47,8 @@ export interface ITarget {
   searchTargetType: TargetType[];
   /** 缓存内的子组织 */
   subTeam: ITarget[];
-  /** 头像 */
-  avatar: FileItemShare | undefined;
+  /** 共享信息 */
+  shareInfo: TargetShare;
   /**
    * 新增
    * @param data

@@ -8,8 +8,9 @@ import {
   DomainTypes,
   emitter,
   ITarget,
+  findTargetShare,
 } from '@/ts/core';
-import { FileItemShare, RegisterType } from '@/ts/base/model';
+import { RegisterType, TargetShare } from '@/ts/base/model';
 const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
 /** 用户控制器 */
@@ -114,18 +115,8 @@ class UserController extends Emitter {
    * 查询组织信息
    * @param id 组织id
    */
-  public async findTeamInfoById(id: string): Promise<FileItemShare | undefined> {
-    const teams = await this.getTeamTree();
-    for (const item of teams) {
-      if (item.id === id) {
-        if (item.avatar) {
-          return { ...item.avatar, name: item.name };
-        } else {
-          return { name: item.name } as FileItemShare;
-        }
-      }
-    }
-    return undefined;
+  public findTeamInfoById(id: string): TargetShare {
+    return findTargetShare(id);
   }
   /**
    * 登录

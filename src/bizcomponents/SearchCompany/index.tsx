@@ -90,14 +90,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       bordered
       style={{ width: '100%' }}
       className={`${styles.card}`}
-      avatar={
-        <TeamIcon
-          avatar={new Person(person).avatar}
-          typeName="人员"
-          size={60}
-          preview={true}
-        />
-      }
+      avatar={<TeamIcon share={new Person(person).shareInfo} size={60} preview={true} />}
       title={
         <Space>
           {person.name}
@@ -126,8 +119,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       className={`${styles.card}`}
       avatar={
         <TeamIcon
-          avatar={new Company(company, company.id).avatar}
-          typeName="单位"
+          share={new Company(company, userCtrl.user.id).shareInfo}
           size={60}
           preview={true}
         />

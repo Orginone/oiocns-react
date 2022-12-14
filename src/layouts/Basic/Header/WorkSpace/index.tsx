@@ -46,7 +46,7 @@ const OrganizationalUnits = () => {
   const loadItem = (data: SpaceType) => {
     return (
       <Space>
-        <TeamIcon typeName={data.typeName} avatar={data.avatar} size={26} />
+        <TeamIcon share={data.share} size={26} />
         <Typography.Text className={styles['space-list']}>{data?.name}</Typography.Text>
       </Space>
     );

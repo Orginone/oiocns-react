@@ -1,9 +1,10 @@
 import { kernel } from '@/ts/base';
 import { XImMsg } from '@/ts/base/schema';
-import { emitter, IChat, IChatGroup, LoadChats } from '@/ts/core';
+import { emitter, findTargetShare, IChat, IChatGroup, LoadChats } from '@/ts/core';
 import userCtrl from '../setting/userCtrl';
 import { DomainTypes, TargetType } from '@/ts/core/enum';
 import { Emitter } from '@/ts/base/common';
+import { TargetShare } from '@/ts/base/model';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
@@ -61,6 +62,13 @@ class ChatController extends Emitter {
       }
     }
     return '未知';
+  }
+  /**
+   * 查询组织信息
+   * @param id 组织id
+   */
+  public findTeamInfoById(id: string): TargetShare {
+    return findTargetShare(id);
   }
   /**
    * 获取未读数量

@@ -1,9 +1,4 @@
-import {
-  AttributeModel,
-  FileItemShare,
-  PageRequest,
-  SpeciesModel,
-} from '../../base/model';
+import { AttributeModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
 import { XAttributeArray, XSpecies } from '../../base/schema';
 
 /** 可为空的标准分类 */
@@ -26,9 +21,9 @@ export interface ISpeciesItem {
   /** 下级标准分类项数组 */
   children: ISpeciesItem[];
   /** 归属信息 */
-  belongInfo: FileItemShare | undefined;
+  belongInfo: TargetShare;
   /** 加载信息 */
-  loadInfo(info: FileItemShare | undefined): Promise<ISpeciesItem>;
+  loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
   /**

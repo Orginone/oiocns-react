@@ -50,9 +50,9 @@ const UserAvatar: React.FC = () => {
 
   return (
     <Dropdown menu={menuItems} placement="bottomLeft">
-      {userCtrl.user.avatar ? (
+      {userCtrl.user.shareInfo.avatar ? (
         <Avatar
-          src={userCtrl.user.avatar.thumbnail}
+          src={userCtrl.user.shareInfo.avatar.thumbnail}
           alt={userCtrl.user.name}
           size={28}></Avatar>
       ) : (
