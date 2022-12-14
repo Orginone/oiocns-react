@@ -66,7 +66,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     return [
       {
         key: 'remove',
-        label: '移除人员',
+        label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
           Modal.confirm({
             title: '提示',
@@ -230,9 +230,13 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 for (const a of currentPerson ? currentPerson : []) {
                   ids.push(a.id);
                 }
-                await indentity?.pullMembers(ids);
-                getPersonData(indentity!);
-                message.success('指派成功');
+                var boolean = await indentity?.pullMembers(ids);
+                if (boolean) {
+                  getPersonData(indentity!);
+                  message.success('指派身份成功');
+                } else {
+                  message.error('指派身份失败');
+                }
               }}>
               <AssignPosts searchFn={setPerson} />
             </Modal>

@@ -156,7 +156,10 @@ const StoreApp: React.FC = () => {
     console.log('当前分类下的appids', appids);
     setAppShowIdlimit([...appids]);
   };
-  const showData = useMemo(() => {
+  debugger;
+  let showData = appCtrl.products;
+  showData = useMemo(() => {
+    debugger;
     if (appShowIdlimit.length > 0) {
       return appCtrl.products.filter((app) => {
         return appShowIdlimit.includes(app.prod.id);
@@ -164,7 +167,7 @@ const StoreApp: React.FC = () => {
     } else {
       return appCtrl.products;
     }
-  }, [appShowIdlimit, key]);
+  }, [appShowIdlimit, key, userCtrl.space]);
 
   // 应用首页dom
   const AppIndex = useMemo(() => {

@@ -62,6 +62,7 @@ export default class BaseTarget implements ITarget {
     return this.pullMembers([target.id], target.typeName);
   }
   async pullMembers(ids: string[], type: TargetType | string): Promise<boolean> {
+
     const targetType: TargetType = type as TargetType;
     if (this.memberTypes.includes(targetType)) {
       const res = await kernel.pullAnyToTeam({
