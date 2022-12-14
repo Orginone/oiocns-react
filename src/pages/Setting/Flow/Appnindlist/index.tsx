@@ -111,7 +111,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
         {appDataList.length == 0 && (
           <Empty>
             <Button
-              type="primary"
+              type="link"
               onClick={() => {
                 setIsOpenModal(true);
               }}>
