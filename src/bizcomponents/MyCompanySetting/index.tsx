@@ -135,11 +135,13 @@ const PersonInfoCompany: React.FC<PersonInfoObj> = (props) => {
     {
       title: '单位名称',
       key: 'name',
+      width: 200,
       render: (item) => item.target.name,
     },
     {
       title: '单位编码',
       key: 'code',
+      width: 250,
       render: (item) => item.target.code,
     },
     {

@@ -25,7 +25,7 @@ const AppShowComp: React.FC = () => {
 
   useEffect(() => {
     setTimeout(async () => {
-      const markets = marketCtrl.Market.joinedMarkets;
+      const markets = marketCtrl.target.joinedMarkets;
       if (markets.length > 0) {
         const index = markets.findIndex((i) => {
           return i.market.id === current?.market.id;
@@ -46,13 +46,13 @@ const AppShowComp: React.FC = () => {
    */
   const handleBuyAppFun = (type: 'buy' | 'join', selectItem: XMerchandise) => {
     if (type === 'join') {
-      marketCtrl.joinApply(selectItem);
+      marketCtrl.appendStaging(selectItem);
     } else {
       Modal.confirm({
         title: '确认订单',
         content: '此操作将生成交易订单。是否确认',
         icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-        onOk: async () => await marketCtrl.buyShoping([selectItem.id]),
+        onOk: async () => await marketCtrl.createOrder([selectItem]),
       });
     }
   };
@@ -62,16 +62,16 @@ const AppShowComp: React.FC = () => {
     return [
       {
         key: 'buy',
-        label: '立即购买',
+        label: '购买',
         onClick: () => {
           handleBuyAppFun('buy', item);
         },
       },
       {
         key: 'toBuyCar',
-        label: '加入购物车',
+        label: '暂存',
         onClick: () => {
-          marketCtrl.joinApply(item);
+          marketCtrl.appendStaging(item);
         },
       },
       {
@@ -88,12 +88,12 @@ const AppShowComp: React.FC = () => {
         onClick: () => {
           Modal.confirm({
             title: '提示',
-            content: '是否确认下架《' + item.caption + '》商品',
+            content: '是否确认下架 [' + item.caption + '] 商品？',
             onOk: async () => {
               if (await current?.unPublish(item.id)) {
-                message.success('下架' + item.caption + '》商品成功');
+                message.success('下架 [' + item.caption + '] 商品成功.');
               } else {
-                message.success('下架失败');
+                message.success('下架失败.');
               }
               marketCtrl.changCallback();
             },
@@ -106,7 +106,7 @@ const AppShowComp: React.FC = () => {
 
   /**
    * @desc:卡片内容渲染函数
-   * @param {MarketTypes.ProductType[]} dataArr
+   * @param {XMerchandise[]} dataArr
    * @return {*}
    */
   const renderCardFun = (dataArr: XMerchandise[]): React.ReactNode[] => {

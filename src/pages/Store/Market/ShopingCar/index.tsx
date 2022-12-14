@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '../components/AppCardShopCar';
-import { MarketTypes } from 'typings/marketType';
 import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import { Button, Col, Layout, message, Modal, PageHeader, Row, Space } from 'antd';
 import { CheckCircleOutlined, ClearOutlined } from '@ant-design/icons';
@@ -15,8 +14,8 @@ import { XMerchandise } from '@/ts/base/schema';
  */
 
 const ShopingCar: React.FC = () => {
+  const [shopList, setShopList] = useState<XMerchandise[]>([]); // 购物车列表
   const [selectedRowKey, setSelectedRowKey] = useState<any>([]); // 被选中的项
-  const [shopList, setShopList] = useState<any>([]); // 购物车列表
 
   /**
    * @description: 订阅购物车数据变化
@@ -24,11 +23,8 @@ const ShopingCar: React.FC = () => {
    */
   useEffect(() => {
     const id = marketCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
-      console.log('监听 购物车变化', marketCtrl.shopinglist || []);
-      const arr = marketCtrl.shopinglist || [];
-      setShopList([...arr]);
+      setShopList([...marketCtrl.shopinglist]);
     });
-
     return () => {
       return marketCtrl.unsubscribe(id);
     };
@@ -38,13 +34,12 @@ const ShopingCar: React.FC = () => {
    * @description: 从购物车中删除商品
    * @return {*}
    */
-  const OnDeleApply = async (ids?: string[]) => {
-    if (!ids && selectedRowKey.length === 0) {
-      message.warning('没有需要删除的商品');
+  const OnDeleApply = async () => {
+    if (selectedRowKey.length === 0) {
+      message.warning('请选择商品.');
       return;
     }
-    await marketCtrl.deleApply(ids ? ids : selectedRowKey);
-    setSelectedRowKey([]);
+    await marketCtrl.removeStaging(selectedRowKey);
   };
 
   /**
@@ -53,14 +48,14 @@ const ShopingCar: React.FC = () => {
    */
   const OnCustomBuy = () => {
     if (selectedRowKey.length === 0) {
-      message.warning('请选择商品');
+      message.warning('请选择商品.');
       return;
     }
     Modal.confirm({
       title: '确认订单',
       content: '此操作将生成交易订单。是否确认',
       icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-      onOk: async () => await marketCtrl.buyShoping(selectedRowKey),
+      onOk: async () => await marketCtrl.createOrder(selectedRowKey),
     });
   };
 
@@ -69,9 +64,9 @@ const ShopingCar: React.FC = () => {
    * @param {MarketTypes} dataArr
    * @return {*}
    */
-  const renderCardFun = (dataArr: MarketTypes.ProductType[]) => {
+  const renderCardFun = (dataArr: XMerchandise[]) => {
     if (dataArr) {
-      return dataArr.map((item: MarketTypes.ProductType) => {
+      return dataArr.map((item: XMerchandise) => {
         return (
           <AppCard
             className={cls.card}
@@ -102,7 +97,8 @@ const ShopingCar: React.FC = () => {
             type="text"
             className={cls.clearShop}
             onClick={() => {
-              OnDeleApply(shopList.map((n: XMerchandise) => n.id));
+              setSelectedRowKey(shopList);
+              OnDeleApply();
             }}
             icon={<ClearOutlined />}>
             清除购物车
@@ -137,10 +133,14 @@ const ShopingCar: React.FC = () => {
         </Col>
         <Col span={12}>
           <Space>
-            <Button type="text" danger onClick={() => OnDeleApply()}>
+            <Button
+              type="link"
+              style={{ color: 'red' }}
+              danger
+              onClick={() => OnDeleApply()}>
               删除
             </Button>
-            <Button type="primary" onClick={() => OnCustomBuy()}>
+            <Button type="link" onClick={() => OnCustomBuy()}>
               下单
             </Button>
           </Space>
