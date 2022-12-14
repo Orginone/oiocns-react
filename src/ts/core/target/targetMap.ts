@@ -29,7 +29,7 @@ export const appendShare = (id: string, share: TargetShare) => {
 };
 
 export const findTargetShare = (targetId: string) => {
-  const result: TargetShare = { name: targetId, typeName: '未知' };
+  const result: TargetShare = { name: '奥集能平台', typeName: '平台' };
   if (targetMap.has(targetId)) {
     const item = targetMap.get(targetId)!;
     if ('code' in item) {

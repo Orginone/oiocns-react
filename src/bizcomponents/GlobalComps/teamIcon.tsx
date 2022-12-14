@@ -41,6 +41,7 @@ const TeamIcon = (info: teamTypeInfo) => {
   }
   let icon;
   switch (info.share.typeName) {
+    case '平台':
     case TargetType.Group:
       icon = <im.ImTree />;
       break;

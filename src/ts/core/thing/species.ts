@@ -24,7 +24,7 @@ export class SpeciesItem implements ISpeciesItem {
         this.children.push(new SpeciesItem(item, this));
       }
     }
-    this.belongInfo = { name: this.target.belongId, typeName: '未知' };
+    this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
   async loadAttrs(id: string, page: PageRequest): Promise<schema.XAttributeArray> {
     const res = await kernel.querySpeciesAttrs({
