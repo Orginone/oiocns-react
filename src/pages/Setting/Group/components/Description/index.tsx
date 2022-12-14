@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, Card, Descriptions, Space } from 'antd';
 import { ITarget } from '@/ts/core';
 import cls from '../../index.module.less';
+import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /**
  * @description: 集团信息内容
@@ -26,13 +27,15 @@ const Description = (props: {
         contentStyle={{ textAlign: 'center', color: '#606266' }}>
         <Descriptions.Item label="集团名称">
           <Space>
-            {selectGroup?.avatar && <Avatar src={selectGroup?.avatar?.thumbnail} />}
+            {selectGroup?.shareInfo.avatar && (
+              <Avatar src={selectGroup?.shareInfo.avatar?.thumbnail} />
+            )}
             <strong>{groupInfo?.name}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="集团编码">{groupInfo?.code || ''}</Descriptions.Item>
         <Descriptions.Item label="创建人">
-          {groupInfo?.createUser || ''}
+          {groupInfo && userCtrl.findTeamInfoById(groupInfo.createUser).name}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {groupInfo?.createTime || ''}
