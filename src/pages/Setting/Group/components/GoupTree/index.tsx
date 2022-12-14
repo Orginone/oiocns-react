@@ -1,18 +1,16 @@
 import { Button } from 'antd';
-import type { TreeProps } from 'antd/es/tree';
 import React, { useEffect, useState } from 'react';
 import * as im from 'react-icons/im';
 
 import cls from './index.module.less';
-import StoreClassifyTree from '@/components/CustomTreeComp';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget } from '@/ts/core/target/itarget';
 import { PlusOutlined } from '@ant-design/icons';
 import ReactDOM from 'react-dom';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import TargetTree from '@/bizcomponents/GlobalComps/targetTree';
 
 type CreateGroupPropsType = {
-  current: ITarget | undefined;
+  rKey: string;
   setCurrent: (current: ITarget) => void;
   handleMenuClick: (key: string, item: ITarget | undefined) => void;
 };
@@ -20,14 +18,16 @@ type CreateGroupPropsType = {
 const GroupTree: React.FC<CreateGroupPropsType> = ({
   handleMenuClick,
   setCurrent,
-  current,
+  rKey,
 }) => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<ITarget[]>([]);
   const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
-    loadTeamTree();
-  }, [current]);
+    userCtrl.company.getJoinedGroups(false).then((res) => {
+      setData([...res]);
+    });
+  }, [rKey]);
 
   /** 加载右侧菜单 */
   const loadMenus = (item: ITarget) => {
@@ -53,39 +53,6 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
     ];
   };
 
-  const loadTeamTree = async () => {
-    const targets = await userCtrl.company.getJoinedGroups(false);
-    setData(buildTargetTree(targets));
-  };
-
-  /** 加载组织树 */
-  const buildTargetTree = (targets: ITarget[]) => {
-    const result: any[] = [];
-    if (targets) {
-      for (const item of targets) {
-        result.push({
-          key: item.id,
-          title: item.name,
-          item: item,
-          isLeaf: item.subTeam.length === 0,
-          menus: loadMenus(item),
-          icon: <TeamIcon avatar={item.avatar} typeName={item.typeName} />,
-          children: buildTargetTree(item.subTeam),
-        });
-      }
-    }
-    return result;
-  };
-
-  const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
-    const item: ITarget = info.node.item;
-    if (item) {
-      await item.loadSubTeam();
-      loadTeamTree();
-      setCurrent(item);
-    }
-  };
-
   // const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
@@ -99,17 +66,13 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
             handleMenuClick(id, undefined);
           }}
         />
-        <StoreClassifyTree
+        <TargetTree
           className={cls.docTree}
           title={'外部机构'}
-          isDirectoryTree
-          menu={'menus'}
-          searchable
-          showIcon
-          treeData={data}
-          selectedKeys={[current?.id]}
-          onSelect={onSelect}
-          handleMenuClick={(id, node) => handleMenuClick(id, node.item)}
+          targets={data}
+          onSelect={setCurrent}
+          loadMenus={loadMenus}
+          handleMenuClick={handleMenuClick}
         />
       </div>,
       treeContainer,

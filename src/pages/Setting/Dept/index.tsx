@@ -10,7 +10,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
-import DepartTree from './components/TreeLeftDeptPage';
+import DepartmentTree from './components/DepartmentTree';
 import DeptDescription from './components/DeptDescription';
 import { columns } from './config';
 import cls from './index.module.less';
@@ -238,9 +238,8 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         ''
       )}
       {/* 左侧树 */}
-      <DepartTree
-        key={key}
-        current={current}
+      <DepartmentTree
+        rkey={key}
         handleMenuClick={handleMenuClick}
         setCurrent={(item) => setCurrent(item)}
       />

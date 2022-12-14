@@ -10,7 +10,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
-import GroupTree from './components/TreeLeftDeptPage';
+import GroupTree from './components/GoupTree';
 import GroupDescription from './components/Description';
 import { columns } from './config';
 import cls from './index.module.less';
@@ -280,8 +280,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
       )}
       {/* 左侧树 */}
       <GroupTree
-        key={key}
-        current={current}
+        rKey={key}
         handleMenuClick={handleMenuClick}
         setCurrent={(item) => setCurrent(item)}
       />

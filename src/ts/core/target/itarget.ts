@@ -23,6 +23,8 @@ export type SpaceType = {
 export interface ITarget {
   /** 唯一标识 */
   id: string;
+  /** 唯一标识 */
+  key: string;
   /** 名称 */
   name: string;
   /** 团队名称 */

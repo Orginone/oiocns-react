@@ -39,7 +39,6 @@ const AddPostModal = (props: Iprops) => {
     setOperateOpen(false);
   };
   const getTree = async () => {
-    console.log('接收对象', current);
     setAuthTree(await current.selectAuthorityTree());
   };
   const columns: ColumnsType<DataType> = [

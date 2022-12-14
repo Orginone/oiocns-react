@@ -6,10 +6,11 @@ import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
 import { ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
-import { logger, sleep } from '@/ts/base/common';
+import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
+  public key: string;
   public typeName: TargetType;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
@@ -41,6 +42,7 @@ export default class BaseTarget implements ITarget {
   }
 
   constructor(target: schema.XTarget) {
+    this.key = generateUuid();
     this.target = target;
     this.createTargetType = [];
     this.joinTargetType = [];
@@ -347,7 +349,6 @@ export default class BaseTarget implements ITarget {
   protected async createTarget(
     data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
-    console.log('进入数据', data);
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
