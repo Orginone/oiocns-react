@@ -125,22 +125,10 @@ class SelfAppController extends Emitter {
   constructor() {
     super();
     /* 监听空间切换 */
-    emitter.subscribePart(DomainTypes.Company, async () => {
-      this._curSpace = userCtrl.isCompanySpace ? userCtrl.company : userCtrl.user;
-      this.resetData();
-    });
-    /* 获取 历史缓存的 自定义目录 */
-    kernel.anystore.subscribed(STORE_USER_MENU, 'user', (Msg: RecMsg<TreeType>) => {
-      // console.log('订阅数据推送 自定义目录===>', Msg.data);
-      const { data = defaultCustomMenu } = Msg;
-      this._customMenu = data;
-      this.changCallbackPart(SelfCallBackTypes.CustomMenu);
-    });
-    kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: RecMsg<string>) => {
-      // console.log('订阅数据推送 最近使用应用===>', Msg.data);
-      const { data = [] } = Msg;
-      this.recentlyUsedAppsIds = data;
-      this.changCallbackPart(SelfCallBackTypes.Recently);
+    emitter.subscribePart(DomainTypes.Company, () => {
+      setTimeout(() => {
+        this._initialization();
+      }, 100);
     });
   }
 
@@ -299,6 +287,23 @@ class SelfAppController extends Emitter {
       },
       onCancel() {},
     });
+  }
+  private async _initialization() {
+    this._curSpace = userCtrl.isCompanySpace ? userCtrl.company : userCtrl.user;
+    /* 获取 历史缓存的 自定义目录 */
+    kernel.anystore.subscribed(STORE_USER_MENU, 'user', (Msg: RecMsg<TreeType>) => {
+      // console.log('订阅数据推送 自定义目录===>', Msg.data);
+      const { data = defaultCustomMenu } = Msg;
+      this._customMenu = data;
+      this.changCallbackPart(SelfCallBackTypes.CustomMenu);
+    });
+    kernel.anystore.subscribed(RecentlyApps, 'user', (Msg: RecMsg<string>) => {
+      // console.log('订阅数据推送 最近使用应用===>', Msg.data);
+      const { data = [] } = Msg;
+      this.recentlyUsedAppsIds = data;
+      this.changCallbackPart(SelfCallBackTypes.Recently);
+    });
+    this.resetData();
   }
 }
 

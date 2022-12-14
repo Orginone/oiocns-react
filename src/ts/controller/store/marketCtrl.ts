@@ -27,22 +27,10 @@ class MarketController extends Emitter {
   constructor() {
     super();
     this.searchMarket = [];
-    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      this._target = userCtrl.space;
-      await this._target.getJoinMarkets();
-      /* 获取 历史缓存的 购物车商品列表 */
-      kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
-        const { data = [] } = shoplist;
-        this._shopinglist = data || [];
-        this.changCallbackPart(MarketCallBackTypes.ApplyData);
-      });
-      /* 获取 历史缓存的 商店用户管理成员 */
-      kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
-        const { data = [] } = managementlist;
-        this.marketMenber = data || [];
-        this.changCallbackPart(MarketCallBackTypes.UserManagement);
-      });
-      this.changCallback();
+    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
+      setTimeout(() => {
+        this._initialization();
+      }, 100);
     });
   }
 
@@ -162,5 +150,23 @@ class MarketController extends Emitter {
       'user',
     );
   };
+
+  private async _initialization() {
+    this._target = userCtrl.space;
+    await this._target.getJoinMarkets();
+    /* 获取 历史缓存的 购物车商品列表 */
+    kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+      const { data = [] } = shoplist;
+      this._shopinglist = data || [];
+      this.changCallbackPart(MarketCallBackTypes.ApplyData);
+    });
+    /* 获取 历史缓存的 商店用户管理成员 */
+    kernel.anystore.subscribed(USER_MANAGEMENT, 'uset', (managementlist: any) => {
+      const { data = [] } = managementlist;
+      this.marketMenber = data || [];
+      this.changCallbackPart(MarketCallBackTypes.UserManagement);
+    });
+    this.changCallback();
+  }
 }
 export default new MarketController();
