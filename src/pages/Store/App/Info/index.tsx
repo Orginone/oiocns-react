@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Form, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -16,6 +16,7 @@ import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import SchemaForm from '@/components/SchemaForm';
+import { ProFormInstance } from '@ant-design/pro-components';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
@@ -23,7 +24,7 @@ const items = DestTypes.map((k) => {
 let sourceColumn = sourceColumns;
 
 const StoreAppInfo: React.FC = () => {
-  const [createAppForm] = Form.useForm<Record<string, any>>();
+  const formRef = useRef<ProFormInstance>();
 
   const [columns, setColumns] = useState<any>(sourceColumns);
   const [key, setKey] = useState<number>(1);
@@ -140,7 +141,7 @@ const StoreAppInfo: React.FC = () => {
         {/* 应用信息 */}
         <SchemaForm<DataItem>
           style={{ padding: '20px' }}
-          form={createAppForm}
+          formRef={formRef}
           layoutType="Form"
           open={true}
           key={key}
