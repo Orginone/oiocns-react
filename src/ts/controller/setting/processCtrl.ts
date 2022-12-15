@@ -72,12 +72,9 @@ class ProcessController extends Emitter {
     this._currentTreeDesign = currentTreeDesign;
     this.changCallbackPart(ConditionCallBackTypes.ProcessTree);
   }
-  // addNodeMap({ nodeId: node.nodeId, node: node });
-  // addNodeMap: async (data: any) =>
-  // set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) })),
+
   public addNodeMap(data: any) {
     console.log('data', data);
-    // set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) }))
   }
 }
 

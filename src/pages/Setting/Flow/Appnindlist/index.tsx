@@ -57,8 +57,8 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
   };
 
   return (
-    <Card bordered={false}>
-      <Space className={cls.appwrap}>
+    <Card bordered={false} bodyStyle={{ padding: 0 }}>
+      <Space className={cls.appwrap} size={20}>
         {appDataList.length > 0 &&
           appDataList.map((item: any) => {
             return (

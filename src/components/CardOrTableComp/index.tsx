@@ -140,7 +140,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         request={async (params) => {
           const {
             current: pageIndex = 1,
-            pageSize = 10,
+            pageSize = 2,
             filter = '',
             keyword = '',
             ...other
@@ -162,11 +162,14 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             }
             return { total: 0, data: [], success: true };
           } else {
+            console.log('pageSize', pageSize);
+            const currentData = dataSource.slice(
+              (pageIndex - 1) * pageSize,
+              pageSize * pageIndex,
+            );
+
             return {
-              data:
-                dataSource.length > 0
-                  ? dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex)
-                  : [],
+              data: dataSource.length > 0 ? [...currentData] : [],
               total: total ?? dataSource.length,
               success: true,
             };

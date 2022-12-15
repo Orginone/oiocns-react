@@ -115,8 +115,9 @@ const SettingFlow: React.FC = () => {
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
     if (result) {
-      setAllData(result);
-      setShowDataSource(result.slice((page - 1) * 1, 10));
+      setAllData([...result]);
+      const currentData = result.slice((page - 1) * 1, 10);
+      setShowDataSource([...currentData]);
       setBindAppMes(result[0] || {});
       setRowId(result[0]?.id || '');
     }
@@ -260,17 +261,20 @@ const SettingFlow: React.FC = () => {
     <div className={cls['company-top-content']}>
       {/* <Card>流程设置</Card> */}
       {tabType === TabType.TABLEMES ? (
-        <div>
-          <Card bordered={false}>
+        <div style={{ background: '#EFF4F8' }}>
+          <Card
+            bordered={false}
+            style={{ paddingBottom: '10px' }}
+            bodyStyle={{ paddingTop: 0 }}>
             <div className={cls['app-wrap']} ref={parentRef}>
               <CardOrTable<XFlowDefine>
+                params={{ id: allData.length }}
                 dataSource={showDataSource}
                 total={allData.length}
-                pageSize={10}
-                page={page}
                 rowClassName={(recorId: any) => {
                   return recorId.id === rowId ? cls.rowClass : '';
                 }}
+                headerTitle="流程列表"
                 onRow={(record: any) => {
                   return {
                     onClick: () => {
@@ -301,7 +305,12 @@ const SettingFlow: React.FC = () => {
             </div>
           </Card>
           {/* 这里后面写模版列表，暂时隐藏 */}
-          <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
+          <Card
+            style={{ marginTop: '10px' }}
+            bordered={false}
+            title={`${bindAppMes.name}绑定的应用`}>
+            <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
+          </Card>
         </div>
       ) : (
         <div className={cls['company-info-content']}>
