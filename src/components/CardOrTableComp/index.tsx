@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown, Pagination, Result } from 'antd';
+import { Dropdown, Empty, Pagination, Result } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
@@ -152,7 +152,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               offset: (pageIndex - 1) * pageSize,
             };
             const res = await request(other ? { ...other, ...page } : page);
-            console.log(res);
             if (res) {
               return {
                 total: res.total || 0,
@@ -162,12 +161,10 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             }
             return { total: 0, data: [], success: true };
           } else {
-            console.log('pageSize', pageSize);
             const currentData = dataSource.slice(
               (pageIndex - 1) * pageSize,
               pageSize * pageIndex,
             );
-
             return {
               data: dataSource.length > 0 ? [...currentData] : [],
               total: total ?? dataSource.length,
@@ -190,26 +187,37 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           ) : (
             <>
               {toolbar}
-              <div
-                className={cls['common-card']}
-                style={{
-                  height:
-                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
-                }}>
-                {renderCardContent ? (
-                  renderCardContent(
-                    dataSource.length !== 0 ? dataSource : props.action.dataSource,
-                  )
-                ) : (
-                  <Result subTitle="暂无卡片配置"></Result>
-                )}
-              </div>
-              <div style={{ height: 64 }}></div>
-              {TableFooter}
-              <Pagination
-                {...props.pagination}
-                style={{ float: 'right', marginTop: -28 }}
-              />
+              {dataSource.length !== 0 ||
+              (props.action.dataSource && props.action.dataSource.length !== 0) ? (
+                <>
+                  <div
+                    className={cls['common-card']}
+                    style={{
+                      height:
+                        defaultHeight !== 'auto'
+                          ? defaultHeight + 40 + 'px'
+                          : defaultHeight,
+                    }}>
+                    {renderCardContent ? (
+                      renderCardContent(
+                        dataSource.length !== 0 ? dataSource : props.action.dataSource,
+                      )
+                    ) : (
+                      <Result subTitle="暂无卡片配置" />
+                    )}
+                  </div>
+
+                  <div style={{ height: 64 }}></div>
+                  {TableFooter}
+
+                  <Pagination
+                    {...props.pagination}
+                    style={{ float: 'right', marginTop: -28 }}
+                  />
+                </>
+              ) : (
+                <Empty />
+              )}
             </>
           );
         }}
