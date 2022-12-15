@@ -1,5 +1,5 @@
-import { Button, Card, Dropdown, Form, Tag } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Dropdown, Tag } from 'antd';
+import React, { useRef, useState } from 'react';
 import cls from './index.module.less';
 import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -25,10 +25,6 @@ let sourceColumn = sourceColumns;
 
 const StoreAppInfo: React.FC = () => {
   const formRef = useRef<ProFormInstance>();
-
-  const [columns, setColumns] = useState<any>(sourceColumns);
-  const [key, setKey] = useState<number>(1);
-
   const history = useHistory();
   if (!appCtrl.curProduct) {
     history.push('/store/app');
@@ -138,13 +134,12 @@ const StoreAppInfo: React.FC = () => {
           formRef={formRef}
           layoutType="Form"
           open={true}
-          key={key}
           title="应用资源信息"
           onFinish={() => {}}
           modalprops={{
             destroyOnClose: true,
           }}
-          columns={[columns as DataItem]}
+          columns={[sourceColumn as DataItem]}
           submitter={{
             render: () => {
               return <></>;
