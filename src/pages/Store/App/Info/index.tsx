@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Tag } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -30,6 +30,9 @@ const StoreAppInfo: React.FC = () => {
     history.push('/store/app');
     return <></>;
   }
+  useEffect(() => {
+    onTabChange('组织');
+  }, []);
   const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
   sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
@@ -42,7 +45,6 @@ const StoreAppInfo: React.FC = () => {
     };
     return obj;
   });
-  onTabChange('组织');
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
