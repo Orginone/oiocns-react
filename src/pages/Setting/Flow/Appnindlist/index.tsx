@@ -89,7 +89,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
                                     message.info('解绑成功');
                                     initData();
                                   } else {
-                                    message.success('解绑失败');
+                                    message.error('解绑失败');
                                   }
                                 });
                             },
@@ -111,7 +111,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
         {appDataList.length == 0 && (
           <Empty>
             <Button
-              type="primary"
+              type="link"
               onClick={() => {
                 setIsOpenModal(true);
               }}>

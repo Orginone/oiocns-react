@@ -32,7 +32,7 @@ const PersonInfo: React.FC = () => {
         <Button type="link" onClick={() => setShowEditModal(true)}>
           修改信息
         </Button>
-        <Button type="link">修改密码</Button>
+        <Button type="link">重置密码</Button>
       </div>
     </div>
   );
@@ -42,8 +42,6 @@ const PersonInfo: React.FC = () => {
       <Card bordered={false}>
         <Descriptions title={title} column={2}>
           <Descriptions.Item label="昵称">{user!.target.name}</Descriptions.Item>
-          {/* <Descriptions.Item label="性别">{}</Descriptions.Item>
-          <Descriptions.Item label="邮箱">{}</Descriptions.Item> */}
           <Descriptions.Item label="联系方式">
             {user!.target.team?.code}
           </Descriptions.Item>
