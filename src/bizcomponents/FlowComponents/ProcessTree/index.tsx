@@ -35,11 +35,12 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
   let currentDom = design.resource;
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
-  // const addNodeMap = processCtrl.nodeMap;
+
+  // const addNodeMap = processCtrl.addNodeMap;
 
   /**组件渲染中变更nodeMap  共享状态*/
-  // var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
-  const nodeMap = processCtrl.nodeMap;
+  var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
+  // const nodeMap = processCtrl.nodeMap;
 
   const getDomTree = (h: any, node: any) => {
     if (!node || !node.nodeId) {
@@ -218,10 +219,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
   const toMapping = (node: any) => {
     if (node && node.nodeId) {
       addNodeMap({ nodeId: node.nodeId, node: node });
-      console.log(
-        'addNodeMap({ nodeId: node.nodeId, node: node });',
-        addNodeMap({ nodeId: node.nodeId, node: node }),
-      );
     }
   };
   const insertCoverLine = (h: any, index: any, doms: any, branches: any) => {

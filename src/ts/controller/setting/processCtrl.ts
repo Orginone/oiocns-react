@@ -5,11 +5,13 @@ import {
   AddNodeType,
   defalutDesignValue,
 } from './processType';
+import { deepClone } from '@/ts/base/common';
 
 export enum ConditionCallBackTypes {
   'ConditionsData' = 'ConditionsData', // 监听当前操作的条件数据
   'CurrentOperateNode' = 'CurrentOperateNode', //监听当前操作节点
   'Scale' = 'Scale', //监听大小
+  'ProcessTree' = 'ProcessTree',
 }
 
 class ProcessController extends Emitter {
@@ -17,7 +19,7 @@ class ProcessController extends Emitter {
   private _scale: number = 100;
   private _conditionData: conditionDataType;
   private _currentNode: nodeType;
-  private _currentTreeDesign: any = defalutDesignValue;
+  private _currentTreeDesign: any = deepClone(defalutDesignValue);
   private _nodeMap: any = new Map();
   constructor() {
     super();
@@ -66,14 +68,17 @@ class ProcessController extends Emitter {
     this.changCallbackPart(ConditionCallBackTypes.Scale);
   }
   public setProcessDesignTree(currentTreeDesign: any) {
+    console.log(currentTreeDesign);
     this._currentTreeDesign = currentTreeDesign;
+    this.changCallbackPart(ConditionCallBackTypes.ProcessTree);
   }
   // addNodeMap({ nodeId: node.nodeId, node: node });
   // addNodeMap: async (data: any) =>
   // set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) })),
-  // public  addNodeMap(data:any) {
-  //   set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) }))
-  // }
+  public addNodeMap(data: any) {
+    console.log('data', data);
+    // set((prev: any) => ({ nodeMap: prev.nodeMap.set(data.nodeId, data.node) }))
+  }
 }
 
 export default new ProcessController();

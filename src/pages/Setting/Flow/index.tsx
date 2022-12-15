@@ -123,8 +123,31 @@ const SettingFlow: React.FC = () => {
   };
 
   const clearForm = () => {
-    processCtrl.setProcessDesignTree(defalutDesignValue);
+    processCtrl.setProcessDesignTree({
+      name: '',
+      code: 'code',
+      remark: '',
+      fields: '',
+      resource: {
+        nodeId: 'ROOT',
+        parentId: null,
+        type: 'ROOT',
+        name: '发起人',
+        children: {
+          nodeId: 'node_590719745693',
+          parentId: 'ROOT',
+          props: {},
+          type: 'CONDITIONS',
+          name: '条件分支',
+        },
+      },
+    });
     processCtrl.setCondtionData({
+      name: '',
+      labels: [{ label: '', value: '', type: '' }],
+      fields: '',
+    });
+    setConditionData({
       name: '',
       labels: [{ label: '', value: '', type: '' }],
       fields: '',
