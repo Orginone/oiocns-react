@@ -70,7 +70,14 @@ const StoreAppInfo: React.FC = () => {
     setList(showData || []);
   }
 
-  const menu = [{ key: '退订', label: '退订' }];
+  const menu = [
+    // { key: 'edit', label: '编辑基础信息' },
+    { key: '退订', label: '退订' },
+  ];
+  function handleEditApp() {
+    appCtrl.setCurProduct(curProd.prod.id);
+    history.push('/store/app/create');
+  }
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
       <Card
@@ -100,8 +107,8 @@ const StoreAppInfo: React.FC = () => {
           }
         />
         <div className="btns">
-          <Button className="btn" type="primary" shape="round">
-            续费
+          <Button className="btn" type="primary" shape="round" onClick={handleEditApp}>
+            编辑
           </Button>
           <Dropdown menu={{ items: menu }} placement="bottom">
             <EllipsisOutlined
