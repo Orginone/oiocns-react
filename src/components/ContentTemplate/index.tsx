@@ -77,6 +77,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
             <Col className={cls.rightstyle}>
               <Space>
                 <a
+                  style={{ padding: '4px 15px' }}
                   onClick={() => {
                     setCurrentType(TOOBAR_TYPE.SHARE);
                     setOpen(true);
@@ -84,6 +85,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
                   {toobarTypeAndNameMaps[TOOBAR_TYPE.SHARE]}
                 </a>
                 <a
+                  style={{ padding: '4px 15px' }}
                   onClick={() => {
                     setCurrentType(TOOBAR_TYPE.COMMEMNT);
                     setOpen(true);
@@ -92,6 +94,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
                 </a>
                 {type === 'market' ? (
                   <a
+                    style={{ padding: '4px 15px' }}
                     onClick={() => {
                       setCurrentType(TOOBAR_TYPE.SHOPCARD);
                       setOpen(true);
@@ -100,6 +103,7 @@ const ContentTemplate: React.FC<ContentTemplateType> = (props) => {
                   </a>
                 ) : (
                   <a
+                    style={{ padding: '4px 15px' }}
                     onClick={() => {
                       setCurrentType(TOOBAR_TYPE.STORAGE);
                       setOpen(true);

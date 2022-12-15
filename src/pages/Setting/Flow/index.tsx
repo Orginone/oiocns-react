@@ -294,7 +294,7 @@ const SettingFlow: React.FC = () => {
                 toolBarRender={() => [
                   <Button
                     key="button"
-                    type="primary"
+                    type="link"
                     onClick={() => {
                       setTabType(TabType.PROCESSDESIGN);
                     }}>

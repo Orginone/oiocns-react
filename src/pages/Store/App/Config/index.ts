@@ -9,6 +9,10 @@ export const myColumns: any = [
     },
   },
   {
+    title: 'id',
+    dataIndex: ['prod', 'id'],
+  },
+  {
     title: '应用图标',
     dataIndex: ['prod', 'belongId'],
   },

@@ -160,7 +160,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                               noticeBaseInfo();
                               resolve(true);
                             } else {
-                              message.success('解绑失败');
+                              message.error('解绑失败');
                               resolve(false);
                             }
                           });
