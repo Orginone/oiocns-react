@@ -13,7 +13,7 @@ interface Iprops {
   handleOk: Function;
 }
 /*
-  编辑
+  编辑用户信息
 */
 const UserInfoEditModal = (props: Iprops) => {
   const { open, handleOk, handleCancel } = props;

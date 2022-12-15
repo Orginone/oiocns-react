@@ -1,13 +1,10 @@
 import { Button, Card, Descriptions } from 'antd';
-import Layout from 'antd/lib/layout/layout';
 import React, { useState } from 'react';
-
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import PersonInfoDepartment from './Department';
-import PersonInfoCompany from '@/bizcomponents/MyCompanySetting';
-import UserInfoEditModal from '@/bizcomponents/EditUserInfo';
-import cls from './index.module.less';
+import PersonInfoCompany from './components/MyCompanySetting';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import UserInfoEditModal from './components/EditUserInfo';
+import cls from './index.module.less';
 
 /**
  * 个人信息
@@ -15,34 +12,32 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
  */
 const PersonInfo: React.FC = () => {
   const user = userCtrl.user;
-  const [showDepartment, setShowDepartment] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  // 信息标题
-  const title = (
-    <div className={cls['person-info-title']}>
-      <div style={{ fontSize: 100 }}>
-        <TeamIcon
-          avatar={userCtrl.user.avatar}
-          typeName="人员"
-          size={100}
-          preview={true}
-        />
-      </div>
-      <div>
-        <Button type="link" onClick={() => setShowEditModal(true)}>
-          修改信息
-        </Button>
-        <Button type="link">重置密码</Button>
-      </div>
-    </div>
-  );
   // 信息内容
   const content = (
     <div className={cls['person-info-info']}>
       <Card bordered={false}>
-        <Descriptions title={title} column={2}>
+        <Descriptions
+          title={
+            <TeamIcon
+              avatar={userCtrl.user.avatar}
+              typeName="人员"
+              size={60}
+              preview={true}
+            />
+          }
+          column={3}
+          extra={
+            <Button type="link" onClick={() => setShowEditModal(true)}>
+              修改信息
+            </Button>
+          }>
           <Descriptions.Item label="昵称">{user!.target.name}</Descriptions.Item>
-          <Descriptions.Item label="联系方式">
+          <Descriptions.Item label="账号" span={2}>
+            {user.target?.code}
+          </Descriptions.Item>
+          <Descriptions.Item label="姓名">{user.target.team?.name}</Descriptions.Item>
+          <Descriptions.Item label="联系方式" span={2}>
             {user!.target.team?.code}
           </Descriptions.Item>
           <Descriptions.Item label="座右铭" span={2}>
@@ -52,24 +47,13 @@ const PersonInfo: React.FC = () => {
       </Card>
     </div>
   );
-  //
   // TODO 1、个人空间显示加入的公司；2、单位空间显示所在的部门、工作组、岗位
   return (
     <div className={cls['person-info-container']}>
-      <Layout className={cls.container}>{content}</Layout>
-      <Layout className={cls.container}>
-        <Card bordered={false}>
-          <div className={cls['person-info-company']}>
-            {showDepartment ? (
-              <PersonInfoDepartment
-                setShowDepartment={setShowDepartment}></PersonInfoDepartment>
-            ) : (
-              <PersonInfoCompany
-                setShowDepartment={setShowDepartment}></PersonInfoCompany>
-            )}
-          </div>
-        </Card>
-      </Layout>
+      {content}
+      <Card bordered={false} className={cls['person-info-company']}>
+        <PersonInfoCompany />
+      </Card>
       <UserInfoEditModal
         open={showEditModal}
         handleCancel={() => setShowEditModal(false)}
