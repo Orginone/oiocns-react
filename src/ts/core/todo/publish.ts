@@ -37,7 +37,6 @@ class PublishTodo implements ITodoGroup {
       return this._applyList;
     }
     const res = await kernel.queryMerchandiseApply({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -57,7 +56,6 @@ class PublishTodo implements ITodoGroup {
   }
   private async getApprovalList() {
     const res = await kernel.queryPublicApproval({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -149,7 +147,6 @@ class ApplyItem implements IApplyItem {
   async cancel(_status: number, _remark: string): Promise<boolean> {
     const res = await kernel.deleteMerchandise({
       id: this._data.id,
-      belongId: '0',
     });
     if (res.success) {
       this._cancelCall.apply(this, [this._data.id]);
