@@ -17,6 +17,7 @@ type AppBindListprops = {
 const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [defineListLength, setDefineListLength] = useState<number>(0);
 
   useEffect(() => {
     initData();
@@ -33,7 +34,8 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
     });
 
     const result = await userCtrl.space.getDefines(false); //流程列表
-
+    console.log('result', result);
+    setDefineListLength(result.length);
     if (result && result.length > 0 && bindAppMes.id) {
       const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
       if (currentValue && currentValue.length > 0) {
@@ -108,7 +110,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
               </div>
             );
           })}
-        {appDataList.length == 0 && (
+        {appDataList.length == 0 && defineListLength > 0 && (
           <Empty>
             <Button
               type="link"

@@ -308,7 +308,7 @@ const SettingFlow: React.FC = () => {
           <Card
             style={{ marginTop: '10px' }}
             bordered={false}
-            title={`${bindAppMes.name}绑定的应用`}>
+            title={`${bindAppMes.name || ''}绑定的应用`}>
             <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
           </Card>
         </div>
