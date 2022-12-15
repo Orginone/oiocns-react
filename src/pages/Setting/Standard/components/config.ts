@@ -34,6 +34,7 @@ export const columns: ProColumns<schema.XAttribute>[] = [
   {
     title: '特性定义',
     dataIndex: 'remark',
+    ellipsis: true,
     key: 'remark',
   },
 ];

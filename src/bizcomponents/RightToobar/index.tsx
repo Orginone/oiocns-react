@@ -32,10 +32,15 @@ const toobarComponentMaps: Record<TOOBAR_TYPE, JSX.Element> = {
 
 const ShareDrawForm: React.FC<ShareDrawFormType> = (props) => {
   const { onClose, open, title, placement = 'right', type } = props;
+
   return (
     <Drawer
-      title={title}
-      width={type !== TOOBAR_TYPE.SHOPCARD ? 460 : '75%'}
+      title={type !== TOOBAR_TYPE.SHOPCARD ? title : false}
+      closable={type !== TOOBAR_TYPE.SHOPCARD ? true : false}
+      bodyStyle={type === TOOBAR_TYPE.SHOPCARD ? { padding: 0 } : {}}
+      width={type !== TOOBAR_TYPE.SHOPCARD ? 460 : 320}
+      getContainer={false}
+      maskStyle={{ background: 'rgba(0,0,0,0)' }}
       placement={placement}
       onClose={onClose}
       open={open}>

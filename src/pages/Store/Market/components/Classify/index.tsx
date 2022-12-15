@@ -32,7 +32,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    const market = await marketCtrl.Market.createMarket({ ...formData });
+    const market = await marketCtrl.target.createMarket({ ...formData });
     if (market) {
       props.setCurrent(market);
     }
@@ -57,7 +57,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const onChange = async (val: any) => {
-    setDataSource((await marketCtrl.Market.getMarketByCode(val.target.value)).result);
+    setDataSource((await marketCtrl.target.getMarketByCode(val.target.value)).result);
   };
 
   /**
@@ -109,7 +109,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           title: '提示',
           content: '是否确认删除',
           onOk: async () => {
-            if (await marketCtrl.Market.deleteMarket(node.market.id)) {
+            if (await marketCtrl.target.deleteMarket(node.market.id)) {
               message.success('删除成功');
               marketCtrl.changCallback();
             }
@@ -121,7 +121,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           title: '提示',
           content: '是否确认退出',
           onOk: async () => {
-            if (await marketCtrl.Market.quitMarket(node.market.id)) {
+            if (await marketCtrl.target.quitMarket(node.market.id)) {
               message.success('退出成功');
               marketCtrl.changCallback();
             }
@@ -146,7 +146,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const getTreeData = () => {
-    const data = marketCtrl.Market.joinedMarkets.map((itemModel) => {
+    const data = marketCtrl.target.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
       if (itemModel.market.belongId === userCtrl.space.id) {
         arrs.push('删除商店');

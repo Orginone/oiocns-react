@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // import cls from './index.module.less';
 import { Modal } from 'antd';
@@ -14,13 +14,55 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
   if (!appCtrl.curProduct) {
     return <></>;
   }
-  const [selectItem, setSelectItem] = useState('');
+  const [selectItem, setSelectItem] = useState<string[]>([]);
+
+  const curProdID = appCtrl.curProduct!.prod.id;
+  useEffect(() => {
+    let parendIds: string[] = [];
+    function findHasId(arr: any[]) {
+      arr.forEach((item: any) => {
+        if (
+          Array.isArray(item?.items) &&
+          item.items.some((v: string) => v === curProdID)
+        ) {
+          parendIds.push(item.id);
+        }
+        if (item.children) {
+          findHasId(item.children);
+        }
+      });
+    }
+    findHasId(appCtrl.spacies);
+    setSelectItem(parendIds);
+  }, [visible === true]);
   const handleOk = () => {
-    console.log('ok', selectItem, '当前操作的应用', appCtrl.curProduct, appCtrl.spacies);
+    function setAppid(arr: any[]) {
+      arr.forEach((item: any) => {
+        // 已选中项定位
+        if (selectItem.includes(item.id)) {
+          // 判断是否具备子集items数组 不包含则增加 id进入items
+          if (Array.isArray(item?.items)) {
+            !item.items.includes(curProdID) && item.items.push(curProdID);
+          } else {
+            item['items'] = [curProdID];
+          }
+        } else {
+          Array.isArray(item?.items)
+            ? (item.items = item.items.filter((v: string) => v !== curProdID))
+            : (item['items'] = []);
+        }
+        if (item.children) {
+          setAppid(item.children);
+        }
+      });
+    }
+    setAppid(appCtrl.spacies);
+
+    // 数据缓存
+    appCtrl.cacheCustomMenu(appCtrl.spacies);
   };
   const handleClickItem = ({ checked }: { checked: string[] }) => {
-    setSelectItem(checked[1] || '');
-    console.log('ok', selectItem);
+    setSelectItem(checked);
   };
   return (
     <>
@@ -30,16 +72,18 @@ const Index: React.FC<indexType> = ({ visible = false, setVisible }) => {
         onOk={handleOk}
         destroyOnClose
         onCancel={() => {
-          setSelectItem('');
+          setSelectItem([]);
           setVisible(false);
         }}>
         <MenuTree
-          title={'目录'}
+          title={'我的分类'}
           checkable
           isDirectoryTree
+          defaultExpandAll={true}
           checkStrictly={true}
+          fieldNames={{ title: 'title', key: 'id', children: 'children' }}
           onCheck={handleClickItem}
-          checkedKeys={[selectItem]}
+          checkedKeys={selectItem}
           autoExpandParent={true}
           treeData={appCtrl.spacies}
         />

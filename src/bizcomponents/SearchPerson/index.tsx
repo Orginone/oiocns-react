@@ -1,7 +1,7 @@
 import { SearchOutlined, SmileOutlined } from '@ant-design/icons';
 import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
-import PersonInfoCard from './../PersonInfoCard';
+import PersonInfoCard from './PersonInfoCard';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { XTarget } from '@/ts/base/schema';
@@ -58,8 +58,10 @@ const SearchPerson: React.FC<SearchPersonProps> = ({ searchCallback }) => {
         value={value}
         onChange={keyWordChange}
       />
-      <div>{persons != [] && personInfoList(persons)}</div>
-      {value && persons == [] && <Result icon={<SmileOutlined />} title="暂无此用户" />}
+      <div>{persons.length > 0 && personInfoList(persons)}</div>
+      {value && persons.length === 0 && (
+        <Result icon={<SmileOutlined />} title="暂无此用户" />
+      )}
     </div>
   );
 };

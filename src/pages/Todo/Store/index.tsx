@@ -2,14 +2,15 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-table';
-import { Space, Tag, Typography } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Space, Tag } from 'antd';
+import React, { useState } from 'react';
 import { DataType } from 'typings/globelType';
 import { statusList, statusMap, tableOperation } from '../components';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { XRelation } from '@/ts/base/schema';
 import { nanoid } from '@ant-design/pro-utils';
+import { PageRequest } from '@/ts/base/model';
 
 /**
  * 批量同意
@@ -41,8 +42,6 @@ type TodoCommonTableProps = {};
 const TodoStore: React.FC<TodoCommonTableProps> = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
-  const [total, setPageTotal] = useState<number>(0);
   const [needReload, setNeedReload] = useState<boolean>(false);
   const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
@@ -84,25 +83,22 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
       valueType: 'dateTime',
     },
   ];
-
   // 获取申请/审核列表
-  const loadList = async (_page: number, _pageSize: number) => {
+  const loadList = async (page: PageRequest) => {
     const listStatusCode = {
       '1': 'getTodoList',
       '2': 'getDoList',
       '3': 'getApplyList',
     };
-    const data = await todoCtrl.MarketTodo[listStatusCode[activeKey]](needReload);
-    setPageData(data);
-    setPageTotal(data.length);
+    const list = await todoCtrl.MarketTodo[listStatusCode[activeKey]](needReload);
     setNeedReload(false);
+    return {
+      total: list.length || 0,
+      result: list || [],
+      offset: 0,
+      limit: list.length,
+    };
   };
-
-  useEffect(() => {
-    setPageData([]);
-    setPageTotal(0);
-    loadList(1, 10);
-  }, [activeKey, needReload]);
 
   return (
     <PageCard
@@ -115,9 +111,9 @@ const TodoStore: React.FC<TodoCommonTableProps> = () => {
         rowKey={(record) => record?.Data?.id || nanoid()}
         bordered={false}
         columns={columns}
-        dataSource={pageData}
-        total={total}
-        onChange={loadList}
+        dataSource={[]}
+        params={{ activeKey, needReload }}
+        request={async (page) => await loadList(page)}
         operation={(item: IApplyItem | IApprovalItem) =>
           tableOperation(activeKey, item, setNeedReload)
         }

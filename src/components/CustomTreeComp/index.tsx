@@ -1,5 +1,5 @@
 import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
-import { Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
+import { Badge, Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
 
@@ -98,7 +98,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
   };
 
   /*******
-   * @desc: 过滤功能 //TODO:
+   * @desc: 过滤功能
    * @param {React} e
    */
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +119,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
         }}>
         <div
           className={cls.treeTitleBoxLabel}
+          style={{ width: '100%' }}
           onDoubleClick={() => {
             onDoubleClickTitle && onDoubleClickTitle(node);
           }}
@@ -129,6 +130,17 @@ const StoreClassifyTree: React.FC<TreeType> = ({
             ? childIcon
             : parentIcon}
           {node.searchTitle || node[fieldNames.title]}
+          {node.items ? (
+            <Badge
+              size={'small'}
+              style={{ marginLeft: '4px' }}
+              color={'geekblue'}
+              count={node.items.length || ''}
+            />
+          ) : (
+            ''
+          )}
+
           {node?.tag ? (
             <Tag
               style={{ marginLeft: '6px' }}

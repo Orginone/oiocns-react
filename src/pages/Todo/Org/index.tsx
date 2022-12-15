@@ -1,6 +1,6 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { Space, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PageCard from '@/components/PageCard';
 import TableItemCard from '../components/TableItemCard';
 import { ProColumns } from '@ant-design/pro-components';
@@ -9,6 +9,7 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { IApplyItem, IApprovalItem } from '@/ts/core/todo/itodo';
 import { XRelation } from '@/ts/base/schema';
 import { statusList, statusMap, tableOperation } from '../components';
+import { PageRequest } from '@/ts/base/model';
 
 // 生成说明数据
 const remarkText = (activeKey: string, item: XRelation) => {
@@ -28,8 +29,7 @@ const renderItemStatus = (record: XRelation) => {
  */
 const TodoOrg: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('1');
-  const [pageData, setPageData] = useState<IApplyItem[] | IApprovalItem[]>([]);
-  const [total, setPageTotal] = useState<number>(0);
+
   const [needReload, setNeedReload] = useState<boolean>(false);
   const columns: ProColumns<IApplyItem | IApprovalItem>[] = [
     {
@@ -70,7 +70,7 @@ const TodoOrg: React.FC = () => {
     },
   ];
   // 获取申请/审核列表
-  const loadList = async (page: number, pageSize: number) => {
+  const loadList = async (page: PageRequest) => {
     const listStatusCode = {
       '1': 'getTodoList',
       '2': 'getDoList',
@@ -83,15 +83,14 @@ const TodoOrg: React.FC = () => {
       (n: IApprovalItem | IApplyItem) =>
         n.Data.team.target.typeName !== TargetType.Person,
     );
-    setPageData(list);
-    setPageTotal(list.length);
     setNeedReload(false);
+    return {
+      total: list.length || 0,
+      result: list || [],
+      offset: 0,
+      limit: list.length,
+    };
   };
-  useEffect(() => {
-    setPageData([]);
-    setPageTotal(0);
-    loadList(1, 10);
-  }, [activeKey, needReload]);
   return (
     <PageCard
       tabList={statusList}
@@ -101,11 +100,10 @@ const TodoOrg: React.FC = () => {
       }}>
       <CardOrTableComp<IApplyItem | IApprovalItem>
         rowKey={(record: IApplyItem | IApprovalItem) => record.Data?.id}
-        bordered={false}
         columns={columns}
-        dataSource={pageData}
-        total={total}
-        onChange={loadList}
+        dataSource={[]}
+        params={{ activeKey, needReload }}
+        request={async (page) => await loadList(page)}
         operation={(item: IApplyItem | IApprovalItem) =>
           tableOperation(activeKey, item, setNeedReload)
         }

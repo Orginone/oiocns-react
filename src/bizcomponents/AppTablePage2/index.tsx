@@ -5,7 +5,7 @@ import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { IProduct } from '@/ts/core';
 interface AppShowCompType {
-  tkey: string;
+  tkey?: string;
   list: any[];
   queryFun?: Function;
   searchParams?: any | { status: ststusTypes };
@@ -31,13 +31,14 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   ...rest
 }) => {
   const [page, setPage] = useState<number>(1);
+  const [pagekey, setPagekey] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   // const [dataSource, setSataSource] = useState<any[]>([]);
-
   const parentRef = useRef<any>(null); //父级容器Dom
   useEffect(() => {
     // setSataSource([...list.map((v) => v.prod)]);
     setTotal(list.length);
+    setPagekey(pagekey + 1);
   }, [list]);
 
   // useEffect(() => {
@@ -88,7 +89,7 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     });
   };
   return (
-    <div className={cls['app-wrap']} ref={parentRef} style={style}>
+    <div className={cls['app-wrap']} ref={parentRef} style={style} key={pagekey}>
       <CardOrTable<IProduct>
         dataSource={list}
         total={total}
@@ -109,4 +110,4 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   );
 };
 
-export default React.memo(AppShowComp);
+export default AppShowComp;

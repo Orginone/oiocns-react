@@ -17,8 +17,8 @@ import PublishComp from './PublishList';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { myColumns } from '@/ts/controller/store/config';
-import { IProduct } from '@/ts/core';
+import { myColumns } from './Config';
+import { IProduct, IResource } from '@/ts/core';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 const StoreApp: React.FC = () => {
@@ -29,6 +29,7 @@ const StoreApp: React.FC = () => {
   const [moveModal, setMoveModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
+  const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
 
   const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
@@ -113,7 +114,7 @@ const StoreApp: React.FC = () => {
           appCtrl.setCurProduct(id);
           history.push({ pathname: '/store/app/publish' });
         },
-      }, //setMoveModal
+      },
       {
         key: 'moveTo',
         label: '移动至',
@@ -145,10 +146,26 @@ const StoreApp: React.FC = () => {
       v.source && typeSet.add(v.source);
     });
 
-    return Array.from(typeSet).map((k) => {
-      return { tab: k, key: k };
-    });
+    return Array.from(typeSet)
+      .filter(Boolean)
+      .map((k) => {
+        return { tab: k, key: k };
+      });
   };
+  const handleSelectClassify = (appids: string[]) => {
+    console.log('当前分类下的appids', appids);
+    setAppShowIdlimit([...appids]);
+  };
+  const showData = useMemo(() => {
+    if (appShowIdlimit.length > 0) {
+      return appCtrl.products.filter((app) => {
+        return appShowIdlimit.includes(app.prod.id);
+      });
+    } else {
+      return appCtrl.products;
+    }
+  }, [appShowIdlimit, key]);
+
   // 应用首页dom
   const AppIndex = useMemo(() => {
     return (
@@ -171,37 +188,51 @@ const StoreApp: React.FC = () => {
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
-              list={appCtrl.products}
+              list={showData}
               searchParams={{ status: statusKey }}
               columns={myColumns}
               renderOperation={renderOperation}
-              tkey={key}
             />
           </div>
         </Card>
       </div>
     );
-  }, [key]);
+  }, [key, showData]);
+  const getCurResource = () => {
+    return appCtrl.curProduct?.resource?.find(
+      (R: IResource) => R.resource.id === checkNodes.resourceId,
+    );
+  };
   // 提交分享
   const handleSubmitShare = async () => {
     if (appCtrl.curProduct) {
+      const target = checkNodes.resourceId ? getCurResource() : appCtrl.curProduct;
+      if (!target) {
+        setShowShareModal(false);
+        return;
+      }
       if (checkNodes?.createList?.length > 0) {
-        const success = await appCtrl.curProduct?.createExtend(
+        const success = await target.createExtend(
           checkNodes.teamId,
           checkNodes.createList,
           checkNodes.type,
         );
-        success && message.success('操作成功');
+        success &&
+          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
       }
       if (checkNodes?.delList?.length > 0) {
-        const success = await appCtrl.curProduct?.deleteExtend(
+        const success = await target.deleteExtend(
           checkNodes.teamId,
           checkNodes.delList,
           checkNodes.type,
         );
-        success && message.success('操作成功');
+        success &&
+          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
       }
-      setShowShareModal(false);
+      // 用户主动关闭 弹窗
+      // setShowShareModal(false);
+    } else {
+      // setShowShareModal(false);
     }
   };
   return (
@@ -219,8 +250,8 @@ const StoreApp: React.FC = () => {
         }}>
         <ShareComp
           shareType={shareType}
-          onCheckeds={(teamId, type, createList, delList) => {
-            setCheckNodes({ teamId, type, createList, delList });
+          onCheckeds={(teamId, type, createList, delList, resourceId) => {
+            setCheckNodes({ teamId, type, createList, delList, resourceId });
           }}
         />
       </Modal>
@@ -230,7 +261,7 @@ const StoreApp: React.FC = () => {
       <Route exact path="/store/app/create" component={CreateApp}></Route>
       <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
-      <TreeComp />
+      <TreeComp onClassifySelect={handleSelectClassify} />
       <MoveApp visible={moveModal} setVisible={setMoveModal} />
     </>
   );

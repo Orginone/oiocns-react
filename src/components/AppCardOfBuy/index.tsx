@@ -12,7 +12,7 @@ interface BuyAppType {
   showBtn?: boolean; //是否展示按钮
   data: any; //数据源
   defaultKey?: any;
-  shouOperation?: boolean; //是否展示 右上角操作按钮
+  showOperation?: boolean; //是否展示 右上角操作按钮
   handleBuyApp: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
   onClick?: (e?: Event) => void; //卡片点击事件
   operation?: (_item: XMerchandise) => common.OperationType[]; //操作区域数据
@@ -30,7 +30,7 @@ const Index: React.FC<BuyAppType> = (props) => {
     data,
     className,
     showBtn = true,
-    shouOperation = false,
+    showOperation = false,
     defaultKey,
     onClick,
     operation,
@@ -48,7 +48,7 @@ const Index: React.FC<BuyAppType> = (props) => {
     return (
       <>
         <span className={cls.nameLabel}>{data[name]}</span>
-        {shouOperation ? (
+        {showOperation ? (
           <Dropdown menu={{ items: operation && operation(data) }} placement="bottom">
             <EllipsisOutlined className={cls.operationBtn} />
           </Dropdown>

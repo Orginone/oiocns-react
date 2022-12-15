@@ -6,7 +6,7 @@ import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import appCtrl from '@/ts/controller/store/appCtrl';
-import { ICompany, ITarget } from '@/ts/core';
+import { ICompany, IResource, ITarget } from '@/ts/core';
 import CustomTree from '@/components/CustomTreeComp';
 interface Iprops {
   shareType: '分配' | '共享';
@@ -15,6 +15,7 @@ interface Iprops {
     type: string,
     createList: string[],
     delList: string[],
+    selectedResourceId: string | null,
   ) => void;
 }
 const DestTypes = [
@@ -60,6 +61,7 @@ const ShareRecent = (props: Iprops) => {
   const [leftCheckedKeys, setLeftCheckedKeys] = useState<Key[]>([]);
 
   const [resourceList, setResourceList] = useState<any[]>([]); //所选应用的资源列表
+  const [curResourceId, setCurResourceId] = useState<string | null>(null);
   const [radio, setRadio] = useState<number>(1); //分配类型
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);
@@ -71,6 +73,7 @@ const ShareRecent = (props: Iprops) => {
     delList: string[];
     type: string;
   }>({} as any);
+  // 记录当前选择分享信息
   let recordShareInfo = new Map();
 
   useEffect(() => {
@@ -78,43 +81,70 @@ const ShareRecent = (props: Iprops) => {
       if (appCtrl.curProduct) {
         if (shareType === '共享') {
           setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree()));
+          await appCtrl.curProduct.queryExtend('组织');
         } else {
           if (userCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
-            console.log('资源数据', resource);
+            if (resource?.length > 0) {
+              let res = await resource[0].queryExtend('组织');
+              setShowData([...(res.result || [])]);
+              setCurResourceId(resource[0].resource.id);
+            }
           }
           setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree(false)));
         }
-        await appCtrl.curProduct.queryExtend('组织');
       }
     }, 10);
   }, []);
   useEffect(() => {
+    // 展示区置空
     setShowData([]);
+    // 左侧树置空
     setCenterTreeData([]);
-    setSelectedTeamId('0');
+    // 左侧树 选中置空
     setLeftTreeSelectedKeys([]);
+    // 当前所选组织置空
+    setSelectedTeamId('0');
+    //中间树 选中置空
+    setCenterCheckedKeys([]);
+    // 重新请求 已分享/分配数据
     queryExtend();
   }, [radio]);
 
+  const getCurResource = () => {
+    return resourceList.find((v) => v.resource.id === curResourceId);
+  };
   // 修改选中 提交修改selectAuthorityTree
   const handelCheckedChange = (createList: string[], delList: string[]) => {
     onCheckeds &&
-      onCheckeds(selectedTeamId, DestTypes[radio - 1].label, createList, delList);
+      onCheckeds(
+        selectedTeamId,
+        DestTypes[radio - 1].label,
+        createList,
+        delList,
+        curResourceId,
+      );
   };
+  // 获取已分享数据
   const queryExtend = async (type?: string, teamId?: string) => {
     const _type = type || DestTypes[radio - 1].label;
     const _teamId = teamId || selectedTeamId || '0';
     let curData = recordShareInfo.has(_type) ? recordShareInfo.get(_type) : {};
-    const { result = [] } = (await appCtrl.curProduct?.queryExtend(_type, _teamId)) || {
+    // 判断是资源分配 还是 应用共享
+    let Target = curResourceId ? getCurResource() : appCtrl.curProduct;
+    if (!Target) {
+      return;
+    }
+    const { result = [] } = (await Target.queryExtend(_type, _teamId)) || {
       result: [],
     };
     curData[_teamId] = result;
 
     recordShareInfo.set(_type, curData);
     setShowData(result);
-    originalSelected = result.map((v) => v.id) || [];
+    // 设置最初 选中记录
+    originalSelected = result.map((v: any) => v.id) || [];
 
     if (radio === 1) {
       setLeftCheckedKeys([...originalSelected]);
@@ -124,21 +154,25 @@ const ShareRecent = (props: Iprops) => {
   };
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     const item: ITarget = info.node.item;
-    // console.log('selected', selectedKeys, info);
     setLeftTreeSelectedKeys(selectedKeys);
     if (hasSelectRecord?.type) {
-      hasSelectRecord?.createList.length > 0 &&
-        appCtrl.curProduct?.createExtend(
+      let Target = curResourceId ? getCurResource() : appCtrl.curProduct;
+      if (hasSelectRecord?.createList.length > 0) {
+        let res = await Target.createExtend(
           selectedTeamId,
           hasSelectRecord.createList,
           hasSelectRecord.type,
         );
-      hasSelectRecord?.delList.length > 0 &&
-        appCtrl.curProduct?.deleteExtend(
+        console.log('新增', res);
+      }
+      if (hasSelectRecord?.delList.length > 0) {
+        let res = await Target.deleteExtend(
           selectedTeamId,
           hasSelectRecord.delList,
           hasSelectRecord.type,
         );
+        console.log('减少', res);
+      }
     }
 
     setSelectedTeamId(item.id);
@@ -318,11 +352,9 @@ const ShareRecent = (props: Iprops) => {
       <div className={cls.top}>
         <p className={cls['top-label']}>应用资源：</p>
         <Radio.Group
+          value={curResourceId}
           onChange={(e: RadioChangeEvent) => {
-            const obj = resourceList.find((v) => v.resource.id === e.target.value);
-            console.log('测试', e.target.value, obj);
-
-            // setRadio(e.target.value);
+            setCurResourceId(e.target.value);
           }}>
           {resourceList.map((item) => {
             return (

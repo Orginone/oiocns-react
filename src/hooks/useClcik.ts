@@ -1,13 +1,16 @@
 import { useRef } from 'react';
 
 // 第一个参数为单击事件函数 第二个参数为双击事件函数
-const useClick = (callback, doubleCallback) => {
+const useClick = (
+  callback: { (item: any): void; apply?: any },
+  doubleCallback: { (item: any): void; apply?: any },
+) => {
   const clickRef = useRef({
     clickCount: 0,
     time: 0,
     timer: 0,
   });
-  return (...args) => {
+  return (...args: any) => {
     clickRef.current.clickCount += 1;
     clickRef.current.time = Date.now();
     clickRef.current.timer = setTimeout(() => {
