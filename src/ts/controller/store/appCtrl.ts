@@ -118,7 +118,10 @@ class AppController extends Emitter {
     // }
     return this._customMenus.species || [];
   }
-
+  public async getOwnProducts() {
+    this._target = userCtrl.isCompanySpace ? userCtrl.space : userCtrl.user;
+    return await this._target.getOwnProducts(true);
+  }
   public setCurProduct(id?: string, cache: boolean = false): void {
     if (!id) {
       this._curProdId = '';
