@@ -412,10 +412,6 @@ const SettingFlow: React.FC = () => {
                     />
                   ) : (
                     <div>
-                      {/* <ProcessDesign
-                        designData={designData}
-                        editorValue={editorValue}
-                        conditionData={conditionData}></ProcessDesign> */}
                       <NewProcessDesign />
                     </div>
                   )}

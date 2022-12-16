@@ -8,6 +8,7 @@ import {
 import InsertButton from '../InsertButton';
 import React from 'react';
 import cls from './index.module.less';
+
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -33,6 +34,7 @@ type NodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  type: AddNodeType;
 };
 
 /**
@@ -75,9 +77,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const nodeHeader = (
     <div
       className={
-        props.type === 'APPROVAL' ? cls['node-body-people'] : cls['node-body-left']
+        props.type === AddNodeType.APPROVAL
+          ? cls['node-body-people']
+          : cls['node-body-left']
       }>
-      {props.type === 'APPROVAL' ? (
+      {props.type === AddNodeType.APPROVAL ? (
         <UsergroupAddOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
@@ -142,7 +146,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
           <div
             className={
-              props.type === 'APPROVAL' ? cls['nodeAproStyle'] : cls['nodeNewStyle']
+              props.type === AddNodeType.APPROVAL
+                ? cls['nodeAproStyle']
+                : cls['nodeNewStyle']
             }>
             {nodeHeader}
             {nodeContent}

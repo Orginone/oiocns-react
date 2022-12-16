@@ -34,7 +34,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
     });
 
     const result = await userCtrl.space.getDefines(false); //流程列表
-    console.log('result', result);
+
     setDefineListLength(result.length);
     if (result && result.length > 0 && bindAppMes.id) {
       const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
@@ -50,7 +50,6 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
           item.remark = findAppId?.remark;
           return item;
         });
-        console.log('getResult', getResult);
         setAppDataList([...getResult]);
       } else {
         setAppDataList([]);

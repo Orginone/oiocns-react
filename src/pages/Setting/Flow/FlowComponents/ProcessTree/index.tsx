@@ -18,7 +18,6 @@ import {
 import processCtrl from '@/ts/controller/setting/processCtrl';
 type ProcessTreeProps = {
   onSelectedNode: (params: any) => void;
-  editorValue: string;
   [key: string]: any;
 };
 

@@ -8,6 +8,7 @@ import {
   conditionDataType,
   conditiondType,
   getConditionKeys,
+  dataType,
 } from '@/ts/controller/setting/processType';
 import cls from './index.module.less';
 
@@ -19,10 +20,10 @@ type ConditionGroupItemConfigProps = {};
  */
 const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
   const [form] = Form.useForm();
-  const [curretEditorValue, setCurretEditorValue] = useState<conditiondType[]>([]);
+  // const [curretEditorValue, setCurretEditorValue] = useState<conditiondType[]>([]);
   const [currentOpNode, setCurrentOpNode] = useState<nodeType>();
   const [currentConditions, setCurrentConditions] = useState<conditionDataType>();
-  const [paramKeyArr, setParamKeyArr] = useState<string[]>([]);
+  // const [paramKeyArr, setParamKeyArr] = useState<string[]>([]);
 
   useEffect(() => {
     setCurrentOpNode(processCtrl.currentNode);
@@ -30,11 +31,13 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
   }, []);
 
   const [key, setKey] = useState(0);
-  const dictory = useCallback((paramKey: any) => {
+  const dictory = useCallback((paramKey: string[]) => {
     var filter = currentConditions?.labels.filter((item: any) => item.value == paramKey);
 
     if (filter && filter.length > 0) {
-      return filter[0].dict.filter((item: any) => item.label && item.value);
+      return (
+        filter[0] || { dict: [] }?.dict.filter((item: any) => item.label && item.value)
+      );
     }
     return [];
   }, []);
@@ -68,10 +71,10 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
     // );
     // console.log('selectedNode.conditions', selectedNode.conditions);
     form.setFieldsValue({ allContent: currentOpNode?.conditions || [] });
-    const paramKey = (currentOpNode?.conditions || []).map((item: conditiondType) => {
-      return item.paramKey;
-    });
-    setParamKeyArr(paramKey);
+    // const paramKey = (currentOpNode?.conditions || []).map((item: conditiondType) => {
+    //   return item.paramKey;
+    // });
+    // setParamKeyArr(paramKey);
   }, []);
 
   return (
@@ -94,14 +97,14 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             // }
             /**当前数组得替换一下 */
             newArr.push(currentValue.allContent[index].paramKey);
-            setParamKeyArr(newArr);
+            // setParamKeyArr(newArr);
             item.type = currentValue.allContent[index].type;
             /**当前条件查找，填写paramLabel */
             const findCon = (currentConditions?.labels || []).find((innItem) => {
               return innItem.value === currentValue.allContent[index].paramKey;
             });
             item.paramLabel = findCon ? findCon?.label : '';
-            item.type = findCon ? findCon?.type : '';
+            item.type = findCon ? findCon?.type : dataType.STRING;
             item.key = currentValue.allContent[index].key;
             if (findCon) {
               /** 大于小于条件查找 */
@@ -119,11 +122,11 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                   },
                 );
                 /** 枚举值赋值 */
-                item.valLabel = findConLabel?.label;
+                item.valLabel = findConLabel?.label || '';
               }
             }
           });
-          setCurretEditorValue([...(currentOpNode?.conditions || [])]);
+          // setCurretEditorValue([...(currentOpNode?.conditions || [])]);
         }}>
         {[...(currentOpNode?.conditions || [])]?.map((condition: any, index: number) => (
           <div key={index + '_g'} className={cls['group']}>

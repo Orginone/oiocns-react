@@ -7,11 +7,10 @@ import processCtrl, { ConditionCallBackTypes } from '@/ts/controller/setting/pro
 import cls from './index.module.less';
 
 type ProcessDesignProps = {
-  editorValue?: string; //编辑的数据
   conditionData?: conditionDataType; //内置条件选择器
 };
 
-const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
+const ProcessDesign: React.FC<ProcessDesignProps> = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentNode, setCurrentNode] = useState<{ type: AddNodeType }>({
     type: AddNodeType.APPROVAL,
@@ -35,12 +34,15 @@ const ProcessDesign: React.FC<ProcessDesignProps> = ({ editorValue }) => {
           <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
-              editorValue={editorValue || '{}'}
               onSelectedNode={(params) => {
-                processCtrl.setCurrentNode(params);
-                //设置当前操作的节点，后续都是对当前节点的操作
-                setCurrentNode(params);
-                setIsOpen(true);
+                if (params.type !== AddNodeType.CONCURRENTS) {
+                  processCtrl.setCurrentNode(params);
+                  //设置当前操作的节点，后续都是对当前节点的操作
+                  setCurrentNode(params);
+                  setIsOpen(true);
+                } else {
+                  return false;
+                }
               }}
             />
           </div>

@@ -25,7 +25,7 @@ export enum AddNodeType {
   'CC' = 'CC',
   'CONDITION' = 'CONDITION',
   'ROOT' = 'ROOT',
-  'CONCURRENTS' = 'CONCURRENTS',
+  'CONCURRENTS' = 'CONCURRENT',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -42,10 +42,16 @@ export type conditionDataType = {
   labels: everyCondition[];
 };
 
+export type dictType = {
+  label: string;
+  value: string;
+};
+
 export type everyCondition = {
   label: string;
   value: string;
-  type: string;
+  type: dataType;
+  dict?: dictType[];
 };
 
 export type conditiondType = {

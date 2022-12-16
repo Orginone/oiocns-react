@@ -18,11 +18,11 @@ interface Iprops {
   selectNodeType: AddNodeType;
 }
 
-const FlowDrawer: React.FC<Iprops> = ({ isOpenFlow, onClose, selectNodeType }) => {
-  const concurrents = () => {
-    return <div>暂无’同时审核‘弹窗需要处理的数据</div>;
-  };
+const concurrents = () => {
+  return <div>暂无同时审核需要处理的数据</div>;
+};
 
+const FlowDrawer: React.FC<Iprops> = ({ isOpenFlow, onClose, selectNodeType }) => {
   const AddtypeAndComponentMaps: Record<AddNodeType, React.FC> = {
     [AddNodeType.ROOT]: RootNode,
     [AddNodeType.APPROVAL]: ApprovalNode,
