@@ -9,10 +9,9 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
-import NewProcessDesign from '@/bizcomponents/FlowComponents';
+import NewProcessDesign from './FlowComponents';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import processCtrl from '@/ts/controller/setting/processCtrl';
-import { defalutDesignValue } from '@/ts/controller/setting/processType';
 import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
