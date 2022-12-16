@@ -211,7 +211,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
               </Button>,
             ]}
           />
-          <div className={cls['pages-wrap']}>
+          <div key={key + 1} className={cls['pages-wrap']}>
             <PageCard
               bordered={false}
               tabList={TitleItems}
@@ -255,9 +255,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                 const ids = selectPerson.map((e) => {
                   return e.id;
                 });
-                if (await current.pullMembers(ids, TargetType.Person)) {
+                if (await current.pullMembers(ids, TargetType.Company)) {
                   message.success('添加成功');
                   handleOk();
+                } else {
+                  message.error('添加失败');
                 }
               }
             }}>
