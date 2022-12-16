@@ -122,33 +122,33 @@ export default class WebApp implements IProduct {
     }
     return res.success;
   }
-  public async update(
-    name: string,
-    code: string,
-    typeName: string,
-    remark: string,
-    resources: model.ResourceModel[],
-  ): Promise<boolean> {
+  public update = async (params: {
+    name: string;
+    code: string;
+    typeName: string;
+    remark: string;
+    resources: model.ResourceModel[];
+  }): Promise<boolean> => {
     const res = await kernel.updateProduct({
       id: this.prod.id,
-      name,
-      code,
-      typeName,
-      remark,
+      name: params.name,
+      code: params.code,
+      typeName: params.typeName,
+      remark: params.remark,
       thingId: this.prod.thingId,
       belongId: this.prod.belongId,
-      resources,
+      resources: params.resources,
     });
     if (res.success) {
-      this.prod.name = name;
-      this.prod.code = code;
-      this.prod.typeName = typeName;
-      this.prod.remark = remark;
+      this.prod.name = params.name;
+      this.prod.code = params.code;
+      this.prod.typeName = params.typeName;
+      this.prod.remark = params.remark;
       this.resource = [];
       res.data.resource?.forEach((a) => {
         this.resource.push(new Resource(a));
       });
     }
     return res.success;
-  }
+  };
 }

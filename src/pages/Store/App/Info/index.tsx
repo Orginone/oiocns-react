@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Tag } from 'antd';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -30,6 +30,9 @@ const StoreAppInfo: React.FC = () => {
     history.push('/store/app');
     return <></>;
   }
+  useEffect(() => {
+    onTabChange('组织');
+  }, []);
   const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
   sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
@@ -42,7 +45,6 @@ const StoreAppInfo: React.FC = () => {
     };
     return obj;
   });
-  onTabChange('组织');
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
@@ -70,7 +72,14 @@ const StoreAppInfo: React.FC = () => {
     setList(showData || []);
   }
 
-  const menu = [{ key: '退订', label: '退订' }];
+  const menu = [
+    // { key: 'edit', label: '编辑基础信息' },
+    { key: '退订', label: '退订' },
+  ];
+  function handleEditApp() {
+    appCtrl.setCurProduct(curProd.prod.id);
+    history.push('/store/app/create');
+  }
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
       <Card
@@ -100,8 +109,8 @@ const StoreAppInfo: React.FC = () => {
           }
         />
         <div className="btns">
-          <Button className="btn" type="primary" shape="round">
-            续费
+          <Button className="btn" type="primary" shape="round" onClick={handleEditApp}>
+            编辑
           </Button>
           <Dropdown menu={{ items: menu }} placement="bottom">
             <EllipsisOutlined

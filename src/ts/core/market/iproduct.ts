@@ -63,17 +63,17 @@ export default interface IProduct {
   unPublish(merchandiseId: string): Promise<boolean>;
   /**
    * 更新应用
-   * @param name 应用名称
-   * @param code 应用编号
-   * @param typeName 应用类型
-   * @param remark 应用信息
-   * @param resources 应用资源
+   * @param params.name 应用名称
+   * @param params.code 应用编号
+   * @param params.typeName 应用类型
+   * @param params.remark 应用信息
+   * @param params.resources 应用资源
    */
-  update(
-    name: string,
-    code: string,
-    typeName: string,
-    remark: string,
-    resources: model.ResourceModel[],
-  ): Promise<boolean>;
+  update(params: {
+    name: string;
+    code: string;
+    typeName: string;
+    remark: string;
+    resources: model.ResourceModel[];
+  }): Promise<boolean>;
 }

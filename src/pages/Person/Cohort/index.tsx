@@ -1,11 +1,8 @@
-import { Button, Space, Tabs, Card, Modal, message } from 'antd';
-import { Divider } from 'antd';
-import Title from 'antd/lib/typography/Title';
 import React, { useState, useEffect } from 'react';
+import { Button, Space, Tabs, Card, Modal, message, Typography, Divider } from 'antd';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
 import { cohortColumn } from './column';
-import cls from './index.module.less';
 import Persons from '../../../bizcomponents/SearchPerson/index';
 import { useHistory } from 'react-router-dom';
 import ChangeCohort from './SearchCohortPerson/index';
@@ -22,21 +19,22 @@ import { ICohort } from '@/ts/core';
 import Indentity from '@/bizcomponents/Indentity';
 import EditCustomModal from '@/bizcomponents/GlobalComps/createTeam';
 import AddCohort from './SearchCohort';
+import cls from './index.module.less';
 const CohortConfig: React.FC = () => {
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [item, setItem] = useState<ICohort>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
   const [changeIsModelOpen, setChangeIsModelOpen] = useState(false);
   const history = useHistory();
   const [friend, setFriend] = useState<schema.XTarget>();
-  const [data, setData] = useState<ICohort[]>();
-  const [joinData, setJoinData] = useState<ICohort[]>();
+  const [data, setData] = useState<ICohort[]>([]);
+  const [joinData, setJoinData] = useState<ICohort[]>([]);
   const [isSetPost, setIsSetPost] = useState<boolean>(false);
   const [isOpenIndentity, setIsOpenIndentity] = useState<boolean>(false);
   const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false);
   const [isFlag, setIsFlag] = useState<string>('');
+  const [activeKey, setActiveKey] = useState<string>('1');
   const [chatKey] = useCtrlUpdate(userCtrl);
   useEffect(() => {
     getData();
@@ -44,8 +42,10 @@ const CohortConfig: React.FC = () => {
 
   const getData = async () => {
     const cohorts = await userCtrl.space.getCohorts();
-    setTotal(cohorts.length);
-    setData(cohorts.filter((obj) => obj.target.belongId == userCtrl.space.target.id));
+    const manageData = cohorts.filter(
+      (obj) => obj.target.belongId == userCtrl.space.target.id,
+    );
+    setData(manageData ?? []);
     setJoinData(
       cohorts.filter((obj) => obj.target.belongId !== userCtrl.space.target.id),
     );
@@ -167,10 +167,7 @@ const CohortConfig: React.FC = () => {
   const handlePageChange = (page: number) => {
     setPage(page);
   };
-  //标签页点击触发事件
-  const onChange = (key: string) => {
-    console.log(key);
-  };
+
   //转移权限确认事件
   const changeHandleOk = async () => {
     setChangeIsModelOpen(false);
@@ -206,150 +203,141 @@ const CohortConfig: React.FC = () => {
   const renderCardFun = (
     dataArr: ICohort[],
     operaiton: (_item: ICohort) => common.OperationType[],
-  ): React.ReactNode[] => {
-    return dataArr.map((item: ICohort) => {
-      return (
-        <CohortCard
-          className="card"
-          data={item}
-          key={item.target.id}
-          operation={operaiton}
-        />
-      );
-    });
+  ) => {
+    if (dataArr) {
+      return dataArr.map((item: ICohort) => {
+        return (
+          <CohortCard
+            className="card"
+            data={item}
+            key={item.target.id}
+            operation={operaiton}
+          />
+        );
+      });
+    }
   };
 
   return (
-    <div>
-      <Card>
-        <div className={cls['person-info-content-header']}>
-          <Title level={2}>
-            <strong>群组</strong>
-          </Title>
-          <div>
-            <Space split={<Divider type="vertical" />}>
-              <Modal
-                title="转移权限"
-                open={changeIsModelOpen}
-                onOk={changeHandleOk}
-                destroyOnClose={true}
-                onCancel={() => setChangeIsModelOpen(false)}
-                width="1050px">
-                <ChangeCohort cohort={item!} searchCallback={searchCallback} />
-              </Modal>
-
-              <Modal
-                title="邀请成员"
-                open={isModalOpen}
-                onOk={handleOk}
-                onCancel={() => setIsModalOpen(false)}
-                width="700px">
-                <Persons searchCallback={searchCallback} />
-              </Modal>
-              {/**身份管理 */}
-              <Indentity
-                open={isOpenIndentity}
-                current={item!}
-                onCancel={() => {
-                  setIsOpenIndentity(false);
-                }}
-              />
-              {item?.authorityTree && (
-                <AddPostModal
-                  title={'角色设置'}
-                  open={isSetPost}
-                  handleOk={() => {
-                    setIsSetPost(false);
-                  }}
-                  current={item}
-                />
-              )}
-              <Modal
-                title="加入群组"
-                open={addIsModalOpen}
-                onOk={() => setAddIsModalOpen(false)}
-                onCancel={() => setAddIsModalOpen(false)}
-                width="1050px">
-                <AddCohort />
-              </Modal>
-              <EditCustomModal
-                title={isFlag}
-                open={isOpenCreate}
-                handleCancel={() => setIsOpenCreate(false)}
-                handleOk={async (item) => {
-                  if (item) {
-                    await getData();
-                    setIsOpenCreate(false);
-                  }
-                }}
-                current={item || userCtrl.space}
-                typeNames={[TargetType.Cohort]}
-              />
-              <Button
-                type="link"
-                onClick={() => {
-                  setIsOpenCreate(true);
-                  setIsFlag('新建');
-                }}>
-                创建群组
-              </Button>
-              <Button type="link" onClick={() => setAddIsModalOpen(true)}>
-                加入群组
-              </Button>
-            </Space>
-          </div>
+    <Card bordered={false}>
+      <div className={cls['person-info-content-header']}>
+        <Typography.Title level={5}>群组</Typography.Title>
+        <div>
+          <Space split={<Divider type="vertical" />}>
+            <Button
+              type="link"
+              onClick={() => {
+                setIsOpenCreate(true);
+                setIsFlag('新建');
+              }}>
+              创建群组
+            </Button>
+            <Button type="link" onClick={() => setAddIsModalOpen(true)}>
+              加入群组
+            </Button>
+          </Space>
         </div>
-        <Tabs
-          defaultActiveKey="1"
-          onChange={onChange}
-          items={[
-            {
-              label: `管理的`,
-              key: '1',
-              children: data ? (
-                <CardOrTable<ICohort>
-                  id={chatKey}
-                  childrenColumnName={'nochildren'}
-                  dataSource={data}
-                  total={total}
-                  page={page}
-                  rowSelection={{}}
-                  defaultPageType={'card'}
-                  showChangeBtn={false}
-                  renderCardContent={(data) => renderCardFun(data, renderOperation)}
-                  columns={cohortColumn as any}
-                  onChange={handlePageChange}
-                  rowKey={'id'}
-                />
-              ) : (
-                ''
-              ),
-            },
-            {
-              label: `加入的`,
-              key: '2',
-              children: joinData ? (
-                <CardOrTable<ICohort>
-                  childrenColumnName={'nochildren'}
-                  dataSource={joinData!}
-                  total={total}
-                  page={page}
-                  rowSelection={{}}
-                  defaultPageType={'card'}
-                  showChangeBtn={false}
-                  renderCardContent={(data) => renderCardFun(data, joinrenderOperation)}
-                  columns={cohortColumn as any}
-                  onChange={handlePageChange}
-                  rowKey={'id'}
-                />
-              ) : (
-                ''
-              ),
-            },
-          ]}
+      </div>
+      <Tabs
+        defaultActiveKey={activeKey}
+        onChange={(key) => setActiveKey(key)}
+        items={[
+          { label: `管理的`, key: '1' },
+          { label: `加入的`, key: '2' },
+        ]}
+      />
+      <div key={chatKey}>
+        {activeKey == '1' ? (
+          <CardOrTable<ICohort>
+            key="manage"
+            childrenColumnName={'nochildren'}
+            dataSource={data}
+            hideOperation={true}
+            total={data.length}
+            page={page}
+            rowSelection={{}}
+            defaultPageType={'card'}
+            showChangeBtn={false}
+            renderCardContent={(data) => renderCardFun(data, renderOperation)}
+            columns={cohortColumn}
+            onChange={handlePageChange}
+            rowKey={'id'}
+          />
+        ) : (
+          <CardOrTable<ICohort>
+            key="joined"
+            childrenColumnName={'nochildren'}
+            dataSource={joinData!}
+            total={joinData.length}
+            page={page}
+            hideOperation={true}
+            rowSelection={{}}
+            defaultPageType={'card'}
+            showChangeBtn={false}
+            renderCardContent={(data) => renderCardFun(data, joinrenderOperation)}
+            columns={cohortColumn as any}
+            onChange={handlePageChange}
+            rowKey={'id'}
+          />
+        )}
+      </div>
+      <Modal
+        title="转移权限"
+        open={changeIsModelOpen}
+        onOk={changeHandleOk}
+        destroyOnClose={true}
+        onCancel={() => setChangeIsModelOpen(false)}
+        width="1050px">
+        <ChangeCohort cohort={item!} searchCallback={searchCallback} />
+      </Modal>
+      <Modal
+        title="邀请成员"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={() => setIsModalOpen(false)}
+        width="700px">
+        <Persons searchCallback={searchCallback} />
+      </Modal>
+      {/**身份管理 */}
+      <Indentity
+        open={isOpenIndentity}
+        current={item!}
+        onCancel={() => {
+          setIsOpenIndentity(false);
+        }}
+      />
+      {item?.authorityTree && (
+        <AddPostModal
+          title={'角色设置'}
+          open={isSetPost}
+          handleOk={() => {
+            setIsSetPost(false);
+          }}
+          current={item}
         />
-      </Card>
-    </div>
+      )}
+      <Modal
+        title="加入群组"
+        open={addIsModalOpen}
+        onOk={() => setAddIsModalOpen(false)}
+        onCancel={() => setAddIsModalOpen(false)}
+        width="1050px">
+        <AddCohort />
+      </Modal>
+      <EditCustomModal
+        title={isFlag}
+        open={isOpenCreate}
+        handleCancel={() => setIsOpenCreate(false)}
+        handleOk={async (item) => {
+          if (item) {
+            await getData();
+            setIsOpenCreate(false);
+          }
+        }}
+        current={item || userCtrl.space}
+        typeNames={[TargetType.Cohort]}
+      />
+    </Card>
   );
 };
 
