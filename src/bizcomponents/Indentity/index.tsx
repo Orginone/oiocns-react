@@ -1,17 +1,16 @@
 import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
-import { schema } from '@/ts/base';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
-import { columns } from './config';
-import EditIndentityModal from './components/AddPositionMoadl';
-import TreeLeftDeptPage from './components/TreeLeftPosPage';
-import AssignPosts from './components/AssignPosts';
-import cls from './index.module.less';
 import { ITarget } from '@/ts/core';
 import { MarketTypes } from 'typings/marketType';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import CardOrTable from '@/components/CardOrTableComp';
+import TreeLeftDeptPage from './components/TreeLeftPosPage';
+import EditIndentityModal from './components/AddPositionMoadl';
+import AssignPosts from './components/AssignPosts';
+import { columns } from './config';
+import cls from './index.module.less';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
@@ -29,7 +28,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   const [indentity, setIndentity] = useState<IIdentity>();
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [currentPerson, setPerson] = useState<schema.XTarget[]>();
+  const [currentPerson, setPerson] = useState<XTarget[]>();
   const [personData, setPersonData] = useState<XTarget[]>([]);
   useEffect(() => {
     if (open) {
