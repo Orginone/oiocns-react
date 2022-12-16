@@ -14,17 +14,24 @@ const steps = ['账户验证', '填写信息'];
 const PassportRegister: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [body, setBody] = useState<RegisterType>();
+  const [nextValue, setNextValue] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState<String>();
   const history = useHistory();
+  const [form] = Form.useForm();
+  const [nextForm] = Form.useForm();
 
   // 上一步
-  const prev = () => {
+  const prev = async () => {
+    const nextFormValue = await nextForm.getFieldsValue();
+    form.setFieldsValue(body);
+    setNextValue(nextFormValue);
     setCurrent(current - 1);
   };
 
   // 下一步
   const next = (val: any) => {
+    nextForm.setFieldsValue(nextValue);
     if (val.firstPassword !== val.secondPassword) {
       message.warn('输入的两次密码不一致！');
       return;
@@ -91,7 +98,7 @@ const PassportRegister: React.FC = () => {
       </Form.Item>
       {current === 0 && (
         <div>
-          <Form onFinish={next}>
+          <Form onFinish={next} form={form}>
             <Form.Item
               name="account"
               rules={[{ required: true, message: '请输入用户名' }]}>
@@ -128,7 +135,7 @@ const PassportRegister: React.FC = () => {
 
       {current === 1 && (
         <div>
-          <Form onFinish={registerAction}>
+          <Form onFinish={registerAction} form={nextForm}>
             <Form.Item
               name="phone"
               rules={[{ required: true, message: '请输入电话号码' }]}>
