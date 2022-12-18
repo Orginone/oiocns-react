@@ -21,25 +21,35 @@ const DeptDescription = (props: {
         title={title}
         extra={extra}
         bordered
-        column={2}
-        labelStyle={{ textAlign: 'center', color: '#606266' }}
-        contentStyle={{ textAlign: 'center', color: '#606266' }}>
-        <Descriptions.Item label="部门名称">
+        column={3}
+        labelStyle={{
+          textAlign: 'left',
+          color: '#606266',
+          width: 120,
+        }}
+        contentStyle={{ textAlign: 'left', color: '#606266' }}>
+        <Descriptions.Item label={selectDept?.typeName + '名称'}>
           <Space>
             {selectDept?.shareInfo.avatar && (
               <Avatar src={selectDept?.shareInfo.avatar?.thumbnail} />
             )}
-            <strong>{deptInfo?.name}</strong>
+            <strong>{selectDept?.teamName}</strong>
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="部门编码">{deptInfo?.code || ''}</Descriptions.Item>
+        <Descriptions.Item label={selectDept?.typeName + '代码'}>
+          {deptInfo?.code || ''}
+        </Descriptions.Item>
+        <Descriptions.Item label={'团队简称'}>{deptInfo?.name || ''}</Descriptions.Item>
+        <Descriptions.Item label={'团队标识'}>
+          {deptInfo?.team?.code || ''}
+        </Descriptions.Item>
         <Descriptions.Item label="创建人">
           {deptInfo && userCtrl.findTeamInfoById(deptInfo.createUser).name}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {deptInfo?.createTime || ''}
         </Descriptions.Item>
-        <Descriptions.Item label="描述" span={2}>
+        <Descriptions.Item label="简介" span={3}>
           {deptInfo?.team?.remark}
         </Descriptions.Item>
       </Descriptions>

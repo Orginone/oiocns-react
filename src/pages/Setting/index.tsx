@@ -26,7 +26,7 @@ const infoMenuItems = [
     icon: <InfoCircleOutlined />,
   },
   {
-    label: '内设机构',
+    label: '团队设置',
     key: '/setting/dept',
     space: 'company',
     icon: <ApartmentOutlined />,

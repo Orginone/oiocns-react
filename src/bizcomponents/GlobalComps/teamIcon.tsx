@@ -67,6 +67,9 @@ const TeamIcon = (info: teamTypeInfo) => {
     case TargetType.Working:
       icon = <im.ImUsers fontSize={fontSize} />;
       break;
+    case TargetType.Station:
+      icon = <im.ImAddressBook fontSize={fontSize} />;
+      break;
     case TargetType.Cohort:
       icon = <im.ImBubbles fontSize={fontSize} />;
       break;

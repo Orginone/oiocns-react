@@ -1,4 +1,4 @@
-import { Button } from 'antd';
+import { Button, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import * as im from 'react-icons/im';
 
@@ -20,22 +20,43 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
   setCurrent,
   handleMenuClick,
 }) => {
+  const [type, setType] = useState('department');
   const [data, setData] = useState<ITarget[]>([]);
   const treeContainer = document.getElementById('templateMenu');
 
   useEffect(() => {
-    userCtrl.space.loadSubTeam(false).then((res) => {
-      setData([...res]);
-    });
-  }, [rkey]);
+    switch (type) {
+      case 'department':
+        setData([userCtrl.company]);
+        break;
+      case 'group':
+        userCtrl.company.getJoinedGroups().then((res) => setData([...res]));
+        break;
+      case 'station':
+        userCtrl.company.getStations().then((res) => setData([...res]));
+        break;
+      case 'cohort':
+        userCtrl.company.getCohorts().then((res) => setData([...res]));
+        break;
+    }
+  }, [rkey, type]);
 
   /** 加载右侧菜单 */
   const loadMenus = (item: ITarget) => {
-    return [
-      {
+    const menus: any[] = [];
+    if (item.subTeamTypes.length > 0) {
+      menus.push({
         key: '新建|' + item.subTeamTypes.join('|'),
         icon: <im.ImPlus />,
         label: '新建',
+        item: item,
+      });
+    }
+    menus.push(
+      {
+        key: '编辑',
+        icon: <im.ImPencil />,
+        label: '编辑',
         item: item,
       },
       {
@@ -50,25 +71,71 @@ const DepartTree: React.FC<CreateGroupPropsType> = ({
         label: '删除',
         item: item,
       },
-    ];
+    );
+    return menus;
   };
 
-  // const menu = ['新增部门', '删除部门'];
   return treeContainer ? (
     ReactDOM.createPortal(
       <div className={cls.topMes}>
-        <Button
-          className={cls.creatgroup}
-          icon={<PlusOutlined className={cls.addIcon} />}
-          type="text"
-          onClick={() => {
-            const id = '新建|' + userCtrl.company.subTeamTypes.join('|');
-            handleMenuClick(id, undefined);
-          }}
-        />
         <TargetTree
+          title={
+            <>
+              <Select
+                showSearch
+                defaultValue={type}
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                onChange={(v) => setType(v)}
+                style={{ width: 160 }}
+                options={[
+                  {
+                    label: '内部机构',
+                    value: 'department',
+                  },
+                  {
+                    label: '外部机构',
+                    value: 'group',
+                  },
+                  {
+                    label: '单位岗位',
+                    value: 'station',
+                  },
+                  {
+                    label: '单位群组',
+                    value: 'cohort',
+                  },
+                ]}
+              />
+              <Button
+                className={cls.creatgroup}
+                icon={<PlusOutlined className={cls.addIcon} />}
+                type="text"
+                onClick={() => {
+                  switch (type) {
+                    case 'cohort':
+                      handleMenuClick('新建|群组', userCtrl.company);
+                      break;
+                    case 'station':
+                      handleMenuClick('新建|岗位', userCtrl.company);
+                      break;
+                    case 'group':
+                      handleMenuClick('新建|集团', userCtrl.company);
+                      break;
+                    case 'department':
+                      handleMenuClick(
+                        '新建|' + userCtrl.company.subTeamTypes.join('|'),
+                        userCtrl.company,
+                      );
+                      break;
+                  }
+                }}
+              />
+            </>
+          }
           className={cls.docTree}
-          title={'内设机构'}
           targets={data}
           onSelect={setCurrent}
           loadMenus={loadMenus}
