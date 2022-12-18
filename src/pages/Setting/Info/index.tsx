@@ -118,7 +118,7 @@ const SettingInfo: React.FC = () => {
     return [
       {
         key: 'remove',
-        label: '踢出',
+        label: <span style={{ color: 'red' }}>踢出</span>,
         onClick: async () => {
           if (await userCtrl.space.removeMember(item)) {
             message.success('踢出成功');
