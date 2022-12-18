@@ -21,6 +21,7 @@ export default interface IMarket {
     samrId: string,
     remark: string,
     ispublic: boolean,
+    photo: string,
   ): Promise<boolean>;
   /**
    * 分页获取商店成员

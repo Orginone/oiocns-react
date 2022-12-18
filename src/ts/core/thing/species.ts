@@ -91,7 +91,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.deleteSpecies({
       id: this.id,
       typeName: '',
-      belongId: '0',
     });
     if (res.success && this.parent) {
       this.parent.children = this.parent.children.filter((i) => {
@@ -125,7 +124,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.deleteAttribute({
       id: id,
       typeName: '',
-      belongId: '0',
     });
     return res.success;
   }

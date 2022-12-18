@@ -67,7 +67,6 @@ class ApplicationTodo implements ITodoGroup {
     let completeList: IApprovalItem[] = [];
     const res = await kernel.queryRecord({
       id: this._id,
-      spaceId: '0',
       page,
     });
     if (res.success) {
@@ -82,7 +81,6 @@ class ApplicationTodo implements ITodoGroup {
     const res = await kernel.queryInstance({
       productId: this._id,
       status: 0,
-      spaceId: '0',
       page,
     });
     if (res.success) {

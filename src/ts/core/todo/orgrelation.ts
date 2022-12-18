@@ -37,7 +37,6 @@ class OrgTodo implements ITodoGroup {
       return this._applyList;
     }
     const res = await kernel.queryJoinTeamApply({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -57,7 +56,6 @@ class OrgTodo implements ITodoGroup {
   }
   private async getApprovalList() {
     const res = await kernel.queryTeamJoinApproval({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -146,7 +144,6 @@ class ApplyItem implements IApplyItem {
     const res = await kernel.cancelJoinTeam({
       id: this._data.id,
       typeName: '',
-      belongId: '0',
     });
     if (res.success) {
       this._cancelFun.apply(this, [this._data]);

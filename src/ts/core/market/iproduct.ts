@@ -74,6 +74,7 @@ export default interface IProduct {
     code: string,
     typeName: string,
     remark: string,
+    photo: string,
     resources: model.ResourceModel[],
   ): Promise<boolean>;
 }

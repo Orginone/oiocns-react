@@ -50,7 +50,6 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
-      id: '0',
       authId: this.id,
       belongId: this._belongId,
     });

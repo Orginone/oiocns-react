@@ -17,6 +17,7 @@ export default class Market implements IMarket {
     samrId: string,
     remark: string,
     ispublic: boolean,
+    photo: string,
   ): Promise<boolean> {
     const res = await kernel.updateMarket({
       id: this.market.id,
@@ -24,6 +25,7 @@ export default class Market implements IMarket {
       code,
       samrId,
       remark,
+      photo,
       public: ispublic,
       belongId: this.market.belongId,
     });
