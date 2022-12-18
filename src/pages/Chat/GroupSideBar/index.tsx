@@ -163,7 +163,7 @@ const GroupSideBar: React.FC = () => {
           } ${child.isToping ? sideStyle.session_toping : ''}`}
           onContextMenu={(e: any) => handleContextClick(e, child)}>
           <div style={{ fontSize: 26, color: '#888', width: 42 }}>
-            <TeamIcon share={child.shareInfo} size={32} />
+            <TeamIcon share={child.shareInfo} size={32} fontSize={28} />
           </div>
           {child.noReadCount > 0 ? (
             <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>

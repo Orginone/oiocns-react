@@ -61,7 +61,7 @@ const Groupheader = (props: Iprops) => {
       <div id={key} className={headerStyle.group_header_wrap}>
         <div className={`${headerStyle.user} ${headerStyle.flex}`}>
           <div style={{ fontSize: 26, color: '#888', width: 42 }}>
-            <TeamIcon share={chatCtrl.chat.shareInfo} size={32} />
+            <TeamIcon share={chatCtrl.chat.shareInfo} size={32} fontSize={28} />
           </div>
           <div>
             <div className={`${headerStyle.flex} ${headerStyle.user_info_top}`}>

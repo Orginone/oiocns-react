@@ -98,8 +98,8 @@ const GroupContent = (props: Iprops) => {
       return (
         <>
           <div className={`${css.con_content}`}>{parseMsg(item)}</div>
-          <div style={{ fontSize: 28, color: '#888', paddingLeft: 10 }}>
-            <TeamIcon share={userCtrl.user.shareInfo} preview size={36} />
+          <div style={{ color: '#888', paddingLeft: 10 }}>
+            <TeamIcon share={userCtrl.user.shareInfo} preview size={36} fontSize={32} />
           </div>
         </>
       );
@@ -107,8 +107,8 @@ const GroupContent = (props: Iprops) => {
       const share = userCtrl.findTeamInfoById(item.fromId);
       return (
         <>
-          <div style={{ fontSize: 28, color: '#888', paddingRight: 10 }}>
-            <TeamIcon preview share={share} size={36} />
+          <div style={{ color: '#888', paddingRight: 10 }}>
+            <TeamIcon preview share={share} size={36} fontSize={32} />
           </div>
           <div className={`${css.con_content}`}>
             <div className={`${css.name}`}>{share.name}</div>
