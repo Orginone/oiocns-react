@@ -121,7 +121,6 @@ export default class BaseTarget implements ITarget {
   ): Promise<IIdentity | undefined> {
     const res = await kernel.createIdentity({
       ...params,
-      id: '0',
       belongId: this.target.id,
     });
     if (res.success && res.data != undefined) {
@@ -361,7 +360,6 @@ export default class BaseTarget implements ITarget {
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
-        id: '0',
       });
     } else {
       return model.badRequest(consts.UnauthorizedError);

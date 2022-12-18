@@ -35,7 +35,6 @@ export class OrderTodo implements ITodoGroup {
   async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IOrderApplyItem[] = [];
     const res = await kernel.queryBuyOrderList({
-      id: '0',
       status: 0,
       page: {
         offset: 0,
@@ -52,7 +51,6 @@ export class OrderTodo implements ITodoGroup {
   }
   private async getApprovalList() {
     const res = await kernel.querySellOrderList({
-      id: '0',
       status: 0,
       page: {
         offset: 0,

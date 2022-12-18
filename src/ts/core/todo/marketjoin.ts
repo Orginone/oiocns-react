@@ -25,7 +25,6 @@ class MarketJoinTodo implements ITodoGroup {
   async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -59,7 +58,6 @@ class MarketJoinTodo implements ITodoGroup {
   }
   private async getJoinApproval() {
     const res = await kernel.queryJoinApproval({
-      id: '0',
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -146,7 +144,6 @@ class ApplyItem implements IApplyItem {
     return (
       await kernel.cancelJoinMarket({
         id: this._data.id,
-        belongId: '0',
         typeName: '',
       })
     ).success;

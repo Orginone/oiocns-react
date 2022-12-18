@@ -67,23 +67,23 @@ export type IdReqModel = {
   // 实体类型
   typeName: string;
   // 归属ID
-  belongId: string;
+  belongId?: string;
 };
 
 export type IdArrayReq = {
   // 唯一ID数组
   ids: string[];
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IdSpaceReq = {
   // 唯一ID
   id: string;
   // 工作空间ID
-  spaceId: string;
+  spaceId?: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type SpaceAuthReq = {
@@ -95,9 +95,9 @@ export type SpaceAuthReq = {
 
 export type IDBelongReq = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type RelationReq = {
@@ -109,7 +109,7 @@ export type RelationReq = {
 
 export type ThingAttrReq = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   //类别Id
   specId: string;
   //类别代码
@@ -123,14 +123,14 @@ export type ThingAttrReq = {
   //是否公开
   public: boolean;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IDWithBelongReq = {
   // 唯一ID
   id: string;
   // 归属ID
-  belongId: string;
+  belongId?: string;
 };
 
 export type IDWithBelongPageReq = {
@@ -139,16 +139,16 @@ export type IDWithBelongPageReq = {
   // 归属ID
   belongId: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IDStatusPageReq = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 状态
   status: number;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IDBelongTargetReq = {
@@ -157,7 +157,7 @@ export type IDBelongTargetReq = {
   // 类型
   targetType: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IDReqSubModel = {
@@ -168,7 +168,7 @@ export type IDReqSubModel = {
   // 子节点类型
   subTypeNames: string[];
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type IDReqJoinedModel = {
@@ -181,7 +181,7 @@ export type IDReqJoinedModel = {
   // 工作空间ID
   spaceId: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type ChatsReqModel = {
@@ -220,7 +220,7 @@ export type IdWithNameModel = {
 
 export type IdNameArray = {
   // 唯一ID数组
-  result: IdWithNameModel[] | undefined;
+  result?: IdWithNameModel[];
 };
 
 export type ApprovalModel = {
@@ -247,7 +247,7 @@ export type DictModel = {
 
 export type DictItemModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -262,7 +262,7 @@ export type DictItemModel = {
 
 export type ThingModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -277,7 +277,7 @@ export type ThingModel = {
 
 export type SpeciesModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -296,7 +296,7 @@ export type SpeciesModel = {
 
 export type AttributeModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -323,7 +323,7 @@ export type AttributeModel = {
 
 export type AuthorityModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -340,7 +340,7 @@ export type AuthorityModel = {
 
 export type IdentityModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -376,7 +376,7 @@ export type TargetModel = {
 
 export type RuleStdModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -393,7 +393,7 @@ export type RuleStdModel = {
 
 export type LogModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   //类型
   type: string;
   //模块
@@ -404,7 +404,7 @@ export type LogModel = {
 
 export type MarketModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -423,7 +423,7 @@ export type MarketModel = {
 
 export type MerchandiseModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 标题
   caption: string;
   // 产品ID
@@ -442,7 +442,7 @@ export type MerchandiseModel = {
 
 export type OrderModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 存证ID
   nftId: string;
   // 名称
@@ -457,7 +457,7 @@ export type OrderModel = {
 
 export type OrderModelByStags = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 存证ID
   nftId: string;
   // 名称
@@ -472,7 +472,7 @@ export type OrderModelByStags = {
 
 export type OrderDetailModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 订单
   caption: string;
   // 商品
@@ -486,7 +486,7 @@ export type OrderDetailModel = {
 
 export type OrderPayModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 订单
   orderDetailId: string;
   // 支付总价
@@ -510,8 +510,10 @@ export type ProductModel = {
   remark: string;
   // 所属ID
   belongId: string;
+  // 图片
+  photo: string;
   // 资源列
-  resources: ResourceModel[] | undefined;
+  resources?: ResourceModel[];
 };
 
 export type ResourceModel = {
@@ -535,7 +537,7 @@ export type ResourceModel = {
 
 export type StagingModel = {
   // 唯一ID
-  id: string | undefined;
+  id?: string;
   // 商品
   merchandiseId: string;
   // 创建组织/个人
@@ -544,7 +546,7 @@ export type StagingModel = {
 
 export type ThingSpeciesModel = {
   // 物的唯一ID
-  id: string | undefined;
+  id?: string;
   // 赋予的类别Id
   speciesId: string;
   // 赋予的类别代码
@@ -553,7 +555,7 @@ export type ThingSpeciesModel = {
 
 export type ThingAttrModel = {
   // 物的唯一ID
-  id: string | undefined;
+  id?: string;
   // 基于关系ID的度量
   relationId: string;
   // 类别Id
@@ -631,7 +633,7 @@ export type SearchExtendReq = {
   // 归属ID
   spaceId: string;
   // TeamID
-  teamId: string | undefined;
+  teamId?: string;
 };
 
 export type MarketPullModel = {
@@ -680,7 +682,7 @@ export type NameTypeModel = {
   // 类型名
   typeNames: string[];
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type NameCodeModel = {
@@ -689,7 +691,7 @@ export type NameCodeModel = {
   // 代码
   code: string;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type ImMsgModel = {
@@ -707,7 +709,7 @@ export type ImMsgModel = {
 
 export type ChatResponse = {
   // 会话分组
-  groups: GroupChatModel[] | undefined;
+  groups?: GroupChatModel[];
 };
 
 export type GroupChatModel = {
@@ -845,11 +847,11 @@ export type FlowReq = {
   // 应用Id
   productId: string;
   // 空间Id
-  spaceId: string;
+  spaceId?: string;
   // 状态
   status: number;
   // 分页
-  page: PageRequest | undefined;
+  page?: PageRequest;
 };
 
 export type ApprovalTaskReq = {
