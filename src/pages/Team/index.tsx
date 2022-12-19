@@ -2,71 +2,50 @@ import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget, TargetType } from '@/ts/core';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
+import TypeSetting from './TypeSetting';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import CompanySetting from './componments/Company';
-import StationSetting from './componments/Station';
-import AgencySetting from './componments/Agency';
-import CohortSetting from './componments/Cohort';
-import PersonSetting from './componments/Person';
-import { GroupMenuType } from './config/typeOperate';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  const [edit, setEdit] = useState<ITarget>();
-  const [activeModal, setActiveModal] = useState<string[]>(['']); // 模态框
-  const getBody = () => {
-    switch (selectMenu.itemType) {
-      case GroupMenuType.User:
-        return <PersonSetting />;
-      case GroupMenuType.Company:
-        return <CompanySetting current={selectMenu.item} />;
-      case GroupMenuType.Agency:
-        return <AgencySetting current={selectMenu.item} />;
-      case GroupMenuType.Station:
-        return <StationSetting current={selectMenu.item} />;
-      case GroupMenuType.Cohort:
-        return <CohortSetting current={selectMenu.item} />;
-      default:
-        return <></>;
-    }
-  };
-
+  const [editTarget, setEditTarget] = useState<ITarget>();
+  const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   return (
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        setSelectMenu(data);
         userCtrl.currentKey = data.key;
         if (data.itemType as TargetType) {
           const item = data.item as ITarget;
-          if (item && item.subTeam.length === 0) {
-            if ((await item.loadSubTeam()).length > 0) {
+          if (item.subTeam.length === 0) {
+            const subs = await item.loadSubTeam();
+            if (subs.length > 0) {
               refreshMenu();
             }
           }
         }
+        setSelectMenu(data);
       }}
-      onMenuClick={(item, key) => {
-        setEdit(item.item);
-        setActiveModal(key.split('|'));
+      onMenuClick={async (item, key) => {
+        setEditTarget(item.item);
+        setOperateKeys(key.split('|'));
       }}
       siderMenuData={menus}>
       <CreateTeamModal
-        title={activeModal[0]}
-        open={['新建', '编辑'].includes(activeModal[0])}
+        title={operateKeys[0]}
+        open={['新建', '编辑'].includes(operateKeys[0])}
         handleCancel={function (): void {
-          setActiveModal(['']);
+          setOperateKeys(['']);
         }}
         handleOk={(newItem) => {
           if (newItem) {
             refreshMenu();
-            setActiveModal(['']);
+            setOperateKeys(['']);
           }
         }}
-        current={edit || userCtrl.space}
-        typeNames={activeModal.slice(1)}
+        current={editTarget || userCtrl.space}
+        typeNames={operateKeys.slice(1)}
       />
-      {getBody()}
+      <TypeSetting selectMenu={selectMenu} />
     </MainLayout>
   );
 };

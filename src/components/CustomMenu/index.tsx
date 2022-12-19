@@ -16,8 +16,8 @@ const CustomMenu = (props: CustomMenuType) => {
   const [overItem, setOverItem] = useState<MenuItemType>();
   const [data, setData] = useState<MenuProps['items']>([]);
   useEffect(() => {
-    setOpenKeys(loadOpenKeys(props.item.children, props.selectKey));
     setData(loadMenus(props.item.children));
+    setOpenKeys(loadOpenKeys(props.item.children, props.selectKey));
   }, [props]);
 
   useEffect(() => {

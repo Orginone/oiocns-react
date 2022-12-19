@@ -4,7 +4,8 @@ import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
-import * as operate from '../config/typeOperate';
+import * as operate from '../config/menuOperate';
+import { GroupMenuType } from '../config/menuType';
 /**
  * 监听控制器刷新hook
  * @param ctrl 控制器
@@ -46,25 +47,25 @@ const useMenuUpdate = (): [
     if (userCtrl.isCompanySpace) {
       children.push(
         operate.loadGroupMenus({
-          key: operate.GroupMenuType.InnerAgency,
+          key: GroupMenuType.InnerAgency,
           item: userCtrl.company,
           typeName: TargetType.Department,
           subTeam: await userCtrl.company.loadSubTeam(),
         }),
         operate.loadGroupMenus({
-          key: operate.GroupMenuType.OutAgency,
+          key: GroupMenuType.OutAgency,
           item: userCtrl.company,
           typeName: TargetType.Group,
           subTeam: await userCtrl.company.getJoinedGroups(),
         }),
         operate.loadGroupMenus({
-          key: operate.GroupMenuType.StationSetting,
+          key: GroupMenuType.StationSetting,
           item: userCtrl.company,
           typeName: TargetType.Station,
           subTeam: await userCtrl.company.getStations(),
         }),
         operate.loadGroupMenus({
-          key: operate.GroupMenuType.CompanyCohort,
+          key: GroupMenuType.CompanyCohort,
           item: userCtrl.company,
           typeName: TargetType.Cohort,
           subTeam: await userCtrl.company.getCohorts(),
@@ -73,7 +74,7 @@ const useMenuUpdate = (): [
     } else {
       children.push(
         operate.loadGroupMenus({
-          key: operate.GroupMenuType.UserCohort,
+          key: GroupMenuType.UserCohort,
           item: userCtrl.user,
           typeName: TargetType.Cohort,
           subTeam: await userCtrl.user.getCohorts(),

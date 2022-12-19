@@ -60,7 +60,11 @@ export default class BaseTarget implements ITarget {
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
-      page: page,
+      page: {
+        limit: page.limit,
+        offset: page.offset,
+        filter: page.filter,
+      },
       id: this.target.id,
       typeNames: [this.target.typeName],
       subTypeNames: this.memberTypes,

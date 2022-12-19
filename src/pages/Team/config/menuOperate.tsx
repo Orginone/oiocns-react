@@ -4,6 +4,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ITarget, TargetType } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { MenuItemType } from 'typings/globelType';
+import { GroupMenuType } from './menuType';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -12,23 +13,10 @@ interface groupMenuParams {
   typeName: string;
   subTeam: ITarget[];
 }
-/** 分组类型 */
-export enum GroupMenuType {
-  'User' = '个人',
-  'Agency' = '机构',
-  'Cohort' = '群组',
-  'Company' = '单位',
-  'Station' = '岗位',
-  'OutAgency'= '外部机构',
-  'UserCohort'= '个人群组',
-  'InnerAgency'= '内部机构',
-  'StationSetting'= '岗位设置',
-  'CompanyCohort'= '单位群组',
-}
 
 /** 转换类型 */
 const parseGroupMenuType = (typeName: TargetType) => {
-  switch(typeName) {
+  switch (typeName) {
     case TargetType.Cohort:
       return GroupMenuType.Cohort;
     case TargetType.Station:
@@ -36,7 +24,7 @@ const parseGroupMenuType = (typeName: TargetType) => {
     default:
       return GroupMenuType.Agency;
   }
-}
+};
 
 /** 编译组织树 */
 export const buildTargetTree = (targets: ITarget[]) => {
@@ -59,7 +47,7 @@ export const buildTargetTree = (targets: ITarget[]) => {
 export const getSpaceMenu = () => {
   let label = '个人信息';
   let itemType = GroupMenuType.User;
-  if(userCtrl.isCompanySpace) {
+  if (userCtrl.isCompanySpace) {
     label = '单位信息';
     itemType = GroupMenuType.Company;
   }
@@ -72,7 +60,8 @@ export const getSpaceMenu = () => {
     icon: <TeamIcon share={userCtrl.space.shareInfo} size={18} fontSize={16} />,
     children: [],
   };
-}
+};
+
 /** 加载分组菜单 */
 export const loadGroupMenus = (param: groupMenuParams) => {
   return {
@@ -94,6 +83,11 @@ export const loadGroupMenus = (param: groupMenuParams) => {
         key: '新建|' + param.typeName,
         icon: <im.ImPlus />,
         label: '新建',
+      },
+      {
+        key: '刷新',
+        icon: <im.ImSpinner9 />,
+        label: '刷新',
       },
     ],
     item: param.item,
