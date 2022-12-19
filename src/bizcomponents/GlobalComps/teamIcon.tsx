@@ -18,7 +18,7 @@ const TeamIcon = (info: teamTypeInfo) => {
   const fontSize = info.fontSize ?? 18;
   if (info.share.avatar && info.share.avatar.thumbnail) {
     return (
-      <div style={{ cursor: 'pointer' }} title="点击预览">
+      <div style={{ cursor: 'pointer', display: 'inline-block' }} title="点击预览">
         {info.preview && (
           <Image
             style={{ display: 'none' }}

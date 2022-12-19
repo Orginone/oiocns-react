@@ -110,22 +110,19 @@ const CreateTeamModal = (props: Iprops) => {
     {
       title: '简称',
       dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '简称为必填项' }],
-      },
     },
     {
       title: '标识',
       dataIndex: 'teamCode',
-      formItemProps: {
-        rules: [{ required: true, message: '标识为必填项' }],
-      },
     },
     {
-      title: '信息备注',
+      title: '简介',
       dataIndex: 'teamRemark',
       valueType: 'textarea',
       colProps: { span: 24 },
+      formItemProps: {
+        rules: [{ required: true, message: '简介为必填项' }],
+      },
     },
   ];
   return (
@@ -157,6 +154,8 @@ const CreateTeamModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
+        values.teamName = values.teamName ?? values.name;
+        values.teamCode = values.teamCode ?? values.code;
         values.avatar = JSON.stringify(avatar);
         if (props.title === '编辑') {
           props.handleOk(await props.current.update(values));

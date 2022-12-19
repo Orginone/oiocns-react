@@ -256,6 +256,15 @@ const MarketRouter: IRouteConfig[] = [
   },
 ];
 
+const TeamRouter: IRouteConfig[] = [
+  {
+    path: '/team',
+    title: '设置',
+    icon: 'icon-setting',
+    component: React.lazy(() => import('@/pages/Team')),
+  },
+];
+
 /* 设置 */
 const SettingRouter: IRouteConfig[] = [
   {
@@ -451,6 +460,7 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...SettingRouter,
+      ...TeamRouter,
       {
         path: '/online',
         title: '第三方应用',
