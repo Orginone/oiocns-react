@@ -20,6 +20,7 @@ const useMenuUpdate = (): [
   const [menus, setMenu] = useState<MenuItemType>({
     key: 'setting',
     label: '设置',
+    itemType: 'group',
     icon: <SettingOutlined />,
     children: [],
   });
@@ -86,6 +87,7 @@ const useMenuUpdate = (): [
         item: item,
         label: label,
         menus: loadMenus(item),
+        itemType: item.typeName,
         icon: <TeamIcon share={item.shareInfo} size={18} fontSize={16} />,
         children: buildTargetTree(item.subTeam),
       });
@@ -99,6 +101,7 @@ const useMenuUpdate = (): [
       children.push({
         key: '外部机构',
         label: '外部机构',
+        itemType: 'group',
         icon: (
           <TeamIcon
             share={{
@@ -122,6 +125,7 @@ const useMenuUpdate = (): [
       children.push({
         key: '岗位设置',
         label: '岗位设置',
+        itemType: 'group',
         icon: (
           <TeamIcon
             share={{
@@ -145,6 +149,7 @@ const useMenuUpdate = (): [
       children.push({
         key: '单位群组',
         label: '单位群组',
+        itemType: 'group',
         icon: (
           <TeamIcon
             share={{
@@ -169,6 +174,7 @@ const useMenuUpdate = (): [
       children.push({
         key: '个人群组',
         label: '个人群组',
+        itemType: 'group',
         icon: (
           <TeamIcon
             share={{
@@ -193,6 +199,7 @@ const useMenuUpdate = (): [
     setMenu({
       key: 'setting',
       label: '设置',
+      itemType: 'group',
       icon: <SettingOutlined />,
       children: children,
     });

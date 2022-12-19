@@ -1,9 +1,10 @@
-import { Col, Layout, Row, Space } from 'antd';
-import React from 'react';
+import { Col, Layout, Row, Space, Typography } from 'antd';
+import React, { useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 const { Content, Sider } = Layout;
 
@@ -28,13 +29,14 @@ type MainLayoutType = {
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
   const { className, siderMenuData, children } = props;
+  const [collapsed, setCollapsed] = useState(false);
   return (
     <Layout className={`${className}`} style={{ height: '100%', position: 'relative' }}>
-      <Sider className={cls.sider} width={220}>
+      <Sider className={cls.sider} width={250} collapsed={collapsed}>
         <div className={cls.title}>
           <Space>
             {props.selectMenu.icon}
-            <strong>{props.selectMenu.label}</strong>{' '}
+            {!collapsed && <strong>{props.selectMenu.label}</strong>}
           </Space>
         </div>
         <div className={cls.container} id="templateMenu">
@@ -55,6 +57,14 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           <Col>
             {
               <CustomBreadcrumb
+                leftBar={
+                  <Typography.Link
+                    onClick={() => {
+                      setCollapsed(!collapsed);
+                    }}>
+                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  </Typography.Link>
+                }
                 selectKey={props.selectMenu.key}
                 item={siderMenuData}
                 onSelect={(item) => {

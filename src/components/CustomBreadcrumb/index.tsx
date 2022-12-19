@@ -6,6 +6,7 @@ import { MenuItemType } from 'typings/globelType';
 import css from './index.module.less';
 
 interface CustomBreadcrumbType {
+  leftBar?: React.ReactNode;
   selectKey?: string;
   item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
@@ -62,6 +63,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
 
   return (
     <Space wrap split={<Divider type="vertical" />} size={2}>
+      {props.leftBar && props.leftBar}
       <Typography.Link
         disabled={items.length === 1}
         onClick={() => {

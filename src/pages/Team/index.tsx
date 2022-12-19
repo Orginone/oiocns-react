@@ -6,46 +6,38 @@ import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import CompanySetting from './componments/Company';
 import StationSetting from './componments/Station';
-import { MenuItemType } from 'typings/globelType';
 import { IStation } from '@/ts/core/target/itarget';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string[]>(['']); // 模态框
-  const getTargetOfMenu = (menu: MenuItemType) => {
-    if (menu.item) {
-      const item = menu.item as ITarget;
-      if (item && item.id?.length > 0) {
-        return item;
-      }
-    }
-  };
   const getBody = () => {
-    const current = getTargetOfMenu(selectMenu);
-    if (current) {
-      switch (current.typeName) {
-        case TargetType.Company:
-        case TargetType.Hospital:
-        case TargetType.University:
-          return <CompanySetting />;
-        case TargetType.Station:
-          return <StationSetting current={current as IStation} />;
-      }
+    switch (selectMenu.itemType) {
+      case TargetType.Company:
+      case TargetType.Hospital:
+      case TargetType.University:
+        return <CompanySetting />;
+      case TargetType.Station:
+        return <StationSetting current={selectMenu.item as IStation} />;
+      default:
+        return <></>;
     }
-    return <></>;
   };
 
   return (
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        userCtrl.currentKey = data.key;
-        const item = getTargetOfMenu(data);
-        if (item && item.subTeam.length === 0) {
-          await item.loadSubTeam();
-          refreshMenu();
-        }
         setSelectMenu(data);
+        userCtrl.currentKey = data.key;
+        if (data.itemType as TargetType) {
+          const item = data.item as ITarget;
+          if (item && item.subTeam.length === 0) {
+            if ((await item.loadSubTeam()).length > 0) {
+              refreshMenu();
+            }
+          }
+        }
       }}
       onMenuClick={(item, key) => {
         setEdit(item.item);

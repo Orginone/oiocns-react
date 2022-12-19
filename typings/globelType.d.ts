@@ -38,6 +38,7 @@ interface IRouteConfig extends RouteConfig {
 interface MenuItemType {
   key: string;
   label: string;
+  itemType: string;
   icon: React.ReactNode;
   item?: any;
   menus?: any[];
