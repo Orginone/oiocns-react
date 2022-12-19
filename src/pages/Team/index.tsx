@@ -20,7 +20,7 @@ const Setting: React.FC<any> = () => {
       case TargetType.Company:
       case TargetType.Hospital:
       case TargetType.University:
-        return <CompanySetting />;
+        return <CompanySetting current={selectMenu.item} />;
       case TargetType.Group:
       case TargetType.College:
       case TargetType.Office:
