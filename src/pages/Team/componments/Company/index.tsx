@@ -21,7 +21,6 @@ import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 
 type ShowmodelType =
@@ -139,9 +138,6 @@ const CompanySetting: React.FC = () => {
           labelStyle={{ textAlign: 'center' }}
           contentStyle={{ textAlign: 'center' }}
           extra={[
-            <Button type="link" key="edit" onClick={() => setActiveModal('edit')}>
-              编辑
-            </Button>,
             <Dropdown menu={{ items: menu }} placement="bottom" key="more">
               <EllipsisOutlined
                 style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
@@ -208,17 +204,6 @@ const CompanySetting: React.FC = () => {
           current={userCtrl.space}
           onCancel={() => setActiveModal('')}
         />
-        <CreateTeamModal
-          title="编辑"
-          open={activeModal === 'edit'}
-          current={userCtrl.company}
-          handleOk={() => {
-            setActiveModal('');
-            userCtrl.changCallback();
-          }}
-          handleCancel={() => setActiveModal('')}
-          typeNames={[userCtrl.company.target.typeName]}
-        />
         {/* 邀请成员*/}
         <Modal
           title="邀请成员"
@@ -241,7 +226,6 @@ const CompanySetting: React.FC = () => {
               }
             }
           }}>
-          {/* <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} /> */}
           <SearchCompany
             searchCallback={setSelectPerson}
             searchType={TargetType.Person}

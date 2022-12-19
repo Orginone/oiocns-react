@@ -18,6 +18,7 @@ interface indexType {
   searchFn: Function;
   // 邀请的数据来源 集团或者单位
   source: ITarget;
+  columns: ProColumns<schema.XTarget>[];
 }
 
 const MemberList: React.FC<indexType> = (props) => {
@@ -62,40 +63,6 @@ const MemberList: React.FC<indexType> = (props) => {
     }
   };
 
-  const personColumn: ProColumns<schema.XTarget>[] = [
-    { title: '序号', valueType: 'index', width: 50 },
-    { title: '账号', dataIndex: 'code' },
-    {
-      title: '昵称',
-      dataIndex: 'name',
-    },
-    {
-      title: '姓名',
-      dataIndex: ['team', 'name'],
-    },
-    {
-      title: '手机号',
-      dataIndex: ['team', 'code'],
-    },
-    {
-      title: '座右铭',
-      dataIndex: ['team', 'remark'],
-    },
-  ];
-
-  const companyColumn: ProColumns<schema.XTarget>[] = [
-    { title: '序号', valueType: 'index', width: 50 },
-    { title: '单位名称', dataIndex: 'name' },
-    {
-      title: '社会统一信用代码',
-      dataIndex: 'code',
-    },
-    {
-      title: '单位简介',
-      dataIndex: ['team', 'remark'],
-    },
-  ];
-
   return (
     <div className={cls.tableBox}>
       <div>
@@ -134,10 +101,7 @@ const MemberList: React.FC<indexType> = (props) => {
           scroll={{ y: 300 }}
           options={false}
           search={false}
-          columns={
-            // 判断是公司还是集团
-            source.target.typeName == TargetType.Department ? personColumn : companyColumn
-          }
+          columns={props.columns}
           rowKey={'id'}
         />
       </div>

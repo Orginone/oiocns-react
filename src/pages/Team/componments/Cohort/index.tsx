@@ -1,18 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
-import {
-  Avatar,
-  Button,
-  Card,
-  Descriptions,
-  Dropdown,
-  message,
-  Modal,
-  Space,
-} from 'antd';
-import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import React, { useRef, useState } from 'react';
+import { Button, message, Modal, Typography } from 'antd';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ICohort, IGroup, ITarget, TargetType } from '@/ts/core';
+import { ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
@@ -21,65 +10,24 @@ import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import SearchCompany from '@/bizcomponents/SearchCompany';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
+import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import Description from '../Description';
 
-type ShowmodelType =
-  | 'addOne'
-  | 'edit'
-  | 'post'
-  | 'transfer'
-  | 'indentity'
-  | 'joinGroup'
-  | '';
-type TabType = 'members' | 'application';
-interface CohortType {
-  item: any;
+interface IProps {
+  current: ICohort;
 }
 /**
  * 群组信息
  * @returns
  */
-const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
+const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const history = useHistory();
-  const [key] = useCtrlUpdate(userCtrl);
   const parentRef = useRef<any>(null);
-  const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
-  const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
-  const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-  const [memberlistKey, setMemberlistKey] = useState<string>('member');
-  if (!userCtrl.isCompanySpace) {
-    history.goBack();
-  }
-  const info: ICohort = props.item;
-  useEffect(() => {
-    setMemberlistKey(info.id);
-  }, [info]);
+  const [key, forceUpdate] = useObjectUpdate(current);
+  const [activeModal, setActiveModal] = useState<string>(''); // 模态框
+  const [selectMember, setSelectMember] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
 
-  const menu = [
-    {
-      key: 'quit',
-      label: <span style={{ color: 'red' }}>退出</span>,
-      onClick: async () => {
-        Modal.confirm({
-          title: `是否退出${info.name}?`,
-          icon: <ExclamationCircleOutlined />,
-          okText: '确认',
-          okType: 'danger',
-          cancelText: '取消',
-          async onOk() {
-            const success = await userCtrl.user.quitCohorts(info.id);
-            if (success) {
-              message.success(`退出${info.name}群组成功!`);
-            } else {
-              message.error('退出群组失败!');
-            }
-          },
-          onCancel() {},
-        });
-      },
-    },
-  ];
   // 标题tabs页
   const TitleItems = [
     {
@@ -111,9 +59,8 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
         key: 'remove',
         label: '踢出',
         onClick: async () => {
-          if (await info.removeMember(item)) {
-            message.success('踢出成功');
-            userCtrl.changCallback();
+          if (await current.removeMember(item)) {
+            forceUpdate();
           }
         },
       },
@@ -121,48 +68,26 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
   };
   return (
     <div key={key} className={cls.companyContainer}>
-      <Card bordered={false} className={cls['company-info-content']}>
-        <Descriptions
-          title="群组详情"
-          bordered
-          size="middle"
-          column={2}
-          labelStyle={{ textAlign: 'center' }}
-          contentStyle={{ textAlign: 'center' }}
-          extra={[
-            <Dropdown menu={{ items: menu }} placement="bottom" key="more">
-              <EllipsisOutlined
-                style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
-                rotate={90}
-              />
-            </Dropdown>,
-          ]}>
-          <Descriptions.Item label="群组名称">{info.name}</Descriptions.Item>
-          <Descriptions.Item label="群组编号">{info.target.code}</Descriptions.Item>
-          <Descriptions.Item label="群组简介">
-            {info.target.team?.remark}
-          </Descriptions.Item>
-        </Descriptions>
-      </Card>
+      <Description
+        title={
+          <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
+        }
+        current={current}
+        extra={[
+          <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
+            权限管理
+          </Button>,
+        ]}
+      />
       <div className={cls['pages-wrap']}>
-        <PageCard
-          bordered={false}
-          tabList={TitleItems}
-          onTabChange={(key) => {
-            setActiveTab(key as TabType);
-          }}
-          tabBarExtraContent={renderBtns()}>
+        <PageCard bordered={false} tabList={TitleItems} tabBarExtraContent={renderBtns()}>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<schema.XTarget>
               dataSource={[]}
-              key={memberlistKey}
+              key={key}
               rowKey={'id'}
               request={(page) => {
-                return info.loadMembers({
-                  limit: page.limit,
-                  offset: page.offset,
-                  filter: '',
-                });
+                return current.loadMembers(page);
               }}
               parentRef={parentRef}
               operation={renderOperation}
@@ -173,19 +98,8 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
         </PageCard>
         <IndentityManage
           open={activeModal === 'indentity'}
-          current={info}
+          current={current}
           onCancel={() => setActiveModal('')}
-        />
-        <CreateTeamModal
-          title="编辑"
-          open={activeModal === 'edit'}
-          current={info}
-          handleOk={() => {
-            setActiveModal('');
-            userCtrl.changCallback();
-          }}
-          handleCancel={() => setActiveModal('')}
-          typeNames={[info.typeName]}
         />
         {/* 邀请成员*/}
         <Modal
@@ -195,23 +109,24 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
           width={900}
           onCancel={() => setActiveModal('')}
           onOk={async () => {
-            if (selectPerson) {
-              const success = await info.pullMembers(
-                selectPerson.map((n) => n.id),
-                selectPerson[0].typeName,
+            if (selectMember) {
+              const success = await current.pullMembers(
+                selectMember.map((n) => n.id),
+                selectMember[0].typeName,
               );
               if (success) {
                 setActiveModal('');
                 message.success('添加成功');
-                userCtrl.changCallback();
+                forceUpdate();
               } else {
                 message.error('添加失败');
               }
             }
           }}>
-          <SearchCompany
-            searchCallback={setSelectPerson}
-            searchType={TargetType.Person}
+          <AssignPosts
+            searchFn={setSelectMember}
+            source={userCtrl.user}
+            columns={PersonColumns}
           />
         </Modal>
       </div>
