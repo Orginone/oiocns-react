@@ -212,29 +212,6 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
             searchType={TargetType.Person}
           />
         </Modal>
-        {/* 申请加入集团*/}
-        <Modal
-          title="申请加入集团"
-          destroyOnClose
-          open={activeModal === 'joinGroup'}
-          width={600}
-          onCancel={() => setActiveModal('')}
-          onOk={async () => {
-            if (selectPerson && userCtrl.company) {
-              selectPerson.forEach(async (group) => {
-                const success = await userCtrl.company.applyJoinGroup(group.id);
-                if (success) {
-                  message.success('添加成功');
-                  userCtrl.changCallback();
-                  setActiveModal('');
-                } else {
-                  message.error('添加失败');
-                }
-              });
-            }
-          }}>
-          <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
-        </Modal>
       </div>
     </div>
   );
