@@ -10,15 +10,11 @@ export const myColumns: any = [
   },
   {
     title: '应用图标',
-    dataIndex: ['prod', 'belongId'],
+    dataIndex: ['prod', 'photo'],
   },
   {
     title: '应用名称',
     dataIndex: ['prod', 'name'],
-  },
-  {
-    title: '版本号',
-    dataIndex: ['prod', 'version'],
   },
   {
     title: '应用类型',

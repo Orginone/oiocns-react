@@ -31,7 +31,7 @@ export default class BaseTarget implements ITarget {
     return this.target.name;
   }
   public get teamName(): string {
-    return this.target.team!.name;
+    return this.target.team?.name ?? this.name;
   }
 
   public get subTeam(): ITarget[] {

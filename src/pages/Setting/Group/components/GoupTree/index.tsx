@@ -68,7 +68,6 @@ const GroupTree: React.FC<CreateGroupPropsType> = ({
         />
         <TargetTree
           className={cls.docTree}
-          title={'外部机构'}
           targets={data}
           onSelect={setCurrent}
           loadMenus={loadMenus}

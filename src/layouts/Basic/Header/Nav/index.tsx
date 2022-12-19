@@ -8,7 +8,6 @@ import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /**
  * 顶部导航
@@ -45,7 +44,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'setting',
-      path: userCtrl.isCompanySpace ? '/setting/info' : '/setting/user',
+      path: '/team',
       title: '设置',
       icon: 'icon-setting',
       count: 0,

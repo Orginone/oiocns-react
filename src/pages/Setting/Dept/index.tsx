@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, message, Modal, Tabs, Typography } from 'antd';
+import { Button, message, Modal, Typography } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
@@ -12,7 +12,7 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferDepartment from './components/TransferDepartment';
 import DepartmentTree from './components/DepartmentTree';
 import DeptDescription from './components/DeptDescription';
-import { columns } from './config';
+import { getColumns } from './config';
 import cls from './index.module.less';
 // import SearchPerson from '@/bizcomponents/SearchPerson';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -29,14 +29,14 @@ interface ICanDelete {
  */
 const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [current, setCurrent] = useState<ITarget>();
+  const [current, setCurrent] = useState<ITarget>(userCtrl.space);
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [createOrEdit, setCreateOrEdit] = useState<string>('新增'); // 编辑或新增部门模态框标题
   const [selectPerson, setSelectPerson] = useState<XTarget[]>([]); // 选中的要拉的人
   const [key, forceUpdate] = useCtrlUpdate(userCtrl, () => {
-    setCurrent(undefined);
+    setCurrent(userCtrl.space);
   });
 
   // 操作内容渲染函数
@@ -79,7 +79,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
         case '删除':
           if (item as unknown as ICanDelete) {
             if (await (item as unknown as ICanDelete).delete()) {
-              setCurrent(undefined);
+              setCurrent(userCtrl.space);
               forceUpdate();
             }
           }
@@ -100,11 +100,11 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: current?.target.typeName ?? '机构' + `成员`,
+      tab: (current?.typeName ?? '机构') + `成员`,
       key: 'deptPerpeos',
     },
     {
-      tab: `部门应用`,
+      tab: (current?.typeName ?? '机构') + `应用`,
       key: 'deptApps',
     },
   ];
@@ -151,12 +151,6 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             }
             selectDept={current}
             extra={[
-              <Button
-                key="edit"
-                type="link"
-                onClick={() => handleMenuClick('编辑', current)}>
-                编辑
-              </Button>,
               <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
                 权限管理
               </Button>,
@@ -166,13 +160,10 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
             <PageCard
               bordered={false}
               tabList={TitleItems}
+              tabBarExtraContent={renderBtns()}
               onTabChange={(key) => {}}
               bodyStyle={{ paddingTop: 16 }}>
               <div className={cls['page-content-table']} ref={parentRef}>
-                <Tabs
-                  items={[{ label: `全部`, key: '1' }]}
-                  tabBarExtraContent={renderBtns()}
-                />
                 <CardOrTable<XTarget>
                   rowKey={'id'}
                   params={tkey}
@@ -180,7 +171,7 @@ const SettingDept: React.FC<RouteComponentProps> = ({ history }) => {
                     return await current.loadMembers(page);
                   }}
                   operation={renderOperation}
-                  columns={columns}
+                  columns={getColumns(current.typeName)}
                   parentRef={parentRef}
                   showChangeBtn={false}
                   dataSource={[]}

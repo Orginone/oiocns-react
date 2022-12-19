@@ -10,7 +10,7 @@ import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
-type modalType = 'create' | 'join' | 'detail' | 'users' | '';
+type modalType = 'create' | 'join' | 'detail' | 'edit' | 'users' | '';
 interface Iprops {
   tkey: string;
   current: IMarket | undefined;
@@ -32,9 +32,20 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    const market = await marketCtrl.Market.createMarket({ ...formData });
-    if (market) {
-      props.setCurrent(market);
+    if (editMarket) {
+      await editMarket.update(
+        formData.name,
+        formData.code,
+        formData.samrId,
+        formData.remark,
+        formData.public,
+        formData.photo,
+      );
+    } else {
+      const market = await marketCtrl.target.createMarket({ ...formData });
+      if (market) {
+        props.setCurrent(market);
+      }
     }
     setActiveModal('');
   };
@@ -57,7 +68,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const onChange = async (val: any) => {
-    setDataSource((await marketCtrl.Market.getMarketByCode(val.target.value)).result);
+    setDataSource((await marketCtrl.target.getMarketByCode(val.target.value)).result);
   };
 
   /**
@@ -84,9 +95,19 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
                 {
                   label: '创建商店',
                   key: 'add',
-                  onClick: () => setActiveModal('create'),
+                  onClick: () => {
+                    setEditMarket(undefined);
+                    setActiveModal('create');
+                  },
                 },
-                { label: '加入商店', key: 'join', onClick: () => setActiveModal('join') },
+                {
+                  label: '加入商店',
+                  key: 'join',
+                  onClick: () => {
+                    setEditMarket(undefined);
+                    setActiveModal('join');
+                  },
+                },
               ],
             }}>
             <EllipsisOutlined style={{ transform: 'rotate(90deg)' }} />
@@ -109,19 +130,23 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           title: '提示',
           content: '是否确认删除',
           onOk: async () => {
-            if (await marketCtrl.Market.deleteMarket(node.market.id)) {
+            if (await marketCtrl.target.deleteMarket(node.market.id)) {
               message.success('删除成功');
               marketCtrl.changCallback();
             }
           },
         });
         break;
+      case '编辑商店':
+        setEditMarket(node);
+        setActiveModal('edit');
+        break;
       case '退出商店':
         Modal.confirm({
           title: '提示',
           content: '是否确认退出',
           onOk: async () => {
-            if (await marketCtrl.Market.quitMarket(node.market.id)) {
+            if (await marketCtrl.target.quitMarket(node.market.id)) {
               message.success('退出成功');
               marketCtrl.changCallback();
             }
@@ -129,8 +154,8 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         });
         break;
       case '基础详情':
-        setActiveModal('detail');
         setEditMarket(node);
+        setActiveModal('detail');
         break;
       case '用户管理':
         setActiveModal('users');
@@ -146,9 +171,10 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const getTreeData = () => {
-    const data = marketCtrl.Market.joinedMarkets.map((itemModel) => {
+    const data = marketCtrl.target.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
       if (itemModel.market.belongId === userCtrl.space.id) {
+        arrs.push('编辑商店');
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');
@@ -188,6 +214,13 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       <CreateMarketModal
         title="创建商店"
         open={activeModal === 'create'}
+        handleOk={onOk}
+        handleCancel={onCancel}
+      />
+      <CreateMarketModal
+        title="编辑商店"
+        open={activeModal === 'edit'}
+        current={editMarket}
         handleOk={onOk}
         handleCancel={onCancel}
       />

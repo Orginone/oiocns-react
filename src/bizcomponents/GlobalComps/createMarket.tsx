@@ -5,10 +5,13 @@ import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, MarketModel } from '@/ts/base/model';
 import { BankOutlined } from '@ant-design/icons';
+import { IMarket } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
   open: boolean;
   title: string;
+  current?: IMarket;
   handleCancel: () => void;
   handleOk: (data: MarketModel) => void;
 }
@@ -130,6 +133,13 @@ const CreateMarketModal = (props: Iprops) => {
           formRef.current?.resetFields();
           setAvatar(undefined);
           handleCancel();
+        } else {
+          if (props.current && props.title === '编辑商店') {
+            setAvatar(parseAvatar(props.current.market.photo));
+            formRef.current?.setFieldsValue({
+              ...props.current.market,
+            });
+          }
         }
       }}
       rowProps={{

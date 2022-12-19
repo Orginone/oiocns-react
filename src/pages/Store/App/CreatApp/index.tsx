@@ -24,6 +24,7 @@ const CreatApp: React.FC<RouteComponentProps> = (props) => {
     });
     const res = await userCtrl.space.createProduct({
       ...values,
+      photo: '',
       resources: list,
     });
     if (res) {

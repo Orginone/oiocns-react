@@ -10,6 +10,10 @@ export default class WebApp implements IProduct {
   resource: Resource[];
   merchandises: Merchandise[];
 
+  get id(): string {
+    return this.prod.id;
+  }
+
   constructor(prod: schema.XProduct) {
     this.prod = prod;
     this.merchandises = [];

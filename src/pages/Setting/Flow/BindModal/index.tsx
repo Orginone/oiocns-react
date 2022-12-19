@@ -8,10 +8,10 @@ import {
   ProFormGroup,
   ProFormText,
 } from '@ant-design/pro-components';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import cls from './index.module.less';
+import appCtrl from '@/ts/controller/store/appCtrl';
 
 type Bindmodalprops = {
   isOpen: boolean;
@@ -39,8 +39,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
   }, [upDateData]);
 
   const initData = async () => {
-    const tableData = await SelfAppCtrl.querySelfApps();
-    const currentData = tableData.map((item) => {
+    const currentData = appCtrl.products.map((item) => {
       return {
         value: item.prod.id,
         label: item.prod.name,

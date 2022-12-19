@@ -47,6 +47,34 @@ export const CompanyColumn: ProColumns<schema.XTarget>[] = [
   },
 ];
 
+export const CohortColumn: ProColumns<schema.XTarget>[] = [
+  {
+    title: '序号',
+    fixed: 'left',
+    dataIndex: 'index',
+    width: 50,
+    render: (_key: any, _record: any, index: number) => {
+      return index + 1;
+    },
+  },
+  {
+    title: '群组名称',
+    dataIndex: ['target', 'name'],
+  },
+  {
+    title: '群组编号',
+    dataIndex: ['target', 'code'],
+  },
+  {
+    title: '群组简介',
+    dataIndex: ['target', 'team', 'remark'],
+  },
+  {
+    title: '归属',
+    dataIndex: ['target', 'belongId'],
+  },
+];
+
 export const ApplicationColumns: ProColumns<IProduct>[] = [
   {
     title: '序号',
@@ -55,11 +83,16 @@ export const ApplicationColumns: ProColumns<IProduct>[] = [
   },
   {
     title: '应用图标',
-    dataIndex: ['prod', 'photo'],
+    dataIndex: ['prod', 'belongId'],
   },
   {
     title: '应用名称',
     dataIndex: ['prod', 'name'],
+  },
+  {
+    title: '版本号',
+    dataIndex: ['prod', 'version'],
+    width: 100,
   },
   {
     title: '应用类型',
@@ -79,5 +112,29 @@ export const ApplicationColumns: ProColumns<IProduct>[] = [
     title: '备注',
     ellipsis: true,
     dataIndex: ['prod', 'remark'],
+  },
+];
+
+export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: 'ID',
+    dataIndex: 'id',
+  },
+  {
+    title: '身份名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '职权',
+    dataIndex: 'name',
+  },
+  {
+    title: '备注',
+    dataIndex: 'remark',
   },
 ];

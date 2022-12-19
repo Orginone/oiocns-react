@@ -14,13 +14,14 @@ import { common } from 'typings/common';
 import TreeComp from './Classify';
 import MoveApp from './moveApp';
 import PublishComp from './PublishList';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { myColumns } from './Config';
 import { IProduct, IResource } from '@/ts/core';
+import appCtrl from '@/ts/controller/store/appCtrl';
 
 type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
+
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [key] = useCtrlUpdate(appCtrl);
@@ -31,7 +32,6 @@ const StoreApp: React.FC = () => {
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
 
-  const BtnsList = ['购买', '创建'];
   const handleBtnsClick = (item: { text: string }) => {
     switch (item.text) {
       case '购买':
@@ -47,13 +47,12 @@ const StoreApp: React.FC = () => {
   };
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
-    const id = item.prod.id;
     const shareArr = [
       {
         key: 'share',
         label: '共享',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           setShareType('共享');
           setShowShareModal(true);
         },
@@ -64,7 +63,7 @@ const StoreApp: React.FC = () => {
         key: 'share2',
         label: '分配',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           setShareType('分配');
           setShowShareModal(true);
         },
@@ -75,19 +74,18 @@ const StoreApp: React.FC = () => {
         key: 'open',
         label: '打开',
         onClick: () => {
-          appCtrl.setCurProduct(id, true);
-          history.push({ pathname: '/online', state: { appId: id } });
+          appCtrl.setCurProduct(item, true);
+          history.push({ pathname: '/online', state: { appId: item.id } });
         },
       },
       {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           history.push({ pathname: '/store/app/info' });
         },
       },
-
       // {
       //   key: 'manage',
       //   label: '管理',
@@ -101,7 +99,7 @@ const StoreApp: React.FC = () => {
         key: 'putaway',
         label: '上架',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           history.push({
             pathname: '/store/app/putaway',
           });
@@ -111,7 +109,7 @@ const StoreApp: React.FC = () => {
         key: 'publish',
         label: '上架列表',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           history.push({ pathname: '/store/app/publish' });
         },
       },
@@ -119,7 +117,7 @@ const StoreApp: React.FC = () => {
         key: 'moveTo',
         label: '移动至',
         onClick: () => {
-          appCtrl.setCurProduct(id);
+          appCtrl.setCurProduct(item);
           setMoveModal(true);
         },
       },
@@ -131,7 +129,7 @@ const StoreApp: React.FC = () => {
           Modal.confirm({
             content: `确认移除《 ${item.prod.name} 》?`,
             async onOk() {
-              await userCtrl.space.deleteProduct(id);
+              await userCtrl.space.deleteProduct(item.id);
               appCtrl.changCallback();
             },
           });
@@ -139,6 +137,7 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
+
   // 根据权限从已获取数据 动态产生tab
   const getItems = () => {
     let typeSet = new Set(['全部']);
@@ -180,7 +179,7 @@ const StoreApp: React.FC = () => {
         <Card
           title="我的应用"
           className={cls['app-tabs']}
-          extra={<BtnGroupDiv list={BtnsList} onClick={handleBtnsClick} />}
+          extra={<BtnGroupDiv list={['购买', '创建']} onClick={handleBtnsClick} />}
           tabList={getItems()}
           activeTabKey={statusKey}
           onTabChange={(k) => {

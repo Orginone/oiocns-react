@@ -25,7 +25,7 @@ const AppShowComp: React.FC = () => {
 
   useEffect(() => {
     setTimeout(async () => {
-      const markets = marketCtrl.Market.joinedMarkets;
+      const markets = marketCtrl.target.joinedMarkets;
       if (markets.length > 0) {
         const index = markets.findIndex((i) => {
           return i.market.id === current?.market.id;
@@ -46,13 +46,13 @@ const AppShowComp: React.FC = () => {
    */
   const handleBuyAppFun = (type: 'buy' | 'join', selectItem: XMerchandise) => {
     if (type === 'join') {
-      marketCtrl.joinApply(selectItem);
+      marketCtrl.appendStaging(selectItem);
     } else {
       Modal.confirm({
         title: '确认订单',
         content: '此操作将生成交易订单。是否确认',
         icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-        onOk: async () => await marketCtrl.buyShoping([selectItem.id]),
+        onOk: async () => await marketCtrl.createOrder([selectItem.id]),
       });
     }
   };
@@ -71,7 +71,7 @@ const AppShowComp: React.FC = () => {
         key: 'toBuyCar',
         label: '加入购物车',
         onClick: () => {
-          marketCtrl.joinApply(item);
+          marketCtrl.appendStaging(item);
         },
       },
       {
@@ -106,7 +106,7 @@ const AppShowComp: React.FC = () => {
 
   /**
    * @desc:卡片内容渲染函数
-   * @param {MarketTypes.ProductType[]} dataArr
+   * @param {XMerchandise[]} dataArr
    * @return {*}
    */
   const renderCardFun = (dataArr: XMerchandise[]): React.ReactNode[] => {

@@ -1,12 +1,9 @@
 // 仓库我的应用 自定义 目录
 export const STORE_USER_MENU = 'STORE_MENU';
+// 常用应用
 export const STORE_RECENTLY_APPS = 'STORE_RECENTLY_APPS';
 // 购物车
 export const JOIN_SHOPING_CAR = 'JOIN_SHOPING_CAR';
-// 用户管理
-export const USER_MANAGEMENT = 'USER_MANAGEMENT';
-//岗位
-export const MY_POSITION_LIST = 'POSITION';
 
 // 分享分发 可选类型
 export const DestTypes = [

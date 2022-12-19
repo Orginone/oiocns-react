@@ -18,7 +18,7 @@ const TeamIcon = (info: teamTypeInfo) => {
   const fontSize = info.fontSize ?? 18;
   if (info.share.avatar && info.share.avatar.thumbnail) {
     return (
-      <div style={{ cursor: 'pointer' }} title="点击预览">
+      <div style={{ cursor: 'pointer', display: 'inline-block' }} title="点击预览">
         {info.preview && (
           <Image
             style={{ display: 'none' }}
@@ -66,6 +66,9 @@ const TeamIcon = (info: teamTypeInfo) => {
       break;
     case TargetType.Working:
       icon = <im.ImUsers fontSize={fontSize} />;
+      break;
+    case TargetType.Station:
+      icon = <im.ImAddressBook fontSize={fontSize} />;
       break;
     case TargetType.Cohort:
       icon = <im.ImBubbles fontSize={fontSize} />;

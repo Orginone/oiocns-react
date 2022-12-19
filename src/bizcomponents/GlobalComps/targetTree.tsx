@@ -9,7 +9,7 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 
 /** 组织树 */
 interface Iprops {
-  title: string;
+  title: any;
   className: string;
   targets: ITarget[];
   onSelect?: (item: ITarget) => void;
@@ -36,7 +36,7 @@ const TargetTree = (props: Iprops) => {
         key: item.key,
         item: item,
         isLeaf: item.subTeam.length === 0,
-        title: item === userCtrl.user ? '我的好友' : item.name,
+        title: item === userCtrl.user ? '我的好友' : item.teamName,
         menus: props.loadMenus ? props.loadMenus(item) : undefined,
         icon: <TeamIcon share={item.shareInfo} size={18} fontSize={16} />,
         children: buildTargetTree(item.subTeam),
@@ -48,7 +48,7 @@ const TargetTree = (props: Iprops) => {
   return (
     <CustomTreeComp
       className={props.className}
-      title={'外部机构'}
+      title={props.title}
       isDirectoryTree
       menu={'menus'}
       searchable

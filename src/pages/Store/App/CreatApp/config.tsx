@@ -326,4 +326,5 @@ const sourceColumns: ProFormColumnsType<Resources> = {
 const columns: ProFormColumnsType<DataItem>[] = [baseColumns, sourceColumns as DataItem];
 
 export { columns, sourceColumns, valueEnum };
+
 export type { Components, DataItem, Field, Flows, Resources };
