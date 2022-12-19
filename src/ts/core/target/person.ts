@@ -256,8 +256,8 @@ export default class Person extends MarketTarget implements IPerson {
     logger.warn(consts.IsExistError);
     return false;
   }
-  public async removeFriend(ids: string[]): Promise<boolean> {
-    if (await this.removeMembers(ids, TargetType.Person)) {
+  public async removeMembers(ids: string[]): Promise<boolean> {
+    if (await super.removeMembers(ids, TargetType.Person)) {
       ids.forEach(async (id) => {
         await kernel.exitAnyOfTeam({
           id,
