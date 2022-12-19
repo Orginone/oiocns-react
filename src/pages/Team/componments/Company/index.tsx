@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -10,19 +10,18 @@ import {
   Space,
 } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { IGroup, TargetType } from '@/ts/core';
+import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
-import { CompanyColumn, PersonColumns } from '../../config/columns';
+import { GroupColumn, PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SearchCompany from '@/bizcomponents/SearchCompany';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 type ShowmodelType =
   | 'addOne'
@@ -33,28 +32,20 @@ type ShowmodelType =
   | 'joinGroup'
   | '';
 type TabType = 'members' | 'application';
+interface IProps {
+  current: ICompany;
+}
 /**
  * 单位信息
  * @returns
  */
-const CompanySetting: React.FC = () => {
+const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
   const history = useHistory();
-  const [key] = useCtrlUpdate(userCtrl);
+  const [key] = useObjectUpdate(current);
   const parentRef = useRef<any>(null);
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-  const [dataSource, setDataSource] = useState<IGroup[]>([]); // 加入的集团
-  if (!userCtrl.isCompanySpace) {
-    history.goBack();
-  }
-  const info = userCtrl.company.target;
-
-  useEffect(() => {
-    userCtrl.company.getJoinedGroups(true).then((e) => {
-      setDataSource(e);
-    });
-  }, [key]);
 
   const menu = [
     { key: 'auth', label: '认证' },
@@ -63,15 +54,15 @@ const CompanySetting: React.FC = () => {
       label: <span style={{ color: 'red' }}>退出</span>,
       onClick: async () => {
         Modal.confirm({
-          title: `是否退出${info.name}?`,
+          title: `是否退出${current.name}?`,
           icon: <ExclamationCircleOutlined />,
           okText: '确认',
           okType: 'danger',
           cancelText: '取消',
           async onOk() {
-            const success = await userCtrl.user.quitCompany(info.id);
+            const success = await userCtrl.user.quitCompany(current.id);
             if (success) {
-              message.success(`退出${info.name}单位成功!`);
+              message.success(`退出${current.name}单位成功!`);
               userCtrl.setCurSpace(userCtrl.user.target.id);
             } else {
               message.error('退出单位失败!');
@@ -139,9 +130,6 @@ const CompanySetting: React.FC = () => {
           labelStyle={{ textAlign: 'center' }}
           contentStyle={{ textAlign: 'center' }}
           extra={[
-            <Button type="link" key="edit" onClick={() => setActiveModal('edit')}>
-              编辑
-            </Button>,
             <Dropdown menu={{ items: menu }} placement="bottom" key="more">
               <EllipsisOutlined
                 style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
@@ -151,16 +139,20 @@ const CompanySetting: React.FC = () => {
           ]}>
           <Descriptions.Item label="单位名称">
             <Space>
-              {userCtrl.company.shareInfo.avatar && (
-                <Avatar src={userCtrl.company.shareInfo.avatar.thumbnail} />
+              {current.shareInfo.avatar && (
+                <Avatar src={current.shareInfo.avatar.thumbnail} />
               )}
-              <strong>{info.team?.name}</strong>
+              <strong>{current.teamName}</strong>
             </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="社会统一信用代码">{info.code}</Descriptions.Item>
-          <Descriptions.Item label="团队简称">{info.name}</Descriptions.Item>
-          <Descriptions.Item label="团队代号">{info.team?.code}</Descriptions.Item>
-          <Descriptions.Item label="单位简介">{info.team?.remark}</Descriptions.Item>
+          <Descriptions.Item label="社会统一信用代码">
+            {current.target.code}
+          </Descriptions.Item>
+          <Descriptions.Item label="团队简称">{current.name}</Descriptions.Item>
+          <Descriptions.Item label="团队代号">{current.teamName}</Descriptions.Item>
+          <Descriptions.Item label="单位简介">
+            {current.target.team?.remark}
+          </Descriptions.Item>
         </Descriptions>
       </Card>
       <div className={cls['pages-wrap']}>
@@ -190,14 +182,23 @@ const CompanySetting: React.FC = () => {
                 showChangeBtn={false}
               />
             ) : (
-              <CardOrTable<IGroup>
+              <CardOrTable<schema.XTarget>
                 key="groups"
                 rowKey={'id'}
                 pagination={false}
+                dataSource={[]}
                 defaultExpandAllRows={true}
-                dataSource={dataSource}
+                request={async (page) => {
+                  const targets = await current.getJoinedGroups();
+                  return {
+                    result: targets?.map((i) => i.target),
+                    limit: page.limit,
+                    offset: page.offset,
+                    total: targets?.length ?? 0,
+                  };
+                }}
                 hideOperation={true}
-                columns={CompanyColumn}
+                columns={GroupColumn}
                 showChangeBtn={false}
               />
             )}
@@ -207,17 +208,6 @@ const CompanySetting: React.FC = () => {
           open={activeModal === 'indentity'}
           current={userCtrl.space}
           onCancel={() => setActiveModal('')}
-        />
-        <CreateTeamModal
-          title="编辑"
-          open={activeModal === 'edit'}
-          current={userCtrl.company}
-          handleOk={() => {
-            setActiveModal('');
-            userCtrl.changCallback();
-          }}
-          handleCancel={() => setActiveModal('')}
-          typeNames={[userCtrl.company.target.typeName]}
         />
         {/* 邀请成员*/}
         <Modal
@@ -241,7 +231,6 @@ const CompanySetting: React.FC = () => {
               }
             }
           }}>
-          {/* <AssignPosts searchFn={setSelectPerson} source={userCtrl.company} /> */}
           <SearchCompany
             searchCallback={setSelectPerson}
             searchType={TargetType.Person}

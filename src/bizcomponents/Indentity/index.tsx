@@ -51,7 +51,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     return [
       {
         key: 'remove',
-        label: '移除人员',
+        label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
           Modal.confirm({
             title: '提示',

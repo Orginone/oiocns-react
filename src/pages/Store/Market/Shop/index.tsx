@@ -93,7 +93,7 @@ const AppShowComp: React.FC = () => {
               if (await current?.unPublish(item.id)) {
                 message.success('下架' + item.caption + '》商品成功');
               } else {
-                message.success('下架失败');
+                message.error('下架失败');
               }
               marketCtrl.changCallback();
             },

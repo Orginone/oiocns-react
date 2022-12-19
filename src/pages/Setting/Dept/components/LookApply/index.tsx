@@ -43,7 +43,7 @@ const LookApply = (props: Iprops) => {
               title: '提示',
               content: '是否确认拒绝该申请',
               onOk: () => {
-                message.success('申请已被拒绝');
+                message.warning('申请已被拒绝');
                 onOk();
               },
             });
