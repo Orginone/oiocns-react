@@ -10,7 +10,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferAgency from './TransferAgency';
-import Description from './Description';
+import Description from '../Description';
 import cls from './index.module.less';
 import AssignPosts from '@/bizcomponents/AssignPostCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
@@ -104,7 +104,13 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
           />
         );
       default:
-        return <AssignPosts searchFn={setSelectMember} source={userCtrl.company} />;
+        return (
+          <AssignPosts
+            searchFn={setSelectMember}
+            source={userCtrl.company}
+            columns={PersonColumns}
+          />
+        );
     }
   };
 
@@ -114,7 +120,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         title={
           <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
         }
-        selectDept={current}
+        current={current}
         extra={[
           <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
             权限管理

@@ -155,6 +155,8 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
                 res = await userCtrl.user.searchPerson(event.target.value);
                 break;
               case TargetType.Company:
+              case TargetType.University:
+              case TargetType.Hospital:
                 res = await userCtrl.user.searchCompany(event.target.value);
                 break;
               case TargetType.Group:
