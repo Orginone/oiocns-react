@@ -23,8 +23,6 @@ import Indentity from '@/bizcomponents/Indentity';
 import EditCustomModal from '@/bizcomponents/GlobalComps/createTeam';
 import AddCohort from './SearchCohort';
 const CohortConfig: React.FC = () => {
-  const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
   const [item, setItem] = useState<ICohort>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addIsModalOpen, setAddIsModalOpen] = useState(false);
@@ -44,7 +42,6 @@ const CohortConfig: React.FC = () => {
 
   const getData = async () => {
     const cohorts = await userCtrl.space.getCohorts();
-    setTotal(cohorts.length);
     setData(cohorts.filter((obj) => obj.target.belongId == userCtrl.space.target.id));
     setJoinData(
       cohorts.filter((obj) => obj.target.belongId !== userCtrl.space.target.id),
@@ -164,9 +161,6 @@ const CohortConfig: React.FC = () => {
     ];
   };
 
-  const handlePageChange = (page: number) => {
-    setPage(page);
-  };
   //标签页点击触发事件
   const onChange = (key: string) => {
     console.log(key);
@@ -311,14 +305,11 @@ const CohortConfig: React.FC = () => {
                   id={chatKey}
                   childrenColumnName={'nochildren'}
                   dataSource={data}
-                  total={total}
-                  page={page}
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={(data) => renderCardFun(data, renderOperation)}
                   columns={cohortColumn as any}
-                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ) : (
@@ -332,14 +323,11 @@ const CohortConfig: React.FC = () => {
                 <CardOrTable<ICohort>
                   childrenColumnName={'nochildren'}
                   dataSource={joinData!}
-                  total={total}
-                  page={page}
                   rowSelection={{}}
                   defaultPageType={'card'}
                   showChangeBtn={false}
                   renderCardContent={(data) => renderCardFun(data, joinrenderOperation)}
                   columns={cohortColumn as any}
-                  onChange={handlePageChange}
                   rowKey={'id'}
                 />
               ) : (

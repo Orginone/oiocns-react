@@ -22,7 +22,6 @@ import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ICohort } from '@/ts/core/target/itarget';
 import { XTarget } from '@/ts/base/schema';
 import Person from '@/ts/core/target/person';
-import { TargetType } from '@/ts/core';
 const ContainerHeight = 400;
 interface defaultObjType {
   cohortData: ICohort;
