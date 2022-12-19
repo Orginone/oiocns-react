@@ -7,10 +7,10 @@ import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
 import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
 import { XIdentity } from '@/ts/base/schema';
-import { ActionType } from '@ant-design/pro-table';
 import { IStation } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {
   current: IStation;
@@ -21,8 +21,7 @@ interface IProps {
  */
 const Station: React.FC<IProps> = (props) => {
   const { current } = props;
-  const actionRef = useRef<ActionType>();
-  const IndentityActionRef = useRef<ActionType>();
+  const [key, forceUpdate] = useObjectUpdate(current);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isOpenPerson, setIsOpenPerson] = useState<boolean>(false);
   const [selectPersons, setSelectPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
@@ -37,7 +36,7 @@ const Station: React.FC<IProps> = (props) => {
         label: <span style={{ color: 'red' }}>移除</span>,
         onClick: async () => {
           if (await current.removeMember(item)) {
-            actionRef.current?.reload();
+            forceUpdate();
           }
         },
       },
@@ -57,7 +56,7 @@ const Station: React.FC<IProps> = (props) => {
             cancelText: '取消',
             onOk: async () => {
               if (await current.removeIdentitys([item.id])) {
-                IndentityActionRef.current?.reload();
+                forceUpdate();
               }
             },
           });
@@ -100,8 +99,8 @@ const Station: React.FC<IProps> = (props) => {
               <CardOrTable
                 dataSource={[]}
                 rowKey={'id'}
+                params={key}
                 operation={identityOperation}
-                actionRef={IndentityActionRef}
                 request={async (page) => {
                   let data = await current.loadIdentitys(true);
                   return {
@@ -132,6 +131,7 @@ const Station: React.FC<IProps> = (props) => {
                 headerTitle={'岗位人员'}
                 dataSource={[] as any}
                 rowKey={'id'}
+                params={key}
                 tableAlertOptionRender={(selectedRowKeys: any) => {
                   return (
                     <Space size={16}>
@@ -146,8 +146,7 @@ const Station: React.FC<IProps> = (props) => {
                                 selectedRowKeys.selectedRowKeys,
                                 TargetType.Person,
                               );
-                              actionRef.current?.reload();
-                              actionRef.current?.clearSelected!();
+                              forceUpdate();
                             },
                           });
                         }}>
@@ -179,7 +178,6 @@ const Station: React.FC<IProps> = (props) => {
                 request={async (page) => {
                   return await current.loadMembers(page);
                 }}
-                actionRef={actionRef}
                 columns={PersonColumns}
                 parentRef={parentRef}
                 showChangeBtn={false}
@@ -203,7 +201,7 @@ const Station: React.FC<IProps> = (props) => {
         onOk={async () => {
           if (selectIdentitys) {
             if (await current.pullIdentitys(selectIdentitys)) {
-              IndentityActionRef.current?.reload();
+              forceUpdate();
             }
             setIsOpenIdentityModal(false);
           }
@@ -226,7 +224,7 @@ const Station: React.FC<IProps> = (props) => {
                 TargetType.Person,
               )
             ) {
-              actionRef.current?.reload();
+              forceUpdate();
             }
           }
         }}
