@@ -21,29 +21,37 @@ export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
     title: '姓名',
     key: 'realName',
-    render: (_key: any, _record: any, index: number) => {
+    render: (_key: any, _record: any, _: number) => {
       return _record.team.name;
     },
   },
   {
     title: '手机号',
     key: 'mobilephone',
-    render: (_key: any, _record: any, index: number) => {
+    render: (_key: any, _record: any, _: number) => {
       return _record.team.code;
+    },
+  },
+  {
+    title: '签名',
+    key: 'remark',
+    render: (_key: any, _record: any, _: number) => {
+      return _record.team.remark;
     },
   },
 ];
 
 export const CompanyColumn: ProColumns<schema.XTarget>[] = [
   { title: '序号', valueType: 'index', width: 50 },
-  { title: '单位名称', dataIndex: 'name' },
+  { title: '单位名称', dataIndex: 'name', width: 350 },
   {
     title: '社会统一信用代码',
-    dataIndex: ['target', 'code'],
+    dataIndex: ['code'],
+    width: 250,
   },
   {
     title: '单位简介',
-    dataIndex: ['target', 'team', 'remark'],
+    dataIndex: ['team', 'remark'],
   },
 ];
 

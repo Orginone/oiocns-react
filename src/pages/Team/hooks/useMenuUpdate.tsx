@@ -77,7 +77,7 @@ const useMenuUpdate = (): [
     for (const item of targets) {
       let label = item.teamName;
       if (item === userCtrl.user) {
-        label = '我的好友';
+        label = '个人信息';
       } else if (item === userCtrl.company) {
         label = '单位信息';
       }
