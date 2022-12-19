@@ -10,12 +10,15 @@ import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetModel, TargetShare } from '@/ts/base/model';
+import { ISpeciesItem } from './species/ispecies';
+import { SpeciesItem } from './species/species';
 export default class BaseTarget implements ITarget {
   public key: string;
   public typeName: TargetType;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
+  public speciesTree: ISpeciesItem | undefined;
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
@@ -443,7 +446,7 @@ export default class BaseTarget implements ITarget {
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(
+  public async loadAuthorityTree(
     reload: boolean = false,
   ): Promise<IAuthority | undefined> {
     if (!reload && this.authorityTree != undefined) {
@@ -459,16 +462,20 @@ export default class BaseTarget implements ITarget {
       },
     });
     if (res.success) {
-      this.authorityTree = this.loopBuildAuthority(res.data);
+      this.authorityTree = new Authority(res.data, this.id);
     }
     return this.authorityTree;
   }
 
-  protected loopBuildAuthority(auth: schema.XAuthority): Authority {
-    const authority = new Authority(auth, this.target.id);
-    auth.nodes?.forEach((a) => {
-      authority.children.push(this.loopBuildAuthority(a));
-    });
-    return authority;
+  public async loadSpeciesTree(
+    reload: boolean = false,
+  ): Promise<ISpeciesItem | undefined> {
+    if (reload || !this.speciesTree) {
+      const res = await kernel.querySpeciesTree(this.id, '');
+      if (res.success) {
+        this.speciesTree = new SpeciesItem(res.data, undefined);
+      }
+    }
+    return this.speciesTree;
   }
 }

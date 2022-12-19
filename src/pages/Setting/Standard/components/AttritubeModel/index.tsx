@@ -57,7 +57,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
       request: async () => {
-        const data = await userCtrl.company.selectAuthorityTree(false);
+        const data = await userCtrl.company.loadAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {

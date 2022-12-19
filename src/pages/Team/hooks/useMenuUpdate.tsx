@@ -43,28 +43,28 @@ const useMenuUpdate = (): [
   /** 刷新菜单 */
   const refreshMenu = async (reset: boolean = false) => {
     const children: MenuItemType[] = [];
-    children.push(operate.getSpaceMenu());
+    children.push(await operate.getSpaceMenu());
     if (userCtrl.isCompanySpace) {
       children.push(
-        operate.loadGroupMenus({
+        await operate.loadGroupMenus({
           key: GroupMenuType.InnerAgency,
           item: userCtrl.company,
           typeName: TargetType.Department,
           subTeam: await userCtrl.company.loadSubTeam(),
         }),
-        operate.loadGroupMenus({
+        await operate.loadGroupMenus({
           key: GroupMenuType.OutAgency,
           item: userCtrl.company,
           typeName: TargetType.Group,
           subTeam: await userCtrl.company.getJoinedGroups(),
         }),
-        operate.loadGroupMenus({
+        await operate.loadGroupMenus({
           key: GroupMenuType.StationSetting,
           item: userCtrl.company,
           typeName: TargetType.Station,
           subTeam: await userCtrl.company.getStations(),
         }),
-        operate.loadGroupMenus({
+        await operate.loadGroupMenus({
           key: GroupMenuType.CompanyCohort,
           item: userCtrl.company,
           typeName: TargetType.Cohort,
@@ -73,7 +73,7 @@ const useMenuUpdate = (): [
       );
     } else {
       children.push(
-        operate.loadGroupMenus({
+        await operate.loadGroupMenus({
           key: GroupMenuType.UserCohort,
           item: userCtrl.user,
           typeName: TargetType.Cohort,

@@ -7,18 +7,14 @@ import css from './index.module.less';
 
 interface CustomBreadcrumbType {
   leftBar?: React.ReactNode;
-  selectKey?: string;
+  selectKey: string;
   item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
 }
 const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   const [items, setItems] = useState<MenuItemType[]>([]);
   useEffect(() => {
-    if (props.selectKey) {
-      setItems(loadBreadItems([props.item], props.selectKey));
-    } else {
-      setItems([]);
-    }
+    setItems(loadBreadItems([props.item], props.selectKey));
   }, [props.selectKey]);
 
   const loadBreadItems = (items: MenuItemType[], key: string) => {
@@ -75,12 +71,11 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
         {items.map((item) => {
           return (
             <Breadcrumb.Item
-              dropdownProps={{ arrow: false }}
+              menu={loadItemMenus(item)}
               key={item.key}
               onClick={() => {
                 props.onSelect?.apply(this, [item]);
-              }}
-              menu={loadItemMenus(item)}>
+              }}>
               {item.icon} {item.label}
             </Breadcrumb.Item>
           );

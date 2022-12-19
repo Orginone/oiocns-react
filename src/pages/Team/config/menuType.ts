@@ -5,6 +5,7 @@ export enum GroupMenuType {
   'Cohort' = '群组',
   'Company' = '单位',
   'Station' = '岗位',
+  'Species' = '分类',
   'OutAgency'= '外部机构',
   'UserCohort'= '个人群组',
   'InnerAgency'= '内部机构',

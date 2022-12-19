@@ -181,7 +181,7 @@ const ShareRecent = (props: Iprops) => {
     switch (radio) {
       case 2: {
         /** 职权 */
-        const res = await item.selectAuthorityTree();
+        const res = await item.loadAuthorityTree();
         let data = handleTreeData(res, info.node.id);
         setCenterTreeData([data]);
         break;
