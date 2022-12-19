@@ -7,11 +7,22 @@ import useMenuUpdate from './hooks/useMenuUpdate';
 import CompanySetting from './componments/Company';
 import StationSetting from './componments/Station';
 import AgencySetting from './componments/Agency';
+import CohortSetting from './componments/Cohort';
+import { MenuItemType } from 'typings/globelType';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string[]>(['']); // 模态框
+  const getTargetOfMenu = (menu: MenuItemType) => {
+    if (menu.item) {
+      const item = menu.item as ITarget;
+      if (item && item.id?.length > 0) {
+        return item;
+      }
+    }
+  };
   const getBody = () => {
+    const current = getTargetOfMenu(selectMenu);
     switch (selectMenu.itemType) {
       case TargetType.Company:
       case TargetType.Hospital:
@@ -28,6 +39,8 @@ const Setting: React.FC<any> = () => {
         return <AgencySetting current={selectMenu.item} />;
       case TargetType.Station:
         return <StationSetting current={selectMenu.item} />;
+      case TargetType.Cohort:
+        return <CohortSetting item={current} />;
       default:
         return <></>;
     }

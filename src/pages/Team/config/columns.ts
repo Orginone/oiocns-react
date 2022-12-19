@@ -63,6 +63,34 @@ export const GroupColumn: ProColumns<schema.XTarget>[] = [
   },
 ];
 
+export const CohortColumn: ProColumns<schema.XTarget>[] = [
+  {
+    title: '序号',
+    fixed: 'left',
+    dataIndex: 'index',
+    width: 50,
+    render: (_key: any, _record: any, index: number) => {
+      return index + 1;
+    },
+  },
+  {
+    title: '群组名称',
+    dataIndex: ['target', 'name'],
+  },
+  {
+    title: '群组编号',
+    dataIndex: ['target', 'code'],
+  },
+  {
+    title: '群组简介',
+    dataIndex: ['target', 'team', 'remark'],
+  },
+  {
+    title: '归属',
+    dataIndex: ['target', 'belongId'],
+  },
+];
+
 export const ApplicationColumns: ProColumns<IProduct>[] = [
   {
     title: '序号',

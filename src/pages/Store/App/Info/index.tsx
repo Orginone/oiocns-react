@@ -35,23 +35,17 @@ const StoreAppInfo: React.FC = () => {
   }
   const curProd = appCtrl.curProduct;
   const [list, setList] = useState<any>([]);
-  useEffect(() => {
-    onTabChange('组织');
-    sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
-      let obj = {
-        // id: item.id,
-        name: item.name,
-        code: item.code,
-        link: item.link,
-        components: item.components && JSON.parse(item.components),
-        flows: item.flows && JSON.parse(item.flows),
-      };
-      return obj;
-    });
-
-    setColumns({ ...sourceColumn });
-    setKey(key + 2);
-  }, []);
+  sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
+    let obj = {
+      name: item.name,
+      code: item.code,
+      link: item.link,
+      components: item.components && JSON.parse(item.components),
+      flows: item.flows && JSON.parse(item.flows),
+    };
+    return obj;
+  });
+  onTabChange('组织');
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
