@@ -16,16 +16,18 @@ export default class Identity implements IIdentity {
     this.target = identity;
   }
   async loadMembers(page: model.PageRequest): Promise<schema.XTargetArray> {
-    return (
-      await kernel.queryIdentityTargets({
-        id: this.id,
-        targetType: TargetType.Person,
-        page: page,
-      })
-    ).data;
+
+    var res = await kernel.queryIdentityTargets({
+      id: this.id,
+      targetType: TargetType.Person,
+      page: page,
+    });
+    return res.data;
   }
   async pullMembers(ids: string[]): Promise<boolean> {
-    return (await kernel.giveIdentity({ id: this.id, targetIds: ids })).success;
+    var res = await kernel.giveIdentity({ id: this.id, targetIds: ids });
+
+    return res.success;
   }
   async removeMembers(ids: string[]): Promise<boolean> {
     return (await kernel.removeIdentity({ id: this.id, targetIds: ids })).success;

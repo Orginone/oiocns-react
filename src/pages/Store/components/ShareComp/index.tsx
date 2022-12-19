@@ -349,22 +349,26 @@ const ShareRecent = (props: Iprops) => {
   //resourceList
   return (
     <div className={cls.layout}>
-      <div className={cls.top}>
-        <p className={cls['top-label']}>应用资源：</p>
-        <Radio.Group
-          value={curResourceId}
-          onChange={(e: RadioChangeEvent) => {
-            setCurResourceId(e.target.value);
-          }}>
-          {resourceList.map((item) => {
-            return (
-              <Radio value={item.resource.id} key={item.resource.id}>
-                {item.resource.name}
-              </Radio>
-            );
-          })}
-        </Radio.Group>
-      </div>
+      {props.shareType === '分配' ? (
+        <div className={cls.top}>
+          <p className={cls['top-label']}>应用资源：</p>
+          <Radio.Group
+            value={curResourceId}
+            onChange={(e: RadioChangeEvent) => {
+              setCurResourceId(e.target.value);
+            }}>
+            {resourceList.map((item) => {
+              return (
+                <Radio value={item.resource.id} key={item.resource.id}>
+                  {item.resource.name}
+                </Radio>
+              );
+            })}
+          </Radio.Group>
+        </div>
+      ) : (
+        ''
+      )}
       <div className={cls.top}>
         <p className={cls['top-label']}>{props.shareType}形式：</p>
         <Radio.Group

@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import thingCtrl from '@/ts/controller/thing';
 import { INullSpeciesItem, ISpeciesItem } from '@/ts/core';
 import SpeciesTree from './components/SpeciesTree';
 import Description from './components/Description';
-import cls from './index.module.less';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { Button, Tabs } from 'antd';
 import { columns } from './components/config';
@@ -15,6 +14,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { PageRequest } from '@/ts/base/model';
+import cls from './index.module.less';
 
 /**
  * 内设机构
@@ -24,9 +24,10 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
   const [modalType, setModalType] = useState('');
   const [current, setCurrent] = useState<INullSpeciesItem>();
   const [editData, setEditData] = useState<XAttribute>();
-  const [key, forceUpdate] = useCtrlUpdate(thingCtrl, () => {
+  const [key, forceUpdate] = useCtrlUpdate(thingCtrl);
+  useEffect(() => {
     setCurrent(thingCtrl.teamSpecies);
-  });
+  }, [key]);
   const parentRef = useRef<any>(null); //父级容器Dom
   /**点击操作内容触发的事件 */
   const handleMenuClick = async (key: string, item: ISpeciesItem) => {
@@ -143,8 +144,8 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
               setModalType('');
             }}
             handleOk={function (success: boolean): void {
-              setModalType('');
               if (success) {
+                setModalType('');
                 forceUpdate();
               }
             }}

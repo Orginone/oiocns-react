@@ -1,5 +1,5 @@
-import { Button, Card, Dropdown, Form, Tag } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Card, Dropdown, Tag } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import { DataItem, sourceColumns } from './config';
 // import { BtnGroupDiv } from '@/components/CommonComp';
@@ -16,6 +16,7 @@ import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import SchemaForm from '@/components/SchemaForm';
+import { ProFormInstance } from '@ant-design/pro-components';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
@@ -23,35 +24,27 @@ const items = DestTypes.map((k) => {
 let sourceColumn = sourceColumns;
 
 const StoreAppInfo: React.FC = () => {
-  const [createAppForm] = Form.useForm<Record<string, any>>();
-
-  const [columns, setColumns] = useState<any>(sourceColumns);
-  const [key, setKey] = useState<number>(1);
-
+  const formRef = useRef<ProFormInstance>();
   const history = useHistory();
   if (!appCtrl.curProduct) {
     history.push('/store/app');
     return <></>;
   }
-  const curProd = appCtrl.curProduct;
-  const [list, setList] = useState<any>([]);
   useEffect(() => {
     onTabChange('组织');
-    sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
-      let obj = {
-        // id: item.id,
-        name: item.name,
-        code: item.code,
-        link: item.link,
-        components: item.components && JSON.parse(item.components),
-        flows: item.flows && JSON.parse(item.flows),
-      };
-      return obj;
-    });
-
-    setColumns({ ...sourceColumn });
-    setKey(key + 2);
   }, []);
+  const curProd = appCtrl.curProduct;
+  const [list, setList] = useState<any>([]);
+  sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
+    let obj = {
+      name: item.name,
+      code: item.code,
+      link: item.link,
+      components: item.components && JSON.parse(item.components),
+      flows: item.flows && JSON.parse(item.flows),
+    };
+    return obj;
+  });
 
   async function onTabChange(tabKey: any) {
     const res = await curProd.queryExtend(tabKey);
@@ -79,7 +72,14 @@ const StoreAppInfo: React.FC = () => {
     setList(showData || []);
   }
 
-  const menu = [{ key: '退订', label: '退订' }];
+  const menu = [
+    // { key: 'edit', label: '编辑基础信息' },
+    { key: '退订', label: '退订' },
+  ];
+  function handleEditApp() {
+    appCtrl.setCurProduct(curProd.prod.id);
+    history.push('/store/app/create');
+  }
   return (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
       <Card
@@ -109,8 +109,8 @@ const StoreAppInfo: React.FC = () => {
           }
         />
         <div className="btns">
-          <Button className="btn" type="primary" shape="round">
-            续费
+          <Button className="btn" type="primary" shape="round" onClick={handleEditApp}>
+            编辑
           </Button>
           <Dropdown menu={{ items: menu }} placement="bottom">
             <EllipsisOutlined
@@ -140,16 +140,15 @@ const StoreAppInfo: React.FC = () => {
         {/* 应用信息 */}
         <SchemaForm<DataItem>
           style={{ padding: '20px' }}
-          form={createAppForm}
+          formRef={formRef}
           layoutType="Form"
           open={true}
-          key={key}
           title="应用资源信息"
           onFinish={() => {}}
           modalprops={{
             destroyOnClose: true,
           }}
-          columns={[columns as DataItem]}
+          columns={[sourceColumn as DataItem]}
           submitter={{
             render: () => {
               return <></>;

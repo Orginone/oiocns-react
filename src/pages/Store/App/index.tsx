@@ -38,6 +38,7 @@ const StoreApp: React.FC = () => {
         history.push('/market/shop');
         break;
       case '创建':
+        appCtrl.setCurProduct();
         history.push('/store/app/create');
         break;
       default:
@@ -139,7 +140,7 @@ const StoreApp: React.FC = () => {
       },
     ];
   };
-  // 根据权限从已获取数据 动态产生tab
+  //TODO: 根据权限从已获取数据 动态产生tab
   const getItems = () => {
     let typeSet = new Set(['全部']);
     appCtrl.products.forEach((v: any) => {
@@ -152,11 +153,16 @@ const StoreApp: React.FC = () => {
         return { tab: k, key: k };
       });
   };
+  /*******
+   * @desc: 获取所选分类下的appids
+   * @param {string[]} appids
+   */
   const handleSelectClassify = (appids: string[]) => {
     console.log('当前分类下的appids', appids);
     setAppShowIdlimit([...appids]);
   };
-  const showData = useMemo(() => {
+  let showData = appCtrl.products;
+  showData = useMemo(() => {
     if (appShowIdlimit.length > 0) {
       return appCtrl.products.filter((app) => {
         return appShowIdlimit.includes(app.prod.id);
@@ -164,7 +170,7 @@ const StoreApp: React.FC = () => {
     } else {
       return appCtrl.products;
     }
-  }, [appShowIdlimit, key]);
+  }, [appShowIdlimit, key, userCtrl.space]);
 
   // 应用首页dom
   const AppIndex = useMemo(() => {

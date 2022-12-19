@@ -150,11 +150,13 @@ export default class StoreHub implements IDisposable {
    * @returns {Promise<ResultType>} 异步结果
    */
   public invoke(methodName: string, ...args: any[]): Promise<ResultType<any>> {
+
     return new Promise((resolve) => {
       if (this.isConnected) {
         this._connection
           .invoke(methodName, ...args)
           .then((res: ResultType<any>) => {
+
             if (!res.success) {
               if (res.code === 401) {
                 logger.unauth();

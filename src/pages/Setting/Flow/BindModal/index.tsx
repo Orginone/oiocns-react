@@ -8,7 +8,7 @@ import {
   ProFormGroup,
   ProFormText,
 } from '@ant-design/pro-components';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { schema } from '@/ts/base';
 import cls from './index.module.less';
@@ -39,7 +39,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
   }, [upDateData]);
 
   const initData = async () => {
-    const tableData = await SelfAppCtrl.querySelfApps();
+    const tableData = appCtrl.products;
     const currentData = tableData.map((item) => {
       return {
         value: item.prod.id,
@@ -160,7 +160,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                               noticeBaseInfo();
                               resolve(true);
                             } else {
-                              message.success('解绑失败');
+                              message.error('解绑失败');
                               resolve(false);
                             }
                           });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Space, Modal, message, Empty, Button } from 'antd';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
+import appCtrl from '@/ts/controller/store/appCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import AppLogo from '/img/appLogo.png';
 
@@ -17,13 +17,14 @@ type AppBindListprops = {
 const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [defineListLength, setDefineListLength] = useState<number>(0);
 
   useEffect(() => {
     initData();
   }, [bindAppMes, upDateInit]);
 
   const initData = async () => {
-    const tableData = await SelfAppCtrl.querySelfApps();
+    const tableData = appCtrl.products;
     const needData = tableData.map((item) => {
       return {
         name: item.prod.name,
@@ -34,6 +35,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
 
     const result = await userCtrl.space.getDefines(false); //流程列表
 
+    setDefineListLength(result.length);
     if (result && result.length > 0 && bindAppMes.id) {
       const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
       if (currentValue && currentValue.length > 0) {
@@ -48,7 +50,6 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
           item.remark = findAppId?.remark;
           return item;
         });
-        console.log('getResult', getResult);
         setAppDataList([...getResult]);
       } else {
         setAppDataList([]);
@@ -57,8 +58,8 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
   };
 
   return (
-    <Card bordered={false}>
-      <Space className={cls.appwrap}>
+    <Card bordered={false} bodyStyle={{ padding: 0 }}>
+      <Space className={cls.appwrap} size={20}>
         {appDataList.length > 0 &&
           appDataList.map((item: any) => {
             return (
@@ -89,7 +90,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
                                     message.info('解绑成功');
                                     initData();
                                   } else {
-                                    message.success('解绑失败');
+                                    message.error('解绑失败');
                                   }
                                 });
                             },
@@ -108,10 +109,10 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
               </div>
             );
           })}
-        {appDataList.length == 0 && (
+        {appDataList.length == 0 && defineListLength > 0 && (
           <Empty>
             <Button
-              type="primary"
+              type="link"
               onClick={() => {
                 setIsOpenModal(true);
               }}>

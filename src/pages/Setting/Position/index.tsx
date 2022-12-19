@@ -25,7 +25,6 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
   const IndentityActionRef = useRef<ActionType>();
   const parentRef = useRef<any>(null); //父级容器Dom
   const treeContainer = document.getElementById('templateMenu');
-
   const [current, setCurrent] = useState<IStation>(); //当前操作岗位
   const [stations, setStations] = useState<any[]>([]); //岗位列表
   const [isOpenPerson, setIsOpenPerson] = useState<boolean>(false);
@@ -124,118 +123,104 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
     setSelectIdentitys(identityData);
   };
 
-  /**头部 */
+  /**岗位身份设置*/
   const header = current && (
-    <div className={`${cls['dept-wrap-pages']}`} style={{ height: '400px' }}>
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
-          <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
+    <Card bordered={false} className={`${cls['dept-wrap-pages']}`}>
+      <div className={cls['page-content-table']} ref={parentRef}>
+        <CardOrTable
+          parentRef={parentRef}
+          headerTitle={('[' + current?.name || '') + ']身份设置'}
+          toolBarRender={() => (
             <Button
-              className={cls.creatgroup}
               type="link"
-              style={{ float: 'right' }}
               onClick={() => {
                 setIsOpenIdentityModal(true);
               }}>
               添加身份
             </Button>
-          </div>
-          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-            <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={[]}
-                rowKey={'id'}
-                operation={identityOperation}
-                actionRef={IndentityActionRef}
-                request={async (page) => {
-                  let data = await current!.loadIdentitys(true);
-                  return {
-                    offset: page.offset,
-                    limit: page.limit,
-                    total: data.length,
-                    result: data.slice(page.offset, page.limit),
-                  };
-                }}
-                columns={indentitycolumns as any}
-                parentRef={parentRef}
-                showChangeBtn={false}
-              />
-            </div>
-          </div>
-        </Card>
+          )}
+          dataSource={[]}
+          rowKey={'id'}
+          operation={identityOperation}
+          actionRef={IndentityActionRef}
+          request={async (page) => {
+            let data = await current!.loadIdentitys(true);
+            return {
+              offset: page.offset,
+              limit: page.limit,
+              total: data.length,
+              result: data.slice(page.offset, page.limit),
+            };
+          }}
+          columns={indentitycolumns as any}
+          showChangeBtn={false}
+        />
       </div>
-    </div>
+    </Card>
   );
   /**人员列表 */
   const personCount = (
-    <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '10px' }}>
-      <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-        <Card className={cls['app-tabs']} bordered={false}>
-          <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
-            <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                headerTitle={'岗位人员'}
-                dataSource={[] as any}
-                rowKey={'id'}
-                tableAlertOptionRender={(selectedRowKeys: any) => {
-                  return (
-                    <Space size={16}>
-                      <a
-                        onClick={() => {
-                          Modal.confirm({
-                            content: '是否将人员从该岗位移出？',
-                            okText: '确认',
-                            cancelText: '取消',
-                            onOk: async () => {
-                              await current?.removeMembers(
-                                selectedRowKeys.selectedRowKeys,
-                                TargetType.Person,
-                              );
-                              actionRef.current?.reload();
-                              actionRef.current?.clearSelected!();
-                            },
-                          });
-                        }}>
-                        批量删除
-                      </a>
-                    </Space>
-                  );
-                }}
-                toolBarRender={() => [
-                  <Button
-                    key={'addperson'}
-                    className={cls.creatgroup}
-                    type="link"
-                    style={{ float: 'right' }}
-                    onClick={() => {
-                      setSelectPersons([]);
-                      setIsOpenPerson(true);
-                    }}>
-                    添加人员
-                  </Button>,
-                ]}
-                options={{
-                  reload: false,
-                  density: false,
-                  setting: false,
-                  search: true,
-                }}
-                operation={personOperation}
-                request={async (page) => {
-                  return await current!.loadMembers(page);
-                }}
-                actionRef={actionRef}
-                columns={columns as any}
-                parentRef={parentRef}
-                showChangeBtn={false}
-                rowSelection={{}}
-              />
-            </div>
-          </div>
-        </Card>
+    <Card bordered={false} className={`${cls['dept-wrap-pages']}`}>
+      <div className={cls['page-content-table']} ref={parentRef}>
+        <CardOrTable
+          parentRef={parentRef}
+          headerTitle={'岗位人员'}
+          dataSource={[] as any}
+          rowKey={'id'}
+          tableAlertOptionRender={(selectedRowKeys: any) => {
+            return (
+              <Space size={16}>
+                <a
+                  onClick={() => {
+                    Modal.confirm({
+                      content: '是否将人员从该岗位移出？',
+                      okText: '确认',
+                      cancelText: '取消',
+                      onOk: async () => {
+                        await current?.removeMembers(
+                          selectedRowKeys.selectedRowKeys,
+                          TargetType.Person,
+                        );
+                        actionRef.current?.reload();
+                        actionRef.current?.clearSelected!();
+                      },
+                    });
+                  }}>
+                  批量删除
+                </a>
+              </Space>
+            );
+          }}
+          toolBarRender={() => [
+            <Button
+              key={'addperson'}
+              className={cls.creatgroup}
+              type="link"
+              style={{ float: 'right' }}
+              onClick={() => {
+                setSelectPersons([]);
+                setIsOpenPerson(true);
+              }}>
+              添加人员
+            </Button>,
+          ]}
+          options={{
+            reload: false,
+            density: false,
+            setting: false,
+            search: true,
+          }}
+          operation={personOperation}
+          request={async (page) => {
+            return await current!.loadMembers(page);
+          }}
+          actionRef={actionRef}
+          columns={columns as any}
+          showChangeBtn={false}
+          rowSelection={{}}
+        />
       </div>
-    </div>
+    </Card>
   );
 
   return (
@@ -255,14 +240,14 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
           }
         }}
         onCancel={() => setIsOpenIdentityModal(false)}
-        width="1050px">
+        width={1020}>
         <IndentityManage multiple={true} onCheckeds={onCheckeds} />
       </Modal>
       <Modal
         title="添加岗位成员"
         open={isOpenPerson}
         destroyOnClose={true}
-        width={1300}
+        width={1020}
         onOk={async () => {
           setIsOpenPerson(false);
           if (selectPersons) {
@@ -293,7 +278,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
         }}
       />
       {/* 左侧树 */}
-      {treeContainer ? (
+      {treeContainer &&
         ReactDOM.createPortal(
           <StationTree
             setCurrent={setCurrent}
@@ -303,10 +288,7 @@ const SettingDept: React.FC<RouteComponentProps> = () => {
             reload={loadStations}
           />,
           treeContainer,
-        )
-      ) : (
-        <></>
-      )}
+        )}
     </div>
   );
 };
