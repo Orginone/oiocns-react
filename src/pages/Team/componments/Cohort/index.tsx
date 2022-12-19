@@ -139,7 +139,9 @@ const CohortSetting: React.FC<CohortType> = (props: CohortType) => {
           ]}>
           <Descriptions.Item label="群组名称">{info.name}</Descriptions.Item>
           <Descriptions.Item label="群组编号">{info.target.code}</Descriptions.Item>
-          <Descriptions.Item label="群组简介">{info.typeName}</Descriptions.Item>
+          <Descriptions.Item label="群组简介">
+            {info.target.team?.remark}
+          </Descriptions.Item>
         </Descriptions>
       </Card>
       <div className={cls['pages-wrap']}>
