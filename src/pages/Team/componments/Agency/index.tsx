@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, message, Modal, Typography } from 'antd';
+import { Button, Modal, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
@@ -35,22 +35,21 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
     return [
-      {
-        key: 'changeDept',
-        label: '变更' + item.typeName,
-        onClick: () => {
-          setSelectMember([item]);
-          setActiveModal('transfer');
-        },
-      },
+      // {
+      //   key: 'changeDept',
+      //   label: '变更' + item.typeName,
+      //   onClick: () => {
+      //     setSelectMember([item]);
+      //     setActiveModal('transfer');
+      //   },
+      // },
       {
         key: 'moveOne',
         label: '移出' + item.typeName,
         onClick: async () => {
           if (selectMember && current) {
             if (await current.removeMember(item)) {
-              message.success('移出成功');
-              userCtrl.changCallback();
+              tforceUpdate();
             }
           }
         },
@@ -167,7 +166,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             const ids = selectMember.map((e) => {
               return e.id;
             });
-            if (await current.pullMembers(ids, TargetType.Person)) {
+            if (await current.pullMembers(ids, selectMember[0].typeName)) {
               tforceUpdate();
               setActiveModal('');
             }

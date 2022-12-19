@@ -5,20 +5,18 @@ import { MenuItemType } from 'typings/globelType';
 import css from './index.module.less';
 
 interface CustomMenuType {
-  selectKey?: string;
+  selectKey: string;
   item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
 const CustomMenu = (props: CustomMenuType) => {
-  const [openKeys, setOpenKeys] = useState<string[]>();
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
   const [overItem, setOverItem] = useState<MenuItemType>();
   const [data, setData] = useState<MenuProps['items']>([]);
   useEffect(() => {
-    if (props.selectKey) {
-      setOpenKeys(loadOpenKeys(props.item.children, props.selectKey));
-    }
+    setOpenKeys(loadOpenKeys(props.item.children, props.selectKey));
     setData(loadMenus(props.item.children));
   }, [props]);
 
@@ -26,6 +24,7 @@ const CustomMenu = (props: CustomMenuType) => {
     setData(loadMenus(props.item.children));
   }, [overItem, visibleMenu]);
 
+  /** 转换数据,解析成原生菜单数据 */
   const loadMenus: any = (items: MenuItemType[]) => {
     const result = [];
     if (Array.isArray(items)) {
@@ -40,7 +39,7 @@ const CustomMenu = (props: CustomMenuType) => {
     }
     return result;
   };
-
+  /** 还原打开的keys */
   const loadOpenKeys = (items: MenuItemType[], key: string) => {
     const result: string[] = [];
     if (Array.isArray(items)) {
@@ -58,6 +57,7 @@ const CustomMenu = (props: CustomMenuType) => {
     }
     return result;
   };
+  /** 渲染标题,支持更多操作 */
   const renderLabel = (item: MenuItemType) => {
     return (
       <div
@@ -112,7 +112,7 @@ const CustomMenu = (props: CustomMenuType) => {
       expandIcon={() => <></>}
       openKeys={openKeys}
       onOpenChange={(keys) => setOpenKeys(keys)}
-      selectedKeys={[props.selectKey ?? '']}></Menu>
+      selectedKeys={[props.selectKey]}></Menu>
   );
 };
 

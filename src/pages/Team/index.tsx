@@ -9,30 +9,22 @@ import StationSetting from './componments/Station';
 import AgencySetting from './componments/Agency';
 import CohortSetting from './componments/Cohort';
 import PersonSetting from './componments/Person';
+import { GroupMenuType } from './config/typeOperate';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [edit, setEdit] = useState<ITarget>();
   const [activeModal, setActiveModal] = useState<string[]>(['']); // 模态框
   const getBody = () => {
     switch (selectMenu.itemType) {
-      case TargetType.Person:
+      case GroupMenuType.User:
         return <PersonSetting />;
-      case TargetType.Company:
-      case TargetType.Hospital:
-      case TargetType.University:
+      case GroupMenuType.Company:
         return <CompanySetting current={selectMenu.item} />;
-      case TargetType.Group:
-      case TargetType.College:
-      case TargetType.Office:
-      case TargetType.Section:
-      case TargetType.Research:
-      case TargetType.Laboratory:
-      case TargetType.JobCohort:
-      case TargetType.Department:
+      case GroupMenuType.Agency:
         return <AgencySetting current={selectMenu.item} />;
-      case TargetType.Station:
+      case GroupMenuType.Station:
         return <StationSetting current={selectMenu.item} />;
-      case TargetType.Cohort:
+      case GroupMenuType.Cohort:
         return <CohortSetting current={selectMenu.item} />;
       default:
         return <></>;
