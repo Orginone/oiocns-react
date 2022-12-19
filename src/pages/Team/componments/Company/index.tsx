@@ -16,7 +16,7 @@ import { IGroup, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
-import { CompanyColumn, PersonColumns } from '../../config/columns';
+import { GroupColumn, PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -190,14 +190,14 @@ const CompanySetting: React.FC = () => {
                 showChangeBtn={false}
               />
             ) : (
-              <CardOrTable<IGroup>
+              <CardOrTable<schema.XTarget>
                 key="groups"
                 rowKey={'id'}
                 pagination={false}
                 defaultExpandAllRows={true}
-                dataSource={dataSource}
+                dataSource={dataSource?.map((i) => i.target) ?? []}
                 hideOperation={true}
-                columns={CompanyColumn}
+                columns={GroupColumn}
                 showChangeBtn={false}
               />
             )}

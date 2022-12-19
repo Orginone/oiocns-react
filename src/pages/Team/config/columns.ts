@@ -36,14 +36,30 @@ export const PersonColumns: ProColumns<schema.XTarget>[] = [
 
 export const CompanyColumn: ProColumns<schema.XTarget>[] = [
   { title: '序号', valueType: 'index', width: 50 },
-  { title: '单位名称', dataIndex: 'name' },
+  { title: '单位简称', dataIndex: 'name' },
   {
     title: '社会统一信用代码',
-    dataIndex: ['target', 'code'],
+    dataIndex: 'code',
   },
+  { title: '单位全称', dataIndex: ['team', 'name'] },
+  { title: '单位代码', dataIndex: ['team', 'code'] },
   {
     title: '单位简介',
-    dataIndex: ['target', 'team', 'remark'],
+    ellipsis: true,
+    dataIndex: ['team', 'remark'],
+  },
+];
+
+export const GroupColumn: ProColumns<schema.XTarget>[] = [
+  { title: '序号', valueType: 'index', width: 50 },
+  { title: '集团简称', dataIndex: 'name' },
+  { title: '集团编码', dataIndex: 'code' },
+  { title: '集团全称', dataIndex: ['team', 'name'] },
+  { title: '集团代码', dataIndex: ['team', 'code'] },
+  {
+    title: '集团简介',
+    ellipsis: true,
+    dataIndex: ['team', 'remark'],
   },
 ];
 
