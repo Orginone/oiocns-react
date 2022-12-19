@@ -151,8 +151,8 @@ const CompanySetting: React.FC = () => {
           ]}>
           <Descriptions.Item label="单位名称">
             <Space>
-              {userCtrl.company.shareInfo.avatar && (
-                <Avatar src={userCtrl.company.shareInfo.avatar.thumbnail} />
+              {userCtrl.company.shareInfo?.avatar && (
+                <Avatar src={userCtrl.company.shareInfo?.avatar.thumbnail} />
               )}
               <strong>{info.team?.name}</strong>
             </Space>

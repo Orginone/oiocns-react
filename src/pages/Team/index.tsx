@@ -34,11 +34,11 @@ const Setting: React.FC<any> = () => {
       case TargetType.Section:
       case TargetType.Research:
       case TargetType.Laboratory:
-      case TargetType.JobCohort:
       case TargetType.Department:
         return <AgencySetting current={selectMenu.item} />;
       case TargetType.Station:
         return <StationSetting current={selectMenu.item} />;
+      case TargetType.JobCohort:
       case TargetType.Cohort:
         return <CohortSetting item={current} />;
       default:
