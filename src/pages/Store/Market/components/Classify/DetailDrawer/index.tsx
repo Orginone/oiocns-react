@@ -1,6 +1,8 @@
 import React from 'react';
-import { Drawer, Row, Col, Tag, Space, Typography } from 'antd';
+import { Drawer, Row, Col, Tag, Space, Typography, Avatar, Image } from 'antd';
 import cls from './index.module.less';
+import { XMarket } from '@/ts/base/schema';
+import marketCtrl from '@/ts/controller/store/marketCtrl';
 
 /**
  * @description: 我的商店 基础详情抽屉
@@ -11,12 +13,12 @@ interface Iporps {
   title: string; // 标题
   onClose: () => void; // 关闭的回调
   open: boolean; // 是否打开
-  nodeDetail: any; // 详情信息
+  nodeDetail: XMarket; // 详情信息
 }
 
-const { Paragraph } = Typography;
-
-const DetailDrawer: React.FC<Iporps> = ({ title, onClose, open, nodeDetail }) => {
+const DetailDrawer: React.FC<Iporps> = (props) => {
+  const { title, onClose, open, nodeDetail } = props;
+  const avatar = JSON.parse(nodeDetail.photo);
   /**
    * @description: 详情内容
    * @return {*}
@@ -25,16 +27,20 @@ const DetailDrawer: React.FC<Iporps> = ({ title, onClose, open, nodeDetail }) =>
     <div className={cls['detail-drawer-content']}>
       <Row>
         <Col span={24}>
-          <Space className={cls['detail-drawer-item']}>商店名称：</Space>
-          {nodeDetail?.name}
+          <Avatar
+            size={64}
+            style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
+            src={<Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />}
+          />
+          {nodeDetail.name}
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>商店编码：</Space>
-          <Paragraph copyable>{nodeDetail?.code}</Paragraph>
+          <Typography.Paragraph copyable>{nodeDetail.code}</Typography.Paragraph>
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>是否公开：</Space>
-          {nodeDetail?.public === true ? (
+          {nodeDetail.public === true ? (
             <Tag color="#87d068">公开</Tag>
           ) : (
             <Tag color="#f50">私有</Tag>
@@ -42,7 +48,7 @@ const DetailDrawer: React.FC<Iporps> = ({ title, onClose, open, nodeDetail }) =>
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>应用权属：</Space>
-          {nodeDetail?.belongId === nodeDetail?.createUser ? (
+          {nodeDetail.belongId === marketCtrl.target.id ? (
             <Tag color="#2db7f5">创建的</Tag>
           ) : (
             <Tag color="#87d068">加入的</Tag>
@@ -50,7 +56,7 @@ const DetailDrawer: React.FC<Iporps> = ({ title, onClose, open, nodeDetail }) =>
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>商店简介：</Space>
-          <Paragraph
+          <Typography.Paragraph
             className={cls['detail-drawer-remark']}
             ellipsis={{
               rows: 3,
@@ -59,16 +65,16 @@ const DetailDrawer: React.FC<Iporps> = ({ title, onClose, open, nodeDetail }) =>
                 console.log('Ellipsis changed:', ellipsis);
               },
             }}>
-            {nodeDetail?.remark}
-          </Paragraph>
+            {nodeDetail.remark}
+          </Typography.Paragraph>
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>归属人：</Space>
-          {nodeDetail?.createUser}
+          {nodeDetail.createUser}
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>创建时间：</Space>
-          {nodeDetail?.createTime}
+          {nodeDetail.createTime}
         </Col>
       </Row>
     </div>

@@ -3,6 +3,7 @@ import IMerchandise from './imerchandise';
 import IResource from './iresource';
 
 export default interface IProduct {
+  id: string;
   /** 应用实体 */
   prod: schema.XProduct;
   /** 商品列表 */

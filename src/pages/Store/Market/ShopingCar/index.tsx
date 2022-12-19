@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '../components/AppCardShopCar';
 import { MarketTypes } from 'typings/marketType';
-import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
 import { Button, Col, Layout, message, Modal, PageHeader, Row, Space } from 'antd';
 import { CheckCircleOutlined, ClearOutlined } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { XMerchandise } from '@/ts/base/schema';
+import { JOIN_SHOPING_CAR } from '@/constants/const';
 
 /**
  * @description: 购物车
@@ -23,7 +23,7 @@ const ShopingCar: React.FC = () => {
    * @return {*}
    */
   useEffect(() => {
-    const id = marketCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
+    const id = marketCtrl.subscribePart(JOIN_SHOPING_CAR, () => {
       console.log('监听 购物车变化', marketCtrl.shopinglist || []);
       const arr = marketCtrl.shopinglist || [];
       setShopList([...arr]);
@@ -43,7 +43,7 @@ const ShopingCar: React.FC = () => {
       message.warning('没有需要删除的商品');
       return;
     }
-    await marketCtrl.deleApply(ids ? ids : selectedRowKey);
+    await marketCtrl.deleteStaging(ids ? ids : selectedRowKey);
     setSelectedRowKey([]);
   };
 
@@ -60,7 +60,7 @@ const ShopingCar: React.FC = () => {
       title: '确认订单',
       content: '此操作将生成交易订单。是否确认',
       icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-      onOk: async () => await marketCtrl.buyShoping(selectedRowKey),
+      onOk: async () => await marketCtrl.createOrder(selectedRowKey),
     });
   };
 

@@ -13,6 +13,7 @@ export default interface IMarket {
    * @param samrId 监管组织/个人
    * @param remark 备注
    * @param ispublic 是否公开
+   * @param photo 照片
    * @returns
    */
   update(

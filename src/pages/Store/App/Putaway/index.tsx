@@ -97,7 +97,7 @@ const AppPutaway: React.FC = () => {
             name="marketId"
             rules={[{ required: true, message: '请选择上架平台' }]}>
             <Select>
-              {marketCtrl.Market.joinedMarkets.map((item) => {
+              {marketCtrl.target.joinedMarkets.map((item) => {
                 return (
                   <Select.Option value={item.market.id} key={item.market.id}>
                     {item.market.name}

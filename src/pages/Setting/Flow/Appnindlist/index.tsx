@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Space, Modal, message, Empty, Button } from 'antd';
-import SelfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import AppLogo from '/img/appLogo.png';
 
 import cls from './index.module.less';
 import BindModal from '../BindModal';
+import appCtrl from '@/ts/controller/store/appCtrl';
 
 const { Meta } = Card;
 
@@ -23,8 +23,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => 
   }, [bindAppMes, upDateInit]);
 
   const initData = async () => {
-    const tableData = await SelfAppCtrl.querySelfApps();
-    const needData = tableData.map((item) => {
+    const needData = appCtrl.products.map((item) => {
       return {
         name: item.prod.name,
         id: item.prod.id,

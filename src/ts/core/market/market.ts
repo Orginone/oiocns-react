@@ -35,6 +35,7 @@ export default class Market implements IMarket {
       this.market.samrId = samrId;
       this.market.remark = remark;
       this.market.public = ispublic;
+      this.market.photo = photo;
       return true;
     }
     return false;

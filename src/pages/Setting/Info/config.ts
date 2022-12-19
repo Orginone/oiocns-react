@@ -55,16 +55,11 @@ export const ApplicationColumns: ProColumns<IProduct>[] = [
   },
   {
     title: '应用图标',
-    dataIndex: ['prod', 'belongId'],
+    dataIndex: ['prod', 'photo'],
   },
   {
     title: '应用名称',
     dataIndex: ['prod', 'name'],
-  },
-  {
-    title: '版本号',
-    dataIndex: ['prod', 'version'],
-    width: 100,
   },
   {
     title: '应用类型',

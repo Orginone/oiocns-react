@@ -50,7 +50,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
     },
     (item: any) => {
       console.log('双击事件触发了', item.name);
-      appCtrl.setCurProduct(item.id, true);
+      appCtrl.setCurProduct(item, true);
       history.push({ pathname: '/online', state: { appId: item.id } });
     },
   );
@@ -80,7 +80,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
                 menu={moreMenu}
                 onOpenChange={() => {
                   console.log('ss1', item.prod.name);
-                  appCtrl.setCurProduct(item.prod.id, true);
+                  appCtrl.setCurProduct(item, true);
                 }}>
                 <EllipsisOutlined
                   style={{ fontSize: 22, color: 'rgba(0,0,0,0.5)' }}
