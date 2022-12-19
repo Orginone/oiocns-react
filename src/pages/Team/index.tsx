@@ -5,7 +5,9 @@ import { ITarget, TargetType } from '@/ts/core';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import CompanySetting from './componments/Company';
+import StationSetting from './componments/Station';
 import { MenuItemType } from 'typings/globelType';
+import { IStation } from '@/ts/core/target/itarget';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [edit, setEdit] = useState<ITarget>();
@@ -26,6 +28,8 @@ const Setting: React.FC<any> = () => {
         case TargetType.Hospital:
         case TargetType.University:
           return <CompanySetting />;
+        case TargetType.Station:
+          return <StationSetting current={current as IStation} />;
       }
     }
     return <></>;

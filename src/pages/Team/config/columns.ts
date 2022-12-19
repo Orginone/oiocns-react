@@ -86,3 +86,27 @@ export const ApplicationColumns: ProColumns<IProduct>[] = [
     dataIndex: ['prod', 'remark'],
   },
 ];
+
+export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: 'ID',
+    dataIndex: 'id',
+  },
+  {
+    title: '身份名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '职权',
+    dataIndex: 'name',
+  },
+  {
+    title: '备注',
+    dataIndex: 'remark',
+  },
+];
