@@ -340,16 +340,6 @@ export interface ISpace extends IFlow, IMTarget, ITarget {
    */
   getCohorts(reload?: boolean): Promise<ICohort[]>;
   /**
-   * 创建群组
-   * @param data 群组基本信息
-   */
-  createCohort(
-    avatar: string,
-    name: string,
-    code: string,
-    remark: string,
-  ): Promise<ICohort | undefined>;
-  /**
    * 解散群组
    * @param id 群组id
    * @param belongId 群组归属id
@@ -391,12 +381,6 @@ export interface IPerson extends ISpace, ITarget {
    * @return 加入的单位列表
    */
   getJoinedCompanys(reload?: boolean): Promise<ICompany[]>;
-  /**
-   * 设立单位
-   * @param data 单位基本信息
-   * @returns 是否成功
-   */
-  createCompany(data: TargetParam): Promise<ICompany | undefined>;
   /**
    * 删除单位
    * @param id 单位Id
@@ -463,22 +447,6 @@ export interface ICompany extends ISpace, ITarget {
   joinedGroup: IGroup[];
   /** 当前用户Id */
   userId: string;
-  /**
-   * 创建集团
-   * @param name 集团名称
-   * @param code 集团代码
-   * @param teamName 团队名称
-   * @param teamCode 团队代码
-   * @param remark 集团简介
-   * @returns 是否成功
-   */
-  createGroup(data: TargetParam): Promise<IGroup | undefined>;
-  /** 创建部门 */
-  createDepartment(data: TargetParam): Promise<IDepartment | undefined>;
-  /** 创建岗位 */
-  createStation(data: TargetParam): Promise<IStation | undefined>;
-  /** 创建工作组 */
-  createWorking(data: TargetParam): Promise<IWorking | undefined>;
   /**
    * 删除集团
    * @param id 集团Id

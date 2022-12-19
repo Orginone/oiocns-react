@@ -73,7 +73,6 @@ export default class Company extends MarketTarget implements ICompany {
     }
     return this.cohorts;
   };
-
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.Group:
@@ -83,45 +82,10 @@ export default class Company extends MarketTarget implements ICompany {
       case TargetType.Station:
         return this.createStation(data);
       case TargetType.Cohort:
-        return this.createCohort(data.avatar, data.name, data.code, data.teamRemark);
+        return this.createCohort(data);
       default:
         return this.createDepartment(data);
     }
-  }
-
-  public async createCohort(
-    avatar: string,
-    name: string,
-    code: string,
-    remark: string,
-  ): Promise<ICohort | undefined> {
-    const res = await this.createTarget({
-      code,
-      name,
-      avatar,
-      teamCode: code,
-      teamName: name,
-      belongId: this.id,
-      typeName: TargetType.Cohort,
-      teamRemark: remark,
-    });
-    if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data);
-      this.cohorts.push(cohort);
-      cohort.pullMembers([this.userId], TargetType.Person);
-      return cohort;
-    }
-  }
-  public async deleteCohort(id: string): Promise<boolean> {
-    let res = await kernel.deleteTarget({
-      id: id,
-      typeName: TargetType.Cohort,
-      belongId: this.id,
-    });
-    if (res.success) {
-      this.cohorts = this.cohorts.filter((a) => a.id != id);
-    }
-    return res.success;
   }
   public async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getWorkings(reload);
@@ -139,7 +103,7 @@ export default class Company extends MarketTarget implements ICompany {
       typeName: this.target.typeName as TargetType,
     };
   }
-  public async createGroup(data: TargetParam): Promise<IGroup | undefined> {
+  private async createGroup(data: TargetParam): Promise<IGroup | undefined> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
     if (!tres.result) {
       const res = await this.createTarget({ ...data, belongId: this.target.id });
@@ -157,7 +121,7 @@ export default class Company extends MarketTarget implements ICompany {
       logger.warn('该集团已存在!');
     }
   }
-  public async createDepartment(
+  private async createDepartment(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<IDepartment | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
@@ -177,7 +141,7 @@ export default class Company extends MarketTarget implements ICompany {
       return department;
     }
   }
-  public async createStation(
+  private async createStation(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<IStation | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
@@ -194,7 +158,7 @@ export default class Company extends MarketTarget implements ICompany {
       return station;
     }
   }
-  public async createWorking(
+  private async createWorking(
     data: Omit<TargetModel, 'id' | 'belongId'>,
   ): Promise<IWorking | undefined> {
     data.teamCode = data.teamCode == '' ? data.code : data.teamCode;
@@ -210,6 +174,35 @@ export default class Company extends MarketTarget implements ICompany {
       this.workings.push(working);
       return working;
     }
+  }
+  private async createCohort(data: TargetModel): Promise<ICohort | undefined> {
+    const res = await this.createTarget({
+      code: data.code,
+      name: data.name,
+      avatar: data.avatar,
+      teamCode: data.code,
+      teamName: data.name,
+      belongId: this.id,
+      typeName: TargetType.Cohort,
+      teamRemark: data.teamRemark,
+    });
+    if (res.success && res.data != undefined) {
+      const cohort = new Cohort(res.data);
+      this.cohorts.push(cohort);
+      cohort.pullMembers([this.userId], TargetType.Person);
+      return cohort;
+    }
+  }
+  public async deleteCohort(id: string): Promise<boolean> {
+    let res = await kernel.deleteTarget({
+      id: id,
+      typeName: TargetType.Cohort,
+      belongId: this.id,
+    });
+    if (res.success) {
+      this.cohorts = this.cohorts.filter((a) => a.id != id);
+    }
+    return res.success;
   }
   public async deleteDepartment(id: string): Promise<boolean> {
     const department = this.departments.find((department) => {
