@@ -15,6 +15,7 @@ const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
 /** 用户控制器 */
 class UserController extends Emitter {
+  public currentKey: string = '';
   private _user: IPerson | undefined;
   private _curSpace: ICompany | undefined;
   /**构造方法 */
@@ -76,6 +77,9 @@ class UserController extends Emitter {
       if (this._curSpace) {
         sessionStorage.setItem(sessionSpaceName, id);
       }
+    }
+    if (this.currentKey === '') {
+      this.currentKey = this.space.key;
     }
     this.changCallbackPart(DomainTypes.Company);
     emitter.changCallbackPart(DomainTypes.Company);
