@@ -5,27 +5,45 @@ import { MenuItemType } from 'typings/globelType';
 import css from './index.module.less';
 
 interface CustomMenuType {
-  selectKey?: string;
+  selectMenu: MenuItemType;
   item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
 const CustomMenu = (props: CustomMenuType) => {
-  const [openKeys, setOpenKeys] = useState<string[]>();
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
   const [overItem, setOverItem] = useState<MenuItemType>();
   const [data, setData] = useState<MenuProps['items']>([]);
+  const [subMenuKey, setSubMenuKey] = useState<string>();
+  const [subMenu, setSubMenu] = useState<MenuItemType>();
   useEffect(() => {
-    if (props.selectKey) {
-      setOpenKeys(loadOpenKeys(props.item.children, props.selectKey));
+    if (!selectedKeys.includes(props.selectMenu.key) || !subMenu) {
+      setSubMenu(undefined);
+      setSubMenuKey(undefined);
+      setSelectedKeys([props.selectMenu.key]);
+      setData(loadMenus(props.item.children));
+      setOpenKeys(loadOpenKeys(props.item.children, props.selectMenu.key));
     }
-    setData(loadMenus(props.item.children));
+    if (subMenu && props.selectMenu.menus) {
+      const menu = props.selectMenu.menus.find((i) => i.key == subMenuKey);
+      if (menu && menu.subMenu) {
+        setSubMenu(menu.subMenu);
+        setData(loadMenus([menu.subMenu]));
+      }
+    }
   }, [props]);
 
   useEffect(() => {
-    setData(loadMenus(props.item.children));
+    if (subMenu) {
+      setData(loadMenus([subMenu]));
+    } else {
+      setData(loadMenus(props.item.children));
+    }
   }, [overItem, visibleMenu]);
 
+  /** 转换数据,解析成原生菜单数据 */
   const loadMenus: any = (items: MenuItemType[]) => {
     const result = [];
     if (Array.isArray(items)) {
@@ -40,7 +58,7 @@ const CustomMenu = (props: CustomMenuType) => {
     }
     return result;
   };
-
+  /** 还原打开的keys */
   const loadOpenKeys = (items: MenuItemType[], key: string) => {
     const result: string[] = [];
     if (Array.isArray(items)) {
@@ -58,12 +76,16 @@ const CustomMenu = (props: CustomMenuType) => {
     }
     return result;
   };
+  /** 渲染标题,支持更多操作 */
   const renderLabel = (item: MenuItemType) => {
     return (
       <div
         onClick={() => {
-          if (item.key != props.selectKey) {
+          if (item.key != props.selectMenu.key) {
             props.onSelect?.apply(this, [item]);
+          }
+          if (subMenu) {
+            setSelectedKeys([props.selectMenu.key, item.key]);
           }
         }}
         style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}
@@ -79,10 +101,26 @@ const CustomMenu = (props: CustomMenuType) => {
           {item.menus && overItem?.key === item.key && (
             <Dropdown
               menu={{
-                items: item.menus,
+                items: item.menus?.map((i) => {
+                  return {
+                    key: i.key,
+                    icon: i.icon,
+                    label: i.label,
+                  };
+                }),
                 onClick: ({ key }) => {
-                  props.onMenuClick?.apply(this, [item, key]);
-                  setVisibleMenu(false);
+                  const menu = item.menus?.find((i) => i.key == key);
+                  if (menu) {
+                    if (menu.subMenu) {
+                      setSubMenuKey(key);
+                      setSubMenu(menu.subMenu);
+                      setSelectedKeys([props.selectMenu.key, menu.subMenu.key]);
+                      props.onSelect?.apply(this, [menu.subMenu]);
+                    } else {
+                      props.onMenuClick?.apply(this, [item, key]);
+                    }
+                    setVisibleMenu(false);
+                  }
                 },
               }}
               placement="bottom"
@@ -112,7 +150,7 @@ const CustomMenu = (props: CustomMenuType) => {
       expandIcon={() => <></>}
       openKeys={openKeys}
       onOpenChange={(keys) => setOpenKeys(keys)}
-      selectedKeys={[props.selectKey ?? '']}></Menu>
+      selectedKeys={selectedKeys}></Menu>
   );
 };
 

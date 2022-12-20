@@ -39,7 +39,7 @@ const AddPostModal = (props: Iprops) => {
     setOperateOpen(false);
   };
   const getTree = async () => {
-    setAuthTree(await current.selectAuthorityTree());
+    setAuthTree(await current.loadAuthorityTree());
   };
   const columns: ColumnsType<DataType> = [
     {

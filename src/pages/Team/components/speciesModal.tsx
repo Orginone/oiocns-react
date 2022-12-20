@@ -10,7 +10,8 @@ interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: (newItem: ISpeciesItem | undefined) => void;
-  current: ISpeciesItem;
+  current?: ISpeciesItem;
+  targetId?: string;
 }
 /*
   分类编辑模态框
@@ -43,11 +44,10 @@ const SpeciesModal = (props: Iprops) => {
       },
       fieldProps: {
         disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id', children: 'subTeam' },
+        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
         showSearch: true,
         filterTreeNode: true,
-        treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
+        treeNodeFilterProp: 'teamName',
       },
     },
     {
@@ -60,7 +60,7 @@ const SpeciesModal = (props: Iprops) => {
         return data ? [data] : [];
       },
       fieldProps: {
-        disabled: title === '编辑',
+        disabled: title === '修改',
         fieldNames: { label: 'name', value: 'id' },
         showSearch: true,
         filterTreeNode: true,
@@ -106,8 +106,9 @@ const SpeciesModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('编辑')) {
-            formRef.current?.setFieldsValue(current.target);
+          formRef.current?.setFieldValue('belongId', props.targetId);
+          if (title.includes('修改')) {
+            formRef.current?.setFieldsValue(current?.target);
           }
         } else {
           formRef.current?.resetFields();
@@ -119,11 +120,11 @@ const SpeciesModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        values = { ...current.target, ...values };
+        values = { ...current?.target, ...values };
         if (title.includes('新增')) {
-          handleOk(await current.create(values));
+          handleOk(await current?.create(values));
         } else {
-          handleOk(await current.update(values));
+          handleOk(await current?.update(values));
         }
       }}
       columns={columns}></SchemaForm>

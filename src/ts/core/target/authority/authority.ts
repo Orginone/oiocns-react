@@ -15,6 +15,11 @@ export default class Authority implements IAuthority {
     this._belongId = belongId;
     this.children = [];
     this.identitys = [];
+    if (auth.nodes && auth.nodes.length > 0) {
+      for (const item of auth.nodes) {
+        this.children.push(new Authority(item, belongId));
+      }
+    }
   }
 
   private get existAuthority(): string[] {
