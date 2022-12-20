@@ -9,6 +9,7 @@ import StationSetting from './componments/Station';
 import AgencySetting from './componments/Agency';
 import CohortSetting from './componments/Cohort';
 import PersonSetting from './componments/Person';
+import FlowSetting from './componments/Flow';
 const Setting: React.FC<any> = () => {
   const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [edit, setEdit] = useState<ITarget>();
@@ -33,7 +34,8 @@ const Setting: React.FC<any> = () => {
         return <StationSetting current={selectMenu.item} />;
       case TargetType.JobCohort:
       case TargetType.Cohort:
-        return <CohortSetting current={selectMenu.item} />;
+        return <FlowSetting />;
+      // return <CohortSetting current={selectMenu.item} />;
       default:
         return <></>;
     }

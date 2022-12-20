@@ -1,0 +1,76 @@
+@import (reference) '~antd/es/style/themes/variable';
+
+.companyContainer {
+  background-color: #eff4f9;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.company-info-content {
+  margin-bottom: 8px;
+  :global {
+    .ogo-card-body {
+      padding: 20px;
+      color: #606266;
+      .ogo-descriptions-header {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+}
+
+
+.pages-wrap {
+  flex: 1;
+  max-height: calc(100% - 242px);
+  .page-content-table {
+    height: 100%;
+  }
+}
+
+
+
+.company-top-content {
+  :global {
+    .rowClass {
+      .ogo-table-cell-row-hover {
+        background: rgba(5, 5, 232, 0.3) !important;
+      }
+    }
+  }
+}
+.operation-btn {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  width: 40px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 12px;
+  font-size: 18px;
+  overflow: hidden;
+  &:hover {
+    background-color: @primary-color;
+    color: @white-color;
+  }
+}
+// .rowClass {
+//   // background: rgba(5, 5, 232, 0.3);
+//   :global {
+//     .ogo-table-cell-row-hover {
+//       background: rgba(91, 91, 92, 0.1) !important;
+//     }
+//     td {
+//       background: rgba(91, 91, 92, 0.1) !important;
+//     }
+//     .ogo-table-cell-fix-left,
+//     .ogo-table-cell-fix-right {
+//       background: rgba(91, 91, 92, 0.1) !important;
+//     }
+//   }
+// }
+
+
+

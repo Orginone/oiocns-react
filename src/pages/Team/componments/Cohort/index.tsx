@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ICohort } from '@/ts/core';
+import { IChat, ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
 import { useHistory } from 'react-router-dom';
@@ -13,7 +13,9 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AssignPosts from '@/bizcomponents/AssignPostCompany';
 import Description from '../Description';
-
+import chatCtrl from '@/ts/controller/chat';
+import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
+import AddPostModal from '@/bizcomponents/AddPositionModal';
 interface IProps {
   current: ICohort;
 }
@@ -31,7 +33,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `群组的成员`,
+      tab: `群组成员`,
       key: 'members',
     },
   ];
@@ -52,19 +54,67 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
       </>
     );
   };
+
+  const getChat = (id: string): IChat | undefined => {
+    for (var i = 0; i < chatCtrl.groups.length; i++) {
+      const group = chatCtrl.groups[i];
+      for (var j = 0; j < group.chats.length; j++) {
+        const chat = group.chats[j];
+        if (id == chat.target.id) {
+          return chat;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  /**进入会话 */
+  const enterChat = (id: string) => {
+    chatCtrl.setCurrent(getChat(id));
+    history.push('/chat');
+  };
+
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
-    return [
-      {
-        key: 'remove',
-        label: '踢出',
-        onClick: async () => {
-          if (await current.removeMember(item)) {
-            forceUpdate();
-          }
+    let operations: common.OperationType[] = [];
+    if (item.id != userCtrl.user.id) {
+      operations = [
+        {
+          key: 'addFriend',
+          label: '添加好友',
+          onClick: async () => {
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否申请添加好友',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                await userCtrl.user?.applyFriend(item);
+                message.success('发起申请成功');
+              },
+            });
+          },
         },
-      },
-    ];
+        {
+          key: 'enterChat',
+          label: '发起会话',
+          onClick: async () => {
+            enterChat(item.id);
+          },
+        },
+        {
+          key: 'remove',
+          label: '踢出',
+          onClick: async () => {
+            if (await current.removeMember(item)) {
+              forceUpdate();
+            }
+          },
+        },
+      ];
+    }
+    return operations;
   };
   return (
     <div key={key} className={cls.companyContainer}>
@@ -129,6 +179,13 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             columns={PersonColumns}
           />
         </Modal>
+        {/* 权限设置 */}
+        <AddPostModal
+          title={'权限设置'}
+          open={activeModal === 'post'}
+          handleOk={() => setActiveModal('')}
+          current={current}
+        />
       </div>
     </div>
   );
