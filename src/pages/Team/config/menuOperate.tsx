@@ -3,7 +3,7 @@ import * as im from 'react-icons/im';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 
 /** 加载分组菜单参数 */
@@ -62,7 +62,7 @@ export const getSpaceMenu = async () => {
   let label = '个人信息';
   let itemType = GroupMenuType.User;
   if (userCtrl.isCompanySpace) {
-    label = '单位信息';
+    label = userCtrl.company.teamName;
     itemType = GroupMenuType.Company;
   }
   await userCtrl.space.loadSpeciesTree();
@@ -218,7 +218,7 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
 
 /** 加载类型更多操作 */
 export const loadTypeMenus = async (item: ITarget) => {
-  const menus: any[] = [];
+  const menus: OperateMenuType[] = [];
   if (item.subTeamTypes.length > 0) {
     menus.push(
       {
