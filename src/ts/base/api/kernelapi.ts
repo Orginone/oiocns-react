@@ -25,7 +25,7 @@ export default class KernelApi {
   private constructor(url: string) {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
-    this._storeHub = new StoreHub(url, 'txt');
+    this._storeHub = new StoreHub(url, 'json');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
       if (methods) {
@@ -249,7 +249,6 @@ export default class KernelApi {
   public async createAttribute(
     params: model.AttributeModel,
   ): Promise<model.ResultType<schema.XAttribute>> {
-    console.log(params);
     return await this.request({
       module: 'thing',
       action: 'CreateAttribute',

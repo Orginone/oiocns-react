@@ -1,82 +1,86 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget, TargetType } from '@/ts/core';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
+import { ISpeciesItem, ITarget } from '@/ts/core';
+import TypeSetting from './TypeSetting';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import CompanySetting from './componments/Company';
-import StationSetting from './componments/Station';
-import AgencySetting from './componments/Agency';
-import CohortSetting from './componments/Cohort';
-import PersonSetting from './componments/Person';
-import FlowSetting from './componments/Flow';
+import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
+import SpeciesModal from './components/speciesModal';
+import { GroupMenuType } from './config/menuType';
 const Setting: React.FC<any> = () => {
-  const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  const [edit, setEdit] = useState<ITarget>();
-  const [activeModal, setActiveModal] = useState<string[]>(['']); // 模态框
-  const getBody = () => {
-    switch (selectMenu.itemType) {
-      case TargetType.Person:
-        return <PersonSetting />;
-      case TargetType.Company:
-      case TargetType.Hospital:
-      case TargetType.University:
-        return <CompanySetting current={selectMenu.item} />;
-      case TargetType.Group:
-      case TargetType.College:
-      case TargetType.Office:
-      case TargetType.Section:
-      case TargetType.Research:
-      case TargetType.Laboratory:
-      case TargetType.Department:
-        return <AgencySetting current={selectMenu.item} />;
-      case TargetType.Station:
-        return <StationSetting current={selectMenu.item} />;
-      case TargetType.JobCohort:
-      case TargetType.Cohort:
-        return <FlowSetting />;
-      // return <CohortSetting current={selectMenu.item} />;
-      default:
-        return <></>;
-    }
-  };
-
+  const [species, setSpecies] = useState<ISpeciesItem>();
+  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [editTarget, setEditTarget] = useState<ITarget>();
+  const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   return (
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        setSelectMenu(data);
+        if (data.itemType === GroupMenuType.Species) {
+          setSpecies(data.item);
+          return;
+        }
         userCtrl.currentKey = data.key;
-        if (data.itemType as TargetType) {
-          const item = data.item as ITarget;
-          if (item && item.subTeam.length === 0) {
-            if ((await item.loadSubTeam()).length > 0) {
+        const item = data.item as ITarget;
+        if (item && !item.speciesTree) {
+          await item.loadSpeciesTree();
+          refreshMenu();
+        }
+        if (data.itemType === GroupMenuType.Agency) {
+          if (item.subTeam.length === 0) {
+            const subs = await item.loadSubTeam();
+            if (subs.length > 0) {
               refreshMenu();
             }
           }
         }
+        setSpecies(undefined);
+        setSelectMenu(data);
       }}
-      onMenuClick={(item, key) => {
-        setEdit(item.item);
-        setActiveModal(key.split('|'));
+      onMenuClick={async (data, key) => {
+        if (key === '移除') {
+          if (await (data.item as ISpeciesItem).delete()) {
+            refreshMenu();
+          }
+        } else {
+          setEditTarget(data.item);
+          setOperateKeys(key.split('|'));
+        }
       }}
       siderMenuData={menus}>
-      <CreateTeamModal
-        title={activeModal[0]}
-        open={['新建', '编辑'].includes(activeModal[0])}
+      {/** 组织模态框 */}
+      <TeamModal
+        title={operateKeys[0]}
+        open={['新建', '编辑'].includes(operateKeys[0])}
         handleCancel={function (): void {
-          setActiveModal(['']);
+          setOperateKeys(['']);
         }}
         handleOk={(newItem) => {
           if (newItem) {
             refreshMenu();
-            setActiveModal(['']);
+            setOperateKeys(['']);
           }
         }}
-        current={edit || userCtrl.space}
-        typeNames={activeModal.slice(1)}
+        current={editTarget || userCtrl.space}
+        typeNames={operateKeys.slice(1)}
       />
-      {getBody()}
+      {/** 分类模态框 */}
+      <SpeciesModal
+        title={operateKeys[0]}
+        open={['新增', '修改'].includes(operateKeys[0])}
+        handleCancel={function (): void {
+          setOperateKeys(['']);
+        }}
+        handleOk={(newItem) => {
+          if (newItem) {
+            refreshMenu();
+            setOperateKeys(['']);
+          }
+        }}
+        targetId={(selectMenu.item as ITarget)?.id}
+        current={species}
+      />
+      <TypeSetting key={key} selectMenu={selectMenu} species={species} />
     </MainLayout>
   );
 };

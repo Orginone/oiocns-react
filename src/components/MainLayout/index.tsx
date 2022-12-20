@@ -42,7 +42,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
         <div className={cls.container} id="templateMenu">
           <CustomMenu
             item={siderMenuData}
-            selectKey={props.selectMenu.key}
+            selectMenu={props.selectMenu}
             onSelect={(item) => {
               props.onSelect?.apply(this, [item]);
             }}

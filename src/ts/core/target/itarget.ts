@@ -6,7 +6,7 @@ import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
-
+import { ISpeciesItem } from './species/ispecies';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -35,6 +35,8 @@ export interface ITarget {
   typeName: TargetType;
   /** 职权树 */
   authorityTree: IAuthority | undefined;
+  /** 分类标准树 */
+  speciesTree: ISpeciesItem | undefined;
   /** 拥有的身份 */
   ownIdentitys: schema.XIdentity[];
   /** 组织的身份 */
@@ -63,7 +65,12 @@ export interface ITarget {
    * 获取职权树
    * @param reload 是否强制刷新
    */
-  selectAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
+  loadAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
+  /**
+   * 获取分类标准树
+   * @param reload 是否强制刷新
+   */
+  loadSpeciesTree(reload?: boolean): Promise<ISpeciesItem | undefined>;
   /**
    * 判断是否拥有该身份
    * @param id 身份id

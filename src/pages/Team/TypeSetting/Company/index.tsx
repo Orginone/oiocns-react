@@ -22,6 +22,7 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import AddPostModal from '@/bizcomponents/AddPositionModal';
 
 type ShowmodelType =
   | 'addOne'
@@ -130,6 +131,9 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
           labelStyle={{ textAlign: 'center' }}
           contentStyle={{ textAlign: 'center' }}
           extra={[
+            <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
+              职权设置
+            </Button>,
             <Dropdown menu={{ items: menu }} placement="bottom" key="more">
               <EllipsisOutlined
                 style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
@@ -259,6 +263,13 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
           }}>
           <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
         </Modal>
+        {/* 对象设置 */}
+        <AddPostModal
+          title={'职权设置'}
+          open={activeModal === 'post'}
+          handleOk={() => setActiveModal('')}
+          current={current}
+        />
       </div>
     </div>
   );

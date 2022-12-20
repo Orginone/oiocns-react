@@ -100,7 +100,7 @@ const CohortConfig: React.FC = () => {
         key: 'roleManage',
         label: '角色管理',
         onClick: async () => {
-          await item.selectAuthorityTree(false);
+          await item.loadAuthorityTree(false);
           setItem(item);
           setIsSetPost(true);
         },

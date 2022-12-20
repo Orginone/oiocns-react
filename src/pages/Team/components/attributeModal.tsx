@@ -1,36 +1,39 @@
 import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { SpeciesModel } from '@/ts/base/model';
+import { AttributeModel } from '@/ts/base/model';
 import { ISpeciesItem } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting/userCtrl';
+import { XAttribute } from '@/ts/base/schema';
 
 interface Iprops {
   title: string;
   open: boolean;
+  data: XAttribute | undefined;
   handleCancel: () => void;
-  handleOk: (newItem: ISpeciesItem | undefined) => void;
+  handleOk: (success: boolean) => void;
   current: ISpeciesItem;
+  targetId?: string;
 }
 /*
-  分类编辑模态框
+  特性编辑模态框
 */
-const SpeciesModal = (props: Iprops) => {
-  const { open, title, handleOk, current, handleCancel } = props;
+const AttributeModal = (props: Iprops) => {
+  const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const columns: ProFormColumnsType<SpeciesModel>[] = [
+  const columns: ProFormColumnsType<AttributeModel>[] = [
     {
-      title: '分类名称',
+      title: '特性名称',
       dataIndex: 'name',
       formItemProps: {
-        rules: [{ required: true, message: '分类名称为必填项' }],
+        rules: [{ required: true, message: '特性名称为必填项' }],
       },
     },
     {
-      title: '分类代码',
+      title: '特性代码',
       dataIndex: 'code',
       formItemProps: {
-        rules: [{ required: true, message: '分类代码为必填项' }],
+        rules: [{ required: true, message: '特性代码为必填项' }],
       },
     },
     {
@@ -42,12 +45,11 @@ const SpeciesModal = (props: Iprops) => {
         return await userCtrl.getTeamTree();
       },
       fieldProps: {
-        disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id', children: 'subTeam' },
+        disabled: title === '修改',
+        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
         showSearch: true,
         filterTreeNode: true,
-        treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
+        treeNodeFilterProp: 'teamName',
       },
     },
     {
@@ -56,7 +58,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
       request: async () => {
-        const data = await userCtrl.space.loadAuthorityTree(false);
+        const data = await userCtrl.company.loadAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {
@@ -89,25 +91,50 @@ const SpeciesModal = (props: Iprops) => {
       },
     },
     {
-      title: '分类定义',
+      title: '特性类型',
+      dataIndex: 'valueType',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: '数值型',
+            label: '数值型',
+          },
+          {
+            value: '描述型',
+            label: '描述型',
+          },
+          {
+            value: '选择型',
+            label: '选择型',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '是否公开为必填项' }],
+      },
+    },
+    {
+      title: '特性定义',
       dataIndex: 'remark',
       valueType: 'textarea',
       colProps: { span: 24 },
       formItemProps: {
-        rules: [{ required: true, message: '分类定义为必填项' }],
+        rules: [{ required: true, message: '特性定义为必填项' }],
       },
     },
   ];
   return (
-    <SchemaForm<SpeciesModel>
+    <SchemaForm<AttributeModel>
       formRef={formRef}
       title={title}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('编辑')) {
-            formRef.current?.setFieldsValue(current.target);
+          formRef.current?.setFieldValue('belongId', props.targetId);
+          if (title.includes('修改')) {
+            formRef.current?.setFieldsValue(data);
           }
         } else {
           formRef.current?.resetFields();
@@ -119,15 +146,15 @@ const SpeciesModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        values = { ...current.target, ...values };
+        values = { ...data, ...values };
         if (title.includes('新增')) {
-          handleOk(await current.create(values));
+          handleOk(await current.createAttr(values));
         } else {
-          handleOk(await current.update(values));
+          handleOk(await current.updateAttr(values));
         }
       }}
       columns={columns}></SchemaForm>
   );
 };
 
-export default SpeciesModal;
+export default AttributeModal;

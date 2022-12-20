@@ -50,7 +50,7 @@ interface IProps {
  * 流程设置
  * @returns
  */
-const FlowSetting: React.FC<IProps> = ({ current }: IProps) => {
+const FlowSetting: React.FC<IProps> = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);

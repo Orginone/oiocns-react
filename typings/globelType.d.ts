@@ -41,6 +41,13 @@ interface MenuItemType {
   itemType: string;
   icon: React.ReactNode;
   item?: any;
-  menus?: any[];
+  menus?: OperateMenuType[];
   children: MenuItemType[];
+}
+
+interface OperateMenuType {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  subMenu?: MenuItemType;
 }
