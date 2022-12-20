@@ -12,7 +12,6 @@ import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
-import SearchPerson from '@/bizcomponents/SearchPerson';
 
 /**
  * 个人信息
@@ -137,27 +136,21 @@ const PersonSetting: React.FC = () => {
           </div>
         </PageCard>
         <Modal
-          title="加入单位"
+          title={modalType === 'company' ? '加入单位' : '添加好友'}
           destroyOnClose={true}
-          open={modalType === 'company'}
+          open={modalType === 'company' || modalType === 'friend'}
           onOk={handleOk}
           onCancel={() => setModalType('')}
-          width={500}>
+          width={670}>
+          {' '}
           <div>
             <SearchCompany
               searchCallback={setSearchCallback}
-              searchType={TargetType.Company}
+              searchType={
+                modalType === 'company' ? TargetType.Company : TargetType.Person
+              }
             />
           </div>
-        </Modal>
-        {/* 加好友 */}
-        <Modal
-          title="添加好友"
-          open={modalType === 'friend'}
-          onOk={handleOk}
-          onCancel={() => setModalType('')}
-          width={500}>
-          {<SearchPerson searchCallback={(p) => setSearchCallback([p])}></SearchPerson>}
         </Modal>
       </Layout>
     </div>

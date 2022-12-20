@@ -12,10 +12,11 @@ import AddPostModal from '@/bizcomponents/AddPositionModal';
 import TransferAgency from './TransferAgency';
 import Description from '../Description';
 import cls from './index.module.less';
-import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import AssignModal from '@/bizcomponents/AssignModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchCompany from '@/bizcomponents/SearchCompany';
+import { schema } from '@/ts/base';
 
 interface IProps {
   current: ITarget;
@@ -105,10 +106,14 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         );
       default:
         return (
-          <AssignPosts
-            searchFn={setSelectMember}
-            source={userCtrl.company}
+          <AssignModal<schema.XTarget>
+            placeholder="请输入用户账号"
+            onFinish={setSelectMember}
             columns={PersonColumns}
+            request={async (page: any) => {
+              let data = await userCtrl.company.loadMembers(page);
+              return data.result || [];
+            }}
           />
         );
     }

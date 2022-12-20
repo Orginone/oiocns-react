@@ -30,13 +30,13 @@ const debounce = (fun: any, delay?: number) => {
  * @return {*}
  */
 const resetParams = (params: any) => {
-  const { page, pageSize, ...rest } = params;
+  const { page, pageSize, filter, ...rest } = params;
   const num = (page - 1) * pageSize;
 
   return {
     offset: num >= 0 ? num : 0,
     limit: pageSize || 20,
-    filter: '',
+    filter: filter,
     ...rest,
   };
 };

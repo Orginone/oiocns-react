@@ -119,7 +119,7 @@ const OrganizationalUnits = () => {
         destroyOnClose={true}
         open={showModal}
         bodyStyle={{ padding: 0 }}
-        okText="确定加入"
+        okText="确定"
         onOk={async () => {
           // 加入单位
           setShowModal(false);

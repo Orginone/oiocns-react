@@ -11,7 +11,7 @@ import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import AssignPosts from '@/bizcomponents/AssignPostCompany';
+import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../Description';
 
 interface IProps {
@@ -123,9 +123,15 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
               }
             }
           }}>
-          <AssignPosts
-            searchFn={setSelectMember}
-            source={userCtrl.user}
+          <AssignModal<schema.XTarget>
+            placeholder="请输入用户账号"
+            request={async (page: any) => {
+              let data = await userCtrl.space.loadMembers(page);
+              return data.result || [];
+            }}
+            onFinish={(data) => {
+              setSelectMember(data);
+            }}
             columns={PersonColumns}
           />
         </Modal>
