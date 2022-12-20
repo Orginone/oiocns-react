@@ -252,6 +252,15 @@ const TeamRouter: IRouteConfig[] = [
   },
 ];
 
+const WelfareRouter: IRouteConfig[] = [
+  {
+    path: '/welfare',
+    title: '公益仓',
+    icon: 'icon-setting',
+    component: React.lazy(() => import('@/pages/Welfare')),
+  },
+];
+
 // 路由汇总
 const Routers: IRouteConfig[] = [
   {
@@ -278,6 +287,7 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...TeamRouter,
+      ...WelfareRouter,
       {
         path: '/online',
         title: '第三方应用',

@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { HeartFilled } from '@ant-design/icons';
 
 /**
  * 顶部导航
@@ -18,6 +19,14 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   const [chatKey] = useCtrlUpdate(chatCtrl);
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
+    {
+      key: 'welfare',
+      path: '/welfare',
+      title: '公益仓',
+      icon: <HeartFilled />,
+      count: 0,
+      fath: '/welfare',
+    },
     {
       key: chatKey,
       path: '/chat',
