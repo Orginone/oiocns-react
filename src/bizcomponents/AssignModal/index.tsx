@@ -2,44 +2,39 @@
  * itarget底下邀请单位或个人
  */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Tooltip } from 'antd';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { resetParams } from '@/utils/tools';
-import { common } from '@/ts/base';
+import { PageRequest } from '@/ts/base/model';
 
 interface indexType<T> {
+  placeholder?: string;
   columns: ProColumns<T>[];
-  placeholder: string;
-  request: (page: any) => Promise<T[]>;
   onFinish: (data: T[]) => void;
+  request: (params: PageRequest & { [key: string]: any }) => Promise<
+    | {
+        result: T[] | undefined;
+        offset: number;
+        limit: number;
+        total: number;
+      }
+    | undefined
+  >;
 }
 const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElement = (
   props,
 ) => {
-  const { request, onFinish, columns, placeholder } = props;
-  const [data, setData] = useState<any>([]);
   const [keyword, setKeyword] = useState('');
-
-  useEffect(() => {
-    setTimeout(async () => {
-      let data = await request({
-        offect: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: keyword,
-      });
-      setData(data);
-    }, 100);
-  }, [keyword]);
+  const { request, onFinish, columns, placeholder } = props;
 
   return (
     <div className={cls.tableBox}>
       <div>
         <Input
           className={cls['search-person-input']}
-          placeholder={placeholder}
+          placeholder={placeholder || '请输入搜索内容'}
           suffix={
             <Tooltip>
               <SearchOutlined />
@@ -51,27 +46,44 @@ const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElemen
       </div>
       <div className={cls.tableContent}>
         <ProTable
-          dataSource={data}
-          rowSelection={{
-            onSelect: (_record: any, _selected: any, selectedRows: any) => {
-              onFinish(selectedRows);
-            },
-          }}
-          request={async (params) =>
-            request(
-              resetParams({
-                page: params.pageIndex,
-                pageSize: params.pageSize,
-                filter: keyword,
-              }),
-            )
-          }
           cardProps={{ bodyStyle: { padding: 0 } }}
           scroll={{ y: 300 }}
           options={false}
           search={false}
           columns={columns as any}
           rowKey={'id'}
+          pagination={{
+            defaultCurrent: 0,
+            defaultPageSize: 10,
+          }}
+          params={{ filter: keyword }}
+          rowSelection={{
+            onSelect: (_record: any, _selected: any, selectedRows: any) => {
+              onFinish(selectedRows);
+            },
+          }}
+          request={async (params) => {
+            const {
+              current: pageIndex = 1,
+              pageSize = 10,
+              filter = '',
+              ...other
+            } = params;
+            const page: PageRequest = {
+              filter: filter,
+              limit: pageSize,
+              offset: (pageIndex - 1) * pageSize,
+            };
+            const res = await request(other ? { ...other, ...page } : page);
+            if (res) {
+              return {
+                total: res.total || 0,
+                data: (res.result as []) || [],
+                success: true,
+              };
+            }
+            return { total: 0, data: [], success: true };
+          }}
         />
       </div>
     </div>

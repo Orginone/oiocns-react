@@ -125,10 +125,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           }}>
           <AssignModal<schema.XTarget>
             placeholder="请输入用户账号"
-            request={async (page: any) => {
-              let data = await userCtrl.space.loadMembers(page);
-              return data.result || [];
-            }}
+            request={async (page: any) => await userCtrl.space.loadMembers(page)}
             onFinish={(data) => {
               setSelectMember(data);
             }}

@@ -109,10 +109,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             placeholder="请输入用户账号"
             onFinish={setSelectMember}
             columns={PersonColumns}
-            request={async (page: any) => {
-              let data = await userCtrl.company.loadMembers(page);
-              return data.result || [];
-            }}
+            request={async (page: any) => await userCtrl.company.loadMembers(page)}
           />
         );
     }
