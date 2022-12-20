@@ -11,4 +11,5 @@ export enum GroupMenuType {
   'InnerAgency'= '内部机构',
   'StationSetting'= '岗位设置',
   'CompanyCohort'= '单位群组',
+  'ResouceSetting'= '资源设置',
 }

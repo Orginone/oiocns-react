@@ -20,7 +20,8 @@ const UserAvatar: React.FC = () => {
         case '/passport/login':
           sessionStorage.clear();
           break;
-        case '/setting/user':
+        case '/team':
+          userCtrl.currentKey = '个人设置';
           userCtrl.setCurSpace(userCtrl.user.id);
           break;
       }
@@ -28,7 +29,7 @@ const UserAvatar: React.FC = () => {
     },
     items: [
       {
-        key: '/setting/user',
+        key: '/team',
         icon: <UserOutlined />,
         label: '个人设置',
       },

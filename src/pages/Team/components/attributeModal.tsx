@@ -46,10 +46,10 @@ const AttributeModal = (props: Iprops) => {
       },
       fieldProps: {
         disabled: title === '修改',
-        fieldNames: { label: 'name', value: 'id', children: 'subTeam' },
+        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
         showSearch: true,
         filterTreeNode: true,
-        treeNodeFilterProp: 'name',
+        treeNodeFilterProp: 'teamName',
       },
     },
     {
@@ -132,12 +132,12 @@ const AttributeModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
+          formRef.current?.setFieldValue('belongId', props.targetId);
           if (title.includes('修改')) {
             formRef.current?.setFieldsValue(data);
           }
         } else {
           formRef.current?.resetFields();
-          formRef.current?.setFieldValue('belongId', props.targetId);
           handleCancel();
         }
       }}

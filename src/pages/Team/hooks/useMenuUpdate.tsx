@@ -3,6 +3,7 @@ import { emitter, TargetType } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
+import { ImStackoverflow } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { GroupMenuType } from '../config/menuType';
@@ -12,11 +13,13 @@ import { GroupMenuType } from '../config/menuType';
  * @returns hooks 常量
  */
 const useMenuUpdate = (): [
+  string,
   MenuItemType,
   () => void,
   MenuItemType,
   (item: MenuItemType) => void,
 ] => {
+  const [key, setKey] = useState<string>('');
   const [menus, setMenu] = useState<MenuItemType>({
     key: 'setting',
     label: '设置',
@@ -41,7 +44,7 @@ const useMenuUpdate = (): [
     return undefined;
   };
   /** 刷新菜单 */
-  const refreshMenu = async (reset: boolean = false) => {
+  const refreshMenu = async () => {
     const children: MenuItemType[] = [];
     children.push(await operate.getSpaceMenu());
     if (userCtrl.isCompanySpace) {
@@ -70,6 +73,14 @@ const useMenuUpdate = (): [
           typeName: TargetType.Cohort,
           subTeam: await userCtrl.company.getCohorts(),
         }),
+        {
+          children: [],
+          key: '流程设置',
+          label: '流程设置',
+          itemType: '流程设置',
+          item: userCtrl.space,
+          icon: <ImStackoverflow />,
+        },
       );
     } else {
       children.push(
@@ -80,7 +91,9 @@ const useMenuUpdate = (): [
           subTeam: await userCtrl.user.getCohorts(),
         }),
       );
+      children.push(operate.loadUserSetting());
     }
+    children.push(operate.loadSpaceSetting());
     setMenu({
       key: 'setting',
       label: '设置',
@@ -88,29 +101,28 @@ const useMenuUpdate = (): [
       icon: <SettingOutlined />,
       children: children,
     });
-    if (reset && selectMenu.key != userCtrl.currentKey) {
-      const item: MenuItemType | undefined = findMenuItemByKey(
-        children,
-        userCtrl.currentKey,
-      );
-      if (item) {
-        setSelectMenu(item);
-      } else {
-        userCtrl.currentKey = children[0].key;
-        setSelectMenu(children[0]);
-      }
+    const item: MenuItemType | undefined = findMenuItemByKey(
+      children,
+      userCtrl.currentKey,
+    );
+    if (item) {
+      setSelectMenu(item);
+    } else {
+      userCtrl.currentKey = children[0].key;
+      setSelectMenu(children[0]);
     }
   };
 
   useEffect(() => {
-    const id = emitter.subscribe(() => {
-      refreshMenu(true);
+    const id = emitter.subscribe((key) => {
+      setKey(key);
+      refreshMenu();
     });
     return () => {
       emitter.unsubscribe(id);
     };
   }, []);
-  return [menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

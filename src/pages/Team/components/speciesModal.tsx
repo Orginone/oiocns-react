@@ -44,11 +44,10 @@ const SpeciesModal = (props: Iprops) => {
       },
       fieldProps: {
         disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id', children: 'subTeam' },
+        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
         showSearch: true,
         filterTreeNode: true,
-        treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
+        treeNodeFilterProp: 'teamName',
       },
     },
     {
@@ -107,12 +106,12 @@ const SpeciesModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
+          formRef.current?.setFieldValue('belongId', props.targetId);
           if (title.includes('修改')) {
             formRef.current?.setFieldsValue(current?.target);
           }
         } else {
           formRef.current?.resetFields();
-          formRef.current?.setFieldValue('belongId', props.targetId);
           handleCancel();
         }
       }}

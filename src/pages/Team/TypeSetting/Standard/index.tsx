@@ -30,11 +30,11 @@ const SettingStandrad: React.FC<IProps> = ({ current, targetId }: IProps) => {
   const renderAttrItemOperate = (item: XAttribute) => {
     return [
       {
-        key: '编辑特性',
+        key: '修改特性',
         label: '编辑特性',
         onClick: () => {
           setEditData(item);
-          setModalType('编辑特性');
+          setModalType('修改特性');
         },
       },
       {

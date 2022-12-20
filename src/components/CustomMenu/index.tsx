@@ -28,9 +28,9 @@ const CustomMenu = (props: CustomMenuType) => {
     }
     if (subMenu && props.selectMenu.menus) {
       const menu = props.selectMenu.menus.find((i) => i.key == subMenuKey);
-      if (menu) {
-        setSubMenu(menu);
-        setData(loadMenus(menu));
+      if (menu && menu.subMenu) {
+        setSubMenu(menu.subMenu);
+        setData(loadMenus([menu.subMenu]));
       }
     }
   }, [props]);
@@ -114,6 +114,8 @@ const CustomMenu = (props: CustomMenuType) => {
                     if (menu.subMenu) {
                       setSubMenuKey(key);
                       setSubMenu(menu.subMenu);
+                      setSelectedKeys([props.selectMenu.key, menu.subMenu.key]);
+                      props.onSelect?.apply(this, [menu.subMenu]);
                     } else {
                       props.onMenuClick?.apply(this, [item, key]);
                     }

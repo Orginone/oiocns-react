@@ -249,7 +249,6 @@ export default class KernelApi {
   public async createAttribute(
     params: model.AttributeModel,
   ): Promise<model.ResultType<schema.XAttribute>> {
-    console.log(params);
     return await this.request({
       module: 'thing',
       action: 'CreateAttribute',

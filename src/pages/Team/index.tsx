@@ -9,7 +9,7 @@ import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
 const Setting: React.FC<any> = () => {
   const [species, setSpecies] = useState<ISpeciesItem>();
-  const [menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   return (
@@ -80,7 +80,7 @@ const Setting: React.FC<any> = () => {
         targetId={(selectMenu.item as ITarget)?.id}
         current={species}
       />
-      <TypeSetting selectMenu={selectMenu} species={species} />
+      <TypeSetting key={key} selectMenu={selectMenu} species={species} />
     </MainLayout>
   );
 };

@@ -122,7 +122,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         current={current}
         extra={[
           <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
-            权限管理
+            职权设置
           </Button>,
         ]}
       />
@@ -188,7 +188,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       />
       {/* 对象设置 */}
       <AddPostModal
-        title={'权限设置'}
+        title={'职权设置'}
         open={activeModal === 'post'}
         handleOk={() => setActiveModal('')}
         current={current}

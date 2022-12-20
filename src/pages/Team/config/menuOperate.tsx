@@ -65,6 +65,7 @@ export const getSpaceMenu = async () => {
     label = '单位信息';
     itemType = GroupMenuType.Company;
   }
+  await userCtrl.space.loadSpeciesTree();
   return {
     key: userCtrl.space.key,
     item: userCtrl.space,
@@ -109,6 +110,86 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
   };
 };
 
+export const loadSpaceSetting = () => {
+  return {
+    key: GroupMenuType.ResouceSetting,
+    label: GroupMenuType.ResouceSetting,
+    itemType: GroupMenuType.ResouceSetting,
+    icon: <im.ImSteam />,
+    item: userCtrl.space,
+    children: [
+      {
+        children: [],
+        key: '权限设置',
+        label: '权限设置',
+        itemType: '权限设置',
+        item: userCtrl.space,
+        icon: <im.Im500Px />,
+      },
+      {
+        children: [],
+        key: '主页设置',
+        label: '主页设置',
+        itemType: '主页设置',
+        item: userCtrl.space,
+        icon: <im.ImBarcode />,
+      },
+      {
+        children: [],
+        key: '帮助中心',
+        label: '帮助中心',
+        itemType: '帮助中心',
+        item: userCtrl.space,
+        icon: <im.ImShield />,
+      },
+    ],
+  };
+};
+
+export const loadUserSetting = () => {
+  return {
+    key: '个人设置',
+    label: '个人设置',
+    itemType: '个人设置',
+    icon: <im.ImUserCheck />,
+    item: userCtrl.user,
+    children: [
+      {
+        children: [],
+        key: '主题设置',
+        label: '主题设置',
+        itemType: '主题设置',
+        item: userCtrl.user,
+        icon: <im.ImLifebuoy />,
+      },
+      {
+        children: [],
+        key: '语言设置',
+        label: '语言设置',
+        itemType: '语言设置',
+        item: userCtrl.user,
+        icon: <im.ImBooks />,
+      },
+      {
+        children: [],
+        key: '卡包设置',
+        label: '卡包设置',
+        itemType: '卡包设置',
+        item: userCtrl.user,
+        icon: <im.ImCreditCard />,
+      },
+      {
+        children: [],
+        key: '地址管理',
+        label: '地址管理',
+        itemType: '地址管理',
+        item: userCtrl.user,
+        icon: <im.ImLocation2 />,
+      },
+    ],
+  };
+};
+
 /** 加载右侧菜单 */
 export const loadSpeciesMenus = (item: ISpeciesItem) => {
   const items = [
@@ -139,24 +220,24 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
 export const loadTypeMenus = async (item: ITarget) => {
   const menus: any[] = [];
   if (item.subTeamTypes.length > 0) {
-    menus.push({
-      key: '新建|' + item.subTeamTypes.join('|'),
-      icon: <im.ImPlus />,
-      label: '新建子组织',
-    });
+    menus.push(
+      {
+        key: '新建|' + item.subTeamTypes.join('|'),
+        icon: <im.ImPlus />,
+        label: '新建子组织',
+      },
+      {
+        key: '刷新',
+        icon: <im.ImSpinner9 />,
+        label: '刷新子组织',
+      },
+    );
   }
-  menus.push(
-    {
-      key: '编辑',
-      icon: <im.ImPencil />,
-      label: '编辑信息',
-    },
-    {
-      key: '刷新',
-      icon: <im.ImSpinner9 />,
-      label: '刷新子组织',
-    },
-  );
+  menus.push({
+    key: '编辑',
+    icon: <im.ImPencil />,
+    label: '编辑信息',
+  });
   if (item.speciesTree) {
     menus.push({
       key: '制定标准',
