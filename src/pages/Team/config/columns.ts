@@ -205,3 +205,33 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'remark',
   },
 ];
+
+export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '流程名称',
+    dataIndex: 'name',
+    ellipsis: true,
+  },
+  {
+    title: '创建人',
+    dataIndex: 'createUser',
+    ellipsis: true,
+  },
+  {
+    title: '备注',
+    ellipsis: true,
+    render: (_, record) => {
+      return JSON.parse(record.content || '{}').fields;
+    },
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    ellipsis: true,
+  },
+];

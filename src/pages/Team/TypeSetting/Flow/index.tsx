@@ -9,18 +9,18 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import type { ProColumns } from '@ant-design/pro-components';
 import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
 import userCtrl from '@/ts/controller/setting/userCtrl';
 import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine } from '@/ts/base/schema';
-import FlowCard from '@/components/FlowCardComp';
 import useWindowSize from '@/utils/windowsize';
 import BindModal from './BindModal';
 import Appbindlist from './Appnindlist';
+import { ITarget } from '@/ts/core';
+import { FlowColumn } from '../../config/columns';
+import { getUuid } from '@/utils/tools';
 
 const { Header, Content } = Layout;
 
@@ -42,24 +42,16 @@ export const stepTypeAndNameMaps: Record<StepType, string> = {
   [StepType.PROCESSMESS]: '流程设计',
 };
 
-type FlowItem = {
-  content: string;
-  id: string;
-  name: string;
-};
-
 /**
  * 流程设置
  * @returns
  */
-const SettingFlow: React.FC = () => {
-  const { height } = useWindowSize();
-  const [page, setPage] = useState<number>(1);
-
+const FlowSetting: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
-  const [allData, setAllData] = useState<schema.XFlowDefine[]>([]);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
+  const [listKey, setListKey] = useState<string>('anykey');
+  const [bindKey, setBindKey] = useState<string>('');
   const [editorValue, setEditorValue] = useState<string | null | undefined>();
   const [designData, setDesignData] = useState<{} | null>();
   const [conditionData, setConditionData] = useState<{
@@ -74,39 +66,11 @@ const SettingFlow: React.FC = () => {
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
-
-  const [dateData, setDateData] = useState(1);
   const [rowId, setRowId] = useState<string>('');
-  const [dataMes, setUpdataMes] = useState(1); //强制刷新
 
   const scale = useAppwfConfig((state: any) => state.scale);
   const setScale = useAppwfConfig((state: any) => state.setScale);
   const design = useAppwfConfig((state: any) => state.design);
-
-  const columns: ProColumns<FlowItem>[] = [
-    {
-      title: '流程名称',
-      dataIndex: 'name',
-      ellipsis: true,
-    },
-    {
-      title: '创建人',
-      dataIndex: 'createUser',
-      ellipsis: true,
-    },
-    {
-      title: '备注',
-      ellipsis: true,
-      render: (_, record) => {
-        return <div>{JSON.parse(record.content || '{}').fields}</div>;
-      },
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      ellipsis: true,
-    },
-  ];
 
   useEffect(() => {
     initData();
@@ -114,12 +78,11 @@ const SettingFlow: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
-    if (result) {
-      setAllData(result);
-      setShowDataSource(result.slice((page - 1) * 1, 10));
-      setBindAppMes(result[0] || {});
-      setRowId(result[0]?.id || '');
-    }
+    console.log('res...', result);
+    setListKey(result[0]?.id);
+    setShowDataSource(result);
+    setBindAppMes(result[0] || {});
+    setRowId(result[0]?.id || '');
   };
 
   const clearFrom = () => {
@@ -154,14 +117,13 @@ const SettingFlow: React.FC = () => {
 
   const parentRef = useRef<any>(null);
 
-  const renderOperation = (record: FlowItem): any[] => {
+  const renderOperation = (record: schema.XFlowDefine): any[] => {
     return [
       {
         key: 'bindApp',
         label: '绑定应用',
         onClick: () => {
           setIsOpenModal(true);
-          setDateData(dateData + 1);
         },
       },
       {
@@ -197,30 +159,13 @@ const SettingFlow: React.FC = () => {
         style: { color: 'red' },
         onClick: async () => {
           if (await userCtrl.space.deleteDefine(record.id)) {
-            initData();
+            await initData();
+            setListKey(`remove${record.id}`);
             message.success('删除成功');
           }
         },
       },
     ];
-  };
-
-  const handlePageChange = (page: number, pageSize: number) => {
-    setPage(page);
-    setShowDataSource(allData.slice((page - 1) * pageSize, page * pageSize));
-  };
-
-  const renderCardFun = (dataArr: XFlowDefine[]): React.ReactNode[] => {
-    return dataArr.map((item: XFlowDefine) => {
-      return (
-        <FlowCard
-          className="card"
-          data={item}
-          key={item.id}
-          onClick={() => console.log('按钮测试')}
-          operation={renderOperation}></FlowCard>
-      );
-    });
   };
 
   return (
@@ -229,12 +174,10 @@ const SettingFlow: React.FC = () => {
       {tabType === TabType.TABLEMES ? (
         <div>
           <Card bordered={false}>
-            <div className={cls['app-wrap']} ref={parentRef}>
-              <CardOrTable<XFlowDefine>
+            <div ref={parentRef}>
+              <CardOrTable<schema.XFlowDefine>
+                key={listKey}
                 dataSource={showDataSource}
-                total={allData.length}
-                pageSize={10}
-                page={page}
                 rowClassName={(recorId: any) => {
                   return recorId.id === rowId ? cls.rowClass : '';
                 }}
@@ -248,27 +191,26 @@ const SettingFlow: React.FC = () => {
                 }}
                 stripe
                 parentRef={parentRef}
-                renderCardContent={renderCardFun}
                 operation={renderOperation}
-                columns={columns}
-                height={0.38 * height}
-                onChange={handlePageChange}
-                rowKey={(record: XFlowDefine) => record.id || 'id'}
+                columns={FlowColumn}
+                rowKey={'id'}
+                rowSelection={{}}
                 toolBarRender={() => [
                   <Button
                     key="button"
-                    type="primary"
+                    type="link"
+                    size="small"
                     onClick={() => {
                       setTabType(TabType.PROCESSDESIGN);
                     }}>
-                    新建
+                    新建流程
                   </Button>,
                 ]}
               />
             </div>
           </Card>
           {/* 这里后面写模版列表，暂时隐藏 */}
-          <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
+          <Appbindlist key={bindKey} bindAppMes={bindAppMes} />
         </div>
       ) : (
         <div className={cls['company-info-content']}>
@@ -390,11 +332,11 @@ const SettingFlow: React.FC = () => {
       <BindModal
         isOpen={isOpenModal}
         bindAppMes={bindAppMes}
-        upDateData={dateData}
-        noticeBaseInfo={() => {
-          setUpdataMes(dataMes + 1);
+        onUpdate={() => {
+          setBindKey(getUuid());
         }}
         onOk={() => {
+          setBindKey(getUuid());
           setIsOpenModal(false);
         }}
         onCancel={() => {
@@ -405,4 +347,4 @@ const SettingFlow: React.FC = () => {
   );
 };
 
-export default SettingFlow;
+export default FlowSetting;

@@ -18,25 +18,24 @@ type Bindmodalprops = {
   bindAppMes: { name: string; id: string };
   onOk: () => void;
   onCancel: () => void;
-  upDateData: number;
-  noticeBaseInfo: () => void;
+  onUpdate: () => void;
 };
 
 const BindModal: React.FC<Bindmodalprops> = ({
   bindAppMes,
   isOpen,
   onCancel,
-  upDateData,
-  noticeBaseInfo, //通知兄弟组件事件
+  onOk,
+  onUpdate,
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
   const [oldFormData, setOldFormData] = useState<schema.XFlowRelation[]>([]);
   const actionRef = useRef();
-
+  debugger;
   useEffect(() => {
     initData();
-  }, [upDateData]);
+  }, [bindAppMes, isOpen]);
 
   const initData = async () => {
     const currentData = appCtrl.products.map((item) => {
@@ -111,20 +110,20 @@ const BindModal: React.FC<Bindmodalprops> = ({
           },
         );
         if (newArr && newArr.length > 0) {
-          Promise.all(newArr)
+          await Promise.all(newArr)
             .then((result) => {
               if (result) {
                 /** 在这里要通知兄弟组件刷新 */
                 message.success('绑定成功');
-                noticeBaseInfo();
+                // noticeBaseInfo();
                 initData();
               }
             })
             .catch((error) => {
               message.error(error);
             });
-          onCancel();
         }
+        onOk();
       }}>
       {/* loading通过样式隐藏，没有相关的Api */}
       <div className={cls.removeLoading}>
@@ -156,7 +155,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                             if (result) {
                               message.info('解绑成功');
                               /** 在这里要通知兄弟组件刷新 */
-                              noticeBaseInfo();
+                              onUpdate();
                               resolve(true);
                             } else {
                               message.error('解绑失败');

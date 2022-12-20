@@ -11,16 +11,16 @@ const { Meta } = Card;
 
 type AppBindListprops = {
   bindAppMes: { name: string; id: string };
-  upDateInit: number;
+  // upDateInit: number;
 };
 
-const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
+const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   useEffect(() => {
     initData();
-  }, [bindAppMes, upDateInit]);
+  }, [bindAppMes]);
 
   const initData = async () => {
     const needData = appCtrl.products.map((item) => {
