@@ -16,7 +16,7 @@ export type DonationBillType = {
 /**
  * 捐赠单
  */
-const DonationBill: React.FC<DonationBillType> = () => {
+const DonationBill: React.FC = () => {
   return (
     <div>
       <Descriptions title="捐赠单据" bordered column={2}>
