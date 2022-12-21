@@ -91,8 +91,8 @@ const useMenuUpdate = (): [
           subTeam: await userCtrl.user.getCohorts(),
         }),
       );
-      children.push(operate.loadUserSetting());
     }
+    children.push(operate.loadUserSetting());
     children.push(operate.loadSpaceSetting());
     setMenu({
       key: 'setting',
