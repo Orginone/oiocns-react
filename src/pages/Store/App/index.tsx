@@ -1,4 +1,4 @@
-import { Card, message, Modal } from 'antd';
+import { Button, Card, message, Modal } from 'antd';
 import React, { useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage2';
 import cls from './index.module.less';
@@ -32,23 +32,31 @@ const StoreApp: React.FC = () => {
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
 
-  const handleBtnsClick = (item: { text: string }) => {
-    switch (item.text) {
-      case '购买':
-        history.push('/market/shop');
-        break;
-      case '创建':
-        history.push('/store/app/create');
-        break;
-      default:
-        console.log('点击事件未注册', item.text);
-        break;
-    }
+  const extraBtns = () => {
+    return (
+      <BtnGroupDiv
+        list={[
+          {
+            text: '购买',
+            onClick: () => {
+              history.push('/market/shop');
+            },
+          },
+          {
+            text: '创建',
+            onClick: () => {
+              history.push('/store/app/create');
+            },
+          },
+        ]}
+      />
+    );
   };
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
-    const shareArr = [
-      {
+    const shareArr = [];
+    if (item.prod.belongId == userCtrl.space.id) {
+      shareArr.push({
         key: 'share',
         label: '共享',
         onClick: () => {
@@ -56,18 +64,18 @@ const StoreApp: React.FC = () => {
           setShareType('共享');
           setShowShareModal(true);
         },
-      },
-    ];
-    if (userCtrl.isCompanySpace) {
-      shareArr.push({
-        key: 'share2',
-        label: '分配',
-        onClick: () => {
-          appCtrl.setCurProduct(item);
-          setShareType('分配');
-          setShowShareModal(true);
-        },
       });
+      if (userCtrl.isCompanySpace) {
+        shareArr.push({
+          key: 'share2',
+          label: '分配',
+          onClick: () => {
+            appCtrl.setCurProduct(item);
+            setShareType('分配');
+            setShowShareModal(true);
+          },
+        });
+      }
     }
     return [
       {
@@ -86,15 +94,6 @@ const StoreApp: React.FC = () => {
           history.push({ pathname: '/store/app/info' });
         },
       },
-      // {
-      //   key: 'manage',
-      //   label: '管理',
-      //   onClick: () => {
-      //     history.push({
-      //       pathname: '/store/app/manage',
-      //     });
-      //   },
-      // },
       {
         key: 'putaway',
         label: '上架',
@@ -140,16 +139,13 @@ const StoreApp: React.FC = () => {
 
   // 根据权限从已获取数据 动态产生tab
   const getItems = () => {
-    let typeSet = new Set(['全部']);
+    let typeSet = new Set(['全部', '分享获得']);
     appCtrl.products.forEach((v: any) => {
-      v.source && typeSet.add(v.source);
+      v.prod.source && typeSet.add(v.prod.source);
     });
-
-    return Array.from(typeSet)
-      .filter(Boolean)
-      .map((k) => {
-        return { tab: k, key: k };
-      });
+    return Array.from(typeSet).map((k) => {
+      return { tab: k, key: k };
+    });
   };
   const handleSelectClassify = (appids: string[]) => {
     console.log('当前分类下的appids', appids);
@@ -179,7 +175,7 @@ const StoreApp: React.FC = () => {
         <Card
           title="我的应用"
           className={cls['app-tabs']}
-          extra={<BtnGroupDiv list={['购买', '创建']} onClick={handleBtnsClick} />}
+          extra={extraBtns()}
           tabList={getItems()}
           activeTabKey={statusKey}
           onTabChange={(k) => {

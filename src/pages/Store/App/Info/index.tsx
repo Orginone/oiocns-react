@@ -16,40 +16,42 @@ import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import SchemaForm from '@/components/SchemaForm';
+import { IProduct } from '@/ts/core';
 // 根据以获取数据 动态产生tab
 const items = DestTypes.map((k) => {
   return { tab: k.label, key: k.label };
 });
-let sourceColumn = sourceColumns;
 
 const StoreAppInfo: React.FC = () => {
+  const [list, setList] = useState<any>([]);
+  const [current, setCurrent] = useState<IProduct>();
   const [createAppForm] = Form.useForm<Record<string, any>>();
 
-  const [columns, setColumns] = useState<any>(sourceColumns);
-  const [key, setKey] = useState<number>(1);
-
   const history = useHistory();
-  if (!appCtrl.curProduct) {
-    history.push('/store/app');
-    return <></>;
-  }
-  const curProd = appCtrl.curProduct;
-  const [list, setList] = useState<any>([]);
-  sourceColumn.initialValue = appCtrl.curProduct?.prod?.resource?.map((item: any) => {
-    let obj = {
-      name: item.name,
-      code: item.code,
-      link: item.link,
-      components: item.components && JSON.parse(item.components),
-      flows: item.flows && JSON.parse(item.flows),
-    };
-    return obj;
-  });
-  onTabChange('组织');
+  const menu = [{ key: '退订', label: '退订' }];
+
+  useEffect(() => {
+    if (appCtrl.curProduct) {
+      setCurrent(appCtrl.curProduct);
+      sourceColumns.initialValue = appCtrl.curProduct.prod.resource?.map((item: any) => {
+        let obj = {
+          name: item.name,
+          code: item.code,
+          link: item.link,
+          components: item.components && JSON.parse(item.components),
+          flows: item.flows && JSON.parse(item.flows),
+        };
+        return obj;
+      });
+      onTabChange('组织');
+    } else {
+      history.push('/store/app');
+    }
+  }, [appCtrl.curProduct]);
 
   async function onTabChange(tabKey: any) {
-    const res = await curProd.queryExtend(tabKey);
-    const showData = res?.result?.map((v) => {
+    const res = await current!.queryExtend(tabKey);
+    const showData = res.result?.map((v) => {
       let obj: any = v;
       switch (tabKey) {
         case '组织':
@@ -72,9 +74,7 @@ const StoreAppInfo: React.FC = () => {
     });
     setList(showData || []);
   }
-
-  const menu = [{ key: '退订', label: '退订' }];
-  return (
+  return current ? (
     <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
       <Card
         title={
@@ -90,13 +90,13 @@ const StoreAppInfo: React.FC = () => {
         <Meta
           avatar={<img className="appLogo" src="/img/appLogo.png" alt="" />}
           style={{ display: 'flex' }}
-          title={curProd.prod.name}
+          title={current.prod.name}
           description={
             <div className="app-info-con">
-              <p className="app-info-con-desc">{curProd.prod.remark}</p>
+              <p className="app-info-con-desc">{current.prod.remark}</p>
               <p className="app-info-con-txt">
-                <span className="vision">版本号 ：{curProd.prod.version}</span>
-                <span className="lastTime">订阅到期时间 ：{curProd.prod.createTime}</span>
+                <span className="vision">版本号 ：{current.prod.version}</span>
+                <span className="lastTime">订阅到期时间 ：{current.prod.createTime}</span>
                 <span className="linkman">遇到问题? 联系运维</span>
               </p>
             </div>
@@ -137,13 +137,12 @@ const StoreAppInfo: React.FC = () => {
           form={createAppForm}
           layoutType="Form"
           open={true}
-          key={key}
           title="应用资源信息"
           onFinish={() => {}}
           modalprops={{
             destroyOnClose: true,
           }}
-          columns={[columns as DataItem]}
+          columns={[sourceColumns as DataItem]}
           submitter={{
             render: () => {
               return <></>;
@@ -152,6 +151,8 @@ const StoreAppInfo: React.FC = () => {
         />
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 
