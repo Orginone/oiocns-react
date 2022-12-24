@@ -59,6 +59,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               <CustomBreadcrumb
                 leftBar={
                   <Typography.Link
+                    style={{ fontSize: 16 }}
                     onClick={() => {
                       setCollapsed(!collapsed);
                     }}>

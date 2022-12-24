@@ -65,7 +65,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
         onClick={() => {
           props.onSelect?.apply(this, [items[items.length - 2]]);
         }}>
-        <ImArrowLeft2 />
+        <ImArrowLeft2 fontSize={16} />
       </Typography.Link>
       <Breadcrumb separator={<CaretRightOutlined />} className={css.customBreadcrumb}>
         {items.map((item) => {
