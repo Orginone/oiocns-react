@@ -11,7 +11,6 @@ import { loadFileSysItemMenus } from '@/pages/Package/config/menuOperate';
 const TableContent = ({
   pageData,
   getThumbnail,
-  getPreview,
   handleMenuClick,
   parentRef,
 }: {
@@ -19,7 +18,6 @@ const TableContent = ({
   pageData: IFileSystemItem[];
   getThumbnail: (item: FileItemModel) => string;
   handleMenuClick: (key: string, node: IFileSystemItem) => void;
-  getPreview: (node: FileItemModel) => false | { src: string };
 }) => {
   const [tableHeight, setTableHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度

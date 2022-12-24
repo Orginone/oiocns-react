@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import FileSystem from './FileSystem';
+import Application from './App';
 import TaskListComp from '@/pages/Package/components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
@@ -14,6 +15,8 @@ interface IProps {
 const ContentIndex = ({ selectMenu }: IProps) => {
   /** 加载内容区 */
   switch (selectMenu.itemType) {
+    case GroupMenuType.Application:
+      return <Application />;
     case GroupMenuType.FileSystemItem:
       return <FileSystem current={selectMenu.item} />;
     default:

@@ -33,14 +33,6 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
     }
     return `/icons/file_type_${item.extension.replace('.', '')}.svg`;
   };
-  const getPreview = (el: FileItemModel) => {
-    if (el.thumbnail?.length > 0) {
-      return {
-        src: '/orginone/anydata/bucket/load/' + el.shareLink,
-      };
-    }
-    return false;
-  };
 
   return (
     <Card id={key} className={style.pageCard} bordered={false}>
@@ -51,7 +43,6 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
             parentRef={parentRef}
             pageData={current.children}
             getThumbnail={getThumbnail}
-            getPreview={getPreview}
             handleMenuClick={(key, target) => {
               setOperateKey(key);
               setOperateTarget(target);
@@ -65,7 +56,6 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
               setOperateKey(key);
               setOperateTarget(target);
             }}
-            getPreview={getPreview}
           />
         )}
       </div>

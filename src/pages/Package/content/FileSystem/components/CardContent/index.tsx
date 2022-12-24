@@ -9,13 +9,11 @@ import { loadFileSysItemMenus } from '@/pages/Package/config/menuOperate';
 const CardListContent = ({
   current,
   handleMenuClick,
-  getPreview,
   getThumbnail,
 }: {
   current: IFileSystemItem;
   getThumbnail: (item: FileItemModel) => string;
   handleMenuClick: (key: string, node: IFileSystemItem) => void;
-  getPreview: (node: FileItemModel) => false | { src: string };
 }) => {
   const FileCard = (el: IFileSystemItem) => (
     <Dropdown
@@ -40,7 +38,7 @@ const CardListContent = ({
         <div className={cls.fileImage}>
           <Image
             preview={false}
-            height={getPreview(el.target) ? 'auto' : 60}
+            height={el.target.thumbnail.length > 0 ? 'auto' : 60}
             src={getThumbnail(el.target)}
             fallback="/icons/default_file.svg"
           />

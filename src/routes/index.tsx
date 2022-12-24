@@ -4,7 +4,6 @@ import {
   AppstoreOutlined,
   AuditOutlined,
   DatabaseOutlined,
-  FileTextOutlined,
   FundOutlined,
   HomeFilled,
   ShopOutlined,
@@ -196,13 +195,6 @@ const StoreRouter: IRouteConfig[] = [
             component: React.lazy(() => import('@/pages/Store/App/Putaway')),
           },
         ],
-      },
-
-      {
-        path: '/store/doc',
-        title: '文档',
-        icon: <FileTextOutlined />,
-        component: React.lazy(() => import('@/pages/Store/Doc')),
       },
       {
         path: '/store/data',

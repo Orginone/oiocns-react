@@ -3,6 +3,7 @@ import storeCtrl from '@/ts/controller/store';
 import { IFileSystemItem } from '@/ts/core';
 import React, { useEffect, useRef, useState } from 'react';
 import { Input, Modal, Upload, UploadProps } from 'antd';
+import CopyOrMoveModal from './CopyOrMove';
 
 interface IProps {
   operateKey?: string;
@@ -45,6 +46,11 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         setTarget(target);
         setNewName(target.name);
         return;
+      case '复制':
+      case '移动':
+        setModalType(key);
+        setTarget(target);
+        return;
       case '|新建':
         await target.create(newName);
         break;
@@ -78,25 +84,39 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
   return (
     <>
       {target && (
-        <Modal
-          title={modalType + '-[' + target.name + ']'}
-          open={['新建', '重命名'].includes(modalType)}
-          onCancel={() => setModalType('')}
-          onOk={async () => {
-            if (newName.length > 0) {
-              await executeOperate('|' + modalType, target);
+        <>
+          <Modal
+            title={modalType + '-[' + target.name + ']'}
+            open={['新建', '重命名'].includes(modalType)}
+            onCancel={() => setModalType('')}
+            onOk={async () => {
+              if (newName.length > 0) {
+                await executeOperate('|' + modalType, target);
+                setModalType('');
+              }
+            }}>
+            <Input
+              placeholder="新建文件夹"
+              size="large"
+              value={newName}
+              onChange={(e) => {
+                setNewName(e.target.value);
+              }}
+            />
+          </Modal>
+          <CopyOrMoveModal
+            title={modalType + '-[' + target.name + ']'}
+            open={['复制', '移动'].includes(modalType)}
+            currentTaget={target}
+            onChange={(success) => {
               setModalType('');
-            }
-          }}>
-          <Input
-            placeholder="新建文件夹"
-            size="large"
-            value={newName}
-            onChange={(e) => {
-              setNewName(e.target.value);
+              if (success) {
+                docsCtrl.changCallback();
+                storeCtrl.changCallback();
+              }
             }}
           />
-        </Modal>
+        </>
       )}
       <Upload {...uploadProps} ref={uploadRef}></Upload>
     </>

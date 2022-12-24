@@ -59,7 +59,9 @@ const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
           });
         }
       });
-    props.onProcess.apply(this, [taskIng]);
+    setTimeout(() => {
+      props.onProcess.apply(this, [taskIng]);
+    }, 10);
     return group;
   };
   const getProcess = (f: number, s: number) => {

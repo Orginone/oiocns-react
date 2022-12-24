@@ -22,10 +22,10 @@ const CustomMenu = (props: CustomMenuType) => {
   useEffect(() => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
-      setSelectedKeys([props.selectMenu.key]);
       const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
       setData(loadMenus(loopFilterTree(props.item.children), expKeys));
       setOpenKeys(expKeys);
+      setSelectedKeys([props.selectMenu.key]);
     }
     if (operateMenu && props.selectMenu.menus) {
       const menu = props.selectMenu.menus.find((i) => i.key == operateMenu?.key);
