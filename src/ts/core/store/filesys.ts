@@ -137,6 +137,7 @@ export class FileSystemItem implements IFileSystemItem {
         this.children = res.data.map((item) => {
           return new FileSystemItem(item, this);
         });
+        return true;
       }
     }
     return false;
@@ -250,20 +251,22 @@ export class FileSystemItem implements IFileSystemItem {
   }
 }
 
-/** 根目录 */
-export const rootDir = new FileSystemItem(
-  {
-    key: '',
-    size: 0,
-    name: '根目录',
-    isDirectory: true,
-    extension: '',
-    thumbnail: '',
-    shareLink: '',
-    contentType: '',
-    hasSubDirectories: true,
-    dateCreated: new Date(),
-    dateModified: new Date(),
-  },
-  undefined,
-);
+/** 获取文件系统的根 */
+export const getFileSysItemRoot = () => {
+  return new FileSystemItem(
+    {
+      key: '',
+      size: 0,
+      name: '根目录',
+      isDirectory: true,
+      extension: '',
+      thumbnail: '',
+      shareLink: '',
+      contentType: '',
+      hasSubDirectories: true,
+      dateCreated: new Date(),
+      dateModified: new Date(),
+    },
+    undefined,
+  );
+};

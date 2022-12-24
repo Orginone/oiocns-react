@@ -4,7 +4,7 @@ import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { ITarget } from '@/ts/core';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';

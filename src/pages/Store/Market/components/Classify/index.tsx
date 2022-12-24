@@ -7,7 +7,7 @@ import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
 import JoinOtherShop from './JoinOtherShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
 type modalType = 'create' | 'join' | 'detail' | 'edit' | 'users' | '';

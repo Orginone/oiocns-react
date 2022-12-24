@@ -41,7 +41,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
         items: item.children.map((i) => {
           return {
             key: i.key,
-            icon: i.icon,
+            icon: <span style={{ fontSize: 16, paddingTop: 2 }}>{i.icon}</span>,
             label: i.label,
           };
         }),
@@ -76,7 +76,8 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
               onClick={() => {
                 props.onSelect?.apply(this, [item]);
               }}>
-              {item.icon} {item.label}
+              <span style={{ fontSize: 16, paddingTop: 2 }}>{item.icon}</span>{' '}
+              {item.label}
             </Breadcrumb.Item>
           );
         })}

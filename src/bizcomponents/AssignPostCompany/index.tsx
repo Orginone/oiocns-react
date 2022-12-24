@@ -11,8 +11,7 @@ import cls from './index.module.less';
 import { resetParams } from '@/utils/tools';
 import { schema } from '@/ts/base';
 import { ITarget, TargetType } from '@/ts/core';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-// import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 
 interface indexType {
   searchFn: Function;

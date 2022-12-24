@@ -6,7 +6,7 @@ import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { TargetType } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import Person from '@/ts/core/target/person';

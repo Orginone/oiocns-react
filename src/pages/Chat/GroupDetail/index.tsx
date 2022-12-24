@@ -8,7 +8,7 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import InviteMembers from '@/components/InviteMembers';
 import RemoveMember from '@/components/RemoveMember';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 
 /**
  * @description:  个人、群聊详情

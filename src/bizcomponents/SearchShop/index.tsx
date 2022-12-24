@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
 import { MonitorOutlined } from '@ant-design/icons';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 type CompanySearchTableProps = {
   [key: string]: any;
 };

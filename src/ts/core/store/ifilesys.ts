@@ -55,7 +55,7 @@ export interface IFileSystemItem {
    * 加载下级文件系统项数组
    * @param {boolean} reload 重新加载,默认false
    */
-  loadChildren(reload: boolean): Promise<boolean>;
+  loadChildren(reload?: boolean): Promise<boolean>;
   /**
    * 上传文件
    * @param name 文件名

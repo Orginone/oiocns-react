@@ -31,7 +31,13 @@
     .ogo-menu-sub.ogo-menu-inline {
       background: @component-background;
     }
-
+    .customMenu {
+      .ogo-menu-submenu-title,
+      .ogo-menu-submenu-selected {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    }
     .ogo-menu-item,
     .ogo-menu-submenu-expand-icon,
     .ogo-menu-submenu-arrow,
@@ -40,6 +46,7 @@
     .ogo-menu-submenu {
       color: @system-menu-color;
     }
+
     .ogo-menu-submenu-selected,
     .ogo-menu-submenu-selected .ogo-badge,
     .ogo-menu-item-selected .ogo-badge,
@@ -47,6 +54,8 @@
     .ogo-menu:not(.ogo-menu-horizontal) .ogo-menu-item-selected {
       color: @text-color;
       background-color: @custom-menu-active-background;
+      border-radius: 8px;
+      overflow: hidden;
     }
     .ogo-menu-submenu-selected .ogo-menu-submenu-title .ogo-menu-item-icon,
     .ogo-menu-item:hover .ogo-menu-item-icon,

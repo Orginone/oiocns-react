@@ -3,7 +3,7 @@ import { Card, Input, List, Result, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import PersonInfoCard from './PersonInfoCard';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { XTarget } from '@/ts/base/schema';
 type SearchPersonProps = {
   searchCallback: (person: XTarget) => void;

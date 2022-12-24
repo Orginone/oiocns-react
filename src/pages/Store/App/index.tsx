@@ -15,7 +15,7 @@ import TreeComp from './Classify';
 import MoveApp from './moveApp';
 import PublishComp from './PublishList';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { myColumns } from './Config';
 import { IProduct, IResource } from '@/ts/core';
 import appCtrl from '@/ts/controller/store/appCtrl';

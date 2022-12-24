@@ -1,5 +1,5 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Form, Input } from 'antd';
 import React from 'react';

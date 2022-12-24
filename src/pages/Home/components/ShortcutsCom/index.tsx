@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { companyTypes } from '@/ts/core/enum';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import SearchPerson from '@/bizcomponents/SearchPerson';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import { useHistory } from 'react-router-dom';

@@ -1,4 +1,4 @@
-import { Col, Layout, Row, Space, Typography } from 'antd';
+import { Col, Divider, Layout, Row, Space, Typography } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
@@ -74,7 +74,22 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             }
           </Col>
           <Col className={cls.rightstyle}>
-            <Space>{props.rightBar}</Space>
+            <Space wrap split={<Divider type="vertical" />} size={2}>
+              {props.rightBar}
+              {props.selectMenu.menus &&
+                props.selectMenu.menus.map((m) => {
+                  return (
+                    <Typography.Link
+                      key={m.key}
+                      title={m.label}
+                      onClick={() => {
+                        props.onMenuClick?.apply(this, [props.selectMenu, m.key]);
+                      }}>
+                      <span style={{ fontSize: 16 }}>{m.icon}</span>
+                    </Typography.Link>
+                  );
+                })}
+            </Space>
           </Col>
         </Row>
         <Content className={cls.content}>{children}</Content>

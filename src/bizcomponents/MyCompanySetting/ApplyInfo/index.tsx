@@ -3,7 +3,7 @@ import type { ColumnsType } from 'antd/es/table';
 import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import { common } from 'typings/common';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 
 type ApplyInfoProps = {
   // eslint-disable-next-line no-unused-vars

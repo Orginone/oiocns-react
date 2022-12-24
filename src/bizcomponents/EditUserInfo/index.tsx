@@ -4,7 +4,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import docsCtrl from '@/ts/controller/store/docsCtrl';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { parseAvatar } from '@/ts/base';
 
 interface Iprops {

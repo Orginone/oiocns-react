@@ -4,7 +4,7 @@ import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { ICompany, IResource, ITarget } from '@/ts/core';
 import CustomTree from '@/components/CustomTreeComp';

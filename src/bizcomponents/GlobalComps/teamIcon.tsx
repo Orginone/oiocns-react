@@ -9,6 +9,7 @@ interface teamTypeInfo {
   size?: number;
   fontSize?: number;
   share: TargetShare;
+  notAvatar?: boolean;
 }
 
 /** 组织图标 */
@@ -79,6 +80,9 @@ const TeamIcon = (info: teamTypeInfo) => {
     default:
       icon = <im.ImSvg fontSize={fontSize} />;
       break;
+  }
+  if (info.notAvatar) {
+    return icon;
   }
   return (
     <Avatar

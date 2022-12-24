@@ -1,5 +1,5 @@
 import { Emitter } from '../../base/common';
-import userCtrl from '../setting/userCtrl';
+import userCtrl from '../setting';
 import { INullSpeciesItem, DomainTypes, emitter, loadSpeciesTree } from '../../core/';
 
 /**

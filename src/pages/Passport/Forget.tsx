@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { Button, Form, Input, message, Tabs } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';

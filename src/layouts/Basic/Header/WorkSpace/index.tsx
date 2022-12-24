@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import styles from './index.module.less';
 import { companyTypes, DomainTypes, TargetType } from '@/ts/core/enum';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { SpaceType } from '@/ts/core/target/itarget';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';

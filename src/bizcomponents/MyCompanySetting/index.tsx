@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { TargetType } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
 import { XTarget } from '@/ts/base/schema';

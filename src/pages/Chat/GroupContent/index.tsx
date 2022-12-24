@@ -11,7 +11,7 @@ import { XImMsg } from '@/ts/base/schema';
 import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { parseAvatar } from '@/ts/base';
 
 /**

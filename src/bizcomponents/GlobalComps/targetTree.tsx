@@ -5,7 +5,7 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import React, { useEffect, useState } from 'react';
 import TeamIcon from './teamIcon';
 import CustomTreeComp from '@/components/CustomTreeComp';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 
 /** 组织树 */
 interface Iprops {

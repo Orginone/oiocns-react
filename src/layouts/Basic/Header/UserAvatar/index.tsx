@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
 import React from 'react';
@@ -20,16 +20,18 @@ const UserAvatar: React.FC = () => {
         case '/passport/login':
           sessionStorage.clear();
           break;
-        case '/team':
-          userCtrl.currentKey = '个人设置';
-          userCtrl.setCurSpace(userCtrl.user.id);
+        case '/setting':
+          if (userCtrl.currentKey != '个人设置') {
+            userCtrl.currentKey = '个人设置';
+            userCtrl.changCallback();
+          }
           break;
       }
       history.push(info.key);
     },
     items: [
       {
-        key: '/team',
+        key: '/setting',
         icon: <UserOutlined />,
         label: '个人设置',
       },

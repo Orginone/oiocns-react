@@ -1,3 +1,4 @@
+@import '~antd/es/style/themes/variable';
 .operateMenu {
   font-size: 14px;
   width: 100%;
@@ -17,6 +18,25 @@
     }
     .ogo-typography {
       color: inherit;
+    }
+    .ogo-menu-submenu-placement-rightTop {
+      .ogo-menu-vertical .ogo-menu-submenu-title {
+        padding-right: 8px;
+        display: flex;
+      }
+    }
+  }
+}
+
+:global {
+  .ogo-menu-submenu-placement-rightTop {
+    .ogo-menu-vertical .ogo-menu-submenu-title {
+      padding-right: 8px;
+      display: flex;
+    }
+    .ogo-menu-submenu-active .ogo-menu-submenu-title {
+      color: @text-color;
+      background-color: @custom-menu-active-background;
     }
   }
 }

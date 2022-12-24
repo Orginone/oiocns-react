@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-components';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import CardOrTableComp from '@/components/CardOrTableComp';
 interface indexType {
   searchFn: Function;

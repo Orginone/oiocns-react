@@ -1,5 +1,5 @@
 import { RegisterType } from '@/ts/base/model';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';

@@ -16,7 +16,7 @@ export {
   TodoType,
 } from './enum';
 export type { IMarket, IMerchandise, IProduct, IResource } from './market';
-export { rootDir } from './store/filesys';
+export { getFileSysItemRoot } from './store/filesys';
 export type { IFileSystemItem, IObjectItem } from './store/ifilesys';
 export type {
   ICohort,

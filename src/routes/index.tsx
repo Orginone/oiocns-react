@@ -243,12 +243,21 @@ const MarketRouter: IRouteConfig[] = [
   },
 ];
 
-const TeamRouter: IRouteConfig[] = [
+const PackageRouter: IRouteConfig[] = [
   {
-    path: '/team',
+    path: '/package',
+    title: '仓库',
+    icon: 'icon-setting',
+    component: React.lazy(() => import('@/pages/Package')),
+  },
+];
+
+const SettingRouter: IRouteConfig[] = [
+  {
+    path: '/setting',
     title: '设置',
     icon: 'icon-setting',
-    component: React.lazy(() => import('@/pages/Team')),
+    component: React.lazy(() => import('@/pages/Setting')),
   },
 ];
 
@@ -286,7 +295,8 @@ const Routers: IRouteConfig[] = [
       ...TodoRouter,
       ...StoreRouter,
       ...MarketRouter,
-      ...TeamRouter,
+      ...PackageRouter,
+      ...SettingRouter,
       ...WelfareRouter,
       {
         path: '/online',

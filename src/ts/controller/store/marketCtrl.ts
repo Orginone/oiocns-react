@@ -7,7 +7,7 @@ import {
 } from '@/constants/const';
 import { message } from 'antd';
 import { Emitter } from '@/ts/base/common';
-import userCtrl from '../setting/userCtrl';
+import userCtrl from '../setting';
 import { XMerchandise } from '@/ts/base/schema';
 
 export interface TreeType {

@@ -5,7 +5,7 @@ import React, { useState, useEffect, Key } from 'react';
 import cls from './index.module.less';
 import { Product } from '@/ts/core/market';
 // import { productCtrl } from '@/ts/controller/store/productCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { kernel } from '@/ts/base';
 import selfAppCtrl from '@/ts/controller/store/selfAppCtrl';
 interface Iprops {

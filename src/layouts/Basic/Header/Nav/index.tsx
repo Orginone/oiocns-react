@@ -53,11 +53,11 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'setting',
-      path: '/team',
+      path: '/setting',
       title: '设置',
       icon: 'icon-setting',
       count: 0,
-      fath: '/team',
+      fath: '/setting',
     },
   ];
   useEffect(() => {
