@@ -79,15 +79,14 @@ export default class WebApp implements IProduct {
     destType: string,
     teamId: string = '0',
   ): Promise<model.IdNameArray> {
-    return (
-      await kernel.queryExtendBySource({
-        sourceId: this.prod.id,
-        sourceType: '产品',
-        spaceId: this.prod.belongId,
-        destType,
-        teamId,
-      })
-    ).data;
+    const res = await kernel.queryExtendBySource({
+      sourceId: this.prod.id,
+      sourceType: '产品',
+      spaceId: this.prod.belongId,
+      destType,
+      teamId,
+    });
+    return res.data;
   }
   public async publish(params: {
     caption: string;

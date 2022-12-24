@@ -5,6 +5,7 @@ interface BtnItemType {
   key?: string;
   type?: 'link' | 'text' | 'ghost' | 'default' | 'primary' | 'dashed' | undefined;
   className?: string;
+  onClick?: Function;
 }
 interface BtnDivType {
   list: BtnItemType[] | string[];
@@ -33,7 +34,11 @@ export const BtnGroupDiv: React.FC<BtnDivType> = ({
           className={item.className}
           type={item.type || 'link'}
           onClick={() => {
-            onClick && onClick({ text: item.text, key: item?.key });
+            if (item.onClick) {
+              item.onClick();
+            } else if (onClick) {
+              onClick({ text: item.text, key: item?.key });
+            }
           }}>
           {item.text}
         </Button>
