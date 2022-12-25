@@ -45,11 +45,11 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'store',
-      path: '/package',
+      path: '/store',
       title: '仓库',
       icon: 'icon-store',
       count: 0,
-      fath: '/package',
+      fath: '/store',
     },
     {
       key: 'setting',

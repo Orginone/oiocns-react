@@ -13,7 +13,7 @@ import { message, Modal } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { marketColumns } from '../../App/Config';
+import { marketColumns } from '../../config/columns';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情

@@ -1,61 +1,51 @@
-import React from 'react';
-
-import { renderRoutes } from 'react-router-config';
-import {
-  AppstoreOutlined,
-  DatabaseOutlined,
-  FileTextOutlined,
-  FundOutlined,
-} from '@ant-design/icons';
-import ContentTemplate from '@/components/ContentTemplate';
-import { IRouteConfig } from 'typings/globelType';
-import { MenuProps } from 'antd';
-// import StoreSiderbar from '@/ts/controller/store/sidebar';
-
-const navItems: MenuProps[`items`] = [
-  {
-    type: 'group',
-    label: '常用分类',
-    children: [
-      {
-        label: '应用',
-        key: 'app',
-        icon: <AppstoreOutlined />,
-        onClick: () => {
-          // StoreSiderbar.handleMenuClick('app');
-        },
-      }, // 菜单项务必填写 key
-      {
-        label: '文档',
-        key: 'doc',
-        icon: <FileTextOutlined />,
-        onClick: () => {
-          // StoreSiderbar.handleMenuClick('docx');
-        },
-      },
-      {
-        label: '数据',
-        key: 'data',
-        icon: <FundOutlined />,
-        onClick: () => {
-          // StoreSiderbar.handleMenuClick('data');
-        },
-      },
-      {
-        label: '资源',
-        key: 'assets',
-        icon: <DatabaseOutlined />,
-        onClick: () => {
-          // StoreSiderbar.handleMenuClick('assets');
-        },
-      },
-    ].map((n) => ({ ...n, key: '/store/' + n.key })),
-  },
-];
-const Store: React.FC<{ route: IRouteConfig }> = ({ route }) => {
+import React, { useState } from 'react';
+import storeCtrl from '@/ts/controller/store';
+import MainLayout from '@/components/MainLayout';
+import useMenuUpdate from './hooks/useMenuUpdate';
+import { GroupMenuType } from './config/menuType';
+import { IFileSystemItem } from '@/ts/core';
+import Content, { TopBarExtra } from './content';
+import { MenuItemType } from 'typings/globelType';
+import FileSysOperate from './components/FileSysOperate';
+/** 仓库模块 */
+const Package: React.FC = () => {
+  const [operateTarget, setOperateTarget] = useState<MenuItemType>();
+  const [operateKey, setOperateKey] = useState<string>();
+  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
-    <ContentTemplate siderMenuData={navItems} content={renderRoutes(route.routes)} />
+    <MainLayout
+      selectMenu={selectMenu}
+      onSelect={async (data) => {
+        storeCtrl.currentKey = data.key;
+        if (data.itemType === GroupMenuType.FileSystemItem) {
+          const item = data.item as IFileSystemItem;
+          if (item.children.length === 0 && (await item.loadChildren())) {
+            refreshMenu();
+          }
+        }
+        setSelectMenu(data);
+      }}
+      rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
+      onMenuClick={async (data, key) => {
+        setOperateKey(key);
+        setOperateTarget(data);
+      }}
+      siderMenuData={menus}>
+      <FileSysOperate
+        operateKey={operateKey}
+        operateTarget={
+          operateTarget?.itemType === GroupMenuType.FileSystemItem
+            ? operateTarget.item
+            : undefined
+        }
+        operateDone={() => {
+          setOperateKey(undefined);
+          setOperateTarget(undefined);
+        }}
+      />
+      <Content key={key} selectMenu={selectMenu} />
+    </MainLayout>
   );
 };
 
-export default Store;
+export default Package;

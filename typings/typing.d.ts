@@ -4,3 +4,4 @@ declare module 'less-vars-to-js';
 declare module 'vite-plugin-style-import';
 declare module 'pako';
 declare module '@wcjiang/notify';
+declare module 'react-file-viewer';
