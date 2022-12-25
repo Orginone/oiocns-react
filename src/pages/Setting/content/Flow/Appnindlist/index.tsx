@@ -1,29 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Space, Modal, message, Empty, Button } from 'antd';
+import appCtrl from '@/ts/controller/store/appCtrl';
 import userCtrl from '@/ts/controller/setting';
 import AppLogo from '/img/appLogo.png';
 
 import cls from './index.module.less';
 import BindModal from '../BindModal';
-import appCtrl from '@/ts/controller/store/appCtrl';
 
 const { Meta } = Card;
 
 type AppBindListprops = {
   bindAppMes: { name: string; id: string };
-  // upDateInit: number;
+  upDateInit: number;
 };
 
-const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
+const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes, upDateInit }) => {
   const [appDataList, setAppDataList] = useState<any[]>([]);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [defineListLength, setDefineListLength] = useState<number>(0);
 
   useEffect(() => {
     initData();
-  }, [bindAppMes]);
+  }, [bindAppMes, upDateInit]);
 
   const initData = async () => {
-    const needData = appCtrl.products.map((item) => {
+    const tableData = appCtrl.products;
+    const needData = tableData.map((item) => {
       return {
         name: item.prod.name,
         id: item.prod.id,
@@ -33,6 +35,7 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
 
     const result = await userCtrl.space.getDefines(false); //流程列表
 
+    setDefineListLength(result.length);
     if (result && result.length > 0 && bindAppMes.id) {
       const currentValue = await userCtrl.space.queryFlowRelation(false); //查询所有绑定值
       if (currentValue && currentValue.length > 0) {
@@ -47,7 +50,6 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
           item.remark = findAppId?.remark;
           return item;
         });
-        console.log('getResult', getResult);
         setAppDataList([...getResult]);
       } else {
         setAppDataList([]);
@@ -56,8 +58,8 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
   };
 
   return (
-    <Card bordered={false}>
-      <Space className={cls.appwrap}>
+    <Card bordered={false} bodyStyle={{ padding: 0 }}>
+      <Space className={cls.appwrap} size={20}>
         {appDataList.length > 0 &&
           appDataList.map((item: any) => {
             return (
@@ -107,10 +109,10 @@ const AppBindList: React.FC<AppBindListprops> = ({ bindAppMes }) => {
               </div>
             );
           })}
-        {appDataList.length == 0 && (
+        {appDataList.length == 0 && defineListLength > 0 && (
           <Empty>
             <Button
-              type="primary"
+              type="link"
               onClick={() => {
                 setIsOpenModal(true);
               }}>

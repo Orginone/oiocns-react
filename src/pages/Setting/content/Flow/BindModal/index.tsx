@@ -8,37 +8,39 @@ import {
   ProFormGroup,
   ProFormText,
 } from '@ant-design/pro-components';
+import appCtrl from '@/ts/controller/store/appCtrl';
 import userCtrl from '@/ts/controller/setting';
 import { schema } from '@/ts/base';
 import cls from './index.module.less';
-import appCtrl from '@/ts/controller/store/appCtrl';
 
 type Bindmodalprops = {
   isOpen: boolean;
   bindAppMes: { name: string; id: string };
   onOk: () => void;
   onCancel: () => void;
-  onUpdate: () => void;
+  upDateData: number;
+  noticeBaseInfo: () => void;
 };
 
 const BindModal: React.FC<Bindmodalprops> = ({
   bindAppMes,
   isOpen,
   onCancel,
-  onOk,
-  onUpdate,
+  upDateData,
+  noticeBaseInfo, //通知兄弟组件事件
 }) => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>();
   const [oldFormData, setOldFormData] = useState<schema.XFlowRelation[]>([]);
   const actionRef = useRef();
-  debugger;
+
   useEffect(() => {
     initData();
-  }, [bindAppMes, isOpen]);
+  }, [upDateData]);
 
   const initData = async () => {
-    const currentData = appCtrl.products.map((item) => {
+    const tableData = appCtrl.products;
+    const currentData = tableData.map((item) => {
       return {
         value: item.prod.id,
         label: item.prod.name,
@@ -110,20 +112,20 @@ const BindModal: React.FC<Bindmodalprops> = ({
           },
         );
         if (newArr && newArr.length > 0) {
-          await Promise.all(newArr)
+          Promise.all(newArr)
             .then((result) => {
               if (result) {
                 /** 在这里要通知兄弟组件刷新 */
                 message.success('绑定成功');
-                // noticeBaseInfo();
+                noticeBaseInfo();
                 initData();
               }
             })
             .catch((error) => {
               message.error(error);
             });
+          onCancel();
         }
-        onOk();
       }}>
       {/* loading通过样式隐藏，没有相关的Api */}
       <div className={cls.removeLoading}>
@@ -155,7 +157,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                             if (result) {
                               message.info('解绑成功');
                               /** 在这里要通知兄弟组件刷新 */
-                              onUpdate();
+                              noticeBaseInfo();
                               resolve(true);
                             } else {
                               message.error('解绑失败');

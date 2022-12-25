@@ -8,19 +8,19 @@ import {
   MinusOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { useAppwfConfig } from '@/bizcomponents/Flow/flow';
-import ProcessDesign from '@/bizcomponents/Flow/ProcessDesign';
+import type { ProColumns } from '@ant-design/pro-components';
+import NewProcessDesign from './FlowComponents';
 import userCtrl from '@/ts/controller/setting';
+import processCtrl from './Controller/processCtrl';
 import { deepClone } from '@/ts/base/common';
 import { schema } from '@/ts/base';
 import BaseInfo from './BaseInfo';
 import CardOrTable from '@/components/CardOrTableComp';
+import { XFlowDefine } from '@/ts/base/schema';
+import FlowCard from './FlowCardComp';
 import useWindowSize from '@/utils/windowsize';
 import BindModal from './BindModal';
 import Appbindlist from './Appnindlist';
-import { ITarget } from '@/ts/core';
-import { FlowColumn } from '../../config/columns';
-import { getUuid } from '@/utils/tools';
 
 const { Header, Content } = Layout;
 
@@ -42,18 +42,25 @@ export const stepTypeAndNameMaps: Record<StepType, string> = {
   [StepType.PROCESSMESS]: '流程设计',
 };
 
+type FlowItem = {
+  content: string;
+  id: string;
+  name: string;
+};
+
 /**
  * 流程设置
  * @returns
  */
-const FlowSetting: React.FC = () => {
+const SettingFlow: React.FC = () => {
+  const { height } = useWindowSize();
+  const [page, setPage] = useState<number>(1);
+
   const [currentStep, setCurrentStep] = useState<StepType>(StepType.BASEINFO);
   const [tabType, setTabType] = useState<TabType>(TabType.TABLEMES);
+  const [allData, setAllData] = useState<schema.XFlowDefine[]>([]);
   const [showDataSource, setShowDataSource] = useState<schema.XFlowDefine[]>([]);
-  const [listKey, setListKey] = useState<string>('anykey');
-  const [bindKey, setBindKey] = useState<string>('');
-  const [editorValue, setEditorValue] = useState<string | null | undefined>();
-  const [designData, setDesignData] = useState<{} | null>();
+
   const [conditionData, setConditionData] = useState<{
     name: string;
     labels: [{}];
@@ -66,11 +73,39 @@ const FlowSetting: React.FC = () => {
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [bindAppMes, setBindAppMes] = useState({ id: '', name: '' });
-  const [rowId, setRowId] = useState<string>('');
 
-  const scale = useAppwfConfig((state: any) => state.scale);
-  const setScale = useAppwfConfig((state: any) => state.setScale);
-  const design = useAppwfConfig((state: any) => state.design);
+  const [dateData, setDateData] = useState(1);
+  const [rowId, setRowId] = useState<string>('');
+  const [dataMes, setUpdataMes] = useState(1); //强制刷新
+  const [currentScale, setCurrentScale] = useState<number>(processCtrl.scale);
+
+  // const scale = useAppwfConfig((state: any) => state.scale);
+  // const design = useAppwfConfig((state: any) => state.design);
+
+  const columns: ProColumns<FlowItem>[] = [
+    {
+      title: '流程名称',
+      dataIndex: 'name',
+      ellipsis: true,
+    },
+    {
+      title: '创建人',
+      dataIndex: 'createUser',
+      ellipsis: true,
+    },
+    {
+      title: '备注',
+      ellipsis: true,
+      render: (_, record) => {
+        return <div>{JSON.parse(record.content || '{}').fields}</div>;
+      },
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      ellipsis: true,
+    },
+  ];
 
   useEffect(() => {
     initData();
@@ -78,29 +113,62 @@ const FlowSetting: React.FC = () => {
 
   const initData = async () => {
     const result = await userCtrl.space.getDefines(false);
-    console.log('res...', result);
-    setListKey(result[0]?.id);
-    setShowDataSource(result);
-    setBindAppMes(result[0] || {});
-    setRowId(result[0]?.id || '');
+    if (result) {
+      setAllData([...result]);
+      const currentData = result.slice((page - 1) * 1, 10);
+      setShowDataSource([...currentData]);
+      setBindAppMes(result[0] || {});
+      setRowId(result[0]?.id || '');
+    }
   };
 
-  const clearFrom = () => {
-    setDesignData(null);
-    setEditorValue(null);
+  const clearForm = () => {
+    processCtrl.setProcessDesignTree({
+      name: '',
+      code: 'code',
+      remark: '',
+      fields: '',
+      resource: {
+        nodeId: 'ROOT',
+        parentId: null,
+        type: 'ROOT',
+        name: '发起人',
+        children: {
+          nodeId: 'node_590719745693',
+          parentId: 'ROOT',
+          props: {},
+          type: 'CONDITIONS',
+          name: '条件分支',
+        },
+      },
+    });
+    processCtrl.setCondtionData({
+      name: '',
+      labels: [{ label: '', value: '', type: '' }],
+      fields: '',
+    });
+    setConditionData({
+      name: '',
+      labels: [{ label: '', value: '', type: '' }],
+      fields: '',
+    });
     setTabType(TabType.TABLEMES);
     setCurrentStep(StepType.BASEINFO);
-    setConditionData({ name: '', labels: [{}], fields: '' });
   };
 
-  const changeScale = (val: any) => {
-    setScale(val);
+  const changeScale = (val: number) => {
+    setCurrentScale(val);
+    processCtrl.setScale(val);
   };
 
   const publish = async () => {
+    processCtrl.currentTreeDesign.name = processCtrl.conditionData.name;
+    processCtrl.currentTreeDesign.fields = processCtrl.conditionData.fields;
+    processCtrl.currentTreeDesign.remark = JSON.stringify(
+      processCtrl.conditionData.labels,
+    );
     /**要发布的数据 */
-    const currentData = deepClone(design);
-    console.log('currentData', currentData);
+    const currentData = deepClone(processCtrl.currentTreeDesign);
     if (currentData.belongId) {
       delete currentData.belongId;
     }
@@ -109,7 +177,7 @@ const FlowSetting: React.FC = () => {
       message.info(result.id ? '编辑成功' : '发布成功');
       // 清理数据
       await initData();
-      clearFrom();
+      clearForm();
     } else {
       return false;
     }
@@ -117,13 +185,14 @@ const FlowSetting: React.FC = () => {
 
   const parentRef = useRef<any>(null);
 
-  const renderOperation = (record: schema.XFlowDefine): any[] => {
+  const renderOperation = (record: FlowItem): any[] => {
     return [
       {
         key: 'bindApp',
         label: '绑定应用',
         onClick: () => {
           setIsOpenModal(true);
+          setDateData(dateData + 1);
         },
       },
       {
@@ -139,14 +208,16 @@ const FlowSetting: React.FC = () => {
             onOk: () => {
               setTabType(TabType.PROCESSDESIGN);
               setCurrentStep(StepType.PROCESSMESS);
-              setEditorValue(record?.content);
               const editorDataMes = JSON.parse(record?.content || '{}');
-              setConditionData({
+              processCtrl.setProcessDesignTree(editorDataMes);
+              const contionData = {
                 name: editorDataMes.name,
                 labels: JSON.parse(editorDataMes.remark || '{}'),
                 fields: editorDataMes.fields,
-              });
-              return new Promise<any>((resolve) => {
+              };
+              processCtrl.setCondtionData(contionData);
+              setConditionData(contionData);
+              return new Promise<boolean>((resolve) => {
                 resolve(true);
               });
             },
@@ -159,8 +230,7 @@ const FlowSetting: React.FC = () => {
         style: { color: 'red' },
         onClick: async () => {
           if (await userCtrl.space.deleteDefine(record.id)) {
-            await initData();
-            setListKey(`remove${record.id}`);
+            initData();
             message.success('删除成功');
           }
         },
@@ -168,19 +238,42 @@ const FlowSetting: React.FC = () => {
     ];
   };
 
+  const handlePageChange = (page: number, pageSize: number) => {
+    setPage(page);
+    setShowDataSource(allData.slice((page - 1) * pageSize, page * pageSize));
+  };
+
+  const renderCardFun = (dataArr: XFlowDefine[]): React.ReactNode[] => {
+    return dataArr.map((item: XFlowDefine) => {
+      return (
+        <FlowCard
+          className="card"
+          data={item}
+          key={item.id}
+          onClick={() => console.log('按钮测试')}
+          operation={renderOperation}></FlowCard>
+      );
+    });
+  };
+
   return (
     <div className={cls['company-top-content']}>
       {/* <Card>流程设置</Card> */}
       {tabType === TabType.TABLEMES ? (
-        <div>
-          <Card bordered={false}>
-            <div ref={parentRef}>
-              <CardOrTable<schema.XFlowDefine>
-                key={listKey}
+        <div style={{ background: '#EFF4F8' }}>
+          <Card
+            bordered={false}
+            style={{ paddingBottom: '10px' }}
+            bodyStyle={{ paddingTop: 0 }}>
+            <div className={cls['app-wrap']} ref={parentRef}>
+              <CardOrTable<XFlowDefine>
+                params={{ id: allData.length }}
                 dataSource={showDataSource}
+                total={allData.length}
                 rowClassName={(recorId: any) => {
                   return recorId.id === rowId ? cls.rowClass : '';
                 }}
+                headerTitle="流程列表"
                 onRow={(record: any) => {
                   return {
                     onClick: () => {
@@ -191,26 +284,32 @@ const FlowSetting: React.FC = () => {
                 }}
                 stripe
                 parentRef={parentRef}
+                renderCardContent={renderCardFun}
                 operation={renderOperation}
-                columns={FlowColumn}
-                rowKey={'id'}
-                rowSelection={{}}
+                columns={columns}
+                height={0.38 * height}
+                onChange={handlePageChange}
+                rowKey={(record: XFlowDefine) => record.id || 'id'}
                 toolBarRender={() => [
                   <Button
                     key="button"
                     type="link"
-                    size="small"
                     onClick={() => {
                       setTabType(TabType.PROCESSDESIGN);
                     }}>
-                    新建流程
+                    新建
                   </Button>,
                 ]}
               />
             </div>
           </Card>
           {/* 这里后面写模版列表，暂时隐藏 */}
-          <Appbindlist key={bindKey} bindAppMes={bindAppMes} />
+          <Card
+            style={{ marginTop: '10px' }}
+            bordered={false}
+            title={`${bindAppMes.name || ''}绑定的应用`}>
+            <Appbindlist bindAppMes={bindAppMes} upDateInit={dataMes} />
+          </Card>
         </div>
       ) : (
         <div className={cls['company-info-content']}>
@@ -243,7 +342,7 @@ const FlowSetting: React.FC = () => {
                           okType: 'danger',
                           cancelText: '取消',
                           onOk() {
-                            clearFrom();
+                            clearForm();
                           },
                           onCancel() {},
                         });
@@ -257,10 +356,6 @@ const FlowSetting: React.FC = () => {
                       current={currentStep}
                       onChange={(e) => {
                         setCurrentStep(e);
-                        /** 只有点击信息的时候才保存，不然进来数据会依然保存 */
-                        if (StepType.BASEINFO === e) {
-                          setDesignData(design);
-                        }
                       }}
                       items={[
                         {
@@ -285,15 +380,15 @@ const FlowSetting: React.FC = () => {
                         <Button
                           className={cls['scale']}
                           size="small"
-                          disabled={scale <= 40}
-                          onClick={() => changeScale(scale - 10)}>
+                          disabled={currentScale <= 40}
+                          onClick={() => changeScale(currentScale - 10)}>
                           <MinusOutlined />
                         </Button>
-                        <span>{scale}%</span>
+                        <span>{currentScale}%</span>
                         <Button
                           size="small"
-                          disabled={scale >= 150}
-                          onClick={() => changeScale(scale + 10)}>
+                          disabled={processCtrl.scale >= 150}
+                          onClick={() => changeScale(currentScale + 10)}>
                           <PlusOutlined />
                         </Button>
                       </Space>
@@ -309,8 +404,6 @@ const FlowSetting: React.FC = () => {
                       currentFormValue={conditionData}
                       onChange={(params) => {
                         setConditionData(params);
-                        design.remark = JSON.stringify(params.labels);
-                        setDesignData(design);
                       }}
                       nextStep={(params) => {
                         setCurrentStep(StepType.PROCESSMESS);
@@ -318,10 +411,9 @@ const FlowSetting: React.FC = () => {
                       }}
                     />
                   ) : (
-                    <ProcessDesign
-                      designData={designData}
-                      editorValue={editorValue}
-                      conditionData={conditionData}></ProcessDesign>
+                    <div>
+                      <NewProcessDesign />
+                    </div>
                   )}
                 </Card>
               </Content>
@@ -332,11 +424,11 @@ const FlowSetting: React.FC = () => {
       <BindModal
         isOpen={isOpenModal}
         bindAppMes={bindAppMes}
-        onUpdate={() => {
-          setBindKey(getUuid());
+        upDateData={dateData}
+        noticeBaseInfo={() => {
+          setUpdataMes(dataMes + 1);
         }}
         onOk={() => {
-          setBindKey(getUuid());
           setIsOpenModal(false);
         }}
         onCancel={() => {
@@ -347,4 +439,4 @@ const FlowSetting: React.FC = () => {
   );
 };
 
-export default FlowSetting;
+export default SettingFlow;
