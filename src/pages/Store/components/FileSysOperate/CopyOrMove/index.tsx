@@ -2,8 +2,7 @@ import React, { useMemo } from 'react';
 import { useState } from 'react';
 import { Modal, Tree } from 'antd';
 import storeCtrl from '@/ts/controller/store';
-import { IMFolder, IMFolderOpen } from '@icongo/im';
-import docsCtrl from '@/ts/controller/store/docsCtrl';
+import { ImFolder, ImFolderOpen } from 'react-icons/im';
 import { IFileSystemItem, IObjectItem } from '@/ts/core';
 const { DirectoryTree } = Tree;
 
@@ -33,7 +32,7 @@ const CopyOrMoveModal = (props: {
       }
       return result;
     };
-    const data = loadTreeData(docsCtrl.root);
+    const data = loadTreeData(storeCtrl.root);
     return [data];
   }, [currentTaget]);
 
@@ -77,15 +76,15 @@ const CopyOrMoveModal = (props: {
           showIcon
           icon={(node: { expanded: boolean }) => {
             return node.expanded ? (
-              <IMFolderOpen color={'#c09553'} />
+              <ImFolderOpen color="#c09553" />
             ) : (
-              <IMFolder color="#c09553" />
+              <ImFolder color="#c09553" />
             );
           }}
           treeData={treeData}
           onSelect={(keys) => {
             if (keys.length > 0) {
-              setSelectNode(searchItemByKey(docsCtrl.root, keys[0].toString()));
+              setSelectNode(searchItemByKey(storeCtrl.root, keys[0].toString()));
             }
           }}
           defaultExpandedKeys={['']}

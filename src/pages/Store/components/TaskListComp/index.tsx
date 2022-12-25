@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Progress } from 'antd';
 import cls from './index.module.less';
-import docsCtrl, { TaskModel } from '@/ts/controller/store/docsCtrl';
+import { IFileSystemItem, TaskModel } from '@/ts/core';
 
 type GroupTaskModel = {
   group: string;
@@ -15,17 +15,18 @@ type GroupTaskModel = {
 type PlanType = {
   isOpen: boolean;
   onClose: () => void;
+  target: IFileSystemItem;
   onProcess: (process: number) => void;
 };
 
 const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
-  const [taskList, setTaskList] = useState(docsCtrl.taskList);
+  const [taskList, setTaskList] = useState(props.target.taskList);
   useEffect(() => {
-    const id = docsCtrl.subscribePart('taskList', () => {
-      setTaskList([...docsCtrl.taskList]);
-    });
+    const id = setInterval(() => {
+      setTaskList([...props.target.taskList]);
+    }, 1000);
     return () => {
-      docsCtrl.unsubscribe(id);
+      clearInterval(id);
     };
   }, []);
   const taskGroup = () => {

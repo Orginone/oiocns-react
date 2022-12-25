@@ -1,7 +1,7 @@
 import { blobToDataUrl, generateUuid } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
 import { model, kernel } from '../../base';
-import { IFileSystemItem, IObjectItem, OnProgressType } from './ifilesys';
+import { IFileSystemItem, IObjectItem, OnProgressType, TaskModel } from './ifilesys';
 /**
  * 文件系统项实现
  */
@@ -14,6 +14,7 @@ export class FileSystemItem implements IFileSystemItem {
   target: model.FileItemModel;
   parent: IObjectItem;
   children: IFileSystemItem[];
+  static _taskList: TaskModel[] = [];
   constructor(target: model.FileItemModel, parent: IObjectItem) {
     this.children = [];
     this.target = target;
@@ -21,6 +22,9 @@ export class FileSystemItem implements IFileSystemItem {
     this.key = target.key;
     this.name = target.name;
     this.isRoot = parent === undefined;
+  }
+  get taskList(): TaskModel[] {
+    return FileSystemItem._taskList;
   }
   shareInfo(): model.FileItemShare {
     return {
@@ -142,10 +146,18 @@ export class FileSystemItem implements IFileSystemItem {
     }
     return false;
   }
-  async upload(name: string, file: Blob, p: OnProgressType): Promise<IObjectItem> {
+  async upload(name: string, file: Blob, p?: OnProgressType): Promise<IObjectItem> {
     const exist = await this._findByName(name);
     if (!exist) {
       p?.apply(this, [0]);
+      const task: TaskModel = {
+        name: name,
+        finished: 0,
+        size: file.size,
+        createTime: new Date(),
+        group: this.name,
+      };
+      FileSystemItem._taskList.push(task);
       let data: BucketOpreateModel = {
         shareDomain: 'user',
         key: this._formatKey(name),
@@ -170,10 +182,12 @@ export class FileSystemItem implements IFileSystemItem {
         if (!res.success) {
           data.operate = BucketOpreates.AbortUpload;
           await kernel.anystore.bucketOpreate<boolean>(data);
+          task.finished = -1;
           p?.apply(this, [-1]);
           return;
         }
         index++;
+        task.finished = end;
         p?.apply(this, [end]);
         if (end === file.size && res.data) {
           const node = new FileSystemItem(res.data, this);
@@ -253,6 +267,7 @@ export class FileSystemItem implements IFileSystemItem {
 
 /** 获取文件系统的根 */
 export const getFileSysItemRoot = () => {
+  FileSystemItem._taskList = [];
   return new FileSystemItem(
     {
       key: '',

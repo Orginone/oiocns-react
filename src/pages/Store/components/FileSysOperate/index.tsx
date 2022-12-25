@@ -1,4 +1,3 @@
-import docsCtrl from '@/ts/controller/store/docsCtrl';
 import storeCtrl from '@/ts/controller/store';
 import { IFileSystemItem } from '@/ts/core';
 import React, { useEffect, useRef, useState } from 'react';
@@ -64,14 +63,12 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         if (target.target.isDirectory) {
           storeCtrl.currentKey = target.key;
           await target.loadChildren();
-          docsCtrl.changCallback();
           storeCtrl.changCallback();
         } else {
           setPreview(target.shareInfo());
         }
         return;
     }
-    docsCtrl.changCallback();
     storeCtrl.changCallback();
   };
   const uploadProps: UploadProps = {
@@ -80,7 +77,9 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
     async customRequest(options) {
       const file = options.file as File;
       if (file && target) {
-        docsCtrl.upload(target, file.name, file);
+        if (await target.upload(file.name, file)) {
+          storeCtrl.changCallback();
+        }
       }
     },
   };
@@ -114,7 +113,6 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
             onChange={(success) => {
               setModalType('');
               if (success) {
-                docsCtrl.changCallback();
                 storeCtrl.changCallback();
               }
             }}

@@ -17,7 +17,7 @@ export {
 } from './enum';
 export type { IMarket, IMerchandise, IProduct, IResource } from './market';
 export { getFileSysItemRoot } from './store/filesys';
-export type { IFileSystemItem, IObjectItem } from './store/ifilesys';
+export type { IFileSystemItem, IObjectItem, TaskModel } from './store/ifilesys';
 export type {
   ICohort,
   ICompany,

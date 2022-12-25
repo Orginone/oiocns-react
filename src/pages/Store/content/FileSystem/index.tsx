@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import style from './index.module.less';
 import { Segmented, Card } from 'antd';
 import useSessionStorage from '@/hooks/useSessionStorage';
-import docsCtrl from '@/ts/controller/store/docsCtrl';
+import storeCtrl from '@/ts/controller/store';
 import TableContent from './components/TableContent';
 import CardListContent from './components/CardContent';
 import { IconFont } from '@/components/IconFont';
@@ -18,7 +18,7 @@ interface IProps {
  * 仓库-文件系统
  */
 const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
-  const [key] = useCtrlUpdate(docsCtrl);
+  const [key] = useCtrlUpdate(storeCtrl);
   const [operateKey, setOperateKey] = useState<string>();
   const [operateTarget, setOperateTarget] = useState<IFileSystemItem>();
   const [segmented, setSegmented] = useSessionStorage('segmented', 'Kanban');

@@ -5,7 +5,6 @@ import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-
 const { Content, Sider } = Layout;
 
 /**
@@ -34,10 +33,8 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     <Layout className={`${className}`} style={{ height: '100%', position: 'relative' }}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
         <div className={cls.title}>
-          <Space>
-            {props.selectMenu.icon}
-            {!collapsed && <strong>{props.selectMenu.label}</strong>}
-          </Space>
+          <span style={{ fontSize: 16, margin: 6 }}>{props.selectMenu.icon}</span>
+          {!collapsed && <strong>{props.selectMenu.label}</strong>}
         </div>
         <div className={cls.container} id="templateMenu">
           <CustomMenu

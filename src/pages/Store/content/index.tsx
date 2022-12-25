@@ -44,6 +44,7 @@ export const TopBarExtra = ({ selectMenu }: IProps) => {
           </Badge>
           <TaskListComp
             isOpen={isOpen}
+            target={selectMenu.item}
             onClose={() => setIsOpen(false)}
             onProcess={(p) => {
               setTaskNum(p);

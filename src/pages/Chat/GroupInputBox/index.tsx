@@ -1,10 +1,11 @@
 import chatCtrl from '@/ts/controller/chat';
-import docsCtrl, { TaskModel } from '@/ts/controller/store/docsCtrl';
+import storeCtrl from '@/ts/controller/store';
 import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
+import { TaskModel } from '@/ts/core';
 
 /**
  * @description: 输入区域
@@ -129,16 +130,17 @@ const Groupinputbox = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('沟通');
+      const docDir = await storeCtrl.home?.create('沟通');
       if (docDir && file) {
-        const result = await docsCtrl.upload(
-          docDir.key,
-          file.name,
-          file,
-          (task: TaskModel) => {
-            setTask({ ...task });
-          },
-        );
+        const result = await docDir.upload(file.name, file, (p: number) => {
+          return setTask({
+            finished: p,
+            size: file.size,
+            name: file.name,
+            group: docDir.name,
+            createTime: new Date(),
+          });
+        });
         setTask(undefined);
         if (result) {
           await chatCtrl.chat?.sendMessage(

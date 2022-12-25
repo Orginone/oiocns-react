@@ -1,4 +1,4 @@
-import docsCtrl from '@/ts/controller/store/docsCtrl';
+import storeCtrl from '@/ts/controller/store';
 import { IFileSystemItem } from '@/ts/core';
 import React from 'react';
 import * as im from 'react-icons/im';
@@ -49,7 +49,7 @@ export const loadFileSysItemMenus = (
     },
   ];
   if (rightClick) return menus;
-  if (item != docsCtrl.root && item != docsCtrl.home) {
+  if (item != storeCtrl.root && item != storeCtrl.home) {
     menus.push(
       {
         key: '重命名',
@@ -83,7 +83,7 @@ export const getAppliactionMenus = () => {
     label: '应用程序',
     itemType: GroupMenuType.Application,
     icon: <im.ImWindows8 />,
-    item: docsCtrl.root,
+    item: storeCtrl.root,
     children: [],
   };
 };
@@ -95,8 +95,8 @@ export const getFileSystemMenus = () => {
     label: '文件系统',
     itemType: GroupMenuType.FileSystemItem,
     icon: <im.ImDrive />,
-    item: docsCtrl.root,
-    menus: loadFileSysItemMenus(docsCtrl.root),
-    children: buildFileSysTree(docsCtrl.root.children),
+    item: storeCtrl.root,
+    menus: loadFileSysItemMenus(storeCtrl.root),
+    children: buildFileSysTree(storeCtrl.root.children),
   };
 };

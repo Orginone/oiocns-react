@@ -4,7 +4,14 @@ import { FileItemModel, FileItemShare } from '../../base/model';
 export type IObjectItem = IFileSystemItem | undefined;
 /** 可为空的进度回调 */
 export type OnProgressType = (p: number) => void | undefined;
-
+/** 任务模型 */
+export type TaskModel = {
+  group: string;
+  name: string;
+  size: number;
+  finished: number;
+  createTime: Date;
+};
 /**
  * 文件系统项接口
  */
@@ -23,6 +30,8 @@ export interface IFileSystemItem {
   children: IFileSystemItem[];
   /** 下级文件系统数据 */
   childrenData: FileItemModel[];
+  /** 上传任务列表 */
+  taskList: TaskModel[];
   /**
    * 分享信息
    */
@@ -63,7 +72,7 @@ export interface IFileSystemItem {
    * @param file 文件内容
    * @param {OnProgressType} onProgress 进度回调
    */
-  upload(name: string, file: Blob, onProgress: OnProgressType): Promise<IObjectItem>;
+  upload(name: string, file: Blob, onProgress?: OnProgressType): Promise<IObjectItem>;
   /**
    * 下载文件
    * @param path 下载保存路径
