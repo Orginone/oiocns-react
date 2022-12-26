@@ -619,7 +619,7 @@ export type XMarket = {
   // 备注
   remark: string;
   // 图片
-  photo: string;
+  photo?: string;
   // 公开的
   public: boolean;
   // 创建组织/个人
