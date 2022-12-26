@@ -1,4 +1,5 @@
-import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
+import { ITodoGroup, IApprovalItem, IApplyItem, IApplyItemResult } from './itodo';
+import { IApprovalItemResult } from './itodo';
 import { model, kernel, schema } from '../../base';
 import { TodoType } from '../enum';
 
@@ -8,7 +9,7 @@ class ApplicationTodo implements ITodoGroup {
   private _todoList: ApprovalItem[];
   private _noticeList: NoticeItem[];
   type: TodoType = TodoType.ApplicationTodo;
-  get name(): string {
+  get displayName(): string {
     return this._name;
   }
   get id(): string {
@@ -27,7 +28,6 @@ class ApplicationTodo implements ITodoGroup {
     return this._todoList.length;
   }
   async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
-    console.log('getTodoList');
     if (!refresh && this._todoList.length > 0) {
       return this._todoList;
     }
@@ -63,7 +63,7 @@ class ApplicationTodo implements ITodoGroup {
     }
     return this._noticeList;
   }
-  async getDoList(page: model.PageRequest): Promise<IApprovalItem[]> {
+  async getDoList(page: model.PageRequest): Promise<IApprovalItemResult> {
     let completeList: IApprovalItem[] = [];
     const res = await kernel.queryRecord({
       id: this._id,
@@ -74,9 +74,14 @@ class ApplicationTodo implements ITodoGroup {
         completeList.push(new CompleteItem(a));
       });
     }
-    return completeList;
+    return {
+      result: completeList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
-  async getApplyList(page: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page: model.PageRequest): Promise<IApplyItemResult> {
     let applyList: ApplyItem[] = [];
     const res = await kernel.queryInstance({
       productId: this._id,
@@ -88,7 +93,12 @@ class ApplicationTodo implements ITodoGroup {
         applyList.push(new ApplyItem(a));
       });
     }
-    return applyList;
+    return {
+      result: applyList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
 }
 

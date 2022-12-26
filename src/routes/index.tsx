@@ -1,12 +1,6 @@
 import React from 'react';
 
-import {
-  AuditOutlined,
-  HomeFilled,
-  ShopOutlined,
-  UnorderedListOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { HomeFilled } from '@ant-design/icons';
 import { Redirect as RouterRedirect } from 'react-router-dom';
 import { IRouteConfig } from '../../typings/globelType.d';
 
@@ -76,74 +70,6 @@ const TodoRouter: IRouteConfig[] = [
     title: '办事',
     icon: 'icon-todo',
     component: React.lazy(() => import('@/pages/Todo')),
-    routes: [
-      {
-        path: '/todo/friend',
-        title: '好友申请',
-        icon: <UserOutlined />,
-        component: React.lazy(() => import('@/pages/Todo/Friend')),
-      },
-      {
-        path: '/todo/org',
-        title: '单位审核',
-        icon: <AuditOutlined />,
-        component: React.lazy(() => import('@/pages/Todo/Org')),
-      },
-      {
-        path: '/todo/appAndStore',
-        title: '商店审核',
-        icon: <ShopOutlined />,
-        // render: () => <div></div>,
-        routes: [
-          {
-            path: '/todo/product',
-            title: '应用上架',
-            icon: <ShopOutlined />,
-            component: React.lazy(() => import('@/pages/Todo/Product')),
-          },
-          {
-            path: '/todo/store',
-            title: '加入市场',
-            icon: <ShopOutlined />,
-            component: React.lazy(() => import('@/pages/Todo/Store')),
-          },
-        ],
-      },
-      {
-        path: '/todo/app/:id',
-        title: '应用上架',
-        icon: <ShopOutlined />,
-        hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/App')),
-      },
-      {
-        path: '/todo/product',
-        title: '应用上架',
-        icon: <ShopOutlined />,
-        hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/Product')),
-      },
-      {
-        path: '/todo/store',
-        title: '加入市场',
-        icon: <ShopOutlined />,
-        hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/Store')),
-      },
-      {
-        path: '/todo/order',
-        title: '订单管理',
-        icon: <UnorderedListOutlined />,
-        component: React.lazy(() => import('@/pages/Todo/Order')),
-      },
-      {
-        path: '/todo/',
-        title: '应用待办',
-        icon: <UnorderedListOutlined />,
-        hideInMenu: true,
-        component: React.lazy(() => import('@/pages/Todo/App')),
-      },
-    ],
   },
 ];
 

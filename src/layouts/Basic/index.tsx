@@ -15,7 +15,6 @@ type BasicLayoutProps = {
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
   useEffect(() => {
-    console.log('登录拦截', userCtrl.logined);
     if (!userCtrl.logined) {
       return history.push('/passport/login');
     }

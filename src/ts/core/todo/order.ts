@@ -1,11 +1,18 @@
 import { logger } from '@/ts/base/common';
 import consts from '../consts';
 import { CommonStatus, TodoType } from '../enum';
-import { ITodoGroup, IApprovalItem, IApplyItem, IOrderApplyItem } from './itodo';
+import {
+  ITodoGroup,
+  IApprovalItem,
+  IOrderApplyItem,
+  IApprovalItemResult,
+  IApplyItemResult,
+} from './itodo';
 import { model, kernel, schema, common } from '@/ts/base';
+import { PageRequest } from '@/ts/base/model';
 
 export class OrderTodo implements ITodoGroup {
-  name: string = '订单审批';
+  displayName: string = '订单审批';
   private _todoList: ApprovalItem[] = [];
   private _doList: ApprovalItem[] = [];
   type: TodoType = TodoType.OrderTodo;
@@ -16,38 +23,42 @@ export class OrderTodo implements ITodoGroup {
     return this._todoList.length - this._doList.length;
   }
   async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
-    if (!refresh && this._todoList.length > 0) {
-      return this._todoList;
+    if (refresh || this._todoList.length == 0) {
+      await this.getApprovalList();
     }
-    await this.getApprovalList();
     return this._todoList;
   }
   async getNoticeList(): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
-    if (this._doList.length > 0) {
-      return this._doList;
+  async getDoList(page: model.PageRequest): Promise<IApprovalItemResult> {
+    if (this._doList.length == 0) {
+      await this.getApprovalList();
     }
-    await this.getApprovalList();
-    return this._doList;
+    return {
+      result: this._doList.splice(page.offset, page.limit),
+      total: this._doList.length,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
-  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page: model.PageRequest): Promise<IApplyItemResult> {
     let applyList: IOrderApplyItem[] = [];
     const res = await kernel.queryBuyOrderList({
       status: 0,
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
+      page,
     });
     if (res.success && res.data.result) {
       applyList = res.data.result.map((a) => {
         return new OrderApplyItem(a);
       });
     }
-    return applyList;
+    return {
+      result: applyList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
   private async getApprovalList() {
     const res = await kernel.querySellOrderList({

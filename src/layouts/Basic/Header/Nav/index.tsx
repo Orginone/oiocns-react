@@ -37,7 +37,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     },
     {
       key: 'task',
-      path: '/todo/friend',
+      path: '/todo',
       title: '待办',
       icon: 'icon-todo',
       count: taskNum,

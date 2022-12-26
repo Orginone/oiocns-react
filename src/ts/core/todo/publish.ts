@@ -1,14 +1,29 @@
 import { common } from '../../base';
 import { CommonStatus, TodoType } from '../enum';
-import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
+import {
+  ITodoGroup,
+  IApprovalItem,
+  IApplyItem,
+  IApplyItemResult,
+  IApprovalItemResult,
+} from './itodo';
 import { model, kernel, schema } from '../../base';
+import { XMarket } from '@/ts/base/schema';
 
 class PublishTodo implements ITodoGroup {
-  name: string = '应用上架';
+  /**@id 唯一值 */
+  public id: string;
+  public icon: string;
+  public displayName: string;
   private _doList: ApprovalItem[] = [];
   private _applyList: ApplyItem[] = [];
   private _todoList: ApprovalItem[] = [];
   type: TodoType = TodoType.MarketTodo;
+  constructor(market: XMarket) {
+    this.id = market.id;
+    this.icon = market.photo;
+    this.displayName = market.name;
+  }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
@@ -25,23 +40,20 @@ class PublishTodo implements ITodoGroup {
   async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
-    if (this._doList.length > 0) {
-      return this._doList;
+  async getDoList(page: model.PageRequest): Promise<IApprovalItemResult> {
+    if (this._doList.length == 0) {
+      await this.getApprovalList();
     }
-    await this.getApprovalList();
-    return this._doList;
+    return {
+      result: this._doList.splice(page.offset, page.limit),
+      total: this._doList.length,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
-  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
-    if (this._applyList.length > 0) {
-      return this._applyList;
-    }
+  async getApplyList(page: model.PageRequest): Promise<IApplyItemResult> {
     const res = await kernel.queryMerchandiseApply({
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
+      page,
     });
     if (res.success && res.data.result) {
       this._applyList = res.data.result.map((a) => {
@@ -52,10 +64,16 @@ class PublishTodo implements ITodoGroup {
         });
       });
     }
-    return this._applyList;
+    return {
+      result: this._applyList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
   private async getApprovalList() {
     const res = await kernel.queryPublicApproval({
+      id: this.id,
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -157,7 +175,17 @@ class ApplyItem implements IApplyItem {
 
 /** 加载应用上架任务 */
 export const loadPublishTodo = async () => {
-  const publishTodo = new PublishTodo();
-  await publishTodo.getTodoList();
-  return publishTodo;
+  const res = await kernel.queryManageMarket({
+    page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+  });
+  let todoGroups: ITodoGroup[] = [];
+  if (res.success && res.data.result) {
+    res.data.result.forEach(async (a) => {
+      const publishTodo = new PublishTodo(a);
+      await publishTodo.getTodoList();
+      todoGroups.push(publishTodo);
+    });
+  }
+  todoGroups.push(new PublishTodo({ name: '我的申请' } as XMarket));
+  return todoGroups;
 };

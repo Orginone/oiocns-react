@@ -1466,6 +1466,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询管理的市场
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XMarketArray>} 请求结果
+   */
+  public async queryManageMarket(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XMarketArray>> {
+    return await this.request({
+      module: 'market',
+      action: 'QueryManageMarket',
+      params: params,
+    });
+  }
+  /**
    * 查询软件共享仓库的市场
    * @returns {model.ResultType<schema.XMarket>} 请求结果
    */

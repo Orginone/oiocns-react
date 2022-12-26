@@ -2,14 +2,30 @@ import { TodoType } from '../enum';
 import { model } from '../../base';
 import { XOrder } from '@/ts/base/schema';
 
+export interface IApprovalItemResult {
+  result: IApprovalItem[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+export interface IApplyItemResult {
+  result: IApplyItem[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
 /** 待办组 */
 export interface ITodoGroup {
   /**@type 待办类型 */
   type: TodoType;
   /**@id 唯一值 */
   id?: string;
-  /** 待办名称 */
-  name: string;
+  /**@icon 图标 */
+  icon?: string;
+  /**@displayName 待办名称 */
+  displayName: string;
   /**@count  待办数量*/
   getCount(): Promise<number>;
   /**@desc 获取待办列表 */
@@ -17,9 +33,9 @@ export interface ITodoGroup {
   /**@desc 获取待抄送待阅列表 */
   getNoticeList(refresh: boolean): Promise<IApprovalItem[]>;
   /**@desc 获取已办列表 */
-  getDoList(page: model.PageRequest): Promise<IApprovalItem[]>;
+  getDoList(page: model.PageRequest): Promise<IApprovalItemResult>;
   /**@desc 获取申请列表 */
-  getApplyList(page: model.PageRequest): Promise<IApplyItem[]>;
+  getApplyList(page: model.PageRequest): Promise<IApplyItemResult>;
 }
 
 /** 待办/已办项 */

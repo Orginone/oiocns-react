@@ -1,9 +1,9 @@
 {
-  "name": "OIOCNS-REACT",
+  "name": "orginone",
   "version": "0.0.1",
   "description": "Vite + Typescript + React + Antd + Less + Eslint + Prettier",
   "keywords": [
-    "OIOCNS-REACT",
+    "orginone",
     "奥集能"
   ],
   "license": "MIT",
