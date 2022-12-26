@@ -1,7 +1,7 @@
 import storeCtrl from '@/ts/controller/store';
 import { IFileSystemItem } from '@/ts/core';
 import React, { useEffect, useRef, useState } from 'react';
-import { Input, Modal, Upload, UploadProps } from 'antd';
+import { Input, message, Modal, Upload, UploadProps } from 'antd';
 import CopyOrMoveModal from './CopyOrMove';
 import FilePreview from './FilePreview';
 import { FileItemShare } from '@/ts/base/model';
@@ -29,11 +29,21 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
   const executeOperate = async (key: string, target: IFileSystemItem) => {
     switch (key) {
       case '刷新':
-        await target.loadChildren(true);
+        if (await target.loadChildren(true)) {
+          message.success('刷新成功!');
+        }
         break;
       case '删除':
-        await target.delete();
-        break;
+        Modal.confirm({
+          content: '确定删除吗?',
+          onOk: async () => {
+            if (await target.delete()) {
+              message.success('删除成功!');
+              storeCtrl.changCallback();
+            }
+          },
+        });
+        return;
       case '上传':
         setTarget(target);
         uploadRef.current.upload.uploader.onClick();

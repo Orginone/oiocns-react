@@ -68,7 +68,9 @@ export default class Company extends MarketTarget implements ICompany {
     });
     if (res.success && res.data.result) {
       this.cohorts = res.data.result.map((a) => {
-        return new Cohort(a);
+        return new Cohort(a, () => {
+          this.cohorts = this.cohorts.filter((i) => i.id != a.id);
+        });
       });
     }
     return this.cohorts;
@@ -187,7 +189,9 @@ export default class Company extends MarketTarget implements ICompany {
       teamRemark: data.teamRemark,
     });
     if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data);
+      const cohort = new Cohort(res.data, () => {
+        this.cohorts = this.cohorts.filter((i) => i.id != res.data.id);
+      });
       this.cohorts.push(cohort);
       cohort.pullMembers([this.userId], TargetType.Person);
       return cohort;

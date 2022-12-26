@@ -62,6 +62,10 @@ export interface ITarget {
    */
   update(data: TargetParam): Promise<ITarget>;
   /**
+   * 删除
+   */
+  delete(): Promise<boolean>;
+  /**
    * 获取职权树
    * @param reload 是否强制刷新
    */
@@ -555,8 +559,6 @@ export interface IGroup extends ITarget {
    * @returns
    */
   getSubGroups(reload?: boolean): Promise<IGroup[]>;
-  /** 删除 */
-  delete(): Promise<boolean>;
 }
 /** 部门操作 */
 export interface IDepartment extends ITarget {
@@ -582,8 +584,6 @@ export interface IDepartment extends ITarget {
   deleteDepartment(id: string): Promise<boolean>;
   /** 删除工作组 */
   deleteWorking(id: string): Promise<boolean>;
-  /** 删除 */
-  delete(): Promise<boolean>;
 }
 /** 工作组 */
 export interface IWorking extends ITarget {
@@ -592,8 +592,6 @@ export interface IWorking extends ITarget {
    * @param code 人员编号
    */
   searchPerson(code: string): Promise<schema.XTargetArray>;
-  /** 删除 */
-  delete(): Promise<boolean>;
 }
 
 export interface IStation extends ITarget {
@@ -602,8 +600,6 @@ export interface IStation extends ITarget {
    * @param code 人员编号
    */
   searchPerson(code: string): Promise<schema.XTargetArray>;
-  /** 删除 */
-  delete(): Promise<boolean>;
   /** 加载岗位下的身份 */
   loadIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /**

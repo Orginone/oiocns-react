@@ -61,6 +61,9 @@ export default class BaseTarget implements ITarget {
     this.typeName = target.typeName as TargetType;
     appendTarget(target);
   }
+  delete(): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
       page: {

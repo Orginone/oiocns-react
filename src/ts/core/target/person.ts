@@ -65,7 +65,9 @@ export default class Person extends MarketTarget implements IPerson {
     const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
     if (res && res.result) {
       this.cohorts = res.result.map((a) => {
-        return new Cohort(a);
+        return new Cohort(a, () => {
+          this.cohorts = this.cohorts.filter((i) => i.id != a.id);
+        });
       });
     }
     return this.cohorts;
@@ -111,7 +113,9 @@ export default class Person extends MarketTarget implements IPerson {
       teamRemark: remark,
     });
     if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data);
+      const cohort = new Cohort(res.data, () => {
+        this.cohorts = this.cohorts.filter((i) => i.id != res.data.id);
+      });
       this.cohorts.push(cohort);
       cohort.pullMember(this.target);
       return cohort;

@@ -7,6 +7,7 @@ import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
+import { Modal } from 'antd';
 const TeamSetting: React.FC = () => {
   const [species, setSpecies] = useState<ISpeciesItem>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
@@ -38,13 +39,31 @@ const TeamSetting: React.FC = () => {
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
-        if (key === '移除') {
-          if (await (data.item as ISpeciesItem).delete()) {
-            refreshMenu();
-          }
-        } else {
-          setEditTarget(data.item);
-          setOperateKeys(key.split('|'));
+        switch (key) {
+          case '删除':
+            Modal.confirm({
+              content: '确定要删除吗?',
+              onOk: async () => {
+                if (await (data.item as ITarget).delete()) {
+                  refreshMenu();
+                }
+              },
+            });
+            break;
+          case '移除':
+            Modal.confirm({
+              content: '确定要删除吗?',
+              onOk: async () => {
+                if (await (data.item as ISpeciesItem).delete()) {
+                  refreshMenu();
+                }
+              },
+            });
+            break;
+          default:
+            setEditTarget(data.item);
+            setOperateKeys(key.split('|'));
+            break;
         }
       }}
       siderMenuData={menus}>

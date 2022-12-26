@@ -5,7 +5,7 @@ import { TargetType } from '../enum';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 
 /**
- * 工作组的元操作
+ * 岗位的元操作
  */
 export default class Station extends BaseTarget implements IStation {
   private _onDeleted: Function;
