@@ -17,10 +17,8 @@ export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  accessToken: string;
-  constructor(target: schema.XTarget, token: string) {
+  constructor(target: schema.XTarget) {
     super(target);
-    this.accessToken = token;
     this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...companyTypes];
     this.subTeamTypes = [];
     this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...companyTypes];
@@ -81,17 +79,16 @@ export default class Person extends MarketTarget implements IPerson {
     if (res && res.result) {
       this.joinedCompany = [];
       for (const a of res.result) {
-        const ares = await kernel.genToken(a.id);
         let company;
         switch (a.typeName) {
           case TargetType.University:
-            company = new University(a, this.id, ares.data);
+            company = new University(a, this.id);
             break;
           case TargetType.Hospital:
-            company = new Hospital(a, this.id, ares.data);
+            company = new Hospital(a, this.id);
             break;
           default:
-            company = new Company(a, this.id, ares.data);
+            company = new Company(a, this.id);
             break;
         }
         this.joinedCompany.push(company);
@@ -141,17 +138,16 @@ export default class Person extends MarketTarget implements IPerson {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;
-        const ares = await kernel.genToken(res.data.id);
         if (res.success) {
           switch (<TargetType>data.typeName) {
             case TargetType.University:
-              company = new University(res.data, this.id, ares.data);
+              company = new University(res.data, this.id);
               break;
             case TargetType.Hospital:
-              company = new Hospital(res.data, this.id, ares.data);
+              company = new Hospital(res.data, this.id);
               break;
             default:
-              company = new Company(res.data, this.id, ares.data);
+              company = new Company(res.data, this.id);
               break;
           }
           this.joinedCompany.push(company);
