@@ -58,8 +58,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -189,7 +189,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                     defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>
                 {renderCardContent ? (
-                  renderCardContent(dataSource.splice((page - 1) * pageSize, pageSize))
+                  renderCardContent(props.action.dataSource)
                 ) : (
                   <Result subTitle="暂无卡片配置"></Result>
                 )}
