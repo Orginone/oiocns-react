@@ -5,7 +5,7 @@ import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
-import SearchMarket from '@/bizcomponents/SearchMarket';
+import SearchShop from '@/bizcomponents/SearchShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting';
 import UserManagement from '../UserManagement';
@@ -220,7 +220,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         </>
       )}
       <Modal
-        title="加入单位"
+        title="加入商店"
         width={670}
         destroyOnClose={true}
         bodyStyle={{ padding: 0 }}
@@ -232,7 +232,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           }
           setActiveModal('');
         }}>
-        <SearchMarket
+        <SearchShop
           searchCallback={(markets: XMarket[]) => {
             setSelectedMarkets(markets);
           }}

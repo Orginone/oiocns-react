@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { IApplyItem, IApprovalItem, ITodoGroup } from '@/ts/core/todo/itodo';
 import { CommonStatus } from '@/ts/core';
@@ -26,6 +26,11 @@ const CommonTodo: React.FC<IProps> = (props) => {
   const [key, forceUpdate] = useObjectUpdate(props);
   const [selectedRows, setSelectRows] = useState<IApplyItem[] | IApprovalItem[]>([]);
 
+  useEffect(() => {
+    if (props.tabList && props.tabList.length > 0) {
+      setTabKey(props.tabList[0].key);
+    }
+  }, [props]);
   const operation = () => {
     switch (tabKey) {
       case 'todo':
