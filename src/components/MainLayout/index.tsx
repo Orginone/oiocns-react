@@ -1,10 +1,14 @@
-import { Col, Divider, Layout, Row, Space, Typography } from 'antd';
+import { Col, Divider, Dropdown, Layout, Row, Space, Typography } from 'antd';
 import React, { useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import {
+  EllipsisOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from '@ant-design/icons';
 const { Content, Sider } = Layout;
 
 /**
@@ -74,19 +78,19 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           <Col className={cls.rightstyle}>
             <Space wrap split={<Divider type="vertical" />} size={2}>
               {props.rightBar}
-              {props.selectMenu.menus &&
-                props.selectMenu.menus.map((m) => {
-                  return (
-                    <Typography.Link
-                      key={m.key}
-                      title={m.label}
-                      onClick={() => {
-                        props.onMenuClick?.apply(this, [props.selectMenu, m.key]);
-                      }}>
-                      <span style={{ fontSize: 16 }}>{m.icon}</span>
-                    </Typography.Link>
-                  );
-                })}
+              {props.selectMenu.menus && (
+                <Dropdown
+                  menu={{
+                    items: props.selectMenu.menus,
+                    onClick: ({ key }) => {
+                      props.onMenuClick?.apply(this, [props.selectMenu, key]);
+                    },
+                  }}
+                  placement="bottom"
+                  trigger={['click', 'contextMenu']}>
+                  <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
+                </Dropdown>
+              )}
             </Space>
           </Col>
         </Row>
