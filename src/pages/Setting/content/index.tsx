@@ -17,9 +17,7 @@ interface IProps {
 
 const ContentIndex = ({ selectMenu, species }: IProps) => {
   if (species) {
-    return (
-      <StandardSetting current={species} targetId={(selectMenu.item as ITarget)?.id} />
-    );
+    return <StandardSetting current={species} target={selectMenu.item as ITarget} />;
   }
   /** 加载内容区 */
   switch (selectMenu.itemType) {

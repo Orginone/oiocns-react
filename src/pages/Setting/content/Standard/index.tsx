@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import thingCtrl from '@/ts/controller/thing';
-import { INullSpeciesItem, ISpeciesItem } from '@/ts/core';
+import { INullSpeciesItem, ISpeciesItem, ITarget } from '@/ts/core';
 import Description from './Description';
 import cls from './index.module.less';
 import { Button, Tabs } from 'antd';
@@ -13,14 +13,14 @@ import userCtrl from '@/ts/controller/setting';
 import { PageRequest } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 interface IProps {
-  targetId?: string;
+  target?: ITarget;
   current: ISpeciesItem;
 }
 /**
  * 标准设定
  * @returns
  */
-const SettingStandrad: React.FC<IProps> = ({ current, targetId }: IProps) => {
+const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState('');
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XAttribute>();
@@ -135,7 +135,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, targetId }: IProps) => {
                 tforceUpdate();
               }
             }}
-            targetId={targetId}
+            target={target}
             current={current}
           />
         </>

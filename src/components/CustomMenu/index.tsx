@@ -154,6 +154,7 @@ const CustomMenu = (props: CustomMenuType) => {
                   };
                 }),
                 onClick: ({ key }) => {
+                  props.onSelect?.apply(this, [item]);
                   const menu = item.menus?.find((i) => i.key == key);
                   if (menu && menu.subMenu) {
                     setOperateMenu(menu);
