@@ -88,7 +88,11 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   }}
                   placement="bottom"
                   trigger={['click', 'contextMenu']}>
-                  <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
+                  <EllipsisOutlined
+                    title={'右键操作'}
+                    style={{ fontSize: 18 }}
+                    rotate={90}
+                  />
                 </Dropdown>
               )}
             </Space>
