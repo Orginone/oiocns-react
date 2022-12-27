@@ -9,7 +9,6 @@ import {
   IApplyItemResult,
 } from './itodo';
 import { model, kernel, schema, common } from '@/ts/base';
-import { PageRequest } from '@/ts/base/model';
 
 export class OrderTodo implements ITodoGroup {
   name: string = '订单审批';

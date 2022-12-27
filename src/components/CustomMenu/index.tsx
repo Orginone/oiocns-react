@@ -1,5 +1,15 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Menu, MenuProps, Typography, Input, Layout, Row, Col } from 'antd';
+import {
+  Dropdown,
+  Menu,
+  MenuProps,
+  Typography,
+  Input,
+  Layout,
+  Row,
+  Col,
+  Badge,
+} from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImSearch, ImUndo2 } from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
@@ -125,6 +135,13 @@ const CustomMenu = (props: CustomMenuType) => {
           setVisibleMenu(false);
         }}>
         <Typography.Text ellipsis>{item.label}</Typography.Text>
+        {item.count && item.count > 0 ? (
+          <span style={{ float: 'right' }}>
+            <Badge key={item.key} count={item.count} size="small" />
+          </span>
+        ) : (
+          <></>
+        )}
         <span onClick={(e: any) => e.stopPropagation()} style={{ float: 'right' }}>
           {item.menus && overItem?.key === item.key && (
             <Dropdown

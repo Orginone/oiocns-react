@@ -13,7 +13,7 @@ import { XMarket } from '@/ts/base/schema';
 class PublishTodo implements ITodoGroup {
   /**@id 唯一值 */
   public id: string;
-  public icon: string;
+  public icon?: string;
   public name: string;
   private _doList: ApprovalItem[] = [];
   private _applyList: ApplyItem[] = [];
@@ -95,7 +95,7 @@ class PublishTodo implements ITodoGroup {
       };
       // 拒绝回调
       let rejectfun = (s: schema.XMerchandise) => {
-        this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
+        this._doList.unshift(new ApprovalItem(s, rePassfun, (_) => {}));
       };
       let reRejectfun = (_: schema.XMerchandise) => {};
       this._doList = res.data.result
@@ -178,14 +178,13 @@ export const loadPublishTodo = async () => {
   const res = await kernel.queryManageMarket({
     page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
   });
-  let todoGroups: ITodoGroup[] = [];
+  let todoGroups: ITodoGroup[] = [new PublishTodo({ name: '我的申请' } as XMarket)];
   if (res.success && res.data.result) {
-    res.data.result.forEach(async (a) => {
-      const publishTodo = new PublishTodo(a);
+    for (const market of res.data.result) {
+      const publishTodo = new PublishTodo(market);
       await publishTodo.getTodoList();
       todoGroups.push(publishTodo);
-    });
+    }
   }
-  todoGroups.push(new PublishTodo({ name: '我的申请' } as XMarket));
   return todoGroups;
 };

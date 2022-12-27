@@ -40,6 +40,7 @@ interface MenuItemType {
   key: string;
   label: string;
   itemType: string;
+  count?: number;
   icon: React.ReactNode;
   expIcon?: React.ReactNode;
   menus?: OperateMenuType[];

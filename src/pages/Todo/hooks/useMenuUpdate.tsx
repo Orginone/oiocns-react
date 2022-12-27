@@ -1,4 +1,3 @@
-import userCtrl from '@/ts/controller/setting/';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { emitter } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
@@ -44,10 +43,8 @@ const useMenuUpdate = (): [
   };
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children: MenuItemType[] = [
-      ...operate.loadPlatformMenu(),
-      operate.loadApplicationMenu(),
-    ];
+    const children: MenuItemType[] = await operate.loadPlatformMenu();
+    children.push(await operate.loadApplicationMenu());
     setMenu({
       key: 'work',
       label: '办事',
@@ -57,12 +54,12 @@ const useMenuUpdate = (): [
     });
     const item: MenuItemType | undefined = findMenuItemByKey(
       children,
-      userCtrl.currentKey,
+      todoCtrl.currentKey,
     );
     if (item) {
       setSelectMenu(item);
     } else {
-      userCtrl.currentKey = children[0].key;
+      todoCtrl.currentKey = children[0].key;
       setSelectMenu(children[0]);
     }
   };

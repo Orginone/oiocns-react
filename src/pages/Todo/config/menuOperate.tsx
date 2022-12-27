@@ -7,40 +7,21 @@ import { GroupMenuType } from './menuType';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { AppstoreAddOutlined, FileSyncOutlined, ToTopOutlined } from '@ant-design/icons';
 
-export const loadPlatformMenu = () => {
+export const loadPlatformMenu = async () => {
   return [
     {
       key: '组织审批',
       label: '组织审批',
       itemType: '组织审批',
-      item: userCtrl.space,
       icon: <im.ImTree />,
-      children: loadOrgChildren(todoCtrl.OrgTodo),
+      ...(await loadOrgChildren(todoCtrl.OrgTodo)),
     },
     {
-      children: [
-        {
-          key: '上架审批',
-          label: '上架审批',
-          itemType: GroupMenuType.Publish,
-          item: userCtrl.space,
-          icon: <ToTopOutlined />,
-          children: loadMarketChildren(todoCtrl.PublishTodo, GroupMenuType.Publish),
-        },
-        {
-          key: '加入审批',
-          label: '加入审批',
-          itemType: GroupMenuType.JoinStore,
-          item: userCtrl.space,
-          icon: <im.ImBarcode />,
-          children: loadMarketChildren(todoCtrl.MarketTodo, GroupMenuType.JoinStore),
-        },
-      ],
       key: '商店审批',
       label: '商店审批',
       itemType: '商店审批',
-      item: userCtrl.space,
       icon: <im.ImCart />,
+      ...(await loadMarket()),
     },
     {
       children: [
@@ -50,6 +31,7 @@ export const loadPlatformMenu = () => {
           label: '销售订单',
           itemType: GroupMenuType.Order,
           item: todoCtrl.OrderTodo,
+          count: await todoCtrl.OrderTodo?.getCount(),
           icon: <im.Im500Px />,
         },
         {
@@ -65,62 +47,113 @@ export const loadPlatformMenu = () => {
       label: '订单管理',
       itemType: GroupMenuType.Order,
       item: todoCtrl.OrderTodo,
+      count: await todoCtrl.OrderTodo?.getCount(),
       icon: <im.ImBarcode />,
     },
   ];
 };
 
-export const loadApplicationMenu = () => {
+export const loadApplicationMenu = async () => {
+  let sum = 0;
   let children = [];
   for (var todo of todoCtrl.AppTodo) {
+    let count = await todo.getCount();
     children.push({
       key: todo.id!,
       label: todo.name,
       itemType: GroupMenuType.Application,
       icon: <im.ImSteam />,
       item: todo,
+      count: count,
       children: [],
     });
+    sum += count;
   }
   return {
     key: GroupMenuType.Application,
     label: GroupMenuType.Application,
     itemType: GroupMenuType.Application,
     icon: <AppstoreAddOutlined />,
-    item: userCtrl.space,
     children: children,
+    count: sum,
   };
 };
 
-const loadMarketChildren = (todoGroups: ITodoGroup[], typeName: string) => {
-  return todoGroups.map((a) => {
+const loadMarket = async () => {
+  let sum = 0;
+  let children = [
     {
-      let key = a.id ? a.id : '-申请';
-      return {
-        key: typeName + key,
-        label: a.name,
-        itemType: typeName,
-        icon: <FileSyncOutlined />,
-        item: a,
-        children: [],
-      };
-    }
-  });
+      key: '上架审批',
+      label: '上架审批',
+      itemType: GroupMenuType.Publish,
+      icon: <ToTopOutlined />,
+      ...(await loadChildren(todoCtrl.PublishTodo, GroupMenuType.Publish)),
+    },
+    {
+      key: '加入审批',
+      label: '加入审批',
+      itemType: GroupMenuType.JoinStore,
+      icon: <im.ImBarcode />,
+      ...(await loadChildren(todoCtrl.MarketTodo, GroupMenuType.JoinStore)),
+    },
+  ];
+  children.forEach((a) => (sum += a.count));
+  return {
+    children: children,
+    count: sum,
+  };
 };
 
-const loadOrgChildren = (todoGroups: ITodoGroup[]) => {
-  return todoGroups.map((a) => {
-    {
-      const icon = a.icon ? <Avatar size={18} src={a.icon} /> : <im.ImOffice />;
-      return {
-        key: a.id,
-        label: a.name,
-        itemType:
-          a.id == userCtrl.user.id ? GroupMenuType.Friend : GroupMenuType.Organization,
-        icon: icon,
-        item: a,
-        children: [],
-      };
-    }
-  });
+const loadChildren = async (todoGroups: ITodoGroup[], typeName: string) => {
+  let sum = 0;
+  let children = [];
+  for (const todoGroup of todoGroups) {
+    let count = todoGroup.id ? await todoGroup.getCount() : 0;
+    let key = todoGroup.id ? todoGroup.id : '-申请';
+    children.push({
+      key: typeName + key,
+      label: todoGroup.name,
+      itemType: typeName,
+      icon: <FileSyncOutlined />,
+      item: todoGroup,
+      count: count,
+      children: [],
+    });
+    sum += count;
+  }
+  return {
+    children: children,
+    count: sum,
+  };
+};
+
+const loadOrgChildren = async (todoGroups: ITodoGroup[]) => {
+  let sum = 0;
+  let children = [];
+  for (const todoGroup of todoGroups) {
+    const icon = todoGroup.icon ? (
+      <Avatar size={18} src={todoGroup.icon} />
+    ) : (
+      <im.ImOffice />
+    );
+    const menuType =
+      todoGroup.id == userCtrl.user.id
+        ? GroupMenuType.Friend
+        : GroupMenuType.Organization;
+    let count = await todoGroup.getCount();
+    children.push({
+      key: todoGroup.id!,
+      label: todoGroup.name,
+      itemType: menuType,
+      icon: icon,
+      item: todoGroup,
+      count: count,
+      children: [],
+    });
+    sum += count;
+  }
+  return {
+    children: children,
+    count: sum,
+  };
 };

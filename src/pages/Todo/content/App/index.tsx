@@ -197,23 +197,11 @@ const AppTodo: React.FC<IProps> = (props) => {
             }
             return menus;
           }}
-          rowSelection={{ selectedRows }}
-          tableAlertRender={({
-            selectedRows,
-            onCleanSelected,
-          }: {
-            selectedRows: IApplyItem[] | IApprovalItem[];
-            onCleanSelected: any;
-          }) => {
-            setSelectRows(selectedRows);
-            return (
-              <span>
-                已选 {selectedRows.length} 项
-                <a style={{ marginInlineStart: 8 }} onClick={onCleanSelected}>
-                  取消选择
-                </a>
-              </span>
-            );
+          rowSelection={{
+            type: 'checkbox',
+            onChange: (_: React.Key[], selectedRows: IApplyItem[] | IApprovalItem[]) => {
+              setSelectRows(selectedRows);
+            },
           }}
         />{' '}
       </div>

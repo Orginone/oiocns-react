@@ -84,7 +84,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
    * @return {Menu} - 渲染 按钮组
    */
   const menu = (item: any) => {
-    return operation && operation(item); // <Menu items={operation && operation(item)} />;
+    return operation!(item); // <Menu items={operation && operation(item)} />;
   };
   /**
    * @desc: 渲染表格主体
@@ -105,7 +105,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
                 <Dropdown
                   className={cls['operation-btn']}
                   menu={{ items: menu(record) }}
-                  trigger={['click']}
                   key="key">
                   <EllipsisOutlined />
                 </Dropdown>,
