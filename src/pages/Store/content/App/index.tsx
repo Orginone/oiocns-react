@@ -19,12 +19,10 @@ import { myColumns } from './Config';
 import { IProduct, IResource } from '@/ts/core';
 import appCtrl from '@/ts/controller/store/appCtrl';
 
-type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
-
 const StoreApp: React.FC = () => {
   const history = useHistory();
   const [key] = useCtrlUpdate(appCtrl);
-  const [statusKey, setStatusKey] = useState<ststusTypes>('全部');
+  const [tabKey, setTabKey] = useState<string>('全部');
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [moveModal, setMoveModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
@@ -136,16 +134,6 @@ const StoreApp: React.FC = () => {
     ];
   };
 
-  // 根据权限从已获取数据 动态产生tab
-  const getItems = () => {
-    let typeSet = new Set(['全部', '分享获得']);
-    appCtrl.products.forEach((v: any) => {
-      v.prod.source && typeSet.add(v.prod.source);
-    });
-    return Array.from(typeSet).map((k) => {
-      return { tab: k, key: k };
-    });
-  };
   const handleSelectClassify = (appids: string[]) => {
     console.log('当前分类下的appids', appids);
     setAppShowIdlimit([...appids]);
@@ -175,15 +163,21 @@ const StoreApp: React.FC = () => {
           title="我的应用"
           className={cls['app-tabs']}
           extra={extraBtns()}
-          tabList={getItems()}
-          activeTabKey={statusKey}
+          tabList={[
+            { tab: '全部', key: '全部' },
+            { tab: '共享的', key: '共享的' },
+            { tab: '可用的', key: '可用的' },
+            { tab: '创建的', key: '创建的' },
+            { tab: '购买的', key: '购买的' },
+          ]}
+          activeTabKey={tabKey}
           onTabChange={(k) => {
-            setStatusKey(k as ststusTypes);
+            setTabKey(k);
           }}>
           <div className={cls['page-content-table']}>
             <AppShowComp
               list={showData}
-              searchParams={{ status: statusKey }}
+              searchParams={{ status: tabKey }}
               columns={myColumns}
               renderOperation={renderOperation}
             />
@@ -191,7 +185,7 @@ const StoreApp: React.FC = () => {
         </Card>
       </div>
     );
-  }, [key, showData]);
+  }, [key, showData, tabKey]);
   const getCurResource = () => {
     return appCtrl.curProduct?.resource?.find(
       (R: IResource) => R.resource.id === checkNodes.resourceId,
