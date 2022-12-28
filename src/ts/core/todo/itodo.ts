@@ -25,7 +25,7 @@ export interface ITodoGroup {
   /**@icon 图标 */
   icon?: string;
   /**@displayName 待办名称 */
-  displayName: string;
+  name: string;
   /**@count  待办数量*/
   getCount(): Promise<number>;
   /**@desc 获取待办列表 */

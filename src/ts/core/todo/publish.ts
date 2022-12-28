@@ -14,7 +14,7 @@ class PublishTodo implements ITodoGroup {
   /**@id 唯一值 */
   public id: string;
   public icon: string;
-  public displayName: string;
+  public name: string;
   private _doList: ApprovalItem[] = [];
   private _applyList: ApplyItem[] = [];
   private _todoList: ApprovalItem[] = [];
@@ -22,7 +22,7 @@ class PublishTodo implements ITodoGroup {
   constructor(market: XMarket) {
     this.id = market.id;
     this.icon = market.photo;
-    this.displayName = market.name;
+    this.name = market.name;
   }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {

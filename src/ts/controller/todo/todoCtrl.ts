@@ -9,6 +9,7 @@ import {
   emitter,
 } from '@/ts/core';
 import { Emitter } from '@/ts/base/common';
+import userCtrl from '../setting';
 
 /** 待办控制器 */
 class TodoController extends Emitter {
@@ -23,7 +24,17 @@ class TodoController extends Emitter {
     super();
     emitter.subscribePart(DomainTypes.User, () => {
       setTimeout(async () => {
-        this._orgTodo = await loadOrgTodo();
+        let orgTodoTypes = [
+          {
+            id: userCtrl.user.id,
+            name: '好友管理',
+            avatar: userCtrl.user.target.avatar,
+          },
+        ];
+        orgTodoTypes.push(
+          ...(await userCtrl.user.getJoinedCompanys(false)).map((a) => a.target),
+        );
+        this._orgTodo = await loadOrgTodo(orgTodoTypes);
         this._appTodo = await loadAppTodo();
         this._pubTodo = await loadPublishTodo();
         this._orderTodo = await loadOrderTodo();

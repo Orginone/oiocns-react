@@ -8,23 +8,21 @@ import {
   IApplyItemResult,
 } from './itodo';
 import { model, kernel, schema } from '../../base';
-import userCtrl from '@/ts/controller/setting/';
-import { XTarget } from '@/ts/base/schema';
 
 class OrgTodo implements ITodoGroup {
-  id: string;
+  readonly id: string;
   icon?: string;
-  displayName: string = '组织审批';
+  name: string = '组织审批';
   private _todoList: ApprovalItem[] = [];
   private _doList: ApprovalItem[] = [];
   private _applyList: ApplyItem[] = [];
   type: TodoType = TodoType.OrgTodo;
-  constructor(target: XTarget) {
-    this.id = target.id;
-    if (target.avatar) {
-      this.icon = JSON.parse(target.avatar).thumbnail;
+  constructor(id: string, name: string, avatar?: string) {
+    this.id = id;
+    if (avatar) {
+      this.icon = JSON.parse(avatar).thumbnail;
     }
-    this.displayName = target.name;
+    this.name = name;
   }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
@@ -98,7 +96,7 @@ class OrgTodo implements ITodoGroup {
       };
       // 拒绝回调
       let rejectfun = (s: schema.XRelation) => {
-        this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
+        this._doList.unshift(new ApprovalItem(s, rePassfun, (_) => {}));
       };
       let reRejectfun = (_: schema.XRelation) => {};
       this._doList = res.data.result
@@ -174,16 +172,14 @@ class ApplyItem implements IApplyItem {
 }
 
 /** 加载组织任务 */
-export const loadOrgTodo = async () => {
-  const orgTodo = new OrgTodo(userCtrl.user.target);
-  await orgTodo.getTodoList();
-  orgTodo.displayName = '好友审批';
-  let todoGroups = [orgTodo];
-  let companys = await userCtrl.user.getJoinedCompanys(false);
-  companys.forEach(async (a) => {
-    const companyTodo = new OrgTodo(a.target);
+export const loadOrgTodo = async (
+  targets: { id: string; name: string; avatar?: string }[],
+) => {
+  let todoGroups = [];
+  for (const target of targets) {
+    const companyTodo = new OrgTodo(target.id, target.name, target.avatar);
     await companyTodo.getTodoList();
     todoGroups.push(companyTodo);
-  });
+  }
   return todoGroups;
 };

@@ -9,7 +9,7 @@ class ApplicationTodo implements ITodoGroup {
   private _todoList: ApprovalItem[];
   private _noticeList: NoticeItem[];
   type: TodoType = TodoType.ApplicationTodo;
-  get displayName(): string {
+  get name(): string {
     return this._name;
   }
   get id(): string {
@@ -76,7 +76,7 @@ class ApplicationTodo implements ITodoGroup {
     }
     return {
       result: completeList,
-      total: res.data.total,
+      total: res.data?.total || 0,
       offset: page.offset,
       limit: page.limit,
     };

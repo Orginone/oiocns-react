@@ -12,7 +12,7 @@ import { model, kernel, schema, common } from '@/ts/base';
 import { PageRequest } from '@/ts/base/model';
 
 export class OrderTodo implements ITodoGroup {
-  displayName: string = '订单审批';
+  name: string = '订单审批';
   private _todoList: ApprovalItem[] = [];
   private _doList: ApprovalItem[] = [];
   type: TodoType = TodoType.OrderTodo;

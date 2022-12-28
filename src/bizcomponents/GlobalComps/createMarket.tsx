@@ -12,7 +12,7 @@ interface Iprops {
   open: boolean;
   title: string;
   current?: IMarket;
-  handleCancel: () => void;
+  handleCancel?: () => void;
   handleOk: (data: MarketModel) => void;
 }
 /*
@@ -132,7 +132,9 @@ const CreateMarketModal = (props: Iprops) => {
         if (!open) {
           formRef.current?.resetFields();
           setAvatar(undefined);
-          handleCancel();
+          if (handleCancel) {
+            handleCancel();
+          }
         } else {
           if (props.current && props.title === '编辑商店') {
             setAvatar(parseAvatar(props.current.market.photo));

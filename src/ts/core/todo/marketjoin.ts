@@ -16,12 +16,12 @@ class MarketJoinTodo implements ITodoGroup {
   type: TodoType = TodoType.MarketTodo;
 
   public id: string;
-  public displayName: string;
+  public name: string;
   public icon: string;
   constructor(market: XMarket) {
     this.id = market.id;
     this.icon = market.photo;
-    this.displayName = market.name;
+    this.name = market.name;
     this._todoList = [];
     this._doList = [];
   }
