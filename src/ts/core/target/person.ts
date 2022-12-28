@@ -17,9 +17,10 @@ export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  constructor(target: schema.XTarget) {
+  accessToken: string;
+  constructor(target: schema.XTarget, token: string) {
     super(target);
-
+    this.accessToken = token;
     this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...companyTypes];
     this.subTeamTypes = [];
     this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...companyTypes];
@@ -78,21 +79,23 @@ export default class Person extends MarketTarget implements IPerson {
     }
     const res = await this.getjoinedTargets(companyTypes, this.id);
     if (res && res.result) {
-      this.joinedCompany = res.result.map((a) => {
+      this.joinedCompany = [];
+      for (const a of res.result) {
+        const ares = await kernel.genToken(a.id);
         let company;
         switch (a.typeName) {
           case TargetType.University:
-            company = new University(a, this.id);
+            company = new University(a, this.id, ares.data);
             break;
           case TargetType.Hospital:
-            company = new Hospital(a, this.id);
+            company = new Hospital(a, this.id, ares.data);
             break;
           default:
-            company = new Company(a, this.id);
+            company = new Company(a, this.id, ares.data);
             break;
         }
-        return company;
-      });
+        this.joinedCompany.push(company);
+      }
     }
     return this.joinedCompany;
   }
@@ -138,20 +141,23 @@ export default class Person extends MarketTarget implements IPerson {
       const res = await this.createTarget(data);
       if (res.success && res.data != undefined) {
         let company;
-        switch (<TargetType>data.typeName) {
-          case TargetType.University:
-            company = new University(res.data, this.id);
-            break;
-          case TargetType.Hospital:
-            company = new Hospital(res.data, this.id);
-            break;
-          default:
-            company = new Company(res.data, this.id);
-            break;
+        const ares = await kernel.genToken(res.data.id);
+        if (res.success) {
+          switch (<TargetType>data.typeName) {
+            case TargetType.University:
+              company = new University(res.data, this.id, ares.data);
+              break;
+            case TargetType.Hospital:
+              company = new Hospital(res.data, this.id, ares.data);
+              break;
+            default:
+              company = new Company(res.data, this.id, ares.data);
+              break;
+          }
+          this.joinedCompany.push(company);
+          company.pullMember(this.target);
+          return company;
         }
-        this.joinedCompany.push(company);
-        company.pullMember(this.target);
-        return company;
       }
     } else {
       logger.warn(consts.IsExistError);

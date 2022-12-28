@@ -42,8 +42,8 @@ export {
   loadPublishTodo,
 } from './todo';
 
-export const createPerson = (data: XTarget) => {
-  return new Person(data);
+export const createPerson = (data: XTarget, token: string) => {
+  return new Person(data, token);
 };
 
 export const createMarket = (data: XMarket) => {
