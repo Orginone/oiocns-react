@@ -339,8 +339,6 @@ export interface IFlow {
   unbindingFlowRelation(params: model.FlowRelationModel): Promise<boolean>;
 }
 export interface ISpace extends IFlow, IMTarget, ITarget {
-  /** 授权访问token */
-  accessToken: string;
   /** 我的群组 */
   cohorts: ICohort[];
   /** 空间类型数据 */

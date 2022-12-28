@@ -24,17 +24,18 @@ class SettingController extends Emitter {
     super();
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
-      this._loadUser(JSON.parse(userJson), kernel.anystore.accessToken);
+      this._user = createPerson(JSON.parse(userJson));
       setTimeout(async () => {
-        await this._user?.getJoinedCompanys();
+        await this._loadUser(JSON.parse(userJson));
         this._curSpace = this._findCompany(
           sessionStorage.getItem(sessionSpaceName) || '',
         );
         if (this._curSpace) {
+          await kernel.genToken(this.space.id);
           this.changCallbackPart(DomainTypes.Company);
           emitter.changCallbackPart(DomainTypes.Company);
         }
-      }, 10);
+      }, 500);
     }
   }
   /** 是否已登录 */
@@ -82,7 +83,7 @@ class SettingController extends Emitter {
     if (this.currentKey === '') {
       this.currentKey = this.space.key;
     }
-    kernel.anystore.updateToken(this.space.accessToken);
+    kernel.genToken(id);
     this.changCallbackPart(DomainTypes.Company);
     emitter.changCallbackPart(DomainTypes.Company);
   }
@@ -132,7 +133,7 @@ class SettingController extends Emitter {
   public async login(account: string, password: string): Promise<model.ResultType<any>> {
     let res = await kernel.login(account, password);
     if (res.success) {
-      await this._loadUser(res.data.person, res.data.accessToken);
+      await this._loadUser(res.data.person);
     }
     return res;
   }
@@ -143,7 +144,7 @@ class SettingController extends Emitter {
   public async register(params: model.RegisterType): Promise<model.ResultType<any>> {
     let res = await kernel.register(params);
     if (res.success) {
-      await this._loadUser(res.data.person, res.data.accessToken);
+      await this._loadUser(res.data.person);
     }
     return res;
   }
@@ -162,11 +163,11 @@ class SettingController extends Emitter {
     return await kernel.resetPassword(account, password, privateKey);
   }
 
-  private async _loadUser(person: schema.XTarget, accessToken: string): Promise<void> {
+  private async _loadUser(person: schema.XTarget): Promise<void> {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    this._user = createPerson(person, accessToken);
+    this._user = createPerson(person);
     this._curSpace = undefined;
-    await this._user.getJoinedCompanys(false);
+    await this._user?.getJoinedCompanys();
     this.changCallbackPart(DomainTypes.User);
     emitter.changCallbackPart(DomainTypes.User);
   }

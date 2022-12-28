@@ -4,6 +4,7 @@ import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
+import { kernel } from '..';
 /**
  * 奥集能内核api
  */
@@ -158,7 +159,7 @@ export default class KernelApi {
       res = await this._restRequest('gentoken', comapnyId);
     }
     if (res.success) {
-      this._anystore.updateToken(res.data);
+      kernel._anystore.updateToken(res.data);
     }
     return res;
   }

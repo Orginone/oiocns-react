@@ -32,11 +32,9 @@ export default class Company extends MarketTarget implements ICompany {
   cohorts: ICohort[] = [];
   workings: IWorking[] = [];
   departmentTypes: TargetType[] = [];
-  accessToken: string;
 
-  constructor(target: schema.XTarget, userId: string, token: string) {
+  constructor(target: schema.XTarget, userId: string) {
     super(target);
-    this.accessToken = token;
     this.userId = userId;
     this.departmentTypes = departmentTypes;
     this.subTeamTypes = [...this.departmentTypes, TargetType.Working];
