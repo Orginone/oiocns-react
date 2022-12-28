@@ -337,6 +337,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
 
     let afterNode = parentNode.children;
     //插入新节点
+    debugger;
     parentNode.children = {
       nodeId: getRandomId(),
       parentId: parentNode.nodeId,

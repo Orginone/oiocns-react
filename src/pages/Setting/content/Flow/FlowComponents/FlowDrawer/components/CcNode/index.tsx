@@ -20,7 +20,7 @@ const CcNode = () => {
 
   const onOk = () => {
     selectedNode.props.assignedUser = [
-      { name: currentData.data.name, id: currentData.data.id },
+      { name: currentData.title, id: currentData.data.id },
     ];
     processCtrl.setCurrentNode(selectedNode);
     setIsApprovalOpen(false);
@@ -68,7 +68,7 @@ const CcNode = () => {
           multiple={false}
           onChecked={(params: any) => {
             selectedNode.props.assignedUser = [
-              { name: params.data.name, id: params.data.id },
+              { name: params.title, id: params.data.id },
             ];
             processCtrl.setCurrentNode(selectedNode);
             setCurrentData(params);

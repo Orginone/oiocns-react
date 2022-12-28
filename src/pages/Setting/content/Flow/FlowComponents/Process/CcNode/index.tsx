@@ -1,4 +1,4 @@
-import Node from '../Node';
+import Node, { AddNodeType } from '../Node';
 import React, { useMemo } from 'react';
 
 type CcNodeProps = {
@@ -40,6 +40,7 @@ const CcNode: React.FC<CcNodeProps> = (props: CcNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      type={AddNodeType.CC}
     />
   );
 };

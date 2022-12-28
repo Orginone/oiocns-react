@@ -30,7 +30,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
   noticeBaseInfo, //通知兄弟组件事件
 }) => {
   const [form] = Form.useForm();
-  const [data, setData] = useState<any>();
+  const [data, setData] = useState<any[]>([]);
   const [oldFormData, setOldFormData] = useState<schema.XFlowRelation[]>([]);
   const actionRef = useRef();
 
@@ -191,7 +191,7 @@ const BindModal: React.FC<Bindmodalprops> = ({
                 width={280}
                 label="应用名称"
                 // mode="multiple"
-                options={data}
+                options={[...data, { value: '396006949977722880', label: '公益仓' }]}
                 placeholder="请选择要绑定的应用"
                 rules={[{ required: true, message: '请选择要绑定的应用!' }]}
               />

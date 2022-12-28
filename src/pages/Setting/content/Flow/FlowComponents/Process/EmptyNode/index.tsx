@@ -1,5 +1,5 @@
 import React from 'react';
-import Node from '../Node';
+import Node, { AddNodeType } from '../Node';
 
 type EmptyNodeProps = {
   onInsertNode: Function;
@@ -26,6 +26,7 @@ const EmptyNode: React.FC<EmptyNodeProps> = (props: EmptyNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      type={AddNodeType.EMPTY}
     />
   );
 };
