@@ -9,7 +9,7 @@ import {
   conditiondType,
   getConditionKeys,
   dataType,
-} from '../../../../Controller/processType';
+} from '../../processType';
 import cls from './index.module.less';
 
 type ConditionGroupItemConfigProps = {};

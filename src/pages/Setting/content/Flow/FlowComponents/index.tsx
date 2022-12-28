@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProcessTree from './ProcessTree';
 import FlowDrawer from './FlowDrawer';
-import { AddNodeType, conditionDataType } from '../Controller/processType';
+import { AddNodeType, conditionDataType } from './FlowDrawer/processType';
 import processCtrl, { ConditionCallBackTypes } from '../Controller/processCtrl';
 
 import cls from './index.module.less';

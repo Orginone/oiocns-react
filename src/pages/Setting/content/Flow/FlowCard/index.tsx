@@ -4,6 +4,7 @@ import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import flowLogo from '@/assets/img/flow.png';
 import './index.less';
+import { ImStackoverflow } from 'react-icons/im';
 interface FlowCardType {
   data: XFlowDefine;
   className?: string;
@@ -21,8 +22,7 @@ const FlowCardComp: React.FC<FlowCardType> = ({
     return (
       <div className="card-title flex" onClick={onClick}>
         <div className="card-title-left">
-          {/* <Avatar src="https://joeschmoe.io/api/v1/random" size={60} /> */}
-          <Avatar className="card-title-left-logo" size={50} src={flowLogo} />
+          <ImStackoverflow />
           <div className="card-title-left-info">
             <div className="app-name">
               <span className="app-name-label">{data.name || '--'}</span>
@@ -43,7 +43,7 @@ const FlowCardComp: React.FC<FlowCardType> = ({
     <div className={`customCardWrap ${className}`}>
       <Title />
       <ul className="card-content">
-        <li className="card-content-desc con">{data.fields || '暂无描述'}</li>
+        <li className="card-content-desc con">{data.remark || '暂无描述'}</li>
         <li className="card-content-date">创建于 {data.createTime}</li>
       </ul>
     </div>

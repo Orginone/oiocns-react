@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, message } from 'antd';
 import ProcessCtrl, { ConditionCallBackTypes } from '../../../../Controller/processCtrl';
-import { conditionDataType, dataType } from '../../../../Controller/processType';
+import { conditionDataType, dataType } from '../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
 
 /**

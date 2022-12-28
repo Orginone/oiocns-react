@@ -5,7 +5,7 @@ import RootNode from './components/RootNode';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType } from '../../Controller/processType';
+import { AddNodeType } from './processType';
 
 /**
  * @description: 流程设置抽屉

@@ -1,4 +1,9 @@
+import { Form } from 'antd';
+import cls from './index.module.less';
 import React, { useEffect } from 'react';
+import { CloseCircleOutlined } from '@ant-design/icons';
+import ProcessCtrl from '../../Controller/processCtrl';
+import { optionType } from '../../FlowComponents/FlowDrawer/processType';
 import {
   ProFormText,
   ProForm,
@@ -8,18 +13,15 @@ import {
   ProFormDependency,
   ProFormTextArea,
 } from '@ant-design/pro-components';
-import { CloseCircleOutlined } from '@ant-design/icons';
-import { Form } from 'antd';
-import ProcessCtrl from '../Controller/processCtrl';
-import { optionType } from '../Controller/processType';
-import cls from './index.module.less';
-type BaseInfoProps = {
-  nextStep: (params: any) => void;
+
+interface IProps {
   currentFormValue: {};
+  nextStep: (params: any) => void;
   onChange: (params: any) => void;
-};
+}
+
 /** 傻瓜组件，只负责读取状态 */
-const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChange }) => {
+const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -122,4 +124,4 @@ const BaseInfo: React.FC<BaseInfoProps> = ({ nextStep, currentFormValue, onChang
   );
 };
 
-export default BaseInfo;
+export default FieldInfo;

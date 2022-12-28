@@ -298,8 +298,6 @@ export interface IMTarget {
 export interface IFlow {
   /** 流程定义 */
   defines: schema.XFlowDefine[];
-  /** 流程绑定关系 */
-  defineRelations: schema.XFlowRelation[];
   /**
    * 获取流程定义列表
    * @param reload 是否强制刷新

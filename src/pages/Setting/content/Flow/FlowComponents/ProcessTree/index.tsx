@@ -14,7 +14,7 @@ import {
   CC_PROPS,
   DELAY_PROPS,
   TRIGGER_PROPS,
-} from '../../Controller/processType';
+} from '../FlowDrawer/processType';
 import processCtrl from '../../Controller/processCtrl';
 type ProcessTreeProps = {
   onSelectedNode: (params: any) => void;
