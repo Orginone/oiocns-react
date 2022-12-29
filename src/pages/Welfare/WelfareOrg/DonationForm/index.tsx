@@ -6,6 +6,7 @@ import {
   Divider,
   Input,
   InputNumber,
+  message,
   Radio,
   RadioChangeEvent,
   Select,
@@ -79,7 +80,12 @@ const DonationSetting: React.FC = () => {
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
-    <Button key="backlist" type="link" onClick={async () => {}}>
+    <Button
+      key="backlist"
+      type="link"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       返回列表
     </Button>,
   ];

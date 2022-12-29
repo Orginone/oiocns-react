@@ -21,6 +21,7 @@ import {
   CheckCircleOutlined,
   ClearOutlined,
   DeleteOutlined,
+  PlusOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
@@ -32,6 +33,7 @@ import VirtualList from 'rc-virtual-list';
 const { TextArea } = Input;
 interface Iprops {
   open: boolean;
+  instance: any;
   onClose: Function;
 }
 /**
@@ -99,6 +101,8 @@ const FlowTodo: React.FC<Iprops> = (props: Iprops) => {
       onOk: async () => await marketCtrl.createOrder(selectedRowKey),
     });
   };
+
+  const createProcessInstance = () => {};
 
   /**
    * @description: 卡片内容渲染函数
@@ -230,77 +234,82 @@ const FlowTodo: React.FC<Iprops> = (props: Iprops) => {
           ]}
         />
 
-        {/* <PageHeader
-          className={cls.header}
-          subTitle="流程审核"
-          extra={
-            <Button
-              type="text"
-              className={cls.clearShop}
-              onClick={() => {
-                OnDeleApply(shopList.map((n: XMerchandise) => n.id));
-              }}
-              icon={<ClearOutlined />}>
-              清除流程审核
-            </Button>
-          }
-        /> */}
         <CheckCard.Group
           multiple
           className={cls['shoping-car']}
+          style={{ backgroundColor: '#FFF' }}
           onChange={(value) => {
             setSelectedRowKey(value);
           }}
           value={selectedRowKey}>
-          流程跟踪
-          <Steps
-            direction="vertical"
-            size="small"
-            current={1}
-            items={[
-              {
-                title: 'Finished',
-                description: 'This is a description.',
-                subTitle: 'subTitle',
-                icon: <UserOutlined />,
-              },
-              {
-                title: 'In Progress',
-                description: 'This is a description.',
-                icon: <UserOutlined />,
-              },
-              {
-                title: 'Waiting',
-                description: 'This is a description.',
-                icon: <UserOutlined />,
-              },
-            ]}
-          />
+          <div style={{ display: 'flex', paddingBottom: '20px', color: 'grey' }}>
+            流程跟踪
+          </div>
+          <div style={{ display: 'flex', paddingBottom: '20px', color: 'grey' }}>
+            <Button icon={<PlusOutlined />}></Button>
+            <span style={{ paddingTop: '5px', paddingLeft: '5px' }}>
+              添加下一节点审批人
+            </span>
+          </div>
+          {props.instance && (
+            <Steps
+              direction="vertical"
+              size="small"
+              current={1}
+              items={[
+                {
+                  title: 'Finished',
+                  description: 'This is a description.',
+                  subTitle: 'subTitle',
+                  icon: <UserOutlined />,
+                },
+                {
+                  title: 'In Progress',
+                  description: 'This is a description.',
+                  icon: <UserOutlined />,
+                },
+                {
+                  title: 'Waiting',
+                  description: 'This is a description.',
+                  icon: <UserOutlined />,
+                },
+              ]}
+            />
+          )}
         </CheckCard.Group>
-        <Row className={cls.footer} justify="space-between">
-          <Col span={12}>
-            <Button danger size="small" onClick={() => {}}>
-              终止流程
+        {props.instance && (
+          <Row className={cls.footer} justify="space-between">
+            <Col span={12}>
+              <Button danger size="small" onClick={() => {}}>
+                终止流程
+              </Button>
+            </Col>
+            <Col span={12}>
+              <Space>
+                <Button
+                  type="text"
+                  style={{ border: 'solid 1px' }}
+                  size="small"
+                  onClick={() => {}}>
+                  暂存
+                </Button>
+                <Button type="primary" size="small" ghost onClick={() => {}}>
+                  驳回
+                </Button>
+                <Button type="primary" size="small" onClick={() => {}}>
+                  同意
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        )}
+        {!props.instance && (
+          <Row className={cls.footer} justify="end">
+            <Button type="primary" size="small" onClick={createProcessInstance}>
+              提交
             </Button>
-          </Col>
-          <Col span={12}>
-            <Space>
-              <Button
-                type="text"
-                style={{ border: 'solid 1px' }}
-                size="small"
-                onClick={() => {}}>
-                暂存
-              </Button>
-              <Button type="primary" size="small" ghost onClick={() => {}}>
-                驳回
-              </Button>
-              <Button type="primary" size="small" onClick={() => {}}>
-                同意
-              </Button>
-            </Space>
-          </Col>
-        </Row>
+          </Row>
+        )}
       </Layout>
     </Drawer>
   );

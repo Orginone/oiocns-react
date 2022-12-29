@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Button, Divider, RadioChangeEvent, Space } from 'antd';
+import { Button, Divider, message, RadioChangeEvent, Space } from 'antd';
 import { common } from 'typings/common';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
@@ -66,7 +66,12 @@ const DonationList: React.FC = () => {
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
-    <Button key="backlist" type="link" onClick={async () => {}}>
+    <Button
+      key="backlist"
+      type="link"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       返回列表
     </Button>,
   ];

@@ -99,7 +99,7 @@ const DoDonationSetting: React.FC = () => {
       label: '暂存箱添加',
       key: '1',
       onClick: () => {
-        console.log('暂存箱添加');
+        message.warn('该功能尚未开放');
       },
     },
     {
@@ -141,16 +141,15 @@ const DoDonationSetting: React.FC = () => {
   const submitAndExamine = async (e: any) => {
     if (checkValid()) {
       formdata.status = Status.Draft;
-
+      await save();
       /**发起流程 */
-      setOpen(true);
-      // await save();
+      message.success('提交成功');
     }
   };
   /**暂存 */
-  const stash = (e: any) => {
-    // load();
-    setOpen(true);
+  const stash = async (e: any) => {
+    message.warn('该功能尚未开放');
+    // await save();
   };
 
   const closeDrawer = () => {
@@ -186,7 +185,11 @@ const DoDonationSetting: React.FC = () => {
           </Button>
         </Dropdown>
 
-        <Button key="exportBatch" onClick={() => {}}>
+        <Button
+          key="exportBatch"
+          onClick={() => {
+            message.warn('该功能尚未开放');
+          }}>
           批量导入/导出
         </Button>
       </div>
@@ -207,7 +210,12 @@ const DoDonationSetting: React.FC = () => {
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
-    <Button key="backlist" type="link" onClick={async () => {}}>
+    <Button
+      key="backlist"
+      type="link"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       返回列表
     </Button>,
   ];
@@ -448,7 +456,10 @@ const DoDonationSetting: React.FC = () => {
           </div>
         </PageCard>
       </div>
-      <FlowTodo open={open} onClose={closeDrawer}></FlowTodo>
+      <FlowTodo
+        open={open}
+        onClose={closeDrawer}
+        instance={formdata.flowinstance}></FlowTodo>
     </div>
   );
 };
