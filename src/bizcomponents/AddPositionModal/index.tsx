@@ -97,7 +97,6 @@ const AddPostModal = (props: Iprops) => {
             <CardOrTable
               dataSource={[authTree!]}
               rowKey={'id'}
-              total={1}
               operation={renderOperation}
               columns={columns as any}
               parentRef={parentRef}

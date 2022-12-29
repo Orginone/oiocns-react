@@ -24,17 +24,18 @@ class SettingController extends Emitter {
     super();
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
-      this._loadUser(JSON.parse(userJson));
+      this._user = createPerson(JSON.parse(userJson));
       setTimeout(async () => {
-        await this._user?.getJoinedCompanys();
+        await this._loadUser(JSON.parse(userJson));
         this._curSpace = this._findCompany(
           sessionStorage.getItem(sessionSpaceName) || '',
         );
         if (this._curSpace) {
+          await kernel.genToken(this.space.id);
           this.changCallbackPart(DomainTypes.Company);
           emitter.changCallbackPart(DomainTypes.Company);
         }
-      }, 10);
+      }, 500);
     }
   }
   /** 是否已登录 */
@@ -82,6 +83,7 @@ class SettingController extends Emitter {
     if (this.currentKey === '') {
       this.currentKey = this.space.key;
     }
+    kernel.genToken(id);
     this.changCallbackPart(DomainTypes.Company);
     emitter.changCallbackPart(DomainTypes.Company);
   }
@@ -165,7 +167,7 @@ class SettingController extends Emitter {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = createPerson(person);
     this._curSpace = undefined;
-    await this._user.getJoinedCompanys(false);
+    await this._user?.getJoinedCompanys();
     this.changCallbackPart(DomainTypes.User);
     emitter.changCallbackPart(DomainTypes.User);
   }

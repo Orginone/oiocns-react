@@ -619,7 +619,7 @@ export type XMarket = {
   // 备注
   remark: string;
   // 图片
-  photo: string;
+  photo?: string;
   // 公开的
   public: boolean;
   // 创建组织/个人
@@ -1213,7 +1213,7 @@ export type XTarget = {
   // 更新时间
   updateTime: string;
   // 头像
-  avatar?: string;
+  avatar: string | undefined;
   // 作为团队的影子
   team: XTeam | undefined;
   // 赋予该组织/个人创建的身份

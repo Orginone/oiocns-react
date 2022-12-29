@@ -65,9 +65,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         }}>
         <Row gutter={16} style={{ width: '100%' }}>
           {dataSource.map((item) => (
-            <Col
-              span={tableProps.searchType === TargetType.Person ? 12 : 24}
-              key={item.id}>
+            <Col span={24} key={item.id}>
               {tableProps.searchType === TargetType.Person ? (
                 <PersonInfoCard key={item.id} person={item}></PersonInfoCard>
               ) : (

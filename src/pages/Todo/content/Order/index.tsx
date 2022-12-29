@@ -13,16 +13,13 @@ interface IProps {
  * @returns
  */
 const OrderTodo: React.FC<IProps> = (props) => {
-  let key = props.typeName.split('-');
-  if (key.length > 1) {
-    switch (key[1]) {
-      case '待办':
-        return <BuyOrder typeName={props.typeName} todoGroup={props.todoGroup} />;
-      case '申请':
-        return <SellOrder typeName={props.typeName} todoGroup={props.todoGroup} />;
-      default:
-        break;
-    }
+  switch (props.typeName) {
+    case '采购订单':
+      return <BuyOrder typeName={props.typeName} todoGroup={props.todoGroup} />;
+    case '销售订单':
+      return <SellOrder typeName={props.typeName} todoGroup={props.todoGroup} />;
+    default:
+      break;
   }
   return <></>;
 };

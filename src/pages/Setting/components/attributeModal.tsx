@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
-import { ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 
@@ -13,108 +13,134 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   current: ISpeciesItem;
-  targetId?: string;
+  target?: ITarget;
 }
 /*
   特性编辑模态框
 */
 const AttributeModal = (props: Iprops) => {
+  const [selectType, setSelectType] = useState<string>();
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const columns: ProFormColumnsType<AttributeModel>[] = [
-    {
-      title: '特性名称',
-      dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '特性名称为必填项' }],
+  const getFromColumns = () => {
+    const columns: ProFormColumnsType<AttributeModel>[] = [
+      {
+        title: '特性名称',
+        dataIndex: 'name',
+        formItemProps: {
+          rules: [{ required: true, message: '特性名称为必填项' }],
+        },
       },
-    },
-    {
-      title: '特性代码',
-      dataIndex: 'code',
-      formItemProps: {
-        rules: [{ required: true, message: '特性代码为必填项' }],
+      {
+        title: '特性代码',
+        dataIndex: 'code',
+        formItemProps: {
+          rules: [{ required: true, message: '特性代码为必填项' }],
+        },
       },
-    },
-    {
-      title: '选择制定组织',
-      dataIndex: 'belongId',
-      valueType: 'treeSelect',
-      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-      request: async () => {
-        return await userCtrl.getTeamTree();
+      {
+        title: '选择制定组织',
+        dataIndex: 'belongId',
+        valueType: 'treeSelect',
+        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+        request: async () => {
+          return await userCtrl.getTeamTree();
+        },
+        fieldProps: {
+          disabled: title === '修改',
+          fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'teamName',
+        },
       },
-      fieldProps: {
-        disabled: title === '修改',
-        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-        showSearch: true,
-        filterTreeNode: true,
-        treeNodeFilterProp: 'teamName',
+      {
+        title: '选择管理职权',
+        dataIndex: 'authId',
+        valueType: 'treeSelect',
+        formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
+        request: async () => {
+          const data = await userCtrl.company.loadAuthorityTree(false);
+          return data ? [data] : [];
+        },
+        fieldProps: {
+          disabled: title === '编辑',
+          fieldNames: { label: 'name', value: 'id' },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'name',
+          treeDefaultExpandAll: true,
+        },
       },
-    },
-    {
-      title: '选择管理职权',
-      dataIndex: 'authId',
-      valueType: 'treeSelect',
-      formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
-      request: async () => {
-        const data = await userCtrl.company.loadAuthorityTree(false);
-        return data ? [data] : [];
+      {
+        title: '向下级组织公开',
+        dataIndex: 'public',
+        valueType: 'select',
+        fieldProps: {
+          options: [
+            {
+              value: true,
+              label: '公开',
+            },
+            {
+              value: false,
+              label: '不公开',
+            },
+          ],
+        },
+        formItemProps: {
+          rules: [{ required: true, message: '是否公开为必填项' }],
+        },
       },
-      fieldProps: {
-        disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id' },
-        showSearch: true,
-        filterTreeNode: true,
-        treeNodeFilterProp: 'name',
-        treeDefaultExpandAll: true,
-      },
-    },
-    {
-      title: '向下级组织公开',
-      dataIndex: 'public',
-      valueType: 'select',
-      fieldProps: {
-        options: [
-          {
-            value: true,
-            label: '公开',
+      {
+        title: '特性类型',
+        dataIndex: 'valueType',
+        valueType: 'select',
+        fieldProps: {
+          options: [
+            {
+              value: '数值型',
+              label: '数值型',
+            },
+            {
+              value: '描述型',
+              label: '描述型',
+            },
+            {
+              value: '选择型',
+              label: '选择型',
+            },
+          ],
+          onSelect: (select: string) => {
+            setSelectType(select);
           },
-          {
-            value: false,
-            label: '不公开',
-          },
-        ],
+        },
+        formItemProps: {
+          rules: [{ required: true, message: '是否公开为必填项' }],
+        },
       },
-      formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
-      },
-    },
-    {
-      title: '特性类型',
-      dataIndex: 'valueType',
-      valueType: 'select',
-      fieldProps: {
-        options: [
-          {
-            value: '数值型',
-            label: '数值型',
-          },
-          {
-            value: '描述型',
-            label: '描述型',
-          },
-          {
-            value: '选择型',
-            label: '选择型',
-          },
-        ],
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
-      },
-    },
-    {
+    ];
+    if (selectType === '选择型') {
+      columns.push({
+        title: '选择枚举分类',
+        dataIndex: 'dictId',
+        valueType: 'treeSelect',
+        formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
+        request: async () => {
+          const data = await props.target?.loadSpeciesTree();
+          return data ? [data] : [];
+        },
+        fieldProps: {
+          disabled: selectType !== '选择型',
+          fieldNames: { label: 'name', value: 'id', children: 'children' },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'name',
+          treeDefaultExpandAll: true,
+        },
+      });
+    }
+    columns.push({
       title: '特性定义',
       dataIndex: 'remark',
       valueType: 'textarea',
@@ -122,8 +148,9 @@ const AttributeModal = (props: Iprops) => {
       formItemProps: {
         rules: [{ required: true, message: '特性定义为必填项' }],
       },
-    },
-  ];
+    });
+    return columns;
+  };
   return (
     <SchemaForm<AttributeModel>
       formRef={formRef}
@@ -132,8 +159,9 @@ const AttributeModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          formRef.current?.setFieldValue('belongId', props.targetId);
+          formRef.current?.setFieldValue('belongId', props.target?.id);
           if (title.includes('修改')) {
+            setSelectType(data?.valueType);
             formRef.current?.setFieldsValue(data);
           }
         } else {
@@ -153,7 +181,7 @@ const AttributeModal = (props: Iprops) => {
           handleOk(await current.updateAttr(values));
         }
       }}
-      columns={columns}></SchemaForm>
+      columns={getFromColumns()}></SchemaForm>
   );
 };
 

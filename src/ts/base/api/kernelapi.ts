@@ -4,6 +4,7 @@ import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
+import { kernel } from '..';
 /**
  * 奥集能内核api
  */
@@ -142,6 +143,23 @@ export default class KernelApi {
     }
     if (res.success) {
       this._anystore.updateToken(res.data.accessToken);
+    }
+    return res;
+  }
+  /**
+   * 生成单位token
+   * @param comapnyId 单位id
+   * @returns 生成后的token
+   */
+  public async genToken(comapnyId: string): Promise<model.ResultType<string>> {
+    var res: model.ResultType<any>;
+    if (this._storeHub.isConnected) {
+      res = await this._storeHub.invoke('GenToken', comapnyId);
+    } else {
+      res = await this._restRequest('gentoken', comapnyId);
+    }
+    if (res.success) {
+      kernel._anystore.updateToken(res.data);
     }
     return res;
   }

@@ -156,7 +156,6 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
               <CardOrTable<XTarget>
                 dataSource={[]}
                 rowKey={'id'}
-                total={0}
                 params={key}
                 request={async (page) => {
                   return await indentity?.loadMembers(page);

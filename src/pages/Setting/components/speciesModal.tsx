@@ -120,7 +120,7 @@ const SpeciesModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        values = { ...current?.target, ...values };
+        console.log(values);
         if (title.includes('新增')) {
           handleOk(await current?.create(values));
         } else {

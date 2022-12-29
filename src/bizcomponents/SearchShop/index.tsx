@@ -1,66 +1,99 @@
 import React, { useState } from 'react';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
-import { Avatar, Card, Col, Result, Row, Tag, Typography } from 'antd';
-import { MonitorOutlined } from '@ant-design/icons';
+import { Col, Result, Row, Space, Tag } from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 import { schema } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
-type CompanySearchTableProps = {
+import { CheckCard } from '@ant-design/pro-components';
+import { XMarket } from '@/ts/base/schema';
+import TeamIcon from '../GlobalComps/teamIcon';
+type ShopSearchTableProps = {
   [key: string]: any;
+  searchCallback: (target: XMarket[]) => void;
 };
-// 商店卡片渲染
-
-const ShopCardList = (dataSource: schema.XMarket[]) => {
-  if (dataSource.length > 0) {
-    return (
-      <Row gutter={16}>
-        {dataSource.map((item) => (
-          <Col span={12} key={item.id}>
-            <Card className={styles.card} style={{ width: 300, marginTop: 16 }}>
-              <Card.Meta
-                avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-                title={item.name}
-                description={<Tag color="blue">{item.code}</Tag>}
-              />
-              <div className={styles.description}>
-                <Typography.Text>简介：{item.remark || '-'}</Typography.Text>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    );
-  } else {
-    return (
-      <Result icon={<MonitorOutlined />} title={`抱歉，没有查询到该编码相关的商店`} />
-    );
-  }
+type MarketInfoCardProps = {
+  market: XMarket;
 };
 /*
   弹出框表格查询
 */
-const CompanySearchList: React.FC<CompanySearchTableProps> = () => {
-  const [searchKey] = useState<string>();
+const ShopSearchList: React.FC<ShopSearchTableProps> = (props) => {
+  const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<schema.XMarket[]>([]);
+
+  const ShopCardList = () => {
+    return (
+      <CheckCard.Group
+        bordered={false}
+        multiple
+        style={{ width: '100%' }}
+        onChange={(value) => {
+          let checkObjs: XMarket[] = [];
+          for (const market of dataSource) {
+            if ((value as string[]).includes(market.id)) {
+              checkObjs.push(market);
+            }
+          }
+          props.searchCallback(checkObjs);
+        }}>
+        <Row gutter={16} style={{ width: '100%' }}>
+          {dataSource.map((item) => (
+            <Col span={24} key={item.id}>
+              <ShopCard key={item.id} market={item}></ShopCard>
+            </Col>
+          ))}
+        </Row>
+      </CheckCard.Group>
+    );
+  };
+
+  // 单位卡片渲染
+  const ShopCard: React.FC<MarketInfoCardProps> = ({ market }) => (
+    <CheckCard
+      bordered
+      style={{ width: '100%' }}
+      className={`${styles.card}`}
+      avatar={
+        <TeamIcon
+          share={market.photo ? JSON.parse(market.photo).shareInfo : ''}
+          size={60}
+          preview={true}
+        />
+      }
+      title={
+        <Space>
+          {market.name}
+          <Tag color="blue">账号：{market.code}</Tag>
+        </Space>
+      }
+      value={market.id}
+      description={`公司简介:${market.remark}`}
+    />
+  );
 
   return (
     <div className={styles[`search-card`]}>
       <SearchInput
         value={searchKey}
         placeholder="请输入商店编码"
-        extra={`找到${dataSource?.length}家商店`}
         onChange={(event) => {
+          setSearchKey(event.target.value);
           if (event.target.value) {
             userCtrl.space.getMarketByCode(event.target.value).then((a) => {
-              setDataSource(a.data.result || []);
+              setDataSource(a.result || []);
             });
           } else {
             setDataSource([]);
           }
         }}
       />
-      {ShopCardList(dataSource)}
+
+      {dataSource.length > 0 && ShopCardList()}
+      {searchKey && dataSource.length == 0 && (
+        <Result icon={<SmileOutlined />} title={`抱歉，没有查询到相关的结果`} />
+      )}
     </div>
   );
 };
-export default CompanySearchList;
+export default ShopSearchList;

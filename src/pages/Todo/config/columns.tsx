@@ -100,7 +100,7 @@ export const MarketColumns: ProColumns<IApplyItem | IApprovalItem>[] = [
     title: '申请组织',
     dataIndex: '',
     render: (_, row) => {
-      return row.Data.target ? row.Data.target.name : '本人';
+      return row.Data.target ? row.Data.target.name : row.Data.targetId;
     },
   },
   {

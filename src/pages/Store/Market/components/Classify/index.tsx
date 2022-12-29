@@ -5,21 +5,25 @@ import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
-import JoinOtherShop from './JoinOtherShop';
+import SearchShop from '@/bizcomponents/SearchShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import userCtrl from '@/ts/controller/setting';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
+import { XMarket } from '@/ts/base/schema';
+
 type modalType = 'create' | 'join' | 'detail' | 'edit' | 'users' | '';
+
 interface Iprops {
   tkey: string;
   current: IMarket | undefined;
   setCurrent: (current: IMarket) => void;
 }
+
 const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const [activeModal, setActiveModal] = useState<modalType>('');
   const [editMarket, setEditMarket] = useState<IMarket>(); // 被选中的树节点
-  const [dataSource, setDataSource] = useState<any>([]); // table数据
+  const [selectMarkets, setSelectedMarkets] = useState<XMarket[]>([]); // table数据
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -50,34 +54,8 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
     setActiveModal('');
   };
 
-  /**
-   * @description: 加入商店
-   * @return {*}
-   */
-  const onJoinOk = async (val: any) => {
-    setActiveModal('');
-    setDataSource([]);
-    if (await userCtrl.user.applyJoinMarket(val[0]?.id)) {
-      message.success('申请已发送');
-    }
-  };
-
-  /**
-   * @description: 加入商店搜索回调
-   * @param {any} val
-   * @return {*}
-   */
-  const onChange = async (val: any) => {
-    setDataSource((await marketCtrl.target.getMarketByCode(val.target.value)).result);
-  };
-
-  /**
-   * @description: 取消的回调
-   * @return {*}
-   */
   const onCancel = () => {
     setActiveModal('');
-    setDataSource([]);
   };
 
   /**
@@ -230,25 +208,36 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
             title={editMarket.market.name}
             nodeDetail={editMarket.market}
             open={activeModal === 'detail'}
-            onClose={() => setActiveModal('')}
+            onClose={onCancel}
           />
           <Drawer
             title="用户管理"
             width={'75%'}
             open={activeModal === 'users'}
-            onClose={() => setActiveModal('')}>
+            onClose={onCancel}>
             <UserManagement current={editMarket} tkey={props.tkey} />
           </Drawer>
         </>
       )}
-      <JoinOtherShop
-        title="搜索商店"
+      <Modal
+        title="加入商店"
+        width={670}
+        destroyOnClose={true}
+        bodyStyle={{ padding: 0 }}
         open={activeModal === 'join'}
         onCancel={onCancel}
-        onOk={onJoinOk}
-        onChange={onChange}
-        dataSource={dataSource || []}
-      />
+        onOk={async () => {
+          for (const market of selectMarkets) {
+            await userCtrl.user.applyJoinMarket(market.id);
+          }
+          setActiveModal('');
+        }}>
+        <SearchShop
+          searchCallback={(markets: XMarket[]) => {
+            setSelectedMarkets(markets);
+          }}
+        />
+      </Modal>
     </div>
   );
 };

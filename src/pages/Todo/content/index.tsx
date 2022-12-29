@@ -12,58 +12,61 @@ interface IProps {
 }
 
 const TypeSetting = ({ selectMenu }: IProps) => {
-  switch (selectMenu.itemType) {
-    case GroupMenuType.Friend:
-    case GroupMenuType.Organization:
-      let orgkeys = selectMenu.key.split('-');
-      return orgkeys.length > 1 ? (
-        <CommonTodo
-          title={selectMenu.itemType + '-' + orgkeys[1]}
-          typeName={orgkeys[1]}
-          todoGroup={selectMenu.item as ITodoGroup}
-          columns={OrgColumns}
-        />
-      ) : (
-        <></>
-      );
-    case GroupMenuType.JoinStore:
-      let marketKey = selectMenu.key.split('-');
-      return marketKey.length > 1 ? (
-        <CommonTodo
-          title={`商店加入审核-` + marketKey[1]}
-          typeName={marketKey[1]}
-          todoGroup={selectMenu.item as ITodoGroup}
-          columns={MarketColumns}
-        />
-      ) : (
-        <></>
-      );
-    case GroupMenuType.Publish:
-      let merchandiseKey = selectMenu.key.split('-');
-      return merchandiseKey.length > 1 ? (
-        <CommonTodo
-          title={`应用上架审批-` + merchandiseKey[1]}
-          typeName={merchandiseKey[1]}
-          todoGroup={selectMenu.item as ITodoGroup}
-          columns={MerchandiseColumns}
-        />
-      ) : (
-        <></>
-      );
-    case GroupMenuType.Order:
-      return (
-        <OrderTodo typeName={selectMenu.key} todoGroup={selectMenu.item as ITodoGroup} />
-      );
-    case GroupMenuType.Application:
-      let appKey = selectMenu.key.split('-');
-      return appKey.length > 1 ? (
-        <AppTodo typeName={appKey[1]} todoGroup={selectMenu.item as ITodoGroup} />
-      ) : (
-        <></>
-      );
-    default:
-      return <></>;
+  let todoGroup = selectMenu.item as ITodoGroup;
+  if (todoGroup) {
+    switch (selectMenu.itemType) {
+      case GroupMenuType.Friend:
+      case GroupMenuType.Organization:
+        return (
+          <CommonTodo
+            todoGroup={todoGroup}
+            columns={OrgColumns}
+            tabList={[
+              { key: 'todo', tab: '我的待办' },
+              { key: 'complete', tab: '我的已办' },
+              { key: 'apply', tab: '我的申请' },
+            ]}
+          />
+        );
+      case GroupMenuType.JoinStore:
+        let tabList = [];
+        if (todoGroup.id) {
+          tabList = [
+            { key: 'todo', tab: '我的待办' },
+            { key: 'complete', tab: '我的已办' },
+          ];
+        } else {
+          tabList = [{ key: 'apply', tab: '我的申请' }];
+        }
+        return (
+          <CommonTodo todoGroup={todoGroup} tabList={tabList} columns={MarketColumns} />
+        );
+      case GroupMenuType.Publish:
+        let publishTabList = [];
+        if (todoGroup.id) {
+          publishTabList = [
+            { key: 'todo', tab: '我的待办' },
+            { key: 'complete', tab: '我的已办' },
+          ];
+        } else {
+          publishTabList = [{ key: 'apply', tab: '我的申请' }];
+        }
+        return (
+          <CommonTodo
+            todoGroup={todoGroup}
+            tabList={publishTabList}
+            columns={MerchandiseColumns}
+          />
+        );
+      case GroupMenuType.Order:
+        return <OrderTodo typeName={selectMenu.key} todoGroup={todoGroup} />;
+      case GroupMenuType.Application:
+        return <AppTodo typeName={selectMenu.key} todoGroup={todoGroup} />;
+      default:
+        return <></>;
+    }
   }
+  return <></>;
 };
 
 export default TypeSetting;
