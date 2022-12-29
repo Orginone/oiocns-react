@@ -30,6 +30,7 @@ import { dateFormat, getUuid } from '@/utils/tools';
 import moment from 'moment';
 import { TargetType } from '@/ts/core';
 import FlowTodo from '@/pages/Setting/content/Flow/Todo';
+import { FlowInstanceModel, ResultType } from '@/ts/base/model';
 /**
  * 发起捐赠(公益方发起捐赠)
  * @returns
@@ -111,18 +112,27 @@ const DoDonationSetting: React.FC = () => {
     },
   ];
 
-  const save = async () => {
+  const save = async (): Promise<boolean> => {
     if (!formdata.creator) {
       formdata.creator = userCtrl.user.id;
       formdata.creatorName = userCtrl.user.name;
       formdata.creatTime = moment().format(dateFormat);
     }
+    let success = true;
     if (!formdata.id) {
       formdata.id = getUuid();
-      await kernel.anystore.insert(doDonationCollName, formdata, 'user');
-      message.success('保存成功');
-      setEditable(false);
+      let res = await kernel.anystore.insert(doDonationCollName, formdata, 'user');
+      success = res.success;
+    } else {
+      let res = await kernel.anystore.update(
+        doDonationCollName,
+        { match: { id: formdata.id }, update: { _set_: formdata } },
+        'user',
+      );
+      success = res.success;
     }
+
+    return success;
   };
 
   const load = async () => {
@@ -135,26 +145,56 @@ const DoDonationSetting: React.FC = () => {
       },
       'user',
     );
+    console.log(res);
   };
 
   /**提交并审核 */
   const submitAndExamine = async (e: any) => {
     if (checkValid()) {
       formdata.status = Status.Draft;
-      await save();
+      let success = await save();
       /**发起流程 */
-      message.success('提交成功');
+      if (success) {
+        let param: FlowInstanceModel = {
+          // 应用Id
+          productId: '396284430303498240',
+          // 功能标识编号
+          functionCode: '公益组织发起捐赠',
+          // 空间Id
+          SpaceId: userCtrl.space.id,
+          // 展示内容
+          content: 'https://www.npmjs.com/',
+          // 内容类型
+          contentType: 'Iframe',
+          // 表单数据内容
+          data: JSON.stringify(formdata),
+          // 标题
+          title: '公益组织发起捐赠流程',
+          // 回调地址
+          hook: 'https://www.npmjs.com/',
+        };
+        console.log('param', param);
+        let res = await kernel.createInstance(param);
+        if (res.success) {
+          setEditable(false);
+          message.success('提交并发起流程成功');
+        } else {
+          message.error('发起流程失败');
+        }
+      } else {
+        message.error('保存失败');
+      }
     }
   };
   /**暂存 */
   const stash = async (e: any) => {
     message.warn('该功能尚未开放');
+    load();
     // await save();
   };
 
   const closeDrawer = () => {
     setOpen(false);
-    console.log('关闭Drawer');
   };
 
   const checkValid = (): boolean => {

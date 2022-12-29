@@ -5,20 +5,24 @@ import DoDonation from '@/pages/Welfare/WelfareOrg/DoDonation';
 import DonationFormList from '@/pages/Welfare/WelfareOrg/DonationFormList';
 import PublishAssetForm from '@/pages/Welfare/WelfareOrg/PublishAssetForm';
 import MainLayout from '@/components/MainLayout';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ISpeciesItem, ITarget } from '@/ts/core';
 import useMenuUpdate from '@/pages/Welfare/hooks/useMenuUpdate';
-import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import { GroupMenuType } from '@/pages/Welfare/config/menuType';
-
+import { donationfromListColumns } from '@/pages/Welfare/config/columns';
+import { renderRoutes } from 'react-router-config';
+import { IRouteConfig } from 'typings/globelType';
+type BasicLayoutProps = {
+  route: IRouteConfig;
+  history: any;
+};
 /**
  * 公益仓路由页
  */
-const Welfare: React.FC<any> = () => {
+const Welfare: React.FC<BasicLayoutProps> = (props) => {
+  const { route, history } = props;
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
     <MainLayout selectMenu={selectMenu} siderMenuData={menus}>
-      <DoDonation></DoDonation>
+      {/* <DonationFormList columns={donationfromListColumns}></DonationFormList> */}
+      {renderRoutes(route.routes)}
     </MainLayout>
   );
 };

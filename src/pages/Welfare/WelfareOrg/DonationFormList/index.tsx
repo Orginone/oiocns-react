@@ -1,80 +1,124 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Divider, message, RadioChangeEvent, Space } from 'antd';
 import { common } from 'typings/common';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
-import { DonationFormAssetColumns } from '@/pages/Welfare/config/columns';
+import { ProColumns } from '@ant-design/pro-components';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
+
+interface IProps {
+  columns: ProColumns[];
+}
 /**
- * 公益捐赠审批单列表
+ * 公益捐赠审批单列表(捐赠方申请)
  * @returns
  */
-const DonationList: React.FC = () => {
-  let formdata: any = {
-    no: 'GYCSQ20220926000046',
-    sponsor: '省财政厅',
-    needStore: '1',
-    store: '1',
-    linkman: '张三',
-    phone: '13800000082',
-    totalValue: 10103910,
-    amount: 20,
-    reason: '这是申请原因这是原因',
-    remark: '这是备注信息这是备注信息这是备注信息这是备注信息',
-  };
-  const [stores, setStores] = useState([
-    {
-      value: '1',
-      label: '仓储机构1',
-    },
-    {
-      value: '2',
-      label: '仓储机构2',
-    },
-  ]);
-  // const [key, forceUpdate] = useObjectUpdate(formdata);
+const DonationList: React.FC<IProps> = (props: IProps) => {
   const parentRef = useRef<any>(null);
+  const [datasource, setDatasource] = useState<any[]>([]);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [key, forceUpdate] = useObjectUpdate(datasource);
+  let allData: any[] = [
+    {
+      id: '111',
+      event: '捐赠发起申请',
+      describe: '这是描述这是描述',
+      sponsor: '省财政厅',
+      creatTime: '2017-10-31 23:12:00',
+      expireTime: '2017-10-31 23:12:00',
+      status: 'todo',
+      handle: null,
+    },
+    {
+      id: '112',
+      event: '捐赠发起申请',
+      describe: '描述这是描述这是描述',
+      sponsor: '张三',
+      creatTime: '2017-10-31 23:12:00',
+      expireTime: '2017-10-31 23:12:00',
+      status: 'todo',
+      handle: null,
+    },
+    {
+      id: '113',
+      event: '捐赠发起申请',
+      describe: '这是描述这是描述这是描述这',
+      sponsor: '省财政厅',
+      creatTime: '2017-10-31 23:12:00',
+      expireTime: '2017-10-31 23:12:00',
+      status: 'done',
+      handle: '接受捐赠',
+    },
+  ];
+  useEffect(() => {
+    setDatasource(allData);
+  }, []);
   // 标题tabs页
   const TitleItems = [
     {
-      tab: `物资明细`,
-      key: 'assetList',
+      tab: `全部`,
+      key: 'all',
+    },
+    {
+      tab: `待办`,
+      key: 'todo',
+    },
+    {
+      tab: `已办`,
+      key: 'done',
     },
   ];
+  //tab页切换
+  const onTabChange = (e: any) => {
+    switch (e) {
+      case 'all':
+        setDatasource(allData);
+        break;
+      case 'todo':
+        setDatasource(allData.filter((item) => item.status == 'todo'));
+        break;
+      case 'done':
+        setDatasource(allData.filter((item) => item.status == 'done'));
+        break;
+    }
+  };
+
+  const refuseDonation = (e: any) => {
+    let unHandleRows = selectedRows.filter((item) => !item.handle);
+    if (unHandleRows.length > 0) {
+      message.warn('此处设置数据状态，功能暂未开放');
+    } else {
+      message.warn('至少选择一条未处理的数据');
+    }
+  };
+
+  const receciveDonation = () => {};
 
   // 按钮
   const renderBtns = () => {
     return (
       <>
-        <Button key="exportBatch" onClick={() => {}}>
-          批量导出
+        <Button
+          key="recieve"
+          style={{ marginRight: '10px' }}
+          type="primary"
+          onClick={receciveDonation}>
+          接受捐赠
+        </Button>
+        <Button key="refuse" style={{ marginRight: '10px' }} onClick={refuseDonation}>
+          拒绝捐赠
+        </Button>
+        <Button
+          key="print"
+          onClick={() => {
+            message.error('该功能暂未开放');
+          }}>
+          打印
         </Button>
       </>
     );
   };
-
-  //Descriptions按钮
-  const buttons = [
-    <Button
-      style={{ marginRight: '10px' }}
-      key="submit"
-      type="primary"
-      onClick={() => {}}>
-      审批
-    </Button>,
-    <Button key="store" onClick={async () => {}}>
-      暂存
-    </Button>,
-    <Divider key="vertical" type="vertical" />,
-    <Button
-      key="backlist"
-      type="link"
-      onClick={async () => {
-        message.warn('该功能尚未开放');
-      }}>
-      返回列表
-    </Button>,
-  ];
 
   // 操作内容渲染函数
   const renderOperation = (item: any): common.OperationType[] => {
@@ -83,63 +127,30 @@ const DonationList: React.FC = () => {
       {
         key: 'remove',
         label: '移除',
-        onClick: async () => {},
+        onClick: async () => {
+          message.warn('此功能暂未开放');
+        },
       },
     ];
     return operations;
   };
 
-  const needStoreChange = (e: RadioChangeEvent) => {
-    // formdata.needStore = e.target.value;
-    // setNeedStore(needStore);
-  };
-
   return (
     <div className={cls[`content-box`]}>
       <div className={cls['pages-wrap']}>
-        <PageCard bordered={false} tabList={TitleItems} tabBarExtraContent={renderBtns()}>
+        <PageCard
+          title={
+            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>公益物资捐赠审批单</div>
+          }
+          bordered={false}
+          tabList={TitleItems}
+          onTabChange={onTabChange}
+          tabBarExtraContent={renderBtns()}>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<any>
-              dataSource={[]}
+              key={key}
+              dataSource={datasource}
               rowKey={'id'}
-              request={(page) => {
-                return new Promise(function (resolve, reject) {
-                  // 异步处理,处理结束后、调用resolve 或 reject
-                  setTimeout(() => {
-                    resolve({
-                      result: [
-                        {
-                          id: '12345678910',
-                          code: '12345678910',
-                          name: '资产名称1',
-                          spec: '500T',
-                          amount: 100,
-                          remark: '这是备注这是备注',
-                        },
-                        {
-                          id: '12345678911',
-                          code: '12345678911',
-                          name: '资产名称2',
-                          spec: '500T',
-                          amount: 100,
-                          remark: '这是备注这是备注这是备注这是备注这是备注这是备注',
-                        },
-                        {
-                          id: '12345678912',
-                          code: '12345678912',
-                          name: '资产名称3',
-                          spec: '500T',
-                          amount: 100,
-                          remark: '这是备注',
-                        },
-                      ],
-                      offset: 0,
-                      limit: 10,
-                      total: 100,
-                    });
-                  }, 1000);
-                });
-              }}
               parentRef={parentRef}
               operation={renderOperation}
               tableAlertOptionRender={({
@@ -149,14 +160,24 @@ const DonationList: React.FC = () => {
               }: any) => {
                 return (
                   <Space size={16}>
-                    <a>暂存勾选</a>
+                    <a
+                      onClick={() => {
+                        message.warn('此功能暂未开放');
+                      }}>
+                      暂存勾选
+                    </a>
                     <a onClick={onCleanSelected}>清空</a>
                   </Space>
                 );
               }}
-              columns={DonationFormAssetColumns}
+              columns={props.columns}
               showChangeBtn={true}
-              rowSelection={{}}
+              rowSelection={{
+                onSelect: (_record: any, _selected: any, selectedRows: any) => {
+                  // onFinish(selectedRows);
+                  setSelectedRows(selectedRows);
+                },
+              }}
             />
           </div>
         </PageCard>

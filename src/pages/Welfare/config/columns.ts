@@ -129,4 +129,45 @@ export const DoDonationAssetColumns: ProColumns[] = [
 
 ];
 
+//公益捐赠审批单
+export const donationfromListColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '事项',
+    dataIndex: 'event',
+    key: 'event',
+  },
+  {
+    title: '描述',
+    dataIndex: 'describe',
+    key: 'describe',
+  },
+  {
+    title: '发起人/单位',
+    dataIndex: 'sponsor',
+    key: 'sponsor',
+  },
+  {
+    title: '提交时间',
+    dataIndex: 'creatTime',
+    key: 'creatTime',
+  },
+  {
+    title: '过期时间',
+    dataIndex: 'expireTime',
+    key: 'expireTime',
+    width: 400,
+  },
+  {
+    title: '处理结果',
+    dataIndex: 'handle',
+    key: 'handle',
+  },
+
+];
+
 
