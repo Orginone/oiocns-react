@@ -2,9 +2,10 @@ import React, { useState, useMemo } from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
-import processCtrl from '../../../../Controller/processCtrl';
+import { FieldCondition } from '../../FlowDrawer/processType';
 
-type ConditionNodeProps = {
+type IProps = {
+  conditions?: FieldCondition[];
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
@@ -18,7 +19,7 @@ type ConditionNodeProps = {
  * 条件节点
  * @returns
  */
-const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) => {
+const ConditionNode: React.FC<IProps> = (props) => {
   const [showError, setShowError] = useState<boolean>(false);
 
   const delNode = () => {
@@ -32,7 +33,6 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
-    const currentCondition = processCtrl.conditionData.fields;
     var text = '请设置条件';
     if (conditions && conditions.length > 0) {
       text = '';
@@ -46,7 +46,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
       text = text.substring(0, text.lastIndexOf(' 且 '));
       const getFindValue = conditions.find(
         (item: { paramLabel: string; paramKey: string }) => {
-          const findData = currentCondition.find(
+          const findData = props.conditions?.find(
             (innItem: { label: string; value: string }) => {
               return item.paramLabel === innItem.label && innItem.value === item.paramKey;
             },

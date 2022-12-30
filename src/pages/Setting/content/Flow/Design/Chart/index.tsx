@@ -2,13 +2,12 @@ import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
-import { AddNodeType, conditionDataType, NodeType } from './FlowDrawer/processType';
-import { FlowNode } from '@/ts/base/model';
+import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType';
 
 interface IProps {
   scale?: number;
-  resource: FlowNode;
-  conditions?: conditionDataType; //内置条件选择器
+  resource: any;
+  conditions?: FieldCondition[]; //内置条件选择器
 }
 
 const ChartDesign: React.FC<IProps> = (props) => {
@@ -27,6 +26,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
           <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
+              conditions={props.conditions}
               resource={props.resource}
               onSelectedNode={(params) => {
                 if (params.type !== AddNodeType.CONCURRENTS) {
@@ -45,7 +45,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       <FlowDrawer
         isOpen={isOpen}
         current={currentNode}
-        conditions={props.conditions?.fields}
+        conditions={props.conditions}
         onClose={() => {
           setIsOpen(false);
         }}

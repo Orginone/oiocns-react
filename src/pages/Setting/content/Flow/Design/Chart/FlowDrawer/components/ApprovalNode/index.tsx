@@ -3,7 +3,6 @@ import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
-import processCtrl from '../../../../../Controller/processCtrl';
 import { NodeType } from '../../processType';
 
 interface IProps {

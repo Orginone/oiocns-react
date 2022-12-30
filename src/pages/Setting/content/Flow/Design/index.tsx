@@ -24,15 +24,29 @@ interface IProps {
 const Design: React.FC<IProps> = (props) => {
   const [scale, setScale] = useState<number>(100);
   const [currentStep, setCurrentStep] = useState(0);
-  const [resource, setResource] = useState<FlowNode>();
+  const [resource, setResource] = useState({
+    nodeId: 'ROOT',
+    parentId: '',
+    type: 'ROOT',
+    name: '发起人',
+    children: {
+      id: '',
+      nodeId: 'node_590719745693',
+      parentId: 'ROOT',
+      props: {},
+      type: 'CONDITIONS',
+      name: '条件分支',
+    },
+  });
   const [conditionData, setConditionData] = useState({
     name: '',
-    fields: [{}],
+    fields: [],
     remark: '',
   });
 
   useEffect(() => {
     if (props.current) {
+      setResource(JSON.parse(props.current.content)['resource']);
       setConditionData({
         name: props.current.name || '',
         remark: JSON.parse(props.current.remark),
@@ -130,7 +144,7 @@ const Design: React.FC<IProps> = (props) => {
                                 name: conditionData.name,
                                 fields: JSON.stringify(conditionData.fields),
                                 remark: conditionData.remark,
-                                resource: resource,
+                                resource: resource as FlowNode,
                               })
                             ) {
                               props.onBack();
@@ -156,7 +170,11 @@ const Design: React.FC<IProps> = (props) => {
                       </Space>
                     }
                   </div>
-                  <ChartDesign scale={scale} />
+                  <ChartDesign
+                    conditions={conditionData.fields}
+                    resource={resource}
+                    scale={scale}
+                  />
                 </div>
               )}
             </Card>

@@ -24,7 +24,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
 
 export type conditionDataType = {
   name: string;
-  labels: string;
+  remark: string;
   fields: FieldCondition[];
 };
 

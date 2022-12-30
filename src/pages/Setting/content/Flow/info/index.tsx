@@ -142,11 +142,7 @@ const FlowList: React.FC<IProps> = (props) => {
                 新建业务绑定
               </Button>
             }
-            title={
-              <Typography.Title level={5}>
-                {current.name + '  的绑定信息'}
-              </Typography.Title>
-            }>
+            title={<Typography.Title level={5}>{current.name}</Typography.Title>}>
             <Card bordered={false} bodyStyle={{ padding: 0 }}>
               <Space className={cls.appwrap} size={20}>
                 {binds.length > 0 ? (

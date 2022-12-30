@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Node from '../Process/Node';
-import { useAppwfConfig } from '../flow';
+import { useAppwfConfig } from './flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
 import Approval from '../Process/ApprovalNode';
@@ -13,11 +13,13 @@ import {
   APPROVAL_PROPS,
   CC_PROPS,
   DELAY_PROPS,
+  FieldCondition,
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { FlowNode } from '@/ts/base/model';
 
 type IProps = {
+  conditions?: FieldCondition[]; //内置条件选择器
   resource: FlowNode;
   onSelectedNode: (params: any) => void;
   [key: string]: any;
@@ -28,7 +30,7 @@ type IProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource }) => {
+const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions }) => {
   const [key, setKey] = useState(0);
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
@@ -197,6 +199,7 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource }) => {
         // ref: node.nodeId,
         key: node.nodeId,
         ...props,
+        conditions,
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
         onDelNode: () => delNode(node),

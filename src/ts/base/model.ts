@@ -779,7 +779,7 @@ export type CreateDefineReq = {
 };
 
 export type FlowNode = {
-  id: string;
+  id?: string;
   nodeId: string;
   parentId: string;
   type: string;
