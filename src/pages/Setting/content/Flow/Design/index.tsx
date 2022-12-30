@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import FieldInfo from './Field';
-import DesignChart from './Chart';
+import ChartDesign from './Chart';
 import { XFlowDefine } from '@/ts/base/schema';
 import { Button, Card, Layout, Modal, Space, Steps } from 'antd';
 import {
@@ -156,7 +156,7 @@ const Design: React.FC<IProps> = (props) => {
                       </Space>
                     }
                   </div>
-                  <DesignChart scale={scale} />
+                  <ChartDesign scale={scale} />
                 </div>
               )}
             </Card>
