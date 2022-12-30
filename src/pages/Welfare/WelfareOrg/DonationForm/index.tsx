@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -19,6 +19,8 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import TextArea from 'antd/lib/input/TextArea';
 import { DonationFormAssetColumns } from '@/pages/Welfare/config/columns';
+import { model, schema, kernel } from '@/ts/base';
+import { TargetType } from '@/ts/core';
 /**
  * 捐赠单信息(捐赠方申请)
  * @returns
@@ -28,7 +30,7 @@ const DonationSetting: React.FC = () => {
     no: 'GYCSQ20220926000046',
     sponsor: '省财政厅',
     needStore: '1',
-    store: '1',
+    store: '395663272721911808',
     linkman: '张三',
     phone: '13800000082',
     totalValue: 10103910,
@@ -36,17 +38,7 @@ const DonationSetting: React.FC = () => {
     reason: '这是申请原因这是原因',
     remark: '这是备注信息这是备注信息这是备注信息这是备注信息',
   };
-  const [stores, setStores] = useState([
-    {
-      value: '1',
-      label: '仓储机构1',
-    },
-    {
-      value: '2',
-      label: '仓储机构2',
-    },
-  ]);
-  // const [key, forceUpdate] = useObjectUpdate(formdata);
+  const [stores, setStores] = useState([]);
   const parentRef = useRef<any>(null);
   // 标题tabs页
   const TitleItems = [
@@ -56,11 +48,44 @@ const DonationSetting: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    queryStores();
+  }, []);
+
+  const queryStores = async () => {
+    let groupResult: model.ResultType<schema.XTargetArray> = await kernel.queryTargetById(
+      { ids: ['395662892994793472'] },
+    );
+    if (groupResult.success && groupResult.data.result) {
+      let group: schema.XTarget = groupResult.data.result[0];
+      const companyResult = await kernel.querySubTargetById({
+        page: {
+          limit: 100,
+          offset: 0,
+          filter: '',
+        },
+        id: group.id,
+        typeNames: [TargetType.Group],
+        subTypeNames: [TargetType.Company],
+      });
+      if (companyResult.success && companyResult.data.result) {
+        let stores: any = companyResult.data.result.map((item) => {
+          return { value: item.id, label: item.name };
+        });
+        setStores(stores);
+      }
+    }
+  };
+
   // 按钮
   const renderBtns = () => {
     return (
       <>
-        <Button key="exportBatch" onClick={() => {}}>
+        <Button
+          key="exportBatch"
+          onClick={() => {
+            message.warn('该功能尚未开放');
+          }}>
           批量导出
         </Button>
       </>
@@ -73,10 +98,16 @@ const DonationSetting: React.FC = () => {
       style={{ marginRight: '10px' }}
       key="submit"
       type="primary"
-      onClick={() => {}}>
+      onClick={() => {
+        message.warn('该功能尚未开放');
+      }}>
       审批
     </Button>,
-    <Button key="store" onClick={async () => {}}>
+    <Button
+      key="store"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
@@ -97,7 +128,9 @@ const DonationSetting: React.FC = () => {
       {
         key: 'remove',
         label: '移除',
-        onClick: async () => {},
+        onClick: async () => {
+          message.warn('该功能尚未开放');
+        },
       },
     ];
     return operations;

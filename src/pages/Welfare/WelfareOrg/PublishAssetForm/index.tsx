@@ -24,6 +24,8 @@ import { DonationFormAssetColumns } from '@/pages/Welfare/config/columns';
 import userCtrl from '@/ts/controller/setting';
 import IMarket from '@/ts/core/market/imarket';
 import { DownOutlined } from '@ant-design/icons';
+import { kernel, model, schema } from '@/ts/base';
+import { TargetType } from '@/ts/core';
 /**
  * 上架物资（公益组织）
  * @returns
@@ -31,7 +33,7 @@ import { DownOutlined } from '@ant-design/icons';
 const PublishAssetSetting: React.FC = () => {
   let formdata: any = {
     no: null,
-    sponsor: userCtrl.company.name,
+    sponsor: userCtrl.space.name,
     market: null, //上架商城
     store: null,
     needAssess: '1', //是否需要评估
@@ -41,23 +43,41 @@ const PublishAssetSetting: React.FC = () => {
     reason: null,
     remark: null,
   };
-  const [stores, setStores] = useState<common.OptionType[]>([
-    {
-      value: '1',
-      label: '仓储机构1',
-    },
-    {
-      value: '2',
-      label: '仓储机构2',
-    },
-  ]);
+  const [stores, setStores] = useState<common.OptionType[]>([]);
   const [markets, setMarkets] = useState<common.OptionType[]>([]);
+  const [key, forceUpdate] = useObjectUpdate(userCtrl.space);
   useEffect(() => {
     getMarkets();
-  }, [userCtrl.company]);
+    queryStores();
+  }, []);
+
+  const queryStores = async () => {
+    let groupResult: model.ResultType<schema.XTargetArray> = await kernel.queryTargetById(
+      { ids: ['395662892994793472'] },
+    );
+    if (groupResult.success && groupResult.data.result) {
+      let group: schema.XTarget = groupResult.data.result[0];
+      const companyResult = await kernel.querySubTargetById({
+        page: {
+          limit: 100,
+          offset: 0,
+          filter: '',
+        },
+        id: group.id,
+        typeNames: [TargetType.Group],
+        subTypeNames: [TargetType.Company],
+      });
+      if (companyResult.success && companyResult.data.result) {
+        let stores: any = companyResult.data.result.map((item) => {
+          return { value: item.id, label: item.name };
+        });
+        setStores(stores);
+      }
+    }
+  };
 
   const getMarkets = async () => {
-    var joinedMarkets: IMarket[] = await userCtrl.company.getJoinMarkets();
+    var joinedMarkets: IMarket[] = await userCtrl.space.getJoinMarkets();
     setMarkets(
       joinedMarkets.map((item: IMarket) => {
         return { value: item.market.id, label: item.market.name };
@@ -79,14 +99,14 @@ const PublishAssetSetting: React.FC = () => {
       label: '暂存箱添加',
       key: '1',
       onClick: () => {
-        console.log('暂存箱添加');
+        message.warn('该功能尚未开放');
       },
     },
     {
       label: '仓库添加',
       key: '2',
       onClick: () => {
-        console.log('仓库添加');
+        message.warn('该功能尚未开放');
       },
     },
   ];
@@ -103,7 +123,11 @@ const PublishAssetSetting: React.FC = () => {
             </Space>
           </Button>
         </Dropdown>
-        <Button key="exportBatch" onClick={() => {}}>
+        <Button
+          key="exportBatch"
+          onClick={() => {
+            message.warn('该功能尚未开放');
+          }}>
           批量导入/导出
         </Button>
       </>
@@ -116,10 +140,16 @@ const PublishAssetSetting: React.FC = () => {
       style={{ marginRight: '10px' }}
       key="submit"
       type="primary"
-      onClick={() => {}}>
+      onClick={() => {
+        message.warn('该功能尚未开放');
+      }}>
       提交并审核
     </Button>,
-    <Button key="store" onClick={async () => {}}>
+    <Button
+      key="store"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
@@ -140,21 +170,19 @@ const PublishAssetSetting: React.FC = () => {
       {
         key: 'remove',
         label: '移除',
-        onClick: async () => {},
+        onClick: async () => {
+          message.warn('该功能尚未开放');
+        },
       },
     ];
     return operations;
-  };
-
-  const needStoreChange = (e: RadioChangeEvent) => {
-    // formdata.needStore = e.target.value;
-    // setNeedStore(needStore);
   };
 
   return (
     <div className={cls[`content-box`]}>
       <Card bordered={false} className={cls['content']}>
         <Descriptions
+          key={key}
           title="公益仓上架申请单"
           bordered
           column={2}
@@ -166,17 +194,32 @@ const PublishAssetSetting: React.FC = () => {
           }}
           contentStyle={{ textAlign: 'left', color: '#606266' }}
           extra={buttons}>
-          <Descriptions.Item label="单据编号">
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>单据编号
+              </span>
+            }>
             <Input placeholder="请输入单据编号" defaultValue={formdata.no} />
           </Descriptions.Item>
-          <Descriptions.Item label="发起人/单位">
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>发起人/单位
+              </span>
+            }>
             <Input
               placeholder="请选择发起人或单位"
               defaultValue={formdata.sponsor}
               disabled
             />
           </Descriptions.Item>
-          <Descriptions.Item label="上架商城">
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>上架商城
+              </span>
+            }>
             <Select
               showSearch
               placeholder="请选择上架商城"

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -22,6 +22,8 @@ import TextArea from 'antd/lib/input/TextArea';
 import { DonationFormAssetColumns } from '@/pages/Welfare/config/columns';
 import { dateFormat } from '@/utils/tools';
 import moment from 'moment';
+import { model, schema, kernel } from '@/ts/base';
+import { TargetType } from '@/ts/core';
 /**
  * 资助单信息(受捐方申请)
  * @returns
@@ -37,21 +39,10 @@ const SupportSetting: React.FC = () => {
     expireTime: '2023-10-25',
     linkman: '张三',
     phone: '13500000000',
-    store: '1',
+    store: '395663272721911808',
     reason: '这是申请原因这是原因',
   };
-  const [stores, setStores] = useState<any[]>([
-    {
-      key: '101',
-      value: '1',
-      label: '仓储机构1',
-    },
-    {
-      key: '102',
-      value: '2',
-      label: '仓储机构2',
-    },
-  ]);
+  const [stores, setStores] = useState<any[]>([]);
   // const [key, forceUpdate] = useObjectUpdate(formdata);
   const parentRef = useRef<any>(null);
   // 标题tabs页
@@ -73,10 +64,16 @@ const SupportSetting: React.FC = () => {
       style={{ marginRight: '10px' }}
       key="submit"
       type="primary"
-      onClick={() => {}}>
+      onClick={() => {
+        message.warn('该功能尚未开放');
+      }}>
       审批
     </Button>,
-    <Button key="store" onClick={async () => {}}>
+    <Button
+      key="store"
+      onClick={async () => {
+        message.warn('该功能尚未开放');
+      }}>
       暂存
     </Button>,
     <Divider key="vertical" type="vertical" />,
@@ -97,15 +94,41 @@ const SupportSetting: React.FC = () => {
       {
         key: 'remove',
         label: '移除',
-        onClick: async () => {},
+        onClick: async () => {
+          message.warn('该功能尚未开放');
+        },
       },
     ];
     return operations;
   };
 
-  const needStoreChange = (e: RadioChangeEvent) => {
-    // formdata.needStore = e.target.value;
-    // setNeedStore(needStore);
+  useEffect(() => {
+    queryStores();
+  }, []);
+
+  const queryStores = async () => {
+    let groupResult: model.ResultType<schema.XTargetArray> = await kernel.queryTargetById(
+      { ids: ['395662892994793472'] },
+    );
+    if (groupResult.success && groupResult.data.result) {
+      let group: schema.XTarget = groupResult.data.result[0];
+      const companyResult = await kernel.querySubTargetById({
+        page: {
+          limit: 100,
+          offset: 0,
+          filter: '',
+        },
+        id: group.id,
+        typeNames: [TargetType.Group],
+        subTypeNames: [TargetType.Company],
+      });
+      if (companyResult.success && companyResult.data.result) {
+        let stores: any = companyResult.data.result.map((item) => {
+          return { value: item.id, label: item.name };
+        });
+        setStores(stores);
+      }
+    }
   };
 
   return (
@@ -263,7 +286,12 @@ const SupportSetting: React.FC = () => {
               }: any) => {
                 return (
                   <Space size={16}>
-                    <a>暂存勾选</a>
+                    <a
+                      onClick={() => {
+                        message.warn('此功能尚未开放');
+                      }}>
+                      暂存勾选
+                    </a>
                     <a onClick={onCleanSelected}>清空</a>
                   </Space>
                 );
