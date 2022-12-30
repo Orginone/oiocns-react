@@ -3,7 +3,7 @@ import cls from './index.module.less';
 import React, { useEffect } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import ProcessCtrl from '../../Controller/processCtrl';
-import { optionType } from '../../FlowComponents/FlowDrawer/processType';
+import { dataType } from '../Chart/FlowDrawer/processType';
 import {
   ProFormText,
   ProForm,
@@ -48,13 +48,13 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
           rules={[{ required: true, message: '请输入流程名称!' }]}
         />
         <ProFormTextArea
-          name="fields"
+          name="remark"
           label="备注信息"
           placeholder="输入备注信息"
           // rules={[{ required: true, message: '请输入备注信息!' }]}
         />
         <ProFormList
-          name="labels"
+          name="fields"
           label="流程字段"
           initialValue={[{ label: '' }]}
           deleteIconProps={{
@@ -79,7 +79,12 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
             <ProFormSelect
               name="type"
               label="字段类型"
-              options={optionType}
+              options={[
+                { label: '字符串', value: dataType.STRING },
+                { label: '数字', value: dataType.NUMERIC },
+                { label: '枚举', value: dataType.DICT },
+                { label: '日期', value: dataType.DATE },
+              ]}
               placeholder="请选择类型"
               rules={[{ required: true, message: '请选择类型!' }]}
             />

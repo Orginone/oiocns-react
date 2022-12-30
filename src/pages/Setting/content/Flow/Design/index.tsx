@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import FieldInfo from './Field';
-import NewProcessDesign from '../FlowComponents';
+import NewProcessDesign from './Chart';
 import { XFlowDefine } from '@/ts/base/schema';
 import { Button, Card, Layout, Modal, Space, Steps } from 'antd';
 import {
@@ -10,6 +10,8 @@ import {
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
+  FileTextOutlined,
+  HighlightOutlined,
 } from '@ant-design/icons';
 
 enum StepType {
@@ -27,13 +29,23 @@ const Design: React.FC<IProps> = (props) => {
   const [currentScale, setCurrentScale] = useState<number>(100);
   const [conditionData, setConditionData] = useState<{
     name: string;
-    labels: [{}];
-    fields: string;
+    fields: [{}];
+    remark: string;
   }>({
     name: '',
-    labels: [{}],
-    fields: '',
+    fields: [{}],
+    remark: '',
   });
+
+  useEffect(() => {
+    if (props.current) {
+      setConditionData({
+        name: props.current.name || '',
+        remark: JSON.parse(props.current.remark),
+        fields: JSON.parse(props.current.content)['fields'],
+      });
+    }
+  }, [props.current]);
 
   return (
     <div className={cls['company-info-content']}>
@@ -68,7 +80,6 @@ const Design: React.FC<IProps> = (props) => {
                       onOk() {
                         props.onBack();
                       },
-                      onCancel() {},
                     });
                   }}>
                   <RollbackOutlined />
@@ -83,42 +94,14 @@ const Design: React.FC<IProps> = (props) => {
                   }}
                   items={[
                     {
-                      title: StepType.Fields,
+                      title: '字段设计',
+                      icon: <FileTextOutlined />,
                     },
                     {
-                      title: StepType.Chart,
+                      title: '流程图设计',
+                      icon: <HighlightOutlined />,
                     },
                   ]}></Steps>
-              </div>
-              <div className={cls['publish']}>
-                {currentStep === StepType.Chart && (
-                  <Space>
-                    <Button
-                      className={cls['publis-issue']}
-                      size="small"
-                      type="primary"
-                      onClick={() => {
-                        props.onBack();
-                      }}>
-                      <SendOutlined />
-                      发布
-                    </Button>
-                    <Button
-                      className={cls['scale']}
-                      size="small"
-                      disabled={currentScale <= 40}
-                      onClick={() => setCurrentScale(currentScale - 10)}>
-                      <MinusOutlined />
-                    </Button>
-                    <span>{currentScale}%</span>
-                    <Button
-                      size="small"
-                      disabled={currentScale >= 150}
-                      onClick={() => setCurrentScale(currentScale + 10)}>
-                      <PlusOutlined />
-                    </Button>
-                  </Space>
-                )}
               </div>
             </div>
           </Layout.Header>
@@ -138,6 +121,36 @@ const Design: React.FC<IProps> = (props) => {
                 />
               ) : (
                 <div>
+                  <div className={cls['publish']}>
+                    {
+                      <Space>
+                        <Button
+                          className={cls['publis-issue']}
+                          size="small"
+                          type="primary"
+                          onClick={() => {
+                            props.onBack();
+                          }}>
+                          <SendOutlined />
+                          发布
+                        </Button>
+                        <Button
+                          className={cls['scale']}
+                          size="small"
+                          disabled={currentScale <= 40}
+                          onClick={() => setCurrentScale(currentScale - 10)}>
+                          <MinusOutlined />
+                        </Button>
+                        <span>{currentScale}%</span>
+                        <Button
+                          size="small"
+                          disabled={currentScale >= 150}
+                          onClick={() => setCurrentScale(currentScale + 10)}>
+                          <PlusOutlined />
+                        </Button>
+                      </Space>
+                    }
+                  </div>
                   <NewProcessDesign />
                 </div>
               )}

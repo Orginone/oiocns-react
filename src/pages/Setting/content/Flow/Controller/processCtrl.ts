@@ -4,7 +4,7 @@ import {
   nodeType,
   AddNodeType,
   defalutDesignValue,
-} from '../FlowComponents/FlowDrawer/processType';
+} from '../Design/Chart/FlowDrawer/processType';
 import { deepClone } from '@/ts/base/common';
 
 export enum ConditionCallBackTypes {

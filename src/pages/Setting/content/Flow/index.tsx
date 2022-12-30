@@ -1,7 +1,7 @@
 import Design from './Design';
 import React, { useState } from 'react';
 import { XFlowDefine } from '../../../../ts/base/schema';
-import FlowList from './List';
+import FlowList from './info';
 
 enum TabType {
   'List' = '流程列表', //表格
