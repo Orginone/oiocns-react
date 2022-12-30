@@ -33,9 +33,7 @@ const items: ItemType[] = [
  * 捐赠方--待办
  */
 const DonationerTodo: React.FC = () => {
-  const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
-  };
+  const onClick: MenuProps['onClick'] = (e) => {};
 
   return (
     <div className={cls.layout}>

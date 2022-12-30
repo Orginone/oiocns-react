@@ -29,7 +29,6 @@ import { kernel, model, schema } from '@/ts/base';
 import { dateFormat, getUuid } from '@/utils/tools';
 import moment from 'moment';
 import { TargetType } from '@/ts/core';
-import FlowTodo from '@/pages/Setting/content/Flow/Todo';
 import { FlowInstanceModel, ResultType } from '@/ts/base/model';
 /**
  * 发起捐赠(公益方发起捐赠)
@@ -107,7 +106,7 @@ const DoDonationSetting: React.FC = () => {
       label: '仓库添加',
       key: '2',
       onClick: () => {
-        console.log('仓库添加');
+        message.warn('该功能尚未开放');
       },
     },
   ];
@@ -145,7 +144,6 @@ const DoDonationSetting: React.FC = () => {
       },
       'user',
     );
-    console.log(res);
   };
 
   /**提交并审核 */
@@ -173,7 +171,6 @@ const DoDonationSetting: React.FC = () => {
           // 回调地址
           hook: 'https://www.npmjs.com/',
         };
-        console.log('param', param);
         let res = await kernel.createInstance(param);
         if (res.success) {
           setEditable(false);
@@ -496,10 +493,6 @@ const DoDonationSetting: React.FC = () => {
           </div>
         </PageCard>
       </div>
-      <FlowTodo
-        open={open}
-        onClose={closeDrawer}
-        instance={formdata.flowinstance}></FlowTodo>
     </div>
   );
 };

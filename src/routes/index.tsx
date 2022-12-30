@@ -128,20 +128,6 @@ const WelfareRouter: IRouteConfig[] = [
     title: '公益仓',
     icon: 'icon-setting',
     component: React.lazy(() => import('@/pages/Welfare')),
-    // routes: [
-    //   {
-    //     path: '/welfareorg/donationForm',
-    //     title: '公益捐赠审批单',
-    //     icon: 'icon-message',
-    //     component: React.lazy(() => import('@/pages/Welfare/WelfareOrg/DonationForm')),
-    //   },
-    //   {
-    //     path: '/welfareorg/dodonation',
-    //     title: '发起捐赠',
-    //     icon: 'icon-message',
-    //     component: React.lazy(() => import('@/pages/Welfare/WelfareOrg/DoDonation')),
-    //   },
-    // ],
   },
 ];
 
