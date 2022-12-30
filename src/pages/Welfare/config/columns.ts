@@ -182,70 +182,6 @@ export const DoDonationAssetColumns: ProColumns[] = [
   },
 ];
 
-/**
- * 公益仓--平台：公益组织加入集团
- */
-export const supervisionWelfareOrgColumns: ProColumns[] = [
-  {
-    title: '序号',
-    valueType: 'index',
-    width: 50,
-  },
-  {
-    title: '组织名称',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: '所在领域',
-    dataIndex: 'businessAreas',
-    key: 'businessAreas',
-  },
-  {
-    title: '注册类型',
-    dataIndex: 'registerType',
-    key: 'registerType',
-  },
-  {
-    title: '统一社会征信代码',
-    dataIndex: 'code',
-    key: 'code',
-    width: 180,
-  },
-  {
-    title: '登记管理机关',
-    dataIndex: 'registerManageOrgan',
-    key: 'registerManageOrgan',
-  },
-  {
-    title: '业务管理机关',
-    dataIndex: 'businessManageOrgan',
-    key: 'businessManageOrgan',
-  },
-  {
-    title: '注册时间',
-    dataIndex: 'registerTime',
-    valueType: 'date',
-    key: 'registerTime',
-  },
-  {
-    title: '成立时间',
-    dataIndex: 'establishTime',
-    valueType: 'date',
-    key: 'establishTime',
-  },
-  {
-    title: '联系人',
-    dataIndex: 'contactPerson',
-    key: 'contactPerson',
-  },
-  {
-    title: '联系方式',
-    dataIndex: 'phone',
-    key: 'phone',
-  },
-];
-
 //公益捐赠审批单
 export const donationfromListColumns: ProColumns[] = [
   {
@@ -328,8 +264,8 @@ export const dodonationListColumns_Processed: ProColumns[] = [
     dataIndex: 'status',
     key: 'status',
   },
-
 ];
+
 //公益发起捐赠列表(已资助)
 export const dodonationListColumns_Supported: ProColumns[] = [
   {
@@ -372,7 +308,70 @@ export const dodonationListColumns_Supported: ProColumns[] = [
     dataIndex: 'assetStatus',
     key: 'assetStatus',
   },
+];
 
+/**
+ * 公益仓--平台：公益组织加入集团
+ */
+export const supervisionWelfareOrgColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '组织名称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '所在领域',
+    dataIndex: 'businessAreas',
+    key: 'businessAreas',
+  },
+  {
+    title: '注册类型',
+    dataIndex: 'registerType',
+    key: 'registerType',
+  },
+  {
+    title: '统一社会征信代码',
+    dataIndex: 'code',
+    key: 'code',
+    width: 180,
+  },
+  {
+    title: '登记管理机关',
+    dataIndex: 'registerManageOrgan',
+    key: 'registerManageOrgan',
+  },
+  {
+    title: '业务管理机关',
+    dataIndex: 'businessManageOrgan',
+    key: 'businessManageOrgan',
+  },
+  {
+    title: '注册时间',
+    dataIndex: 'registerTime',
+    valueType: 'date',
+    key: 'registerTime',
+  },
+  {
+    title: '成立时间',
+    dataIndex: 'establishTime',
+    valueType: 'date',
+    key: 'establishTime',
+  },
+  {
+    title: '联系人',
+    dataIndex: 'contactPerson',
+    key: 'contactPerson',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
 ];
 
 /**
