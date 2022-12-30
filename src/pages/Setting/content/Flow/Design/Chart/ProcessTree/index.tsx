@@ -15,8 +15,10 @@ import {
   DELAY_PROPS,
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
-import processCtrl from '../../../Controller/processCtrl';
-type ProcessTreeProps = {
+import { FlowNode } from '@/ts/base/model';
+
+type IProps = {
+  resource: FlowNode;
   onSelectedNode: (params: any) => void;
   [key: string]: any;
 };
@@ -26,12 +28,8 @@ type ProcessTreeProps = {
  * @returns
  */
 
-const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
+const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource }) => {
   const [key, setKey] = useState(0);
-
-  /**组件渲染中变更dom   共享状态*/
-  let design = processCtrl.currentTreeDesign;
-  let currentDom = design.resource;
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
 
@@ -202,7 +200,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
         //定义事件，插入节点，删除节点，选中节点，复制/移动
         onInsertNode: (type: any) => insertNode(type, node),
         onDelNode: () => delNode(node),
-        onSelected: () => selectNode(node),
+        onSelected: () => onSelectedNode(node),
         onCopy: () => copyBranch(node),
         onLeftMove: () => branchMove(node, -1),
         onRightMove: () => branchMove(node, 1),
@@ -322,10 +320,6 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
     return `node_${new Date().getTime().toString().substring(5)}${Math.round(
       Math.random() * 9000 + 1000,
     )}`;
-  };
-  //选中一个节点
-  const selectNode = (node: any) => {
-    onSelectedNode(node);
   };
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
@@ -607,7 +601,7 @@ const ProcessTree: React.FC<ProcessTreeProps> = ({ onSelectedNode }) => {
   const getTree = () => {
     nodeMap.clear();
 
-    let processTrees = getDomTree(React.createElement, currentDom);
+    let processTrees = getDomTree(React.createElement, resource);
     //插入末端节点
     processTrees.push(
       React.createElement(

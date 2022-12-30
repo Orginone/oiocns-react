@@ -1,8 +1,7 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown } from 'antd';
+import { Dropdown } from 'antd';
 import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
-import flowLogo from '@/assets/img/flow.png';
 import './index.less';
 import { ImStackoverflow } from 'react-icons/im';
 interface FlowCardType {
@@ -12,12 +11,7 @@ interface FlowCardType {
   operation?: (_item: XFlowDefine) => any[];
 }
 
-const FlowCardComp: React.FC<FlowCardType> = ({
-  className,
-  data,
-  onClick,
-  operation,
-}) => {
+const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation }) => {
   const Title = () => {
     return (
       <div className="card-title flex" onClick={onClick}>
@@ -50,4 +44,4 @@ const FlowCardComp: React.FC<FlowCardType> = ({
   );
 };
 
-export default FlowCardComp;
+export default FlowCard;

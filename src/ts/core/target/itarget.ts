@@ -313,7 +313,7 @@ export interface IFlow {
    * @param data
    */
   publishDefine(
-    data: Omit<model.CreateDefineReq, 'BelongId'>,
+    data: Omit<model.CreateDefineReq, 'belongId'>,
   ): Promise<schema.XFlowDefine>;
   /**
    * 删除流程定义

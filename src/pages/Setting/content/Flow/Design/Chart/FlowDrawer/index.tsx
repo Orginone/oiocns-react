@@ -1,47 +1,62 @@
 import React from 'react';
-import { Drawer } from 'antd';
-import EditTitle from './components/EditTitle';
-import RootNode from './components/RootNode';
+import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType } from './processType';
+import { AddNodeType, FieldCondition, NodeType } from './processType';
 
 /**
  * @description: 流程设置抽屉
  * @return {*}
  */
 
-interface Iprops {
-  isOpenFlow: boolean;
+interface IProps {
+  isOpen: boolean;
+  current?: NodeType;
+  conditions?: FieldCondition[];
   onClose: () => void;
-  selectNodeType: AddNodeType;
 }
 
-const concurrents = () => {
-  return <div>暂无同时审核需要处理的数据</div>;
-};
-
-const FlowDrawer: React.FC<Iprops> = ({ isOpenFlow, onClose, selectNodeType }) => {
-  const AddtypeAndComponentMaps: Record<AddNodeType, React.FC> = {
-    [AddNodeType.ROOT]: RootNode,
-    [AddNodeType.APPROVAL]: ApprovalNode,
-    [AddNodeType.CC]: CcNode,
-    [AddNodeType.CONDITION]: ConditionNode,
-    [AddNodeType.CONCURRENTS]: concurrents,
+const FlowDrawer: React.FC<IProps> = ({ isOpen, onClose, conditions, current }) => {
+  const Component = () => {
+    switch (current?.type) {
+      case AddNodeType.APPROVAL:
+        return <ApprovalNode current={current} />;
+      case AddNodeType.CC:
+        return <CcNode current={current} />;
+      case AddNodeType.CONDITION:
+        if (conditions) {
+          return <ConditionNode current={current} conditions={conditions} />;
+        }
+        return <div>请先在字段设计中，设置条件字段</div>;
+      default:
+        return <div>暂无需要处理的数据</div>;
+    }
   };
 
-  const Component = AddtypeAndComponentMaps[selectNodeType];
-
-  return (
+  return current ? (
     <Drawer
-      title={<EditTitle />}
+      title={
+        <Typography.Title
+          editable={{
+            onChange: (e: any) => {
+              current.name = e;
+            },
+          }}
+          level={5}
+          style={{ margin: 0 }}>
+          {current.name}
+        </Typography.Title>
+      }
+      destroyOnClose
       placement="right"
-      open={isOpenFlow}
+      open={isOpen}
       onClose={() => onClose()}
       width={600}>
-      <Component />
+      {Component()}
     </Drawer>
+  ) : (
+    <></>
   );
 };
 

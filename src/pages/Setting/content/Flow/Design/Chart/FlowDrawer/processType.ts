@@ -24,11 +24,11 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
 
 export type conditionDataType = {
   name: string;
-  fields: string;
-  labels: everyCondition[];
+  labels: string;
+  fields: FieldCondition[];
 };
 
-export type everyCondition = {
+export type FieldCondition = {
   label: string;
   value: string;
   type: dataType;
@@ -49,7 +49,7 @@ export type conditiondType = {
   valLabel?: string;
 };
 
-export type nodeType = {
+export type NodeType = {
   type: AddNodeType;
   parentId: string;
   nodeId: string;

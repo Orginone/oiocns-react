@@ -1,65 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Button, message } from 'antd';
-import ProcessCtrl, {
-  ConditionCallBackTypes,
-} from '../../../../../Controller/processCtrl';
-import { conditionDataType, dataType } from '../../processType';
+import { Button } from 'antd';
+import ProcessCtrl from '../../../../../Controller/processCtrl';
+import { dataType, FieldCondition, NodeType } from '../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
+
+interface Iprops {
+  current: NodeType;
+  conditions?: FieldCondition[];
+}
 
 /**
  * @description: 条件
  * @return {*}
  */
 
-const ConditionNode = () => {
-  const [conditionData, setConditionData] = useState<conditionDataType>({
-    name: '',
-    fields: '',
-    labels: [],
-  });
-  const refreshUI = () => {
-    setConditionData(ProcessCtrl.conditionData);
-  };
+const ConditionNode: React.FC<Iprops> = (props) => {
+  const [conditions, setConditions] = useState<FieldCondition[]>();
 
   useEffect(() => {
-    const id = ProcessCtrl.subscribePart(
-      ConditionCallBackTypes.ConditionsData,
-      refreshUI,
-    );
-    return () => {
-      ProcessCtrl.unsubscribe(id);
-    };
-  }, []);
+    setConditions(props.conditions);
+  }, [props]);
 
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
-    if (conditionData?.labels && conditionData?.labels.length > 0) {
-      ProcessCtrl.currentNode?.conditions?.push({
-        pos: ProcessCtrl.currentNode?.conditions.length + 1,
-        paramKey: '',
-        paramLabel: '',
-        key: '',
-        label: '',
-        type: dataType.NUMERIC,
-        val: null,
-      });
-    } else {
-      message.warning('你还未设置条件，请到基本信息填写条件字段');
-    }
-    ProcessCtrl.setCurrentNode(ProcessCtrl.currentNode);
+    props.current?.conditions?.push({
+      pos: props.current?.conditions.length + 1,
+      paramKey: '',
+      paramLabel: '',
+      key: '',
+      label: '',
+      type: dataType.NUMERIC,
+      val: null,
+    });
     setKey(key + 1);
   };
 
-  return (
+  return conditions ? (
     <div>
       <div style={{ marginBottom: '10px' }}>
         <Button type="primary" onClick={addConditionGroup}>
           添加条件
         </Button>
       </div>
-      {conditionData.labels.length > 0 ? <ConditionGroupItemConfig /> : null}
+      <ConditionGroupItemConfig currnet={props.current} conditions={conditions} />
     </div>
+  ) : (
+    <></>
   );
 };
 export default ConditionNode;

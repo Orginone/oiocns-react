@@ -2,7 +2,6 @@ import { Form } from 'antd';
 import cls from './index.module.less';
 import React, { useEffect } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
-import ProcessCtrl from '../../Controller/processCtrl';
 import { dataType } from '../Chart/FlowDrawer/processType';
 import {
   ProFormText,
@@ -35,7 +34,6 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
         onValuesChange={async () => {
           const currentValue = await form.getFieldsValue();
           onChange(currentValue);
-          ProcessCtrl.setCondtionData(currentValue);
         }}
         form={form}
         onFinish={async (e) => {

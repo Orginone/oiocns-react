@@ -1,81 +1,35 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Select, InputNumber, Input, Form } from 'antd';
-import processCtrl from '../../../../../Controller/processCtrl';
-import { ConditionCallBackTypes } from '../../../../../Controller/processCtrl';
 import {
-  nodeType,
-  conditionDataType,
+  NodeType,
   conditiondType,
   getConditionKeys,
   dataType,
+  FieldCondition,
 } from '../../processType';
 import cls from './index.module.less';
 
-type ConditionGroupItemConfigProps = {};
+interface IProps {
+  currnet: NodeType;
+  conditions: FieldCondition[];
+}
 
 /**
  * @description: 条件
  * @return {*}
  */
-const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => {
-  const [form] = Form.useForm();
-  // const [curretEditorValue, setCurretEditorValue] = useState<conditiondType[]>([]);
-  const [currentOpNode, setCurrentOpNode] = useState<nodeType>();
-  const [currentConditions, setCurrentConditions] = useState<conditionDataType>();
-  // const [paramKeyArr, setParamKeyArr] = useState<string[]>([]);
-
-  useEffect(() => {
-    setCurrentOpNode(processCtrl.currentNode);
-    setCurrentConditions(processCtrl.conditionData);
-  }, []);
-
+const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
   const [key, setKey] = useState(0);
-  const dictory = useCallback((paramKey: string[]) => {
-    var filter = currentConditions?.labels.filter((item: any) => item.value == paramKey);
-
-    if (filter && filter.length > 0) {
-      return (
-        filter[0] || { dict: [] }?.dict.filter((item: any) => item.label && item.value)
-      );
-    }
-    return [];
-  }, []);
-
-  const refreshUI = () => {
-    setCurrentOpNode(processCtrl.currentNode);
-    form.setFieldsValue({ allContent: processCtrl.currentNode?.conditions || [] });
-  };
+  const [form] = Form.useForm();
+  const [currentNode, setCurrentNode] = useState<NodeType>();
+  const [conditions, setConditions] = useState<FieldCondition[]>([]);
 
   useEffect(() => {
-    const id = processCtrl.subscribePart(
-      ConditionCallBackTypes.CurrentOperateNode,
-      refreshUI,
-    );
-    return () => {
-      processCtrl.unsubscribe(id);
-    };
-  }, []);
-
-  useEffect(() => {
-    // const = DefaultProps.getFormFields(); //所有的条件
-    /** 干掉条件不存在的 */
-    // const filterResult = selectedNode.conditions.filter(
-    //   (item: { paramKey: string; paramLabel: string }) => {
-    //     const findData = currentCondtions.find((innItem) => {
-    //       return innItem.value === item.paramKey && innItem.label === item.paramLabel;
-    //     });
-
-    //     return typeof findData !== 'undefined';
-    //   },
-    // );
-    // console.log('selectedNode.conditions', selectedNode.conditions);
-    form.setFieldsValue({ allContent: currentOpNode?.conditions || [] });
-    // const paramKey = (currentOpNode?.conditions || []).map((item: conditiondType) => {
-    //   return item.paramKey;
-    // });
-    // setParamKeyArr(paramKey);
-  }, []);
+    setCurrentNode(props.currnet);
+    setConditions(props.conditions);
+    form.setFieldsValue({ allContent: props.currnet.conditions });
+  }, [props]);
 
   return (
     <div>
@@ -84,7 +38,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
         onValuesChange={async () => {
           const currentValue = await form.getFieldsValue();
           const newArr: string[] = []; // 重置当前条件 不然会越来越多 给不上值
-          currentOpNode?.conditions.map((item: conditiondType, index: number) => {
+          currentNode?.conditions.map((item: conditiondType, index: number) => {
             /** 怎么知道paramKey有没有变化 */
             item.val = currentValue.allContent[index].val;
             item.paramKey = currentValue.allContent[index].paramKey;
@@ -100,7 +54,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
             // setParamKeyArr(newArr);
             item.type = currentValue.allContent[index].type;
             /**当前条件查找，填写paramLabel */
-            const findCon = (currentConditions?.labels || []).find((innItem) => {
+            const findCon = (conditions || []).find((innItem) => {
               return innItem.value === currentValue.allContent[index].paramKey;
             });
             item.paramLabel = findCon ? findCon?.label : '';
@@ -128,13 +82,13 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
           });
           // setCurretEditorValue([...(currentOpNode?.conditions || [])]);
         }}>
-        {[...(currentOpNode?.conditions || [])]?.map((condition: any, index: number) => (
+        {[...(currentNode?.conditions || [])]?.map((condition, index) => (
           <div key={index + '_g'} className={cls['group']}>
             <div className={cls['group-header']}>
               <div
                 onClick={() => {
-                  currentOpNode?.conditions.splice(index, 1);
-                  setCurrentOpNode(currentOpNode);
+                  currentNode?.conditions.splice(index, 1);
+                  setCurrentNode(currentNode);
                   setKey(key + 1);
                 }}>
                 <DeleteOutlined />
@@ -147,7 +101,7 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                     style={{ width: 150 }}
                     placeholder="请选择参数"
                     allowClear
-                    options={currentConditions?.labels}
+                    options={conditions}
                   />
                 </Form.Item>
 
@@ -189,14 +143,21 @@ const ConditionGroupItemConfig: React.FC<ConditionGroupItemConfigProps> = () => 
                     <InputNumber style={{ width: 200 }} />
                   </Form.Item>
                 )}
-                {/* 如果是枚举类型 */}
+                {/* 枚举类型 */}
                 {condition.type == 'DICT' && (
                   <Form.Item name={['allContent', index, 'val']}>
                     <Select
                       style={{ width: 200 }}
                       placeholder="请选择"
                       allowClear
-                      options={dictory(condition.paramKey)}
+                      options={conditions
+                        .find((a) => a.value == condition.paramKey)
+                        ?.dict?.map((a) => {
+                          return {
+                            id: a.label,
+                            value: a.value,
+                          };
+                        })}
                     />
                   </Form.Item>
                 )}

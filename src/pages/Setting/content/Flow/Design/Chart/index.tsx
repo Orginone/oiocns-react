@@ -2,34 +2,21 @@ import cls from './index.module.less';
 import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
-import { AddNodeType, conditionDataType } from './FlowDrawer/processType';
-import processCtrl, { ConditionCallBackTypes } from '../../Controller/processCtrl';
+import { AddNodeType, conditionDataType, NodeType } from './FlowDrawer/processType';
 
 interface IProps {
   scale?: number;
   conditions?: conditionDataType; //内置条件选择器
 }
 
-const ProcessDesign: React.FC<IProps> = (props) => {
+const ChartDesign: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(100);
-  const [currentNode, setCurrentNode] = useState<{ type: AddNodeType }>({
-    type: AddNodeType.APPROVAL,
-  });
+  const [currentNode, setCurrentNode] = useState<NodeType>();
 
   useEffect(() => {
     setScale(props.scale ?? 100);
   }, [props]);
-
-  const refreshUI = () => {
-    setScale(processCtrl.scale);
-  };
-  useEffect(() => {
-    const id = processCtrl.subscribePart(ConditionCallBackTypes.Scale, refreshUI);
-    return () => {
-      processCtrl.unsubscribe(id);
-    };
-  }, []);
 
   return (
     <div className={cls['container']}>
@@ -40,7 +27,6 @@ const ProcessDesign: React.FC<IProps> = (props) => {
             <ProcessTree
               onSelectedNode={(params) => {
                 if (params.type !== AddNodeType.CONCURRENTS) {
-                  processCtrl.setCurrentNode(params);
                   //设置当前操作的节点，后续都是对当前节点的操作
                   setCurrentNode(params);
                   setIsOpen(true);
@@ -54,8 +40,9 @@ const ProcessDesign: React.FC<IProps> = (props) => {
       </div>
       {/* 侧边数据填充 */}
       <FlowDrawer
-        isOpenFlow={isOpen}
-        selectNodeType={currentNode?.type}
+        isOpen={isOpen}
+        current={currentNode}
+        conditions={props.conditions?.fields}
         onClose={() => {
           setIsOpen(false);
         }}
@@ -64,4 +51,4 @@ const ProcessDesign: React.FC<IProps> = (props) => {
   );
 };
 
-export default ProcessDesign;
+export default ChartDesign;

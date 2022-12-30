@@ -32,7 +32,7 @@ const ConditionNode: React.FC<ConditionNodeProps> = (props: ConditionNodeProps) 
   };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
-    const currentCondition = processCtrl.conditionData.labels;
+    const currentCondition = processCtrl.conditionData.fields;
     var text = '请设置条件';
     if (conditions && conditions.length > 0) {
       text = '';

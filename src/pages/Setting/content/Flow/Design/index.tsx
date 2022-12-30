@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import FieldInfo from './Field';
-import NewProcessDesign from './Chart';
+import DesignChart from './Chart';
 import { XFlowDefine } from '@/ts/base/schema';
 import { Button, Card, Layout, Modal, Space, Steps } from 'antd';
 import {
@@ -13,11 +13,8 @@ import {
   FileTextOutlined,
   HighlightOutlined,
 } from '@ant-design/icons';
-
-enum StepType {
-  'Fields',
-  'Chart',
-}
+import userCtrl from '@/ts/controller/setting';
+import { FlowNode } from '@/ts/base/model';
 
 interface IProps {
   current?: XFlowDefine;
@@ -25,13 +22,10 @@ interface IProps {
 }
 
 const Design: React.FC<IProps> = (props) => {
-  const [currentStep, setCurrentStep] = useState(StepType.Fields);
-  const [currentScale, setCurrentScale] = useState<number>(100);
-  const [conditionData, setConditionData] = useState<{
-    name: string;
-    fields: [{}];
-    remark: string;
-  }>({
+  const [scale, setScale] = useState<number>(100);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [resource, setResource] = useState<FlowNode>();
+  const [conditionData, setConditionData] = useState({
     name: '',
     fields: [{}],
     remark: '',
@@ -108,14 +102,14 @@ const Design: React.FC<IProps> = (props) => {
           <Layout.Content>
             <Card bordered={false}>
               {/* 基本信息组件 */}
-              {currentStep === StepType.Fields ? (
+              {currentStep === 0 ? (
                 <FieldInfo
                   currentFormValue={conditionData}
                   onChange={(params) => {
                     setConditionData(params);
                   }}
                   nextStep={(params) => {
-                    setCurrentStep(StepType.Chart);
+                    setCurrentStep(1);
                     setConditionData(params);
                   }}
                 />
@@ -128,8 +122,19 @@ const Design: React.FC<IProps> = (props) => {
                           className={cls['publis-issue']}
                           size="small"
                           type="primary"
-                          onClick={() => {
-                            props.onBack();
+                          onClick={async () => {
+                            if (
+                              await userCtrl.space.publishDefine({
+                                id: props.current?.id,
+                                code: conditionData.name,
+                                name: conditionData.name,
+                                fields: JSON.stringify(conditionData.fields),
+                                remark: conditionData.remark,
+                                resource: resource,
+                              })
+                            ) {
+                              props.onBack();
+                            }
                           }}>
                           <SendOutlined />
                           发布
@@ -137,21 +142,21 @@ const Design: React.FC<IProps> = (props) => {
                         <Button
                           className={cls['scale']}
                           size="small"
-                          disabled={currentScale <= 40}
-                          onClick={() => setCurrentScale(currentScale - 10)}>
+                          disabled={scale <= 40}
+                          onClick={() => setScale(scale - 10)}>
                           <MinusOutlined />
                         </Button>
-                        <span>{currentScale}%</span>
+                        <span>{scale}%</span>
                         <Button
                           size="small"
-                          disabled={currentScale >= 150}
-                          onClick={() => setCurrentScale(currentScale + 10)}>
+                          disabled={scale >= 150}
+                          onClick={() => setScale(scale + 10)}>
                           <PlusOutlined />
                         </Button>
                       </Space>
                     }
                   </div>
-                  <NewProcessDesign />
+                  <DesignChart scale={scale} />
                 </div>
               )}
             </Card>
