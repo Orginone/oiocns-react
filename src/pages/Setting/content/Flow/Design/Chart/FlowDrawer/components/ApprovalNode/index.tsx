@@ -1,37 +1,29 @@
 import React, { useState } from 'react';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
-import IndentityManage from '@/bizcomponents/IndentityManage';
+import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import processCtrl from '../../../../../Controller/processCtrl';
+import { NodeType } from '../../processType';
+
+interface IProps {
+  current: NodeType;
+}
 
 /**
  * @description: 审批对象
  * @return {*}
  */
 
-const ApprovalNode = () => {
-  const selectedNode = processCtrl.currentNode;
-  const [isApprovalOpen, setIsApprovalOpen] = useState<boolean>(false); // 打开弹窗
+const ApprovalNode: React.FC<IProps> = (props) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
-  const [processValue, setProcessValue] = useState(1);
-  const [currentData, setCurrentData] = useState<{
-    data: { id: string; name: string };
-    title: string;
-    key: string;
-  }>({ title: '', key: '', data: { id: '', name: '' } });
-
-  const onOk = () => {
-    selectedNode.props.assignedUser = [
-      { name: currentData.title, id: currentData.data.id },
-    ];
-    processCtrl.setCurrentNode(selectedNode);
-    setIsApprovalOpen(false);
-  };
-
-  const onCancel = () => {
-    setIsApprovalOpen(false);
-  };
+  // const [processValue, setProcessValue] = useState(1);
+  const [currentData, setCurrentData] = useState({
+    title: '',
+    key: '',
+    data: { id: '', name: '' },
+  });
 
   return (
     <div className={cls[`app-roval-node`]}>
@@ -46,9 +38,8 @@ const ApprovalNode = () => {
             shape="round"
             size="small"
             onClick={() => {
-              selectedNode.props.assignedType = 'JOB';
-              processCtrl.setCurrentNode(selectedNode);
-              setIsApprovalOpen(true);
+              props.current.props.assignedType = 'JOB';
+              setIsOpen(true);
             }}>
             选择身份
           </Button>
@@ -60,63 +51,49 @@ const ApprovalNode = () => {
         </Space>
         <Divider />
         <div className={cls['roval-node-select']}>
-          <Col className={cls['roval-node-select-col']}>👩‍👦‍👦 多人审批时审批方式</Col>
+          <Col className={cls['roval-node-select-col']}>👩‍👦‍👦 审批方式</Col>
           <Radio.Group
             onChange={(e) => {
               setRadioValue(e.target.value);
             }}
             style={{ paddingBottom: '10px' }}
             value={radioValue}>
-            <Radio value={1}>全部（所有人必须同意）</Radio>
-            <Radio value={2}>会签（可同时审批，每个人必须同意）</Radio>
+            <Radio value={1}>全部: 需征得该身份下所有人员同意</Radio>
+            <Radio value={2}>部分会签: 指定审批该节点的人员的数量</Radio>
           </Radio.Group>
-          {radioValue === 2 ? (
+          {radioValue === 2 && (
             <Form.Item label="会签人数">
               <InputNumber
+                min={1}
                 onChange={(e: number | null) => {
-                  selectedNode.props.num = e;
+                  props.current.props.num = e;
                 }}
                 placeholder="请设置会签人数"
                 addonBefore={<UserOutlined />}
                 style={{ width: '60%' }}
               />
             </Form.Item>
-          ) : null}
-        </div>
-        <div className={cls['roval-node-radiobtns']}>
-          <Col className={cls['roval-node-select-col']}>🙅‍ 如果审批被驳回 👇</Col>
-          <Row>
-            <Radio.Group
-              onChange={() => {
-                setProcessValue(1);
-              }}
-              value={processValue}>
-              <Radio value={1}>直接结束流程</Radio>
-              <Radio value={2} disabled>
-                驳回到上级审批节点
-              </Radio>
-              <Radio value={3} disabled>
-                驳回到指定节点
-              </Radio>
-            </Radio.Group>
-          </Row>
+          )}
         </div>
       </div>
       <Modal
+        width="650px"
         title="添加身份"
-        key="addApproval"
-        open={isApprovalOpen}
+        open={isOpen}
         destroyOnClose={true}
-        onOk={() => onOk()}
-        onCancel={() => onCancel()}
-        width="650px">
-        <IndentityManage
+        onOk={() => {
+          props.current.props.assignedUser = [
+            { name: currentData.title, id: currentData.data.id },
+          ];
+          setIsOpen(false);
+        }}
+        onCancel={() => setIsOpen(false)}>
+        <IndentitySelect
           multiple={false}
           onChecked={(params: any) => {
-            selectedNode.props.assignedUser = [
+            props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },
             ];
-            processCtrl.setCurrentNode(selectedNode);
             setCurrentData(params);
           }}
         />

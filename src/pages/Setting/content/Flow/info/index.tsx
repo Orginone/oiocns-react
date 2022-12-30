@@ -3,11 +3,9 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
-import processCtrl from '../Controller/processCtrl';
-import { deepClone } from '@/ts/base/common';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XFlowDefine, XFlowRelation } from '@/ts/base/schema';
-import FlowCard from '../FlowCard';
+import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
 import BindModal from './bind/modal';
 import { FlowColumn } from '../../../config/columns';
@@ -33,26 +31,6 @@ const FlowList: React.FC<IProps> = (props) => {
   useEffect(() => {
     loadBangdingCard;
   });
-
-  const publish = async () => {
-    processCtrl.currentTreeDesign.name = processCtrl.conditionData.name;
-    processCtrl.currentTreeDesign.fields = processCtrl.conditionData.fields;
-    processCtrl.currentTreeDesign.remark = JSON.stringify(
-      processCtrl.conditionData.labels,
-    );
-    /**要发布的数据 */
-    const currentData = deepClone(processCtrl.currentTreeDesign);
-    if (currentData.belongId) {
-      delete currentData.belongId;
-    }
-    const result = await userCtrl.space.publishDefine(currentData);
-    if (await userCtrl.space.publishDefine(currentData)) {
-      message.info(result.id ? '编辑成功' : '发布成功');
-      forceUpdate();
-    } else {
-      return false;
-    }
-  };
 
   const renderOperation = (record: XFlowDefine): any[] => {
     return [
