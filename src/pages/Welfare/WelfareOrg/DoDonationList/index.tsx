@@ -186,7 +186,6 @@ const DoDonationList: React.FC<any> = () => {
               showChangeBtn={true}
               rowSelection={{
                 onSelect: (_record: any, _selected: any, selectedRows: any) => {
-                  // onFinish(selectedRows);
                   setSelectedRows(selectedRows);
                 },
               }}

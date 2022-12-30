@@ -19,7 +19,7 @@ const Welfare: React.FC<any> = () => {
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
     <MainLayout selectMenu={selectMenu} siderMenuData={menus}>
-      <DoDonationList></DoDonationList>
+      <DonationFormList></DonationFormList>
     </MainLayout>
   );
 };
