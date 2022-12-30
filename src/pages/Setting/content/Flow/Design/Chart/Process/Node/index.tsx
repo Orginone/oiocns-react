@@ -4,6 +4,7 @@ import {
   CloseOutlined,
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import InsertButton from '../InsertButton';
 import React from 'react';
@@ -41,10 +42,12 @@ type NodeProps = {
  * 添加的节点枚举
  * */
 export enum AddNodeType {
-  'APPROVAL',
-  'CC',
-  'CONDITIONS',
-  'CONCURRENTS',
+  'APPROVAL' = 'APPROVAL',
+  'CC' = 'CC',
+  'CONDITIONS' = 'CONDITIONS',
+  'CONCURRENTS' = 'CONCURRENTS',
+  'EMPTY' = 'EMPTY',
+  'START' = 'START',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -52,6 +55,8 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CC]: '抄送节点',
   [AddNodeType.CONDITIONS]: '条件节点',
   [AddNodeType.CONCURRENTS]: '同时审核节点',
+  [AddNodeType.EMPTY]: '空节点',
+  [AddNodeType.START]: '开始节点',
 };
 
 /**
@@ -81,11 +86,17 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           ? cls['node-body-people']
           : cls['node-body-left']
       }>
-      {props.type === AddNodeType.APPROVAL ? (
+      {props.type === AddNodeType.APPROVAL && (
         <UsergroupAddOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
-      ) : (
+      )}
+      {props.type === AddNodeType.CC && (
+        <MailOutlined
+          style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
+        />
+      )}
+      {props.type === AddNodeType.START && (
         <TagOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />

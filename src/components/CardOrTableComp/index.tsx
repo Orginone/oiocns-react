@@ -58,8 +58,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
@@ -125,10 +123,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           size: 'default',
           showSizeChanger: true,
           defaultCurrent: 1,
-          onChange: (page, pagesize) => {
-            setPage(page);
-            setPageSize(pagesize);
-          },
+          onChange: (_) => {},
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}

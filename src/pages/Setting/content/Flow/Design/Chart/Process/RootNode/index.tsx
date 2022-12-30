@@ -1,5 +1,5 @@
 import React from 'react';
-import Node from '../Node';
+import Node, { AddNodeType } from '../Node';
 
 type RootNodeProps = {
   onInsertNode: Function;
@@ -27,6 +27,7 @@ const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
       placeholder="所有人"
       headerBgc="#576a95"
       headerIcon="el-icon-user-solid"
+      type={AddNodeType.START}
     />
   );
 };

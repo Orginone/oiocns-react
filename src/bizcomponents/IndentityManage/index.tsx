@@ -74,8 +74,9 @@ const ShareRecent = (props: Iprops) => {
       await item.loadSubTeam();
       loadTeamTree();
       const result = (await item.getIdentitys()).map((i) => {
+        // i.target.name = `[${item.name}]` + i.target.name;
         return {
-          title: i.name,
+          title: `[${item.name}]` + i.name,
           key: i.id,
           data: i.target,
         };

@@ -26,6 +26,7 @@ const EmptyNode: React.FC<EmptyNodeProps> = (props: EmptyNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      type={AddNodeType.EMPTY}
     />
   );
 };

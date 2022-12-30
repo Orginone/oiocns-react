@@ -4,6 +4,8 @@ import { message } from 'antd';
 import { formatDate } from '@/utils/index';
 import { DataType, PageData } from 'typings/globelType';
 
+const dateFormat: string = 'YYYY-MM-DD';
+
 const showMessage = (response: any) => {
   if (response.success) {
     message.success('操作成功！');
@@ -182,4 +184,5 @@ export {
   showChatTime,
   showMessage,
   validIsSocialCreditCode,
+  dateFormat
 };

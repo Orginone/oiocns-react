@@ -4,4 +4,10 @@ export namespace common {
     label: any;
     onClick: () => void;
   }
+
+  interface OptionType {
+    value: string;
+    label: any;
+    onClick?: () => void;
+  }
 }
