@@ -3,9 +3,11 @@ import FlowDrawer from './FlowDrawer';
 import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
 import { AddNodeType, conditionDataType, NodeType } from './FlowDrawer/processType';
+import { FlowNode } from '@/ts/base/model';
 
 interface IProps {
   scale?: number;
+  resource: FlowNode;
   conditions?: conditionDataType; //内置条件选择器
 }
 
@@ -25,6 +27,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
           <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
+              resource={props.resource}
               onSelectedNode={(params) => {
                 if (params.type !== AddNodeType.CONCURRENTS) {
                   //设置当前操作的节点，后续都是对当前节点的操作
