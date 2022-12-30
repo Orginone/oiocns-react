@@ -145,7 +145,6 @@ export const DonationFormAssetColumns: ProColumns[] = [
     key: 'remark',
     width: 400,
   },
-
 ];
 
 //发起捐赠-选择物资
@@ -181,7 +180,70 @@ export const DoDonationAssetColumns: ProColumns[] = [
     key: 'remark',
     width: 400,
   },
+];
 
+/**
+ * 公益仓--平台：公益组织加入集团
+ */
+export const supervisionWelfareOrgColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '组织名称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '所在领域',
+    dataIndex: 'businessAreas',
+    key: 'businessAreas',
+  },
+  {
+    title: '注册类型',
+    dataIndex: 'registerType',
+    key: 'registerType',
+  },
+  {
+    title: '统一社会征信代码',
+    dataIndex: 'code',
+    key: 'code',
+    width: 180,
+  },
+  {
+    title: '登记管理机关',
+    dataIndex: 'registerManageOrgan',
+    key: 'registerManageOrgan',
+  },
+  {
+    title: '业务管理机关',
+    dataIndex: 'businessManageOrgan',
+    key: 'businessManageOrgan',
+  },
+  {
+    title: '注册时间',
+    dataIndex: 'registerTime',
+    valueType: 'date',
+    key: 'registerTime',
+  },
+  {
+    title: '成立时间',
+    dataIndex: 'establishTime',
+    valueType: 'date',
+    key: 'establishTime',
+  },
+  {
+    title: '联系人',
+    dataIndex: 'contactPerson',
+    key: 'contactPerson',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
 ];
 
 //公益捐赠审批单
@@ -313,3 +375,117 @@ export const dodonationListColumns_Supported: ProColumns[] = [
 
 ];
 
+/**
+ * 公益仓--平台：创建商城
+ */
+export const supervisionCreateMallColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '商城名称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '主营类型',
+    dataIndex: 'mainBusiness',
+    key: 'mainBusiness',
+  },
+  {
+    title: '次营类型',
+    dataIndex: 'minorBusiness',
+    key: 'minorBusiness',
+  },
+  {
+    title: '公益组织',
+    dataIndex: 'welfareOrg',
+    key: 'welfareOrg',
+  },
+  {
+    title: '仓储机构',
+    dataIndex: 'storageAgency',
+    key: 'storageAgency',
+  },
+  {
+    title: '联系人',
+    dataIndex: 'contactPerson',
+    key: 'contactPerson',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
+  {
+    title: '注册时间',
+    dataIndex: 'registerTime',
+    valueType: 'date',
+    key: 'registerTime',
+  },
+];
+/**
+ * 公益仓--平台：仓储机构接入
+ */
+export const supervisionStorageAgencyColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '仓储名称',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: '统一社会征信代码',
+    dataIndex: 'code',
+    key: 'code',
+    width: 180,
+  },
+  {
+    title: '所在地区',
+    dataIndex: 'provincialCity',
+    key: 'provincialCity',
+  },
+  {
+    title: '面积㎡',
+    dataIndex: 'area',
+    key: 'area',
+  },
+  {
+    title: '库存类型',
+    dataIndex: 'storeType',
+    key: 'storeType',
+  },
+  {
+    title: '注册时间',
+    dataIndex: 'registerTime',
+    valueType: 'date',
+    key: 'registerTime',
+  },
+  {
+    title: '成立时间',
+    dataIndex: 'establishTime',
+    valueType: 'date',
+    key: 'establishTime',
+  },
+  {
+    title: '联系人',
+    dataIndex: 'contactPerson',
+    key: 'contactPerson',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
+  {
+    title: '仓储地址',
+    dataIndex: 'address',
+    key: 'address',
+  },
+];
