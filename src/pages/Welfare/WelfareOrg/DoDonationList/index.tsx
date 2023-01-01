@@ -103,8 +103,7 @@ const DoDonationList: React.FC<any> = () => {
   };
 
   const pop = () => {
-    let unHandleRows = selectedRows.filter((item) => !item.handle);
-    if (unHandleRows.length > 0) {
+    if (selectedRows.length > 0) {
       message.warn('此处设置数据状态，功能暂未开放');
     } else {
       message.warn('至少选择一条未处理的数据');
