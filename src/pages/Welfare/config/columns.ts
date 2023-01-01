@@ -213,12 +213,106 @@ export const donationfromListColumns: ProColumns[] = [
     title: '过期时间',
     dataIndex: 'expireTime',
     key: 'expireTime',
-    width: 400,
   },
   {
-    title: '处理结果',
+    title: '处理',
     dataIndex: 'handle',
     key: 'handle',
+  },
+];
+
+//公益捐赠审批单列表
+export const donationformListColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '单据编号',
+    dataIndex: 'no',
+    key: 'no',
+  },
+  {
+    title: '发起人/单位',
+    dataIndex: 'sponsor',
+    key: 'sponsor',
+  },
+  {
+    title: '仓储机构',
+    dataIndex: 'store',
+    key: 'store',
+  },
+  {
+    title: '联系人',
+    dataIndex: 'linkman',
+    key: 'linkman',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
+  {
+    title: '涉及总数量',
+    dataIndex: 'amount',
+    key: 'amount',
+  },
+  {
+    title: '申请原因',
+    dataIndex: 'reason',
+    key: 'reason',
+  },
+];
+
+//公益资助审批单列表
+export const supportformListColumns: ProColumns[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '单据编号',
+    dataIndex: 'no',
+    key: 'no',
+  },
+  {
+    title: '申请人/单位',
+    dataIndex: 'applicant',
+    key: 'applicant',
+  },
+  {
+    title: '仓储机构',
+    dataIndex: 'store',
+    key: 'store',
+  },
+  {
+    title: '需求物品',
+    dataIndex: 'needsomething',
+    key: 'needsomething',
+  },
+  {
+    title: '涉及总数量',
+    dataIndex: 'amount',
+    key: 'amount',
+  },
+
+  {
+    title: '联系人',
+    dataIndex: 'linkman',
+    key: 'linkman',
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'phone',
+    key: 'phone',
+  },
+
+  {
+    title: '申请原因',
+    dataIndex: 'reason',
+    key: 'reason',
   },
 ];
 

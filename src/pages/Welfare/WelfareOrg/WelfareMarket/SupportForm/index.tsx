@@ -24,10 +24,10 @@ import { dateFormat } from '@/utils/tools';
 import moment from 'moment';
 import { model, schema, kernel } from '@/ts/base';
 import { TargetType } from '@/ts/core';
-import { SupportFormModel } from '../../config/model';
+import { SupportFormModel } from '@/pages/Welfare/config/model';
 import { FlowInstanceModel } from '@/ts/base/model';
-import { supportFormCollName } from '../../config/collNames';
-import { Status } from '../../config/status';
+import { supportFormCollName } from '@/pages/Welfare/config/collNames';
+import { Status } from '@/pages/Welfare/config/status';
 import userCtrl from '@/ts/controller/setting';
 export type IProps = {
   formdata: SupportFormModel;
@@ -201,67 +201,81 @@ const SupportSetting: React.FC<IProps> = ({ formdata, backtolist }) => {
           contentStyle={{ textAlign: 'left', color: '#606266' }}
           extra={buttons}>
           <Descriptions.Item label="单据编号">
-            <Input placeholder="请输入单据编号" defaultValue={formdata.no} disabled />
+            <Input placeholder="请输入单据编号" defaultValue={formdata.no} />
           </Descriptions.Item>
-          <Descriptions.Item label="申请人/单位">
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>申请人/单位
+              </span>
+            }>
             <Input
               placeholder="请输入申请人或单位"
               defaultValue={formdata.applicant}
               disabled
             />
           </Descriptions.Item>
-          <Descriptions.Item label="需求物品">
-            <Input
-              placeholder="请输入需求物品"
-              defaultValue={formdata.needsomething}
-              disabled
-            />
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>需求物品
+              </span>
+            }>
+            <Input placeholder="请输入需求物品" defaultValue={formdata.needsomething} />
           </Descriptions.Item>
-          <Descriptions.Item label="需求数量">
-            <InputNumber min={0} defaultValue={formdata.amount || 0} disabled />
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>需求数量
+              </span>
+            }>
+            <InputNumber min={0} defaultValue={formdata.amount || 0} />
           </Descriptions.Item>
 
-          <Descriptions.Item label="物资使用方式">
-            <Input
-              placeholder="请输入物资使用方式"
-              defaultValue={formdata.useWay}
-              disabled
-            />
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>物资使用方式
+              </span>
+            }>
+            <Input placeholder="请输入物资使用方式" defaultValue={formdata.useWay} />
           </Descriptions.Item>
-          <Descriptions.Item label="发放地址">
-            <Input
-              placeholder="请输入发放地址"
-              defaultValue={formdata.useAddress}
-              disabled
-            />
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>发放地址
+              </span>
+            }>
+            <Input placeholder="请输入发放地址" defaultValue={formdata.useAddress} />
           </Descriptions.Item>
-          <Descriptions.Item label="需求截止时间">
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>需求截止时间
+              </span>
+            }>
             <DatePicker
-              disabled
               defaultValue={moment(formdata.expireTime, dateFormat)}
               format={dateFormat}
-            />
-          </Descriptions.Item>
-          <Descriptions.Item label="联系人">
-            <Input
-              placeholder="请输入联系人名称"
-              defaultValue={formdata.linkman}
-              disabled
-            />
-          </Descriptions.Item>
-          <Descriptions.Item label="联系方式">
-            <Input
-              placeholder="请输入联系人方式"
-              defaultValue={formdata.phone}
-              disabled
             />
           </Descriptions.Item>
           <Descriptions.Item
             label={
               <span>
-                <span style={{ color: 'red' }}>*</span>选择仓储
+                <span style={{ color: 'red' }}>*</span>联系人
               </span>
             }>
+            <Input placeholder="请输入联系人名称" defaultValue={formdata.linkman} />
+          </Descriptions.Item>
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>联系方法
+              </span>
+            }>
+            <Input placeholder="请输入联系人方式" defaultValue={formdata.phone} />
+          </Descriptions.Item>
+          <Descriptions.Item label="选择仓储">
             <Select
               showSearch
               placeholder="请选择仓储地点"
@@ -280,12 +294,17 @@ const SupportSetting: React.FC<IProps> = ({ formdata, backtolist }) => {
             />
           </Descriptions.Item>
 
-          <Descriptions.Item label="申请原因" span={2}>
+          <Descriptions.Item
+            label={
+              <span>
+                <span style={{ color: 'red' }}>*</span>申请原因
+              </span>
+            }
+            span={2}>
             <TextArea
               autoSize={{ minRows: 1, maxRows: 3 }}
               placeholder="请输入申请原因"
               defaultValue={formdata.reason}
-              disabled
             />
           </Descriptions.Item>
         </Descriptions>

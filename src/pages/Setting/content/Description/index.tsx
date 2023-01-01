@@ -33,9 +33,6 @@ const Description = (props: { title: any; current: ITarget; extra: any }) => {
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label={current.typeName + '代码'}>
-          {deptInfo?.id || ''}
-        </Descriptions.Item>
-        <Descriptions.Item label={current.typeName + '代码'}>
           {deptInfo?.code || ''}
         </Descriptions.Item>
         <Descriptions.Item label={'团队简称'}>{deptInfo?.name || ''}</Descriptions.Item>
