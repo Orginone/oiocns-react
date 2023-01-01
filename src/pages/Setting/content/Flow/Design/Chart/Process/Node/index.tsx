@@ -97,39 +97,43 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         />
       )}
       {props.type === AddNodeType.START && (
-        <TagOutlined
-          style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
-        />
+        <span className={cls['process-content']}>START</span>
+        // <TagOutlined
+        //   style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
+        // />
       )}
     </div>
   );
 
   const nodeContent = (
-    <div className={cls['node-body-right']}>
-      <div onClick={select}>
-        <span className={cls['name-title']}>{props.title}</span>
-      </div>
-      <div>
-        {!props.content && (
-          <span onClick={select} className={cls['placeholder']}>
-            {props.placeholder}
-          </span>
-        )}
-        {props.content && (
-          <span onClick={select} className={cls['name-select-title']}>
-            {props.content}
-          </span>
-        )}
-        {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-        {!props.isRoot && (
-          <CloseOutlined
-            className={cls['iconPosition']}
-            style={{ fontSize: '12px', display: 'block' }}
-            onClick={delNode}
-          />
-        )}
-      </div>
-    </div>
+    <>
+      {props.isRoot && <div className={cls['node-root-body-right']}>开始</div>}
+      {!props.isRoot && (
+        <div className={cls['node-body-right']}>
+          <div onClick={select}>
+            <span className={cls['name-title']}>{props.title}</span>
+          </div>
+          <div>
+            {!props.content && (
+              <span onClick={select} className={cls['placeholder']}>
+                {props.placeholder}
+              </span>
+            )}
+            {props.content && (
+              <span onClick={select} className={cls['name-select-title']}>
+                {props.content}
+              </span>
+            )}
+            {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
+            <CloseOutlined
+              className={cls['iconPosition']}
+              style={{ fontSize: '12px', display: 'block' }}
+              onClick={delNode}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 
   const nodeError = (
