@@ -24,6 +24,7 @@ interface IProps {
 const FlowList: React.FC<IProps> = (props) => {
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate('');
+  const [freshBinds, setFreshBinds] = useState<boolean>(false);
   const [current, setCurrent] = useState<XFlowDefine>();
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [binds, setBinds] = useState<XFlowRelation[]>([]);
@@ -69,7 +70,8 @@ const FlowList: React.FC<IProps> = (props) => {
   const loadBangdingCard = useMemo(async () => {
     let data = await userCtrl.space.queryFlowRelation(false);
     setBinds(data.filter((a) => a.defineId == current?.id));
-  }, [current]);
+    setFreshBinds(false);
+  }, [current, freshBinds == true]);
 
   return (
     <div className={cls['company-top-content']}>
@@ -151,13 +153,17 @@ const FlowList: React.FC<IProps> = (props) => {
                       <AppBindCard
                         key={a.id}
                         current={a}
-                        onClick={(item) => {
-                          userCtrl.space.unbindingFlowRelation({
-                            defineId: item.defineId,
-                            productId: item.productId,
-                            functionCode: item.functionCode,
-                            spaceId: userCtrl.space.id,
-                          });
+                        onClick={async (item) => {
+                          if (
+                            await userCtrl.space.unbindingFlowRelation({
+                              defineId: item.defineId,
+                              productId: item.productId,
+                              functionCode: item.functionCode,
+                              spaceId: userCtrl.space.id,
+                            })
+                          ) {
+                            setFreshBinds(true);
+                          }
                         }}
                       />
                     );
@@ -169,11 +175,11 @@ const FlowList: React.FC<IProps> = (props) => {
             </Card>
           </Card>
         )}
-      </div>
+      </div>{' '}
       {current && (
         <BindModal
           isOpen={isOpenModal}
-          current={current!}
+          current={current}
           onOk={async (relations) => {
             let successCount = 0;
             for (const relation of relations) {
@@ -190,7 +196,7 @@ const FlowList: React.FC<IProps> = (props) => {
             }
             if (successCount > 0) {
               message.success('绑定' + successCount + '项业务成功');
-              forceUpdate();
+              setFreshBinds(true);
             }
             setIsOpenModal(false);
           }}

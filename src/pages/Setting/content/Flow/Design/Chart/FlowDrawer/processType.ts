@@ -58,26 +58,6 @@ export type NodeType = {
   props: { assignedUser: {}; assignedType: {}; num: number | null };
 };
 
-export const defalutDesignValue = {
-  name: '',
-  code: 'code',
-  remark: '',
-  fields: '',
-  resource: {
-    nodeId: 'ROOT',
-    parentId: null,
-    type: 'ROOT',
-    name: '发起人',
-    children: {
-      nodeId: 'node_590719745693',
-      parentId: 'ROOT',
-      props: {},
-      type: 'CONDITIONS',
-      name: '条件分支',
-    },
-  },
-};
-
 export const getConditionKeys: (type: string) => any[] = (type: string) => {
   var keys: any[] = [];
   switch (type) {

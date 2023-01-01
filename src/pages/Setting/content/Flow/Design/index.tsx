@@ -29,14 +29,7 @@ const Design: React.FC<IProps> = (props) => {
     parentId: '',
     type: 'ROOT',
     name: '发起人',
-    children: {
-      id: '',
-      nodeId: 'node_590719745693',
-      parentId: 'ROOT',
-      props: {},
-      type: 'CONDITIONS',
-      name: '条件分支',
-    },
+    children: {},
   });
   const [conditionData, setConditionData] = useState({
     name: '',
@@ -49,8 +42,8 @@ const Design: React.FC<IProps> = (props) => {
       setResource(JSON.parse(props.current.content)['resource']);
       setConditionData({
         name: props.current.name || '',
-        remark: JSON.parse(props.current.remark),
-        fields: JSON.parse(props.current.content)['fields'],
+        remark: props.current.remark,
+        fields: JSON.parse(JSON.parse(props.current.content)['fields']),
       });
     }
   }, [props.current]);
@@ -111,6 +104,47 @@ const Design: React.FC<IProps> = (props) => {
                     },
                   ]}></Steps>
               </div>
+              <div className={cls['publish']}>
+                {
+                  <Space>
+                    <Button
+                      className={cls['publis-issue']}
+                      size="small"
+                      type="primary"
+                      onClick={async () => {
+                        if (
+                          await userCtrl.space.publishDefine({
+                            id: props.current?.id,
+                            code: conditionData.name,
+                            name: conditionData.name,
+                            fields: JSON.stringify(conditionData.fields),
+                            remark: conditionData.remark,
+                            resource: resource as FlowNode,
+                          })
+                        ) {
+                          props.onBack();
+                        }
+                      }}>
+                      <SendOutlined />
+                      发布
+                    </Button>
+                    <Button
+                      className={cls['scale']}
+                      size="small"
+                      disabled={scale <= 40}
+                      onClick={() => setScale(scale - 10)}>
+                      <MinusOutlined />
+                    </Button>
+                    <span>{scale}%</span>
+                    <Button
+                      size="small"
+                      disabled={scale >= 150}
+                      onClick={() => setScale(scale + 10)}>
+                      <PlusOutlined />
+                    </Button>
+                  </Space>
+                }
+              </div>
             </div>
           </Layout.Header>
           <Layout.Content>
@@ -129,47 +163,6 @@ const Design: React.FC<IProps> = (props) => {
                 />
               ) : (
                 <div>
-                  <div className={cls['publish']}>
-                    {
-                      <Space>
-                        <Button
-                          className={cls['publis-issue']}
-                          size="small"
-                          type="primary"
-                          onClick={async () => {
-                            if (
-                              await userCtrl.space.publishDefine({
-                                id: props.current?.id,
-                                code: conditionData.name,
-                                name: conditionData.name,
-                                fields: JSON.stringify(conditionData.fields),
-                                remark: conditionData.remark,
-                                resource: resource as FlowNode,
-                              })
-                            ) {
-                              props.onBack();
-                            }
-                          }}>
-                          <SendOutlined />
-                          发布
-                        </Button>
-                        <Button
-                          className={cls['scale']}
-                          size="small"
-                          disabled={scale <= 40}
-                          onClick={() => setScale(scale - 10)}>
-                          <MinusOutlined />
-                        </Button>
-                        <span>{scale}%</span>
-                        <Button
-                          size="small"
-                          disabled={scale >= 150}
-                          onClick={() => setScale(scale + 10)}>
-                          <PlusOutlined />
-                        </Button>
-                      </Space>
-                    }
-                  </div>
                   <ChartDesign
                     conditions={conditionData.fields}
                     resource={resource}
