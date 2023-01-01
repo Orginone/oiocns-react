@@ -1,4 +1,4 @@
-import MallList from './Supervision/MallList';
+import MallList from './Supervision/StoreList';
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/pages/Welfare/hooks/useMenuUpdate';

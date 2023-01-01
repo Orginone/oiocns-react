@@ -377,7 +377,7 @@ export const supervisionWelfareOrgColumns: ProColumns[] = [
 /**
  * 公益仓--平台：创建商城
  */
-export const supervisionCreateMallColumns: ProColumns[] = [
+export const supervisionCreateStoreColumns: ProColumns[] = [
   {
     title: '序号',
     valueType: 'index',
