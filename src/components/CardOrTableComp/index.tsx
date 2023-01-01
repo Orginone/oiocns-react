@@ -89,7 +89,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       ...columns,
       {
         title: '操作',
-        width: 80,
+        width: 100,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
@@ -180,6 +180,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               <div
                 className={cls['common-card']}
                 style={{
+                  minHeight: 150,
                   height:
                     defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>

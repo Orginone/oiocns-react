@@ -215,23 +215,18 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   {
     title: '流程名称',
     dataIndex: 'name',
-    ellipsis: true,
   },
   {
     title: '创建人',
     dataIndex: 'createUser',
-    ellipsis: true,
   },
   {
     title: '备注',
     ellipsis: true,
-    render: (_, record) => {
-      return JSON.parse(record.content || '{}').fields;
-    },
+    dataIndex: 'remark',
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
-    ellipsis: true,
   },
 ];

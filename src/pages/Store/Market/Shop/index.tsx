@@ -14,6 +14,7 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { marketColumns } from '../../config/columns';
+import WelfareMarket from '@/pages/Welfare/WelfareOrg/WelfareMarket';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
@@ -132,21 +133,25 @@ const AppShowComp: React.FC = () => {
   };
   return (
     <div className={`${cls['app-wrap']} ${cls['market-public-wrap']}`} ref={parentRef}>
-      <CardOrTable<XMerchandise>
-        key={key}
-        dataSource={[]}
-        stripe
-        headerTitle={current?.market.name}
-        parentRef={parentRef}
-        renderCardContent={renderCardFun}
-        operation={renderOperation}
-        columns={marketColumns}
-        rowKey={'id'}
-        params={{ id: current?.market.id }}
-        request={async (page) => {
-          return await current?.getMerchandise(page);
-        }}
-      />
+      {current?.market.name.includes('公益') && <WelfareMarket />}
+      {!current?.market.name.includes('公益') && (
+        <CardOrTable<XMerchandise>
+          key={key}
+          dataSource={[]}
+          stripe
+          headerTitle={current?.market.name}
+          parentRef={parentRef}
+          renderCardContent={renderCardFun}
+          operation={renderOperation}
+          columns={marketColumns}
+          rowKey={'id'}
+          params={{ id: current?.market.id }}
+          request={async (page) => {
+            return await current?.getMerchandise(page);
+          }}
+        />
+      )}
+
       <ProductDetailModal
         open={isProduce}
         title="应用详情"

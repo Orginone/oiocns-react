@@ -763,7 +763,7 @@ export type FlowInstanceModel = {
 
 export type CreateDefineReq = {
   // 唯一Id
-  id: string;
+  id?: string;
   // 名称
   name: string;
   // 编号
@@ -771,7 +771,7 @@ export type CreateDefineReq = {
   // 备注
   remark: string;
   // 节点信息
-  resource: FlowNode;
+  resource?: FlowNode;
   // 归属Id
   belongId: string;
   // 流程字段json
@@ -779,7 +779,7 @@ export type CreateDefineReq = {
 };
 
 export type FlowNode = {
-  id: string;
+  id?: string;
   nodeId: string;
   parentId: string;
   type: string;
