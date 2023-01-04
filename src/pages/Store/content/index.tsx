@@ -6,6 +6,7 @@ import Application from './App';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
+import Asset from '@/pages/Welfare/WelfareOrg/Asset';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -19,6 +20,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       return <Application />;
     case GroupMenuType.FileSystemItem:
       return <FileSystem current={selectMenu.item} />;
+    case GroupMenuType.Asset:
+      return <Asset />;
     default:
       return <></>;
   }

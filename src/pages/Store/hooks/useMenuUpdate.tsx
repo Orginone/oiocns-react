@@ -47,6 +47,7 @@ const useMenuUpdate = (): [
   const refreshMenu = async () => {
     const children: MenuItemType[] = [];
     children.push(operate.getAppliactionMenus());
+    children.push(operate.getAssetMenus());
     children.push(operate.getFileSystemMenus());
     setMenu({
       key: 'store',

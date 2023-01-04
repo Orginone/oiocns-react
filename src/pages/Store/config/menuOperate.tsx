@@ -88,6 +88,18 @@ export const getAppliactionMenus = () => {
   };
 };
 
+/** 获取资产菜单 */
+export const getAssetMenus = () => {
+  return {
+    key: '资产',
+    label: '资产',
+    itemType: GroupMenuType.Asset,
+    icon: <im.ImCalculator />,
+    item: storeCtrl.root,
+    children: [],
+  };
+};
+
 /** 获取文件系统菜单 */
 export const getFileSystemMenus = () => {
   return {

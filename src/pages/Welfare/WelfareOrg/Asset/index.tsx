@@ -1,38 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Button,
-  Descriptions,
-  Divider,
-  message,
-  Modal,
-  RadioChangeEvent,
-  Space,
-} from 'antd';
+import { Button, Divider, message, Modal, RadioChangeEvent, Space } from 'antd';
 import { common } from 'typings/common';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import { ProColumns } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { AssetColumns } from '@/pages/Welfare/config/columns';
-import DonationForm from '@/pages/Welfare/WelfareOrg/WelfareMarket/DonationForm';
-import SupportForm from '@/pages/Welfare/WelfareOrg/WelfareMarket/SupportForm';
+import { AssetStoreColumns } from '@/pages/Welfare/config/columns';
+import { Route, useHistory } from 'react-router-dom';
+import PutawayComp from '@/pages/Store/content/App/Putaway';
+import appCtrl from '@/ts/controller/store/appCtrl';
+import PublishAssetForm from '@/pages/Welfare/WelfareOrg/PublishAssetForm';
 import { getUuid } from '@/utils/tools';
 import { Status } from '../../config/status';
 import userCtrl from '@/ts/controller/setting';
-import AssetCard from '@/pages/Welfare/WelfareOrg/WelfareMarket/AssetCard';
+import DoDonation from '@/pages/Welfare/WelfareOrg/DoDonation';
+import AssetCard from '../WelfareMarket/AssetCard';
 /**
- * 公益商店
+ * 仓库/物资列表
  * @returns
  */
-const WelfareMarket: React.FC<any> = () => {
+const Asset: React.FC<any> = () => {
   const parentRef = useRef<any>(null);
   const [datasource, setDatasource] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [key, forceUpdate] = useObjectUpdate(datasource);
+  const [openPublishPage, setOpenPublishPage] = useState<any>(null);
+  const [openDodonation, setOpenDodonation] = useState<any>(null);
   const [openAssetCard, setOpenAssetCard] = useState<any>(null);
-  const [openDonationform, setOpenDonationform] = useState<boolean>(false);
-  const [openSupportform, setOpenSupportform] = useState<boolean>(false);
+  const [openAssetModal, setOpenAssetModal] = useState<any>(null);
+  const history = useHistory();
   let allData: any[] = [
     {
       id: '111',
@@ -42,9 +39,7 @@ const WelfareMarket: React.FC<any> = () => {
       amount: 100,
       price: 50000,
       totalValue: '350.1万',
-      welfareOrg: '省红十字会',
-      storageAgency: '仓储A',
-      address: '商店A',
+      address: '仓库A',
       description: '这是描述这是描述',
     },
     {
@@ -55,9 +50,7 @@ const WelfareMarket: React.FC<any> = () => {
       amount: 1001,
       price: 50000,
       totalValue: '350.1万',
-      welfareOrg: '公益基金会',
-      storageAgency: '浙江省1号公益仓',
-      address: '商店B',
+      address: '仓库B',
       description: '这是描述这是描述',
     },
     {
@@ -68,9 +61,7 @@ const WelfareMarket: React.FC<any> = () => {
       amount: 100,
       price: 50000,
       totalValue: '350.1万',
-      welfareOrg: '省红十字会',
-      storageAgency: '仓储A',
-      address: '商店A',
+      address: '仓库A',
       description: '这是描述这是描述',
     },
   ];
@@ -107,13 +98,22 @@ const WelfareMarket: React.FC<any> = () => {
     }
   };
 
-  const publish = (e: any) => {
-    setOpenDonationform(true);
+  const addAsset = () => {
+    // message.warn('功能暂未开放');
+    setOpenAssetModal(true);
   };
 
-  const unpublish = () => {
+  const publish = (e: any) => {
     if (selectedRows.length > 0) {
-      setOpenSupportform(true);
+      setOpenPublishPage(selectedRows[0]);
+    } else {
+      message.warn('至少选择一条未处理的数据');
+    }
+  };
+
+  const dodonation = () => {
+    if (selectedRows.length > 0) {
+      setOpenDodonation(selectedRows[0]);
     } else {
       message.warn('至少选择一条未处理的数据');
     }
@@ -124,14 +124,21 @@ const WelfareMarket: React.FC<any> = () => {
     return (
       <>
         <Button
+          key="addAsset"
+          style={{ marginRight: '10px' }}
+          type="primary"
+          onClick={addAsset}>
+          添加资产
+        </Button>
+        <Button
           key="recieve"
           style={{ marginRight: '10px' }}
           type="primary"
           onClick={publish}>
-          捐赠上架
+          上架
         </Button>
-        <Button key="refuse" style={{ marginRight: '10px' }} onClick={unpublish}>
-          申领下架
+        <Button key="refuse" style={{ marginRight: '10px' }} onClick={dodonation}>
+          捐出
         </Button>
       </>
     );
@@ -145,7 +152,6 @@ const WelfareMarket: React.FC<any> = () => {
         key: 'opencard',
         label: '资产卡片',
         onClick: async () => {
-          // message.warn('此功能暂未开放');
           setOpenAssetCard(item);
         },
       },
@@ -163,9 +169,9 @@ const WelfareMarket: React.FC<any> = () => {
   return (
     <div className={cls[`content-box`]}>
       <div className={cls['pages-wrap']}>
-        {!openDonationform && !openSupportform && (
+        {!openPublishPage && !openDodonation && (
           <PageCard
-            title={<div style={{ fontSize: '16px', fontWeight: 'bold' }}>公益商城</div>}
+            title={<div style={{ fontSize: '16px', fontWeight: 'bold' }}>物资列表</div>}
             bordered={false}
             tabList={TitleItems}
             onTabChange={onTabChange}
@@ -194,7 +200,7 @@ const WelfareMarket: React.FC<any> = () => {
                     </Space>
                   );
                 }}
-                columns={AssetColumns}
+                columns={AssetStoreColumns}
                 showChangeBtn={true}
                 rowSelection={{
                   onSelect: (_record: any, _selected: any, selectedRows: any) => {
@@ -204,6 +210,56 @@ const WelfareMarket: React.FC<any> = () => {
               />
             </div>
           </PageCard>
+        )}
+        {openPublishPage && (
+          <PublishAssetForm
+            formdata={{
+              id: getUuid(),
+              no: '',
+              sponsor: userCtrl.isCompanySpace
+                ? userCtrl.company.name
+                : userCtrl.user.name,
+              market: '',
+              store: '',
+              needAssess: '1',
+              netWorth: 0,
+              totalValue: 0,
+              amount: 0,
+              reason: '',
+              remark: '',
+              status: Status.Draft,
+              assets: selectedRows,
+            }}
+            backtolist={() => setOpenPublishPage(null)}></PublishAssetForm>
+        )}
+        {openDodonation && (
+          <DoDonation
+            formdata={{
+              id: getUuid(),
+              no: '',
+              sponsor: userCtrl.isCompanySpace
+                ? userCtrl.company.name
+                : userCtrl.user.name,
+              needStore: '1',
+              store: '',
+              needAssess: '1',
+              linkman: '',
+              phone: '',
+              netWorth: 0,
+              totalValue: 0,
+              amount: 0,
+              reason: '',
+              remark: '',
+              status: Status.Draft,
+              welfareOrg: '',
+              donorCode: '',
+              donors: '',
+              creator: '',
+              creatorName: '',
+              creatTime: '',
+              assets: selectedRows,
+            }}
+            backtolist={() => setOpenDodonation(null)}></DoDonation>
         )}
         <Modal
           title="资产卡片"
@@ -219,67 +275,9 @@ const WelfareMarket: React.FC<any> = () => {
           {' '}
           <AssetCard info={openAssetCard}></AssetCard>
         </Modal>
-        {openDonationform && (
-          <DonationForm
-            formdata={{
-              id: getUuid(),
-              no: '',
-              sponsor: userCtrl.isCompanySpace
-                ? userCtrl.company.name
-                : userCtrl.user.name,
-              needStore: '1',
-              needAssess: '1',
-              store: '',
-              linkman: '',
-              phone: '',
-              netWorth: 0,
-              totalValue: 0,
-              amount: 0,
-              reason: '',
-              remark: '',
-              welfareOrg: '',
-              donorCode: '',
-              donors: '',
-              creator: '',
-              creatorName: '',
-              creatTime: '',
-              status: Status.Draft,
-              assets: [],
-            }}
-            backtolist={() => {
-              setSelectedRows([]);
-              setOpenDonationform(false);
-            }}></DonationForm>
-        )}
-        {openSupportform && (
-          <SupportForm
-            formdata={{
-              id: getUuid(),
-              no: '',
-              applicant: userCtrl.isCompanySpace
-                ? userCtrl.company.name
-                : userCtrl.user.name,
-              needsomething: '',
-              store: '',
-              amount: 0,
-              remark: '',
-              status: Status.Draft,
-              useWay: '',
-              useAddress: '',
-              expireTime: '2023-10-25',
-              linkman: '',
-              phone: '',
-              reason: '',
-              assets: selectedRows,
-            }}
-            backtolist={() => {
-              setSelectedRows([]);
-              setOpenSupportform(false);
-            }}></SupportForm>
-        )}
       </div>
     </div>
   );
 };
 
-export default WelfareMarket;
+export default Asset;

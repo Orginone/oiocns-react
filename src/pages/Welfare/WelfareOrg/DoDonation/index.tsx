@@ -30,30 +30,35 @@ import { dateFormat, getUuid } from '@/utils/tools';
 import moment from 'moment';
 import { TargetType } from '@/ts/core';
 import { FlowInstanceModel, ResultType } from '@/ts/base/model';
+import { DonationFormModel } from '../../config/model';
+export type IProps = {
+  formdata: DonationFormModel;
+  backtolist: Function;
+};
 /**
  * 发起捐赠(公益方发起捐赠)
  * @returns
  */
 
-const DoDonationSetting: React.FC = () => {
+const DoDonationSetting: React.FC<IProps> = ({ formdata, backtolist }) => {
   // let editable = true;
-  let formdata: any = {
-    no: null,
-    sponsor: userCtrl.isCompanySpace ? userCtrl.company.name : userCtrl.user.name,
-    donors: null, //捐赠对象
-    store: null,
-    needAssess: '1', //是否需要评估
-    netWorth: 0, //净值
-    totalValue: 0, //总值
-    amount: 0,
-    reason: null,
-    remark: null,
-  };
+  // let formdata: any = {
+  //   no: null,
+  //   sponsor: userCtrl.isCompanySpace ? userCtrl.company.name : userCtrl.user.name,
+  //   donors: null, //捐赠对象
+  //   store: null,
+  //   needAssess: '1', //是否需要评估
+  //   netWorth: 0, //净值
+  //   totalValue: 0, //总值
+  //   amount: 0,
+  //   reason: null,
+  //   remark: null,
+  // };
   const [editable, setEditable] = useState<boolean>(
     !formdata.status || formdata.status == Status.Draft,
   );
   const [stores, setStores] = useState([]);
-  const [assetList, setAssetList] = useState([]);
+  // const [assetList, setAssetList] = useState([]);
   const [key, forceUpdate] = useObjectUpdate(userCtrl.space);
   const [open, setOpen] = useState<boolean>(false);
   useEffect(() => {
@@ -186,7 +191,7 @@ const DoDonationSetting: React.FC = () => {
   /**暂存 */
   const stash = async (e: any) => {
     message.warn('该功能尚未开放');
-    load();
+    // load();
     // await save();
   };
 
@@ -251,7 +256,7 @@ const DoDonationSetting: React.FC = () => {
       key="backlist"
       type="link"
       onClick={async () => {
-        message.warn('该功能尚未开放');
+        backtolist();
       }}>
       返回列表
     </Button>,
@@ -275,7 +280,7 @@ const DoDonationSetting: React.FC = () => {
       <Card bordered={false} className={cls['content']}>
         <Descriptions
           key={key}
-          title="单据信息"
+          title="单据信息/发起捐赠"
           bordered
           column={2}
           size="small"
@@ -371,7 +376,7 @@ const DoDonationSetting: React.FC = () => {
               prefix="￥"
               formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               style={{ width: '100%', backgroundColor: '#fff', border: 'none' }}
-              onChange={(event) => {
+              onChange={(event: any) => {
                 formdata.netWorth = event;
               }}
             />
@@ -383,7 +388,7 @@ const DoDonationSetting: React.FC = () => {
               prefix="￥"
               formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               style={{ width: '100%', backgroundColor: '#fff', border: 'none' }}
-              onChange={(event) => {
+              onChange={(event: any) => {
                 formdata.totalValue = event;
               }}
             />
@@ -392,7 +397,7 @@ const DoDonationSetting: React.FC = () => {
             <InputNumber
               min={0}
               defaultValue={formdata.amount || 0}
-              onChange={(event) => {
+              onChange={(event: any) => {
                 formdata.amount = event;
               }}
             />
@@ -429,49 +434,8 @@ const DoDonationSetting: React.FC = () => {
         <PageCard bordered={false} tabList={TitleItems} tabBarExtraContent={renderBtns()}>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<any>
-              dataSource={assetList}
+              dataSource={formdata.assets}
               rowKey={'id'}
-              // request={(page) => {
-              //   return new Promise(function (resolve, reject) {
-              //     // 异步处理,处理结束后、调用resolve 或 reject
-              //     setTimeout(() => {
-              //       resolve({
-              //         result: [
-              //           {
-              //             id: '12345678910',
-              //             code: '12345678910',
-              //             name: '资产名称1',
-              //             spec: '500T',
-              //             amount: 100,
-              //             storeAddress: '仓库A',
-              //             remark: '这是备注这是备注',
-              //           },
-              //           {
-              //             id: '12345678911',
-              //             code: '12345678911',
-              //             name: '资产名称2',
-              //             spec: '500T',
-              //             amount: 100,
-              //             storeAddress: '仓库B',
-              //             remark: '这是备注这是备注这是备注这是备注这是备注这是备注',
-              //           },
-              //           {
-              //             id: '12345678912',
-              //             code: '12345678912',
-              //             name: '资产名称3',
-              //             spec: '500T',
-              //             amount: 100,
-              //             storeAddress: '仓库C',
-              //             remark: '这是备注',
-              //           },
-              //         ],
-              //         offset: 0,
-              //         limit: 10,
-              //         total: 100,
-              //       });
-              //     }, 1000);
-              //   });
-              // }}
               parentRef={parentRef}
               operation={renderOperation}
               tableAlertOptionRender={({

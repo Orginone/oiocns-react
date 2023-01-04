@@ -25,17 +25,24 @@ export type DonationFormModel = {
     id: string;
     no: string,  //单据编号
     sponsor: string, //发起人/单位
-    needStore: string,
-    store: string,
-    linkman: string,
-    phone: string,
-    totalValue: number,
-    amount: number,
-    reason: string,
-    remark: string,
+    needStore: string, //是否需要存储
+    needAssess: string, //是否需要评估
+    store: string,  //仓储机构
+    linkman: string, //联系人
+    phone: string,  //联系方式
+    netWorth: number, //净值
+    totalValue: number, //总价值
+    amount: number, //数量
+    reason: string, //原因
+    remark: string, //备注
     status: string,  //草稿已送审已审核已资助
     welfareOrg: string, //公益组织
     donorCode: string, //受捐单位机构代码
+    donors: string, //捐赠对象
+    creator: string, //创建人 id
+    creatorName: string, //创建人 名称
+    creatTime: string, //创建时间
+
     assets: AssetModel[]
 };
 export type SupportFormModel = {
@@ -55,3 +62,18 @@ export type SupportFormModel = {
     status: string,  //草稿已送审已审核已资助
     assets: AssetModel[]
 };
+export type PublishAssetFormModel = {
+    id: string;
+    no: string,  //单据编号
+    sponsor: string, //发起人/单位
+    market: string, //上架商店
+    store: string,  //仓储机构
+    needAssess: string, //是否需要评估
+    netWorth: number,//净值
+    totalValue: number,//总值
+    amount: number, //数量  
+    reason: string, //原因
+    remark: string, //备注
+    status: string,  //草稿已送审已审核
+    assets: AssetModel[]
+}
