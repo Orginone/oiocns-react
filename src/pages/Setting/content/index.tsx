@@ -3,7 +3,7 @@ import StationSetting from './Station';
 import AgencySetting from './Agency';
 import CohortSetting from './Cohort';
 import PersonSetting from './Person';
-import FlowSetting from './Flow';
+import SettingFlow from './Flow';
 import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
@@ -32,7 +32,7 @@ const ContentIndex = ({ selectMenu, species }: IProps) => {
     case GroupMenuType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
     case '流程设置':
-      return <FlowSetting />;
+      return <SettingFlow />;
     default:
       return <></>;
   }

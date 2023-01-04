@@ -180,6 +180,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               <div
                 className={cls['common-card']}
                 style={{
+                  minHeight: 150,
                   height:
                     defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
                 }}>

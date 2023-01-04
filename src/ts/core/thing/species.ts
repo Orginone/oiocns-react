@@ -102,7 +102,6 @@ export class SpeciesItem implements ISpeciesItem {
   async createAttr(
     data: Omit<AttributeModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
-    debugger
     const res = await kernel.createAttribute({
       id: undefined,
       speciesId: this.id,
