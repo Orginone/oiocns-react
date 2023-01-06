@@ -54,8 +54,6 @@
     "@icongo/im": "^1.1.2",
     "@microsoft/signalr": "^6.0.10",
     "@msgpack/msgpack": "^2.8.0",
-    "@tanstack/react-query": "^4.13.0",
-    "@tanstack/react-query-devtools": "^4.12.0",
     "@types/qrcode": "^1.5.0",
     "@wcjiang/notify": "^2.1.0",
     "antd": "^4.24.4",
