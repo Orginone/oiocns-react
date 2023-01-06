@@ -212,6 +212,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           />
           <Drawer
             title="用户管理"
+            destroyOnClose
             width={'75%'}
             open={activeModal === 'users'}
             onClose={onCancel}>

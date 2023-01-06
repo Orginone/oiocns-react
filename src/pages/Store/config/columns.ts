@@ -1,6 +1,9 @@
 import { schema } from '@/ts/base';
 import { IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
+import { Tag } from 'antd';
+import ColumnGroup from 'antd/lib/table/ColumnGroup';
+import React from 'react';
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -113,11 +116,6 @@ export const ApplicationColumns: ProColumns<IProduct>[] = [
     dataIndex: ['prod', 'name'],
   },
   {
-    title: '版本号',
-    dataIndex: ['prod', 'version'],
-    width: 100,
-  },
-  {
     title: '应用类型',
     dataIndex: ['prod', 'typeName'],
   },
@@ -225,9 +223,7 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   {
     title: '备注',
     ellipsis: true,
-    render: (_, record) => {
-      return JSON.parse(record.content || '{}').fields;
-    },
+    dataIndex: 'remark',
   },
   {
     title: '创建时间',
