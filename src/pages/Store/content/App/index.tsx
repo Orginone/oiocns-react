@@ -1,6 +1,6 @@
-import { Button, Card, message, Modal } from 'antd';
+import { Card, message, Modal } from 'antd';
 import React, { useMemo, useState } from 'react';
-import AppShowComp from '@/bizcomponents/AppTablePage2';
+import AppShowComp from '@/bizcomponents/AppTablePage';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/BtnGroupComp';
@@ -206,7 +206,7 @@ const StoreApp: React.FC = () => {
           checkNodes.type,
         );
         success &&
-          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
+          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'}, 操作成功`);
       }
       if (checkNodes?.delList?.length > 0) {
         const success = await target.deleteExtend(
@@ -215,7 +215,7 @@ const StoreApp: React.FC = () => {
           checkNodes.type,
         );
         success &&
-          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
+          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'}, 操作成功`);
       }
       // 用户主动关闭 弹窗
       // setShowShareModal(false);

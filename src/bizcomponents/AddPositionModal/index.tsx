@@ -36,6 +36,7 @@ const AddPostModal = (props: Iprops) => {
     getTree();
   }, []);
   const onHandleOk = () => {
+    getTree();
     setOperateOpen(false);
   };
   const getTree = async () => {

@@ -5,6 +5,7 @@ import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { IProduct } from '@/ts/core';
 import useCtrl from '@/ts/controller/setting';
+
 interface AppShowCompType {
   tkey?: string;
   list: IProduct[];
@@ -18,6 +19,9 @@ interface AppShowCompType {
   [key: string]: any;
 }
 
+/**
+ * 应用程序
+ */
 const AppShowComp: React.FC<AppShowCompType> = ({
   tkey,
   queryFun,

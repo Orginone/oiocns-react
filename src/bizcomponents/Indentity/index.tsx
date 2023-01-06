@@ -55,7 +55,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
         onClick: async () => {
           Modal.confirm({
             title: '提示',
-            content: '是否确认移除该人员',
+            content: '确认移除该人员',
             okText: '确认',
             cancelText: '取消',
             onOk: async () => {
@@ -89,8 +89,8 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       onClick={async () => {
         Modal.confirm({
           title: '提示',
-          content: '是否确认删除',
-          okText: '确认',
+          content: '确定删除该身份吗',
+          okText: '确定',
           cancelText: '取消',
           onOk: async () => {
             const success = await current?.deleteIdentity(indentity?.target.id!);

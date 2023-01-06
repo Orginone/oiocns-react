@@ -13,7 +13,6 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
@@ -65,7 +64,7 @@ const PersonSetting: React.FC = () => {
   // 信息标题
   const title = (
     <div className={cls['person-info-title']}>
-      <div style={{ fontSize: 100 }}>
+      <div>
         <TeamIcon share={userCtrl.user.shareInfo} size={100} preview={true} />
       </div>
       <div>
@@ -83,7 +82,7 @@ const PersonSetting: React.FC = () => {
           <Descriptions.Item label="联系方式">
             {userCtrl.user.target.team?.code}
           </Descriptions.Item>
-          <Descriptions.Item label="座右铭" span={2}>
+          <Descriptions.Item label="座右铭">
             {userCtrl.user.target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
@@ -108,7 +107,6 @@ const PersonSetting: React.FC = () => {
     ];
   };
 
-  // TODO 1、个人空间显示加入的公司；2、单位空间显示所在的部门、工作组、岗位
   return (
     <div className={cls['person-info-container']}>
       <Layout className={cls.container}>{content}</Layout>

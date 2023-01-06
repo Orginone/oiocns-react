@@ -8,6 +8,7 @@ import {
   message,
   Modal,
   Space,
+  Typography,
 } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
@@ -47,6 +48,7 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
   const [activeModal, setActiveModal] = useState<ShowmodelType>(''); // 模态框
   const [activeTab, setActiveTab] = useState<TabType>('members'); // 模态框
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
+  const [ellipsis] = useState(true);
 
   const menu = [
     { key: 'auth', label: '认证' },
@@ -120,6 +122,7 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
       },
     ];
   };
+
   return (
     <div key={key} className={cls.companyContainer}>
       <Card bordered={false} className={cls['company-info-content']}>
@@ -128,8 +131,7 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
           bordered
           size="middle"
           column={2}
-          labelStyle={{ textAlign: 'center' }}
-          contentStyle={{ textAlign: 'center' }}
+          labelStyle={{ textAlign: 'center', width: '200px' }}
           extra={[
             <Button type="link" key="qx" onClick={() => setActiveModal('post')}>
               职权设置
@@ -141,7 +143,7 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
               />
             </Dropdown>,
           ]}>
-          <Descriptions.Item label="单位名称">
+          <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
             <Space>
               {current.shareInfo.avatar && (
                 <Avatar src={current.shareInfo.avatar.thumbnail} />
@@ -149,13 +151,22 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
               <strong>{current.teamName}</strong>
             </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="社会统一信用代码">
+          <Descriptions.Item
+            label="社会统一信用代码"
+            contentStyle={{ textAlign: 'center' }}>
             {current.target.code}
           </Descriptions.Item>
-          <Descriptions.Item label="团队简称">{current.name}</Descriptions.Item>
-          <Descriptions.Item label="团队代号">{current.teamName}</Descriptions.Item>
-          <Descriptions.Item label="单位简介">
-            {current.target.team?.remark}
+          <Descriptions.Item label="团队简称" contentStyle={{ textAlign: 'center' }}>
+            {current.name}
+          </Descriptions.Item>
+          <Descriptions.Item label="团队代号" contentStyle={{ textAlign: 'center' }}>
+            {current.teamName}
+          </Descriptions.Item>
+          <Descriptions.Item label="单位简介" span={2}>
+            <Typography.Paragraph
+              ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
+              {current.target.team?.remark}
+            </Typography.Paragraph>
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -218,7 +229,7 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
           title="邀请成员"
           destroyOnClose
           open={activeModal === 'addOne'}
-          width={900}
+          width={600}
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectPerson && userCtrl.company) {
