@@ -185,12 +185,15 @@ const CustomMenu = (props: CustomMenuType) => {
         <Layout className={style.operateMenu}>
           <Row justify="space-between">
             <Col>
-              {operateMenu.icon}
-              {operateMenu.label}
+              <div style={{ display: 'flex' }}>
+                <div style={{ paddingRight: '6px' }}>{operateMenu.icon}</div>
+                <div>{operateMenu.label}</div>
+              </div>
             </Col>
             <Col>
               <ImUndo2
                 style={{ cursor: 'pointer' }}
+                title={'返回'}
                 onClick={() => {
                   setOperateMenu(undefined);
                   props.onSelect?.apply(this, [props.selectMenu]);
