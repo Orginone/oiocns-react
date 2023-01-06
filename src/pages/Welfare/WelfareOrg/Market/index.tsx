@@ -15,6 +15,7 @@ import cls from './index.module.less';
 import { ProColumns } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { AssetColumns } from '@/pages/Welfare/config/columns';
+import AssetCard from '../WelfareMarket/AssetCard';
 
 /**
  * 商店/物资列表
@@ -25,7 +26,7 @@ const Market: React.FC<any> = () => {
   const [datasource, setDatasource] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [key, forceUpdate] = useObjectUpdate(datasource);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openAssetCard, setOpenAssetCard] = useState<any>(null);
   let allData: any[] = [
     {
       id: '111',
@@ -138,8 +139,7 @@ const Market: React.FC<any> = () => {
         key: 'opencard',
         label: '资产卡片',
         onClick: async () => {
-          // message.warn('此功能暂未开放');
-          setOpenModal(true);
+          setOpenAssetCard(item);
         },
       },
       {
@@ -190,7 +190,6 @@ const Market: React.FC<any> = () => {
               showChangeBtn={true}
               rowSelection={{
                 onSelect: (_record: any, _selected: any, selectedRows: any) => {
-                  // onFinish(selectedRows);
                   setSelectedRows(selectedRows);
                 },
               }}
@@ -199,44 +198,17 @@ const Market: React.FC<any> = () => {
         </PageCard>
         <Modal
           title="资产卡片"
-          open={openModal}
+          open={openAssetCard}
           onOk={() => {
-            setOpenModal(false);
+            setOpenAssetCard(null);
           }}
           onCancel={() => {
-            setOpenModal(false);
+            setOpenAssetCard(null);
           }}
           okText="下载"
           width={1000}>
           {' '}
-          <Descriptions title="基本信息" layout="vertical" bordered={false} column={4}>
-            <Descriptions.Item label="共享范围">-</Descriptions.Item>
-            <Descriptions.Item label="卡片经纬度">-</Descriptions.Item>
-            <Descriptions.Item label="GS1编码">-</Descriptions.Item>
-            <Descriptions.Item label="资产分类">载货汽车(含自卸汽车)</Descriptions.Item>
-            <Descriptions.Item label="原值">2870</Descriptions.Item>
-            <Descriptions.Item label="均价/单价(元)">-</Descriptions.Item>
-            <Descriptions.Item label="价值类型">原值</Descriptions.Item>
-            <Descriptions.Item label="资产编码">ZCFW20210800006097</Descriptions.Item>
-            <Descriptions.Item label="资产名称">载货汽车(含自卸汽车)</Descriptions.Item>
-            <Descriptions.Item label="数量">1</Descriptions.Item>
-            <Descriptions.Item label="取得日期">2020-02-28</Descriptions.Item>
-            <Descriptions.Item label="开始使用日期">2020-02-28</Descriptions.Item>
-          </Descriptions>
-          <Descriptions title="专属信息" layout="vertical" bordered={false}>
-            <Descriptions.Item label="注册日期">-</Descriptions.Item>
-            <Descriptions.Item label="保修截止日期">-</Descriptions.Item>
-            <Descriptions.Item label="供应商">-</Descriptions.Item>
-            <Descriptions.Item label="汽车排量">-</Descriptions.Item>
-            <Descriptions.Item label="车牌号">-</Descriptions.Item>
-            <Descriptions.Item label="发动机号">-</Descriptions.Item>
-            <Descriptions.Item label="车辆识别代码（车架号）">-</Descriptions.Item>
-            <Descriptions.Item label="车辆产地">-</Descriptions.Item>
-            <Descriptions.Item label="车身颜色">-</Descriptions.Item>
-            <Descriptions.Item label="车辆类型">-</Descriptions.Item>
-            <Descriptions.Item label="车辆所有人">-</Descriptions.Item>
-            <Descriptions.Item label="车辆行使证">-</Descriptions.Item>
-          </Descriptions>
+          <AssetCard info={openAssetCard}></AssetCard>
         </Modal>
       </div>
     </div>

@@ -1,13 +1,13 @@
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { Button, Card, Modal, Space } from 'antd';
 import React, { useState } from 'react';
-import { supervisionCreateMallColumns } from '../config/columns';
+import { supervisionCreateStoreColumns } from '../config/columns';
 import { kernel } from '@/ts/base';
-import MallView from './MallView';
-import MallCreate from './MallCreate';
+import StoreView from './StoreView';
+import StoreCreate from './StoreCreate';
 import { generateUuid } from '@/ts/base/common';
 
-export type MallModel = {
+export type StoreModel = {
   id: string;
   name: string;
   mainBusiness: string;
@@ -22,61 +22,61 @@ export type MallModel = {
 };
 
 /**
- * 平台：公益商城列表
+ * 平台：公益组织商店列表
  */
-const MallList: React.FC = () => {
-  const [mall, setMall] = useState<MallModel>();
-  const [newMall, setNewMall] = useState<MallModel>();
+const StoreList: React.FC = () => {
+  const [store, setStore] = useState<StoreModel>();
+  const [newStore, setNewStore] = useState<StoreModel>();
   const [selectedRows, setSelectedRows] = useState<any[]>();
 
   /**
-   * 创建商城
+   * 创建商店
    */
   const create = () => {
     setIsCreateModalOpen(true);
   };
 
   /**
-   * 加入商城
+   * 加入商店
    */
-  const join = (item: MallModel) => {
+  const join = (item: StoreModel) => {
     // TODO
   };
 
   /**
-   * 进入商城
+   * 进入商店
    */
-  const enter = (item: MallModel) => {
+  const enter = (item: StoreModel) => {
     // TODO
   };
 
   /**
-   * 上架商品
+   * 去上架商品
    */
-  const upper = (item: MallModel) => {
+  const upper = (item: StoreModel) => {
     // TODO
   };
 
-  const tableOperation = (item: MallModel) => {
+  const tableOperation = (item: StoreModel) => {
     return [
       {
         key: 'view',
-        label: '查看商城',
+        label: '查看商店',
         onClick: () => {
           setIsViewModalOpen(true);
-          setMall(item);
+          setStore(item);
         },
       },
       {
         key: 'join',
-        label: '加入商城',
+        label: '加入商店',
         onClick: () => {
           join(item);
         },
       },
       {
         key: 'enter',
-        label: '进入商城',
+        label: '进入商店',
         onClick: () => {
           enter(item);
         },
@@ -93,8 +93,8 @@ const MallList: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleCreateOk = () => {
-    const body = { ...newMall, ...{ id: generateUuid(), dataStatus: 1 } };
-    kernel.anystore.insert('we_welfaremall', body, 'company').then((res) => {
+    const body = { ...newStore, ...{ id: generateUuid(), dataStatus: 1 } };
+    kernel.anystore.insert('we_welfarestore', body, 'company').then((res) => {
       console.log(res);
       setIsCreateModalOpen(false);
     });
@@ -112,11 +112,11 @@ const MallList: React.FC = () => {
               display: 'flex',
             }}>
             <div>
-              <b>公益商城列表</b>
+              <b>公益商店列表</b>
             </div>
             <div>
               <Button type="primary" onClick={create}>
-                创建商城
+                创建商店
               </Button>
             </div>
           </div>
@@ -124,7 +124,7 @@ const MallList: React.FC = () => {
         <CardOrTableComp
           rowKey={'id'}
           bordered={false}
-          columns={supervisionCreateMallColumns}
+          columns={supervisionCreateStoreColumns}
           pagination={{
             defaultCurrent: 0,
             defaultPageSize: 10,
@@ -132,7 +132,7 @@ const MallList: React.FC = () => {
           dataSource={[]}
           request={async (params: any) => {
             const res = await kernel.anystore.aggregate(
-              'we_welfaremall',
+              'we_welfarestore',
               { match: {}, skip: params.offset, limit: params.limit },
               'company',
             );
@@ -146,7 +146,7 @@ const MallList: React.FC = () => {
           }}
           operation={(item) => tableOperation(item)}
           rowSelection={{
-            onChange: (selectedRowKeys: React.Key[], selectedRows: MallModel[]) => {
+            onChange: (selectedRowKeys: React.Key[], selectedRows: StoreModel[]) => {
               console.log(
                 `selectedRowKeys: ${selectedRowKeys}`,
                 'selectedRows: ',
@@ -165,28 +165,28 @@ const MallList: React.FC = () => {
         />
       </Card>
       <Modal
-        title="公益商城信息"
+        title="公益商店信息"
         open={isViewModalOpen}
         width={900}
         onOk={handleViewOk}
         onCancel={() => setIsViewModalOpen(false)}
         okText="下载"
         cancelText="关闭">
-        <MallView mall={mall as MallModel} />
+        <StoreView store={store as StoreModel} />
       </Modal>
 
       <Modal
-        title="创建商城"
+        title="创建商店"
         open={isCreateModalOpen}
         width={900}
         onOk={handleCreateOk}
         onCancel={() => setIsCreateModalOpen(false)}
         okText="保存"
         cancelText="关闭">
-        <MallCreate updateNewMall={setNewMall} />
+        <StoreCreate updateNewStore={setNewStore} />
       </Modal>
     </div>
   );
 };
 
-export default MallList;
+export default StoreList;
