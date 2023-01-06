@@ -1,4 +1,4 @@
-import { Button, Card, Descriptions, message, Modal } from 'antd';
+import { Button, Card, Descriptions, message, Modal, Typography } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import React, { useRef, useState } from 'react';
 
@@ -13,7 +13,6 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
@@ -62,24 +61,26 @@ const PersonSetting: React.FC = () => {
       key: 'companys',
     },
   ];
-  // 信息标题
-  const title = (
-    <div className={cls['person-info-title']}>
-      <div style={{ fontSize: 100 }}>
-        <TeamIcon share={userCtrl.user.shareInfo} size={100} preview={true} />
-      </div>
-      <div>
-        <Button type="link">修改密码</Button>
-      </div>
-    </div>
-  );
   // 信息内容
   const content = (
     <div className={cls['person-info-info']}>
       <Card bordered={false}>
-        <Descriptions title={title} column={2}>
-          <Descriptions.Item label="昵称">{userCtrl.user.name}</Descriptions.Item>
+        <Descriptions
+          bordered
+          size="middle"
+          title={'个人信息'}
+          column={2}
+          extra={[<Button type="link">修改密码</Button>]}>
+          <Descriptions.Item label="昵称">
+            <TeamIcon share={userCtrl.user.shareInfo} size={40} preview={true} />
+            {userCtrl.user.name}
+          </Descriptions.Item>
           <Descriptions.Item label="姓名">{userCtrl.user.teamName}</Descriptions.Item>
+          <Descriptions.Item label="账号">
+            <Typography.Paragraph copyable>
+              {userCtrl.user.target.code}
+            </Typography.Paragraph>
+          </Descriptions.Item>
           <Descriptions.Item label="联系方式">
             {userCtrl.user.target.team?.code}
           </Descriptions.Item>

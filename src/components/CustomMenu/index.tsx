@@ -134,7 +134,8 @@ const CustomMenu = (props: CustomMenuType) => {
           setOverItem(undefined);
           setVisibleMenu(false);
         }}>
-        <Typography.Text ellipsis>{item.label}</Typography.Text>
+        {!item.display && <Typography.Text ellipsis>{item.label}</Typography.Text>}
+        {item.display}
         {item.count && item.count > 0 ? (
           <span style={{ float: 'right' }}>
             <Badge key={item.key} count={item.count} size="small" />

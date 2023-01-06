@@ -1,3 +1,4 @@
+import React from 'react';
 import { RouteConfig } from 'react-router-config';
 
 interface DataType {
@@ -39,12 +40,21 @@ interface MenuItemType {
   item?: any;
   key: string;
   label: string;
+  display?: React.ReactNode;
   itemType: string;
   count?: number;
   icon: React.ReactNode;
   expIcon?: React.ReactNode;
   menus?: OperateMenuType[];
   children: MenuItemType[];
+}
+
+interface TabItemType {
+  key: string;
+  label: string;
+  menu: MenuItemType;
+  icon?: React.ReactNode;
+  expIcon?: React.ReactNode;
 }
 
 interface OperateMenuType {
