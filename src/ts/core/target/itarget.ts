@@ -79,7 +79,7 @@ export interface ITarget {
    * 判断是否拥有该身份
    * @param id 身份id
    */
-  judgeHasIdentity(id: string): Promise<boolean>;
+  judgeHasIdentity(codes: string[]): Promise<boolean>;
   /**
    * 获取身份
    * @return {IIdentity[]} 身份数组
@@ -366,6 +366,8 @@ export interface ICohort extends ITarget {
 }
 /** 人员操作 */
 export interface IPerson extends ISpace, ITarget {
+  /** 我的好友列表 */
+  joinedFriend: schema.XTarget[];
   /** 我加入的单位 */
   joinedCompany: ICompany[];
   /**

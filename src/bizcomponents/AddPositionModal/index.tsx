@@ -13,6 +13,7 @@ interface Iprops {
   open: boolean;
   handleOk: () => void;
   current: ITarget;
+  IsAdmin: boolean;
 }
 interface DataType {
   key: React.ReactNode;
@@ -70,16 +71,18 @@ const AddPostModal = (props: Iprops) => {
   ];
 
   const renderOperation = (item: IAuthority): common.OperationType[] => {
-    return [
-      {
+    let operations: common.OperationType[] = [];
+    if (props.IsAdmin) {
+      operations.push({
         key: 'addNew',
         label: '新增',
         onClick: () => {
           setOperateOpen(true);
           setItem(item);
         },
-      },
-    ];
+      });
+    }
+    return operations;
   };
 
   const addmodal = (
