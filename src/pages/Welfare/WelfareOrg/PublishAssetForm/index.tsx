@@ -26,23 +26,29 @@ import IMarket from '@/ts/core/market/imarket';
 import { DownOutlined } from '@ant-design/icons';
 import { kernel, model, schema } from '@/ts/base';
 import { TargetType } from '@/ts/core';
+import { PublishAssetFormModel } from '../../config/model';
+
+export type IProps = {
+  formdata: PublishAssetFormModel;
+  backtolist: Function;
+};
 /**
  * 上架物资（公益组织）
  * @returns
  */
-const PublishAssetSetting: React.FC = () => {
-  let formdata: any = {
-    no: null,
-    sponsor: userCtrl.space.name,
-    market: null, //上架商城
-    store: null,
-    needAssess: '1', //是否需要评估
-    netWorth: 0, //净值
-    totalValue: 0, //总值
-    amount: 0,
-    reason: null,
-    remark: null,
-  };
+const PublishAssetSetting: React.FC<IProps> = ({ formdata, backtolist }) => {
+  // let formdata: any = {
+  //   no: null,
+  //   sponsor: userCtrl.space.name,
+  //   market: null, //上架商城
+  //   store: null,
+  //   needAssess: '1', //是否需要评估
+  //   netWorth: 0, //净值
+  //   totalValue: 0, //总值
+  //   amount: 0,
+  //   reason: null,
+  //   remark: null,
+  // };
   const [stores, setStores] = useState<common.OptionType[]>([]);
   const [markets, setMarkets] = useState<common.OptionType[]>([]);
   const [key, forceUpdate] = useObjectUpdate(userCtrl.space);
@@ -157,7 +163,7 @@ const PublishAssetSetting: React.FC = () => {
       key="backlist"
       type="link"
       onClick={async () => {
-        message.warn('该功能尚未开放');
+        backtolist();
       }}>
       返回列表
     </Button>,
@@ -303,7 +309,7 @@ const PublishAssetSetting: React.FC = () => {
         <PageCard bordered={false} tabList={TitleItems} tabBarExtraContent={renderBtns()}>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<any>
-              dataSource={[]}
+              dataSource={formdata.assets}
               rowKey={'id'}
               parentRef={parentRef}
               operation={renderOperation}

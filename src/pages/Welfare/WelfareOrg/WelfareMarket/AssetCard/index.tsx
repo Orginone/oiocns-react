@@ -39,7 +39,7 @@ const AssetCard: React.FC<IProps> = ({ info }) => {
         <Descriptions.Item label="车身颜色">-</Descriptions.Item>
         <Descriptions.Item label="车辆类型">-</Descriptions.Item>
         <Descriptions.Item label="车辆所有人">-</Descriptions.Item>
-        <Descriptions.Item label="车辆行使证">-</Descriptions.Item>
+        <Descriptions.Item label="车辆行驶证">-</Descriptions.Item>
       </Descriptions>
     </div>
   );

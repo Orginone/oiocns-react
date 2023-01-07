@@ -1,11 +1,12 @@
 import userCtrl from '@/ts/controller/setting';
-import { TargetType } from '@/ts/core';
+import { ISpeciesItem, TargetType } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { ImStackoverflow } from 'react-icons/im';
+import { ImCommand, ImNewspaper, ImStackoverflow } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
+import { buildSpeciesTree } from '../config/menuOperate';
 import { GroupMenuType } from '../config/menuType';
 /**
  * 设置菜单刷新hook
@@ -78,9 +79,33 @@ const useMenuUpdate = (): [
         }),
         {
           children: [],
-          key: GroupMenuType.FlowSetting,
-          label: GroupMenuType.FlowSetting,
-          itemType: GroupMenuType.FlowSetting,
+          key: '分类标准',
+          label: '分类标准',
+          itemType: '分类标准',
+          menus: [
+            {
+              key: '制定标准',
+              label: '制定标准',
+              icon: <ImNewspaper />,
+              subMenu: buildSpeciesTree(userCtrl.space.speciesTree as ISpeciesItem),
+            },
+          ],
+          item: userCtrl.space,
+          icon: <ImNewspaper />,
+        },
+        {
+          children: [],
+          key: '业务设置',
+          label: '业务设置',
+          itemType: '业务设置',
+          item: userCtrl.space,
+          icon: <ImCommand />,
+        },
+        {
+          children: [],
+          key: '流程设置',
+          label: '流程设置',
+          itemType: '流程设置',
           item: userCtrl.space,
           icon: <ImStackoverflow />,
         },
