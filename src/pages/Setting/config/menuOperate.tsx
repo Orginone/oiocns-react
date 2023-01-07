@@ -110,6 +110,39 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
     children: await buildTargetTree(param.subTeam),
   };
 };
+/** 加载分类标准 业务标准菜单 */
+// export const loadStandardMenus = async (param: groupMenuParams) => {
+//   return {
+//     key: param.key,
+//     label: param.key,
+//     itemType: param.key,
+//     icon: (
+//       <TeamIcon
+//         share={{
+//           name: param.key,
+//           typeName: param.typeName,
+//         }}
+//         size={18}
+//         fontSize={16}
+//         notAvatar={true}
+//       />
+//     ),
+//     menus: [
+//       {
+//         key: '新建|' + param.typeName,
+//         icon: <im.ImPlus />,
+//         label: '新建' + param.typeName,
+//       },
+//       {
+//         key: '刷新',
+//         icon: <im.ImSpinner9 />,
+//         label: '刷新子组织',
+//       },
+//     ],
+//     item: param.item,
+//     children: await buildTargetTree(param.subTeam),
+//   };
+// };
 
 export const loadSpaceSetting = () => {
   return {
@@ -241,8 +274,8 @@ export const loadTypeMenus = async (item: ITarget) => {
   });
   if (item.speciesTree) {
     menus.push({
-      key: '制定标准',
-      label: '制定标准',
+      key: '分类标准',
+      label: '分类标准',
       icon: <im.ImNewspaper />,
       subMenu: buildSpeciesTree(item.speciesTree),
     });
