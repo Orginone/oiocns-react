@@ -31,7 +31,7 @@ const ContentIndex = ({ selectMenu, species }: IProps) => {
       return <StationSetting current={selectMenu.item} />;
     case GroupMenuType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
-    case '流程设置':
+    case GroupMenuType.FlowSetting:
       return <SettingFlow />;
     default:
       return <></>;

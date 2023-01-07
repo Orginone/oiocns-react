@@ -12,4 +12,6 @@ export enum GroupMenuType {
   'StationSetting'= '岗位设置',
   'CompanyCohort'= '单位群组',
   'ResouceSetting'= '资源设置',
+  'FlowSetting'= '流程设置',
+  'Template'= '业务设置',
 }

@@ -31,6 +31,7 @@ export type {
   IWorking,
 } from './target/itarget';
 export { findTargetShare } from './target/targetMap';
+export type { INullTemplate, ITemplate } from './template';
 export type { INullSpeciesItem, ISpeciesItem } from './thing';
 export { loadSpeciesTree } from './thing';
 export type { IApplyItem, IApprovalItem, IOrderApplyItem, ITodoGroup } from './todo';

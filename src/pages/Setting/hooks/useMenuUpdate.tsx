@@ -78,9 +78,9 @@ const useMenuUpdate = (): [
         }),
         {
           children: [],
-          key: '流程设置',
-          label: '流程设置',
-          itemType: '流程设置',
+          key: GroupMenuType.FlowSetting,
+          label: GroupMenuType.FlowSetting,
+          itemType: GroupMenuType.FlowSetting,
           item: userCtrl.space,
           icon: <ImStackoverflow />,
         },
