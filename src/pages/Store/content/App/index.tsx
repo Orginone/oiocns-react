@@ -1,6 +1,6 @@
-import { Button, Card, message, Modal } from 'antd';
+import { Card, message, Modal, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
-import AppShowComp from '@/bizcomponents/AppTablePage2';
+import AppShowComp from '@/bizcomponents/AppTablePage';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { BtnGroupDiv } from '@/components/BtnGroupComp';
@@ -15,9 +15,9 @@ import MoveApp from './moveApp';
 import PublishComp from './PublishList';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
-import { myColumns } from './Config';
 import { IProduct, IResource } from '@/ts/core';
 import appCtrl from '@/ts/controller/store/appCtrl';
+import { ApplicationColumns } from '../../config/columns';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
@@ -160,7 +160,7 @@ const StoreApp: React.FC = () => {
           ''
         )}
         <Card
-          title="我的应用"
+          title={<Typography.Title level={5}> 我的应用</Typography.Title>}
           className={cls['app-tabs']}
           extra={extraBtns()}
           tabList={[
@@ -178,7 +178,7 @@ const StoreApp: React.FC = () => {
             <AppShowComp
               list={showData}
               searchParams={{ status: tabKey }}
-              columns={myColumns}
+              columns={ApplicationColumns}
               renderOperation={renderOperation}
             />
           </div>
@@ -206,7 +206,7 @@ const StoreApp: React.FC = () => {
           checkNodes.type,
         );
         success &&
-          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
+          message.success(`新增${checkNodes.resourceId ? '分配' : '分享'}, 操作成功`);
       }
       if (checkNodes?.delList?.length > 0) {
         const success = await target.deleteExtend(
@@ -215,7 +215,7 @@ const StoreApp: React.FC = () => {
           checkNodes.type,
         );
         success &&
-          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'},操作成功`);
+          message.success(`取消${checkNodes.resourceId ? '分配' : '分享'}, 操作成功`);
       }
       // 用户主动关闭 弹窗
       // setShowShareModal(false);

@@ -35,7 +35,6 @@ const App = () => {
           <div className="DialogTempalte" id="DialogTempalte"></div>
         </Suspense>
       </ConfigProvider>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </HashRouter>
   );
 };

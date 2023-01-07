@@ -20,7 +20,7 @@ type CompanySearchTableProps = {
 };
 
 type PersonInfoCardProps = {
-  person: XTarget;
+  target: XTarget;
 };
 
 /*
@@ -36,13 +36,13 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   useEffect(() => {
     switch (tableProps.searchType) {
       case TargetType.Person:
-        setSearchPlace('请输入要搜索用户的账号');
+        setSearchPlace('请输入用户的账号');
         break;
       case TargetType.Company:
-        setSearchPlace('请输入要查询单位的信用代码');
+        setSearchPlace('请输入单位的社会统一信用代码');
         break;
       case TargetType.Group:
-        setSearchPlace('请输入要搜索集团的编号');
+        setSearchPlace('请输入集团的编码');
         break;
     }
   }, []);
@@ -66,10 +66,19 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         <Row gutter={16} style={{ width: '100%' }}>
           {dataSource.map((item) => (
             <Col span={24} key={item.id}>
-              {tableProps.searchType === TargetType.Person ? (
-                <PersonInfoCard key={item.id} person={item}></PersonInfoCard>
-              ) : (
-                <CompanyCardCard key={item.id} person={item}></CompanyCardCard>
+              {tableProps.searchType === TargetType.Person && (
+                <PersonInfoCard key={item.id} target={item} />
+              )}
+              {tableProps.searchType === TargetType.Group && (
+                <GroupCard key={item.id} target={item} />
+              )}
+              {[
+                TargetType.Company,
+                TargetType.University,
+                TargetType.Hospital,
+                TargetType.Research,
+              ].includes(tableProps.searchType) && (
+                <CompanyCard key={item.id} target={item} />
               )}
             </Col>
           ))}
@@ -83,26 +92,26 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
    * @param person 人员
    * @returns
    */
-  const PersonInfoCard: React.FC<PersonInfoCardProps> = ({ person }) => (
+  const PersonInfoCard: React.FC<PersonInfoCardProps> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
       className={`${styles.card}`}
-      avatar={<TeamIcon share={new Person(person).shareInfo} size={60} preview={true} />}
+      avatar={<TeamIcon share={new Person(target).shareInfo} size={60} preview={true} />}
       title={
         <Space>
-          {person.name}
-          <Tag color="blue">账号：{person.code}</Tag>
+          {target.name}
+          <Tag color="blue">账号：{target.code}</Tag>
         </Space>
       }
-      value={person.id}
-      key={person.id}
+      value={target.id}
+      key={target.id}
       description={
         <Descriptions column={2} size="small" style={{ marginTop: 16 }}>
-          <Descriptions.Item label="姓名">{person.team?.name}</Descriptions.Item>
-          <Descriptions.Item label="手机号">{person.team?.code}</Descriptions.Item>
+          <Descriptions.Item label="姓名">{target.team?.name}</Descriptions.Item>
+          <Descriptions.Item label="手机号">{target.team?.code}</Descriptions.Item>
           <Descriptions.Item label="座右铭" span={2}>
-            {person.team?.remark}
+            {target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       }
@@ -110,40 +119,58 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   );
 
   // 单位卡片渲染
-  const CompanyCardCard: React.FC<PersonInfoCardProps> = ({ person: company }) => (
+  const CompanyCard: React.FC<PersonInfoCardProps> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
       className={`${styles.card}`}
       avatar={
         <TeamIcon
-          share={new Company(company, userCtrl.user.id).shareInfo}
+          share={new Company(target, userCtrl.user.id).shareInfo}
           size={60}
           preview={true}
         />
       }
       title={
         <Space>
-          {company.name}
-          <Tag color="blue">账号：{company.code}</Tag>
+          {target.name}
+          <Tag color="blue">统一社会信用代码：{target.code}</Tag>
         </Space>
       }
-      value={company.id}
-      description={`公司简介:${company.team?.remark}`}
+      value={target.id}
+      description={`公司简介:${target.team?.remark}`}
     />
   );
 
-  // {suffix={
-  //   <Tooltip title="搜索用户">
-  //     <SearchOutlined />
-  //   </Tooltip>
-  // }}
+  // 集团卡片渲染
+  const GroupCard: React.FC<PersonInfoCardProps> = ({ target }) => (
+    <CheckCard
+      bordered
+      style={{ width: '100%' }}
+      className={`${styles.card}`}
+      avatar={
+        <TeamIcon
+          share={new Company(target, userCtrl.user.id).shareInfo}
+          size={60}
+          preview={true}
+        />
+      }
+      title={
+        <Space>
+          {target.name}
+          <Tag color="blue">集团编码：{target.code}</Tag>
+        </Space>
+      }
+      value={target.id}
+      description={`集团简介:${target.team?.remark}`}
+    />
+  );
+
   return (
     <div className={styles[`search-card`]}>
       <SearchInput
         value={searchKey}
         placeholder={searchPlace}
-        // extra={`找到${dataSource?.length}家单位`}
         onChange={async (event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
@@ -164,7 +191,6 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
             // 个人 查询公司 查询人， 公司查询集团
             if (res.total && res.result) {
               setDataSource(res.result);
-              // tableProps.searchCallback(res.result);
             } else {
               setDataSource([]);
             }

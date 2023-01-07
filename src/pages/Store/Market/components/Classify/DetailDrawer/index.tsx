@@ -18,7 +18,7 @@ interface Iporps {
 
 const DetailDrawer: React.FC<Iporps> = (props) => {
   const { title, onClose, open, nodeDetail } = props;
-  const avatar = JSON.parse(nodeDetail.photo);
+  const avatar = JSON.parse(nodeDetail.photo || '{}');
   /**
    * @description: 详情内容
    * @return {*}

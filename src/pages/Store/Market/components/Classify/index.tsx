@@ -106,7 +106,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       case '删除商店':
         Modal.confirm({
           title: '提示',
-          content: '是否确认删除',
+          content: '确定删除该商店吗',
           onOk: async () => {
             if (await marketCtrl.target.deleteMarket(node.market.id)) {
               message.success('删除成功');
@@ -212,6 +212,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           />
           <Drawer
             title="用户管理"
+            destroyOnClose
             width={'75%'}
             open={activeModal === 'users'}
             onClose={onCancel}>

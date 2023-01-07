@@ -28,6 +28,9 @@ class ChatController extends Emitter {
       }
     });
   }
+
+  /** 当前会话、通讯录的搜索内容 */
+  public currentKey: string = '';
   /** 通讯录 */
   public get groups() {
     return this._groups;

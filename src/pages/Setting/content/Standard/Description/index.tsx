@@ -44,7 +44,11 @@ const Description = (info: { current: ISpeciesItem }) => {
           {data.target.public ? '开放' : '私有'}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">{data.target.createTime}</Descriptions.Item>
-        <Descriptions.Item label="分类定义" span={2}>
+        <Descriptions.Item
+          contentStyle={{ textAlign: 'left' }}
+          labelStyle={{ textAlign: 'center' }}
+          label="分类定义"
+          span={2}>
           {data.target.remark}
         </Descriptions.Item>
       </Descriptions>

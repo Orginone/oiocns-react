@@ -8,6 +8,7 @@ import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
 import { Modal } from 'antd';
+
 const TeamSetting: React.FC = () => {
   const [species, setSpecies] = useState<ISpeciesItem>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();

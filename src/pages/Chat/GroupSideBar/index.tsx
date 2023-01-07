@@ -1,14 +1,15 @@
 import * as imIcon from 'react-icons/im';
-import { Input, Tabs } from 'antd';
+import { Input, Space, Tabs } from 'antd';
 import React, { useEffect, useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import sideStyle from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import { IChat } from '@/ts/core/chat/ichat';
-import ContentMenu from '@/components/ContentMenu';
 import { handleFormatDate } from '@/utils/tools';
 import { MessageType } from '@/ts/core/enum';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import Sider from 'antd/lib/layout/Sider';
+import { IconFont } from '@/components/IconFont';
 
 /**
  * @description: 右键菜单信息
@@ -246,25 +247,35 @@ const GroupSideBar: React.FC = () => {
   ];
   return (
     <div id={key} className={sideStyle.chart_side_wrap}>
-      <ContentMenu width={300}>
-        <div className={sideStyle.group_side_bar_search}>
-          <Input
-            placeholder="搜索"
-            prefix={<imIcon.ImSearch />}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
+      <Sider width={300} className={sideStyle.sider}>
+        <div className={sideStyle.container}>
+          <div className={sideStyle.title}>
+            <Space>
+              <>
+                <IconFont type={'icon-message'} className={sideStyle['icon']} />
+                <strong>沟通</strong>
+              </>
+            </Space>
+          </div>
+          <div className={sideStyle.group_side_bar_search}>
+            <Input
+              placeholder="搜索"
+              prefix={<imIcon.ImSearch />}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+              }}
+            />
+          </div>
+          <Tabs
+            centered
+            activeKey={chatCtrl.tabIndex}
+            onTabClick={(k) => {
+              chatCtrl.setTabIndex(k);
             }}
+            items={items}
           />
         </div>
-        <Tabs
-          centered
-          activeKey={chatCtrl.tabIndex}
-          onTabClick={(k) => {
-            chatCtrl.setTabIndex(k);
-          }}
-          items={items}
-        />
-      </ContentMenu>
+      </Sider>
 
       {/* 鼠标右键 */}
       {mousePosition.isShowContext ? (

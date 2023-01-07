@@ -8,6 +8,7 @@ import userCtrl from '@/ts/controller/setting';
 import { CheckCard } from '@ant-design/pro-components';
 import { XMarket } from '@/ts/base/schema';
 import TeamIcon from '../GlobalComps/teamIcon';
+
 type ShopSearchTableProps = {
   [key: string]: any;
   searchCallback: (target: XMarket[]) => void;

@@ -7,6 +7,6 @@ export enum GroupMenuType {
   'BuyOrder' = '采购订单',
   'SellOrder' = '销售订单',
   'JoinStore' = '加入商店审批',
-  'Application' = '应用代办',
+  'Application' = '应用待办',
   'Organization' = '组织审批',
 }

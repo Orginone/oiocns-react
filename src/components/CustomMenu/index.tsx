@@ -134,7 +134,8 @@ const CustomMenu = (props: CustomMenuType) => {
           setOverItem(undefined);
           setVisibleMenu(false);
         }}>
-        <Typography.Text ellipsis>{item.label}</Typography.Text>
+        {!item.display && <Typography.Text ellipsis>{item.label}</Typography.Text>}
+        {item.display}
         {item.count && item.count > 0 ? (
           <span style={{ float: 'right' }}>
             <Badge key={item.key} count={item.count} size="small" />
@@ -185,12 +186,15 @@ const CustomMenu = (props: CustomMenuType) => {
         <Layout className={style.operateMenu}>
           <Row justify="space-between">
             <Col>
-              {operateMenu.icon}
-              {operateMenu.label}
+              <div style={{ display: 'flex' }}>
+                <div style={{ paddingRight: '6px' }}>{operateMenu.icon}</div>
+                <div>{operateMenu.label}</div>
+              </div>
             </Col>
             <Col>
               <ImUndo2
                 style={{ cursor: 'pointer' }}
+                title={'返回'}
                 onClick={() => {
                   setOperateMenu(undefined);
                   props.onSelect?.apply(this, [props.selectMenu]);
