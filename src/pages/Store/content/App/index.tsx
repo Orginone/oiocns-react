@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import AppShowComp from '@/bizcomponents/AppTablePage';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
-import { BtnGroupDiv } from '@/components/BtnGroupComp';
+import { GroupBtn } from '@/components/GroupBtn';
 import PutawayComp from './Putaway';
 import ShareComp from '../components/ShareComp';
 import CreateApp from './CreatApp'; // 上架弹窗
@@ -28,27 +28,6 @@ const StoreApp: React.FC = () => {
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
-
-  const extraBtns = () => {
-    return (
-      <BtnGroupDiv
-        list={[
-          {
-            text: '购买',
-            onClick: () => {
-              history.push('/market/shop');
-            },
-          },
-          {
-            text: '创建',
-            onClick: () => {
-              history.push('/store/app/create');
-            },
-          },
-        ]}
-      />
-    );
-  };
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
     const shareArr = [];
@@ -162,7 +141,24 @@ const StoreApp: React.FC = () => {
         <Card
           title={<Typography.Title level={5}> 我的应用</Typography.Title>}
           className={cls['app-tabs']}
-          extra={extraBtns()}
+          extra={
+            <GroupBtn
+              list={[
+                {
+                  text: '购买',
+                  onClick: () => {
+                    history.push('/market/shop');
+                  },
+                },
+                {
+                  text: '创建',
+                  onClick: () => {
+                    history.push('/store/app/create');
+                  },
+                },
+              ]}
+            />
+          }
           tabList={[
             { tab: '全部', key: '全部' },
             { tab: '共享的', key: '共享的' },

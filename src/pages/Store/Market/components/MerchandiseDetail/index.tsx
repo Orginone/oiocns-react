@@ -15,7 +15,7 @@ interface Iprops {
   width?: number;
 }
 
-const ProductDetailModal: React.FC<Iprops> = ({ title, open, onClose, width, data }) => {
+const MerchandiseDetail: React.FC<Iprops> = ({ title, open, onClose, width, data }) => {
   const content = (
     <Card bordered={false}>
       <Descriptions bordered column={2}>
@@ -61,4 +61,5 @@ const ProductDetailModal: React.FC<Iprops> = ({ title, open, onClose, width, dat
     </div>
   );
 };
-export default ProductDetailModal;
+
+export default MerchandiseDetail;
