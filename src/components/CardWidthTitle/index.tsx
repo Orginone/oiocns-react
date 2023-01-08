@@ -1,16 +1,16 @@
 import './index.less';
-
 import { EditOutlined } from '@ant-design/icons';
 import { Button, Divider } from 'antd';
 import React, { ReactNode } from 'react';
-interface CardWidthTitleType {
+
+interface IProps {
   title: string; //props
   children?: ReactNode;
   className?: string;
   btns?: any;
 }
 // 带头部 卡片模板
-const CardWidthTitle: React.FC<CardWidthTitleType> = ({ title, children, className }) => {
+const CardWidthTitle: React.FC<IProps> = ({ title, children, className }) => {
   return (
     <>
       <div className={`CardWidthTitle-wrap ${className}`}>

@@ -2,10 +2,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
-import AppCard from '@/components/AppCardOfBuy';
+import AppCard from '@/components/AppShopCard';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import ProductDetailModal from '@/components/ProductDetailModal';
+import MerchandiseDetail from '../components/MerchandiseDetail';
 import MarketClassify from '../components/Classify';
 import ReactDOM from 'react-dom';
 import { XMerchandise } from '@/ts/base/schema';
@@ -18,7 +18,7 @@ import WelfareMarket from '@/pages/Welfare/WelfareOrg/WelfareMarket';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
-  const [detail, setDetail] = useState<XMerchandise>(); // 查看详情
+  const [merchandise, setMerchandise] = useState<XMerchandise>(); // 查看详情
   const parentRef = useRef<any>(null); //父级容器Dom
   const treeContainer = document.getElementById('templateMenu');
   const [key] = useCtrlUpdate(marketCtrl);
@@ -79,8 +79,8 @@ const AppShowComp: React.FC = () => {
         key: 'detail',
         label: '详情',
         onClick: () => {
+          setMerchandise(item);
           setIsProduce(true);
-          setDetail(item);
         },
       },
       {
@@ -99,7 +99,6 @@ const AppShowComp: React.FC = () => {
               marketCtrl.changCallback();
             },
           });
-          setDetail(item);
         },
       },
     ];
@@ -115,15 +114,8 @@ const AppShowComp: React.FC = () => {
       return (
         <AppCard
           className="card"
-          data={item}
+          current={item}
           key={item.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           showOperation={true}
           operation={renderOperation}
           handleBuyApp={handleBuyAppFun}
@@ -152,11 +144,11 @@ const AppShowComp: React.FC = () => {
         />
       )}
 
-      <ProductDetailModal
+      <MerchandiseDetail
         open={isProduce}
         title="应用详情"
         onClose={() => setIsProduce(false)}
-        data={detail}
+        data={merchandise}
       />
       {treeContainer
         ? ReactDOM.createPortal(

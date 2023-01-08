@@ -1,14 +1,13 @@
-import { DownOutlined, RightOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Col, Row, Typography } from 'antd';
-import React, { useState } from 'react';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import detailStyle from './index.module.less';
-import chatCtrl from '@/ts/controller/chat';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import InviteMembers from '@/components/InviteMembers';
-import RemoveMember from '@/components/RemoveMember';
 import { schema } from '@/ts/base';
+import React, { useState } from 'react';
+import chatCtrl from '@/ts/controller/chat';
+import detailStyle from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import { DownOutlined, RightOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Col, Modal, Row, Typography } from 'antd';
+import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 
 /**
  * @description:  个人、群聊详情
@@ -89,10 +88,8 @@ const Groupdetail = () => {
       <Col span={20}>
         <h4 className={detailStyle.title}>
           {chatCtrl.chat.target.name}
-          {chatCtrl.chat.target.typeName !== '人员' ? (
+          {chatCtrl.chat.target.typeName !== '人员' && (
             <span className={detailStyle.number}>({chatCtrl.chat.personCount})</span>
-          ) : (
-            ''
           )}
         </h4>
         <div className={detailStyle.base_info_desc}>{chatCtrl.chat.target.remark}</div>
@@ -236,22 +233,25 @@ const Groupdetail = () => {
         )}
       </div>
       {/* 邀请成员 */}
-      <InviteMembers
+      <Modal
+        title={'邀请成员'}
+        destroyOnClose
         open={open}
+        width={1024}
         onOk={onOk}
-        onCancel={onCancel}
-        title="邀请成员"
-        setSelectPerson={setSelectPerson}
-      />
+        onCancel={onCancel}>
+        <AssignPosts searchFn={setSelectPerson} />
+      </Modal>
       {/* 移出成员 */}
-      <RemoveMember
-        title="移出成员"
+      <Modal
+        title={'移出成员'}
+        destroyOnClose
         open={removeOpen}
-        onOk={onRemoveOk}
+        width={1024}
         onCancel={onCancel}
-        setSelectPerson={setSelectPerson}
-        personData={removePerosn}
-      />
+        onOk={onRemoveOk}>
+        <AssignPosts searchFn={setSelectPerson} personData={removePerosn} />
+      </Modal>
     </>
   );
 };
