@@ -1,7 +1,7 @@
 import React from 'react';
 import * as im from 'react-icons/im';
 import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem, ITarget, TargetType, ITemplate } from '@/ts/core';
+import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
@@ -53,20 +53,6 @@ export const buildSpeciesTree = (species: ISpeciesItem) => {
     itemType: GroupMenuType.Species,
     menus: loadSpeciesMenus(species),
     children: species.children?.map((i) => buildSpeciesTree(i)) ?? [],
-  };
-  return result;
-};
-
-/** 编译模板树 */
-export const buildTemplateTree = (template: ITemplate) => {
-  const result: MenuItemType = {
-    key: template.id,
-    item: template,
-    label: template.name,
-    icon: <im.ImTree />,
-    itemType: GroupMenuType.Template,
-    menus: loadTemplatMenus(template),
-    children: template.children?.map((i) => buildTemplateTree(i)) ?? [],
   };
   return result;
 };
@@ -124,39 +110,6 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
     children: await buildTargetTree(param.subTeam),
   };
 };
-/** 加载分类标准 业务标准菜单 */
-// export const loadStandardMenus = async (param: groupMenuParams) => {
-//   return {
-//     key: param.key,
-//     label: param.key,
-//     itemType: param.key,
-//     icon: (
-//       <TeamIcon
-//         share={{
-//           name: param.key,
-//           typeName: param.typeName,
-//         }}
-//         size={18}
-//         fontSize={16}
-//         notAvatar={true}
-//       />
-//     ),
-//     menus: [
-//       {
-//         key: '新建|' + param.typeName,
-//         icon: <im.ImPlus />,
-//         label: '新建' + param.typeName,
-//       },
-//       {
-//         key: '刷新',
-//         icon: <im.ImSpinner9 />,
-//         label: '刷新子组织',
-//       },
-//     ],
-//     item: param.item,
-//     children: await buildTargetTree(param.subTeam),
-//   };
-// };
 
 export const loadSpaceSetting = () => {
   return {
@@ -245,37 +198,6 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
       key: '新增',
       icon: <im.ImPlus />,
       label: '新增分类',
-    },
-  ];
-  if (item.target.belongId) {
-    items.push(
-      {
-        key: '修改',
-        icon: <im.ImCog />,
-        label: '编辑分类',
-      },
-      {
-        key: '移除',
-        icon: <im.ImBin />,
-        label: '删除分类',
-      },
-    );
-  }
-  return items;
-};
-
-/** 加载模板右侧菜单 */
-export const loadTemplatMenus = (item: ITemplate) => {
-  const items = [
-    {
-      key: '新增',
-      icon: <im.ImPlus />,
-      label: '新增分类',
-    },
-    {
-      key: '复制',
-      icon: <im.ImPlus />,
-      label: '复制分类',
     },
   ];
   if (item.target.belongId) {
