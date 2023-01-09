@@ -3,7 +3,13 @@ import { ISpeciesItem, TargetType } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { ImCommand, ImNewspaper, ImStackoverflow } from 'react-icons/im';
+import {
+  ImAidKit,
+  ImBook,
+  ImCommand,
+  ImNewspaper,
+  ImStackoverflow,
+} from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { buildSpeciesTree } from '../config/menuOperate';
@@ -93,14 +99,22 @@ const useMenuUpdate = (): [
           item: userCtrl.space,
           icon: <ImNewspaper />,
         },
-        {
-          children: [],
-          key: '业务标准',
-          label: '业务标准',
-          itemType: '业务标准',
-          item: userCtrl.space,
-          icon: <ImCommand />,
-        },
+        // {
+        //   children: [],
+        //   key: '字典设置',
+        //   label: '字典设置',
+        //   itemType: '字典设置',
+        //   item: userCtrl.space,
+        //   menus: [
+        //     {
+        //       key: '制定标准',
+        //       label: '制定标准',
+        //       icon: <ImNewspaper />,
+        //       subMenu: buildSpeciesTree(userCtrl.space.speciesTree as ISpeciesItem),
+        //     },
+        //   ],
+        //   icon: <ImBook />,
+        // },
         {
           children: [],
           key: '流程设置',
