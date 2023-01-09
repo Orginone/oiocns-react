@@ -7,73 +7,57 @@ import cls from './index.module.less';
 import { common } from 'typings/common';
 import appImg from '/img/appLogo.svg';
 import { XMerchandise } from '@/ts/base/schema';
-interface BuyAppType {
+
+interface IProps {
   className?: string;
   showBtn?: boolean; //是否展示按钮
-  data: any; //数据源
-  defaultKey?: any;
+  current: XMerchandise; //数据源
   showOperation?: boolean; //是否展示 右上角操作按钮
-  handleBuyApp: (_type: 'buy' | 'join', item: BuyAppType['data']) => void;
   onClick?: (e?: Event) => void; //卡片点击事件
   operation?: (_item: XMerchandise) => common.OperationType[]; //操作区域数据
+  handleBuyApp: (_type: 'buy' | 'join', item: XMerchandise) => void;
 }
-const defaultObj = {
-  name: 'name', //名称
-  size: 'size', //大小
-  type: 'type', //是否免费
-  desc: 'desc', //描述
-  typeName: 'typeName', //应用类型
-  creatTime: 'creatTime', //上架时间
-};
-const Index: React.FC<BuyAppType> = (props) => {
+
+const AppShopCard: React.FC<IProps> = (props) => {
   const {
-    data,
+    current,
     className,
     showBtn = true,
     showOperation = false,
-    defaultKey,
     onClick,
     operation,
     handleBuyApp,
   } = props;
-  const {
-    name = 'name',
-    size = 'size',
-    type = 'type',
-    desc = 'desc',
-    typeName = 'typeName',
-    creatTime = 'creatTime',
-  } = { ...defaultObj, ...defaultKey };
-  function renderName() {
+
+  const renderName = () => {
     return (
       <>
-        <span className={cls.nameLabel}>{data[name]}</span>
-        {showOperation ? (
-          <Dropdown menu={{ items: operation && operation(data) }} placement="bottom">
+        <span className={cls.nameLabel}>{current.caption}</span>
+        {showOperation && operation && (
+          <Dropdown menu={{ items: operation(current) }} placement="bottom">
             <EllipsisOutlined className={cls.operationBtn} />
           </Dropdown>
-        ) : (
-          ''
         )}
       </>
     );
-  }
-  function renderDesc() {
+  };
+
+  const renderDesc = () => {
     return (
       <div>
-        <p className="app-desc">{data[desc] || '暂无描述'}</p>
+        <p className="app-desc">{current.information || '暂无描述'}</p>
         {showBtn ? (
           <p className={cls.btnBox}>
             <Button
               className={cls.btn}
               shape="round"
-              onClick={() => handleBuyApp('join', data)}>
+              onClick={() => handleBuyApp('join', current)}>
               加入购物车
             </Button>
             <Button
               className={cls.btn}
               shape="round"
-              onClick={() => handleBuyApp('buy', data)}>
+              onClick={() => handleBuyApp('buy', current)}>
               获取
             </Button>
           </p>
@@ -82,26 +66,26 @@ const Index: React.FC<BuyAppType> = (props) => {
         )}
       </div>
     );
-  }
-  function renderTitle() {
+  };
+
+  const renderTitle = () => {
     return (
       <div className={cls.cardTitle}>
         <img style={{ width: 60, height: 60 }} src={appImg} alt="" />
         <span className={cls.version}>V 0.0.1</span>
       </div>
     );
-  }
+  };
 
   return (
-    <>
-      <CheckCard
-        avatar={renderTitle()}
-        title={renderName()}
-        className={`${cls.buyCard} ${className}`}
-        description={renderDesc()}
-        onClick={onClick}></CheckCard>
-    </>
+    <CheckCard
+      avatar={renderTitle()}
+      title={renderName()}
+      className={`${cls.buyCard} ${className}`}
+      description={renderDesc()}
+      onClick={onClick}
+    />
   );
 };
 
-export default Index;
+export default AppShopCard;

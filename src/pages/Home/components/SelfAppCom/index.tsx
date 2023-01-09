@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.less';
+import CardWidthTitle from '@/components/CardWidthTitle';
 
 const dataSource = [
   {
@@ -15,7 +16,6 @@ const dataSource = [
     key: 4,
   },
 ];
-import CardWidthTitle from '@/components/CardWidthTitle';
 interface SelfAppComType {
   props: []; //入口列表
 }

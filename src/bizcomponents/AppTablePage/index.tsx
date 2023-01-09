@@ -5,8 +5,7 @@ import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { IProduct } from '@/ts/core';
 import useCtrl from '@/ts/controller/setting';
-
-interface AppShowCompType {
+interface IProps {
   tkey?: string;
   list: IProduct[];
   queryFun?: Function;
@@ -19,10 +18,7 @@ interface AppShowCompType {
   [key: string]: any;
 }
 
-/**
- * 应用程序
- */
-const AppShowComp: React.FC<AppShowCompType> = ({
+const AppShowComp: React.FC<IProps> = ({
   tkey,
   queryFun,
   list,
@@ -69,15 +65,8 @@ const AppShowComp: React.FC<AppShowCompType> = ({
       return (
         <AppCard
           className="card"
-          data={item}
+          current={item}
           key={item.prod.id}
-          defaultKey={{
-            name: 'name',
-            size: 'price',
-            type: 'source',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           operation={renderOperation}
         />
       );
