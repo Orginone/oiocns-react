@@ -60,7 +60,6 @@ const MemberList: React.FC<indexType> = (props) => {
         <CardOrTableComp<schema.XTarget>
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
-              console.log(record, selected, selectedRows);
               searchFn(selectedRows);
             },
           }}

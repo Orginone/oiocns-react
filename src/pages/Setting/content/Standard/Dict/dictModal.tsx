@@ -99,7 +99,6 @@ const DictModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        debugger;
         console.log(values);
         if (title.includes('新增')) {
           handleOk(await speciesItem?.createDict(values));

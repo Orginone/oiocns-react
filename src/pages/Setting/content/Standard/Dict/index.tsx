@@ -28,61 +28,11 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState<string>('新增');
   const [currentDict, setCurrentDict] = useState<IDict>();
   const [speciesItem, setSpeciesItem] = useState<ISpeciesItem>();
-  const [dicts, setDicts] = useState<any>([
-    // {
-    //   label: '是否',
-    //   key: 'sf',
-    // },
-    // {
-    //   label: '男女',
-    //   key: 'nv',
-    // },
-    // {
-    //   label: '交割方式',
-    //   key: 'pubway',
-    // },
-    // {
-    //   label: '规格',
-    //   key: 'spec',
-    // },
-    // {
-    //   label: '层级',
-    //   key: 'layer',
-    // },
-    // {
-    //   label: '花纹',
-    //   key: 'figure',
-    // },
-    // {
-    //   label: '等级',
-    //   key: 'level',
-    // },
-    // {
-    //   label: '城市',
-    //   key: 'city',
-    // },
-    // {
-    //   label: '单位类型',
-    //   key: 'companyType',
-    // },
-    // {
-    //   label: '资产',
-    //   key: 'asset',
-    // },
-    // {
-    //   label: '入账类型',
-    //   key: 'rzType',
-    // },
-    // {
-    //   label: '县区',
-    //   key: 'area',
-    // },
-  ]);
+  const [dicts, setDicts] = useState<any>([]);
   useEffect(() => {
     kernel
       .queryDicts({ id: current.target.id, spaceId: userCtrl.space.id })
       .then((res) => {
-        console.log('res', res);
         if (res.success) {
           let records: XDict[] | undefined = res.data.result;
           let menus = records?.map((item: XDict) => {
@@ -153,8 +103,6 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           setOpenDictModal(false);
         }}
         handleOk={function (res: any): void {
-          debugger;
-          console.log(res);
           setOpenDictModal(false);
         }}
         current={currentDict}

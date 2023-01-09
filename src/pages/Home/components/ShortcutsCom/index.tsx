@@ -51,7 +51,6 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
             size="large"
             icon={item.icon}
             onClick={() => {
-              console.log('1111', item);
               onShortClick(item?.label);
             }}>
             {item.label}
@@ -67,7 +66,6 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
    * @return {*}
    */
   const onShortClick = (item: string) => {
-    console.log('123456', item);
     switch (item) {
       case '加好友':
         setIsModalOpen(true);

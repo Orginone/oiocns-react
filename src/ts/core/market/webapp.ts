@@ -55,7 +55,6 @@ export default class WebApp implements IProduct {
       destType,
       teamId,
     });
-    console.log('chungjian1', destIds, rs);
 
     return rs.success;
   }

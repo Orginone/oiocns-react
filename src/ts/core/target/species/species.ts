@@ -79,7 +79,7 @@ export class SpeciesItem implements ISpeciesItem {
   }
 
   async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
-    debugger
+
     const res = await kernel.createDict({
       ...data,
       id: undefined,
