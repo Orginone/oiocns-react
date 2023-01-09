@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, Modal, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { common } from 'typings/common';
@@ -17,6 +17,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { schema } from '@/ts/base';
+import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 
 interface IProps {
   current: ITarget;
@@ -30,21 +31,23 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const history = useHistory();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
+  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
+  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
 
+  useEffect(() => {
+    setTimeout(async () => {
+      SetIsSuperAdmin(await IsSuperAdmin(current));
+      SetIsRelationAdmin(await IsRelationAdmin(current));
+    }, 10);
+  }, [current]);
+
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
-    return [
-      // {
-      //   key: 'changeDept',
-      //   label: '变更' + item.typeName,
-      //   onClick: () => {
-      //     setSelectMember([item]);
-      //     setActiveModal('transfer');
-      //   },
-      // },
-      {
+    let operations: common.OperationType[] = [];
+    if (isRelationAdmin) {
+      operations.push({
         key: 'moveOne',
         label: '移出' + item.typeName,
         onClick: async () => {
@@ -54,8 +57,9 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             }
           }
         },
-      },
-    ];
+      });
+    }
+    return operations;
   };
 
   // 标题tabs页
@@ -77,12 +81,16 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         <Button type="link" onClick={() => setActiveModal('indentity')}>
           身份设置
         </Button>
-        <Button type="link" onClick={() => setActiveModal('addOne')}>
-          添加成员
-        </Button>
-        <Button type="link" onClick={() => history.push('/todo/org')}>
-          查看申请
-        </Button>
+        {isRelationAdmin && (
+          <>
+            <Button type="link" onClick={() => setActiveModal('addOne')}>
+              添加成员
+            </Button>
+            <Button type="link" onClick={() => history.push('/todo/org')}>
+              查看申请
+            </Button>
+          </>
+        )}
       </>
     );
   };
@@ -152,6 +160,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       </div>
       {/* 编辑机构身份 */}
       <IndentityManage
+        isAdmin={isRelationAdmin}
         open={activeModal === 'indentity'}
         current={current}
         onCancel={() => setActiveModal('')}
@@ -194,6 +203,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         open={activeModal === 'post'}
         handleOk={() => setActiveModal('')}
         current={current}
+        IsAdmin={isSuperAdmin}
       />
     </div>
   );

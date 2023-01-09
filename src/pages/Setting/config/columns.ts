@@ -206,6 +206,56 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
   },
 ];
 
+export const MethodColumns: ProColumns<schema.XAttribute>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '业务编号',
+    dataIndex: 'code',
+    key: 'code',
+    width: 150,
+  },
+  {
+    title: '业务名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 200,
+  },
+  {
+    title: '业务类型',
+    dataIndex: 'methodType',
+    key: 'methodType',
+    width: 150,
+  },
+  {
+    title: '业务内容',
+    dataIndex: 'content',
+    key: 'content',
+    width: 150,
+  },
+  {
+    title: '特性分类',
+    dataIndex: 'speciesId',
+    key: 'speciesId',
+    width: 150,
+  },
+  {
+    title: '共享组织',
+    dataIndex: 'belongId',
+    key: 'belongId',
+    width: 200,
+  },
+  {
+    title: '特性定义',
+    dataIndex: 'remark',
+    ellipsis: true,
+    key: 'remark',
+  },
+];
+
 export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   {
     title: '序号',

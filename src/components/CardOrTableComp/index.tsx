@@ -60,54 +60,75 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
 }) => {
   const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
+
   // 监听父级高度
   useEffect(() => {
-    setTimeout(() => {
-      if (parentRef?.current) {
-        let _height = parentRef.current.offsetHeight;
-        // let width = parentRef.current.offsetWidth;
-        // console.log('展示高度', _height);
-        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
-      }
-    }, 50);
+    if (parentRef?.current) {
+      let _height = parentRef.current.offsetHeight;
+      // let width = parentRef.current.offsetWidth;
+      // console.log('展示高度', _height);
+      setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
+    }
   }, [parentRef]);
 
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = (item: any) => {
-    return operation!(item); // <Menu items={operation && operation(item)} />;
-  };
   /**
    * @desc: 渲染表格主体
    * @return {表格主体头部数组}
    */
   const resetColumns: ProColumns<any>[] = useMemo(() => {
-    return [
-      ...columns,
-      {
+    let result = [...columns];
+    if (operation) {
+      result.push({
         title: '操作',
         width: 100,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
         render: (_text, record) => {
-          return operation && operation(record).length > 0
-            ? [
-                <Dropdown
-                  className={cls['operation-btn']}
-                  menu={{ items: menu(record) }}
-                  key="key">
-                  <EllipsisOutlined />
-                </Dropdown>,
-              ]
-            : '';
+          return [
+            <Dropdown
+              className={cls['operation-btn']}
+              menu={{ items: operation(record) }}
+              key="key">
+              <EllipsisOutlined />
+            </Dropdown>,
+          ];
         },
-      },
-    ];
+      });
+    }
+    return result;
   }, [columns, operation]);
+
+  /**
+   * @desc: 自定义表格 底部区域
+   * @return {底部组件}
+   */
+  const TableFooter = (
+    <div className={cls['common-table-footer']} key="pagetype">
+      {/* 切换展示形式 */}
+      {showChangeBtn && (
+        <div className={cls['btn-box']}>
+          <>
+            <IconFont
+              className={pageType === 'table' ? 'active' : ''}
+              type={'icon-chuangdanwei'}
+              onClick={() => {
+                setPageType('table');
+              }}
+            />
+            <IconFont
+              className={pageType === 'card' ? 'active' : ''}
+              type={'icon-jianyingyong'}
+              onClick={() => {
+                setPageType('card');
+              }}
+            />
+          </>
+        </div>
+      )}
+    </div>
+  );
+
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
     return (
@@ -210,48 +231,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       />
     );
   }, [pageType, dataSource, resetColumns, defaultHeight]);
-  /**
-   * @desc: 自定义表格 底部区域
-   * @return {底部组件}
-   */
-  const TableFooter = (
-    <div className={cls['common-table-footer']} key="pagetype">
-      {/* 切换展示形式 */}
-      <div className={cls['btn-box']}>
-        {showChangeBtn ? (
-          <>
-            <IconFont
-              className={pageType === 'table' ? 'active' : ''}
-              type={'icon-chuangdanwei'}
-              onClick={() => {
-                setPageType('table');
-              }}
-            />
-            <IconFont
-              className={pageType === 'card' ? 'active' : ''}
-              type={'icon-jianyingyong'}
-              onClick={() => {
-                setPageType('card');
-              }}
-            />
-          </>
-        ) : (
-          ''
-        )}
-      </div>
-      {/* 翻页功能 */}
-      {/* <Pagination
-        total={tableTotal || 0}
-        onChange={(page, pageSize) => {
-          setTablePage({ page, pageSize });
-          onChange && onChange(page, pageSize);
-        }}
-        current={page || 1}
-        showTotal={(total: number) => `共 ${total} 条`}
-        showSizeChanger
-      /> */}
-    </div>
-  );
 
   return (
     <div className={cls['common-table-wrap']} style={style}>

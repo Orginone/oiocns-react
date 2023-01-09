@@ -20,23 +20,23 @@ const TeamSetting: React.FC = () => {
       onSelect={async (data) => {
         if (data.itemType === GroupMenuType.Species) {
           setSpecies(data.item);
-          return;
-        }
-        userCtrl.currentKey = data.key;
-        const item = data.item as ITarget;
-        if (item && !item.speciesTree) {
-          await item.loadSpeciesTree();
-          refreshMenu();
-        }
-        if (data.itemType === GroupMenuType.Agency) {
-          if (item.subTeam.length === 0) {
-            const subs = await item.loadSubTeam();
-            if (subs.length > 0) {
-              refreshMenu();
+        } else {
+          setSpecies(undefined);
+          userCtrl.currentKey = data.key;
+          const item = data.item as ITarget;
+          if (item && !item.speciesTree) {
+            await item.loadSpeciesTree();
+            refreshMenu();
+          }
+          if (data.itemType === GroupMenuType.Agency) {
+            if (item.subTeam.length === 0) {
+              const subs = await item.loadSubTeam();
+              if (subs.length > 0) {
+                refreshMenu();
+              }
             }
           }
         }
-        setSpecies(undefined);
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {

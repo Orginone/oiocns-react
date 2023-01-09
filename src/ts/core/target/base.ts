@@ -376,7 +376,7 @@ export default class BaseTarget implements ITarget {
     }
   }
 
-  async create(data: TargetModel): Promise<ITarget | undefined> {
+  async create(_: TargetModel): Promise<ITarget | undefined> {
     await sleep(0);
     return;
   }
@@ -423,14 +423,16 @@ export default class BaseTarget implements ITarget {
   }
 
   /**
-   * 判断是否拥有该身份
-   * @param id 身份id
+   * 判断是否拥有该职权对应身份
+   * @param codes 职权编号集合
    */
-  async judgeHasIdentity(id: string): Promise<boolean> {
+  async judgeHasIdentity(codes: string[]): Promise<boolean> {
     if (this.ownIdentitys.length == 0) {
       await this.getOwnIdentitys(true);
     }
-    return this.ownIdentitys.find((a) => a.id == id) != undefined;
+    return (
+      this.ownIdentitys.find((a) => codes.includes(a.authority?.code ?? '')) != undefined
+    );
   }
 
   private async getOwnIdentitys(reload: boolean = false) {
