@@ -116,7 +116,7 @@ const AttributeModal = (props: Iprops) => {
           },
         },
         formItemProps: {
-          rules: [{ required: true, message: '是否公开为必填项' }],
+          rules: [{ required: true, message: '特性类型为必填项' }],
         },
       },
     ];
@@ -159,7 +159,7 @@ const AttributeModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          formRef.current?.setFieldValue('belongId', props.target?.id);
+          // formRef.current?.setFieldValue('belongId', props.target?.id);
           if (title.includes('修改')) {
             setSelectType(data?.valueType);
             formRef.current?.setFieldsValue(data);

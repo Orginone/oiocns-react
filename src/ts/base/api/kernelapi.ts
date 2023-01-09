@@ -274,6 +274,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 创建业务标准
+   * @param {model.MethodModel} params 请求参数
+   * @returns {model.ResultType<schema.XMethod>} 请求结果
+   */
+  public async createMethod(
+    params: model.MethodModel,
+  ): Promise<model.ResultType<schema.XMethod>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateMethod',
+      params: params,
+    });
+  }
+  /**
    * 创建物
    * @param {model.ThingModel} params 请求参数
    * @returns {model.ResultType<schema.XThing>} 请求结果
@@ -316,6 +330,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 删除业务标准
+   * @param {model.IdReqModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteMethod(
+    params: model.IdReqModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteMethod',
+      params: params,
+    });
+  }
+  /**
    * 删除物
    * @param {model.IdReqModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -352,6 +380,20 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'UpdateAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 更新业务标准
+   * @param {model.MethodModel} params 请求参数
+   * @returns {model.ResultType<schema.XMethod>} 请求结果
+   */
+  public async updateMethod(
+    params: model.MethodModel,
+  ): Promise<model.ResultType<schema.XMethod>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateMethod',
       params: params,
     });
   }
@@ -456,6 +498,20 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'QuerySpeciesAttrs',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类的业务标准
+   * @param {model.IdSpaceReq} params 请求参数
+   * @returns {model.ResultType<schema.XMethod>} 请求结果
+   */
+  public async querySpeciesMethods(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.XMethodArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesMethods',
       params: params,
     });
   }
