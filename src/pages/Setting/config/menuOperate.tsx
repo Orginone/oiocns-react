@@ -115,6 +115,20 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
   };
 };
 
+export const loadSpeciesSetting = async () => {
+  const species = await userCtrl.space.loadSpeciesTree();
+  if (species) {
+    return {
+      children: [buildSpeciesTree(species)],
+      key: '标准设置',
+      label: '标准设置',
+      itemType: '标准设置',
+      item: userCtrl.space,
+      icon: <im.ImNewspaper />,
+    };
+  }
+};
+
 export const loadSpaceSetting = () => {
   return {
     key: GroupMenuType.ResouceSetting,
@@ -233,12 +247,6 @@ export const loadTypeMenus = async (item: ITarget) => {
         label: '新建子组织',
       });
     }
-    menus.push({
-      key: '分类标准',
-      label: '分类标准',
-      icon: <im.ImNewspaper />,
-      subMenu: item.speciesTree ? buildSpeciesTree(item.speciesTree) : undefined,
-    });
   }
   if (isAdmin) {
     menus.push({
