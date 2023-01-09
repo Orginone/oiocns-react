@@ -31,7 +31,7 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const [dicts, setDicts] = useState<any>([]);
   useEffect(() => {
     kernel
-      .queryDicts({ id: current.target.id, spaceId: userCtrl.space.id })
+      .querySpeciesDict({ id: current.target.id, spaceId: userCtrl.space.id })
       .then((res) => {
         if (res.success) {
           let records: XDict[] | undefined = res.data.result;

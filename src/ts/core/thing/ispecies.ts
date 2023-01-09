@@ -3,7 +3,7 @@ import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   DictModel,
-  MethodModel,
+  OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
@@ -43,9 +43,9 @@ export interface ISpeciesItem {
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
   /**
-* 创建字典
-* @param data 创建参数
-*/
+   * 创建字典
+   * @param data 创建参数
+   */
   createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
   /**
    * 更新标准分类项
@@ -74,13 +74,13 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   createMethod(
-    data: Omit<MethodModel, 'id' | 'speciesId' | 'speciesCode'>,
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
   /**
    * 更新业务标准
    * @param data 创建参数
    */
-  updateMethod(data: Omit<MethodModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
+  updateMethod(data: Omit<OperationModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
   /**
    * 删除业务标准
    * @param id 特性项id
