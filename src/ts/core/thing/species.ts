@@ -1,5 +1,7 @@
 import { kernel, parseAvatar, schema } from '../../base';
-import { AttributeModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
+import { AttributeModel, DictModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
+import { Dict } from '../target/species/dict';
+import { INullDict } from '../target/species/idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -69,6 +71,19 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return;
   }
+
+  async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
+    const res = await kernel.createDict({
+      ...data,
+      id: undefined,
+    });
+    if (res.success) {
+      const newItem = new Dict(res.data);
+      return newItem;
+    }
+    return;
+  }
+
   async update(
     data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>,
   ): Promise<ISpeciesItem> {

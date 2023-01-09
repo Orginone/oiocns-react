@@ -13,6 +13,8 @@ import { XAttribute } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { PageRequest } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import Dict from '@/pages/Setting/content/Standard/Dict';
+
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
@@ -27,7 +29,6 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XAttribute>();
   const parentRef = useRef<any>(null); //父级容器Dom
-
   // Tab 改变事件
   const tabChange = (key: string) => {
     setTabKey(key);
@@ -121,7 +122,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     {
       label: `分类字典`,
       key: '3',
-      children: `Content of Tab Pane 4`,
+      children: <Dict current={current} />,
     },
     {
       label: `业务标准`,

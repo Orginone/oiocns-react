@@ -1,10 +1,13 @@
 import { kernel, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
+  DictModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
 } from '../../../base/model';
+import { Dict } from './dict';
+import { INullDict } from './idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -74,6 +77,20 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return;
   }
+
+  async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
+    debugger
+    const res = await kernel.createDict({
+      ...data,
+      id: undefined,
+    });
+    if (res.success) {
+      const newItem = new Dict(res.data);
+      return newItem;
+    }
+    return;
+  }
+
   async update(
     data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>,
   ): Promise<ISpeciesItem> {

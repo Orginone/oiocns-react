@@ -1,5 +1,6 @@
-import { AttributeModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
+import { AttributeModel, DictModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
 import { XAttributeArray, XSpecies } from '../../base/schema';
+import { INullDict } from '../target/species/idict';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -31,6 +32,11 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
+  /**
+* 创建字典
+* @param data 创建参数
+*/
+  createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
   /**
    * 更新标准分类项
    * @param data 创建参数

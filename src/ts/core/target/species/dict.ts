@@ -1,5 +1,5 @@
-import { kernel, parseAvatar, schema } from '../../base';
-import { DictItemModel, PageRequest, DictModel, TargetShare } from '../../base/model';
+import { kernel, parseAvatar, schema } from '../../../base';
+import { DictItemModel, PageRequest, DictModel, TargetShare } from '../../../base/model';
 import { INullDict, IDict } from './idict';
 /**
  * 分类系统项实现
@@ -7,23 +7,16 @@ import { INullDict, IDict } from './idict';
 export class Dict implements IDict {
   id: string;
   name: string;
-  isRoot: boolean;
+  // isRoot: boolean;
   target: schema.XDict;
   // parent: INullDict;
   // children: IDict[];
   belongInfo: TargetShare;
-  constructor(target: schema.XDict, parent: INullDict) {
-    // this.children = [];
+
+  constructor(target: schema.XDict) {
     this.target = target;
-    // this.parent = parent;
     this.id = target.id;
     this.name = target.name;
-    this.isRoot = parent === undefined;
-    // if (target.nodes && target.nodes.length > 0) {
-    //   for (const item of target.nodes) {
-    //     this.children.push(new Dict(item, this));
-    //   }
-    // }
     this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
   async loadItems(id: string, page: PageRequest): Promise<schema.XDictItemArray> {
@@ -61,8 +54,7 @@ export class Dict implements IDict {
       id: undefined,
     });
     if (res.success) {
-      const newItem = new Dict(res.data, this);
-      // this.children.push(newItem);
+      const newItem = new Dict(res.data);
       return newItem;
     }
     return;

@@ -469,7 +469,7 @@ export default class KernelApi {
     params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
-      module: 'thing',
+      module: 'base',
       action: 'QueryDicts',
       params: params,
     });
@@ -484,7 +484,7 @@ export default class KernelApi {
     params: model.IDBelongReq,
   ): Promise<model.ResultType<schema.XDictItemArray>> {
     return await this.request({
-      module: 'thing',
+      module: 'base',
       action: 'QueryDictItems',
       params: params,
     });
