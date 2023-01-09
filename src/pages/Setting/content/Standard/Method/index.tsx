@@ -27,6 +27,14 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
   const renderOperate = (item: XMethod) => {
     return [
       {
+        key: '设计表单',
+        label: '设计表单',
+        onClick: async () => {
+          await current?.deleteAttr(item.id);
+          tforceUpdate();
+        },
+      },
+      {
         key: '修改',
         label: '编辑',
         onClick: () => {
