@@ -43,7 +43,7 @@ const SpeciesModal = (props: Iprops) => {
         return await userCtrl.getTeamTree();
       },
       fieldProps: {
-        disabled: title === '编辑',
+        disabled: title === '修改',
         fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
         showSearch: true,
         filterTreeNode: true,
@@ -106,7 +106,7 @@ const SpeciesModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          formRef.current?.setFieldValue('belongId', props.targetId);
+          // formRef.current?.setFieldValue('belongId', props.targetId);
           if (title.includes('修改')) {
             formRef.current?.setFieldsValue(current?.target);
           }

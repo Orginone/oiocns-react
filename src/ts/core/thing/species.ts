@@ -1,8 +1,16 @@
 import { kernel, parseAvatar, schema } from '../../base';
-import { AttributeModel, DictModel, PageRequest, SpeciesModel, TargetShare } from '../../base/model';
 import { Dict } from '../target/species/dict';
 import { INullDict } from '../target/species/idict';
+import {
+  AttributeModel,
+  DictModel,
+  MethodModel,
+  PageRequest,
+  SpeciesModel,
+  TargetShare,
+} from '../../base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
+
 /**
  * 分类系统项实现
  */
@@ -30,6 +38,19 @@ export class SpeciesItem implements ISpeciesItem {
   }
   async loadAttrs(id: string, page: PageRequest): Promise<schema.XAttributeArray> {
     const res = await kernel.querySpeciesAttrs({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
+  async loadMethods(id: string, page: PageRequest): Promise<schema.XMethodArray> {
+    const res = await kernel.querySpeciesMethods({
       id: this.id,
       spaceId: id,
       page: {
@@ -137,6 +158,37 @@ export class SpeciesItem implements ISpeciesItem {
   }
   async deleteAttr(id: string): Promise<boolean> {
     const res = await kernel.deleteAttribute({
+      id: id,
+      typeName: '',
+    });
+    return res.success;
+  }
+
+  async createMethod(
+    data: Omit<MethodModel, 'id' | 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean> {
+    const res = await kernel.createMethod({
+      id: undefined,
+      speciesId: this.id,
+      speciesCode: this.target.code,
+      ...data,
+    });
+    return res.success;
+  }
+
+  async updateMethod(
+    data: Omit<MethodModel, 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean> {
+    const res = await kernel.updateMethod({
+      ...data,
+      speciesId: this.target.id,
+      speciesCode: this.target.code,
+    });
+    return res.success;
+  }
+
+  async deleteMethod(id: string): Promise<boolean> {
+    const res = await kernel.deleteMethod({
       id: id,
       typeName: '',
     });

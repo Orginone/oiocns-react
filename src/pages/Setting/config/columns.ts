@@ -206,7 +206,7 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
   },
 ];
 
-export const MethodColumns: ProColumns<schema.XAttribute>[] = [
+export const MethodColumns: ProColumns<schema.XMethod>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -249,7 +249,7 @@ export const MethodColumns: ProColumns<schema.XAttribute>[] = [
     width: 200,
   },
   {
-    title: '特性定义',
+    title: '备注',
     dataIndex: 'remark',
     ellipsis: true,
     key: 'remark',

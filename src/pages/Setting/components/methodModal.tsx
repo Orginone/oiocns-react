@@ -1,15 +1,15 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { AttributeModel } from '@/ts/base/model';
+import { MethodModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
-import { XAttribute } from '@/ts/base/schema';
+import { XMethod } from '@/ts/base/schema';
 
 interface Iprops {
   title: string;
   open: boolean;
-  data: XAttribute | undefined;
+  data: XMethod | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   current: ISpeciesItem;
@@ -19,20 +19,19 @@ interface Iprops {
   业务标准编辑模态框
 */
 const MethodModal = (props: Iprops) => {
-  const [selectType, setSelectType] = useState<string>();
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
-    const columns: ProFormColumnsType<AttributeModel>[] = [
+    const columns: ProFormColumnsType<MethodModel>[] = [
       {
-        title: '特性名称',
+        title: '业务名称',
         dataIndex: 'name',
         formItemProps: {
           rules: [{ required: true, message: '特性名称为必填项' }],
         },
       },
       {
-        title: '特性代码',
+        title: '业务代码',
         dataIndex: 'code',
         formItemProps: {
           rules: [{ required: true, message: '特性代码为必填项' }],
@@ -93,78 +92,58 @@ const MethodModal = (props: Iprops) => {
         },
       },
       {
-        title: '特性类型',
-        dataIndex: 'valueType',
+        title: '业务分类',
+        dataIndex: 'methodType',
         valueType: 'select',
         fieldProps: {
           options: [
             {
-              value: '数值型',
-              label: '数值型',
+              value: '创建',
+              label: '创建',
             },
             {
-              value: '描述型',
-              label: '描述型',
+              value: '修改',
+              label: '修改',
             },
             {
-              value: '选择型',
-              label: '选择型',
+              value: '删除',
+              label: '删除',
             },
           ],
-          onSelect: (select: string) => {
-            setSelectType(select);
-          },
         },
         formItemProps: {
-          rules: [{ required: true, message: '是否公开为必填项' }],
+          rules: [{ required: true, message: '业务分类为必填项' }],
+        },
+      },
+      {
+        title: '业务内容',
+        dataIndex: 'content',
+        valueType: 'textarea',
+        colProps: { span: 24 },
+        formItemProps: {
+          rules: [{ required: true, message: '业务内容为必填项' }],
+        },
+      },
+      {
+        title: '备注',
+        dataIndex: 'remark',
+        valueType: 'textarea',
+        colProps: { span: 24 },
+        formItemProps: {
+          rules: [{ required: true, message: '业务定义为必填项' }],
         },
       },
     ];
-    if (selectType === '选择型') {
-      columns.push({
-        title: '选择枚举分类',
-        dataIndex: 'dictId',
-        valueType: 'treeSelect',
-        formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
-        request: async () => {
-          const data = await props.target?.loadSpeciesTree();
-          return data ? [data] : [];
-        },
-        fieldProps: {
-          disabled: selectType !== '选择型',
-          fieldNames: { label: 'name', value: 'id', children: 'children' },
-          showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
-        },
-      });
-    }
-    columns.push({
-      title: '特性定义',
-      dataIndex: 'remark',
-      valueType: 'textarea',
-      colProps: { span: 24 },
-      formItemProps: {
-        rules: [{ required: true, message: '特性定义为必填项' }],
-      },
-    });
     return columns;
   };
   return (
-    <SchemaForm<AttributeModel>
+    <SchemaForm<MethodModel>
       formRef={formRef}
       title={title}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
-        if (open) {
-          formRef.current?.setFieldValue('belongId', props.target?.id);
-          if (title.includes('修改')) {
-            setSelectType(data?.valueType);
-            formRef.current?.setFieldsValue(data);
-          }
-        } else {
+        if (!open) {
           formRef.current?.resetFields();
           handleCancel();
         }
@@ -176,9 +155,9 @@ const MethodModal = (props: Iprops) => {
       onFinish={async (values) => {
         values = { ...data, ...values };
         if (title.includes('新增')) {
-          handleOk(await current.createAttr(values));
+          handleOk(await current.createMethod(values));
         } else {
-          handleOk(await current.updateAttr(values));
+          handleOk(await current.updateMethod(values));
         }
       }}
       columns={getFromColumns()}></SchemaForm>
