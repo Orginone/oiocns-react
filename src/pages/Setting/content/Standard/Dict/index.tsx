@@ -31,7 +31,7 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const [key, forceUpdate] = useObjectUpdate(editData);
   useEffect(() => {
     kernel
-      .queryDicts({
+      .querySpeciesDict({
         id: current.target.id,
         spaceId: userCtrl.space.id,
         page: { offset: 0, limit: 10000, filter: '' },

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { MethodModel } from '@/ts/base/model';
+import { OperationModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import { XMethod } from '@/ts/base/schema';
@@ -22,7 +22,7 @@ const MethodModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
-    const columns: ProFormColumnsType<MethodModel>[] = [
+    const columns: ProFormColumnsType<OperationModel>[] = [
       {
         title: '业务名称',
         dataIndex: 'name',
@@ -137,7 +137,7 @@ const MethodModal = (props: Iprops) => {
     return columns;
   };
   return (
-    <SchemaForm<MethodModel>
+    <SchemaForm<OperationModel>
       formRef={formRef}
       title={title}
       open={open}
