@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { INullSpeciesItem, ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
-import { XMethod } from '@/ts/base/schema';
+import { XOperation } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
 import thingCtrl from '@/ts/controller/thing';
-import { MethodColumns } from '@/pages/Setting/config/columns';
+import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import MethodModel from '../../../components/methodModal';
+import OperationModel from '../../../components/operationModal';
+import FormDesignModal from '../../../components/formDesignModal';
+import ViewFormModal from '../../../components/viewFormModal';
 
 interface IProps {
   target?: ITarget;
@@ -20,26 +22,45 @@ interface IProps {
  * @description: 分类--业务标准
  * @return {*}
  */
-const Method = ({ current, target, modalType, setModalType }: IProps) => {
+const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [editData, setEditData] = useState<XMethod>();
+  const [editData, setEditData] = useState<XOperation>();
+  const [open, setOpen] = useState<boolean>(false);
+  const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
+
   // 操作内容渲染函数
-  const renderOperate = (item: XMethod) => {
+  const renderOperate = (item: XOperation) => {
     return [
       {
         key: '修改',
         label: '编辑',
         onClick: () => {
           setEditData(item);
-          setModalType('修改业务');
+          setModalType('修改业务标准');
         },
       },
       {
         key: '删除',
         label: '删除',
         onClick: async () => {
-          await current?.deleteAttr(item.id);
+          await current?.deleteOperation(item.id);
           tforceUpdate();
+        },
+      },
+      {
+        key: '设计表单',
+        label: '设计表单',
+        onClick: () => {
+          setEditData(item);
+          setOpen(true);
+        },
+      },
+      {
+        key: '查看表单',
+        label: '查看表单',
+        onClick: () => {
+          setEditData(item);
+          setViewFormOpen(true);
         },
       },
     ];
@@ -59,14 +80,10 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
     return id;
   };
 
-  const loadMethods = async (page: PageRequest) => {
-    const res = await current!.loadMethods(userCtrl.space.id, page);
+  const loadOperations = async (page: PageRequest) => {
+    const res = await current!.loadOperations(userCtrl.space.id, page);
     if (res && res.result) {
       for (const item of res.result) {
-        const team = userCtrl.findTeamInfoById(item.belongId);
-        if (team) {
-          item.belongId = team.name;
-        }
         item.speciesId = findSpecesName(thingCtrl.teamSpecies, item.speciesId);
       }
     }
@@ -74,20 +91,20 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
   };
   return (
     <>
-      <CardOrTable<XMethod>
+      <CardOrTable<XOperation>
         rowKey={'id'}
         params={tkey}
         request={async (page) => {
-          return await loadMethods(page);
+          return await loadOperations(page);
         }}
         operation={renderOperate}
-        columns={MethodColumns}
+        columns={OperationColumns}
         showChangeBtn={false}
         dataSource={[]}
       />
       {/** 新增/编辑业务标准模态框 */}
-      <MethodModel
-        data={editData}
+      <OperationModel
+        data={editData as XOperation}
         title={modalType}
         open={modalType.includes('业务标准')}
         handleCancel={function (): void {
@@ -102,7 +119,33 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
         target={target}
         current={current}
       />
+      <FormDesignModal
+        data={editData as XOperation}
+        title={modalType}
+        open={open}
+        handleCancel={function (): void {
+          setOpen(false);
+        }}
+        handleOk={function (success: boolean): void {
+          setOpen(false);
+          if (success) {
+            tforceUpdate();
+          }
+        }}
+        target={target}
+        current={current}
+      />
+      <ViewFormModal
+        data={editData}
+        open={viewFormOpen}
+        handleCancel={() => {
+          setViewFormOpen(false);
+        }}
+        handleOk={() => {
+          setViewFormOpen(false);
+        }}
+      />
     </>
   );
 };
-export default Method;
+export default Operation;

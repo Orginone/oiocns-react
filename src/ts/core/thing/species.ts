@@ -49,7 +49,7 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadMethods(id: string, page: PageRequest): Promise<schema.XMethodArray> {
+  async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
     const res = await kernel.querySpeciesOperation({
       id: this.id,
       spaceId: id,
@@ -172,30 +172,28 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  async createMethod(
+  async createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
     const res = await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
-      speciesCode: this.target.code,
       ...data,
     });
     return res.success;
   }
 
-  async updateMethod(
+  async updateOperation(
     data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
     const res = await kernel.updateOperation({
       ...data,
       speciesId: this.target.id,
-      speciesCode: this.target.code,
     });
     return res.success;
   }
 
-  async deleteMethod(id: string): Promise<boolean> {
+  async deleteOperation(id: string): Promise<boolean> {
     const res = await kernel.deleteOperation({
       id: id,
       typeName: '',

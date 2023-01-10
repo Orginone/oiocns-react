@@ -2456,8 +2456,8 @@ export default class KernelApi {
    * @param {string} methodName 方法名
    * @returns {void} 无返回值
    */
-  public on(methodName: string, newMethod: (...args: any[]) => any): void {
-    if (!methodName || !newMethod) {
+  public on(methodName: string, newOperation: (...args: any[]) => any): void {
+    if (!methodName || !newOperation) {
       return;
     }
 
@@ -2466,11 +2466,11 @@ export default class KernelApi {
       this._methods[methodName] = [];
     }
 
-    if (this._methods[methodName].indexOf(newMethod) !== -1) {
+    if (this._methods[methodName].indexOf(newOperation) !== -1) {
       return;
     }
 
-    this._methods[methodName].push(newMethod);
+    this._methods[methodName].push(newOperation);
   }
   /**
    * 使用rest请求后端

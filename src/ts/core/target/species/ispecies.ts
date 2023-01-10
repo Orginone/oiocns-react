@@ -1,11 +1,12 @@
 import {
   AttributeModel,
   DictModel,
+  OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
 } from '../../../base/model';
-import { XAttributeArray, XSpecies } from '../../../base/schema';
+import { XAttributeArray, XOperationArray, XSpecies } from '../../../base/schema';
 import { INullDict } from './idict';
 
 /** 可为空的标准分类 */
@@ -33,6 +34,8 @@ export interface ISpeciesItem {
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
+  /** 加载业务标准 */
+  loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /**
    * 创建标准分类项
    * @param data 创建参数
@@ -75,6 +78,25 @@ export interface ISpeciesItem {
    * @param id 特性项id
    */
   deleteAttr(id: string): Promise<boolean>;
+  /**
+   * 创建业务标准
+   * @param data 创建参数
+   */
+  createOperation(
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean>;
+  /**
+   * 更新业务标准
+   * @param data 创建参数
+   */
+  updateOperation(
+    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean>;
+  /**
+   * 删除业务标准
+   * @param id 特性项id
+   */
+  deleteOperation(id: string): Promise<boolean>;
   /**
    * 删除标准分类项
    */

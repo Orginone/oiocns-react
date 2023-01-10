@@ -7,7 +7,7 @@ import {
   SpeciesModel,
   TargetShare,
 } from '../../base/model';
-import { XAttributeArray, XMethodArray, XSpecies } from '../../base/schema';
+import { XAttributeArray, XOperationArray, XSpecies } from '../../base/schema';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -35,7 +35,7 @@ export interface ISpeciesItem {
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
   /** 加载业务标准 */
-  loadMethods(id: string, page: PageRequest): Promise<XMethodArray>;
+  loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /**
    * 创建标准分类项
    * @param data 创建参数
@@ -82,19 +82,21 @@ export interface ISpeciesItem {
    * 创建业务标准
    * @param data 创建参数
    */
-  createMethod(
+  createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
   /**
    * 更新业务标准
    * @param data 创建参数
    */
-  updateMethod(data: Omit<OperationModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
+  updateOperation(
+    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean>;
   /**
    * 删除业务标准
    * @param id 特性项id
    */
-  deleteMethod(id: string): Promise<boolean>;
+  deleteOperation(id: string): Promise<boolean>;
   /**
    * 删除标准分类项
    */
