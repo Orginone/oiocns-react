@@ -189,18 +189,13 @@ export class SpeciesItem implements ISpeciesItem {
       ...data,
       speciesId: this.target.id,
     });
-    // // 修改、删除或插入子表
-    console.log('data.id', data.id);
-    console.log('data.remark', data.remark);
-    console.log('res.success', res.success);
-    if (res.success && data.remark && data.id) {
-      console.log('3333333333333');
-      const items = await kernel.queryOperationItems({
-        id: data.id as string,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      console.log(items);
-    }
+    // // // 修改、删除或插入子表
+    // if (res.success && data.remark && data.id) {
+    //   const items = await kernel.queryOperationItems({
+    //     id: data.id as string,
+    //     page: { offset: 0, limit: 100000, filter: '' },
+    //   });
+    // }
     return res.success;
   }
 

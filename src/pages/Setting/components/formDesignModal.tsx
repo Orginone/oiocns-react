@@ -52,6 +52,7 @@ const FormDesignModal = (props: FormDesignProps) => {
           defaultValue={schema}
           onSchemaChange={(schema) => {
             if (schema) {
+              // TODO 保留旧remark
               data = { ...data, ...{ remark: JSON.stringify(schema) as string } };
             }
           }}
