@@ -100,7 +100,10 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
                     setOpenDictItemModal(true);
                     break;
                   case '删除':
-                    current.deleteDict(item.id);
+                    current.deleteDict(item.id).then((success) => {
+                      forceUpdate();
+                      success ? message.success('删除成功') : message.error('删除失败');
+                    });
                     break;
                 }
               },
@@ -127,7 +130,12 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
       {
         key: '删除项',
         label: <span style={{ color: 'red' }}>删除项</span>,
-        onClick: async () => {},
+        onClick: async () => {
+          currentDict?.deleteItem(item.id).then((success) => {
+            setItemKey(getUuid());
+            success ? message.success('删除成功') : message.error('删除失败');
+          });
+        },
       },
     ];
   };
