@@ -250,7 +250,7 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     },
   },
   {
-    title: '备注',
+    title: '表单配置',
     dataIndex: 'remark',
     ellipsis: true,
     key: 'remark',

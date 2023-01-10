@@ -35,8 +35,8 @@ const FormDesignModal = (props: FormDesignProps) => {
       remark: data?.remark as string,
       belongId: data?.belongId as string,
       speciesId: '',
-      speciesCode: '',
     };
+    // 修改
     const result = await current.updateOperation(body);
     handleOk(result);
   };
