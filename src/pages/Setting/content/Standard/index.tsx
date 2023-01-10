@@ -17,9 +17,6 @@ interface IProps {
  * @returns
  */
 const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
-  console.log('current', current);
-  console.log('current', current.createDict);
-
   const [modalType, setModalType] = useState('');
   const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom

@@ -63,10 +63,6 @@ const Attritube = ({ current, target, modalType, setModalType }: IProps) => {
     const res = await current!.loadAttrs(userCtrl.space.id, page);
     if (res && res.result) {
       for (const item of res.result) {
-        const team = userCtrl.findTeamInfoById(item.belongId);
-        if (team) {
-          item.belongId = team.name;
-        }
         item.speciesId = findSpecesName(thingCtrl.teamSpecies, item.speciesId);
       }
     }

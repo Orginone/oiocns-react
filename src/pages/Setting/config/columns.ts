@@ -1,6 +1,7 @@
 import { schema } from '@/ts/base';
 import { IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
+import userCtrl from '@/ts/controller/setting';
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -197,6 +198,12 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     dataIndex: 'belongId',
     key: 'belongId',
     width: 200,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '特性定义',
@@ -235,6 +242,12 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     dataIndex: 'belongId',
     key: 'belongId',
     width: 200,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '备注',

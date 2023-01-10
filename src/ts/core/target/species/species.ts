@@ -2,6 +2,7 @@ import { kernel, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
   DictModel,
+  OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
@@ -47,6 +48,19 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
+  async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
+    const res = await kernel.querySpeciesOperation({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
   async loadInfo(info: TargetShare): Promise<ISpeciesItem> {
     if (info.typeName != '未知') {
       this.belongInfo = info;
@@ -79,7 +93,6 @@ export class SpeciesItem implements ISpeciesItem {
   }
 
   async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
-
     const res = await kernel.createDict({
       ...data,
       id: undefined,
@@ -145,6 +158,37 @@ export class SpeciesItem implements ISpeciesItem {
   }
   async deleteAttr(id: string): Promise<boolean> {
     const res = await kernel.deleteAttribute({
+      id: id,
+      typeName: '',
+    });
+    return res.success;
+  }
+
+  async createOperation(
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean> {
+    const res = await kernel.createOperation({
+      id: undefined,
+      speciesId: this.id,
+      speciesCode: this.target.code,
+      ...data,
+    });
+    return res.success;
+  }
+
+  async updateOperation(
+    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
+  ): Promise<boolean> {
+    const res = await kernel.updateOperation({
+      ...data,
+      speciesId: this.target.id,
+      speciesCode: this.target.code,
+    });
+    return res.success;
+  }
+
+  async deleteOperation(id: string): Promise<boolean> {
+    const res = await kernel.deleteOperation({
       id: id,
       typeName: '',
     });

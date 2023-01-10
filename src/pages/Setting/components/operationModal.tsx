@@ -73,15 +73,15 @@ const OperationModal = (props: Iprops) => {
           rules: [{ required: true, message: '是否公开为必填项' }],
         },
       },
-      {
-        title: '业务内容',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        colProps: { span: 24 },
-        formItemProps: {
-          rules: [{ required: true, message: '业务内容为必填项' }],
-        },
-      },
+      // {
+      //   title: '业务内容',
+      //   dataIndex: 'remark',
+      //   valueType: 'textarea',
+      //   colProps: { span: 24 },
+      //   formItemProps: {
+      //     rules: [{ required: true, message: '业务内容为必填项' }],
+      //   },
+      // },
     ];
     return columns;
   };
@@ -92,7 +92,11 @@ const OperationModal = (props: Iprops) => {
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
-        if (!open) {
+        if (open) {
+          if (title.includes('修改')) {
+            formRef.current?.setFieldsValue(data);
+          }
+        } else {
           formRef.current?.resetFields();
           handleCancel();
         }
@@ -104,7 +108,6 @@ const OperationModal = (props: Iprops) => {
       onFinish={async (values) => {
         values = { ...data, ...values };
         if (title.includes('新增')) {
-          console.log('current', current.createOperation);
           handleOk(await current.createOperation(values));
         } else {
           handleOk(await current.updateOperation(values));
