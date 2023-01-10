@@ -4,7 +4,7 @@ import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   DictModel,
-  MethodModel,
+  OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
@@ -49,8 +49,8 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadMethods(id: string, page: PageRequest): Promise<schema.XMethodArray> {
-    const res = await kernel.querySpeciesMethods({
+  async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
+    const res = await kernel.querySpeciesOperation({
       id: this.id,
       spaceId: id,
       page: {
@@ -164,10 +164,10 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  async createMethod(
-    data: Omit<MethodModel, 'id' | 'speciesId' | 'speciesCode'>,
+  async createOperation(
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
-    const res = await kernel.createMethod({
+    const res = await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
       speciesCode: this.target.code,
@@ -176,10 +176,10 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  async updateMethod(
-    data: Omit<MethodModel, 'speciesId' | 'speciesCode'>,
+  async updateOperation(
+    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
-    const res = await kernel.updateMethod({
+    const res = await kernel.updateOperation({
       ...data,
       speciesId: this.target.id,
       speciesCode: this.target.code,
@@ -187,8 +187,8 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  async deleteMethod(id: string): Promise<boolean> {
-    const res = await kernel.deleteMethod({
+  async deleteOperation(id: string): Promise<boolean> {
+    const res = await kernel.deleteOperation({
       id: id,
       typeName: '',
     });

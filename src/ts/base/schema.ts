@@ -57,27 +57,21 @@ export type XAttributeArray = {
 };
 
 //业务标准定义定义
-export type XMethod = {
+export type XOperation = {
   // 雪花ID
   id: string;
   // 名称
   name: string;
   // 编号
   code: string;
-  // 业务类型
-  methodType: string;
   // 公开的
   public: boolean;
-  // 业务内容
-  content: string;
   // 备注
   remark: string;
   // 类别ID
   speciesId: string;
   // 创建组织/个人
   belongId: string;
-  // 工作职权Id
-  authId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -92,14 +86,12 @@ export type XMethod = {
   updateTime: string;
   // 度量特性对应的类别
   species: XSpecies | undefined;
-  // 工作职权
-  authority: XAuthority | undefined;
   // 创建度量标准的组织/个人
   belong: XTarget | undefined;
 };
 
 //业务标准查询返回集合
-export type XMethodArray = {
+export type XOperationArray = {
   // 偏移量
   offset: number;
   // 最大数量
@@ -107,7 +99,7 @@ export type XMethodArray = {
   // 总数
   total: number;
   // 结果
-  result: XMethod[] | undefined;
+  result: XOperation[] | undefined;
 };
 
 //职权定义

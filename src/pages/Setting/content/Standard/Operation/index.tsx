@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { INullSpeciesItem, ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
-import { XMethod } from '@/ts/base/schema';
+import { XOperation } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
 import thingCtrl from '@/ts/controller/thing';
-import { MethodColumns } from '@/pages/Setting/config/columns';
+import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import MethodModel from '../../../components/methodModal';
+import OperationModel from '../../../components/operationModal';
 
 interface IProps {
   target?: ITarget;
@@ -20,11 +20,11 @@ interface IProps {
  * @description: 分类--业务标准
  * @return {*}
  */
-const Method = ({ current, target, modalType, setModalType }: IProps) => {
+const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [editData, setEditData] = useState<XMethod>();
+  const [editData, setEditData] = useState<XOperation>();
   // 操作内容渲染函数
-  const renderOperate = (item: XMethod) => {
+  const renderOperate = (item: XOperation) => {
     return [
       {
         key: '设计表单',
@@ -67,8 +67,8 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
     return id;
   };
 
-  const loadMethods = async (page: PageRequest) => {
-    const res = await current!.loadMethods(userCtrl.space.id, page);
+  const loadOperations = async (page: PageRequest) => {
+    const res = await current!.loadOperations(userCtrl.space.id, page);
     if (res && res.result) {
       for (const item of res.result) {
         const team = userCtrl.findTeamInfoById(item.belongId);
@@ -82,19 +82,19 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
   };
   return (
     <>
-      <CardOrTable<XMethod>
+      <CardOrTable<XOperation>
         rowKey={'id'}
         params={tkey}
         request={async (page) => {
-          return await loadMethods(page);
+          return await loadOperations(page);
         }}
         operation={renderOperate}
-        columns={MethodColumns}
+        columns={OperationColumns}
         showChangeBtn={false}
         dataSource={[]}
       />
       {/** 新增/编辑业务标准模态框 */}
-      <MethodModel
+      <OperationModel
         data={editData}
         title={modalType}
         open={modalType.includes('业务标准')}
@@ -113,4 +113,4 @@ const Method = ({ current, target, modalType, setModalType }: IProps) => {
     </>
   );
 };
-export default Method;
+export default Operation;

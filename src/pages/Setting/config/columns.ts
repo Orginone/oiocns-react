@@ -206,7 +206,7 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
   },
 ];
 
-export const MethodColumns: ProColumns<schema.XMethod>[] = [
+export const OperationColumns: ProColumns<schema.XOperation>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -223,18 +223,6 @@ export const MethodColumns: ProColumns<schema.XMethod>[] = [
     dataIndex: 'name',
     key: 'name',
     width: 200,
-  },
-  {
-    title: '业务类型',
-    dataIndex: 'methodType',
-    key: 'methodType',
-    width: 150,
-  },
-  {
-    title: '业务内容',
-    dataIndex: 'content',
-    key: 'content',
-    width: 150,
   },
   {
     title: '特性分类',
@@ -311,5 +299,4 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     key: 'createTime',
     width: 150,
   },
-
 ];

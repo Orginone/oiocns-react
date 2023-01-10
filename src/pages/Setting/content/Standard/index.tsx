@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
 import Dict from '@/pages/Setting/content/Standard/Dict';
-import Method from './Method';
+import Operation from './Operation';
 import Attritube from './Attritube';
 
 interface IProps {
@@ -17,6 +17,9 @@ interface IProps {
  * @returns
  */
 const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
+  console.log('current', current);
+  console.log('current', current.createDict);
+
   const [modalType, setModalType] = useState('');
   const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom
@@ -96,11 +99,11 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       label: `业务标准`,
       key: '业务标准',
       children: (
-        <Method
+        <Operation
           current={current}
           target={target}
           modalType={modalType}
-          setModalType={setModalType}></Method>
+          setModalType={setModalType}></Operation>
       ),
     },
     {

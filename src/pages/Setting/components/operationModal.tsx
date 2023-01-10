@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { MethodModel } from '@/ts/base/model';
+import { OperationModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
-import { XMethod } from '@/ts/base/schema';
+import { XOperation } from '@/ts/base/schema';
 
 interface Iprops {
   title: string;
   open: boolean;
-  data: XMethod | undefined;
+  data: XOperation | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   current: ISpeciesItem;
@@ -18,11 +18,11 @@ interface Iprops {
 /*
   业务标准编辑模态框
 */
-const MethodModal = (props: Iprops) => {
+const OperationModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
-    const columns: ProFormColumnsType<MethodModel>[] = [
+    const columns: ProFormColumnsType<OperationModel>[] = [
       {
         title: '业务名称',
         dataIndex: 'name',
@@ -54,24 +54,6 @@ const MethodModal = (props: Iprops) => {
         },
       },
       {
-        title: '选择管理职权',
-        dataIndex: 'authId',
-        valueType: 'treeSelect',
-        formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
-        request: async () => {
-          const data = await userCtrl.company.loadAuthorityTree(false);
-          return data ? [data] : [];
-        },
-        fieldProps: {
-          disabled: title === '编辑',
-          fieldNames: { label: 'name', value: 'id' },
-          showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
-        },
-      },
-      {
         title: '向下级组织公开',
         dataIndex: 'public',
         valueType: 'select',
@@ -92,52 +74,19 @@ const MethodModal = (props: Iprops) => {
         },
       },
       {
-        title: '业务分类',
-        dataIndex: 'methodType',
-        valueType: 'select',
-        fieldProps: {
-          options: [
-            {
-              value: '创建',
-              label: '创建',
-            },
-            {
-              value: '修改',
-              label: '修改',
-            },
-            {
-              value: '删除',
-              label: '删除',
-            },
-          ],
-        },
-        formItemProps: {
-          rules: [{ required: true, message: '业务分类为必填项' }],
-        },
-      },
-      {
         title: '业务内容',
-        dataIndex: 'content',
+        dataIndex: 'remark',
         valueType: 'textarea',
         colProps: { span: 24 },
         formItemProps: {
           rules: [{ required: true, message: '业务内容为必填项' }],
         },
       },
-      {
-        title: '备注',
-        dataIndex: 'remark',
-        valueType: 'textarea',
-        colProps: { span: 24 },
-        formItemProps: {
-          rules: [{ required: true, message: '业务定义为必填项' }],
-        },
-      },
     ];
     return columns;
   };
   return (
-    <SchemaForm<MethodModel>
+    <SchemaForm<OperationModel>
       formRef={formRef}
       title={title}
       open={open}
@@ -155,13 +104,14 @@ const MethodModal = (props: Iprops) => {
       onFinish={async (values) => {
         values = { ...data, ...values };
         if (title.includes('新增')) {
-          handleOk(await current.createMethod(values));
+          console.log('current', current.createOperation);
+          handleOk(await current.createOperation(values));
         } else {
-          handleOk(await current.updateMethod(values));
+          handleOk(await current.updateOperation(values));
         }
       }}
       columns={getFromColumns()}></SchemaForm>
   );
 };
 
-export default MethodModal;
+export default OperationModal;
