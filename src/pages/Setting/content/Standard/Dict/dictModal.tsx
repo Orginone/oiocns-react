@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel } from '@/ts/base/model';
-import { Dict, IDict } from '@/ts/core';
+import { IDict } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 
@@ -10,16 +10,15 @@ interface Iprops {
   title: string;
   open: boolean;
   handleCancel: () => void;
-  handleOk: (newItem: IDict | undefined) => void;
-  current?: IDict;
-  speciesItem?: ISpeciesItem;
+  handleOk: (newItem: IDict | boolean | undefined) => void;
+  current?: ISpeciesItem;
   targetId?: string;
 }
 /*
   分类编辑模态框
 */
 const DictModal = (props: Iprops) => {
-  const { open, title, handleOk, current, speciesItem, handleCancel } = props;
+  const { open, title, handleOk, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<DictModel>[] = [
     {
@@ -99,11 +98,10 @@ const DictModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        console.log(values);
         if (title.includes('新增')) {
-          handleOk(await speciesItem?.createDict(values));
+          handleOk(await current?.createDict(values));
         } else {
-          handleOk(await current?.update(values));
+          handleOk(await current?.updateDict(values));
         }
       }}
       columns={columns}></SchemaForm>

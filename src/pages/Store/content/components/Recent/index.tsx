@@ -79,7 +79,6 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
                 placement="bottomLeft"
                 menu={moreMenu}
                 onOpenChange={() => {
-                  console.log('ss1', item.prod.name);
                   appCtrl.setCurProduct(item, true);
                 }}>
                 <EllipsisOutlined

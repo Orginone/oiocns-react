@@ -39,10 +39,15 @@ export interface ISpeciesItem {
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
   /**
- * 创建字典
- * @param data 创建参数
- */
+   * 创建字典
+   * @param data 创建参数
+   */
   createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
+  /**
+   * 更新分类特性项
+   * @param data 创建参数
+   */
+  updateDict(data: Omit<DictModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
   /**
    * 更新标准分类项
    * @param data 创建参数

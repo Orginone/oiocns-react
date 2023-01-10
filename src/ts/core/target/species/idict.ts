@@ -1,5 +1,5 @@
 import { DictItemModel, PageRequest, DictModel, TargetShare } from '../../../base/model';
-import { XDictItem, XDict, XDictItemArray } from '../../../base/schema';
+import { XDict, XDictItemArray } from '../../../base/schema';
 
 /** 可为空的字典 */
 export type INullDict = IDict | undefined;

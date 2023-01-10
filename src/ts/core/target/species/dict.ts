@@ -59,9 +59,7 @@ export class Dict implements IDict {
     }
     return;
   }
-  async update(
-    data: Omit<DictModel, 'id' | 'parentId' | 'code'>,
-  ): Promise<IDict> {
+  async update(data: Omit<DictModel, 'id' | 'parentId' | 'code'>): Promise<IDict> {
     const res = await kernel.updateDict({
       ...data,
       id: this.id,

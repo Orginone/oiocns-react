@@ -257,7 +257,6 @@ const sourceColumns: ProFormColumnsType<Resources> = {
       {
         required: true,
         validator: async (_: any, value: string | any[]) => {
-          console.log(value);
           if (value && value.length > 0) {
             return;
           }

@@ -79,7 +79,6 @@ export class SpeciesItem implements ISpeciesItem {
   }
 
   async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
-
     const res = await kernel.createDict({
       ...data,
       id: undefined,
@@ -90,6 +89,14 @@ export class SpeciesItem implements ISpeciesItem {
       return newItem;
     }
     return;
+  }
+
+  async updateDict(data: Omit<DictModel, 'speciesId' | 'speciesCode'>): Promise<boolean> {
+    const res = await kernel.updateDict({
+      ...data,
+      speciesId: this.target.id,
+    });
+    return res.success;
   }
 
   async update(

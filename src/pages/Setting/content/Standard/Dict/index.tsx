@@ -1,19 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Card, Menu, message } from 'antd';
-import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { PlusOutlined } from '@ant-design/icons';
-import { ImPencil } from 'react-icons/im';
 import CardOrTable from '@/components/CardOrTableComp';
 import { DictItemColumns } from '@/pages/Setting/config/columns';
-import { XAttribute, XDict, XDictItem } from '@/ts/base/schema';
+import { XDict, XDictItem } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IDict, ISpeciesItem, ITarget } from '@/ts/core';
-import { Dict } from '@/ts/core/target/species/dict';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { kernel } from '@/ts/base';
-import { SpeciesItem } from '@/ts/core/thing/species';
 import userCtrl from '@/ts/controller/setting';
 import DictModel from './dictModal';
-import { getUuid } from '@/utils/tools';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
@@ -29,7 +24,7 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState<string>('新增');
   const [currentDict, setCurrentDict] = useState<XDict>();
   const [dicts, setDicts] = useState<any>([]);
-  const [itemkey, itemforceUpdate] = useObjectUpdate(currentDict);
+  const [itemkey] = useObjectUpdate(currentDict);
   useEffect(() => {
     kernel
       .queryDicts({
@@ -47,7 +42,6 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
             return { label: item.name, key: item.code, data: item };
           });
           setDicts(menus);
-        } else {
         }
       });
   }, [current]);
@@ -87,8 +81,6 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           items={dicts}
           style={{ width: '100%', height: '50vh', overflow: 'auto' }}
           onClick={(e: any) => {
-            debugger;
-            console.log(e);
             for (let dict of dicts) {
               if (e.key == dict.key) {
                 setCurrentDict(dict.data);
@@ -131,8 +123,7 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           tforceUpdate();
           setOpenDictModal(false);
         }}
-        current={new Dict(currentDict as XDict)}
-        speciesItem={current}
+        current={current}
       />
     </div>
   );
