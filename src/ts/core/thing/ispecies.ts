@@ -2,7 +2,7 @@ import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   DictModel,
-  MethodModel,
+  OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
@@ -78,13 +78,13 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   createMethod(
-    data: Omit<MethodModel, 'id' | 'speciesId' | 'speciesCode'>,
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
   /**
    * 更新业务标准
    * @param data 创建参数
    */
-  updateMethod(data: Omit<MethodModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
+  updateMethod(data: Omit<OperationModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
   /**
    * 删除业务标准
    * @param id 特性项id
