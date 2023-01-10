@@ -46,13 +46,14 @@ const FormDesignModal = (props: FormDesignProps) => {
       open={open}
       onOk={async () => save()}
       onCancel={handleCancel}
+      maskClosable={false}
       width={1280}>
       <div style={{ paddingTop: '14px' }}>
         <Generator
           defaultValue={schema}
           onSchemaChange={(schema) => {
             if (schema) {
-              // TODO 保留旧remark
+              // TODO 保留旧remark; 删除时判断归属权限; 加载子表并赋予ID
               data = { ...data, ...{ remark: JSON.stringify(schema) as string } };
             }
           }}

@@ -103,11 +103,11 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           setModalType={setModalType}></Operation>
       ),
     },
-    {
-      label: `业务流程`,
-      key: '业务流程',
-      children: <></>,
-    },
+    // {
+    //   label: `业务流程`,
+    //   key: '业务流程',
+    //   children: <></>,
+    // },
   ];
 
   return (
