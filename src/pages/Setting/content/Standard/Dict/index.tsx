@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Menu } from 'antd';
+import { Button, Card, Menu, message } from 'antd';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 import { PlusOutlined } from '@ant-design/icons';
 import { ImPencil } from 'react-icons/im';
@@ -7,11 +7,13 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { DictItemColumns } from '@/pages/Setting/config/columns';
 import { XAttribute, XDict, XDictItem } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IDict, ISpeciesItem, ITarget, Dict } from '@/ts/core';
+import { IDict, ISpeciesItem, ITarget } from '@/ts/core';
+import { Dict } from '@/ts/core/target/species/dict';
 import { kernel } from '@/ts/base';
 import { SpeciesItem } from '@/ts/core/thing/species';
 import userCtrl from '@/ts/controller/setting';
 import DictModel from './dictModal';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
@@ -21,20 +23,26 @@ interface IProps {
  * @return {*}
  */
 const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
-  // const [tkey, tforceUpdate] = useObjectUpdate(current);
-
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
   const [modalType, setModalType] = useState<string>('新增');
-  const [currentDict, setCurrentDict] = useState<IDict>();
-  const [speciesItem, setSpeciesItem] = useState<ISpeciesItem>();
+  const [currentDict, setCurrentDict] = useState<XDict>();
   const [dicts, setDicts] = useState<any>([]);
+  const [itemkey, itemforceUpdate] = useObjectUpdate(currentDict);
   useEffect(() => {
     kernel
-      .queryDicts({ id: current.target.id, spaceId: userCtrl.space.id })
+      .queryDicts({
+        id: current.target.id,
+        spaceId: userCtrl.space.id,
+        page: { offset: 0, limit: 10000, filter: '' },
+      })
       .then((res) => {
         if (res.success) {
           let records: XDict[] | undefined = res.data.result;
+          if (records) {
+            setCurrentDict(records[0]);
+          }
           let menus = records?.map((item: XDict) => {
             return { label: item.name, key: item.code, data: item };
           });
@@ -74,20 +82,34 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           新增
         </Button>
         <Menu
+          key={tkey}
           mode="vertical"
           items={dicts}
           style={{ width: '100%', height: '50vh', overflow: 'auto' }}
-          onClick={() => {}}
+          onClick={(e: any) => {
+            debugger;
+            console.log(e);
+            for (let dict of dicts) {
+              if (e.key == dict.key) {
+                setCurrentDict(dict.data);
+              }
+            }
+          }}
         />
       </div>
       <div style={{ width: '90vw' }}>
         <Card bordered={false} style={{ padding: '10px' }}>
           <CardOrTable<XDictItem>
+            key={itemkey}
             rowKey={'id'}
-            // key={tkey}
-            // request={async (page) => {
-            //   return await loadAttrs(page);
-            // }}
+            request={async (page) => {
+              let res = await kernel.queryDictItems({
+                id: currentDict ? currentDict.id : '1',
+                spaceId: userCtrl.space.id,
+                page: page,
+              });
+              return res.data;
+            }}
             operation={renderItemOperate}
             columns={DictItemColumns}
             parentRef={parentRef}
@@ -103,9 +125,13 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           setOpenDictModal(false);
         }}
         handleOk={function (res: any): void {
+          if (res) {
+            message.success(`${modalType}成功`);
+          }
+          tforceUpdate();
           setOpenDictModal(false);
         }}
-        current={currentDict}
+        current={new Dict(currentDict as XDict)}
         speciesItem={current}
       />
     </div>

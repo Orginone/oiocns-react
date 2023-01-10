@@ -243,6 +243,8 @@ export type DictModel = {
   belongId: string;
   // 备注
   remark: string;
+  //分类id
+  speciesId: string;
 };
 
 export type DictItemModel = {

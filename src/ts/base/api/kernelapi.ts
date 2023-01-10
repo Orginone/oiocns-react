@@ -171,8 +171,9 @@ export default class KernelApi {
   public async createDict(
     params: model.DictModel,
   ): Promise<model.ResultType<schema.XDict>> {
+
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'CreateDict',
       params: params,
     });
@@ -186,7 +187,7 @@ export default class KernelApi {
     params: model.DictItemModel,
   ): Promise<model.ResultType<schema.XDictItem>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'CreateDictItem',
       params: params,
     });
@@ -510,9 +511,10 @@ export default class KernelApi {
   public async queryDicts(
     params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
+
     return await this.request({
-      module: 'base',
-      action: 'QueryDicts',
+      module: 'thing',
+      action: 'QuerySpeciesDict',
       params: params,
     });
   }
@@ -523,10 +525,10 @@ export default class KernelApi {
 * @returns {model.ResultType<schema.XDictItemArray>} 请求结果
 */
   public async queryDictItems(
-    params: model.IDBelongReq,
+    params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XDictItemArray>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'QueryDictItems',
       params: params,
     });
