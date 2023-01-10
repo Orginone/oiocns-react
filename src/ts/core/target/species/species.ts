@@ -177,7 +177,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
-      speciesCode: this.target.code,
       ...data,
     });
     return res.success;
@@ -189,8 +188,16 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.updateOperation({
       ...data,
       speciesId: this.target.id,
-      speciesCode: this.target.code,
     });
+    // // 修改、删除或插入子表
+    console.log('data.id', data.id);
+    // if (res.success && data.remark && data.id) {
+    //   const items = await kernel.queryOperationItems({
+    //     id: data.id as string,
+    //     page: { offset: 0, limit: 100000, filter: '' },
+    //   });
+    //   console.log(items);
+    // }
     return res.success;
   }
 
