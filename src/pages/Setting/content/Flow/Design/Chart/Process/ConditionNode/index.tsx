@@ -55,7 +55,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
           return typeof findData === 'undefined';
         },
       );
-      console.log('getFindValue', getFindValue);
       if (getFindValue) {
         setShowError(true);
       }

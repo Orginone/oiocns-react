@@ -241,10 +241,10 @@ export type DictModel = {
   public: boolean;
   // 创建组织/个人
   belongId: string;
+  // 分类Id
+  speciesId: string;
   // 备注
   remark: string;
-  //分类id
-  speciesId: string;
 };
 
 export type DictItemModel = {
@@ -338,8 +338,23 @@ export type OperationModel = {
   belongId: string;
   // 类别Id
   speciesId: string;
-  // 类别代码
-  speciesCode: string;
+};
+
+export type OperationItemModel = {
+  // 唯一ID
+  id?: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 规则
+  rule: string;
+  // 备注
+  remark: string;
+  // 创建组织/个人
+  belongId: string;
+  // 业务Id
+  operationId: string;
 };
 
 export type AuthorityModel = {

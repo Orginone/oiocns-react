@@ -105,6 +105,14 @@ export class SpeciesItem implements ISpeciesItem {
     return;
   }
 
+  async updateDict(data: Omit<DictModel, 'speciesId' | 'speciesCode'>): Promise<boolean> {
+    const res = await kernel.updateDict({
+      ...data,
+      speciesId: this.target.id,
+    });
+    return res.success;
+  }
+
   async update(
     data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>,
   ): Promise<ISpeciesItem> {
@@ -170,7 +178,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
-      speciesCode: this.target.code,
       ...data,
     });
     return res.success;
@@ -182,7 +189,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.updateOperation({
       ...data,
       speciesId: this.target.id,
-      speciesCode: this.target.code,
     });
     return res.success;
   }

@@ -114,7 +114,6 @@ const StoreApp: React.FC = () => {
   };
 
   const handleSelectClassify = (appids: string[]) => {
-    console.log('当前分类下的appids', appids);
     setAppShowIdlimit([...appids]);
   };
   const showData = useMemo(() => {

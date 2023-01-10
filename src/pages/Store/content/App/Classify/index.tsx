@@ -153,7 +153,6 @@ const StoreClassify: React.FC<StoreClassifyType> = ({ onClassifySelect }) => {
    * @return {*}
    */
   const handleMenuClick = (key: string, data: any) => {
-    console.log('目录更多操作', key, data);
     selectMenuInfo = data;
     modalType = key;
     switch (key) {
@@ -204,11 +203,9 @@ const StoreClassify: React.FC<StoreClassifyType> = ({ onClassifySelect }) => {
             bodyStyle={{ padding: 0 }}
             okText="确定加入"
             onOk={() => {
-              console.log(`确定按钮`);
               setShowModal(false);
             }}
             onCancel={() => {
-              console.log(`取消按钮`);
               setShowModal(false);
             }}>
             <SearchSjopComp />
