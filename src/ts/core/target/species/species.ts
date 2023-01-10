@@ -83,6 +83,7 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.createDict({
       ...data,
       id: undefined,
+      speciesId: this.id,
     });
     if (res.success) {
       const newItem = new Dict(res.data);
