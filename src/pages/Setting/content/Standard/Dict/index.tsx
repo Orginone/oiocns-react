@@ -12,6 +12,7 @@ import userCtrl from '@/ts/controller/setting';
 import DictModel from './dictModal';
 import DictItemModel from './dictItemModal';
 import { ImBin, ImPencil, ImPlus } from 'react-icons/im';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
@@ -25,10 +26,12 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
   const [openDictItemModal, setOpenDictItemModal] = useState<boolean>(false);
   const [editData, setEditData] = useState<XDict>();
+  const [editItemData, setEditItemData] = useState<XDictItem>();
   const [currentDict, setCurrentDict] = useState<IDict>();
   const [dicts, setDicts] = useState<any[]>([]);
   // const [itemkey, setItemKey] = useState<number>(0);
-  const [key, forceUpdate] = useObjectUpdate(editData);
+  const [dictKey, forceUpdate] = useObjectUpdate(editData);
+  const [itemKey, setItemKey] = useState<string>();
   useEffect(() => {
     kernel
       .querySpeciesDict({
@@ -44,40 +47,12 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
               label: renderLabel(item),
               key: item.code,
               data: item,
-              // children: [
-              //   {
-              //     label: '编辑',
-              //     key: `${item.code}编辑`,
-              //     icon: <ImPencil></ImPencil>,
-              //     onClick: (e: any) => {
-              //       setEditData(item);
-              //       setOpenDictModal(true);
-              //     },
-              //   },
-              //   {
-              //     label: '新增子项',
-              //     key: `${item.code}新增子项`,
-              //     icon: <ImPlus></ImPlus>,
-              //     onClick: (e: any) => {
-              //       setCurrentDict(new Dict(item));
-              //       setOpenDictItemModal(true);
-              //     },
-              //   },
-              //   {
-              //     label: <span style={{ color: 'red' }}>删除</span>,
-              //     key: `${item.code}删除`,
-              //     icon: <ImBin></ImBin>,
-              //     onClick: (e: any) => {
-              //       console.log('删除', e);
-              //     },
-              //   },
-              // ],
             };
           });
           setDicts(menus as any[]);
         }
       });
-  }, [current]);
+  }, [current, dictKey]);
 
   /** 渲染标题,支持更多操作 */
   const renderLabel = (item: XDict) => {
@@ -88,8 +63,8 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
             // alert(item.name);
             setCurrentDict(new Dict(item));
             // setEditData(item);
-            forceUpdate();
-            // setItemKey(itemkey + 1);
+            // forceUpdate2();
+            setItemKey(getUuid());
           }}>
           {item.name}
         </span>
@@ -120,11 +95,12 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
                     setOpenDictModal(true);
                     break;
                   case '新增子项':
+                    setEditItemData(undefined);
                     setCurrentDict(new Dict(item));
                     setOpenDictItemModal(true);
                     break;
                   case '删除':
-                    console.log('删除', key);
+                    current.deleteDict(item.id);
                     break;
                 }
               },
@@ -141,21 +117,24 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   const renderItemOperate = (item: XDictItem) => {
     return [
       {
-        key: '编辑字典项',
-        label: '编辑字典项',
-        onClick: () => {},
+        key: '编辑项',
+        label: '编辑项',
+        onClick: () => {
+          setEditItemData(item);
+          setOpenDictItemModal(true);
+        },
       },
       {
-        key: '删除字典项',
-        label: '删除字典项',
+        key: '删除项',
+        label: <span style={{ color: 'red' }}>删除项</span>,
         onClick: async () => {},
       },
     ];
   };
 
   return (
-    <div style={{ display: 'flex', height: '50vh' }}>
-      <div style={{ width: '10vw', height: '50vh', margin: '5px' }}>
+    <div style={{ display: 'flex', height: '75vh' }}>
+      <div style={{ width: '15vw', height: '75vh', margin: '5px' }}>
         <Button
           type="link"
           size="small"
@@ -167,34 +146,20 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
           }}>
           新增
         </Button>
-        {/* <CustomMenu
-          item={siderMenuData}
-          onSelect={(item) => {}}
-          onMenuClick={(item, key) => {}}
-        /> */}
         <Menu
+          key={dictKey}
           mode="inline"
           items={dicts}
-          style={{ width: '100%', height: '50vh', overflow: 'auto' }}
-          // onClick={(e: any) => {
-          //   setItemKey(itemkey + 1);
-          // }}
+          style={{ width: '100%', height: '75vh', overflow: 'auto' }}
         />
       </div>
-      <div style={{ width: '90vw' }}>
+      <div style={{ width: '85vw' }}>
         <Card bordered={false} style={{ padding: '10px' }}>
           <CardOrTable<XDictItem>
-            key={key}
+            key={itemKey}
             rowKey={'id'}
             request={async (page) => {
               if (currentDict) {
-                // let res = await kernel.queryDictItems({
-                //   id: editData.id,
-                //   spaceId: userCtrl.space.id,
-                //   page: page,
-                // });
-                // console.log('res', res);
-                // return res.data;
                 let res = await currentDict.loadItems(userCtrl.space.id, page);
                 console.log('res', res);
                 return res;
@@ -224,18 +189,21 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
         handleOk={function (res: any): void {
           if (res) {
             message.success(`操作成功`);
+            forceUpdate();
           }
           setOpenDictModal(false);
         }}
         current={current}
       />
       <DictItemModel
+        data={editItemData}
         open={openDictItemModal}
         handleCancel={function (): void {
           setOpenDictItemModal(false);
         }}
         handleOk={function (res: any): void {
           if (res) {
+            setItemKey(getUuid());
             message.success(`操作成功`);
           }
           setOpenDictItemModal(false);

@@ -102,7 +102,8 @@ const DictItemModal = (props: Iprops) => {
         if (title.includes('新增')) {
           handleOk(await current?.createItem(values));
         } else {
-          handleOk(await current?.updateItem(values));
+          let formdata = Object.assign(data ? data : {}, values);
+          handleOk(await current?.updateItem(formdata));
         }
       }}
       columns={columns}></SchemaForm>

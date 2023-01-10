@@ -156,4 +156,11 @@ export class SpeciesItem implements ISpeciesItem {
     });
     return res.success;
   }
+  async deleteDict(id: string): Promise<boolean> {
+    const res = await kernel.deleteDict({
+      id: id,
+      typeName: '',
+    });
+    return res.success;
+  }
 }
