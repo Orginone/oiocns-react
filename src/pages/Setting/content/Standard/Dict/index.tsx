@@ -57,17 +57,12 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   /** 渲染标题,支持更多操作 */
   const renderLabel = (item: XDict) => {
     return (
-      <span>
-        <span
-          onClick={() => {
-            // alert(item.name);
-            setCurrentDict(new Dict(item));
-            // setEditData(item);
-            // forceUpdate2();
-            setItemKey(getUuid());
-          }}>
-          {item.name}
-        </span>
+      <div
+        onClick={() => {
+          setCurrentDict(new Dict(item));
+          setItemKey(getUuid());
+        }}>
+        <span>{item.name}</span>
         <span onClick={(e: any) => e.stopPropagation()} style={{ float: 'right' }}>
           <Dropdown
             menu={{
@@ -101,6 +96,8 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
                     break;
                   case '删除':
                     current.deleteDict(item.id).then((success) => {
+                      setCurrentDict(new Dict(dicts[0].data));
+                      setItemKey(getUuid);
                       forceUpdate();
                       success ? message.success('删除成功') : message.error('删除失败');
                     });
@@ -113,7 +110,7 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
             <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
           </Dropdown>
         </span>
-      </span>
+      </div>
     );
   };
 
