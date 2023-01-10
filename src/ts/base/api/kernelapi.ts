@@ -198,7 +198,7 @@ export default class KernelApi {
    */
   public async deleteDict(params: model.IdReqModel): Promise<model.ResultType<boolean>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'DeleteDict',
       params: params,
     });
@@ -212,7 +212,7 @@ export default class KernelApi {
     params: model.IdReqModel,
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'DeleteDictItem',
       params: params,
     });
@@ -226,7 +226,7 @@ export default class KernelApi {
     params: model.DictModel,
   ): Promise<model.ResultType<schema.XDict>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'UpdateDict',
       params: params,
     });
@@ -240,7 +240,7 @@ export default class KernelApi {
     params: model.DictItemModel,
   ): Promise<model.ResultType<schema.XDictItem>> {
     return await this.request({
-      module: 'base',
+      module: 'thing',
       action: 'UpdateDictItem',
       params: params,
     });

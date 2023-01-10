@@ -91,10 +91,9 @@ export class SpeciesItem implements ISpeciesItem {
     return;
   }
 
-  async updateDict(data: Omit<DictModel, 'speciesId' | 'speciesCode'>): Promise<boolean> {
+  async updateDict(data: DictModel): Promise<boolean> {
     const res = await kernel.updateDict({
       ...data,
-      speciesId: this.target.id,
     });
     return res.success;
   }

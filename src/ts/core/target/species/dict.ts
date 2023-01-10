@@ -19,9 +19,10 @@ export class Dict implements IDict {
     this.name = target.name;
     this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
-  async loadItems(id: string, page: PageRequest): Promise<schema.XDictItemArray> {
+  async loadItems(spaceId: string, page: PageRequest): Promise<schema.XDictItemArray> {
     const res = await kernel.queryDictItems({
-      id: id,
+      id: this.target.id,
+      spaceId: spaceId,
       page: {
         offset: page.offset,
         limit: page.limit,
@@ -80,18 +81,15 @@ export class Dict implements IDict {
     });
     return res.success;
   }
-  async createItem(
-    data: Omit<DictItemModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
+  async createItem(data: Omit<DictItemModel, 'id' | 'dictId'>): Promise<boolean> {
     const res = await kernel.createDictItem({
-      id: undefined,
       ...data,
+      id: undefined,
+      dictId: this.target.id,
     });
     return res.success;
   }
-  async updateItem(
-    data: Omit<DictItemModel, 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
+  async updateItem(data: DictItemModel): Promise<boolean> {
     const res = await kernel.updateDictItem({
       ...data,
     });

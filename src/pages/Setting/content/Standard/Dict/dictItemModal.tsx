@@ -1,45 +1,39 @@
 import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { DictModel } from '@/ts/base/model';
+import { DictItemModel } from '@/ts/base/model';
 import { IDict } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
-import { XDict } from '@/ts/base/schema';
+import { XDictItem } from '@/ts/base/schema';
 
 interface Iprops {
   open: boolean;
-  data: XDict | undefined;
+  data?: XDictItem;
   handleCancel: () => void;
-  handleOk: (newItem: IDict | boolean | undefined) => void;
-  current?: ISpeciesItem;
+  handleOk: (newItem: boolean | undefined) => void;
+  current?: IDict;
   targetId?: string;
 }
 /*
   分类编辑模态框
 */
-const DictModal = (props: Iprops) => {
+const DictItemModal = (props: Iprops) => {
   const { open, handleOk, current, data, handleCancel } = props;
-  let title: string = data ? '修改' : '新增';
+  let title: string = data ? '修改字典项' : '新增字典项目';
   const formRef = useRef<ProFormInstance>();
-  const columns: ProFormColumnsType<DictModel>[] = [
+  const columns: ProFormColumnsType<DictItemModel>[] = [
     {
-      title: 'id',
-      dataIndex: 'id',
-      hideInForm: true,
-    },
-    {
-      title: '字典名称',
+      title: '名称',
       dataIndex: 'name',
       formItemProps: {
-        rules: [{ required: true, message: '字典名称为必填项' }],
+        rules: [{ required: true, message: '字典项名称为必填项' }],
       },
     },
     {
-      title: '字典代码',
-      dataIndex: 'code',
+      title: '值',
+      dataIndex: 'value',
       formItemProps: {
-        rules: [{ required: true, message: '字典代码为必填项' }],
+        rules: [{ required: true, message: '字典项值为必填项' }],
       },
     },
     {
@@ -84,7 +78,7 @@ const DictModal = (props: Iprops) => {
     },
   ];
   return (
-    <SchemaForm<DictModel>
+    <SchemaForm<DictItemModel>
       formRef={formRef}
       title={title}
       open={open}
@@ -106,14 +100,13 @@ const DictModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          handleOk(await current?.createDict(values));
+          handleOk(await current?.createItem(values));
         } else {
-          let formdata = Object.assign(data ? data : {}, values);
-          handleOk(await current?.updateDict(formdata));
+          handleOk(await current?.updateItem(values));
         }
       }}
       columns={columns}></SchemaForm>
   );
 };
 
-export default DictModal;
+export default DictItemModal;

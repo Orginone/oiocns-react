@@ -25,7 +25,7 @@ export interface IDict {
   /** 加载信息 */
   loadInfo(info: TargetShare): Promise<IDict>;
   /** 加载字典子项 */
-  loadItems(id: string, page: PageRequest): Promise<XDictItemArray>;
+  loadItems(spaceId: string, page: PageRequest): Promise<XDictItemArray>;
   /**
    * 创建字典
    * @param data 创建参数
@@ -40,14 +40,12 @@ export interface IDict {
    * 创建字典子项
    * @param data 创建参数
    */
-  createItem(
-    data: Omit<DictItemModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean>;
+  createItem(data: Omit<DictItemModel, 'id' | 'dictId'>): Promise<boolean>;
   /**
    * 更新字典子项
    * @param data 创建参数
    */
-  updateItem(data: Omit<DictItemModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
+  updateItem(data: DictItemModel): Promise<boolean>;
   /**
    * 删除字典子项
    * @param id 子项id
