@@ -190,7 +190,6 @@ export class SpeciesItem implements ISpeciesItem {
       ...data,
       speciesId: this.target.id,
     });
-    console.log('data.id22', data.id);
     return res.success;
   }
 

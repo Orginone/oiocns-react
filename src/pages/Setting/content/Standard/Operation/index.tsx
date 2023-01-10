@@ -56,8 +56,8 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         },
       },
       {
-        key: '查看表单',
-        label: '查看表单',
+        key: '预览表单',
+        label: '预览表单',
         onClick: () => {
           setEditData(item);
           setViewFormOpen(true);
