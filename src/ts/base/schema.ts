@@ -172,6 +172,8 @@ export type XDict = {
   public: boolean;
   // 创建组织/个人
   belongId: string;
+  // 类别ID
+  speciesId: string;
   // 状态
   status: number;
   // 创建人员ID

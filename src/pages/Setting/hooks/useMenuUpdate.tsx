@@ -3,7 +3,13 @@ import { TargetType } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { ImStackoverflow } from 'react-icons/im';
+import {
+  ImAidKit,
+  ImBook,
+  ImCommand,
+  ImNewspaper,
+  ImStackoverflow,
+} from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { GroupMenuType } from '../config/menuType';

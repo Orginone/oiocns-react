@@ -501,6 +501,38 @@ export default class KernelApi {
       params: params,
     });
   }
+
+  /**
+ * 查询字典
+ * @param {model.IdSpaceReq} params 请求参数
+ * @returns {model.ResultType<schema.XDictArray>} 请求结果
+ */
+  public async queryDicts(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.XDictArray>> {
+    return await this.request({
+      module: 'base',
+      action: 'QueryDicts',
+      params: params,
+    });
+  }
+
+  /**
+* 查询字典子项
+* @param {model.IdSpaceReq} params 请求参数
+* @returns {model.ResultType<schema.XDictItemArray>} 请求结果
+*/
+  public async queryDictItems(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XDictItemArray>> {
+    return await this.request({
+      module: 'base',
+      action: 'QueryDictItems',
+      params: params,
+    });
+  }
+
+
   /**
    * 查询分类的业务标准
    * @param {model.IdSpaceReq} params 请求参数

@@ -1,5 +1,8 @@
+
+import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
+  DictModel,
   MethodModel,
   PageRequest,
   SpeciesModel,
@@ -39,6 +42,11 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
+  /**
+* 创建字典
+* @param data 创建参数
+*/
+  createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
   /**
    * 更新标准分类项
    * @param data 创建参数

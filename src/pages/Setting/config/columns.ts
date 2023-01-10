@@ -280,3 +280,36 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
     dataIndex: 'createTime',
   },
 ];
+
+export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 200,
+  },
+  {
+    title: '值',
+    dataIndex: 'value',
+    key: 'value',
+    width: 150,
+  },
+  {
+    title: '创建人',
+    dataIndex: 'createUser',
+    key: 'createUser',
+    width: 150,
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
+    width: 150,
+  },
+
+];

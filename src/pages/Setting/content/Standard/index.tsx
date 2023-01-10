@@ -4,6 +4,7 @@ import { Button, Tabs } from 'antd';
 import React, { useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
+import Dict from '@/pages/Setting/content/Standard/Dict';
 import Method from './Method';
 import Attritube from './Attritube';
 
@@ -19,7 +20,6 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState('');
   const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom
-
   // Tab 改变事件
   const tabChange = (key: string) => {
     setTabKey(key);
@@ -89,8 +89,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     },
     {
       label: `分类字典`,
-      key: '分类字典',
-      children: `Content of Tab Pane 4`,
+      key: '3',
+      children: <Dict current={current} />,
     },
     {
       label: `业务标准`,

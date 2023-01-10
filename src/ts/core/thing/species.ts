@@ -1,6 +1,9 @@
 import { kernel, parseAvatar, schema } from '../../base';
+import { Dict } from '../target/species/dict';
+import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
+  DictModel,
   MethodModel,
   PageRequest,
   SpeciesModel,
@@ -89,6 +92,19 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return;
   }
+
+  async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
+    const res = await kernel.createDict({
+      ...data,
+      id: undefined,
+    });
+    if (res.success) {
+      const newItem = new Dict(res.data);
+      return newItem;
+    }
+    return;
+  }
+
   async update(
     data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>,
   ): Promise<ISpeciesItem> {

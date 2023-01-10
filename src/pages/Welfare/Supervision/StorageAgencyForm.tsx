@@ -25,12 +25,10 @@ const StorageAgencyForm: React.FC = () => {
           onFinish={(formdata) => {
             // TODO 按照业务校验表单
             // TODO 补充社会统一信用代码
-            console.log('formdata', formdata);
             formdata = { ...formdata, ...{ id: generateUuid(), dataStatus: 1 } };
             kernel.anystore
               .insert('we_storageagency', formdata, 'company')
               .then((res) => {
-                console.log('res', res);
                 if (res.success) {
                   // TODO 调用加入集团方法
                   message.success('申请成功！');

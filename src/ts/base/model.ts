@@ -232,7 +232,7 @@ export type ApprovalModel = {
 
 export type DictModel = {
   // 唯一ID
-  id: string;
+  id?: string;
   // 名称
   name: string;
   // 编号

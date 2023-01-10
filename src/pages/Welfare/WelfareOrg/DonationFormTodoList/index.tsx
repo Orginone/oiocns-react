@@ -104,7 +104,6 @@ const DonationTodoList: React.FC<any> = () => {
       },
       'company',
     );
-    console.log(res2);
   };
 
   const approve = async () => {

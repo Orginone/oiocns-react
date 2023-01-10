@@ -294,7 +294,6 @@ const JsonFrom: React.FC<Type> = ({ open, setOpen }) => {
         }}
         grid={layoutType !== 'LightFilter' && layoutType !== 'QueryFilter'}
         onFinish={async (values) => {
-          console.log(values);
           setOpen(false);
         }}
         columns={(layoutType === 'StepsForm' ? [columns] : columns) as any}
