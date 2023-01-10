@@ -47,10 +47,15 @@ export interface ISpeciesItem {
    */
   createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
   /**
-   * 更新分类特性项
+   * 更新字典
    * @param data 创建参数
    */
   updateDict(data: DictModel): Promise<boolean>;
+  /**
+   * 删除字典
+   * @param id 特性项id
+   */
+  deleteDict(id: string): Promise<boolean>;
   /**
    * 更新标准分类项
    * @param data 创建参数

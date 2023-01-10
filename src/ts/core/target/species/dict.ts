@@ -7,10 +7,7 @@ import { INullDict, IDict } from './idict';
 export class Dict implements IDict {
   id: string;
   name: string;
-  // isRoot: boolean;
   target: schema.XDict;
-  // parent: INullDict;
-  // children: IDict[];
   belongInfo: TargetShare;
 
   constructor(target: schema.XDict) {
