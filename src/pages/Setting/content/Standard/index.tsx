@@ -10,6 +10,7 @@ import Attritube from './Attritube';
 import userCtrl from '@/ts/controller/setting';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
+import { ImUndo2 } from 'react-icons/im';
 
 interface IProps {
   target?: ITarget;
@@ -91,14 +92,29 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
         );
       case '业务流程':
         return (
-          <Button
-            key="edit"
-            type="link"
-            onClick={() => {
-              setModalType('新增业务流程');
-            }}>
-            {'新增流程'}
-          </Button>
+          <>
+            {modalType != '新增业务流程' && (
+              <Button
+                key="edit"
+                type="link"
+                onClick={() => {
+                  setModalType('新增业务流程');
+                }}>
+                {'新增流程'}
+              </Button>
+            )}
+            {modalType == '新增业务流程' && (
+              <Button
+                key="back"
+                type="link"
+                icon={<ImUndo2 />}
+                onClick={() => {
+                  setModalType('返回');
+                }}>
+                {'返回'}
+              </Button>
+            )}
+          </>
         );
       default:
         return <></>;
@@ -151,7 +167,14 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     {
       label: `业务流程`,
       key: '业务流程',
-      children: <SettingFlow />,
+      children: (
+        <SettingFlow
+          current={current}
+          target={target}
+          modalType={modalType}
+          setModalType={setModalType}
+        />
+      ),
     },
   ];
 

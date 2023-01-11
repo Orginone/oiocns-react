@@ -13,6 +13,8 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AppBindCard from './bind/card';
 
 interface IProps {
+  modalType: string;
+  setModalType: (modalType: string) => void;
   onDesign: () => void;
   onCurrentChaned: (item?: XFlowDefine) => void;
 }
@@ -21,7 +23,12 @@ interface IProps {
  * 流程设置
  * @returns
  */
-const FlowList: React.FC<IProps> = (props) => {
+const FlowList: React.FC<IProps> = ({
+  modalType,
+  setModalType,
+  onDesign,
+  onCurrentChaned,
+}: IProps) => {
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate('');
   const [freshBinds, setFreshBinds] = useState<boolean>(false);
@@ -32,6 +39,14 @@ const FlowList: React.FC<IProps> = (props) => {
   useEffect(() => {
     loadBangdingCard;
   });
+
+  useEffect(() => {
+    if (modalType.includes('新增业务流程')) {
+      // alert('新增业务流程');
+      onCurrentChaned(undefined);
+      onDesign();
+    }
+  }, [modalType]);
 
   const renderOperation = (record: XFlowDefine): any[] => {
     return [
@@ -47,8 +62,8 @@ const FlowList: React.FC<IProps> = (props) => {
             cancelText: '取消',
             okType: 'danger',
             onOk: () => {
-              props.onCurrentChaned(record);
-              props.onDesign();
+              onCurrentChaned(record);
+              onDesign();
             },
           });
         },

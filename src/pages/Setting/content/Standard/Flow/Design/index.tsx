@@ -5,24 +5,30 @@ import ChartDesign from './Chart';
 import { XFlowDefine } from '@/ts/base/schema';
 import { Button, Card, Layout, Modal, Space, Steps } from 'antd';
 import {
-  RollbackOutlined,
   ExclamationCircleOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
   FileTextOutlined,
-  HighlightOutlined,
+  FormOutlined,
 } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import { FlowNode } from '@/ts/base/model';
 
 interface IProps {
   current?: XFlowDefine;
+  modalType: string;
+  setModalType: (modalType: string) => void;
   onBack: () => void;
 }
 
-const Design: React.FC<IProps> = (props) => {
-  const [scale, setScale] = useState<number>(100);
+const Design: React.FC<IProps> = ({
+  current,
+  modalType,
+  setModalType,
+  onBack,
+}: IProps) => {
+  const [scale, setScale] = useState<number>(90);
   const [currentStep, setCurrentStep] = useState(0);
   const [resource, setResource] = useState({
     nodeId: 'ROOT',
@@ -38,15 +44,33 @@ const Design: React.FC<IProps> = (props) => {
   });
 
   useEffect(() => {
-    if (props.current) {
-      setResource(JSON.parse(props.current.content)['resource']);
+    if (current) {
+      setResource(JSON.parse(current.content)['resource']);
       setConditionData({
-        name: props.current.name || '',
-        remark: props.current.remark,
-        fields: JSON.parse(JSON.parse(props.current.content)['fields']),
+        name: current.name || '',
+        remark: current.remark,
+        fields: JSON.parse(JSON.parse(current.content)['fields']),
       });
     }
-  }, [props.current]);
+  }, [current]);
+
+  useEffect(() => {
+    if (modalType.includes('返回')) {
+      Modal.confirm({
+        title: '未发布的内容将不会被保存，是否直接退出?',
+        icon: <ExclamationCircleOutlined />,
+        okText: '确认',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk() {
+          onBack();
+        },
+        onCancel() {
+          setModalType('新增业务流程');
+        },
+      });
+    }
+  }, [modalType]);
 
   return (
     <div className={cls['company-info-content']}>
@@ -69,24 +93,7 @@ const Design: React.FC<IProps> = (props) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <div>
-                <Button
-                  onClick={() => {
-                    Modal.confirm({
-                      title: '未发布的内容将不会被保存，是否直接退出?',
-                      icon: <ExclamationCircleOutlined />,
-                      okText: '确认',
-                      okType: 'danger',
-                      cancelText: '取消',
-                      onOk() {
-                        props.onBack();
-                      },
-                    });
-                  }}>
-                  <RollbackOutlined />
-                  返回
-                </Button>
-              </div>
+              <div></div>
               <div style={{ width: '300px' }}>
                 <Steps
                   current={currentStep}
@@ -95,17 +102,17 @@ const Design: React.FC<IProps> = (props) => {
                   }}
                   items={[
                     {
-                      title: '字段设计',
+                      title: '流程信息',
                       icon: <FileTextOutlined />,
                     },
                     {
                       title: '流程图设计',
-                      icon: <HighlightOutlined />,
+                      icon: <FormOutlined />,
                     },
                   ]}></Steps>
               </div>
               <div className={cls['publish']}>
-                {
+                {currentStep == 1 && (
                   <Space>
                     <Button
                       className={cls['publis-issue']}
@@ -114,7 +121,7 @@ const Design: React.FC<IProps> = (props) => {
                       onClick={async () => {
                         if (
                           await userCtrl.space.publishDefine({
-                            id: props.current?.id,
+                            id: current?.id,
                             code: conditionData.name,
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
@@ -122,7 +129,7 @@ const Design: React.FC<IProps> = (props) => {
                             resource: resource as FlowNode,
                           })
                         ) {
-                          props.onBack();
+                          onBack();
                         }
                       }}>
                       <SendOutlined />
@@ -143,7 +150,7 @@ const Design: React.FC<IProps> = (props) => {
                       <PlusOutlined />
                     </Button>
                   </Space>
-                }
+                )}
               </div>
             </div>
           </Layout.Header>

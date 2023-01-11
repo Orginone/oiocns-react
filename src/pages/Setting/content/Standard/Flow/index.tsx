@@ -2,24 +2,43 @@ import Design from './Design';
 import React, { useState } from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import FlowList from './info';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 
 /**
  * 流程设置
  * @returns
  */
-const SettingFlow: React.FC = () => {
-  const [tabKey, SetTabKey] = useState(0);
-  const [current, setCurrent] = useState<XFlowDefine>();
 
+interface IProps {
+  target?: ITarget;
+  current: ISpeciesItem;
+  modalType: string;
+  setModalType: (modalType: string) => void;
+}
+const SettingFlow: React.FC<IProps> = ({
+  current,
+  target,
+  modalType,
+  setModalType,
+}: IProps) => {
+  const [tabKey, SetTabKey] = useState(0);
+  const [flowDesign, setFlowDesign] = useState<XFlowDefine>();
   return tabKey === 0 ? (
     <FlowList
       onCurrentChaned={(item) => {
-        setCurrent(item);
+        setFlowDesign(item);
       }}
       onDesign={() => SetTabKey(1)}
+      modalType={modalType}
+      setModalType={setModalType}
     />
   ) : (
-    <Design current={current} onBack={() => SetTabKey(0)} />
+    <Design
+      current={flowDesign}
+      onBack={() => SetTabKey(0)}
+      modalType={modalType}
+      setModalType={setModalType}
+    />
   );
 };
 

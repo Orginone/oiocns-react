@@ -1,17 +1,7 @@
 import { Form } from 'antd';
 import cls from './index.module.less';
 import React, { useEffect } from 'react';
-import { CloseCircleOutlined } from '@ant-design/icons';
-import { dataType } from '../Chart/FlowDrawer/processType';
-import {
-  ProFormText,
-  ProForm,
-  ProFormGroup,
-  ProFormList,
-  ProFormSelect,
-  ProFormDependency,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ProFormText, ProForm, ProFormTextArea } from '@ant-design/pro-components';
 
 interface IProps {
   currentFormValue: {};
@@ -51,7 +41,7 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
           placeholder="输入备注信息"
           // rules={[{ required: true, message: '请输入备注信息!' }]}
         />
-        <ProFormList
+        {/* <ProFormList
           name="fields"
           label="流程字段"
           initialValue={[{ label: '' }]}
@@ -121,7 +111,7 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
               );
             }}
           </ProFormDependency>
-        </ProFormList>
+        </ProFormList> */}
       </ProForm>
     </div>
   );
