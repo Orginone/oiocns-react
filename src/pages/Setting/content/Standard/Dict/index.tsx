@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Dropdown, Menu, message } from 'antd';
+import { Button, Card, Dropdown, message } from 'antd';
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import CardOrTable from '@/components/CardOrTableComp';
 import { DictItemColumns } from '@/pages/Setting/config/columns';
@@ -13,16 +13,25 @@ import DictModel from './dictModal';
 import DictItemModel from './dictItemModal';
 import { ImBin, ImPencil, ImPlus } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
+import CustomTreeComp from '@/components/CustomTreeComp';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
+  modalType: string;
+  setModalType: (modalType: string) => void;
 }
 /**
  * @description: 分类字典管理
  * @return {*}
  */
-const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
+const DictInfo: React.FC<IProps> = ({
+  current,
+  target,
+  modalType,
+  setModalType,
+}: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
+  const [selectKey, setSelectKey] = useState<string>();
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
   const [openDictItemModal, setOpenDictItemModal] = useState<boolean>(false);
   const [editData, setEditData] = useState<XDict>();
@@ -41,18 +50,38 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
       })
       .then((res) => {
         if (res.success) {
-          let records: XDict[] | undefined = res.data.result;
-          let menus = records?.map((item: XDict) => {
-            return {
-              label: renderLabel(item),
-              key: item.code,
-              data: item,
-            };
-          });
-          setDicts(menus as any[]);
+          let records: XDict[] = (res.data.result as XDict[]) || [];
+          setDicts(buildTree(records));
+          setSelectKey(dicts[0]?.key);
         }
       });
   }, [current, dictKey]);
+
+  useEffect(() => {
+    if (modalType.includes('新增字典')) {
+      if (currentDict) {
+        setEditItemData(undefined);
+        setOpenDictItemModal(true);
+      } else {
+        message.warn('请先选择 左侧分类字典');
+        setModalType('');
+      }
+    }
+  }, [modalType, currentDict]);
+
+  const buildTree = (dicts: XDict[]) => {
+    const result: any[] = [];
+    for (const item of dicts) {
+      result.push({
+        key: item.id,
+        item: item,
+        isLeaf: true,
+        title: renderLabel(item),
+        icon: <></>,
+      });
+    }
+    return result;
+  };
 
   /** 渲染标题,支持更多操作 */
   const renderLabel = (item: XDict) => {
@@ -96,10 +125,13 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
                     break;
                   case '删除':
                     current.deleteDict(item.id).then((success) => {
-                      setCurrentDict(new Dict(dicts[0].data));
+                      setSelectKey(dicts[0]?.key);
                       setItemKey(getUuid);
                       forceUpdate();
                       success ? message.success('删除成功') : message.error('删除失败');
+                      if (dicts[0]) {
+                        setCurrentDict(new Dict(dicts[0].data));
+                      }
                     });
                     break;
                 }
@@ -140,26 +172,37 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
   return (
     <div style={{ display: 'flex', height: '75vh' }}>
       <div style={{ width: '15vw', height: '75vh', margin: '5px' }}>
-        <Button
-          type="link"
-          size="small"
-          icon={<PlusOutlined />}
-          style={{ width: '100%' }}
-          onClick={() => {
-            setEditData(undefined);
-            setOpenDictModal(true);
-          }}>
-          新增
-        </Button>
-        <Menu
+        <CustomTreeComp
           key={dictKey}
-          mode="inline"
-          items={dicts}
-          style={{ width: '100%', height: '75vh', overflow: 'auto' }}
+          title={
+            <div style={{ display: 'flex' }}>
+              {'分类字典'}
+              <Button
+                type="link"
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditData(undefined);
+                  setOpenDictModal(true);
+                }}>
+                新增
+              </Button>
+            </div>
+          }
+          isDirectoryTree
+          menu={'menus'}
+          searchable
+          showIcon
+          treeData={dicts}
+          selectedKeys={[selectKey]}
+          onSelect={async (_: any, info: any) => {
+            setSelectKey(info.node.key);
+          }}
+          handleMenuClick={(id, node) => {}}
         />
       </div>
       <div style={{ width: '85vw' }}>
-        <Card bordered={false} style={{ padding: '10px' }}>
+        <Card bordered={false} style={{ paddingLeft: '10px' }}>
           <CardOrTable<XDictItem>
             key={itemKey}
             rowKey={'id'}
@@ -200,21 +243,25 @@ const DictInfo: React.FC<IProps> = ({ current, target }: IProps) => {
         }}
         current={current}
       />
-      <DictItemModel
-        data={editItemData}
-        open={openDictItemModal}
-        handleCancel={function (): void {
-          setOpenDictItemModal(false);
-        }}
-        handleOk={function (res: any): void {
-          if (res) {
-            setItemKey(getUuid());
-            message.success(`操作成功`);
-          }
-          setOpenDictItemModal(false);
-        }}
-        current={currentDict}
-      />
+      {currentDict && (
+        <DictItemModel
+          data={editItemData}
+          open={openDictItemModal}
+          handleCancel={function (): void {
+            setModalType('');
+            setOpenDictItemModal(false);
+          }}
+          handleOk={function (res: any): void {
+            if (res) {
+              setItemKey(getUuid());
+              message.success(`操作成功`);
+            }
+            setModalType('');
+            setOpenDictItemModal(false);
+          }}
+          current={currentDict}
+        />
+      )}
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { DictItemModel } from '@/ts/base/model';
 import { IDict } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import { XDictItem } from '@/ts/base/schema';
+import { message } from 'antd';
 
 interface Iprops {
   open: boolean;
@@ -19,7 +20,11 @@ interface Iprops {
 */
 const DictItemModal = (props: Iprops) => {
   const { open, handleOk, current, data, handleCancel } = props;
-  let title: string = data ? '修改字典项' : '新增字典项目';
+  if (!current) {
+    message.warn('请先选择代码字典');
+  }
+
+  let title: string = data ? '修改字典项' : '新增字典项';
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<DictItemModel>[] = [
     {

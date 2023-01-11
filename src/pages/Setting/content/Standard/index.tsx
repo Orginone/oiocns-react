@@ -48,9 +48,9 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             key="edit"
             type="link"
             onClick={() => {
-              setModalType('新增字典');
+              setModalType('新增字典项');
             }}>
-            {'新增字典'}
+            {'新增字典项'}
           </Button>
         );
       case '业务标准':
@@ -89,8 +89,15 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     },
     {
       label: `分类字典`,
-      key: '3',
-      children: <Dict current={current} />,
+      key: '分类字典',
+      children: (
+        <Dict
+          current={current}
+          target={target}
+          modalType={modalType}
+          setModalType={setModalType}
+        />
+      ),
     },
     {
       label: `业务标准`,
