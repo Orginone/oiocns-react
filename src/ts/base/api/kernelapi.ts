@@ -293,7 +293,7 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XOperation>} 请求结果
    */
   public async createOperationItem(
-    params: model.OperationModel,
+    params: model.OperationItemModel,
   ): Promise<model.ResultType<schema.XOperationItem>> {
     return await this.request({
       module: 'thing',
