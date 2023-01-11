@@ -113,9 +113,9 @@ const StoreApp: React.FC = () => {
     ];
   };
 
-  const handleSelectClassify = (appids: string[]) => {
-    setAppShowIdlimit([...appids]);
-  };
+  // const handleSelectClassify = (appids: string[]) => {
+  //   setAppShowIdlimit([...appids]);
+  // };
   const showData = useMemo(() => {
     if (appShowIdlimit.length > 0) {
       return appCtrl.products.filter((app) => {
@@ -218,6 +218,7 @@ const StoreApp: React.FC = () => {
       // setShowShareModal(false);
     }
   };
+
   return (
     <>
       {AppIndex}
@@ -238,6 +239,16 @@ const StoreApp: React.FC = () => {
           }}
         />
       </Modal>
+      {/* <Modal
+        title="创建应用"
+        width={670}
+        destroyOnClose={true}
+        open={showChooseCreateWayModal}
+        bodyStyle={{ padding: 0 }}
+        footer={[]}
+        onCancel={() => {
+          setShowChooseCreateWayModal(false);
+        }}></Modal> */}
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/manage" render={() => <Manage />}></Route>

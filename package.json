@@ -10,7 +10,7 @@
   "scripts": {
     "serve": "npm run dev",
     "dev": "vite --mode development",
-    "build": "vite build",
+    "build": "node --max_old_space_size=1024000 ./node_modules/vite/bin/vite.js build",
     "build:beta": "vite build --mode beta",
     "build:release": "vite build --mode release",
     "build:legacy": "vite build --mode legacy ",

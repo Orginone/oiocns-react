@@ -1,4 +1,4 @@
-import { INullDict } from '../target/species/idict';
+import { IDict, INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   DictModel,
@@ -34,6 +34,8 @@ export interface ISpeciesItem {
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
+  /** 加载分类字典 */
+  loadDicts(spaceId: string, page: PageRequest): Promise<IDict[]>;
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /**
