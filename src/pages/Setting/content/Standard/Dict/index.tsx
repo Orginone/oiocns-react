@@ -102,11 +102,6 @@ const DictInfo: React.FC<IProps> = ({
                   icon: <ImPencil></ImPencil>,
                 },
                 {
-                  label: '新增子项',
-                  key: `新增子项`,
-                  icon: <ImPlus></ImPlus>,
-                },
-                {
                   label: <span style={{ color: 'red' }}>删除</span>,
                   key: `删除`,
                   icon: <ImBin></ImBin>,
@@ -117,11 +112,6 @@ const DictInfo: React.FC<IProps> = ({
                   case '编辑':
                     setEditData(item);
                     setOpenDictModal(true);
-                    break;
-                  case '新增子项':
-                    setEditItemData(undefined);
-                    setCurrentDict(new Dict(item));
-                    setOpenDictItemModal(true);
                     break;
                   case '删除':
                     current.deleteDict(item.id).then((success) => {
