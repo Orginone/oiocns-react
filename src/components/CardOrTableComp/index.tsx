@@ -16,9 +16,6 @@ interface PageType<T> {
   showChangeBtn?: boolean; //是否展示 图列切换按钮
   hideOperation?: boolean; //是否展示 默认操作区域
   columns?: ProColumns<any>[]; //表格头部数组
-  total?: number; // 总条数 总数量
-  page?: number; // 当前页
-  pageSize?: number;
   height?: number; //表格高度
   width?: number; //表格高度
   stripe?: boolean; // 斑马纹
@@ -43,16 +40,13 @@ interface PageType<T> {
 }
 
 const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
-  defaultPageType,
+  defaultPageType = 'table',
   showChangeBtn = true,
   dataSource = [],
   columns = [],
   rowKey,
   hideOperation = false,
   operation,
-  total,
-  page,
-  pageSize,
   height,
   width,
   parentRef,
@@ -64,7 +58,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   request,
   ...rest
 }) => {
-  const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
+  const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
   // 监听父级高度
   useEffect(() => {
@@ -128,10 +122,8 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           defaultPageSize: 10,
           size: 'default',
           showSizeChanger: true,
-          defaultCurrent: page,
-          onChange: (current) => {
-            // console.log(current);
-          },
+          defaultCurrent: 1,
+          onChange: (_) => {},
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
@@ -165,8 +157,11 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               pageSize * pageIndex,
             );
             return {
-              data: dataSource.length > 0 ? [...currentData] : [],
-              total: total ?? dataSource.length,
+              data:
+                dataSource.length > 0
+                  ? dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex)
+                  : [],
+              total: dataSource.length,
               success: true,
             };
           }
@@ -186,37 +181,24 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           ) : (
             <>
               {toolbar}
-              {dataSource.length !== 0 ||
-              (props.action.dataSource && props.action.dataSource.length !== 0) ? (
-                <>
-                  <div
-                    className={cls['common-card']}
-                    style={{
-                      height:
-                        defaultHeight !== 'auto'
-                          ? defaultHeight + 40 + 'px'
-                          : defaultHeight,
-                    }}>
-                    {renderCardContent ? (
-                      renderCardContent(
-                        dataSource.length !== 0 ? dataSource : props.action.dataSource,
-                      )
-                    ) : (
-                      <Result subTitle="暂无卡片配置" />
-                    )}
-                  </div>
-
-                  <div style={{ height: 64 }}></div>
-                  {TableFooter}
-
-                  <Pagination
-                    {...props.pagination}
-                    style={{ float: 'right', marginTop: -28 }}
-                  />
-                </>
-              ) : (
-                <Empty />
-              )}
+              <div
+                className={cls['common-card']}
+                style={{
+                  height:
+                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
+                }}>
+                {renderCardContent ? (
+                  renderCardContent(props.action.dataSource)
+                ) : (
+                  <Result subTitle="暂无卡片配置"></Result>
+                )}
+              </div>
+              <div style={{ height: 64 }}></div>
+              {TableFooter}
+              <Pagination
+                {...props.pagination}
+                style={{ float: 'right', marginTop: -28 }}
+              />
             </>
           );
         }}

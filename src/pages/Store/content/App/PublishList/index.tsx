@@ -111,7 +111,6 @@ const PublishComp: React.FC<indexType> = () => {
         <CardOrTable
           dataSource={dataSource}
           rowKey={(record, index) => (record && record?.merchandise?.id) || index}
-          total={10}
           stripe
           operation={renderOperation}
           columns={columns}

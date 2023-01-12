@@ -4,11 +4,12 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { IProduct } from '@/ts/core';
+import useCtrl from '@/ts/controller/setting';
 interface AppShowCompType {
   tkey?: string;
-  list: any[];
+  list: IProduct[];
   queryFun?: Function;
-  searchParams?: any | { status: ststusTypes };
+  searchParams?: { status: string };
   columns: ProColumns<any>[];
   toolBarRender?: () => React.ReactNode;
   renderOperation?: any; //渲染操作按钮
@@ -16,7 +17,6 @@ interface AppShowCompType {
   style?: React.CSSProperties;
   [key: string]: any;
 }
-type ststusTypes = '全部' | '创建的' | '购买的' | '共享的' | '分配的';
 
 const AppShowComp: React.FC<AppShowCompType> = ({
   tkey,
@@ -30,43 +30,34 @@ const AppShowComp: React.FC<AppShowCompType> = ({
   style,
   ...rest
 }) => {
-  const [page, setPage] = useState<number>(1);
-  const [pagekey, setPagekey] = useState<number>(1);
-  const [total, setTotal] = useState<number>(0);
-  // const [dataSource, setSataSource] = useState<any[]>([]);
   const parentRef = useRef<any>(null); //父级容器Dom
+  const [data, setData] = useState<IProduct[]>([]);
   useEffect(() => {
-    // setSataSource([...list.map((v) => v.prod)]);
-    setTotal(list.length);
-    setPagekey(pagekey + 1);
-  }, [list]);
-
-  // useEffect(() => {
-  //   if (!list?.length) {
-  //     return;
-  //   }
-  // 根据权限 判断 应用来源
-  //   if (!searchParams || searchParams.status === '全部') {
-  //     setTotal(list.length);
-  //     setSataSource([...list]);
-  //   } else {
-  //     const result = list.filter((item) => {
-  //       return item?.source === searchParams.status;
-  //     });
-  //     setTotal(result.length);
-  //     setSataSource([...result]);
-  //   }
-  // }, [searchParams, list]);
-
-  /**
-   * handlePageChage
-   */
-  const handlePageChange = (page: number, pageSize: number) => {
-    setPage(page);
-    console.log('切换页码', page, pageSize);
-
-    // queryFun && queryFun({ page, pageSize });
-  };
+    switch (searchParams?.status) {
+      case '创建的':
+        setData(
+          list.filter(
+            (a) => a.prod.source == '创建的' && a.prod.belongId == useCtrl.space.id,
+          ),
+        );
+        break;
+      case '购买的':
+        setData(
+          list.filter(
+            (a) => a.prod.source == '购买的' && a.prod.belongId == useCtrl.space.id,
+          ),
+        );
+        break;
+      case '共享的':
+        setData(list.filter((a) => a.prod.belongId != useCtrl.space.id));
+        break;
+      case '可用的':
+        break;
+      default:
+        setData(list);
+        break;
+    }
+  }, [list, searchParams]);
 
   // 卡片内容渲染函数
   const renderCardFun = (dataArr: IProduct[]): React.ReactNode[] => {
@@ -89,19 +80,19 @@ const AppShowComp: React.FC<AppShowCompType> = ({
     });
   };
   return (
-    <div className={cls['app-wrap']} ref={parentRef} style={style} key={pagekey}>
+    <div
+      className={cls['app-wrap']}
+      ref={parentRef}
+      style={style}
+      key={searchParams?.status + '12'}>
       <CardOrTable<IProduct>
-        dataSource={list}
-        total={total}
-        page={page}
-        // pageSize={2}
+        dataSource={data}
         stripe
         headerTitle={headerTitle}
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
         columns={columns}
-        onChange={handlePageChange}
         rowKey={(record: any) => record?.prod?.id}
         toolBarRender={toolBarRender}
         {...rest}

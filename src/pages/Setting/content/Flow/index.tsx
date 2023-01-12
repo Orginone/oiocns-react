@@ -269,7 +269,6 @@ const SettingFlow: React.FC = () => {
               <CardOrTable<XFlowDefine>
                 params={{ id: allData.length }}
                 dataSource={showDataSource}
-                total={allData.length}
                 rowClassName={(recorId: any) => {
                   return recorId.id === rowId ? cls.rowClass : '';
                 }}

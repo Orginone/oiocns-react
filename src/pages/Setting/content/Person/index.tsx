@@ -12,6 +12,9 @@ import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
+import { common } from 'typings/common';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * 个人信息
@@ -20,6 +23,7 @@ import PageCard from '@/components/PageCard';
 const PersonSetting: React.FC = () => {
   const history = useHistory();
   const parentRef = useRef<any>(null);
+  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [tabKey, setTabKey] = useState<string>('friends');
   const [modalType, setModalType] = useState('');
   const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
@@ -86,7 +90,24 @@ const PersonSetting: React.FC = () => {
       </Card>
     </div>
   );
-  //
+  // 操作内容渲染函数
+  const renderOperation = (item: schema.XTarget): common.OperationType[] => {
+    return [
+      {
+        key: 'remove',
+        label: tabKey === 'companys' ? '退出' : '移除',
+        onClick: async () => {
+          if (tabKey === 'companys') {
+            await userCtrl.user.quitCompany(item.id);
+          } else {
+            await userCtrl.user.removeMember(item);
+          }
+          forceUpdate();
+        },
+      },
+    ];
+  };
+
   // TODO 1、个人空间显示加入的公司；2、单位空间显示所在的部门、工作组、岗位
   return (
     <div className={cls['person-info-container']}>
@@ -111,12 +132,12 @@ const PersonSetting: React.FC = () => {
           }>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<schema.XTarget>
+              key={key}
               dataSource={[]}
-              pageSize={10}
               showChangeBtn={false}
-              hideOperation={true}
               parentRef={parentRef}
               params={tabKey}
+              operation={renderOperation}
               request={async (page) => {
                 if (tabKey === 'companys') {
                   const targets = userCtrl.user.joinedCompany?.map((i) => i.target);
