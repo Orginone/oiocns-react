@@ -16,7 +16,7 @@ interface Iprops {
   targetId?: string;
 }
 /*
-  分类编辑模态框
+  字典子项编辑模态框
 */
 const DictItemModal = (props: Iprops) => {
   const { open, handleOk, current, data, handleCancel } = props;

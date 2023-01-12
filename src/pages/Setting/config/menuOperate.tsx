@@ -217,6 +217,11 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
       icon: <im.ImPlus />,
       label: '新增分类',
     },
+    {
+      key: '转为字典',
+      icon: <im.ImBoxAdd />,
+      label: '转为字典',
+    },
   ];
   if (item.target.belongId) {
     items.push(

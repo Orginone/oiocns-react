@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, message } from 'antd';
+import { Button, Card, message, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import CardOrTable from '@/components/CardOrTableComp';
 import { DictItemColumns } from '@/pages/Setting/config/columns';
@@ -10,6 +10,8 @@ import DictModel from './dictModal';
 import DictItemModel from './dictItemModal';
 import { getUuid } from '@/utils/tools';
 import CustomTreeComp from '@/components/CustomTreeComp';
+import TransToDict from '@/pages/Setting/content/Standard/Dict/transToDict';
+import TransToSpecies from '@/pages/Setting/content/Standard/Dict/transToSpecies';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
@@ -32,6 +34,8 @@ const DictInfo: React.FC<IProps> = ({
 }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
+  const [openTransToDictModal, setOpenTransToDictModal] = useState<boolean>(false);
+  const [openTransToSpeciesModal, setOpenTransToSpeciesModal] = useState<boolean>(false);
   const [openDictItemModal, setOpenDictItemModal] = useState<boolean>(false);
   const [editData, setEditData] = useState<XDict>();
   const [editItemData, setEditItemData] = useState<XDictItem>();
@@ -105,10 +109,18 @@ const DictInfo: React.FC<IProps> = ({
                 }}>
                 新增
               </Button>
+              <Button
+                type="link"
+                size="small"
+                onClick={() => {
+                  setOpenTransToDictModal(true);
+                }}>
+                从分类生成
+              </Button>
             </div>
           }
           isDirectoryTree
-          menu={['编辑', '删除']}
+          menu={['编辑', '删除', '转为分类']}
           searchable
           showIcon
           treeData={dicts}
@@ -134,6 +146,10 @@ const DictInfo: React.FC<IProps> = ({
                     setCurrentDict(dicts[0].item);
                   }
                 });
+                break;
+              case '转为分类':
+                setCurrentDict(node.item);
+                setOpenTransToSpeciesModal(true);
                 break;
               default:
                 break;
@@ -182,6 +198,17 @@ const DictInfo: React.FC<IProps> = ({
         }}
         current={current}
       />
+      <TransToDict
+        open={openTransToDictModal}
+        setOpen={setOpenTransToDictModal}
+        currentSpeciesItem={current}></TransToDict>
+      {currentDict && (
+        <TransToSpecies
+          open={openTransToSpeciesModal}
+          setOpen={setOpenTransToSpeciesModal}
+          dict={currentDict}
+          currentSpeciesItem={current}></TransToSpecies>
+      )}
       {currentDict && (
         <DictItemModel
           data={editItemData}
