@@ -59,7 +59,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
       <div onClick={addApprovalNode}>
         <HighlightOutlined
           style={{
-            color: 'rgb(255, 148, 62)',
+            color: 'rgb(50, 150, 250)',
             fontSize: '20px',
             position: 'absolute',
             top: '18px',
@@ -71,7 +71,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
       <div onClick={addCcNode}>
         <SendOutlined
           style={{
-            color: 'rgb(50, 150, 250)',
+            color: 'rgb(255, 148, 62)',
             fontSize: '20px',
             position: 'absolute',
             top: '18px',

@@ -1,16 +1,14 @@
-import { Card, Button, Modal, message, Typography, Space } from 'antd';
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Card, Modal, message } from 'antd';
+import React, { useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine, XFlowRelation } from '@/ts/base/schema';
+import { XFlowDefine } from '@/ts/base/schema';
 import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
-import BindModal from './bind/modal';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import AppBindCard from './bind/card';
 
 interface IProps {
   modalType: string;
@@ -31,14 +29,6 @@ const FlowList: React.FC<IProps> = ({
 }: IProps) => {
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate('');
-  const [freshBinds, setFreshBinds] = useState<boolean>(false);
-  const [current, setCurrent] = useState<XFlowDefine>();
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
-  const [binds, setBinds] = useState<XFlowRelation[]>([]);
-
-  useEffect(() => {
-    loadBangdingCard;
-  });
 
   useEffect(() => {
     if (modalType.includes('新增业务流程')) {
@@ -54,7 +44,6 @@ const FlowList: React.FC<IProps> = ({
         key: 'editor',
         label: '编辑',
         onClick: () => {
-          setCurrent(record);
           Modal.confirm({
             title: '与该流程相关的未完成待办将会重置，是否确定编辑?',
             icon: <ExclamationCircleOutlined />,
@@ -81,12 +70,6 @@ const FlowList: React.FC<IProps> = ({
       },
     ];
   };
-
-  const loadBangdingCard = useMemo(async () => {
-    let data = await userCtrl.space.queryFlowRelation(false);
-    setBinds(data.filter((a) => a.defineId == current?.id));
-    setFreshBinds(false);
-  }, [current, freshBinds == true]);
 
   return (
     <div className={cls['company-top-content']}>
@@ -115,9 +98,7 @@ const FlowList: React.FC<IProps> = ({
               }}
               onRow={(record: any) => {
                 return {
-                  onClick: () => {
-                    setCurrent(record);
-                  },
+                  onClick: () => {},
                 };
               }}
               renderCardContent={(items) => {
@@ -133,81 +114,7 @@ const FlowList: React.FC<IProps> = ({
             />
           </div>
         </Card>
-        {current && (
-          <Card
-            style={{ marginTop: '10px' }}
-            bordered={false}
-            extra={
-              <Button
-                key="button"
-                type="link"
-                onClick={() => {
-                  setIsOpenModal(true);
-                }}>
-                新建业务绑定
-              </Button>
-            }
-            title={<Typography.Title level={5}>{current.name}</Typography.Title>}>
-            <Card bordered={false} bodyStyle={{ padding: 0 }}>
-              <Space className={cls.appwrap} size={20}>
-                {binds.length > 0 ? (
-                  binds.map((a) => {
-                    return (
-                      <AppBindCard
-                        key={a.id}
-                        current={a}
-                        onClick={async (item) => {
-                          if (
-                            await userCtrl.space.unbindingFlowRelation({
-                              defineId: item.defineId,
-                              productId: item.productId,
-                              functionCode: item.functionCode,
-                              spaceId: userCtrl.space.id,
-                            })
-                          ) {
-                            setFreshBinds(true);
-                          }
-                        }}
-                      />
-                    );
-                  })
-                ) : (
-                  <></>
-                )}
-              </Space>
-            </Card>
-          </Card>
-        )}
-      </div>{' '}
-      {current && (
-        <BindModal
-          isOpen={isOpenModal}
-          current={current}
-          onOk={async (relations) => {
-            let successCount = 0;
-            for (const relation of relations) {
-              if (
-                await userCtrl.space.bindingFlowRelation({
-                  defineId: current.id,
-                  productId: relation.productId,
-                  functionCode: relation.functionCode,
-                  spaceId: userCtrl.space.id,
-                })
-              ) {
-                successCount += 1;
-              }
-            }
-            if (successCount > 0) {
-              message.success('绑定' + successCount + '项业务成功');
-              setFreshBinds(true);
-            }
-            setIsOpenModal(false);
-          }}
-          onCancel={() => {
-            setIsOpenModal(false);
-          }}
-        />
-      )}
+      </div>
     </div>
   );
 };

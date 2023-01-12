@@ -38,7 +38,7 @@ const BindModal: React.FC<IProps> = ({ current, isOpen, onOk, onCancel }) => {
 
   const initData = async () => {
     const prods = appCtrl.products
-      .filter((a) => a.prod.resource?.find((q) => q.flows?.length > 0))
+      // .filter((a) => a.prod.resource?.find((q) => q.flows?.length > 0))
       .map((a) => {
         return {
           value: a.prod.id,
