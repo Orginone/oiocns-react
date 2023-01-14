@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { INullSpeciesItem, ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
 import { XOperation } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
-import thingCtrl from '@/ts/controller/thing';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel from '../../../components/operationModal';
@@ -66,29 +65,10 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
     ];
   };
 
-  const findSpecesName = (species: INullSpeciesItem, id: string) => {
-    if (species) {
-      if (species.id == id) {
-        return species.name;
-      }
-      for (const item of species.children) {
-        if (findSpecesName(item, id) != id) {
-          return item.name;
-        }
-      }
-    }
-    return id;
+  const loadOperations = async (page: PageRequest) => {
+    return await current!.loadOperations(userCtrl.space.id, page);
   };
 
-  const loadOperations = async (page: PageRequest) => {
-    const res = await current!.loadOperations(userCtrl.space.id, page);
-    if (res && res.result) {
-      for (const item of res.result) {
-        item.speciesId = findSpecesName(thingCtrl.teamSpecies, item.speciesId);
-      }
-    }
-    return res;
-  };
   return (
     <>
       <CardOrTable<XOperation>

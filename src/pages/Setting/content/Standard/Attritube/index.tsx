@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { INullSpeciesItem, ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
-import thingCtrl from '@/ts/controller/thing';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AttributeModal from '../../../components/attributeModal';
@@ -45,29 +44,8 @@ const Attritube = ({ current, target, modalType, setModalType }: IProps) => {
     ];
   };
 
-  const findSpecesName = (species: INullSpeciesItem, id: string) => {
-    if (species) {
-      if (species.id == id) {
-        return species.name;
-      }
-      for (const item of species.children) {
-        if (findSpecesName(item, id) != id) {
-          return item.name;
-        }
-      }
-    }
-    return id;
-  };
-
   const loadAttrs = async (page: PageRequest) => {
-    const res = await current!.loadAttrs(userCtrl.space.id, page);
-    console.log(res);
-    if (res && res.result) {
-      for (const item of res.result) {
-        item.speciesId = findSpecesName(thingCtrl.teamSpecies, item.speciesId);
-      }
-    }
-    return res;
+    return await current!.loadAttrs(userCtrl.space.id, page);
   };
   return (
     <>
