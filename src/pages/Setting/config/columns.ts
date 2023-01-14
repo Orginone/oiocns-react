@@ -1,7 +1,8 @@
 import { schema } from '@/ts/base';
-import { IProduct } from '@/ts/core';
+import { INullSpeciesItem, IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import userCtrl from '@/ts/controller/setting';
+import thingCtrl from '@/ts/controller/thing';
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -192,6 +193,9 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
+    render: (_, record) => {
+      return findSpecesName([thingCtrl.teamSpecies], record.speciesId);
+    },
   },
   {
     title: '共享组织',
@@ -212,6 +216,21 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'remark',
   },
 ];
+
+export const findSpecesName = (
+  species: INullSpeciesItem[],
+  id: string,
+): string | undefined => {
+  let specesName = undefined;
+  for (const item of species) {
+    if (item?.id == id) {
+      specesName = item.name;
+    } else if (item?.children) {
+      specesName = findSpecesName(item?.children, id);
+    }
+  }
+  return specesName;
+};
 
 export const OperationColumns: ProColumns<schema.XOperation>[] = [
   {
@@ -236,6 +255,9 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
+    render: (_, record) => {
+      return findSpecesName([thingCtrl.teamSpecies], record.speciesId);
+    },
   },
   {
     title: '共享组织',

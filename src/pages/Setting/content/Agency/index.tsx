@@ -168,7 +168,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       {/* 添加成员*/}
       <Modal
         title="添加成员"
-        width={1024}
+        width={600}
         destroyOnClose
         open={activeModal === 'addOne'}
         onCancel={() => setActiveModal('')}
