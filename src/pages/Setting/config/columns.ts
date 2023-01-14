@@ -279,6 +279,25 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
   // },
 ];
 
+export const OperationItemColumns: ProColumns<schema.XOperationItem>[] = [
+  { title: '字段名称', dataIndex: 'name', key: 'name', width: 140 },
+  { title: '字段编码', dataIndex: 'code', key: 'code', width: 160 },
+  { title: '字段类型', dataIndex: 'remark', key: 'remark', width: 120 },
+  {
+    title: '共享组织',
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
+  },
+  { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
+];
+
 export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   {
     title: '序号',

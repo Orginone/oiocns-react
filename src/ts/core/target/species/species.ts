@@ -1,4 +1,3 @@
-import { XDict } from '@/ts/base/schema';
 import { kernel, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
@@ -9,7 +8,7 @@ import {
   TargetShare,
 } from '../../../base/model';
 import { Dict } from './dict';
-import { IDict, INullDict } from './idict';
+import { INullDict } from './idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -49,21 +48,17 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadDicts(spaceId: string, page: PageRequest): Promise<IDict[]> {
+  async loadDicts(id: string, page: PageRequest): Promise<schema.XDictArray> {
     const res = await kernel.querySpeciesDict({
       id: this.id,
-      spaceId: spaceId,
+      spaceId: id,
       page: {
         offset: page.offset,
         limit: page.limit,
         filter: '',
       },
     });
-    return (
-      res.data.result?.map((item: XDict) => {
-        return new Dict(item);
-      }) || []
-    );
+    return res.data;
   }
 
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
@@ -200,12 +195,10 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  async updateOperation(
-    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
+  async updateOperation(data: OperationModel): Promise<boolean> {
     const res = await kernel.updateOperation({
       ...data,
-      speciesId: this.target.id,
+      speciesId: data.speciesId || this.target.id,
     });
     return res.success;
   }
