@@ -49,6 +49,19 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
+  async loadDicts(id: string, page: PageRequest): Promise<schema.XDictArray> {
+    const res = await kernel.querySpeciesDict({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
     const res = await kernel.querySpeciesOperation({
       id: this.id,

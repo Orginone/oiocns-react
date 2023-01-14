@@ -147,7 +147,8 @@ const FormDesignModal = (props: FormDesignModalProps) => {
       belongId: data?.belongId as string,
       speciesId: data.speciesId,
     };
-    // 修改
+    console.log('speciesId', body.speciesId);
+    // // 修改
     const result = await current.updateOperation(body);
     handleOk(result);
   };
