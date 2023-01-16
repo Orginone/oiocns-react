@@ -76,7 +76,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
     selectRow = record;
   };
 
-  const expandedRowRender = () => {
+  const expandedRowRender = (record: XOperation) => {
     return (
       <ProTable
         columns={OperationItemColumns}
@@ -86,7 +86,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         pagination={false}
         request={async () => {
           const res = await kernel.queryOperationItems({
-            id: selectRow?.id,
+            id: record.id || selectRow?.id,
             spaceId: userCtrl.space.id,
             page: { offset: 0, limit: 100000, filter: '' },
           });
