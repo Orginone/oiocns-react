@@ -812,6 +812,12 @@ export type CreateDefineReq = {
   belongId: string;
   // 流程字段json
   fields?: string;
+  //分类id
+  speciesId?: string;
+  // 职权ID
+  authId?: string;
+  //是否公开
+  public?: boolean;
 };
 
 export type FlowNode = {

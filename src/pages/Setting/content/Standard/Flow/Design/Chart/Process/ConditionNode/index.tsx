@@ -3,6 +3,8 @@ import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import { FieldCondition } from '../../FlowDrawer/processType';
+import { Tooltip } from 'antd';
+import userCtrl from '@/ts/controller/setting';
 
 type IProps = {
   conditions?: FieldCondition[];
@@ -71,10 +73,15 @@ const ConditionNode: React.FC<IProps> = (props) => {
       <span className={cls['title']}>
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
-      <span className={cls['option']}>
-        <CopyOutlined style={{ fontSize: '12px', paddingRight: '5px' }} onClick={copy} />
-        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
-      </span>
+      {(!props.config.belongId || props.config.belongId == userCtrl.space.id) && (
+        <span className={cls['option']}>
+          <CopyOutlined
+            style={{ fontSize: '12px', paddingRight: '5px' }}
+            onClick={copy}
+          />
+          <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
+        </span>
+      )}
     </div>
   );
   const nodeContent = (
@@ -89,15 +96,22 @@ const ConditionNode: React.FC<IProps> = (props) => {
     </div>
   );
   return (
-    <div className={`${cls['node']} ${showError ? cls['node-error-state'] : ''}`}>
-      <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
-        <div className={cls['node-body-main']}>
-          {nodeHeader}
-          {nodeContent}
+    <div
+      className={`${
+        !props.config.belongId || props.config.belongId == userCtrl.space.id
+          ? cls['node']
+          : cls['node-unEdit']
+      } ${showError ? cls['node-error-state'] : ''}`}>
+      <Tooltip title={<span>创建人: {props.config.belongId}</span>} placement="right">
+        <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
+          <div className={cls['node-body-main']}>
+            {nodeHeader}
+            {nodeContent}
+          </div>
         </div>
-      </div>
 
-      <div className={cls['node-footer']}>{footer}</div>
+        <div className={cls['node-footer']}>{footer}</div>
+      </Tooltip>
     </div>
   );
 };

@@ -51,6 +51,7 @@ const FlowList: React.FC<IProps> = ({
             cancelText: '取消',
             okType: 'danger',
             onOk: () => {
+              setModalType('编辑业务流程');
               onCurrentChaned(record);
               onDesign();
             },

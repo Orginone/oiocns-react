@@ -54,6 +54,7 @@ export type NodeType = {
   parentId: string;
   nodeId: string;
   name: string;
+  belongId?: string;
   conditions: conditiondType[];
   props: { assignedUser: {}; assignedType: {}; num: number | null };
 };

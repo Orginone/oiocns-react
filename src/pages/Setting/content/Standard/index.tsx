@@ -93,7 +93,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       case '业务流程':
         return (
           <>
-            {modalType != '新增业务流程' && (
+            {modalType == '' && (
               <Button
                 key="edit"
                 type="link"
@@ -103,7 +103,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 {'新增流程'}
               </Button>
             )}
-            {modalType == '新增业务流程' && (
+            {(modalType == '新增业务流程' || modalType == '编辑业务流程') && (
               <Button
                 key="back"
                 type="link"

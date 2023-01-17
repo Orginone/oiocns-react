@@ -31,6 +31,7 @@ const CcNode: React.FC<CcNodeProps> = (props: CcNodeProps) => {
   return (
     <Node
       title={props.config.name}
+      belongId={props.config.belongId}
       showError={false}
       content={content}
       errorInfo="错误信息"

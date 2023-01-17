@@ -49,7 +49,8 @@ const Design: React.FC<IProps> = ({
       setConditionData({
         name: current.name || '',
         remark: current.remark,
-        fields: JSON.parse(JSON.parse(current.content)['fields']),
+        // fields: JSON.parse(JSON.parse(current.content)['fields']),
+        fields: [],
       });
     }
   }, [current]);
@@ -64,6 +65,7 @@ const Design: React.FC<IProps> = ({
         cancelText: '取消',
         onOk() {
           onBack();
+          setModalType('');
         },
         onCancel() {
           setModalType('新增业务流程');
@@ -119,18 +121,20 @@ const Design: React.FC<IProps> = ({
                       size="small"
                       type="primary"
                       onClick={async () => {
-                        if (
-                          await userCtrl.space.publishDefine({
-                            id: current?.id,
-                            code: conditionData.name,
-                            name: conditionData.name,
-                            fields: JSON.stringify(conditionData.fields),
-                            remark: conditionData.remark,
-                            resource: resource as FlowNode,
-                          })
-                        ) {
-                          onBack();
-                        }
+                        console.log('conditionData', conditionData);
+                        console.log('resource', resource);
+                        // if (
+                        //   await userCtrl.space.publishDefine({
+                        //     id: current?.id,
+                        //     code: conditionData.name,
+                        //     name: conditionData.name,
+                        //     fields: JSON.stringify(conditionData.fields),
+                        //     remark: conditionData.remark,
+                        //     resource: resource as FlowNode,
+                        //   })
+                        // ) {
+                        //   onBack();
+                        // }
                       }}>
                       <SendOutlined />
                       发布

@@ -1,7 +1,8 @@
-import { XDict } from '@/ts/base/schema';
+import { XDict, XFlowDefine } from '@/ts/base/schema';
 import { kernel, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
+  CreateDefineReq,
   DictModel,
   OperationModel,
   PageRequest,
@@ -68,6 +69,19 @@ export class SpeciesItem implements ISpeciesItem {
 
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
     const res = await kernel.querySpeciesOperation({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
+  async loadFlowDefines(id: string, page: PageRequest): Promise<schema.XFlowDefineArray> {
+    const res = await kernel.queryDefine2({
       id: this.id,
       spaceId: id,
       page: {
@@ -223,6 +237,25 @@ export class SpeciesItem implements ISpeciesItem {
       id: id,
       typeName: '',
     });
+    return res.success;
+  }
+
+  async createFlowDefine(
+    data: Omit<CreateDefineReq, 'id' | 'speciesId'>,
+  ): Promise<XFlowDefine> {
+    const res = await kernel.publishDefine({ ...data, speciesId: this.id });
+    return res.data;
+  }
+
+  async updateFlowDefine(data: CreateDefineReq): Promise<boolean> {
+    const res = await kernel.publishDefine({
+      ...data,
+    });
+    return res.success;
+  }
+
+  async deleteFlowDefine(id: string): Promise<boolean> {
+    const res = await kernel.deleteDefine({ id });
     return res.success;
   }
 }

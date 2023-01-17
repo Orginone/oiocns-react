@@ -354,6 +354,8 @@ export type XFlowDefine = {
   updateTime: string;
   // 归属组织/个人
   target: XTarget | undefined;
+  // 分类id
+  speciesId?: string;
 };
 
 //流程定义查询返回集合

@@ -17,6 +17,7 @@ import {
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { FlowNode } from '@/ts/base/model';
+import userCtrl from '@/ts/controller/setting';
 
 type IProps = {
   conditions?: FieldCondition[]; //内置条件选择器
@@ -97,7 +98,6 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
           childDoms,
         );
       });
-
       //插入添加分支/条件的按钮
       branchItems?.unshift(
         h(
@@ -111,7 +111,11 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
             h(
               'button',
               {
-                className: cls[`add-branch-btn-el`],
+                className:
+                  !node.belongId || node.belongId == userCtrl.space.id
+                    ? cls[`add-branch-btn-el`]
+                    : cls[`add-branch-btn-el-unEdit`],
+                // className: cls[`add-branch-btn-el`],
                 key: getRandomId(),
                 props: {
                   size: 'small',
@@ -389,14 +393,17 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
   };
   const insertApprovalNode = (parentNode: any) => {
     parentNode.children.name = '审批对象';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertCcNode = (parentNode: any) => {
     parentNode.children.name = '抄送对象';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.props = deepCopy(CC_PROPS);
   };
   const insertConditionsNode = (parentNode: any) => {
     parentNode.children.name = '条件分支';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
@@ -411,6 +418,7 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
         // props: deepCopy(DefaultProps.CONDITION_PROPS),
         conditions: [],
         name: '条件1',
+        belongId: userCtrl.space.id,
         // children: {},
       },
       {
@@ -420,12 +428,14 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
         // props: deepCopy(DefaultProps.CONDITION_PROPS),
         conditions: [],
         name: '条件2',
+        belongId: userCtrl.space.id,
         // children: {},
       },
     ];
   };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
@@ -435,6 +445,7 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
       {
         nodeId: getRandomId(),
         name: '分支1',
+        belongId: userCtrl.space.id,
         parentId: parentNode.children.nodeId,
         type: 'CONCURRENT',
         props: {},
@@ -443,6 +454,7 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
       {
         nodeId: getRandomId(),
         name: '分支2',
+        belongId: userCtrl.space.id,
         parentId: parentNode.children.nodeId,
         type: 'CONCURRENT',
         props: {},
@@ -452,10 +464,12 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
   };
   const insertDelayNode = (parentNode: any) => {
     parentNode.children.name = '延时处理';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.props = deepCopy(DELAY_PROPS);
   };
   const insertTriggerNode = (parentNode: any) => {
     parentNode.children.name = '触发器';
+    parentNode.children.belongId = userCtrl.space.id;
     parentNode.children.props = deepCopy(TRIGGER_PROPS);
   };
   const getBranchEndNode: any = (conditionNode: any) => {
@@ -465,10 +479,13 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
     return getBranchEndNode(conditionNode.children);
   };
   const addBranchNode = (node: any) => {
-    if (node.branches.length < 8) {
+    if (node.belongId && node.belongId != userCtrl.space.id) {
+      message.warning(`该节点由其他人或单位创建，无法在此添加新节点`);
+    } else if (node.branches.length < 8) {
       node.branches.push({
         nodeId: getRandomId(),
         parentId: node.nodeId,
+        belongId: userCtrl.space.id,
         name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
         // props: isConditionNode(node) ? deepCopy(DefaultProps.CONDITION_PROPS) : {},
         conditions: [],

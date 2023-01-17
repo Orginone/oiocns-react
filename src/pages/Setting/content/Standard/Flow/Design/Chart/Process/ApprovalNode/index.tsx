@@ -38,6 +38,7 @@ const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => 
       type={props?.config.type}
       showError={false}
       content={content}
+      belongId={props.config.belongId}
       errorInfo="错误信息"
       placeholder="请设置审批对象"
       headerBgc="#ff943e"

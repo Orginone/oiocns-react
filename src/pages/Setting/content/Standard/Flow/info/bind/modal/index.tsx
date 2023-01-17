@@ -37,7 +37,6 @@ const BindModal: React.FC<IProps> = ({ current, isOpen, onOk, onCancel }) => {
   }, [current, isOpen]);
 
   const initData = async () => {
-    debugger;
     const prods = appCtrl.products
       // .filter((a) => a.prod.resource?.find((q) => q.flows?.length > 0))
       .map((a) => {

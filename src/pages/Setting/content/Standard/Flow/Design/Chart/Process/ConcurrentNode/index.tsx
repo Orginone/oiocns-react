@@ -2,6 +2,8 @@ import React from 'react';
 import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
+import { Tooltip } from 'antd';
+import userCtrl from '@/ts/controller/setting';
 type ConcurrentNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
@@ -44,10 +46,15 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           {props.config.name ? props.config.name : '并行任务' + props.level}
         </span>
       </span>
-      <span className={cls['option']}>
-        <CopyOutlined style={{ fontSize: '12px', paddingRight: '5px' }} onClick={copy} />
-        <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
-      </span>
+      {(!props.config.belongId || props.config.belongId == userCtrl.space.id) && (
+        <span className={cls['option']}>
+          <CopyOutlined
+            style={{ fontSize: '12px', paddingRight: '5px' }}
+            onClick={copy}
+          />
+          <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
+        </span>
+      )}
     </div>
   );
   const nodeContent = (
@@ -56,15 +63,21 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     </div>
   );
   return (
-    <div className={cls['node']}>
-      <div className={cls['node-body']}>
-        <div className={cls['node-body-main']}>
-          {nodeHeader}
-          {nodeContent}
+    <div
+      className={
+        !props.config.belongId || props.config.belongId == userCtrl.space.id
+          ? cls['node']
+          : cls['node-unEdit']
+      }>
+      <Tooltip title={<span>创建人: {props.config.belongId}</span>} placement="right">
+        <div className={cls['node-body']}>
+          <div className={cls['node-body-main']}>
+            {nodeHeader}
+            {nodeContent}
+          </div>
         </div>
-      </div>
-
-      <div className={cls['node-footer']}>{footer}</div>
+        <div className={cls['node-footer']}>{footer}</div>
+      </Tooltip>
     </div>
   );
 };

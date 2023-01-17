@@ -94,7 +94,7 @@ const DictInfo: React.FC<IProps> = ({
 
   return (
     <div style={{ display: 'flex', height: '75vh' }}>
-      <div style={{ width: '15vw', height: '75vh', margin: '5px' }}>
+      <div style={{ width: '25vw', height: '75vh' }}>
         <CustomTreeComp
           title={
             <div style={{ display: 'flex' }}>
@@ -157,7 +157,7 @@ const DictInfo: React.FC<IProps> = ({
           }}
         />
       </div>
-      <div style={{ width: '85vw' }}>
+      <div style={{ width: '75vw' }}>
         <Card bordered={false} style={{ paddingLeft: '10px' }}>
           <CardOrTable<XDictItem>
             key={itemKey}

@@ -9,6 +9,7 @@ import {
 import InsertButton from '../InsertButton';
 import React from 'react';
 import cls from './index.module.less';
+import userCtrl from '@/ts/controller/setting';
 
 type NodeProps = {
   //是否为根节点
@@ -23,6 +24,8 @@ type NodeProps = {
   content?: string;
   title?: string;
   placeholder?: string;
+  //创建组织
+  belongId?: string;
   //节点体左侧图标
   leftIcon?: string;
   //头部图标
@@ -124,12 +127,17 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
                 {props.content}
               </span>
             )}
+            {/* {props.belongId && (
+              <span style={{ color: 'red' }}>创建人: {props.belongId}</span>
+            )} */}
             {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-            <CloseOutlined
-              className={cls['iconPosition']}
-              style={{ fontSize: '12px', display: 'block' }}
-              onClick={delNode}
-            />
+            {(!props.belongId || props.belongId == userCtrl.space.id) && (
+              <CloseOutlined
+                className={cls['iconPosition']}
+                style={{ fontSize: '12px', display: 'block' }}
+                onClick={delNode}
+              />
+            )}
           </div>
         </div>
       )}
@@ -148,7 +156,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   if (props.show) {
     return (
       <div
-        className={`${cls['node']} ${props.isRoot || !props.show ? cls['root'] : ''}  ${
+        className={`${
+          !props.belongId || props.belongId == userCtrl.space.id
+            ? cls['node']
+            : cls['node-unEdit']
+        } ${props.isRoot || !props.show ? cls['root'] : ''}  ${
           props.showError || (props._passed === 0 && !props._executable)
             ? cls['node-error-state']
             : ''
@@ -158,18 +170,20 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
-        <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
-          <div
-            className={
-              props.type === AddNodeType.APPROVAL
-                ? cls['nodeAproStyle']
-                : cls['nodeNewStyle']
-            }>
-            {nodeHeader}
-            {nodeContent}
-            {nodeError}
+        <Tooltip title={<span>创建人: {props.belongId}</span>} placement="right">
+          <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
+            <div
+              className={
+                props.type === AddNodeType.APPROVAL
+                  ? cls['nodeAproStyle']
+                  : cls['nodeNewStyle']
+              }>
+              {nodeHeader}
+              {nodeContent}
+              {nodeError}
+            </div>
           </div>
-        </div>
+        </Tooltip>
         {footer}
       </div>
     );
