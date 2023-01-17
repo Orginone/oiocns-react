@@ -13,10 +13,13 @@ import {
   FormOutlined,
 } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
-import { FlowNode } from '@/ts/base/model';
+import { FlowNode, PageRequest } from '@/ts/base/model';
+import { ISpeciesItem } from '@/ts/core';
+import { kernel } from '@/ts/base';
 
 interface IProps {
   current?: XFlowDefine;
+  species?: ISpeciesItem;
   modalType: string;
   setModalType: (modalType: string) => void;
   onBack: () => void;
@@ -24,10 +27,12 @@ interface IProps {
 
 const Design: React.FC<IProps> = ({
   current,
+  species,
   modalType,
   setModalType,
   onBack,
 }: IProps) => {
+  const [attrs, setAttrs] = useState<any[]>([]);
   const [scale, setScale] = useState<number>(90);
   const [currentStep, setCurrentStep] = useState(0);
   const [resource, setResource] = useState({
@@ -37,20 +42,82 @@ const Design: React.FC<IProps> = ({
     name: '发起人',
     children: {},
   });
-  const [conditionData, setConditionData] = useState({
+  const [conditionData, setConditionData] = useState<any>({
     name: '',
     fields: [],
     remark: '',
   });
+  const loadAttrs = async () => {
+    return await species!.loadAttrs(userCtrl.space.id, {
+      offset: 0,
+      limit: 100,
+      filter: '',
+    });
+  };
 
+  useEffect(() => {
+    loadAttrs().then((res) => {
+      setAttrs(res.result || []);
+      setConditionData({
+        name: '',
+        remark: '',
+        fields: res.result?.map((attr: any) => {
+          switch (attr.valueType) {
+            case '描述型':
+              return { label: attr.name, value: attr.code, type: 'STRING' };
+            case '数值型':
+              return { label: attr.name, value: attr.code, type: 'NUMERIC' };
+            case '选择型':
+              return {
+                label: attr.name,
+                value: attr.code,
+                type: 'DICT',
+                dict: loadDictItems(attr.dictId),
+              };
+            default:
+              return { label: attr.name, value: attr.code, type: 'STRING' };
+          }
+        }),
+      });
+    });
+  }, []);
+  const loadDictItems = async (dictId: any) => {
+    let res = await kernel.queryDictItems({
+      id: dictId,
+      spaceId: userCtrl.space.id,
+      page: {
+        offset: 0,
+        limit: 1000,
+        filter: '',
+      },
+    });
+    return res.data.result?.map((item) => {
+      return { label: item.name, value: item.value };
+    });
+  };
   useEffect(() => {
     if (current) {
       setResource(JSON.parse(current.content)['resource']);
       setConditionData({
         name: current.name || '',
         remark: current.remark,
-        // fields: JSON.parse(JSON.parse(current.content)['fields']),
-        fields: [],
+        fields: attrs.map((attr: any) => {
+          switch (attr.valueType) {
+            case '描述型':
+              return { label: attr.name, value: attr.code, type: 'STRING' };
+            case '数值型':
+              return { label: attr.name, value: attr.code, type: 'NUMERIC' };
+            case '选择型':
+              return {
+                label: attr.name,
+                value: attr.code,
+                type: 'DICT',
+                dict: loadDictItems(attr.dictId),
+              };
+            default:
+              return { label: attr.name, value: attr.code, type: 'STRING' };
+          }
+        }),
       });
     }
   }, [current]);
@@ -121,20 +188,18 @@ const Design: React.FC<IProps> = ({
                       size="small"
                       type="primary"
                       onClick={async () => {
-                        console.log('conditionData', conditionData);
-                        console.log('resource', resource);
-                        // if (
-                        //   await userCtrl.space.publishDefine({
-                        //     id: current?.id,
-                        //     code: conditionData.name,
-                        //     name: conditionData.name,
-                        //     fields: JSON.stringify(conditionData.fields),
-                        //     remark: conditionData.remark,
-                        //     resource: resource as FlowNode,
-                        //   })
-                        // ) {
-                        //   onBack();
-                        // }
+                        if (
+                          await userCtrl.space.publishDefine({
+                            id: current?.id,
+                            code: conditionData.name,
+                            name: conditionData.name,
+                            fields: JSON.stringify(conditionData.fields),
+                            remark: conditionData.remark,
+                            resource: resource as FlowNode,
+                          })
+                        ) {
+                          onBack();
+                        }
                       }}>
                       <SendOutlined />
                       发布

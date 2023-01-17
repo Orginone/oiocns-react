@@ -102,6 +102,9 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                     placeholder="请选择参数"
                     allowClear
                     options={conditions}
+                    onChange={(e) => {
+                      console.log('e', e);
+                    }}
                   />
                 </Form.Item>
 

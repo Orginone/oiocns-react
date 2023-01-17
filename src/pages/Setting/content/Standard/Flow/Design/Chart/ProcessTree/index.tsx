@@ -201,7 +201,8 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
       {
         config: node,
         // ref: node.nodeId,
-        key: node.nodeId,
+        // key: node.nodeId,
+        key: getRandomId(),
         ...props,
         conditions,
         //定义事件，插入节点，删除节点，选中节点，复制/移动

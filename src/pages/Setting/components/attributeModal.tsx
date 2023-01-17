@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { IDict, ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 
@@ -22,6 +22,38 @@ const AttributeModal = (props: Iprops) => {
   const [selectType, setSelectType] = useState<string>();
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
+  const [dictItemMap, setDictItemMap] = useState<any>({});
+  const buildTree = (dicts: IDict[]) => {
+    const result: any = {};
+    for (const item of dicts) {
+      result[item.id] = { id: item.id, name: item.name, text: item.name };
+      // result.push({
+      //   // id: item.id,
+      //   // key: item.id,
+      //   value: item.id,
+      //   // name: item.name,
+      //   label: item.name,
+      //   // text: item.name,
+      //   // item: item,
+      //   // // isLeaf: true,
+      //   // title: item.name,
+      //   // icon: <></>,
+      // });
+    }
+    return result;
+  };
+  useEffect(() => {
+    current
+      .loadDicts(userCtrl.space.id, {
+        offset: 0,
+        limit: 10000,
+        filter: '',
+      })
+      .then((data) => {
+        setDictItemMap(buildTree(data));
+      });
+    // const dataSelectItems = buildTree(data);
+  }, []);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<AttributeModel>[] = [
       {
@@ -124,19 +156,12 @@ const AttributeModal = (props: Iprops) => {
       columns.push({
         title: '选择枚举分类',
         dataIndex: 'dictId',
-        valueType: 'treeSelect',
+        valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
-        request: async () => {
-          const data = await props.target?.loadSpeciesTree();
-          return data ? [data] : [];
-        },
+        valueEnum: dictItemMap,
         fieldProps: {
           disabled: selectType !== '选择型',
-          fieldNames: { label: 'name', value: 'id', children: 'children' },
           showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
         },
       });
     }

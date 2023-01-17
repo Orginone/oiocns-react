@@ -35,6 +35,7 @@ const SettingFlow: React.FC<IProps> = ({
   ) : (
     <Design
       current={flowDesign}
+      species={current}
       onBack={() => SetTabKey(0)}
       modalType={modalType}
       setModalType={setModalType}
