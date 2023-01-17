@@ -1,6 +1,6 @@
 import { kernel, parseAvatar, schema } from '../../base';
 import { Dict } from '../target/species/dict';
-import { IDict, INullDict } from '../target/species/idict';
+import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   CreateDefineReq,
@@ -11,7 +11,7 @@ import {
   TargetShare,
 } from '../../base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
-import { XDict, XFlowDefine } from '@/ts/base/schema';
+import { XFlowDefine } from '@/ts/base/schema';
 
 /**
  * 分类系统项实现
@@ -51,21 +51,17 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadDicts(spaceId: string, page: PageRequest): Promise<IDict[]> {
+  async loadDicts(id: string, page: PageRequest): Promise<schema.XDictArray> {
     const res = await kernel.querySpeciesDict({
       id: this.id,
-      spaceId: spaceId,
+      spaceId: id,
       page: {
         offset: page.offset,
         limit: page.limit,
         filter: '',
       },
     });
-    return (
-      res.data.result?.map((item: XDict) => {
-        return new Dict(item);
-      }) || []
-    );
+    return res.data;
   }
 
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {

@@ -1,4 +1,4 @@
-import { IDict, INullDict } from '../target/species/idict';
+import { INullDict } from '../target/species/idict';
 import {
   AttributeModel,
   CreateDefineReq,
@@ -12,6 +12,7 @@ import {
   XAttributeArray,
   XFlowDefine,
   XFlowDefineArray,
+  XDictArray,
   XOperationArray,
   XSpecies,
 } from '../../base/schema';
@@ -42,7 +43,7 @@ export interface ISpeciesItem {
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
   /** 加载分类字典 */
-  loadDicts(spaceId: string, page: PageRequest): Promise<IDict[]>;
+  loadDicts(id: string, page: PageRequest): Promise<XDictArray>;
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /** 加载流程设计 */

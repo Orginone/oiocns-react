@@ -1,7 +1,8 @@
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import { Input, Select } from 'antd';
 import Generator, { FRGeneratorProps, defaultSettings } from 'fr-generator';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import userCtrl from '@/ts/controller/setting';
 
 interface FormDesignProps extends FRGeneratorProps {
   current: ISpeciesItem;
@@ -19,25 +20,7 @@ const AttrWidget: React.FC<WidgetProps> = ({ value, onChange }) => (
 
 // 分类字典小部件
 const DictWidget: React.FC<WidgetProps> = ({ value, onChange }) => (
-  <Select
-    defaultValue={value}
-    onChange={onChange}
-    style={{ width: '100%' }}
-    options={[
-      {
-        value: 'jack',
-        label: 'Jack',
-      },
-      {
-        value: 'lucy',
-        label: 'Lucy',
-      },
-      {
-        value: 'Yiminghe',
-        label: 'yiminghe',
-      },
-    ]}
-  />
+  <Select defaultValue={value} onChange={onChange} style={{ width: '100%' }} />
 );
 
 // 自定义扩展组件
@@ -47,7 +30,12 @@ const widgets: any[] = [
     name: 'attr',
     schema: { title: '分类特性', type: 'string', widget: 'attrWidget' },
     setting: {
-      bind: { title: '字段名', type: 'string', widget: 'select' },
+      bind: {
+        title: '字段名',
+        type: 'string',
+        widget: 'select',
+        onChange: (e: any) => console.log('e', e),
+      },
     },
   },
   {
@@ -74,7 +62,7 @@ const widgets: any[] = [
 ];
 
 // 左侧组件配置
-const settings = [
+const ss = [
   { show: true, title: '平台组件(自定义扩展)', useCommon: true, widgets },
   ...defaultSettings,
 ];
@@ -127,6 +115,35 @@ const commonSetting = {
   表单设计
 */
 const FormDesign = (props: FormDesignProps) => {
+  const [settings, setSetting] = useState(ss);
+  const species: ISpeciesItem = props.current;
+  const loadAttrs = async () => {
+    const res = await species.loadAttrs(userCtrl.space.id, {
+      offset: 0,
+      limit: 100000,
+      filter: '',
+    });
+    const attrs = res.result;
+    settings[0].widgets[0].setting.bind.enum = attrs?.map((attr) => attr.code);
+    settings[0].widgets[0].setting.bind.enumNames = attrs?.map((attr) => attr.name);
+    setSetting(settings);
+  };
+  const loadDicts = async () => {
+    const res = await species.loadDicts(userCtrl.space.id, {
+      offset: 0,
+      limit: 100000,
+      filter: '',
+    });
+    const dicts = res.result;
+    settings[0].widgets[1].setting.dict.enum = dicts?.map((dict) => dict.code);
+    settings[0].widgets[1].setting.dict.enumNames = dicts?.map((dict) => dict.name);
+    setSetting(settings);
+  };
+  useEffect(() => {
+    loadAttrs();
+    loadDicts();
+  });
+
   return (
     <Generator
       defaultValue={props.defaultValue}

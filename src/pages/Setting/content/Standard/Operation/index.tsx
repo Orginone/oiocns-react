@@ -4,11 +4,13 @@ import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
 import { XOperation } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
-import { OperationColumns } from '@/pages/Setting/config/columns';
+import { OperationColumns, OperationItemColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel from '../../../components/operationModal';
 import FormDesignModal from '../../../components/formDesignModal';
 import ViewFormModal from '../../../components/viewFormModal';
+import { ProTable } from '@ant-design/pro-components';
+import { kernel } from '@/ts/base';
 
 interface IProps {
   target?: ITarget;
@@ -22,6 +24,7 @@ interface IProps {
  * @return {*}
  */
 const Operation = ({ current, target, modalType, setModalType }: IProps) => {
+  let selectRow: XOperation;
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XOperation>();
   const [open, setOpen] = useState<boolean>(false);
@@ -69,6 +72,30 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
     return await current!.loadOperations(userCtrl.space.id, page);
   };
 
+  const onRow = (record: any) => {
+    selectRow = record;
+  };
+
+  const expandedRowRender = (record: XOperation) => {
+    return (
+      <ProTable
+        columns={OperationItemColumns}
+        headerTitle={false}
+        search={false}
+        options={false}
+        pagination={false}
+        request={async () => {
+          const res = await kernel.queryOperationItems({
+            id: record.id || selectRow?.id,
+            spaceId: userCtrl.space.id,
+            page: { offset: 0, limit: 100000, filter: '' },
+          });
+          return { total: res.data.total, data: res.data.result, success: true };
+        }}
+      />
+    );
+  };
+
   return (
     <>
       <CardOrTable<XOperation>
@@ -81,6 +108,8 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         columns={OperationColumns}
         showChangeBtn={false}
         dataSource={[]}
+        expandable={{ expandedRowRender }}
+        onRow={onRow}
       />
       {/** 新增/编辑业务标准模态框 */}
       <OperationModel

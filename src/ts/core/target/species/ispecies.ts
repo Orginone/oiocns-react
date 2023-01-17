@@ -11,10 +11,11 @@ import {
   XAttributeArray,
   XFlowDefine,
   XFlowDefineArray,
+  XDictArray,
   XOperationArray,
   XSpecies,
 } from '../../../base/schema';
-import { IDict, INullDict } from './idict';
+import { INullDict } from './idict';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -42,7 +43,7 @@ export interface ISpeciesItem {
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
   /** 加载分类字典 */
-  loadDicts(spaceId: string, page: PageRequest): Promise<IDict[]>;
+  loadDicts(id: string, page: PageRequest): Promise<XDictArray>;
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /** 加载流程设计 */
