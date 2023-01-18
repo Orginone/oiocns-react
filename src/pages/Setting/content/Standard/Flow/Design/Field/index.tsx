@@ -1,13 +1,7 @@
 import { Form } from 'antd';
 import cls from './index.module.less';
 import React, { useEffect, useRef } from 'react';
-import {
-  ProFormText,
-  ProForm,
-  ProFormTextArea,
-  ProFormColumnsType,
-  ProFormInstance,
-} from '@ant-design/pro-components';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
 import userCtrl from '@/ts/controller/setting';
@@ -31,38 +25,38 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
           rules: [{ required: true, message: '流程名称为必填项' }],
         },
       },
-      // {
-      //   title: '选择制定组织',
-      //   dataIndex: 'belongId',
-      //   valueType: 'treeSelect',
-      //   formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-      //   request: async () => {
-      //     return await userCtrl.getTeamTree();
-      //   },
-      //   fieldProps: {
-      //     fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-      //     showSearch: true,
-      //     filterTreeNode: true,
-      //     treeNodeFilterProp: 'teamName',
-      //   },
-      // },
-      // {
-      //   title: '选择管理职权',
-      //   dataIndex: 'authId',
-      //   valueType: 'treeSelect',
-      //   formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
-      //   request: async () => {
-      //     const data = await userCtrl.company.loadAuthorityTree(false);
-      //     return data ? [data] : [];
-      //   },
-      //   fieldProps: {
-      //     fieldNames: { label: 'name', value: 'id' },
-      //     showSearch: true,
-      //     filterTreeNode: true,
-      //     treeNodeFilterProp: 'name',
-      //     treeDefaultExpandAll: true,
-      //   },
-      // },
+      {
+        title: '选择制定组织',
+        dataIndex: 'belongId',
+        valueType: 'treeSelect',
+        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+        request: async () => {
+          return await userCtrl.getTeamTree();
+        },
+        fieldProps: {
+          fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'teamName',
+        },
+      },
+      {
+        title: '选择管理职权',
+        dataIndex: 'authId',
+        valueType: 'treeSelect',
+        formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
+        request: async () => {
+          const data = await userCtrl.company.loadAuthorityTree(false);
+          return data ? [data] : [];
+        },
+        fieldProps: {
+          fieldNames: { label: 'name', value: 'id' },
+          showSearch: true,
+          filterTreeNode: true,
+          treeNodeFilterProp: 'name',
+          treeDefaultExpandAll: true,
+        },
+      },
       {
         title: '向下级组织公开',
         dataIndex: 'public',

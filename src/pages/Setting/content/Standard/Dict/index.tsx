@@ -42,14 +42,16 @@ const DictInfo: React.FC<IProps> = ({
   const [currentDict, setCurrentDict] = useState<IDict>();
   const buildTree = (dicts: IDict[]) => {
     const result: any[] = [];
-    for (const item of dicts) {
-      result.push({
-        key: item.id,
-        item: item,
-        isLeaf: true,
-        title: item.name,
-        icon: <></>,
-      });
+    if (dicts) {
+      for (const item of dicts) {
+        result.push({
+          key: item.id,
+          item: item,
+          isLeaf: true,
+          title: item.name,
+          icon: <></>,
+        });
+      }
     }
     return result;
   };

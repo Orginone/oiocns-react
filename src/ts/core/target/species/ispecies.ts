@@ -15,7 +15,7 @@ import {
   XOperationArray,
   XSpecies,
 } from '../../../base/schema';
-import { INullDict } from './idict';
+import { IDict, INullDict } from './idict';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -44,6 +44,8 @@ export interface ISpeciesItem {
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
   /** 加载分类字典 */
   loadDicts(id: string, page: PageRequest): Promise<XDictArray>;
+  /** 加载分类字典实体 */
+  loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]>;
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /** 加载流程设计 */

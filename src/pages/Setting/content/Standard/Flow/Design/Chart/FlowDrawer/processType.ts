@@ -47,6 +47,7 @@ export type conditiondType = {
   type: dataType;
   val: string | null;
   valLabel?: string;
+  dict?: any[];
 };
 
 export type NodeType = {

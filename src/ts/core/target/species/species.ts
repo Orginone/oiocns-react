@@ -1,4 +1,4 @@
-import { XFlowDefine } from '@/ts/base/schema';
+import { XDict, XFlowDefine } from '@/ts/base/schema';
 import { kernel, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
@@ -10,7 +10,7 @@ import {
   TargetShare,
 } from '../../../base/model';
 import { Dict } from './dict';
-import { INullDict } from './idict';
+import { IDict, INullDict } from './idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -61,6 +61,23 @@ export class SpeciesItem implements ISpeciesItem {
       },
     });
     return res.data;
+  }
+
+  async loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]> {
+    const res = await kernel.querySpeciesDict({
+      id: this.id,
+      spaceId: spaceId,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return (
+      res.data.result?.map((item: XDict) => {
+        return new Dict(item);
+      }) || []
+    );
   }
 
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {

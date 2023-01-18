@@ -170,7 +170,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
-        <Tooltip title={<span>创建人: {props.belongId}</span>} placement="right">
+        <Tooltip
+          title={<span>创建人: {userCtrl.getBelongName(props.belongId || '')}</span>}
+          placement="right">
           <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
             <div
               className={

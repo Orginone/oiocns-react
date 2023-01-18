@@ -32,7 +32,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   };
 
   const loadDicts = async () => {
-    let res: IDict[] = await current.loadDicts(userCtrl.space.id, {
+    let res: IDict[] = await current.loadDictsEntity(userCtrl.space.id, {
       offset: 0,
       limit: 10000,
       filter: '',

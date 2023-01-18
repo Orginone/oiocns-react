@@ -102,7 +102,9 @@ const ConditionNode: React.FC<IProps> = (props) => {
           ? cls['node']
           : cls['node-unEdit']
       } ${showError ? cls['node-error-state'] : ''}`}>
-      <Tooltip title={<span>创建人: {props.config.belongId}</span>} placement="right">
+      <Tooltip
+        title={<span>创建人: {userCtrl.getBelongName(props.config.belongId)}</span>}
+        placement="right">
         <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
           <div className={cls['node-body-main']}>
             {nodeHeader}

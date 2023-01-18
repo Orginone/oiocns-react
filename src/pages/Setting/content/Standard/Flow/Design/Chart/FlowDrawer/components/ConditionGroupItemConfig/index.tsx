@@ -26,6 +26,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
   const [conditions, setConditions] = useState<FieldCondition[]>([]);
 
   useEffect(() => {
+    debugger;
     setCurrentNode(props.currnet);
     setConditions(props.conditions);
     form.setFieldsValue({ allContent: props.currnet.conditions });
@@ -103,7 +104,27 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                     allowClear
                     options={conditions}
                     onChange={(e) => {
-                      console.log('e', e);
+                      conditions.forEach((element: any) => {
+                        if (element.value == e) {
+                          condition.type = element.type;
+                          condition.paramKey = e;
+                          condition.paramLabel = element.label;
+                          // debugger;
+                          if (element.dict) {
+                            element.dict.then((dicts: any[]) => {
+                              condition.dict = dicts.map((a: any) => {
+                                return {
+                                  label: a.label,
+                                  value: a.value,
+                                };
+                              });
+                              setKey(key + 1);
+                            });
+                          } else {
+                            setKey(key + 1);
+                          }
+                        }
+                      });
                     }}
                   />
                 </Form.Item>
@@ -140,6 +161,12 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                     />
                   </Form.Item>
                 )}
+                {/* 既不是枚举也不是数字类型 */}
+                {condition.type != 'DICT' && condition.type != 'NUMERIC' && (
+                  <Form.Item name={['allContent', index, 'val']}>
+                    <Input style={{ width: 200 }} placeholder="请输入值" allowClear />
+                  </Form.Item>
+                )}
                 {/* 数字类型 */}
                 {condition.type == 'NUMERIC' && (
                   <Form.Item name={['allContent', index, 'val']}>
@@ -153,21 +180,8 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                       style={{ width: 200 }}
                       placeholder="请选择"
                       allowClear
-                      options={conditions
-                        .find((a) => a.value == condition.paramKey)
-                        ?.dict?.map((a) => {
-                          return {
-                            id: a.label,
-                            value: a.value,
-                          };
-                        })}
+                      options={condition.dict || []}
                     />
-                  </Form.Item>
-                )}
-                {/* 既不是枚举也不是数字类型 */}
-                {condition.type != 'DICT' && condition.type != 'NUMERIC' && (
-                  <Form.Item name={['allContent', index, 'val']}>
-                    <Input style={{ width: 200 }} placeholder="请输入值" allowClear />
                   </Form.Item>
                 )}
               </div>

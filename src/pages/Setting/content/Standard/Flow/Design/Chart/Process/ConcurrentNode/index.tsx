@@ -69,7 +69,9 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           ? cls['node']
           : cls['node-unEdit']
       }>
-      <Tooltip title={<span>创建人: {props.config.belongId}</span>} placement="right">
+      <Tooltip
+        title={<span>创建人: {userCtrl.getBelongName(props.config.belongId)}</span>}
+        placement="right">
         <div className={cls['node-body']}>
           <div className={cls['node-body-main']}>
             {nodeHeader}
