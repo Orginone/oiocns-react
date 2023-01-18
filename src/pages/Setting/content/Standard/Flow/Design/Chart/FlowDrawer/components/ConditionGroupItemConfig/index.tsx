@@ -26,7 +26,6 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
   const [conditions, setConditions] = useState<FieldCondition[]>([]);
 
   useEffect(() => {
-    debugger;
     setCurrentNode(props.currnet);
     setConditions(props.conditions);
     form.setFieldsValue({ allContent: props.currnet.conditions });
