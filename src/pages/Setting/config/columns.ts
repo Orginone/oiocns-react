@@ -228,6 +228,9 @@ export const findSpecesName = (
     } else if (item?.children) {
       specesName = findSpecesName(item?.children, id);
     }
+    if (specesName) {
+      break;
+    }
   }
   return specesName;
 };
