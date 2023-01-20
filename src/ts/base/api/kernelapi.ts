@@ -2322,20 +2322,6 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
    */
   public async queryDefine(
-    params: model.IdReq,
-  ): Promise<model.ResultType<schema.XFlowDefineArray>> {
-    return await this.request({
-      module: 'flow',
-      action: 'QueryDefine',
-      params: params,
-    });
-  }
-  /**
-   * 查询流程定义
-   * @param {model.IdReq} params 请求参数
-   * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
-   */
-  public async queryDefine2(
     params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XFlowDefineArray>> {
     return await this.request({
