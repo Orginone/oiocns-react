@@ -49,6 +49,8 @@ const useMenuUpdate = (): [
     children.push(operate.getAppliactionMenus());
     // children.push(operate.getAssetMenus());
     children.push(operate.getFileSystemMenus());
+    let thingMenus = await operate.getThingMenus();
+    children.push(thingMenus);
     setMenu({
       key: 'store',
       label: '仓库',
@@ -56,6 +58,7 @@ const useMenuUpdate = (): [
       icon: <ImHome />,
       children: children,
     });
+    debugger;
     const item = findMenuItemByKey(children, storeCtrl.currentKey);
     if (item) {
       setSelectMenu(item);

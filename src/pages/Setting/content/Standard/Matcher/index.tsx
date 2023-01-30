@@ -77,7 +77,6 @@ const Matcher = (props: any, ref: any) => {
         ids: [props.data.sourceCompanyId, props.data.targetCompanyId],
       });
       if (companysResult.success && companysResult.data.result) {
-        debugger;
         let companys: XTarget[] = companysResult.data.result;
         let sourceCompany = companys.find(
           (item) => item.id == props.data.sourceCompanyId,
@@ -98,7 +97,6 @@ const Matcher = (props: any, ref: any) => {
       //   let targetSpecies = speciess.find((item) => item.id == props.data.targetSpeciesId);
       //   setTargetSpecies(new SpeciesItem(targetSpecies as XSpecies, undefined));
       // }
-      debugger;
       setMatchAttrs(props.data.matchAttrs);
     }
   };
