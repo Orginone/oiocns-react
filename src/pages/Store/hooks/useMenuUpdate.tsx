@@ -58,7 +58,6 @@ const useMenuUpdate = (): [
       icon: <ImHome />,
       children: children,
     });
-    debugger;
     const item = findMenuItemByKey(children, storeCtrl.currentKey);
     if (item) {
       setSelectMenu(item);
