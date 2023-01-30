@@ -13,7 +13,7 @@ import {
   FormOutlined,
 } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
-import { FlowNode, PageRequest } from '@/ts/base/model';
+import { FlowNode } from '@/ts/base/model';
 import { ISpeciesItem } from '@/ts/core';
 import { kernel } from '@/ts/base';
 
@@ -46,6 +46,7 @@ const Design: React.FC<IProps> = ({
     name: '',
     fields: [],
     remark: '',
+    belongId: '',
   });
   const loadAttrs = async () => {
     return await species!.loadAttrs(userCtrl.space.id, {
@@ -189,13 +190,13 @@ const Design: React.FC<IProps> = ({
                       type="primary"
                       onClick={async () => {
                         if (
-                          await userCtrl.space.publishDefine({
-                            id: current?.id,
+                          await species?.createFlowDefine({
                             code: conditionData.name,
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
                             resource: resource as FlowNode,
+                            belongId: conditionData.belongId,
                           })
                         ) {
                           onBack();

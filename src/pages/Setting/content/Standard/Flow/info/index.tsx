@@ -9,9 +9,11 @@ import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { ISpeciesItem } from '@/ts/core/thing/ispecies';
 
 interface IProps {
   modalType: string;
+  species?: ISpeciesItem;
   setModalType: (modalType: string) => void;
   onDesign: () => void;
   onCurrentChaned: (item?: XFlowDefine) => void;
@@ -23,6 +25,7 @@ interface IProps {
  */
 const FlowList: React.FC<IProps> = ({
   modalType,
+  species,
   setModalType,
   onDesign,
   onCurrentChaned,
@@ -89,13 +92,7 @@ const FlowList: React.FC<IProps> = ({
               height={0.38 * useWindowSize().height}
               rowKey={(record: XFlowDefine) => record.id}
               request={async (page) => {
-                let data = await userCtrl.space.getDefines(false);
-                return {
-                  limit: page.limit,
-                  total: data.length,
-                  offset: page.offset,
-                  result: data.splice(page.offset, page.limit),
-                };
+                return await species?.loadFlowDefines(userCtrl.space.id, page);
               }}
               onRow={(record: any) => {
                 return {

@@ -28,6 +28,7 @@ const SettingFlow: React.FC<IProps> = ({
       onCurrentChaned={(item) => {
         setFlowDesign(item);
       }}
+      species={current}
       onDesign={() => SetTabKey(1)}
       modalType={modalType}
       setModalType={setModalType}
