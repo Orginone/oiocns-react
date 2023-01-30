@@ -15,7 +15,6 @@ interface IProps {
 
 /** 内容区 */
 const ContentIndex = ({ selectMenu }: IProps) => {
-  debugger;
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case GroupMenuType.Application:
