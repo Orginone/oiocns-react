@@ -510,6 +510,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 根据id查询分类
+   * @param {model.IdArrayReq} params 请求参数
+   * @returns {model.ResultType<schema.XSpeciesArray>} 请求结果
+   */
+  public async querySpeciesById(
+    params: model.IdArrayReq,
+  ): Promise<model.ResultType<schema.XSpeciesArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesById',
+      params: params,
+    });
+  }
+  /**
    * 查询分类树
    * @param {string} targetId 组织ID
    * @returns {model.ResultType<schema.XSpecies>} 请求结果

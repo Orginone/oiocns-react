@@ -356,6 +356,10 @@ export type XFlowDefine = {
   target: XTarget | undefined;
   // 分类id
   speciesId?: string;
+  // 职权Id
+  authId?: string;
+  // 公开的
+  public?: boolean;
 };
 
 //流程定义查询返回集合
