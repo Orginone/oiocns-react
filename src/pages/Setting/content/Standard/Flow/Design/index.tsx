@@ -197,6 +197,7 @@ const Design: React.FC<IProps> = ({
                             remark: conditionData.remark,
                             resource: resource as FlowNode,
                             belongId: conditionData.belongId,
+                            // speciesId: species.id,
                           })
                         ) {
                           onBack();
