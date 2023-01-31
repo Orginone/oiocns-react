@@ -201,6 +201,7 @@ const Design: React.FC<IProps> = ({
                           })
                         ) {
                           onBack();
+                          setModalType('');
                         }
                       }}>
                       <SendOutlined />
