@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ImHome } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
+import userCtrl from '@/ts/controller/setting';
 /**
  * 仓库菜单刷新hook
  * @returns key 变更后的标识,
@@ -72,10 +73,16 @@ const useMenuUpdate = (): [
       setKey(key);
       refreshMenu();
     });
+    const id2 = userCtrl.subscribe((key) => {
+      // setKey(key);
+      refreshMenu();
+    });
     return () => {
       storeCtrl.unsubscribe(id);
+      userCtrl.unsubscribe(id2);
     };
   }, []);
+
   return [key, menus, refreshMenu, selectMenu, setSelectMenu];
 };
 
