@@ -830,6 +830,7 @@ export type FlowNode = {
   props: Prop;
   children: FlowNode;
   branches: Branche[];
+  belongId: string;
 };
 
 export type Branche = {

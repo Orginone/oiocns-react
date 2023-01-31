@@ -514,11 +514,11 @@ const TeamSetting: React.FC = () => {
         }}
         onOk={(newItem) => {
           if (newItem) {
-            if (matchRef.current && matchRef.current.checkValid()) {
-              matchRef.current.submit();
-              refreshMenu();
-              setOperateKeys(['']);
-            }
+            // if (matchRef.current && matchRef.current.checkValid()) {
+            //   matchRef.current.submit();
+            //   refreshMenu();
+            //   setOperateKeys(['']);
+            // }
           }
         }}>
         <SpeciesMatcher ref={matchRef} data={mockData}></SpeciesMatcher>
