@@ -196,6 +196,7 @@ const Design: React.FC<IProps> = ({
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
                             resource: resource as FlowNode,
+                            speciesId: species?.id,
                           })
                         ) {
                           onBack();
