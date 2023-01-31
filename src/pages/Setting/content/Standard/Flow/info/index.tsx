@@ -31,7 +31,7 @@ const FlowList: React.FC<IProps> = ({
   onCurrentChaned,
 }: IProps) => {
   const parentRef = useRef<any>(null);
-  const [key, forceUpdate] = useObjectUpdate('');
+  const [tkey, tforceUpdate] = useObjectUpdate(species);
 
   useEffect(() => {
     if (modalType.includes('新增业务流程')) {
@@ -68,7 +68,7 @@ const FlowList: React.FC<IProps> = ({
         onClick: async () => {
           if (await userCtrl.space.deleteDefine(record.id)) {
             message.success('删除成功');
-            forceUpdate();
+            tforceUpdate();
           }
         },
       },
@@ -79,7 +79,7 @@ const FlowList: React.FC<IProps> = ({
     <div className={cls['company-top-content']}>
       <div style={{ background: '#EFF4F8' }}>
         <Card
-          key={key}
+          key={tkey}
           bordered={false}
           style={{ paddingBottom: '10px' }}
           bodyStyle={{ paddingTop: 0 }}>

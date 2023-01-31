@@ -312,13 +312,21 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
     dataIndex: 'name',
   },
   {
-    title: '创建人',
-    dataIndex: 'createUser',
-  },
-  {
     title: '备注',
     ellipsis: true,
     dataIndex: 'remark',
+  },
+  {
+    title: '共享组织',
+    dataIndex: 'belongId',
+    key: 'belongId',
+    width: 200,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '创建时间',
