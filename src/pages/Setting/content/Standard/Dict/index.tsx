@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, message, Modal } from 'antd';
+import { Button, Card, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import CardOrTable from '@/components/CardOrTableComp';
 import { DictItemColumns } from '@/pages/Setting/config/columns';
@@ -26,12 +26,11 @@ interface IProps {
  */
 const DictInfo: React.FC<IProps> = ({
   current,
-  target,
   dictRecords,
   modalType,
   setModalType,
   reload,
-}: IProps) => {
+}) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
   const [openTransToDictModal, setOpenTransToDictModal] = useState<boolean>(false);

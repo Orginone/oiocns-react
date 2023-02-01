@@ -96,7 +96,15 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
   },
   {
     title: '归属',
-    dataIndex: ['target', 'belongId'],
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
 ];
 
@@ -353,10 +361,16 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     width: 150,
   },
   {
-    title: '创建人',
-    dataIndex: 'createUser',
-    key: 'createUser',
-    width: 150,
+    title: '共享组织',
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '创建时间',
