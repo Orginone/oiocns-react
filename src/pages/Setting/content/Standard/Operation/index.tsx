@@ -116,7 +116,6 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
             if (res.data && res.data.result) {
               let properties = {};
               for (let it of res.data.result) {
-                debugger;
                 // properties[it.id] = { title: it.name, type: 'string', props: {} };
                 properties[it.id as string] = JSON.parse(it.rule);
               }
