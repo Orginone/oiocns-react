@@ -7,6 +7,7 @@ import { ITodoGroup } from '@/ts/core/todo/itodo';
 interface IProps {
   typeName: string;
   todoGroup: ITodoGroup;
+  reflashMenu: () => void;
 }
 /**
  * 办事-订单

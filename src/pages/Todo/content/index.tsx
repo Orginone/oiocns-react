@@ -8,10 +8,11 @@ import OrderTodo from './Order';
 import AppTodo from './App';
 
 interface IProps {
+  reflashMenu: () => void;
   selectMenu: MenuItemType;
 }
 
-const TypeSetting = ({ selectMenu }: IProps) => {
+const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
   let todoGroup = selectMenu.item as ITodoGroup;
   if (todoGroup) {
     switch (selectMenu.itemType) {
@@ -21,6 +22,7 @@ const TypeSetting = ({ selectMenu }: IProps) => {
           <CommonTodo
             todoGroup={todoGroup}
             columns={OrgColumns}
+            reflashMenu={reflashMenu}
             tabList={[
               { key: 'todo', tab: '我的待办' },
               { key: 'complete', tab: '我的已办' },
@@ -39,7 +41,12 @@ const TypeSetting = ({ selectMenu }: IProps) => {
           tabList = [{ key: 'apply', tab: '我的申请' }];
         }
         return (
-          <CommonTodo todoGroup={todoGroup} tabList={tabList} columns={MarketColumns} />
+          <CommonTodo
+            todoGroup={todoGroup}
+            tabList={tabList}
+            columns={MarketColumns}
+            reflashMenu={reflashMenu}
+          />
         );
       case GroupMenuType.Publish:
         let publishTabList = [];
@@ -56,12 +63,25 @@ const TypeSetting = ({ selectMenu }: IProps) => {
             todoGroup={todoGroup}
             tabList={publishTabList}
             columns={MerchandiseColumns}
+            reflashMenu={reflashMenu}
           />
         );
       case GroupMenuType.Order:
-        return <OrderTodo typeName={selectMenu.key} todoGroup={todoGroup} />;
+        return (
+          <OrderTodo
+            typeName={selectMenu.key}
+            todoGroup={todoGroup}
+            reflashMenu={reflashMenu}
+          />
+        );
       case GroupMenuType.Application:
-        return <AppTodo typeName={selectMenu.key} todoGroup={todoGroup} />;
+        return (
+          <AppTodo
+            typeName={selectMenu.key}
+            todoGroup={todoGroup}
+            reflashMenu={reflashMenu}
+          />
+        );
       default:
         return <></>;
     }

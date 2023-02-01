@@ -13,6 +13,7 @@ import cls from './index.module.less';
 interface IProps {
   typeName: string;
   todoGroup: ITodoGroup;
+  reflashMenu: () => void;
 }
 const AppTodo: React.FC<IProps> = (props) => {
   const parentRef = useRef<any>(null);
