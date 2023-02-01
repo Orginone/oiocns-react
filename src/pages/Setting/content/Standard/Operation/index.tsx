@@ -10,7 +10,8 @@ import OperationModel from '../../../components/operationModal';
 import FormDesignModal from '../../../components/formDesignModal';
 import ViewFormModal from '../../../components/viewFormModal';
 import { ProTable } from '@ant-design/pro-components';
-import { kernel } from '@/ts/base';
+import { kernel, model } from '@/ts/base';
+import { message } from 'antd';
 
 interface IProps {
   target?: ITarget;
@@ -99,10 +100,34 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   return (
     <>
       <CardOrTable<XOperation>
+        key={tkey}
         rowKey={'id'}
         params={tkey}
         request={async (page) => {
-          return await loadOperations(page);
+          let xOperationArray = await loadOperations(page);
+
+          xOperationArray.result?.map(async (item: XOperation) => {
+            const res = await kernel.queryOperationItems({
+              id: item.id,
+              spaceId: userCtrl.space.id,
+              page: { offset: 0, limit: 100000, filter: '' },
+            });
+            console.log('result', res);
+            if (res.data && res.data.result) {
+              let properties = {};
+              for (let it of res.data.result) {
+                debugger;
+                // properties[it.id] = { title: it.name, type: 'string', props: {} };
+                properties[it.id as string] = JSON.parse(it.rule);
+              }
+              let oldRemark = JSON.parse(item.remark);
+              oldRemark.properties = properties;
+              item.remark = JSON.stringify(oldRemark);
+            }
+            return item;
+          });
+
+          return xOperationArray;
         }}
         operation={renderOperate}
         columns={OperationColumns}
@@ -122,6 +147,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         handleOk={function (success: boolean): void {
           setModalType('');
           if (success) {
+            message.success('保存成功');
             tforceUpdate();
           }
         }}
@@ -134,12 +160,13 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         open={open}
         handleCancel={function (): void {
           setOpen(false);
+          setEditData(undefined);
         }}
         handleOk={function (success: boolean): void {
           setOpen(false);
-          if (success) {
-            tforceUpdate();
-          }
+          setEditData(undefined);
+          message.success('保存成功');
+          tforceUpdate();
         }}
         target={target}
         current={current}
