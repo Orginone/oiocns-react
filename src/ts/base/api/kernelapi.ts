@@ -2345,6 +2345,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询流程节点(复现流程图)
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
+   */
+  public async queryNodes(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.FlowNode>> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryNodes',
+      params: params,
+    });
+  }
+  /**
    * 查询应用业务与定义的绑定关系
    * @param {model.IdReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
