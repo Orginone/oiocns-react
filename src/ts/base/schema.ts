@@ -362,6 +362,49 @@ export type XFlowDefine = {
   public?: boolean;
 };
 
+export type FlowNode = {
+  Id: number;
+  NodeId: string;
+  Type: string;
+  Name: string;
+  Props: Prop;
+  Children: FlowNode;
+  Branches: Branche[];
+};
+
+type Branche = {
+  Conditions: Condition[];
+  Children: FlowNode;
+};
+
+type Condition = {
+  ParamKey: string;
+  Key: string;
+  Type: string;
+  Val: string;
+};
+
+type Prop = {
+  AssignedType: string;
+  Mode: string;
+  AssignedUser: Assigned[];
+  Refuse: Refuse;
+  FriendDialogmode: boolean;
+  Num: number;
+};
+
+type Assigned = {
+  Id: number;
+  Name: string;
+  Type: string;
+  OrgIds: string;
+};
+
+type Refuse = {
+  Type: string;
+  Target: string;
+};
+
 //流程定义查询返回集合
 export type XFlowDefineArray = {
   // 偏移量
