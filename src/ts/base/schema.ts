@@ -759,8 +759,12 @@ export type XMarket = {
   remark: string;
   // 图片
   photo?: string;
-  // 公开的
-  public: boolean;
+  // 加入操作是否公开的
+  joinPublic: boolean;
+  // 售卖操作是否公开
+  sellPublic: boolean;
+  // 购买操作是否公开
+  buyPublic: boolean;
   // 创建组织/个人
   belongId: string;
   // 市场监管组织/个人

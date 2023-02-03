@@ -42,7 +42,9 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         formData.code,
         formData.samrId,
         formData.remark,
-        formData.public,
+        formData.joinPublic,
+        formData.sellPublic,
+        formData.buyPublic,
         formData.photo,
       );
     } else {

@@ -451,8 +451,12 @@ export type MarketModel = {
   samrId: string;
   // 备注
   remark: string;
-  // 是否公开
-  public: boolean;
+  // 加入操作是否公开
+  joinPublic: boolean;
+  // 售卖操作是否公开
+  sellPublic: boolean;
+  // 购买操作是否公开
+  buyPublic: boolean;
   // 图片
   photo: string;
 };

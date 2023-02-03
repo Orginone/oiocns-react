@@ -92,8 +92,8 @@ const CreateMarketModal = (props: Iprops) => {
       },
     },
     {
-      title: '是否开放',
-      dataIndex: 'public',
+      title: '是否开放加入',
+      dataIndex: 'joinPublic',
       valueType: 'select',
       fieldProps: {
         options: [
@@ -108,7 +108,47 @@ const CreateMarketModal = (props: Iprops) => {
         ],
       },
       formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
+        rules: [{ required: true, message: '是否开放加入为必填项' }],
+      },
+    },
+    {
+      title: '售卖权限',
+      dataIndex: 'sellPublic',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '所有人',
+          },
+          {
+            value: false,
+            label: '成员',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '售卖权限为必填项' }],
+      },
+    },
+    {
+      title: '购买权限',
+      dataIndex: 'buyPublic',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '所有人',
+          },
+          {
+            value: false,
+            label: '成员',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '购买权限为必填项' }],
       },
     },
     {
