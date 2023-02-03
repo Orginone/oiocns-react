@@ -31,9 +31,17 @@ class TodoController extends Emitter {
             avatar: userCtrl.user.target.avatar,
           },
         ];
-        orgTodoTypes.push(
-          ...(await userCtrl.user.getJoinedCompanys(false)).map((a) => a.target),
-        );
+        let groupIds: string[] = [];
+        let companys = await userCtrl.user.getJoinedCompanys(false);
+        companys.forEach(async (company) => {
+          (await company.getJoinedGroups(false))
+            .filter((a) => groupIds.indexOf(a.id) < 0)
+            .forEach((a) => {
+              orgTodoTypes.push(a.target);
+              groupIds.push(a.id);
+            });
+        });
+        orgTodoTypes.push(...companys.map((a) => a.target));
         this._orgTodo = await loadOrgTodo(orgTodoTypes);
         this._appTodo = await loadAppTodo();
         this._pubTodo = await loadPublishTodo();
@@ -75,19 +83,21 @@ class TodoController extends Emitter {
   /** 获取总的待办数量 */
   public async getTaskCount(): Promise<number> {
     let sum = 0;
+    let marketTodos = this.MarketTodo.filter((a) => a.id != '' && a.id);
+    let publishTodos = this.PublishTodo.filter((a) => a.id != '' && a.id);
     sum += (await this._orderTodo?.getCount()) ?? 0;
-    this.OrgTodo.forEach(async (a) => {
-      sum += (await a?.getCount()) ?? 0;
-    });
-    this.MarketTodo.filter((a) => a.id != '').forEach(async (a) => {
-      sum += (await a?.getCount()) ?? 0;
-    });
-    this.PublishTodo.filter((a) => a.id != '').forEach(async (a) => {
-      sum += (await a?.getCount()) ?? 0;
-    });
-    this._appTodo.forEach(async (item) => {
-      sum += await item.getCount();
-    });
+    for (let i = 0; i < this.OrgTodo.length; i++) {
+      sum += await this.OrgTodo[i]?.getCount();
+    }
+    for (let i = 0; i < marketTodos.length; i++) {
+      sum += await marketTodos[i]?.getCount();
+    }
+    for (let i = 0; i < publishTodos.length; i++) {
+      sum += await publishTodos[i]?.getCount();
+    }
+    for (let i = 0; i < this._appTodo.length; i++) {
+      sum += await this._appTodo[i]?.getCount();
+    }
     return sum;
   }
 }

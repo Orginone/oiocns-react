@@ -279,6 +279,14 @@ export const loadTypeMenus = async (item: ITarget) => {
         label: '删除' + item.typeName,
       });
     }
+  } else if (await IsSuperAdmin(userCtrl.space)) {
+    if (item != userCtrl.user && item != userCtrl.company) {
+      menus.push({
+        key: '退出',
+        icon: <im.ImBin />,
+        label: '退出' + item.typeName,
+      });
+    }
   }
   return menus;
 };

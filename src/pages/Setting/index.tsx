@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -9,7 +9,7 @@ import TransToDict from '@/pages/Setting/content/Standard/Dict/transToDict';
 import SpeciesMatcher from '@/pages/Setting/content/Standard/Matcher';
 import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
-import { message, Modal } from 'antd';
+import { Modal } from 'antd';
 
 const TeamSetting: React.FC = () => {
   const matchRef = useRef(null);
@@ -444,6 +444,21 @@ const TeamSetting: React.FC = () => {
                 if (await (data.item as ITarget).delete()) {
                   refreshMenu();
                 }
+              },
+            });
+            break;
+          case '退出':
+            Modal.confirm({
+              content: '确定要退出吗?',
+              onOk: async () => {
+                let item = data.item as ITarget;
+                switch (item.typeName) {
+                  case TargetType.Group:
+                    userCtrl.company.quitGroup((data.item as ITarget).id);
+                  case TargetType.Cohort:
+                    userCtrl.user.quitCohorts((data.item as ITarget).id);
+                }
+                refreshMenu();
               },
             });
             break;

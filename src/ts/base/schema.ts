@@ -362,6 +362,45 @@ export type XFlowDefine = {
   public?: boolean;
 };
 
+export type FlowNode = {
+  // 雪花ID
+  Id: string;
+  // 前端定义的编码 代替原先的NodeId
+  Code: string;
+  // 节点类型
+  Type: string;
+  // 节点名称
+  Name: string;
+  // 审批数量
+  Num: number;
+  // 节点审批操作人类型 暂只支持 '身份'
+  DestType: string;
+  // 节点审批操作Id 如 '身份Id'
+  DestId: number;
+  // 子节点
+  Children: FlowNode;
+  // 分支节点
+  Branches: Branche[];
+};
+
+type Branche = {
+  // 分支条件
+  Conditions: Condition[];
+  // 分支子节点
+  Children: FlowNode;
+};
+
+type Condition = {
+  // 规则
+  ParamKey: string;
+  // 键
+  Key: string;
+  // 类型
+  Type: string;
+  // 值
+  Val: string;
+};
+
 //流程定义查询返回集合
 export type XFlowDefineArray = {
   // 偏移量

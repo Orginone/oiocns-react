@@ -1,8 +1,9 @@
-import { XOrderDetail } from '@/ts/base/schema';
-import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core';
-import { ProColumns } from '@ant-design/pro-table';
-import { Space, Tag } from 'antd';
 import React from 'react';
+import { Space, Tag } from 'antd';
+import userCtrl from '@/ts/controller/setting';
+import { XOrderDetail } from '@/ts/base/schema';
+import { ProColumns } from '@ant-design/pro-table';
+import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core';
 
 export const WorkColumns: ProColumns<{ Data: any }>[] = [
   {
@@ -99,8 +100,16 @@ export const MarketColumns: ProColumns<IApplyItem | IApprovalItem>[] = [
   {
     title: '申请组织',
     dataIndex: '',
-    render: (_, row) => {
-      return row.Data.target ? row.Data.target.name : row.Data.targetId;
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      if (record.Data.target) {
+        return record.Data.target.name;
+      }
+      const team = userCtrl.findTeamInfoById(record.Data.targetId);
+      if (team) {
+        return team.name;
+      }
     },
   },
   {
@@ -243,9 +252,17 @@ export const BuyOrderItemColumns: ProColumns<XOrderDetail>[] = [
   },
   {
     title: '卖家',
-    dataIndex: 'sellerId',
     // valueType: 'radio',
     // valueEnum: chat.nameMap,
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.sellerId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '状态',
@@ -296,9 +313,17 @@ export const SaleColumns: ProColumns<IApprovalItem>[] = [
   },
   {
     title: '买家',
-    dataIndex: ['Data', 'order', 'belongId'],
     // valueType: 'radio',
     // valueEnum: chat.nameMap,
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.Data.order.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '售卖权属',
@@ -344,7 +369,18 @@ export const SaleColumns: ProColumns<IApprovalItem>[] = [
 export const ApplicationColumns: ProColumns<IApprovalItem>[] = [
   { title: '序号', valueType: 'index', width: 60 },
   { title: '当前流程', dataIndex: ['Data', 'flowInstance', 'title'] },
-  { title: '申请人', dataIndex: ['Data', 'createUser'] },
+  {
+    title: '申请人',
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.Data.createUser);
+      if (team) {
+        return team.name;
+      }
+    },
+  },
   { title: '事项', dataIndex: ['Data', 'flowInstance', 'content'] },
   {
     title: '状态',
