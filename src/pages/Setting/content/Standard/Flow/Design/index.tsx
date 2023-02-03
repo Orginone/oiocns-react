@@ -25,6 +25,17 @@ interface IProps {
   onBack: () => void;
 }
 
+type FlowDefine = {
+  id?: string;
+  name: string;
+  fields: any[];
+  remark: string;
+  // resource: string;
+  authId: string;
+  belongId: string;
+  public: boolean | undefined;
+};
+
 const Design: React.FC<IProps> = ({
   current,
   species,
@@ -42,11 +53,14 @@ const Design: React.FC<IProps> = ({
     name: '发起人',
     children: {},
   });
-  const [conditionData, setConditionData] = useState<any>({
+  const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
     fields: [],
     remark: '',
+    // resource: '',
+    authId: '',
     belongId: '',
+    public: true,
   });
   const loadAttrs = async () => {
     return await species!.loadAttrs(userCtrl.space.id, {
@@ -56,32 +70,38 @@ const Design: React.FC<IProps> = ({
     });
   };
 
-  useEffect(() => {
-    loadAttrs().then((res) => {
-      setAttrs(res.result || []);
-      setConditionData({
-        name: '',
-        remark: '',
-        fields: res.result?.map((attr: any) => {
-          switch (attr.valueType) {
-            case '描述型':
-              return { label: attr.name, value: attr.code, type: 'STRING' };
-            case '数值型':
-              return { label: attr.name, value: attr.code, type: 'NUMERIC' };
-            case '选择型':
-              return {
-                label: attr.name,
-                value: attr.code,
-                type: 'DICT',
-                dict: loadDictItems(attr.dictId),
-              };
-            default:
-              return { label: attr.name, value: attr.code, type: 'STRING' };
-          }
-        }),
-      });
-    });
-  }, []);
+  // useEffect(() => {
+  //   loadAttrs().then((res) => {
+  //     setAttrs(res.result || []);
+
+  //     setConditionData({
+  //       name: '',
+  //       remark: '',
+  //       authId: '',
+  //       belongId: '',
+  //       public: true,
+  //       fields: res.result
+  //         ? res.result.map((attr: any) => {
+  //             switch (attr.valueType) {
+  //               case '描述型':
+  //                 return { label: attr.name, value: attr.code, type: 'STRING' };
+  //               case '数值型':
+  //                 return { label: attr.name, value: attr.code, type: 'NUMERIC' };
+  //               case '选择型':
+  //                 return {
+  //                   label: attr.name,
+  //                   value: attr.code,
+  //                   type: 'DICT',
+  //                   dict: loadDictItems(attr.dictId),
+  //                 };
+  //               default:
+  //                 return { label: attr.name, value: attr.code, type: 'STRING' };
+  //             }
+  //           })
+  //         : [],
+  //     });
+  //   });
+  // }, []);
   const loadDictItems = async (dictId: any) => {
     let res = await kernel.queryDictItems({
       id: dictId,
@@ -97,11 +117,17 @@ const Design: React.FC<IProps> = ({
     });
   };
   useEffect(() => {
+    loadAttrs().then((res) => {
+      setAttrs(res.result || []);
+    });
     if (current) {
       setResource(JSON.parse(current.content)['resource']);
       setConditionData({
         name: current.name || '',
         remark: current.remark,
+        authId: current.authId || '',
+        belongId: current.belongId,
+        public: current.public,
         fields: attrs.map((attr: any) => {
           switch (attr.valueType) {
             case '描述型':
@@ -237,6 +263,7 @@ const Design: React.FC<IProps> = ({
                   }}
                   nextStep={(params) => {
                     setCurrentStep(1);
+
                     setConditionData(params);
                   }}
                 />

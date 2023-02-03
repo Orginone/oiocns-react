@@ -251,7 +251,10 @@ class CohortChat extends BaseChat {
       appendTarget(res.data.result);
       res.data.result.forEach((item) => {
         item.name = item.team?.name ?? item.name;
-        this.persons.push(item);
+        let idArray = this.persons.map((r: schema.XTarget) => r.id);
+        if (!idArray.includes(item.id)) {
+          this.persons.push(item);
+        }
       });
       this.personCount = res.data?.total ?? 0;
     }

@@ -23,7 +23,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       key: item.key,
       item: item,
       label: item.teamName,
-      itemType: item.typeName,
+      itemType: GroupMenuType.Books + '-' + item.typeName,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: await buildTargetTree(item.subTeam),
     });
@@ -40,7 +40,7 @@ export const loadBookMenu = async () => {
       key: company.id,
       label: company.name,
       item: company,
-      itemType: GroupMenuType.Books,
+      itemType: GroupMenuType.Books + '-' + BookType.Company,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         await loadGroupMenus({
@@ -49,12 +49,12 @@ export const loadBookMenu = async () => {
           typeName: TargetType.Department,
           subTeam: await company.loadSubTeam(),
         }),
-        await loadGroupMenus({
-          key: '外设机构',
-          item: company,
-          typeName: TargetType.Group,
-          subTeam: await company.getJoinedGroups(),
-        }),
+        // await loadGroupMenus({
+        //   key: '外设机构',
+        //   item: company,
+        //   typeName: TargetType.Group,
+        //   subTeam: await company.getJoinedGroups(),
+        // }),
         await loadGroupMenus({
           key: '岗位',
           item: company,
@@ -79,28 +79,35 @@ export const loadBookMenu = async () => {
       {
         key: BookType.Common,
         label: BookType.Common,
-        itemType: GroupMenuType.Books,
+        itemType: GroupMenuType.Books + '-' + BookType.Common,
         icon: <im.ImHeart />,
         children: [],
       },
       {
-        key: BookType.NewFriend,
-        label: BookType.NewFriend,
-        itemType: GroupMenuType.Books,
-        icon: <im.ImUserPlus />,
+        key: BookType.RecentlyContacts,
+        label: BookType.RecentlyContacts,
+        itemType: GroupMenuType.Books + '-' + BookType.RecentlyContacts,
+        icon: <im.ImAddressBook />,
         children: [],
       },
+      // {
+      //   key: BookType.NewFriend,
+      //   label: BookType.NewFriend,
+      //   itemType: GroupMenuType.Books + '-' + BookType.NewFriend,
+      //   icon: <im.ImUserPlus />,
+      //   children: [],
+      // },
       {
         key: BookType.Friend,
         label: BookType.Friend,
-        itemType: GroupMenuType.Books,
+        itemType: GroupMenuType.Books + '-' + BookType.Friend,
         icon: <im.ImUser />,
         children: [],
       },
       {
         key: BookType.UserCohort,
         label: BookType.UserCohort,
-        itemType: GroupMenuType.Books,
+        itemType: GroupMenuType.Books + '-' + BookType.UserCohort + BookType.TypeGroup,
         icon: <im.ImUsers />,
         children: cohorts.map((a) => {
           return {
@@ -108,7 +115,7 @@ export const loadBookMenu = async () => {
             key: a.id,
             label: a.name,
             item: a,
-            itemType: GroupMenuType.Books,
+            itemType: GroupMenuType.Books + '-' + BookType.UserCohort,
             icon: <TeamIcon share={a.shareInfo} size={18} fontSize={16} />,
           };
         }),
@@ -123,7 +130,7 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
   return {
     key: param.item.id + param.key,
     label: param.key,
-    itemType: GroupMenuType.Books,
+    itemType: GroupMenuType.Books + '-' + param.typeName + BookType.TypeGroup,
     icon: (
       <TeamIcon
         share={{
@@ -161,7 +168,7 @@ export const loadChatMenu = () => {
       itemType: GroupMenuType.Chat,
       item: a,
       children: [],
-      icon: <TeamIcon share={a.shareInfo} size={16} fontSize={16} />,
+      icon: <TeamIcon share={a.shareInfo} size={28} fontSize={28} />,
     };
   });
   return {

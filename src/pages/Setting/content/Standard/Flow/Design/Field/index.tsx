@@ -7,7 +7,7 @@ import { AttributeModel } from '@/ts/base/model';
 import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
-  currentFormValue: {};
+  currentFormValue: any;
   nextStep: (params: any) => void;
   onChange: (params: any) => void;
 }

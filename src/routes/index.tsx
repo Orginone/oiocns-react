@@ -59,7 +59,7 @@ const ChatRouter: IRouteConfig[] = [
     path: '/chat',
     title: '沟通',
     icon: 'icon-message',
-    component: React.lazy(() => import('@/pages/Chat')),
+    component: React.lazy(() => import('@/pages/Chats')),
   },
 ];
 
