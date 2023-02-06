@@ -21,7 +21,9 @@ export default interface IMarket {
     code: string,
     samrId: string,
     remark: string,
-    ispublic: boolean,
+    joinPublic: boolean,
+    sellPublic: boolean,
+    buyPublic: boolean,
     photo: string,
   ): Promise<boolean>;
   /**
