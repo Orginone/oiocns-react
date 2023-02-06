@@ -127,9 +127,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
                 {props.content}
               </span>
             )}
-            {/* {props.belongId && (
-              <span style={{ color: 'red' }}>创建人: {props.belongId}</span>
-            )} */}
             {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
             {(!props.belongId || props.belongId == userCtrl.space.id) && (
               <CloseOutlined
@@ -171,7 +168,15 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
         <Tooltip
-          title={<span>创建人: {userCtrl.getBelongName(props.belongId || '')}</span>}
+          title={
+            <span>
+              创建人:{' '}
+              {
+                // userCtrl.getBelongName(props.belongId || '')
+                props.belongId
+              }
+            </span>
+          }
           placement="right">
           <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
             <div

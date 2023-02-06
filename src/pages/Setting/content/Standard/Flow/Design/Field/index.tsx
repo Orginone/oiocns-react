@@ -8,12 +8,20 @@ import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
   currentFormValue: any;
+  operateOrgId?: string;
+  modalType: string;
+  setOperateOrgId: Function;
   nextStep: (params: any) => void;
   onChange: (params: any) => void;
 }
 
 /** 傻瓜组件，只负责读取状态 */
-const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) => {
+const FieldInfo: React.FC<IProps> = ({
+  nextStep,
+  currentFormValue,
+  onChange,
+  modalType,
+}) => {
   const [form] = Form.useForm();
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
@@ -21,6 +29,7 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
       {
         title: '流程名称',
         dataIndex: 'name',
+        readonly: modalType == '编辑业务流程',
         formItemProps: {
           rules: [{ required: true, message: '流程名称为必填项' }],
         },
@@ -29,6 +38,7 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
         title: '选择制定组织',
         dataIndex: 'belongId',
         valueType: 'treeSelect',
+        readonly: modalType == '编辑业务流程',
         formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
         request: async () => {
           return await userCtrl.getTeamTree();
@@ -40,44 +50,62 @@ const FieldInfo: React.FC<IProps> = ({ nextStep, currentFormValue, onChange }) =
           treeNodeFilterProp: 'teamName',
         },
       },
-      {
-        title: '选择管理职权',
-        dataIndex: 'authId',
+
+      // {
+      //   title: '选择管理职权',
+      //   dataIndex: 'authId',
+      //   valueType: 'treeSelect',
+      //   // formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
+      //   request: async () => {
+      //     const data = await userCtrl.company.loadAuthorityTree(false);
+      //     return data ? [data] : [];
+      //   },
+      //   fieldProps: {
+      //     fieldNames: { label: 'name', value: 'id' },
+      //     showSearch: true,
+      //     filterTreeNode: true,
+      //     treeNodeFilterProp: 'name',
+      //     treeDefaultExpandAll: true,
+      //   },
+      // },
+      // {
+      //   title: '向下级组织公开',
+      //   dataIndex: 'public',
+      //   valueType: 'select',
+      //   fieldProps: {
+      //     options: [
+      //       {
+      //         value: true,
+      //         label: '公开',
+      //       },
+      //       {
+      //         value: false,
+      //         label: '不公开',
+      //       },
+      //     ],
+      //   },
+      //   // formItemProps: {
+      //   //   rules: [{ required: true, message: '是否公开为必填项' }],
+      //   // },
+      // },
+    ];
+    if (currentFormValue.operateOrgId != undefined) {
+      columns.push({
+        title: '当前操作组织',
+        dataIndex: 'operateOrgId',
+        readonly: true,
         valueType: 'treeSelect',
-        formItemProps: { rules: [{ required: true, message: '管理职权为必填项' }] },
         request: async () => {
-          const data = await userCtrl.company.loadAuthorityTree(false);
-          return data ? [data] : [];
+          return await userCtrl.getTeamTree();
         },
         fieldProps: {
-          fieldNames: { label: 'name', value: 'id' },
+          fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
           showSearch: true,
           filterTreeNode: true,
-          treeNodeFilterProp: 'name',
-          treeDefaultExpandAll: true,
+          treeNodeFilterProp: 'teamName',
         },
-      },
-      {
-        title: '向下级组织公开',
-        dataIndex: 'public',
-        valueType: 'select',
-        fieldProps: {
-          options: [
-            {
-              value: true,
-              label: '公开',
-            },
-            {
-              value: false,
-              label: '不公开',
-            },
-          ],
-        },
-        formItemProps: {
-          rules: [{ required: true, message: '是否公开为必填项' }],
-        },
-      },
-    ];
+      });
+    }
     columns.push({
       title: '备注信息',
       dataIndex: 'remark',

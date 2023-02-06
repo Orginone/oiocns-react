@@ -18,9 +18,11 @@ import { ISpeciesItem } from '@/ts/core';
 import { kernel } from '@/ts/base';
 
 interface IProps {
-  current?: XFlowDefine;
+  current: XFlowDefine;
   species?: ISpeciesItem;
   modalType: string;
+  operateOrgId?: string;
+  setOperateOrgId: Function;
   setModalType: (modalType: string) => void;
   onBack: () => void;
 }
@@ -34,16 +36,20 @@ type FlowDefine = {
   authId: string;
   belongId: string;
   public: boolean | undefined;
+  operateOrgId?: string;
 };
 
 const Design: React.FC<IProps> = ({
   current,
   species,
   modalType,
+  operateOrgId,
+  setOperateOrgId,
   setModalType,
   onBack,
 }: IProps) => {
-  const [attrs, setAttrs] = useState<any[]>([]);
+  // const [attrs, setAttrs] = useState<any[]>([]);
+  debugger;
   const [scale, setScale] = useState<number>(90);
   const [currentStep, setCurrentStep] = useState(0);
   const [resource, setResource] = useState({
@@ -61,47 +67,9 @@ const Design: React.FC<IProps> = ({
     authId: '',
     belongId: '',
     public: true,
+    operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
   });
-  const loadAttrs = async () => {
-    return await species!.loadAttrs(userCtrl.space.id, {
-      offset: 0,
-      limit: 100,
-      filter: '',
-    });
-  };
 
-  // useEffect(() => {
-  //   loadAttrs().then((res) => {
-  //     setAttrs(res.result || []);
-
-  //     setConditionData({
-  //       name: '',
-  //       remark: '',
-  //       authId: '',
-  //       belongId: '',
-  //       public: true,
-  //       fields: res.result
-  //         ? res.result.map((attr: any) => {
-  //             switch (attr.valueType) {
-  //               case '描述型':
-  //                 return { label: attr.name, value: attr.code, type: 'STRING' };
-  //               case '数值型':
-  //                 return { label: attr.name, value: attr.code, type: 'NUMERIC' };
-  //               case '选择型':
-  //                 return {
-  //                   label: attr.name,
-  //                   value: attr.code,
-  //                   type: 'DICT',
-  //                   dict: loadDictItems(attr.dictId),
-  //                 };
-  //               default:
-  //                 return { label: attr.name, value: attr.code, type: 'STRING' };
-  //             }
-  //           })
-  //         : [],
-  //     });
-  //   });
-  // }, []);
   const loadDictItems = async (dictId: any) => {
     let res = await kernel.queryDictItems({
       id: dictId,
@@ -117,35 +85,45 @@ const Design: React.FC<IProps> = ({
     });
   };
   useEffect(() => {
-    loadAttrs().then((res) => {
-      setAttrs(res.result || []);
-    });
     if (current) {
-      setResource(JSON.parse(current.content)['resource']);
-      setConditionData({
-        name: current.name || '',
-        remark: current.remark,
-        authId: current.authId || '',
-        belongId: current.belongId,
-        public: current.public,
-        fields: attrs.map((attr: any) => {
-          switch (attr.valueType) {
-            case '描述型':
-              return { label: attr.name, value: attr.code, type: 'STRING' };
-            case '数值型':
-              return { label: attr.name, value: attr.code, type: 'NUMERIC' };
-            case '选择型':
-              return {
-                label: attr.name,
-                value: attr.code,
-                type: 'DICT',
-                dict: loadDictItems(attr.dictId),
-              };
-            default:
-              return { label: attr.name, value: attr.code, type: 'STRING' };
-          }
-        }),
-      });
+      if (current.content && current.content != '') {
+        setResource(JSON.parse(current.content)['resource']);
+      }
+
+      species!
+        .loadAttrs(userCtrl.space.id, {
+          offset: 0,
+          limit: 100,
+          filter: '',
+        })
+        .then((res) => {
+          let attrs = res.result || [];
+          setConditionData({
+            name: current.name || '',
+            remark: current.remark,
+            authId: current.authId || '',
+            belongId: current.belongId,
+            public: current.public,
+            operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
+            fields: attrs.map((attr: any) => {
+              switch (attr.valueType) {
+                case '描述型':
+                  return { label: attr.name, value: attr.code, type: 'STRING' };
+                case '数值型':
+                  return { label: attr.name, value: attr.code, type: 'NUMERIC' };
+                case '选择型':
+                  return {
+                    label: attr.name,
+                    value: attr.code,
+                    type: 'DICT',
+                    dict: loadDictItems(attr.dictId),
+                  };
+                default:
+                  return { label: attr.name, value: attr.code, type: 'STRING' };
+              }
+            }),
+          });
+        });
     }
   }, [current]);
 
@@ -258,12 +236,14 @@ const Design: React.FC<IProps> = ({
               {currentStep === 0 ? (
                 <FieldInfo
                   currentFormValue={conditionData}
+                  operateOrgId={operateOrgId}
+                  setOperateOrgId={setOperateOrgId}
+                  modalType={modalType}
                   onChange={(params) => {
                     setConditionData(params);
                   }}
                   nextStep={(params) => {
                     setCurrentStep(1);
-
                     setConditionData(params);
                   }}
                 />

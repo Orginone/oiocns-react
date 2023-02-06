@@ -1,8 +1,10 @@
 import Design from './Design';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import FlowList from './info';
 import { ISpeciesItem, ITarget } from '@/ts/core';
+import { IsThingAdmin } from '@/utils/authority';
+import userCtrl from '@/ts/controller/setting';
 
 /**
  * 流程设置
@@ -22,12 +24,40 @@ const SettingFlow: React.FC<IProps> = ({
   setModalType,
 }: IProps) => {
   const [tabKey, SetTabKey] = useState(0);
-  const [flowDesign, setFlowDesign] = useState<XFlowDefine>();
+  const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
+    id: '',
+    name: '',
+    code: '',
+    belongId: '',
+    content: '',
+    remark: '',
+    status: 0,
+    createUser: '',
+    updateUser: '',
+    version: '',
+    createTime: '',
+    updateTime: '',
+    target: undefined,
+  });
+  const [operateOrgId, setOperateOrgId] = useState<string>();
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const judgeIsAdmin = async (target: ITarget) => {
+    let isAdmin = await IsThingAdmin(target);
+    setIsAdmin(isAdmin);
+  };
+  useEffect(() => {
+    judgeIsAdmin(userCtrl.space);
+  }, []);
   return tabKey === 0 ? (
     <FlowList
       onCurrentChaned={(item) => {
-        setFlowDesign(item);
+        if (item) {
+          setFlowDesign(item);
+        }
       }}
+      isAdmin={isAdmin}
+      operateOrgId={operateOrgId}
+      setOperateOrgId={setOperateOrgId}
       species={current}
       onDesign={() => SetTabKey(1)}
       modalType={modalType}
@@ -37,6 +67,8 @@ const SettingFlow: React.FC<IProps> = ({
     <Design
       current={flowDesign}
       species={current}
+      operateOrgId={operateOrgId}
+      setOperateOrgId={setOperateOrgId}
       onBack={() => SetTabKey(0)}
       modalType={modalType}
       setModalType={setModalType}
