@@ -1,4 +1,4 @@
-import { kernel, parseAvatar, schema } from '../../base';
+import { kernel, model, parseAvatar, schema } from '../../base';
 import { Dict } from '../target/species/dict';
 import { IDict, INullDict } from '../target/species/idict';
 import {
@@ -219,13 +219,12 @@ export class SpeciesItem implements ISpeciesItem {
 
   async createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
-    const res = await kernel.createOperation({
+  ): Promise<model.ResultType<schema.XOperation>> {
+    return await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
       ...data,
     });
-    return res.success;
   }
 
   async updateOperation(

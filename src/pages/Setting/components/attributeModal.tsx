@@ -27,18 +27,6 @@ const AttributeModal = (props: Iprops) => {
     const result: any = {};
     for (const item of dicts) {
       result[item.id] = { id: item.id, name: item.name, text: item.name };
-      // result.push({
-      //   // id: item.id,
-      //   // key: item.id,
-      //   value: item.id,
-      //   // name: item.name,
-      //   label: item.name,
-      //   // text: item.name,
-      //   // item: item,
-      //   // // isLeaf: true,
-      //   // title: item.name,
-      //   // icon: <></>,
-      // });
     }
     return result;
   };

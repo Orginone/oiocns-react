@@ -16,6 +16,7 @@ import {
   XOperationArray,
   XSpecies,
 } from '../../base/schema';
+import { model, schema } from '@/ts/base';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -113,7 +114,7 @@ export interface ISpeciesItem {
    */
   createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean>;
+  ): Promise<model.ResultType<schema.XOperation>>;
   /**
    * 更新业务标准
    * @param data 创建参数

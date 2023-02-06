@@ -213,6 +213,33 @@ function filterEmptyPropObj(obj: any) {
   return obj;
 }
 
+/**
+ * 递归访问整个树
+ */
+function visitTree(
+  tree: any[],
+  cb: (item: any, parent: any, deep: number) => void,
+  options?: {
+    /** 子项名，默认：`'children'` */
+    childrenMapName?: string;
+  },
+) {
+  options = {
+    childrenMapName: 'children',
+    ...options,
+  };
+  const inFn = (data: any[], parent: any, deep: number) => {
+    for (const item of data) {
+      cb(item, parent, deep);
+      const childrenVal = item[options!.childrenMapName!];
+      if (childrenVal && childrenVal.length > 0) {
+        inFn(childrenVal, item, deep + 1);
+      }
+    }
+  };
+  inFn(tree, null, 1);
+}
+
 export {
   filterEmptyPropObj,
   formatDate,
@@ -220,4 +247,5 @@ export {
   getQueryString,
   isEmoji,
   isSpecialChar,
+  visitTree,
 };
