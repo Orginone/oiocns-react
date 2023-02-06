@@ -20,6 +20,7 @@ const useMenuUpdate = (): [
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
+  // const [viewkey, setViewkey] = useState<string>('');
   const [menus, setMenu] = useState<TabItemType[]>([]);
   const [selectMenu, setSelectMenu] = useState<MenuItemType>({
     key: '会话',
@@ -73,6 +74,7 @@ const useMenuUpdate = (): [
         children = books.children;
         break;
     }
+
     const item: MenuItemType | undefined = findMenuItemByKey(
       children,
       chatCtrl.currentKey,

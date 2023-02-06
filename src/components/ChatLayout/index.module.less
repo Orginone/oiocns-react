@@ -1,5 +1,28 @@
 @import '~antd/es/style/themes/variable';
 
+.customMenu {
+  :global {
+    .ogo-menu-title-content {
+      margin-left: 6px;
+    }
+    .ogo-menu-submenu-title {
+      padding-top: 6px;
+      padding-right: 6px;
+      height: auto !important;
+      line-height: auto !important;
+    }
+    .ogo-typography {
+      color: inherit;
+    }
+    .ogo-menu-submenu-placement-rightTop {
+      .ogo-menu-vertical .ogo-menu-submenu-title {
+        padding-right: 8px;
+        display: flex;
+      }
+    }
+  }
+}
+
 .sider {
   background-color: @component-background;
   height: 100%;

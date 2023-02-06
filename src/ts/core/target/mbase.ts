@@ -178,13 +178,17 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     remark,
     samrId,
     photo,
-    ispublic = true,
+    joinPublic = true,
+    sellPublic = false,
+    buyPublic = false,
   }: {
     name: string;
     code: string;
     remark: string;
     samrId: string;
-    ispublic: boolean;
+    joinPublic: boolean;
+    sellPublic: boolean;
+    buyPublic: boolean;
     photo: string;
   }): Promise<IMarket | undefined> {
     const res = await kernel.createMarket({
@@ -193,8 +197,10 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       remark,
       samrId,
       photo,
+      joinPublic,
+      sellPublic,
+      buyPublic,
       id: undefined,
-      public: ispublic,
       belongId: this.target.id,
     });
     if (res.success) {

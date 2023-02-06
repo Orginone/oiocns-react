@@ -5,6 +5,7 @@ import userCtrl from '../setting';
 import { DomainTypes, TargetType } from '@/ts/core/enum';
 import { Emitter } from '@/ts/base/common';
 import { TargetShare } from '@/ts/base/model';
+import { message } from 'antd';
 
 // 会话缓存对象名称
 const chatsObjectName = 'userchat';
@@ -28,7 +29,6 @@ class ChatController extends Emitter {
       }
     });
   }
-
   /** 当前会话、通讯录的搜索内容 */
   public currentKey: string = '';
   /** 通讯录 */
@@ -51,6 +51,7 @@ class ChatController extends Emitter {
   public get tabIndex() {
     return this._tabIndex;
   }
+
   /**
    * 获取会话ID对应名称
    * @param id 会话ID
@@ -149,6 +150,7 @@ class ChatController extends Emitter {
   }
   /** 置顶功能 */
   public setToping(chat: IChat): void {
+    message.success('置顶成功');
     const index = this._chats.findIndex((i) => {
       return i.fullId === chat.fullId;
     });
@@ -168,7 +170,10 @@ class ChatController extends Emitter {
           let lchat = this.findChat(item);
           if (lchat) {
             lchat.loadCache(item);
-            this._appendChats(lchat);
+            let ids = this._chats.map((ct: IChat) => ct.chatId);
+            if (!ids.includes(lchat.chatId)) {
+              this._appendChats(lchat);
+            }
           }
         }
         this.changCallback();

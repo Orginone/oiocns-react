@@ -64,6 +64,21 @@ const Groupdetail = () => {
   };
 
   /**
+   * 消息免打扰
+   * @param e
+   */
+  const changeSilence = (e: any) => {};
+  /**
+   * 置顶
+   * @param e
+   */
+  const changeTop = (e: any) => {
+    if (chatCtrl.chat) {
+      chatCtrl.setToping(chatCtrl.chat);
+    }
+  };
+
+  /**
    * @description: 取消
    * @return {*}
    */
@@ -188,13 +203,13 @@ const Groupdetail = () => {
           )}
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
             <span>消息免打扰</span>
-            <Checkbox />
+            <Checkbox onChange={changeSilence} />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
             <span>
               {chatCtrl.chat.target.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}
             </span>
-            <Checkbox />
+            <Checkbox onChange={changeTop} checked={chatCtrl.chat.isToping} />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
             <span>查找聊天记录</span>

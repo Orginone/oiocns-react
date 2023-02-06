@@ -18,6 +18,7 @@ import style from './index.module.less';
 interface CustomMenuType {
   selectMenu: MenuItemType;
   item: MenuItemType;
+  menuStyle?: any;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
@@ -33,6 +34,7 @@ const CustomMenu = (props: CustomMenuType) => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
       const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
+
       setData(loadMenus(loopFilterTree(props.item.children), expKeys));
       setOpenKeys(expKeys);
       setSelectedKeys([props.selectMenu.key]);
@@ -213,7 +215,7 @@ const CustomMenu = (props: CustomMenuType) => {
         }}
       />
       <Menu
-        className={style.customMenu}
+        className={props.menuStyle ? props.menuStyle : style.customMenu}
         mode="inline"
         inlineIndent={10}
         items={data}
