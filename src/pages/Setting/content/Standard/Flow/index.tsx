@@ -15,30 +15,19 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
+  flowDesign: XFlowDefine;
+  setFlowDesign: Function;
   setModalType: (modalType: string) => void;
 }
 const SettingFlow: React.FC<IProps> = ({
   current,
   target,
   modalType,
+  flowDesign,
+  setFlowDesign,
   setModalType,
 }: IProps) => {
   const [tabKey, SetTabKey] = useState(0);
-  const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
-    id: '',
-    name: '',
-    code: '',
-    belongId: '',
-    content: '',
-    remark: '',
-    status: 0,
-    createUser: '',
-    updateUser: '',
-    version: '',
-    createTime: '',
-    updateTime: '',
-    target: undefined,
-  });
   const [operateOrgId, setOperateOrgId] = useState<string>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const judgeIsAdmin = async (target: ITarget) => {

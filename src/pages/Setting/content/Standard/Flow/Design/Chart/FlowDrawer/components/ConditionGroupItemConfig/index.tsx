@@ -108,7 +108,6 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                           condition.type = element.type;
                           condition.paramKey = e;
                           condition.paramLabel = element.label;
-                          // debugger;
                           if (element.dict) {
                             element.dict.then((dicts: any[]) => {
                               condition.dict = dicts.map((a: any) => {

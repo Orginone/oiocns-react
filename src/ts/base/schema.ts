@@ -364,41 +364,45 @@ export type XFlowDefine = {
 
 export type FlowNode = {
   // 雪花ID
-  Id: string;
+  id: string;
   // 前端定义的编码 代替原先的NodeId
-  Code: string;
+  code: string;
   // 节点类型
-  Type: string;
+  type: string;
   // 节点名称
-  Name: string;
+  name: string;
   // 审批数量
-  Num: number;
+  num: number;
   // 节点审批操作人类型 暂只支持 '身份'
-  DestType: string;
+  destType: string;
   // 节点审批操作Id 如 '身份Id'
-  DestId: number;
+  destId: number | undefined;
+  // 节点审批操作名称 如 '身份名称'
+  destName: string;
   // 子节点
-  Children: FlowNode;
+  children: FlowNode | undefined;
   // 分支节点
-  Branches: Branche[];
+  branches: Branche[];
+  // 节点归属
+  belongId: string;
 };
 
-type Branche = {
+export type Branche = {
   // 分支条件
-  Conditions: Condition[];
+  conditions: Condition[];
   // 分支子节点
-  Children: FlowNode;
+  children: FlowNode;
 };
 
-type Condition = {
+export type Condition = {
   // 规则
-  ParamKey: string;
+  paramKey: string;
   // 键
-  Key: string;
+  key: string;
   // 类型
-  Type: string;
+  type: string;
   // 值
-  Val: string;
+  val: string;
 };
 
 //流程定义查询返回集合

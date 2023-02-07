@@ -2,6 +2,7 @@ import Node, { AddNodeType } from '../Node';
 import React, { useMemo } from 'react';
 
 type CcNodeProps = {
+  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
@@ -41,6 +42,7 @@ const CcNode: React.FC<CcNodeProps> = (props: CcNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      operateOrgId={props.operateOrgId}
       type={AddNodeType.CC}
     />
   );

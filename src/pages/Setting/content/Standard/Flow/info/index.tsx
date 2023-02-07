@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XFlowDefine, XFlowDefineArray } from '@/ts/base/schema';
 import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
 import { FlowColumn } from '@/pages/Setting/config/columns';
@@ -128,7 +128,11 @@ const FlowList: React.FC<IProps> = ({
               height={0.38 * useWindowSize().height}
               rowKey={(record: XFlowDefine) => record.id}
               request={async (page) => {
-                return await species?.loadFlowDefines(userCtrl.space.id, page);
+                let res: XFlowDefineArray | undefined = await species?.loadFlowDefines(
+                  userCtrl.space.id,
+                  page,
+                );
+                return res;
               }}
               onRow={(record: any) => {
                 return {

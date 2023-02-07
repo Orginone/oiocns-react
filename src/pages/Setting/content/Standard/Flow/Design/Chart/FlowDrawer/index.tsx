@@ -4,22 +4,28 @@ import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
 import { AddNodeType, FieldCondition, NodeType } from './processType';
-import userCtrl from '@/ts/controller/setting';
 /**
  * @description: 流程设置抽屉
  * @return {*}
  */
 
 interface IProps {
+  operateOrgId?: string;
   isOpen: boolean;
   current?: NodeType;
   conditions?: FieldCondition[];
   onClose: () => void;
 }
 
-const FlowDrawer: React.FC<IProps> = ({ isOpen, onClose, conditions, current }) => {
+const FlowDrawer: React.FC<IProps> = ({
+  isOpen,
+  onClose,
+  conditions,
+  current,
+  operateOrgId,
+}) => {
   const Component = (current: any) => {
-    if (current.belongId && current.belongId != userCtrl.space.id) {
+    if (current.belongId && operateOrgId && current.belongId != operateOrgId) {
       return <div>此节点由{current.belongId}创建,无法编辑</div>;
     } else {
       switch (current?.type) {
@@ -42,7 +48,7 @@ const FlowDrawer: React.FC<IProps> = ({ isOpen, onClose, conditions, current }) 
     <Drawer
       title={
         <>
-          {(!current.belongId || current.belongId == userCtrl.space.id) && (
+          {(!current.belongId || !operateOrgId || current.belongId == operateOrgId) && (
             <Typography.Title
               editable={{
                 onChange: (e: any) => {
@@ -54,7 +60,7 @@ const FlowDrawer: React.FC<IProps> = ({ isOpen, onClose, conditions, current }) 
               {current.name}
             </Typography.Title>
           )}
-          {current.belongId && current.belongId != userCtrl.space.id && (
+          {current.belongId && operateOrgId && current.belongId != operateOrgId && (
             <div>{current.name}</div>
           )}
         </>

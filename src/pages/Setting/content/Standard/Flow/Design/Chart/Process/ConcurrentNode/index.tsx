@@ -5,6 +5,7 @@ import cls from './index.module.less';
 import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 type ConcurrentNodeProps = {
+  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onCopy: Function;
@@ -46,7 +47,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           {props.config.name ? props.config.name : '并行任务' + props.level}
         </span>
       </span>
-      {(!props.config.belongId || props.config.belongId == userCtrl.space.id) && (
+      {(!props.config.belongId || props.config.belongId == props.operateOrgId) && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -65,17 +66,17 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   return (
     <div
       className={
-        !props.config.belongId || props.config.belongId == userCtrl.space.id
+        !props.config.belongId || props.config.belongId == props.operateOrgId
           ? cls['node']
           : cls['node-unEdit']
       }>
       <Tooltip
         title={
           <span>
-            创建人:{' '}
+            创建组织:{' '}
             {
               // userCtrl.getBelongName(props.config.belongId)
-              props.config.belongId
+              userCtrl.getBelongName(props.config.belongId)
             }
           </span>
         }

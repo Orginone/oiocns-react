@@ -1,4 +1,7 @@
 /* eslint-disable no-unused-vars */
+
+import { FlowNode as SchemaFlowNode } from './schema';
+
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -811,7 +814,7 @@ export type CreateDefineReq = {
   // 备注
   remark: string;
   // 节点信息
-  resource?: FlowNode;
+  resource?: SchemaFlowNode;
   // 归属Id
   belongId: string;
   // 流程字段json
@@ -845,6 +848,7 @@ export type Branche = {
   type: string;
   conditions: Condition[];
   children: FlowNode;
+  belongId?: string;
 };
 
 export type Condition = {
