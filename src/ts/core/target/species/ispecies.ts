@@ -1,3 +1,4 @@
+import { model, schema } from '@/ts/base';
 import {
   AttributeModel,
   CreateDefineReq,
@@ -114,7 +115,7 @@ export interface ISpeciesItem {
    */
   createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean>;
+  ): Promise<model.ResultType<schema.XOperation>>;
   /**
    * 更新业务标准
    * @param data 创建参数

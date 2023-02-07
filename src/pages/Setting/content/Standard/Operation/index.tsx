@@ -4,14 +4,14 @@ import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
 import { XOperation } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
-import { OperationColumns, OperationItemColumns } from '@/pages/Setting/config/columns';
+import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import OperationModel from '../../../components/operationModal';
+import OperationModel, { transformItemModel } from '../../../components/operationModal';
 import FormDesignModal from '../../../components/formDesignModal';
+import OperationItemTable from '../../../components/OperationItemTable';
 import ViewFormModal from '../../../components/viewFormModal';
-import { ProTable } from '@ant-design/pro-components';
-import { kernel, model } from '@/ts/base';
-import { message } from 'antd';
+import { message, Popconfirm } from 'antd';
+import { kernel } from '@/ts/base';
 
 interface IProps {
   target?: ITarget;
@@ -28,8 +28,45 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   let selectRow: XOperation;
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XOperation>();
-  const [open, setOpen] = useState<boolean>(false);
+
+  const [designOpen, setDesignOpen] = useState<boolean>(false);
   const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
+  // 添加表单项
+  const appendItems = async (operation: XOperation) => {
+    const res = await current.loadAttrs(userCtrl.space.id, {
+      offset: 0,
+      limit: 100000,
+      filter: '',
+    });
+    let attrs = (res.result || []).filter((attr) => attr.belongId === userCtrl.space.id);
+    if (attrs.length > 0) {
+      const existItemsRes = await kernel.queryOperationItems({
+        id: operation.id,
+        spaceId: userCtrl.space.id,
+        page: { offset: 0, limit: 100000, filter: '' },
+      });
+      const existCodes = (existItemsRes.data?.result || []).map((i) => i.code);
+      attrs = attrs.filter((attr) => !existCodes.includes(attr.id));
+      const items = transformItemModel(attrs, operation);
+      if (items.length > 0) {
+        let result = false;
+        for (const item of items) {
+          const res = await kernel.createOperationItem(item);
+          result = res.success;
+        }
+        if (result) {
+          message.success('向表单补充字段成功！');
+          tforceUpdate();
+        } else {
+          message.error('向表单补充字段失败！');
+        }
+      } else {
+        message.warning('当前表单已包括所有有权限的特性！');
+      }
+    } else {
+      message.warning('当前表单已包括所有有权限的特性！');
+    }
+  };
 
   // 操作内容渲染函数
   const renderOperate = (item: XOperation) => {
@@ -44,18 +81,34 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
       },
       {
         key: '删除',
-        label: '删除',
-        onClick: async () => {
-          await current?.deleteOperation(item.id);
-          tforceUpdate();
-        },
+        label: (
+          <Popconfirm
+            placement="left"
+            trigger={'click'}
+            title={'确定删除吗？'}
+            onConfirm={async () => {
+              await current?.deleteOperation(item.id);
+              tforceUpdate();
+            }}
+            okText="确定"
+            cancelText="取消">
+            <div>删除</div>
+          </Popconfirm>
+        ),
       },
+      // {
+      //   key: '设计表单',
+      //   label: '设计表单',
+      //   onClick: () => {
+      //     setEditData(item);
+      //     setDesignOpen(true);
+      //   },
+      // },
       {
-        key: '设计表单',
-        label: '设计表单',
+        key: '补充字段',
+        label: '补充字段',
         onClick: () => {
-          setEditData(item);
-          setOpen(true);
+          appendItems(item);
         },
       },
       {
@@ -79,21 +132,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
 
   const expandedRowRender = (record: XOperation) => {
     return (
-      <ProTable
-        columns={OperationItemColumns}
-        headerTitle={false}
-        search={false}
-        options={false}
-        pagination={false}
-        request={async () => {
-          const res = await kernel.queryOperationItems({
-            id: record.id || selectRow?.id,
-            spaceId: userCtrl.space.id,
-            page: { offset: 0, limit: 100000, filter: '' },
-          });
-          return { total: res.data.total, data: res.data.result, success: true };
-        }}
-      />
+      <OperationItemTable operationId={record.id || selectRow?.id} current={current} />
     );
   };
 
@@ -104,29 +143,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         rowKey={'id'}
         params={tkey}
         request={async (page) => {
-          let xOperationArray = await loadOperations(page);
-
-          xOperationArray.result?.map(async (item: XOperation) => {
-            const res = await kernel.queryOperationItems({
-              id: item.id,
-              spaceId: userCtrl.space.id,
-              page: { offset: 0, limit: 100000, filter: '' },
-            });
-            console.log('result', res);
-            if (res.data && res.data.result) {
-              let properties = {};
-              for (let it of res.data.result) {
-                // properties[it.id] = { title: it.name, type: 'string', props: {} };
-                properties[it.id as string] = JSON.parse(it.rule);
-              }
-              let oldRemark = JSON.parse(item.remark);
-              oldRemark.properties = properties;
-              item.remark = JSON.stringify(oldRemark);
-            }
-            return item;
-          });
-
-          return xOperationArray;
+          return await loadOperations(page);
         }}
         operation={renderOperate}
         columns={OperationColumns}
@@ -156,13 +173,13 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
       <FormDesignModal
         data={editData as XOperation}
         title={modalType}
-        open={open}
+        open={designOpen}
         handleCancel={function (): void {
-          setOpen(false);
+          setDesignOpen(false);
           setEditData(undefined);
         }}
         handleOk={function (success: boolean): void {
-          setOpen(false);
+          setDesignOpen(false);
           setEditData(undefined);
           message.success('保存成功');
           tforceUpdate();
