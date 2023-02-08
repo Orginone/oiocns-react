@@ -8,8 +8,9 @@ import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel, { transformItemModel } from '../../../components/operationModal';
 import FormDesignModal from '../../../components/formDesignModal';
-import OperationItemTable from '../../../components/OperationItemTable';
+import OperationItemTable from '../../../components/operationItemTable';
 import ViewFormModal from '../../../components/viewFormModal';
+import ViewCardModal from '../../../components/viewCardModal';
 import { message, Popconfirm } from 'antd';
 import { kernel } from '@/ts/base';
 
@@ -31,6 +32,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
 
   const [designOpen, setDesignOpen] = useState<boolean>(false);
   const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
+  const [viewCardOpen, setViewCardOpen] = useState<boolean>(false);
   // 添加表单项
   const appendItems = async (operation: XOperation) => {
     const res = await current.loadAttrs(userCtrl.space.id, {
@@ -119,6 +121,14 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
           setViewFormOpen(true);
         },
       },
+      {
+        key: '预览卡片',
+        label: '预览卡片',
+        onClick: () => {
+          setEditData(item);
+          setViewCardOpen(true);
+        },
+      },
     ];
   };
 
@@ -195,6 +205,16 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         }}
         handleOk={() => {
           setViewFormOpen(false);
+        }}
+      />
+      <ViewCardModal
+        data={editData}
+        open={viewCardOpen}
+        handleCancel={() => {
+          setViewCardOpen(false);
+        }}
+        handleOk={() => {
+          setViewCardOpen(false);
         }}
       />
     </>
