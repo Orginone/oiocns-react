@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType';
 
 interface IProps {
+  operateOrgId?: string;
   scale?: number;
   resource: any;
   conditions?: FieldCondition[]; //内置条件选择器
@@ -26,6 +27,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
           <div className={cls['design']} style={{ transform: `scale(${scale / 100})` }}>
             {/* 树结构展示 */}
             <ProcessTree
+              operateOrgId={props.operateOrgId}
               conditions={props.conditions}
               resource={props.resource}
               onSelectedNode={(params) => {
@@ -43,6 +45,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       </div>
       {/* 侧边数据填充 */}
       <FlowDrawer
+        operateOrgId={props.operateOrgId}
         isOpen={isOpen}
         current={currentNode}
         conditions={props.conditions}

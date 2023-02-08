@@ -7,6 +7,7 @@ import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 
 type IProps = {
+  operateOrgId?: string;
   conditions?: FieldCondition[];
   onInsertNode: Function;
   onDelNode: Function;
@@ -33,6 +34,58 @@ const ConditionNode: React.FC<IProps> = (props) => {
   const select = () => {
     props.onSelected();
   };
+
+  const findNameBykey = (condition: any, type: string) => {
+    let name: string;
+    let options = [
+      { value: 'EQ', label: '=' },
+      { value: 'GT', label: '>' },
+      { value: 'GTE', label: '≥' },
+      { value: 'LT', label: '<' },
+      { value: 'LTE', label: '≤' },
+      { value: 'NEQ', label: '≠' },
+    ];
+    let allConditions = props.conditions || [];
+    switch (type) {
+      case 'attr':
+        name = condition.paramKey;
+        for (let cd of allConditions) {
+          if (cd.value == condition.paramKey) {
+            name = cd.label;
+            break;
+          }
+        }
+        break;
+      case 'key':
+        name = condition.key;
+        for (let option of options) {
+          if (option.value == condition.key) {
+            name = option.label;
+            break;
+          }
+        }
+        break;
+      case 'dict':
+        name = condition.val;
+        for (let cd of allConditions) {
+          if (cd.value == condition.paramKey) {
+            if (cd.dict) {
+              for (let entry of cd.dict) {
+                if (entry.value == condition.val) {
+                  name = entry.label;
+                  break;
+                }
+              }
+            }
+            break;
+          }
+        }
+        break;
+      default:
+        name = condition.paramKey;
+    }
+    return name;
+  };
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -40,9 +93,9 @@ const ConditionNode: React.FC<IProps> = (props) => {
       text = '';
       for (let condition of conditions) {
         text +=
-          condition.paramLabel +
-          condition.label +
-          (condition.valLabel || condition.val) +
+          findNameBykey(condition, 'attr') +
+          findNameBykey(condition, 'key') +
+          findNameBykey(condition, 'dict') +
           ' 且 ';
       }
       text = text.substring(0, text.lastIndexOf(' 且 '));
@@ -50,7 +103,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
         (item: { paramLabel: string; paramKey: string }) => {
           const findData = props.conditions?.find(
             (innItem: { label: string; value: string }) => {
-              return item.paramLabel === innItem.label && innItem.value === item.paramKey;
+              return innItem.value === item.paramKey;
             },
           );
           /**能找到说明是可以的 */
@@ -73,7 +126,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       <span className={cls['title']}>
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
-      {(!props.config.belongId || props.config.belongId == userCtrl.space.id) && (
+      {(!props.config.belongId || props.config.belongId == props.operateOrgId) && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -90,7 +143,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       {content && <span className={cls['name']}>{content}</span>}
       {showError ? (
         <p style={{ color: 'red', paddingBottom: '10px' }}>
-          该条件已修改或则删除，请重新设置
+          该条件已修改或者删除，请重新设置
         </p>
       ) : null}
     </div>
@@ -98,12 +151,21 @@ const ConditionNode: React.FC<IProps> = (props) => {
   return (
     <div
       className={`${
-        !props.config.belongId || props.config.belongId == userCtrl.space.id
+        !props.config.belongId || props.config.belongId == props.operateOrgId
           ? cls['node']
           : cls['node-unEdit']
       } ${showError ? cls['node-error-state'] : ''}`}>
       <Tooltip
-        title={<span>创建人: {userCtrl.getBelongName(props.config.belongId)}</span>}
+        title={
+          <span>
+            创建组织:{' '}
+            {
+              // userCtrl.getBelongName(props.config.belongId)
+              userCtrl.getBelongName(props.config.belongId)
+            }
+            :{userCtrl.getBelongName(props.operateOrgId || '')}
+          </span>
+        }
         placement="right">
         <div className={`${cls['node-body']} ${showError ? cls['error'] : ''}`}>
           <div className={cls['node-body-main']}>

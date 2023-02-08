@@ -150,7 +150,7 @@ class ChatController extends Emitter {
   }
   /** 置顶功能 */
   public setToping(chat: IChat): void {
-    message.success('置顶成功');
+    message.success('操作成功');
     const index = this._chats.findIndex((i) => {
       return i.fullId === chat.fullId;
     });

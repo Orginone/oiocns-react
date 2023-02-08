@@ -39,6 +39,7 @@ type NodeProps = {
   onDelNode: Function;
   onSelected: Function;
   type?: AddNodeType;
+  operateOrgId?: string;
 };
 
 /**
@@ -127,11 +128,8 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
                 {props.content}
               </span>
             )}
-            {/* {props.belongId && (
-              <span style={{ color: 'red' }}>创建人: {props.belongId}</span>
-            )} */}
             {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-            {(!props.belongId || props.belongId == userCtrl.space.id) && (
+            {(!props.belongId || props.belongId == props.operateOrgId) && (
               <CloseOutlined
                 className={cls['iconPosition']}
                 style={{ fontSize: '12px', display: 'block' }}
@@ -157,7 +155,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     return (
       <div
         className={`${
-          !props.belongId || props.belongId == userCtrl.space.id
+          !props.belongId || props.belongId == props.operateOrgId
             ? cls['node']
             : cls['node-unEdit']
         } ${props.isRoot || !props.show ? cls['root'] : ''}  ${
@@ -171,7 +169,16 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           props._passed === 2 ? cls['node-completed-state'] : ''
         }`}>
         <Tooltip
-          title={<span>创建人: {userCtrl.getBelongName(props.belongId || '')}</span>}
+          title={
+            <span>
+              创建组织:{' '}
+              {
+                // userCtrl.getBelongName(props.belongId || '')
+                userCtrl.getBelongName(props.belongId || '')
+              }
+              :{userCtrl.getBelongName(props.operateOrgId || '')}
+            </span>
+          }
           placement="right">
           <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
             <div

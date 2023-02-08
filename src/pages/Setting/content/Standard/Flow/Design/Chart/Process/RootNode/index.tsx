@@ -2,13 +2,13 @@ import React from 'react';
 import Node, { AddNodeType } from '../Node';
 
 type RootNodeProps = {
+  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
   config: any;
   [key: string]: any;
 };
-
 
 /**
  * 开始节点
@@ -24,6 +24,7 @@ const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      operateOrgId={props.operateOrgId}
       errorInfo="错误信息"
       placeholder="所有人"
       headerBgc="#576a95"

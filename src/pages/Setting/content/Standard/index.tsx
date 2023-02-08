@@ -11,6 +11,7 @@ import userCtrl from '@/ts/controller/setting';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
 import { ImUndo2 } from 'react-icons/im';
+import { XFlowDefine } from '@/ts/base/schema';
 
 interface IProps {
   target?: ITarget;
@@ -26,6 +27,21 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [dictRecords, setDictRecords] = useState<IDict[]>([]);
   const [key, forceUpdate] = useObjectUpdate(dictRecords);
+  const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
+    id: '',
+    name: '',
+    code: '',
+    belongId: '',
+    content: '',
+    remark: '',
+    status: 0,
+    createUser: '',
+    updateUser: '',
+    version: '',
+    createTime: '',
+    updateTime: '',
+    target: undefined,
+  });
   // Tab 改变事件
   const tabChange = (key: string) => {
     setTabKey(key);
@@ -99,6 +115,21 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 type="link"
                 onClick={() => {
                   setModalType('新增业务流程');
+                  setFlowDesign({
+                    id: '',
+                    name: '',
+                    code: '',
+                    belongId: '',
+                    content: '',
+                    remark: '',
+                    status: 0,
+                    createUser: '',
+                    updateUser: '',
+                    version: '',
+                    createTime: '',
+                    updateTime: '',
+                    target: undefined,
+                  });
                 }}>
                 {'新增流程'}
               </Button>
@@ -173,6 +204,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           target={target}
           modalType={modalType}
           setModalType={setModalType}
+          flowDesign={flowDesign}
+          setFlowDesign={setFlowDesign}
         />
       ),
     },

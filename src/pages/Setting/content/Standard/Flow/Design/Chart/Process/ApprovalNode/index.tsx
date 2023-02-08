@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import Node from '../Node';
 type ApprovalNodeProps = {
+  operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
@@ -22,7 +23,9 @@ const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => 
       props.config.props.assignedUser.length > 0
     ) {
       let texts: any[] = [];
-      props.config.props.assignedUser.forEach((org: any) => texts.push(org.name));
+      props.config.props.assignedUser.forEach((org: any) => {
+        texts.push(org.name);
+      });
       return String(texts).replaceAll(',', '、');
     } else {
       return null;
@@ -35,6 +38,7 @@ const ApprovalNode: React.FC<ApprovalNodeProps> = (props: ApprovalNodeProps) => 
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      operateOrgId={props.operateOrgId}
       type={props?.config.type}
       showError={false}
       content={content}

@@ -1,19 +1,25 @@
-import { Card, Modal, message } from 'antd';
-import React, { useRef, useEffect } from 'react';
+import { Card, Modal, message, TreeSelect } from 'antd';
+import React, { useRef, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XFlowDefine, XFlowDefineArray } from '@/ts/base/schema';
 import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { ISpeciesItem } from '@/ts/core/thing/ispecies';
+// import { IsThingAdmin } from '@/utils/authority';
+import { ITarget } from '@/ts/core';
+import { DefaultOptionType } from 'rc-select/lib/Select';
 
 interface IProps {
   modalType: string;
   species?: ISpeciesItem;
+  operateOrgId?: string;
+  setOperateOrgId: Function;
+  isAdmin: boolean;
   setModalType: (modalType: string) => void;
   onDesign: () => void;
   onCurrentChaned: (item?: XFlowDefine) => void;
@@ -26,23 +32,51 @@ interface IProps {
 const FlowList: React.FC<IProps> = ({
   modalType,
   species,
+  operateOrgId,
+  setOperateOrgId,
+  isAdmin,
   setModalType,
   onDesign,
   onCurrentChaned,
 }: IProps) => {
   const parentRef = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
-
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // const [operateOrgId, setOperateOrgId] = useState<string>();
+  const [treeData, setTreeData] = useState<any[]>([]);
   useEffect(() => {
     if (modalType.includes('新增业务流程')) {
-      // alert('新增业务流程');
       onCurrentChaned(undefined);
       onDesign();
     }
   }, [modalType]);
 
+  const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
+    return targets.map((item: ITarget) => {
+      return {
+        label: item.teamName,
+        value: item.id,
+        children:
+          item.subTeam && item.subTeam.length > 0 ? getTreeData(item.subTeam) : [],
+      };
+    });
+  };
+
+  const loadTreeData = async () => {
+    let tree = await userCtrl.getTeamTree();
+    setTreeData(getTreeData(tree));
+  };
+
+  useEffect(() => {
+    loadTreeData();
+  }, [userCtrl.space]);
+
+  const onChange = (newValue: string) => {
+    setOperateOrgId(newValue);
+  };
+
   const renderOperation = (record: XFlowDefine): any[] => {
-    return [
+    let operations: any[] = [
       {
         key: 'editor',
         label: '编辑',
@@ -54,14 +88,15 @@ const FlowList: React.FC<IProps> = ({
             cancelText: '取消',
             okType: 'danger',
             onOk: () => {
-              setModalType('编辑业务流程');
               onCurrentChaned(record);
-              onDesign();
+              setIsModalOpen(true);
             },
           });
         },
       },
-      {
+    ];
+    if (isAdmin) {
+      operations.push({
         key: 'delete',
         label: '删除',
         style: { color: 'red' },
@@ -71,8 +106,9 @@ const FlowList: React.FC<IProps> = ({
             tforceUpdate();
           }
         },
-      },
-    ];
+      });
+    }
+    return operations;
   };
 
   return (
@@ -92,7 +128,11 @@ const FlowList: React.FC<IProps> = ({
               height={0.38 * useWindowSize().height}
               rowKey={(record: XFlowDefine) => record.id}
               request={async (page) => {
-                return await species?.loadFlowDefines(userCtrl.space.id, page);
+                let res: XFlowDefineArray | undefined = await species?.loadFlowDefines(
+                  userCtrl.space.id,
+                  page,
+                );
+                return res;
               }}
               onRow={(record: any) => {
                 return {
@@ -112,6 +152,34 @@ const FlowList: React.FC<IProps> = ({
             />
           </div>
         </Card>
+        <Modal
+          title="请选择操作组织"
+          open={isModalOpen}
+          onOk={() => {
+            if (operateOrgId) {
+              setIsModalOpen(false);
+              setModalType('编辑业务流程');
+              onDesign();
+            } else {
+              message.warn('请选择操作组织');
+            }
+          }}
+          onCancel={() => {
+            setIsModalOpen(false);
+          }}>
+          选择操作组织:
+          <TreeSelect
+            showSearch
+            style={{ width: '100%' }}
+            value={operateOrgId}
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+            placeholder="请选择操作组织"
+            allowClear
+            treeDefaultExpandAll
+            onChange={onChange}
+            treeData={treeData}
+          />
+        </Modal>
       </div>
     </div>
   );

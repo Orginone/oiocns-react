@@ -99,7 +99,7 @@ const DictInfo: React.FC<IProps> = ({
         <CustomTreeComp
           title={
             <div style={{ display: 'flex' }}>
-              {'分类字典'}
+              {/* {'分类字典'} */}
               <Button
                 type="link"
                 size="small"
