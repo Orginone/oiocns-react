@@ -98,14 +98,14 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
           </Popconfirm>
         ),
       },
-      // {
-      //   key: '设计表单',
-      //   label: '设计表单',
-      //   onClick: () => {
-      //     setEditData(item);
-      //     setDesignOpen(true);
-      //   },
-      // },
+      {
+        key: '设计表单',
+        label: '设计表单',
+        onClick: () => {
+          setEditData(item);
+          setDesignOpen(true);
+        },
+      },
       {
         key: '补充字段',
         label: '补充字段',
