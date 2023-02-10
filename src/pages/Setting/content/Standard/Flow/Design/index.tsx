@@ -50,10 +50,8 @@ const Design: React.FC<IProps> = ({
   setModalType,
   onBack,
 }: IProps) => {
-  // const [attrs, setAttrs] = useState<any[]>([]);
-  // debugger;
   const [scale, setScale] = useState<number>(90);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(modalType == '新增业务流程' ? 0 : 1);
 
   const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
@@ -145,6 +143,9 @@ const Design: React.FC<IProps> = ({
       }
     };
     load();
+    if (!current) {
+      onBack();
+    }
   }, [current]);
 
   useEffect(() => {
@@ -404,22 +405,37 @@ const Design: React.FC<IProps> = ({
                 justifyContent: 'space-between',
               }}>
               <div></div>
+              {modalType != '新增业务流程' && (
+                <>
+                  <div></div> <div></div>
+                </>
+              )}
+
               <div style={{ width: '300px' }}>
                 <Steps
                   current={currentStep}
                   onChange={(e) => {
                     setCurrentStep(e);
                   }}
-                  items={[
-                    {
-                      title: '流程信息',
-                      icon: <FileTextOutlined />,
-                    },
-                    {
-                      title: '流程图设计',
-                      icon: <FormOutlined />,
-                    },
-                  ]}></Steps>
+                  items={
+                    modalType == '新增业务流程'
+                      ? [
+                          {
+                            title: '流程信息',
+                            icon: <FileTextOutlined />,
+                          },
+                          {
+                            title: '流程图设计',
+                            icon: <FormOutlined />,
+                          },
+                        ]
+                      : [
+                          {
+                            title: '流程图设计',
+                            icon: <FormOutlined />,
+                          },
+                        ]
+                  }></Steps>
               </div>
               <div className={cls['publish']}>
                 {currentStep == 1 && (

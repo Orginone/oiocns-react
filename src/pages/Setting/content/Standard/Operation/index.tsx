@@ -8,7 +8,7 @@ import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel, { transformItemModel } from '../../../components/operationModal';
 import FormDesignModal from '../../../components/formDesignModal';
-import OperationItemTable from '../../../components/OperationItemTable';
+import OperationItemTable from '../../../components/operationItemTable';
 import ViewFormModal from '../../../components/viewFormModal';
 import { message, Popconfirm } from 'antd';
 import { kernel } from '@/ts/base';
