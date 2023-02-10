@@ -2427,6 +2427,90 @@ export default class KernelApi {
       params: params,
     });
   }
+
+  /// ******* 公共方法 *********///
+  /// *** 后续迁移至终端实现 ****///
+  /// ****** （资产链）Did *****///
+
+  /// 生成助记词
+  /// @param {int} language 请求参数
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async newMnemonic(language: number): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'NewMnemonic',
+      params: { language: language },
+    });
+  }
+
+  /// 从助记词到私钥
+  /// @param {int} index 序号
+  /// @param {String} mnemonic 助记词
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async mnemonicToPrivateKey(
+    index: number,
+    mnemonic: string,
+  ): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'MnemonicToPrivateKey',
+      params: { index: index, mnemonic: mnemonic },
+    });
+  }
+
+  /// 从私钥到公钥
+  /// @param {String} privateKey 私钥
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async privateKeyToPublicKey(privateKey: string): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'PrivateKeyToPublicKey',
+      params: { privateKey: privateKey },
+    });
+  }
+
+  /// 从公钥到地址
+  /// @param {String} publicKey 公钥
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async publicKeyToAddress(publicKey: string): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'PublicKeyToAddress',
+      params: { publicKey: publicKey },
+    });
+  }
+
+  /// 签名
+  /// @param {String} privateKey 私钥
+  /// @param {String} message 消息
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async signature(
+    privateKey: string,
+    message: string,
+  ): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'Signature',
+      params: { privateKey: privateKey, message: message },
+    });
+  }
+
+  /// 验签
+  /// @param {String} publicKey 公钥
+  /// @param {List<int>} signature 签名
+  /// @param {String} message 消息
+  /// @returns {ResultType<dynamic>} 请求结果
+  public async verify(
+    publicKey: string,
+    message: string,
+    signature: number[],
+  ): Promise<model.ResultType<any>> {
+    return await this.request({
+      module: 'public',
+      action: 'Verify',
+      params: { publicKey: publicKey, message: message, signature: signature },
+    });
+  }
   /**
    * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
