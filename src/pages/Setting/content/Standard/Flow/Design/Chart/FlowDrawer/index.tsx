@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
@@ -27,6 +27,7 @@ const FlowDrawer: React.FC<IProps> = ({
   operateOrgId,
   designOrgId,
 }) => {
+  const [title, setTitle] = useState<string>(current ? current.name : '');
   const Component = (current: any) => {
     if (current.belongId && operateOrgId && current.belongId != operateOrgId) {
       return (
@@ -64,23 +65,24 @@ const FlowDrawer: React.FC<IProps> = ({
   return current ? (
     <Drawer
       title={
-        <>
+        <div key={title}>
           {(!current.belongId || !operateOrgId || current.belongId == operateOrgId) && (
             <Typography.Title
               editable={{
                 onChange: (e: any) => {
                   current.name = e;
+                  setTitle(e);
                 },
               }}
               level={5}
               style={{ margin: 0 }}>
-              {current.name}
+              {title}
             </Typography.Title>
           )}
           {current.belongId && operateOrgId && current.belongId != operateOrgId && (
-            <div>{current.name}</div>
+            <div>{title}</div>
           )}
-        </>
+        </div>
       }
       destroyOnClose
       placement="right"
