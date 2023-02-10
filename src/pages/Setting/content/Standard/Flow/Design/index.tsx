@@ -319,10 +319,11 @@ const Design: React.FC<IProps> = ({
   const changeResource = (resource: any, type: string): any => {
     let obj: any;
     if (type == 'flowNode') {
-      let belongId =
-        resource.belongId != undefined && resource.belongId != ''
-          ? resource.belongId
-          : conditionData.belongId;
+      // let belongId =
+      //   resource.belongId != undefined && resource.belongId != ''
+      //     ? resource.belongId
+      //     : conditionData.belongId;
+      let belongId = resource.belongId || operateOrgId;
       let flowNode: FlowNode = {
         id: resource.id,
         code: resource.nodeId,
