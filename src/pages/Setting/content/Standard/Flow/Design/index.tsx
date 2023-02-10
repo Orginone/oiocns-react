@@ -176,25 +176,32 @@ const Design: React.FC<IProps> = ({
     parentBelongId: string,
   ): any => {
     let obj: any;
-    switch (resource.type) {
-      case '起始':
-        resource.type = 'ROOT';
-        break;
-      case '审批':
-        resource.type = 'APPROVAL';
-        break;
-      case '抄送':
-        resource.type = 'CC';
-        break;
-      case '条件':
-        resource.type = 'CONDITIONS';
-        break;
-      default:
-        break;
+    if (resource) {
+      switch (resource.type) {
+        case '起始':
+          resource.type = 'ROOT';
+          break;
+        case '审批':
+          resource.type = 'APPROVAL';
+          break;
+        case '抄送':
+          resource.type = 'CC';
+          break;
+        case '条件':
+          resource.type = 'CONDITIONS';
+          break;
+        case '全部':
+          resource.type = 'CONCURRENTS';
+          break;
+        default:
+          break;
+      }
     }
+
+    let hasEmptyChildren = false;
     if (type == 'flowNode') {
       let branches = undefined;
-      if (resource.name == '条件分支') {
+      if (resource.name == '条件分支' || resource.name == '并行分支') {
         branches = resource.branches
           ? resource.branches.map((item: any) => {
               return loadResource(
@@ -207,6 +214,7 @@ const Design: React.FC<IProps> = ({
               );
             })
           : undefined;
+        hasEmptyChildren = true;
       }
       let flowNode: FlowNodeModel = {
         id: resource.id,
@@ -233,28 +241,27 @@ const Design: React.FC<IProps> = ({
           friendDialogmode: false,
           num: resource.num || 0,
         },
-        belongId: resource.belongId || '',
+        belongId: resource.belongId,
         branches: branches,
-        children:
-          resource.type == 'CONDITIONS' || resource.type == 'CONCURRENTS'
-            ? loadResource(
-                resource.children,
-                'empty',
-                resource.code,
-                resource.type,
-                resource.children,
-                resource.belongId || '',
-              )
-            : resource.children && resource.children.name != undefined
-            ? loadResource(
-                resource.children,
-                'flowNode',
-                resource.code,
-                resource.type,
-                undefined,
-                resource.belongId || '',
-              )
-            : undefined,
+        children: hasEmptyChildren
+          ? loadResource(
+              resource.children,
+              'empty',
+              resource.code,
+              resource.type,
+              resource.children,
+              resource.belongId,
+            )
+          : resource.children && resource.children.name != undefined
+          ? loadResource(
+              resource.children,
+              'flowNode',
+              resource.code,
+              resource.type,
+              undefined,
+              resource.belongId,
+            )
+          : undefined,
       };
       obj = flowNode;
     } else if (type == 'branch') {
@@ -323,7 +330,13 @@ const Design: React.FC<IProps> = ({
       //   resource.belongId != undefined && resource.belongId != ''
       //     ? resource.belongId
       //     : conditionData.belongId;
-      let belongId = resource.belongId || operateOrgId;
+      let belongId = undefined;
+      if (!resource.belongId && resource.belongId != '') {
+        belongId = resource.belongId;
+      } else {
+        belongId = operateOrgId || conditionData.belongId || current.belongId;
+      }
+
       let flowNode: FlowNode = {
         id: resource.id,
         code: resource.nodeId,
@@ -450,17 +463,15 @@ const Design: React.FC<IProps> = ({
 
                         let define: any = undefined;
                         if (modalType == '新增业务流程') {
-                          define = await species?.createFlowDefine({
+                          let flowdefine = {
                             code: conditionData.name,
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
-                            // resource: resource as FlowNode,
                             resource: changeResource(resource, 'flowNode') as FlowNode,
-                            // resourceEx: resource as FlowNode,
                             belongId: conditionData.belongId,
-                            // speciesId: species.id,
-                          });
+                          };
+                          define = await species?.createFlowDefine(flowdefine);
                         } else {
                           define = await species?.updateFlowDefine({
                             id: current.id,
@@ -468,11 +479,8 @@ const Design: React.FC<IProps> = ({
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
-                            // resource: resource as FlowNode,
                             resource: changeResource(resource, 'flowNode') as FlowNode,
-                            // resourceEx: resource as FlowNode,
                             belongId: operateOrgId,
-                            // speciesId: species.id,
                           });
                         }
 
@@ -530,6 +538,7 @@ const Design: React.FC<IProps> = ({
                 <div>
                   <ChartDesign
                     operateOrgId={operateOrgId}
+                    designOrgId={conditionData.belongId}
                     conditions={conditionData.fields}
                     resource={resource}
                     scale={scale}

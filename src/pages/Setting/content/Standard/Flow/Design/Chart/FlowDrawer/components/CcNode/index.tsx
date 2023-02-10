@@ -6,6 +6,7 @@ import { NodeType } from '../../processType';
 
 interface IProps {
   current: NodeType;
+  orgId?: string;
 }
 /**
  * @description: 抄送对象
@@ -57,6 +58,7 @@ const CcNode: React.FC<IProps> = (props) => {
         width="650px">
         <IndentityManage
           multiple={false}
+          orgId={props.orgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },

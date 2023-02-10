@@ -6,6 +6,7 @@ import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
 interface Iprops {
   current: NodeType;
   conditions?: FieldCondition[];
+  orgId?: string;
 }
 
 /**
