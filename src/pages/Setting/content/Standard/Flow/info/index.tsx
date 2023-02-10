@@ -101,10 +101,20 @@ const FlowList: React.FC<IProps> = ({
         label: '删除',
         style: { color: 'red' },
         onClick: async () => {
-          if (await userCtrl.space.deleteDefine(record.id)) {
-            message.success('删除成功');
-            tforceUpdate();
-          }
+          Modal.confirm({
+            title: '确定删除流程?',
+            icon: <ExclamationCircleOutlined />,
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+              if (await userCtrl.space.deleteDefine(record.id)) {
+                message.success('删除成功');
+                tforceUpdate();
+              }
+            },
+            onCancel() {},
+          });
         },
       });
     }

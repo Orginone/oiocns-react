@@ -4,7 +4,7 @@ import FieldInfo from './Field';
 import ChartDesign from './Chart';
 import { Branche, FlowNode, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel, FlowNode as FlowNodeModel } from '@/ts/base/model';
-import { Button, Card, Layout, Modal, Space, Steps } from 'antd';
+import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -59,7 +59,7 @@ const Design: React.FC<IProps> = ({
     remark: '',
     // resource: '',
     authId: '',
-    belongId: '',
+    belongId: current.belongId,
     public: true,
     operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
   });
@@ -102,7 +102,9 @@ const Design: React.FC<IProps> = ({
               })
             ).data;
           }
+          console.log('preLoad:', resource_);
           resource_ = loadResource(resource_, 'flowNode', '', '', undefined, '');
+          console.log('afterLoad:', resource_);
           setResource(resource_);
         }
 
@@ -325,17 +327,20 @@ const Design: React.FC<IProps> = ({
 
   const changeResource = (resource: any, type: string): any => {
     let obj: any;
+    let belongId = undefined;
+    if (resource.belongId && resource.belongId != '') {
+      belongId = resource.belongId;
+    } else if (operateOrgId && operateOrgId != '') {
+      belongId = operateOrgId;
+    } else {
+      belongId = conditionData.belongId || current.belongId;
+    }
+
     if (type == 'flowNode') {
       // let belongId =
       //   resource.belongId != undefined && resource.belongId != ''
       //     ? resource.belongId
       //     : conditionData.belongId;
-      let belongId = undefined;
-      if (!resource.belongId && resource.belongId != '') {
-        belongId = resource.belongId;
-      } else {
-        belongId = operateOrgId || conditionData.belongId || current.belongId;
-      }
 
       let flowNode: FlowNode = {
         id: resource.id,
@@ -428,9 +433,9 @@ const Design: React.FC<IProps> = ({
               <div style={{ width: '300px' }}>
                 <Steps
                   current={currentStep}
-                  onChange={(e) => {
-                    setCurrentStep(e);
-                  }}
+                  // onChange={(e) => {
+                  //   setCurrentStep(e);
+                  // }}
                   items={
                     modalType == '新增业务流程'
                       ? [
@@ -463,6 +468,7 @@ const Design: React.FC<IProps> = ({
 
                         let define: any = undefined;
                         if (modalType == '新增业务流程') {
+                          console.log('prePub:', resource);
                           let flowdefine = {
                             code: conditionData.name,
                             name: conditionData.name,
@@ -471,8 +477,10 @@ const Design: React.FC<IProps> = ({
                             resource: changeResource(resource, 'flowNode') as FlowNode,
                             belongId: conditionData.belongId,
                           };
+                          console.log('afterPub:', changeResource(resource, 'flowNode'));
                           define = await species?.createFlowDefine(flowdefine);
                         } else {
+                          console.log('prePub:', resource);
                           define = await species?.updateFlowDefine({
                             id: current.id,
                             code: conditionData.name,
@@ -482,9 +490,11 @@ const Design: React.FC<IProps> = ({
                             resource: changeResource(resource, 'flowNode') as FlowNode,
                             belongId: operateOrgId,
                           });
+                          console.log('afterPub:', changeResource(resource, 'flowNode'));
                         }
 
                         if (define != undefined) {
+                          message.success('保存成功');
                           onBack();
                           setModalType('');
                         }
@@ -530,8 +540,8 @@ const Design: React.FC<IProps> = ({
                     conditionData.belongId = params.belongId + '';
                     conditionData.name = params.name;
                     conditionData.remark = params.remark;
-                    setCurrentStep(1);
                     setConditionData(conditionData);
+                    setCurrentStep(1);
                   }}
                 />
               ) : (
