@@ -16,6 +16,7 @@ export type ResultType = {
 };
 interface Iprops {
   multiple: boolean;
+  orgId?: string;
   onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
@@ -28,22 +29,40 @@ const ShareRecent = (props: Iprops) => {
 
   const loadTeamTree = async () => {
     const targets = await userCtrl.getTeamTree();
-    setData(buildTargetTree(targets));
+    setData(buildTargetTree(targets, false));
   };
 
   /** 加载组织树 */
-  const buildTargetTree = (targets: ITarget[]) => {
+  const buildTargetTree = (targets: ITarget[], isChild: boolean) => {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
-        result.push({
-          key: item.id,
-          title: item.name,
-          item: item,
-          isLeaf: item.subTeam.length === 0,
-          icon: <TeamIcon share={item.shareInfo} size={18} />,
-          children: buildTargetTree(item.subTeam),
-        });
+        if (props.orgId && !isChild) {
+          if (item.id == props.orgId) {
+            result.push({
+              key: item.id,
+              title: item.name,
+              item: item,
+              isLeaf: item.subTeam.length === 0,
+              icon: <TeamIcon share={item.shareInfo} size={18} />,
+              children: buildTargetTree(item.subTeam, true),
+            });
+          } else {
+            let children = buildTargetTree(item.subTeam, false);
+            for (let child of children) {
+              result.push(child);
+            }
+          }
+        } else {
+          result.push({
+            key: item.id,
+            title: item.name,
+            item: item,
+            isLeaf: item.subTeam.length === 0,
+            icon: <TeamIcon share={item.shareInfo} size={18} />,
+            children: buildTargetTree(item.subTeam, isChild),
+          });
+        }
       }
     }
     return result;
@@ -51,7 +70,7 @@ const ShareRecent = (props: Iprops) => {
 
   useEffect(() => {
     loadTeamTree();
-  }, []);
+  }, [props.orgId]);
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const item: ITarget = info.node.item;

@@ -37,6 +37,11 @@ const SettingFlow: React.FC<IProps> = ({
   useEffect(() => {
     judgeIsAdmin(userCtrl.space);
   }, []);
+  useEffect(() => {
+    setModalType('');
+    setFlowDesign(undefined);
+  }, [current]);
+
   return tabKey === 0 ? (
     <FlowList
       onCurrentChaned={(item) => {
@@ -58,7 +63,10 @@ const SettingFlow: React.FC<IProps> = ({
       species={current}
       operateOrgId={operateOrgId}
       setOperateOrgId={setOperateOrgId}
-      onBack={() => SetTabKey(0)}
+      onBack={() => {
+        setOperateOrgId(undefined);
+        SetTabKey(0);
+      }}
       modalType={modalType}
       setModalType={setModalType}
     />

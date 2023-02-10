@@ -4,6 +4,7 @@ import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
 import { AddNodeType, FieldCondition, NodeType } from './processType';
+import userCtrl from '@/ts/controller/setting';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -11,6 +12,7 @@ import { AddNodeType, FieldCondition, NodeType } from './processType';
 
 interface IProps {
   operateOrgId?: string;
+  designOrgId?: string;
   isOpen: boolean;
   current?: NodeType;
   conditions?: FieldCondition[];
@@ -23,19 +25,34 @@ const FlowDrawer: React.FC<IProps> = ({
   conditions,
   current,
   operateOrgId,
+  designOrgId,
 }) => {
   const Component = (current: any) => {
     if (current.belongId && operateOrgId && current.belongId != operateOrgId) {
-      return <div>此节点由{current.belongId}创建,无法编辑</div>;
+      return (
+        <div>
+          此节点由{' '}
+          <span style={{ color: 'blue' }}>
+            {userCtrl.getBelongName(current.belongId)}
+          </span>{' '}
+          创建,无法编辑
+        </div>
+      );
     } else {
       switch (current?.type) {
         case AddNodeType.APPROVAL:
-          return <ApprovalNode current={current} />;
+          return <ApprovalNode current={current} orgId={operateOrgId || designOrgId} />;
         case AddNodeType.CC:
-          return <CcNode current={current} />;
+          return <CcNode current={current} orgId={operateOrgId || designOrgId} />;
         case AddNodeType.CONDITION:
           if (conditions) {
-            return <ConditionNode current={current} conditions={conditions} />;
+            return (
+              <ConditionNode
+                current={current}
+                conditions={conditions}
+                orgId={operateOrgId || designOrgId}
+              />
+            );
           }
           return <div>请先在字段设计中，设置条件字段</div>;
         default:

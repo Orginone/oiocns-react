@@ -6,6 +6,7 @@ import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType'
 
 interface IProps {
   operateOrgId?: string;
+  designOrgId?: string;
   scale?: number;
   resource: any;
   conditions?: FieldCondition[]; //内置条件选择器
@@ -46,6 +47,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {/* 侧边数据填充 */}
       <FlowDrawer
         operateOrgId={props.operateOrgId}
+        designOrgId={props.designOrgId}
         isOpen={isOpen}
         current={currentNode}
         conditions={props.conditions}

@@ -7,6 +7,7 @@ import { NodeType } from '../../processType';
 
 interface IProps {
   current: NodeType;
+  orgId?: string;
 }
 
 /**
@@ -89,6 +90,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
           multiple={false}
+          orgId={props.orgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },
