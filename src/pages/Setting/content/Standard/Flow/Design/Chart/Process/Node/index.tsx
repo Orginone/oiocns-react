@@ -7,7 +7,7 @@ import {
   MailOutlined,
 } from '@ant-design/icons';
 import InsertButton from '../InsertButton';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
 
@@ -39,7 +39,12 @@ type NodeProps = {
   onDelNode: Function;
   onSelected: Function;
   type?: AddNodeType;
+  //默认操作组织id
   operateOrgId?: string;
+  //起始节点belongId
+  startNodeBelongId?: string;
+  //node的空间id(后端获取)
+  spaceId?: string;
 };
 
 /**
@@ -52,6 +57,7 @@ export enum AddNodeType {
   'CONCURRENTS' = 'CONCURRENTS',
   'EMPTY' = 'EMPTY',
   'START' = 'START',
+  'DEPTGATEWAY' = 'DEPTGATEWAY',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -61,6 +67,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CONCURRENTS]: '同时审核节点',
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
+  [AddNodeType.DEPTGATEWAY]: '部门网关',
 };
 
 /**
@@ -68,6 +75,24 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  * @returns
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
+  const [editable, setEditable] = useState<boolean>(true);
+  const isEditable = (): boolean => {
+    let editable = true;
+    if (
+      props.startNodeBelongId &&
+      props.startNodeBelongId != '' &&
+      props.startNodeBelongId != userCtrl.space.id
+    ) {
+      editable = false;
+    }
+    if (props.spaceId && props.spaceId != '' && props.spaceId != userCtrl.space.id) {
+      editable = false;
+    }
+    return editable;
+  };
+  useEffect(() => {
+    setEditable(isEditable());
+  }, [props.startNodeBelongId, props.spaceId, userCtrl.space]);
   const delNode = (e: React.MouseEvent) => {
     e.preventDefault();
     props.onDelNode();
@@ -76,11 +101,15 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     props.onSelected();
   };
   const footer = (
-    <div className={cls['node-footer']}>
-      <div className={cls['btn']}>
-        <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-      </div>
-    </div>
+    <>
+      {editable && (
+        <div className={cls['node-footer']}>
+          <div className={cls['btn']}>
+            <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
+          </div>
+        </div>
+      )}
+    </>
   );
 
   const nodeHeader = (
@@ -176,7 +205,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
                 // userCtrl.getBelongName(props.belongId || '')
                 userCtrl.getBelongName(props.belongId || '')
               }
-              :{userCtrl.getBelongName(props.operateOrgId || '')}
             </span>
           }
           placement="right">

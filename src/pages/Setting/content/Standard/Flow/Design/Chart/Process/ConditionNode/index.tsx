@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
@@ -7,7 +7,12 @@ import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 
 type IProps = {
+  //默认操作组织id
   operateOrgId?: string;
+  //起始节点belongId
+  startNodeBelongId?: string;
+  //node的空间id(后端获取)
+  spaceId?: string;
   conditions?: FieldCondition[];
   onInsertNode: Function;
   onDelNode: Function;
@@ -24,6 +29,7 @@ type IProps = {
  */
 const ConditionNode: React.FC<IProps> = (props) => {
   const [showError, setShowError] = useState<boolean>(false);
+  const [editable, setEditable] = useState<boolean>(true);
 
   const delNode = () => {
     props.onDelNode();
@@ -86,6 +92,23 @@ const ConditionNode: React.FC<IProps> = (props) => {
     }
     return name;
   };
+  const isEditable = (): boolean => {
+    let editable = true;
+    if (
+      props.startNodeBelongId &&
+      props.startNodeBelongId != '' &&
+      props.startNodeBelongId != userCtrl.space.id
+    ) {
+      editable = false;
+    }
+    if (props.spaceId && props.spaceId != '' && props.spaceId != userCtrl.space.id) {
+      editable = false;
+    }
+    return editable;
+  };
+  useEffect(() => {
+    setEditable(isEditable());
+  }, [props.startNodeBelongId, props.spaceId, userCtrl.space]);
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -117,9 +140,13 @@ const ConditionNode: React.FC<IProps> = (props) => {
     return text;
   }, [props.config]);
   const footer = (
-    <div className={cls['btn']}>
-      <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-    </div>
+    <>
+      {editable && (
+        <div className={cls['btn']}>
+          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
+        </div>
+      )}
+    </>
   );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
@@ -163,7 +190,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
               // userCtrl.getBelongName(props.config.belongId)
               userCtrl.getBelongName(props.config.belongId)
             }
-            :{userCtrl.getBelongName(props.operateOrgId || '')}
           </span>
         }
         placement="right">

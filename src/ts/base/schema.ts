@@ -388,6 +388,10 @@ export type FlowNode = {
 };
 
 export type Branche = {
+  //名称
+  name?: string;
+  //父节点
+  parentId?: string;
   // 分支条件
   conditions: Condition[];
   // 分支子节点

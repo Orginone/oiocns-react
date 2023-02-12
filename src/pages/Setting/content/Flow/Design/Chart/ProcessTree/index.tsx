@@ -137,14 +137,11 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
         ),
       ];
       //继续遍历分支后的节点
-
       let afterChildDoms: any = node.children ? getDomTree(h, node.children) : [];
       return [h('div', { key: getRandomId() }, [bchDom, afterChildDoms])];
     } else if (isEmptyNode(node)) {
       //空节点，存在于分支尾部
-
       let childDoms: any = node.children ? getDomTree(h, node.children) : [];
-
       decodeAppendDom(h, node, childDoms, {
         _disabled: node?._disabled,
         _executable: node?._executable,
@@ -326,12 +323,9 @@ const ProcessTree: React.FC<IProps> = ({ onSelectedNode, resource, conditions })
   };
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
-    // ;
     // console.log('处理节点插入逻辑', type, parentNode);
-
     // ctx.refs['_root'].click()
     //缓存一下后面的节点
-
     let afterNode = parentNode.children;
     //插入新节点
     parentNode.children = {

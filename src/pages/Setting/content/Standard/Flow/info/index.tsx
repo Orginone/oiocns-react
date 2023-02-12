@@ -177,7 +177,6 @@ const FlowList: React.FC<IProps> = ({
           onCancel={() => {
             setIsModalOpen(false);
           }}>
-          选择操作组织:
           <TreeSelect
             showSearch
             style={{ width: '100%' }}

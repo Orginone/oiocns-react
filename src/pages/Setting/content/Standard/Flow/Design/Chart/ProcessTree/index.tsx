@@ -40,9 +40,6 @@ const ProcessTree: React.FC<IProps> = ({
   const [key, setKey] = useState(0);
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
-
-  // const addNodeMap = processCtrl.addNodeMap;
-
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
   // const nodeMap = processCtrl.nodeMap;
@@ -130,7 +127,7 @@ const ProcessTree: React.FC<IProps> = ({
                 // innerHTML: `添加${isConditionNode(node)?'条件':'分支'}`
                 // dangerouslySetInnerHTML: { __html: `添加${isConditionNode(node)?'条件':'分支'}` }
               },
-              [`添加${isConditionNode(node) ? '条件' : '分支'}`],
+              [`添加${getConditionNodeName(node)}`],
             ),
           ],
         ),
@@ -205,8 +202,6 @@ const ProcessTree: React.FC<IProps> = ({
       compTrans(node.type.toLowerCase()),
       {
         config: node,
-        // ref: node.nodeId,
-        // key: node.nodeId,
         key: getRandomId(),
         ...props,
         conditions,
@@ -311,18 +306,56 @@ const ProcessTree: React.FC<IProps> = ({
     );
   };
   const isBranchNode = (node: any) => {
-    return node && (node.type === 'CONDITIONS' || node.type === 'CONCURRENTS');
+    return (
+      node &&
+      (node.type === 'CONDITIONS' ||
+        node.type === 'CONCURRENTS' ||
+        node.type === 'DEPTGATEWAY')
+    );
   };
   const isEmptyNode = (node: any) => {
     return node && node.type === 'EMPTY';
   };
   //是分支节点
-  const isConditionNode = (node: any) => {
-    return node.type === 'CONDITIONS';
+  // const isConditionNode = (node: any) => {
+  //   return node.type === 'CONDITIONS';
+  // };
+  const getConditionNodeType = (node: any) => {
+    let type = '';
+    switch (node.type) {
+      case 'CONDITIONS':
+        type = 'CONDITION';
+        break;
+      case 'CONCURRENTS':
+        type = 'CONCURRENT';
+        break;
+      case 'DEPTGATEWAY':
+        type = 'DEPTWAY';
+        break;
+    }
+    return type;
+  };
+  const getConditionNodeName = (node: any) => {
+    let name = '';
+    switch (node.type) {
+      case 'CONDITIONS':
+        name = '条件';
+        break;
+      case 'CONCURRENTS':
+        name = '分支';
+        break;
+      case 'DEPTGATEWAY':
+        name = '分支';
+        break;
+    }
+    return name;
   };
   //是分支节点
   const isBranchSubNode = (node: any) => {
-    return node && (node.type === 'CONDITION' || node.type === 'CONCURRENT');
+    return (
+      node &&
+      (node.type === 'CONDITION' || node.type === 'CONCURRENT' || node.type === 'DEPTWAY')
+    );
   };
   // const isConcurrentNode = (node: any) => {
   //   return node.type === 'CONCURRENTS';
@@ -367,6 +400,9 @@ const ProcessTree: React.FC<IProps> = ({
         break;
       case 'CONCURRENTS':
         insertConcurrentsNode(parentNode);
+        break;
+      case 'DEPTGATEWAY':
+        insertDeptGateWayNode(parentNode);
         break;
       default:
         break;
@@ -433,6 +469,9 @@ const ProcessTree: React.FC<IProps> = ({
       },
     ];
   };
+  const insertDeptGateWayNode = (parentNode: any) => {
+    message.warn('insertDeptGateWayNode');
+  };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';
     parentNode.children.children = {
@@ -480,10 +519,12 @@ const ProcessTree: React.FC<IProps> = ({
       node.branches.push({
         nodeId: getRandomId(),
         parentId: node.nodeId,
-        name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
+        name: getConditionNodeName(node) + (node.branches.length + 1),
+        // name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
         // props: isConditionNode(node) ? deepCopy(DefaultProps.CONDITION_PROPS) : {},
         conditions: [],
-        type: isConditionNode(node) ? 'CONDITION' : 'CONCURRENT',
+        type: getConditionNodeType(node),
+        // type: isConditionNode(node) ? 'CONDITION' : 'CONCURRENT',
         children: {},
       });
       setKey(key + 1);
@@ -546,10 +587,10 @@ const ProcessTree: React.FC<IProps> = ({
   // };
 
   // const validateNode = (err: any, node: any) => {
-  // var cmp:any = ctx.refs[node.nodeId];
-  // if (cmp.validate) {
-  //   state.valid = cmp.validate(err)
-  // }
+  //   var cmp: any = ctx.refs[node.nodeId];
+  //   if (cmp.validate) {
+  //     state.valid = cmp.validate(err);
+  //   }
   // };
 
   //更新指定节点的dom

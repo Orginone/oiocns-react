@@ -5,6 +5,7 @@ import CcNode from './components/CcNode';
 import ConditionNode from './components/ConditionNode';
 import { AddNodeType, FieldCondition, NodeType } from './processType';
 import userCtrl from '@/ts/controller/setting';
+import { getUuid } from '@/utils/tools';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -27,7 +28,7 @@ const FlowDrawer: React.FC<IProps> = ({
   operateOrgId,
   designOrgId,
 }) => {
-  const [title, setTitle] = useState<string>(current ? current.name : '');
+  const [key, setKey] = useState<string>();
   const Component = (current: any) => {
     if (current.belongId && operateOrgId && current.belongId != operateOrgId) {
       return (
@@ -65,22 +66,22 @@ const FlowDrawer: React.FC<IProps> = ({
   return current ? (
     <Drawer
       title={
-        <div key={title}>
+        <div key={key}>
           {(!current.belongId || !operateOrgId || current.belongId == operateOrgId) && (
             <Typography.Title
               editable={{
                 onChange: (e: any) => {
                   current.name = e;
-                  setTitle(e);
+                  setKey(getUuid());
                 },
               }}
               level={5}
               style={{ margin: 0 }}>
-              {title}
+              {current.name}
             </Typography.Title>
           )}
           {current.belongId && operateOrgId && current.belongId != operateOrgId && (
-            <div>{title}</div>
+            <div>{current.name}</div>
           )}
         </div>
       }

@@ -20,6 +20,9 @@ import userCtrl from '@/ts/controller/setting';
 import { IProduct, IResource } from '@/ts/core';
 import appCtrl from '@/ts/controller/store/appCtrl';
 import { ApplicationColumns } from '../../config/columns';
+import CreateAppByCustom from '@/pages/Store/content/App/CreateApp/createAppByCustom';
+import SelectAppTemplate from '@/pages/Store/content/App/CreateApp/selectAppTemplate';
+import AppInfoModal from '@/pages/Store/content/App/CreateApp/appInfoModal';
 
 const StoreApp: React.FC = () => {
   const history = useHistory();
@@ -31,6 +34,7 @@ const StoreApp: React.FC = () => {
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
   const [chooseCreateWayOpen, setChooseCreateWayOpen] = useState<boolean>(false);
+  const [createWay, setCreateWay] = useState<string>();
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
     const shareArr = [];
@@ -158,12 +162,12 @@ const StoreApp: React.FC = () => {
                     history.push('/store/app/create');
                   },
                 },
-                // {
-                //   text: '生成',
-                //   onClick: () => {
-                //     setChooseCreateWayOpen(true);
-                //   },
-                // },
+                {
+                  text: '生成',
+                  onClick: () => {
+                    setChooseCreateWayOpen(true);
+                  },
+                },
               ]}
             />
           }
@@ -230,7 +234,16 @@ const StoreApp: React.FC = () => {
 
   return (
     <>
-      {AppIndex}
+      {createWay == undefined && AppIndex}
+      {createWay == 'createAppByCustom' && (
+        <CreateAppByCustom setCreateWay={setCreateWay}></CreateAppByCustom>
+      )}
+      <AppInfoModal
+        open={createWay == 'createBlankApp'}
+        setCreateWay={setCreateWay}></AppInfoModal>
+      <SelectAppTemplate
+        open={createWay == 'createAppByTemplate'}
+        setCreateWay={setCreateWay}></SelectAppTemplate>
       <Modal
         title={`应用${shareType}`}
         width={800}
@@ -251,7 +264,8 @@ const StoreApp: React.FC = () => {
       <ChooseCreateWay
         open={chooseCreateWayOpen}
         setOpen={setChooseCreateWayOpen}
-        jump={(url: string) => history.push(url)}></ChooseCreateWay>
+        jump={(url: string) => history.push(url)}
+        setCreateWay={setCreateWay}></ChooseCreateWay>
       {/* 创建应用页面*/}
       <Route exact path="/store/app/createBlankApp" component={CreateBlankApp}></Route>
       {/* 详情页面 /store/app/info*/}

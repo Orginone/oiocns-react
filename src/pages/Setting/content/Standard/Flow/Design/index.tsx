@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import FieldInfo from './Field';
 import ChartDesign from './Chart';
 import { Branche, FlowNode, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel, FlowNode as FlowNodeModel } from '@/ts/base/model';
-import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
+import { Button, Card, Empty, Layout, message, Modal, Space, Steps } from 'antd';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -18,6 +18,7 @@ import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem } from '@/ts/core';
 import { kernel } from '@/ts/base';
 import { getUuid } from '@/utils/tools';
+import { ImWarning } from 'react-icons/im';
 
 interface IProps {
   current: XFlowDefine;
@@ -52,7 +53,9 @@ const Design: React.FC<IProps> = ({
 }: IProps) => {
   const [scale, setScale] = useState<number>(90);
   const [currentStep, setCurrentStep] = useState(modalType == '新增业务流程' ? 0 : 1);
-
+  const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
+  //visualNodes 特点type==EMPTY,parentId=任意,belongId=spaceId,children不为空, FlowNode
+  const [visualNodes, setVisualNodes] = useState<any[]>([]);
   const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
     fields: [],
@@ -89,8 +92,9 @@ const Design: React.FC<IProps> = ({
   useEffect(() => {
     const load = async () => {
       if (current) {
+        setVisualNodes([]);
         if (current.content && current.content != '') {
-          let resource_: any = {};
+          let resource_: any;
           if (modalType == '新增业务流程') {
             resource_ = JSON.parse(current.content)['resource'];
           } else {
@@ -102,10 +106,10 @@ const Design: React.FC<IProps> = ({
               })
             ).data;
           }
-          console.log('preLoad:', resource_);
-          resource_ = loadResource(resource_, 'flowNode', '', '', undefined, '');
-          console.log('afterLoad:', resource_);
-          setResource(resource_);
+          // console.log('preLoad:', resource_);
+          let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
+          // console.log('afterLoad:', resourceData);
+          setResource(resourceData);
         }
 
         species!
@@ -143,6 +147,7 @@ const Design: React.FC<IProps> = ({
             });
           });
       }
+      // setLoaded(true);
     };
     load();
     if (!current) {
@@ -168,6 +173,123 @@ const Design: React.FC<IProps> = ({
       });
     }
   }, [modalType]);
+
+  const getAllNodes = (resource: FlowNode, array: FlowNode[]): FlowNode[] => {
+    array = [...array, resource];
+    if (resource.children) {
+      array = getAllNodes(resource.children, array);
+    }
+    if (resource.branches && resource.branches.length > 0) {
+      for (let branch of resource.branches) {
+        if (branch.children) {
+          array = getAllNodes(branch.children, array);
+        }
+      }
+    }
+    return array;
+  };
+  const getAllBranches = (resource: FlowNode, array: Branche[]): Branche[] => {
+    if (resource.children) {
+      array = getAllBranches(resource.children, array);
+    }
+    if (resource.branches && resource.branches.length > 0) {
+      resource.branches = resource.branches.map((item: Branche) => {
+        item.parentId = resource.code;
+        return item;
+      });
+      console.log(resource.branches);
+      array = [...array, ...resource.branches];
+      for (let branch of resource.branches) {
+        if (branch.children) {
+          array = getAllBranches(branch.children, array);
+        }
+      }
+    }
+    return array;
+  };
+
+  const getErrorItem = (text: string | ReactNode): ReactNode => {
+    return (
+      <div style={{ padding: 10 }}>
+        <ImWarning color="orange" />
+        {text}
+      </div>
+    );
+  };
+
+  const checkValid = (resource: FlowNode): ReactNode[] => {
+    let errors: ReactNode[] = [];
+    //校验 至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
+    let allNodes: FlowNode[] = getAllNodes(resource, []);
+    let allBranches: Branche[] = getAllBranches(resource, []);
+    //校验 至少有一个审批节点
+    let approvalNodes = allNodes.filter((item) => item.type == 'APPROVAL');
+    if (approvalNodes.length == 0) {
+      errors.push(getErrorItem('至少需要一个审批节点'));
+    }
+    //每个节点的 belongId  审核和抄送的destId
+    for (let node of allNodes) {
+      if (!node.belongId && node.type != 'ROOT') {
+        errors.push(
+          getErrorItem(
+            <>
+              节点： <span color="blue">{node.name}</span> 缺少belongId
+            </>,
+          ),
+        );
+      }
+      if (
+        (node.type == 'APPROVAL' || node.type == 'CC') &&
+        (!node.destId || node.destId == 0)
+      ) {
+        errors.push(
+          getErrorItem(
+            <>
+              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作者
+            </>,
+          ),
+        );
+      }
+    }
+    //条件节点条件不为空  分支下最多只能有n个分支children为空
+    let n = 0;
+    let parentIdSet: Set<string> = new Set();
+    // let map: Map<string, undefined[]> = new Map();
+    for (let branch of allBranches) {
+      if (branch.conditions && branch.conditions.length > 0) {
+        for (let condition of branch.conditions) {
+          if (!condition.key || !condition.paramKey || !condition.val) {
+            errors.push(getErrorItem(`分支: branch.name的条件未完成`));
+          }
+        }
+      } else {
+        let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
+        if (parent.type == 'CONDITIONS') {
+          errors.push(getErrorItem(`分支: branch.name缺少条件`));
+        }
+      }
+      parentIdSet.add(branch.parentId as string);
+    }
+
+    for (let parentId of Array.from(parentIdSet)) {
+      let parent = allNodes.filter((item) => item.code == parentId)[0];
+      let branches = allBranches.filter(
+        (item) => item.parentId == parentId && !item.children,
+      );
+      if (branches.length > n) {
+        errors.push(
+          getErrorItem(
+            n == 0
+              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+              : `${
+                  parent.type == 'CONDITIONS' ? '条件' : '并行'
+                }节点分支下最多只能有${n}个分支节点为空`,
+          ),
+        );
+      }
+    }
+    return errors;
+  };
 
   const loadResource = (
     resource: any,
@@ -195,6 +317,18 @@ const Design: React.FC<IProps> = ({
         case '全部':
           resource.type = 'CONCURRENTS';
           break;
+        //如果时空结点（下个流程的起始节点）
+        case '空':
+        case 'EMPTY':
+          setVisualNodes([...visualNodes, resource]);
+          return loadResource(
+            resource.children,
+            'flowNode',
+            parentId,
+            '',
+            '',
+            resource.belongId,
+          );
         default:
           break;
       }
@@ -325,7 +459,12 @@ const Design: React.FC<IProps> = ({
     return obj;
   };
 
-  const changeResource = (resource: any, type: string): any => {
+  const changeResource = (resource: any, type: string, parent: any): any => {
+    //起点belongId为空
+    //不属于=>属于=>不属于=>不属于 保留所有虚拟节点(并判断虚拟节点子节点code和belongId)+只传属于=>不属于的虚拟节点
+    //只留下 属于 的部分
+    //主流程最后拼接visualNode 如何判断主流程最后？
+
     let obj: any;
     let belongId = undefined;
     if (resource.belongId && resource.belongId != '') {
@@ -337,11 +476,6 @@ const Design: React.FC<IProps> = ({
     }
 
     if (type == 'flowNode') {
-      // let belongId =
-      //   resource.belongId != undefined && resource.belongId != ''
-      //     ? resource.belongId
-      //     : conditionData.belongId;
-
       let flowNode: FlowNode = {
         id: resource.id,
         code: resource.nodeId,
@@ -433,9 +567,6 @@ const Design: React.FC<IProps> = ({
               <div style={{ width: '300px' }}>
                 <Steps
                   current={currentStep}
-                  // onChange={(e) => {
-                  //   setCurrentStep(e);
-                  // }}
                   items={
                     modalType == '新增业务流程'
                       ? [
@@ -465,32 +596,46 @@ const Design: React.FC<IProps> = ({
                       type="primary"
                       onClick={async () => {
                         operateOrgId = operateOrgId || '';
-
                         let define: any = undefined;
+                        let visualNodeChildrenCodes = visualNodes.map(
+                          (item) => item.children.code,
+                        );
+                        let visualNodeChildrenBelongMap = new Map();
+                        for (let visualNode of visualNodes) {
+                          visualNodeChildrenBelongMap.set(
+                            visualNode.children.code,
+                            visualNode.belongId,
+                          );
+                        }
+                        let resource_: FlowNode = changeResource(
+                          resource,
+                          'flowNode',
+                          undefined,
+                        ) as FlowNode;
+                        let errors = checkValid(resource_);
+                        if (errors.length > 0) {
+                          setShowErrorsModal(errors);
+                          return;
+                        }
                         if (modalType == '新增业务流程') {
-                          console.log('prePub:', resource);
-                          let flowdefine = {
+                          define = await species?.createFlowDefine({
                             code: conditionData.name,
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
-                            resource: changeResource(resource, 'flowNode') as FlowNode,
+                            resource: resource_,
                             belongId: conditionData.belongId,
-                          };
-                          console.log('afterPub:', changeResource(resource, 'flowNode'));
-                          define = await species?.createFlowDefine(flowdefine);
+                          });
                         } else {
-                          console.log('prePub:', resource);
                           define = await species?.updateFlowDefine({
                             id: current.id,
                             code: conditionData.name,
                             name: conditionData.name,
                             fields: JSON.stringify(conditionData.fields),
                             remark: conditionData.remark,
-                            resource: changeResource(resource, 'flowNode') as FlowNode,
+                            resource: resource_,
                             belongId: operateOrgId,
                           });
-                          console.log('afterPub:', changeResource(resource, 'flowNode'));
                         }
 
                         if (define != undefined) {
@@ -559,6 +704,14 @@ const Design: React.FC<IProps> = ({
           </Layout.Content>
         </Layout>
       </Card>
+      <Modal
+        title={'校验不通过'}
+        width={500}
+        open={showErrorsModal.length > 0}
+        onCancel={() => setShowErrorsModal([])}
+        footer={[]}>
+        <Card bordered={false}> {showErrorsModal}</Card>
+      </Modal>
     </div>
   );
 };

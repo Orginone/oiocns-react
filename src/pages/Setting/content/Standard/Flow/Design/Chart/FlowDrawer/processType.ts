@@ -12,6 +12,7 @@ export enum AddNodeType {
   'CONDITION' = 'CONDITION',
   'ROOT' = 'ROOT',
   'CONCURRENTS' = 'CONCURRENT',
+  'DEPTWAY' = 'DEPTWAY',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -20,6 +21,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CC]: '抄送节点',
   [AddNodeType.CONDITION]: '条件节点',
   [AddNodeType.CONCURRENTS]: '同时审核节点',
+  [AddNodeType.DEPTWAY]: '部门节点',
 };
 
 export type conditionDataType = {
