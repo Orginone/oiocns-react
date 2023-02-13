@@ -41,7 +41,7 @@ const FlowList: React.FC<IProps> = ({
 }: IProps) => {
   const parentRef = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   // const [operateOrgId, setOperateOrgId] = useState<string>();
   const [treeData, setTreeData] = useState<any[]>([]);
   useEffect(() => {
@@ -71,9 +71,9 @@ const FlowList: React.FC<IProps> = ({
     loadTreeData();
   }, [userCtrl.space]);
 
-  const onChange = (newValue: string) => {
-    setOperateOrgId(newValue);
-  };
+  // const onChange = (newValue: string) => {
+  //   setOperateOrgId(newValue);
+  // };
 
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
@@ -89,7 +89,11 @@ const FlowList: React.FC<IProps> = ({
             okType: 'danger',
             onOk: () => {
               onCurrentChaned(record);
-              setIsModalOpen(true);
+              // setIsModalOpen(true);
+              // setIsModalOpen(false);
+              setOperateOrgId(userCtrl.space.id);
+              setModalType('编辑业务流程');
+              onDesign();
             },
           });
         },
@@ -163,7 +167,7 @@ const FlowList: React.FC<IProps> = ({
             />
           </div>
         </Card>
-        <Modal
+        {/* <Modal
           title="请选择操作组织"
           open={isModalOpen}
           onOk={() => {
@@ -189,7 +193,7 @@ const FlowList: React.FC<IProps> = ({
             onChange={onChange}
             treeData={treeData}
           />
-        </Modal>
+        </Modal> */}
       </div>
     </div>
   );

@@ -105,7 +105,6 @@ const FlowDrawer: React.FC<IProps> = ({
       open={isOpen}
       onClose={() => onClose()}
       width={600}>
-      NodeBelongId:{current.belongId}
       {Component(current)}
     </Drawer>
   ) : (

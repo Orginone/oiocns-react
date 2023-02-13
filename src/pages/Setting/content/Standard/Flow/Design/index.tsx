@@ -69,7 +69,7 @@ const Design: React.FC<IProps> = ({
     operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
   });
   const [resource, setResource] = useState({
-    nodeId: 'ROOT',
+    nodeId: `node_${getUuid()}`,
     parentId: '',
     type: 'ROOT',
     name: '发起人',
@@ -95,14 +95,9 @@ const Design: React.FC<IProps> = ({
     const load = async () => {
       if (current) {
         setSpaceResource(undefined);
-        debugger;
         // content字段可能取消
-        // if (current.content && current.content != '') {
         let resource_: any;
-        if (modalType == '新增业务流程') {
-          // resource_ = JSON.parse(current.content)['resource'];
-          // resource_ = resource;
-        } else {
+        if (modalType != '新增业务流程') {
           resource_ = (
             await kernel.queryNodes({
               id: current.id || '',
@@ -110,12 +105,26 @@ const Design: React.FC<IProps> = ({
               page: { offset: 0, limit: 1000, filter: '' },
             })
           ).data;
-          // debugger;
           console.log('preLoad:', resource_);
+
           let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
-          // console.log('afterLoad:', resourceData);
+          let nodes = getAllNodes(resourceData, []);
+          let spaceRootNodes = nodes.filter(
+            (item) => item.type == 'ROOT' && item.belongId == userCtrl.space.id,
+          );
+          if (spaceRootNodes.length == 0) {
+            resourceData = {
+              nodeId: `node_${getUuid()}`,
+              parentId: '',
+              type: 'ROOT',
+              name: '发起人',
+              belongId: userCtrl.space.id,
+              children: resourceData,
+            };
+          }
+          console.log('addedRoot:', resource_);
+          console.log('afterLoad:', resourceData);
           setResource(resourceData);
-          // }
         }
 
         species!
@@ -371,7 +380,6 @@ const Design: React.FC<IProps> = ({
         if (resource.belongId == userCtrl.space.id) {
           setSpaceResource(resource);
         }
-
         flowNode = {
           id: resource.id,
           nodeId: nodeId,
@@ -480,6 +488,7 @@ const Design: React.FC<IProps> = ({
       let empty: any = {
         nodeId: nodeId,
         parentId: parentId,
+        belongId: parentBelongId,
         type: 'EMPTY',
         children:
           emptyChild != undefined
@@ -514,9 +523,9 @@ const Design: React.FC<IProps> = ({
     }
 
     //判断是否是当前空间的节点
-    if (resource.belongId && resource.belongId != userCtrl.space.id) {
-      resource.children = undefined;
-    }
+    // if (resource.belongId && resource.belongId != userCtrl.space.id) {
+    //   resource.children = undefined;
+    // }
     // let needSave = true;
     // //判断是否虚拟节点
     // if (
@@ -673,12 +682,12 @@ const Design: React.FC<IProps> = ({
                         //     visualNode_currentSpaces[0].code,
                         //   );
                         // }
-                        if (spaceResource) {
-                          resource.children = findResourceByNodeId(
-                            resource,
-                            spaceResource.code,
-                          );
-                        }
+                        // if (spaceResource) {
+                        //   resource.children = findResourceByNodeId(
+                        //     resource,
+                        //     spaceResource.code,
+                        //   );
+                        // }
                         //数据结构转化
                         let resource_: FlowNode = changeResource(
                           resource,

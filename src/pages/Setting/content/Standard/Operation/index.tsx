@@ -170,11 +170,17 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         handleCancel={function (): void {
           setModalType('');
         }}
-        handleOk={function (success: boolean): void {
+        handleOk={async (res: any) => {
           setModalType('');
-          if (success) {
+          if (res.success) {
             message.success('保存成功');
             tforceUpdate();
+            if (modalType.includes('新增')) {
+              await kernel.createFlowRelation({
+                defineId: '413064145815080960',
+                operationId: res.data.id,
+              });
+            }
           }
         }}
         target={target}

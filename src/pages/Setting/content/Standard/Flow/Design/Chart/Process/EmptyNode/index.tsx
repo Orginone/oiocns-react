@@ -5,6 +5,7 @@ type EmptyNodeProps = {
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;
+  config: any;
   [key: string]: any;
 };
 
@@ -26,6 +27,7 @@ const EmptyNode: React.FC<EmptyNodeProps> = (props: EmptyNodeProps) => {
       onInsertNode={props.onInsertNode}
       onDelNode={props.onDelNode}
       onSelected={props.onSelected}
+      belongId={props.config.belongId}
       type={AddNodeType.EMPTY}
     />
   );
