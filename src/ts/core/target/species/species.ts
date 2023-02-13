@@ -95,7 +95,7 @@ export class SpeciesItem implements ISpeciesItem {
 
   async loadFlowDefines(id: string, page: PageRequest): Promise<schema.XFlowDefineArray> {
     const res = await kernel.queryDefine({
-      id: this.id,
+      speciesId: this.target.id,
       spaceId: id,
       page: {
         offset: page.offset,
