@@ -140,6 +140,7 @@ const FlowList: React.FC<IProps> = ({
               request={async (page) => {
                 let res: XFlowDefineArray | undefined = await species?.loadFlowDefines(
                   userCtrl.space.id,
+                  false,
                   page,
                 );
                 return res;

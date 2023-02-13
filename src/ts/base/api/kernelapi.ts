@@ -2224,20 +2224,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 创建流程定义
-   * @param {schema.XFlowDefine} params 请求参数
-   * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
-   */
-  public async createDefine(
-    params: schema.XFlowDefine,
-  ): Promise<model.ResultType<schema.XFlowDefine>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateDefine',
-      params: params,
-    });
-  }
-  /**
    * 发布流程定义（包括创建、更新操作）
    * @param {model.CreateDefineReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
@@ -2305,11 +2291,11 @@ export default class KernelApi {
   }
   /**
    * 删除流程绑定
-   * @param {model.FlowRelationModel} params 请求参数
+   * @param {model.IdReq} params 请求参数 业务标准Id
    * @returns {model.ResultType<boolean>} 请求结果
    */
   public async deleteFlowRelation(
-    params: model.FlowRelationModel,
+    params: model.IdReq,
   ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
@@ -2331,8 +2317,8 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询流程定义
-   * @param {model.IdReq} params 请求参数
+   * 查询分类下的流程定义
+   * @param {model.QueryDefineReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
    */
   public async queryDefine(
@@ -2438,20 +2424,6 @@ export default class KernelApi {
     return await this.request({
       module: 'flow',
       action: 'ApprovalTask',
-      params: params,
-    });
-  }
-  /**
-   * 重置流程定义
-   * @param {schema.XFlowDefine} params 请求参数
-   * @returns {model.ResultType<schema.XFlowDefine>} 请求结果
-   */
-  public async resetDefine(
-    params: schema.XFlowDefine,
-  ): Promise<model.ResultType<schema.XFlowDefine>> {
-    return await this.request({
-      module: 'flow',
-      action: 'ResetDefine',
       params: params,
     });
   }

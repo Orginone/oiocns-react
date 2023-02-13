@@ -128,62 +128,65 @@ const FormDesignModal = (props: FormDesignModalProps) => {
     console.log('deleteItemIds', deleteItemIds);
   };
 
-  // 保存
   const save = async () => {
-    for (const item of createItems) {
-      item.id = undefined;
-      const res = await kernel.createOperationItem(item);
-      schema.properties[res.data.id] = JSON.parse(item.rule);
-    }
-    for (const item of updateItems) {
-      schema.properties[item.id as string] = JSON.parse(item.rule);
-      const res = await kernel.updateOperationItem(item);
-      console.log(res);
-    }
-    // TODO 删除时判断归属权限
-    deleteItemIds.forEach(async (id) => {
-      const res = await kernel.deleteOperationItem({
-        id,
-        typeName: '',
-      });
-      console.log(res);
-      delete schema.properties[id];
-    });
-    const ids: string[] = [];
-    for (const key in schema.properties) {
-      if (Object.prototype.hasOwnProperty.call(schema.properties, key) && key) {
-        if (isNumber(Number(key))) {
-          ids.push(key);
-          const element = schema.properties[key];
-          for (const item of operationItems) {
-            if (item.id === key) {
-              item.name = element.title;
-              item.code = element.bind || key;
-              item.rule = JSON.stringify(element);
-              item.remark = element.type;
-            }
-          }
-        } else {
-          delete schema.properties[key];
-        }
-      }
-    }
-    operationItems = operationItems.filter((i) => ids.includes(i.id));
-
-    const body: OperationModel = {
-      id: data?.id,
-      name: data?.name as string,
-      code: data?.code as string,
-      public: data?.public as boolean,
-      remark: JSON.stringify(schema),
-      belongId: data?.belongId as string,
-      speciesId: data.speciesId,
-    };
-    console.log('speciesId', body.speciesId);
-    // // 修改
-    const result = await current.updateOperation(body);
-    handleOk(result);
+    handleOk(true);
   };
+  // // 保存
+  // const save = async () => {
+  //   for (const item of createItems) {
+  //     item.id = undefined;
+  //     const res = await kernel.createOperationItem(item);
+  //     schema.properties[res.data.id] = JSON.parse(item.rule);
+  //   }
+  //   for (const item of updateItems) {
+  //     schema.properties[item.id as string] = JSON.parse(item.rule);
+  //     const res = await kernel.updateOperationItem(item);
+  //     console.log(res);
+  //   }
+  //   // TODO 删除时判断归属权限
+  //   deleteItemIds.forEach(async (id) => {
+  //     const res = await kernel.deleteOperationItem({
+  //       id,
+  //       typeName: '',
+  //     });
+  //     console.log(res);
+  //     delete schema.properties[id];
+  //   });
+  //   const ids: string[] = [];
+  //   for (const key in schema.properties) {
+  //     if (Object.prototype.hasOwnProperty.call(schema.properties, key) && key) {
+  //       if (isNumber(Number(key))) {
+  //         ids.push(key);
+  //         const element = schema.properties[key];
+  //         for (const item of operationItems) {
+  //           if (item.id === key) {
+  //             item.name = element.title;
+  //             item.code = element.bind || key;
+  //             item.rule = JSON.stringify(element);
+  //             item.remark = element.type;
+  //           }
+  //         }
+  //       } else {
+  //         delete schema.properties[key];
+  //       }
+  //     }
+  //   }
+  //   operationItems = operationItems.filter((i) => ids.includes(i.id));
+
+  //   const body: OperationModel = {
+  //     id: data?.id,
+  //     name: data?.name as string,
+  //     code: data?.code as string,
+  //     public: data?.public as boolean,
+  //     remark: JSON.stringify(schema),
+  //     belongId: data?.belongId as string,
+  //     speciesId: data.speciesId,
+  //   };
+  //   console.log('speciesId', body.speciesId);
+  //   // // 修改
+  //   const result = await current.updateOperation(body);
+  //   handleOk(result);
+  // };
   return (
     <Modal
       title={title}

@@ -86,6 +86,7 @@ const DictWidget = (props: any) => {
 };
 
 type OptionType = {
+  key: string;
   label: string;
   value: string;
   origin: any;
@@ -103,6 +104,7 @@ const DepartmentWidget = (props: any) => {
       setTreeData(
         depts.map((item) => {
           return {
+            key: item.id,
             label: item.name,
             value: item.id,
             origin: item,
@@ -120,7 +122,7 @@ const DepartmentWidget = (props: any) => {
           label: item.name,
           value: item.id,
           origin: item,
-          pid: dataNode.value,
+          key: item.id,
         };
       });
       visitTree(treeData, (node) => {
@@ -158,6 +160,7 @@ const GroupWidget = (props: any) => {
       setTreeData(
         groups.map((item) => {
           return {
+            key: item.id,
             label: item.name,
             value: item.id,
             origin: item,
@@ -175,7 +178,7 @@ const GroupWidget = (props: any) => {
           label: item.name,
           value: item.id,
           origin: item,
-          pid: dataNode.value,
+          key: item.id,
         };
       });
       visitTree(treeData, (node) => {
