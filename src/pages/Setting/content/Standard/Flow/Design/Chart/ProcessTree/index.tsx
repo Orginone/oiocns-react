@@ -6,6 +6,7 @@ import Root from '../Process/RootNode';
 import Approval from '../Process/ApprovalNode';
 import Cc from '../Process/CcNode';
 import Concurrent from '../Process/ConcurrentNode';
+import DeptWay from '../Process/DeptWayNode';
 import Condition from '../Process/ConditionNode';
 import Empty from '../Process/EmptyNode';
 import cls from './index.module.less';
@@ -17,6 +18,7 @@ import {
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { FlowNode } from '@/ts/base/model';
+import { getUuid } from '@/utils/tools';
 
 type IProps = {
   operateOrgId?: string;
@@ -49,9 +51,6 @@ const ProcessTree: React.FC<IProps> = ({
       return [];
     }
     toMapping(node);
-    if (node?.type == 'CC') {
-      console.log('');
-    }
     if (isPrimaryNode(node)) {
       //普通业务节点
       let childDoms: any = getDomTree(h, node.children);
@@ -184,6 +183,8 @@ const ProcessTree: React.FC<IProps> = ({
       return Cc;
     } else if (comp == 'concurrent') {
       return Concurrent;
+    } else if (comp == 'organizationa') {
+      return DeptWay;
     } else if (comp == 'condition') {
       return Condition;
     } else if (comp == 'empty') {
@@ -310,7 +311,7 @@ const ProcessTree: React.FC<IProps> = ({
       node &&
       (node.type === 'CONDITIONS' ||
         node.type === 'CONCURRENTS' ||
-        node.type === 'DEPTGATEWAY')
+        node.type === 'ORGANIZATIONAL')
     );
   };
   const isEmptyNode = (node: any) => {
@@ -329,8 +330,8 @@ const ProcessTree: React.FC<IProps> = ({
       case 'CONCURRENTS':
         type = 'CONCURRENT';
         break;
-      case 'DEPTGATEWAY':
-        type = 'DEPTWAY';
+      case 'ORGANIZATIONAL':
+        type = 'ORGANIZATIONA';
         break;
     }
     return type;
@@ -344,8 +345,8 @@ const ProcessTree: React.FC<IProps> = ({
       case 'CONCURRENTS':
         name = '分支';
         break;
-      case 'DEPTGATEWAY':
-        name = '分支';
+      case 'ORGANIZATIONAL':
+        name = '部门分支';
         break;
     }
     return name;
@@ -354,7 +355,9 @@ const ProcessTree: React.FC<IProps> = ({
   const isBranchSubNode = (node: any) => {
     return (
       node &&
-      (node.type === 'CONDITION' || node.type === 'CONCURRENT' || node.type === 'DEPTWAY')
+      (node.type === 'CONDITION' ||
+        node.type === 'CONCURRENT' ||
+        node.type === 'ORGANIZATIONA')
     );
   };
   // const isConcurrentNode = (node: any) => {
@@ -362,9 +365,7 @@ const ProcessTree: React.FC<IProps> = ({
   // };
 
   const getRandomId = () => {
-    return `node_${new Date().getTime().toString().substring(5)}${Math.round(
-      Math.random() * 9000 + 1000,
-    )}`;
+    return `node_${getUuid()}`;
   };
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
@@ -401,7 +402,7 @@ const ProcessTree: React.FC<IProps> = ({
       case 'CONCURRENTS':
         insertConcurrentsNode(parentNode);
         break;
-      case 'DEPTGATEWAY':
+      case 'ORGANIZATIONAL':
         insertDeptGateWayNode(parentNode);
         break;
       default:
@@ -470,7 +471,28 @@ const ProcessTree: React.FC<IProps> = ({
     ];
   };
   const insertDeptGateWayNode = (parentNode: any) => {
-    message.warn('insertDeptGateWayNode');
+    parentNode.children.name = '部门分支';
+    parentNode.children.children = {
+      nodeId: getRandomId(),
+      parentId: parentNode.children.nodeId,
+      type: 'EMPTY',
+    };
+    parentNode.children.branches = [
+      {
+        nodeId: getRandomId(),
+        parentId: parentNode.children.nodeId,
+        type: 'ORGANIZATIONA',
+        conditions: [],
+        name: '部门分支1',
+      },
+      {
+        nodeId: getRandomId(),
+        parentId: parentNode.children.nodeId,
+        type: 'ORGANIZATIONA',
+        conditions: [],
+        name: '部门分支2',
+      },
+    ];
   };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';

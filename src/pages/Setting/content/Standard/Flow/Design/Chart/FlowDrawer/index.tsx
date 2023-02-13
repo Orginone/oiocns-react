@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
+import ConcurrentNode from './components/ConcurrentNode';
+import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
-import { AddNodeType, FieldCondition, NodeType } from './processType';
+import { AddNodeType, dataType, FieldCondition, NodeType } from './processType';
 import userCtrl from '@/ts/controller/setting';
 import { getUuid } from '@/utils/tools';
 /**
@@ -30,7 +32,7 @@ const FlowDrawer: React.FC<IProps> = ({
 }) => {
   const [key, setKey] = useState<string>();
   const Component = (current: any) => {
-    if (current.belongId && operateOrgId && current.belongId != operateOrgId) {
+    if (current?.belongId && current?.belongId != userCtrl.space.id) {
       return (
         <div>
           此节点由{' '}
@@ -57,6 +59,19 @@ const FlowDrawer: React.FC<IProps> = ({
             );
           }
           return <div>请先在字段设计中，设置条件字段</div>;
+        case AddNodeType.CONCURRENTS:
+          return (
+            <ConcurrentNode
+              current={current}
+              orgId={operateOrgId || designOrgId}></ConcurrentNode>
+          );
+        case AddNodeType.ORGANIZATIONA:
+          return (
+            <DeptWayNode
+              current={current}
+              conditions={[{ label: '部门', value: 'belongId', type: dataType.BELONG }]}
+              orgId={operateOrgId || designOrgId}></DeptWayNode>
+          );
         default:
           return <div>暂无需要处理的数据</div>;
       }
@@ -90,6 +105,7 @@ const FlowDrawer: React.FC<IProps> = ({
       open={isOpen}
       onClose={() => onClose()}
       width={600}>
+      NodeBelongId:{current.belongId}
       {Component(current)}
     </Drawer>
   ) : (

@@ -58,7 +58,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
    * 部门网关
    */
   const addDeptGateWayNode = () => {
-    props.onInsertNode('DEPTGATEWAY');
+    props.onInsertNode('ORGANIZATIONAL');
   };
 
   const content = (

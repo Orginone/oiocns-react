@@ -41,10 +41,6 @@ type NodeProps = {
   type?: AddNodeType;
   //默认操作组织id
   operateOrgId?: string;
-  //起始节点belongId
-  startNodeBelongId?: string;
-  //node的空间id(后端获取)
-  spaceId?: string;
 };
 
 /**
@@ -57,7 +53,7 @@ export enum AddNodeType {
   'CONCURRENTS' = 'CONCURRENTS',
   'EMPTY' = 'EMPTY',
   'START' = 'START',
-  'DEPTGATEWAY' = 'DEPTGATEWAY',
+  'ORGANIZATIONAL' = 'ORGANIZATIONAL',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -67,7 +63,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CONCURRENTS]: '同时审核节点',
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
-  [AddNodeType.DEPTGATEWAY]: '部门网关',
+  [AddNodeType.ORGANIZATIONAL]: '部门网关',
 };
 
 /**
@@ -78,21 +74,14 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
   const isEditable = (): boolean => {
     let editable = true;
-    if (
-      props.startNodeBelongId &&
-      props.startNodeBelongId != '' &&
-      props.startNodeBelongId != userCtrl.space.id
-    ) {
-      editable = false;
-    }
-    if (props.spaceId && props.spaceId != '' && props.spaceId != userCtrl.space.id) {
+    if (props.belongId && props.belongId != '' && props.belongId != userCtrl.space.id) {
       editable = false;
     }
     return editable;
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props.startNodeBelongId, props.spaceId, userCtrl.space]);
+  }, [props]);
   const delNode = (e: React.MouseEvent) => {
     e.preventDefault();
     props.onDelNode();
@@ -102,13 +91,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   };
   const footer = (
     <>
-      {editable && (
-        <div className={cls['node-footer']}>
-          <div className={cls['btn']}>
-            <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-          </div>
+      <div className={cls['node-footer']}>
+        <div className={cls['btn']}>
+          {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
         </div>
-      )}
+      </div>
     </>
   );
 
@@ -158,7 +145,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
               </span>
             )}
             {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-            {(!props.belongId || props.belongId == props.operateOrgId) && (
+            {editable && (
               <CloseOutlined
                 className={cls['iconPosition']}
                 style={{ fontSize: '12px', display: 'block' }}
@@ -183,11 +170,9 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   if (props.show) {
     return (
       <div
-        className={`${
-          !props.belongId || props.belongId == props.operateOrgId
-            ? cls['node']
-            : cls['node-unEdit']
-        } ${props.isRoot || !props.show ? cls['root'] : ''}  ${
+        className={`${editable ? cls['node'] : cls['node-unEdit']} ${
+          props.isRoot || !props.show ? cls['root'] : ''
+        }  ${
           props.showError || (props._passed === 0 && !props._executable)
             ? cls['node-error-state']
             : ''

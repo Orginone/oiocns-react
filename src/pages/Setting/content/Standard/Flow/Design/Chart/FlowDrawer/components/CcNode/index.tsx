@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-
+import userCtrl from '@/ts/controller/setting';
 interface IProps {
   current: NodeType;
   orgId?: string;
@@ -20,10 +20,25 @@ const CcNode: React.FC<IProps> = (props) => {
     title: string;
     key: string;
   }>({ title: '', key: '', data: { id: '', name: '' } });
-
+  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
+    props.current.belongId || props.orgId || userCtrl.space.id,
+  );
+  const onChange = (newValue: string) => {
+    setNodeOperateOrgId(newValue);
+    props.current.belongId = newValue;
+  };
+  useEffect(() => {
+    if (!props.current.belongId) {
+      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
+      props.current.belongId = props.orgId;
+    }
+  });
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
+        {/* <div style={{ marginBottom: '10px' }}>
+          <SelectOrg orgId={nodeOperateOrgId} onChange={onChange}></SelectOrg>
+        </div> */}
         <div style={{ marginBottom: '10px' }}>
           <Button
             type="primary"
@@ -58,7 +73,7 @@ const CcNode: React.FC<IProps> = (props) => {
         width="650px">
         <IndentityManage
           multiple={false}
-          orgId={props.orgId}
+          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },

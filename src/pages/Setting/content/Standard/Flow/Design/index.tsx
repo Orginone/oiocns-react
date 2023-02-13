@@ -5,6 +5,7 @@ import ChartDesign from './Chart';
 import { Branche, FlowNode, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel, FlowNode as FlowNodeModel } from '@/ts/base/model';
 import { Button, Card, Empty, Layout, message, Modal, Space, Steps } from 'antd';
+import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -55,14 +56,15 @@ const Design: React.FC<IProps> = ({
   const [currentStep, setCurrentStep] = useState(modalType == '新增业务流程' ? 0 : 1);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
   //visualNodes 特点type==EMPTY,parentId=任意,belongId=spaceId,children不为空, FlowNode
-  const [visualNodes, setVisualNodes] = useState<any[]>([]);
+  // const [visualNodes, setVisualNodes] = useState<any[]>([]);
+  const [spaceResource, setSpaceResource] = useState<any>();
   const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
     fields: [],
     remark: '',
     // resource: '',
     authId: '',
-    belongId: current.belongId,
+    belongId: current?.belongId || userCtrl.space.id,
     public: true,
     operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
   });
@@ -71,7 +73,7 @@ const Design: React.FC<IProps> = ({
     parentId: '',
     type: 'ROOT',
     name: '发起人',
-    belongId: conditionData.belongId,
+    belongId: conditionData.belongId || userCtrl.space.id,
     children: {},
   });
 
@@ -92,24 +94,28 @@ const Design: React.FC<IProps> = ({
   useEffect(() => {
     const load = async () => {
       if (current) {
-        setVisualNodes([]);
-        if (current.content && current.content != '') {
-          let resource_: any;
-          if (modalType == '新增业务流程') {
-            resource_ = JSON.parse(current.content)['resource'];
-          } else {
-            resource_ = (
-              await kernel.queryNodes({
-                id: current.id || '',
-                spaceId: operateOrgId,
-                page: { offset: 0, limit: 1000, filter: '' },
-              })
-            ).data;
-          }
-          // console.log('preLoad:', resource_);
+        setSpaceResource(undefined);
+        debugger;
+        // content字段可能取消
+        // if (current.content && current.content != '') {
+        let resource_: any;
+        if (modalType == '新增业务流程') {
+          // resource_ = JSON.parse(current.content)['resource'];
+          // resource_ = resource;
+        } else {
+          resource_ = (
+            await kernel.queryNodes({
+              id: current.id || '',
+              spaceId: operateOrgId,
+              page: { offset: 0, limit: 1000, filter: '' },
+            })
+          ).data;
+          // debugger;
+          console.log('preLoad:', resource_);
           let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
           // console.log('afterLoad:', resourceData);
           setResource(resourceData);
+          // }
         }
 
         species!
@@ -174,7 +180,7 @@ const Design: React.FC<IProps> = ({
     }
   }, [modalType]);
 
-  const getAllNodes = (resource: FlowNode, array: FlowNode[]): FlowNode[] => {
+  const getAllNodes = (resource: any, array: any[]): any[] => {
     array = [...array, resource];
     if (resource.children) {
       array = getAllNodes(resource.children, array);
@@ -197,7 +203,6 @@ const Design: React.FC<IProps> = ({
         item.parentId = resource.code;
         return item;
       });
-      console.log(resource.branches);
       array = [...array, ...resource.branches];
       for (let branch of resource.branches) {
         if (branch.children) {
@@ -252,7 +257,7 @@ const Design: React.FC<IProps> = ({
       }
     }
     //条件节点条件不为空  分支下最多只能有n个分支children为空
-    let n = 0;
+    // let n = 0;
     let parentIdSet: Set<string> = new Set();
     // let map: Map<string, undefined[]> = new Map();
     for (let branch of allBranches) {
@@ -271,24 +276,34 @@ const Design: React.FC<IProps> = ({
       parentIdSet.add(branch.parentId as string);
     }
 
-    for (let parentId of Array.from(parentIdSet)) {
-      let parent = allNodes.filter((item) => item.code == parentId)[0];
-      let branches = allBranches.filter(
-        (item) => item.parentId == parentId && !item.children,
-      );
-      if (branches.length > n) {
-        errors.push(
-          getErrorItem(
-            n == 0
-              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-              : `${
-                  parent.type == 'CONDITIONS' ? '条件' : '并行'
-                }节点分支下最多只能有${n}个分支节点为空`,
-          ),
-        );
+    // for (let parentId of Array.from(parentIdSet)) {
+    //   let parent = allNodes.filter((item) => item.code == parentId)[0];
+    //   let branches = allBranches.filter(
+    //     (item) => item.parentId == parentId && !item.children,
+    //   );
+    //   if (branches.length > n) {
+    //     errors.push(
+    //       getErrorItem(
+    //         n == 0
+    //           ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+    //           : `${
+    //               parent.type == 'CONDITIONS' ? '条件' : '并行'
+    //             }节点分支下最多只能有${n}个分支节点为空`,
+    //       ),
+    //     );
+    //   }
+    // }
+    return errors;
+  };
+
+  const findResourceByNodeId = (resource: any, nodeId: string): any => {
+    let nodes = getAllNodes(resource, []);
+    for (let node of nodes) {
+      if (node.code == nodeId) {
+        return node;
       }
     }
-    return errors;
+    return undefined;
   };
 
   const loadResource = (
@@ -317,18 +332,14 @@ const Design: React.FC<IProps> = ({
         case '全部':
           resource.type = 'CONCURRENTS';
           break;
-        //如果时空结点（下个流程的起始节点）
+        case '组织':
+          resource.type = 'ORGANIZATIONAL';
+          break;
+        //如果是空结点（下个流程的起始节点）
         case '空':
         case 'EMPTY':
-          setVisualNodes([...visualNodes, resource]);
-          return loadResource(
-            resource.children,
-            'flowNode',
-            parentId,
-            '',
-            '',
-            resource.belongId,
-          );
+          resource.type = 'EMPTY';
+          break;
         default:
           break;
       }
@@ -337,7 +348,7 @@ const Design: React.FC<IProps> = ({
     let hasEmptyChildren = false;
     if (type == 'flowNode') {
       let branches = undefined;
-      if (resource.name == '条件分支' || resource.name == '并行分支') {
+      if (['条件分支', '并行分支', '部门分支'].includes(resource.name)) {
         branches = resource.branches
           ? resource.branches.map((item: any) => {
               return loadResource(
@@ -352,53 +363,81 @@ const Design: React.FC<IProps> = ({
           : undefined;
         hasEmptyChildren = true;
       }
-      let flowNode: FlowNodeModel = {
-        id: resource.id,
-        nodeId: resource.code,
-        parentId: parentId,
-        type: resource.type,
-        name: resource.name,
-        desc: '',
-        props: {
-          assignedType: 'JOB',
-          mode: 'AND',
-          assignedUser: [
-            {
-              id: resource.destId,
-              name: resource.destName,
-              type: '',
-              orgIds: '',
+      let flowNode: any;
+      if (resource.type == 'EMPTY') {
+        let nodeId = getUuid();
+        resource.nodeId = nodeId;
+        // setVisualNodes([...visualNodes, resource]);
+        if (resource.belongId == userCtrl.space.id) {
+          setSpaceResource(resource);
+        }
+
+        flowNode = {
+          id: resource.id,
+          nodeId: nodeId,
+          parentId: parentId,
+          type: 'EMPTY',
+          children:
+            resource.children && resource.children.name != undefined
+              ? loadResource(
+                  resource.children,
+                  'flowNode',
+                  nodeId,
+                  resource.type,
+                  undefined,
+                  resource.belongId,
+                )
+              : undefined,
+        };
+      } else {
+        flowNode = {
+          id: resource.id,
+          nodeId: resource.code,
+          parentId: parentId,
+          type: resource.type,
+          name: resource.name,
+          desc: '',
+          props: {
+            assignedType: 'JOB',
+            mode: 'AND',
+            assignedUser: [
+              {
+                id: resource.destId,
+                name: resource.destName,
+                type: '',
+                orgIds: '',
+              },
+            ],
+            refuse: {
+              type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+              target: '', //驳回到指定ID的节点
             },
-          ],
-          refuse: {
-            type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-            target: '', //驳回到指定ID的节点
+            friendDialogmode: false,
+            num: resource.num || 0,
           },
-          friendDialogmode: false,
-          num: resource.num || 0,
-        },
-        belongId: resource.belongId,
-        branches: branches,
-        children: hasEmptyChildren
-          ? loadResource(
-              resource.children,
-              'empty',
-              resource.code,
-              resource.type,
-              resource.children,
-              resource.belongId,
-            )
-          : resource.children && resource.children.name != undefined
-          ? loadResource(
-              resource.children,
-              'flowNode',
-              resource.code,
-              resource.type,
-              undefined,
-              resource.belongId,
-            )
-          : undefined,
-      };
+          belongId: resource.belongId,
+          branches: branches,
+          children: hasEmptyChildren
+            ? loadResource(
+                resource.children,
+                'empty',
+                resource.code,
+                resource.type,
+                resource.children,
+                resource.belongId,
+              )
+            : resource.children && resource.children.name != undefined
+            ? loadResource(
+                resource.children,
+                'flowNode',
+                resource.code,
+                resource.type,
+                undefined,
+                resource.belongId,
+              )
+            : undefined,
+        };
+      }
       obj = flowNode;
     } else if (type == 'branch') {
       let nodeId = getUuid();
@@ -459,12 +498,11 @@ const Design: React.FC<IProps> = ({
     return obj;
   };
 
-  const changeResource = (resource: any, type: string, parent: any): any => {
+  const changeResource = (resource: any, type: string): any => {
     //起点belongId为空
     //不属于=>属于=>不属于=>不属于 保留所有虚拟节点(并判断虚拟节点子节点code和belongId)+只传属于=>不属于的虚拟节点
     //只留下 属于 的部分
     //主流程最后拼接visualNode 如何判断主流程最后？
-
     let obj: any;
     let belongId = undefined;
     if (resource.belongId && resource.belongId != '') {
@@ -474,6 +512,26 @@ const Design: React.FC<IProps> = ({
     } else {
       belongId = conditionData.belongId || current.belongId;
     }
+
+    //判断是否是当前空间的节点
+    if (resource.belongId && resource.belongId != userCtrl.space.id) {
+      resource.children = undefined;
+    }
+    // let needSave = true;
+    // //判断是否虚拟节点
+    // if (
+    //   resource.code &&
+    //   visualNodeCodes.includes(resource.code) &&
+    //   resource.type == 'EMPTY'
+    // ) {
+    //   //若为虚拟节点
+    //   //判断是否属于当前空间
+    //   needSave = resource.belongId == userCtrl.space.id;
+    //   //最后拼接visualNode
+    //   if (!needSave) {
+    //     resource.children = undefined;
+    //   }
+    // }
 
     if (type == 'flowNode') {
       let flowNode: FlowNode = {
@@ -557,7 +615,11 @@ const Design: React.FC<IProps> = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <div></div>
+              <div style={{ width: '200px' }}>
+                {/* {currentStep == 1 && (
+                  <SelectOrg orgId={operateOrgId} onChange={onChange}></SelectOrg>
+                )} */}
+              </div>
               {modalType != '新增业务流程' && (
                 <>
                   <div></div> <div></div>
@@ -587,7 +649,7 @@ const Design: React.FC<IProps> = ({
                         ]
                   }></Steps>
               </div>
-              <div className={cls['publish']}>
+              <div className={cls['publish']} style={{ width: '200px' }}>
                 {currentStep == 1 && (
                   <Space>
                     <Button
@@ -597,20 +659,30 @@ const Design: React.FC<IProps> = ({
                       onClick={async () => {
                         operateOrgId = operateOrgId || '';
                         let define: any = undefined;
-                        let visualNodeChildrenCodes = visualNodes.map(
-                          (item) => item.children.code,
-                        );
-                        let visualNodeChildrenBelongMap = new Map();
-                        for (let visualNode of visualNodes) {
-                          visualNodeChildrenBelongMap.set(
-                            visualNode.children.code,
-                            visualNode.belongId,
+                        // let visualNodeCodes = visualNodes.map((item) => item.code);
+                        // //若存在属于当前空间的虚拟节点 起始节点后直接添加虚拟节点的children
+                        // let visualNode_currentSpaces = visualNodes.filter(
+                        //   (item) => item.belongId == userCtrl.space.id,
+                        // );
+                        // if (
+                        //   visualNode_currentSpaces &&
+                        //   visualNode_currentSpaces.length > 0
+                        // ) {
+                        //   resource.children = findResourceByNodeId(
+                        //     resource,
+                        //     visualNode_currentSpaces[0].code,
+                        //   );
+                        // }
+                        if (spaceResource) {
+                          resource.children = findResourceByNodeId(
+                            resource,
+                            spaceResource.code,
                           );
                         }
+                        //数据结构转化
                         let resource_: FlowNode = changeResource(
                           resource,
                           'flowNode',
-                          undefined,
                         ) as FlowNode;
                         let errors = checkValid(resource_);
                         if (errors.length > 0) {
@@ -618,6 +690,7 @@ const Design: React.FC<IProps> = ({
                           return;
                         }
                         if (modalType == '新增业务流程') {
+                          console.log('resource:', resource_);
                           define = await species?.createFlowDefine({
                             code: conditionData.name,
                             name: conditionData.name,
@@ -627,6 +700,7 @@ const Design: React.FC<IProps> = ({
                             belongId: conditionData.belongId,
                           });
                         } else {
+                          console.log('resource:', resource_);
                           define = await species?.updateFlowDefine({
                             id: current.id,
                             code: conditionData.name,
@@ -663,6 +737,7 @@ const Design: React.FC<IProps> = ({
                     </Button>
                   </Space>
                 )}
+                {currentStep == 0 && <div></div>}
               </div>
             </div>
           </Layout.Header>
@@ -676,15 +751,19 @@ const Design: React.FC<IProps> = ({
                   setOperateOrgId={setOperateOrgId}
                   modalType={modalType}
                   onChange={(params) => {
-                    conditionData.belongId = params.belongId + '';
+                    conditionData.belongId = userCtrl.space.id;
                     conditionData.name = params.name;
                     conditionData.remark = params.remark;
+                    // conditionData.operateOrgId = params.operateOrgId;
+                    // setOperateOrgId(params.operateOrgId);
                     setConditionData(conditionData);
                   }}
                   nextStep={(params) => {
-                    conditionData.belongId = params.belongId + '';
+                    conditionData.belongId = userCtrl.space.id;
                     conditionData.name = params.name;
                     conditionData.remark = params.remark;
+                    // conditionData.operateOrgId = params.operateOrgId;
+                    // setOperateOrgId(params.operateOrgId);
                     setConditionData(conditionData);
                     setCurrentStep(1);
                   }}

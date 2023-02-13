@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import Node from '../Node';
 type ApprovalNodeProps = {
   operateOrgId?: string;
+  nodeOperateOrgId?: string;
+  setNodeOperateOrgId: Function;
   onInsertNode: Function;
   onDelNode: Function;
   onSelected: Function;

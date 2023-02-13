@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
-type ConcurrentNodeProps = {
+type DeptWayNodeProps = {
   //默认操作组织id
   operateOrgId?: string;
   onInsertNode: Function;
@@ -25,7 +25,7 @@ type ConcurrentNodeProps = {
  * 并行节点
  * @returns
  */
-const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
+const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
   const delNode = () => {
     props.onDelNode();
@@ -63,7 +63,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
       <span className={cls['title']}>
         <i className={cls['el-icon-s-operation']}></i>
         <span className={cls['name']}>
-          {props.config.name ? props.config.name : '并行任务' + props.level}
+          {props.config.name ? props.config.name : '部门分支' + props.level}
         </span>
       </span>
       {editable && (
@@ -79,9 +79,10 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   );
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
-      <span>并行任务（同时进行）</span>
+      <span>部门分支</span>
     </div>
   );
+
   return (
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
@@ -99,10 +100,10 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   );
 };
 
-ConcurrentNode.defaultProps = {
+DeptWayNode.defaultProps = {
   config: {},
   level: 1,
   size: 0,
 };
 
-export default ConcurrentNode;
+export default DeptWayNode;

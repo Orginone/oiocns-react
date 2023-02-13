@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-
+import userCtrl from '@/ts/controller/setting';
 interface IProps {
   current: NodeType;
   orgId?: string;
+  // nodeOperateOrgId?: string;
+  // setNodeOperateOrgId: Function;
 }
 
 /**
@@ -18,16 +20,36 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
+
   // const [processValue, setProcessValue] = useState(1);
+  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
+    props.current.belongId || props.orgId || userCtrl.space.id,
+  );
   const [currentData, setCurrentData] = useState({
     title: '',
     key: '',
     data: { id: '', name: '' },
   });
+  const onChange = (newValue: string) => {
+    setNodeOperateOrgId(newValue);
+    props.current.belongId = newValue;
+  };
+
+  useEffect(() => {
+    if (!props.current.belongId) {
+      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
+      props.current.belongId = props.orgId;
+    }
+  });
 
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
+        {/* <Row style={{ marginBottom: '10px' }}>
+          <SettingOutlined style={{ marginTop: '3px' }} />
+          <span className={cls[`roval-node-title`]}>选择操作组织</span>
+          <SelectOrg orgId={nodeOperateOrgId} onChange={onChange}></SelectOrg>
+        </Row> */}
         <Row style={{ marginBottom: '10px' }}>
           <SettingOutlined style={{ marginTop: '3px' }} />
           <span className={cls[`roval-node-title`]}>选择审批对象</span>
@@ -90,7 +112,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
           multiple={false}
-          orgId={props.orgId}
+          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },

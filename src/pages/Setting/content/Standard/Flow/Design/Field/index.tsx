@@ -33,23 +33,25 @@ const FieldInfo: React.FC<IProps> = ({
         formItemProps: {
           rules: [{ required: true, message: '流程名称为必填项' }],
         },
+        colProps: { span: 24 },
       },
-      {
-        title: '选择制定组织',
-        dataIndex: 'belongId',
-        valueType: 'treeSelect',
-        readonly: modalType == '编辑业务流程',
-        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-        request: async () => {
-          return await userCtrl.getTeamTree();
-        },
-        fieldProps: {
-          fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-          showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'teamName',
-        },
-      },
+      // {
+      //   title: '归属',
+      //   dataIndex: 'belongId',
+      //   // dataIndex: 'operateOrgId',
+      //   valueType: 'treeSelect',
+      //   readonly: true,
+      //   formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+      //   request: async () => {
+      //     return await userCtrl.getTeamTree();
+      //   },
+      //   fieldProps: {
+      //     fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
+      //     showSearch: true,
+      //     filterTreeNode: true,
+      //     treeNodeFilterProp: 'teamName',
+      //   },
+      // },
 
       // {
       //   title: '选择管理职权',
@@ -89,23 +91,23 @@ const FieldInfo: React.FC<IProps> = ({
       //   // },
       // },
     ];
-    if (currentFormValue.operateOrgId != undefined) {
-      columns.push({
-        title: '当前操作组织',
-        dataIndex: 'operateOrgId',
-        readonly: true,
-        valueType: 'treeSelect',
-        request: async () => {
-          return await userCtrl.getTeamTree();
-        },
-        fieldProps: {
-          fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-          showSearch: true,
-          filterTreeNode: true,
-          treeNodeFilterProp: 'teamName',
-        },
-      });
-    }
+    // if (currentFormValue.operateOrgId != undefined) {
+    //   columns.push({
+    //     title: '当前操作组织',
+    //     dataIndex: 'operateOrgId',
+    //     readonly: true,
+    //     valueType: 'treeSelect',
+    //     request: async () => {
+    //       return await userCtrl.getTeamTree();
+    //     },
+    //     fieldProps: {
+    //       fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
+    //       showSearch: true,
+    //       filterTreeNode: true,
+    //       treeNodeFilterProp: 'teamName',
+    //     },
+    //   });
+    // }
     columns.push({
       title: '备注信息',
       dataIndex: 'remark',

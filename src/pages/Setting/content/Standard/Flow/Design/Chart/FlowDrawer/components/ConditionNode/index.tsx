@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { dataType, FieldCondition, NodeType } from '../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
+import userCtrl from '@/ts/controller/setting';
 
 interface Iprops {
   current: NodeType;
@@ -31,13 +32,19 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       key: '',
       label: '',
       type: dataType.NUMERIC,
-      val: null,
+      val: undefined,
     });
     setKey(key + 1);
   };
 
   return conditions ? (
     <div>
+      {/* <div style={{ marginBottom: '10px' }}>
+        <SelectOrg
+          orgId={nodeOperateOrgId}
+          onChange={onChange}
+          readonly={true}></SelectOrg>
+      </div> */}
       <div style={{ marginBottom: '10px' }}>
         <Button type="primary" onClick={addConditionGroup}>
           添加条件

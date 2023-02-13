@@ -9,7 +9,7 @@ export default class FlowTarget extends BaseTarget {
     if (!reload && this.defines.length > 0) {
       return this.defines;
     }
-    const res = await kernel.queryDefine({ id: this.target.id });
+    const res = await kernel.queryDefine({ speciesId: this.target.id });
 
     if (res.success && res.data.result) {
       this.defines = res.data.result;

@@ -32,10 +32,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
               conditions={props.conditions}
               resource={props.resource}
               onSelectedNode={(params) => {
-                if (
-                  params.type !== AddNodeType.CONCURRENTS &&
-                  params.type !== AddNodeType.DEPTWAY
-                ) {
+                if (params.type !== AddNodeType.CONCURRENTS) {
                   //设置当前操作的节点，后续都是对当前节点的操作
                   setCurrentNode(params);
                   setIsOpen(true);

@@ -89,6 +89,15 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type QueryDefineReq = {
+  // 唯一ID
+  speciesId: string;
+  // 工作空间ID
+  spaceId?: string;
+  // 分页
+  page?: PageRequest;
+};
+
 export type SpaceAuthReq = {
   // 职权ID
   authId: string;

@@ -9,10 +9,6 @@ import userCtrl from '@/ts/controller/setting';
 type IProps = {
   //默认操作组织id
   operateOrgId?: string;
-  //起始节点belongId
-  startNodeBelongId?: string;
-  //node的空间id(后端获取)
-  spaceId?: string;
   conditions?: FieldCondition[];
   onInsertNode: Function;
   onDelNode: Function;
@@ -95,20 +91,17 @@ const ConditionNode: React.FC<IProps> = (props) => {
   const isEditable = (): boolean => {
     let editable = true;
     if (
-      props.startNodeBelongId &&
-      props.startNodeBelongId != '' &&
-      props.startNodeBelongId != userCtrl.space.id
+      props.config.belongId &&
+      props.config.belongId != '' &&
+      props.config.belongId != userCtrl.space.id
     ) {
-      editable = false;
-    }
-    if (props.spaceId && props.spaceId != '' && props.spaceId != userCtrl.space.id) {
       editable = false;
     }
     return editable;
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props.startNodeBelongId, props.spaceId, userCtrl.space]);
+  }, [props]);
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -141,11 +134,9 @@ const ConditionNode: React.FC<IProps> = (props) => {
   }, [props.config]);
   const footer = (
     <>
-      {editable && (
-        <div className={cls['btn']}>
-          <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-        </div>
-      )}
+      <div className={cls['btn']}>
+        {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+      </div>
     </>
   );
   const nodeHeader = (
@@ -153,7 +144,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       <span className={cls['title']}>
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
-      {(!props.config.belongId || props.config.belongId == props.operateOrgId) && (
+      {editable && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -177,11 +168,9 @@ const ConditionNode: React.FC<IProps> = (props) => {
   );
   return (
     <div
-      className={`${
-        !props.config.belongId || props.config.belongId == props.operateOrgId
-          ? cls['node']
-          : cls['node-unEdit']
-      } ${showError ? cls['node-error-state'] : ''}`}>
+      className={`${editable ? cls['node'] : cls['node-unEdit']} ${
+        showError ? cls['node-error-state'] : ''
+      }`}>
       <Tooltip
         title={
           <span>
