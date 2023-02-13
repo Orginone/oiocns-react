@@ -354,6 +354,8 @@ export type OperationModel = {
   speciesId: string;
   // 流程定义Id
   defineId?: string;
+  // 业务发起职权Id
+  beginAuthId?: string;
 };
 
 export type OperationItemModel = {
@@ -903,13 +905,13 @@ export type FlowRelationModel = {
 
 export type FlowReq = {
   // 流程实例Id
-  id: string;
+  id?: string;
   // 空间Id
   spaceId?: string;
   // 状态
-  status: number;
+  status?: number;
   // 分页
-  page?: PageRequest;
+  page: PageRequest;
 };
 
 export type ApprovalTaskReq = {
