@@ -94,6 +94,8 @@ export type QueryDefineReq = {
   speciesId: string;
   // 空间ID
   spaceId: string;
+  // 是否严格模式 true:只筛选属于该空间的流程定义 false:筛选该分类下可见的流程定义
+  isStrict: boolean;
   // 分页
   page: PageRequest;
 };
@@ -350,6 +352,8 @@ export type OperationModel = {
   belongId: string;
   // 类别Id
   speciesId: string;
+  // 流程定义Id
+  defineId?: string;
 };
 
 export type OperationItemModel = {
