@@ -139,9 +139,8 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     <>
       {props.isRoot && (
         <div className={cls['node-root-body-right']} onClick={select}>
-          <div style={{ paddingLeft: '40%' }}>开始</div>
-          <div>
-            {' '}
+          {/* <div style={{ paddingLeft: '40%' }}>开始</div> */}
+          <div style={{ width: '100%', height: '100%' }}>
             <SelectAuth
               key={key}
               onChange={onChange}

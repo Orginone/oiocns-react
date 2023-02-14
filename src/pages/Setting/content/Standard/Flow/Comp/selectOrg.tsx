@@ -1,9 +1,10 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
-import { ITarget } from '@/ts/core';
+import { ICompany, ITarget } from '@/ts/core';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
+  company?: ICompany;
   orgId?: string;
   value?: string;
   onChange: any;
@@ -12,8 +13,16 @@ interface IProps {
 const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await userCtrl.getTeamTree();
-    setTreeData(buildTargetTree(tree, false));
+    let tree;
+    if (props.company) {
+      tree = await userCtrl.getCompanyTeamTree(props.company);
+    } else {
+      tree = await userCtrl.getTeamTree();
+    }
+
+    let targets = buildTargetTree(tree, false);
+    debugger;
+    setTreeData(targets);
   };
   const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
     return targets.map((item: ITarget) => {

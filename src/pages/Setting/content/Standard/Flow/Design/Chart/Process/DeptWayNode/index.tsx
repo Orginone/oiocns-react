@@ -6,6 +6,7 @@ import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import { dataType } from '../../FlowDrawer/processType';
+import { ICompany } from '@/ts/core';
 type DeptWayNodeProps = {
   //默认操作组织id
   operateOrgId?: string;
@@ -30,6 +31,8 @@ type DeptWayNodeProps = {
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
   const [key, setKey] = useState<number>(0);
+  const [orgId, setOrgId] = useState<string>();
+  const [company, setCompany] = useState<ICompany>();
   const delNode = () => {
     props.onDelNode();
   };
@@ -50,6 +53,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     }
     return editable;
   };
+  const findCompany = async () => {};
   useEffect(() => {
     setEditable(isEditable());
     if (props.config.conditions.length == 0) {
@@ -65,6 +69,14 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
         },
       ];
       setKey(key + 1);
+    }
+    debugger;
+    if (!isEditable()) {
+      setOrgId(props.config.conditions[0]?.val);
+      setCompany(undefined);
+    } else {
+      setOrgId(userCtrl.space.id);
+      setCompany(userCtrl.company);
     }
   }, []);
 
@@ -109,7 +121,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           key={key}
           onChange={onChange}
           readonly={!editable}
-          orgId={userCtrl.space.id}
+          orgId={orgId}
+          company={company}
           value={props.config.conditions[0]?.val}></SelectOrg>
       </span>
     </div>
