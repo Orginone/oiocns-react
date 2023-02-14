@@ -508,13 +508,38 @@ export type XFlowRecordArray = {
 };
 
 //流程对应
+// export type XFlowRelation = {
+//   // 雪花ID
+//   id: string;
+//   // 产品Id
+//   productId: string;
+//   // 业务编号
+//   functionCode: string;
+//   // 流程定义Id
+//   defineId: string;
+//   // 状态
+//   status: number;
+//   // 创建人员ID
+//   createUser: string;
+//   // 更新人员ID
+//   updateUser: string;
+//   // 修改次数
+//   version: string;
+//   // 创建时间
+//   createTime: string;
+//   // 更新时间
+//   updateTime: string;
+//   // 应用资源
+//   product: XProduct | undefined;
+//   // 流程的定义
+//   flowDefine: XFlowDefine | undefined;
+// };
+//流程对应
 export type XFlowRelation = {
   // 雪花ID
   id: string;
-  // 产品Id
-  productId: string;
-  // 业务编号
-  functionCode: string;
+  // 业务标准Id
+  operationId: string;
   // 流程定义Id
   defineId: string;
   // 状态
@@ -529,10 +554,10 @@ export type XFlowRelation = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 应用资源
-  product: XProduct | undefined;
   // 流程的定义
-  flowDefine: XFlowDefine | undefined;
+  define: XFlowDefine | undefined;
+  // 业务标准
+  operation: XOperation | undefined;
 };
 
 //流程对应查询返回集合

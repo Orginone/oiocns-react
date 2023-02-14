@@ -2346,11 +2346,11 @@ export default class KernelApi {
   }
   /**
    * 查询应用业务与定义的绑定关系
-   * @param {model.IdReq} params 请求参数
+   * @param {model.QueryDefineRelationReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
    */
   public async queryDefineRelation(
-    params: model.IdReq,
+    params: model.QueryDefineRelationReq,
   ): Promise<model.ResultType<schema.XFlowRelationArray>> {
     return await this.request({
       module: 'flow',

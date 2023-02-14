@@ -920,7 +920,7 @@ const Design: React.FC<IProps> = ({
               流程已结束
             </Button>
           )}
-          {instance && (
+          {/* {instance && (
             <Button
               style={{ position: 'fixed', bottom: 0, zIndex: 100, left: 400 }}
               type="primary"
@@ -929,7 +929,7 @@ const Design: React.FC<IProps> = ({
               }}>
               resource
             </Button>
-          )}
+          )} */}
         </Layout>
       </Card>
       <Modal

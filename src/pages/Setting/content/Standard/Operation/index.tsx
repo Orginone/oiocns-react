@@ -175,12 +175,12 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
           if (res.success) {
             message.success('保存成功');
             tforceUpdate();
-            if (modalType.includes('新增')) {
-              await kernel.createFlowRelation({
-                defineId: '413412066620215296',
-                operationId: res.data.id,
-              });
-            }
+            // if (modalType.includes('新增')) {
+            //   await kernel.createFlowRelation({
+            //     defineId: '413415610907758592',
+            //     operationId: res.data.id,
+            //   });
+            // }
           }
         }}
         target={target}
