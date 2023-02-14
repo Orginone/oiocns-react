@@ -29,6 +29,7 @@ const SettingFlow: React.FC<IProps> = ({
 }: IProps) => {
   const [tabKey, SetTabKey] = useState(0);
   const [operateOrgId, setOperateOrgId] = useState<string>();
+  const [instance, setInstance] = useState<any>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const judgeIsAdmin = async (target: ITarget) => {
     let isAdmin = await IsThingAdmin(target);
@@ -52,6 +53,7 @@ const SettingFlow: React.FC<IProps> = ({
       isAdmin={isAdmin}
       operateOrgId={operateOrgId}
       setOperateOrgId={setOperateOrgId}
+      setInstance={setInstance}
       species={current}
       onDesign={() => SetTabKey(1)}
       modalType={modalType}
@@ -61,9 +63,11 @@ const SettingFlow: React.FC<IProps> = ({
     <Design
       current={flowDesign}
       species={current}
+      instance={instance}
       operateOrgId={operateOrgId}
       setOperateOrgId={setOperateOrgId}
       onBack={() => {
+        setInstance(undefined);
         setOperateOrgId(undefined);
         SetTabKey(0);
       }}

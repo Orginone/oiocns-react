@@ -13,6 +13,7 @@ import { ISpeciesItem } from '@/ts/core/thing/ispecies';
 // import { IsThingAdmin } from '@/utils/authority';
 import { ITarget } from '@/ts/core';
 import { DefaultOptionType } from 'rc-select/lib/Select';
+import { kernel } from '@/ts/base';
 
 interface IProps {
   modalType: string;
@@ -23,6 +24,7 @@ interface IProps {
   setModalType: (modalType: string) => void;
   onDesign: () => void;
   onCurrentChaned: (item?: XFlowDefine) => void;
+  setInstance: Function;
 }
 
 /**
@@ -38,6 +40,7 @@ const FlowList: React.FC<IProps> = ({
   setModalType,
   onDesign,
   onCurrentChaned,
+  setInstance,
 }: IProps) => {
   const parentRef = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
@@ -77,6 +80,36 @@ const FlowList: React.FC<IProps> = ({
 
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
+      {
+        key: 'createInstance',
+        label: '发起测试流程',
+        onClick: async () => {
+          let res = await kernel.createInstance({
+            defineId: record.id,
+            SpaceId: userCtrl.space.id,
+            content: 'Text文本显示正常',
+            contentType: 'Text',
+            data: JSON.stringify({
+              id: '789171',
+              name: '测试流程的数据',
+              code: 'test',
+              remark: '测试流程的数据',
+            }),
+            title: record.name,
+            hook: '',
+          });
+          if (res.success) {
+            message.success('发起测试流程成功');
+            setInstance(res.data);
+            onCurrentChaned(record);
+            setOperateOrgId(userCtrl.space.id);
+            setModalType('编辑业务流程');
+            onDesign();
+          } else {
+            message.error('发起测试流程失败');
+          }
+        },
+      },
       {
         key: 'editor',
         label: '编辑',

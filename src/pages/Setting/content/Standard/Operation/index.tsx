@@ -177,7 +177,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
             tforceUpdate();
             if (modalType.includes('新增')) {
               await kernel.createFlowRelation({
-                defineId: '413276480144019456',
+                defineId: '413347592299220992',
                 operationId: res.data.id,
               });
             }

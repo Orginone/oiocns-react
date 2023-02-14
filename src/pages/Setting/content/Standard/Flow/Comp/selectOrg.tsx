@@ -21,7 +21,6 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     }
 
     let targets = buildTargetTree(tree, false);
-    debugger;
     setTreeData(targets);
   };
   const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {

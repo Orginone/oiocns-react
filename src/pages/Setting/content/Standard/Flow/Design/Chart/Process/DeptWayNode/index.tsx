@@ -70,13 +70,10 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       ];
       setKey(key + 1);
     }
-    debugger;
     if (!isEditable()) {
       setOrgId(props.config.conditions[0]?.val);
-      setCompany(undefined);
     } else {
       setOrgId(userCtrl.space.id);
-      setCompany(userCtrl.company);
     }
   }, []);
 
@@ -117,13 +114,14 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       {/* <span>组织分支</span> */}
       <span>
         {' '}
-        <SelectOrg
-          key={key}
-          onChange={onChange}
-          readonly={!editable}
-          orgId={orgId}
-          company={company}
-          value={props.config.conditions[0]?.val}></SelectOrg>
+        {editable && (
+          <SelectOrg
+            key={key}
+            onChange={onChange}
+            orgId={orgId}
+            value={props.config.conditions[0]?.val}></SelectOrg>
+        )}
+        {!editable && userCtrl.getBelongName(props.config.conditions[0]?.val)}
       </span>
     </div>
   );

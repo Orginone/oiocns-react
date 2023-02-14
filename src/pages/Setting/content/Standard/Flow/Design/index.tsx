@@ -25,6 +25,7 @@ interface IProps {
   species?: ISpeciesItem;
   modalType: string;
   operateOrgId?: string;
+  instance?: any;
   setOperateOrgId: Function;
   setModalType: (modalType: string) => void;
   onBack: () => void;
@@ -47,6 +48,7 @@ const Design: React.FC<IProps> = ({
   species,
   modalType,
   operateOrgId,
+  instance,
   setOperateOrgId,
   setModalType,
   onBack,
@@ -77,10 +79,10 @@ const Design: React.FC<IProps> = ({
       mode: 'AND',
       assignedUser: [
         {
-          id: '',
-          name: '',
-          type: '',
-          orgIds: '',
+          id: undefined,
+          name: undefined,
+          type: undefined,
+          orgIds: undefined,
         },
       ],
       refuse: {
@@ -140,10 +142,10 @@ const Design: React.FC<IProps> = ({
                 mode: 'AND',
                 assignedUser: [
                   {
-                    id: '',
-                    name: '',
-                    type: '',
-                    orgIds: '',
+                    id: undefined,
+                    name: undefined,
+                    type: undefined,
+                    orgIds: undefined,
                   },
                 ],
                 refuse: {
@@ -268,9 +270,16 @@ const Design: React.FC<IProps> = ({
 
   const checkValid = (resource: FlowNode): ReactNode[] => {
     let errors: ReactNode[] = [];
-    //校验 至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
+    //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
     let allNodes: FlowNode[] = getAllNodes(resource, []);
     let allBranches: Branche[] = getAllBranches(resource, []);
+    //校验Root类型节点角色不为空
+    let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
+    for (let rootNode of rootNodes) {
+      if (rootNode.destId == undefined) {
+        errors.push(getErrorItem('ROOT节点缺少角色'));
+      }
+    }
     //校验 至少有一个审批节点
     let approvalNodes = allNodes.filter((item) => item.type == 'APPROVAL');
     if (approvalNodes.length == 0) {
@@ -582,7 +591,8 @@ const Design: React.FC<IProps> = ({
           resource.props != undefined &&
           resource.props.assignedUser != undefined &&
           resource.props.assignedUser.length > 0 &&
-          resource.props.assignedUser[0] != undefined
+          resource.props.assignedUser[0] != undefined &&
+          resource.props.assignedUser[0].id != ''
             ? resource.props.assignedUser[0].id
             : undefined,
         destName:
@@ -591,7 +601,7 @@ const Design: React.FC<IProps> = ({
           resource.props.assignedUser.length > 0 &&
           resource.props.assignedUser[0] != undefined
             ? resource.props.assignedUser[0].name
-            : '',
+            : undefined,
         children:
           resource.children && resource.children.name != undefined
             ? changeResource(resource.children, 'flowNode')
@@ -630,6 +640,37 @@ const Design: React.FC<IProps> = ({
     return obj;
   };
 
+  const next = async (instanceId: string, belongId: string, freshed: boolean) => {
+    let res = await kernel.queryInstance({
+      id: instanceId,
+      spaceId: belongId,
+      page: { offset: 0, limit: 1000, filter: '' },
+    });
+    let instance: any = res.data.result ? res.data.result[0] : undefined;
+    let nodeRes = await kernel.queryNodes({
+      id: instance?.defineId || '',
+      spaceId: belongId,
+      page: { offset: 0, limit: 1000, filter: '' },
+    });
+    let node: FlowNode = nodeRes.data;
+    if (!freshed && instance) {
+      for (let task of instance.historyTasks) {
+        if (task.status == 1) {
+          let approvalResult = await kernel.approvalTask({
+            id: task.id,
+            status: 100,
+            comment: '审核意见：通过',
+          });
+          if (approvalResult.success) {
+            message.success('审核成功');
+            next(instanceId, belongId, true);
+          } else {
+            message.error('审核失败');
+          }
+        }
+      }
+    }
+  };
   return (
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
@@ -716,13 +757,13 @@ const Design: React.FC<IProps> = ({
                           resource,
                           'flowNode',
                         ) as FlowNode;
+                        console.log('resource:', resource_);
                         let errors = checkValid(resource_);
                         if (errors.length > 0) {
                           setShowErrorsModal(errors);
                           return;
                         }
                         if (modalType == '新增业务流程') {
-                          console.log('resource:', resource_);
                           define = await species?.createFlowDefine({
                             code: conditionData.name,
                             name: conditionData.name,
@@ -732,7 +773,6 @@ const Design: React.FC<IProps> = ({
                             belongId: conditionData.belongId,
                           });
                         } else {
-                          console.log('resource:', resource_);
                           define = await species?.updateFlowDefine({
                             id: current.id,
                             code: conditionData.name,
@@ -813,6 +853,15 @@ const Design: React.FC<IProps> = ({
               )}
             </Card>
           </Layout.Content>
+
+          {instance && (
+            <Button
+              style={{ position: 'fixed', bottom: 0, zIndex: 100 }}
+              type="primary"
+              onClick={() => next(instance.id, instance.belongId, false)}>
+              下一步
+            </Button>
+          )}
         </Layout>
       </Card>
       <Modal

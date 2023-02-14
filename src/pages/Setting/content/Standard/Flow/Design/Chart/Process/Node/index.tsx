@@ -95,7 +95,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const onChange = (newValue: string) => {
     // props.config.conditions[0].val = newValue;
     // setKey(key + 1);
-    debugger;
     props.config.props.assignedUser[0].id = newValue;
     setKey(key + 1);
   };

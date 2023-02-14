@@ -453,6 +453,8 @@ export type XFlowInstance = {
   updateTime: string;
   // 流程的定义
   flowDefine: XFlowDefine | undefined;
+  // 归属
+  belongId: string;
 };
 
 //流程实例查询返回集合
