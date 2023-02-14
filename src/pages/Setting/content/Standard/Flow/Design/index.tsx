@@ -26,6 +26,7 @@ interface IProps {
   modalType: string;
   operateOrgId?: string;
   instance?: any;
+  setInstance: Function;
   setOperateOrgId: Function;
   setModalType: (modalType: string) => void;
   onBack: () => void;
@@ -50,14 +51,16 @@ const Design: React.FC<IProps> = ({
   operateOrgId,
   instance,
   setOperateOrgId,
+  setInstance,
   setModalType,
   onBack,
 }: IProps) => {
   const [scale, setScale] = useState<number>(90);
-  const [currentStep, setCurrentStep] = useState(modalType == '新增业务流程' ? 0 : 1);
+  const [currentStep, setCurrentStep] = useState(modalType == '新增流程设计' ? 0 : 1);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
   //visualNodes 特点type==EMPTY,parentId=任意,belongId=spaceId,children不为空, FlowNode
   // const [visualNodes, setVisualNodes] = useState<any[]>([]);
+  const [key, setKey] = useState<string>();
   const [spaceResource, setSpaceResource] = useState<any>();
   const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
@@ -67,7 +70,7 @@ const Design: React.FC<IProps> = ({
     authId: '',
     belongId: current?.belongId || userCtrl.space.id,
     public: true,
-    operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
+    operateOrgId: modalType == '编辑流程设计' ? operateOrgId : undefined,
   });
   const [resource, setResource] = useState({
     nodeId: `node_${getUuid()}`,
@@ -116,7 +119,7 @@ const Design: React.FC<IProps> = ({
         setSpaceResource(undefined);
         // content字段可能取消
         let resource_: any;
-        if (modalType != '新增业务流程') {
+        if (modalType != '新增流程设计') {
           resource_ = (
             await kernel.queryNodes({
               id: current.id || '',
@@ -159,9 +162,18 @@ const Design: React.FC<IProps> = ({
               children: resourceData,
             };
           }
-          console.log('addedRoot:', resource_);
           console.log('afterLoad:', resourceData);
-          setResource(resourceData);
+          if (instance) {
+            let res = await kernel.queryInstance({
+              id: instance.id,
+              spaceId: instance.belongId,
+              page: { offset: 0, limit: 1000, filter: '' },
+            });
+            let instance_: any = res.data.result ? res.data.result[0] : undefined;
+            showTask(instance_, resourceData);
+          } else {
+            setResource(resourceData);
+          }
         }
 
         species!
@@ -178,7 +190,7 @@ const Design: React.FC<IProps> = ({
               authId: current.authId || '',
               belongId: current.belongId,
               public: current.public,
-              operateOrgId: modalType == '编辑业务流程' ? operateOrgId : undefined,
+              operateOrgId: modalType == '编辑流程设计' ? operateOrgId : undefined,
               fields: attrs.map((attr: any) => {
                 switch (attr.valueType) {
                   case '描述型':
@@ -220,7 +232,7 @@ const Design: React.FC<IProps> = ({
           setModalType('');
         },
         onCancel() {
-          setModalType('新增业务流程');
+          setModalType('新增流程设计');
         },
       });
     }
@@ -640,6 +652,38 @@ const Design: React.FC<IProps> = ({
     return obj;
   };
 
+  const changeNodeStatus = (resource: any, map: Map<string, number>) => {
+    if (resource.id && map.get(resource.id) != undefined) {
+      resource._passed = map.get(resource.id);
+    }
+    if (resource.children) {
+      resource.children = changeNodeStatus(resource.children, map);
+    }
+    if (resource.branches && resource.branches.length > 0) {
+      resource.branches = resource.branches.map((item: any) =>
+        changeNodeStatus(item, map),
+      );
+    }
+    return resource;
+  };
+
+  const showTask = (instance: any, resource: any) => {
+    let map = new Map<string, number>();
+    debugger;
+    for (let task of instance.historyTasks) {
+      let _passed = 1;
+      if (task.status >= 200) {
+        _passed = 0;
+      } else if (task.status >= 100 && task.status < 200) {
+        _passed = 2;
+      }
+      map.set(task.nodeId, _passed);
+    }
+    let resource_showState = changeNodeStatus(resource, map);
+    console.log('resource_showState:', resource_showState);
+    setResource(resource_showState);
+  };
+
   const next = async (instanceId: string, belongId: string, freshed: boolean) => {
     let res = await kernel.queryInstance({
       id: instanceId,
@@ -647,13 +691,15 @@ const Design: React.FC<IProps> = ({
       page: { offset: 0, limit: 1000, filter: '' },
     });
     let instance: any = res.data.result ? res.data.result[0] : undefined;
-    let nodeRes = await kernel.queryNodes({
-      id: instance?.defineId || '',
-      spaceId: belongId,
-      page: { offset: 0, limit: 1000, filter: '' },
-    });
-    let node: FlowNode = nodeRes.data;
+
+    if (freshed) {
+      setInstance(instance);
+      showTask(instance, resource);
+    }
+    // let node: FlowNode = nodeRes.data;
+
     if (!freshed && instance) {
+      let needFresh = false;
       for (let task of instance.historyTasks) {
         if (task.status == 1) {
           let approvalResult = await kernel.approvalTask({
@@ -663,11 +709,14 @@ const Design: React.FC<IProps> = ({
           });
           if (approvalResult.success) {
             message.success('审核成功');
-            next(instanceId, belongId, true);
+            needFresh = true;
           } else {
             message.error('审核失败');
           }
         }
+      }
+      if (needFresh) {
+        next(instanceId, belongId, true);
       }
     }
   };
@@ -693,7 +742,7 @@ const Design: React.FC<IProps> = ({
                 justifyContent: 'space-between',
               }}>
               <div style={{ width: '200px' }}></div>
-              {modalType != '新增业务流程' && (
+              {modalType != '新增流程设计' && (
                 <>
                   <div></div> <div></div>
                 </>
@@ -703,7 +752,7 @@ const Design: React.FC<IProps> = ({
                 <Steps
                   current={currentStep}
                   items={
-                    modalType == '新增业务流程'
+                    modalType == '新增流程设计'
                       ? [
                           {
                             title: '流程信息',
@@ -723,7 +772,7 @@ const Design: React.FC<IProps> = ({
                   }></Steps>
               </div>
               <div className={cls['publish']} style={{ width: '200px' }}>
-                {currentStep == 1 && (
+                {currentStep == 1 && !instance && (
                   <Space>
                     <Button
                       className={cls['publis-issue']}
@@ -763,7 +812,7 @@ const Design: React.FC<IProps> = ({
                           setShowErrorsModal(errors);
                           return;
                         }
-                        if (modalType == '新增业务流程') {
+                        if (modalType == '新增流程设计') {
                           define = await species?.createFlowDefine({
                             code: conditionData.name,
                             name: conditionData.name,
@@ -843,6 +892,7 @@ const Design: React.FC<IProps> = ({
               ) : (
                 <div>
                   <ChartDesign
+                    key={key}
                     operateOrgId={operateOrgId}
                     designOrgId={conditionData.belongId}
                     conditions={conditionData.fields}
@@ -854,12 +904,30 @@ const Design: React.FC<IProps> = ({
             </Card>
           </Layout.Content>
 
-          {instance && (
+          {instance && instance.status < 100 && (
             <Button
               style={{ position: 'fixed', bottom: 0, zIndex: 100 }}
               type="primary"
               onClick={() => next(instance.id, instance.belongId, false)}>
               下一步
+            </Button>
+          )}
+          {instance && instance.status >= 100 && (
+            <Button
+              style={{ position: 'fixed', bottom: 0, zIndex: 100 }}
+              type="primary"
+              disabled>
+              流程已结束
+            </Button>
+          )}
+          {instance && (
+            <Button
+              style={{ position: 'fixed', bottom: 0, zIndex: 100, left: 400 }}
+              type="primary"
+              onClick={() => {
+                console.log('resource:', resource);
+              }}>
+              resource
             </Button>
           )}
         </Layout>

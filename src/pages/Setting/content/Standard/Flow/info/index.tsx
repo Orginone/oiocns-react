@@ -48,7 +48,7 @@ const FlowList: React.FC<IProps> = ({
   // const [operateOrgId, setOperateOrgId] = useState<string>();
   const [treeData, setTreeData] = useState<any[]>([]);
   useEffect(() => {
-    if (modalType.includes('新增业务流程')) {
+    if (modalType.includes('新增流程设计')) {
       onCurrentChaned(undefined);
       onDesign();
     }
@@ -81,6 +81,27 @@ const FlowList: React.FC<IProps> = ({
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
       {
+        key: 'editor',
+        label: '编辑',
+        onClick: () => {
+          Modal.confirm({
+            title: '与该流程相关的未完成待办将会重置，是否确定编辑?',
+            icon: <ExclamationCircleOutlined />,
+            okText: '确认',
+            cancelText: '取消',
+            okType: 'danger',
+            onOk: () => {
+              onCurrentChaned(record);
+              // setIsModalOpen(true);
+              // setIsModalOpen(false);
+              setOperateOrgId(userCtrl.space.id);
+              setModalType('编辑流程设计');
+              onDesign();
+            },
+          });
+        },
+      },
+      {
         key: 'createInstance',
         label: '发起测试流程',
         onClick: async () => {
@@ -103,32 +124,11 @@ const FlowList: React.FC<IProps> = ({
             setInstance(res.data);
             onCurrentChaned(record);
             setOperateOrgId(userCtrl.space.id);
-            setModalType('编辑业务流程');
+            setModalType('编辑流程设计');
             onDesign();
           } else {
             message.error('发起测试流程失败');
           }
-        },
-      },
-      {
-        key: 'editor',
-        label: '编辑',
-        onClick: () => {
-          Modal.confirm({
-            title: '与该流程相关的未完成待办将会重置，是否确定编辑?',
-            icon: <ExclamationCircleOutlined />,
-            okText: '确认',
-            cancelText: '取消',
-            okType: 'danger',
-            onOk: () => {
-              onCurrentChaned(record);
-              // setIsModalOpen(true);
-              // setIsModalOpen(false);
-              setOperateOrgId(userCtrl.space.id);
-              setModalType('编辑业务流程');
-              onDesign();
-            },
-          });
         },
       },
     ];
@@ -206,7 +206,7 @@ const FlowList: React.FC<IProps> = ({
           onOk={() => {
             if (operateOrgId) {
               setIsModalOpen(false);
-              setModalType('编辑业务流程');
+              setModalType('编辑流程设计');
               onDesign();
             } else {
               message.warn('请选择操作组织');

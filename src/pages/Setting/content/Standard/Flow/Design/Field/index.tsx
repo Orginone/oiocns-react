@@ -29,7 +29,7 @@ const FieldInfo: React.FC<IProps> = ({
       {
         title: '流程名称',
         dataIndex: 'name',
-        readonly: modalType == '编辑业务流程',
+        readonly: modalType == '编辑流程设计',
         formItemProps: {
           rules: [{ required: true, message: '流程名称为必填项' }],
         },

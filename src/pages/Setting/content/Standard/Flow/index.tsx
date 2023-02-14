@@ -64,6 +64,7 @@ const SettingFlow: React.FC<IProps> = ({
       current={flowDesign}
       species={current}
       instance={instance}
+      setInstance={setInstance}
       operateOrgId={operateOrgId}
       setOperateOrgId={setOperateOrgId}
       onBack={() => {
