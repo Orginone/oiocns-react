@@ -5,6 +5,7 @@ import { ITarget } from '@/ts/core';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
   orgId?: string;
+  value?: string;
   onChange: any;
   readonly?: boolean;
 }
@@ -12,7 +13,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
     let tree = await userCtrl.getTeamTree();
-    setTreeData(getTreeData(tree));
+    setTreeData(buildTargetTree(tree, false));
   };
   const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
     return targets.map((item: ITarget) => {
@@ -24,6 +25,35 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
       };
     });
   };
+  /** 加载组织树 */
+  const buildTargetTree = (targets: ITarget[], isChild: boolean) => {
+    const result: any[] = [];
+    if (targets) {
+      for (const item of targets) {
+        if (props.orgId && !isChild) {
+          if (item.id == props.orgId) {
+            result.push({
+              label: item.teamName,
+              value: item.id,
+              children: buildTargetTree(item.subTeam, true),
+            });
+          } else {
+            let children = buildTargetTree(item.subTeam, false);
+            for (let child of children) {
+              result.push(child);
+            }
+          }
+        } else {
+          result.push({
+            label: item.teamName,
+            value: item.id,
+            children: buildTargetTree(item.subTeam, isChild),
+          });
+        }
+      }
+    }
+    return result;
+  };
   useEffect(() => {
     loadTreeData();
   }, [userCtrl.space]);
@@ -31,7 +61,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     <TreeSelect
       showSearch
       style={{ width: '100%' }}
-      value={props.orgId}
+      value={props.value}
       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
       placeholder="请选择操作组织"
       treeDefaultExpandAll

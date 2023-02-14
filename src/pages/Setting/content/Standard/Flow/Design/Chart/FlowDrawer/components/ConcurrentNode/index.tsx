@@ -15,12 +15,6 @@ const ConcurrentNode: React.FC<IProps> = (props) => {
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
-        {/* <div style={{ marginBottom: '10px' }}>
-          <SelectOrg
-            orgId={nodeOperateOrgId}
-            onChange={onChange}
-            readonly={true}></SelectOrg>
-        </div> */}
         <div>并行任务(同时进行)</div>
       </div>
     </div>

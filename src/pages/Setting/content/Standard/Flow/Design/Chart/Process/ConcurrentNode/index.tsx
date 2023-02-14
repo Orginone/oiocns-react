@@ -49,7 +49,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props]);
+  }, []);
 
   const footer = (
     <>

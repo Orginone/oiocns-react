@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Select, InputNumber, Input, Form, message } from 'antd';
 import { NodeType, FieldCondition, conditiondType } from '../../processType';
-import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp';
+import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import cls from './index.module.less';
+import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
   orgId?: string;
@@ -11,18 +12,18 @@ interface IProps {
 }
 
 /**
- * @description: 部门选择
+ * @description: 组织选择
  * @return {*}
  */
 const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
   const [form] = Form.useForm();
   const [currentNode, setCurrentNode] = useState<NodeType>();
-  const [conditions, setConditions] = useState<FieldCondition[]>([]);
+  // const [conditions, setConditions] = useState<FieldCondition[]>([]);
   const [key, setKey] = useState(0);
 
   useEffect(() => {
     setCurrentNode(props.currnet);
-    setConditions(props.conditions || []);
+    // setConditions(props.conditions || []);
     form.setFieldsValue({ allContent: props.currnet.conditions });
   }, [props]);
 
@@ -39,7 +40,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
         {[...(currentNode?.conditions || [])]?.map((condition, index) => (
           <div key={index + '_g'} className={cls['group']}>
             <div className={cls['group-header']}>
-              <span className={cls['group-name']}>部门</span>
+              <span className={cls['group-name']}>组织</span>
               <div className={cls['group-cp']}>
                 <Form.Item name={['allContent', index, 'key']}>
                   <Select
@@ -50,14 +51,15 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                   />
                 </Form.Item>
 
-                {/* 枚举类型 */}
+                {/* 组织 */}
                 {condition.type == 'BELONG' && (
                   <Form.Item name={['allContent', index, 'val']}>
                     <div style={{ width: 200 }}>
                       <SelectOrg
                         key={key}
                         onChange={onChange}
-                        orgId={condition.val}></SelectOrg>
+                        orgId={userCtrl.space.id}
+                        value={condition.val}></SelectOrg>
                     </div>
                   </Form.Item>
                 )}

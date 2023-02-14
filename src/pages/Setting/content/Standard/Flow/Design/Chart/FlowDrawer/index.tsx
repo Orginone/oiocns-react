@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
 import CcNode from './components/CcNode';
+import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
 import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
@@ -44,6 +45,8 @@ const FlowDrawer: React.FC<IProps> = ({
       );
     } else {
       switch (current?.type) {
+        case AddNodeType.ROOT:
+          return <RootNode current={current} orgId={operateOrgId || designOrgId} />;
         case AddNodeType.APPROVAL:
           return <ApprovalNode current={current} orgId={operateOrgId || designOrgId} />;
         case AddNodeType.CC:
@@ -69,7 +72,7 @@ const FlowDrawer: React.FC<IProps> = ({
           return (
             <DeptWayNode
               current={current}
-              conditions={[{ label: '部门', value: 'belongId', type: dataType.BELONG }]}
+              conditions={[{ label: '组织', value: 'belongId', type: dataType.BELONG }]}
               orgId={operateOrgId || designOrgId}></DeptWayNode>
           );
         default:

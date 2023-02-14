@@ -26,6 +26,7 @@ const RootNode: React.FC<RootNodeProps> = (props: RootNodeProps) => {
       onSelected={props.onSelected}
       operateOrgId={props.operateOrgId}
       belongId={props.config.belongId}
+      config={props.config}
       errorInfo="错误信息"
       placeholder="所有人"
       headerBgc="#576a95"

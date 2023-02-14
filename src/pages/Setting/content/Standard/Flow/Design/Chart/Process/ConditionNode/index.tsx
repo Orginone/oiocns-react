@@ -101,7 +101,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props]);
+  }, []);
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -159,7 +159,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {!content && <span className={cls['placeholder']}>请设置条件</span>}
       {content && <span className={cls['name']}>{content}</span>}
-      {showError ? (
+      {showError && editable ? (
         <p style={{ color: 'red', paddingBottom: '10px' }}>
           该条件已修改或者删除，请重新设置
         </p>
@@ -169,7 +169,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
   return (
     <div
       className={`${editable ? cls['node'] : cls['node-unEdit']} ${
-        showError ? cls['node-error-state'] : ''
+        showError && editable ? cls['node-error-state'] : ''
       }`}>
       <Tooltip
         title={

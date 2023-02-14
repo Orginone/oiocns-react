@@ -20,7 +20,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
 
   useEffect(() => {
     setConditions(props.conditions);
-  }, [props]);
+  }, []);
 
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
@@ -39,12 +39,6 @@ const ConditionNode: React.FC<Iprops> = (props) => {
 
   return conditions ? (
     <div>
-      {/* <div style={{ marginBottom: '10px' }}>
-        <SelectOrg
-          orgId={nodeOperateOrgId}
-          onChange={onChange}
-          readonly={true}></SelectOrg>
-      </div> */}
       <div style={{ marginBottom: '10px' }}>
         <Button type="primary" onClick={addConditionGroup}>
           添加条件

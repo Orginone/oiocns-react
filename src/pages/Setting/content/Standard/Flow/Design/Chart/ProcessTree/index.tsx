@@ -346,7 +346,7 @@ const ProcessTree: React.FC<IProps> = ({
         name = '分支';
         break;
       case 'ORGANIZATIONAL':
-        name = '部门分支';
+        name = '组织分支';
         break;
     }
     return name;
@@ -471,7 +471,7 @@ const ProcessTree: React.FC<IProps> = ({
     ];
   };
   const insertDeptGateWayNode = (parentNode: any) => {
-    parentNode.children.name = '部门分支';
+    parentNode.children.name = '组织分支';
     parentNode.children.children = {
       nodeId: getRandomId(),
       parentId: parentNode.children.nodeId,
@@ -483,14 +483,14 @@ const ProcessTree: React.FC<IProps> = ({
         parentId: parentNode.children.nodeId,
         type: 'ORGANIZATIONA',
         conditions: [],
-        name: '部门分支1',
+        name: '组织分支1',
       },
       {
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
         type: 'ORGANIZATIONA',
         conditions: [],
-        name: '部门分支2',
+        name: '组织分支2',
       },
     ];
   };

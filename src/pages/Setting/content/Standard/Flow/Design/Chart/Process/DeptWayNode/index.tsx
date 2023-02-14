@@ -4,6 +4,8 @@ import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
+import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
+import { dataType } from '../../FlowDrawer/processType';
 type DeptWayNodeProps = {
   //默认操作组织id
   operateOrgId?: string;
@@ -27,6 +29,7 @@ type DeptWayNodeProps = {
  */
 const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
+  const [key, setKey] = useState<number>(0);
   const delNode = () => {
     props.onDelNode();
   };
@@ -49,7 +52,21 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props]);
+    if (props.config.conditions.length == 0) {
+      props.config.conditions = [
+        {
+          pos: 1,
+          paramKey: 'belongId',
+          paramLabel: '组织',
+          key: 'EQ',
+          label: '=',
+          type: dataType.BELONG,
+          val: userCtrl.space.id,
+        },
+      ];
+      setKey(key + 1);
+    }
+  }, []);
 
   const footer = (
     <>
@@ -63,7 +80,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       <span className={cls['title']}>
         <i className={cls['el-icon-s-operation']}></i>
         <span className={cls['name']}>
-          {props.config.name ? props.config.name : '部门分支' + props.level}
+          {props.config.name ? props.config.name : '组织分支' + props.level}
         </span>
       </span>
       {editable && (
@@ -77,9 +94,24 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       )}
     </div>
   );
+
+  const onChange = (newValue: string) => {
+    props.config.conditions[0].val = newValue;
+    setKey(key + 1);
+  };
+
   const nodeContent = (
     <div className={cls['node-body-main-content']} onClick={select}>
-      <span>部门分支</span>
+      {/* <span>组织分支</span> */}
+      <span>
+        {' '}
+        <SelectOrg
+          key={key}
+          onChange={onChange}
+          readonly={!editable}
+          orgId={userCtrl.space.id}
+          value={props.config.conditions[0]?.val}></SelectOrg>
+      </span>
     </div>
   );
 

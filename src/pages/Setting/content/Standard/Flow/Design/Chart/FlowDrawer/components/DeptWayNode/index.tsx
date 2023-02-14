@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { NodeType, dataType, FieldCondition } from '../../processType';
-import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp';
 import userCtrl from '@/ts/controller/setting';
 import DeptWayGroupItemConfig from '../DeptWayGroupItemConfig';
 interface IProps {
@@ -34,19 +33,18 @@ const DeptWayNode: React.FC<IProps> = (props) => {
       props.current?.conditions?.push({
         pos: props.current?.conditions.length + 1,
         paramKey: 'belongId',
-        paramLabel: '部门',
+        paramLabel: '组织',
         key: 'EQ',
         label: '=',
         type: dataType.BELONG,
-        val: null,
+        val: userCtrl.space.id,
       });
     }
-  }, [props]);
+  }, []);
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <div style={{ marginBottom: '10px' }}>
-          {/* <SelectOrg orgId={nodeOperateOrgId} onChange={onChange}></SelectOrg> */}
           <DeptWayGroupItemConfig
             orgId={props.orgId}
             currnet={props.current}

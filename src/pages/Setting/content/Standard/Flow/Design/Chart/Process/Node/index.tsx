@@ -10,7 +10,8 @@ import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
-
+import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
+import { createSecretKey } from 'crypto';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -41,6 +42,7 @@ type NodeProps = {
   type?: AddNodeType;
   //默认操作组织id
   operateOrgId?: string;
+  config?: any;
 };
 
 /**
@@ -63,7 +65,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CONCURRENTS]: '同时审核节点',
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
-  [AddNodeType.ORGANIZATIONAL]: '部门网关',
+  [AddNodeType.ORGANIZATIONAL]: '组织网关',
 };
 
 /**
@@ -72,6 +74,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
+  const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = true;
     if (props.belongId && props.belongId != '' && props.belongId != userCtrl.space.id) {
@@ -81,13 +84,20 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   };
   useEffect(() => {
     setEditable(isEditable());
-  }, [props]);
+  }, []);
   const delNode = (e: React.MouseEvent) => {
     e.preventDefault();
     props.onDelNode();
   };
   const select = () => {
     props.onSelected();
+  };
+  const onChange = (newValue: string) => {
+    // props.config.conditions[0].val = newValue;
+    // setKey(key + 1);
+    debugger;
+    props.config.props.assignedUser[0].id = newValue;
+    setKey(key + 1);
   };
   const footer = (
     <>
@@ -127,7 +137,19 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   const nodeContent = (
     <>
-      {props.isRoot && <div className={cls['node-root-body-right']}>开始</div>}
+      {props.isRoot && (
+        <div className={cls['node-root-body-right']} onClick={select}>
+          <div style={{ paddingLeft: '40%' }}>开始</div>
+          <div>
+            {' '}
+            <SelectAuth
+              key={key}
+              onChange={onChange}
+              readonly={!editable}
+              value={props.config.props.assignedUser[0].id}></SelectAuth>
+          </div>
+        </div>
+      )}
       {!props.isRoot && (
         <div className={cls['node-body-right']}>
           <div onClick={select}>

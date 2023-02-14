@@ -55,7 +55,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
     // FlowSub.emit('insertNode', 'CONCURRENTS');
   };
   /**
-   * 部门网关
+   * 组织网关
    */
   const addDeptGateWayNode = () => {
     props.onInsertNode('ORGANIZATIONAL');
@@ -121,7 +121,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
             left: '25px',
           }}
         />
-        <span>部门网关</span>
+        <span>组织网关</span>
       </div>
     </div>
   );

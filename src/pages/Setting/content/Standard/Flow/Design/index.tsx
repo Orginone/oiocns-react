@@ -5,7 +5,6 @@ import ChartDesign from './Chart';
 import { Branche, FlowNode, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel, FlowNode as FlowNodeModel } from '@/ts/base/model';
 import { Button, Card, Empty, Layout, message, Modal, Space, Steps } from 'antd';
-import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -73,6 +72,24 @@ const Design: React.FC<IProps> = ({
     parentId: '',
     type: 'ROOT',
     name: '发起人',
+    props: {
+      assignedType: 'JOB',
+      mode: 'AND',
+      assignedUser: [
+        {
+          id: '',
+          name: '',
+          type: '',
+          orgIds: '',
+        },
+      ],
+      refuse: {
+        type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+        target: '', //驳回到指定ID的节点
+      },
+      friendDialogmode: false,
+      num: 0,
+    },
     belongId: conditionData.belongId || userCtrl.space.id,
     children: {},
   });
@@ -118,6 +135,24 @@ const Design: React.FC<IProps> = ({
               parentId: '',
               type: 'ROOT',
               name: '发起人',
+              props: {
+                assignedType: 'JOB',
+                mode: 'AND',
+                assignedUser: [
+                  {
+                    id: '',
+                    name: '',
+                    type: '',
+                    orgIds: '',
+                  },
+                ],
+                refuse: {
+                  type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+                  target: '', //驳回到指定ID的节点
+                },
+                friendDialogmode: false,
+                num: 0,
+              },
               belongId: userCtrl.space.id,
               children: resourceData,
             };
@@ -279,7 +314,10 @@ const Design: React.FC<IProps> = ({
       } else {
         let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
         if (parent.type == 'CONDITIONS') {
-          errors.push(getErrorItem(`分支: branch.name缺少条件`));
+          errors.push(getErrorItem(`条件分支: 缺少条件`));
+        }
+        if (parent.type == 'ORGANIZATIONAL') {
+          errors.push(getErrorItem(`组织分支: 请选择组织`));
         }
       }
       parentIdSet.add(branch.parentId as string);
@@ -303,16 +341,6 @@ const Design: React.FC<IProps> = ({
     //   }
     // }
     return errors;
-  };
-
-  const findResourceByNodeId = (resource: any, nodeId: string): any => {
-    let nodes = getAllNodes(resource, []);
-    for (let node of nodes) {
-      if (node.code == nodeId) {
-        return node;
-      }
-    }
-    return undefined;
   };
 
   const loadResource = (
@@ -357,7 +385,7 @@ const Design: React.FC<IProps> = ({
     let hasEmptyChildren = false;
     if (type == 'flowNode') {
       let branches = undefined;
-      if (['条件分支', '并行分支', '部门分支'].includes(resource.name)) {
+      if (['条件分支', '并行分支', '组织分支'].includes(resource.name)) {
         branches = resource.branches
           ? resource.branches.map((item: any) => {
               return loadResource(
@@ -549,8 +577,7 @@ const Design: React.FC<IProps> = ({
         type: resource.type,
         name: resource.name,
         num: resource.props == undefined ? 0 : resource.props.num,
-        destType: '身份',
-        // DestId: resource.props.assignedUser[0].id,
+        destType: resource.type == 'ROOT' ? '角色' : '身份',
         destId:
           resource.props != undefined &&
           resource.props.assignedUser != undefined &&
@@ -624,11 +651,7 @@ const Design: React.FC<IProps> = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <div style={{ width: '200px' }}>
-                {/* {currentStep == 1 && (
-                  <SelectOrg orgId={operateOrgId} onChange={onChange}></SelectOrg>
-                )} */}
-              </div>
+              <div style={{ width: '200px' }}></div>
               {modalType != '新增业务流程' && (
                 <>
                   <div></div> <div></div>
