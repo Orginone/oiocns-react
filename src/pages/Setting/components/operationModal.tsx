@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { OperationItemModel, OperationModel } from '@/ts/base/model';
@@ -77,12 +77,12 @@ export const transformItemModel = (
 */
 const OperationModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
-
   const formRef = useRef<ProFormInstance>();
+
   const getFromColumns = () => {
     const columns: ProFormColumnsType<OperationModel>[] = [
       {
-        title: '业务名称',
+        title: '表单名称',
         dataIndex: 'name',
         formItemProps: {
           rules: [{ required: true, message: '特性名称为必填项' }],
@@ -135,6 +135,18 @@ const OperationModal = (props: Iprops) => {
         title: '流程',
         dataIndex: 'defineId',
         valueType: 'select',
+        // request: async () => {
+        //   const res = await current.loadFlowDefines(userCtrl.space.id, false, {
+        //     offset: 0,
+        //     limit: 1000000,
+        //     filter: '',
+        //   });
+        //   const flowDefines = res.result || [];
+        //   console.log('flowDefines', flowDefines);
+        //   return flowDefines.map((def) => {
+        //     return { label: def.name, value: def.id };
+        //   });
+        // },
       },
       {
         title: '角色',

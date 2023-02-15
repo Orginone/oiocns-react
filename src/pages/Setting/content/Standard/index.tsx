@@ -101,9 +101,9 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             key="edit"
             type="link"
             onClick={() => {
-              setModalType('新增业务标准');
+              setModalType('新增表单');
             }}>
-            {'新增业务'}
+            {'新增表单'}
           </Button>
         );
       case '流程定义':

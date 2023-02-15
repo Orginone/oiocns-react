@@ -23,7 +23,7 @@ interface IProps {
 }
 
 /**
- * @description: 分类--业务标准
+ * @description: 分类--表单
  * @return {*}
  */
 const Operation = ({ current, target, modalType, setModalType }: IProps) => {
@@ -79,7 +79,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         label: '编辑',
         onClick: () => {
           setEditData(item);
-          setModalType('修改业务标准');
+          setModalType('修改表单');
         },
       },
       {
@@ -165,11 +165,11 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         expandable={{ expandedRowRender }}
         onRow={onRow}
       />
-      {/** 新增/编辑业务标准模态框 */}
+      {/** 新增/编辑表单模态框 */}
       <OperationModel
         data={editData as XOperation}
         title={modalType}
-        open={modalType.includes('业务标准')}
+        open={modalType.includes('表单')}
         handleCancel={function (): void {
           setModalType('');
         }}
