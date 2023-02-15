@@ -218,26 +218,28 @@ const ViewFormModal = (props: FormDesignProps) => {
   const form = useForm();
   const { open, data, handleCancel, handleOk } = props;
   // JSON.parse(data?.remark as string) || defaultRemark,
-  const [schema, setSchema] = useState(defaultRemark);
+  const [schema] = useState(defaultRemark);
 
   useEffect(() => {
-    const queryItems = async () => {
-      const res = await kernel.queryOperationItems({
-        id: props.data?.id as string,
-        spaceId: userCtrl.space.id,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      const items = (res.data?.result || []).sort((a, b) => {
-        return Number(a) - Number(b);
-      });
-      const properties: any = {};
-      for (const item of items) {
-        properties[item.code] = JSON.parse(item.rule);
-      }
-      schema.properties = properties;
-      form.setSchema(schema);
-    };
-    queryItems();
+    if (props.data) {
+      const queryItems = async () => {
+        const res = await kernel.queryOperationItems({
+          id: props.data?.id as string,
+          spaceId: userCtrl.space.id,
+          page: { offset: 0, limit: 100000, filter: '' },
+        });
+        const items = (res.data?.result || []).sort((a, b) => {
+          return Number(a) - Number(b);
+        });
+        const properties: any = {};
+        for (const item of items) {
+          properties[item.code] = JSON.parse(item.rule);
+        }
+        schema.properties = properties;
+        form.setSchema(schema);
+      };
+      queryItems();
+    }
   }, [props.data]);
 
   return (
