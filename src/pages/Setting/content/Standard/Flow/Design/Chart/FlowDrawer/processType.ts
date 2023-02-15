@@ -59,6 +59,7 @@ export type NodeType = {
   nodeId: string;
   name: string;
   belongId?: string;
+  task?: any;
   conditions: conditiondType[];
   props: { assignedUser: {}; assignedType: {}; num: number | null };
 };
