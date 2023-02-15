@@ -6,6 +6,7 @@ import Root from '../Process/RootNode';
 import Approval from '../Process/ApprovalNode';
 import Cc from '../Process/CcNode';
 import Concurrent from '../Process/ConcurrentNode';
+import DeptWay from '../Process/DeptWayNode';
 import Condition from '../Process/ConditionNode';
 import Empty from '../Process/EmptyNode';
 import cls from './index.module.less';
@@ -17,6 +18,7 @@ import {
   TRIGGER_PROPS,
 } from '../FlowDrawer/processType';
 import { FlowNode } from '@/ts/base/model';
+import { getUuid } from '@/utils/tools';
 
 type IProps = {
   operateOrgId?: string;
@@ -40,9 +42,6 @@ const ProcessTree: React.FC<IProps> = ({
   const [key, setKey] = useState(0);
 
   const addNodeMap = useAppwfConfig((state: any) => state.addNodeMap);
-
-  // const addNodeMap = processCtrl.addNodeMap;
-
   /**组件渲染中变更nodeMap  共享状态*/
   var nodeMap = useAppwfConfig((state: any) => state.nodeMap);
   // const nodeMap = processCtrl.nodeMap;
@@ -52,9 +51,6 @@ const ProcessTree: React.FC<IProps> = ({
       return [];
     }
     toMapping(node);
-    if (node?.type == 'CC') {
-      console.log('');
-    }
     if (isPrimaryNode(node)) {
       //普通业务节点
       let childDoms: any = getDomTree(h, node.children);
@@ -130,7 +126,7 @@ const ProcessTree: React.FC<IProps> = ({
                 // innerHTML: `添加${isConditionNode(node)?'条件':'分支'}`
                 // dangerouslySetInnerHTML: { __html: `添加${isConditionNode(node)?'条件':'分支'}` }
               },
-              [`添加${isConditionNode(node) ? '条件' : '分支'}`],
+              [`添加${getConditionNodeName(node)}`],
             ),
           ],
         ),
@@ -187,6 +183,8 @@ const ProcessTree: React.FC<IProps> = ({
       return Cc;
     } else if (comp == 'concurrent') {
       return Concurrent;
+    } else if (comp == 'organizationa') {
+      return DeptWay;
     } else if (comp == 'condition') {
       return Condition;
     } else if (comp == 'empty') {
@@ -205,8 +203,6 @@ const ProcessTree: React.FC<IProps> = ({
       compTrans(node.type.toLowerCase()),
       {
         config: node,
-        // ref: node.nodeId,
-        // key: node.nodeId,
         key: getRandomId(),
         ...props,
         conditions,
@@ -311,27 +307,65 @@ const ProcessTree: React.FC<IProps> = ({
     );
   };
   const isBranchNode = (node: any) => {
-    return node && (node.type === 'CONDITIONS' || node.type === 'CONCURRENTS');
+    return (
+      node &&
+      (node.type === 'CONDITIONS' ||
+        node.type === 'CONCURRENTS' ||
+        node.type === 'ORGANIZATIONAL')
+    );
   };
   const isEmptyNode = (node: any) => {
     return node && node.type === 'EMPTY';
   };
   //是分支节点
-  const isConditionNode = (node: any) => {
-    return node.type === 'CONDITIONS';
+  // const isConditionNode = (node: any) => {
+  //   return node.type === 'CONDITIONS';
+  // };
+  const getConditionNodeType = (node: any) => {
+    let type = '';
+    switch (node.type) {
+      case 'CONDITIONS':
+        type = 'CONDITION';
+        break;
+      case 'CONCURRENTS':
+        type = 'CONCURRENT';
+        break;
+      case 'ORGANIZATIONAL':
+        type = 'ORGANIZATIONA';
+        break;
+    }
+    return type;
+  };
+  const getConditionNodeName = (node: any) => {
+    let name = '';
+    switch (node.type) {
+      case 'CONDITIONS':
+        name = '条件';
+        break;
+      case 'CONCURRENTS':
+        name = '分支';
+        break;
+      case 'ORGANIZATIONAL':
+        name = '组织分支';
+        break;
+    }
+    return name;
   };
   //是分支节点
   const isBranchSubNode = (node: any) => {
-    return node && (node.type === 'CONDITION' || node.type === 'CONCURRENT');
+    return (
+      node &&
+      (node.type === 'CONDITION' ||
+        node.type === 'CONCURRENT' ||
+        node.type === 'ORGANIZATIONA')
+    );
   };
   // const isConcurrentNode = (node: any) => {
   //   return node.type === 'CONCURRENTS';
   // };
 
   const getRandomId = () => {
-    return `node_${new Date().getTime().toString().substring(5)}${Math.round(
-      Math.random() * 9000 + 1000,
-    )}`;
+    return `node_${getUuid()}`;
   };
   //处理节点插入逻辑
   const insertNode = (type: any, parentNode: any) => {
@@ -367,6 +401,9 @@ const ProcessTree: React.FC<IProps> = ({
         break;
       case 'CONCURRENTS':
         insertConcurrentsNode(parentNode);
+        break;
+      case 'ORGANIZATIONAL':
+        insertDeptGateWayNode(parentNode);
         break;
       default:
         break;
@@ -433,6 +470,30 @@ const ProcessTree: React.FC<IProps> = ({
       },
     ];
   };
+  const insertDeptGateWayNode = (parentNode: any) => {
+    parentNode.children.name = '组织分支';
+    parentNode.children.children = {
+      nodeId: getRandomId(),
+      parentId: parentNode.children.nodeId,
+      type: 'EMPTY',
+    };
+    parentNode.children.branches = [
+      {
+        nodeId: getRandomId(),
+        parentId: parentNode.children.nodeId,
+        type: 'ORGANIZATIONA',
+        conditions: [],
+        name: '组织分支1',
+      },
+      {
+        nodeId: getRandomId(),
+        parentId: parentNode.children.nodeId,
+        type: 'ORGANIZATIONA',
+        conditions: [],
+        name: '组织分支2',
+      },
+    ];
+  };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';
     parentNode.children.children = {
@@ -480,10 +541,12 @@ const ProcessTree: React.FC<IProps> = ({
       node.branches.push({
         nodeId: getRandomId(),
         parentId: node.nodeId,
-        name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
+        name: getConditionNodeName(node) + (node.branches.length + 1),
+        // name: (isConditionNode(node) ? '条件' : '分支') + (node.branches.length + 1),
         // props: isConditionNode(node) ? deepCopy(DefaultProps.CONDITION_PROPS) : {},
         conditions: [],
-        type: isConditionNode(node) ? 'CONDITION' : 'CONCURRENT',
+        type: getConditionNodeType(node),
+        // type: isConditionNode(node) ? 'CONDITION' : 'CONCURRENT',
         children: {},
       });
       setKey(key + 1);
@@ -546,10 +609,10 @@ const ProcessTree: React.FC<IProps> = ({
   // };
 
   // const validateNode = (err: any, node: any) => {
-  // var cmp:any = ctx.refs[node.nodeId];
-  // if (cmp.validate) {
-  //   state.valid = cmp.validate(err)
-  // }
+  //   var cmp: any = ctx.refs[node.nodeId];
+  //   if (cmp.validate) {
+  //     state.valid = cmp.validate(err);
+  //   }
   // };
 
   //更新指定节点的dom

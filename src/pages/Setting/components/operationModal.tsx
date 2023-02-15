@@ -12,7 +12,7 @@ interface Iprops {
   open: boolean;
   data: XOperation | undefined;
   handleCancel: () => void;
-  handleOk: (success: boolean) => void;
+  handleOk: (res: any) => void;
   current: ISpeciesItem;
   target?: ITarget;
 }
@@ -207,7 +207,7 @@ const OperationModal = (props: Iprops) => {
           if (res.success) {
             generateItems(res.data);
           }
-          handleOk(res.success);
+          handleOk(res);
         } else {
           handleOk(await current.updateOperation(value));
         }

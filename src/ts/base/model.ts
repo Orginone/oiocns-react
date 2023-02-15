@@ -100,6 +100,13 @@ export type QueryDefineReq = {
   page: PageRequest;
 };
 
+export type QueryDefineRelationReq = {
+  // 定义id
+  defineId?: string;
+  // 业务id
+  operationId?: string;
+};
+
 export type SpaceAuthReq = {
   // 职权ID
   authId: string;

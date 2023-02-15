@@ -114,7 +114,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 key="edit"
                 type="link"
                 onClick={() => {
-                  setModalType('新增业务流程');
+                  setModalType('新增流程设计');
                   setFlowDesign({
                     id: '',
                     name: '',
@@ -134,7 +134,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 {'新增流程'}
               </Button>
             )}
-            {(modalType == '新增业务流程' || modalType == '编辑业务流程') && (
+            {(modalType == '新增流程设计' || modalType == '编辑流程设计') && (
               <Button
                 key="back"
                 type="link"

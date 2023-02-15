@@ -98,7 +98,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
               <div className={cls['group-cp']}>
                 <Form.Item name={['allContent', index, 'paramKey']}>
                   <Select
-                    style={{ width: 150 }}
+                    style={{ width: 130 }}
                     placeholder="请选择参数"
                     allowClear
                     options={conditions}
@@ -131,7 +131,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                 {condition.type != 'NUMERIC' && (
                   <Form.Item name={['allContent', index, 'key']}>
                     <Select
-                      style={{ width: 100 }}
+                      style={{ width: 80 }}
                       placeholder="判断条件"
                       allowClear
                       options={[

@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-
+import userCtrl from '@/ts/controller/setting';
 interface IProps {
   current: NodeType;
   orgId?: string;
+  // nodeOperateOrgId?: string;
+  // setNodeOperateOrgId: Function;
 }
 
 /**
@@ -18,11 +20,26 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
+
   // const [processValue, setProcessValue] = useState(1);
+  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
+    props.current.belongId || props.orgId || userCtrl.space.id,
+  );
   const [currentData, setCurrentData] = useState({
     title: '',
     key: '',
     data: { id: '', name: '' },
+  });
+  const onChange = (newValue: string) => {
+    setNodeOperateOrgId(newValue);
+    props.current.belongId = newValue;
+  };
+
+  useEffect(() => {
+    if (!props.current.belongId) {
+      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
+      props.current.belongId = props.orgId;
+    }
   });
 
   return (
@@ -58,7 +75,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             }}
             style={{ paddingBottom: '10px' }}
             value={radioValue}>
-            <Radio value={1}>全部: 需征得该身份下所有人员同意</Radio>
+            <Radio value={1} style={{ width: '100%' }}>
+              全部: 需征得该身份下所有人员同意
+            </Radio>
             <Radio value={2}>部分会签: 指定审批该节点的人员的数量</Radio>
           </Radio.Group>
           {radioValue === 2 && (
@@ -90,7 +109,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
           multiple={false}
-          orgId={props.orgId}
+          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },

@@ -50,24 +50,24 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
   // 操作内容渲染函数
   const renderOperation = (item: XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
-    if (isAdmin) {
-      operations.push({
-        key: 'remove',
-        label: <span style={{ color: 'red' }}>移除</span>,
-        onClick: async () => {
-          Modal.confirm({
-            title: '提示',
-            content: '确认移除该人员',
-            okText: '确认',
-            cancelText: '取消',
-            onOk: async () => {
-              await indentity?.removeMembers([item.id]);
-              forceUpdate();
-            },
-          });
-        },
-      });
-    }
+
+    operations.push({
+      key: 'remove',
+      label: <span style={{ color: 'red' }}>移除</span>,
+      onClick: async () => {
+        Modal.confirm({
+          title: '提示',
+          content: '确认移除该人员',
+          okText: '确认',
+          cancelText: '取消',
+          onOk: async () => {
+            await indentity?.removeMembers([item.id]);
+            forceUpdate();
+          },
+        });
+      },
+    });
+
     return operations;
   };
 
@@ -139,12 +139,11 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </div>
   );
   // 按钮
-  const renderBtns = isAdmin && (
+  const renderBtns = (
     <Button type="link" onClick={async () => setIsOpenAssign(true)}>
       指派身份
     </Button>
   );
-
   // 身份信息标题
 
   //身份主体
