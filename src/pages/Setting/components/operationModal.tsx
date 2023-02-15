@@ -77,6 +77,7 @@ export const transformItemModel = (
 */
 const OperationModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
+
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
     const columns: ProFormColumnsType<OperationModel>[] = [
@@ -139,21 +140,6 @@ const OperationModal = (props: Iprops) => {
         title: '角色',
         dataIndex: 'beginAuthId',
         valueType: 'select',
-        fieldProps: {
-          options: [
-            {
-              value: true,
-              label: '公开',
-            },
-            {
-              value: false,
-              label: '不公开',
-            },
-          ],
-        },
-        formItemProps: {
-          rules: [{ required: true, message: '是否公开为必填项' }],
-        },
       },
       // {
       //   title: '业务内容',
