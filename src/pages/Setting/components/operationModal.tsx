@@ -135,18 +135,18 @@ const OperationModal = (props: Iprops) => {
         title: '流程',
         dataIndex: 'defineId',
         valueType: 'select',
-        // request: async () => {
-        //   const res = await current.loadFlowDefines(userCtrl.space.id, false, {
-        //     offset: 0,
-        //     limit: 1000000,
-        //     filter: '',
-        //   });
-        //   const flowDefines = res.result || [];
-        //   console.log('flowDefines', flowDefines);
-        //   return flowDefines.map((def) => {
-        //     return { label: def.name, value: def.id };
-        //   });
-        // },
+        request: async () => {
+          const res = await current.loadFlowDefines(userCtrl.space.id, true, {
+            offset: 0,
+            limit: 1000000,
+            filter: '',
+          });
+          const flowDefines = res.result || [];
+          console.log('flowDefines', flowDefines);
+          return flowDefines.map((def) => {
+            return { label: def.name, value: def.id };
+          });
+        },
       },
       {
         title: '角色',
