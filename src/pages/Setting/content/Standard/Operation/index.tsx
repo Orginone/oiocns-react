@@ -7,7 +7,8 @@ import { PageRequest } from '@/ts/base/model';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel, { transformItemModel } from '../../../components/operationModal';
-import FormDesignModal from '../../../components/formDesignModal';
+// import FormDesignModal from '../../../components/formDesignModal';
+import FormDesignModal from '../../../components/formDesignModal2';
 import OperationItemTable from '../../../components/operationItemTable';
 import ViewFormModal from '../../../components/viewFormModal';
 import ViewCardModal from '../../../components/viewCardModal';
@@ -133,7 +134,9 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   };
 
   const loadOperations = async (page: PageRequest) => {
-    return await current!.loadOperations(userCtrl.space.id, page);
+    if (userCtrl.space.id && page) {
+      return await current!.loadOperations(userCtrl.space.id, page);
+    }
   };
 
   const onRow = (record: any) => {
@@ -180,6 +183,23 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         target={target}
         current={current}
       />
+      {/* <FormDesignModal
+        data={editData as XOperation}
+        title={modalType}
+        open={designOpen}
+        handleCancel={function (): void {
+          setDesignOpen(false);
+          setEditData(undefined);
+        }}
+        handleOk={function (success: boolean): void {
+          setDesignOpen(false);
+          setEditData(undefined);
+          message.success('保存成功');
+          tforceUpdate();
+        }}
+        target={target}
+        current={current}
+      /> */}
       <FormDesignModal
         data={editData as XOperation}
         title={modalType}

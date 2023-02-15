@@ -246,6 +246,7 @@ const ViewFormModal = (props: FormDesignProps) => {
       open={open}
       onOk={() => handleOk(true)}
       onCancel={handleCancel}
+      destroyOnClose={true}
       cancelText={'关闭'}
       width={900}>
       <FormRender

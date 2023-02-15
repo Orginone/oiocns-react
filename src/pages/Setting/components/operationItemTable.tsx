@@ -26,13 +26,14 @@ type OperationItemExt = {
   max: string;
   description: string;
   placeholder: string;
+  groupName: string;
   rules: string;
 };
 
 /**
  * 组件选择
  */
-const widgetsOpts = [
+export const widgetsOpts = [
   {
     label: '文本',
     value: 'input',
@@ -100,6 +101,14 @@ const widgetsOpts = [
   {
     label: '集团',
     value: 'group',
+  },
+  {
+    label: '类别子表',
+    value: 'species',
+  },
+  {
+    label: '自定义子表',
+    value: 'tableList',
   },
 ];
 
@@ -210,10 +219,19 @@ const fieldColumns: ProColumns<OperationItemExt>[] = [
     title: '字段说明',
     dataIndex: 'description',
     valueType: 'text',
+    width: 160,
+    ellipsis: true,
   },
   {
     title: '输入描述',
     dataIndex: 'placeholder',
+    valueType: 'text',
+    width: 160,
+    ellipsis: true,
+  },
+  {
+    title: '分组名称',
+    dataIndex: 'groupName',
     valueType: 'text',
   },
   {
@@ -258,6 +276,7 @@ const transformExt = (xitems: XOperationItem[]) => {
       max: rule.max,
       description: rule.description,
       placeholder: rule.placeholder,
+      groupName: rule.groupName,
       rules: rule.rules,
     };
   });
@@ -286,6 +305,7 @@ const transformItemModel = (i: OperationItemExt) => {
       max: i.max,
       description: i.description,
       placeholder: i.placeholder,
+      groupName: i.groupName,
       rules: i.rules,
     }),
   };

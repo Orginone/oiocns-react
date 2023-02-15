@@ -80,7 +80,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             {'新增特性'}
           </Button>
         );
-      case '分类字典':
+      case '字典定义':
         return (
           <>
             {dictRecords.length != 0 && (
@@ -95,7 +95,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             )}
           </>
         );
-      case '业务标准':
+      case '表单设计':
         return (
           <Button
             key="edit"
@@ -106,7 +106,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             {'新增业务'}
           </Button>
         );
-      case '业务流程':
+      case '流程定义':
         return (
           <>
             {modalType == '' && (
@@ -171,8 +171,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `分类字典`,
-      key: '分类字典',
+      label: `字典定义`,
+      key: '字典定义',
       children: (
         <Dict
           current={current}
@@ -185,8 +185,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `业务标准`,
-      key: '业务标准',
+      label: `表单设计`,
+      key: '表单设计',
       children: (
         <Operation
           current={current}
@@ -196,8 +196,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `业务流程`,
-      key: '业务流程',
+      label: `流程定义`,
+      key: '流程定义',
       children: (
         <SettingFlow
           current={current}

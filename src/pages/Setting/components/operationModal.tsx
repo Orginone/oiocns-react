@@ -130,6 +130,31 @@ const OperationModal = (props: Iprops) => {
           rules: [{ required: true, message: '是否公开为必填项' }],
         },
       },
+      {
+        title: '流程',
+        dataIndex: 'defineId',
+        valueType: 'select',
+      },
+      {
+        title: '角色',
+        dataIndex: 'beginAuthId',
+        valueType: 'select',
+        fieldProps: {
+          options: [
+            {
+              value: true,
+              label: '公开',
+            },
+            {
+              value: false,
+              label: '不公开',
+            },
+          ],
+        },
+        formItemProps: {
+          rules: [{ required: true, message: '是否公开为必填项' }],
+        },
+      },
       // {
       //   title: '业务内容',
       //   dataIndex: 'remark',
