@@ -58,7 +58,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   };
 
   useEffect(() => {
-    if (tabKey === '分类字典') {
+    if (tabKey === '字典定义') {
       loadDicts();
     }
   }, [current]);
