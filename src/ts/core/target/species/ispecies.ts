@@ -50,7 +50,11 @@ export interface ISpeciesItem {
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
   /** 加载流程设计 */
-  loadFlowDefines(id: string, page: PageRequest): Promise<XFlowDefineArray>;
+  loadFlowDefines(
+    id: string,
+    isStrict: boolean,
+    page: PageRequest,
+  ): Promise<XFlowDefineArray>;
   /**
    * 创建标准分类项
    * @param data 创建参数
