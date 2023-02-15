@@ -181,6 +181,13 @@ class SettingController extends Emitter {
       }
     }
   }
+
+  public getBelongName(belongId: string): any {
+    const team = this.findTeamInfoById(belongId);
+    if (team) {
+      return team.name;
+    }
+  }
 }
 
 export default new SettingController();

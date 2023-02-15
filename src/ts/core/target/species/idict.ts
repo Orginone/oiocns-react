@@ -1,5 +1,5 @@
 import { DictItemModel, PageRequest, DictModel, TargetShare } from '../../../base/model';
-import { XDict, XDictItemArray } from '../../../base/schema';
+import { XDict, XDictItem, XDictItemArray } from '../../../base/schema';
 
 /** 可为空的字典 */
 export type INullDict = IDict | undefined;
@@ -16,6 +16,8 @@ export interface IDict {
   name: string;
   /** 字典对应的目标 */
   target: XDict;
+  /**字典对应的子项 */
+  items?: XDictItem[];
   /** 上级字典  用于级联 */
   // parent: INullDict;
   // /** 下级字典数组 用于级联*/

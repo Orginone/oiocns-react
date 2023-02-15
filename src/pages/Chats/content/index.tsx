@@ -6,14 +6,19 @@ import { MenuItemType } from 'typings/globelType';
 
 interface IProps {
   selectMenu: MenuItemType;
+  enterChat: Function;
 }
 
-const TypeSetting = ({ selectMenu }: IProps) => {
-  switch (selectMenu.itemType) {
+const TypeSetting = ({ selectMenu, enterChat }: IProps) => {
+  let preType =
+    selectMenu.itemType.indexOf('-') > 0
+      ? selectMenu.itemType.substring(0, selectMenu.itemType.indexOf('-'))
+      : selectMenu.itemType;
+  switch (preType) {
     case GroupMenuType.Chat:
       return <Chat />;
     case GroupMenuType.Books:
-      return <Book selectMenu={selectMenu} />;
+      return <Book selectMenu={selectMenu} enterChat={enterChat} />;
     default:
       return <></>;
   }

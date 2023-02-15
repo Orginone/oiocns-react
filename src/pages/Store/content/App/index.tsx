@@ -6,7 +6,9 @@ import { Route, useHistory } from 'react-router-dom';
 import { GroupBtn } from '@/components/GroupBtn';
 import PutawayComp from './Putaway';
 import ShareComp from '../components/ShareComp';
-import CreateApp from './CreatApp'; // 上架弹窗
+import CreatApp from './CreatApp'; // 上架弹窗
+import CreateBlankApp from '@/pages/Store/content/App/CreateApp/blank'; // 创建空白app
+import ChooseCreateWay from '@/pages/Store/content/App/CreateApp/chooseCreateWay'; // 选择创建方式弹窗
 import AppInfo from './Info'; //应用信息页面
 import Manage from './Manage'; //应用管理页面
 import StoreRecent from '../components/Recent';
@@ -28,6 +30,7 @@ const StoreApp: React.FC = () => {
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
   const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
+  const [chooseCreateWayOpen, setChooseCreateWayOpen] = useState<boolean>(false);
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
     const shareArr = [];
@@ -113,9 +116,9 @@ const StoreApp: React.FC = () => {
     ];
   };
 
-  const handleSelectClassify = (appids: string[]) => {
-    setAppShowIdlimit([...appids]);
-  };
+  // const handleSelectClassify = (appids: string[]) => {
+  //   setAppShowIdlimit([...appids]);
+  // };
   const showData = useMemo(() => {
     if (appShowIdlimit.length > 0) {
       return appCtrl.products.filter((app) => {
@@ -155,6 +158,12 @@ const StoreApp: React.FC = () => {
                     history.push('/store/app/create');
                   },
                 },
+                // {
+                //   text: '生成',
+                //   onClick: () => {
+                //     setChooseCreateWayOpen(true);
+                //   },
+                // },
               ]}
             />
           }
@@ -218,6 +227,7 @@ const StoreApp: React.FC = () => {
       // setShowShareModal(false);
     }
   };
+
   return (
     <>
       {AppIndex}
@@ -238,10 +248,16 @@ const StoreApp: React.FC = () => {
           }}
         />
       </Modal>
+      <ChooseCreateWay
+        open={chooseCreateWayOpen}
+        setOpen={setChooseCreateWayOpen}
+        jump={(url: string) => history.push(url)}></ChooseCreateWay>
+      {/* 创建应用页面*/}
+      <Route exact path="/store/app/createBlankApp" component={CreateBlankApp}></Route>
       {/* 详情页面 /store/app/info*/}
       <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
       <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
-      <Route exact path="/store/app/create" component={CreateApp}></Route>
+      <Route exact path="/store/app/create" component={CreatApp}></Route>
       <Route exact path="/store/app/publish" component={PublishComp}></Route>
       <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
       {/* <TreeComp onClassifySelect={handleSelectClassify} /> */}

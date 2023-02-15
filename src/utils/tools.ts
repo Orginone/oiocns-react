@@ -173,16 +173,98 @@ const findAimObj = (isParent = false, id: string, topParentData?: any[]) => {
   findItem(id, { children: topParentData });
   return aimObjet;
 };
+
+/**
+ * 中英文混合按首字母排序
+ */
+const pySegSort = (arr: string[]) => {
+  if (!String.prototype.localeCompare) {
+    return null;
+  }
+  let pattern = new RegExp('[A-Za-z]+');
+  let letters = '*abcdefghjklmnopqrstwxyz'.split('');
+  let zh = '阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀'.split('');
+  let segs: any[] = [];
+  letters.forEach(function (item, i) {
+    let curr: any = { letter: item, data: [] };
+    arr.forEach(function (item2: string) {
+      if (pattern.test(item2.split('')[0])) {
+        if (
+          (!letters[i] || letters[i].localeCompare(item2) <= 0) &&
+          (item2.localeCompare(letters[i + 1]) == -1 || i == letters.length - 1)
+        ) {
+          curr.data.push(item2);
+        }
+      } else {
+        if (
+          (!zh[i - 1] || zh[i - 1].localeCompare(item2) <= 0) &&
+          item2.localeCompare(zh[i]) == -1
+        ) {
+          curr.data.push(item2);
+        }
+      }
+    });
+    if (curr.data.length) {
+      segs.push(curr);
+      curr.data.sort(function (a: any, b: any) {
+        return a.localeCompare(b);
+      });
+    }
+  });
+  return segs;
+};
+/**
+ * 中英文混合按首字母排序  对象数组
+ */
+const pySegSortObj = (objArr: any[], field: string) => {
+  if (!String.prototype.localeCompare) {
+    return null;
+  }
+  let pattern = new RegExp('[A-Za-z]+');
+  let letters = '*abcdefghjklmnopqrstwxyz'.split('');
+  let zh = '阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀'.split('');
+  let segs: any[] = [];
+  letters.forEach(function (item, i) {
+    let curr: any = { letter: item, data: [] };
+    objArr.forEach(function (item2: any) {
+      if (pattern.test(item2[field].split('')[0])) {
+        if (
+          (!letters[i] || letters[i].localeCompare(item2[field]) <= 0) &&
+          (item2[field].localeCompare(letters[i + 1]) == -1 || i == letters.length - 1)
+        ) {
+          curr.data.push(item2);
+        }
+      } else {
+        if (
+          (!zh[i - 1] || zh[i - 1].localeCompare(item2[field]) <= 0) &&
+          item2[field].localeCompare(zh[i]) == -1
+        ) {
+          curr.data.push(item2);
+        }
+      }
+    });
+    if (curr.data.length) {
+      segs.push(curr);
+      curr.data.sort(function (a: any, b: any) {
+        return a[field].localeCompare(b[field]);
+      });
+    }
+  });
+  return segs;
+};
+
 export {
+  dateFormat,
   debounce,
   findAimObj,
   getNewKeyWithString,
   getUuid,
   handleFormatDate,
+  pySegSort,
+  pySegSortObj,
   renderNum,
   resetParams,
   showChatTime,
   showMessage,
   validIsSocialCreditCode,
-  dateFormat
 };

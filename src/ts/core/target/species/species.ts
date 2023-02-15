@@ -1,6 +1,8 @@
-import { kernel, parseAvatar, schema } from '../../../base';
+import { XDict, XFlowDefine } from '@/ts/base/schema';
+import { kernel, model, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,
+  CreateDefineReq,
   DictModel,
   OperationModel,
   PageRequest,
@@ -8,7 +10,7 @@ import {
   TargetShare,
 } from '../../../base/model';
 import { Dict } from './dict';
-import { INullDict } from './idict';
+import { IDict, INullDict } from './idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 /**
  * 分类系统项实现
@@ -48,8 +50,51 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
+  async loadDicts(id: string, page: PageRequest): Promise<schema.XDictArray> {
+    const res = await kernel.querySpeciesDict({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
+  async loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]> {
+    const res = await kernel.querySpeciesDict({
+      id: this.id,
+      spaceId: spaceId,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return (
+      res.data.result?.map((item: XDict) => {
+        return new Dict(item);
+      }) || []
+    );
+  }
+
   async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
     const res = await kernel.querySpeciesOperation({
+      id: this.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
+  async loadFlowDefines(id: string, page: PageRequest): Promise<schema.XFlowDefineArray> {
+    const res = await kernel.queryDefine({
       id: this.id,
       spaceId: id,
       page: {
@@ -173,21 +218,18 @@ export class SpeciesItem implements ISpeciesItem {
 
   async createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
-    const res = await kernel.createOperation({
+  ): Promise<model.ResultType<schema.XOperation>> {
+    return await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
       ...data,
     });
-    return res.success;
   }
 
-  async updateOperation(
-    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean> {
+  async updateOperation(data: OperationModel): Promise<boolean> {
     const res = await kernel.updateOperation({
       ...data,
-      speciesId: this.target.id,
+      speciesId: data.speciesId || this.target.id,
     });
     return res.success;
   }
@@ -205,6 +247,25 @@ export class SpeciesItem implements ISpeciesItem {
       id: id,
       typeName: '',
     });
+    return res.success;
+  }
+
+  async createFlowDefine(
+    data: Omit<CreateDefineReq, 'id' | 'speciesId'>,
+  ): Promise<XFlowDefine> {
+    const res = await kernel.publishDefine({ ...data, speciesId: this.id });
+    return res.data;
+  }
+
+  async updateFlowDefine(data: CreateDefineReq): Promise<boolean> {
+    const res = await kernel.publishDefine({
+      ...data,
+    });
+    return res.success;
+  }
+
+  async deleteFlowDefine(id: string): Promise<boolean> {
+    const res = await kernel.deleteDefine({ id });
     return res.success;
   }
 }

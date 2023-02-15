@@ -1,13 +1,22 @@
-import { INullDict } from '../target/species/idict';
+import { IDict, INullDict } from '../target/species/idict';
 import {
   AttributeModel,
+  CreateDefineReq,
   DictModel,
   OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
 } from '../../base/model';
-import { XAttributeArray, XOperationArray, XSpecies } from '../../base/schema';
+import {
+  XAttributeArray,
+  XFlowDefine,
+  XFlowDefineArray,
+  XDictArray,
+  XOperationArray,
+  XSpecies,
+} from '../../base/schema';
+import { model, schema } from '@/ts/base';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -34,8 +43,14 @@ export interface ISpeciesItem {
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
   loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
+  /** 加载分类字典 */
+  loadDicts(id: string, page: PageRequest): Promise<XDictArray>;
+  /** 加载分类字典实体 */
+  loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]>;
   /** 加载业务标准 */
   loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
+  /** 加载流程设计 */
+  loadFlowDefines(id: string, page: PageRequest): Promise<XFlowDefineArray>;
   /**
    * 创建标准分类项
    * @param data 创建参数
@@ -56,6 +71,21 @@ export interface ISpeciesItem {
    * @param id 特性项id
    */
   deleteDict(id: string): Promise<boolean>;
+  /**
+   * 创建流程设计
+   * @param data 创建参数
+   */
+  createFlowDefine(data: Omit<CreateDefineReq, 'id' | 'speciesId'>): Promise<XFlowDefine>;
+  /**
+   * 更新流程设计
+   * @param data 创建参数
+   */
+  updateFlowDefine(data: CreateDefineReq): Promise<boolean>;
+  /**
+   * 删除流程设计
+   * @param id 流程设计id
+   */
+  deleteFlowDefine(id: string): Promise<boolean>;
   /**
    * 更新标准分类项
    * @param data 创建参数
@@ -84,7 +114,7 @@ export interface ISpeciesItem {
    */
   createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
-  ): Promise<boolean>;
+  ): Promise<model.ResultType<schema.XOperation>>;
   /**
    * 更新业务标准
    * @param data 创建参数

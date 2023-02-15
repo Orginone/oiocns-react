@@ -1,7 +1,8 @@
 import { schema } from '@/ts/base';
-import { IProduct } from '@/ts/core';
+import { INullSpeciesItem, IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import userCtrl from '@/ts/controller/setting';
+import thingCtrl from '@/ts/controller/thing';
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -95,7 +96,15 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
   },
   {
     title: '归属',
-    dataIndex: ['target', 'belongId'],
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
 ];
 
@@ -192,6 +201,9 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
+    render: (_, record) => {
+      return findSpecesName([thingCtrl.teamSpecies], record.speciesId);
+    },
   },
   {
     title: '共享组织',
@@ -212,6 +224,24 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'remark',
   },
 ];
+
+export const findSpecesName = (
+  species: INullSpeciesItem[],
+  id: string,
+): string | undefined => {
+  let specesName = undefined;
+  for (const item of species) {
+    if (item?.id == id) {
+      specesName = item.name;
+    } else if (item?.children) {
+      specesName = findSpecesName(item?.children, id);
+    }
+    if (specesName) {
+      break;
+    }
+  }
+  return specesName;
+};
 
 export const OperationColumns: ProColumns<schema.XOperation>[] = [
   {
@@ -236,6 +266,9 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
+    render: (_, record) => {
+      return findSpecesName([thingCtrl.teamSpecies], record.speciesId);
+    },
   },
   {
     title: '共享组织',
@@ -257,6 +290,25 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
   // },
 ];
 
+export const OperationItemColumns: ProColumns<schema.XOperationItem>[] = [
+  { title: '字段名称', dataIndex: 'name', key: 'name', width: 140 },
+  { title: '字段编码', dataIndex: 'code', key: 'code', width: 160 },
+  { title: '字段类型', dataIndex: 'remark', key: 'remark', width: 120 },
+  {
+    title: '共享组织',
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
+  },
+  { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
+];
+
 export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   {
     title: '序号',
@@ -268,13 +320,21 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
     dataIndex: 'name',
   },
   {
-    title: '创建人',
-    dataIndex: 'createUser',
-  },
-  {
     title: '备注',
     ellipsis: true,
     dataIndex: 'remark',
+  },
+  {
+    title: '共享组织',
+    dataIndex: 'belongId',
+    key: 'belongId',
+    width: 200,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '创建时间',
@@ -301,10 +361,16 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     width: 150,
   },
   {
-    title: '创建人',
-    dataIndex: 'createUser',
-    key: 'createUser',
-    width: 150,
+    title: '共享组织',
+    dataIndex: 'rule',
+    key: 'rule',
+    width: 180,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.belongId);
+      if (team) {
+        return team.name;
+      }
+    },
   },
   {
     title: '创建时间',

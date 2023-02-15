@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import FileSystem from './FileSystem';
+import Thing from '@/pages/Store/content/Thing';
 import Application from './App';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
@@ -22,6 +23,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       return <FileSystem current={selectMenu.item} />;
     case GroupMenuType.Asset:
       return <Asset />;
+    case GroupMenuType.Thing:
+      return <Thing current={selectMenu.item} />;
     default:
       return <></>;
   }

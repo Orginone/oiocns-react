@@ -13,6 +13,7 @@ import cls from './index.module.less';
 // 卡片渲染
 interface IProps {
   todoGroup: ITodoGroup;
+  reflashMenu: () => void;
   tabList?: CardTabListType[];
   columns: ProColumns<IApplyItem | IApprovalItem>[];
 }
@@ -45,6 +46,7 @@ const CommonTodo: React.FC<IProps> = (props) => {
                   await (a as IApprovalItem).pass(CommonStatus.ApproveStartStatus, '');
                 });
                 forceUpdate();
+                props.reflashMenu();
               }}>
               同意
             </Button>
@@ -53,8 +55,9 @@ const CommonTodo: React.FC<IProps> = (props) => {
               onClick={async () => {
                 selectedRows.forEach(async (a) => {
                   await (a as IApprovalItem).reject(CommonStatus.RejectStartStatus, '');
-                  forceUpdate();
                 });
+                forceUpdate();
+                props.reflashMenu();
               }}
               style={{ color: 'red' }}>
               拒绝
@@ -127,6 +130,7 @@ const CommonTodo: React.FC<IProps> = (props) => {
                         '',
                       );
                       forceUpdate();
+                      props.reflashMenu();
                     },
                   },
                   {
@@ -138,6 +142,7 @@ const CommonTodo: React.FC<IProps> = (props) => {
                         '',
                       );
                       forceUpdate();
+                      props.reflashMenu();
                     },
                   },
                 ];

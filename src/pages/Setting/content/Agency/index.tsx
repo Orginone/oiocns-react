@@ -39,7 +39,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(current));
+      SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
     }, 10);
   }, [current]);
 
@@ -168,7 +168,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       {/* 添加成员*/}
       <Modal
         title="添加成员"
-        width={1024}
+        width={600}
         destroyOnClose
         open={activeModal === 'addOne'}
         onCancel={() => setActiveModal('')}

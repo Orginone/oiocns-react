@@ -5,6 +5,10 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
+import userCtrl from '@/ts/controller/setting';
+import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
+import { kernel } from '@/ts/base';
+import { SpeciesItem } from '@/ts/core/target/species/species';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -111,4 +115,41 @@ export const getFileSystemMenus = () => {
     menus: loadFileSysItemMenus(storeCtrl.root),
     children: buildFileSysTree(storeCtrl.root.children),
   };
+};
+
+/** 获取物菜单 */
+export const getThingMenus = async () => {
+  const root = await userCtrl.space.loadSpeciesTree();
+  const species =
+    root && root.children ? root.children.filter((item) => item.name == '物')[0] : null;
+  return species
+    ? buildSpeciesTree(species)
+    : {
+        children: [],
+        key: '物',
+        label: '物',
+        itemType: GroupMenuType.Thing,
+        item: userCtrl.space,
+        icon: <im.ImNewspaper />,
+      };
+};
+
+/** 编译分类树 */
+export const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
+  const result: MenuItemType = {
+    key: species.id,
+    item: species,
+    label: species.name,
+    icon: <im.ImNewspaper />,
+    itemType: GroupMenuType.Thing,
+    // menus: loadSpeciesMenus(species),
+    children: species.children?.map((i) => buildSpeciesTree(i)) ?? [],
+  };
+  return result;
+};
+
+/** 加载右侧菜单 */
+export const loadSpeciesMenus = (item: ISpeciesItem) => {
+  const items: any[] = [];
+  return items;
 };

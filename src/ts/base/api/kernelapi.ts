@@ -510,6 +510,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 根据id查询分类
+   * @param {model.IdArrayReq} params 请求参数
+   * @returns {model.ResultType<schema.XSpeciesArray>} 请求结果
+   */
+  public async querySpeciesById(
+    params: model.IdArrayReq,
+  ): Promise<model.ResultType<schema.XSpeciesArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesById',
+      params: params,
+    });
+  }
+  /**
    * 查询分类树
    * @param {string} targetId 组织ID
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
@@ -2218,7 +2232,7 @@ export default class KernelApi {
     params: schema.XFlowDefine,
   ): Promise<model.ResultType<schema.XFlowDefine>> {
     return await this.request({
-      module: 'flow',
+      module: 'thing',
       action: 'CreateDefine',
       params: params,
     });
@@ -2322,11 +2336,25 @@ export default class KernelApi {
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
    */
   public async queryDefine(
-    params: model.IdReq,
+    params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XFlowDefineArray>> {
     return await this.request({
       module: 'flow',
       action: 'QueryDefine',
+      params: params,
+    });
+  }
+  /**
+   * 查询流程节点(复现流程图)
+   * @param {model.IdReq} params 请求参数
+   * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
+   */
+  public async queryNodes(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.FlowNode>> {
+    return await this.request({
+      module: 'flow',
+      action: 'QueryNodes',
       params: params,
     });
   }

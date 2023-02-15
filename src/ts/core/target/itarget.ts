@@ -230,7 +230,9 @@ export interface IMTarget {
     code,
     remark,
     samrId,
-    ispublic,
+    joinPublic,
+    sellPublic,
+    buyPublic,
   }: {
     // 名称
     name: string;
@@ -240,8 +242,12 @@ export interface IMTarget {
     remark: string;
     // 监管组织/个人
     samrId: string;
-    // 产品类型名
-    ispublic: boolean;
+    // 是否公开加入权限
+    joinPublic: boolean;
+    // 是否公开售卖权限
+    sellPublic: boolean;
+    // 是否公开购买权限
+    buyPublic: boolean;
   }): Promise<IMarket | undefined>;
   /**
    * 创建应用

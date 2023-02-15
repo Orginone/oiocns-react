@@ -217,6 +217,16 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
       icon: <im.ImPlus />,
       label: '新增分类',
     },
+    {
+      key: '转为字典',
+      icon: <im.ImBoxAdd />,
+      label: '转为字典',
+    },
+    {
+      key: '分类匹配',
+      icon: <im.ImMagicWand />,
+      label: '分类匹配',
+    },
   ];
   if (item.target.belongId) {
     items.push(
@@ -267,6 +277,14 @@ export const loadTypeMenus = async (item: ITarget) => {
         key: '删除',
         icon: <im.ImBin />,
         label: '删除' + item.typeName,
+      });
+    }
+  } else if (await IsSuperAdmin(userCtrl.space)) {
+    if (item != userCtrl.user && item != userCtrl.company) {
+      menus.push({
+        key: '退出',
+        icon: <im.ImBin />,
+        label: '退出' + item.typeName,
       });
     }
   }

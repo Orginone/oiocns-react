@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import { OperationModel } from '@/ts/base/model';
+import { OperationItemModel, OperationModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
-import { XOperation } from '@/ts/base/schema';
+import { XAttribute, XOperation } from '@/ts/base/schema';
+import { kernel } from '@/ts/base';
 
 interface Iprops {
   title: string;
@@ -15,6 +16,62 @@ interface Iprops {
   current: ISpeciesItem;
   target?: ITarget;
 }
+
+/**
+ * 默认备注：xrender默认布局
+ */
+export const defaultRemark: any = {
+  type: 'object',
+  properties: {},
+  labelWidth: 120,
+  displayType: 'row',
+  column: 2,
+};
+
+/**
+ * 特性转业务标准项
+ * @param attrs 特性列表
+ * @param operation 业务标准
+ * @returns 业务标准项
+ */
+export const transformItemModel = (
+  attrs: XAttribute[],
+  operation: XOperation,
+): OperationItemModel[] => {
+  return attrs.map((attr, index) => {
+    let widget = 'input';
+    let type = 'string';
+    let dictId: string | undefined = undefined;
+    if (attr.valueType === '数值型') {
+      widget = 'number';
+      type = 'number';
+    } else if (attr.valueType === '选择型') {
+      widget = 'dict';
+      dictId = attr.dictId;
+    }
+    const item: OperationItemModel = {
+      id: undefined,
+      name: attr.name,
+      code: attr.id,
+      remark: `${index + 1}`,
+      belongId: attr.belongId,
+      operationId: operation.id,
+      rule: JSON.stringify({
+        title: attr.name,
+        type,
+        widget,
+        required: false,
+        readOnly: false,
+        hidden: attr.code === 'thingId',
+        placeholder: `请输入${attr.name}`,
+        description: attr.remark,
+        dictId,
+      }),
+    };
+    return item;
+  });
+};
+
 /*
   业务标准编辑模态框
 */
@@ -85,6 +142,21 @@ const OperationModal = (props: Iprops) => {
     ];
     return columns;
   };
+  // 生成业务标准子项
+  const generateItems = async (operation: XOperation) => {
+    // 1. 查询特性
+    const res = await current.loadAttrs(userCtrl.space.id, {
+      offset: 0,
+      limit: 100000,
+      filter: '',
+    });
+    const attrs = res.result || [];
+    const items = transformItemModel(attrs, operation);
+    for (const item of items) {
+      const res = await kernel.createOperationItem(item);
+      console.log(res);
+    }
+  };
   return (
     <SchemaForm<OperationModel>
       formRef={formRef}
@@ -105,12 +177,16 @@ const OperationModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       layoutType="ModalForm"
-      onFinish={async (values) => {
-        values = { ...data, ...values };
+      onFinish={async (value) => {
+        value = { ...{ remark: JSON.stringify(defaultRemark) }, ...data, ...value };
         if (title.includes('新增')) {
-          handleOk(await current.createOperation(values));
+          const res = await current.createOperation(value);
+          if (res.success) {
+            generateItems(res.data);
+          }
+          handleOk(res.success);
         } else {
-          handleOk(await current.updateOperation(values));
+          handleOk(await current.updateOperation(value));
         }
       }}
       columns={getFromColumns()}></SchemaForm>

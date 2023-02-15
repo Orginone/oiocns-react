@@ -1,4 +1,7 @@
 /* eslint-disable no-unused-vars */
+
+import { FlowNode as SchemaFlowNode } from './schema';
+
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -451,8 +454,12 @@ export type MarketModel = {
   samrId: string;
   // 备注
   remark: string;
-  // 是否公开
-  public: boolean;
+  // 加入操作是否公开
+  joinPublic: boolean;
+  // 售卖操作是否公开
+  sellPublic: boolean;
+  // 购买操作是否公开
+  buyPublic: boolean;
   // 图片
   photo: string;
 };
@@ -807,11 +814,17 @@ export type CreateDefineReq = {
   // 备注
   remark: string;
   // 节点信息
-  resource?: FlowNode;
+  resource?: SchemaFlowNode;
   // 归属Id
   belongId: string;
   // 流程字段json
   fields?: string;
+  //分类id
+  speciesId?: string;
+  // 职权ID
+  authId?: string;
+  //是否公开
+  public?: boolean;
 };
 
 export type FlowNode = {
@@ -824,6 +837,7 @@ export type FlowNode = {
   props: Prop;
   children: FlowNode;
   branches: Branche[];
+  belongId: string;
 };
 
 export type Branche = {
@@ -834,6 +848,7 @@ export type Branche = {
   type: string;
   conditions: Condition[];
   children: FlowNode;
+  belongId?: string;
 };
 
 export type Condition = {

@@ -354,6 +354,55 @@ export type XFlowDefine = {
   updateTime: string;
   // 归属组织/个人
   target: XTarget | undefined;
+  // 分类id
+  speciesId?: string;
+  // 职权Id
+  authId?: string;
+  // 公开的
+  public?: boolean;
+};
+
+export type FlowNode = {
+  // 雪花ID
+  id: string;
+  // 前端定义的编码 代替原先的NodeId
+  code: string;
+  // 节点类型
+  type: string;
+  // 节点名称
+  name: string;
+  // 审批数量
+  num: number;
+  // 节点审批操作人类型 暂只支持 '身份'
+  destType: string;
+  // 节点审批操作Id 如 '身份Id'
+  destId: number | undefined;
+  // 节点审批操作名称 如 '身份名称'
+  destName: string;
+  // 子节点
+  children: FlowNode | undefined;
+  // 分支节点
+  branches: Branche[];
+  // 节点归属
+  belongId: string;
+};
+
+export type Branche = {
+  // 分支条件
+  conditions: Condition[];
+  // 分支子节点
+  children: FlowNode;
+};
+
+export type Condition = {
+  // 规则
+  paramKey: string;
+  // 键
+  key: string;
+  // 类型
+  type: string;
+  // 值
+  val: string;
 };
 
 //流程定义查询返回集合
@@ -714,8 +763,12 @@ export type XMarket = {
   remark: string;
   // 图片
   photo?: string;
-  // 公开的
-  public: boolean;
+  // 加入操作是否公开的
+  joinPublic: boolean;
+  // 售卖操作是否公开
+  sellPublic: boolean;
+  // 购买操作是否公开
+  buyPublic: boolean;
   // 创建组织/个人
   belongId: string;
   // 市场监管组织/个人

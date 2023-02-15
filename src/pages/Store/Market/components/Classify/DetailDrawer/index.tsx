@@ -40,10 +40,26 @@ const DetailDrawer: React.FC<Iporps> = (props) => {
         </Col>
         <Col span={24}>
           <Space className={cls['detail-drawer-item']}>是否公开：</Space>
-          {nodeDetail.public === true ? (
+          {nodeDetail.joinPublic === true ? (
             <Tag color="#87d068">公开</Tag>
           ) : (
             <Tag color="#f50">私有</Tag>
+          )}
+        </Col>{' '}
+        <Col span={24}>
+          <Space className={cls['detail-drawer-item']}>购买是否公开：</Space>
+          {nodeDetail.buyPublic === true ? (
+            <Tag color="#87d068">所有人</Tag>
+          ) : (
+            <Tag color="#f50">成员</Tag>
+          )}
+        </Col>{' '}
+        <Col span={24}>
+          <Space className={cls['detail-drawer-item']}>是否公开：</Space>
+          {nodeDetail.sellPublic === true ? (
+            <Tag color="#87d068">所有人</Tag>
+          ) : (
+            <Tag color="#f50">成员</Tag>
           )}
         </Col>
         <Col span={24}>

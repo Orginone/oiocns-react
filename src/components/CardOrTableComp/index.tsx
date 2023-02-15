@@ -20,6 +20,7 @@ interface PageType<T> {
   width?: number; //表格高度
   stripe?: boolean; // 斑马纹
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
+  onRow?: (record: T) => any;
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
   operation?: (item: T) => any[]; //操作区域数据
 
@@ -52,6 +53,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
   parentRef,
   stripe = false,
   style,
+  onRow,
   onChange,
   renderCardContent,
   headerTitle,
@@ -148,6 +150,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
+        onRow={onRow}
         params={{ filter: '' }}
         request={async (params) => {
           const {
