@@ -4,7 +4,13 @@ import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine, XFlowDefineArray } from '@/ts/base/schema';
+import {
+  XFlowDefine,
+  XFlowDefineArray,
+  XFlowRelation,
+  XOperation,
+} from '@/ts/base/schema';
+import { OperationColumns } from '@/pages/Setting/config/columns';
 import FlowCard from './FlowCard';
 import useWindowSize from '@/utils/windowsize';
 import { FlowColumn } from '@/pages/Setting/config/columns';
@@ -13,6 +19,9 @@ import { ISpeciesItem } from '@/ts/core/thing/ispecies';
 // import { IsThingAdmin } from '@/utils/authority';
 import { ITarget } from '@/ts/core';
 import { DefaultOptionType } from 'rc-select/lib/Select';
+import { kernel } from '@/ts/base';
+import { PageRequest } from '@/ts/base/model';
+import { getUuid } from '@/utils/tools';
 
 interface IProps {
   modalType: string;
@@ -23,6 +32,7 @@ interface IProps {
   setModalType: (modalType: string) => void;
   onDesign: () => void;
   onCurrentChaned: (item?: XFlowDefine) => void;
+  setInstance: Function;
 }
 
 /**
@@ -38,14 +48,17 @@ const FlowList: React.FC<IProps> = ({
   setModalType,
   onDesign,
   onCurrentChaned,
+  setInstance,
 }: IProps) => {
   const parentRef = useRef<any>(null);
+  const parentRef2 = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  // const [operateOrgId, setOperateOrgId] = useState<string>();
+  const [key, setKey] = useState<string>();
+  const [binds, setBinds] = useState<any[]>([]);
+  const [operationModal, setOperationModal] = useState<string>();
   const [treeData, setTreeData] = useState<any[]>([]);
   useEffect(() => {
-    if (modalType.includes('新增业务流程')) {
+    if (modalType.includes('新增流程设计')) {
       onCurrentChaned(undefined);
       onDesign();
     }
@@ -71,10 +84,6 @@ const FlowList: React.FC<IProps> = ({
     loadTreeData();
   }, [userCtrl.space]);
 
-  const onChange = (newValue: string) => {
-    setOperateOrgId(newValue);
-  };
-
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
       {
@@ -89,9 +98,51 @@ const FlowList: React.FC<IProps> = ({
             okType: 'danger',
             onOk: () => {
               onCurrentChaned(record);
-              setIsModalOpen(true);
+              // setIsModalOpen(true);
+              // setIsModalOpen(false);
+              setOperateOrgId(userCtrl.space.id);
+              setModalType('编辑流程设计');
+              onDesign();
             },
           });
+        },
+      },
+      {
+        key: 'bindOperation',
+        label: '绑定业务',
+        onClick: () => {
+          setOperationModal(record.id);
+        },
+      },
+      {
+        key: 'createInstance',
+        label: '发起测试流程',
+        onClick: async () => {
+          let res = await kernel.createInstance({
+            defineId: record.id,
+            SpaceId: userCtrl.space.id,
+            content: 'Text文本显示正常',
+            contentType: 'Text',
+            data: JSON.stringify({
+              id: '789171',
+              name: '测试流程的数据',
+              code: 'test',
+              // price: '0',
+              remark: '测试流程的数据',
+            }),
+            title: record.name,
+            hook: '',
+          });
+          if (res.success) {
+            message.success('发起测试流程成功');
+            setInstance(res.data);
+            onCurrentChaned(record);
+            setOperateOrgId(userCtrl.space.id);
+            setModalType('编辑流程设计');
+            onDesign();
+          } else {
+            message.error('发起测试流程失败');
+          }
         },
       },
     ];
@@ -101,14 +152,54 @@ const FlowList: React.FC<IProps> = ({
         label: '删除',
         style: { color: 'red' },
         onClick: async () => {
-          if (await userCtrl.space.deleteDefine(record.id)) {
-            message.success('删除成功');
-            tforceUpdate();
-          }
+          Modal.confirm({
+            title: '确定删除流程?',
+            icon: <ExclamationCircleOutlined />,
+            okText: '确认',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+              if (await userCtrl.space.deleteDefine(record.id)) {
+                message.success('删除成功');
+                setBinds([]);
+                tforceUpdate();
+              }
+            },
+            onCancel() {},
+          });
         },
       });
     }
     return operations;
+  };
+
+  const loadOperations = async (page: PageRequest) => {
+    return await species!.loadOperations(userCtrl.space.id, page);
+  };
+
+  // 操作内容渲染函数
+  const renderOperate = (item: XOperation) => {
+    return [
+      {
+        key: 'bind',
+        label: '绑定',
+        onClick: async () => {
+          // setEditData(item);
+          // setModalType('修改业务标准');
+          let res = await kernel.createFlowRelation({
+            defineId: operationModal || '',
+            operationId: item.id,
+          });
+          if (res.success) {
+            message.success('绑定成功');
+            setOperationModal(undefined);
+            setKey(getUuid());
+          } else {
+            message.error('绑定失败');
+          }
+        },
+      },
+    ];
   };
 
   return (
@@ -117,26 +208,42 @@ const FlowList: React.FC<IProps> = ({
         <Card
           key={tkey}
           bordered={false}
-          style={{ paddingBottom: '10px' }}
+          // style={{ paddingBottom: '10px' }}
           bodyStyle={{ paddingTop: 0 }}>
-          <div className={cls['app-wrap']} ref={parentRef}>
+          <div className={cls['app-wrap']} ref={parentRef} style={{ height: 400 }}>
             <CardOrTable<XFlowDefine>
               columns={FlowColumn}
               parentRef={parentRef}
               dataSource={[]}
               operation={renderOperation}
-              height={0.38 * useWindowSize().height}
+              // height={height}
               rowKey={(record: XFlowDefine) => record.id}
               request={async (page) => {
                 let res: XFlowDefineArray | undefined = await species?.loadFlowDefines(
                   userCtrl.space.id,
+                  false,
                   page,
                 );
                 return res;
               }}
               onRow={(record: any) => {
                 return {
-                  onClick: () => {},
+                  onClick: async () => {
+                    let res = await kernel.queryDefineRelation({ defineId: record.id });
+                    let relations: XFlowRelation[] | undefined = res.data?.result;
+                    if (relations) {
+                      // message.warn(relations.length);
+                      let operations = relations
+                        .map((item) => item.operation)
+                        .filter((item) => item != undefined);
+                      setBinds(operations);
+                      setKey(getUuid());
+                      // setHeight(0.3 * useWindowSize().height);
+                    } else {
+                      setBinds([]);
+                      // setHeight(useWindowSize().height);
+                    }
+                  },
                 };
               }}
               renderCardContent={(items) => {
@@ -152,35 +259,44 @@ const FlowList: React.FC<IProps> = ({
             />
           </div>
         </Card>
-        <Modal
-          title="请选择操作组织"
-          open={isModalOpen}
-          onOk={() => {
-            if (operateOrgId) {
-              setIsModalOpen(false);
-              setModalType('编辑业务流程');
-              onDesign();
-            } else {
-              message.warn('请选择操作组织');
-            }
-          }}
-          onCancel={() => {
-            setIsModalOpen(false);
-          }}>
-          选择操作组织:
-          <TreeSelect
-            showSearch
-            style={{ width: '100%' }}
-            value={operateOrgId}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            placeholder="请选择操作组织"
-            allowClear
-            treeDefaultExpandAll
-            onChange={onChange}
-            treeData={treeData}
-          />
-        </Modal>
       </div>
+      {binds.length > 0 && (
+        <div style={{ height: 200 }} ref={parentRef2}>
+          <Card
+            // key={tkey}
+            title={'已绑定业务'}
+            bordered={false}
+            style={{ paddingBottom: '10px' }}
+            bodyStyle={{ paddingTop: 0 }}>
+            <CardOrTable<XOperation>
+              parentRef={parentRef2}
+              key={key}
+              rowKey={'id'}
+              // params={tkey}
+              columns={OperationColumns}
+              showChangeBtn={false}
+              dataSource={binds}
+            />
+          </Card>
+        </div>
+      )}
+      <Modal
+        title={'绑定业务'}
+        footer={[]}
+        open={operationModal != undefined}
+        onCancel={() => setOperationModal(undefined)}
+        width={'60%'}>
+        <CardOrTable<XOperation>
+          rowKey={'id'}
+          columns={OperationColumns}
+          showChangeBtn={false}
+          operation={renderOperate}
+          request={async (page) => {
+            return await loadOperations(page);
+          }}
+          dataSource={[]}
+        />
+      </Modal>
     </div>
   );
 };

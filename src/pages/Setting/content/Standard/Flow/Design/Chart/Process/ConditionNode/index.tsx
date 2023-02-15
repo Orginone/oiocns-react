@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
@@ -7,6 +7,7 @@ import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 
 type IProps = {
+  //默认操作组织id
   operateOrgId?: string;
   conditions?: FieldCondition[];
   onInsertNode: Function;
@@ -24,6 +25,7 @@ type IProps = {
  */
 const ConditionNode: React.FC<IProps> = (props) => {
   const [showError, setShowError] = useState<boolean>(false);
+  const [editable, setEditable] = useState<boolean>(true);
 
   const delNode = () => {
     props.onDelNode();
@@ -86,6 +88,20 @@ const ConditionNode: React.FC<IProps> = (props) => {
     }
     return name;
   };
+  const isEditable = (): boolean => {
+    let editable = true;
+    if (
+      props.config.belongId &&
+      props.config.belongId != '' &&
+      props.config.belongId != userCtrl.space.id
+    ) {
+      editable = false;
+    }
+    return editable;
+  };
+  useEffect(() => {
+    setEditable(isEditable());
+  }, []);
   const content = useMemo(() => {
     const conditions = props.config.conditions;
     var text = '请设置条件';
@@ -117,16 +133,18 @@ const ConditionNode: React.FC<IProps> = (props) => {
     return text;
   }, [props.config]);
   const footer = (
-    <div className={cls['btn']}>
-      <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-    </div>
+    <>
+      <div className={cls['btn']}>
+        {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+      </div>
+    </>
   );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
       <span className={cls['title']}>
         {props.config.name ? props.config.name : '条件' + props.level}
       </span>
-      {(!props.config.belongId || props.config.belongId == props.operateOrgId) && (
+      {editable && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -141,7 +159,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
     <div className={cls['node-body-main-content']} onClick={select}>
       {!content && <span className={cls['placeholder']}>请设置条件</span>}
       {content && <span className={cls['name']}>{content}</span>}
-      {showError ? (
+      {showError && editable ? (
         <p style={{ color: 'red', paddingBottom: '10px' }}>
           该条件已修改或者删除，请重新设置
         </p>
@@ -150,11 +168,9 @@ const ConditionNode: React.FC<IProps> = (props) => {
   );
   return (
     <div
-      className={`${
-        !props.config.belongId || props.config.belongId == props.operateOrgId
-          ? cls['node']
-          : cls['node-unEdit']
-      } ${showError ? cls['node-error-state'] : ''}`}>
+      className={`${editable ? cls['node'] : cls['node-unEdit']} ${
+        showError && editable ? cls['node-error-state'] : ''
+      }`}>
       <Tooltip
         title={
           <span>
@@ -163,7 +179,6 @@ const ConditionNode: React.FC<IProps> = (props) => {
               // userCtrl.getBelongName(props.config.belongId)
               userCtrl.getBelongName(props.config.belongId)
             }
-            :{userCtrl.getBelongName(props.operateOrgId || '')}
           </span>
         }
         placement="right">

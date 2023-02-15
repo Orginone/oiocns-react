@@ -5,21 +5,31 @@ interface Iprops {
   open: boolean;
   setOpen: Function;
   jump: Function;
+  setCreateWay: Function;
 }
-const ChooseCreateWayModal: React.FC<Iprops> = ({ open, setOpen, jump }: Iprops) => {
+const ChooseCreateWayModal: React.FC<Iprops> = ({
+  open,
+  setOpen,
+  jump,
+  setCreateWay,
+}: Iprops) => {
   const createBlankApp = () => {
     setOpen(false);
-    jump('/store/app/createBlankApp');
+    setCreateWay('createBlankApp');
+    // jump('/store/app/createBlankApp');
   };
   const createAppByTemplate = () => {
     setOpen(false);
+    setCreateWay('createAppByTemplate');
     // jump('/store/app/createAppByTemplate');
-    message.warn('该功能尚未开放');
+    // message.warn('该功能尚未开放');
   };
   const createAppByCustom = () => {
     setOpen(false);
-    message.warn('该功能尚未开放');
+    setCreateWay('createAppByCustom');
+    // message.warn('该功能尚未开放');
     // jump('/store/app/create');
+    // jump('/store/app/createAppByCustom');
   };
   return (
     <Modal

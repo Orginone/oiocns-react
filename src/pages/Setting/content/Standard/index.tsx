@@ -80,7 +80,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             {'新增特性'}
           </Button>
         );
-      case '分类字典':
+      case '字典定义':
         return (
           <>
             {dictRecords.length != 0 && (
@@ -95,18 +95,18 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             )}
           </>
         );
-      case '业务标准':
+      case '表单设计':
         return (
           <Button
             key="edit"
             type="link"
             onClick={() => {
-              setModalType('新增业务标准');
+              setModalType('新增表单');
             }}>
-            {'新增业务'}
+            {'新增表单'}
           </Button>
         );
-      case '业务流程':
+      case '流程定义':
         return (
           <>
             {modalType == '' && (
@@ -114,7 +114,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 key="edit"
                 type="link"
                 onClick={() => {
-                  setModalType('新增业务流程');
+                  setModalType('新增流程设计');
                   setFlowDesign({
                     id: '',
                     name: '',
@@ -134,7 +134,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                 {'新增流程'}
               </Button>
             )}
-            {(modalType == '新增业务流程' || modalType == '编辑业务流程') && (
+            {(modalType == '新增流程设计' || modalType == '编辑流程设计') && (
               <Button
                 key="back"
                 type="link"
@@ -171,8 +171,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `分类字典`,
-      key: '分类字典',
+      label: `字典定义`,
+      key: '字典定义',
       children: (
         <Dict
           current={current}
@@ -185,8 +185,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `业务标准`,
-      key: '业务标准',
+      label: `表单设计`,
+      key: '表单设计',
       children: (
         <Operation
           current={current}
@@ -196,8 +196,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       ),
     },
     {
-      label: `业务流程`,
-      key: '业务流程',
+      label: `流程定义`,
+      key: '流程定义',
       children: (
         <SettingFlow
           current={current}

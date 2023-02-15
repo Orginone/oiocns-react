@@ -20,11 +20,6 @@ interface FormDesignModalProps extends FRGeneratorProps {
   target?: ITarget;
 }
 
-// 表单提交校验
-// const valid = (schema: any): boolean => {
-//   return false;
-// };
-
 /*
   表单设计模态框
 */
@@ -191,6 +186,7 @@ const FormDesignModal = (props: FormDesignModalProps) => {
     <Modal
       title={title}
       open={open}
+      destroyOnClose={true}
       onOk={async () => save()}
       onCancel={handleCancel}
       maskClosable={false}

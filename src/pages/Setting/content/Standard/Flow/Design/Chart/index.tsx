@@ -6,6 +6,7 @@ import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType'
 
 interface IProps {
   operateOrgId?: string;
+  designOrgId?: string;
   scale?: number;
   resource: any;
   conditions?: FieldCondition[]; //内置条件选择器
@@ -31,7 +32,11 @@ const ChartDesign: React.FC<IProps> = (props) => {
               conditions={props.conditions}
               resource={props.resource}
               onSelectedNode={(params) => {
-                if (params.type !== AddNodeType.CONCURRENTS) {
+                if (
+                  params.type !== AddNodeType.CONCURRENTS &&
+                  params.type !== AddNodeType.ORGANIZATIONA &&
+                  params.type !== AddNodeType.ROOT
+                ) {
                   //设置当前操作的节点，后续都是对当前节点的操作
                   setCurrentNode(params);
                   setIsOpen(true);
@@ -46,6 +51,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       {/* 侧边数据填充 */}
       <FlowDrawer
         operateOrgId={props.operateOrgId}
+        designOrgId={props.designOrgId}
         isOpen={isOpen}
         current={currentNode}
         conditions={props.conditions}

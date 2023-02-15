@@ -89,6 +89,24 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type QueryDefineReq = {
+  // 分类ID
+  speciesId: string;
+  // 空间ID
+  spaceId: string;
+  // 是否严格模式 true:只筛选属于该空间的流程定义 false:筛选该分类下可见的流程定义
+  isStrict: boolean;
+  // 分页
+  page: PageRequest;
+};
+
+export type QueryDefineRelationReq = {
+  // 定义id
+  defineId?: string;
+  // 业务id
+  operationId?: string;
+};
+
 export type SpaceAuthReq = {
   // 职权ID
   authId: string;
@@ -341,6 +359,10 @@ export type OperationModel = {
   belongId: string;
   // 类别Id
   speciesId: string;
+  // 流程定义Id
+  defineId?: string;
+  // 业务发起职权Id
+  beginAuthId?: string;
 };
 
 export type OperationItemModel = {
@@ -786,10 +808,8 @@ export type ChatModel = {
 };
 
 export type FlowInstanceModel = {
-  // 应用Id
-  productId: string;
-  // 功能标识编号
-  functionCode: string;
+  // 流程定义Id
+  defineId: string;
   // 空间Id
   SpaceId: string;
   // 展示内容
@@ -886,23 +906,19 @@ export type Refuse = {
 export type FlowRelationModel = {
   //流程定义Id
   defineId: string;
-  // 应用Id
-  productId: string;
-  // 功能标识编号
-  functionCode: string;
-  // 空间Id
-  spaceId: string;
+  // 业务标准Id
+  operationId: string;
 };
 
 export type FlowReq = {
-  // 应用Id
-  productId: string;
+  // 流程实例Id
+  id?: string;
   // 空间Id
   spaceId?: string;
   // 状态
-  status: number;
+  status?: number;
   // 分页
-  page?: PageRequest;
+  page: PageRequest;
 };
 
 export type ApprovalTaskReq = {

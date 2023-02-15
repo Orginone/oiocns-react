@@ -4,7 +4,6 @@ import { XOperation } from '@/ts/base/schema';
 import { Descriptions, Modal } from 'antd';
 import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
-import ProField from '@ant-design/pro-field';
 
 interface FormDesignProps extends FRGeneratorProps {
   open: boolean;
@@ -57,6 +56,7 @@ const ViewCardModal = (props: FormDesignProps) => {
       open={open}
       onOk={() => handleOk(true)}
       onCancel={handleCancel}
+      destroyOnClose={true}
       cancelText={'关闭'}
       width={900}>
       <Descriptions title={'卡片'} column={2} bordered>

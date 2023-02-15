@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 type ConcurrentNodeProps = {
+  //默认操作组织id
   operateOrgId?: string;
   onInsertNode: Function;
   onDelNode: Function;
@@ -25,6 +26,7 @@ type ConcurrentNodeProps = {
  * @returns
  */
 const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProps) => {
+  const [editable, setEditable] = useState<boolean>(true);
   const delNode = () => {
     props.onDelNode();
   };
@@ -34,10 +36,27 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   const select = () => {
     props.onSelected();
   };
+  const isEditable = (): boolean => {
+    let editable = true;
+    if (
+      props.config.belongId &&
+      props.config.belongId != '' &&
+      props.config.belongId != userCtrl.space.id
+    ) {
+      editable = false;
+    }
+    return editable;
+  };
+  useEffect(() => {
+    setEditable(isEditable());
+  }, []);
+
   const footer = (
-    <div className={cls['btn']}>
-      <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
-    </div>
+    <>
+      <div className={cls['btn']}>
+        {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+      </div>
+    </>
   );
   const nodeHeader = (
     <div className={cls['node-body-main-header']}>
@@ -47,7 +66,7 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
           {props.config.name ? props.config.name : '并行任务' + props.level}
         </span>
       </span>
-      {(!props.config.belongId || props.config.belongId == props.operateOrgId) && (
+      {editable && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -64,22 +83,9 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     </div>
   );
   return (
-    <div
-      className={
-        !props.config.belongId || props.config.belongId == props.operateOrgId
-          ? cls['node']
-          : cls['node-unEdit']
-      }>
+    <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
-        title={
-          <span>
-            创建组织:{' '}
-            {
-              // userCtrl.getBelongName(props.config.belongId)
-              userCtrl.getBelongName(props.config.belongId)
-            }
-          </span>
-        }
+        title={<span>创建组织: {userCtrl.getBelongName(props.config.belongId)}</span>}
         placement="right">
         <div className={cls['node-body']}>
           <div className={cls['node-body-main']}>

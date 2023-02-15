@@ -4,6 +4,7 @@ export enum dataType {
   'NUMERIC' = 'NUMERIC',
   'DICT' = 'DICT',
   'DATE' = 'DATE',
+  'BELONG' = 'BELONG'
 }
 
 export enum AddNodeType {
@@ -12,6 +13,7 @@ export enum AddNodeType {
   'CONDITION' = 'CONDITION',
   'ROOT' = 'ROOT',
   'CONCURRENTS' = 'CONCURRENT',
+  'ORGANIZATIONA' = 'ORGANIZATIONA',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -20,6 +22,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CC]: '抄送节点',
   [AddNodeType.CONDITION]: '条件节点',
   [AddNodeType.CONCURRENTS]: '同时审核节点',
+  [AddNodeType.ORGANIZATIONA]: '组织节点',
 };
 
 export type conditionDataType = {
@@ -45,7 +48,7 @@ export type conditiondType = {
   key: string;
   label: string;
   type: dataType;
-  val: string | null;
+  val: string | undefined;
   valLabel?: string;
   dict?: any[];
 };

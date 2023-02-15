@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { dataType, FieldCondition, NodeType } from '../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
+import userCtrl from '@/ts/controller/setting';
 
 interface Iprops {
   current: NodeType;
   conditions?: FieldCondition[];
+  orgId?: string;
 }
 
 /**
@@ -18,7 +20,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
 
   useEffect(() => {
     setConditions(props.conditions);
-  }, [props]);
+  }, []);
 
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
@@ -30,7 +32,7 @@ const ConditionNode: React.FC<Iprops> = (props) => {
       key: '',
       label: '',
       type: dataType.NUMERIC,
-      val: null,
+      val: undefined,
     });
     setKey(key + 1);
   };

@@ -35,6 +35,7 @@ const CcNode: React.FC<CcNodeProps> = (props: CcNodeProps) => {
       belongId={props.config.belongId}
       showError={false}
       content={content}
+      config={props?.config}
       errorInfo="错误信息"
       placeholder="请设置抄送对象"
       headerBgc="#3296fa"
