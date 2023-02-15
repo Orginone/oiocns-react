@@ -162,12 +162,12 @@ const StoreApp: React.FC = () => {
                     history.push('/store/app/create');
                   },
                 },
-                {
-                  text: '生成',
-                  onClick: () => {
-                    setChooseCreateWayOpen(true);
-                  },
-                },
+                // {
+                //   text: '生成',
+                //   onClick: () => {
+                //     setChooseCreateWayOpen(true);
+                //   },
+                // },
               ]}
             />
           }

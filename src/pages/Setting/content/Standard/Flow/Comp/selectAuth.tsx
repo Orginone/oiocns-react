@@ -1,11 +1,9 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
-// import { ITarget } from '@/ts/core';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
-  // orgId?: string;
   value?: string;
   onChange: any;
   readonly?: boolean;
@@ -28,35 +26,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
       };
     });
   };
-  /** 加载角色树 */
-  // const buildTargetTree = (targets: IAuthority[], isChild: boolean) => {
-  //   const result: any[] = [];
-  //   if (targets) {
-  //     for (const item of targets) {
-  //       if (props.orgId && !isChild) {
-  //         if (item.id == props.orgId) {
-  //           result.push({
-  //             label: item.teamName,
-  //             value: item.id,
-  //             children: buildTargetTree(item.subTeam, true),
-  //           });
-  //         } else {
-  //           let children = buildTargetTree(item.subTeam, false);
-  //           for (let child of children) {
-  //             result.push(child);
-  //           }
-  //         }
-  //       } else {
-  //         result.push({
-  //           label: item.teamName,
-  //           value: item.id,
-  //           children: buildTargetTree(item.subTeam, isChild),
-  //         });
-  //       }
-  //     }
-  //   }
-  //   return result;
-  // };
+
   useEffect(() => {
     loadTreeData();
   }, [userCtrl.space]);

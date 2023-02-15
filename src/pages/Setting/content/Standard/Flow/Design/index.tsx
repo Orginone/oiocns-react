@@ -58,9 +58,7 @@ const Design: React.FC<IProps> = ({
   const [scale, setScale] = useState<number>(90);
   const [currentStep, setCurrentStep] = useState(modalType == '新增流程设计' ? 0 : 1);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  //visualNodes 特点type==EMPTY,parentId=任意,belongId=spaceId,children不为空, FlowNode
-  // const [visualNodes, setVisualNodes] = useState<any[]>([]);
-  const [key, setKey] = useState<string>();
+  // const [key, setKey] = useState<string>();
   const [spaceResource, setSpaceResource] = useState<any>();
   const [conditionData, setConditionData] = useState<FlowDefine>({
     name: '',
@@ -295,11 +293,7 @@ const Design: React.FC<IProps> = ({
         errors.push(getErrorItem('至少需要一个审批节点'));
       }
     }
-    //校验 至少有一个审批节点
-    // let approvalNodes = allNodes.filter((item) => item.type == 'APPROVAL');
-    // if (approvalNodes.length == 0) {
-    //   errors.push(getErrorItem('至少需要一个审批节点'));
-    // }
+
     //每个节点的 belongId  审核和抄送的destId
     for (let node of allNodes) {
       if (!node.belongId && node.type != 'ROOT') {
@@ -450,9 +444,6 @@ const Design: React.FC<IProps> = ({
               : undefined,
         };
       } else {
-        if (resource.type == 'APPROVAL') {
-          debugger;
-        }
         flowNode = {
           id: resource.id,
           nodeId: resource.code,
@@ -849,7 +840,7 @@ const Design: React.FC<IProps> = ({
               ) : (
                 <div>
                   <ChartDesign
-                    key={key}
+                    // key={key}
                     operateOrgId={operateOrgId}
                     designOrgId={conditionData.belongId}
                     conditions={conditionData.fields}

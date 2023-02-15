@@ -54,11 +54,8 @@ const FlowList: React.FC<IProps> = ({
   const parentRef2 = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
   const [key, setKey] = useState<string>();
-  // const [height, setHeight] = useState<number>(useWindowSize().height);
   const [binds, setBinds] = useState<any[]>([]);
   const [operationModal, setOperationModal] = useState<string>();
-  // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  // const [operateOrgId, setOperateOrgId] = useState<string>();
   const [treeData, setTreeData] = useState<any[]>([]);
   useEffect(() => {
     if (modalType.includes('新增流程设计')) {
@@ -86,10 +83,6 @@ const FlowList: React.FC<IProps> = ({
   useEffect(() => {
     loadTreeData();
   }, [userCtrl.space]);
-
-  // const onChange = (newValue: string) => {
-  //   setOperateOrgId(newValue);
-  // };
 
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
@@ -168,6 +161,7 @@ const FlowList: React.FC<IProps> = ({
             onOk: async () => {
               if (await userCtrl.space.deleteDefine(record.id)) {
                 message.success('删除成功');
+                setBinds([]);
                 tforceUpdate();
               }
             },
