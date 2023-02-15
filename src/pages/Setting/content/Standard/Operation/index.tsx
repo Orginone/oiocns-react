@@ -7,7 +7,8 @@ import { PageRequest } from '@/ts/base/model';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import OperationModel, { transformItemModel } from '../../../components/operationModal';
-import FormDesignModal from '../../../components/formDesignModal';
+// import FormDesignModal from '../../../components/formDesignModal';
+import FormDesignModal from '../../../components/formDesignModal2';
 import OperationItemTable from '../../../components/operationItemTable';
 import ViewFormModal from '../../../components/viewFormModal';
 import ViewCardModal from '../../../components/viewCardModal';
@@ -22,7 +23,7 @@ interface IProps {
 }
 
 /**
- * @description: 分类--业务标准
+ * @description: 分类--表单
  * @return {*}
  */
 const Operation = ({ current, target, modalType, setModalType }: IProps) => {
@@ -78,7 +79,7 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         label: '编辑',
         onClick: () => {
           setEditData(item);
-          setModalType('修改业务标准');
+          setModalType('修改表单');
         },
       },
       {
@@ -133,7 +134,9 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
   };
 
   const loadOperations = async (page: PageRequest) => {
-    return await current!.loadOperations(userCtrl.space.id, page);
+    if (userCtrl.space.id && page) {
+      return await current!.loadOperations(userCtrl.space.id, page);
+    }
   };
 
   const onRow = (record: any) => {
@@ -162,11 +165,11 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         expandable={{ expandedRowRender }}
         onRow={onRow}
       />
-      {/** 新增/编辑业务标准模态框 */}
+      {/** 新增/编辑表单模态框 */}
       <OperationModel
         data={editData as XOperation}
         title={modalType}
-        open={modalType.includes('业务标准')}
+        open={modalType.includes('表单')}
         handleCancel={function (): void {
           setModalType('');
         }}
@@ -186,6 +189,23 @@ const Operation = ({ current, target, modalType, setModalType }: IProps) => {
         target={target}
         current={current}
       />
+      {/* <FormDesignModal
+        data={editData as XOperation}
+        title={modalType}
+        open={designOpen}
+        handleCancel={function (): void {
+          setDesignOpen(false);
+          setEditData(undefined);
+        }}
+        handleOk={function (success: boolean): void {
+          setDesignOpen(false);
+          setEditData(undefined);
+          message.success('保存成功');
+          tforceUpdate();
+        }}
+        target={target}
+        current={current}
+      /> */}
       <FormDesignModal
         data={editData as XOperation}
         title={modalType}
