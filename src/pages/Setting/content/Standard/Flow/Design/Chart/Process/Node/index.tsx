@@ -146,7 +146,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
             <SelectAuth
               onChange={onChange}
               readonly={!editable}
-              value={props.config.props.assignedUser[0].id}></SelectAuth>
+              value={props.config.props.assignedUser[0]?.id}></SelectAuth>
           </div>
         </div>
       )}

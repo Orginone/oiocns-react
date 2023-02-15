@@ -82,7 +82,7 @@ const Design: React.FC<IProps> = ({
       mode: 'AND',
       assignedUser: [
         {
-          id: undefined,
+          id: '0',
           name: undefined,
           type: undefined,
           orgIds: undefined,
@@ -127,8 +127,6 @@ const Design: React.FC<IProps> = ({
               page: { offset: 0, limit: 1000, filter: '' },
             })
           ).data;
-          console.log('preLoad:', resource_);
-
           let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
           let nodes = getAllNodes(resourceData, []);
           let spaceRootNodes = nodes.filter(
@@ -145,7 +143,7 @@ const Design: React.FC<IProps> = ({
                 mode: 'AND',
                 assignedUser: [
                   {
-                    id: undefined,
+                    id: '0',
                     name: undefined,
                     type: undefined,
                     orgIds: undefined,
@@ -162,7 +160,6 @@ const Design: React.FC<IProps> = ({
               children: resourceData,
             };
           }
-          console.log('afterLoad:', resourceData);
           if (instance) {
             let res = await kernel.queryInstance({
               id: instance.id,
@@ -291,12 +288,18 @@ const Design: React.FC<IProps> = ({
       if (rootNode.destId == undefined) {
         errors.push(getErrorItem('ROOT节点缺少角色'));
       }
+      let companyApprovalNodes = allNodes.filter(
+        (item) => item.type == 'APPROVAL' && item.belongId == rootNode.belongId,
+      );
+      if (companyApprovalNodes.length == 0) {
+        errors.push(getErrorItem('至少需要一个审批节点'));
+      }
     }
     //校验 至少有一个审批节点
-    let approvalNodes = allNodes.filter((item) => item.type == 'APPROVAL');
-    if (approvalNodes.length == 0) {
-      errors.push(getErrorItem('至少需要一个审批节点'));
-    }
+    // let approvalNodes = allNodes.filter((item) => item.type == 'APPROVAL');
+    // if (approvalNodes.length == 0) {
+    //   errors.push(getErrorItem('至少需要一个审批节点'));
+    // }
     //每个节点的 belongId  审核和抄送的destId
     for (let node of allNodes) {
       if (!node.belongId && node.type != 'ROOT') {
@@ -322,7 +325,7 @@ const Design: React.FC<IProps> = ({
       }
     }
     //条件节点条件不为空  分支下最多只能有n个分支children为空
-    // let n = 0;
+    let n = 0;
     let parentIdSet: Set<string> = new Set();
     // let map: Map<string, undefined[]> = new Map();
     for (let branch of allBranches) {
@@ -344,23 +347,23 @@ const Design: React.FC<IProps> = ({
       parentIdSet.add(branch.parentId as string);
     }
 
-    // for (let parentId of Array.from(parentIdSet)) {
-    //   let parent = allNodes.filter((item) => item.code == parentId)[0];
-    //   let branches = allBranches.filter(
-    //     (item) => item.parentId == parentId && !item.children,
-    //   );
-    //   if (branches.length > n) {
-    //     errors.push(
-    //       getErrorItem(
-    //         n == 0
-    //           ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-    //           : `${
-    //               parent.type == 'CONDITIONS' ? '条件' : '并行'
-    //             }节点分支下最多只能有${n}个分支节点为空`,
-    //       ),
-    //     );
-    //   }
-    // }
+    for (let parentId of Array.from(parentIdSet)) {
+      let parent = allNodes.filter((item) => item.code == parentId)[0];
+      let branches = allBranches.filter(
+        (item) => item.parentId == parentId && !item.children,
+      );
+      if (branches.length > n) {
+        errors.push(
+          getErrorItem(
+            n == 0
+              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+              : `${
+                  parent.type == 'CONDITIONS' ? '条件' : '并行'
+                }节点分支下最多只能有${n}个分支节点为空`,
+          ),
+        );
+      }
+    }
     return errors;
   };
 
@@ -447,6 +450,9 @@ const Design: React.FC<IProps> = ({
               : undefined,
         };
       } else {
+        if (resource.type == 'APPROVAL') {
+          debugger;
+        }
         flowNode = {
           id: resource.id,
           nodeId: resource.code,
@@ -557,10 +563,6 @@ const Design: React.FC<IProps> = ({
   };
 
   const changeResource = (resource: any, type: string): any => {
-    //起点belongId为空
-    //不属于=>属于=>不属于=>不属于 保留所有虚拟节点(并判断虚拟节点子节点code和belongId)+只传属于=>不属于的虚拟节点
-    //只留下 属于 的部分
-    //主流程最后拼接visualNode 如何判断主流程最后？
     let obj: any;
     let belongId = undefined;
     if (resource.belongId && resource.belongId != '') {
@@ -570,27 +572,6 @@ const Design: React.FC<IProps> = ({
     } else {
       belongId = conditionData.belongId || current.belongId;
     }
-
-    //判断是否是当前空间的节点
-    // if (resource.belongId && resource.belongId != userCtrl.space.id) {
-    //   resource.children = undefined;
-    // }
-    // let needSave = true;
-    // //判断是否虚拟节点
-    // if (
-    //   resource.code &&
-    //   visualNodeCodes.includes(resource.code) &&
-    //   resource.type == 'EMPTY'
-    // ) {
-    //   //若为虚拟节点
-    //   //判断是否属于当前空间
-    //   needSave = resource.belongId == userCtrl.space.id;
-    //   //最后拼接visualNode
-    //   if (!needSave) {
-    //     resource.children = undefined;
-    //   }
-    // }
-
     if (type == 'flowNode') {
       let flowNode: FlowNode = {
         id: resource.id,
@@ -669,7 +650,6 @@ const Design: React.FC<IProps> = ({
 
   const showTask = (instance: any, resource: any) => {
     let map = new Map<string, number>();
-    debugger;
     for (let task of instance.historyTasks) {
       let _passed = 1;
       if (task.status >= 200) {
@@ -680,7 +660,6 @@ const Design: React.FC<IProps> = ({
       map.set(task.nodeId, _passed);
     }
     let resource_showState = changeNodeStatus(resource, map);
-    console.log('resource_showState:', resource_showState);
     setResource(resource_showState);
   };
 
@@ -781,32 +760,11 @@ const Design: React.FC<IProps> = ({
                       onClick={async () => {
                         operateOrgId = operateOrgId || '';
                         let define: any = undefined;
-                        // let visualNodeCodes = visualNodes.map((item) => item.code);
-                        // //若存在属于当前空间的虚拟节点 起始节点后直接添加虚拟节点的children
-                        // let visualNode_currentSpaces = visualNodes.filter(
-                        //   (item) => item.belongId == userCtrl.space.id,
-                        // );
-                        // if (
-                        //   visualNode_currentSpaces &&
-                        //   visualNode_currentSpaces.length > 0
-                        // ) {
-                        //   resource.children = findResourceByNodeId(
-                        //     resource,
-                        //     visualNode_currentSpaces[0].code,
-                        //   );
-                        // }
-                        // if (spaceResource) {
-                        //   resource.children = findResourceByNodeId(
-                        //     resource,
-                        //     spaceResource.code,
-                        //   );
-                        // }
                         //数据结构转化
                         let resource_: FlowNode = changeResource(
                           resource,
                           'flowNode',
                         ) as FlowNode;
-                        console.log('resource:', resource_);
                         let errors = checkValid(resource_);
                         if (errors.length > 0) {
                           setShowErrorsModal(errors);
@@ -832,8 +790,7 @@ const Design: React.FC<IProps> = ({
                             belongId: operateOrgId,
                           });
                         }
-
-                        if (define != undefined) {
+                        if (define) {
                           message.success('保存成功');
                           onBack();
                           setModalType('');
@@ -920,16 +877,6 @@ const Design: React.FC<IProps> = ({
               流程已结束
             </Button>
           )}
-          {/* {instance && (
-            <Button
-              style={{ position: 'fixed', bottom: 0, zIndex: 100, left: 400 }}
-              type="primary"
-              onClick={() => {
-                console.log('resource:', resource);
-              }}>
-              resource
-            </Button>
-          )} */}
         </Layout>
       </Card>
       <Modal

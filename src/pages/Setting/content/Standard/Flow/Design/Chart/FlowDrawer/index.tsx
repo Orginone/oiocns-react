@@ -107,7 +107,7 @@ const FlowDrawer: React.FC<IProps> = ({
       placement="right"
       open={isOpen}
       onClose={() => onClose()}
-      width={400}>
+      width={500}>
       {Component(current)}
     </Drawer>
   ) : (

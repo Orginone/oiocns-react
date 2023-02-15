@@ -134,6 +134,7 @@ const FlowList: React.FC<IProps> = ({
               id: '789171',
               name: '测试流程的数据',
               code: 'test',
+              // price: '0',
               remark: '测试流程的数据',
             }),
             title: record.name,
@@ -235,7 +236,6 @@ const FlowList: React.FC<IProps> = ({
                 return {
                   onClick: async () => {
                     let res = await kernel.queryDefineRelation({ defineId: record.id });
-                    debugger;
                     let relations: XFlowRelation[] | undefined = res.data?.result;
                     if (relations) {
                       // message.warn(relations.length);
