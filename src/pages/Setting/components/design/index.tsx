@@ -243,7 +243,7 @@ const Design: React.FC<DesignProps> = (props: any) => {
       const operationItems = checkedAttrs.map((attr) => {
         return transformAttrToOperationItem(attr, operation.id);
       });
-      items['operationItems'] = operationItems;
+      items['operationItems'] = [...items['operationItems'], ...operationItems];
       const attrIds = checkedAttrs.map((attr) => attr.id);
       items['attrs'] = items['attrs'].filter((attr: any) => !attrIds.includes(attr.id));
       setSaveOperationItems(operationItems);
