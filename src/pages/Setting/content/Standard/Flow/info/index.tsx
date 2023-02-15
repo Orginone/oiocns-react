@@ -174,7 +174,9 @@ const FlowList: React.FC<IProps> = ({
   };
 
   const loadOperations = async (page: PageRequest) => {
-    return await species!.loadOperations(userCtrl.space.id, page);
+    debugger;
+    let res = await species!.loadOperations(userCtrl.space.id, page);
+    return res;
   };
 
   // 操作内容渲染函数
@@ -203,10 +205,9 @@ const FlowList: React.FC<IProps> = ({
   };
 
   return (
-    <div className={cls['company-top-content']}>
+    <div className={cls['company-top-content']} key={tkey}>
       <div style={{ background: '#EFF4F8' }}>
         <Card
-          key={tkey}
           bordered={false}
           // style={{ paddingBottom: '10px' }}
           bodyStyle={{ paddingTop: 0 }}>

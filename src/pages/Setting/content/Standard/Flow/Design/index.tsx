@@ -624,16 +624,21 @@ const Design: React.FC<IProps> = ({
     return obj;
   };
 
-  const changeNodeStatus = (resource: any, map: Map<string, number>) => {
+  const changeNodeStatus = (
+    resource: any,
+    map: Map<string, number>,
+    taskmap: Map<string, any>,
+  ) => {
     if (resource.id && map.get(resource.id) != undefined) {
       resource._passed = map.get(resource.id);
+      resource.task = taskmap.get(resource.id);
     }
     if (resource.children) {
-      resource.children = changeNodeStatus(resource.children, map);
+      resource.children = changeNodeStatus(resource.children, map, taskmap);
     }
     if (resource.branches && resource.branches.length > 0) {
       resource.branches = resource.branches.map((item: any) =>
-        changeNodeStatus(item, map),
+        changeNodeStatus(item, map, taskmap),
       );
     }
     return resource;
@@ -641,6 +646,7 @@ const Design: React.FC<IProps> = ({
 
   const showTask = (instance: any, resource: any) => {
     let map = new Map<string, number>();
+    let taskmap = new Map<string, any>();
     for (let task of instance.historyTasks) {
       let _passed = 1;
       if (task.status >= 200) {
@@ -649,8 +655,9 @@ const Design: React.FC<IProps> = ({
         _passed = 2;
       }
       map.set(task.nodeId, _passed);
+      taskmap.set(task.nodeId, task);
     }
-    let resource_showState = changeNodeStatus(resource, map);
+    let resource_showState = changeNodeStatus(resource, map, taskmap);
     setResource(resource_showState);
   };
 
@@ -675,7 +682,7 @@ const Design: React.FC<IProps> = ({
           let approvalResult = await kernel.approvalTask({
             id: task.id,
             status: 100,
-            comment: '审核意见：通过',
+            comment: '经评审讨论通过',
           });
           if (approvalResult.success) {
             message.success('审核成功');

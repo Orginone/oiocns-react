@@ -33,7 +33,23 @@ const FlowDrawer: React.FC<IProps> = ({
 }) => {
   const [key, setKey] = useState<string>();
   const Component = (current: any) => {
-    if (current?.belongId && current?.belongId != userCtrl.space.id) {
+    if (current.task?.records?.length > 0) {
+      return current.task?.records.map((record: any) => {
+        let handleResult = '通过';
+        if (record.status >= 200) {
+          handleResult = '不通过';
+        }
+        return (
+          <>
+            <div>审核人：{userCtrl.getBelongName(record.createUser)}</div>
+            <div>审核结果：{handleResult}</div>
+            <div>审核意见：{record.comment}</div>
+            <div>审核时间：{record.createTime}</div>
+          </>
+        );
+      });
+      // return (<div><div>审核人：{}</dev></div>)
+    } else if (current?.belongId && current?.belongId != userCtrl.space.id) {
       return (
         <div>
           此节点由{' '}

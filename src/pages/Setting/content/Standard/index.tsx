@@ -200,6 +200,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       key: '流程定义',
       children: (
         <SettingFlow
+          key={tabKey}
           current={current}
           target={target}
           modalType={modalType}
