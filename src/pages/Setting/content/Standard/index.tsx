@@ -106,11 +106,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             {'新增表单'}
           </Button>
         );
-<<<<<<< HEAD
-      case '流程设计':
-=======
       case '流程定义':
->>>>>>> origin/dev
         return (
           <>
             {modalType == '' && (
