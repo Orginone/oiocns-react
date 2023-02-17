@@ -357,7 +357,18 @@ export type OperationModel = {
   // 子项列表
   items: OperationItemModel[];
   // 子表分类ID集合
-  subSpeciesIds: string[];
+  subSpeciesIds: OperationRelationModel[];
+};
+
+export type OperationRelationModel = {
+  // 规则
+  rule: string;
+  // 备注
+  speciesId: string;
+  // 创建组织/个人
+  belongId: string;
+  // 业务Id
+  operationId: string;
 };
 
 export type OperationItemModel = {
