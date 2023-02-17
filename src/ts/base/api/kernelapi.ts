@@ -278,26 +278,12 @@ export default class KernelApi {
    * @param {model.OperationModel} params 请求参数
    * @returns {model.ResultType<schema.XOperation>} 请求结果
    */
-  public async createOperation(
+  public async publishOperation(
     params: model.OperationModel,
   ): Promise<model.ResultType<schema.XOperation>> {
     return await this.request({
       module: 'thing',
-      action: 'CreateOperation',
-      params: params,
-    });
-  }
-  /**
-   * 创建业务标准项
-   * @param {model.OperationModel} params 请求参数
-   * @returns {model.ResultType<schema.XOperation>} 请求结果
-   */
-  public async createOperationItem(
-    params: model.OperationItemModel,
-  ): Promise<model.ResultType<schema.XOperationItem>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateOperationItem',
+      action: 'PublishOperation',
       params: params,
     });
   }
@@ -358,20 +344,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 删除业务标准项
-   * @param {model.IdReqModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteOperationItem(
-    params: model.IdReqModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteOperationItem',
-      params: params,
-    });
-  }
-  /**
    * 删除物
    * @param {model.IdReqModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -422,20 +394,6 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'UpdateOperation',
-      params: params,
-    });
-  }
-  /**
-   * 更新业务标准项
-   * @param {model.OperationModel} params 请求参数
-   * @returns {model.ResultType<schema.XOperationItem>} 请求结果
-   */
-  public async updateOperationItem(
-    params: model.OperationItemModel,
-  ): Promise<model.ResultType<schema.XOperationItem>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateOperationItem',
       params: params,
     });
   }
@@ -2254,11 +2212,11 @@ export default class KernelApi {
   /**
    * 创建流程绑定
    * @param {model.FlowRelationModel} params 请求参数
-   * @returns {model.ResultType<schema.XFlowRelation>} 请求结果
+   * @returns {model.ResultType<schema.boolean>} 请求结果
    */
   public async createFlowRelation(
     params: model.FlowRelationModel,
-  ): Promise<model.ResultType<schema.XFlowRelation>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'CreateFlowRelation',
@@ -2286,20 +2244,6 @@ export default class KernelApi {
     return await this.request({
       module: 'flow',
       action: 'DeleteInstance',
-      params: params,
-    });
-  }
-  /**
-   * 删除流程绑定
-   * @param {model.IdReq} params 请求参数 业务标准Id
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteFlowRelation(
-    params: model.IdReq,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'flow',
-      action: 'DeleteFlowRelation',
       params: params,
     });
   }
@@ -2346,12 +2290,12 @@ export default class KernelApi {
   }
   /**
    * 查询应用业务与定义的绑定关系
-   * @param {model.QueryDefineRelationReq} params 请求参数
-   * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XOperationArray>} 请求结果
    */
   public async queryDefineRelation(
-    params: model.QueryDefineRelationReq,
-  ): Promise<model.ResultType<schema.XFlowRelationArray>> {
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XOperationArray>> {
     return await this.request({
       module: 'flow',
       action: 'QueryDefineRelation',

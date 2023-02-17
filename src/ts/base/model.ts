@@ -94,17 +94,8 @@ export type QueryDefineReq = {
   speciesId: string;
   // 空间ID
   spaceId: string;
-  // 是否严格模式 true:只筛选属于该空间的流程定义 false:筛选该分类下可见的流程定义
-  isStrict: boolean;
   // 分页
   page: PageRequest;
-};
-
-export type QueryDefineRelationReq = {
-  // 定义id
-  defineId?: string;
-  // 业务id
-  operationId?: string;
 };
 
 export type SpaceAuthReq = {
@@ -363,6 +354,10 @@ export type OperationModel = {
   defineId?: string;
   // 业务发起职权Id
   beginAuthId?: string;
+  // 子项列表
+  items: OperationItemModel[];
+  // 子表分类ID集合
+  subSpeciesIds: string[];
 };
 
 export type OperationItemModel = {
@@ -372,6 +367,8 @@ export type OperationItemModel = {
   name: string;
   // 编号
   code: string;
+  // 绑定的特性ID
+  attrId: string;
   // 规则
   rule: string;
   // 备注
