@@ -282,12 +282,11 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
       }
     },
   },
-  // {
-  //   title: '表单配置',
-  //   dataIndex: 'remark',
-  //   ellipsis: true,
-  //   key: 'remark',
-  // },
+  {
+    title: '角色',
+    dataIndex: 'beginAuthId',
+    key: 'beginAuthId',
+  },
 ];
 
 export const OperationItemColumns: ProColumns<schema.XOperationItem>[] = [

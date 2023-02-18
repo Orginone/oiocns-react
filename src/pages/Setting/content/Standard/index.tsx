@@ -1,11 +1,11 @@
 import PageCard from '@/components/PageCard';
 import { IDict, ISpeciesItem, ITarget } from '@/ts/core';
-import { Button, Tabs } from 'antd';
+import { Button, Segmented, Tabs } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
 import Dict from '@/pages/Setting/content/Standard/Dict';
-import Operation from './Operation';
+import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
 import userCtrl from '@/ts/controller/setting';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
@@ -188,11 +188,11 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       label: `表单设计`,
       key: '表单设计',
       children: (
-        <Operation
+        <SpeciesForm
           current={current}
           target={target}
           modalType={modalType}
-          setModalType={setModalType}></Operation>
+          setModalType={setModalType}></SpeciesForm>
       ),
     },
     {
@@ -212,6 +212,16 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     },
   ];
 
+  const renderTabBarExtraContent = () => {
+    return (
+      <div>
+        <Segmented options={['本组织', '全部']} />
+        <Segmented options={['本分类', '全部']} />
+        {renderButton()}
+      </div>
+    );
+  };
+
   return (
     <div className={cls[`dept-content-box`]}>
       {current && (
@@ -224,7 +234,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
                   key={key}
                   activeKey={tabKey}
                   items={items}
-                  tabBarExtraContent={renderButton()}
+                  tabBarExtraContent={renderTabBarExtraContent()}
                   onChange={tabChange}
                 />
               </div>
