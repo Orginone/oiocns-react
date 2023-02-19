@@ -90,7 +90,7 @@ const OperationModal = (props: Iprops) => {
       dataIndex: 'defineId',
       valueType: 'select',
       request: async () => {
-        const res = await current.loadFlowDefines(userCtrl.space.id, true, {
+        const res = await current.loadFlowDefines(userCtrl.space.id, {
           offset: 0,
           limit: 1000000,
           filter: '',
