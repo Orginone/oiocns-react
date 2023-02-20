@@ -545,6 +545,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询分类的业务子表项
+   * @param {model.IdSpaceReq} params 请求参数
+   * @returns {model.ResultType<schema.XOperationRelationArray>} 请求结果
+   */
+  public async queryOperationSpeciesItems(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.XOperationRelationArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryOperationSpeciesItems',
+      params: params,
+    });
+  }
+  /**
    * 查询分类字典
    * @param {model.IdSpaceReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
