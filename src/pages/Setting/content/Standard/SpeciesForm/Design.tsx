@@ -1,4 +1,3 @@
-import { kernel } from '@/ts/base';
 import { XOperation } from '@/ts/base/schema';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { Button, Card, message } from 'antd';
@@ -7,6 +6,7 @@ import { ImUndo2 } from 'react-icons/im';
 import Design from '../../../components/design/index';
 import { SaveOutlined } from '@ant-design/icons';
 import { OperationModel } from '@/ts/base/model';
+import { kernel } from '@/ts/base';
 
 interface Iprops {
   target?: ITarget;
@@ -19,7 +19,7 @@ interface Iprops {
   表单设计
 */
 const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
-  const { target, current, operation, setTabKey } = props;
+  const { current, operation, setTabKey } = props;
   const [operationModel, setOperationModel] = useState<OperationModel>();
 
   const save = async () => {
