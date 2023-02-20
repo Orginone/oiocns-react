@@ -25,6 +25,7 @@ import SpeciesTabs from './SpeciesTabs';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
+import { OperationItemModel, OperationModel } from '@/ts/base/model';
 
 /**
  * 组件选择
@@ -103,7 +104,10 @@ export const widgetsOpts = [
 /**
  * 转化特性为表单项
  */
-const transformAttrToOperationItem = (attr: any, operationId: string) => {
+const transformAttrToOperationItem = (
+  attr: any,
+  operationId: string,
+): OperationItemModel => {
   let widget = 'input';
   let type = 'string';
   let dictId: string | undefined = undefined;
@@ -121,6 +125,7 @@ const transformAttrToOperationItem = (attr: any, operationId: string) => {
       code: attr.code,
       belongId: userCtrl.space.id,
       operationId: operationId,
+      attrId: attr.id,
       attr: attr,
       rule: JSON.stringify({
         title: attr.name,
@@ -144,7 +149,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
   const rule = JSON.parse(operationItem.rule);
   return (
     operationItem.attr || {
-      id: operationItem.id,
+      id: operationItem.attrId,
       name: operationItem.name,
       code: operationItem.code,
       belongId: userCtrl.space.id,
@@ -163,22 +168,34 @@ const transformOperationItemToAttr = (operationItem: any) => {
 type DesignProps = {
   operation: XOperation;
   current: any;
-  setSaveOperationItems: (saveOperationItems: any[]) => void;
+  setOperationModel: (operationModel: OperationModel) => void;
+};
+
+type DesignSpecies = {
+  // 规则
+  rule: string;
+  // 备注
+  speciesId: string;
+  // 创建组织/个人
+  belongId: string;
+  // 业务Id
+  operationId: string;
+  // 类别
+  species: ISpeciesItem;
 };
 
 /**
  * 表单设计器
  * @param props
  */
-const Design: React.FC<DesignProps> = (props: any) => {
-  const { operation, current, setSaveOperationItems } = props;
+const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const belongId = userCtrl.space.id;
   const [items, setItems] = useState<any>({
     attrs: [],
     operationItems: [],
   });
-  const [species, setSpecies] = useState<ISpeciesItem[]>([]);
+  const [designSpeciesArray, setDesignSpeciesArray] = useState<DesignSpecies[]>([]);
   const [form] = Form.useForm();
   const [formCol, setFormCol] = useState(12);
   const [selectedItem, setSelectedItem] = useState<any>({});
@@ -200,12 +217,10 @@ const Design: React.FC<DesignProps> = (props: any) => {
       });
       let operateItems = operateItemRes.data?.result || [];
       let attrs: any[] = attrRes.result || [];
-      const codes = operateItems.map((item) => item.code);
+      const attrIds = operateItems.map((item) => item.attrId);
       items['operationItems'] = operateItems;
       // 过滤
-      items['attrs'] = attrs.filter(
-        (attr) => !(codes.includes(attr.code) || codes.includes(attr.id)),
-      );
+      items['attrs'] = attrs.filter((attr) => !attrIds.includes(attr.id));
       setItems(items);
       tforceUpdate();
     };
@@ -218,12 +233,12 @@ const Design: React.FC<DesignProps> = (props: any) => {
       return id;
     }
     return Object.keys(items).find((key) => {
-      return items[key].find((item: any) => item.id === id);
+      return items[key].find((item: any) => item.id === id || item.attrId === id);
     });
   }
 
   // 设置从一个容器到另一个容器时候的变化
-  function dragMoveEvent(props: any) {
+  const dragMoveEvent = (props: any) => {
     const { active, over } = props;
     const overId = over?.id;
     if (!overId) return;
@@ -240,27 +255,33 @@ const Design: React.FC<DesignProps> = (props: any) => {
         const attr = items[activeContainer].find((attr: any) => attr.id === active.id);
         dragItem = transformAttrToOperationItem(attr, operation.id);
         itemClick(dragItem);
-      } else {
+      } else if (items[activeContainer]) {
         const operationItem = items[activeContainer].find(
           (oi: any) => oi.id === active.id,
         );
         dragItem = transformOperationItemToAttr(operationItem);
       }
-      const data = {
-        ...items,
-        [activeContainer]: items[activeContainer].filter((item: any) => {
-          return item.id !== active.id;
-        }),
-        [overContainer]: [
-          ...items[overContainer].slice(0, newIndex),
-          dragItem,
-          ...items[overContainer].slice(newIndex, items[overContainer].length),
-        ],
-      };
-      setSaveOperationItems(data['operationItems']);
-      setItems(data);
+      if (dragItem) {
+        const data = {
+          ...items,
+          [activeContainer]: items[activeContainer].filter((item: any) => {
+            return item.id !== active.id;
+          }),
+          [overContainer]: [
+            ...items[overContainer].slice(0, newIndex),
+            dragItem,
+            ...items[overContainer].slice(newIndex, items[overContainer].length),
+          ],
+        };
+        setOperationModel({
+          ...operation,
+          ...{ items: data['operationItems'] },
+          ...{ subSpeciesIds: designSpeciesArray },
+        });
+        setItems(data);
+      }
     }
-  }
+  };
 
   // 设置移动结束后时候的改变
   const dragEndFn = (props: any) => {
@@ -284,7 +305,11 @@ const Design: React.FC<DesignProps> = (props: any) => {
           }),
           operationItems: [...items['operationItems'], operationItem],
         };
-        setSaveOperationItems(data['operationItems']);
+        setOperationModel({
+          ...operation,
+          ...{ items: data['operationItems'] },
+          ...{ subSpeciesIds: designSpeciesArray },
+        });
         setItems(data);
       } else if (activeContainer === 'operationItems') {
         // 表单项转特性
@@ -297,8 +322,13 @@ const Design: React.FC<DesignProps> = (props: any) => {
             return item.id !== active.id;
           }),
         };
-        setSaveOperationItems(data['operationItems']);
+        setOperationModel({
+          ...operation,
+          ...{ items: data['operationItems'] },
+          ...{ subSpeciesIds: designSpeciesArray },
+        });
         setItems(data);
+        itemClick(operationItem);
       }
     } else if (activeContainer == overContainer) {
       // 相同容器
@@ -311,14 +341,19 @@ const Design: React.FC<DesignProps> = (props: any) => {
         }));
       }
       if (overContainer == 'operationItems') {
-        itemClick(overItems.find((item: any) => item.id === overId));
+        itemClick(activeItems.find((item: any) => item.id === activeId));
       }
+    } else {
+      itemClick(activeItems.find((item: any) => item.id === activeId));
     }
   };
+
   // 表单项选中事件
   const itemClick = (item: any) => {
     setSelectedItem(item);
-    form.setFieldsValue(JSON.parse(item.rule));
+    if (item && item.rule) {
+      form.setFieldsValue(JSON.parse(item.rule));
+    }
   };
 
   // 项配置改变
@@ -335,21 +370,50 @@ const Design: React.FC<DesignProps> = (props: any) => {
       return oi;
     });
     const data = { ...items, ...{ operationItems } };
-    setSaveOperationItems(operationItems);
+    setOperationModel({
+      ...operation,
+      ...{ items: operationItems },
+      ...{ subSpeciesIds: designSpeciesArray },
+    });
     setItems(data);
     tforceUpdate();
   };
 
   // 添加子表
-  const addSpecies = (species: ISpeciesItem[]) => {
-    setSpecies(species);
+  const addSpecies = (speciesArray: ISpeciesItem[]) => {
+    const ids = designSpeciesArray.map((ds) => ds.speciesId);
+    speciesArray = speciesArray.filter((sp) => !ids.includes(sp.id));
+    const dsArray = [
+      ...designSpeciesArray,
+      ...speciesArray.map((sp) => {
+        return {
+          rule: '{}',
+          speciesId: sp.id,
+          belongId,
+          operationId: operation.id,
+          species: sp,
+        };
+      }),
+    ];
+    setDesignSpeciesArray(dsArray);
+    setOperationModel({
+      ...operation,
+      ...{ items: items['operationItems'] },
+      ...{ subSpeciesIds: dsArray },
+    });
     setOpenSpeciesModal(false);
     tforceUpdate();
   };
 
   // 删除子表
   const deleteSpecies = (id: string) => {
-    setSpecies(species.filter((sp) => sp.id !== id));
+    const dsArray = designSpeciesArray.filter((ds) => ds.speciesId !== id);
+    setOperationModel({
+      ...operation,
+      ...{ items: items['operationItems'] },
+      ...{ subSpeciesIds: dsArray },
+    });
+    setDesignSpeciesArray(dsArray);
     tforceUpdate();
   };
 
@@ -431,10 +495,10 @@ const Design: React.FC<DesignProps> = (props: any) => {
                         <OperateItem item={item} />
                       </Col>
                     ))}
-                    {species.length > 0 && (
+                    {designSpeciesArray.length > 0 && (
                       <Col span={24}>
                         <SpeciesTabs
-                          species={species}
+                          species={designSpeciesArray.map((ds) => ds.species)}
                           deleteSpecies={deleteSpecies}
                           setOpenSpeciesModal={setOpenSpeciesModal}
                         />

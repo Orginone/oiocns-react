@@ -120,6 +120,7 @@ const OperationModal = (props: Iprops) => {
 
   return (
     <SchemaForm<OperationModel>
+      destroyOnClose={true}
       formRef={formRef}
       title={title}
       open={open}
@@ -133,6 +134,7 @@ const OperationModal = (props: Iprops) => {
           handleCancel();
         }
         formRef.current?.resetFields();
+        formRef.current?.setFieldsValue(data);
       }}
       rowProps={{
         gutter: [24, 0],
