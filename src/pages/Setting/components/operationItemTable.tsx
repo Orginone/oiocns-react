@@ -31,88 +31,6 @@ type OperationItemExt = {
 };
 
 /**
- * 组件选择
- */
-export const widgetsOpts = [
-  {
-    label: '文本',
-    value: 'input',
-  },
-  {
-    label: '多行文本',
-    value: 'textarea',
-  },
-  {
-    label: '数字',
-    value: 'number',
-  },
-  {
-    label: '链接',
-    value: 'url',
-  },
-  {
-    label: '日期',
-    value: 'date',
-  },
-  {
-    label: '时间',
-    value: 'time',
-  },
-  {
-    label: '日期范围',
-    value: 'dateRange',
-  },
-  {
-    label: '时间范围',
-    value: 'timeRange',
-  },
-  {
-    label: '颜色选择',
-    value: 'color',
-  },
-  {
-    label: '下拉单选',
-    value: 'select',
-  },
-  {
-    label: '下拉多选',
-    value: 'multiSelect',
-  },
-  {
-    label: '开关',
-    value: 'switch',
-  },
-  {
-    label: '文件上传',
-    value: 'upload',
-  },
-  {
-    label: '字典',
-    value: 'dict',
-  },
-  {
-    label: '人员',
-    value: 'person',
-  },
-  {
-    label: '部门',
-    value: 'department',
-  },
-  {
-    label: '集团',
-    value: 'group',
-  },
-  {
-    label: '类别子表',
-    value: 'species',
-  },
-  {
-    label: '自定义子表',
-    value: 'tableList',
-  },
-];
-
-/**
  * 字段列
  */
 const fieldColumns: ProColumns<OperationItemExt>[] = [
@@ -145,7 +63,7 @@ const fieldColumns: ProColumns<OperationItemExt>[] = [
     dataIndex: 'widget',
     valueType: 'select',
     fieldProps: {
-      options: widgetsOpts,
+      options: [],
       width: 90,
     },
   },

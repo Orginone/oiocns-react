@@ -20,34 +20,36 @@ const ViewCardModal = (props: FormDesignProps) => {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    const queryItems = async () => {
-      const res = await kernel.queryOperationItems({
-        id: props.data?.id as string,
-        spaceId: userCtrl.space.id,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      const operationItems = (res.data?.result || [])
-        .sort((a, b) => {
-          return Number(a.remark) - Number(b.remark);
-        })
-        .map((item) => {
-          item.rule = JSON.parse(item.rule) || {};
-          if ((item.rule as any).widget == 'number') {
-            (item.rule as any).widget = 'digit';
-          } else if ((item.rule as any).widget == 'dict') {
-            (item.rule as any).widget = 'select';
-          } else if ((item.rule as any).widget == 'person') {
-            (item.rule as any).widget = 'select';
-          } else if ((item.rule as any).widget == 'group') {
-            (item.rule as any).widget = 'treeSelect';
-          } else if ((item.rule as any).widget == 'department') {
-            (item.rule as any).widget = 'treeSelect';
-          }
-          return item;
+    if (data?.id) {
+      const queryItems = async () => {
+        const res = await kernel.queryOperationItems({
+          id: data?.id as string,
+          spaceId: userCtrl.space.id,
+          page: { offset: 0, limit: 100000, filter: '' },
         });
-      setItems(operationItems);
-    };
-    queryItems();
+        const operationItems = (res.data?.result || [])
+          .sort((a, b) => {
+            return Number(a.remark) - Number(b.remark);
+          })
+          .map((item) => {
+            item.rule = JSON.parse(item.rule) || {};
+            if ((item.rule as any).widget == 'number') {
+              (item.rule as any).widget = 'digit';
+            } else if ((item.rule as any).widget == 'dict') {
+              (item.rule as any).widget = 'select';
+            } else if ((item.rule as any).widget == 'person') {
+              (item.rule as any).widget = 'select';
+            } else if ((item.rule as any).widget == 'group') {
+              (item.rule as any).widget = 'treeSelect';
+            } else if ((item.rule as any).widget == 'department') {
+              (item.rule as any).widget = 'treeSelect';
+            }
+            return item;
+          });
+        setItems(operationItems);
+      };
+      queryItems();
+    }
   }, [props.data]);
 
   return (

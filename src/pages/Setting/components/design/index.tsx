@@ -1,5 +1,5 @@
 import { kernel } from '@/ts/base';
-import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import {
   Button,
@@ -8,26 +8,97 @@ import {
   Form,
   Input,
   InputNumber,
-  message,
   Radio,
   Row,
   Select,
   Space,
-  Tooltip,
-  TreeSelect,
 } from 'antd';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { DoubleRightOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
+import SpeciesTabs from './SpeciesTabs';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
-import { widgetsOpts } from '../operationItemTable';
 import { XOperation } from '@/ts/base/schema';
+
+/**
+ * 组件选择
+ */
+export const widgetsOpts = [
+  {
+    label: '文本',
+    value: 'input',
+  },
+  {
+    label: '多行文本',
+    value: 'textarea',
+  },
+  {
+    label: '数字',
+    value: 'number',
+  },
+  {
+    label: '链接',
+    value: 'url',
+  },
+  {
+    label: '日期',
+    value: 'date',
+  },
+  {
+    label: '时间',
+    value: 'time',
+  },
+  {
+    label: '日期范围',
+    value: 'dateRange',
+  },
+  {
+    label: '时间范围',
+    value: 'timeRange',
+  },
+  {
+    label: '颜色选择',
+    value: 'color',
+  },
+  {
+    label: '下拉单选',
+    value: 'select',
+  },
+  {
+    label: '下拉多选',
+    value: 'multiSelect',
+  },
+  {
+    label: '开关',
+    value: 'switch',
+  },
+  {
+    label: '文件上传',
+    value: 'upload',
+  },
+  {
+    label: '字典',
+    value: 'dict',
+  },
+  {
+    label: '人员',
+    value: 'person',
+  },
+  {
+    label: '部门',
+    value: 'department',
+  },
+  {
+    label: '集团',
+    value: 'group',
+  },
+];
 
 /**
  * 转化特性为表单项
@@ -48,7 +119,7 @@ const transformAttrToOperationItem = (attr: any, operationId: string) => {
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: attr.belongId,
+      belongId: userCtrl.space.id,
       operationId: operationId,
       attr: attr,
       rule: JSON.stringify({
@@ -76,7 +147,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
       id: operationItem.id,
       name: operationItem.name,
       code: operationItem.code,
-      belongId: operationItem.belongId,
+      belongId: userCtrl.space.id,
       remark: rule.description,
       dictId: rule.dictId || undefined,
       valueType:
@@ -102,24 +173,16 @@ type DesignProps = {
 const Design: React.FC<DesignProps> = (props: any) => {
   const { operation, current, setSaveOperationItems } = props;
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [belongId, setBelongId] = useState<string>(userCtrl.space.id);
-  const [treeData, setTreeData] = useState<any[]>();
+  const belongId = userCtrl.space.id;
   const [items, setItems] = useState<any>({
     attrs: [],
     operationItems: [],
   });
+  const [species, setSpecies] = useState<ISpeciesItem[]>([]);
   const [form] = Form.useForm();
+  const [formCol, setFormCol] = useState(12);
   const [selectedItem, setSelectedItem] = useState<any>({});
-  const [checkedAttrs, setCheckedAttrs] = useState<any[]>([]);
   const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
-
-  useEffect(() => {
-    const loadTeam = async () => {
-      const res = await userCtrl.getTeamTree();
-      setTreeData(res);
-    };
-    loadTeam();
-  }, []);
 
   useEffect(() => {
     const queryItems = async () => {
@@ -158,15 +221,6 @@ const Design: React.FC<DesignProps> = (props: any) => {
       return items[key].find((item: any) => item.id === id);
     });
   }
-  // 处理点击失效
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        delay: 140,
-        tolerance: 0,
-      },
-    }),
-  );
 
   // 设置从一个容器到另一个容器时候的变化
   function dragMoveEvent(props: any) {
@@ -176,9 +230,6 @@ const Design: React.FC<DesignProps> = (props: any) => {
     const activeContainer = findContaniner(active?.id) || '';
     const overContainer = findContaniner(over?.id) || '';
 
-    if (!overContainer || !activeContainer) {
-      return;
-    }
     // 将activeContainer里删除拖拽元素，在overContainer中添加拖拽元素
     if (activeContainer !== overContainer) {
       const overIndex = items[overContainer].indexOf(over.id);
@@ -188,6 +239,7 @@ const Design: React.FC<DesignProps> = (props: any) => {
       if (activeContainer === 'attrs') {
         const attr = items[activeContainer].find((attr: any) => attr.id === active.id);
         dragItem = transformAttrToOperationItem(attr, operation.id);
+        itemClick(dragItem);
       } else {
         const operationItem = items[activeContainer].find(
           (oi: any) => oi.id === active.id,
@@ -217,151 +269,153 @@ const Design: React.FC<DesignProps> = (props: any) => {
     const activeId = active?.id;
     const activeContainer = findContaniner(activeId) || '';
     const overContainer = findContaniner(overId) || '';
+
     const activeItems = items[activeContainer];
     const overItems = items[overContainer];
-
-    if (!activeContainer) return;
-    if (!overId) return;
-
-    if (overContainer) {
+    if (!overId) {
+      // 目标容器为空
+      if (activeContainer === 'attrs') {
+        // 特性转表单项
+        const attr = items['attrs'].find((attr: any) => attr.id === active.id);
+        const operationItem = transformAttrToOperationItem(attr, operation.id);
+        const data = {
+          attrs: items['attrs'].filter((item: any) => {
+            return item.id !== active.id;
+          }),
+          operationItems: [...items['operationItems'], operationItem],
+        };
+        setSaveOperationItems(data['operationItems']);
+        setItems(data);
+      } else if (activeContainer === 'operationItems') {
+        // 表单项转特性
+        const operationItem = items['operationItems'].find(
+          (oi: any) => oi.id === active.id,
+        );
+        const data = {
+          attrs: [...items['attrs'], transformOperationItemToAttr(operationItem)],
+          operationItems: items['operationItems'].filter((item: any) => {
+            return item.id !== active.id;
+          }),
+        };
+        setSaveOperationItems(data['operationItems']);
+        setItems(data);
+      }
+    } else if (activeContainer == overContainer) {
+      // 相同容器
       const overIndex = overItems.findIndex((item: any) => item.id === overId);
       const activeIndex = activeItems.findIndex((item: any) => item.id === activeId);
-
       if (activeIndex !== overIndex) {
         setItems((items: any) => ({
           ...items,
           [overContainer]: arrayMove(overItems, activeIndex, overIndex),
         }));
       }
+      if (overContainer == 'operationItems') {
+        itemClick(overItems.find((item: any) => item.id === overId));
+      }
     }
   };
-
-  const patchAdd = () => {
-    if (!checkedAttrs || checkedAttrs.length === 0) {
-      message.warning('请勾选特性');
-    } else {
-      const operationItems = checkedAttrs.map((attr) => {
-        return transformAttrToOperationItem(attr, operation.id);
-      });
-      items['operationItems'] = [...items['operationItems'], ...operationItems];
-      const attrIds = checkedAttrs.map((attr) => attr.id);
-      items['attrs'] = items['attrs'].filter((attr: any) => !attrIds.includes(attr.id));
-      setSaveOperationItems(operationItems);
-      setItems(items);
-      setCheckedAttrs([]);
-      tforceUpdate();
-    }
-  };
-
-  const checkAttr = (checked: boolean, attr: any) => {
-    if (checked) {
-      checkedAttrs.push(attr);
-      setCheckedAttrs(checkedAttrs);
-    } else {
-      const newCheckedAttrs = checkedAttrs.filter((a: any) => attr.id !== a.id);
-      setCheckedAttrs(newCheckedAttrs);
-    }
-  };
-
+  // 表单项选中事件
   const itemClick = (item: any) => {
     setSelectedItem(item);
     form.setFieldsValue(JSON.parse(item.rule));
   };
 
+  // 项配置改变
+  const formValuesChange = (changedValues: any) => {
+    const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
+    setSelectedItem({
+      ...selectedItem,
+      ...{ rule: JSON.stringify(rule) },
+    });
+    const operationItems = items['operationItems'].map((oi: any) => {
+      if (oi.id === selectedItem.id) {
+        oi.rule = JSON.stringify(rule);
+      }
+      return oi;
+    });
+    const data = { ...items, ...{ operationItems } };
+    setSaveOperationItems(operationItems);
+    setItems(data);
+    tforceUpdate();
+  };
+
   // 添加子表
   const addSpecies = (species: ISpeciesItem[]) => {
-    const operationItems = [];
-    for (const sp of species) {
-      const operationItemIds = items['operationItems'].map((item: any) => item.id);
-      if (!operationItemIds.includes(sp.id)) {
-        operationItems.push({
-          id: sp.id,
-          name: sp.name,
-          code: sp.target.code,
-          rule: JSON.stringify({
-            title: sp.name,
-            type: 'array',
-            widget: 'species',
-            required: false,
-            readOnly: false,
-            hidden: false,
-            description: sp.target.remark,
-            speciesId: sp.id,
-          }),
-        });
-      }
-    }
-    items['operationItems'] = [...items['operationItems'], ...operationItems];
-    setSaveOperationItems(items['operationItems']);
+    setSpecies(species);
     setOpenSpeciesModal(false);
-    setItems(items);
+    tforceUpdate();
+  };
+
+  // 删除子表
+  const deleteSpecies = (id: string) => {
+    setSpecies(species.filter((sp) => sp.id !== id));
     tforceUpdate();
   };
 
   return (
     <>
-      <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn} sensors={sensors}>
+      <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn}>
         <Row>
-          <Col span={4}>
+          <Col span={3}>
             <SortableContext items={items['attrs']}>
-              <Card
-                title="特性"
-                extra={
-                  <Tooltip title={'批量添加'}>
-                    <Button onClick={() => patchAdd()}>
-                      <DoubleRightOutlined />
-                    </Button>
-                  </Tooltip>
-                }>
+              <h3 style={{ paddingLeft: '6px' }}>特性</h3>
+              <div
+                style={{
+                  maxHeight: '700px',
+                  overflowY: 'scroll',
+                  overflowX: 'scroll',
+                }}>
                 {items['attrs'].map((attr: any) => (
-                  <AttrItem item={attr} key={attr.id} checkAttr={checkAttr} />
+                  <AttrItem item={attr} key={attr.id} />
                 ))}
-              </Card>
+              </div>
             </SortableContext>
           </Col>
-
-          <Col span={15}>
-            <Card
-              title={operation?.name}
-              extra={
-                <Space wrap>
-                  <TreeSelect
-                    style={{ width: '200px' }}
-                    defaultValue={userCtrl.space.id}
-                    value={belongId}
-                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                    treeData={treeData}
-                    placeholder="请选择制定组织"
-                    fieldNames={{ label: 'teamName', value: 'id', children: 'subTeam' }}
-                    onChange={(value) => setBelongId(value)}
-                  />
-                  <Button
-                    icon={<PlusOutlined />}
-                    onClick={() => setOpenSpeciesModal(true)}>
-                    插入子表
-                  </Button>
-                  {/* <Button icon={<SearchOutlined />}>预览表单</Button> */}
-                </Space>
-              }>
-              <SortableContext items={items['operationItems']}>
+          <Col span={16}>
+            <SortableContext items={items['operationItems']}>
+              <Card
+                style={{
+                  maxHeight: '800px',
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  maxWidth: '1000px',
+                }}
+                title={'表单'}
+                extra={
+                  <div style={{ display: 'flex' }}>
+                    <label style={{ padding: '6px' }}>整体布局：</label>
+                    <Select
+                      defaultValue={formCol}
+                      style={{ width: '160px' }}
+                      options={[
+                        { value: 24, label: '一行一列' },
+                        { value: 12, label: '一行两列' },
+                        { value: 8, label: '一行三列' },
+                      ]}
+                      onChange={setFormCol}
+                    />
+                    <Space wrap>
+                      <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => setOpenSpeciesModal(true)}>
+                        插入子表
+                      </Button>
+                      <Button icon={<SearchOutlined />}>预览表单</Button>
+                    </Space>
+                  </div>
+                }>
                 <ProForm
                   submitter={{
                     searchConfig: {
                       resetText: '重置',
                       submitText: '提交',
                     },
-                    // 配置按钮的属性
                     resetButtonProps: {
-                      style: {
-                        // 隐藏重置按钮
-                        display: 'none',
-                      },
+                      style: { display: 'none' },
                     },
                     submitButtonProps: {
-                      style: {
-                        // 隐藏重置按钮
-                        display: 'none',
-                      },
+                      style: { display: 'none' },
                     },
                   }}
                   layout="horizontal"
@@ -371,83 +425,80 @@ const Design: React.FC<DesignProps> = (props: any) => {
                     xs: { span: 10 },
                     sm: { span: 10 },
                   }}>
-                  <Row
-                    gutter={24}
-                    style={{ maxHeight: '700px', overflowY: 'auto', maxWidth: '800px' }}>
+                  <Row gutter={24}>
                     {items['operationItems'].map((item: any) => (
-                      <Col
-                        span={JSON.parse(item.rule)?.widget === 'species' ? 24 : 12}
-                        key={item.id}
-                        onClick={() => {
-                          itemClick(item);
-                        }}>
+                      <Col span={formCol} key={item.id}>
                         <OperateItem item={item} />
                       </Col>
                     ))}
+                    {species.length > 0 && (
+                      <Col span={24}>
+                        <SpeciesTabs
+                          species={species}
+                          deleteSpecies={deleteSpecies}
+                          setOpenSpeciesModal={setOpenSpeciesModal}
+                        />
+                      </Col>
+                    )}
                   </Row>
                 </ProForm>
-              </SortableContext>
-            </Card>
+              </Card>
+            </SortableContext>
           </Col>
 
           <Col span={5}>
             <Card title="表单项配置">
-              <h3>{selectedItem?.name}</h3>
-              <Form
-                form={form}
-                style={{ maxWidth: 600 }}
-                onValuesChange={(changedValues: any) => {
-                  const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
-                  setSelectedItem({ ...selectedItem, ...{ rule: JSON.stringify(rule) } });
-                  const operationItems = items['operationItems'].map((oi: any) => {
-                    if (oi.id === selectedItem.id) {
-                      oi.rule = JSON.stringify(rule);
-                      console.log('oi', oi);
-                    }
-                    return oi;
-                  });
-                  const data = { ...items, ...{ operationItems } };
-                  setSaveOperationItems(operationItems);
-                  setItems(data);
-                  tforceUpdate();
-                }}>
-                <Form.Item label="组件" name="widget">
-                  <Select options={widgetsOpts} />
-                </Form.Item>
-                <Form.Item label="必须" name="required">
-                  <Radio.Group buttonStyle="solid">
-                    <Radio.Button value={true}>是</Radio.Button>
-                    <Radio.Button value={false}>否</Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item label="只读" name="readOnly">
-                  <Radio.Group buttonStyle="solid">
-                    <Radio.Button value={true}>是</Radio.Button>
-                    <Radio.Button value={false}>否</Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item label="隐藏" name="hidden">
-                  <Radio.Group buttonStyle="solid">
-                    <Radio.Button value={true}>是</Radio.Button>
-                    <Radio.Button value={false}>否</Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item label="最小值" name="min">
-                  <InputNumber />
-                </Form.Item>
-                <Form.Item label="最大值" name="max">
-                  <InputNumber />
-                </Form.Item>
-                <Form.Item label="输入提示" name="placeholder">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="特性说明" name="description">
-                  <Input.TextArea />
-                </Form.Item>
-                <Form.Item label="校验规则" name="rules">
-                  <Input.TextArea />
-                </Form.Item>
-              </Form>
+              <Card bordered={false} title={selectedItem?.name}>
+                <Form
+                  form={form}
+                  disabled={selectedItem?.belongId !== belongId}
+                  onValuesChange={formValuesChange}>
+                  <Form.Item label="组件" name="widget">
+                    <Select options={widgetsOpts} />
+                  </Form.Item>
+                  <Form.Item label="必填" name="required">
+                    <Radio.Group buttonStyle="solid">
+                      <Radio.Button value={true}>是</Radio.Button>
+                      <Radio.Button value={false}>否</Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item label="只读" name="readOnly">
+                    <Radio.Group buttonStyle="solid">
+                      <Radio.Button value={true}>是</Radio.Button>
+                      <Radio.Button value={false}>否</Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item label="隐藏" name="hidden">
+                    <Radio.Group buttonStyle="solid">
+                      <Radio.Button value={true}>是</Radio.Button>
+                      <Radio.Button value={false}>否</Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item label="最小值" name="min">
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item label="最大值" name="max">
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item label="输入提示" name="placeholder">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item label="特性说明" name="description">
+                    <Input.TextArea />
+                  </Form.Item>
+                  <Form.Item
+                    label="校验规则"
+                    name="rules"
+                    tooltip="示例：[
+      {
+        pattern: '^[A-Za-z0-9]+$',
+        message: '只允许填写英文字母和数字',
+      },
+    ]">
+                    <Input.TextArea />
+                  </Form.Item>
+                </Form>
+              </Card>
             </Card>
           </Col>
         </Row>
@@ -463,6 +514,6 @@ const Design: React.FC<DesignProps> = (props: any) => {
       />
     </>
   );
-}
+};
 
 export default Design;
