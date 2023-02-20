@@ -124,7 +124,7 @@ const Operation = ({
         }}
         handleOk={async (res: any) => {
           setModalType('');
-          if (res.success) {
+          if (res) {
             message.success('保存成功');
             tforceUpdate();
           }

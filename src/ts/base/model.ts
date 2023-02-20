@@ -357,7 +357,7 @@ export type OperationModel = {
   // 子项列表
   items: OperationItemModel[];
   // 子表分类ID集合
-  subSpeciesIds: OperationRelationModel[];
+  speciesItems: OperationRelationModel[];
 };
 
 export type OperationRelationModel = {

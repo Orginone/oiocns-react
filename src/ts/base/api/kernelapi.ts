@@ -483,10 +483,13 @@ export default class KernelApi {
   }
   /**
    * 查询分类树
+   * @param {string} id 根分类ID
    * @param {string} targetId 组织ID
+   * @param {string} filter 过滤内容
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
    */
   public async querySpeciesTree(
+    id: string,
     targetId: string,
     filter: string,
   ): Promise<model.ResultType<schema.XSpecies>> {
@@ -494,7 +497,8 @@ export default class KernelApi {
       module: 'thing',
       action: 'QuerySpeciesTree',
       params: {
-        id: targetId,
+        id: id,
+        spaceId: targetId,
         page: {
           filter: filter,
         },
@@ -541,6 +545,20 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'QueryOperationItems',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类的业务子表项
+   * @param {model.IdSpaceReq} params 请求参数
+   * @returns {model.ResultType<schema.XOperationRelationArray>} 请求结果
+   */
+  public async queryOperationSpeciesItems(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.XOperationRelationArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryOperationSpeciesItems',
       params: params,
     });
   }
