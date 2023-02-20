@@ -25,7 +25,11 @@ import SpeciesTabs from './SpeciesTabs';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
-import { OperationItemModel, OperationModel } from '@/ts/base/model';
+import {
+  OperationItemModel,
+  OperationModel,
+  OperationRelationModel,
+} from '@/ts/base/model';
 
 /**
  * 组件选择
@@ -292,7 +296,9 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         setOperationModel({
           ...operation,
           ...{ items: data['operationItems'] },
-          ...{ subSpeciesIds: designSpeciesArray },
+          ...{
+            speciesItems: designSpeciesArray as OperationRelationModel[],
+          },
         });
         setItems(data);
       }
@@ -324,7 +330,9 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         setOperationModel({
           ...operation,
           ...{ items: data['operationItems'] },
-          ...{ subSpeciesIds: designSpeciesArray },
+          ...{
+            speciesItems: designSpeciesArray as OperationRelationModel[],
+          },
         });
         setItems(data);
       } else if (activeContainer === 'operationItems') {
@@ -341,7 +349,9 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         setOperationModel({
           ...operation,
           ...{ items: data['operationItems'] },
-          ...{ subSpeciesIds: designSpeciesArray },
+          ...{
+            speciesItems: designSpeciesArray as OperationRelationModel[],
+          },
         });
         setItems(data);
         itemClick(operationItem);
@@ -389,7 +399,9 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
     setOperationModel({
       ...operation,
       ...{ items: operationItems },
-      ...{ subSpeciesIds: designSpeciesArray },
+      ...{
+        speciesItems: designSpeciesArray as OperationRelationModel[],
+      },
     });
     setItems(data);
     tforceUpdate();
@@ -415,7 +427,14 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
     setOperationModel({
       ...operation,
       ...{ items: items['operationItems'] },
-      ...{ subSpeciesIds: dsArray },
+      ...{
+        speciesItems: dsArray.map((a) => ({
+          belongId: a.belongId,
+          operationId: a.operationId,
+          speciesId: a.speciesId,
+          rule: a.rule,
+        })),
+      },
     });
     setOpenSpeciesModal(false);
     tforceUpdate();
@@ -427,7 +446,14 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
     setOperationModel({
       ...operation,
       ...{ items: items['operationItems'] },
-      ...{ subSpeciesIds: dsArray },
+      ...{
+        speciesItems: dsArray.map((a) => ({
+          belongId: a.belongId,
+          operationId: a.operationId,
+          speciesId: a.speciesId,
+          rule: a.rule,
+        })),
+      },
     });
     setDesignSpeciesArray(dsArray);
     tforceUpdate();

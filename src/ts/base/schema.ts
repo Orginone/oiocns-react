@@ -79,6 +79,18 @@ export type XOperationRelation = {
   updateTime: string;
 };
 
+//度量特性定义查询返回集合
+export type XOperationRelationArray = {
+  // 偏移量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XOperationRelation[] | undefined;
+};
+
 //业务标准定义
 export type XOperation = {
   // 雪花ID
