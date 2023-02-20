@@ -13,7 +13,10 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const loadTreeData = async () => {
     let tree = await userCtrl.space.loadAuthorityTree(false);
     if (tree) {
-      setTreeData([...[{ label: '全员', value: '0' }], ...getTreeData([tree])]);
+      setTreeData([
+        ...[{ label: '全员', value: '0', children: [] }],
+        ...getTreeData([tree]),
+      ]);
     }
   };
   const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {

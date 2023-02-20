@@ -64,6 +64,10 @@ const FlowList: React.FC<IProps> = ({
     }
   }, [modalType]);
 
+  useEffect(() => {
+    setBinds([]);
+  }, [species]);
+
   const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
     return targets.map((item: ITarget) => {
       return {
@@ -135,6 +139,7 @@ const FlowList: React.FC<IProps> = ({
           });
           if (res.success) {
             message.success('发起测试流程成功');
+            console.log('instance', res.data);
             setInstance(res.data);
             onCurrentChaned(record);
             setOperateOrgId(userCtrl.space.id);
