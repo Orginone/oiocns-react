@@ -33,7 +33,7 @@ import { OperationItemModel, OperationModel } from '@/ts/base/model';
 export const widgetsOpts = [
   {
     label: '文本',
-    value: 'input',
+    value: 'text',
   },
   {
     label: '多行文本',
@@ -52,8 +52,8 @@ export const widgetsOpts = [
     value: 'date',
   },
   {
-    label: '时间',
-    value: 'time',
+    label: '日期时间',
+    value: 'datetime',
   },
   {
     label: '日期范围',
@@ -76,12 +76,28 @@ export const widgetsOpts = [
     value: 'multiSelect',
   },
   {
+    label: '树型选择',
+    value: 'treeSelect',
+  },
+  {
+    label: '单选',
+    value: 'radio',
+  },
+  {
+    label: '勾选',
+    value: 'checkbox',
+  },
+  {
     label: '开关',
     value: 'switch',
   },
   {
-    label: '文件上传',
+    label: '文件',
     value: 'upload',
+  },
+  {
+    label: '金额',
+    value: 'money',
   },
   {
     label: '字典',
