@@ -7,6 +7,7 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
+import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
@@ -30,7 +31,12 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      onTabChanged={(tabKey) => {
+        storeCtrl.setTabIndex(tabKey);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={

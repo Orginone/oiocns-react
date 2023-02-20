@@ -14,6 +14,7 @@ const Setting: React.FC<any> = () => {
         setSelectMenu(data);
       }}
       onMenuClick={() => {}}
+      onTabChanged={() => {}}
       siderMenuData={menus}>
       <Content key={key} selectMenu={selectMenu} reflashMenu={reflashMenu} />
     </MainLayout>

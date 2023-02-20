@@ -41,6 +41,8 @@ interface MenuItemType {
   key: string;
   label: string;
   display?: React.ReactNode;
+  menuType?: string;
+  checked?: boolean;
   itemType: string;
   count?: number;
   icon: React.ReactNode;

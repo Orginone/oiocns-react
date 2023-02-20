@@ -179,7 +179,6 @@ const FlowList: React.FC<IProps> = ({
   };
 
   const loadOperations = async (page: PageRequest) => {
-    debugger;
     let res = await species!.loadOperations(userCtrl.space.id, page);
     return res;
   };

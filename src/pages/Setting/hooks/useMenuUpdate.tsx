@@ -30,7 +30,6 @@ const useMenuUpdate = (): [
     children: [],
   });
   const [selectMenu, setSelectMenu] = useState<MenuItemType>(menus);
-
   /** 查找菜单 */
   const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
     for (const item of items) {
