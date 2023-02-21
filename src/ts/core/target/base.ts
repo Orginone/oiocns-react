@@ -476,7 +476,7 @@ export default class BaseTarget implements ITarget {
     reload: boolean = false,
   ): Promise<ISpeciesItem | undefined> {
     if (reload || !this.speciesTree) {
-      const res = await kernel.querySpeciesTree('', this.id, '');
+      const res = await kernel.querySpeciesTree('0', this.id, '');
       if (res.success) {
         this.speciesTree = new SpeciesItem(res.data, undefined);
       }

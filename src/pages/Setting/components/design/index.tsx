@@ -28,6 +28,7 @@ import { XOperation } from '@/ts/base/schema';
 import {
   OperationItemModel,
   OperationModel,
+  OperationRelation,
   OperationRelationModel,
 } from '@/ts/base/model';
 
@@ -281,7 +282,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -315,7 +316,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -334,7 +335,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -384,7 +385,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: operationItems },
       ...{
-        speciesItems: designSpeciesArray as OperationRelationModel[],
+        speciesItems: designSpeciesArray,
       },
     });
     setItems(data);
@@ -412,12 +413,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: items['operationItems'] },
       ...{
-        speciesItems: dsArray.map((a) => ({
-          belongId: a.belongId,
-          operationId: a.operationId,
-          speciesId: a.speciesId,
-          rule: a.rule,
-        })),
+        speciesItems: dsArray,
       },
     });
     setOpenSpeciesModal(false);
@@ -431,12 +427,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: items['operationItems'] },
       ...{
-        speciesItems: dsArray.map((a) => ({
-          belongId: a.belongId,
-          operationId: a.operationId,
-          speciesId: a.speciesId,
-          rule: a.rule,
-        })),
+        speciesItems: dsArray,
       },
     });
     setDesignSpeciesArray(dsArray);
