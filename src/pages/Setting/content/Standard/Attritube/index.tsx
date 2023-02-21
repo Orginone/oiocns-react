@@ -45,7 +45,7 @@ const Attritube = ({ current, target, modalType, setModalType }: IProps) => {
   };
 
   const loadAttrs = async (page: PageRequest) => {
-    return await current!.loadAttrs(userCtrl.space.id, page);
+    return await current!.loadAttrs(userCtrl.space.id, true, true, page);
   };
   return (
     <>
