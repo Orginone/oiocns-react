@@ -2,12 +2,22 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import {
+  ProFormCheckbox,
   ProFormDigit,
+  ProFormRadio,
   ProFormSelect,
   ProFormText,
   ProFormUploadButton,
 } from '@ant-design/pro-form';
 import userCtrl from '@/ts/controller/setting';
+import {
+  ProFormDatePicker,
+  ProFormDateRangePicker,
+  ProFormDateTimePicker,
+  ProFormDateTimeRangePicker,
+  ProFormMoney,
+  ProFormTreeSelect,
+} from '@ant-design/pro-components';
 
 const OperateItem = (props: any) => {
   const belongId = userCtrl.space.id;
@@ -56,7 +66,19 @@ const OperateItem = (props: any) => {
             labelAlign="right"
           />
         );
-      case 'dict':
+      case 'treeSelect':
+        return (
+          <ProFormTreeSelect
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'dict': {
+        const dictId = rule.dictId;
+        // Todo 查询字典
+        console.log(dictId);
         return (
           <ProFormSelect
             name={item.code}
@@ -67,6 +89,7 @@ const OperateItem = (props: any) => {
             labelAlign="right"
           />
         );
+      }
       case 'file':
       case 'upload':
         return (
@@ -75,6 +98,69 @@ const OperateItem = (props: any) => {
             label={rule.title}
             fieldProps={rule}
             rules={rule.rules}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'date':
+        return (
+          <ProFormDatePicker
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'datetime':
+        return (
+          <ProFormDateTimePicker
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'dateRange':
+        return (
+          <ProFormDateRangePicker
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'dateTimeRange':
+        return (
+          <ProFormDateTimeRangePicker
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'checkbox':
+        return (
+          <ProFormCheckbox
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'radio':
+        return (
+          <ProFormRadio
+            name={item.code}
+            label={rule.title}
+            tooltip={rule.description}
+            labelAlign="right"
+          />
+        );
+      case 'money':
+        return (
+          <ProFormMoney
+            name={item.code}
+            label={rule.title}
             tooltip={rule.description}
             labelAlign="right"
           />

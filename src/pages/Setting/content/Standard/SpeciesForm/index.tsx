@@ -8,6 +8,7 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
+  toFlowDesign: (operation: XOperation) => void;
   setModalType: (modalType: string) => void;
 }
 
@@ -15,7 +16,13 @@ interface IProps {
  * @description: 分类--业务表单
  * @return {*}
  */
-const SpeciesForm = ({ current, target, modalType, setModalType }: IProps) => {
+const SpeciesForm = ({
+  current,
+  target,
+  modalType,
+  toFlowDesign,
+  setModalType,
+}: IProps) => {
   const [tabKey, setTabKey] = useState(0);
   const [selectedOperation, setSelectedOperation] = useState<XOperation>();
 
@@ -38,6 +45,7 @@ const SpeciesForm = ({ current, target, modalType, setModalType }: IProps) => {
       current={current}
       operation={selectedOperation as XOperation}
       setTabKey={setTabKey}
+      toFlowDesign={toFlowDesign}
     />
   );
 };

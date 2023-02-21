@@ -18,7 +18,7 @@ import { useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
 import SpeciesTabs from './SpeciesTabs';
@@ -28,6 +28,7 @@ import { XOperation } from '@/ts/base/schema';
 import {
   OperationItemModel,
   OperationModel,
+  OperationRelation,
   OperationRelationModel,
 } from '@/ts/base/model';
 
@@ -37,7 +38,7 @@ import {
 export const widgetsOpts = [
   {
     label: '文本',
-    value: 'input',
+    value: 'text',
   },
   {
     label: '多行文本',
@@ -56,8 +57,8 @@ export const widgetsOpts = [
     value: 'date',
   },
   {
-    label: '时间',
-    value: 'time',
+    label: '日期时间',
+    value: 'datetime',
   },
   {
     label: '日期范围',
@@ -80,12 +81,28 @@ export const widgetsOpts = [
     value: 'multiSelect',
   },
   {
+    label: '树型选择',
+    value: 'treeSelect',
+  },
+  {
+    label: '单选',
+    value: 'radio',
+  },
+  {
+    label: '勾选',
+    value: 'checkbox',
+  },
+  {
     label: '开关',
     value: 'switch',
   },
   {
-    label: '文件上传',
+    label: '文件',
     value: 'upload',
+  },
+  {
+    label: '金额',
+    value: 'money',
   },
   {
     label: '字典',
@@ -127,7 +144,7 @@ const transformAttrToOperationItem = (
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: userCtrl.space.id,
+      belongId: undefined,
       operationId: operationId,
       attrId: attr.id,
       attr: attr,
@@ -156,7 +173,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
       id: operationItem.attrId,
       name: operationItem.name,
       code: operationItem.code,
-      belongId: userCtrl.space.id,
+      belongId: undefined,
       remark: rule.description,
       dictId: rule.dictId || undefined,
       valueType:
@@ -172,6 +189,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
 type DesignProps = {
   operation: XOperation;
   current: any;
+  toFlowDesign: (operation: XOperation) => void;
   setOperationModel: (operationModel: OperationModel) => void;
 };
 
@@ -192,7 +210,12 @@ type DesignSpecies = {
  * 表单设计器
  * @param props
  */
-const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }) => {
+const Design: React.FC<DesignProps> = ({
+  operation,
+  current,
+  toFlowDesign,
+  setOperationModel,
+}) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const belongId = userCtrl.space.id;
   const [items, setItems] = useState<any>({
@@ -213,6 +236,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         spaceId: belongId,
         page: { offset: 0, limit: 100000, filter: '' },
       });
+      console.log('operateItemRes', operateItemRes);
       // 查询特性
       const attrRes = await current.loadAttrs(belongId, {
         offset: 0,
@@ -281,7 +305,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -315,7 +339,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -334,7 +358,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           ...operation,
           ...{ items: data['operationItems'] },
           ...{
-            speciesItems: designSpeciesArray as OperationRelationModel[],
+            speciesItems: designSpeciesArray,
           },
         });
         setItems(data);
@@ -384,7 +408,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: operationItems },
       ...{
-        speciesItems: designSpeciesArray as OperationRelationModel[],
+        speciesItems: designSpeciesArray,
       },
     });
     setItems(data);
@@ -412,12 +436,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: items['operationItems'] },
       ...{
-        speciesItems: dsArray.map((a) => ({
-          belongId: a.belongId,
-          operationId: a.operationId,
-          speciesId: a.speciesId,
-          rule: a.rule,
-        })),
+        speciesItems: dsArray,
       },
     });
     setOpenSpeciesModal(false);
@@ -431,12 +450,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       ...operation,
       ...{ items: items['operationItems'] },
       ...{
-        speciesItems: dsArray.map((a) => ({
-          belongId: a.belongId,
-          operationId: a.operationId,
-          speciesId: a.speciesId,
-          rule: a.rule,
-        })),
+        speciesItems: dsArray,
       },
     });
     setDesignSpeciesArray(dsArray);
@@ -474,6 +488,30 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
                 title={'表单'}
                 extra={
                   <div style={{ display: 'flex' }}>
+                    {!operation.flow && (
+                      <>
+                        <label style={{ padding: '6px' }}>绑定流程：</label>
+                        <Select
+                          defaultValue={formCol}
+                          style={{ width: '160px' }}
+                          options={[
+                            { value: 24, label: '一行一列' },
+                            { value: 12, label: '一行两列' },
+                            { value: 8, label: '一行三列' },
+                          ]}
+                          onChange={setFormCol}
+                        />
+                      </>
+                    )}
+                    {operation.flow && (
+                      <Button
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                          toFlowDesign(operation);
+                        }}>
+                        设计流程
+                      </Button>
+                    )}
                     <label style={{ padding: '6px' }}>整体布局：</label>
                     <Select
                       defaultValue={formCol}

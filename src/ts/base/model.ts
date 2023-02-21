@@ -355,25 +355,30 @@ export type OperationModel = {
   // 业务发起职权Id
   beginAuthId?: string;
   // 子项列表
-  items: OperationItemModel[];
+  items: OperationItem[];
   // 子表分类ID集合
-  speciesItems: OperationRelationModel[];
+  speciesItems: OperationRelation[];
 };
 
-export type OperationRelationModel = {
+export type OperationItemModel = {
+  // 创建组织/个人
+  spaceId: string;
+  // 业务Id
+  operationId: string;
+  // 子项集合
+  operationItems: OperationItem[];
+  // 子表集合
+  SpeciesItems: OperationRelation[];
+};
+
+export type OperationRelation = {
   // 规则
   rule: string;
   // 备注
   speciesId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 业务Id
-  operationId: string;
 };
 
-export type OperationItemModel = {
-  // 唯一ID
-  id?: string;
+export type OperationItem = {
   // 名称
   name: string;
   // 编号
@@ -384,10 +389,6 @@ export type OperationItemModel = {
   rule: string;
   // 备注
   remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 业务Id
-  operationId: string;
 };
 
 export type AuthorityModel = {

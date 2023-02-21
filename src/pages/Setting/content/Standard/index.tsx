@@ -11,7 +11,7 @@ import userCtrl from '@/ts/controller/setting';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
 import { ImUndo2 } from 'react-icons/im';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XFlowDefine, XOperation } from '@/ts/base/schema';
 
 interface IProps {
   target?: ITarget;
@@ -27,6 +27,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
   const [dictRecords, setDictRecords] = useState<IDict[]>([]);
   const [key, forceUpdate] = useObjectUpdate(dictRecords);
+  const [flowTabKey, setFlowTabKey] = useState(0);
   const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
     id: '',
     name: '',
@@ -45,6 +46,16 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   // Tab 改变事件
   const tabChange = (key: string) => {
     setTabKey(key);
+  };
+
+  const toFlowDesign = (operation: XOperation) => {
+    console.log('toFlowDesign', toFlowDesign);
+    if (operation.flow) {
+      setTabKey('流程定义');
+      setModalType('编辑流程设计');
+      setFlowTabKey(1);
+      setFlowDesign(operation.flow);
+    }
   };
 
   const loadDicts = async () => {
@@ -192,7 +203,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           current={current}
           target={target}
           modalType={modalType}
-          setModalType={setModalType}></SpeciesForm>
+          setModalType={setModalType}
+          toFlowDesign={toFlowDesign}></SpeciesForm>
       ),
     },
     {
@@ -207,6 +219,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           setModalType={setModalType}
           flowDesign={flowDesign}
           setFlowDesign={setFlowDesign}
+          curTabKey={flowTabKey}
         />
       ),
     },
