@@ -3,7 +3,7 @@ import { emitter } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 /**
  * 监听控制器刷新hook
@@ -12,20 +12,28 @@ import * as operate from '../config/menuOperate';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType,
+  // MenuItemType,
+  TabItemType[],
   () => void,
   MenuItemType,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenu] = useState<MenuItemType>({
+  const [menus, setMenu] = useState<TabItemType[]>([]);
+  // const [menus, setMenu] = useState<MenuItemType>({
+  //   key: 'work',
+  //   label: '办事',
+  //   itemType: 'group',
+  //   icon: <SettingOutlined />,
+  //   children: [],
+  // });
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
     key: 'work',
     label: '办事',
     itemType: 'group',
     icon: <SettingOutlined />,
     children: [],
   });
-  const [selectMenu, setSelectMenu] = useState<MenuItemType>(menus);
 
   /** 查找菜单 */
   const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
@@ -43,15 +51,43 @@ const useMenuUpdate = (): [
   };
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children: MenuItemType[] = await operate.loadPlatformMenu();
-    children.push(await operate.loadApplicationMenu());
-    setMenu({
-      key: 'work',
-      label: '办事',
-      itemType: 'group',
-      icon: <SettingOutlined />,
-      children: children,
-    });
+    const todoMenus: MenuItemType[] = await operate.loadPlatformMenu();
+    let appMenu: MenuItemType = await operate.loadApplicationMenu();
+    let menus = [];
+    menus.push(
+      {
+        key: '1',
+        label: '办事',
+        menu: {
+          key: 'work',
+          label: '办事',
+          itemType: 'group',
+          icon: <SettingOutlined />,
+          children: [appMenu],
+        },
+      },
+      {
+        key: '2',
+        label: '待办',
+        menu: {
+          key: 'todo',
+          label: '待办',
+          itemType: 'group',
+          icon: <SettingOutlined />,
+          children: todoMenus,
+        },
+      },
+    );
+    setMenu(menus);
+    let children = [];
+    switch (todoCtrl.tabIndex) {
+      case '1':
+        children = [appMenu];
+        break;
+      default:
+        children = todoMenus;
+        break;
+    }
     const item: MenuItemType | undefined = findMenuItemByKey(
       children,
       todoCtrl.currentKey,

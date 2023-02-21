@@ -7,7 +7,6 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
-import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
