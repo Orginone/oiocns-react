@@ -39,6 +39,7 @@ const Package: React.FC = () => {
         setCheckedList([]);
         refreshMenu();
       }}
+      tabKey={storeCtrl.tabIndex}
       onCheckedChange={(checkedList: any[]) => {
         setCheckedList(checkedList);
         refreshMenu();

@@ -1,11 +1,12 @@
-import React, { Component, useEffect, useRef, useState } from 'react';
-import { Card, Tabs } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, message, Tabs } from 'antd';
 import storeCtrl from '@/ts/controller/store';
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
-import CardOrTable from '@/components/CardOrTableComp';
+import 'devextreme/dist/css/dx.light.css';
+import Button from 'devextreme-react/button';
 interface IProps {
   current: ISpeciesItem;
   checkedList?: any[];
