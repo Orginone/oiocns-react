@@ -220,7 +220,7 @@ export class SpeciesItem implements ISpeciesItem {
   async createOperation(
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<model.ResultType<schema.XOperation>> {
-    return await kernel.publishOperation({
+    return await kernel.createOperation({
       id: undefined,
       speciesId: this.id,
       ...data,

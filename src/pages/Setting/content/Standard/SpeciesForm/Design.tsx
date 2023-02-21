@@ -7,6 +7,7 @@ import Design from '../../../components/design/index';
 import { SaveOutlined } from '@ant-design/icons';
 import { OperationModel } from '@/ts/base/model';
 import { kernel } from '@/ts/base';
+import userCtrl from '@/ts/controller/setting';
 
 interface Iprops {
   target?: ITarget;
@@ -26,7 +27,21 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
   const save = async () => {
     console.log('operationModel', operationModel);
     if (operationModel) {
-      const res = await kernel.publishOperation(operationModel);
+      const res = await kernel.createOperationItems({
+        spaceId: userCtrl.space.id,
+        operationId: operationModel.id!,
+        SpeciesItems: operationModel.speciesItems.map((a) => ({
+          rule: a.rule,
+          speciesId: a.speciesId,
+        })),
+        operationItems: operationModel.items.map((a) => ({
+          name: a.name,
+          code: a.code,
+          attrId: a.attrId,
+          rule: a.rule,
+          remark: a.remark,
+        })),
+      });
       if (res.success) {
         message.success('保存成功！');
       } else {

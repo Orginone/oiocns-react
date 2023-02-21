@@ -30,7 +30,12 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      onTabChanged={(tabKey) => {
+        storeCtrl.setTabIndex(tabKey);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={

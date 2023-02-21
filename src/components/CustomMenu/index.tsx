@@ -13,7 +13,9 @@ import {
 import React, { useEffect, useState } from 'react';
 import { ImSearch, ImUndo2 } from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
+import { Checkbox } from 'antd';
 import style from './index.module.less';
+import { getUuid } from '@/utils/tools';
 
 interface CustomMenuType {
   selectMenu: MenuItemType;
@@ -27,14 +29,15 @@ const CustomMenu = (props: CustomMenuType) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
-  const [overItem, setOverItem] = useState<MenuItemType>();
+  const [overItem, setOverItem] = useState<any>();
   const [data, setData] = useState<MenuProps['items']>([]);
   const [operateMenu, setOperateMenu] = useState<OperateMenuType>();
+  const [checkedKeyList, setCheckedKeyList] = useState<string[]>([]);
+  const [checkboxKey, setCheckboxKey] = useState<string>();
   useEffect(() => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
       const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
-
       setData(loadMenus(loopFilterTree(props.item.children), expKeys));
       setOpenKeys(expKeys);
       setSelectedKeys([props.selectMenu.key]);
@@ -47,6 +50,19 @@ const CustomMenu = (props: CustomMenuType) => {
       }
     }
   }, [props]);
+
+  useEffect(() => {
+    if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
+      const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
+      setData(loadMenus(loopFilterTree(props.item.children), expKeys));
+    }
+    if (operateMenu && props.selectMenu.menus) {
+      const menu = props.selectMenu.menus.find((i) => i.key == operateMenu?.key);
+      if (menu && menu.subMenu) {
+        setData(loadMenus(loopFilterTree([menu.subMenu])));
+      }
+    }
+  }, [checkboxKey]);
 
   useEffect(() => {
     if (operateMenu) {
@@ -87,6 +103,21 @@ const CustomMenu = (props: CustomMenuType) => {
           key: item.key,
           icon: (
             <span style={{ fontSize: 16, paddingTop: 2 }}>
+              {item.menuType == 'checkbox' && (
+                <Checkbox
+                  checked={checkedKeyList.includes(item.key)}
+                  style={{ paddingRight: 10 }}
+                  onChange={(e: any) => {
+                    if (e.target.checked) {
+                      checkedKeyList.push(item.key);
+                      setCheckedKeyList(checkedKeyList);
+                    } else {
+                      let list = checkedKeyList.filter((ky) => ky != item.key);
+                      setCheckedKeyList(list);
+                    }
+                    setCheckboxKey(getUuid());
+                  }}></Checkbox>
+              )}
               {item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon}
             </span>
           ),
@@ -182,6 +213,7 @@ const CustomMenu = (props: CustomMenuType) => {
       </span>
     );
   };
+
   return (
     <>
       {operateMenu && (
@@ -217,6 +249,7 @@ const CustomMenu = (props: CustomMenuType) => {
       <Menu
         className={props.menuStyle ? props.menuStyle : style.customMenu}
         mode="inline"
+        // selectable={true}
         inlineIndent={10}
         items={data}
         triggerSubMenuAction="click"
@@ -226,8 +259,26 @@ const CustomMenu = (props: CustomMenuType) => {
         }}
         expandIcon={() => <></>}
         openKeys={openKeys}
-        onOpenChange={(keys) => setOpenKeys(keys)}
+        onOpenChange={(keys) => {
+          setOpenKeys(keys);
+        }}
         selectedKeys={selectedKeys}></Menu>
+      {/* <Menu
+        className={props.menuStyle ? props.menuStyle : style.customMenu}
+        mode="inline"
+        inlineIndent={10}
+        items={data}
+        triggerSubMenuAction="click"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setVisibleMenu(true);
+        }}
+        expandIcon={() => <></>}
+        openKeys={openKeys}
+        onOpenChange={(keys) => {
+          setOpenKeys(keys);
+        }}
+        selectedKeys={selectedKeys}></Menu> */}
     </>
   );
 };

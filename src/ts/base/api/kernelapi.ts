@@ -278,12 +278,26 @@ export default class KernelApi {
    * @param {model.OperationModel} params 请求参数
    * @returns {model.ResultType<schema.XOperation>} 请求结果
    */
-  public async publishOperation(
+  public async createOperation(
     params: model.OperationModel,
   ): Promise<model.ResultType<schema.XOperation>> {
     return await this.request({
       module: 'thing',
-      action: 'PublishOperation',
+      action: 'CreateOperation',
+      params: params,
+    });
+  }
+  /**
+   * 创建业务标准子项
+   * @param {model.OperationItemModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async createOperationItems(
+    params: model.OperationItemModel,
+  ): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateOperationItems',
       params: params,
     });
   }
@@ -483,10 +497,13 @@ export default class KernelApi {
   }
   /**
    * 查询分类树
+   * @param {string} id 根分类ID
    * @param {string} targetId 组织ID
+   * @param {string} filter 过滤内容
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
    */
   public async querySpeciesTree(
+    id: string,
     targetId: string,
     filter: string,
   ): Promise<model.ResultType<schema.XSpecies>> {
@@ -494,7 +511,8 @@ export default class KernelApi {
       module: 'thing',
       action: 'QuerySpeciesTree',
       params: {
-        id: targetId,
+        id: id,
+        spaceId: targetId,
         page: {
           filter: filter,
         },

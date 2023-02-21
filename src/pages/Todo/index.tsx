@@ -5,7 +5,7 @@ import useMenuUpdate from './hooks/useMenuUpdate';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 const Setting: React.FC<any> = () => {
   // eslint-disable-next-line no-unused-vars
-  const [key, menus, reflashMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -14,8 +14,13 @@ const Setting: React.FC<any> = () => {
         setSelectMenu(data);
       }}
       onMenuClick={() => {}}
-      siderMenuData={menus}>
-      <Content key={key} selectMenu={selectMenu} reflashMenu={reflashMenu} />
+      onTabChanged={(tabKey) => {
+        todoCtrl.setTabIndex(tabKey);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
+      <Content key={key} selectMenu={selectMenu} reflashMenu={refreshMenu} />
     </MainLayout>
   );
 };
