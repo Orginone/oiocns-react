@@ -22,7 +22,6 @@ type MainLayoutType = {
   selectMenu: MenuItemType;
   tabs?: TabItemType[];
   checkedList: any[];
-  setCheckedList: Function;
   tabKey?: string;
   onTabChanged: (tabKey: string) => void;
   onCheckedChange: Function;
@@ -43,7 +42,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
     children,
     tabs,
     checkedList,
-    setCheckedList,
     tabKey,
     onTabChanged,
     onCheckedChange,
@@ -78,7 +76,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               }}
               onCheckedChange={onCheckedChange}
               checkedList={checkedList}
-              setCheckedList={setCheckedList}
             />
           )}
           {tabs && (
@@ -109,7 +106,6 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                       }}
                       onCheckedChange={onCheckedChange}
                       checkedList={checkedList}
-                      setCheckedList={setCheckedList}
                     />
                   ),
                 };

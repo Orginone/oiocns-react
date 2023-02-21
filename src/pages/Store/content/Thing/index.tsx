@@ -22,7 +22,7 @@ const Thing: React.FC<IProps> = ({ current, checkedList }: IProps) => {
   const [columns, setColumns] = useState<any[]>([]);
   const [tabKey_, setTabKey_] = useState<string>();
   // const parentRef = useRef<any>();
-  const loadAttrs = async () => {
+  const loadAttrs = async (speciesItem: ISpeciesItem) => {
     let targetAttrs: XAttribute[] =
       (
         await current.loadAttrs(userCtrl.space.id + '', {
@@ -40,13 +40,16 @@ const Thing: React.FC<IProps> = ({ current, checkedList }: IProps) => {
   };
   useEffect(() => {
     if (current && userCtrl.space.id) {
-      loadAttrs();
+      if (!tabKey_) {
+        loadAttrs(current);
+      }
     }
   }, [current]);
   useEffect(() => {
     if (checkedList && checkedList.length > 0) {
       if (!checkedList.map((item) => item.key).includes(tabKey_)) {
         setTabKey_(checkedList[0].key);
+        loadAttrs(checkedList[0].item);
       }
     }
   }, [checkedList]);

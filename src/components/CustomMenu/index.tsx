@@ -22,7 +22,6 @@ interface CustomMenuType {
   item: MenuItemType;
   menuStyle?: any;
   checkedList: any[];
-  setCheckedList: Function;
   onSelect?: (item: MenuItemType) => void;
   onCheckedChange: Function;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
@@ -114,11 +113,9 @@ const CustomMenu = (props: CustomMenuType) => {
                     if (e.target.checked) {
                       let checkedList = props.checkedList;
                       checkedList.push(item);
-                      props.setCheckedList(checkedList);
                       props.onCheckedChange(checkedList);
                     } else {
                       let list = props.checkedList.filter((ky) => ky.key != item.key);
-                      props.setCheckedList(list);
                       props.onCheckedChange(list);
                     }
                     setCheckboxKey(getUuid());

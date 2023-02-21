@@ -148,7 +148,6 @@ const ChatLayout: React.FC<IProps> = (props) => {
                     }}
                     onCheckedChange={() => {}}
                     checkedList={[]}
-                    setCheckedList={() => {}}
                   />
                 ),
               };
