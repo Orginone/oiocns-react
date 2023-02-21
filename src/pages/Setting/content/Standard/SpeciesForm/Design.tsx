@@ -12,6 +12,7 @@ interface Iprops {
   target?: ITarget;
   current: ISpeciesItem;
   operation: XOperation;
+  toFlowDesign: (operation: XOperation) => void;
   setTabKey: (tabKey: number) => void;
 }
 
@@ -19,7 +20,7 @@ interface Iprops {
   表单设计
 */
 const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
-  const { current, operation, setTabKey } = props;
+  const { current, operation, setTabKey, toFlowDesign } = props;
   const [operationModel, setOperationModel] = useState<OperationModel>();
 
   const save = async () => {
@@ -61,6 +62,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
         operation={operation}
         current={current}
         setOperationModel={setOperationModel}
+        toFlowDesign={toFlowDesign}
       />
     </Card>
   );

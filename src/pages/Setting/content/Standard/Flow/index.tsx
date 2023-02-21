@@ -16,6 +16,7 @@ interface IProps {
   current: ISpeciesItem;
   modalType: string;
   flowDesign: XFlowDefine;
+  curTabKey?: number;
   setFlowDesign: Function;
   setModalType: (modalType: string) => void;
 }
@@ -24,10 +25,11 @@ const SettingFlow: React.FC<IProps> = ({
   target,
   modalType,
   flowDesign,
+  curTabKey,
   setFlowDesign,
   setModalType,
 }: IProps) => {
-  const [tabKey, SetTabKey] = useState(0);
+  const [tabKey, SetTabKey] = useState(curTabKey || 0);
   const [operateOrgId, setOperateOrgId] = useState<string>();
   const [instance, setInstance] = useState<any>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
