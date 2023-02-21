@@ -16,7 +16,13 @@ import Market from '@/pages/Welfare/WelfareOrg/Market';
 const Welfare: React.FC<any> = () => {
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
-    <MainLayout selectMenu={selectMenu} siderMenuData={menus} onTabChanged={() => {}}>
+    <MainLayout
+      selectMenu={selectMenu}
+      siderMenuData={menus}
+      onTabChanged={() => {}}
+      onCheckedChange={(checkedKeyList: string[]) => {}}
+      checkedList={[]}
+      setCheckedList={() => {}}>
       <MallList />
     </MainLayout>
   );

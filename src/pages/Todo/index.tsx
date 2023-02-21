@@ -6,6 +6,7 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 const Setting: React.FC<any> = () => {
   // eslint-disable-next-line no-unused-vars
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [checkedList, setCheckedList] = useState<any[]>([]);
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -18,6 +19,9 @@ const Setting: React.FC<any> = () => {
         todoCtrl.setTabIndex(tabKey);
         refreshMenu();
       }}
+      checkedList={checkedList}
+      setCheckedList={setCheckedList}
+      onCheckedChange={(checkedKeyList: string[]) => {}}
       siderMenuData={menus[0]?.menu}
       tabs={menus}>
       <Content key={key} selectMenu={selectMenu} reflashMenu={refreshMenu} />

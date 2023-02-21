@@ -1,4 +1,5 @@
 import { XDict, XFlowDefine } from '@/ts/base/schema';
+import { message } from 'antd';
 import { kernel, model, parseAvatar, schema } from '../../../base';
 import {
   AttributeModel,

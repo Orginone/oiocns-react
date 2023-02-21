@@ -14,7 +14,6 @@ interface CustomBreadcrumbType {
 const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   const [items, setItems] = useState<MenuItemType[]>([]);
   useEffect(() => {
-    debugger;
     setItems(loadBreadItems([props.item], props.selectKey));
   }, [props.selectKey]);
 

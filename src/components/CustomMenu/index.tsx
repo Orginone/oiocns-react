@@ -21,7 +21,10 @@ interface CustomMenuType {
   selectMenu: MenuItemType;
   item: MenuItemType;
   menuStyle?: any;
+  checkedList: any[];
+  setCheckedList: Function;
   onSelect?: (item: MenuItemType) => void;
+  onCheckedChange: Function;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 }
 const CustomMenu = (props: CustomMenuType) => {
@@ -32,7 +35,7 @@ const CustomMenu = (props: CustomMenuType) => {
   const [overItem, setOverItem] = useState<any>();
   const [data, setData] = useState<MenuProps['items']>([]);
   const [operateMenu, setOperateMenu] = useState<OperateMenuType>();
-  const [checkedKeyList, setCheckedKeyList] = useState<string[]>([]);
+  // const [checkedList, setCheckedList] = useState<any[]>([]);
   const [checkboxKey, setCheckboxKey] = useState<string>();
   useEffect(() => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
@@ -105,15 +108,18 @@ const CustomMenu = (props: CustomMenuType) => {
             <span style={{ fontSize: 16, paddingTop: 2 }}>
               {item.menuType == 'checkbox' && (
                 <Checkbox
-                  checked={checkedKeyList.includes(item.key)}
+                  checked={props.checkedList.map((it) => it.key).includes(item.key)}
                   style={{ paddingRight: 10 }}
                   onChange={(e: any) => {
                     if (e.target.checked) {
-                      checkedKeyList.push(item.key);
-                      setCheckedKeyList(checkedKeyList);
+                      let checkedList = props.checkedList;
+                      checkedList.push(item);
+                      props.setCheckedList(checkedList);
+                      props.onCheckedChange(checkedList);
                     } else {
-                      let list = checkedKeyList.filter((ky) => ky != item.key);
-                      setCheckedKeyList(list);
+                      let list = props.checkedList.filter((ky) => ky.key != item.key);
+                      props.setCheckedList(list);
+                      props.onCheckedChange(list);
                     }
                     setCheckboxKey(getUuid());
                   }}></Checkbox>

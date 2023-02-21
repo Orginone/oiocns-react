@@ -7,11 +7,13 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
+import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [checkedList, setCheckedList] = useState<any[]>([]);
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -30,8 +32,15 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
+      checkedList={checkedList}
+      setCheckedList={setCheckedList}
       onTabChanged={(tabKey) => {
         storeCtrl.setTabIndex(tabKey);
+        setCheckedList([]);
+        refreshMenu();
+      }}
+      onCheckedChange={(checkedList: any[]) => {
+        setCheckedList(checkedList);
         refreshMenu();
       }}
       siderMenuData={menus[0]?.menu}
@@ -48,7 +57,7 @@ const Package: React.FC = () => {
           setOperateTarget(undefined);
         }}
       />
-      <Content key={key} selectMenu={selectMenu} />
+      <Content key={key} selectMenu={selectMenu} checkedList={checkedList} />
     </MainLayout>
   );
 };

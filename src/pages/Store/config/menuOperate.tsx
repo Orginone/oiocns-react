@@ -151,7 +151,7 @@ export const getThingMenus = async () => {
         key: '物',
         label: '物',
         itemType: GroupMenuType.Thing,
-        item: userCtrl.space,
+        item: species,
         icon: <im.ImNewspaper />,
       };
 };
@@ -168,7 +168,7 @@ export const getWelMenus = async () => {
         key: '财',
         label: '财',
         itemType: GroupMenuType.Wel,
-        item: userCtrl.space,
+        item: species,
         icon: <im.ImNewspaper />,
       };
 };
@@ -177,6 +177,7 @@ export const getWelMenus = async () => {
 export const buildSpeciesTree = (
   species: ISpeciesItem,
   itemType: string,
+  menuType?: string,
 ): MenuItemType => {
   const result: MenuItemType = {
     key: species.id,
@@ -184,9 +185,10 @@ export const buildSpeciesTree = (
     label: species.name,
     icon: <im.ImNewspaper />,
     itemType: itemType,
-    menuType: 'checkbox',
+    menuType: menuType,
     menus: loadSpeciesMenus(species),
-    children: species.children?.map((i) => buildSpeciesTree(i, itemType)) ?? [],
+    children:
+      species.children?.map((i) => buildSpeciesTree(i, itemType, 'checkbox')) ?? [],
   };
   return result;
 };

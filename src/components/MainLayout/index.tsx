@@ -21,8 +21,11 @@ type MainLayoutType = {
   rightBar?: React.ReactNode;
   selectMenu: MenuItemType;
   tabs?: TabItemType[];
+  checkedList: any[];
+  setCheckedList: Function;
   tabKey?: string;
   onTabChanged: (tabKey: string) => void;
+  onCheckedChange: Function;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };
@@ -34,7 +37,17 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const { className, siderMenuData, children, tabs, tabKey, onTabChanged } = props;
+  const {
+    className,
+    siderMenuData,
+    children,
+    tabs,
+    checkedList,
+    setCheckedList,
+    tabKey,
+    onTabChanged,
+    onCheckedChange,
+  } = props;
   const [tabKey_, setTabKey_] = useState<string>(tabKey || '1');
   useEffect(() => {
     setTabKey_(tabKey || '1');
@@ -63,6 +76,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               onMenuClick={(item, key) => {
                 props.onMenuClick?.apply(this, [item, key]);
               }}
+              onCheckedChange={onCheckedChange}
+              checkedList={checkedList}
+              setCheckedList={setCheckedList}
             />
           )}
           {tabs && (
@@ -91,6 +107,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                       onMenuClick={(item, key) => {
                         props.onMenuClick?.apply(this, [item, key]);
                       }}
+                      onCheckedChange={onCheckedChange}
+                      checkedList={checkedList}
+                      setCheckedList={setCheckedList}
                     />
                   ),
                 };
