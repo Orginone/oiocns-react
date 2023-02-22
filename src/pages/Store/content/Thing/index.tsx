@@ -27,7 +27,6 @@ interface IProps {
  * 仓库-物
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
-  message.warn(props.checkedList?.length);
   const [key] = useCtrlUpdate(storeCtrl);
   const [thingAttrs, setThingAttrs] = useState<any[]>();
   const [tabKey_, setTabKey_] = useState<string>();
