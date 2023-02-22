@@ -18,7 +18,6 @@ import DataGrid, {
   Paging,
   Lookup,
 } from 'devextreme-react/data-grid';
-import { locale, loadMessages } from 'devextreme/localization';
 import { getUuid } from '@/utils/tools';
 interface IProps {
   current: ISpeciesItem;
@@ -29,7 +28,7 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const [key] = useCtrlUpdate(storeCtrl);
-  const [thingAttrs, setThingAttrs] = useState<XAttribute[]>();
+  const [thingAttrs, setThingAttrs] = useState<any[]>();
   const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
   const loadAttrs = async (speciesItem: ISpeciesItem) => {
@@ -37,7 +36,16 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       (item: ISpeciesItem) => item.id == speciesItem.id,
     )[0];
     if (instance) {
-      setThingAttrs(instance.attrs || []);
+      let parentHeaders = [];
+      //所有id
+      let attrsSpeciesIdSet = new Set(
+        instance.attrs?.map((attr) => attr.speciesId) || [],
+      );
+      for (let speciesId of Array.from(attrsSpeciesIdSet)) {
+        let attrs = instance.attrs?.filter((attr) => attr.speciesId == speciesId) || [];
+        parentHeaders.push({ caption: attrs[0].species?.name, children: attrs });
+      }
+      setThingAttrs(parentHeaders);
     } else {
       setThingAttrs(undefined);
     }
@@ -76,7 +84,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 ASSET_CODE: 'BZ011',
                 ASSET_NAME: '测试数据(本征)',
                 ASSET_TYPE: '10000000',
-                speciesItemId: '27466605935444992',
+                tagIds: '27466605935444992',
               },
               {
                 key: getUuid(),
@@ -84,7 +92,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 ASSET_CODE: 'GC0187',
                 ASSET_NAME: '测试数据(工程建筑)',
                 ASSET_TYPE: '10010000',
-                speciesItemId: '27466605935444993',
+                SOURCE_PLACE: '北京市朝阳区601号',
+                FLOOR_AREA: '10000 m2',
+                tagIds: '27466605935444992,27466605935444993',
               },
               {
                 key: getUuid(),
@@ -92,10 +102,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 HERITAGE_NO: 'WW011',
                 TYPES_OF_CULTURAL_RELICS: '书画',
                 SOURCE_OF_CULTURAL_RELICS: '1',
-                speciesItemId: '27466605935445008',
+                tagIds: '27466605935445008',
               },
-            ].filter((record) =>
-              getParentAndSelfIds(a, []).includes(record.speciesItemId),
+            ].filter(
+              (record) =>
+                // getParentAndSelfIds(a, []).includes(record.speciesItemId),
+                record.tagIds.indexOf(a.id) > -1,
             )}
             keyExpr="key"
             columnMinWidth={80}
@@ -136,15 +148,19 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               displayMode={'full'}
             />
             <Paging defaultPageSize={10} />
-            {thingAttrs.map((attr: XAttribute) => (
-              <Column key={attr.id} dataField={attr.code} caption={attr.name}>
-                {attr.valueType == '选择型' && (
-                  <Lookup
-                    dataSource={attr.dictItems || []}
-                    displayExpr="name"
-                    valueExpr="value"
-                  />
-                )}
+            {thingAttrs.map((parentHeader: any) => (
+              <Column key={parentHeader.caption} caption={parentHeader.caption}>
+                {parentHeader.children.map((attr: any) => (
+                  <Column key={attr.id} dataField={attr.code} caption={attr.name}>
+                    {attr.valueType == '选择型' && (
+                      <Lookup
+                        dataSource={attr.dictItems || []}
+                        displayExpr="name"
+                        valueExpr="value"
+                      />
+                    )}
+                  </Column>
+                ))}
               </Column>
             ))}
           </DataGrid>
