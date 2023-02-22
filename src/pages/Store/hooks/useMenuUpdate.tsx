@@ -80,7 +80,7 @@ const useMenuUpdate = (): [
           label: '物',
           itemType: '物',
           icon: <im.ImTree />,
-          children: [...childrenCommon, thingMenus],
+          children: [...childrenCommon, ...thingMenus],
         },
       },
       {
@@ -91,7 +91,7 @@ const useMenuUpdate = (): [
           label: '财',
           itemType: '财',
           icon: <im.ImCoinDollar />,
-          children: [...childrenCommon, welMenus],
+          children: [...childrenCommon, ...welMenus],
         },
       },
     );
@@ -99,25 +99,13 @@ const useMenuUpdate = (): [
     let children = [];
     switch (storeCtrl.tabIndex) {
       case '1':
-        children = [...childrenCommon, thingMenus];
+        children = [...childrenCommon, ...thingMenus];
         break;
       default:
-        children = [...childrenCommon, welMenus];
+        children = [...childrenCommon, ...welMenus];
         break;
     }
 
-    // const item: MenuItemType | undefined = findMenuItemByKey(
-    //   children,
-    //   chatCtrl.currentKey,
-    // );
-    // if (item) {
-    //   setSelectMenu(item);
-    // } else {
-    //   if (children.length > 0) {
-    //     chatCtrl.currentKey = children[0].key;
-    //     setSelectMenu(children[0]);
-    //   }
-    // }
     const item = findMenuItemByKey(children, storeCtrl.currentKey);
     if (item) {
       setSelectMenu(item);
