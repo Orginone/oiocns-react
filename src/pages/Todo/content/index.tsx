@@ -70,7 +70,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
       case GroupMenuType.Order:
         return (
           <OrderTodo
-            typeName={selectMenu[0].key}
+            typeName={selectMenu.key}
             todoGroup={todoGroup}
             reflashMenu={reflashMenu}
           />
@@ -78,7 +78,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
       case GroupMenuType.Application:
         return (
           <AppTodo
-            typeName={selectMenu[0].key}
+            typeName={selectMenu.key}
             todoGroup={todoGroup}
             reflashMenu={reflashMenu}
           />
