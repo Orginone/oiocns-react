@@ -1,21 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Content from './content';
-import MainTabLayout from '@/components/MainTabLayout';
+import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import todoCtrl from '@/ts/controller/todo/todoCtrl';
+import { MenuItemType } from 'typings/globelType';
 const Setting: React.FC<any> = () => {
+  const [checkedList, setCheckedList] = useState<MenuItemType[]>([]);
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   return (
-    <MainTabLayout
+    <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        todoCtrl.currentKey = data[0].key;
         setSelectMenu(data);
       }}
-      onMenuClick={() => {}}
+      checkedList={checkedList}
+      onTabChanged={(_) => {
+        setCheckedList([]);
+        refreshMenu();
+      }}
+      tabKey={'1'}
+      onCheckedChange={(checkedList: any[]) => {
+        setCheckedList(checkedList);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
       tabs={menus}>
-      <Content key={key} selectMenu={selectMenu} reflashMenu={refreshMenu} />
-    </MainTabLayout>
+      <Content
+        key={key}
+        selectMenu={selectMenu}
+        reflashMenu={refreshMenu}
+        checkedList={checkedList}
+      />
+    </MainLayout>
   );
 };
 

@@ -15,20 +15,18 @@ const useMenuUpdate = (): [
   string,
   TabItemType[],
   () => void,
-  MenuItemType[],
-  (items: MenuItemType[]) => void,
+  MenuItemType,
+  (items: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
   const [menus, setMenu] = useState<TabItemType[]>([]);
-  const [selectMenu, setSelectMenu] = useState<MenuItemType[]>([
-    {
-      key: 'work',
-      label: '办事',
-      itemType: 'group',
-      icon: <SettingOutlined />,
-      children: [],
-    },
-  ]);
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
+    key: 'work',
+    label: '办事',
+    itemType: 'group',
+    icon: <SettingOutlined />,
+    children: [],
+  });
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
@@ -42,7 +40,7 @@ const useMenuUpdate = (): [
           label: '办事',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: [await operate.loadThingMenus('work', true)],
+          children: await operate.loadThingMenus('work', true),
         },
       },
       {
@@ -53,7 +51,7 @@ const useMenuUpdate = (): [
           label: '待办',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: [...todoMenus, await operate.loadThingMenus('todo')],
+          children: [...todoMenus, ...(await operate.loadThingMenus('todo'))],
         },
       },
     ]);
