@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Tabs } from 'antd';
+import { Card } from 'antd';
 import storeCtrl from '@/ts/controller/store';
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
@@ -12,7 +12,6 @@ import DataGrid, {
   ColumnFixing,
   Editing,
   HeaderFilter,
-  FilterPanel,
   FilterRow,
   Pager,
   Paging,
@@ -29,7 +28,7 @@ interface IProps {
 const Thing: React.FC<IProps> = (props: IProps) => {
   const [key] = useCtrlUpdate(storeCtrl);
   const [thingAttrs, setThingAttrs] = useState<any[]>();
-  const [tabKey_, setTabKey_] = useState<string>();
+  // const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
   const getSortedList = (
     speciesArray: ISpeciesItem[],
@@ -68,7 +67,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     }
     let attrArray = Array.from(attrSet);
     let sortedSpecies = getSortedList(instances, [], false);
-    debugger;
     for (let species of sortedSpecies) {
       if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
         let attrs =
@@ -79,37 +77,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         });
       }
     }
-    // for (let speciesItem of speciesArray) {
-    //   let instance = storeCtrl.checkedSpeciesList.filter(
-    //     (item: ISpeciesItem) => item.id == speciesItem.id,
-    //   )[0];
-    //   if (instance) {
-    //     //所有id
-    //     let sortedSpecies = getSortedList(instance, []);
-    //     for (let species of sortedSpecies) {
-    //       if (
-    //         (instance.attrs?.map((attr) => attr.speciesId) || []).includes(species.id)
-    //       ) {
-    //         let attrs =
-    //           instance.attrs?.filter((attr) => attr.speciesId == species.id) || [];
-    //         parentHeaders.push({
-    //           caption: attrs[0].species?.name || species.name,
-    //           children: attrs,
-    //         });
-    //       }
-    //     }
-    //   }
-    // }
     setThingAttrs(parentHeaders);
   };
 
   useEffect(() => {
     if (storeCtrl.checkedSpeciesList.length > 0) {
       if (props.checkedList && props.checkedList.length > 0) {
-        // if (!props.checkedList.map((item) => item.key).includes(tabKey_)) {
-        //   setTabKey_(props.checkedList[0].key);
-        //   loadAttrs(props.checkedList[0].item);
-        // }
         loadAttrs(props.checkedList.map((item) => item.item));
       } else if (props.current && userCtrl.space.id) {
         loadAttrs([props.current]);
@@ -117,13 +90,13 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     }
   }, [props.current, props.checkedList, storeCtrl.checkedSpeciesList]);
 
-  const getParentAndSelfIds = (a: ISpeciesItem, ids: string[]): string[] => {
-    ids.push(a.id);
-    if (a.parent) {
-      ids = getParentAndSelfIds(a.parent, ids);
-    }
-    return ids;
-  };
+  // const getParentAndSelfIds = (a: ISpeciesItem, ids: string[]): string[] => {
+  //   ids.push(a.id);
+  //   if (a.parent) {
+  //     ids = getParentAndSelfIds(a.parent, ids);
+  //   }
+  //   return ids;
+  // };
 
   const getComponent = (speciesArray: ISpeciesItem[]) => {
     return (
@@ -157,17 +130,13 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 SOURCE_OF_CULTURAL_RELICS: '1',
                 tagIds: '27466605935445008',
               },
-            ].filter((record) =>
-              // getParentAndSelfIds(a, []).includes(record.speciesItemId),
-              // record.tagIds.indexOf(a.id) > -1,
-              {
-                let hasTag = true;
-                for (let species of speciesArray) {
-                  hasTag = hasTag && record.tagIds.indexOf(species.id) > -1;
-                }
-                return hasTag;
-              },
-            )}
+            ].filter((record) => {
+              let hasTag = true;
+              for (let species of speciesArray) {
+                hasTag = hasTag && record.tagIds.indexOf(species.id) > -1;
+              }
+              return hasTag;
+            })}
             keyExpr="key"
             columnMinWidth={80}
             focusedRowEnabled={true}
@@ -230,33 +199,11 @@ const Thing: React.FC<IProps> = (props: IProps) => {
 
   return (
     <Card id={key} bordered={false}>
-      {
-        props.checkedList &&
-          props.checkedList.length > 0 &&
-          getComponent(props.checkedList.map((item) => item.item))
-        // (<Tabs
-        //     activeKey={tabKey_}
-        //     onChange={(key: any) => {
-        //       setTabKey_(key);
-        //       loadAttrs(props.checkedList?.filter((item) => item.key == key)[0].item);
-        //     }}
-        //     items={props.checkedList?.map((a) => {
-        //       return {
-        //         key: a.key,
-        //         label: a.label,
-        //         children: getComponent(a.item),
-        //       };
-        //     })}
-        //   />)
-      }
+      {props.checkedList &&
+        props.checkedList.length > 0 &&
+        getComponent(props.checkedList.map((item) => item.item))}
       {(!props.checkedList || props.checkedList.length == 0) &&
         getComponent([props.current])}
-      {/* <CardOrTable
-        dataSource={[]}
-        columns={columns}
-        rowKey={(record: any) => record?.prod?.id}
-        operation={renderOperate}
-      /> */}
     </Card>
   );
 };
