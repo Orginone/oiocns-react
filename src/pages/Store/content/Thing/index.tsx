@@ -31,47 +31,88 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   const [thingAttrs, setThingAttrs] = useState<any[]>();
   const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
-  const getSortedList = (species: ISpeciesItem, array: any[]): any[] => {
-    array = [species, ...array];
-    if (species.parent) {
-      array = getSortedList(species.parent, array);
+  const getSortedList = (
+    speciesArray: ISpeciesItem[],
+    array: any[],
+    front: boolean,
+  ): any[] => {
+    for (let species of speciesArray) {
+      if (!array.includes(species)) {
+        //没有就放在最前面 改为父级放前，子级放后
+        if (front) {
+          array = [species, ...array];
+        } else {
+          array = [...array, species];
+        }
+      }
+      if (species.parent) {
+        array = getSortedList([species.parent], array, true);
+      }
     }
     return array;
   };
 
-  const loadAttrs = async (speciesItem: ISpeciesItem) => {
-    let instance = storeCtrl.checkedSpeciesList.filter(
-      (item: ISpeciesItem) => item.id == speciesItem.id,
-    )[0];
-    if (instance) {
-      let parentHeaders = [];
-      //所有id
-      let sortedSpecies = getSortedList(instance, []);
-      for (let species of sortedSpecies) {
-        if ((instance.attrs?.map((attr) => attr.speciesId) || []).includes(species.id)) {
-          let attrs =
-            instance.attrs?.filter((attr) => attr.speciesId == species.id) || [];
-          parentHeaders.push({
-            caption: attrs[0].species?.name || species.name,
-            children: attrs,
-          });
-        }
+  const loadAttrs = async (speciesArray: ISpeciesItem[]) => {
+    let parentHeaders: any[] = [];
+    let speciesIds = speciesArray.map((item) => item.id);
+    //带属性的分类
+    let instances = storeCtrl.checkedSpeciesList.filter((item: ISpeciesItem) =>
+      speciesIds.includes(item.id),
+    );
+    //属性set
+    let attrSet = new Set<XAttribute>();
+    for (let instance of instances) {
+      for (let attr of instance.attrs || []) {
+        attrSet.add(attr);
       }
-      setThingAttrs(parentHeaders);
-    } else {
-      setThingAttrs(undefined);
     }
+    let attrArray = Array.from(attrSet);
+    let sortedSpecies = getSortedList(instances, [], false);
+    debugger;
+    for (let species of sortedSpecies) {
+      if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
+        let attrs =
+          attrArray?.filter((attr: XAttribute) => attr.speciesId == species.id) || [];
+        parentHeaders.push({
+          caption: attrs[0].species?.name || species.name,
+          children: attrs,
+        });
+      }
+    }
+    // for (let speciesItem of speciesArray) {
+    //   let instance = storeCtrl.checkedSpeciesList.filter(
+    //     (item: ISpeciesItem) => item.id == speciesItem.id,
+    //   )[0];
+    //   if (instance) {
+    //     //所有id
+    //     let sortedSpecies = getSortedList(instance, []);
+    //     for (let species of sortedSpecies) {
+    //       if (
+    //         (instance.attrs?.map((attr) => attr.speciesId) || []).includes(species.id)
+    //       ) {
+    //         let attrs =
+    //           instance.attrs?.filter((attr) => attr.speciesId == species.id) || [];
+    //         parentHeaders.push({
+    //           caption: attrs[0].species?.name || species.name,
+    //           children: attrs,
+    //         });
+    //       }
+    //     }
+    //   }
+    // }
+    setThingAttrs(parentHeaders);
   };
 
   useEffect(() => {
     if (storeCtrl.checkedSpeciesList.length > 0) {
       if (props.checkedList && props.checkedList.length > 0) {
-        if (!props.checkedList.map((item) => item.key).includes(tabKey_)) {
-          setTabKey_(props.checkedList[0].key);
-          loadAttrs(props.checkedList[0].item);
-        }
+        // if (!props.checkedList.map((item) => item.key).includes(tabKey_)) {
+        //   setTabKey_(props.checkedList[0].key);
+        //   loadAttrs(props.checkedList[0].item);
+        // }
+        loadAttrs(props.checkedList.map((item) => item.item));
       } else if (props.current && userCtrl.space.id) {
-        loadAttrs(props.current);
+        loadAttrs([props.current]);
       }
     }
   }, [props.current, props.checkedList, storeCtrl.checkedSpeciesList]);
@@ -84,7 +125,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     return ids;
   };
 
-  const getComponent = (a: ISpeciesItem) => {
+  const getComponent = (speciesArray: ISpeciesItem[]) => {
     return (
       <>
         {thingAttrs && (
@@ -116,10 +157,16 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 SOURCE_OF_CULTURAL_RELICS: '1',
                 tagIds: '27466605935445008',
               },
-            ].filter(
-              (record) =>
-                // getParentAndSelfIds(a, []).includes(record.speciesItemId),
-                record.tagIds.indexOf(a.id) > -1,
+            ].filter((record) =>
+              // getParentAndSelfIds(a, []).includes(record.speciesItemId),
+              // record.tagIds.indexOf(a.id) > -1,
+              {
+                let hasTag = true;
+                for (let species of speciesArray) {
+                  hasTag = hasTag && record.tagIds.indexOf(species.id) > -1;
+                }
+                return hasTag;
+              },
             )}
             keyExpr="key"
             columnMinWidth={80}
@@ -183,25 +230,27 @@ const Thing: React.FC<IProps> = (props: IProps) => {
 
   return (
     <Card id={key} bordered={false}>
-      {props.checkedList && props.checkedList.length > 0 && (
-        // getComponent(props.checkedList.map((item) => item.item))
-        <Tabs
-          activeKey={tabKey_}
-          onChange={(key: any) => {
-            setTabKey_(key);
-            loadAttrs(props.checkedList?.filter((item) => item.key == key)[0].item);
-          }}
-          items={props.checkedList?.map((a) => {
-            return {
-              key: a.key,
-              label: a.label,
-              children: getComponent(a.item),
-            };
-          })}
-        />
-      )}
+      {
+        props.checkedList &&
+          props.checkedList.length > 0 &&
+          getComponent(props.checkedList.map((item) => item.item))
+        // (<Tabs
+        //     activeKey={tabKey_}
+        //     onChange={(key: any) => {
+        //       setTabKey_(key);
+        //       loadAttrs(props.checkedList?.filter((item) => item.key == key)[0].item);
+        //     }}
+        //     items={props.checkedList?.map((a) => {
+        //       return {
+        //         key: a.key,
+        //         label: a.label,
+        //         children: getComponent(a.item),
+        //       };
+        //     })}
+        //   />)
+      }
       {(!props.checkedList || props.checkedList.length == 0) &&
-        getComponent(props.current)}
+        getComponent([props.current])}
       {/* <CardOrTable
         dataSource={[]}
         columns={columns}
