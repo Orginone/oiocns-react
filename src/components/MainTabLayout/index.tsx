@@ -21,7 +21,8 @@ type MainLayoutType = {
   selectMenu: MenuItemType[];
   tabs: TabItemType[];
   tabKey?: string;
-  onSelect?: (items: MenuItemType[]) => void;
+  onSelect?: (items: MenuItemType) => void;
+  onCheck?: (items: MenuItemType[]) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };
 
@@ -66,12 +67,14 @@ const MainTabLayout: React.FC<MainLayoutType> = (props) => {
                     //   a.label == GroupMenuType.Books ? undefined : cls.customMenu
                     // }
                     onSelect={(item) => {
-                      props.onSelect?.apply(this, [[item]]);
+                      if (item.menuType != 'checkbox') {
+                        props.onSelect?.apply(this, [item]);
+                      }
                     }}
                     onMenuClick={(item, key) => {
                       props.onMenuClick?.apply(this, [item, key]);
                     }}
-                    onCheckedChange={props.onSelect}
+                    onCheckedChange={props.onCheck}
                     checkedList={props.selectMenu}
                   />
                 ),
@@ -99,7 +102,7 @@ const MainTabLayout: React.FC<MainLayoutType> = (props) => {
                   selectKey={props.selectMenu[0].key}
                   item={tabs?.filter((tab) => tab.key == tabKey_)[0]?.menu}
                   onSelect={(item) => {
-                    props.onSelect?.apply(this, [[item]]);
+                    props.onSelect?.apply(this, [item]);
                   }}
                 />
               )}
