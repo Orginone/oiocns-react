@@ -246,7 +246,7 @@ const Design: React.FC<DesignProps> = ({
         page: { offset: 0, limit: 100000, filter: '' },
       });
       // 查询特性
-      const attrRes = await current.loadAttrs(belongId, {
+      const attrRes = await current.loadAttrs(belongId, true, true, {
         offset: 0,
         limit: 100000,
         filter: '',
@@ -332,46 +332,49 @@ const Design: React.FC<DesignProps> = ({
     const activeItems = items[activeContainer];
     const overItems = items[overContainer];
     if (!overId) {
-      console.log('props', props);
-      // 目标容器为空
-      if (activeContainer === 'attrs') {
-        // 特性转表单项
-        const attr = items['attrs'].find((attr: any) => attr.id === active.id);
-        const operationItem = transformAttrToOperationItem(attr, operation.id);
-        const data = {
-          attrs: items['attrs'].filter((item: any) => {
-            return item.id !== active.id;
-          }),
-          operationItems: [...items['operationItems'], operationItem],
-        };
-        setOperationModel({
-          ...operation,
-          ...{ items: data['operationItems'] },
-          ...{
-            speciesItems: designSpeciesArray,
-          },
-        });
-        setItems(data);
-      } else if (activeContainer === 'operationItems') {
-        // 表单项转特性
-        const operationItem = items['operationItems'].find(
-          (oi: any) => oi.id === active.id,
-        );
-        const data = {
-          attrs: [...items['attrs'], transformOperationItemToAttr(operationItem)],
-          operationItems: items['operationItems'].filter((item: any) => {
-            return item.id !== active.id;
-          }),
-        };
-        setOperationModel({
-          ...operation,
-          ...{ items: data['operationItems'] },
-          ...{
-            speciesItems: designSpeciesArray,
-          },
-        });
-        setItems(data);
-        itemClick(operationItem);
+      const x: number = props.delta.x || 0;
+      const y: number = props.delta.y || 0;
+      if (x * x + y * y > 6400) {
+        // 目标容器为空
+        if (activeContainer === 'attrs') {
+          // 特性转表单项
+          const attr = items['attrs'].find((attr: any) => attr.id === active.id);
+          const operationItem = transformAttrToOperationItem(attr, operation.id);
+          const data = {
+            attrs: items['attrs'].filter((item: any) => {
+              return item.id !== active.id;
+            }),
+            operationItems: [...items['operationItems'], operationItem],
+          };
+          setOperationModel({
+            ...operation,
+            ...{ items: data['operationItems'] },
+            ...{
+              speciesItems: designSpeciesArray,
+            },
+          });
+          setItems(data);
+        } else if (activeContainer === 'operationItems') {
+          // 表单项转特性
+          const operationItem = items['operationItems'].find(
+            (oi: any) => oi.id === active.id,
+          );
+          const data = {
+            attrs: [...items['attrs'], transformOperationItemToAttr(operationItem)],
+            operationItems: items['operationItems'].filter((item: any) => {
+              return item.id !== active.id;
+            }),
+          };
+          setOperationModel({
+            ...operation,
+            ...{ items: data['operationItems'] },
+            ...{
+              speciesItems: designSpeciesArray,
+            },
+          });
+          setItems(data);
+          itemClick(operationItem);
+        }
       }
     } else if (activeContainer == overContainer) {
       // 相同容器

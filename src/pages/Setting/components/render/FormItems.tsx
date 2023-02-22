@@ -26,10 +26,11 @@ import ProFormGroup from './../render/widgets/ProFormGroup';
 const OioFormItem = (props: any) => {
   const { item } = props;
   const rule = JSON.parse(item.rule);
+  // Todo 规则校验
   // console.log('rule.rules', rule);
-  if (rule.rules && typeof rule.rules === 'string') {
-    rule.rules = JSON.parse(rule.rules);
-  }
+  // if (rule.rules && typeof rule.rules === 'string') {
+  //   rule.rules = JSON.parse(rule.rules);
+  // }
   switch (rule.widget) {
     case 'input':
     case 'string':

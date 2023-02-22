@@ -24,6 +24,8 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
       const res = await kernel.querySpeciesAttrs({
         id: sp.id,
         spaceId: userCtrl.space.id,
+        recursionOrg: true,
+        recursionSpecies: true,
         page: {
           offset: 0,
           limit: 10000,

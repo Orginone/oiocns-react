@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import userCtrl from '@/ts/controller/setting';
@@ -12,6 +12,8 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
+  recursionOrg: boolean;
+  recursionSpecies: boolean;
   setModalType: (modalType: string) => void;
 }
 
@@ -19,7 +21,14 @@ interface IProps {
  * @description: 分类特性标准
  * @return {*}
  */
-const Attritube = ({ current, target, modalType, setModalType }: IProps) => {
+const Attritube = ({
+  current,
+  target,
+  modalType,
+  recursionOrg,
+  recursionSpecies,
+  setModalType,
+}: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XAttribute>();
   // 操作内容渲染函数
@@ -44,8 +53,21 @@ const Attritube = ({ current, target, modalType, setModalType }: IProps) => {
     ];
   };
 
+  useEffect(() => {
+    tforceUpdate();
+  }, [recursionOrg]);
+
+  useEffect(() => {
+    tforceUpdate();
+  }, [recursionSpecies]);
+
   const loadAttrs = async (page: PageRequest) => {
-    return await current!.loadAttrs(userCtrl.space.id, true, true, page);
+    return await current!.loadAttrs(
+      userCtrl.space.id,
+      recursionOrg,
+      recursionSpecies,
+      page,
+    );
   };
   return (
     <>

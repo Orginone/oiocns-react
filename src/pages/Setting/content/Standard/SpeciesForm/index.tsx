@@ -8,6 +8,8 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
+  recursionOrg: boolean;
+  recursionSpecies: boolean;
   toFlowDesign: (operation: XOperation) => void;
   setModalType: (modalType: string) => void;
 }
@@ -20,6 +22,8 @@ const SpeciesForm = ({
   current,
   target,
   modalType,
+  recursionOrg,
+  recursionSpecies,
   toFlowDesign,
   setModalType,
 }: IProps) => {
@@ -37,6 +41,8 @@ const SpeciesForm = ({
       modalType={modalType}
       setModalType={setModalType}
       setTabKey={setTabKey}
+      recursionOrg={recursionOrg}
+      recursionSpecies={recursionSpecies}
       setSelectedOperation={setSelectedOperation}
     />
   ) : (
