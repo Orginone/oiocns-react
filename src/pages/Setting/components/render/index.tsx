@@ -5,36 +5,45 @@ import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import OioFormItem from './FormItems';
 import SpeciesTables from './SpeciesTables';
-import { XOperation, XOperationItem, XOperationRelation } from '@/ts/base/schema';
+import { XOperationItem, XOperationRelation } from '@/ts/base/schema';
 
 type OioFormProps = {
-  operationId?: string;
-  operation?: XOperation;
+  operationId: string;
+  operationItems?: XOperationItem[];
+  designSps?: any[];
   onValuesChange: (values: any) => void;
 };
 
 /**
  * 奥集能表单
  */
-const OioForm: React.FC<OioFormProps> = ({ operationId }) => {
+const OioForm: React.FC<OioFormProps> = ({ operationId, operationItems, designSps }) => {
   const [sps, setSps] = useState<any[]>([]);
   const [items, setItems] = useState<XOperationItem[]>([]);
   useEffect(() => {
     const queryItems = async () => {
-      // 查询类别子表
-      const speciesRes = await kernel.queryOperationSpeciesItems({
-        id: operationId as string,
-        spaceId: userCtrl.space.id,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      setSps(speciesRes.data.result as XOperationRelation[]);
-      // 查询操作项
-      const operateItemRes = await kernel.queryOperationItems({
-        id: operationId as string,
-        spaceId: userCtrl.space.id,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      setItems(operateItemRes.data.result as XOperationItem[]);
+      // 类别子表
+      if (designSps && designSps.length > 0) {
+        setSps(designSps);
+      } else {
+        const speciesRes = await kernel.queryOperationSpeciesItems({
+          id: operationId as string,
+          spaceId: userCtrl.space.id,
+          page: { offset: 0, limit: 100000, filter: '' },
+        });
+        setSps(speciesRes.data.result as XOperationRelation[]);
+      }
+      // 表单项
+      if (operationItems && operationItems.length > 0) {
+        setItems(operationItems);
+      } else {
+        const operateItemRes = await kernel.queryOperationItems({
+          id: operationId as string,
+          spaceId: userCtrl.space.id,
+          page: { offset: 0, limit: 100000, filter: '' },
+        });
+        setItems(operateItemRes.data.result as XOperationItem[]);
+      }
     };
     queryItems();
   }, [operationId]);
