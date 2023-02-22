@@ -59,13 +59,15 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       speciesIds.includes(item.id),
     );
     //属性set
-    let attrSet = new Set<XAttribute>();
+    let attrArray: XAttribute[] = [];
     for (let instance of instances) {
       for (let attr of instance.attrs || []) {
-        attrSet.add(attr);
+        if (!attrArray.map((item) => item.id).includes(attr.id)) {
+          attrArray.push(attr);
+        }
       }
     }
-    let attrArray = Array.from(attrSet);
+
     let sortedSpecies = getSortedList(instances, [], false);
     for (let species of sortedSpecies) {
       if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
