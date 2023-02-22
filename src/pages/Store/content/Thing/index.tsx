@@ -149,13 +149,14 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             showRowLines={true}
             rowAlternationEnabled={true}
             hoverStateEnabled={true}
-            height={'calc(100vh - 240px)'}
+            height={'calc(100vh - 175px)'}
             showBorders={true}>
             <ColumnChooser
               enabled={true}
               title={'列选择器'}
               height={'500px'}
               allowSearch={true}
+              mode={'select'}
               sortOrder={'asc'}
             />
             <ColumnFixing enabled={true} />
