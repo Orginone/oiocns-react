@@ -1,11 +1,12 @@
 import React from 'react';
 import { Avatar } from 'antd';
 import * as im from 'react-icons/im';
-import { ITodoGroup } from '@/ts/core';
+import { ISpeciesItem, ITodoGroup } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting/';
 import { GroupMenuType } from './menuType';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { AppstoreAddOutlined, FileSyncOutlined, ToTopOutlined } from '@ant-design/icons';
+import { FileSyncOutlined, ToTopOutlined } from '@ant-design/icons';
+import { MenuItemType } from 'typings/globelType';
 
 export const loadPlatformMenu = async () => {
   return [
@@ -53,30 +54,20 @@ export const loadPlatformMenu = async () => {
   ];
 };
 
-export const loadApplicationMenu = async () => {
-  let sum = 0;
-  let children = [];
-  for (var todo of todoCtrl.AppTodo) {
-    let count = await todo.getCount();
-    children.push({
-      key: todo.id!,
-      label: todo.name,
-      itemType: GroupMenuType.Application,
-      icon: <im.ImSteam />,
-      item: todo,
-      count: count,
-      children: [],
-    });
-    sum += count;
-  }
-  return {
-    key: GroupMenuType.Application,
-    label: GroupMenuType.Application,
-    itemType: GroupMenuType.Application,
-    icon: <AppstoreAddOutlined />,
-    children: children,
-    count: sum,
-  };
+/** 获取事菜单 */
+export const loadThingMenus = async (isWork: boolean = false) => {
+  const root = await userCtrl.space.loadSpeciesTree();
+  const species = root?.children?.find((item) => item.name == '事') || null;
+  return species
+    ? await buildSpeciesTree(species, '事', isWork)
+    : {
+        children: [],
+        key: '事',
+        label: '事',
+        itemType: '事',
+        item: species,
+        icon: <im.ImNewspaper />,
+      };
 };
 
 const loadMarket = async () => {
@@ -156,4 +147,43 @@ const loadOrgChildren = async (todoGroups: ITodoGroup[]) => {
     children: children,
     count: sum,
   };
+};
+
+/** 编译分类树 */
+const buildSpeciesTree = async (
+  species: ISpeciesItem,
+  itemType: string,
+  isWork: boolean,
+): Promise<MenuItemType> => {
+  let children: MenuItemType[] = [];
+  species.children.forEach(async (a) => {
+    children.push(await buildSpeciesTree(a, itemType, isWork));
+  });
+  const result: MenuItemType = {
+    key: species.id,
+    item: species,
+    label: species.name,
+    icon: <im.ImNewspaper />,
+    itemType: itemType,
+    menus: [],
+    children: children,
+  };
+  const res = await species.loadOperations(userCtrl.space.id, true, true, {
+    offset: 0,
+    limit: 1000,
+    filter: '',
+  });
+  res.result?.forEach((a) => {
+    result.children.push({
+      key: a.id,
+      item: a,
+      label: a.name,
+      icon: <im.ImNewspaper />,
+      itemType: itemType,
+      menuType: isWork ? 'checkbox' : undefined,
+      menus: [],
+      children: [],
+    });
+  });
+  return result;
 };

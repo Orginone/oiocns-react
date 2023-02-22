@@ -32,7 +32,7 @@ const AttributeModal = (props: Iprops) => {
   };
   useEffect(() => {
     current
-      .loadDictsEntity(userCtrl.space.id, {
+      .loadDictsEntity(userCtrl.space.id, true, true, {
         offset: 0,
         limit: 10000,
         filter: '',

@@ -96,7 +96,7 @@ const Operation = ({
   // 加载业务表单列表
   const loadOperations = async (page: PageRequest) => {
     if (userCtrl.space.id && page) {
-      return await current!.loadOperations(userCtrl.space.id, page);
+      return await current!.loadOperations(userCtrl.space.id, true, true, page);
     }
   };
 

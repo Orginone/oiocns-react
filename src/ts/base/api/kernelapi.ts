@@ -521,11 +521,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类的度量标准
-   * @param {model.IdSpaceReq} params 请求参数
+   * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
    */
   public async querySpeciesAttrs(
-    params: model.IdSpaceReq,
+    params: model.IdSpeciesReq,
   ): Promise<model.ResultType<schema.XAttributeArray>> {
     return await this.request({
       module: 'thing',
@@ -536,11 +536,11 @@ export default class KernelApi {
 
   /**
    * 查询分类的业务标准
-   * @param {model.IdSpaceReq} params 请求参数
+   * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XOperationArray>} 请求结果
    */
   public async querySpeciesOperation(
-    params: model.IdSpaceReq,
+    params: model.IdSpeciesReq,
   ): Promise<model.ResultType<schema.XOperationArray>> {
     return await this.request({
       module: 'thing',
@@ -578,11 +578,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类字典
-   * @param {model.IdSpaceReq} params 请求参数
+   * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
   public async querySpeciesDict(
-    params: model.IdSpaceReq,
+    params: model.IdSpeciesReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
