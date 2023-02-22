@@ -56,6 +56,41 @@ export type XAttributeArray = {
   result: XAttribute[] | undefined;
 };
 
+export type XOperationRelation = {
+  // 雪花ID
+  id: string;
+  // 子表分类ID
+  speciesId: string;
+  // 表单设计
+  operationId: string;
+  // 归属个人/组织
+  belongId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+};
+
+//度量特性定义查询返回集合
+export type XOperationRelationArray = {
+  // 偏移量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XOperationRelation[] | undefined;
+};
+
 //业务标准定义
 export type XOperation = {
   // 雪花ID
@@ -72,6 +107,8 @@ export type XOperation = {
   speciesId: string;
   // 创建组织/个人
   belongId: string;
+  // 绑定的流程ID
+  defineId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -84,10 +121,14 @@ export type XOperation = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 绑定的流程
+  flow: XFlowDefine | undefined;
   // 度量特性对应的类别
   species: XSpecies | undefined;
   // 创建度量标准的组织/个人
   belong: XTarget | undefined;
+  // 子表绑定的分类
+  operationRelations: XOperationRelation[] | undefined;
 };
 
 //业务标准查询返回集合
@@ -118,6 +159,8 @@ export type XOperationItem = {
   operationId: string;
   // 创建组织/个人
   belongId: string;
+  // 绑定的特性ID
+  attrId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -134,6 +177,8 @@ export type XOperationItem = {
   operation: XOperation | undefined;
   // 创建度量标准的组织/个人
   belong: XTarget | undefined;
+  // 绑定的特性
+  attr: XAttribute | undefined;
 };
 
 //业务标准查询返回集合

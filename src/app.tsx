@@ -5,7 +5,6 @@ import { HashRouter } from 'react-router-dom';
 
 import routes from '@/routes';
 import './global.less';
-
 // import enUS from 'antd/es/locale/en_US';
 import zhCN from 'antd/es/locale/zh_CN';
 import moment from 'moment';

@@ -12,6 +12,7 @@ const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [checkedList, setCheckedList] = useState<any[]>([]);
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -30,7 +31,19 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      checkedList={checkedList}
+      onTabChanged={(tabKey) => {
+        storeCtrl.setTabIndex(tabKey);
+        setCheckedList([]);
+        refreshMenu();
+      }}
+      tabKey={storeCtrl.tabIndex}
+      onCheckedChange={(checkedList: any[]) => {
+        setCheckedList(checkedList);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={
@@ -43,7 +56,7 @@ const Package: React.FC = () => {
           setOperateTarget(undefined);
         }}
       />
-      <Content key={key} selectMenu={selectMenu} />
+      <Content key={key} selectMenu={selectMenu} checkedList={checkedList} />
     </MainLayout>
   );
 };

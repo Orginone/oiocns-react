@@ -13,6 +13,7 @@ import userCtrl from '../setting';
 
 /** 待办控制器 */
 class TodoController extends Emitter {
+  private _tabIndex: string = '1';
   public currentKey: string = '';
   private _orgTodo: ITodoGroup[] = [];
   private _pubTodo: ITodoGroup[] = [];
@@ -99,6 +100,14 @@ class TodoController extends Emitter {
       sum += await this._appTodo[i]?.getCount();
     }
     return sum;
+  }
+  /** 页面Tab控制序列 */
+  public get tabIndex() {
+    return this._tabIndex;
+  }
+  public setTabIndex(index: string): void {
+    this._tabIndex = index;
+    this.changCallback();
   }
 }
 

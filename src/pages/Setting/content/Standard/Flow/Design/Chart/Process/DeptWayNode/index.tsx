@@ -119,7 +119,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             key={key}
             onChange={onChange}
             orgId={orgId}
-            value={props.config.conditions[0]?.val}></SelectOrg>
+            value={props.config.conditions[0]?.val}
+            rootDisable={false}></SelectOrg>
         )}
         {!editable && userCtrl.getBelongName(props.config.conditions[0]?.val)}
       </span>

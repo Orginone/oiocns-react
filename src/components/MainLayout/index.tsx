@@ -1,9 +1,9 @@
-import { Col, Divider, Dropdown, Layout, Row, Space, Typography } from 'antd';
-import React, { useState } from 'react';
+import { Col, Divider, Dropdown, Layout, Row, Space, Typography, Tabs } from 'antd';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import {
   EllipsisOutlined,
   MenuFoldOutlined,
@@ -20,6 +20,11 @@ type MainLayoutType = {
   siderMenuData: MenuItemType;
   rightBar?: React.ReactNode;
   selectMenu: MenuItemType;
+  tabs?: TabItemType[];
+  checkedList: any[];
+  tabKey?: string;
+  onTabChanged: (tabKey: string) => void;
+  onCheckedChange: Function;
   onSelect?: (item: MenuItemType) => void;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
 };
@@ -31,7 +36,24 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const { className, siderMenuData, children } = props;
+  const {
+    className,
+    siderMenuData,
+    children,
+    tabs,
+    checkedList,
+    tabKey,
+    onTabChanged,
+    onCheckedChange,
+  } = props;
+  const [tabKey_, setTabKey_] = useState<string>(tabKey || '1');
+  useEffect(() => {
+    setTabKey_(tabKey || '1');
+    if (tabs) {
+      onTabChanged(tabKey || '1');
+    }
+  }, [tabKey]);
+
   const [collapsed, setCollapsed] = useState(false);
   return (
     <Layout className={`${className}`} style={{ height: '100%', position: 'relative' }}>
@@ -40,23 +62,81 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           <span style={{ fontSize: 16, margin: 6 }}>{props.selectMenu.icon}</span>
           {!collapsed && <strong>{props.selectMenu.label}</strong>}
         </div>
+
         <div className={cls.container} id="templateMenu">
-          <CustomMenu
-            item={siderMenuData}
-            selectMenu={props.selectMenu}
-            onSelect={(item) => {
-              props.onSelect?.apply(this, [item]);
-            }}
-            onMenuClick={(item, key) => {
-              props.onMenuClick?.apply(this, [item, key]);
-            }}
-          />
+          {!tabs && (
+            <CustomMenu
+              item={siderMenuData}
+              selectMenu={props.selectMenu}
+              onSelect={(item) => {
+                props.onSelect?.apply(this, [item]);
+              }}
+              onMenuClick={(item, key) => {
+                props.onMenuClick?.apply(this, [item, key]);
+              }}
+              onCheckedChange={onCheckedChange}
+              checkedList={checkedList}
+            />
+          )}
+          {tabs && (
+            <Tabs
+              centered
+              activeKey={tabKey_}
+              onChange={(key: any) => {
+                setTabKey_(key);
+                onTabChanged(key);
+                // setSelectTab(menuData.find((a) => a.key == key));
+              }}
+              items={tabs.map((a) => {
+                return {
+                  key: a.key,
+                  label: a.label,
+                  children: (
+                    <CustomMenu
+                      item={a.menu}
+                      selectMenu={props.selectMenu}
+                      // menuStyle={
+                      //   a.label == GroupMenuType.Books ? undefined : cls.customMenu
+                      // }
+                      onSelect={(item) => {
+                        props.onSelect?.apply(this, [item]);
+                      }}
+                      onMenuClick={(item, key) => {
+                        props.onMenuClick?.apply(this, [item, key]);
+                      }}
+                      onCheckedChange={onCheckedChange}
+                      checkedList={checkedList}
+                    />
+                  ),
+                };
+              })}
+            />
+          )}
         </div>
       </Sider>
       <Layout className={cls.container}>
         <Row className={cls[`content-top`]} justify="space-between">
           <Col>
-            {
+            {tabs && tabs?.filter((tab) => tab.key == tabKey_)[0]?.menu && (
+              <CustomBreadcrumb
+                key={tabKey_}
+                leftBar={
+                  <Typography.Link
+                    style={{ fontSize: 16 }}
+                    onClick={() => {
+                      setCollapsed(!collapsed);
+                    }}>
+                    {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  </Typography.Link>
+                }
+                selectKey={props.selectMenu.key}
+                item={tabs?.filter((tab) => tab.key == tabKey_)[0]?.menu}
+                onSelect={(item) => {
+                  props.onSelect?.apply(this, [item]);
+                }}
+              />
+            )}
+            {!tabs && (
               <CustomBreadcrumb
                 leftBar={
                   <Typography.Link
@@ -73,7 +153,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   props.onSelect?.apply(this, [item]);
                 }}
               />
-            }
+            )}
           </Col>
           <Col className={cls.rightstyle}>
             <Space wrap split={<Divider type="vertical" />} size={2}>

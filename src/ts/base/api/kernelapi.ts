@@ -288,16 +288,16 @@ export default class KernelApi {
     });
   }
   /**
-   * 创建业务标准项
-   * @param {model.OperationModel} params 请求参数
-   * @returns {model.ResultType<schema.XOperation>} 请求结果
+   * 创建业务标准子项
+   * @param {model.OperationItemModel} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async createOperationItem(
+  public async createOperationItems(
     params: model.OperationItemModel,
-  ): Promise<model.ResultType<schema.XOperationItem>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
-      action: 'CreateOperationItem',
+      action: 'CreateOperationItems',
       params: params,
     });
   }
@@ -358,20 +358,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 删除业务标准项
-   * @param {model.IdReqModel} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteOperationItem(
-    params: model.IdReqModel,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteOperationItem',
-      params: params,
-    });
-  }
-  /**
    * 删除物
    * @param {model.IdReqModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
@@ -422,20 +408,6 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'UpdateOperation',
-      params: params,
-    });
-  }
-  /**
-   * 更新业务标准项
-   * @param {model.OperationModel} params 请求参数
-   * @returns {model.ResultType<schema.XOperationItem>} 请求结果
-   */
-  public async updateOperationItem(
-    params: model.OperationItemModel,
-  ): Promise<model.ResultType<schema.XOperationItem>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateOperationItem',
       params: params,
     });
   }
@@ -525,10 +497,13 @@ export default class KernelApi {
   }
   /**
    * 查询分类树
+   * @param {string} id 根分类ID
    * @param {string} targetId 组织ID
+   * @param {string} filter 过滤内容
    * @returns {model.ResultType<schema.XSpecies>} 请求结果
    */
   public async querySpeciesTree(
+    id: string,
     targetId: string,
     filter: string,
   ): Promise<model.ResultType<schema.XSpecies>> {
@@ -536,7 +511,8 @@ export default class KernelApi {
       module: 'thing',
       action: 'QuerySpeciesTree',
       params: {
-        id: targetId,
+        id: id,
+        spaceId: targetId,
         page: {
           filter: filter,
         },
@@ -545,11 +521,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类的度量标准
-   * @param {model.IdSpaceReq} params 请求参数
+   * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
    */
   public async querySpeciesAttrs(
-    params: model.IdSpaceReq,
+    params: model.IdSpeciesReq,
   ): Promise<model.ResultType<schema.XAttributeArray>> {
     return await this.request({
       module: 'thing',
@@ -560,11 +536,11 @@ export default class KernelApi {
 
   /**
    * 查询分类的业务标准
-   * @param {model.IdSpaceReq} params 请求参数
+   * @param {model.IdOperationReq} params 请求参数
    * @returns {model.ResultType<schema.XOperationArray>} 请求结果
    */
   public async querySpeciesOperation(
-    params: model.IdSpaceReq,
+    params: model.IdOperationReq,
   ): Promise<model.ResultType<schema.XOperationArray>> {
     return await this.request({
       module: 'thing',
@@ -587,12 +563,26 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询分类字典
+   * 查询分类的业务子表项
    * @param {model.IdSpaceReq} params 请求参数
+   * @returns {model.ResultType<schema.XOperationRelationArray>} 请求结果
+   */
+  public async queryOperationSpeciesItems(
+    params: model.IdSpaceReq,
+  ): Promise<model.ResultType<schema.XOperationRelationArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryOperationSpeciesItems',
+      params: params,
+    });
+  }
+  /**
+   * 查询分类字典
+   * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
   public async querySpeciesDict(
-    params: model.IdSpaceReq,
+    params: model.IdSpeciesReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
@@ -2254,11 +2244,11 @@ export default class KernelApi {
   /**
    * 创建流程绑定
    * @param {model.FlowRelationModel} params 请求参数
-   * @returns {model.ResultType<schema.XFlowRelation>} 请求结果
+   * @returns {model.ResultType<schema.boolean>} 请求结果
    */
   public async createFlowRelation(
     params: model.FlowRelationModel,
-  ): Promise<model.ResultType<schema.XFlowRelation>> {
+  ): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'flow',
       action: 'CreateFlowRelation',
@@ -2286,20 +2276,6 @@ export default class KernelApi {
     return await this.request({
       module: 'flow',
       action: 'DeleteInstance',
-      params: params,
-    });
-  }
-  /**
-   * 删除流程绑定
-   * @param {model.IdReq} params 请求参数 业务标准Id
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteFlowRelation(
-    params: model.IdReq,
-  ): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'flow',
-      action: 'DeleteFlowRelation',
       params: params,
     });
   }
@@ -2346,12 +2322,12 @@ export default class KernelApi {
   }
   /**
    * 查询应用业务与定义的绑定关系
-   * @param {model.QueryDefineRelationReq} params 请求参数
-   * @returns {model.ResultType<schema.XFlowRelationArray>} 请求结果
+   * @param {model.IDBelongReq} params 请求参数
+   * @returns {model.ResultType<schema.XOperationArray>} 请求结果
    */
   public async queryDefineRelation(
-    params: model.QueryDefineRelationReq,
-  ): Promise<model.ResultType<schema.XFlowRelationArray>> {
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XOperationArray>> {
     return await this.request({
       module: 'flow',
       action: 'QueryDefineRelation',

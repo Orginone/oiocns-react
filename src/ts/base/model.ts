@@ -89,22 +89,40 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type IdSpeciesReq = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 是否递归分类
+  recursionSpecies: boolean;
+  // 分页
+  page: PageRequest;
+};
+export type IdOperationReq = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否职权过滤
+  filterAuth: boolean;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 是否递归分类
+  recursionSpecies: boolean;
+  // 分页
+  page: PageRequest;
+};
+
 export type QueryDefineReq = {
   // 分类ID
   speciesId: string;
   // 空间ID
   spaceId: string;
-  // 是否严格模式 true:只筛选属于该空间的流程定义 false:筛选该分类下可见的流程定义
-  isStrict: boolean;
   // 分页
   page: PageRequest;
-};
-
-export type QueryDefineRelationReq = {
-  // 定义id
-  defineId?: string;
-  // 业务id
-  operationId?: string;
 };
 
 export type SpaceAuthReq = {
@@ -363,23 +381,41 @@ export type OperationModel = {
   defineId?: string;
   // 业务发起职权Id
   beginAuthId?: string;
+  // 子项列表
+  items: OperationItem[];
+  // 子表分类ID集合
+  speciesItems: OperationRelation[];
 };
 
 export type OperationItemModel = {
-  // 唯一ID
-  id?: string;
+  // 创建组织/个人
+  spaceId: string;
+  // 业务Id
+  operationId: string;
+  // 子项集合
+  operationItems: OperationItem[];
+  // 子表集合
+  SpeciesItems: OperationRelation[];
+};
+
+export type OperationRelation = {
+  // 规则
+  rule: string;
+  // 备注
+  speciesId: string;
+};
+
+export type OperationItem = {
   // 名称
   name: string;
   // 编号
   code: string;
+  // 绑定的特性ID
+  attrId: string;
   // 规则
   rule: string;
   // 备注
   remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 业务Id
-  operationId: string;
 };
 
 export type AuthorityModel = {

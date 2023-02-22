@@ -7,8 +7,6 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
-import { kernel } from '@/ts/base';
-import { SpeciesItem } from '@/ts/core/target/species/species';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -80,6 +78,30 @@ export const loadFileSysItemMenus = (
   return menus;
 };
 
+/** 获取数据菜单 */
+export const getDataMenus = () => {
+  return {
+    key: '数据',
+    label: '数据',
+    itemType: GroupMenuType.Data,
+    icon: <im.ImDatabase></im.ImDatabase>,
+    item: storeCtrl.root,
+    children: [],
+  };
+};
+
+/** 获取资源菜单 */
+export const getResourceMenus = () => {
+  return {
+    key: '资源',
+    label: '资源',
+    itemType: GroupMenuType.Resource,
+    icon: <im.ImCloudDownload></im.ImCloudDownload>,
+    item: storeCtrl.root,
+    children: [],
+  };
+};
+
 /** 获取应用程序菜单 */
 export const getAppliactionMenus = () => {
   return {
@@ -123,33 +145,62 @@ export const getThingMenus = async () => {
   const species =
     root && root.children ? root.children.filter((item) => item.name == '物')[0] : null;
   return species
-    ? buildSpeciesTree(species)
+    ? buildSpeciesTree(species, GroupMenuType.Thing)
     : {
         children: [],
         key: '物',
         label: '物',
         itemType: GroupMenuType.Thing,
-        item: userCtrl.space,
+        item: species,
+        icon: <im.ImNewspaper />,
+      };
+};
+
+/** 获取财菜单 */
+export const getWelMenus = async () => {
+  const root = await userCtrl.space.loadSpeciesTree();
+  const species =
+    root && root.children ? root.children.filter((item) => item.name == '财')[0] : null;
+  return species
+    ? buildSpeciesTree(species, GroupMenuType.Wel)
+    : {
+        children: [],
+        key: '财',
+        label: '财',
+        itemType: GroupMenuType.Wel,
+        item: species,
         icon: <im.ImNewspaper />,
       };
 };
 
 /** 编译分类树 */
-export const buildSpeciesTree = (species: ISpeciesItem): MenuItemType => {
+export const buildSpeciesTree = (
+  species: ISpeciesItem,
+  itemType: string,
+  menuType?: string,
+): MenuItemType => {
   const result: MenuItemType = {
     key: species.id,
     item: species,
     label: species.name,
     icon: <im.ImNewspaper />,
-    itemType: GroupMenuType.Thing,
-    // menus: loadSpeciesMenus(species),
-    children: species.children?.map((i) => buildSpeciesTree(i)) ?? [],
+    itemType: itemType,
+    menuType: menuType,
+    menus: loadSpeciesMenus(species),
+    children:
+      species.children?.map((i) => buildSpeciesTree(i, itemType, 'checkbox')) ?? [],
   };
   return result;
 };
 
 /** 加载右侧菜单 */
 export const loadSpeciesMenus = (item: ISpeciesItem) => {
-  const items: any[] = [];
+  const items: OperateMenuType[] = [
+    {
+      key: '数据形式',
+      label: '数据形式',
+      icon: <im.ImPlus />,
+    },
+  ];
   return items;
 };

@@ -165,6 +165,7 @@ const Design: React.FC<IProps> = ({
               page: { offset: 0, limit: 1000, filter: '' },
             });
             let instance_: any = res.data.result ? res.data.result[0] : undefined;
+            setInstance(instance_);
             showTask(instance_, resourceData);
           } else {
             setResource(resourceData);
@@ -632,6 +633,9 @@ const Design: React.FC<IProps> = ({
     if (resource.id && map.get(resource.id) != undefined) {
       resource._passed = map.get(resource.id);
       resource.task = taskmap.get(resource.id);
+    } else {
+      resource._passed = undefined;
+      resource.task = undefined;
     }
     if (resource.children) {
       resource.children = changeNodeStatus(resource.children, map, taskmap);
@@ -647,16 +651,19 @@ const Design: React.FC<IProps> = ({
   const showTask = (instance: any, resource: any) => {
     let map = new Map<string, number>();
     let taskmap = new Map<string, any>();
-    for (let task of instance.historyTasks) {
-      let _passed = 1;
-      if (task.status >= 200) {
-        _passed = 0;
-      } else if (task.status >= 100 && task.status < 200) {
-        _passed = 2;
+    if (instance.historyTasks) {
+      for (let task of instance.historyTasks) {
+        let _passed = 1;
+        if (task.status >= 200) {
+          _passed = 0;
+        } else if (task.status >= 100 && task.status < 200) {
+          _passed = 2;
+        }
+        map.set(task.nodeId, _passed);
+        taskmap.set(task.nodeId, task);
       }
-      map.set(task.nodeId, _passed);
-      taskmap.set(task.nodeId, task);
     }
+
     let resource_showState = changeNodeStatus(resource, map, taskmap);
     setResource(resource_showState);
   };
@@ -668,7 +675,6 @@ const Design: React.FC<IProps> = ({
       page: { offset: 0, limit: 1000, filter: '' },
     });
     let instance: any = res.data.result ? res.data.result[0] : undefined;
-
     if (freshed) {
       setInstance(instance);
       showTask(instance, resource);
@@ -677,21 +683,25 @@ const Design: React.FC<IProps> = ({
 
     if (!freshed && instance) {
       let needFresh = false;
-      for (let task of instance.historyTasks) {
-        if (task.status == 1) {
-          let approvalResult = await kernel.approvalTask({
-            id: task.id,
-            status: 100,
-            comment: '经评审讨论通过',
-          });
-          if (approvalResult.success) {
-            message.success('审核成功');
-            needFresh = true;
-          } else {
-            message.error('审核失败');
+      if (instance.historyTasks) {
+        for (let task of instance.historyTasks) {
+          if (task.status == 1) {
+            let approvalResult = await kernel.approvalTask({
+              id: task.id,
+              status: 100,
+              comment: '经评审讨论通过',
+            });
+            if (approvalResult.success) {
+              message.success('审核成功');
+              // next(instanceId, belongId, true);
+              needFresh = true;
+            } else {
+              message.error('审核失败');
+            }
           }
         }
       }
+
       if (needFresh) {
         next(instanceId, belongId, true);
       }

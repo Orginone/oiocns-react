@@ -20,10 +20,10 @@ const ViewCardModal = (props: FormDesignProps) => {
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
-    if (props.data) {
+    if (data?.id) {
       const queryItems = async () => {
         const res = await kernel.queryOperationItems({
-          id: props.data?.id as string,
+          id: data?.id as string,
           spaceId: userCtrl.space.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });

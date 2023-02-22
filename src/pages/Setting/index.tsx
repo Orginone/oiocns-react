@@ -455,8 +455,10 @@ const TeamSetting: React.FC = () => {
                 switch (item.typeName) {
                   case TargetType.Group:
                     userCtrl.company.quitGroup((data.item as ITarget).id);
+                    break;
                   case TargetType.Cohort:
                     userCtrl.user.quitCohorts((data.item as ITarget).id);
+                    break;
                 }
                 refreshMenu();
               },
@@ -478,7 +480,10 @@ const TeamSetting: React.FC = () => {
             break;
         }
       }}
-      siderMenuData={menus}>
+      siderMenuData={menus}
+      onCheckedChange={(checkedKeyList: string[]) => {}}
+      checkedList={[]}
+      onTabChanged={() => {}}>
       {/** 组织模态框 */}
       <TeamModal
         title={operateKeys[0]}

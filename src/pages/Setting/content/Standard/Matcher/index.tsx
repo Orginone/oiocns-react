@@ -157,7 +157,7 @@ const Matcher = (props: any, ref: any) => {
         //查询源和目标的特性
         let sourceAttrs: XAttribute[] =
           (
-            await sourceSpecies.loadAttrs(sourceCompany?.id || '', {
+            await sourceSpecies.loadAttrs(sourceCompany?.id || '', true, true, {
               offset: 0,
               limit: 1000,
               filter: '',
@@ -166,7 +166,7 @@ const Matcher = (props: any, ref: any) => {
         setSourceAttrs(sourceAttrs);
         let targetAttrs: XAttribute[] =
           (
-            await targetSpecies.loadAttrs(targetCompany?.id || '', {
+            await targetSpecies.loadAttrs(targetCompany?.id || '', true, true, {
               offset: 0,
               limit: 1000,
               filter: '',
@@ -179,13 +179,13 @@ const Matcher = (props: any, ref: any) => {
           .map((item) => item.dictId);
 
         let sourceDicts: IDict[] =
-          (await sourceSpecies.loadDictsEntity(sourceCompany?.id || '', {
+          (await sourceSpecies.loadDictsEntity(sourceCompany?.id || '', true, true, {
             offset: 0,
             limit: 1000,
             filter: '',
           })) || [];
         let targetDicts: IDict[] =
-          (await targetSpecies.loadDictsEntity(targetCompany?.id || '', {
+          (await targetSpecies.loadDictsEntity(targetCompany?.id || '', true, true, {
             offset: 0,
             limit: 1000,
             filter: '',
@@ -297,7 +297,7 @@ const Matcher = (props: any, ref: any) => {
         // setMatchDicts(matchDicts);
       }
     } else if (sourceSpecies) {
-      let res = await sourceSpecies.loadAttrs(sourceCompany?.id || '', {
+      let res = await sourceSpecies.loadAttrs(sourceCompany?.id || '', true, true, {
         offset: 0,
         limit: 1000,
         filter: '',
@@ -321,7 +321,7 @@ const Matcher = (props: any, ref: any) => {
         }) || [],
       );
     } else if (targetSpecies) {
-      let res = await targetSpecies.loadAttrs(targetCompany?.id || '', {
+      let res = await targetSpecies.loadAttrs(targetCompany?.id || '', true, true, {
         offset: 0,
         limit: 1000,
         filter: '',

@@ -42,19 +42,36 @@ export interface ISpeciesItem {
   /** 加载信息 */
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
-  loadAttrs(id: string, page: PageRequest): Promise<XAttributeArray>;
-  /** 加载分类字典 */
-  loadDicts(id: string, page: PageRequest): Promise<XDictArray>;
-  /** 加载分类字典实体 */
-  loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]>;
-  /** 加载业务标准 */
-  loadOperations(id: string, page: PageRequest): Promise<XOperationArray>;
-  /** 加载流程设计 */
-  loadFlowDefines(
+  loadAttrs(
     id: string,
-    isStrict: boolean,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
     page: PageRequest,
-  ): Promise<XFlowDefineArray>;
+  ): Promise<XAttributeArray>;
+  /** 加载分类字典 */
+  loadDicts(
+    id: string,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<XDictArray>;
+  /** 加载分类字典实体 */
+  loadDictsEntity(
+    spaceId: string,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<IDict[]>;
+  /** 加载业务标准 */
+  loadOperations(
+    id: string,
+    filterAuth: boolean,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<XOperationArray>;
+  /** 加载流程设计 */
+  loadFlowDefines(id: string, page: PageRequest): Promise<XFlowDefineArray>;
   /**
    * 创建标准分类项
    * @param data 创建参数

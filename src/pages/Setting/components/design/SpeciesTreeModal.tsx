@@ -9,7 +9,9 @@ type SpeciesTreeModalProps = {
   handleCancel: () => void;
   handleOk: (success: boolean, species: any[]) => void;
 };
-
+/**
+ * 类别选择模态框
+ */
 const SpeciesTreeModal: React.FC<SpeciesTreeModalProps> = ({
   open,
   spaceId,
@@ -19,7 +21,7 @@ const SpeciesTreeModal: React.FC<SpeciesTreeModalProps> = ({
 }) => {
   const [treeData, setTreeData] = useState<ISpeciesItem[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(speciesIds);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [checkedNodes, setCheckedNodes] = useState<any[]>([]);
 

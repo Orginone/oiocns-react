@@ -4,6 +4,7 @@ import userCtrl from '@/ts/controller/setting';
 import { ICompany, ITarget } from '@/ts/core';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
+  rootDisable?: boolean;
   company?: ICompany;
   orgId?: string;
   value?: string;
@@ -20,7 +21,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
       tree = await userCtrl.getTeamTree();
     }
 
-    let targets = buildTargetTree(tree, false);
+    let targets = buildTargetTree(tree, false, 0);
     setTreeData(targets);
   };
   const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
@@ -34,7 +35,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     });
   };
   /** 加载组织树 */
-  const buildTargetTree = (targets: ITarget[], isChild: boolean) => {
+  const buildTargetTree = (targets: ITarget[], isChild: boolean, level: number) => {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
@@ -43,10 +44,14 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
             result.push({
               label: item.teamName,
               value: item.id,
-              children: buildTargetTree(item.subTeam, true),
+              disabled: props.rootDisable && level == 0,
+              children: [
+                ...[{ label: '其他', value: '0' }],
+                ...buildTargetTree(item.subTeam, true, level + 1),
+              ],
             });
           } else {
-            let children = buildTargetTree(item.subTeam, false);
+            let children = buildTargetTree(item.subTeam, false, level + 1);
             for (let child of children) {
               result.push(child);
             }
@@ -55,7 +60,8 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
           result.push({
             label: item.teamName,
             value: item.id,
-            children: buildTargetTree(item.subTeam, isChild),
+            disabled: props.rootDisable && level == 0,
+            children: buildTargetTree(item.subTeam, isChild, level + 1),
           });
         }
       }
@@ -64,7 +70,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   };
   useEffect(() => {
     loadTreeData();
-  }, [userCtrl.space]);
+  }, [userCtrl.space, props]);
   return (
     <TreeSelect
       showSearch

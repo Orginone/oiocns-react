@@ -218,10 +218,10 @@ const ViewFormModal = (props: FormDesignProps) => {
   const form = useForm();
   const { open, data, handleCancel, handleOk } = props;
   // JSON.parse(data?.remark as string) || defaultRemark,
-  const [schema] = useState(defaultRemark);
+  const schema = defaultRemark;
 
   useEffect(() => {
-    if (props.data) {
+    if (data?.id) {
       const queryItems = async () => {
         const res = await kernel.queryOperationItems({
           id: props.data?.id as string,

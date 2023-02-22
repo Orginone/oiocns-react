@@ -146,6 +146,8 @@ const ChatLayout: React.FC<IProps> = (props) => {
                     onMenuClick={(item, key) => {
                       props.onMenuClick?.apply(this, [item, key]);
                     }}
+                    onCheckedChange={() => {}}
+                    checkedList={[]}
                   />
                 ),
               };

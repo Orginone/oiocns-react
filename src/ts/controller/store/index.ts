@@ -10,6 +10,7 @@ import {
  * 仓库控制器
  */
 class StoreController extends Emitter {
+  private _tabIndex: string = '1';
   public currentKey: string = '';
   private _home: IObjectItem;
   private _root: IFileSystemItem = getFileSysItemRoot();
@@ -30,6 +31,14 @@ class StoreController extends Emitter {
   /** 主目录 */
   public get home(): IObjectItem {
     return this._home;
+  }
+  /** 页面Tab控制序列 */
+  public get tabIndex() {
+    return this._tabIndex;
+  }
+  public setTabIndex(index: string): void {
+    this._tabIndex = index;
+    this.changCallback();
   }
 }
 

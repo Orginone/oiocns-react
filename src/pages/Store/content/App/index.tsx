@@ -32,7 +32,7 @@ const StoreApp: React.FC = () => {
   const [moveModal, setMoveModal] = useState<boolean>(false);
   const [checkNodes, setCheckNodes] = useState<any>({});
   const [shareType, setShareType] = useState<'分配' | '共享'>('共享');
-  const [appShowIdlimit, setAppShowIdlimit] = useState<string[]>([]);
+  const [appShowIdlimit] = useState<string[]>([]);
   const [chooseCreateWayOpen, setChooseCreateWayOpen] = useState<boolean>(false);
   const [createWay, setCreateWay] = useState<string>();
 
@@ -234,13 +234,20 @@ const StoreApp: React.FC = () => {
 
   return (
     <>
-      {createWay == undefined && AppIndex}
-      {createWay == 'createAppByCustom' && (
-        <CreateAppByCustom setCreateWay={setCreateWay}></CreateAppByCustom>
-      )}
+      {AppIndex}
+      <CreateAppByCustom
+        open={createWay == 'createAppByCustom'}
+        setCreateWay={setCreateWay}></CreateAppByCustom>
       <AppInfoModal
+        title="应用信息"
         open={createWay == 'createBlankApp'}
-        setCreateWay={setCreateWay}></AppInfoModal>
+        // setCreateWay={setCreateWay}
+        handleOk={() => {
+          setCreateWay(undefined);
+        }}
+        handleCancel={() => {
+          setCreateWay(undefined);
+        }}></AppInfoModal>
       <SelectAppTemplate
         open={createWay == 'createAppByTemplate'}
         setCreateWay={setCreateWay}></SelectAppTemplate>
