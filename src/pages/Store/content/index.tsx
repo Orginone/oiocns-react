@@ -11,10 +11,11 @@ import Asset from '@/pages/Welfare/WelfareOrg/Asset';
 
 interface IProps {
   selectMenu: MenuItemType;
+  checkedList?: any[];
 }
 
 /** 内容区 */
-const ContentIndex = ({ selectMenu }: IProps) => {
+const ContentIndex = ({ selectMenu, checkedList }: IProps) => {
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case GroupMenuType.Application:
@@ -24,7 +25,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
     case GroupMenuType.Asset:
       return <Asset />;
     case GroupMenuType.Thing:
-      return <Thing current={selectMenu.item} />;
+    case GroupMenuType.Wel:
+      return <Thing current={selectMenu.item} checkedList={checkedList} />;
     default:
       return <></>;
   }

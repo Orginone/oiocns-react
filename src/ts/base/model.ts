@@ -89,6 +89,33 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type IdSpeciesReq = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 是否递归分类
+  recursionSpecies: boolean;
+  // 分页
+  page: PageRequest;
+};
+export type IdOperationReq = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否职权过滤
+  filterAuth: boolean;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 是否递归分类
+  recursionSpecies: boolean;
+  // 分页
+  page: PageRequest;
+};
+
 export type QueryDefineReq = {
   // 分类ID
   speciesId: string;

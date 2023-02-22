@@ -481,6 +481,8 @@ const TeamSetting: React.FC = () => {
         }
       }}
       siderMenuData={menus}
+      onCheckedChange={(checkedKeyList: string[]) => {}}
+      checkedList={[]}
       onTabChanged={() => {}}>
       {/** 组织模态框 */}
       <TeamModal

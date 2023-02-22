@@ -4,15 +4,9 @@ import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import {
-  XFlowDefine,
-  XFlowDefineArray,
-  XFlowRelation,
-  XOperation,
-} from '@/ts/base/schema';
+import { XFlowDefine, XFlowDefineArray, XOperation } from '@/ts/base/schema';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import FlowCard from './FlowCard';
-import useWindowSize from '@/utils/windowsize';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { ISpeciesItem } from '@/ts/core/thing/ispecies';
@@ -42,7 +36,6 @@ interface IProps {
 const FlowList: React.FC<IProps> = ({
   modalType,
   species,
-  operateOrgId,
   setOperateOrgId,
   isAdmin,
   setModalType,
@@ -179,7 +172,7 @@ const FlowList: React.FC<IProps> = ({
   };
 
   const loadOperations = async (page: PageRequest) => {
-    let res = await species!.loadOperations(userCtrl.space.id, page);
+    let res = await species!.loadOperations(userCtrl.space.id, false, true, true, page);
     return res;
   };
 
@@ -226,7 +219,6 @@ const FlowList: React.FC<IProps> = ({
               request={async (page) => {
                 let res: XFlowDefineArray | undefined = await species?.loadFlowDefines(
                   userCtrl.space.id,
-                  false,
                   page,
                 );
                 return res;
@@ -234,20 +226,13 @@ const FlowList: React.FC<IProps> = ({
               onRow={(record: any) => {
                 return {
                   onClick: async () => {
-                    let res = await kernel.queryDefineRelation({ defineId: record.id });
-                    let relations: XFlowRelation[] | undefined = res.data?.result;
-                    if (relations) {
-                      // message.warn(relations.length);
-                      let operations = relations
-                        .map((item) => item.operation)
-                        .filter((item) => item != undefined);
-                      setBinds(operations);
-                      setKey(getUuid());
-                      // setHeight(0.3 * useWindowSize().height);
-                    } else {
-                      setBinds([]);
-                      // setHeight(useWindowSize().height);
-                    }
+                    let res = await kernel.queryDefineRelation({
+                      id: record.id,
+                      page: { offset: 0, limit: 1000, filter: '' },
+                    });
+                    setBinds(res.data.result || []);
+                    setKey(getUuid());
+                    // setHeight(0.3 * useWindowSize().height);
                   },
                 };
               }}

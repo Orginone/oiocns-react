@@ -37,10 +37,17 @@ export class SpeciesItem implements ISpeciesItem {
     }
     this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
-  async loadAttrs(id: string, page: PageRequest): Promise<schema.XAttributeArray> {
+  async loadAttrs(
+    id: string,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<schema.XAttributeArray> {
     const res = await kernel.querySpeciesAttrs({
       id: this.id,
       spaceId: id,
+      recursionOrg: recursionOrg,
+      recursionSpecies: recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,
@@ -50,10 +57,17 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadDicts(id: string, page: PageRequest): Promise<schema.XDictArray> {
+  async loadDicts(
+    id: string,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<schema.XDictArray> {
     const res = await kernel.querySpeciesDict({
       id: this.id,
       spaceId: id,
+      recursionOrg: recursionOrg,
+      recursionSpecies: recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,
@@ -63,10 +77,17 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadDictsEntity(spaceId: string, page: PageRequest): Promise<IDict[]> {
+  async loadDictsEntity(
+    spaceId: string,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<IDict[]> {
     const res = await kernel.querySpeciesDict({
       id: this.id,
       spaceId: spaceId,
+      recursionOrg: recursionOrg,
+      recursionSpecies: recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,
@@ -80,10 +101,19 @@ export class SpeciesItem implements ISpeciesItem {
     );
   }
 
-  async loadOperations(id: string, page: PageRequest): Promise<schema.XOperationArray> {
+  async loadOperations(
+    id: string,
+    filterAuth: boolean,
+    recursionOrg: boolean,
+    recursionSpecies: boolean,
+    page: PageRequest,
+  ): Promise<schema.XOperationArray> {
     const res = await kernel.querySpeciesOperation({
       id: this.id,
       spaceId: id,
+      filterAuth,
+      recursionOrg,
+      recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,
