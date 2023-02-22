@@ -30,17 +30,21 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
       const res = await kernel.createOperationItems({
         spaceId: userCtrl.space.id,
         operationId: operationModel.id!,
-        SpeciesItems: operationModel.speciesItems.map((a) => ({
-          rule: a.rule,
-          speciesId: a.speciesId,
-        })),
-        operationItems: operationModel.items.map((a) => ({
-          name: a.name,
-          code: a.code,
-          attrId: a.attrId,
-          rule: a.rule,
-          remark: a.remark,
-        })),
+        SpeciesItems: operationModel.speciesItems
+          .filter((i: any) => i.belongId == userCtrl.space.id)
+          .map((a) => ({
+            rule: a.rule,
+            speciesId: a.speciesId,
+          })),
+        operationItems: operationModel.items
+          .filter((i: any) => i.belongId == userCtrl.space.id)
+          .map((a) => ({
+            name: a.name,
+            code: a.code,
+            attrId: a.attrId,
+            rule: a.rule,
+            remark: a.remark,
+          })),
       });
       if (res.success) {
         message.success('保存成功！');
