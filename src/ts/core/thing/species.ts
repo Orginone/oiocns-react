@@ -104,6 +104,7 @@ export class SpeciesItem implements ISpeciesItem {
 
   async loadOperations(
     id: string,
+    filterAuth: boolean,
     recursionOrg: boolean,
     recursionSpecies: boolean,
     page: PageRequest,
@@ -111,8 +112,9 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.querySpeciesOperation({
       id: this.id,
       spaceId: id,
-      recursionOrg: recursionOrg,
-      recursionSpecies: recursionSpecies,
+      filterAuth,
+      recursionOrg,
+      recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,

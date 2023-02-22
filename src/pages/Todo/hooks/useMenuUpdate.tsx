@@ -42,7 +42,7 @@ const useMenuUpdate = (): [
           label: '办事',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: [await operate.loadThingMenus(true)],
+          children: [await operate.loadThingMenus('work', true)],
         },
       },
       {
@@ -53,7 +53,7 @@ const useMenuUpdate = (): [
           label: '待办',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: [...todoMenus, await operate.loadThingMenus()],
+          children: [...todoMenus, await operate.loadThingMenus('todo')],
         },
       },
     ]);

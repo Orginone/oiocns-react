@@ -55,16 +55,16 @@ export const loadPlatformMenu = async () => {
 };
 
 /** 获取事菜单 */
-export const loadThingMenus = async (isWork: boolean = false) => {
+export const loadThingMenus = async (prefix: string, isWork: boolean = false) => {
   const root = await userCtrl.space.loadSpeciesTree();
   const species = root?.children?.find((item) => item.name == '事') || null;
   return species
-    ? await buildSpeciesTree(species, '事', isWork)
+    ? await buildSpeciesTree(species, prefix + '事', isWork)
     : {
         children: [],
-        key: '事',
+        key: prefix + '事',
         label: '事',
-        itemType: '事',
+        itemType: prefix + '事',
         item: species,
         icon: <im.ImNewspaper />,
       };
@@ -159,23 +159,14 @@ const buildSpeciesTree = async (
   species.children.forEach(async (a) => {
     children.push(await buildSpeciesTree(a, itemType, isWork));
   });
-  const result: MenuItemType = {
-    key: species.id,
-    item: species,
-    label: species.name,
-    icon: <im.ImNewspaper />,
-    itemType: itemType,
-    menus: [],
-    children: children,
-  };
-  const res = await species.loadOperations(userCtrl.space.id, true, true, {
+  const res = await species.loadOperations(userCtrl.space.id, isWork, true, false, {
     offset: 0,
     limit: 1000,
     filter: '',
   });
   res.result?.forEach((a) => {
-    result.children.push({
-      key: a.id,
+    children.push({
+      key: itemType + a.id,
       item: a,
       label: a.name,
       icon: <im.ImNewspaper />,
@@ -185,5 +176,13 @@ const buildSpeciesTree = async (
       children: [],
     });
   });
-  return result;
+  return {
+    key: itemType + species.id,
+    item: species,
+    label: species.name,
+    icon: <im.ImNewspaper />,
+    itemType: itemType,
+    menus: [],
+    children: children,
+  };
 };
