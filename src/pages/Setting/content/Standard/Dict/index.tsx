@@ -12,13 +12,15 @@ import { getUuid } from '@/utils/tools';
 import CustomTreeComp from '@/components/CustomTreeComp';
 import TransToDict from '@/pages/Setting/content/Standard/Dict/transToDict';
 import TransToSpecies from '@/pages/Setting/content/Standard/Dict/transToSpecies';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
-  dictRecords: IDict[];
   modalType: string;
+  recursionOrg: boolean;
+  recursionSpecies: boolean;
+  setShowAddDict: (show: boolean) => void;
   setModalType: (modalType: string) => void;
-  reload: Function;
 }
 /**
  * @description: 分类字典管理
@@ -26,11 +28,14 @@ interface IProps {
  */
 const DictInfo: React.FC<IProps> = ({
   current,
-  dictRecords,
   modalType,
+  recursionOrg,
+  recursionSpecies,
+  setShowAddDict,
   setModalType,
-  reload,
 }) => {
+  const [dictRecords, setDictRecords] = useState<IDict[]>([]);
+  const [key, forceUpdate] = useObjectUpdate(dictRecords);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [openDictModal, setOpenDictModal] = useState<boolean>(false);
   const [openTransToDictModal, setOpenTransToDictModal] = useState<boolean>(false);
@@ -39,6 +44,26 @@ const DictInfo: React.FC<IProps> = ({
   const [editData, setEditData] = useState<XDict>();
   const [editItemData, setEditItemData] = useState<XDictItem>();
   const [currentDict, setCurrentDict] = useState<IDict>();
+
+  useEffect(() => {
+    const loadDicts = async () => {
+      let res: IDict[] = await current.loadDictsEntity(
+        userCtrl.space.id,
+        recursionOrg,
+        recursionSpecies,
+        {
+          offset: 0,
+          limit: 10000,
+          filter: '',
+        },
+      );
+      setShowAddDict(res.length > 0 && !!currentDict);
+      setDictRecords(res);
+      forceUpdate();
+    };
+    loadDicts();
+  }, [current, recursionOrg, recursionSpecies]);
+
   const buildTree = (dicts: IDict[]) => {
     const result: any[] = [];
     if (dicts) {
@@ -141,7 +166,7 @@ const DictInfo: React.FC<IProps> = ({
                 current.deleteDict(node.item.id).then((success) => {
                   setSelectKey(dicts[0]?.key);
                   setItemKey(getUuid());
-                  reload();
+                  forceUpdate();
                   success ? message.success('删除成功') : message.error('删除失败');
                   if (dicts[0]) {
                     setCurrentDict(dicts[0].item);
@@ -193,7 +218,7 @@ const DictInfo: React.FC<IProps> = ({
         handleOk={function (res: any): void {
           if (res) {
             message.success(`操作成功`);
-            reload();
+            forceUpdate();
           }
           setOpenDictModal(false);
         }}

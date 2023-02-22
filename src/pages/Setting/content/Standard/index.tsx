@@ -1,14 +1,12 @@
 import PageCard from '@/components/PageCard';
-import { IDict, ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { Button, Segmented, Tabs } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
 import Dict from '@/pages/Setting/content/Standard/Dict';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
-import userCtrl from '@/ts/controller/setting';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
 import { ImUndo2 } from 'react-icons/im';
 import { XFlowDefine, XOperation } from '@/ts/base/schema';
@@ -25,8 +23,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState('');
   const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom
-  const [dictRecords, setDictRecords] = useState<IDict[]>([]);
-  const [key, forceUpdate] = useObjectUpdate(dictRecords);
+
   const [flowTabKey, setFlowTabKey] = useState(0);
   const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
     id: '',
@@ -43,36 +40,25 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
     updateTime: '',
     target: undefined,
   });
+  const [showAddDict, setShowAddDict] = useState<boolean>(true);
+  const [recursionOrg, setRecursionOrg] = useState<boolean>(true);
+  const [recursionSpecies, setRecursionSpecies] = useState<boolean>(true);
   // Tab 改变事件
   const tabChange = (key: string) => {
     setTabKey(key);
   };
 
+  // 跳转到流程设计
   const toFlowDesign = (operation: XOperation) => {
-    console.log('toFlowDesign', toFlowDesign);
     if (operation.flow) {
       setTabKey('流程定义');
       setModalType('编辑流程设计');
       setFlowTabKey(1);
       setFlowDesign(operation.flow);
+    } else {
+      setTabKey('流程定义');
     }
   };
-
-  const loadDicts = async () => {
-    let res: IDict[] = await current.loadDictsEntity(userCtrl.space.id, true, true, {
-      offset: 0,
-      limit: 10000,
-      filter: '',
-    });
-    setDictRecords(res);
-    forceUpdate();
-  };
-
-  useEffect(() => {
-    if (tabKey === '字典定义') {
-      loadDicts();
-    }
-  }, [current]);
 
   /** 操作按钮 */
   const renderButton = (belong: boolean = false) => {
@@ -94,7 +80,7 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
       case '字典定义':
         return (
           <>
-            {dictRecords.length != 0 && (
+            {showAddDict && (
               <Button
                 key="edit"
                 type="link"
@@ -177,6 +163,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           current={current}
           target={target}
           modalType={modalType}
+          recursionOrg={recursionOrg}
+          recursionSpecies={recursionSpecies}
           setModalType={setModalType}
         />
       ),
@@ -190,8 +178,9 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           target={target}
           modalType={modalType}
           setModalType={setModalType}
-          dictRecords={dictRecords}
-          reload={loadDicts}
+          recursionOrg={recursionOrg}
+          recursionSpecies={recursionSpecies}
+          setShowAddDict={setShowAddDict}
         />
       ),
     },
@@ -203,6 +192,8 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
           current={current}
           target={target}
           modalType={modalType}
+          recursionOrg={recursionOrg}
+          recursionSpecies={recursionSpecies}
           setModalType={setModalType}
           toFlowDesign={toFlowDesign}></SpeciesForm>
       ),
@@ -228,8 +219,30 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const renderTabBarExtraContent = () => {
     return (
       <div>
-        <Segmented options={['本组织', '全部']} />
-        <Segmented options={['本分类', '全部']} />
+        {tabKey != '流程定义' && (
+          <Segmented
+            options={['全部', '本组织']}
+            onChange={(value) => {
+              if (value === '本组织') {
+                setRecursionOrg(false);
+              } else {
+                setRecursionOrg(true);
+              }
+            }}
+          />
+        )}
+        {tabKey != '流程定义' && (
+          <Segmented
+            options={['全部', '本分类']}
+            onChange={(value) => {
+              if (value === '本分类') {
+                setRecursionSpecies(false);
+              } else {
+                setRecursionSpecies(true);
+              }
+            }}
+          />
+        )}
         {renderButton()}
       </div>
     );
@@ -244,7 +257,6 @@ const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
             <PageCard bordered={false} bodyStyle={{ paddingTop: 16 }}>
               <div className={cls['page-content-table']} ref={parentRef}>
                 <Tabs
-                  key={key}
                   activeKey={tabKey}
                   items={items}
                   tabBarExtraContent={renderTabBarExtraContent()}

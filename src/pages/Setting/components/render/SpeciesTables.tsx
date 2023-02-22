@@ -5,8 +5,7 @@ import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import { EditableProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
-import { SelectOutlined } from '@ant-design/icons';
+import { DesignSpecies } from './../design';
 
 type SpeciesTableProps = {
   sp: ISpeciesItem;
@@ -23,6 +22,8 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
       const res = await kernel.querySpeciesAttrs({
         id: sp.id,
         spaceId: userCtrl.space.id,
+        recursionOrg: true,
+        recursionSpecies: true,
         page: {
           offset: 0,
           limit: 10000,
@@ -64,21 +65,20 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
 };
 
 type SpeciesTabsProps = {
-  species: ISpeciesItem[];
-  deleteSpecies: (id: string) => void;
-  setOpenSpeciesModal: (show: boolean) => void;
+  dsps: DesignSpecies[];
 };
 
-const SpeciesTables: React.FC<SpeciesTabsProps> = ({
-  species,
-  deleteSpecies,
-  setOpenSpeciesModal,
-}) => {
-  const items = species.map((sp) => {
+const SpeciesTables: React.FC<SpeciesTabsProps> = ({ dsps }) => {
+  const items = dsps.map((dsp) => {
     return {
-      key: sp.id,
-      label: <div style={{ paddingTop: '4px', paddingLeft: '12px' }}>{sp.name}</div>,
-      children: <SpeciesTable sp={sp} />,
+      key: dsp.speciesId,
+      label: (
+        <div style={{ paddingTop: '4px', paddingLeft: '12px', paddingRight: '4px' }}>
+          {dsp.species?.name}
+        </div>
+      ),
+      closable: dsp.belongId == userCtrl.space.id,
+      children: <SpeciesTable sp={dsp.species} />,
     };
   });
 
@@ -88,28 +88,9 @@ const SpeciesTables: React.FC<SpeciesTabsProps> = ({
     setActiveKey(newActiveKey);
   };
 
-  const add = () => {
-    setOpenSpeciesModal(true);
-  };
-
-  const onEdit = (id: string, action: 'add' | 'remove') => {
-    if (action === 'add') {
-      add();
-    } else {
-      deleteSpecies(id);
-    }
-  };
-
   return (
     <div style={{ padding: '6px' }}>
-      <Tabs
-        type="editable-card"
-        onChange={onChange}
-        activeKey={activeKey}
-        onEdit={(key: any, action) => onEdit(key, action)}
-        items={items}
-        tabBarExtraContent={<Button icon={<SelectOutlined />}>选择</Button>}
-      />
+      <Tabs onChange={onChange} activeKey={activeKey} items={items} />
     </div>
   );
 };

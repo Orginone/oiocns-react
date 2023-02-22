@@ -85,23 +85,23 @@ const OperationModal = (props: Iprops) => {
         rules: [{ required: true, message: '是否公开为必填项' }],
       },
     },
-    {
-      title: '流程',
-      dataIndex: 'defineId',
-      valueType: 'select',
-      request: async () => {
-        const res = await current.loadFlowDefines(userCtrl.space.id, {
-          offset: 0,
-          limit: 1000000,
-          filter: '',
-        });
-        const flowDefines = res.result || [];
-        console.log('flowDefines', flowDefines);
-        return flowDefines.map((def) => {
-          return { label: def.name, value: def.id };
-        });
-      },
-    },
+    // {
+    //   title: '流程',
+    //   dataIndex: 'defineId',
+    //   valueType: 'select',
+    //   request: async () => {
+    //     const res = await current.loadFlowDefines(userCtrl.space.id, {
+    //       offset: 0,
+    //       limit: 1000000,
+    //       filter: '',
+    //     });
+    //     const flowDefines = res.result || [];
+    //     console.log('flowDefines', flowDefines);
+    //     return flowDefines.map((def) => {
+    //       return { label: def.name, value: def.id };
+    //     });
+    //   },
+    // },
     {
       title: '角色',
       dataIndex: 'beginAuthId',

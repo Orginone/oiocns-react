@@ -6,7 +6,7 @@ import { XOperation } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { message, Popconfirm } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import OperationModel from '../../../components/operationModal';
 import ViewCardModal from '../../../components/viewCardModal';
 import ViewFormModal from '../../../components/viewFormModal';
@@ -15,6 +15,8 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
+  recursionOrg: boolean;
+  recursionSpecies: boolean;
   setModalType: (modalType: string) => void;
   setSelectedOperation: (operation: XOperation) => void;
   setTabKey: (tabKey: number) => void;
@@ -28,6 +30,8 @@ const Operation = ({
   current,
   target,
   modalType,
+  recursionOrg,
+  recursionSpecies,
   setModalType,
   setSelectedOperation,
   setTabKey,
@@ -37,6 +41,14 @@ const Operation = ({
 
   const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
   const [viewCardOpen, setViewCardOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    tforceUpdate();
+  }, [recursionOrg]);
+
+  useEffect(() => {
+    tforceUpdate();
+  }, [recursionSpecies]);
 
   // 操作内容渲染函数
   const renderOperate = (item: XOperation) => {
@@ -96,7 +108,13 @@ const Operation = ({
   // 加载业务表单列表
   const loadOperations = async (page: PageRequest) => {
     if (userCtrl.space.id && page) {
-      return await current!.loadOperations(userCtrl.space.id, false, true, true, page);
+      return await current!.loadOperations(
+        userCtrl.space.id,
+        false,
+        recursionOrg,
+        recursionSpecies,
+        page,
+      );
     }
   };
 
