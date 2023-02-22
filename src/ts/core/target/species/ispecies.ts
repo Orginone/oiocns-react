@@ -15,6 +15,7 @@ import {
   XDictArray,
   XOperationArray,
   XSpecies,
+  XAttribute,
 } from '../../../base/schema';
 import { IDict, INullDict } from './idict';
 
@@ -39,6 +40,8 @@ export interface ISpeciesItem {
   children: ISpeciesItem[];
   /** 归属信息 */
   belongInfo: TargetShare;
+  /** 属性 */
+  attrs?: XAttribute[];
   /** 加载信息 */
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */

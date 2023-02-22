@@ -142,35 +142,35 @@ export const getFileSystemMenus = () => {
 /** 获取物菜单 */
 export const getThingMenus = async () => {
   const root = await userCtrl.space.loadSpeciesTree();
-  const species =
-    root && root.children ? root.children.filter((item) => item.name == '物')[0] : null;
-  return species
-    ? buildSpeciesTree(species, GroupMenuType.Thing)
-    : {
-        children: [],
-        key: '物',
-        label: '物',
-        itemType: GroupMenuType.Thing,
-        item: species,
-        icon: <im.ImNewspaper />,
-      };
+  const species = root?.children?.filter((item) => item.name == '物')[0];
+  return buildSpeciesChildrenTree(species, GroupMenuType.Thing, 'checkbox');
+  // return species
+  //   ? buildSpeciesTree(species, GroupMenuType.Thing)
+  //   : {
+  //       children: [],
+  //       key: '物',
+  //       label: '物',
+  //       itemType: GroupMenuType.Thing,
+  //       item: species,
+  //       icon: <im.ImNewspaper />,
+  //     };
 };
 
 /** 获取财菜单 */
 export const getWelMenus = async () => {
   const root = await userCtrl.space.loadSpeciesTree();
-  const species =
-    root && root.children ? root.children.filter((item) => item.name == '财')[0] : null;
-  return species
-    ? buildSpeciesTree(species, GroupMenuType.Wel)
-    : {
-        children: [],
-        key: '财',
-        label: '财',
-        itemType: GroupMenuType.Wel,
-        item: species,
-        icon: <im.ImNewspaper />,
-      };
+  const species = root?.children?.filter((item) => item.name == '财')[0];
+  return buildSpeciesChildrenTree(species, GroupMenuType.Wel, 'checkbox');
+  // return species
+  //   ? buildSpeciesTree(species, GroupMenuType.Wel)
+  //   : {
+  //       children: [],
+  //       key: '财',
+  //       label: '财',
+  //       itemType: GroupMenuType.Wel,
+  //       item: species,
+  //       icon: <im.ImNewspaper />,
+  //     };
 };
 
 /** 编译分类树 */
@@ -193,14 +193,36 @@ export const buildSpeciesTree = (
   return result;
 };
 
+export const buildSpeciesChildrenTree = (
+  parent: ISpeciesItem | undefined,
+  itemType: string,
+  menuType?: string,
+): MenuItemType[] => {
+  return (
+    parent?.children?.map((species) => {
+      return {
+        key: species.id,
+        item: species,
+        label: species.name,
+        icon: <im.ImNewspaper />,
+        itemType: itemType,
+        menuType: menuType,
+        menus: loadSpeciesMenus(species),
+        children:
+          species.children?.map((i) => buildSpeciesTree(i, itemType, 'checkbox')) ?? [],
+      };
+    }) || []
+  );
+};
+
 /** 加载右侧菜单 */
 export const loadSpeciesMenus = (item: ISpeciesItem) => {
   const items: OperateMenuType[] = [
-    {
-      key: '数据形式',
-      label: '数据形式',
-      icon: <im.ImPlus />,
-    },
+    // {
+    //   key: '操作',
+    //   label: '操作',
+    //   icon: <im.ImPlus />,
+    // },
   ];
   return items;
 };
