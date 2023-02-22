@@ -62,6 +62,14 @@ class StoreController extends Emitter {
           })
         ).result || [];
       for (let targetAttr of targetAttrs) {
+        if (targetAttr.speciesId == speciesItem.id) {
+          targetAttr.species = speciesItem.target;
+        } else if (existIds.includes(targetAttr.speciesId)) {
+          targetAttr.species = this._checkedSpeciesList.filter(
+            (item) => item.id == targetAttr.speciesId,
+          )[0].target;
+        }
+
         if (targetAttr.dictId) {
           targetAttr.dictItems =
             (

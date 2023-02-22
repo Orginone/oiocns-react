@@ -9,6 +9,7 @@ import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
 import { getUuid } from '@/utils/tools';
 import userCtrl from '@/ts/controller/setting';
+import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
@@ -50,17 +51,18 @@ const Package: React.FC = () => {
         setContentKey(getUuid());
       }}
       tabKey={storeCtrl.tabIndex}
-      onCheckedChange={async (checkedList: any[]) => {
+      onCheckedChange={async (checks: any[]) => {
         if (
-          checkedList[0]?.itemType === GroupMenuType.Thing ||
-          checkedList[0]?.itemType === GroupMenuType.Wel
+          checks &&
+          (checks[0]?.itemType === GroupMenuType.Thing ||
+            checks[0]?.itemType === GroupMenuType.Wel)
         ) {
           await storeCtrl.addCheckedSpeciesList(
-            checkedList.map((cd) => cd.item),
+            checks.map((cd) => cd.item),
             userCtrl.space.id,
           );
         }
-        setCheckedList(checkedList);
+        setCheckedList(checks);
         refreshMenu();
         setContentKey(getUuid());
       }}
@@ -78,7 +80,11 @@ const Package: React.FC = () => {
           setOperateTarget(undefined);
         }}
       />
-      <Content key={contentKey} selectMenu={selectMenu} checkedList={checkedList} />
+      <Content
+        key={checkedList.length}
+        selectMenu={selectMenu}
+        checkedList={checkedList}
+      />
     </MainLayout>
   );
 };

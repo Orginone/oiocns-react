@@ -112,12 +112,12 @@ const CustomMenu = (props: CustomMenuType) => {
                   onChange={(e: any) => {
                     if (e.target.checked) {
                       checkedList.push(item);
+                      props.onCheckedChange?.call(this, checkedList);
                       setCheckedList(checkedList);
-                      props.onCheckedChange?.apply(this, checkedList);
                     } else {
                       let list = checkedList.filter((ky) => ky.key != item.key);
+                      props.onCheckedChange?.call(this, list);
                       setCheckedList(list);
-                      props.onCheckedChange?.apply(this, list);
                     }
                     setCheckboxKey(getUuid());
                   }}></Checkbox>

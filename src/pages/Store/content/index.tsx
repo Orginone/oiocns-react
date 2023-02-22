@@ -16,6 +16,15 @@ interface IProps {
 
 /** 内容区 */
 const ContentIndex = (props: IProps) => {
+  if (props.checkedList && props.checkedList.length) {
+    return (
+      <Thing
+        key={props.checkedList?.length}
+        current={props.selectMenu.item}
+        checkedList={props.checkedList}
+      />
+    );
+  }
   /** 加载内容区 */
   switch (props.selectMenu.itemType) {
     case GroupMenuType.Application:
