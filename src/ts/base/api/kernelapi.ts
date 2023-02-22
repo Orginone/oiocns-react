@@ -536,11 +536,11 @@ export default class KernelApi {
 
   /**
    * 查询分类的业务标准
-   * @param {model.IdSpeciesReq} params 请求参数
+   * @param {model.IdOperationReq} params 请求参数
    * @returns {model.ResultType<schema.XOperationArray>} 请求结果
    */
   public async querySpeciesOperation(
-    params: model.IdSpeciesReq,
+    params: model.IdOperationReq,
   ): Promise<model.ResultType<schema.XOperationArray>> {
     return await this.request({
       module: 'thing',
