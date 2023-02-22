@@ -50,13 +50,12 @@ class StoreController extends Emitter {
   }
 
   public async addCheckedSpeciesList(speciesItems: ISpeciesItem[], spaceId: string) {
-    debugger
     let existIds = this._checkedSpeciesList.map((item: any) => item.id);
     let items = speciesItems.filter((item: any) => !existIds.includes(item.id));
     for (let speciesItem of items) {
       let targetAttrs: XAttribute[] =
         (
-          await speciesItem.loadAttrs(spaceId, {
+          await speciesItem.loadAttrs(spaceId, true, true, {
             offset: 0,
             limit: 1000,
             filter: '',
