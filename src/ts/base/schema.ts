@@ -36,6 +36,8 @@ export type XAttribute = {
   updateTime: string;
   // 字典类型
   dict: XDict | undefined;
+  // 字典子项类型
+  dictItems: XDictItem[] | undefined;
   // 度量特性对应的类别
   species: XSpecies | undefined;
   // 工作职权

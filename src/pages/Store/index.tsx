@@ -7,11 +7,15 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
+import { getUuid } from '@/utils/tools';
+import userCtrl from '@/ts/controller/setting';
+import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [contentKey, setContentKey] = useState<string>();
   const [checkedList, setCheckedList] = useState<any[]>([]);
   return (
     <MainLayout
@@ -22,8 +26,16 @@ const Package: React.FC = () => {
           const item = data.item as IFileSystemItem;
           if (item.children.length === 0 && (await item.loadChildren())) {
             refreshMenu();
+            setContentKey(getUuid());
           }
         }
+        if (
+          data.itemType === GroupMenuType.Thing ||
+          data.itemType === GroupMenuType.Wel
+        ) {
+          storeCtrl.addCheckedSpeciesList([data.item], userCtrl.space.id);
+        }
+
         setSelectMenu(data);
       }}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
@@ -36,11 +48,23 @@ const Package: React.FC = () => {
         storeCtrl.setTabIndex(tabKey);
         setCheckedList([]);
         refreshMenu();
+        setContentKey(getUuid());
       }}
       tabKey={storeCtrl.tabIndex}
-      onCheckedChange={(checkedList: any[]) => {
-        setCheckedList(checkedList);
+      onCheckedChange={async (checks: any[]) => {
+        if (
+          checks &&
+          (checks[0]?.itemType === GroupMenuType.Thing ||
+            checks[0]?.itemType === GroupMenuType.Wel)
+        ) {
+          await storeCtrl.addCheckedSpeciesList(
+            checks.map((cd) => cd.item),
+            userCtrl.space.id,
+          );
+        }
+        setCheckedList(checks);
         refreshMenu();
+        setContentKey(getUuid());
       }}
       siderMenuData={menus[0]?.menu}
       tabs={menus}>
@@ -56,7 +80,11 @@ const Package: React.FC = () => {
           setOperateTarget(undefined);
         }}
       />
-      <Content key={key} selectMenu={selectMenu} checkedList={checkedList} />
+      <Content
+        key={checkedList.length}
+        selectMenu={selectMenu}
+        checkedList={checkedList}
+      />
     </MainLayout>
   );
 };

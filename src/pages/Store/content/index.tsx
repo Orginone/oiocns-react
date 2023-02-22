@@ -15,18 +15,27 @@ interface IProps {
 }
 
 /** 内容区 */
-const ContentIndex = ({ selectMenu, checkedList }: IProps) => {
+const ContentIndex = (props: IProps) => {
+  if (props.checkedList && props.checkedList.length) {
+    return (
+      <Thing
+        key={props.checkedList?.length}
+        current={props.selectMenu.item}
+        checkedList={props.checkedList}
+      />
+    );
+  }
   /** 加载内容区 */
-  switch (selectMenu.itemType) {
+  switch (props.selectMenu.itemType) {
     case GroupMenuType.Application:
       return <Application />;
     case GroupMenuType.FileSystemItem:
-      return <FileSystem current={selectMenu.item} />;
+      return <FileSystem current={props.selectMenu.item} />;
     case GroupMenuType.Asset:
       return <Asset />;
     case GroupMenuType.Thing:
     case GroupMenuType.Wel:
-      return <Thing current={selectMenu.item} checkedList={checkedList} />;
+      return <Thing current={props.selectMenu.item} checkedList={props.checkedList} />;
     default:
       return <></>;
   }

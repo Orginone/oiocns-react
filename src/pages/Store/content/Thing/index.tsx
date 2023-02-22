@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Card, message, Tabs } from 'antd';
+import { Card, Tabs } from 'antd';
 import storeCtrl from '@/ts/controller/store';
 import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import 'devextreme/dist/css/dx.light.css';
-import Button from 'devextreme-react/button';
+import DataGrid, {
+  Column,
+  ColumnChooser,
+  ColumnFixing,
+  Editing,
+  HeaderFilter,
+  FilterPanel,
+  FilterRow,
+  Pager,
+  Paging,
+  Lookup,
+} from 'devextreme-react/data-grid';
+import { getUuid } from '@/utils/tools';
 interface IProps {
   current: ISpeciesItem;
   checkedList?: any[];
@@ -14,71 +26,160 @@ interface IProps {
 /**
  * 仓库-物
  */
-const Thing: React.FC<IProps> = ({ current, checkedList }: IProps) => {
+const Thing: React.FC<IProps> = (props: IProps) => {
   const [key] = useCtrlUpdate(storeCtrl);
-  // const [operateKey, setOperateKey] = useState<string>();
-  // const [operateTarget, setOperateTarget] = useState<ISpeciesItem>();
-  const [thingAttrs, setThingAttrs] = useState<XAttribute[]>([]);
-  const [columns, setColumns] = useState<any[]>([]);
+  const [thingAttrs, setThingAttrs] = useState<any[]>();
   const [tabKey_, setTabKey_] = useState<string>();
-  // const parentRef = useRef<any>();
+  const allowedPageSizes = [10, 20];
   const loadAttrs = async (speciesItem: ISpeciesItem) => {
-    let targetAttrs: XAttribute[] =
-      (
-        await current.loadAttrs(userCtrl.space.id + '', {
-          offset: 0,
-          limit: 1000,
-          filter: '',
-        })
-      ).result || [];
-    setThingAttrs(targetAttrs);
-    setColumns(
-      targetAttrs.map((item: XAttribute) => {
-        return { title: item.name, dataIndex: item.code, key: item.code, width: 150 };
-      }),
-    );
+    let instance = storeCtrl.checkedSpeciesList.filter(
+      (item: ISpeciesItem) => item.id == speciesItem.id,
+    )[0];
+    if (instance) {
+      let parentHeaders = [];
+      //所有id
+      let attrsSpeciesIdSet = new Set(
+        instance.attrs?.map((attr) => attr.speciesId) || [],
+      );
+      for (let speciesId of Array.from(attrsSpeciesIdSet)) {
+        let attrs = instance.attrs?.filter((attr) => attr.speciesId == speciesId) || [];
+        parentHeaders.push({ caption: attrs[0].species?.name, children: attrs });
+      }
+      setThingAttrs(parentHeaders);
+    } else {
+      setThingAttrs(undefined);
+    }
   };
+
   useEffect(() => {
-    if (current && userCtrl.space.id) {
-      if (!tabKey_) {
-        loadAttrs(current);
+    if (storeCtrl.checkedSpeciesList.length > 0) {
+      if (props.checkedList && props.checkedList.length > 0) {
+        if (!props.checkedList.map((item) => item.key).includes(tabKey_)) {
+          setTabKey_(props.checkedList[0].key);
+          loadAttrs(props.checkedList[0].item);
+        }
+      } else if (props.current && userCtrl.space.id) {
+        loadAttrs(props.current);
       }
     }
-  }, [current]);
-  useEffect(() => {
-    if (checkedList && checkedList.length > 0) {
-      if (!checkedList.map((item) => item.key).includes(tabKey_)) {
-        setTabKey_(checkedList[0].key);
-        loadAttrs(checkedList[0].item);
-      }
+  }, [props.current, props.checkedList, storeCtrl.checkedSpeciesList]);
+
+  const getParentAndSelfIds = (a: ISpeciesItem, ids: string[]): string[] => {
+    ids.push(a.id);
+    if (a.parent) {
+      ids = getParentAndSelfIds(a.parent, ids);
     }
-  }, [checkedList]);
+    return ids;
+  };
 
   const getComponent = (a: ISpeciesItem) => {
-    return <div>{a.name}</div>;
-  };
-
-  // 操作内容渲染函数
-  const renderOperate = (item: XAttribute) => {
-    return [
-      {
-        key: '上架',
-        label: '上架',
-        onClick: () => {},
-      },
-    ];
+    return (
+      <>
+        {thingAttrs && (
+          <DataGrid
+            dataSource={[
+              {
+                key: getUuid(),
+                ASSET_ID: '8719817174617',
+                ASSET_CODE: 'BZ011',
+                ASSET_NAME: '测试数据(本征)',
+                ASSET_TYPE: '10000000',
+                tagIds: '27466605935444992',
+              },
+              {
+                key: getUuid(),
+                ASSET_ID: '8719817177875',
+                ASSET_CODE: 'GC0187',
+                ASSET_NAME: '测试数据(工程建筑)',
+                ASSET_TYPE: '10010000',
+                SOURCE_PLACE: '北京市朝阳区601号',
+                FLOOR_AREA: '10000 m2',
+                tagIds: '27466605935444992,27466605935444993',
+              },
+              {
+                key: getUuid(),
+                HERITAGE_GR: '211',
+                HERITAGE_NO: 'WW011',
+                TYPES_OF_CULTURAL_RELICS: '书画',
+                SOURCE_OF_CULTURAL_RELICS: '1',
+                tagIds: '27466605935445008',
+              },
+            ].filter(
+              (record) =>
+                // getParentAndSelfIds(a, []).includes(record.speciesItemId),
+                record.tagIds.indexOf(a.id) > -1,
+            )}
+            keyExpr="key"
+            columnMinWidth={80}
+            focusedRowEnabled={true}
+            allowColumnReordering={true}
+            allowColumnResizing={true}
+            columnAutoWidth={true}
+            showColumnLines={true}
+            showRowLines={true}
+            rowAlternationEnabled={true}
+            hoverStateEnabled={true}
+            height={'calc(100vh - 240px)'}
+            showBorders={true}>
+            <ColumnChooser
+              enabled={true}
+              title={'列选择器'}
+              height={'500px'}
+              allowSearch={true}
+              sortOrder={'asc'}
+            />
+            <ColumnFixing enabled={true} />
+            <Editing
+              allowUpdating={true}
+              allowDeleting={true}
+              selectTextOnEditStart={true}
+              useIcons={true}
+            />
+            <HeaderFilter visible={true} />
+            {/* <FilterPanel visible={true} /> */}
+            <FilterRow visible={true} />
+            <Pager
+              visible={true}
+              allowedPageSizes={allowedPageSizes}
+              showPageSizeSelector={true}
+              showNavigationButtons={true}
+              showInfo={true}
+              infoText={'共{2}条'}
+              displayMode={'full'}
+            />
+            <Paging defaultPageSize={10} />
+            {thingAttrs.map((parentHeader: any) => (
+              <Column key={parentHeader.caption} caption={parentHeader.caption}>
+                {parentHeader.children.map((attr: any) => (
+                  <Column key={attr.id} dataField={attr.code} caption={attr.name}>
+                    {attr.valueType == '选择型' && (
+                      <Lookup
+                        dataSource={attr.dictItems || []}
+                        displayExpr="name"
+                        valueExpr="value"
+                      />
+                    )}
+                  </Column>
+                ))}
+              </Column>
+            ))}
+          </DataGrid>
+        )}
+      </>
+    );
   };
 
   return (
     <Card id={key} bordered={false}>
-      {checkedList && checkedList.length > 0 && (
+      {props.checkedList && props.checkedList.length > 0 && (
         <Tabs
           activeKey={tabKey_}
           onChange={(key: any) => {
             setTabKey_(key);
+            loadAttrs(props.checkedList?.filter((item) => item.key == key)[0].item);
             // onTabChanged(key);
           }}
-          items={checkedList?.map((a) => {
+          items={props.checkedList?.map((a) => {
             return {
               key: a.key,
               label: a.label,
@@ -87,7 +188,8 @@ const Thing: React.FC<IProps> = ({ current, checkedList }: IProps) => {
           })}
         />
       )}
-      {(!checkedList || checkedList.length == 0) && getComponent(current)}
+      {(!props.checkedList || props.checkedList.length == 0) &&
+        getComponent(props.current)}
       {/* <CardOrTable
         dataSource={[]}
         columns={columns}
