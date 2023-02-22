@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
   Radio,
   Row,
   Select,
@@ -25,12 +26,8 @@ import SpeciesTabs from './SpeciesTabs';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
-import {
-  OperationItemModel,
-  OperationModel,
-  OperationRelation,
-  OperationRelationModel,
-} from '@/ts/base/model';
+import { OperationItemModel, OperationModel } from '@/ts/base/model';
+import OioForm from '../render';
 
 /**
  * 组件选择
@@ -114,7 +111,7 @@ export const widgetsOpts = [
   },
   {
     label: '部门',
-    value: 'department',
+    value: 'dept',
   },
   {
     label: '集团',
@@ -129,7 +126,7 @@ const transformAttrToOperationItem = (
   attr: any,
   operationId: string,
 ): OperationItemModel => {
-  let widget = 'input';
+  let widget = 'text';
   let type = 'string';
   let dictId: string | undefined = undefined;
   if (attr.valueType === '数值型') {
@@ -144,7 +141,7 @@ const transformAttrToOperationItem = (
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: undefined,
+      belongId: userCtrl.space.id,
       operationId: operationId,
       attrId: attr.id,
       attr: attr,
@@ -173,7 +170,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
       id: operationItem.attrId,
       name: operationItem.name,
       code: operationItem.code,
-      belongId: undefined,
+      belongId: userCtrl.space.id,
       remark: rule.description,
       dictId: rule.dictId || undefined,
       valueType:
@@ -193,7 +190,7 @@ type DesignProps = {
   setOperationModel: (operationModel: OperationModel) => void;
 };
 
-type DesignSpecies = {
+export type DesignSpecies = {
   // 规则
   rule: string;
   // 备注
@@ -227,16 +224,27 @@ const Design: React.FC<DesignProps> = ({
   const [formCol, setFormCol] = useState(12);
   const [selectedItem, setSelectedItem] = useState<any>({});
   const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
+  const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
 
   useEffect(() => {
     const queryItems = async () => {
+      // 查询类别子表
+      const speciesRes = await kernel.queryOperationSpeciesItems({
+        id: operation.id,
+        spaceId: belongId,
+        page: { offset: 0, limit: 100000, filter: '' },
+      });
+      if (speciesRes.success) {
+        setDesignSpeciesArray(
+          (speciesRes.data.result || []) as unknown as DesignSpecies[],
+        );
+      }
       // 查询操作项
       const operateItemRes = await kernel.queryOperationItems({
         id: operation.id,
         spaceId: belongId,
         page: { offset: 0, limit: 100000, filter: '' },
       });
-      console.log('operateItemRes', operateItemRes);
       // 查询特性
       const attrRes = await current.loadAttrs(belongId, {
         offset: 0,
@@ -324,6 +332,7 @@ const Design: React.FC<DesignProps> = ({
     const activeItems = items[activeContainer];
     const overItems = items[overContainer];
     if (!overId) {
+      console.log('props', props);
       // 目标容器为空
       if (activeContainer === 'attrs') {
         // 特性转表单项
@@ -488,30 +497,6 @@ const Design: React.FC<DesignProps> = ({
                 title={'表单'}
                 extra={
                   <div style={{ display: 'flex' }}>
-                    {!operation.flow && (
-                      <>
-                        <label style={{ padding: '6px' }}>绑定流程：</label>
-                        <Select
-                          defaultValue={formCol}
-                          style={{ width: '160px' }}
-                          options={[
-                            { value: 24, label: '一行一列' },
-                            { value: 12, label: '一行两列' },
-                            { value: 8, label: '一行三列' },
-                          ]}
-                          onChange={setFormCol}
-                        />
-                      </>
-                    )}
-                    {operation.flow && (
-                      <Button
-                        icon={<EditOutlined />}
-                        onClick={() => {
-                          toFlowDesign(operation);
-                        }}>
-                        设计流程
-                      </Button>
-                    )}
                     <label style={{ padding: '6px' }}>整体布局：</label>
                     <Select
                       defaultValue={formCol}
@@ -523,13 +508,35 @@ const Design: React.FC<DesignProps> = ({
                       ]}
                       onChange={setFormCol}
                     />
+                    {!operation.flow && (
+                      <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                          toFlowDesign(operation);
+                        }}>
+                        新建流程
+                      </Button>
+                    )}
+                    {operation.flow && (
+                      <Button
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                          toFlowDesign(operation);
+                        }}>
+                        设计流程
+                      </Button>
+                    )}
                     <Space wrap>
                       <Button
                         icon={<PlusOutlined />}
                         onClick={() => setOpenSpeciesModal(true)}>
                         插入子表
                       </Button>
-                      <Button icon={<SearchOutlined />}>预览表单</Button>
+                      <Button
+                        icon={<SearchOutlined />}
+                        onClick={() => setOpenPreviewModal(true)}>
+                        预览表单
+                      </Button>
                     </Space>
                   </div>
                 }>
@@ -562,7 +569,7 @@ const Design: React.FC<DesignProps> = ({
                     {designSpeciesArray.length > 0 && (
                       <Col span={24}>
                         <SpeciesTabs
-                          species={designSpeciesArray.map((ds) => ds.species)}
+                          dsps={designSpeciesArray}
                           deleteSpecies={deleteSpecies}
                           setOpenSpeciesModal={setOpenSpeciesModal}
                         />
@@ -640,6 +647,20 @@ const Design: React.FC<DesignProps> = ({
           addSpecies(species);
         }}
       />
+      <Modal
+        title={`${operation?.name}(预览)`}
+        open={openPreviewModal}
+        destroyOnClose={true}
+        onOk={() => setOpenPreviewModal(false)}
+        onCancel={() => setOpenPreviewModal(false)}
+        maskClosable={false}
+        width={900}>
+        <OioForm
+          operationId={operation.id}
+          operation={operation}
+          onValuesChange={(values) => console.log('values', values)}
+        />
+      </Modal>
     </>
   );
 };

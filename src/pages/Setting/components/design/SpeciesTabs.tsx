@@ -5,8 +5,9 @@ import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import { EditableProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
-import { SelectOutlined } from '@ant-design/icons';
+// import { Button } from 'antd';
+// import { SelectOutlined } from '@ant-design/icons';
+import { DesignSpecies } from '.';
 
 type SpeciesTableProps = {
   sp: ISpeciesItem;
@@ -64,21 +65,26 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
 };
 
 type SpeciesTabsProps = {
-  species: ISpeciesItem[];
+  dsps: DesignSpecies[];
   deleteSpecies: (id: string) => void;
   setOpenSpeciesModal: (show: boolean) => void;
 };
 
 const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
-  species,
+  dsps,
   deleteSpecies,
   setOpenSpeciesModal,
 }) => {
-  const items = species.map((sp) => {
+  const items = dsps.map((dsp) => {
     return {
-      key: sp.id,
-      label: <div style={{ paddingTop: '4px', paddingLeft: '12px' }}>{sp.name}</div>,
-      children: <SpeciesTable sp={sp} />,
+      key: dsp.speciesId,
+      label: (
+        <div style={{ paddingTop: '4px', paddingLeft: '12px', paddingRight: '4px' }}>
+          {dsp.species.name}
+        </div>
+      ),
+      closable: dsp.belongId == userCtrl.space.id,
+      children: <SpeciesTable sp={dsp.species} />,
     };
   });
 
@@ -108,7 +114,7 @@ const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
         activeKey={activeKey}
         onEdit={(key: any, action) => onEdit(key, action)}
         items={items}
-        tabBarExtraContent={<Button icon={<SelectOutlined />}>选择</Button>}
+        // tabBarExtraContent={<Button icon={<SelectOutlined />}>选择</Button>}
       />
     </div>
   );
