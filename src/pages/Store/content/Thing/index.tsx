@@ -31,6 +31,14 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   const [thingAttrs, setThingAttrs] = useState<any[]>();
   const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
+  const getSortedList = (species: ISpeciesItem, array: any[]): any[] => {
+    array = [species, ...array];
+    if (species.parent) {
+      array = getSortedList(species.parent, array);
+    }
+    return array;
+  };
+
   const loadAttrs = async (speciesItem: ISpeciesItem) => {
     let instance = storeCtrl.checkedSpeciesList.filter(
       (item: ISpeciesItem) => item.id == speciesItem.id,
@@ -38,12 +46,16 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     if (instance) {
       let parentHeaders = [];
       //所有id
-      let attrsSpeciesIdSet = new Set(
-        instance.attrs?.map((attr) => attr.speciesId) || [],
-      );
-      for (let speciesId of Array.from(attrsSpeciesIdSet)) {
-        let attrs = instance.attrs?.filter((attr) => attr.speciesId == speciesId) || [];
-        parentHeaders.push({ caption: attrs[0].species?.name, children: attrs });
+      let sortedSpecies = getSortedList(instance, []);
+      for (let species of sortedSpecies) {
+        if ((instance.attrs?.map((attr) => attr.speciesId) || []).includes(species.id)) {
+          let attrs =
+            instance.attrs?.filter((attr) => attr.speciesId == species.id) || [];
+          parentHeaders.push({
+            caption: attrs[0].species?.name || species.name,
+            children: attrs,
+          });
+        }
       }
       setThingAttrs(parentHeaders);
     } else {
@@ -172,12 +184,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   return (
     <Card id={key} bordered={false}>
       {props.checkedList && props.checkedList.length > 0 && (
+        // getComponent(props.checkedList.map((item) => item.item))
         <Tabs
           activeKey={tabKey_}
           onChange={(key: any) => {
             setTabKey_(key);
             loadAttrs(props.checkedList?.filter((item) => item.key == key)[0].item);
-            // onTabChanged(key);
           }}
           items={props.checkedList?.map((a) => {
             return {

@@ -151,47 +151,16 @@ const buildSpeciesTree = async (
 ): Promise<MenuItemType[]> => {
   var result: MenuItemType[] = [];
   for (let item of species) {
-    let children: MenuItemType[] = [];
-    children.push(...(await buildSpeciesTree(item.children, itemType, isWork)));
-    var operations = await loadOperation(item, itemType, isWork);
-    if (operations && operations.length > 0) {
-      children.push(...operations);
-    }
-    if (children.length > 0) {
-      result.push({
-        key: itemType + item.id,
-        item: item,
-        label: item.name,
-        icon: <im.ImNewspaper />,
-        itemType: itemType,
-        menus: [],
-        children: children,
-      });
-    }
-  }
-  return result;
-};
-
-const loadOperation = async (
-  species: ISpeciesItem,
-  itemType: string,
-  isWork: boolean,
-) => {
-  const res = await species.loadOperations(userCtrl.space.id, isWork, true, false, {
-    offset: 0,
-    limit: 1000,
-    filter: '',
-  });
-  return res.result?.map((a) => {
-    return {
-      key: itemType + a.id,
-      item: a,
-      label: a.name,
+    result.push({
+      key: itemType + item.id,
+      item: item,
+      label: item.name,
       icon: <im.ImNewspaper />,
       itemType: itemType,
       menuType: isWork ? 'checkbox' : undefined,
       menus: [],
-      children: [],
-    };
-  });
+      children: await buildSpeciesTree(item.children, itemType, isWork),
+    });
+  }
+  return result;
 };
