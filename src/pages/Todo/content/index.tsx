@@ -1,11 +1,12 @@
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import React from 'react';
-import { ITodoGroup } from '@/ts/core';
+import { ISpeciesItem, ITodoGroup } from '@/ts/core';
 import { MarketColumns, MerchandiseColumns, OrgColumns } from '../config/columns';
 import CommonTodo from './Common';
 import OrderTodo from './Order';
 import AppTodo from './App';
+import Work from './Work';
 
 interface IProps {
   reflashMenu: () => void;
@@ -14,8 +15,7 @@ interface IProps {
 }
 
 const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
-  if (checkedList.length > 0) {
-  } else {
+  if (checkedList.length <= 0) {
     let todoGroup = selectMenu.item as ITodoGroup;
     if (todoGroup) {
       switch (selectMenu.itemType) {
@@ -89,6 +89,14 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
           return <></>;
       }
     }
+  } else {
+    return (
+      <>
+        <Work
+          key={'work'}
+          ids={checkedList.map((a) => (a.item as ISpeciesItem).id)}></Work>
+      </>
+    );
   }
   return <></>;
 };

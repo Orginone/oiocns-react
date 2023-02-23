@@ -11,13 +11,18 @@ type OioFormProps = {
   operationId: string;
   operationItems?: XOperationItem[];
   designSps?: any[];
-  onValuesChange: (values: any) => void;
+  onValuesChange?: (values: any) => void;
 };
 
 /**
  * 奥集能表单
  */
-const OioForm: React.FC<OioFormProps> = ({ operationId, operationItems, designSps }) => {
+const OioForm: React.FC<OioFormProps> = ({
+  operationId,
+  operationItems,
+  designSps,
+  onValuesChange,
+}) => {
   const [sps, setSps] = useState<any[]>([]);
   const [items, setItems] = useState<XOperationItem[]>([]);
   useEffect(() => {
@@ -31,7 +36,11 @@ const OioForm: React.FC<OioFormProps> = ({ operationId, operationItems, designSp
           spaceId: userCtrl.space.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
-        setSps(speciesRes.data.result as XOperationRelation[]);
+        if (speciesRes.data.result) {
+          setSps(speciesRes.data.result);
+        } else {
+          setSps([]);
+        }
       }
       // 表单项
       if (operationItems && operationItems.length > 0) {
@@ -61,6 +70,7 @@ const OioForm: React.FC<OioFormProps> = ({ operationId, operationItems, designSp
           style: { display: 'none' },
         },
       }}
+      onValuesChange={onValuesChange}
       layout="horizontal"
       labelAlign="left"
       labelWrap={true}

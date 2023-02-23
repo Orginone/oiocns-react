@@ -20,7 +20,7 @@ const Setting: React.FC<any> = () => {
       tabKey={'1'}
       onCheckedChange={(checkedList: any[]) => {
         setCheckedList(checkedList);
-        refreshMenu();
+        // refreshMenu();
       }}
       siderMenuData={menus[0]?.menu}
       tabs={menus}>
