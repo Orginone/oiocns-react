@@ -1,22 +1,24 @@
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import React from 'react';
-import { ITodoGroup } from '@/ts/core';
+import { ISpeciesItem, ITodoGroup } from '@/ts/core';
 import { MarketColumns, MerchandiseColumns, OrgColumns } from '../config/columns';
 import CommonTodo from './Common';
 import OrderTodo from './Order';
 import AppTodo from './App';
+import Work from './Work';
 
 interface IProps {
   reflashMenu: () => void;
-  selectMenu: MenuItemType[];
+  selectMenu: MenuItemType;
+  checkedList: MenuItemType[];
 }
 
-const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
-  if (selectMenu.length == 1) {
-    let todoGroup = selectMenu[0].item as ITodoGroup;
+const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
+  if (checkedList.length <= 0) {
+    let todoGroup = selectMenu.item as ITodoGroup;
     if (todoGroup) {
-      switch (selectMenu[0].itemType) {
+      switch (selectMenu.itemType) {
         case GroupMenuType.Friend:
         case GroupMenuType.Organization:
           return (
@@ -70,7 +72,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
         case GroupMenuType.Order:
           return (
             <OrderTodo
-              typeName={selectMenu[0].key}
+              typeName={selectMenu.key}
               todoGroup={todoGroup}
               reflashMenu={reflashMenu}
             />
@@ -78,7 +80,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
         case GroupMenuType.Application:
           return (
             <AppTodo
-              typeName={selectMenu[0].key}
+              typeName={selectMenu.key}
               todoGroup={todoGroup}
               reflashMenu={reflashMenu}
             />
@@ -87,6 +89,14 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
           return <></>;
       }
     }
+  } else {
+    return (
+      <>
+        <Work
+          key={'work'}
+          ids={checkedList.map((a) => (a.item as ISpeciesItem).id)}></Work>
+      </>
+    );
   }
   return <></>;
 };

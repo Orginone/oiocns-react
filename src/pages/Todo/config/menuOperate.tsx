@@ -57,17 +57,11 @@ export const loadPlatformMenu = async () => {
 /** 获取事菜单 */
 export const loadThingMenus = async (prefix: string, isWork: boolean = false) => {
   const root = await userCtrl.space.loadSpeciesTree();
-  const species = root?.children?.find((item) => item.name == '事') || null;
-  return species
-    ? await buildSpeciesTree(species, prefix + '事', isWork)
-    : {
-        children: [],
-        key: prefix + '事',
-        label: '事',
-        itemType: prefix + '事',
-        item: species,
-        icon: <im.ImNewspaper />,
-      };
+  var thing = root?.children?.find((item) => item.name == '事');
+  if (thing) {
+    return await buildSpeciesTree(thing.children, prefix + '事', isWork);
+  }
+  return [];
 };
 
 const loadMarket = async () => {
@@ -151,38 +145,22 @@ const loadOrgChildren = async (todoGroups: ITodoGroup[]) => {
 
 /** 编译分类树 */
 const buildSpeciesTree = async (
-  species: ISpeciesItem,
+  species: ISpeciesItem[],
   itemType: string,
   isWork: boolean,
-): Promise<MenuItemType> => {
-  let children: MenuItemType[] = [];
-  species.children.forEach(async (a) => {
-    children.push(await buildSpeciesTree(a, itemType, isWork));
-  });
-  const res = await species.loadOperations(userCtrl.space.id, isWork, true, false, {
-    offset: 0,
-    limit: 1000,
-    filter: '',
-  });
-  res.result?.forEach((a) => {
-    children.push({
-      key: itemType + a.id,
-      item: a,
-      label: a.name,
+): Promise<MenuItemType[]> => {
+  var result: MenuItemType[] = [];
+  for (let item of species) {
+    result.push({
+      key: itemType + item.id,
+      item: item,
+      label: item.name,
       icon: <im.ImNewspaper />,
       itemType: itemType,
       menuType: isWork ? 'checkbox' : undefined,
       menus: [],
-      children: [],
+      children: await buildSpeciesTree(item.children, itemType, isWork),
     });
-  });
-  return {
-    key: itemType + species.id,
-    item: species,
-    label: species.name,
-    icon: <im.ImNewspaper />,
-    itemType: itemType,
-    menus: [],
-    children: children,
-  };
+  }
+  return result;
 };
