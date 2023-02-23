@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FRGeneratorProps } from 'fr-generator';
 import { XOperation } from '@/ts/base/schema';
 import { Descriptions, Modal } from 'antd';
 import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
 
-interface FormDesignProps extends FRGeneratorProps {
+interface FormDesignProps {
   open: boolean;
   data: XOperation | undefined;
   handleCancel: () => void;
@@ -65,7 +64,6 @@ const ViewCardModal = (props: FormDesignProps) => {
         {items.map((item) => {
           return (
             <Descriptions.Item key={item.id} label={item.rule?.title}>
-              {/* <ProField valueType={item.rule.widget} mode="edit" bordered={false} /> */}
               <div style={{ width: '120px' }}></div>
             </Descriptions.Item>
           );

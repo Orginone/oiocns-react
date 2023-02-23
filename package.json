@@ -69,8 +69,6 @@
     "dayjs": "^1.10.6",
     "devextreme": "22.2.4",
     "devextreme-react": "22.2.4",
-    "form-render": "^1.14.7",
-    "fr-generator": "^2.8.4",
     "mockjs": "^1.1.0",
     "pako": "^2.0.4",
     "qrcode": "^1.5.1",
