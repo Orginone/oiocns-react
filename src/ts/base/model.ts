@@ -115,6 +115,12 @@ export type IdOperationReq = {
   // 分页
   page: PageRequest;
 };
+export type IdArraySpaceReq = {
+  // 唯一ID
+  ids: string[];
+  // 工作空间ID
+  spaceId: string;
+};
 
 export type QueryDefineReq = {
   // 分类ID

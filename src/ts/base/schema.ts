@@ -129,6 +129,8 @@ export type XOperation = {
   species: XSpecies | undefined;
   // 创建度量标准的组织/个人
   belong: XTarget | undefined;
+  // 子项
+  items: XOperationItem[] | undefined;
   // 子表绑定的分类
   operationRelations: XOperationRelation[] | undefined;
 };

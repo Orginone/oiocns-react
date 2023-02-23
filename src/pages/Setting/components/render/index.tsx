@@ -31,7 +31,11 @@ const OioForm: React.FC<OioFormProps> = ({ operationId, operationItems, designSp
           spaceId: userCtrl.space.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
-        setSps(speciesRes.data.result as XOperationRelation[]);
+        if (speciesRes.data.result) {
+          setSps(speciesRes.data.result);
+        } else {
+          setSps([]);
+        }
       }
       // 表单项
       if (operationItems && operationItems.length > 0) {
