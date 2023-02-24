@@ -1,20 +1,19 @@
-import { TreeSelect } from 'antd';
-import React, { useEffect, useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import { DefaultOptionType } from 'rc-select/lib/Select';
-interface IProps {
-  value?: string;
-  onChange: any;
-  readonly?: boolean;
-}
-const SelectAuth: React.FC<IProps> = (props: IProps) => {
+import { ProFormTreeSelect } from '@ant-design/pro-components';
+import { DefaultOptionType } from 'antd/lib/select';
+import React, { useEffect, useState } from 'react';
+
+/**
+ * 职权组件
+ */
+const ProFormAuth = (props: any) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
     let tree = await userCtrl.space.loadAuthorityTree(false);
     if (tree) {
       setTreeData([
-        ...[{ label: '全员', value: '0', children: [] }],
+        ...[{ label: '全员', value: '0', key: '0', children: [] }],
         ...getTreeData([tree]),
       ]);
     }
@@ -22,6 +21,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
     return targets.map((item: IAuthority) => {
       return {
+        key: item.id,
         label: item.name,
         value: item.id,
         children:
@@ -35,18 +35,20 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
   }, [userCtrl.space]);
 
   return (
-    <TreeSelect
-      showSearch
-      style={{ width: '100%', paddingTop: '10%' }}
-      value={props.value}
-      dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-      placeholder="请选择角色"
-      treeDefaultExpandAll
-      onChange={props.onChange}
-      treeData={treeData}
-      disabled={props.readonly}
+    <ProFormTreeSelect
+      name={props.name}
+      label={props.label || '角色'}
+      tooltip={props.tooltip}
+      labelAlign={props.labelAlign}
+      colProps={props.colProps}
+      allowClear
+      fieldProps={{
+        ...props.rule,
+        ...{ treeData },
+      }}
+      rules={props.rules}
     />
   );
 };
 
-export default SelectAuth;
+export default ProFormAuth;

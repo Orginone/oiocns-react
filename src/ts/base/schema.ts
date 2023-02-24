@@ -123,6 +123,8 @@ export type XOperation = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 角色ID
+  beginAuthId: string;
   // 绑定的流程
   flow: XFlowDefine | undefined;
   // 度量特性对应的类别

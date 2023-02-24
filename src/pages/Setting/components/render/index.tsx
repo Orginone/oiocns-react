@@ -5,7 +5,7 @@ import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import OioFormItem from './FormItems';
 import SpeciesTables from './SpeciesTables';
-import { XOperationItem, XOperationRelation } from '@/ts/base/schema';
+import { XOperationItem } from '@/ts/base/schema';
 
 type OioFormProps = {
   operationId: string;
