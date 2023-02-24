@@ -1,6 +1,6 @@
 // @ts-nocheck
 import axios from 'axios';
-import Qs from 'qs';
+// import Qs from 'qs';
 
 export const requestInstance = axios.create({});
 
@@ -164,7 +164,7 @@ export default function request(
       } else {
         // 类型 `application/x-www-form-urlencoded`
         // 服务器收到的raw body(原始数据) name=homeway&key=nokey
-        defaultConfig.data = Qs.stringify(data);
+        // defaultConfig.data = Qs.stringify(data);
       }
     }
   }
