@@ -27,7 +27,7 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const [key] = useCtrlUpdate(storeCtrl);
-  const [thingAttrs, setThingAttrs] = useState<any[]>();
+  const [thingAttrs, setThingAttrs] = useState<any[]>([]);
   // const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
   const getSortedList = (
