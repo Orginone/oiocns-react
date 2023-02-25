@@ -32,9 +32,6 @@ const CcNode: React.FC<IProps> = (props) => {
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
-        {/* <div style={{ marginBottom: '10px' }}>
-          <SelectOrg orgId={nodeOperateOrgId} onChange={onChange}></SelectOrg>
-        </div> */}
         <div style={{ marginBottom: '10px' }}>
           <Button
             type="primary"
