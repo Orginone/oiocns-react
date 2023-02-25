@@ -11,7 +11,7 @@ const Setting: React.FC<any> = () => {
     setSelectMenu,
     checkedList,
     operations,
-    LoadWorkOperation,
+    setCheckedList,
   ] = useMenuUpdate();
   return (
     <MainLayout
@@ -21,13 +21,13 @@ const Setting: React.FC<any> = () => {
       }}
       checkedList={checkedList}
       onTabChanged={(_) => {
-        LoadWorkOperation([]);
+        setCheckedList([]);
         refreshMenu();
       }}
       tabKey={'1'}
       onCheckedChange={(checkedList: any[]) => {
-        LoadWorkOperation(checkedList);
-        refreshMenu();
+        setCheckedList(checkedList);
+        // refreshMenu();
       }}
       siderMenuData={menus[0]?.menu}
       tabs={menus}>
