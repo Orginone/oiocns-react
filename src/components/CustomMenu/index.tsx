@@ -34,8 +34,9 @@ const CustomMenu = (props: CustomMenuType) => {
   const [overItem, setOverItem] = useState<any>();
   const [data, setData] = useState<MenuProps['items']>([]);
   const [operateMenu, setOperateMenu] = useState<OperateMenuType>();
-  const [checkedList, setCheckedList] = useState<MenuItemType[]>(props.checkedList || []);
+  // const [checkedList, setCheckedList] = useState<MenuItemType[]>(props.checkedList || []);
   const [checkboxKey, setCheckboxKey] = useState<string>();
+  // useEffect()
   useEffect(() => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
@@ -107,17 +108,18 @@ const CustomMenu = (props: CustomMenuType) => {
             <span style={{ fontSize: 16, paddingTop: 2 }}>
               {item.menuType == 'checkbox' && (
                 <Checkbox
-                  checked={checkedList.map((it) => it.key).includes(item.key)}
+                  checked={props.checkedList?.map((it) => it.key).includes(item.key)}
                   style={{ paddingRight: 10 }}
                   onChange={(e: any) => {
                     if (e.target.checked) {
+                      let checkedList = props.checkedList || [];
                       checkedList.push(item);
                       props.onCheckedChange?.call(this, checkedList);
-                      setCheckedList(checkedList);
+                      // setCheckedList(checkedList);
                     } else {
-                      let list = checkedList.filter((ky) => ky.key != item.key);
+                      let list = props.checkedList?.filter((ky) => ky.key != item.key);
                       props.onCheckedChange?.call(this, list);
-                      setCheckedList(list);
+                      // setCheckedList(list);
                     }
                     setCheckboxKey(getUuid());
                   }}></Checkbox>
