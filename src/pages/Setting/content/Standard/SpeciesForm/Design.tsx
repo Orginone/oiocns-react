@@ -30,12 +30,6 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
       const res = await kernel.createOperationItems({
         spaceId: userCtrl.space.id,
         operationId: operationModel.id!,
-        SpeciesItems: operationModel.speciesItems
-          .filter((i: any) => i.belongId == userCtrl.space.id)
-          .map((a) => ({
-            rule: a.rule,
-            speciesId: a.speciesId,
-          })),
         operationItems: operationModel.items
           .filter((i: any) => i.belongId == userCtrl.space.id)
           .map((a) => ({
@@ -44,6 +38,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
             attrId: a.attrId,
             rule: a.rule,
             remark: a.remark,
+            speciesIds: a.speciesIds || [],
           })),
       });
       if (res.success) {

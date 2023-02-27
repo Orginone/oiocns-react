@@ -23,10 +23,9 @@ import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
 import SpeciesTabs from './SpeciesTabs';
-import SpeciesDataGrid from './SpeciesDataGrid';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
-import { XOperation } from '@/ts/base/schema';
+import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { OperationItemModel, OperationModel } from '@/ts/base/model';
 import OioForm from '../render';
 
@@ -191,19 +190,6 @@ type DesignProps = {
   setOperationModel: (operationModel: OperationModel) => void;
 };
 
-export type DesignSpecies = {
-  // 规则
-  rule: string;
-  // 备注
-  speciesId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 业务Id
-  operationId: string;
-  // 类别
-  species: ISpeciesItem;
-};
-
 /**
  * 表单设计器
  * @param props
@@ -217,29 +203,20 @@ const Design: React.FC<DesignProps> = ({
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const belongId = userCtrl.space.id;
   const [items, setItems] = useState<any>({
+    // 特性
     attrs: [],
+    // 表单项
     operationItems: [],
   });
-  const [designSpeciesArray, setDesignSpeciesArray] = useState<DesignSpecies[]>([]);
+  // 表单项--子表
   const [form] = Form.useForm();
   const [formCol, setFormCol] = useState(12);
-  const [selectedItem, setSelectedItem] = useState<any>({});
+  const [selectedItem, setSelectedItem] = useState<XOperationItem>();
   const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
 
   useEffect(() => {
     const queryItems = async () => {
-      // // 查询类别子表
-      // const speciesRes = await kernel.queryOperationSpeciesItems({
-      //   id: operation.id,
-      //   spaceId: belongId,
-      //   page: { offset: 0, limit: 100000, filter: '' },
-      // });
-      // if (speciesRes.success) {
-      //   setDesignSpeciesArray(
-      //     (speciesRes.data.result || []) as unknown as DesignSpecies[],
-      //   );
-      // }
       // 查询操作项
       const operateItemRes = await kernel.queryOperationItems({
         id: operation.id,
@@ -253,16 +230,10 @@ const Design: React.FC<DesignProps> = ({
         filter: '',
       });
       let operateItems = operateItemRes.data?.result || [];
-      const tabOperateItems = operateItems.filter(
-        (item) => item.containSpecies && item.containSpecies.length > 0,
-      );
-      operateItems = operateItems.filter((item) => item.attrId);
-      console.log('tabOperateItems', tabOperateItems);
-
       let attrs: any[] = attrRes.result || [];
       const attrIds = operateItems.map((item) => item.attrId);
       items['operationItems'] = operateItems;
-      // 过滤
+      // 过滤出特性
       items['attrs'] = attrs.filter((attr) => !attrIds.includes(attr.id));
       setItems(items);
       tforceUpdate();
@@ -411,73 +382,68 @@ const Design: React.FC<DesignProps> = ({
 
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
-    const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
-    setSelectedItem({
-      ...selectedItem,
-      ...{ rule: JSON.stringify(rule) },
-    });
-    const operationItems = items['operationItems'].map((oi: any) => {
-      if (oi.id === selectedItem.id) {
-        oi.rule = JSON.stringify(rule);
-      }
-      return oi;
-    });
-    const data = { ...items, ...{ operationItems } };
-    setOperationModel({
-      ...operation,
-      ...{ items: operationItems },
-      ...{
-        speciesItems: designSpeciesArray,
-      },
-    });
-    setItems(data);
-    tforceUpdate();
+    if (selectedItem) {
+      const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
+      setSelectedItem({
+        ...selectedItem,
+        ...{ rule: JSON.stringify(rule) },
+      });
+      const operationItems = items['operationItems'].map((oi: any) => {
+        if (oi.id === selectedItem.id) {
+          oi.rule = JSON.stringify(rule);
+        }
+        return oi;
+      });
+      const data = { ...items, ...{ operationItems } };
+      setOperationModel({
+        ...operation,
+        ...{ items: operationItems },
+      });
+      setItems(data);
+      tforceUpdate();
+    }
   };
 
-  // 添加子表
-  const addSpecies = (speciesArray: ISpeciesItem[]) => {
-    const ids = designSpeciesArray.map((ds) => ds.speciesId);
-    speciesArray = speciesArray.filter((sp) => !ids.includes(sp.id));
-    const dsArray = [
-      ...designSpeciesArray,
-      ...speciesArray.map((sp) => {
-        return {
-          rule: '{}',
-          speciesId: sp.id,
-          belongId,
-          operationId: operation.id,
-          species: sp,
-        };
-      }),
+  // 添加表单子表项
+  const addOperationItem = (
+    operationItem: XOperationItem,
+    speciesArray: ISpeciesItem[],
+  ) => {
+    items['operationItems'] = [
+      ...items['operationItems'],
+      {
+        containSpecies: speciesArray.map((i) => i.target),
+        speciesIds: speciesArray.map((i) => i.target.id),
+        // speciesIds: speciesArray.map((i) => i.id),
+        name: operationItem.name,
+        code: operationItem.code,
+        belongId: operationItem.belongId,
+        rule: '{}',
+        operationId: operation.id,
+      },
     ];
-    setDesignSpeciesArray(dsArray);
+    setItems(items);
     setOperationModel({
       ...operation,
       ...{ items: items['operationItems'] },
-      ...{
-        speciesItems: dsArray,
-      },
     });
     setOpenSpeciesModal(false);
     tforceUpdate();
   };
 
-  // 删除子表
-  const deleteSpecies = (id: string) => {
-    const dsArray = designSpeciesArray.filter((ds) => ds.speciesId !== id);
+  // 删除表单子表项
+  const deleteOperationItem = (code: string) => {
+    items['operationItems'] = items['operationItems'].filter((i: any) => i.code !== code);
+    setItems(items);
     setOperationModel({
       ...operation,
       ...{ items: items['operationItems'] },
-      ...{
-        speciesItems: dsArray,
-      },
     });
-    setDesignSpeciesArray(dsArray);
     tforceUpdate();
   };
 
   return (
-    <>
+    <div key={tkey}>
       <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn}>
         <Row>
           <Col span={3}>
@@ -571,19 +537,24 @@ const Design: React.FC<DesignProps> = ({
                     sm: { span: 10 },
                   }}>
                   <Row gutter={24}>
-                    {items['operationItems'].map((item: any) => (
-                      <Col span={formCol} key={item.id}>
-                        <OperateItem item={item} />
-                      </Col>
-                    ))}
-                    {designSpeciesArray.length > 0 && (
+                    {items['operationItems']
+                      .filter((i: XOperationItem) => i.attrId)
+                      .map((item: any) => (
+                        <Col span={formCol} key={item.id}>
+                          <OperateItem item={item} />
+                        </Col>
+                      ))}
+                    {items['operationItems'].filter((i: XOperationItem) => !i.attrId)
+                      .length > 0 && (
                       <Col span={24}>
-                        {/* <SpeciesTabs
-                          dsps={designSpeciesArray}
-                          deleteSpecies={deleteSpecies}
+                        <SpeciesTabs
+                          operationItems={items['operationItems'].filter(
+                            (i: XOperationItem) => !i.attrId,
+                          )}
+                          setSelectedItem={setSelectedItem}
+                          deleteOperationItem={deleteOperationItem}
                           setOpenSpeciesModal={setOpenSpeciesModal}
-                        /> */}
-                        <SpeciesDataGrid dsps={designSpeciesArray} />
+                        />
                       </Col>
                     )}
                   </Row>
@@ -652,10 +623,11 @@ const Design: React.FC<DesignProps> = ({
       <SpeciesTreeModal
         spaceId={belongId || userCtrl.space.id}
         open={showSpecies}
+        operationItem={selectedItem}
         handleCancel={() => setOpenSpeciesModal(false)}
         speciesIds={[]}
-        handleOk={(result, species: any[]) => {
-          addSpecies(species);
+        handleOk={(operationItem, species: any[]) => {
+          addOperationItem(operationItem, species);
         }}
       />
       <Modal
@@ -669,11 +641,10 @@ const Design: React.FC<DesignProps> = ({
         <OioForm
           operationId={operation.id}
           operationItems={items['operationItems']}
-          designSps={designSpeciesArray}
           onValuesChange={(values) => console.log('values', values)}
         />
       </Modal>
-    </>
+    </div>
   );
 };
 

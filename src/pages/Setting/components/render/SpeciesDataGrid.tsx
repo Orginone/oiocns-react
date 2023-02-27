@@ -10,8 +10,8 @@ import DataGrid, {
   HeaderFilter,
   FilterRow,
 } from 'devextreme-react/data-grid';
-import { DesignSpecies } from './../design';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { XSpecies } from '@/ts/base/schema';
 
 export type Header = {
   id: string;
@@ -20,26 +20,26 @@ export type Header = {
 };
 
 interface IProps {
-  dsps: DesignSpecies[];
+  speciesArray: XSpecies[];
 }
 /**
  * 类别-数据表格子表
  */
-const SpeciesDataGrid: React.FC<IProps> = ({ dsps }) => {
+const SpeciesDataGrid: React.FC<IProps> = ({ speciesArray }) => {
   const [headers, setHeaders] = useState<Header[]>([]);
-  const [tkey, tforceUpdate] = useObjectUpdate(dsps);
+  const [tkey, tforceUpdate] = useObjectUpdate(speciesArray);
 
   useEffect(() => {
     const loadHeader = async () => {
       const headers: Header[] = [];
-      for (const dsp of dsps) {
+      for (const species of speciesArray) {
         const header: Header = {
-          id: dsp.speciesId,
-          title: dsp.species.name,
+          id: species.id,
+          title: species.name,
           children: [],
         };
         const res = await kernel.querySpeciesAttrs({
-          id: dsp.speciesId,
+          id: species.id,
           spaceId: userCtrl.space.id,
           recursionOrg: true,
           recursionSpecies: false,

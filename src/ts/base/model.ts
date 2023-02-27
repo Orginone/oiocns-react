@@ -389,8 +389,6 @@ export type OperationModel = {
   beginAuthId?: string;
   // 子项列表
   items: OperationItem[];
-  // 子表分类ID集合
-  speciesItems: OperationRelation[];
 };
 
 export type OperationItemModel = {

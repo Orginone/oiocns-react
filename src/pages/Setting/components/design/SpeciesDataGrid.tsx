@@ -3,15 +3,9 @@ import { Card } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import { kernel } from '@/ts/base';
 import 'devextreme/dist/css/dx.light.css';
-import DataGrid, {
-  Column,
-  ColumnChooser,
-  ColumnFixing,
-  HeaderFilter,
-  FilterRow,
-} from 'devextreme-react/data-grid';
-import { DesignSpecies } from '.';
+import DataGrid, { Column, ColumnFixing, FilterRow } from 'devextreme-react/data-grid';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { XSpecies } from '@/ts/base/schema';
 
 export type Header = {
   id: string;
@@ -20,26 +14,26 @@ export type Header = {
 };
 
 interface IProps {
-  dsps: DesignSpecies[];
+  speciesArray: XSpecies[];
 }
 /**
  * 类别-数据表格子表
  */
-const SpeciesDataGrid: React.FC<IProps> = ({ dsps }) => {
+const SpeciesDataGrid: React.FC<IProps> = ({ speciesArray }) => {
   const [headers, setHeaders] = useState<Header[]>([]);
-  const [tkey, tforceUpdate] = useObjectUpdate(dsps);
+  const [tkey, tforceUpdate] = useObjectUpdate(speciesArray);
 
   useEffect(() => {
     const loadHeader = async () => {
       const headers: Header[] = [];
-      for (const dsp of dsps) {
+      for (const species of speciesArray) {
         const header: Header = {
-          id: dsp.speciesId,
-          title: dsp.species.name,
+          id: species.id,
+          title: species.name,
           children: [],
         };
         const res = await kernel.querySpeciesAttrs({
-          id: dsp.speciesId,
+          id: species.id,
           spaceId: userCtrl.space.id,
           recursionOrg: true,
           recursionSpecies: false,
@@ -78,16 +72,8 @@ const SpeciesDataGrid: React.FC<IProps> = ({ dsps }) => {
         hoverStateEnabled={true}
         height={'400px'}
         showBorders={true}>
-        <ColumnChooser
-          enabled={true}
-          title={'列选择器'}
-          height={'500px'}
-          allowSearch={true}
-          mode={'select'}
-          sortOrder={'asc'}
-        />
         <ColumnFixing enabled={true} />
-        <HeaderFilter visible={true} />
+        {/* <HeaderFilter visible={true} /> */}
         <FilterRow visible={true} />
         {headers.map((header) => (
           <Column key={header.id} caption={header.title}>

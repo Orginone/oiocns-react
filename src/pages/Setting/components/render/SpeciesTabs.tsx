@@ -4,24 +4,17 @@ import userCtrl from '@/ts/controller/setting';
 import { XOperationItem } from '@/ts/base/schema';
 import SpeciesDataGrid from './SpeciesDataGrid';
 
+/**
+ * 多子表
+ */
 type SpeciesTabsProps = {
   operationItems: XOperationItem[];
-  setSelectedItem: (item: XOperationItem) => void;
-  deleteOperationItem: (id: string) => void;
-  setOpenSpeciesModal: (show: boolean) => void;
 };
 
-/**
- * 子表Tabs
- */
-const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
-  operationItems,
-  deleteOperationItem,
-  setOpenSpeciesModal,
-}) => {
+const SpeciesTabs: React.FC<SpeciesTabsProps> = ({ operationItems }) => {
   const items = operationItems.map((item) => {
     return {
-      key: item.code,
+      key: item.id,
       label: (
         <div style={{ paddingTop: '4px', paddingLeft: '12px', paddingRight: '4px' }}>
           {item.name}
@@ -38,27 +31,9 @@ const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
     setActiveKey(newActiveKey);
   };
 
-  const add = () => {
-    setOpenSpeciesModal(true);
-  };
-
-  const onEdit = (key: string, action: 'add' | 'remove') => {
-    if (action === 'add') {
-      add();
-    } else {
-      deleteOperationItem(key);
-    }
-  };
-
   return (
     <div style={{ padding: '6px' }}>
-      <Tabs
-        type="editable-card"
-        onChange={onChange}
-        activeKey={activeKey}
-        onEdit={(key: any, action) => onEdit(key, action)}
-        items={items}
-      />
+      <Tabs onChange={onChange} activeKey={activeKey} items={items} />
     </div>
   );
 };

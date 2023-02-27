@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react';
 import { kernel } from '@/ts/base';
+import { XOperationItem } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
-import SpeciesTables from './SpeciesTables';
-import { XOperationItem } from '@/ts/base/schema';
-import SpeciesDataGrid from './SpeciesDataGrid';
+import SpeciesTabs from './SpeciesTabs';
 
 type OioFormProps = {
   operationId: string;
   operationItems?: XOperationItem[];
-  designSps?: any[];
   onValuesChange?: (values: any) => void;
 };
 
@@ -21,28 +19,11 @@ type OioFormProps = {
 const OioForm: React.FC<OioFormProps> = ({
   operationId,
   operationItems,
-  designSps,
   onValuesChange,
 }) => {
-  const [sps, setSps] = useState<any[]>([]);
   const [items, setItems] = useState<XOperationItem[]>([]);
   useEffect(() => {
     const queryItems = async () => {
-      // 类别子表
-      if (designSps && designSps.length > 0) {
-        setSps(designSps);
-      } else {
-        const speciesRes = await kernel.queryOperationSpeciesItems({
-          id: operationId as string,
-          spaceId: userCtrl.space.id,
-          page: { offset: 0, limit: 100000, filter: '' },
-        });
-        if (speciesRes.data.result) {
-          setSps(speciesRes.data.result);
-        } else {
-          setSps([]);
-        }
-      }
       // 表单项
       if (operationItems && operationItems.length > 0) {
         setItems(operationItems);
@@ -85,10 +66,9 @@ const OioForm: React.FC<OioFormProps> = ({
             <OioFormItem item={item} />
           </Col>
         ))}
-        {sps.length > 0 && (
+        {operationItems && operationItems.length > 0 && (
           <Col span={24}>
-            {/* <SpeciesTables dsps={sps} /> */}
-            <SpeciesDataGrid dsps={sps} />
+            <SpeciesTabs operationItems={operationItems} />
           </Col>
         )}
       </Row>
