@@ -133,8 +133,6 @@ export type XOperation = {
   belong: XTarget | undefined;
   // 子项
   items: XOperationItem[] | undefined;
-  // 子表绑定的分类
-  operationRelations: XOperationRelation[] | undefined;
 };
 
 //业务标准查询返回集合
