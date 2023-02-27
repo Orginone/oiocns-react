@@ -6,6 +6,7 @@ import { Col, Row } from 'antd';
 import OioFormItem from './FormItems';
 import SpeciesTables from './SpeciesTables';
 import { XOperationItem } from '@/ts/base/schema';
+import SpeciesDataGrid from './SpeciesDataGrid';
 
 type OioFormProps = {
   operationId: string;
@@ -51,7 +52,7 @@ const OioForm: React.FC<OioFormProps> = ({
           spaceId: userCtrl.space.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
-        setItems(operateItemRes.data.result as XOperationItem[]);
+        setItems((operateItemRes.data.result || []) as XOperationItem[]);
       }
     };
     queryItems();
@@ -86,7 +87,8 @@ const OioForm: React.FC<OioFormProps> = ({
         ))}
         {sps.length > 0 && (
           <Col span={24}>
-            <SpeciesTables dsps={sps} />
+            {/* <SpeciesTables dsps={sps} /> */}
+            <SpeciesDataGrid dsps={sps} />
           </Col>
         )}
       </Row>

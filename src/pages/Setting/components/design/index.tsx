@@ -23,6 +23,7 @@ import { EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
 import SpeciesTabs from './SpeciesTabs';
+import SpeciesDataGrid from './SpeciesDataGrid';
 import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
@@ -571,11 +572,12 @@ const Design: React.FC<DesignProps> = ({
                     ))}
                     {designSpeciesArray.length > 0 && (
                       <Col span={24}>
-                        <SpeciesTabs
+                        {/* <SpeciesTabs
                           dsps={designSpeciesArray}
                           deleteSpecies={deleteSpecies}
                           setOpenSpeciesModal={setOpenSpeciesModal}
-                        />
+                        /> */}
+                        <SpeciesDataGrid dsps={designSpeciesArray} />
                       </Col>
                     )}
                   </Row>

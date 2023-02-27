@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs } from 'antd';
 import { ISpeciesItem } from '@/ts/core';
 import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import { EditableProTable } from '@ant-design/pro-components';
-import { DesignSpecies } from './../design';
 
 type SpeciesTableProps = {
   sp: ISpeciesItem;
@@ -64,38 +62,4 @@ const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
   );
 };
 
-/**
- * 多子表
- */
-type SpeciesTabsProps = {
-  dsps: DesignSpecies[];
-};
-
-const SpeciesTables: React.FC<SpeciesTabsProps> = ({ dsps }) => {
-  const items = dsps.map((dsp) => {
-    return {
-      key: dsp.speciesId,
-      label: (
-        <div style={{ paddingTop: '4px', paddingLeft: '12px', paddingRight: '4px' }}>
-          {dsp.species?.name}
-        </div>
-      ),
-      closable: dsp.belongId == userCtrl.space.id,
-      children: <SpeciesTable sp={dsp.species} />,
-    };
-  });
-
-  const [activeKey, setActiveKey] = useState<any>();
-
-  const onChange = (newActiveKey: string) => {
-    setActiveKey(newActiveKey);
-  };
-
-  return (
-    <div style={{ padding: '6px' }}>
-      <Tabs onChange={onChange} activeKey={activeKey} items={items} />
-    </div>
-  );
-};
-
-export default SpeciesTables;
+export default SpeciesTable;

@@ -5,7 +5,6 @@ import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
-import 'devextreme/dist/css/dx.light.css';
 import DataGrid, {
   Column,
   ColumnChooser,
@@ -79,6 +78,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         });
       }
     }
+    console.log('parentHeaders', parentHeaders);
     setThingAttrs(parentHeaders);
   };
 

@@ -36,6 +36,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         { find: /^~/, replacement: '' },
         { find: '@', replacement: path.resolve(__dirname, 'src') },
         { find: '@cfg', replacement: path.resolve(__dirname, 'config') },
+        {
+          find: 'devextreme-react/ui',
+          replacement: path.resolve(__dirname, 'devextreme-react/esm/ui'),
+        },
       ],
     },
     server: {
@@ -73,7 +77,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         // 确保外部化处理那些你不想打包进库的依赖
         // external: ['react', 'antd'], // 注意看这里
-        treeshake: false,
+        treeshake: true,
         output: {
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
@@ -89,6 +93,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           //   }
           // },
         },
+        plugins: [
+          {
+            name: 'no-treeshake',
+            transform(_, id) {
+              if (id.includes('integration/jquery')) {
+                return { moduleSideEffects: 'no-treeshake' };
+              }
+              if (id.includes('ui/data_grid')) {
+                return { moduleSideEffects: 'no-treeshake' };
+              }
+            },
+          },
+        ],
       },
     },
     define: {
