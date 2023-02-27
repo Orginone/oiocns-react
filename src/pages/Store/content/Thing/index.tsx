@@ -5,6 +5,7 @@ import { ISpeciesItem } from '@/ts/core/target/species/ispecies';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
+import 'devextreme/dist/css/dx.light.css';
 import DataGrid, {
   Column,
   ColumnChooser,
@@ -15,6 +16,7 @@ import DataGrid, {
   Pager,
   Paging,
   Lookup,
+  // StateStoring,
 } from 'devextreme-react/data-grid';
 import { getUuid } from '@/utils/tools';
 interface IProps {
@@ -78,7 +80,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         });
       }
     }
-    console.log('parentHeaders', parentHeaders);
     setThingAttrs(parentHeaders);
   };
 
@@ -108,28 +109,28 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             dataSource={[
               {
                 key: getUuid(),
-                ASSET_ID: '8719817174617',
-                ASSET_CODE: 'BZ011',
-                ASSET_NAME: '测试数据(本征)',
-                ASSET_TYPE: '10000000',
+                '27466608057172992': '8719817174617',
+                '27466608057205760': 'BZ011',
+                '27466608057205761': '测试数据(本征)',
+                '27466608057205762': '10000000',
                 tagIds: '27466605935444992',
               },
               {
                 key: getUuid(),
-                ASSET_ID: '8719817177875',
-                ASSET_CODE: 'GC0187',
-                ASSET_NAME: '测试数据(工程建筑)',
-                ASSET_TYPE: '10010000',
-                SOURCE_PLACE: '北京市朝阳区601号',
-                FLOOR_AREA: '10000 m2',
+                '27466608057172992': '8719817177875',
+                '27466608057205760': 'GC0187',
+                '27466608057205761': '测试数据(工程建筑)',
+                '27466608057205762': '10010000',
+                '27466608057205780': '北京市朝阳区601号',
+                '	27466608057205781': '10000 m2',
                 tagIds: '27466605935444992,27466605935444993',
               },
               {
                 key: getUuid(),
-                HERITAGE_GR: '211',
-                HERITAGE_NO: 'WW011',
-                TYPES_OF_CULTURAL_RELICS: '书画',
-                SOURCE_OF_CULTURAL_RELICS: '1',
+                '27466608057238644': '211',
+                '27466608057238645': 'WW011',
+                '27466608057238646': '书画',
+                '27466608057238647': '1',
                 tagIds: '27466605935445008',
               },
             ].filter((record) => {
@@ -166,8 +167,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               selectTextOnEditStart={true}
               useIcons={true}
             />
+            {/* <StateStoring enabled={true} type="localStorage" /> */}
             <HeaderFilter visible={true} />
-            {/* <FilterPanel visible={true} /> */}
             <FilterRow visible={true} />
             <Pager
               visible={true}
@@ -182,7 +183,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             {thingAttrs.map((parentHeader: any) => (
               <Column key={parentHeader.caption} caption={parentHeader.caption}>
                 {parentHeader.children.map((attr: any) => (
-                  <Column key={attr.id} dataField={attr.code} caption={attr.name}>
+                  <Column key={attr.id} dataField={attr.id} caption={attr.name}>
                     {attr.valueType == '选择型' && (
                       <Lookup
                         dataSource={attr.dictItems || []}
