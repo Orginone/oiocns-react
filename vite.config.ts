@@ -36,10 +36,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         { find: /^~/, replacement: '' },
         { find: '@', replacement: path.resolve(__dirname, 'src') },
         { find: '@cfg', replacement: path.resolve(__dirname, 'config') },
-        {
-          find: 'devextreme-react/ui',
-          replacement: path.resolve(__dirname, 'devextreme-react/esm/ui'),
-        },
       ],
     },
     server: {
