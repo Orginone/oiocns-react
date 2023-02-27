@@ -400,8 +400,6 @@ export type OperationItemModel = {
   operationId: string;
   // 子项集合
   operationItems: OperationItem[];
-  // 子表集合
-  SpeciesItems: OperationRelation[];
 };
 
 export type OperationRelation = {
@@ -422,6 +420,8 @@ export type OperationItem = {
   rule: string;
   // 备注
   remark: string;
+  // 子表项下的分类Id集合
+  speciesIds: string[];
 };
 
 export type AuthorityModel = {
