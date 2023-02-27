@@ -104,7 +104,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   const getComponent = (speciesArray: ISpeciesItem[]) => {
     return (
       <>
-        {thingAttrs && (
+        {thingAttrs && thingAttrs.length > 0 && (
           <DataGrid
             dataSource={[
               {
