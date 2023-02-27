@@ -185,6 +185,10 @@ export type XOperationItem = {
   belong: XTarget | undefined;
   // 绑定的特性
   attr: XAttribute | undefined;
+  // 子表关联的分类
+  containSpecies: XSpecies[] | undefined;
+  // 子项与分类的关联
+  operationRelations: XOperationRelation[] | undefined;
 };
 
 //业务标准查询返回集合
