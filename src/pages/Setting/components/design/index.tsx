@@ -229,17 +229,17 @@ const Design: React.FC<DesignProps> = ({
 
   useEffect(() => {
     const queryItems = async () => {
-      // 查询类别子表
-      const speciesRes = await kernel.queryOperationSpeciesItems({
-        id: operation.id,
-        spaceId: belongId,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      if (speciesRes.success) {
-        setDesignSpeciesArray(
-          (speciesRes.data.result || []) as unknown as DesignSpecies[],
-        );
-      }
+      // // 查询类别子表
+      // const speciesRes = await kernel.queryOperationSpeciesItems({
+      //   id: operation.id,
+      //   spaceId: belongId,
+      //   page: { offset: 0, limit: 100000, filter: '' },
+      // });
+      // if (speciesRes.success) {
+      //   setDesignSpeciesArray(
+      //     (speciesRes.data.result || []) as unknown as DesignSpecies[],
+      //   );
+      // }
       // 查询操作项
       const operateItemRes = await kernel.queryOperationItems({
         id: operation.id,
@@ -253,6 +253,12 @@ const Design: React.FC<DesignProps> = ({
         filter: '',
       });
       let operateItems = operateItemRes.data?.result || [];
+      const tabOperateItems = operateItems.filter(
+        (item) => item.containSpecies && item.containSpecies.length > 0,
+      );
+      operateItems = operateItems.filter((item) => item.attrId);
+      console.log('tabOperateItems', tabOperateItems);
+
       let attrs: any[] = attrRes.result || [];
       const attrIds = operateItems.map((item) => item.attrId);
       items['operationItems'] = operateItems;
