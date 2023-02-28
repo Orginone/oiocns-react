@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import { IChat, ICohort } from '@/ts/core';
@@ -16,6 +16,7 @@ import Description from '../Description';
 import chatCtrl from '@/ts/controller/chat';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import AddPostModal from '@/bizcomponents/AddPositionModal';
+import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 interface IProps {
   current: ICohort;
 }
@@ -27,8 +28,17 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const history = useHistory();
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
+  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
+  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
+
+  useEffect(() => {
+    setTimeout(async () => {
+      SetIsSuperAdmin(await IsSuperAdmin(current));
+      SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
+    }, 10);
+  }, [current]);
 
   // 标题tabs页
   const TitleItems = [
@@ -45,12 +55,14 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
         <Button type="link" onClick={() => setActiveModal('indentity')}>
           身份设置
         </Button>
-        <Button type="link" onClick={() => setActiveModal('addOne')}>
-          邀请成员
-        </Button>
-        <Button type="link" onClick={() => history.push('/todo/org')}>
+        {isRelationAdmin && (
+          <Button type="link" onClick={() => setActiveModal('addOne')}>
+            邀请成员
+          </Button>
+        )}
+        {/* <Button type="link" onClick={() => history.push('/todo/org')}>
           查看申请
-        </Button>
+        </Button> */}
       </>
     );
   };
@@ -78,32 +90,36 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
     if (item.id != userCtrl.user.id) {
-      operations = [
-        {
-          key: 'addFriend',
-          label: '添加好友',
-          onClick: async () => {
-            Modal.confirm({
-              title: '提示',
-              icon: <ExclamationCircleOutlined />,
-              content: '是否申请添加好友',
-              okText: '确认',
-              cancelText: '取消',
-              onOk: async () => {
-                await userCtrl.user?.applyFriend(item);
-                message.success('发起申请成功');
-              },
-            });
+      operations.push(
+        ...[
+          {
+            key: 'addFriend',
+            label: '添加好友',
+            onClick: async () => {
+              Modal.confirm({
+                title: '提示',
+                icon: <ExclamationCircleOutlined />,
+                content: '是否申请添加好友',
+                okText: '确认',
+                cancelText: '取消',
+                onOk: async () => {
+                  await userCtrl.user?.applyFriend(item);
+                  message.success('发起申请成功');
+                },
+              });
+            },
           },
-        },
-        {
-          key: 'enterChat',
-          label: '发起会话',
-          onClick: async () => {
-            enterChat(item.id);
+          {
+            key: 'enterChat',
+            label: '发起会话',
+            onClick: async () => {
+              enterChat(item.id);
+            },
           },
-        },
-        {
+        ],
+      );
+      if (isSuperAdmin) {
+        operations.push({
           key: 'remove',
           label: '踢出',
           onClick: async () => {
@@ -111,11 +127,12 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
               forceUpdate();
             }
           },
-        },
-      ];
+        });
+      }
     }
     return operations;
   };
+
   return (
     <div key={key} className={cls.companyContainer}>
       <Description
@@ -147,8 +164,9 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           </div>
         </PageCard>
         <IndentityManage
-          open={activeModal === 'indentity'}
           current={current}
+          isAdmin={isSuperAdmin}
+          open={activeModal === 'indentity'}
           onCancel={() => setActiveModal('')}
         />
         {/* 邀请成员*/}
@@ -185,6 +203,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
         {/* 权限设置 */}
         <AddPostModal
           title={'权限设置'}
+          IsAdmin={isSuperAdmin}
           open={activeModal === 'post'}
           handleOk={() => setActiveModal('')}
           current={current}

@@ -42,17 +42,6 @@ const useMenuUpdate = (): [
     setMenu([
       {
         key: '1',
-        label: '办事',
-        menu: {
-          key: 'work',
-          label: '办事',
-          itemType: 'group',
-          icon: <SettingOutlined />,
-          children: await operate.loadThingMenus('work', true),
-        },
-      },
-      {
-        key: '2',
         label: '待办',
         menu: {
           key: 'todo',
@@ -60,6 +49,17 @@ const useMenuUpdate = (): [
           itemType: 'group',
           icon: <SettingOutlined />,
           children: [...todoMenus, ...(await operate.loadThingMenus('todo'))],
+        },
+      },
+      {
+        key: '2',
+        label: '办事',
+        menu: {
+          key: 'work',
+          label: '办事',
+          itemType: 'group',
+          icon: <SettingOutlined />,
+          children: await operate.loadThingMenus('work', true),
         },
       },
     ]);

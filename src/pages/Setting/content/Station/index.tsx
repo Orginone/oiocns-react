@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Card, Modal, Button, Space } from 'antd';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
@@ -11,6 +11,8 @@ import { IStation } from '@/ts/core/target/itarget';
 import { TargetType } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import { IsSuperAdmin } from '@/utils/authority';
+import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
   current: IStation;
@@ -23,45 +25,60 @@ const Station: React.FC<IProps> = (props) => {
   const { current } = props;
   const [key, forceUpdate] = useObjectUpdate(current);
   const parentRef = useRef<any>(null); //父级容器Dom
+  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isOpenPerson, setIsOpenPerson] = useState<boolean>(false);
   const [selectPersons, setSelectPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
   const [selectIdentitys, setSelectIdentitys] = useState<XIdentity[]>(); //待添加的身份数据集
   const [isOpenSelectIdentityModal, setIsOpenIdentityModal] = useState<boolean>(false); //身份选择模态框
 
+  useEffect(() => {
+    setTimeout(async () => {
+      SetIsSuperAdmin(await IsSuperAdmin(userCtrl.space));
+    }, 10);
+  }, [current]);
+
   // 人员表格操作内容渲染函数
   const personOperation = (item: schema.XTarget): any[] => {
     return [
-      {
-        key: 'remove',
-        label: <span style={{ color: 'red' }}>移除</span>,
-        onClick: async () => {
-          if (await current.removeMember(item)) {
-            forceUpdate();
-          }
-        },
-      },
+      isSuperAdmin ? (
+        {
+          key: 'remove',
+          label: <span style={{ color: 'red' }}>移除</span>,
+          onClick: async () => {
+            if (await current.removeMember(item)) {
+              forceUpdate();
+            }
+          },
+        }
+      ) : (
+        <></>
+      ),
     ];
   };
 
   // 身份表格操作内容渲染函数
   const identityOperation = (item: XIdentity): any[] => {
     return [
-      {
-        key: 'remove',
-        label: <span style={{ color: 'red' }}>移除</span>,
-        onClick: async () => {
-          Modal.confirm({
-            content: '是否移除该身份？',
-            okText: '确认',
-            cancelText: '取消',
-            onOk: async () => {
-              if (await current.removeIdentitys([item.id])) {
-                forceUpdate();
-              }
-            },
-          });
-        },
-      },
+      isSuperAdmin ? (
+        {
+          key: 'remove',
+          label: <span style={{ color: 'red' }}>移除</span>,
+          onClick: async () => {
+            Modal.confirm({
+              content: '是否移除该身份？',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                if (await current.removeIdentitys([item.id])) {
+                  forceUpdate();
+                }
+              },
+            });
+          },
+        }
+      ) : (
+        <></>
+      ),
     ];
   };
 
@@ -84,15 +101,17 @@ const Station: React.FC<IProps> = (props) => {
         <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
             <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
-            <Button
-              className={cls.creatgroup}
-              type="link"
-              style={{ float: 'right' }}
-              onClick={() => {
-                setIsOpenIdentityModal(true);
-              }}>
-              添加身份
-            </Button>
+            {isSuperAdmin && (
+              <Button
+                className={cls.creatgroup}
+                type="link"
+                style={{ float: 'right' }}
+                onClick={() => {
+                  setIsOpenIdentityModal(true);
+                }}>
+                添加身份
+              </Button>
+            )}
           </div>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
@@ -134,39 +153,45 @@ const Station: React.FC<IProps> = (props) => {
                 params={key}
                 tableAlertOptionRender={(selectedRowKeys: any) => {
                   return (
-                    <Space size={16}>
-                      <a
-                        onClick={() => {
-                          Modal.confirm({
-                            content: '是否将人员从该岗位移出？',
-                            okText: '确认',
-                            cancelText: '取消',
-                            onOk: async () => {
-                              await current.removeMembers(
-                                selectedRowKeys.selectedRowKeys,
-                                TargetType.Person,
-                              );
-                              forceUpdate();
-                            },
-                          });
-                        }}>
-                        批量删除
-                      </a>
-                    </Space>
+                    isSuperAdmin && (
+                      <Space size={16}>
+                        <a
+                          onClick={() => {
+                            Modal.confirm({
+                              content: '是否将人员从该岗位移出？',
+                              okText: '确认',
+                              cancelText: '取消',
+                              onOk: async () => {
+                                await current.removeMembers(
+                                  selectedRowKeys.selectedRowKeys,
+                                  TargetType.Person,
+                                );
+                                forceUpdate();
+                              },
+                            });
+                          }}>
+                          批量删除
+                        </a>
+                      </Space>
+                    )
                   );
                 }}
                 toolBarRender={() => [
-                  <Button
-                    key={'addperson'}
-                    className={cls.creatgroup}
-                    type="link"
-                    style={{ float: 'right' }}
-                    onClick={() => {
-                      setSelectPersons([]);
-                      setIsOpenPerson(true);
-                    }}>
-                    添加人员
-                  </Button>,
+                  isSuperAdmin ? (
+                    <Button
+                      key={'addperson'}
+                      className={cls.creatgroup}
+                      type="link"
+                      style={{ float: 'right' }}
+                      onClick={() => {
+                        setSelectPersons([]);
+                        setIsOpenPerson(true);
+                      }}>
+                      添加人员
+                    </Button>
+                  ) : (
+                    <></>
+                  ),
                 ]}
                 options={{
                   reload: false,
