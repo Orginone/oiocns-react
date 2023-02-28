@@ -53,10 +53,10 @@ const useMenuUpdate = (): [
       },
       {
         key: '2',
-        label: '办事',
+        label: '发起',
         menu: {
           key: 'work',
-          label: '办事',
+          label: '发起',
           itemType: 'group',
           icon: <SettingOutlined />,
           children: await operate.loadThingMenus('work', true),

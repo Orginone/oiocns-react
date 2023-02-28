@@ -27,7 +27,7 @@ const Work: React.FC<IProps> = ({ operations }) => {
             </Card>
           ))}
           <Button icon={<SaveOutlined />} type="primary" className={cls['bootom_right']}>
-            发起
+            提交
           </Button>
         </>
       )}
