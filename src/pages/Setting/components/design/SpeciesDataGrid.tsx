@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import { kernel } from '@/ts/base';
 import 'devextreme/dist/css/dx.light.css';
@@ -56,34 +55,32 @@ const SpeciesDataGrid: React.FC<IProps> = ({ speciesArray }) => {
   }, []);
 
   return (
-    <Card bordered={false}>
-      <DataGrid
-        key={tkey}
-        dataSource={[]}
-        keyExpr="key"
-        columnMinWidth={80}
-        focusedRowEnabled={true}
-        allowColumnReordering={true}
-        allowColumnResizing={true}
-        columnAutoWidth={true}
-        showColumnLines={true}
-        showRowLines={true}
-        rowAlternationEnabled={true}
-        hoverStateEnabled={true}
-        height={'400px'}
-        showBorders={true}>
-        <ColumnFixing enabled={true} />
-        {/* <HeaderFilter visible={true} /> */}
-        <FilterRow visible={true} />
-        {headers.map((header) => (
-          <Column key={header.id} caption={header.title}>
-            {header.children.map((h) => (
-              <Column key={h.id} dataField={h.id} caption={h.title}></Column>
-            ))}
-          </Column>
-        ))}
-      </DataGrid>
-    </Card>
+    <DataGrid
+      key={tkey}
+      dataSource={[]}
+      keyExpr="key"
+      columnMinWidth={80}
+      focusedRowEnabled={true}
+      allowColumnReordering={true}
+      allowColumnResizing={true}
+      columnAutoWidth={true}
+      showColumnLines={true}
+      showRowLines={true}
+      rowAlternationEnabled={true}
+      hoverStateEnabled={true}
+      height={'400px'}
+      showBorders={true}>
+      <ColumnFixing enabled={true} />
+      {/* <HeaderFilter visible={true} /> */}
+      <FilterRow visible={true} />
+      {headers.map((header) => (
+        <Column key={header.id} caption={header.title}>
+          {header.children.map((h) => (
+            <Column key={h.id} dataField={h.id} caption={h.title}></Column>
+          ))}
+        </Column>
+      ))}
+    </DataGrid>
   );
 };
 export default SpeciesDataGrid;

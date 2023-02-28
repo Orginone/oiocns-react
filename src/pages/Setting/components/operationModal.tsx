@@ -30,8 +30,8 @@ export const defaultRemark: any = {
   type: 'object',
   properties: {},
   labelWidth: 120,
-  displayType: 'row',
-  column: 2,
+  layout: 'horizontal',
+  col: 12,
 };
 
 /*
@@ -46,7 +46,7 @@ const OperationModal = (props: Iprops) => {
 
   return (
     <Modal
-      title={data?.name}
+      title={data?.name || title}
       open={open}
       onOk={async () => {
         const value = {

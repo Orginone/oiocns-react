@@ -190,6 +190,11 @@ type DesignProps = {
   setOperationModel: (operationModel: OperationModel) => void;
 };
 
+type FormLayout = {
+  layout: 'horizontal' | 'vertical';
+  col: 8 | 12 | 24;
+};
+
 /**
  * 表单设计器
  * @param props
@@ -210,7 +215,10 @@ const Design: React.FC<DesignProps> = ({
   });
   // 表单项--子表
   const [form] = Form.useForm();
-  const [formCol, setFormCol] = useState(12);
+  const [formLayout, setFormLayout] = useState<FormLayout>({
+    layout: 'horizontal',
+    col: 12,
+  });
   const [selectedItem, setSelectedItem] = useState<XOperationItem>();
   const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
@@ -375,6 +383,16 @@ const Design: React.FC<DesignProps> = ({
     }
   };
 
+  // 布局改变
+  const layoutChange = (value: any) => {
+    setFormLayout({ ...formLayout, ...value });
+    setOperationModel({
+      ...operation,
+      ...{ items: items['operationItems'] },
+      ...{ remark: JSON.stringify({ ...JSON.parse(operation.remark), ...formLayout }) },
+    });
+  };
+
   // 项配置改变
   const formValuesChange = (changedValues: any) => {
     if (selectedItem) {
@@ -409,7 +427,6 @@ const Design: React.FC<DesignProps> = ({
       {
         containSpecies: speciesArray.map((i) => i.target),
         speciesIds: speciesArray.map((i) => i.target.id),
-        // speciesIds: speciesArray.map((i) => i.id),
         name: operationItem.name,
         code: operationItem.code,
         belongId: operationItem.belongId,
@@ -470,14 +487,27 @@ const Design: React.FC<DesignProps> = ({
                   <div style={{ display: 'flex' }}>
                     <label style={{ padding: '6px' }}>整体布局：</label>
                     <Select
-                      defaultValue={formCol}
-                      style={{ width: '160px' }}
+                      defaultValue={formLayout.col}
+                      style={{ width: '120px' }}
                       options={[
                         { value: 24, label: '一行一列' },
                         { value: 12, label: '一行两列' },
                         { value: 8, label: '一行三列' },
                       ]}
-                      onChange={setFormCol}
+                      onChange={(value) => {
+                        layoutChange({ col: value });
+                      }}
+                    />
+                    <Select
+                      defaultValue={formLayout.layout}
+                      style={{ width: '80px' }}
+                      options={[
+                        { value: 'horizontal', label: '水平' },
+                        { value: 'vertical', label: '垂直' },
+                      ]}
+                      onChange={(value) => {
+                        layoutChange({ layout: value });
+                      }}
                     />
                     {!operation.flow && (
                       <Button
@@ -524,7 +554,7 @@ const Design: React.FC<DesignProps> = ({
                       style: { display: 'none' },
                     },
                   }}
-                  layout="horizontal"
+                  layout={formLayout.layout}
                   labelAlign="left"
                   labelWrap={true}
                   labelCol={{
@@ -535,7 +565,7 @@ const Design: React.FC<DesignProps> = ({
                     {items['operationItems']
                       .filter((i: XOperationItem) => i.attrId)
                       .map((item: any) => (
-                        <Col span={formCol} key={item.id}>
+                        <Col span={formLayout.col} key={item.id}>
                           <OperateItem item={item} />
                         </Col>
                       ))}

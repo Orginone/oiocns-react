@@ -25,8 +25,11 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
   const [operationModel, setOperationModel] = useState<OperationModel>();
 
   const save = async () => {
-    console.log('operationModel', operationModel);
     if (operationModel) {
+      if (operationModel.belongId === userCtrl.space.id) {
+        const res = await kernel.updateOperation(operationModel);
+        console.log(res);
+      }
       const res = await kernel.createOperationItems({
         spaceId: userCtrl.space.id,
         operationId: operationModel.id!,

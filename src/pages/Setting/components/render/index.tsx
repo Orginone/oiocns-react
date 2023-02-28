@@ -61,14 +61,18 @@ const OioForm: React.FC<OioFormProps> = ({
         sm: { span: 10 },
       }}>
       <Row gutter={24}>
-        {items.map((item: any) => (
-          <Col span={12} key={item.id}>
-            <OioFormItem item={item} />
-          </Col>
-        ))}
-        {operationItems && operationItems.length > 0 && (
+        {items
+          .filter((i: XOperationItem) => i.attrId)
+          .map((item: any) => (
+            <Col span={12} key={item.id}>
+              <OioFormItem item={item} />
+            </Col>
+          ))}
+        {items.filter((i: XOperationItem) => !i.attrId).length > 0 && (
           <Col span={24}>
-            <SpeciesTabs operationItems={operationItems} />
+            <SpeciesTabs
+              operationItems={items.filter((i: XOperationItem) => !i.attrId)}
+            />
           </Col>
         )}
       </Row>
