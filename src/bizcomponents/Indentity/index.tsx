@@ -1,7 +1,6 @@
 import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import CardOrTable from '@/components/CardOrTableComp';
-import { common } from 'typings/common';
 import { schema } from '@/ts/base';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import { XTarget } from '@/ts/base/schema';
@@ -48,27 +47,29 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     }
   };
   // 操作内容渲染函数
-  const renderOperation = (item: XTarget): common.OperationType[] => {
-    let operations: common.OperationType[] = [];
-
-    operations.push({
-      key: 'remove',
-      label: <span style={{ color: 'red' }}>移除</span>,
-      onClick: async () => {
-        Modal.confirm({
-          title: '提示',
-          content: '确认移除该人员',
-          okText: '确认',
-          cancelText: '取消',
-          onOk: async () => {
-            await indentity?.removeMembers([item.id]);
-            forceUpdate();
+  const renderOperation = (item: XTarget) => {
+    return [
+      isAdmin ? (
+        {
+          key: 'remove',
+          label: <span style={{ color: 'red' }}>移除</span>,
+          onClick: async () => {
+            Modal.confirm({
+              title: '提示',
+              content: '确认移除该人员',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                await indentity?.removeMembers([item.id]);
+                forceUpdate();
+              },
+            });
           },
-        });
-      },
-    });
-
-    return operations;
+        }
+      ) : (
+        <></>
+      ),
+    ];
   };
 
   // 选中树的时候操作
@@ -139,10 +140,12 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </div>
   );
   // 按钮
-  const renderBtns = (
+  const renderBtns = isAdmin ? (
     <Button type="link" onClick={async () => setIsOpenAssign(true)}>
       指派身份
     </Button>
+  ) : (
+    <></>
   );
   // 身份信息标题
 

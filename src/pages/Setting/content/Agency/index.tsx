@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Modal, Typography } from 'antd';
-import { useHistory } from 'react-router-dom';
 import { common } from 'typings/common';
 import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
@@ -29,10 +28,9 @@ interface IProps {
  */
 const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
-  const history = useHistory();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
+  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
 
@@ -86,9 +84,9 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             <Button type="link" onClick={() => setActiveModal('addOne')}>
               添加成员
             </Button>
-            <Button type="link" onClick={() => history.push('/todo/org')}>
+            {/* <Button type="link" onClick={() => history.push('/todo/org')}>
               查看申请
-            </Button>
+            </Button> */}
           </>
         )}
       </>
@@ -160,7 +158,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       </div>
       {/* 编辑机构身份 */}
       <IndentityManage
-        isAdmin={isRelationAdmin}
+        isAdmin={isSuperAdmin}
         open={activeModal === 'indentity'}
         current={current}
         onCancel={() => setActiveModal('')}
@@ -168,7 +166,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       {/* 添加成员*/}
       <Modal
         title="添加成员"
-        width={600}
+        width={900}
         destroyOnClose
         open={activeModal === 'addOne'}
         onCancel={() => setActiveModal('')}
