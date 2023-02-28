@@ -21,9 +21,7 @@ const Work: React.FC<IProps> = ({ operations }) => {
           {operations.map((operation) => (
             <Card key={operation.id} title={operation?.name}>
               <OioForm
-                operationId={operation.id}
-                operationItems={operation.items ?? []}
-                designSps={operation.operationRelations ?? []}
+                operation={operation}
                 onValuesChange={(values) => console.log('values', values)}
               />
             </Card>

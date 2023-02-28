@@ -21,7 +21,11 @@ const SpeciesTabs: React.FC<SpeciesTabsProps> = ({ operationItems }) => {
         </div>
       ),
       closable: item.belongId == userCtrl.space.id,
-      children: <SpeciesDataGrid speciesArray={item.containSpecies || []} />,
+      children: (
+        <SpeciesDataGrid
+          speciesArray={(item.containSpecies || []).sort((a: any, b: any) => a.id - b.id)}
+        />
+      ),
     };
   });
 

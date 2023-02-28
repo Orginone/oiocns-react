@@ -1,5 +1,5 @@
 import { kernel } from '@/ts/base';
-import { XOperationItem } from '@/ts/base/schema';
+import { XOperation, XOperationItem } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
@@ -8,36 +8,31 @@ import OioFormItem from './FormItems';
 import SpeciesTabs from './SpeciesTabs';
 
 type OioFormProps = {
-  operationId: string;
-  operationItems?: XOperationItem[];
+  operation: XOperation;
   onValuesChange?: (values: any) => void;
 };
 
 /**
  * 奥集能表单
  */
-const OioForm: React.FC<OioFormProps> = ({
-  operationId,
-  operationItems,
-  onValuesChange,
-}) => {
+const OioForm: React.FC<OioFormProps> = ({ operation, onValuesChange }) => {
   const [items, setItems] = useState<XOperationItem[]>([]);
+  const config = JSON.parse(operation.remark);
+  console.log('config===', config);
   useEffect(() => {
     const queryItems = async () => {
       // 表单项
-      if (operationItems && operationItems.length > 0) {
-        setItems(operationItems);
-      } else {
-        const operateItemRes = await kernel.queryOperationItems({
-          id: operationId as string,
-          spaceId: userCtrl.space.id,
-          page: { offset: 0, limit: 100000, filter: '' },
-        });
-        setItems((operateItemRes.data.result || []) as XOperationItem[]);
-      }
+      const operateItemRes = await kernel.queryOperationItems({
+        id: operation.id,
+        spaceId: userCtrl.space.id,
+        page: { offset: 0, limit: 100000, filter: '' },
+      });
+      const operateItems = (operateItemRes.data.result || []) as XOperationItem[];
+      setItems(operateItems);
     };
     queryItems();
-  }, [operationId]);
+  }, [operation.id]);
+
   return (
     <ProForm
       submitter={{
@@ -53,7 +48,7 @@ const OioForm: React.FC<OioFormProps> = ({
         },
       }}
       onValuesChange={onValuesChange}
-      layout="horizontal"
+      layout={config.layout}
       labelAlign="left"
       labelWrap={true}
       labelCol={{
@@ -64,7 +59,7 @@ const OioForm: React.FC<OioFormProps> = ({
         {items
           .filter((i: XOperationItem) => i.attrId)
           .map((item: any) => (
-            <Col span={12} key={item.id}>
+            <Col span={config.col} key={item.id}>
               <OioFormItem item={item} />
             </Col>
           ))}

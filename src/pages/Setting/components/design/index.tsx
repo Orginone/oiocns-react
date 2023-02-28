@@ -215,10 +215,7 @@ const Design: React.FC<DesignProps> = ({
   });
   // 表单项--子表
   const [form] = Form.useForm();
-  const [formLayout, setFormLayout] = useState<FormLayout>({
-    layout: 'horizontal',
-    col: 12,
-  });
+  const [formLayout, setFormLayout] = useState<FormLayout>(JSON.parse(operation.remark));
   const [selectedItem, setSelectedItem] = useState<XOperationItem>();
   const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
@@ -238,6 +235,12 @@ const Design: React.FC<DesignProps> = ({
         filter: '',
       });
       let operateItems = operateItemRes.data?.result || [];
+      operateItems = operateItems.map((item: any) => {
+        if (item.containSpecies && item.containSpecies.length > 0) {
+          item.speciesIds = item.containSpecies.map((species: any) => species.id);
+        }
+        return item;
+      });
       let attrs: any[] = attrRes.result || [];
       const attrIds = operateItems.map((item) => item.attrId);
       items['operationItems'] = operateItems;
@@ -385,12 +388,16 @@ const Design: React.FC<DesignProps> = ({
 
   // 布局改变
   const layoutChange = (value: any) => {
-    setFormLayout({ ...formLayout, ...value });
-    setOperationModel({
+    const newFormLayout = { ...formLayout, ...value };
+    setFormLayout(newFormLayout);
+    const newOperationModel = {
       ...operation,
       ...{ items: items['operationItems'] },
-      ...{ remark: JSON.stringify({ ...JSON.parse(operation.remark), ...formLayout }) },
-    });
+      ...{
+        remark: JSON.stringify({ ...JSON.parse(operation.remark), ...newFormLayout }),
+      },
+    };
+    setOperationModel(newOperationModel);
   };
 
   // 项配置改变
