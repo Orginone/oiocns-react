@@ -290,9 +290,6 @@ const Design: React.FC<DesignProps> = ({
         setOperationModel({
           ...operation,
           ...{ items: data['operationItems'] },
-          ...{
-            speciesItems: designSpeciesArray,
-          },
         });
         setItems(data);
       }
@@ -327,9 +324,6 @@ const Design: React.FC<DesignProps> = ({
           setOperationModel({
             ...operation,
             ...{ items: data['operationItems'] },
-            ...{
-              speciesItems: designSpeciesArray,
-            },
           });
           setItems(data);
         } else if (activeContainer === 'operationItems') {
@@ -346,9 +340,6 @@ const Design: React.FC<DesignProps> = ({
           setOperationModel({
             ...operation,
             ...{ items: data['operationItems'] },
-            ...{
-              speciesItems: designSpeciesArray,
-            },
           });
           setItems(data);
           itemClick(operationItem);
@@ -370,6 +361,10 @@ const Design: React.FC<DesignProps> = ({
     } else {
       itemClick(activeItems.find((item: any) => item.id === activeId));
     }
+    setOperationModel({
+      ...operation,
+      ...{ items: items['operationItems'] },
+    });
   };
 
   // 表单项选中事件

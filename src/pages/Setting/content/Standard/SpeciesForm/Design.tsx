@@ -54,7 +54,11 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
       title={operation?.name}
       extra={
         <>
-          <Button onClick={() => save()} type="primary" icon={<SaveOutlined />}>
+          <Button
+            onClick={() => save()}
+            type="primary"
+            icon={<SaveOutlined />}
+            disabled={!operationModel}>
             保存
           </Button>
           <Button
