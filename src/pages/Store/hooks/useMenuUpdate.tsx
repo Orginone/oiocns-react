@@ -23,20 +23,15 @@ const useMenuUpdate = (): [
 ] => {
   const [key, setKey] = useState<string>('');
   const [menus, setMenu] = useState<TabItemType[]>([]);
-  // const [menus, setMenu] = useState<MenuItemType>({
-  //   key: 'store',
-  //   label: '仓库',
-  //   itemType: 'group',
-  //   icon: <ImHome />,
-  //   children: [],
-  // });
+
   const [selectMenu, setSelectMenu] = useState<MenuItemType>({
     key: '1',
-    label: '物',
+    label: '管理的',
     itemType: 'group',
     icon: <ImHome />,
     children: [],
   });
+
   /** 查找菜单 */
   const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
     for (const item of items) {
@@ -53,58 +48,41 @@ const useMenuUpdate = (): [
   };
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const childrenCommon: MenuItemType[] = [];
-    //数据
-    childrenCommon.push(operate.getDataMenus());
-    //应用
-    childrenCommon.push(operate.getAppliactionMenus());
-    // children.push(operate.getAssetMenus());
-    //文档
-    childrenCommon.push(operate.getFileSystemMenus());
-    //资源
-    childrenCommon.push(operate.getResourceMenus());
-
-    let thingMenus = await operate.getThingMenus();
-    let welMenus = await operate.getWelMenus();
-    // children.push(thingMenus);
-    // const chats = await operate.loadChatMenu();
-    // const books = await operate.loadBookMenu();
-
-    let menus = [];
-    menus.push(
+    let tabName_1 = userCtrl.isCompanySpace ? '管理的' : '我的';
+    const anyThingMenus = await operate.loadAnythingMenus();
+    const children: MenuItemType[] = [
+      operate.getDataMenus(),
+      operate.getAppliactionMenus(),
+      operate.getFileSystemMenus(),
+      operate.getResourceMenus(),
+    ];
+    if (anyThingMenus) {
+      children.push(anyThingMenus);
+    }
+    setMenu([
       {
         key: '1',
-        label: '物',
+        label: tabName_1,
         menu: {
-          key: '物',
-          label: '物',
-          itemType: '物',
+          key: tabName_1,
+          label: tabName_1,
+          itemType: tabName_1,
           icon: <im.ImTree />,
-          children: [...childrenCommon, ...thingMenus],
+          children,
         },
       },
       {
         key: '2',
-        label: '财',
+        label: '可见的',
         menu: {
-          key: '财',
-          label: '财',
-          itemType: '财',
+          key: '可见的',
+          label: '可见的',
+          itemType: '可见的',
           icon: <im.ImCoinDollar />,
-          children: [...childrenCommon, ...welMenus],
+          children,
         },
       },
-    );
-    setMenu(menus);
-    let children = [];
-    switch (storeCtrl.tabIndex) {
-      case '1':
-        children = [...childrenCommon, ...thingMenus];
-        break;
-      default:
-        children = [...childrenCommon, ...welMenus];
-        break;
-    }
+    ]);
 
     const item = findMenuItemByKey(children, storeCtrl.currentKey);
     if (item) {
@@ -120,13 +98,8 @@ const useMenuUpdate = (): [
       setKey(key);
       refreshMenu();
     });
-    const id2 = userCtrl.subscribe((key) => {
-      // setKey(key);
-      refreshMenu();
-    });
     return () => {
       storeCtrl.unsubscribe(id);
-      userCtrl.unsubscribe(id2);
     };
   }, []);
 

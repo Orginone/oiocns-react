@@ -3,12 +3,13 @@ import { TargetType } from '@/ts/core';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { MenuItemType } from 'typings/globelType';
+import { ImHome } from 'react-icons/im';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { GroupMenuType } from '../config/menuType';
 /**
  * 设置菜单刷新hook
- * @returns key 变更后的标识,
+ * @returns key ,变更后的标识
  * menus 新的菜单,
  * refreshMenu 强制重新加载,
  * selectMenu 选中菜单,
@@ -16,20 +17,21 @@ import { GroupMenuType } from '../config/menuType';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType,
+  TabItemType[],
   () => void,
   MenuItemType,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenu] = useState<MenuItemType>({
-    key: 'setting',
-    label: '设置',
-    itemType: 'group',
-    icon: <SettingOutlined />,
+  const [menus, setMenu] = useState<TabItemType[]>([]);
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
+    key: '1',
+    label: '关系',
+    itemType: '关系',
+    item: userCtrl.space,
+    icon: <ImHome />,
     children: [],
   });
-  const [selectMenu, setSelectMenu] = useState<MenuItemType>(menus);
   /** 查找菜单 */
   const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
     for (const item of items) {
@@ -46,6 +48,7 @@ const useMenuUpdate = (): [
   };
   /** 刷新菜单 */
   const refreshMenu = async () => {
+    const menus: TabItemType[] = [];
     const children: MenuItemType[] = [];
     children.push(await operate.getSpaceMenu());
     if (userCtrl.isCompanySpace) {
@@ -85,19 +88,31 @@ const useMenuUpdate = (): [
         }),
       );
     }
-    const speciesSetting = await operate.loadSpeciesSetting();
-    if (speciesSetting) {
-      children.push(speciesSetting);
-    }
     children.push(operate.loadUserSetting());
     children.push(operate.loadSpaceSetting());
-    setMenu({
-      key: 'setting',
-      label: '设置',
-      itemType: 'group',
-      icon: <SettingOutlined />,
-      children: children,
-    });
+    const species = await operate.loadSpeciesSetting();
+    if (species) {
+      menus.push({
+        key: '2',
+        label: '标准',
+        menu: species,
+      });
+    }
+    setMenu([
+      {
+        key: '1',
+        label: '关系',
+        menu: {
+          children: children,
+          key: 'setting',
+          label: '关系',
+          item: userCtrl.space,
+          itemType: 'group',
+          icon: <SettingOutlined />,
+        },
+      },
+      ...menus,
+    ]);
     const item = findMenuItemByKey(children, userCtrl.currentKey);
     if (item) {
       setSelectMenu(item);
