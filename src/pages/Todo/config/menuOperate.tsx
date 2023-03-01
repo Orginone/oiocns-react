@@ -57,9 +57,8 @@ export const loadPlatformMenu = async () => {
 /** 获取事菜单 */
 export const loadThingMenus = async (prefix: string, isWork: boolean = false) => {
   const root = await userCtrl.space.loadSpeciesTree();
-  var thing = root?.children?.find((item) => item.name == '事');
-  if (thing) {
-    return await buildSpeciesTree(thing.children, prefix + '事', isWork);
+  if (root) {
+    return await buildSpeciesTree(root?.children, prefix + '事', isWork);
   }
   return [];
 };
