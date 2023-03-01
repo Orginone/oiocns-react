@@ -17,7 +17,9 @@ import DataGrid, {
   Paging,
   Lookup,
 } from 'devextreme-react/data-grid';
-import { getUuid } from '@/utils/tools';
+import config from 'devextreme/core/config';
+import { loadMessages, locale } from 'devextreme/localization';
+import zhMessage from 'devextreme/localization/messages/zh.json';
 interface IProps {
   current: ISpeciesItem;
   checkedList?: any[];
@@ -82,6 +84,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   };
 
   useEffect(() => {
+    config({ defaultCurrency: 'zh' });
+    loadMessages(zhMessage);
+    locale('zh');
     if (storeCtrl.checkedSpeciesList.length > 0) {
       if (props.checkedList && props.checkedList.length > 0) {
         loadAttrs(props.checkedList.map((item) => item.item));
@@ -91,45 +96,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     }
   }, [props.current, props.checkedList, storeCtrl.checkedSpeciesList]);
 
-  const getComponent = (speciesArray: ISpeciesItem[]) => {
+  const getComponent = () => {
     return (
       <>
         {thingAttrs && thingAttrs.length > 0 && (
           <DataGrid
-            dataSource={[
-              {
-                key: getUuid(),
-                '27466608057172992': '8719817174617',
-                '27466608057205760': 'BZ011',
-                '27466608057205761': '测试数据(本征)',
-                '27466608057205762': '10000000',
-                tagIds: '27466605935444992',
-              },
-              {
-                key: getUuid(),
-                '27466608057172992': '8719817177875',
-                '27466608057205760': 'GC0187',
-                '27466608057205761': '测试数据(工程建筑)',
-                '27466608057205762': '10010000',
-                '27466608057205780': '北京市朝阳区601号',
-                '	27466608057205781': '10000 m2',
-                tagIds: '27466605935444992,27466605935444993',
-              },
-              {
-                key: getUuid(),
-                '27466608057238644': '211',
-                '27466608057238645': 'WW011',
-                '27466608057238646': '书画',
-                '27466608057238647': '1',
-                tagIds: '27466605935445008',
-              },
-            ].filter((record) => {
-              let hasTag = true;
-              for (let species of speciesArray) {
-                hasTag = hasTag && record.tagIds.indexOf(species.id) > -1;
-              }
-              return hasTag;
-            })}
+            dataSource={[]}
             keyExpr="key"
             columnMinWidth={80}
             // focusedRowEnabled={true}
@@ -141,7 +113,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             rowAlternationEnabled={true}
             hoverStateEnabled={true}
             height={'calc(100vh - 175px)'}
-            width={'80vw'}
+            width={'calc(100vw - 300px)'}
             showBorders={true}>
             <ColumnChooser
               enabled={true}
@@ -193,11 +165,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
 
   return (
     <Card id={key} bordered={false}>
-      {props.checkedList &&
-        props.checkedList.length > 0 &&
-        getComponent(props.checkedList.map((item) => item.item))}
-      {(!props.checkedList || props.checkedList.length == 0) &&
-        getComponent([props.current])}
+      {props.checkedList && props.checkedList.length > 0 && getComponent()}
+      {(!props.checkedList || props.checkedList.length == 0) && getComponent()}
     </Card>
   );
 };

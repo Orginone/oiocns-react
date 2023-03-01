@@ -6,6 +6,7 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import { IsSuperAdmin } from '@/utils/authority';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -58,6 +59,19 @@ export const buildSpeciesTree = (species: ISpeciesItem) => {
   return result;
 };
 
+/** 编译职权树 */
+export const buildAuthorityTree = (authoritys: IAuthority) => {
+  const result: MenuItemType = {
+    key: authoritys.id,
+    item: authoritys,
+    label: authoritys.name,
+    icon: <im.ImTree />,
+    itemType: GroupMenuType.Authority,
+    menus: loadAuthorityMenus(authoritys),
+    children: authoritys.children?.map((i) => buildAuthorityTree(i)) ?? [],
+  };
+  return result;
+};
 /** 获取空间菜单 */
 export const getSpaceMenu = async () => {
   let label = '个人信息';
@@ -115,18 +129,31 @@ export const loadGroupMenus = async (param: groupMenuParams) => {
   };
 };
 
-export const loadSpeciesSetting = async () => {
-  const species = await userCtrl.space.loadSpeciesTree();
-  if (species) {
-    return {
-      children: [buildSpeciesTree(species)],
-      key: '标准设置',
-      label: '标准设置',
-      itemType: '标准设置',
+export const loadStandardSetting = async () => {
+  const result: MenuItemType[] = [];
+  const authors = await userCtrl.space.loadAuthorityTree();
+  if (authors) {
+    result.push({
+      children: [buildAuthorityTree(authors)],
+      key: '职权标准',
+      label: '职权标准',
+      itemType: '职权标准',
       item: userCtrl.space,
       icon: <im.ImNewspaper />,
-    };
+    });
   }
+  const species = await userCtrl.space.loadSpeciesTree();
+  if (species) {
+    result.push({
+      children: [buildSpeciesTree(species)],
+      key: '分类标准',
+      label: '分类标准',
+      itemType: '分类标准',
+      item: userCtrl.space,
+      icon: <im.ImNewspaper />,
+    });
+  }
+  return result;
 };
 
 export const loadSpaceSetting = () => {
@@ -245,6 +272,31 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
   return items;
 };
 
+/** 加载右侧菜单 */
+export const loadAuthorityMenus = (item: IAuthority) => {
+  const items = [
+    {
+      key: '新增',
+      icon: <im.ImPlus />,
+      label: '新增职权',
+    },
+  ];
+  if (item.belongId) {
+    items.push(
+      {
+        key: '修改',
+        icon: <im.ImCog />,
+        label: '编辑职权',
+      },
+      {
+        key: '移除',
+        icon: <im.ImBin />,
+        label: '删除职权',
+      },
+    );
+  }
+  return items;
+};
 /** 加载类型更多操作 */
 export const loadTypeMenus = async (item: ITarget) => {
   const menus: OperateMenuType[] = [];

@@ -12,14 +12,14 @@ export const loadPlatformMenu = async () => {
   return [
     {
       key: '组织审批',
-      label: '组织审批',
+      label: '组织',
       itemType: '组织审批',
       icon: <im.ImTree />,
       ...(await loadOrgChildren(todoCtrl.OrgTodo)),
     },
     {
       key: '商店审批',
-      label: '商店审批',
+      label: '商店',
       itemType: '商店审批',
       icon: <im.ImCart />,
       ...(await loadMarket()),
@@ -29,7 +29,7 @@ export const loadPlatformMenu = async () => {
         {
           children: [],
           key: '销售订单',
-          label: '销售订单',
+          label: '销售',
           itemType: GroupMenuType.Order,
           item: todoCtrl.OrderTodo,
           count: await todoCtrl.OrderTodo?.getCount(),
@@ -38,14 +38,14 @@ export const loadPlatformMenu = async () => {
         {
           children: [],
           key: '采购订单',
-          label: '采购订单',
+          label: '采购',
           itemType: GroupMenuType.Order,
           item: todoCtrl.OrderTodo,
           icon: <im.ImBarcode />,
         },
       ],
       key: '订单管理',
-      label: '订单管理',
+      label: '订单',
       itemType: GroupMenuType.Order,
       item: todoCtrl.OrderTodo,
       count: await todoCtrl.OrderTodo?.getCount(),

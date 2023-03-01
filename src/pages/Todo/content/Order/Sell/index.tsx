@@ -5,6 +5,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { SaleColumns } from '../../../config/columns';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { IApprovalItem, ITodoGroup } from '@/ts/core/todo/itodo';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 // 卡片渲染
 interface IProps {
@@ -39,7 +40,8 @@ const TodoOrg: React.FC<IProps> = (props) => {
         onClick: async () => {
           if (await data.pass(OrderStatus.Deliver, '')) {
             message.success('交付成功');
-            forceUpdate();
+            // forceUpdate();
+            todoCtrl.changCallback();
           }
         },
       });
