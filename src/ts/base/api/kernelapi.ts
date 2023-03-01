@@ -2279,19 +2279,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询流程有关应用
-   * @returns {model.ResultType<model.IdWithNameModel[]>} 请求结果
-   */
-  public async queryApprovalProduct(): Promise<
-    model.ResultType<model.IdWithNameModel[]>
-  > {
-    return await this.request({
-      module: 'flow',
-      action: 'QueryApprovalProduct',
-      params: {},
-    });
-  }
-  /**
    * 查询分类下的流程定义
    * @param {model.QueryDefineReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
