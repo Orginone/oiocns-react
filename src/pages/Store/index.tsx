@@ -7,7 +7,6 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
-import { getUuid } from '@/utils/tools';
 import userCtrl from '@/ts/controller/setting';
 /** 仓库模块 */
 const Package: React.FC = () => {

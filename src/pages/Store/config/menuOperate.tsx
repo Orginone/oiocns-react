@@ -145,7 +145,7 @@ export const loadAnythingMenus = async () => {
     ? {
         children: buildSpeciesChildrenTree(
           root.children.filter((item) => item.name == '物' || item.name == '财'),
-          '财物',
+          GroupMenuType.Thing,
           'checkbox',
         ),
         key: '财物',

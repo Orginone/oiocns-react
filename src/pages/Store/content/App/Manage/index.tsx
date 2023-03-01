@@ -12,11 +12,9 @@ import {
 import { IconFont } from '@/components/IconFont';
 
 import { useHistory } from 'react-router-dom';
-import appCtrl from '@/ts/controller/store/appCtrl';
 
 const StoreAppInfo: React.FC = () => {
   const history = useHistory();
-  console.log('appCtrl.curProduct', appCtrl.curProduct);
 
   const renderManageInfo = () => {
     return (
