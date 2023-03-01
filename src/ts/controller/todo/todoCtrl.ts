@@ -1,5 +1,4 @@
 import {
-  loadAppTodo,
   loadOrderTodo,
   loadMarketTodo,
   loadOrgTodo,
@@ -19,7 +18,6 @@ class TodoController extends Emitter {
   private _pubTodo: ITodoGroup[] = [];
   private _orderTodo: ITodoGroup | undefined;
   private _marketTodo: ITodoGroup[] = [];
-  private _appTodo: ITodoGroup[] = [];
   private _curAppTodo: ITodoGroup | undefined;
   constructor() {
     super();
@@ -44,7 +42,6 @@ class TodoController extends Emitter {
         });
         orgTodoTypes.push(...companys.map((a) => a.target));
         this._orgTodo = await loadOrgTodo(orgTodoTypes);
-        this._appTodo = await loadAppTodo();
         this._pubTodo = await loadPublishTodo();
         this._orderTodo = await loadOrderTodo();
         this._marketTodo = await loadMarketTodo();
@@ -55,10 +52,6 @@ class TodoController extends Emitter {
   /** 组织单位审批 */
   public get OrgTodo(): ITodoGroup[] {
     return this._orgTodo!;
-  }
-  /** 第三方应用审批 */
-  public get AppTodo(): ITodoGroup[] {
-    return this._appTodo!;
   }
   /** 市场审批 */
   public get MarketTodo(): ITodoGroup[] {
@@ -76,11 +69,6 @@ class TodoController extends Emitter {
   public get CurAppTodo(): ITodoGroup | undefined {
     return this._curAppTodo;
   }
-  /** 设置选中应用待办 */
-  public setCurrentAppTodo = (id: string) => {
-    this._curAppTodo = this._appTodo.find((n: ITodoGroup) => n.id === id);
-    this.changCallbackPart('CurAppTodo');
-  };
   /** 获取总的待办数量 */
   public async getTaskCount(): Promise<number> {
     let sum = 0;
@@ -95,9 +83,6 @@ class TodoController extends Emitter {
     }
     for (let i = 0; i < publishTodos.length; i++) {
       sum += await publishTodos[i]?.getCount();
-    }
-    for (let i = 0; i < this._appTodo.length; i++) {
-      sum += await this._appTodo[i]?.getCount();
     }
     return sum;
   }

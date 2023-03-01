@@ -24,7 +24,6 @@ const ShopingCar: React.FC = () => {
    */
   useEffect(() => {
     const id = marketCtrl.subscribePart(JOIN_SHOPING_CAR, () => {
-      console.log('监听 购物车变化', marketCtrl.shopinglist || []);
       const arr = marketCtrl.shopinglist || [];
       setShopList([...arr]);
     });

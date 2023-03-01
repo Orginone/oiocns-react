@@ -1,61 +1,38 @@
-import React, { useEffect, useState } from 'react';
 import { kernel } from '@/ts/base';
+import { XOperation, XOperationItem } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
-import SpeciesTables from './SpeciesTables';
-import { XOperationItem, XOperationRelation } from '@/ts/base/schema';
+import SpeciesTabs from './SpeciesTabs';
 
 type OioFormProps = {
-  operationId: string;
-  operationItems?: XOperationItem[];
-  designSps?: any[];
+  operation: XOperation;
   onValuesChange?: (values: any) => void;
 };
 
 /**
  * 奥集能表单
  */
-const OioForm: React.FC<OioFormProps> = ({
-  operationId,
-  operationItems,
-  designSps,
-  onValuesChange,
-}) => {
-  const [sps, setSps] = useState<any[]>([]);
+const OioForm: React.FC<OioFormProps> = ({ operation, onValuesChange }) => {
   const [items, setItems] = useState<XOperationItem[]>([]);
+  const config = JSON.parse(operation.remark);
+  console.log('config===', config);
   useEffect(() => {
     const queryItems = async () => {
-      // 类别子表
-      if (designSps && designSps.length > 0) {
-        setSps(designSps);
-      } else {
-        const speciesRes = await kernel.queryOperationSpeciesItems({
-          id: operationId as string,
-          spaceId: userCtrl.space.id,
-          page: { offset: 0, limit: 100000, filter: '' },
-        });
-        if (speciesRes.data.result) {
-          setSps(speciesRes.data.result);
-        } else {
-          setSps([]);
-        }
-      }
       // 表单项
-      if (operationItems && operationItems.length > 0) {
-        setItems(operationItems);
-      } else {
-        const operateItemRes = await kernel.queryOperationItems({
-          id: operationId as string,
-          spaceId: userCtrl.space.id,
-          page: { offset: 0, limit: 100000, filter: '' },
-        });
-        setItems(operateItemRes.data.result as XOperationItem[]);
-      }
+      const operateItemRes = await kernel.queryOperationItems({
+        id: operation.id,
+        spaceId: userCtrl.space.id,
+        page: { offset: 0, limit: 100000, filter: '' },
+      });
+      const operateItems = (operateItemRes.data.result || []) as XOperationItem[];
+      setItems(operateItems);
     };
     queryItems();
-  }, [operationId]);
+  }, [operation.id]);
+
   return (
     <ProForm
       submitter={{
@@ -71,7 +48,7 @@ const OioForm: React.FC<OioFormProps> = ({
         },
       }}
       onValuesChange={onValuesChange}
-      layout="horizontal"
+      layout={config.layout}
       labelAlign="left"
       labelWrap={true}
       labelCol={{
@@ -79,14 +56,18 @@ const OioForm: React.FC<OioFormProps> = ({
         sm: { span: 10 },
       }}>
       <Row gutter={24}>
-        {items.map((item: any) => (
-          <Col span={12} key={item.id}>
-            <OioFormItem item={item} />
-          </Col>
-        ))}
-        {sps.length > 0 && (
+        {items
+          .filter((i: XOperationItem) => i.attrId)
+          .map((item: any) => (
+            <Col span={config.col} key={item.id}>
+              <OioFormItem item={item} />
+            </Col>
+          ))}
+        {items.filter((i: XOperationItem) => !i.attrId).length > 0 && (
           <Col span={24}>
-            <SpeciesTables dsps={sps} />
+            <SpeciesTabs
+              operationItems={items.filter((i: XOperationItem) => !i.attrId)}
+            />
           </Col>
         )}
       </Row>

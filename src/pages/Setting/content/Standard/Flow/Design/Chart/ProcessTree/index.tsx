@@ -13,6 +13,7 @@ import cls from './index.module.less';
 import {
   APPROVAL_PROPS,
   CC_PROPS,
+  dataType,
   DELAY_PROPS,
   FieldCondition,
   TRIGGER_PROPS,
@@ -489,8 +490,19 @@ const ProcessTree: React.FC<IProps> = ({
         nodeId: getRandomId(),
         parentId: parentNode.children.nodeId,
         type: 'ORGANIZATIONA',
-        conditions: [],
-        name: '组织分支2',
+        conditions: [
+          {
+            pos: 1,
+            paramKey: 'belongId',
+            paramLabel: '组织',
+            key: 'EQ',
+            label: '=',
+            type: dataType.BELONG,
+            val: '0',
+          },
+        ],
+        readonly: true,
+        name: '其他',
       },
     ];
   };

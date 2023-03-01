@@ -58,7 +58,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       outDir: 'dist', // 指定输出路径
       minify: 'terser', // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
-      chunkSizeWarningLimit: 2048,
+      chunkSizeWarningLimit: 4096,
       terserOptions: {
         compress: {
           drop_console: VITE_DROP_CONSOLE, // 生产环境移除console
@@ -73,6 +73,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         // 确保外部化处理那些你不想打包进库的依赖
         // external: ['react', 'antd'], // 注意看这里
+        treeshake: true,
         output: {
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
@@ -88,6 +89,19 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
           //   }
           // },
         },
+        plugins: [
+          {
+            name: 'no-treeshake',
+            transform(_, id) {
+              if (id.includes('integration/jquery')) {
+                return { moduleSideEffects: 'no-treeshake' };
+              }
+              if (id.includes('ui/data_grid')) {
+                return { moduleSideEffects: 'no-treeshake' };
+              }
+            },
+          },
+        ],
       },
     },
     define: {

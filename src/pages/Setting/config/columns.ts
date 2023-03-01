@@ -3,6 +3,7 @@ import { INullSpeciesItem, IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import userCtrl from '@/ts/controller/setting';
 import thingCtrl from '@/ts/controller/thing';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -243,6 +244,21 @@ export const findSpecesName = (
   return specesName;
 };
 
+export const findAuthName = (auths: IAuthority[], id: string): string | undefined => {
+  let authName = undefined;
+  for (const item of auths) {
+    if (item?.id == id) {
+      authName = item.name;
+    } else if (item?.children) {
+      authName = findAuthName(item?.children, id);
+    }
+    if (authName) {
+      break;
+    }
+  }
+  return authName;
+};
+
 export const OperationColumns: ProColumns<schema.XOperation>[] = [
   {
     title: '序号',
@@ -286,6 +302,12 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     title: '角色',
     dataIndex: 'beginAuthId',
     key: 'beginAuthId',
+    render: (_, record) => {
+      return findAuthName(
+        [userCtrl.space.authorityTree as IAuthority],
+        record.beginAuthId,
+      );
+    },
   },
 ];
 

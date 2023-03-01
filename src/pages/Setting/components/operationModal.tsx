@@ -1,10 +1,17 @@
-import SchemaForm from '@/components/SchemaForm';
 import { OperationModel } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem, ITarget } from '@/ts/core';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { useRef } from 'react';
+import {
+  ProForm,
+  ProFormSelect,
+  ProFormText,
+  ProFormTreeSelect,
+} from '@ant-design/pro-components';
+import { Modal } from 'antd';
+import { useForm } from 'antd/es/form/Form';
+import React from 'react';
+import ProFormAuth from './render/widgets/ProFormAuth';
 
 interface Iprops {
   title: string;
@@ -23,8 +30,8 @@ export const defaultRemark: any = {
   type: 'object',
   properties: {},
   labelWidth: 120,
-  displayType: 'row',
-  column: 2,
+  layout: 'horizontal',
+  col: 12,
 };
 
 /*
@@ -32,123 +39,118 @@ export const defaultRemark: any = {
 */
 const OperationModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
-  const formRef = useRef<ProFormInstance>();
-
-  const columns: ProFormColumnsType<OperationModel>[] = [
-    {
-      title: '表单名称',
-      dataIndex: 'name',
-      formItemProps: {
-        rules: [{ required: true, message: '特性名称为必填项' }],
-      },
-    },
-    {
-      title: '业务代码',
-      dataIndex: 'code',
-      formItemProps: {
-        rules: [{ required: true, message: '特性代码为必填项' }],
-      },
-    },
-    {
-      title: '选择制定组织',
-      dataIndex: 'belongId',
-      valueType: 'treeSelect',
-      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-      request: async () => {
-        return await userCtrl.getTeamTree();
-      },
-      fieldProps: {
-        disabled: title === '修改',
-        fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-        showSearch: true,
-        filterTreeNode: true,
-        treeNodeFilterProp: 'teamName',
-      },
-    },
-    {
-      title: '向下级组织公开',
-      dataIndex: 'public',
-      valueType: 'select',
-      fieldProps: {
-        options: [
-          {
-            value: true,
-            label: '公开',
-          },
-          {
-            value: false,
-            label: '不公开',
-          },
-        ],
-      },
-      formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
-      },
-    },
-    // {
-    //   title: '流程',
-    //   dataIndex: 'defineId',
-    //   valueType: 'select',
-    //   request: async () => {
-    //     const res = await current.loadFlowDefines(userCtrl.space.id, {
-    //       offset: 0,
-    //       limit: 1000000,
-    //       filter: '',
-    //     });
-    //     const flowDefines = res.result || [];
-    //     console.log('flowDefines', flowDefines);
-    //     return flowDefines.map((def) => {
-    //       return { label: def.name, value: def.id };
-    //     });
-    //   },
-    // },
-    {
-      title: '角色',
-      dataIndex: 'beginAuthId',
-      valueType: 'select',
-    },
-    // {
-    //   title: '业务内容',
-    //   dataIndex: 'remark',
-    //   valueType: 'textarea',
-    //   colProps: { span: 24 },
-    //   formItemProps: {
-    //     rules: [{ required: true, message: '业务内容为必填项' }],
-    //   },
-    // },
-  ];
+  const [form] = useForm<OperationModel>();
+  if (data) {
+    form.setFieldsValue(data);
+  }
 
   return (
-    <SchemaForm<OperationModel>
-      destroyOnClose={true}
-      formRef={formRef}
-      title={title}
+    <Modal
+      title={data?.name || title}
       open={open}
-      width={640}
-      onOpenChange={(open: boolean) => {
-        if (open) {
-          if (title.includes('修改')) {
-            formRef.current?.setFieldsValue(data);
-          }
-        } else {
-          handleCancel();
-        }
-        formRef.current?.resetFields();
-        formRef.current?.setFieldsValue(data);
-      }}
-      rowProps={{
-        gutter: [24, 0],
-      }}
-      layoutType="ModalForm"
-      onFinish={async (value) => {
-        value = { ...{ remark: JSON.stringify(defaultRemark) }, ...data, ...value };
+      onOk={async () => {
+        const value = {
+          ...{ remark: JSON.stringify(defaultRemark) },
+          ...data,
+          ...form.getFieldsValue(),
+        };
         if (title.includes('新增')) {
           handleOk(await current.createOperation(value));
         } else {
           handleOk(await current.updateOperation(value));
         }
       }}
-      columns={columns}></SchemaForm>
+      onCancel={handleCancel}
+      destroyOnClose={true}
+      cancelText={'关闭'}
+      width={640}>
+      <ProForm<OperationModel>
+        layout="vertical"
+        grid={true}
+        form={form}
+        submitter={{
+          searchConfig: {
+            resetText: '重置',
+            submitText: '提交',
+          },
+          resetButtonProps: {
+            style: { display: 'none' },
+          },
+          submitButtonProps: {
+            style: { display: 'none' },
+          },
+        }}>
+        <ProFormText
+          width="md"
+          name="name"
+          label="表单名称"
+          placeholder="请输入表单名称"
+          required={true}
+          colProps={{ span: 12 }}
+          rules={[{ required: true, message: '表单名称为必填项' }]}
+        />
+        <ProFormText
+          width="md"
+          name="code"
+          label="表单代码"
+          placeholder="请输入表单代码"
+          required={true}
+          colProps={{ span: 12 }}
+          rules={[{ required: true, message: '表单代码为必填项' }]}
+        />
+        <ProFormTreeSelect
+          width="md"
+          name="belongId"
+          label="制定组织"
+          placeholder="请选择制定组织"
+          required={true}
+          colProps={{ span: 12 }}
+          request={async () => {
+            return await userCtrl.getTeamTree();
+          }}
+          fieldProps={{
+            disabled: title === '修改',
+            fieldNames: {
+              label: 'teamName',
+              value: 'id',
+              children: 'subTeam',
+            },
+            showSearch: true,
+            filterTreeNode: true,
+            treeNodeFilterProp: 'teamName',
+          }}
+        />
+        <ProFormSelect
+          width="md"
+          name="public"
+          label="向下级组织公开"
+          placeholder="请选择是否向下级组织公开"
+          required={true}
+          colProps={{ span: 12 }}
+          fieldProps={{
+            options: [
+              {
+                value: true,
+                label: '公开',
+              },
+              {
+                value: false,
+                label: '不公开',
+              },
+            ],
+          }}
+          formItemProps={{
+            rules: [{ required: true, message: '是否公开为必填项' }],
+          }}
+        />
+        <ProFormAuth
+          width="md"
+          name="beginAuthId"
+          placeholder="请选择角色"
+          colProps={{ span: 12 }}
+        />
+      </ProForm>
+    </Modal>
   );
 };
 

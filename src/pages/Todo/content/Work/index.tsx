@@ -1,47 +1,35 @@
-import React, { useMemo, useState } from 'react';
-import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import React from 'react';
 import { XOperation } from '@/ts/base/schema';
 import OioForm from '@/pages/Setting/components/render';
+import { Card, Button } from 'antd';
+import { SaveOutlined } from '@ant-design/icons';
+import cls from './index.module.less';
 
 // 卡片渲染
 interface IProps {
-  ids: string[];
+  operations: XOperation[];
 }
 /**
  * 办事-订单
  * @returns
  */
-const Work: React.FC<IProps> = ({ ids }) => {
-  const [operations, setOperations] = useState<XOperation[]>([]);
-  useMemo(() => {
-    if (ids.length > 0) {
-      setTimeout(async () => {
-        const res = await kernel.queryOperationBySpeciesIds({
-          ids: ids,
-          spaceId: userCtrl.space.id,
-        });
-        setOperations(res.data.result ?? []);
-      }, 200);
-    } else {
-      setOperations([]);
-    }
-  }, ids);
-
+const Work: React.FC<IProps> = ({ operations }) => {
   return (
     <>
       {operations.length > 0 && (
-        <div>
+        <>
           {operations.map((operation) => (
-            <OioForm
-              key={operation.id}
-              operationId={operation.id}
-              operationItems={operation.items ?? []}
-              designSps={operation.operationRelations ?? []}
-              onValuesChange={(values) => console.log('values', values)}
-            />
+            <Card key={operation.id} title={operation?.name}>
+              <OioForm
+                operation={operation}
+                onValuesChange={(values) => console.log('values', values)}
+              />
+            </Card>
           ))}
-        </div>
+          <Button icon={<SaveOutlined />} type="primary" className={cls['bootom_right']}>
+            提交
+          </Button>
+        </>
       )}
     </>
   );

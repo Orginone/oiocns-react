@@ -123,6 +123,8 @@ export type XOperation = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 角色ID
+  beginAuthId: string;
   // 绑定的流程
   flow: XFlowDefine | undefined;
   // 度量特性对应的类别
@@ -131,8 +133,6 @@ export type XOperation = {
   belong: XTarget | undefined;
   // 子项
   items: XOperationItem[] | undefined;
-  // 子表绑定的分类
-  operationRelations: XOperationRelation[] | undefined;
 };
 
 //业务标准查询返回集合
@@ -183,6 +183,10 @@ export type XOperationItem = {
   belong: XTarget | undefined;
   // 绑定的特性
   attr: XAttribute | undefined;
+  // 子表关联的分类
+  containSpecies: XSpecies[] | undefined;
+  // 子项与分类的关联
+  operationRelations: XOperationRelation[] | undefined;
 };
 
 //业务标准查询返回集合

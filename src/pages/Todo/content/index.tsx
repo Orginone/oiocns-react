@@ -1,21 +1,22 @@
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import React from 'react';
-import { ISpeciesItem, ITodoGroup } from '@/ts/core';
+import { ITodoGroup } from '@/ts/core';
 import { MarketColumns, MerchandiseColumns, OrgColumns } from '../config/columns';
 import CommonTodo from './Common';
 import OrderTodo from './Order';
 import AppTodo from './App';
 import Work from './Work';
+import { XOperation } from '@/ts/base/schema';
 
 interface IProps {
   reflashMenu: () => void;
   selectMenu: MenuItemType;
-  checkedList: MenuItemType[];
+  operations: XOperation[];
 }
 
-const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
-  if (checkedList.length <= 0) {
+const TypeSetting = ({ selectMenu, reflashMenu, operations }: IProps) => {
+  if (operations.length <= 0) {
     let todoGroup = selectMenu.item as ITodoGroup;
     if (todoGroup) {
       switch (selectMenu.itemType) {
@@ -34,6 +35,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
             />
           );
         case GroupMenuType.JoinStore:
+          // eslint-disable-next-line no-case-declarations
           let tabList = [];
           if (todoGroup.id) {
             tabList = [
@@ -52,6 +54,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
             />
           );
         case GroupMenuType.Publish:
+          // eslint-disable-next-line no-case-declarations
           let publishTabList = [];
           if (todoGroup.id) {
             publishTabList = [
@@ -90,13 +93,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, checkedList }: IProps) => {
       }
     }
   } else {
-    return (
-      <>
-        <Work
-          key={'work'}
-          ids={checkedList.map((a) => (a.item as ISpeciesItem).id)}></Work>
-      </>
-    );
+    return <Work key={'work'} operations={operations}></Work>;
   }
   return <></>;
 };

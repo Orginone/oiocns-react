@@ -7,15 +7,12 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
-import { getUuid } from '@/utils/tools';
 import userCtrl from '@/ts/controller/setting';
-import { message } from 'antd';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  const [contentKey, setContentKey] = useState<string>();
   const [checkedList, setCheckedList] = useState<any[]>([]);
   return (
     <MainLayout
@@ -26,7 +23,6 @@ const Package: React.FC = () => {
           const item = data.item as IFileSystemItem;
           if (item.children.length === 0 && (await item.loadChildren())) {
             refreshMenu();
-            setContentKey(getUuid());
           }
         }
         if (
@@ -48,7 +44,6 @@ const Package: React.FC = () => {
         storeCtrl.setTabIndex(tabKey);
         setCheckedList([]);
         refreshMenu();
-        setContentKey(getUuid());
       }}
       tabKey={storeCtrl.tabIndex}
       onCheckedChange={async (checks: any[]) => {
@@ -64,7 +59,6 @@ const Package: React.FC = () => {
         }
         setCheckedList(checks);
         refreshMenu();
-        setContentKey(getUuid());
       }}
       siderMenuData={menus[0]?.menu}
       tabs={menus}>

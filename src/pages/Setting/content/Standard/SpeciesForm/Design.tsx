@@ -25,17 +25,14 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
   const [operationModel, setOperationModel] = useState<OperationModel>();
 
   const save = async () => {
-    console.log('operationModel', operationModel);
     if (operationModel) {
+      if (operationModel.belongId === userCtrl.space.id) {
+        const res = await kernel.updateOperation(operationModel);
+        console.log(res);
+      }
       const res = await kernel.createOperationItems({
         spaceId: userCtrl.space.id,
         operationId: operationModel.id!,
-        SpeciesItems: operationModel.speciesItems
-          .filter((i: any) => i.belongId == userCtrl.space.id)
-          .map((a) => ({
-            rule: a.rule,
-            speciesId: a.speciesId,
-          })),
         operationItems: operationModel.items
           .filter((i: any) => i.belongId == userCtrl.space.id)
           .map((a) => ({
@@ -44,6 +41,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
             attrId: a.attrId,
             rule: a.rule,
             remark: a.remark,
+            speciesIds: a.speciesIds || [],
           })),
       });
       if (res.success) {
@@ -59,7 +57,11 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
       title={operation?.name}
       extra={
         <>
-          <Button onClick={() => save()} type="primary" icon={<SaveOutlined />}>
+          <Button
+            onClick={() => save()}
+            type="primary"
+            icon={<SaveOutlined />}
+            disabled={!operationModel}>
             保存
           </Button>
           <Button

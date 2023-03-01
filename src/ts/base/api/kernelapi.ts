@@ -576,20 +576,6 @@ export default class KernelApi {
     });
   }
   /**
-   * 查询分类的业务子表项
-   * @param {model.IdSpaceReq} params 请求参数
-   * @returns {model.ResultType<schema.XOperationRelationArray>} 请求结果
-   */
-  public async queryOperationSpeciesItems(
-    params: model.IdSpaceReq,
-  ): Promise<model.ResultType<schema.XOperationRelationArray>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryOperationSpeciesItems',
-      params: params,
-    });
-  }
-  /**
    * 查询分类字典
    * @param {model.IdSpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
@@ -2290,19 +2276,6 @@ export default class KernelApi {
       module: 'flow',
       action: 'DeleteInstance',
       params: params,
-    });
-  }
-  /**
-   * 查询流程有关应用
-   * @returns {model.ResultType<model.IdWithNameModel[]>} 请求结果
-   */
-  public async queryApprovalProduct(): Promise<
-    model.ResultType<model.IdWithNameModel[]>
-  > {
-    return await this.request({
-      module: 'flow',
-      action: 'QueryApprovalProduct',
-      params: {},
     });
   }
   /**

@@ -92,7 +92,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           {props.config.name ? props.config.name : '组织分支' + props.level}
         </span>
       </span>
-      {editable && (
+      {editable && props.config.readonly && (
         <span className={cls['option']}>
           <CopyOutlined
             style={{ fontSize: '12px', paddingRight: '5px' }}
@@ -120,6 +120,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             onChange={onChange}
             orgId={orgId}
             value={props.config.conditions[0]?.val}
+            readonly={props.config.readonly}
             rootDisable={false}></SelectOrg>
         )}
         {!editable && userCtrl.getBelongName(props.config.conditions[0]?.val)}

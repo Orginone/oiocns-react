@@ -1,92 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Tabs } from 'antd';
-import { ISpeciesItem } from '@/ts/core';
-import { kernel } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
-import { XAttribute } from '@/ts/base/schema';
-import { EditableProTable } from '@ant-design/pro-components';
-// import { Button } from 'antd';
-// import { SelectOutlined } from '@ant-design/icons';
-import { DesignSpecies } from '.';
-
-type SpeciesTableProps = {
-  sp: ISpeciesItem;
-};
-
-/**
- * 子表
- */
-const SpeciesTable: React.FC<SpeciesTableProps> = ({ sp }) => {
-  const [columns, setColumns] = useState<any[]>([]);
-
-  useEffect(() => {
-    const loadAttrs = async () => {
-      const res = await kernel.querySpeciesAttrs({
-        id: sp.id,
-        spaceId: userCtrl.space.id,
-        recursionOrg: true,
-        recursionSpecies: true,
-        page: {
-          offset: 0,
-          limit: 10000,
-          filter: '',
-        },
-      });
-      const attrs = res.data?.result || [];
-      setColumns(
-        attrs.map((item: XAttribute) => {
-          return {
-            title: item.name,
-            dataIndex: item.code,
-            key: item.code,
-            width:
-              item.name.length <= 2
-                ? 60
-                : item.name.length > 12
-                ? item.name.length * 12
-                : item.name.length * 20,
-          };
-        }),
-      );
-    };
-    loadAttrs();
-  }, []);
-  return (
-    <EditableProTable
-      columns={columns}
-      recordCreatorProps={false}
-      scroll={{
-        x: 1100,
-      }}
-      editable={{
-        type: 'multiple',
-        actionRender: (row, config, dom) => [dom.save, dom.cancel],
-      }}
-    />
-  );
-};
+import { XOperationItem } from '@/ts/base/schema';
+import SpeciesDataGrid from './SpeciesDataGrid';
 
 type SpeciesTabsProps = {
-  dsps: DesignSpecies[];
-  deleteSpecies: (id: string) => void;
+  operationItems: XOperationItem[];
+  setSelectedItem: (item: XOperationItem) => void;
+  deleteOperationItem: (id: string) => void;
   setOpenSpeciesModal: (show: boolean) => void;
 };
 
+/**
+ * 子表Tabs
+ */
 const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
-  dsps,
-  deleteSpecies,
+  operationItems,
+  deleteOperationItem,
   setOpenSpeciesModal,
 }) => {
-  const items = dsps.map((dsp) => {
+  const items = operationItems.map((item) => {
     return {
-      key: dsp.speciesId,
+      key: item.code,
       label: (
         <div style={{ paddingTop: '4px', paddingLeft: '12px', paddingRight: '4px' }}>
-          {dsp.species.name}
+          {item.name}
         </div>
       ),
-      closable: dsp.belongId == userCtrl.space.id,
-      children: <SpeciesTable sp={dsp.species} />,
+      closable: item.belongId == userCtrl.space.id,
+      children: <SpeciesDataGrid speciesArray={item.containSpecies || []} />,
     };
   });
 
@@ -100,11 +42,11 @@ const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
     setOpenSpeciesModal(true);
   };
 
-  const onEdit = (id: string, action: 'add' | 'remove') => {
+  const onEdit = (key: string, action: 'add' | 'remove') => {
     if (action === 'add') {
       add();
     } else {
-      deleteSpecies(id);
+      deleteOperationItem(key);
     }
   };
 
@@ -116,7 +58,6 @@ const SpeciesTabs: React.FC<SpeciesTabsProps> = ({
         activeKey={activeKey}
         onEdit={(key: any, action) => onEdit(key, action)}
         items={items}
-        // tabBarExtraContent={<Button icon={<SelectOutlined />}>选择</Button>}
       />
     </div>
   );

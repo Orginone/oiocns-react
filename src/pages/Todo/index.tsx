@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Content from './content';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import { MenuItemType } from 'typings/globelType';
 const Setting: React.FC<any> = () => {
-  const [checkedList, setCheckedList] = useState<MenuItemType[]>([]);
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [
+    key,
+    menus,
+    refreshMenu,
+    selectMenu,
+    setSelectMenu,
+    checkedList,
+    operations,
+    setCheckedList,
+  ] = useMenuUpdate();
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -28,7 +35,7 @@ const Setting: React.FC<any> = () => {
         key={key}
         selectMenu={selectMenu}
         reflashMenu={refreshMenu}
-        checkedList={checkedList}
+        operations={operations}
       />
     </MainLayout>
   );
