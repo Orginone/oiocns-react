@@ -73,7 +73,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         // 确保外部化处理那些你不想打包进库的依赖
         // external: ['react', 'antd'], // 注意看这里
-        treeshake: true,
+        treeshake: false,
         output: {
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
