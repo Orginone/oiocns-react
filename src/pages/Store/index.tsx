@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import storeCtrl from '@/ts/controller/store';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
@@ -14,6 +14,9 @@ const Package: React.FC = () => {
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [checkedList, setCheckedList] = useState<any[]>([]);
+  useEffect(() => {
+    refreshMenu();
+  }, [userCtrl.space.id]);
   return (
     <MainLayout
       selectMenu={selectMenu}
