@@ -16,7 +16,6 @@ import DataGrid, {
   Pager,
   Paging,
   Lookup,
-  // StateStoring,
 } from 'devextreme-react/data-grid';
 import { getUuid } from '@/utils/tools';
 interface IProps {
@@ -29,7 +28,6 @@ interface IProps {
 const Thing: React.FC<IProps> = (props: IProps) => {
   const [key] = useCtrlUpdate(storeCtrl);
   const [thingAttrs, setThingAttrs] = useState<any[]>([]);
-  // const [tabKey_, setTabKey_] = useState<string>();
   const allowedPageSizes = [10, 20];
   const getSortedList = (
     speciesArray: ISpeciesItem[],
@@ -93,14 +91,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     }
   }, [props.current, props.checkedList, storeCtrl.checkedSpeciesList]);
 
-  // const getParentAndSelfIds = (a: ISpeciesItem, ids: string[]): string[] => {
-  //   ids.push(a.id);
-  //   if (a.parent) {
-  //     ids = getParentAndSelfIds(a.parent, ids);
-  //   }
-  //   return ids;
-  // };
-
   const getComponent = (speciesArray: ISpeciesItem[]) => {
     return (
       <>
@@ -142,7 +132,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             })}
             keyExpr="key"
             columnMinWidth={80}
-            focusedRowEnabled={true}
+            // focusedRowEnabled={true}
             allowColumnReordering={true}
             allowColumnResizing={true}
             columnAutoWidth={true}
@@ -151,6 +141,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             rowAlternationEnabled={true}
             hoverStateEnabled={true}
             height={'calc(100vh - 175px)'}
+            width={'80vw'}
             showBorders={true}>
             <ColumnChooser
               enabled={true}
@@ -167,7 +158,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               selectTextOnEditStart={true}
               useIcons={true}
             />
-            {/* <StateStoring enabled={true} type="localStorage" /> */}
             <HeaderFilter visible={true} />
             <FilterRow visible={true} />
             <Pager
