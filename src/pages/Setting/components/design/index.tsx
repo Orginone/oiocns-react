@@ -671,8 +671,7 @@ const Design: React.FC<DesignProps> = ({
         maskClosable={false}
         width={900}>
         <OioForm
-          operationId={operation.id}
-          operationItems={items['operationItems']}
+          operation={operation}
           onValuesChange={(values) => console.log('values', values)}
         />
       </Modal>

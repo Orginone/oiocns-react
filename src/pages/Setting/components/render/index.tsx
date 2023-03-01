@@ -17,8 +17,10 @@ type OioFormProps = {
  */
 const OioForm: React.FC<OioFormProps> = ({ operation, onValuesChange }) => {
   const [items, setItems] = useState<XOperationItem[]>([]);
-  const config = JSON.parse(operation.remark);
-  console.log('config===', config);
+  let config: any = { col: 12, layout: 'horizontal' };
+  if (operation.remark) {
+    config = JSON.parse(operation.remark);
+  }
   useEffect(() => {
     const queryItems = async () => {
       // 表单项
