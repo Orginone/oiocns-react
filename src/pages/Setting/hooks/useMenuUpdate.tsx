@@ -48,7 +48,6 @@ const useMenuUpdate = (): [
   };
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const menus: TabItemType[] = [];
     const children: MenuItemType[] = [];
     children.push(await operate.getSpaceMenu());
     if (userCtrl.isCompanySpace) {
@@ -88,16 +87,9 @@ const useMenuUpdate = (): [
         }),
       );
     }
-    children.push(operate.loadUserSetting());
-    children.push(operate.loadSpaceSetting());
-    const species = await operate.loadSpeciesSetting();
-    if (species) {
-      menus.push({
-        key: '2',
-        label: '标准',
-        menu: species,
-      });
-    }
+    const standrads = await operate.loadStandardSetting();
+    standrads.push(operate.loadUserSetting());
+    standrads.push(operate.loadSpaceSetting());
     setMenu([
       {
         key: '1',
@@ -111,7 +103,18 @@ const useMenuUpdate = (): [
           icon: <SettingOutlined />,
         },
       },
-      ...menus,
+      {
+        key: '2',
+        label: '标准',
+        menu: {
+          children: standrads,
+          key: 'setting',
+          label: '标准',
+          item: userCtrl.space,
+          itemType: 'group',
+          icon: <SettingOutlined />,
+        },
+      },
     ]);
     const item = findMenuItemByKey(children, userCtrl.currentKey);
     if (item) {

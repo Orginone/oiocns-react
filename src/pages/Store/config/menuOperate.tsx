@@ -105,8 +105,8 @@ export const getResourceMenus = () => {
 /** 获取应用程序菜单 */
 export const getAppliactionMenus = () => {
   return {
-    key: '应用程序',
-    label: '应用程序',
+    key: '应用',
+    label: '应用',
     itemType: GroupMenuType.Application,
     icon: <im.ImWindows8 />,
     item: storeCtrl.root,
@@ -148,8 +148,8 @@ export const loadAnythingMenus = async () => {
           GroupMenuType.Thing,
           'checkbox',
         ),
-        key: '财物',
-        label: '财物',
+        key: '清单',
+        label: '清单',
         itemType: GroupMenuType.Thing,
         item: root,
         icon: <im.ImNewspaper />,

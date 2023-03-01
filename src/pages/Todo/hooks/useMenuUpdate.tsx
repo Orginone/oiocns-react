@@ -48,7 +48,16 @@ const useMenuUpdate = (): [
           label: '待办',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: [...todoMenus, ...(await operate.loadThingMenus('todo'))],
+          children: [
+            ...todoMenus,
+            {
+              key: '事项',
+              label: '事项',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: await operate.loadThingMenus('todo'),
+            },
+          ],
         },
       },
       {
@@ -59,7 +68,36 @@ const useMenuUpdate = (): [
           label: '发起',
           itemType: 'group',
           icon: <SettingOutlined />,
-          children: await operate.loadThingMenus('work', true),
+          children: [
+            {
+              key: '加好友',
+              label: '加好友',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+            {
+              key: '加单位',
+              label: '加单位',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+            {
+              key: '加商店',
+              label: '加商店',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+            {
+              key: '办事项',
+              label: '办事项',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: await operate.loadThingMenus('work', true),
+            },
+          ],
         },
       },
     ]);

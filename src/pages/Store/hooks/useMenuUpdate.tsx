@@ -51,10 +51,10 @@ const useMenuUpdate = (): [
     let tabName_1 = userCtrl.isCompanySpace ? '管理的' : '我的';
     const anyThingMenus = await operate.loadAnythingMenus();
     const children: MenuItemType[] = [
-      operate.getDataMenus(),
       operate.getAppliactionMenus(),
       operate.getFileSystemMenus(),
       operate.getResourceMenus(),
+      operate.getDataMenus(),
     ];
     if (anyThingMenus) {
       children.push(anyThingMenus);
