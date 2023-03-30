@@ -1,0 +1,117 @@
+.common-table-wrap {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  flex: 1;
+
+  .operation-btn {
+    display: flex;
+    align-items: center;
+    height: 20px;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 12px;
+    font-size: 18px;
+    overflow: hidden;
+
+    &:hover {
+      background-color: @primary-color;
+      color: @white-color;
+    }
+  }
+  .stripe {
+    background: #f9fafe;
+  }
+  :global {
+    .ogo-pro-card .ogo-pro-card-body {
+      padding-inline: 0;
+      padding-block: 6px;
+    }
+
+    // 表格头部背景色
+    .ogo-table-thead th {
+      background-color: @table-header-background;
+    }
+
+    // 表格头部 字体设置
+    .ogo-table-thead > tr > th {
+      font-weight: 600;
+    }
+
+    .card-title {
+      box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+      padding-block: 8px;
+      padding-inline: 0;
+      color: rgba(0, 0, 0, 0.85);
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .ogo-pro-card-body {
+      padding: 0;
+    }
+
+    .stripe > .option {
+      background: #f9fafe !important;
+    }
+    .ogo-pro {
+      flex: 1;
+      position: relative;
+    }
+  }
+}
+
+.ogo-pro {
+  flex: 1;
+}
+
+// 卡片布局
+.common-card-content {
+  position: relative;
+}
+.common-card {
+  flex: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  overflow-y: auto;
+  padding-bottom: 10px;
+}
+
+.common-table-footer {
+  // display: flex;
+  // justify-content: space-between;
+  // align-items: center;
+  margin-top: -49px;
+  z-index: 1;
+  position: relative;
+  width: 100px;
+}
+
+.btn-box {
+  display: flex;
+
+  :global {
+    .anticon {
+      width: 34px;
+      height: 22px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 13px;
+      margin-right: 5px;
+      border-radius: 12px;
+
+      &.active {
+        color: #fff;
+        background-color: @primary-color;
+      }
+    }
+  }
+}
