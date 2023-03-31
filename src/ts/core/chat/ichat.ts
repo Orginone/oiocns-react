@@ -1,6 +1,7 @@
 import { ChatModel, TargetShare } from '@/ts/base/model';
 import { schema, model } from '../../base';
 import { MessageType } from '../enum';
+import { XImMsg } from '@/ts/base/schema';
 /**
  * 会话接口
  */
@@ -107,4 +108,6 @@ export type ChatCache = {
   noReadCount: number;
   /** 最后一次消息时间 */
   lastMsgTime: number;
+  /** 最新消息 */
+  lastMessage: XImMsg | undefined;
 };
