@@ -10,6 +10,7 @@ import { getUuid } from '@/utils/tools';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
+  let cohortTodo = await loadChildren(todoCtrl.CohortTodo);
   let companyTodo = await loadChildren(todoCtrl.CompanyTodo);
   let groupTodo = await loadChildren(todoCtrl.GroupTodo);
 
@@ -23,6 +24,13 @@ export const loadPlatformTodoMenu = async () => {
       icon: <im.ImTree />,
       children: [
         ...friendTodo.children,
+        {
+          key: WorkType.CohortTodo,
+          label: '群组',
+          itemType: WorkType.CohortTodo,
+          icon: <im.ImTree />,
+          ...cohortTodo,
+        },
         {
           key: WorkType.CompanyTodo,
           label: '单位',
@@ -38,7 +46,7 @@ export const loadPlatformTodoMenu = async () => {
           ...groupTodo,
         },
       ],
-      count: friendTodo.count + companyTodo.count + groupTodo.count,
+      count: friendTodo.count + companyTodo.count + cohortTodo.count + groupTodo.count,
     },
     {
       key: WorkType.StoreTodo,
@@ -97,6 +105,13 @@ export const loadPlatformApplyMenu = async () => {
           key: WorkType.FriendApply,
           label: '加好友',
           itemType: WorkType.FriendApply,
+          icon: <im.ImTree />,
+          children: [],
+        },
+        {
+          key: WorkType.CohortApply,
+          label: '加群组',
+          itemType: WorkType.CohortApply,
           icon: <im.ImTree />,
           children: [],
         },

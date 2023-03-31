@@ -1,4 +1,4 @@
-import { Card, Empty, List, message, Tag } from 'antd';
+import { Card, Empty, List, message, Modal, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { BookType } from '../../config/menuType';
@@ -6,7 +6,11 @@ import { IChat, ITarget, TargetType } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
 import chatCtrl from '@/ts/controller/chat';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { UserAddOutlined, WechatOutlined } from '@ant-design/icons';
+import {
+  ExclamationCircleOutlined,
+  UserAddOutlined,
+  WechatOutlined,
+} from '@ant-design/icons';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import setting from '@/ts/controller/setting';
 import { XTarget } from '@/ts/base/schema';
@@ -116,11 +120,22 @@ const Book: React.FC<IProps> = ({ selectMenu }: IProps) => {
           key="添加好友"
           title="添加好友"
           onClick={async () => {
-            const res = await setting.user.applyFriend({
-              id: chat.chatId,
-              typeName: TargetType.Person,
-            } as XTarget);
-            res ? message.success('已提交申请') : message.error('添加失败');
+            Modal.confirm({
+              title: '提示',
+              icon: <ExclamationCircleOutlined />,
+              content: '是否申请添加好友',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                let res = await userCtrl.user?.applyFriend({
+                  id: chat.chatId,
+                  typeName: TargetType.Person,
+                } as XTarget);
+                if (res) {
+                  message.success('发起申请成功');
+                }
+              },
+            });
           }}>
           <UserAddOutlined style={{ fontSize: 18 }} />
         </a>,

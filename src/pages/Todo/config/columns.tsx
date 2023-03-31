@@ -3,7 +3,7 @@ import { Space, Tag } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import { XOrderDetail } from '@/ts/base/schema';
 import { ProColumns } from '@ant-design/pro-table';
-import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core';
+import { IApplyItem, IApprovalItem, IOrderApplyItem, TargetType } from '@/ts/core';
 import thingCtrl from '@/ts/controller/thing';
 import { schema } from '@/ts/base';
 
@@ -49,9 +49,19 @@ export const OrgColumns = [
     dataIndex: ['Data', 'remark'],
     render: (_: any, row: any) => {
       if ((row as IApplyItem).cancel) {
-        return '请求添加' + row.Data?.team?.name + '为好友';
+        switch (row.Data.team.target.typeName) {
+          case TargetType.Person:
+            return '请求添加' + row.Data.team.name + '为好友';
+          default:
+            return '请求加入' + row.Data.team.name;
+        }
       } else {
-        return row.Data?.target?.name + '请求添加好友';
+        switch (row.Data.team.target.typeName) {
+          case TargetType.Person:
+            return row.Data.target.name + '请求添加好友';
+          default:
+            return row.Data.target.name + '请求加入' + row.Data.team.name;
+        }
       }
     },
   },

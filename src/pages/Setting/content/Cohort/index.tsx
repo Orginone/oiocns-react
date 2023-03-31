@@ -34,7 +34,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
+      SetIsRelationAdmin(await IsRelationAdmin(current));
     }, 10);
   }, [current]);
 
@@ -58,9 +58,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             邀请成员
           </Button>
         )}
-        {/* <Button type="link" onClick={() => history.push('/todo/org')}>
-          查看申请
-        </Button> */}
       </>
     );
   };
@@ -82,8 +79,10 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                  await userCtrl.user?.applyFriend(item);
-                  message.success('发起申请成功');
+                  let res = await userCtrl.user?.applyFriend(item);
+                  if (res) {
+                    message.success('发起申请成功');
+                  }
                 },
               });
             },
@@ -104,7 +103,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           },
         ],
       );
-      if (isSuperAdmin) {
+      if (isRelationAdmin) {
         operations.push({
           key: 'remove',
           label: '踢出',

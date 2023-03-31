@@ -36,7 +36,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
+      SetIsRelationAdmin(await IsRelationAdmin(current));
     }, 10);
   }, [current]);
 

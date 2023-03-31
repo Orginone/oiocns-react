@@ -5,7 +5,6 @@ import React, { useRef, useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import cls from './index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { useHistory } from 'react-router-dom';
 import { schema } from '@/ts/base';
 import CardOrTable from '@/components/CardOrTableComp';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
@@ -20,34 +19,32 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
  * @returns
  */
 const PersonSetting: React.FC = () => {
-  const history = useHistory();
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [tabKey, setTabKey] = useState<string>('friends');
   const [modalType, setModalType] = useState('');
-  const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
+  const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>([]);
   const handleOk = async () => {
     let success = false;
-    if (searchCallback && searchCallback.length > 0) {
-      if (searchCallback && searchCallback.length > 0) {
-        searchCallback.forEach(async (item) => {
-          switch (modalType) {
-            case 'company':
-              success = await userCtrl.user.applyJoinCompany(
-                item.id,
-                item.typeName as TargetType,
-              );
-              break;
-            case 'friend':
-              success = await userCtrl.user.applyFriend(item);
-              break;
-          }
-        });
+    for (let target of searchCallback) {
+      switch (modalType) {
+        case 'company':
+          success = await userCtrl.user.applyJoinCompany(
+            target.id,
+            target.typeName as TargetType,
+          );
+          break;
+        case 'friend':
+          success = await userCtrl.user.applyFriend(target);
+          break;
+        case 'cohort':
+          success = await userCtrl.user.applyJoinCohort(target.id);
+          break;
       }
     }
     if (success) {
-      message.success('操作成功!');
       setModalType('');
+      message.success('操作成功!');
     }
   };
   // 标题tabs页
@@ -123,14 +120,14 @@ const PersonSetting: React.FC = () => {
           onTabChange={(key) => setTabKey(key)}
           tabBarExtraContent={
             <>
-              <Button type="link" onClick={() => history.push('/todo/org')}>
-                查看申请记录
-              </Button>
               <Button type="link" onClick={() => setModalType('friend')}>
                 添加好友
               </Button>
               <Button type="link" onClick={() => setModalType('company')}>
                 加入单位
+              </Button>
+              <Button type="link" onClick={() => setModalType('cohort')}>
+                加入群组
               </Button>
             </>
           }>
@@ -161,18 +158,27 @@ const PersonSetting: React.FC = () => {
           </div>
         </PageCard>
         <Modal
-          title={modalType === 'company' ? '加入单位' : '添加好友'}
+          title={
+            modalType === 'company'
+              ? '加入单位'
+              : modalType === 'cohort'
+              ? '加入群组'
+              : '添加好友'
+          }
           destroyOnClose={true}
-          open={modalType === 'company' || modalType === 'friend'}
+          open={modalType != ''}
           onOk={handleOk}
           onCancel={() => setModalType('')}
           width={670}>
-          {' '}
           <div>
             <SearchCompany
               searchCallback={setSearchCallback}
               searchType={
-                modalType === 'company' ? TargetType.Company : TargetType.Person
+                modalType === 'company'
+                  ? TargetType.Company
+                  : modalType === 'cohort'
+                  ? TargetType.Cohort
+                  : TargetType.Person
               }
             />
           </div>

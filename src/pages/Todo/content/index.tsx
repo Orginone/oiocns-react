@@ -20,6 +20,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
   switch (selectMenu.itemType) {
     case WorkType.FriendTodo:
     case WorkType.CompanyTodo:
+    case WorkType.CohortTodo:
     case WorkType.GroupTodo:
       return (
         <CommonTodo
@@ -59,6 +60,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
     case WorkType.OrderTodo:
       return <SellOrder typeName={selectMenu.key} todoGroup={selectMenu.item} />;
     case WorkType.FriendApply:
+    case WorkType.CohortApply:
     case WorkType.CompanyApply:
     case WorkType.GroupApply:
       return (
