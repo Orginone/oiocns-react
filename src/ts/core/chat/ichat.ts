@@ -29,6 +29,8 @@ export interface IChat {
   persons: schema.XTarget[];
   /** 共享信息 */
   shareInfo: TargetShare;
+  /** 最后一个消息的时间 */
+  lastMsgTime: Date;
   /** 消息变更通知 */
   onMessage(callback: (messages: schema.XImMsg[]) => void): void;
   /**
@@ -103,4 +105,6 @@ export type ChatCache = {
   isToping: boolean;
   /** 会话未读消息数量 */
   noReadCount: number;
+  /** 最后一次消息时间 */
+  lastMsgTime: Date;
 };

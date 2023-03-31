@@ -305,16 +305,6 @@ export const loadChatMenu = () => {
         icon: <TeamIcon share={a.shareInfo} size={22} fontSize={22} />,
       };
     });
-    const sortNumber = (c: IChat) => {
-      let sum = 0;
-      if (c.isToping) {
-        sum += 10;
-      }
-      if (c.lastMessage) {
-        sum += 2;
-      }
-      return sum;
-    };
     return {
       key: item.key,
       label: item.label,
@@ -325,11 +315,9 @@ export const loadChatMenu = () => {
       icon: <im.ImUsers />,
       menus: [],
       children: children.sort((a, b) => {
-        const num = sortNumber(b.item) - sortNumber(a.item);
+        const num = (b.item.isToping ? 10 : 0) - (a.item.isToping ? 10 : 0);
         if (num === 0) {
-          const atime = new Date(a.item.lastMessage?.createTime || a.item.target.msgTime);
-          const btime = new Date(b.item.lastMessage?.createTime || b.item.target.msgTime);
-          return btime > atime ? 1 : -1;
+          return b.item.lastMsgTime > a.item.lastMsgTime ? 1 : -1;
         }
         return num;
       }),

@@ -133,7 +133,7 @@ const CustomMenu = (props: CustomMenuType) => {
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (
-          <span style={{ float: 'right' }}>
+          <span className={style.badge}>
             <Badge key={item.key} count={item.count} size="small" />
           </span>
         ) : (

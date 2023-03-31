@@ -22,6 +22,7 @@ class BaseChat implements IChat {
   personCount: number;
   noReadCount: number;
   userId: string;
+  lastMsgTime: Date;
   messageNotify?: (messages: schema.XImMsg[]) => void;
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     this.spaceId = id;
@@ -35,6 +36,7 @@ class BaseChat implements IChat {
     this.isToping = false;
     this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
+    this.lastMsgTime = new Date('2022-07-01');
     appendShare(m.id, this.shareInfo);
   }
 
@@ -54,11 +56,14 @@ class BaseChat implements IChat {
       isToping: this.isToping,
       spaceName: this.spaceName,
       noReadCount: this.noReadCount,
+      lastMsgTime: this.lastMsgTime,
     };
   }
   loadCache(cache: ChatCache): void {
+    this.target = cache.target;
     this.isToping = cache.isToping;
     this.noReadCount = cache.noReadCount;
+    this.lastMsgTime = cache.lastMsgTime ?? new Date('2022-07-01');
   }
   onMessage(callback: (messages: schema.XImMsg[]) => void): void {
     this.messageNotify = callback;
@@ -78,6 +83,7 @@ class BaseChat implements IChat {
         this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
+      this.lastMsgTime = new Date();
     }
     return false;
   }
@@ -100,6 +106,7 @@ class BaseChat implements IChat {
         this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
+      this.lastMsgTime = new Date();
     }
     return false;
   }
@@ -144,6 +151,7 @@ class BaseChat implements IChat {
         this.messages.push(msg);
       }
       this.noReadCount += noread ? 1 : 0;
+      this.lastMsgTime = new Date();
     }
     this.messageNotify?.apply(this, [this.messages]);
   }
@@ -155,6 +163,9 @@ class BaseChat implements IChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
+    if (!this.lastMsgTime) {
+      this.lastMsgTime = new Date(msgs[msgs.length - 1].createTime);
+    }
     this.messageNotify?.apply(this, [this.messages]);
   }
   protected async loadCacheMessages(): Promise<number> {
