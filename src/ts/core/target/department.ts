@@ -10,8 +10,10 @@ import { logger } from '@/ts/base/common';
  * 部门的元操作
  */
 export default class Department extends BaseTarget implements IDepartment {
+  workingsLoaded: boolean = false;
   workings: IWorking[];
   person: schema.XTarget[];
+  departmentsLoaded: boolean = false;
   departments: IDepartment[];
   private _onDeleted: Function;
 
@@ -58,34 +60,42 @@ export default class Department extends BaseTarget implements IDepartment {
   }
 
   public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
-    if (!reload && this.departments.length > 0) {
+    if (!reload && this.departmentsLoaded) {
       return this.departments;
     }
+    this.departmentsLoaded = true;
     const res = await super.getSubTargets(departmentTypes);
-    if (res.success && res.data.result) {
-      this.departments = res.data.result.map((a) => {
-        return new Department(a, () => {
-          this.departments = this.departments.filter((i) => {
-            return i.id != a.id;
+    if (res.success) {
+      this.departments =
+        res.data.result?.map((a) => {
+          return new Department(a, () => {
+            this.departments = this.departments.filter((i) => {
+              return i.id != a.id;
+            });
           });
-        });
-      });
+        }) ?? [];
+    } else {
+      this.departmentsLoaded = false;
     }
     return this.departments;
   }
   public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
-    if (!reload && this.workings.length > 0) {
+    if (!reload && this.workingsLoaded) {
       return this.workings;
     }
+    this.workingsLoaded = true;
     const res = await super.getSubTargets([TargetType.Working]);
-    if (res.success && res.data.result) {
-      this.workings = res.data.result.map((a) => {
-        return new Working(a, () => {
-          this.workings = this.workings.filter((i) => {
-            return i.id != a.id;
+    if (res.success) {
+      this.workings =
+        res.data.result?.map((a) => {
+          return new Working(a, () => {
+            this.workings = this.workings.filter((i) => {
+              return i.id != a.id;
+            });
           });
-        });
-      });
+        }) ?? [];
+    } else {
+      this.workingsLoaded = false;
     }
     return this.workings;
   }

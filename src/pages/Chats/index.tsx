@@ -19,8 +19,8 @@ const Setting: React.FC<any> = () => {
           await chatCtrl.setCurrent(data.item);
         } else {
           chatCtrl.currentKey = data.key;
+          setSelectMenu(data);
         }
-        setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
         switch (key) {

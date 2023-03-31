@@ -280,47 +280,56 @@ export const loadChatMenu = () => {
   chatCtrl.chats.forEach((item) => {
     if (groups.names.indexOf(item.spaceName) < 0) {
       groups.names.push(item.spaceName);
+      let sortId = parseInt(item.spaceId.substring(6));
+      if (item.spaceName === '我的') {
+        sortId = Number.MAX_VALUE;
+      }
       groups.spaces.push({
+        sortId: sortId,
         label: item.spaceName,
         key: item.spaceId + '-' + item.spaceName,
       });
     }
   });
-  return groups.spaces.map((item) => {
-    const chats = chatCtrl.chats.filter((i) => i.spaceName === item.label);
-    let noReadCount = 0;
-    for (const i of chats) {
-      noReadCount += i.noReadCount;
-    }
-    var children: MenuItemType[] = chats.map((a) => {
+  return groups.spaces
+    .sort((a, b) => {
+      return b.sortId - a.sortId;
+    })
+    .map((item) => {
+      const chats = chatCtrl.chats.filter((i) => i.spaceName === item.label);
+      let noReadCount = 0;
+      for (const i of chats) {
+        noReadCount += i.noReadCount;
+      }
+      var children: MenuItemType[] = chats.map((a) => {
+        return {
+          key: a.fullId,
+          label: a.target.name + (a.isToping ? '(置顶)' : ''),
+          menus: loadChatMenus(a, true),
+          itemType: GroupMenuType.Chat,
+          item: a,
+          children: [],
+          count: a.noReadCount,
+          tag: [a.spaceName, a.target.label],
+          icon: <TeamIcon share={a.shareInfo} size={22} fontSize={22} />,
+        };
+      });
       return {
-        key: a.fullId,
-        label: a.target.name + (a.isToping ? '(置顶)' : ''),
-        menus: loadChatMenus(a, true),
-        itemType: GroupMenuType.Chat,
-        item: a,
-        children: [],
-        count: a.noReadCount,
-        tag: [a.spaceName, a.target.label],
-        icon: <TeamIcon share={a.shareInfo} size={22} fontSize={22} />,
+        key: item.key,
+        label: item.label,
+        item: null,
+        itemType: '空间',
+        count: noReadCount,
+        tag: ['空间'],
+        icon: <im.ImUsers />,
+        menus: [],
+        children: children.sort((a, b) => {
+          const num = (b.item.isToping ? 10 : 0) - (a.item.isToping ? 10 : 0);
+          if (num === 0) {
+            return b.item.lastMsgTime > a.item.lastMsgTime ? 1 : -1;
+          }
+          return num;
+        }),
       };
     });
-    return {
-      key: item.key,
-      label: item.label,
-      item: null,
-      itemType: '空间',
-      count: noReadCount,
-      tag: ['空间'],
-      icon: <im.ImUsers />,
-      menus: [],
-      children: children.sort((a, b) => {
-        const num = (b.item.isToping ? 10 : 0) - (a.item.isToping ? 10 : 0);
-        if (num === 0) {
-          return b.item.lastMsgTime > a.item.lastMsgTime ? 1 : -1;
-        }
-        return num;
-      }),
-    };
-  });
 };

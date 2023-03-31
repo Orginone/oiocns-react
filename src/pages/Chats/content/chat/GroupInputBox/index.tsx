@@ -34,7 +34,10 @@ const Groupinputbox = (props: Iprops) => {
     if (massage.length > 0) {
       await chatCtrl.chat?.sendMessage(MessageType.Text, massage);
     }
-    document.getElementById('insterHtml')!.innerHTML = '';
+    const insterHtml = document.getElementById('insterHtml');
+    if (insterHtml) {
+      insterHtml.innerHTML = '';
+    }
   };
 
   /**
@@ -218,7 +221,6 @@ const Groupinputbox = (props: Iprops) => {
         </div>
         <div className={inputboxStyle.input_content}>
           <div
-            autoFocus
             id="insterHtml"
             className={inputboxStyle.textarea}
             contentEditable="true"
