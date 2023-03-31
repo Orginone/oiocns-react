@@ -24,6 +24,9 @@ class SettingController extends Emitter {
   /**构造方法 */
   constructor() {
     super();
+    kernel.on('ChatRefresh', async () => {
+      await this.refresh();
+    });
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._user = createPerson(JSON.parse(userJson));
@@ -179,7 +182,7 @@ class SettingController extends Emitter {
     return await kernel.resetPassword(account, password, privateKey);
   }
   /** 重载 */
-  public async refresh(): Promise<void> {
+  private async refresh(): Promise<void> {
     const res = await this._user?.loadMembers({ offset: 0, limit: 10000, filter: '' });
     if (res?.result?.length ?? 0 > 0) {
       this.friends = res!.result!;

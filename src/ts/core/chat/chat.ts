@@ -22,6 +22,7 @@ class BaseChat implements IChat {
   personCount: number;
   noReadCount: number;
   userId: string;
+  messageNotify?: (messages: schema.XImMsg[]) => void;
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     this.spaceId = id;
     this.spaceName = name;
@@ -59,6 +60,9 @@ class BaseChat implements IChat {
     this.isToping = cache.isToping;
     this.noReadCount = cache.noReadCount;
   }
+  onMessage(callback: (messages: schema.XImMsg[]) => void): void {
+    this.messageNotify = callback;
+  }
   async clearMessage(): Promise<boolean> {
     if (this.spaceId === this.userId) {
       const res = await kernel.anystore.remove(
@@ -71,6 +75,7 @@ class BaseChat implements IChat {
       );
       if (res.success) {
         this.messages = [];
+        this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
     }
@@ -92,6 +97,7 @@ class BaseChat implements IChat {
         if (index > -1) {
           this.messages.splice(index, 1);
         }
+        this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
     }
@@ -139,6 +145,7 @@ class BaseChat implements IChat {
       }
       this.noReadCount += noread ? 1 : 0;
     }
+    this.messageNotify?.apply(this, [this.messages]);
   }
   protected loadMessages(msgs: schema.XImMsg[]): void {
     msgs.forEach((item: any) => {
@@ -148,6 +155,7 @@ class BaseChat implements IChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
+    this.messageNotify?.apply(this, [this.messages]);
   }
   protected async loadCacheMessages(): Promise<number> {
     const res = await kernel.anystore.aggregate(

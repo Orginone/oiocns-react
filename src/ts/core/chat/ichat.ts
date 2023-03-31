@@ -29,6 +29,8 @@ export interface IChat {
   persons: schema.XTarget[];
   /** 共享信息 */
   shareInfo: TargetShare;
+  /** 消息变更通知 */
+  onMessage(callback: (messages: schema.XImMsg[]) => void): void;
   /**
    * 获取会话缓存
    */

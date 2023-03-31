@@ -218,11 +218,11 @@ const Groupinputbox = (props: Iprops) => {
         </div>
         <div className={inputboxStyle.input_content}>
           <div
+            autoFocus
             id="insterHtml"
             className={inputboxStyle.textarea}
             contentEditable="true"
             spellCheck="false"
-            //   ref="inputRef"
             placeholder="请输入内容"
             onKeyDown={keyDown}></div>
           <div className={inputboxStyle.send_box}>

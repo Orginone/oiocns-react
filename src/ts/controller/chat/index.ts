@@ -18,6 +18,9 @@ class ChatController extends Emitter {
   private _curChat: IChat | undefined;
   constructor() {
     super();
+    kernel.on('RecvMsg', (data) => {
+      this._recvMessage(data);
+    });
     emitter.subscribePart(DomainTypes.User, () => {
       if (this._userId != userCtrl.user.target.id) {
         this._userId = userCtrl.user.target.id;
@@ -65,13 +68,16 @@ class ChatController extends Emitter {
    * @param chat 会话
    */
   public async setCurrent(chat: IChat | undefined): Promise<void> {
-    if (chat && !this.isCurrent(chat)) {
+    if (chat && this.isCurrent(chat)) return;
+    if (chat) {
       this.currentKey = chat.fullId;
       chat.noReadCount = 0;
       if (chat.persons.length === 0) {
         await chat.morePerson('');
       }
-      await chat.moreMessage('');
+      if (chat.messages.length === 0) {
+        await chat.moreMessage('');
+      }
       this._appendChats(chat);
       this._cacheChats();
     }
@@ -131,12 +137,6 @@ class ChatController extends Emitter {
         this.changCallback();
       }
     });
-    kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
-    });
-    kernel.on('ChatRefresh', async () => {
-      await userCtrl.refresh();
-    });
   }
   /**
    * 接收到新信息
@@ -157,7 +157,9 @@ class ChatController extends Emitter {
         c.receiveMessage(data, !this.isCurrent(c));
         this._appendChats(c);
         this._cacheChats();
-        this.changCallback();
+        if (!this.isCurrent(c)) {
+          this.changCallback();
+        }
         return;
       }
     }

@@ -10,7 +10,6 @@ import { showChatTime } from '@/utils/tools';
 import { XImMsg } from '@/ts/base/schema';
 import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { parseAvatar } from '@/ts/base';
 
@@ -24,23 +23,32 @@ interface Iprops {
 }
 
 const GroupContent = (props: Iprops) => {
-  const [key, forceUpdate] = useCtrlUpdate(chatCtrl);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<XImMsg[]>([]);
   const { handleReWrites } = props;
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
+  const [beforescrollHeight, setBeforescrollHeight] = useState(0);
 
   useEffect(() => {
     if (chatCtrl.chat) {
       setMessages([...chatCtrl.chat.messages]);
-      setTimeout(() => {
-        if (body && body.current) {
-          body.current.scrollTop = body.current.scrollHeight;
-        }
-      }, 10);
+      chatCtrl.chat.onMessage((ms) => {
+        setMessages([...ms]);
+      });
     }
-  }, [key]);
+  }, []);
+
+  useEffect(() => {
+    if (body && body.current) {
+      if (loading) {
+        setLoading(false);
+        body.current.scrollTop = body.current.scrollHeight - beforescrollHeight;
+      } else {
+        body.current.scrollTop = body.current.scrollHeight;
+      }
+    }
+  }, [messages]);
 
   const isShowTime = (curDate: string, beforeDate: string) => {
     if (beforeDate === '') return true;
@@ -50,16 +58,8 @@ const GroupContent = (props: Iprops) => {
   const onScroll = async () => {
     if (!loading && body.current && chatCtrl.chat && body.current.scrollTop < 10) {
       setLoading(true);
-      const scrollHeight = body.current.scrollHeight;
-      if ((await chatCtrl.chat.moreMessage('')) > 0) {
-        setMessages([...chatCtrl.chat.messages]);
-        setTimeout(() => {
-          setLoading(false);
-          if (body.current) {
-            body.current.scrollTop = body.current.scrollHeight - scrollHeight;
-          }
-        }, 10);
-      } else {
+      setBeforescrollHeight(body.current.scrollHeight);
+      if ((await chatCtrl.chat.moreMessage('')) < 1) {
         setLoading(false);
       }
     }
@@ -122,7 +122,7 @@ const GroupContent = (props: Iprops) => {
   return (
     <div className={css.chart_content} ref={body} onScroll={onScroll}>
       <Spin tip="加载中..." spinning={loading}>
-        <div id={key} className={css.group_content_wrap}>
+        <div className={css.group_content_wrap}>
           {messages.map((item, index: any) => {
             return (
               <React.Fragment key={item.fromId + index}>
@@ -180,9 +180,7 @@ const GroupContent = (props: Iprops) => {
                               type="text"
                               danger
                               onClick={async () => {
-                                if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                                  forceUpdate();
-                                }
+                                await chatCtrl.chat?.deleteMessage(item.id);
                               }}>
                               删除
                             </Button>
@@ -242,9 +240,7 @@ const GroupContent = (props: Iprops) => {
                                 type="text"
                                 danger
                                 onClick={async () => {
-                                  if (await chatCtrl.chat?.deleteMessage(item.id)) {
-                                    forceUpdate();
-                                  }
+                                  await chatCtrl.chat?.deleteMessage(item.id);
                                 }}>
                                 删除
                               </Button>
