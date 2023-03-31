@@ -17,16 +17,25 @@ class ChatController extends Emitter {
   private _userId: string = '';
   private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
+  private _preMessages: XImMsg[] = [];
   constructor() {
     super();
     kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
+      if (this._userId === '') {
+        this._preMessages.push(data);
+      } else {
+        this._recvMessage(data);
+      }
     });
     emitter.subscribePart(DomainTypes.User, () => {
       if (this._userId != userCtrl.user.target.id) {
         this._userId = userCtrl.user.target.id;
         setTimeout(async () => {
           await this._initialization();
+          this._preMessages.forEach((data) => {
+            this._recvMessage(data);
+          });
+          this._preMessages = [];
         }, 100);
       }
     });
