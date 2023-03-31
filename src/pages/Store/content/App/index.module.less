@@ -1,0 +1,41 @@
+.pages-wrap {
+  height: 100%;
+
+  :global {
+    .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
+      border: none;
+    }
+
+    .ogo-card-head {
+      border: none;
+      padding: 0 24px;
+    }
+
+    .ogo-tabs-nav::before {
+      border: none !important;
+    }
+
+    .ogo-card-body {
+      padding: 4px;
+      // height: 100%;
+      height: calc(100% - 80px);
+    }
+
+    .ogo-tabs-tab {
+      padding: 7px 0 !important;
+      font-size: 13px !important;
+    }
+  }
+
+  .app-tabs {
+    flex: 1;
+  }
+
+  .page-content-table {
+    flex: 1;
+    height: 100%;
+    // height: calc(100% - 60px);
+  }
+
+  background-color: @layout-body-background;
+}

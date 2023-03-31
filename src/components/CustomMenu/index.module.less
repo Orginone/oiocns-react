@@ -1,0 +1,73 @@
+@import '~antd/es/style/themes/variable';
+
+.operateMenu {
+  font-size: 14px;
+  width: 100%;
+  margin: 5px 0px;
+  padding: 10px;
+  color: #888;
+  font-weight: bold;
+  background-color: inherit;
+}
+
+.customMenu {
+  overflow-y: scroll;
+  height: calc(100vh - 220px);
+  overflow-x: hidden;
+
+  :global {
+    .ogo-menu-title-content {
+      margin-left: 6px;
+    }
+
+    .ogo-menu-submenu-title {
+      padding-top: 6px;
+      padding-right: 6px;
+      height: 35px !important;
+      line-height: 35px !important;
+    }
+
+    .ogo-typography {
+      color: inherit;
+    }
+
+    .ogo-menu-submenu-placement-rightTop {
+      .ogo-menu-vertical .ogo-menu-submenu-title {
+        padding-right: 8px;
+        display: flex;
+      }
+    }
+  }
+}
+
+:global {
+  .ogo-menu-submenu-placement-rightTop {
+    .ogo-menu-vertical .ogo-menu-submenu-title {
+      padding-right: 8px;
+      display: flex;
+    }
+
+    .ogo-menu-submenu-active .ogo-menu-submenu-title {
+      color: @text-color;
+      background-color: @custom-menu-active-background;
+    }
+  }
+}
+
+.customlabel {
+  display: contents;
+  .label {
+    margin: 0 10px;
+    width: calc(100% - 30px);
+  }
+
+  .badge {
+    position: absolute;
+    right: 20px;
+  }
+
+  .moreButton {
+    position: absolute;
+    right: 2px;
+  }
+}
