@@ -18,17 +18,19 @@ class ChatController extends Emitter {
   private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
   private _preMessages: XImMsg[] = [];
+  private _inited: boolean = false;
   constructor() {
     super();
     kernel.on('RecvMsg', (data) => {
-      if (this._userId === '') {
-        this._preMessages.push(data);
-      } else {
+      if (this._inited) {
         this._recvMessage(data);
+      } else {
+        this._preMessages.push(data);
       }
     });
     emitter.subscribePart(DomainTypes.User, () => {
       if (this._userId != userCtrl.user.target.id) {
+        this._inited = false;
         this._userId = userCtrl.user.target.id;
         setTimeout(async () => {
           await this._initialization();
@@ -36,6 +38,7 @@ class ChatController extends Emitter {
             this._recvMessage(data);
           });
           this._preMessages = [];
+          this._inited = true;
         }, 100);
       }
     });
