@@ -207,7 +207,7 @@ class ChatController extends Emitter {
     const res = await kernel.queryTargetById({
       ids: [data.spaceId, sessionId],
     });
-    if ((res?.data?.result?.length ?? 0) > 1) {
+    if (res.data.result && res.data.result.length > 0) {
       const target = res!.data!.result!.filter((item) => item.id === sessionId)[0];
       const spaceTarget = res!.data!.result!.filter(
         (item) => item.id === data.spaceId,
@@ -237,7 +237,6 @@ class ChatController extends Emitter {
       this._appendChats(chat);
       this._cacheChats();
       this.changCallback();
-      return;
     }
   }
   /**
