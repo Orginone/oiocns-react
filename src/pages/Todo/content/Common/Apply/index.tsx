@@ -42,6 +42,9 @@ const CommonApply: React.FC<IProps> = (props) => {
       case WorkType.FriendApply:
         setTargetType(TargetType.Person);
         break;
+      case WorkType.CohortApply:
+        setTargetType(TargetType.Cohort);
+        break;
       case WorkType.CompanyApply:
         setTargetType(TargetType.Company);
         break;
@@ -62,6 +65,7 @@ const CommonApply: React.FC<IProps> = (props) => {
       case WorkType.FriendApply:
       case WorkType.CompanyApply:
       case WorkType.GroupApply:
+      case WorkType.CohortApply:
         return <SearchCompany searchCallback={setSelectTarget} searchType={targetType} />;
       case WorkType.JoinStoreApply:
         return (
@@ -159,6 +163,9 @@ const CommonApply: React.FC<IProps> = (props) => {
                   target.id,
                   (target as XTarget).typeName as TargetType,
                 );
+                break;
+              case WorkType.CohortApply:
+                success = await userCtrl.user.applyJoinCohort(target.id);
                 break;
               case WorkType.FriendApply:
                 success = await userCtrl.user.applyFriend(target as XTarget);

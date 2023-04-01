@@ -6,7 +6,6 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import thingCtrl from '@/ts/controller/thing';
 import { ToTopOutlined } from '@ant-design/icons';
 import { MenuItemType } from 'typings/globelType';
-import { getUuid } from '@/utils/tools';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
@@ -25,23 +24,23 @@ export const loadPlatformTodoMenu = async () => {
       children: [
         ...friendTodo.children,
         {
-          key: WorkType.CohortTodo,
+          key: '群组待办',
           label: '群组',
-          itemType: WorkType.CohortTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...cohortTodo,
         },
         {
-          key: WorkType.CompanyTodo,
+          key: '单位待办',
           label: '单位',
-          itemType: WorkType.CompanyTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...companyTodo,
         },
         {
-          key: WorkType.GroupTodo,
+          key: '集团待办',
           label: '集团',
-          itemType: WorkType.GroupTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...groupTodo,
         },
@@ -189,7 +188,7 @@ const loadChildren = async (todoGroups: ITodoGroup[]) => {
     let count = todoGroup.id ? await todoGroup.getCount() : 0;
     children.push({
       icon: icon,
-      key: getUuid(),
+      key: todoGroup.name + todoGroup.type,
       label: todoGroup.name,
       itemType: todoGroup.type,
       item: todoGroup,

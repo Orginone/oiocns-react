@@ -48,7 +48,7 @@ class TodoController extends Emitter {
             companys.push(company.target);
           }
           (await company.getJoinedGroups(false)).forEach(async (s) => {
-            if (await IsRelationAdmin(s)) {
+            if ((await IsRelationAdmin(s)) && group.findIndex((a) => a.id == s.id) < 0) {
               group.push(s.target);
             }
           });
@@ -172,7 +172,6 @@ class TodoController extends Emitter {
   }
   public setTabIndex(index: string): void {
     this._tabIndex = index;
-    this.changCallback();
   }
 
   public refreshWorkTodo() {

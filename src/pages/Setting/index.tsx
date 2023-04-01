@@ -75,10 +75,10 @@ const TeamSetting: React.FC = () => {
                 let item = data.item as ITarget;
                 switch (item.typeName) {
                   case TargetType.Group:
-                    userCtrl.company.quitGroup((data.item as ITarget).id);
+                   await userCtrl.company.quitGroup((data.item as ITarget).id);
                     break;
                   case TargetType.Cohort:
-                    userCtrl.user.quitCohorts((data.item as ITarget).id);
+                  await userCtrl.user.quitCohorts((data.item as ITarget).id);
                     break;
                 }
                 refreshMenu();

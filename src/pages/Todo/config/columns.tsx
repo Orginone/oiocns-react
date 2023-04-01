@@ -7,36 +7,6 @@ import { IApplyItem, IApprovalItem, IOrderApplyItem, TargetType } from '@/ts/cor
 import thingCtrl from '@/ts/controller/thing';
 import { schema } from '@/ts/base';
 
-export const WorkColumns: ProColumns<{ Data: any }>[] = [
-  {
-    title: '序号',
-    dataIndex: 'index',
-    valueType: 'index',
-    width: 60,
-  },
-  {
-    title: '说明',
-    dataIndex: ['Data', 'remark'],
-  },
-  {
-    title: '事项',
-    dataIndex: ['Data', 'team', 'target', 'typeName'],
-  },
-  {
-    title: '申请人',
-    dataIndex: ['Data', 'target', 'name'],
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-  },
-  {
-    title: '申请时间',
-    dataIndex: ['Data', 'createTime'],
-    valueType: 'dateTime',
-  },
-];
-
 export const OrgColumns = [
   {
     title: '序号',
@@ -68,7 +38,13 @@ export const OrgColumns = [
   {
     title: '事项',
     dataIndex: ['Data', 'team', 'target', 'typeName'],
-    render: () => <Tag color="#5BD8A6">好友</Tag>,
+    render: (_: any, row: any) => (
+      <Tag color="#5BD8A6">
+        {row.Data.team.target.typeName == TargetType.Person
+          ? '好友'
+          : row.Data.team.target.typeName}
+      </Tag>
+    ),
   },
   {
     title: '申请人',
@@ -78,8 +54,8 @@ export const OrgColumns = [
     title: '状态',
     dataIndex: 'status',
     render: (_: any, record: IApplyItem | IApprovalItem) => {
-      const status = statusMap[record.Data.status];
-      return <Tag color={status.color}>{status.text}</Tag>;
+      const status = getStatus(record.Data.status as number);
+      return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
@@ -129,7 +105,7 @@ export const MarketColumns = [
     dataIndex: 'status',
     valueType: 'select',
     render: (_: any, record: any) => {
-      const status = statusMap[record.Data.status];
+      const status = getStatus(record.Data.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -204,7 +180,7 @@ export const MerchandiseColumns = [
     title: '状态 ',
     dataIndex: 'status',
     render: (_: any, record: any) => {
-      const status = statusMap[record.Data.status];
+      const status = getStatus(record.Data.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -281,7 +257,7 @@ export const BuyOrderItemColumns: ProColumns<XOrderDetail>[] = [
     title: '状态',
     dataIndex: 'status',
     render: (_, _record) => {
-      const status = statusMap[_record.status];
+      const status = getStatus(_record.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -357,7 +333,7 @@ export const SaleColumns: ProColumns<IApprovalItem>[] = [
     title: '状态',
     dataIndex: 'status',
     render: (_, record) => {
-      const status = statusMap[record.Data.status];
+      const status = getStatus(record.Data.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -399,7 +375,7 @@ export const ApplicationColumns: ProColumns<IApprovalItem>[] = [
     title: '状态',
     dataIndex: ['Data', 'status'],
     render: (_, record) => {
-      const status = statusMap[record.Data.status];
+      const status = getStatus(record.Data.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -413,7 +389,7 @@ export const ApplicationApplyColumns: ProColumns<IApplyItem>[] = [
     title: '状态',
     dataIndex: ['Data', 'status'],
     render: (_, record) => {
-      const status = statusMap[record.Data.status];
+      const status = getStatus(record.Data.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -448,7 +424,7 @@ export const WorkReocrdColumns: ProColumns<schema.XFlowRecord>[] = [
     title: '状态',
     dataIndex: 'status',
     render: (_, record) => {
-      const status = statusMap[record.status];
+      const status = getStatus(record.status as number);
       if (record.historyTask.node?.nodeType == '抄送') {
         return <Tag color={status.color}>已阅</Tag>;
       }
@@ -477,7 +453,7 @@ export const WorkStartReocrdColumns: ProColumns[] = [
     title: '状态',
     dataIndex: 'status',
     render: (_, record) => {
-      const status = statusMap[record.status];
+      const status = getStatus(record.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -508,7 +484,7 @@ export const WorkTodoColumns: ProColumns[] = [
     title: '状态',
     dataIndex: 'status',
     render: (_, record) => {
-      const status = statusMap[record.status];
+      const status = getStatus(record.status as number);
       return <Tag color={status.color}>{status.text}</Tag>;
     },
   },
@@ -529,35 +505,63 @@ export const WorkTodoColumns: ProColumns[] = [
   },
 ];
 
-const statusMap = {
-  1: {
-    color: 'blue',
-    text: '待处理',
-  },
-  100: {
-    color: 'green',
-    text: '已同意',
-  },
-  200: {
-    color: 'red',
-    text: '已拒绝',
-  },
-  102: {
-    color: 'green',
-    text: '已发货',
-  },
-  220: {
-    color: 'gold',
-    text: '买方取消订单',
-  },
-  221: {
-    color: 'volcano',
-    text: '卖方取消订单',
-  },
-  222: {
-    color: 'default',
-    text: '已退货',
-  },
+const getStatus = (status: number) => {
+  return (
+    statusMap.get(status) ?? {
+      color: 'blue',
+      text: '待处理',
+    }
+  );
 };
 
-export const FlowInstanceColumns: ProColumns<IApprovalItem>[] = [];
+const statusMap = new Map([
+  [
+    1,
+    {
+      color: 'blue',
+      text: '待处理',
+    },
+  ],
+  [
+    100,
+    {
+      color: 'green',
+      text: '已同意',
+    },
+  ],
+  [
+    200,
+    {
+      color: 'red',
+      text: '已拒绝',
+    },
+  ],
+  [
+    102,
+    {
+      color: 'green',
+      text: '已发货',
+    },
+  ],
+  [
+    220,
+    {
+      color: 'gold',
+      text: '买方取消订单',
+    },
+  ],
+  [
+    221,
+    {
+      color: 'volcano',
+      text: '卖方取消订单',
+    },
+  ],
+  [
+    222,
+    {
+      color: 'default',
+      text: '已退货',
+    },
+  ],
+]); ;

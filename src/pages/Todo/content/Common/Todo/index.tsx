@@ -1,14 +1,15 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { IApplyItem, IApprovalItem, ITodoGroup } from '@/ts/core/todo/itodo';
 import { CommonStatus } from '@/ts/core';
 import { PageRequest } from '@/ts/base/model';
 import { ProColumns } from '@ant-design/pro-components';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { Button, Space } from 'antd';
 import PageCard from '@/components/PageCard';
 import { CardTabListType } from 'antd/lib/card';
 import cls from './index.module.less';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 // 卡片渲染
 interface IProps {
@@ -22,12 +23,16 @@ interface IProps {
  * @returns
  */
 const CommonTodo: React.FC<IProps> = (props) => {
-  const parentRef = useRef<any>(null);
-  const [tabKey, setTabKey] = useState(props.tabList[0].key);
-  const [key, forceUpdate] = useObjectUpdate(props);
+  const [tabKey, setTabKey] = useState<string>(props.tabList[0].key);
+  const [key] = useObjectUpdate(props);
   const [selectedRows, setSelectRows] = useState<IApplyItem[] | IApprovalItem[]>([]);
 
-  const operation = () => (
+  useEffect(() => {
+    let tabs = props.tabList.find((a) => a.key == todoCtrl.tabIndex);
+    setTabKey(tabs?.key ?? props.tabList[0].key);
+  }, [props]);
+
+  const operation = (
     <Space>
       <Button
         type="link"
@@ -36,8 +41,7 @@ const CommonTodo: React.FC<IProps> = (props) => {
           rows.forEach(async (a) => {
             await (a as IApprovalItem).pass(CommonStatus.ApproveStartStatus, '');
           });
-          forceUpdate();
-          props.reflashMenu();
+          todoCtrl.changCallback();
         }}>
         同意
       </Button>
@@ -47,8 +51,7 @@ const CommonTodo: React.FC<IProps> = (props) => {
           selectedRows.forEach(async (a) => {
             await (a as IApprovalItem).reject(CommonStatus.RejectStartStatus, '');
           });
-          forceUpdate();
-          props.reflashMenu();
+          todoCtrl.changCallback();
         }}
         style={{ color: 'red' }}>
         拒绝
@@ -60,14 +63,17 @@ const CommonTodo: React.FC<IProps> = (props) => {
     <PageCard
       bordered={false}
       tabList={props.tabList}
-      onTabChange={(key) => setTabKey(key)}
-      tabBarExtraContent={operation()}>
-      <div className={cls['page-content-table']} ref={parentRef}>
+      activeTabKey={tabKey}
+      onTabChange={(key) => {
+        setTabKey(key);
+        todoCtrl.setTabIndex(key);
+      }}
+      tabBarExtraContent={operation}>
+      <div className={cls['page-content-table']}>
         <CardOrTableComp<IApprovalItem>
           key={key}
           dataSource={[]}
           params={tabKey}
-          parentRef={parentRef}
           rowKey={(record: IApprovalItem) => record.Data?.id}
           columns={props.columns}
           request={async (page: PageRequest) => {
@@ -91,21 +97,26 @@ const CommonTodo: React.FC<IProps> = (props) => {
                 key: 'approve',
                 label: '同意',
                 onClick: async () => {
-                  await (item as IApprovalItem).pass(CommonStatus.ApproveStartStatus, '');
-                  forceUpdate();
-                  props.reflashMenu();
+                  let res = await(item as IApprovalItem).pass(
+                    CommonStatus.ApproveStartStatus,
+                    '',
+                  );
+                  if (res) {
+                    todoCtrl.changCallback();
+                  }
                 },
               },
               {
                 key: 'refuse',
                 label: '拒绝',
                 onClick: async () => {
-                  await (item as IApprovalItem).reject(
+                  let res = await(item as IApprovalItem).reject(
                     CommonStatus.RejectStartStatus,
                     '',
                   );
-                  forceUpdate();
-                  props.reflashMenu();
+                  if (res) {
+                    todoCtrl.changCallback();
+                  }
                 },
               },
             ];
