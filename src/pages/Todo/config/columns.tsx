@@ -3,7 +3,7 @@ import { Space, Tag } from 'antd';
 import userCtrl from '@/ts/controller/setting';
 import { XOrderDetail } from '@/ts/base/schema';
 import { ProColumns } from '@ant-design/pro-table';
-import { IApplyItem, IApprovalItem, IOrderApplyItem } from '@/ts/core';
+import { IApplyItem, IApprovalItem, IOrderApplyItem, WorkType } from '@/ts/core';
 import thingCtrl from '@/ts/controller/thing';
 import { schema } from '@/ts/base';
 
@@ -37,7 +37,7 @@ export const WorkColumns: ProColumns<{ Data: any }>[] = [
   },
 ];
 
-export const OrgColumns = [
+export const OrgColumns = (type: WorkType) => [
   {
     title: '序号',
     dataIndex: 'index',
@@ -49,16 +49,16 @@ export const OrgColumns = [
     dataIndex: ['Data', 'remark'],
     render: (_: any, row: any) => {
       if ((row as IApplyItem).cancel) {
-        return '请求添加' + row.Data?.team?.name + '为好友';
+        return '请求加入' + type.replaceAll('待办', '') + row.Data?.team?.name;
       } else {
-        return row.Data?.target?.name + '请求添加好友';
+        return row.Data?.target?.name + '请求加' + type.replaceAll('待办', '');
       }
     },
   },
   {
     title: '事项',
     dataIndex: ['Data', 'team', 'target', 'typeName'],
-    render: () => <Tag color="#5BD8A6">好友</Tag>,
+    render: () => <Tag color="#5BD8A6">加{type.replaceAll('待办', '')}</Tag>,
   },
   {
     title: '申请人',
@@ -519,7 +519,7 @@ export const WorkTodoColumns: ProColumns[] = [
   },
 ];
 
-const statusMap = {
+const statusMap: any = {
   1: {
     color: 'blue',
     text: '待处理',

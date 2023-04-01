@@ -69,6 +69,7 @@ export enum WorkType {
   FriendTodo = '好友待办',
   GroupTodo = '集团待办',
   CompanyTodo = '单位待办',
+  CohortTodo = '群组待办',
   OrderTodo = '订单待办',
   StoreTodo = '市场待办',
   PublishTodo = '上架待办',

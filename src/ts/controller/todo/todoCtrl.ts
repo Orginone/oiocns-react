@@ -21,6 +21,7 @@ class TodoController extends Emitter {
   private _tabIndex: string = '1';
   public currentKey: string = '';
   private _friendTodo: ITodoGroup[] = [];
+  private _cohortTodo: ITodoGroup[] = [];
   private _groupTodo: ITodoGroup[] = [];
   private _companyTodo: ITodoGroup[] = [];
   private _pubApply: ITodoGroup | undefined;
@@ -59,6 +60,8 @@ class TodoController extends Emitter {
           ],
           WorkType.FriendTodo,
         );
+        let cohorts = await userCtrl.user.getCohorts(false);
+        this._cohortTodo = await loadOrgTodo(cohorts, WorkType.CohortTodo);
         this._groupTodo = await loadOrgTodo(group, WorkType.GroupTodo);
         this._companyTodo = await loadOrgTodo(
           companys.map((a) => a.target),
@@ -83,6 +86,10 @@ class TodoController extends Emitter {
   /** 好友审批 */
   public get FriendTodo(): ITodoGroup[] {
     return this._friendTodo!;
+  }
+  /** 群组审批 */
+  public get CohortTodo(): ITodoGroup[] {
+    return this._cohortTodo!;
   }
   /** 单位审批 */
   public get CompanyTodo(): ITodoGroup[] {

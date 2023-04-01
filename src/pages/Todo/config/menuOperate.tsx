@@ -11,6 +11,7 @@ import setting from '@/ts/controller/setting';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
+  let cohortTodo = await loadChildren(todoCtrl.CohortTodo);
   let companyTodo = await loadChildren(todoCtrl.CompanyTodo);
   let groupTodo = await loadChildren(todoCtrl.GroupTodo);
 
@@ -24,6 +25,13 @@ export const loadPlatformTodoMenu = async () => {
       icon: <im.ImTree />,
       children: [
         ...friendTodo.children,
+        {
+          key: WorkType.CohortTodo,
+          label: '群组',
+          itemType: WorkType.CohortTodo,
+          icon: <im.ImTree />,
+          ...cohortTodo,
+        },
         {
           key: WorkType.CompanyTodo,
           label: '单位',
