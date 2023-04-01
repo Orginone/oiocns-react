@@ -103,7 +103,7 @@ export const loadBookMenu = async () => {
   for (const company of companys) {
     companyItems.push({
       key: company.id,
-      label: company.name,
+      label: company.teamName,
       item: {
         source: company,
         chat: chatCtrl.findTargetChat(
