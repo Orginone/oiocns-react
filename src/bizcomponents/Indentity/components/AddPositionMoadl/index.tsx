@@ -22,27 +22,27 @@ const EditCustomModal = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<XIdentity>[] = [
     {
-      title: '身份名称',
+      title: '角色名称',
       dataIndex: 'name',
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
       },
     },
     {
-      title: '身份编号',
+      title: '角色编号',
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '编码为必填项' }],
       },
     },
     {
-      title: '所属角色',
+      title: '设置权限',
       dataIndex: 'authId',
       colProps: { span: 24 },
       valueType: 'treeSelect',
-      formItemProps: { rules: [{ required: true, message: '所属角色为必填项' }] },
+      formItemProps: { rules: [{ required: true, message: '设置权限为必填项' }] },
       request: async () => {
-        const data = await current.selectAuthorityTree(false);
+        const data = await current.loadAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {
@@ -56,7 +56,7 @@ const EditCustomModal = (props: Iprops) => {
     },
 
     {
-      title: '身份简介',
+      title: '角色简介',
       dataIndex: 'remark',
       valueType: 'textarea',
       colProps: { span: 24 },

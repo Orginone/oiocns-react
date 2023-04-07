@@ -63,9 +63,7 @@ const Share: React.FC<ShareType> = () => {
               item.isSwiVsi && (
                 <Switch
                   defaultChecked={item.defaultChecked}
-                  onChange={(e) => {
-                    console.log(e);
-                  }}></Switch>
+                  onChange={(e) => {}}></Switch>
               ),
               item.swiDes && (
                 <a

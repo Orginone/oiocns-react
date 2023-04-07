@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
 import React from 'react';
@@ -16,18 +16,24 @@ const UserAvatar: React.FC = () => {
    */
   const menuItems: MenuProps = {
     onClick: (info) => {
-      if (info.key) {
-        if (info.key === '/passport/login') {
+      switch (info.key) {
+        case '/passport/login':
           sessionStorage.clear();
-        }
-        history.push(info.key);
+          break;
+        case '/setting':
+          if (userCtrl.currentKey != '个人设置') {
+            userCtrl.currentKey = '个人设置';
+            userCtrl.changCallback();
+          }
+          break;
       }
+      history.push(info.key);
     },
     items: [
       {
-        key: '/person/info',
+        key: '/setting',
         icon: <UserOutlined />,
-        label: '个人中心',
+        label: '个人设置',
       },
       {
         type: 'divider' as const,
@@ -47,9 +53,9 @@ const UserAvatar: React.FC = () => {
 
   return (
     <Dropdown menu={menuItems} placement="bottomLeft">
-      {userCtrl.user.avatar ? (
+      {userCtrl.user.shareInfo.avatar ? (
         <Avatar
-          src={userCtrl.user.avatar.thumbnail}
+          src={userCtrl.user.shareInfo.avatar.thumbnail}
           alt={userCtrl.user.name}
           size={28}></Avatar>
       ) : (

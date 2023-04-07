@@ -24,7 +24,6 @@ const Index = <T extends DataType>({
     colProps: { span: 12 },
     grid: layoutType !== 'LightFilter' && layoutType !== 'QueryFilter',
     onFinish: async (values: T) => {
-      console.log('jsonfromonFinish', values);
       onFinish(values);
     },
     columns: (layoutType === 'StepsForm' ? [columns] : columns) as any,

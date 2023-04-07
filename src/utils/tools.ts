@@ -2,7 +2,9 @@ import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
 import { formatDate } from '@/utils/index';
-import { DataType, PageData } from 'typings/globelType';
+import { DataType, MenuItemType, PageData } from 'typings/globelType';
+
+const dateFormat: string = 'YYYY-MM-DD';
 
 const showMessage = (response: any) => {
   if (response.success) {
@@ -30,13 +32,13 @@ const debounce = (fun: any, delay?: number) => {
  * @return {*}
  */
 const resetParams = (params: any) => {
-  const { page, pageSize, ...rest } = params;
+  const { page, pageSize, filter, ...rest } = params;
   const num = (page - 1) * pageSize;
 
   return {
     offset: num >= 0 ? num : 0,
     limit: pageSize || 20,
-    filter: '',
+    filter: filter,
     ...rest,
   };
 };
@@ -171,12 +173,111 @@ const findAimObj = (isParent = false, id: string, topParentData?: any[]) => {
   findItem(id, { children: topParentData });
   return aimObjet;
 };
+
+/**
+ * 中英文混合按首字母排序
+ */
+const pySegSort = (arr: string[]) => {
+  if (!String.prototype.localeCompare) {
+    return null;
+  }
+  let pattern = new RegExp('[A-Za-z]+');
+  let letters = '*abcdefghjklmnopqrstwxyz'.split('');
+  let zh = '阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀'.split('');
+  let segs: any[] = [];
+  letters.forEach(function (item, i) {
+    let curr: any = { letter: item, data: [] };
+    arr.forEach(function (item2: string) {
+      if (pattern.test(item2.split('')[0])) {
+        if (
+          (!letters[i] || letters[i].localeCompare(item2) <= 0) &&
+          (item2.localeCompare(letters[i + 1]) == -1 || i == letters.length - 1)
+        ) {
+          curr.data.push(item2);
+        }
+      } else {
+        if (
+          (!zh[i - 1] || zh[i - 1].localeCompare(item2) <= 0) &&
+          item2.localeCompare(zh[i]) == -1
+        ) {
+          curr.data.push(item2);
+        }
+      }
+    });
+    if (curr.data.length) {
+      segs.push(curr);
+      curr.data.sort(function (a: any, b: any) {
+        return a.localeCompare(b);
+      });
+    }
+  });
+  return segs;
+};
+/**
+ * 中英文混合按首字母排序  对象数组
+ */
+const pySegSortObj = (objArr: any[], field: string) => {
+  if (!String.prototype.localeCompare) {
+    return null;
+  }
+  let pattern = new RegExp('[A-Za-z]+');
+  let letters = '*abcdefghjklmnopqrstwxyz'.split('');
+  let zh = '阿八嚓哒妸发旮哈讥咔垃痳拏噢妑七呥扨它穵夕丫帀'.split('');
+  let segs: any[] = [];
+  letters.forEach(function (item, i) {
+    let curr: any = { letter: item, data: [] };
+    objArr.forEach(function (item2: any) {
+      if (pattern.test(item2[field].split('')[0])) {
+        if (
+          (!letters[i] || letters[i].localeCompare(item2[field]) <= 0) &&
+          (item2[field].localeCompare(letters[i + 1]) == -1 || i == letters.length - 1)
+        ) {
+          curr.data.push(item2);
+        }
+      } else {
+        if (
+          (!zh[i - 1] || zh[i - 1].localeCompare(item2[field]) <= 0) &&
+          item2[field].localeCompare(zh[i]) == -1
+        ) {
+          curr.data.push(item2);
+        }
+      }
+    });
+    if (curr.data.length) {
+      segs.push(curr);
+      curr.data.sort(function (a: any, b: any) {
+        return a[field].localeCompare(b[field]);
+      });
+    }
+  });
+  return segs;
+};
+
+/** 查找菜单 */
+const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
+  for (const item of items) {
+    if (item.key === key) {
+      return item;
+    } else if (Array.isArray(item.children) && item.children.length > 0) {
+      const find = findMenuItemByKey(item.children, key);
+      if (find) {
+        return find;
+      }
+    }
+  }
+  return undefined;
+};
+
 export {
+  dateFormat,
   debounce,
   findAimObj,
+  findMenuItemByKey,
   getNewKeyWithString,
   getUuid,
   handleFormatDate,
+  pySegSort,
+  pySegSortObj,
   renderNum,
   resetParams,
   showChatTime,

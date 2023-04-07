@@ -3,12 +3,12 @@ import { SendOutlined } from '@ant-design/icons';
 import { Button, Modal } from 'antd';
 import React, { useState } from 'react';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import { companyTypes } from '@/ts/core/enum';
+import { companyTypes, TargetType } from '@/ts/core/enum';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import SearchPerson from '@/bizcomponents/SearchPerson';
+import userCtrl from '@/ts/controller/setting';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import { useHistory } from 'react-router-dom';
+import SearchCompany from '@/bizcomponents/SearchCompany';
 
 interface ShortcutsComType {
   props: []; //入口列表
@@ -25,7 +25,7 @@ const btns = [
 const BannerCom: React.FC<ShortcutsComType> = () => {
   const [showFormModal, setShowFormModal] = useState<boolean>(false); // 创建单位开关
   const [isModalOpen, setIsModalOpen] = useState(false); // 添加好友的开关
-  const [friend, setFriend] = useState<schema.XTarget>(); // 搜索出的好友列表
+  const [friends, setFriends] = useState<schema.XTarget[]>([]); // 搜索出的好友列表
 
   const history = useHistory();
 
@@ -34,8 +34,8 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
    * @param {schema} person
    * @return {*}
    */
-  const searchCallback = (person: schema.XTarget) => {
-    setFriend(person);
+  const searchCallback = (persons: schema.XTarget[]) => {
+    setFriends(persons);
   };
   /**
    * @description: 按钮循环
@@ -51,7 +51,6 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
             size="large"
             icon={item.icon}
             onClick={() => {
-              console.log('1111', item);
               onShortClick(item?.label);
             }}>
             {item.label}
@@ -67,7 +66,6 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
    * @return {*}
    */
   const onShortClick = (item: string) => {
-    console.log('123456', item);
     switch (item) {
       case '加好友':
         setIsModalOpen(true);
@@ -75,10 +73,13 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
       case '创单位':
         setShowFormModal(true);
         break;
-      case '建应用':
-        history.push('/store/app/create');
+      case '邀成员':
         break;
-
+      case '逛商场':
+        history.push('/market/shop');
+        break;
+      case '添数据':
+        break;
       default:
         break;
     }
@@ -99,8 +100,9 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
    */
   const handleOk = async () => {
     setIsModalOpen(false);
-    console.log(friend);
-    await userCtrl.user.applyFriend(friend!);
+    for (const friend of friends) {
+      await userCtrl.user.applyFriend(friend);
+    }
   };
 
   return (
@@ -109,12 +111,12 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
       {/* 加好友 */}
       <Modal
         title="添加好友"
-        okButtonProps={{ disabled: !friend }}
+        okButtonProps={{ disabled: !friends }}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={onCancel}
-        width={500}>
-        <div>{<SearchPerson searchCallback={searchCallback}></SearchPerson>}</div>
+        width={670}>
+        <SearchCompany searchCallback={searchCallback} searchType={TargetType.Person} />
       </Modal>
       {/* 创建单位 */}
       <CreateTeamModal

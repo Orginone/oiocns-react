@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
 import { ProColumns } from '@ant-design/pro-components';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import CardOrTableComp from '@/components/CardOrTableComp';
 interface indexType {
   searchFn: Function;
@@ -60,11 +60,9 @@ const MemberList: React.FC<indexType> = (props) => {
         <CardOrTableComp<schema.XTarget>
           rowSelection={{
             onSelect: (record: any, selected: any, selectedRows: any) => {
-              console.log(record, selected, selectedRows);
               searchFn(selectedRows);
             },
           }}
-          showChangeBtn={false}
           dataSource={personData ?? []}
           params={{ filter: searchValue }}
           request={

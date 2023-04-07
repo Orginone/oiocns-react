@@ -1,18 +1,28 @@
 import { common } from '../../base';
-import { CommonStatus, TodoType } from '../enum';
-import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
+import { CommonStatus, WorkType } from '../enum';
+import {
+  ITodoGroup,
+  IApprovalItem,
+  IApplyItem,
+  IApplyItemResult,
+  IApprovalItemResult,
+} from './itodo';
 import { model, kernel, schema } from '../../base';
+import { XMarket } from '@/ts/base/schema';
 
 class MarketJoinTodo implements ITodoGroup {
-  private _name: string;
   private _todoList: ApprovalItem[];
   private _doList: ApprovalItem[];
-  type: TodoType = TodoType.MarketTodo;
-  get name(): string {
-    return this._name;
-  }
-  constructor() {
-    this._name = '加入市场';
+  type: WorkType = WorkType.StoreTodo;
+
+  public id: string;
+  public name: string;
+  public icon?: string;
+  constructor(market: XMarket, type: WorkType) {
+    this.id = market.id;
+    this.type = type;
+    this.icon = market.photo;
+    this.name = market.name;
     this._todoList = [];
     this._doList = [];
   }
@@ -22,23 +32,22 @@ class MarketJoinTodo implements ITodoGroup {
     }
     return this._todoList.length;
   }
-  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
+  async getApplyList(page: model.PageRequest): Promise<IApplyItemResult> {
     let applyList: IApplyItem[] = [];
     const res = await kernel.queryJoinMarketApply({
-      id: '0',
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
+      page: page,
     });
-    console.log(res);
     if (res.success) {
       res.data.result?.forEach((a) => {
         applyList.push(new ApplyItem(a));
       });
     }
-    return applyList;
+    return {
+      result: applyList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
   async getTodoList(refresh: boolean = false): Promise<IApprovalItem[]> {
     if (!refresh && this._todoList.length > 0) {
@@ -47,19 +56,23 @@ class MarketJoinTodo implements ITodoGroup {
     await this.getJoinApproval();
     return this._todoList;
   }
-  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
-    if (this._doList.length > 0) {
-      return this._doList;
+  async getDoList(page: model.PageRequest): Promise<IApprovalItemResult> {
+    if (this._doList.length == 0) {
+      await this.getJoinApproval();
     }
-    await this.getJoinApproval();
-    return this._doList;
+    return {
+      result: this._doList.splice(page.offset, page.limit),
+      total: this._doList.length,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
   async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
   private async getJoinApproval() {
     const res = await kernel.queryJoinApproval({
-      id: '0',
+      id: this.id,
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -146,7 +159,6 @@ class ApplyItem implements IApplyItem {
     return (
       await kernel.cancelJoinMarket({
         id: this._data.id,
-        belongId: '0',
         typeName: '',
       })
     ).success;
@@ -155,7 +167,21 @@ class ApplyItem implements IApplyItem {
 
 /** 加载市场任务 */
 export const loadMarketTodo = async () => {
-  const marketTodo = new MarketJoinTodo();
-  await marketTodo.getTodoList();
-  return marketTodo;
+  const res = await kernel.queryManageMarket({
+    page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+  });
+  let todoGroups: ITodoGroup[] = [];
+  if (res.success && res.data.result) {
+    for (const market of res.data.result) {
+      const marketTodo = new MarketJoinTodo(market, WorkType.JoinStoreTodo);
+      await marketTodo.getTodoList();
+      todoGroups.push(marketTodo);
+    }
+  }
+  return todoGroups;
+};
+
+/** 加载市场任务 */
+export const loadMarketApply = async () => {
+  return new MarketJoinTodo({ name: '加入申请' } as XMarket, WorkType.JoinStoreApply);
 };

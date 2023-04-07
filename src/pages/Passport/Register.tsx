@@ -1,5 +1,5 @@
 import { RegisterType } from '@/ts/base/model';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';
@@ -14,24 +14,17 @@ const steps = ['账户验证', '填写信息'];
 const PassportRegister: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [body, setBody] = useState<RegisterType>();
-  const [nextValue, setNextValue] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [privateKey, setPrivateKey] = useState<String>();
   const history = useHistory();
-  const [form] = Form.useForm();
-  const [nextForm] = Form.useForm();
 
   // 上一步
-  const prev = async () => {
-    const nextFormValue = await nextForm.getFieldsValue();
-    form.setFieldsValue(body);
-    setNextValue(nextFormValue);
+  const prev = () => {
     setCurrent(current - 1);
   };
 
   // 下一步
   const next = (val: any) => {
-    nextForm.setFieldsValue(nextValue);
     if (val.firstPassword !== val.secondPassword) {
       message.warn('输入的两次密码不一致！');
       return;
@@ -43,6 +36,11 @@ const PassportRegister: React.FC = () => {
     }
     if (password.length > 15) {
       message.warn('密码的长度不能大于15');
+      return;
+    }
+    let reg = /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,15}/;
+    if (!reg.test(password)) {
+      message.warn('密码必须包含：数字、字母、特殊字符');
       return;
     }
     setCurrent(current + 1);
@@ -98,7 +96,7 @@ const PassportRegister: React.FC = () => {
       </Form.Item>
       {current === 0 && (
         <div>
-          <Form onFinish={next} form={form}>
+          <Form onFinish={next}>
             <Form.Item
               name="account"
               rules={[{ required: true, message: '请输入用户名' }]}>
@@ -135,7 +133,7 @@ const PassportRegister: React.FC = () => {
 
       {current === 1 && (
         <div>
-          <Form onFinish={registerAction} form={nextForm}>
+          <Form onFinish={registerAction}>
             <Form.Item
               name="phone"
               rules={[{ required: true, message: '请输入电话号码' }]}>

@@ -7,14 +7,14 @@ const { Divider } = StatisticCard;
 
 const Charts: React.FC<any> = () => {
   return (
-    <CardWidthTitle title="数据检测">
+    <CardWidthTitle title="数据监测">
       <StatisticCard.Group direction={'row'}>
         <StatisticCard
           statistic={{
-            title: '冻结金额',
+            title: '应用',
             value: 20190102,
             precision: 2,
-            suffix: '元',
+            suffix: '个',
           }}
           chart={
             <img
@@ -27,7 +27,7 @@ const Charts: React.FC<any> = () => {
         <Divider type={'vertical'} />
         <StatisticCard
           statistic={{
-            title: '设计资源数',
+            title: '数据',
             value: 234,
           }}
           chart={
@@ -41,7 +41,7 @@ const Charts: React.FC<any> = () => {
         <Divider type={'vertical'} />
         <StatisticCard
           statistic={{
-            title: '信息完成度',
+            title: '实体',
             value: 5,
             suffix: '/ 100',
           }}

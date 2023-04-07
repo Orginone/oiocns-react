@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ProColumns } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { Dropdown, Empty, Pagination, Result } from 'antd';
+import { Dropdown, Pagination, Result } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { EllipsisOutlined } from '@ant-design/icons';
@@ -16,13 +16,11 @@ interface PageType<T> {
   showChangeBtn?: boolean; //是否展示 图列切换按钮
   hideOperation?: boolean; //是否展示 默认操作区域
   columns?: ProColumns<any>[]; //表格头部数组
-  total?: number; // 总条数 总数量
-  page?: number; // 当前页
-  pageSize?: number;
   height?: number; //表格高度
   width?: number; //表格高度
   stripe?: boolean; // 斑马纹
   style?: React.CSSProperties; // wrap样式加载 对表格外部margin pading 等定制展示
+  onRow?: (record: T) => any;
   onChange?: (page: number, pageSize: number) => void; // 弹出切换页码事件
   operation?: (item: T) => any[]; //操作区域数据
 
@@ -43,78 +41,94 @@ interface PageType<T> {
 }
 
 const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
-  defaultPageType,
+  defaultPageType = 'table',
   showChangeBtn = true,
   dataSource = [],
   columns = [],
   rowKey,
   hideOperation = false,
   operation,
-  total,
-  page,
-  pageSize,
   height,
   width,
   parentRef,
   stripe = false,
   style,
+  onRow,
   onChange,
   renderCardContent,
   headerTitle,
   request,
   ...rest
 }) => {
-  const [pageType, setPageType] = useState<PageShowType>(defaultPageType || 'table'); //切换设置
+  const [pageType, setPageType] = useState<PageShowType>(defaultPageType); //切换设置
   const [defaultHeight, setDefaultHeight] = useState<number | 'auto'>('auto'); //计算高度
+
   // 监听父级高度
   useEffect(() => {
-    setTimeout(() => {
-      if (parentRef?.current) {
-        let _height = parentRef.current.offsetHeight;
-        // let width = parentRef.current.offsetWidth;
-        // console.log('展示高度', _height);
-        setDefaultHeight(_height > 200 ? _height - (headerTitle ? 164 : 146) : 200);
-      }
-    }, 50);
+    if (parentRef?.current) {
+      let _height = parentRef.current.offsetHeight;
+      setDefaultHeight(_height > 200 ? _height - (headerTitle ? 154 : 136) : 200);
+    }
   }, [parentRef]);
 
-  /**
-   * @desc: 操作按钮区域
-   * @param {any} item - 表格单条数据 data
-   * @return {Menu} - 渲染 按钮组
-   */
-  const menu = (item: any) => {
-    return operation && operation(item); // <Menu items={operation && operation(item)} />;
-  };
   /**
    * @desc: 渲染表格主体
    * @return {表格主体头部数组}
    */
   const resetColumns: ProColumns<any>[] = useMemo(() => {
-    return [
-      ...columns,
-      {
+    let result = [...columns];
+    if (operation) {
+      result.push({
         title: '操作',
-        width: 80,
+        width: 100,
         key: 'option',
         valueType: 'option',
         fixed: 'right',
         render: (_text, record) => {
-          return operation && operation(record).length > 0
-            ? [
-                <Dropdown
-                  className={cls['operation-btn']}
-                  menu={{ items: menu(record) }}
-                  trigger={['click']}
-                  key="key">
-                  <EllipsisOutlined />
-                </Dropdown>,
-              ]
-            : '';
+          return [
+            <Dropdown
+              className={cls['operation-btn']}
+              menu={{ items: operation(record) }}
+              key="key">
+              <EllipsisOutlined />
+            </Dropdown>,
+          ];
         },
-      },
-    ];
+      });
+    }
+    return result;
   }, [columns, operation]);
+
+  /**
+   * @desc: 自定义表格 底部区域
+   * @return {底部组件}
+   */
+  const TableFooter = (
+    <div className={cls['common-table-footer']} key="pagetype">
+      {/* 切换展示形式 */}
+      {showChangeBtn && (
+        <div className={cls['btn-box']}>
+          <>
+            <IconFont
+              className={pageType === 'table' ? 'active' : ''}
+              type={'icon-chuangdanwei'}
+              onClick={() => {
+                setPageType('table');
+              }}
+            />
+            <IconFont
+              className={pageType === 'card' ? 'active' : ''}
+              type={'icon-jianyingyong'}
+              onClick={() => {
+                setPageType('card');
+              }}
+            />
+          </>
+        </div>
+      )}
+    </div>
+  );
+
   // 表格主体 卡片与表格切换功能--增加缓存
   const renderTable = useMemo(() => {
     return (
@@ -129,18 +143,17 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           defaultPageSize: 10,
           size: 'default',
           showSizeChanger: true,
-          defaultCurrent: page,
-          onChange: (current) => {
-            console.log(current);
-          },
+          defaultCurrent: 1,
+          onChange: (_) => {},
           showTotal: (total: number) => `共 ${total} 条`,
         }}
         options={false}
+        onRow={onRow}
         params={{ filter: '' }}
         request={async (params) => {
           const {
             current: pageIndex = 1,
-            pageSize = 2,
+            pageSize = 10,
             filter = '',
             keyword = '',
             ...other
@@ -161,13 +174,12 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             }
             return { total: 0, data: [], success: true };
           } else {
-            const currentData = dataSource.slice(
-              (pageIndex - 1) * pageSize,
-              pageSize * pageIndex,
-            );
             return {
-              data: dataSource.length > 0 ? [...currentData] : [],
-              total: total ?? dataSource.length,
+              data:
+                dataSource.length > 0
+                  ? dataSource.slice((pageIndex - 1) * pageSize, pageSize * pageIndex)
+                  : [],
+              total: dataSource.length,
               success: true,
             };
           }
@@ -187,37 +199,25 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
           ) : (
             <>
               {toolbar}
-              {dataSource.length !== 0 ||
-              (props.action.dataSource && props.action.dataSource.length !== 0) ? (
-                <>
-                  <div
-                    className={cls['common-card']}
-                    style={{
-                      height:
-                        defaultHeight !== 'auto'
-                          ? defaultHeight + 40 + 'px'
-                          : defaultHeight,
-                    }}>
-                    {renderCardContent ? (
-                      renderCardContent(
-                        dataSource.length !== 0 ? dataSource : props.action.dataSource,
-                      )
-                    ) : (
-                      <Result subTitle="暂无卡片配置" />
-                    )}
-                  </div>
-
-                  <div style={{ height: 64 }}></div>
-                  {TableFooter}
-
-                  <Pagination
-                    {...props.pagination}
-                    style={{ float: 'right', marginTop: -28 }}
-                  />
-                </>
-              ) : (
-                <Empty />
-              )}
+              <div
+                className={cls['common-card']}
+                style={{
+                  minHeight: 150,
+                  height:
+                    defaultHeight !== 'auto' ? defaultHeight + 40 + 'px' : defaultHeight,
+                }}>
+                {renderCardContent ? (
+                  renderCardContent(props.action.dataSource)
+                ) : (
+                  <Result subTitle="暂无卡片配置"></Result>
+                )}
+              </div>
+              <div style={{ height: 64 }}></div>
+              {TableFooter}
+              <Pagination
+                {...props.pagination}
+                style={{ float: 'right', marginTop: -28 }}
+              />
             </>
           );
         }}
@@ -232,48 +232,6 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
       />
     );
   }, [pageType, dataSource, resetColumns, defaultHeight]);
-  /**
-   * @desc: 自定义表格 底部区域
-   * @return {底部组件}
-   */
-  const TableFooter = (
-    <div className={cls['common-table-footer']} key="pagetype">
-      {/* 切换展示形式 */}
-      <div className={cls['btn-box']}>
-        {showChangeBtn ? (
-          <>
-            <IconFont
-              className={pageType === 'table' ? 'active' : ''}
-              type={'icon-chuangdanwei'}
-              onClick={() => {
-                setPageType('table');
-              }}
-            />
-            <IconFont
-              className={pageType === 'card' ? 'active' : ''}
-              type={'icon-jianyingyong'}
-              onClick={() => {
-                setPageType('card');
-              }}
-            />
-          </>
-        ) : (
-          ''
-        )}
-      </div>
-      {/* 翻页功能 */}
-      {/* <Pagination
-        total={tableTotal || 0}
-        onChange={(page, pageSize) => {
-          setTablePage({ page, pageSize });
-          onChange && onChange(page, pageSize);
-        }}
-        current={page || 1}
-        showTotal={(total: number) => `共 ${total} 条`}
-        showSizeChanger
-      /> */}
-    </div>
-  );
 
   return (
     <div className={cls['common-table-wrap']} style={style}>

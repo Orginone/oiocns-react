@@ -4,7 +4,7 @@ import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { logger, LoggerLevel } from '@/ts/base/common';
 
 type BasicLayoutProps = {
@@ -15,7 +15,6 @@ type BasicLayoutProps = {
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
   useEffect(() => {
-    console.log('登录拦截', userCtrl.logined);
     if (!userCtrl.logined) {
       return history.push('/passport/login');
     }

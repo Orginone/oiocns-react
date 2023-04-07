@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { Button, Form, Input, message, Tabs } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -19,6 +19,11 @@ const PassportForget: React.FC = () => {
     }
     if (password.length > 15) {
       message.warn('密码的长度不能大于15');
+      return;
+    }
+    let reg = /(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{6,15}/;
+    if (!reg.test(password)) {
+      message.warn('密码必须包含：数字、字母、特殊字符');
       return;
     }
     const res = await userCtrl.resetPassword(

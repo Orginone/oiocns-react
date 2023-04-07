@@ -4,10 +4,9 @@ import cls from './index.module.less';
 type ShareShowRecentProps = {
   departData: any[];
   deleteFuc: (id: string) => void;
+  onClick?: Function;
 };
 const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
-  console.log('所选数据', props.departData);
-
   return (
     <div className={cls.layout}>
       <div className={cls.title}>已选{props.departData.length}条数据</div>
@@ -17,11 +16,16 @@ const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
             <div
               style={{
                 background:
-                  el.type == 'del' ? '#ffb4c4' : el.type == 'add' ? '#beffd0' : '',
+                  el?.type == 'del' ? '#ffb4c4' : el?.type == 'add' ? '#beffd0' : '',
               }}
               key={el.id}
               className={cls.row}>
-              <div>{el.name}</div>
+              <div
+                onClick={() => {
+                  props.onClick?.call(this, el);
+                }}>
+                {props.onClick ? <a>{el.name}</a> : el.name}
+              </div>
               <CloseCircleOutlined
                 className={cls.closeIcon}
                 onClick={() => {

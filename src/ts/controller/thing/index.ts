@@ -1,41 +1,89 @@
-import { Emitter } from '../../base/common';
-import userCtrl from '../setting/userCtrl';
-import { INullSpeciesItem, DomainTypes, emitter, loadSpeciesTree } from '../../core/';
+import { Emitter, logger } from '../../base/common';
+import userCtrl from '../setting';
+import {
+  INullSpeciesItem,
+  DomainTypes,
+  emitter,
+  loadSpeciesTree,
+  ISpeciesItem,
+} from '../../core/';
+import { kernel, schema } from '@/ts/base';
+import { badRequest, ResultType } from '@/ts/base/model';
 
 /**
  * 物的控制器
  */
 class ThingController extends Emitter {
-  private _teamId: string = '';
-  private _species: Map<string, INullSpeciesItem>;
+  public species: INullSpeciesItem;
+  public speciesList: ISpeciesItem[] = [];
+
+  private lookForAll(data: any[], arr: any[]): any[] {
+    for (let item of data) {
+      arr.push(item);
+      if (item.children && item.children.length) {
+        this.lookForAll(item.children, arr);
+      }
+    }
+    return arr;
+  }
+
   constructor() {
     super();
-    this._species = new Map();
     emitter.subscribePart([DomainTypes.Company], () => {
       setTimeout(async () => {
-        if (this._teamId != userCtrl.company.id) {
-          if (userCtrl.isCompanySpace) {
-            await this.loadTeamSpecies(userCtrl.company.id);
-          }
-        }
-      }, 500);
+        await this.loadSpeciesTree(true);
+      }, 100);
     });
   }
-  /** 组织的分类根 */
-  public get teamSpecies(): INullSpeciesItem {
-    if (this._species.has(this._teamId)) {
-      return this._species.get(this._teamId);
-    }
-    return undefined;
-  }
+
   /** 加载组织分类 */
-  public async loadTeamSpecies(teamId: string): Promise<INullSpeciesItem> {
-    this._teamId = teamId;
-    if (teamId.length > 0 && !this._species.has(this._teamId)) {
-      this._species.set(this._teamId, await loadSpeciesTree(this._teamId));
+  public async loadSpeciesTree(_reload: boolean = false): Promise<INullSpeciesItem> {
+    if (this.species == undefined || _reload) {
+      this.species = await loadSpeciesTree(userCtrl.space.id);
+      this.speciesList = this.lookForAll([this.species], []);
+      this.changCallback();
     }
-    this.changCallback();
-    return this.teamSpecies;
+    return this.species;
+  }
+
+  /** 根据id获取分类 */
+  public async getSpeciesByIds(
+    ids: string[],
+    _reload: boolean = false,
+  ): Promise<ISpeciesItem[]> {
+    this.loadSpeciesTree(false);
+    return this.speciesList.filter((item: any) => ids.includes(item.id));
+  }
+
+  public async createThing(data: any): Promise<ResultType<boolean>> {
+    let res = await kernel.anystore.createThing(
+      1,
+      userCtrl.isCompanySpace ? 'company' : 'user',
+    );
+    if (res.success) {
+      return await kernel.perfectThing({
+        id: (res.data as [{ Id: string }])[0].Id,
+        data: JSON.stringify(data),
+        belongId: userCtrl.space.id,
+      });
+    } else {
+      logger.error(res.msg);
+      return badRequest();
+    }
+  }
+
+  public async perfectThing(id: string, data: any): Promise<ResultType<boolean>> {
+    return await kernel.perfectThing({
+      id,
+      data: JSON.stringify(data),
+      belongId: userCtrl.space.id,
+    });
+  }
+
+  public async loadFlowDefine(): Promise<ResultType<schema.XFlowDefineArray>> {
+    return await kernel.queryDefine({
+      spaceId: userCtrl.space.id,
+    });
   }
 }
 

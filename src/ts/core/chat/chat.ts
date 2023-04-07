@@ -1,10 +1,14 @@
-import { FileItemShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { schema, kernel, model, common, parseAvatar } from '../../base';
 import { TargetType, MessageType } from '../enum';
+import { appendShare, appendTarget } from '../target/targetMap';
 import { ChatCache, IChat } from './ichat';
+import { XImMsg } from '@/ts/base/schema';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
+// 空时间
+const nullTime = new Date('2022-07-01').getTime();
 /**
  * 会话基类
  * @abstract
@@ -21,7 +25,9 @@ class BaseChat implements IChat {
   personCount: number;
   noReadCount: number;
   userId: string;
-  lastMessage: schema.XImMsg | undefined;
+  lastMsgTime: number = nullTime;
+  lastMessage: XImMsg | undefined;
+  messageNotify?: (messages: schema.XImMsg[]) => void;
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     this.spaceId = id;
     this.spaceName = name;
@@ -34,30 +40,47 @@ class BaseChat implements IChat {
     this.isToping = false;
     this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
+    appendShare(m.id, this.shareInfo);
   }
 
-  public get avatar(): FileItemShare | undefined {
-    return parseAvatar(this.target.photo);
+  public get shareInfo(): TargetShare {
+    const result: TargetShare = {
+      name: this.target.name,
+      typeName: this.target.typeName,
+    };
+    result.avatar = parseAvatar(this.target.photo);
+    return result;
   }
 
   getCache(): ChatCache {
     return {
-      chatId: this.chatId,
+      target: this.target,
       spaceId: this.spaceId,
       isToping: this.isToping,
-      lastMessage: this.lastMessage,
+      spaceName: this.spaceName,
       noReadCount: this.noReadCount,
+      lastMsgTime: this.lastMsgTime,
+      lastMessage: this.lastMessage,
     };
   }
+
   loadCache(cache: ChatCache): void {
-    if (cache.lastMessage?.id != this.lastMessage?.id) {
-      if (cache.lastMessage) {
+    this.target = cache.target;
+    this.isToping = cache.isToping;
+    this.noReadCount = cache.noReadCount;
+    this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
+    if (cache.lastMessage && cache.lastMessage.id != this.lastMessage?.id) {
+      this.lastMessage = cache.lastMessage;
+      const index = this.messages.findIndex((i) => i.id === cache.lastMessage?.id);
+      if (index > -1) {
+        this.messages[index] = cache.lastMessage;
+      } else {
         this.messages.push(cache.lastMessage);
       }
     }
-    this.isToping = cache.isToping;
-    this.noReadCount = cache.noReadCount;
-    this.lastMessage = cache.lastMessage;
+  }
+  onMessage(callback: (messages: schema.XImMsg[]) => void): void {
+    this.messageNotify = callback;
   }
   async clearMessage(): Promise<boolean> {
     if (this.spaceId === this.userId) {
@@ -71,8 +94,10 @@ class BaseChat implements IChat {
       );
       if (res.success) {
         this.messages = [];
+        this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
+      this.lastMsgTime = new Date().getTime();
     }
     return false;
   }
@@ -92,8 +117,10 @@ class BaseChat implements IChat {
         if (index > -1) {
           this.messages.splice(index, 1);
         }
+        this.messageNotify?.apply(this, [this.messages]);
         return true;
       }
+      this.lastMsgTime = new Date().getTime();
     }
     return false;
   }
@@ -138,8 +165,10 @@ class BaseChat implements IChat {
         this.messages.push(msg);
       }
       this.noReadCount += noread ? 1 : 0;
+      this.lastMsgTime = new Date().getTime();
       this.lastMessage = msg;
     }
+    this.messageNotify?.apply(this, [this.messages]);
   }
   protected loadMessages(msgs: schema.XImMsg[]): void {
     msgs.forEach((item: any) => {
@@ -149,6 +178,10 @@ class BaseChat implements IChat {
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });
+    if (this.lastMsgTime === nullTime && msgs.length > 0) {
+      this.lastMsgTime = new Date(msgs[0].createTime).getTime();
+    }
+    this.messageNotify?.apply(this, [this.messages]);
   }
   protected async loadCacheMessages(): Promise<number> {
     const res = await kernel.anystore.aggregate(
@@ -194,9 +227,9 @@ class PersonChat extends BaseChat {
           filter: filter,
         },
       });
-      if (res && res.success && Array.isArray(res.data)) {
-        this.loadMessages(res.data);
-        return res.data.length;
+      if (res.data.result && res.data.result.length > 0) {
+        this.loadMessages(res.data.result);
+        return res.data.result.length;
       }
     }
     return 0;
@@ -222,9 +255,9 @@ class CohortChat extends BaseChat {
           filter: filter,
         },
       });
-      if (res && res.success && Array.isArray(res.data)) {
-        this.loadMessages(res.data);
-        return res.data.length;
+      if (res.data.result && res.data.result.length > 0) {
+        this.loadMessages(res.data.result);
+        return res.data.result.length;
       }
     }
     return 0;
@@ -240,10 +273,14 @@ class CohortChat extends BaseChat {
         filter: filter,
       },
     });
-    if (res.success) {
-      res.data?.result?.forEach((item) => {
+    if (res.success && res.data && res.data.result) {
+      appendTarget(res.data.result);
+      res.data.result.forEach((item) => {
         item.name = item.team?.name ?? item.name;
-        this.persons.push(item);
+        let idArray = this.persons.map((r: schema.XTarget) => r.id);
+        if (!idArray.includes(item.id)) {
+          this.persons.push(item);
+        }
       });
       this.personCount = res.data?.total ?? 0;
     }

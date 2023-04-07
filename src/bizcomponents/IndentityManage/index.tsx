@@ -1,12 +1,11 @@
 /* eslint-disable no-unused-vars */
-import * as im from 'react-icons/im';
 import { TreeProps } from 'antd';
 import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting/userCtrl';
-import { ITarget, TargetType } from '@/ts/core';
+import userCtrl from '@/ts/controller/setting';
+import { ITarget } from '@/ts/core';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
@@ -17,6 +16,7 @@ export type ResultType = {
 };
 interface Iprops {
   multiple: boolean;
+  orgId?: string;
   onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
@@ -29,41 +29,48 @@ const ShareRecent = (props: Iprops) => {
 
   const loadTeamTree = async () => {
     const targets = await userCtrl.getTeamTree();
-    setData(buildTargetTree(targets));
+    setData(buildTargetTree(targets, false));
   };
 
   /** 加载组织树 */
-  const buildTargetTree = (targets: ITarget[]) => {
+  const buildTargetTree = (targets: ITarget[], isChild: boolean) => {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
-        result.push({
-          key: item.id,
-          title: item.name,
-          item: item,
-          isLeaf: item.subTeam.length === 0,
-          icon: (
-            <TeamIcon typeName={item.target.typeName} avatar={item.avatar} size={18} />
-          ),
-          children: buildTargetTree(item.subTeam),
-        });
+        if (props.orgId && !isChild) {
+          if (item.id == props.orgId) {
+            result.push({
+              key: item.id,
+              title: item.name,
+              item: item,
+              isLeaf: item.subTeam.length === 0,
+              icon: <TeamIcon share={item.shareInfo} size={18} />,
+              children: buildTargetTree(item.subTeam, true),
+            });
+          } else {
+            let children = buildTargetTree(item.subTeam, false);
+            for (let child of children) {
+              result.push(child);
+            }
+          }
+        } else {
+          result.push({
+            key: item.id,
+            title: item.name,
+            item: item,
+            isLeaf: item.subTeam.length === 0,
+            icon: <TeamIcon share={item.shareInfo} size={18} />,
+            children: buildTargetTree(item.subTeam, isChild),
+          });
+        }
       }
     }
     return result;
   };
 
-  const getIcon = (type: TargetType) => {
-    switch (type) {
-      case TargetType.Group:
-        return <im.ImTree />;
-      default:
-        return <im.ImOffice />;
-    }
-  };
-
   useEffect(() => {
     loadTeamTree();
-  }, []);
+  }, [props.orgId]);
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const item: ITarget = info.node.item;
@@ -86,8 +93,9 @@ const ShareRecent = (props: Iprops) => {
       await item.loadSubTeam();
       loadTeamTree();
       const result = (await item.getIdentitys()).map((i) => {
+        // i.target.name = `[${item.name}]` + i.target.name;
         return {
-          title: i.name,
+          title: `[${item.name}]` + i.name,
           key: i.id,
           data: i.target,
         };

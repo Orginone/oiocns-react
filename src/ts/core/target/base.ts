@@ -1,15 +1,17 @@
 import consts from '../consts';
 import { TargetType } from '../enum';
+import { appendTarget } from './targetMap';
 import { kernel, model, common, schema, parseAvatar } from '../../base';
 import Authority from './authority/authority';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
 import { ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
-import { logger, sleep } from '@/ts/base/common';
+import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
-import { FileItemShare, TargetModel } from '@/ts/base/model';
+import { TargetModel, TargetShare } from '@/ts/base/model';
 export default class BaseTarget implements ITarget {
+  public key: string;
   public typeName: TargetType;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
@@ -29,18 +31,24 @@ export default class BaseTarget implements ITarget {
     return this.target.name;
   }
   public get teamName(): string {
-    return this.target.team!.name;
+    return this.target.team?.name ?? this.name;
   }
 
   public get subTeam(): ITarget[] {
     return [];
   }
 
-  public get avatar(): FileItemShare | undefined {
-    return parseAvatar(this.target.avatar);
+  public get shareInfo(): TargetShare {
+    const result: TargetShare = {
+      name: this.teamName,
+      typeName: this.typeName,
+    };
+    result.avatar = parseAvatar(this.target.avatar);
+    return result;
   }
 
   constructor(target: schema.XTarget) {
+    this.key = generateUuid();
     this.target = target;
     this.createTargetType = [];
     this.joinTargetType = [];
@@ -48,14 +56,23 @@ export default class BaseTarget implements ITarget {
     this.ownIdentitys = [];
     this.identitys = [];
     this.typeName = target.typeName as TargetType;
+    appendTarget(target);
+  }
+  delete(): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
-      page: page,
+      page: {
+        limit: page.limit,
+        offset: page.offset,
+        filter: page.filter,
+      },
       id: this.target.id,
       typeNames: [this.target.typeName],
       subTypeNames: this.memberTypes,
     });
+    appendTarget(res.data);
     return res.data;
   }
   async pullMember(target: XTarget): Promise<boolean> {
@@ -111,7 +128,6 @@ export default class BaseTarget implements ITarget {
   ): Promise<IIdentity | undefined> {
     const res = await kernel.createIdentity({
       ...params,
-      id: '0',
       belongId: this.target.id,
     });
     if (res.success && res.data != undefined) {
@@ -220,6 +236,7 @@ export default class BaseTarget implements ITarget {
           limit: common.Constants.MAX_UINT_16,
         },
       });
+      appendTarget(res.data);
       return res.data;
     }
     logger.warn(consts.UnauthorizedError);
@@ -347,18 +364,16 @@ export default class BaseTarget implements ITarget {
   protected async createTarget(
     data: Omit<model.TargetModel, 'id'>,
   ): Promise<model.ResultType<schema.XTarget>> {
-    console.log('进入数据', data);
     if (this.createTargetType.includes(<TargetType>data.typeName)) {
       return await kernel.createTarget({
         ...data,
-        id: '0',
       });
     } else {
       return model.badRequest(consts.UnauthorizedError);
     }
   }
 
-  async create(data: TargetModel): Promise<ITarget | undefined> {
+  async create(_: TargetModel): Promise<ITarget | undefined> {
     await sleep(0);
     return;
   }
@@ -405,14 +420,16 @@ export default class BaseTarget implements ITarget {
   }
 
   /**
-   * 判断是否拥有该身份
-   * @param id 身份id
+   * 判断是否拥有该权限对应角色
+   * @param codes 权限编号集合
    */
-  async judgeHasIdentity(id: string): Promise<boolean> {
+  async judgeHasIdentity(codes: string[]): Promise<boolean> {
     if (this.ownIdentitys.length == 0) {
       await this.getOwnIdentitys(true);
     }
-    return this.ownIdentitys.find((a) => a.id == id) != undefined;
+    return (
+      this.ownIdentitys.find((a) => codes.includes(a.authority?.code ?? '')) != undefined
+    );
   }
 
   private async getOwnIdentitys(reload: boolean = false) {
@@ -427,11 +444,11 @@ export default class BaseTarget implements ITarget {
   }
 
   /**
-   * 查询组织职权树
+   * 查询组织权限树
    * @param id
    * @returns
    */
-  public async selectAuthorityTree(
+  public async loadAuthorityTree(
     reload: boolean = false,
   ): Promise<IAuthority | undefined> {
     if (!reload && this.authorityTree != undefined) {
@@ -440,6 +457,7 @@ export default class BaseTarget implements ITarget {
     await this.getOwnIdentitys(reload);
     const res = await kernel.queryAuthorityTree({
       id: this.target.id,
+      spaceId: '0',
       page: {
         offset: 0,
         filter: '',
@@ -447,16 +465,8 @@ export default class BaseTarget implements ITarget {
       },
     });
     if (res.success) {
-      this.authorityTree = this.loopBuildAuthority(res.data);
+      this.authorityTree = new Authority(res.data, this.id);
     }
     return this.authorityTree;
-  }
-
-  protected loopBuildAuthority(auth: schema.XAuthority): Authority {
-    const authority = new Authority(auth, this.target.id);
-    auth.nodes?.forEach((a) => {
-      authority.children.push(this.loopBuildAuthority(a));
-    });
-    return authority;
   }
 }

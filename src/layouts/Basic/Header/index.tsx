@@ -7,7 +7,7 @@ import HeaderHome from './Home';
 import cls from './index.module.less';
 import HeaderNav from './Nav';
 import UserAvatar from './UserAvatar';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { PageLoading } from '@ant-design/pro-layout';
 
 const { Header } = Layout;

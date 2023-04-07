@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
@@ -12,17 +12,17 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
     <div>
       <Tabs size="large" items={[{ label: '账号密码登录', key: 'account' }]} />
       <Form
-        onFinish={({ account, password }) => {
+        onFinish={async ({ account, password }) => {
           if (account && password) {
             setLoading(true);
-            return userCtrl.login(account, password).then((res) => {
-              setLoading(false);
-              if (res.success) {
-                props.history.push('/home');
-              }
-            });
+            const res = await userCtrl.login(account, password);
+            setLoading(false);
+            if (res.success) {
+              props.history.push('/home');
+            }
+          } else {
+            message.warning('请填写账号和密码 ！');
           }
-          message.error('账号或密码错误，请重试！');
         }}>
         <Form.Item name="account" rules={[{ required: true, message: '请输入用户名' }]}>
           <Input size="large" prefix={<UserOutlined />} placeholder="请输入用户名" />

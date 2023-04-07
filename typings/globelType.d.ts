@@ -1,3 +1,4 @@
+import React from 'react';
 import { RouteConfig } from 'react-router-config';
 
 interface DataType {
@@ -33,4 +34,27 @@ interface IRouteConfig extends RouteConfig {
   auth?: boolean;
   // 子路由
   routes?: IRouteConfig[];
+}
+
+interface MenuItemType {
+  item?: any;
+  key: string;
+  label: string;
+  menuType?: string;
+  checked?: boolean;
+  itemType: string;
+  count?: number;
+  tag?: string[];
+  icon?: React.ReactNode;
+  expIcon?: React.ReactNode;
+  menus?: OperateMenuType[];
+  children: MenuItemType[];
+}
+
+interface OperateMenuType {
+  key: string;
+  label: string;
+  model?: string;
+  icon: React.ReactNode;
+  subMenu?: MenuItemType;
 }

@@ -1,31 +1,32 @@
-import { kernel } from '../../base';
-import { TargetType } from '../enum';
+import { ChatModel } from '@/ts/base/model';
 import { CreateChat } from './chat';
-import { IChatGroup } from './ichat';
-/**
- * 加载通讯录会话
- * @returns 会话接口数组
- */
-export const LoadChats = async (userId: string): Promise<IChatGroup[]> => {
-  let groups: IChatGroup[] = [];
-  const res = await kernel.queryImChats({
-    spaceId: userId,
-    cohortName: TargetType.Cohort,
-    spaceTypeName: TargetType.Company,
-  });
-  if (res.success) {
-    res.data?.groups?.forEach((item, index) => {
-      groups.push({
-        spaceId: item.id,
-        spaceName: item.name,
-        isOpened: index === 0,
-        chats: item.chats.map((c) => {
-          return CreateChat(item.id, item.name, c, userId);
-        }),
-      });
-    });
+import { XTarget } from '@/ts/base/schema';
+
+/** 根据target生成会话 */
+export const TargetChat = (
+  target: ChatModel | XTarget,
+  userId: string,
+  spaceId: string,
+  spaceName: string,
+  label: string,
+) => {
+  const xtarget = target as XTarget;
+  if (xtarget.thingId && xtarget.thingId.length > 0) {
+    return CreateChat(
+      spaceId,
+      spaceName,
+      {
+        photo: xtarget.avatar || '{}',
+        id: xtarget.id,
+        name: xtarget.team?.name || xtarget.name,
+        label: label,
+        remark: xtarget.team?.remark || '',
+        typeName: xtarget.typeName,
+      } as ChatModel,
+      userId,
+    );
   }
-  return groups;
+  return CreateChat(spaceId, spaceName, target as ChatModel, userId);
 };
 
 export type { IChat, IChatGroup } from './ichat';

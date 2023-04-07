@@ -267,11 +267,6 @@ export const routerInfo = [
             icon: '',
           },
           {
-            path: '/setting/flow',
-            title: '流程设置',
-            icon: '',
-          },
-          {
             path: '/setting/standard',
             title: '标准设置',
             icon: 'icon-setting',
@@ -336,11 +331,6 @@ export const routerInfo = [
           {
             path: '/person/lang',
             title: '语言设置',
-            icon: '',
-          },
-          {
-            path: '/person/standard',
-            title: '标准设置',
             icon: '',
           },
         ],

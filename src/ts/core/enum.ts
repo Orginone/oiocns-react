@@ -30,7 +30,7 @@ export enum MessageType {
   Readed = '已读',
 }
 
-/** 职权类型 */
+/** 权限类型 */
 export enum AuthorityType {
   SuperAdmin = 'super-admin',
   RelationAdmin = 'relation-admin',
@@ -64,12 +64,28 @@ export enum OrderStatus {
   RejectOrder = 222,
 }
 
-export enum TodoType {
-  FrientTodo = '好友申请',
-  OrgTodo = '组织审批',
-  OrderTodo = '订单管理',
-  MarketTodo = '市场管理',
-  ApplicationTodo = '应用待办',
+export enum WorkType {
+  OrgTodo = '组织待办',
+  FriendTodo = '好友待办',
+  GroupTodo = '集团待办',
+  CompanyTodo = '单位待办',
+  CohortTodo = '群组待办',
+  OrderTodo = '订单待办',
+  StoreTodo = '市场待办',
+  PublishTodo = '上架待办',
+  JoinStoreTodo = '加入市场待办',
+  OrgApply = '组织申请',
+  FriendApply = '好友申请',
+  CohortApply = '加群申请',
+  GroupApply = '集团申请',
+  CompanyApply = '单位申请',
+  OrderApply = '订单申请',
+  StoreApply = '市场申请',
+  PublishApply = '上架申请',
+  JoinStoreApply = '加入市场申请',
+  WorkItem = 'work事',
+  WorkTodo = 'todo事',
+  WorkDone = 'done事',
 }
 
 export const companyTypes = [

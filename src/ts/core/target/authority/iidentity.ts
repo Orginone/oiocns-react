@@ -4,12 +4,12 @@ import { model, schema } from '@/ts/base';
 export interface IIdentity {
   /** 实体对象 */
   target: schema.XIdentity;
-  /** 当前身份Id */
+  /** 当前角色Id */
   id: string;
-  /** 当前身份名称 */
+  /** 当前角色名称 */
   name: string;
   /**
-   * 更新身份
+   * 更新角色
    * @param name 名称
    * @param code 编号
    * @param remark 备注

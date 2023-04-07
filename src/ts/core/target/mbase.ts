@@ -29,7 +29,6 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
   public async getMarketByCode(name: string): Promise<schema.XMarketArray> {
     return (
       await kernel.queryMarketByCode({
-        id: '0',
         page: {
           offset: 0,
           limit: common.Constants.MAX_UINT_16,
@@ -178,21 +177,30 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     code,
     remark,
     samrId,
-    ispublic = true,
+    photo,
+    joinPublic = true,
+    sellPublic = false,
+    buyPublic = false,
   }: {
     name: string;
     code: string;
     remark: string;
     samrId: string;
-    ispublic: boolean;
+    joinPublic: boolean;
+    sellPublic: boolean;
+    buyPublic: boolean;
+    photo: string;
   }): Promise<IMarket | undefined> {
     const res = await kernel.createMarket({
       name,
       code,
       remark,
       samrId,
+      photo,
+      joinPublic,
+      sellPublic,
+      buyPublic,
       id: undefined,
-      public: ispublic,
       belongId: this.target.id,
     });
     if (res.success) {
@@ -227,7 +235,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.market.id != id;
+        return market.target.id != id;
       });
       return true;
     }
@@ -253,7 +261,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.market.id != id;
+        return market.target.id != id;
       });
       return true;
     }
@@ -298,7 +306,6 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
   ): Promise<XOrder> {
     return (
       await kernel.createOrder({
-        id: '0',
         nftId,
         name,
         code,

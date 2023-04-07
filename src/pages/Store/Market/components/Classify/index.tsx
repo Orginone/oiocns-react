@@ -5,21 +5,25 @@ import cls from './index.module.less';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
-import JoinOtherShop from './JoinOtherShop';
+import SearchShop from '@/bizcomponents/SearchShop';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import userCtrl from '@/ts/controller/setting/userCtrl';
+import userCtrl from '@/ts/controller/setting';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
-type modalType = 'create' | 'join' | 'detail' | 'users' | '';
+import { XMarket } from '@/ts/base/schema';
+
+type modalType = 'create' | 'join' | 'detail' | 'edit' | 'users' | '';
+
 interface Iprops {
   tkey: string;
   current: IMarket | undefined;
   setCurrent: (current: IMarket) => void;
 }
+
 const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const [activeModal, setActiveModal] = useState<modalType>('');
   const [editMarket, setEditMarket] = useState<IMarket>(); // 被选中的树节点
-  const [dataSource, setDataSource] = useState<any>([]); // table数据
+  const [selectMarkets, setSelectedMarkets] = useState<XMarket[]>([]); // table数据
   const [treeData, setTreeData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -32,41 +36,28 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
    * @return {*}
    */
   const onOk = async (formData: any) => {
-    const market = await marketCtrl.target.createMarket({ ...formData });
-    if (market) {
-      props.setCurrent(market);
+    if (editMarket) {
+      await editMarket.update(
+        formData.name,
+        formData.code,
+        formData.samrId,
+        formData.remark,
+        formData.joinPublic,
+        formData.sellPublic,
+        formData.buyPublic,
+        formData.photo,
+      );
+    } else {
+      const market = await marketCtrl.target.createMarket({ ...formData });
+      if (market) {
+        props.setCurrent(market);
+      }
     }
     setActiveModal('');
   };
 
-  /**
-   * @description: 加入商店
-   * @return {*}
-   */
-  const onJoinOk = async (val: any) => {
-    setActiveModal('');
-    setDataSource([]);
-    if (await userCtrl.user.applyJoinMarket(val[0]?.id)) {
-      message.success('申请已发送');
-    }
-  };
-
-  /**
-   * @description: 加入商店搜索回调
-   * @param {any} val
-   * @return {*}
-   */
-  const onChange = async (val: any) => {
-    setDataSource((await marketCtrl.target.getMarketByCode(val.target.value)).result);
-  };
-
-  /**
-   * @description: 取消的回调
-   * @return {*}
-   */
   const onCancel = () => {
     setActiveModal('');
-    setDataSource([]);
   };
 
   /**
@@ -84,9 +75,19 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
                 {
                   label: '创建商店',
                   key: 'add',
-                  onClick: () => setActiveModal('create'),
+                  onClick: () => {
+                    setEditMarket(undefined);
+                    setActiveModal('create');
+                  },
                 },
-                { label: '加入商店', key: 'join', onClick: () => setActiveModal('join') },
+                {
+                  label: '加入商店',
+                  key: 'join',
+                  onClick: () => {
+                    setEditMarket(undefined);
+                    setActiveModal('join');
+                  },
+                },
               ],
             }}>
             <EllipsisOutlined style={{ transform: 'rotate(90deg)' }} />
@@ -107,21 +108,25 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       case '删除商店':
         Modal.confirm({
           title: '提示',
-          content: '是否确认删除',
+          content: '确定删除该商店吗',
           onOk: async () => {
-            if (await marketCtrl.target.deleteMarket(node.market.id)) {
+            if (await marketCtrl.target.deleteMarket(node.target.id)) {
               message.success('删除成功');
               marketCtrl.changCallback();
             }
           },
         });
         break;
+      case '编辑商店':
+        setEditMarket(node);
+        setActiveModal('edit');
+        break;
       case '退出商店':
         Modal.confirm({
           title: '提示',
           content: '是否确认退出',
           onOk: async () => {
-            if (await marketCtrl.target.quitMarket(node.market.id)) {
+            if (await marketCtrl.target.quitMarket(node.target.id)) {
               message.success('退出成功');
               marketCtrl.changCallback();
             }
@@ -129,8 +134,8 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         });
         break;
       case '基础详情':
-        setActiveModal('detail');
         setEditMarket(node);
+        setActiveModal('detail');
         break;
       case '用户管理':
         setActiveModal('users');
@@ -148,25 +153,26 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const getTreeData = () => {
     const data = marketCtrl.target.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
-      if (itemModel.market.belongId === userCtrl.space.id) {
+      if (itemModel.target.belongId === userCtrl.space.id) {
+        arrs.push('编辑商店');
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');
       }
       return {
-        title: itemModel.market.name,
-        key: itemModel.market.id,
+        title: itemModel.target.name,
+        key: itemModel.target.id,
         item: itemModel,
         tag:
-          itemModel.market.belongId === userCtrl.user.target.id
+          itemModel.target.belongId === userCtrl.user.target.id
             ? {
                 color: 'blue',
                 txt: '我的',
               }
             : null,
         children: [],
-        belongId: itemModel.market.belongId,
-        menus: itemModel.market.belongId ? arrs : undefined,
+        belongId: itemModel.target.belongId,
+        menus: itemModel.target.belongId ? arrs : undefined,
       };
     });
     setTreeData(data);
@@ -178,7 +184,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       <MarketClassifyTree
         parentIcon={<AppstoreFilled />}
         childIcon={<AppstoreFilled style={{ color: '#a6aec7' }} />}
-        selectedKeys={[props.current?.market.id]}
+        selectedKeys={[props.current?.target.id]}
         onSelect={(_: any, info: any) => props.setCurrent(info.node.item)}
         handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
         treeData={treeData}
@@ -191,31 +197,50 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         handleOk={onOk}
         handleCancel={onCancel}
       />
+      <CreateMarketModal
+        title="编辑商店"
+        open={activeModal === 'edit'}
+        current={editMarket}
+        handleOk={onOk}
+        handleCancel={onCancel}
+      />
       {editMarket && (
         <>
           <DetailDrawer
-            title={editMarket.market.name}
-            nodeDetail={editMarket.market}
+            title={editMarket.target.name}
+            nodeDetail={editMarket.target}
             open={activeModal === 'detail'}
-            onClose={() => setActiveModal('')}
+            onClose={onCancel}
           />
           <Drawer
             title="用户管理"
+            destroyOnClose
             width={'75%'}
             open={activeModal === 'users'}
-            onClose={() => setActiveModal('')}>
+            onClose={onCancel}>
             <UserManagement current={editMarket} tkey={props.tkey} />
           </Drawer>
         </>
       )}
-      <JoinOtherShop
-        title="搜索商店"
+      <Modal
+        title="加入商店"
+        width={670}
+        destroyOnClose={true}
+        bodyStyle={{ padding: 0 }}
         open={activeModal === 'join'}
         onCancel={onCancel}
-        onOk={onJoinOk}
-        onChange={onChange}
-        dataSource={dataSource || []}
-      />
+        onOk={async () => {
+          for (const market of selectMarkets) {
+            await userCtrl.user.applyJoinMarket(market.id);
+          }
+          setActiveModal('');
+        }}>
+        <SearchShop
+          searchCallback={(markets: XMarket[]) => {
+            setSelectedMarkets(markets);
+          }}
+        />
+      </Modal>
     </div>
   );
 };

@@ -8,11 +8,19 @@ import { SpeciesItem } from './species';
  */
 export const loadSpeciesTree = async (id: string) => {
   let item: INullSpeciesItem;
-  const res = await kernel.querySpeciesTree(id, '');
+  const res = await kernel.querySpeciesTree({
+    id: id,
+    page: {
+      offset: 0,
+      limit: 0,
+      filter: '',
+    },
+  });
   if (res.success) {
-    item = new SpeciesItem(res.data, undefined);
+    item = new SpeciesItem(res.data, undefined, id);
   }
   return item;
 };
 
 export type { INullSpeciesItem, ISpeciesItem } from './ispecies';
+export type { IFlowDefine } from './iflowDefine';

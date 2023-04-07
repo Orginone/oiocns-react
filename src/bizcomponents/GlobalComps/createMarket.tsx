@@ -2,14 +2,17 @@ import React, { useRef, useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import docsCtrl from '@/ts/controller/store/docsCtrl';
+import storeCtrl from '@/ts/controller/store';
 import { FileItemShare, MarketModel } from '@/ts/base/model';
 import { BankOutlined } from '@ant-design/icons';
+import { IMarket } from '@/ts/core';
+import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
   open: boolean;
   title: string;
-  handleCancel: () => void;
+  current?: IMarket;
+  handleCancel?: () => void;
   handleOk: (data: MarketModel) => void;
 }
 /*
@@ -32,9 +35,9 @@ const CreateMarketModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await docsCtrl.home?.create('图片');
+      const docDir = await storeCtrl.home?.create('图片');
       if (docDir && file) {
-        const result = await docsCtrl.upload(docDir.key, file.name, file);
+        const result = await docDir.upload(file.name, file);
         if (result) {
           setAvatar(result.shareInfo());
         }
@@ -89,8 +92,8 @@ const CreateMarketModal = (props: Iprops) => {
       },
     },
     {
-      title: '是否开放',
-      dataIndex: 'public',
+      title: '是否开放加入',
+      dataIndex: 'joinPublic',
       valueType: 'select',
       fieldProps: {
         options: [
@@ -105,7 +108,47 @@ const CreateMarketModal = (props: Iprops) => {
         ],
       },
       formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
+        rules: [{ required: true, message: '是否开放加入为必填项' }],
+      },
+    },
+    {
+      title: '售卖权限',
+      dataIndex: 'sellPublic',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '所有人',
+          },
+          {
+            value: false,
+            label: '成员',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '售卖权限为必填项' }],
+      },
+    },
+    {
+      title: '购买权限',
+      dataIndex: 'buyPublic',
+      valueType: 'select',
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '所有人',
+          },
+          {
+            value: false,
+            label: '成员',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '购买权限为必填项' }],
       },
     },
     {
@@ -129,7 +172,16 @@ const CreateMarketModal = (props: Iprops) => {
         if (!open) {
           formRef.current?.resetFields();
           setAvatar(undefined);
-          handleCancel();
+          if (handleCancel) {
+            handleCancel();
+          }
+        } else {
+          if (props.current && props.title === '编辑商店') {
+            setAvatar(parseAvatar(props.current.target.photo));
+            formRef.current?.setFieldsValue({
+              ...props.current.target,
+            });
+          }
         }
       }}
       rowProps={{

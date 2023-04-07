@@ -1,14 +1,30 @@
 import { common } from '../../base';
-import { CommonStatus, TodoType } from '../enum';
-import { ITodoGroup, IApprovalItem, IApplyItem } from './itodo';
+import { CommonStatus, WorkType } from '../enum';
+import {
+  ITodoGroup,
+  IApprovalItem,
+  IApplyItem,
+  IApplyItemResult,
+  IApprovalItemResult,
+} from './itodo';
 import { model, kernel, schema } from '../../base';
+import { XMarket } from '@/ts/base/schema';
 
 class PublishTodo implements ITodoGroup {
-  name: string = '应用上架';
+  /**@id 唯一值 */
+  public id: string;
+  public icon?: string;
+  public name: string;
   private _doList: ApprovalItem[] = [];
   private _applyList: ApplyItem[] = [];
   private _todoList: ApprovalItem[] = [];
-  type: TodoType = TodoType.MarketTodo;
+  type: WorkType = WorkType.PublishTodo;
+  constructor(market: XMarket, type: WorkType) {
+    this.id = market.id;
+    this.type = type;
+    this.icon = market.photo;
+    this.name = market.name;
+  }
   async getCount(): Promise<number> {
     if (this._todoList.length <= 0) {
       await this.getTodoList();
@@ -25,24 +41,20 @@ class PublishTodo implements ITodoGroup {
   async getNoticeList(_: boolean = false): Promise<IApprovalItem[]> {
     throw new Error('Method not implemented.');
   }
-  async getDoList(_: model.PageRequest): Promise<IApprovalItem[]> {
-    if (this._doList.length > 0) {
-      return this._doList;
+  async getDoList(page: model.PageRequest): Promise<IApprovalItemResult> {
+    if (this._doList.length == 0) {
+      await this.getApprovalList();
     }
-    await this.getApprovalList();
-    return this._doList;
+    return {
+      result: this._doList.splice(page.offset, page.limit),
+      total: this._doList.length,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
-  async getApplyList(_: model.PageRequest): Promise<IApplyItem[]> {
-    if (this._applyList.length > 0) {
-      return this._applyList;
-    }
+  async getApplyList(page: model.PageRequest): Promise<IApplyItemResult> {
     const res = await kernel.queryMerchandiseApply({
-      id: '0',
-      page: {
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
-      },
+      page,
     });
     if (res.success && res.data.result) {
       this._applyList = res.data.result.map((a) => {
@@ -53,11 +65,16 @@ class PublishTodo implements ITodoGroup {
         });
       });
     }
-    return this._applyList;
+    return {
+      result: this._applyList,
+      total: res.data.total,
+      offset: page.offset,
+      limit: page.limit,
+    };
   }
   private async getApprovalList() {
     const res = await kernel.queryPublicApproval({
-      id: '0',
+      id: this.id,
       page: {
         offset: 0,
         limit: common.Constants.MAX_UINT_16,
@@ -79,7 +96,7 @@ class PublishTodo implements ITodoGroup {
       };
       // 拒绝回调
       let rejectfun = (s: schema.XMerchandise) => {
-        this._doList.unshift(new ApprovalItem(s, rePassfun, (s) => {}));
+        this._doList.unshift(new ApprovalItem(s, rePassfun, (_) => {}));
       };
       let reRejectfun = (_: schema.XMerchandise) => {};
       this._doList = res.data.result
@@ -149,7 +166,6 @@ class ApplyItem implements IApplyItem {
   async cancel(_status: number, _remark: string): Promise<boolean> {
     const res = await kernel.deleteMerchandise({
       id: this._data.id,
-      belongId: '0',
     });
     if (res.success) {
       this._cancelCall.apply(this, [this._data.id]);
@@ -160,7 +176,21 @@ class ApplyItem implements IApplyItem {
 
 /** 加载应用上架任务 */
 export const loadPublishTodo = async () => {
-  const publishTodo = new PublishTodo();
-  await publishTodo.getTodoList();
-  return publishTodo;
+  const res = await kernel.queryManageMarket({
+    page: { offset: 0, limit: common.Constants.MAX_UINT_16, filter: '' },
+  });
+  let todoGroups: ITodoGroup[] = [];
+  if (res.success && res.data.result) {
+    for (const market of res.data.result) {
+      const publishTodo = new PublishTodo(market, WorkType.PublishTodo);
+      await publishTodo.getTodoList();
+      todoGroups.push(publishTodo);
+    }
+  }
+  return todoGroups;
+};
+
+/** 加载应用上架任务 */
+export const loadPublishApply = async () => {
+  return new PublishTodo({ name: '我的申请' } as XMarket, WorkType.PublishApply);
 };

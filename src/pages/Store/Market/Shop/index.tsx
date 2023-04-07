@@ -2,10 +2,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
-import AppCard from '@/components/AppCardOfBuy';
+import AppCard from '@/components/AppShopCard';
 import { common } from 'typings/common';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import ProductDetailModal from '@/components/ProductDetailModal';
+import MerchandiseDetail from '../components/MerchandiseDetail';
 import MarketClassify from '../components/Classify';
 import ReactDOM from 'react-dom';
 import { XMerchandise } from '@/ts/base/schema';
@@ -13,11 +13,11 @@ import { message, Modal } from 'antd';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { IMarket } from '@/ts/core';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { marketColumns } from '../../App/Config';
+import { marketColumns } from '../../config/columns';
 
 const AppShowComp: React.FC = () => {
   const [isProduce, setIsProduce] = useState<boolean>(false); // 查看详情
-  const [detail, setDetail] = useState<XMerchandise>(); // 查看详情
+  const [merchandise, setMerchandise] = useState<XMerchandise>(); // 查看详情
   const parentRef = useRef<any>(null); //父级容器Dom
   const treeContainer = document.getElementById('templateMenu');
   const [key] = useCtrlUpdate(marketCtrl);
@@ -28,7 +28,7 @@ const AppShowComp: React.FC = () => {
       const markets = marketCtrl.target.joinedMarkets;
       if (markets.length > 0) {
         const index = markets.findIndex((i) => {
-          return i.market.id === current?.market.id;
+          return i.target.id === current?.target.id;
         });
         if (index < 0) {
           setCurrent(markets[0]);
@@ -52,7 +52,7 @@ const AppShowComp: React.FC = () => {
         title: '确认订单',
         content: '此操作将生成交易订单。是否确认',
         icon: <CheckCircleOutlined className={cls['buy-icon']} />,
-        onOk: async () => await marketCtrl.createOrder([selectItem]),
+        onOk: async () => await marketCtrl.createOrder([selectItem.id]),
       });
     }
   };
@@ -62,14 +62,14 @@ const AppShowComp: React.FC = () => {
     return [
       {
         key: 'buy',
-        label: '购买',
+        label: '立即购买',
         onClick: () => {
           handleBuyAppFun('buy', item);
         },
       },
       {
         key: 'toBuyCar',
-        label: '暂存',
+        label: '加入购物车',
         onClick: () => {
           marketCtrl.appendStaging(item);
         },
@@ -78,8 +78,8 @@ const AppShowComp: React.FC = () => {
         key: 'detail',
         label: '详情',
         onClick: () => {
+          setMerchandise(item);
           setIsProduce(true);
-          setDetail(item);
         },
       },
       {
@@ -88,17 +88,16 @@ const AppShowComp: React.FC = () => {
         onClick: () => {
           Modal.confirm({
             title: '提示',
-            content: '是否确认下架 [' + item.caption + '] 商品？',
+            content: '是否确认下架《' + item.caption + '》商品',
             onOk: async () => {
               if (await current?.unPublish(item.id)) {
-                message.success('下架 [' + item.caption + '] 商品成功.');
+                message.success('下架' + item.caption + '》商品成功');
               } else {
                 message.error('下架失败');
               }
               marketCtrl.changCallback();
             },
           });
-          setDetail(item);
         },
       },
     ];
@@ -114,15 +113,8 @@ const AppShowComp: React.FC = () => {
       return (
         <AppCard
           className="card"
-          data={item}
+          current={item}
           key={item.id}
-          defaultKey={{
-            name: 'caption',
-            size: 'price',
-            type: 'sellAuth',
-            desc: 'remark',
-            creatTime: 'createTime',
-          }}
           showOperation={true}
           operation={renderOperation}
           handleBuyApp={handleBuyAppFun}
@@ -136,22 +128,23 @@ const AppShowComp: React.FC = () => {
         key={key}
         dataSource={[]}
         stripe
-        headerTitle={current?.market.name}
+        headerTitle={current?.target.name}
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
         columns={marketColumns}
         rowKey={'id'}
-        params={{ id: current?.market.id }}
+        params={{ id: current?.target.id }}
         request={async (page) => {
           return await current?.getMerchandise(page);
         }}
       />
-      <ProductDetailModal
+
+      <MerchandiseDetail
         open={isProduce}
         title="应用详情"
         onClose={() => setIsProduce(false)}
-        data={detail}
+        data={merchandise}
       />
       {treeContainer
         ? ReactDOM.createPortal(

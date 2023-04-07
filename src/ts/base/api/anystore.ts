@@ -39,7 +39,7 @@ export default class AnyStore {
         this._storeHub
           .invoke('TokenAuth', this.accessToken, 'user')
           .then(() => {
-            logger.info('连接到私有存储成功!');
+            // logger.info('连接到私有存储成功!');
             Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
               const key = fullKey.split('|')[0];
               const domain = fullKey.split('|')[1];
@@ -138,7 +138,17 @@ export default class AnyStore {
    * @returns {ResultType} 对象异步结果
    */
   public async get<T>(key: string, domain: string): Promise<ResultType<T>> {
-    return await this._storeHub.invoke('Get', key, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Get', key, domain);
+    }
+    return await this._restRequest(
+      'Object',
+      'Get/' + key,
+      {
+        shareDomain: domain,
+      },
+      {},
+    );
   }
   /**
    * 修改对象
@@ -148,7 +158,17 @@ export default class AnyStore {
    * @returns {ResultType} 变更异步结果
    */
   public async set(key: string, setData: any, domain: string): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Set', key, setData, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Set', key, setData, domain);
+    }
+    return await this._restRequest(
+      'Object',
+      'Set/' + key,
+      {
+        shareDomain: domain,
+      },
+      setData,
+    );
   }
   /**
    * 删除对象
@@ -157,7 +177,17 @@ export default class AnyStore {
    * @returns {ResultType} 删除异步结果
    */
   public async delete(key: string, domain: string): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Delete', key, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Delete', key, domain);
+    }
+    return await this._restRequest(
+      'Object',
+      'Delete/' + key,
+      {
+        shareDomain: domain,
+      },
+      {},
+    );
   }
   /**
    * 添加数据到数据集
@@ -171,7 +201,17 @@ export default class AnyStore {
     data: any,
     domain: string,
   ): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Insert', collName, data, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Insert', collName, data, domain);
+    }
+    return await this._restRequest(
+      'Collection',
+      'Update/' + collName,
+      {
+        shareDomain: domain,
+      },
+      data,
+    );
   }
   /**
    * 更新数据到数据集
@@ -185,7 +225,17 @@ export default class AnyStore {
     update: any,
     domain: string,
   ): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Update', collName, update, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Update', collName, update, domain);
+    }
+    return await this._restRequest(
+      'Collection',
+      'Update/' + collName,
+      {
+        shareDomain: domain,
+      },
+      update,
+    );
   }
   /**
    * 从数据集移除数据
@@ -199,7 +249,17 @@ export default class AnyStore {
     match: any,
     domain: string,
   ): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Remove', collName, match, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Remove', collName, match, domain);
+    }
+    return await this._restRequest(
+      'Collection',
+      'Remove/' + collName,
+      {
+        shareDomain: domain,
+      },
+      match,
+    );
   }
   /**
    * 从数据集查询数据
@@ -213,7 +273,17 @@ export default class AnyStore {
     options: any,
     domain: string,
   ): Promise<ResultType<any>> {
-    return await this._storeHub.invoke('Aggregate', collName, options, domain);
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Aggregate', collName, options, domain);
+    }
+    return await this._restRequest(
+      'Collection',
+      'Aggregate/' + collName,
+      {
+        shareDomain: domain,
+      },
+      options,
+    );
   }
   /**
    * 桶操作
@@ -224,7 +294,52 @@ export default class AnyStore {
     if (this._storeHub.isConnected) {
       return await this._storeHub.invoke('BucketOpreate', data);
     }
-    return await this._restRequest('Bucket', 'Operate', data);
+    return await this._restRequest('Bucket', 'Operate', {}, data);
+  }
+  /**
+   * 加载物
+   * @param  过滤参数
+   * @returns {ResultType<T>} 移除异步结果
+   */
+  public async loadThing<T>(options: any, domain: string): Promise<ResultType<T>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Load', options, domain);
+    }
+    options.shareDomain = domain;
+    return await this._restRequest('Thing', 'Load', options, {});
+  }
+  /**
+   * 加载物的归档信息
+   * @param  过滤参数
+   * @returns {ResultType<T>} 移除异步结果
+   */
+  public async loadThingArchives<T>(
+    options: any,
+    domain: string,
+  ): Promise<ResultType<T>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('LoadArchives', options, domain);
+    }
+    options.shareDomain = domain;
+    return await this._restRequest('Thing', 'LoadArchives', options, {});
+  }
+  /**
+   * 创建物
+   * @param  创建数量
+   * @returns {ResultType<T>} 移除异步结果
+   */
+  public async createThing<T>(number: number, domain: string): Promise<ResultType<T>> {
+    if (this._storeHub.isConnected) {
+      return await this._storeHub.invoke('Create', number, domain);
+    }
+    return await this._restRequest(
+      'Thing',
+      'Create',
+      {
+        shareDomain: domain,
+      },
+      number,
+    );
   }
   /**
    * 对象变更通知
@@ -245,14 +360,17 @@ export default class AnyStore {
   }
   /**
    * 使用rest请求后端
+   * @param controller 控制器
    * @param methodName 方法
-   * @param data 参数
+   * @param data 内容体数据
+   * @param params 查询参数
    * @returns 返回结果
    */
   private async _restRequest(
     controller: string,
     methodName: string,
-    args: any,
+    params: any,
+    data: any,
   ): Promise<ResultType<any>> {
     const res = await this._axiosInstance({
       method: 'post',
@@ -261,7 +379,8 @@ export default class AnyStore {
       headers: {
         Authorization: this.accessToken,
       },
-      data: args,
+      data: data,
+      params: params,
     });
     if (res.data && (res.data as ResultType<any>)) {
       return res.data as ResultType<any>;

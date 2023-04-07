@@ -11,6 +11,7 @@ type CreateGroupPropsType = {
   setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
   indentitys: IIdentity[];
   current: ITarget;
+  isAdmin: boolean;
 };
 type target = {
   title: string;
@@ -18,7 +19,7 @@ type target = {
   object: IIdentity;
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  const { indentitys, setCurrent, current, currentKey } = props;
+  const { indentitys, setCurrent, current, currentKey, isAdmin } = props;
   const [selectMenu, setSelectMenu] = useState<string>(currentKey);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
@@ -61,20 +62,22 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
       selectedKeys={[selectMenu]}
       treeData={changeData(indentitys!)}
       onSelect={onSelect}
-      title={'全部身份'}
+      title={'全部角色'}
     />
   );
   return (
     <div>
       <div className={cls.topMes}>
-        <Button
-          className={cls.creatgroup}
-          type="text"
-          icon={<PlusOutlined className={cls.addIcon} />}
-          onClick={() => {
-            setIsOpenModal(true);
-          }}
-        />
+        {isAdmin && (
+          <Button
+            className={cls.creatgroup}
+            type="text"
+            icon={<PlusOutlined className={cls.addIcon} />}
+            onClick={() => {
+              setIsOpenModal(true);
+            }}
+          />
+        )}
         {positionList}
       </div>
       <AddPosttionModal

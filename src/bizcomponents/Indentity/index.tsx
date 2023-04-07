@@ -1,35 +1,36 @@
 import { Card, Button, Descriptions, Modal, message, Layout, ModalProps } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
-import { common } from 'typings/common';
-import { XTarget } from '@/ts/base/schema';
-import { ITarget } from '@/ts/core';
-import { MarketTypes } from 'typings/marketType';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import CardOrTable from '@/components/CardOrTableComp';
-import TreeLeftDeptPage from './components/TreeLeftPosPage';
-import EditIndentityModal from './components/AddPositionMoadl';
-import AssignPosts from './components/AssignPosts';
+import { schema } from '@/ts/base';
+import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import { XTarget } from '@/ts/base/schema';
 import { columns } from './config';
+import EditIndentityModal from './components/AddPositionMoadl';
+import TreeLeftDeptPage from './components/TreeLeftPosPage';
+import AssignPosts from './components/AssignPosts';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
+import { ITarget } from '@/ts/core';
 
 const { Sider, Content } = Layout;
 type IndentityManageType = {
   open: boolean;
   current: ITarget;
+  isAdmin: boolean;
 };
 /**
- * 身份设置
+ * 角色设置
  * @returns
  */
 const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
-  const { open, current, ...other } = props;
+  const { open, current, isAdmin, ...other } = props;
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [indentity, setIndentity] = useState<IIdentity>();
   const [indentitys, setIndentitys] = useState<IIdentity[]>([]);
   const [isOpenAssign, setIsOpenAssign] = useState<boolean>(false);
-  const [currentPerson, setPerson] = useState<XTarget[]>();
-  const [personData, setPersonData] = useState<XTarget[]>([]);
+  const [currentPerson, setPerson] = useState<schema.XTarget[]>();
+  const [key, forceUpdate] = useObjectUpdate(indentity);
   useEffect(() => {
     if (open) {
       getDataList();
@@ -37,7 +38,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       setIndentity(undefined);
     }
   }, [open]);
-  // 左侧身份数据
+  // 左侧角色数据
   const getDataList = async () => {
     const data = await current.getIdentitys();
     setIndentitys(data);
@@ -45,90 +46,79 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
       await setTreeCurrent(data[0]);
     }
   };
-  // 点击选中加载
-  const getPersonData = async (currentIndentity: IIdentity) => {
-    const res = await currentIndentity.loadMembers({
-      offset: 0,
-      filter: '',
-      limit: 65535,
-    });
-    if (res?.result) {
-      //加载身份下的成员
-      setPersonData(res.result);
-      //加载可指派成员
-    } else {
-      setPersonData([]);
-    }
-  };
   // 操作内容渲染函数
-  const renderOperation = (item: MarketTypes.ProductType): common.OperationType[] => {
+  const renderOperation = (item: XTarget) => {
     return [
-      {
-        key: 'remove',
-        label: <span style={{ color: 'red' }}>移除</span>,
-        onClick: async () => {
-          Modal.confirm({
-            title: '提示',
-            content: '是否确认移除该人员',
-            okText: '确认',
-            cancelText: '取消',
-            onOk: async () => {
-              await indentity?.removeMembers([item.id]);
-              getPersonData(indentity!);
-            },
-          });
-        },
-      },
+      isAdmin ? (
+        {
+          key: 'remove',
+          label: <span style={{ color: 'red' }}>移除</span>,
+          onClick: async () => {
+            Modal.confirm({
+              title: '提示',
+              content: '确认移除该人员',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                await indentity?.removeMembers([item.id]);
+                forceUpdate();
+              },
+            });
+          },
+        }
+      ) : (
+        <></>
+      ),
     ];
   };
 
   // 选中树的时候操作
   const setTreeCurrent = async (current: IIdentity) => {
     setIndentity(current);
-    await getPersonData(current);
   };
-  // 身份信息操作
-  const buttons = [
-    <Button
-      key="edit"
-      type="link"
-      onClick={() => {
-        setIsOpenModal(true);
-        setIndentity(indentity);
-      }}>
-      编辑
-    </Button>,
-    <Button
-      key="delete"
-      type="link"
-      onClick={async () => {
-        Modal.confirm({
-          title: '提示',
-          content: '是否确认删除',
-          okText: '确认',
-          cancelText: '取消',
-          onOk: async () => {
-            const success = await current?.deleteIdentity(indentity?.target.id!);
-            if (success) {
-              message.success('删除成功');
-              getDataList();
-              setPersonData([]);
-              setIndentity(undefined);
-            } else {
-              message.error('删除失败');
-            }
-          },
-        });
-      }}>
-      删除
-    </Button>,
-  ];
+  // 角色信息操作
+  const buttons = isAdmin
+    ? [
+        <Button
+          key="edit"
+          type="link"
+          onClick={() => {
+            setIsOpenModal(true);
+            setIndentity(indentity);
+          }}>
+          编辑
+        </Button>,
+        <Button
+          key="delete"
+          type="link"
+          onClick={async () => {
+            Modal.confirm({
+              title: '提示',
+              content: '是否确认删除',
+              okText: '确认',
+              cancelText: '取消',
+              onOk: async () => {
+                const success = await current?.deleteIdentity(indentity?.target.id!);
+                if (success) {
+                  message.success('删除成功');
+                  getDataList();
+                  setIndentity(undefined);
+                } else {
+                  message.error('删除失败');
+                }
+              },
+            });
+          }}>
+          删除
+        </Button>,
+      ]
+    : [];
 
-  // 身份信息内容
+  // 角色信息内容
   const content = (
     <div className={cls['company-dept-content']}>
       <Descriptions
-        title="身份信息"
+        title="角色信息"
         bordered
         column={2}
         size="small"
@@ -150,15 +140,16 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     </div>
   );
   // 按钮
-  const renderBtns = (
+  const renderBtns = isAdmin ? (
     <Button type="link" onClick={async () => setIsOpenAssign(true)}>
-      指派身份
+      指派角色
     </Button>
+  ) : (
+    <></>
   );
+  // 角色信息标题
 
-  // 身份信息标题
-
-  //身份主体
+  //角色主体
   const deptCount = (
     <div className={`${cls['dept-wrap-pages']}`}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
@@ -169,10 +160,13 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
           bordered={false}>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
-              <CardOrTable
-                dataSource={personData as any}
+              <CardOrTable<XTarget>
+                dataSource={[]}
                 rowKey={'id'}
-                total={personData.length || 0}
+                params={key}
+                request={async (page) => {
+                  return await indentity?.loadMembers(page);
+                }}
                 operation={renderOperation}
                 columns={columns as any}
                 parentRef={parentRef}
@@ -188,8 +182,9 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
     <Modal
       open={open}
       width={1424}
-      title="身份设置"
+      title="角色设置"
       destroyOnClose
+      footer={[]}
       bodyStyle={{ padding: 0 }}
       {...other}>
       <Layout style={{ height: 682, overflow: 'hidden' }}>
@@ -199,6 +194,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
             currentKey={indentity ? indentity?.id : ''}
             indentitys={indentitys}
             current={current}
+            isAdmin={isAdmin}
           />
         </Sider>
         <Content style={{ paddingLeft: 4 }}>
@@ -218,7 +214,7 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
               current={current}
             />
             <Modal
-              title="指派身份"
+              title="指派角色"
               open={isOpenAssign}
               width={900}
               destroyOnClose
@@ -229,13 +225,8 @@ const SettingIdentity: React.FC<IndentityManageType & ModalProps> = (props) => {
                 for (const a of currentPerson ? currentPerson : []) {
                   ids.push(a.id);
                 }
-                var boolean = await indentity?.pullMembers(ids);
-                if (boolean) {
-                  getPersonData(indentity!);
-                  message.success('指派身份成功');
-                } else {
-                  message.error('指派身份失败');
-                }
+                await indentity?.pullMembers(ids);
+                forceUpdate();
               }}>
               <AssignPosts searchFn={setPerson} />
             </Modal>

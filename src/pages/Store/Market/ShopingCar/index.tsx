@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '../components/AppCardShopCar';
-import { MarketCallBackTypes } from '@/ts/controller/store/marketCtrl';
+import { MarketTypes } from 'typings/marketType';
 import { Button, Col, Layout, message, Modal, PageHeader, Row, Space } from 'antd';
 import { CheckCircleOutlined, ClearOutlined } from '@ant-design/icons';
 import { CheckCard } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { XMerchandise } from '@/ts/base/schema';
+import { JOIN_SHOPING_CAR } from '@/constants/const';
 
 /**
  * @description: 购物车
@@ -14,17 +15,19 @@ import { XMerchandise } from '@/ts/base/schema';
  */
 
 const ShopingCar: React.FC = () => {
-  const [shopList, setShopList] = useState<XMerchandise[]>([]); // 购物车列表
   const [selectedRowKey, setSelectedRowKey] = useState<any>([]); // 被选中的项
+  const [shopList, setShopList] = useState<any>([]); // 购物车列表
 
   /**
    * @description: 订阅购物车数据变化
    * @return {*}
    */
   useEffect(() => {
-    const id = marketCtrl.subscribePart(MarketCallBackTypes.ApplyData, () => {
-      setShopList([...marketCtrl.shopinglist]);
+    const id = marketCtrl.subscribePart(JOIN_SHOPING_CAR, () => {
+      const arr = marketCtrl.shopinglist || [];
+      setShopList([...arr]);
     });
+
     return () => {
       return marketCtrl.unsubscribe(id);
     };
@@ -34,12 +37,13 @@ const ShopingCar: React.FC = () => {
    * @description: 从购物车中删除商品
    * @return {*}
    */
-  const OnDeleApply = async () => {
-    if (selectedRowKey.length === 0) {
-      message.warning('请选择商品.');
+  const OnDeleApply = async (ids?: string[]) => {
+    if (!ids && selectedRowKey.length === 0) {
+      message.warning('没有需要删除的商品');
       return;
     }
-    await marketCtrl.removeStaging(selectedRowKey);
+    await marketCtrl.deleteStaging(ids ? ids : selectedRowKey);
+    setSelectedRowKey([]);
   };
 
   /**
@@ -48,7 +52,7 @@ const ShopingCar: React.FC = () => {
    */
   const OnCustomBuy = () => {
     if (selectedRowKey.length === 0) {
-      message.warning('请选择商品.');
+      message.warning('请选择商品');
       return;
     }
     Modal.confirm({
@@ -64,9 +68,9 @@ const ShopingCar: React.FC = () => {
    * @param {MarketTypes} dataArr
    * @return {*}
    */
-  const renderCardFun = (dataArr: XMerchandise[]) => {
+  const renderCardFun = (dataArr: MarketTypes.ProductType[]) => {
     if (dataArr) {
-      return dataArr.map((item: XMerchandise) => {
+      return dataArr.map((item: MarketTypes.ProductType) => {
         return (
           <AppCard
             className={cls.card}
@@ -97,8 +101,7 @@ const ShopingCar: React.FC = () => {
             type="text"
             className={cls.clearShop}
             onClick={() => {
-              setSelectedRowKey(shopList);
-              OnDeleApply();
+              OnDeleApply(shopList.map((n: XMerchandise) => n.id));
             }}
             icon={<ClearOutlined />}>
             清除购物车
@@ -133,14 +136,10 @@ const ShopingCar: React.FC = () => {
         </Col>
         <Col span={12}>
           <Space>
-            <Button
-              type="link"
-              style={{ color: 'red' }}
-              danger
-              onClick={() => OnDeleApply()}>
+            <Button type="text" danger onClick={() => OnDeleApply()}>
               删除
             </Button>
-            <Button type="link" onClick={() => OnCustomBuy()}>
+            <Button type="primary" onClick={() => OnCustomBuy()}>
               下单
             </Button>
           </Space>

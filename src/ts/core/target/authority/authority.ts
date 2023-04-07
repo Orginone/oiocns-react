@@ -3,6 +3,7 @@ import { IAuthority } from './iauthority';
 import { AuthorityType } from '../../enum';
 import consts from '@/ts/core/consts';
 import Identity from './identity';
+import { PageRequest } from '@/ts/base/model';
 
 export default class Authority implements IAuthority {
   private _belongId: string;
@@ -15,6 +16,11 @@ export default class Authority implements IAuthority {
     this._belongId = belongId;
     this.children = [];
     this.identitys = [];
+    if (auth.nodes && auth.nodes.length > 0) {
+      for (const item of auth.nodes) {
+        this.children.push(new Authority(item, belongId));
+      }
+    }
   }
 
   private get existAuthority(): string[] {
@@ -50,7 +56,6 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
-      id: '0',
       authId: this.id,
       belongId: this._belongId,
     });
@@ -81,6 +86,7 @@ export default class Authority implements IAuthority {
   public async createSubAuthority(
     name: string,
     code: string,
+    belongId: string,
     ispublic: boolean,
     remark: string,
   ): Promise<model.ResultType<schema.XAuthority>> {
@@ -94,11 +100,19 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: this._belongId,
+      belongId: belongId || this._belongId,
     });
     if (res.success && res.data != undefined) {
       this.children.push(new Authority(res.data, this._belongId));
     }
+    return res;
+  }
+  public async delete(): Promise<model.ResultType<any>> {
+    const res = await kernel.deleteAuthority({
+      id: this.id,
+      belongId: this._belongId,
+      typeName: '',
+    });
     return res;
   }
   public async deleteSubAuthority(id: string): Promise<model.ResultType<any>> {
@@ -150,6 +164,7 @@ export default class Authority implements IAuthority {
     }
     const res = await kernel.queryAuthorityIdentitys({
       id: this._authority.id,
+      spaceId: this.id,
       page: {
         offset: 0,
         filter: '',
@@ -163,23 +178,14 @@ export default class Authority implements IAuthority {
     }
     return this.identitys;
   }
-  public async getSubAuthoritys(reload: boolean = false): Promise<IAuthority[]> {
-    if (!reload && this.children.length > 0) {
-      return this.children;
-    }
-    const res = await kernel.querySubAuthoritys({
+  public async queryAuthorityPerson(
+    spaceId: string,
+    page: PageRequest,
+  ): Promise<model.ResultType<schema.XTargetArray>> {
+    return await kernel.queryPersonByAuthority({
       id: this._authority.id,
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
+      spaceId: spaceId,
+      page: page,
     });
-    if (res.success && res.data.result) {
-      this.children = res.data.result.map((auth) => {
-        return new Authority(auth, this._belongId);
-      });
-    }
-    return this.children;
   }
 }

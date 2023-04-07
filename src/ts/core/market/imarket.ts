@@ -3,7 +3,7 @@ import { XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 import { TargetType } from '../enum';
 export default interface IMarket {
   /** 市场实体 */
-  market: schema.XMarket;
+  target: schema.XMarket;
   /** 可以拉取的成员类型 */
   pullTypes: TargetType[];
   /**
@@ -13,6 +13,7 @@ export default interface IMarket {
    * @param samrId 监管组织/个人
    * @param remark 备注
    * @param ispublic 是否公开
+   * @param photo 照片
    * @returns
    */
   update(
@@ -20,7 +21,10 @@ export default interface IMarket {
     code: string,
     samrId: string,
     remark: string,
-    ispublic: boolean,
+    joinPublic: boolean,
+    sellPublic: boolean,
+    buyPublic: boolean,
+    photo: string,
   ): Promise<boolean>;
   /**
    * 分页获取商店成员

@@ -14,9 +14,7 @@ import {
   VITE_APP_COMPRESS_GZIP,
   VITE_APP_COMPRESS_GZIP_DELETE_FILE,
   VITE_APP_LEGACY,
-  VITE_APP_MOCK,
 } from '../../constant';
-import configMockPlugin from './mock';
 import configVisualizerPlugin from './visualizer';
 
 export function createVitePlugins(viteEnv: string, isBuild: boolean) {
@@ -34,9 +32,6 @@ export function createVitePlugins(viteEnv: string, isBuild: boolean) {
         renderLegacyChunks: true,
       }),
     );
-
-  // vite-plugin-mock
-  VITE_APP_MOCK && vitePlugins.push(configMockPlugin(isBuild));
 
   // vite-plugin-style-import
   // vitePlugins.push(configStyleImportPlugin(isBuild));

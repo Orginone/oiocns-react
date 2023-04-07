@@ -16,23 +16,12 @@ interface Iprops {
  */
 const UserManagement = (props: Iprops) => {
   const [key, setKey] = useState('');
+
   /**
    * @description: 操作内容渲染函数
    * @param {MarketTypes} item
    * @return {*}
    */
-  const renderOperation = (item: XMarketRelation): common.OperationType[] => {
-    return [
-      {
-        key: 'detail',
-        label: '移出',
-        onClick: async () => {
-          await props.current.removeMember([item.id]);
-          setKey(getUuid());
-        },
-      },
-    ];
-  };
 
   return (
     <div id={key} className={cls['user-management']}>
@@ -45,7 +34,18 @@ const UserManagement = (props: Iprops) => {
         request={async (page) => {
           return await props.current.getMember(page);
         }}
-        operation={renderOperation}
+        operation={(item: XMarketRelation): common.OperationType[] => {
+          return [
+            {
+              key: 'detail',
+              label: '移出',
+              onClick: async () => {
+                await props.current.removeMember([item.id]);
+                setKey(getUuid());
+              },
+            },
+          ];
+        }}
       />
     </div>
   );

@@ -7,6 +7,7 @@ import { logger } from '@/ts/base/common';
 import { TargetModel } from '@/ts/base/model';
 
 export default class Group extends BaseTarget implements IGroup {
+  subGroupLoaded: boolean = false;
   subGroup: IGroup[];
   private _onDeleted: Function;
   constructor(target: XTarget, onDeleted: Function) {
@@ -86,18 +87,22 @@ export default class Group extends BaseTarget implements IGroup {
     return false;
   }
   public async getSubGroups(reload: boolean = false): Promise<IGroup[]> {
-    if (!reload && this.subGroup.length > 0) {
+    if (!reload && this.subGroupLoaded) {
       return this.subGroup;
     }
+    this.subGroupLoaded = true;
     const res = await this.getSubTargets([TargetType.Group]);
-    if (res.success && res.data.result) {
-      this.subGroup = res.data.result.map((a) => {
-        return new Group(a, () => {
-          this.subGroup = this.subGroup.filter((item) => {
-            return item.id != a.id;
+    if (res.success) {
+      this.subGroup =
+        res.data.result?.map((a) => {
+          return new Group(a, () => {
+            this.subGroup = this.subGroup.filter((item) => {
+              return item.id != a.id;
+            });
           });
-        });
-      });
+        }) ?? [];
+    } else {
+      this.subGroupLoaded = false;
     }
     return this.subGroup;
   }
