@@ -1,6 +1,6 @@
-import { message, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import {
-  TagOutlined,
+  ForkOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
 import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
-import { createSecretKey } from 'crypto';
+
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -57,6 +57,7 @@ export enum AddNodeType {
   'EMPTY' = 'EMPTY',
   'START' = 'START',
   'ORGANIZATIONAL' = 'ORGANIZATIONAL',
+  'WORKFLOW' = 'WORKFLOW',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -67,6 +68,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
   [AddNodeType.ORGANIZATIONAL]: '组织网关',
+  [AddNodeType.WORKFLOW]: '子流程',
 };
 
 /**
@@ -121,6 +123,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       {props.type === AddNodeType.APPROVAL && (
         <UsergroupAddOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
+        />
+      )}
+      {props.type === AddNodeType.WORKFLOW && (
+        <ForkOutlined
+          style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
         />
       )}
       {props.type === AddNodeType.CC && (
@@ -216,9 +223,8 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         <Tooltip
           title={
             <span>
-              创建组织:{' '}
+              创建组织:
               {
-                // userCtrl.getBelongName(props.belongId || '')
                 userCtrl.getBelongName(props.belongId || '')
               }
             </span>

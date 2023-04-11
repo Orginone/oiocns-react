@@ -189,7 +189,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
       </div>
       <Modal
         width="650px"
-        title="添加角色"
+        title="选择角色"
         open={isOpen}
         destroyOnClose={true}
         onOk={() => {

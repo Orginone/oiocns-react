@@ -4,6 +4,7 @@ import { useAppwfConfig } from './flow';
 import { message } from 'antd';
 import Root from '../Process/RootNode';
 import Approval from '../Process/ApprovalNode';
+import WorkFlow from '../Process/WorkFlowNode';
 import Cc from '../Process/CcNode';
 import Concurrent from '../Process/ConcurrentNode';
 import DeptWay from '../Process/DeptWayNode';
@@ -182,6 +183,8 @@ const ProcessTree: React.FC<IProps> = ({
       return Node;
     } else if (comp == 'approval') {
       return Approval;
+    } else if (comp == 'workflow') {
+      return WorkFlow;
     } else if (comp == 'cc') {
       return Cc;
     } else if (comp == 'concurrent') {
@@ -305,6 +308,7 @@ const ProcessTree: React.FC<IProps> = ({
       node &&
       (node.type === 'ROOT' ||
         node.type === 'APPROVAL' ||
+        node.type === 'WORKFLOW' ||
         node.type === 'CC' ||
         node.type === 'DELAY' ||
         node.type === 'TRIGGER')
@@ -375,7 +379,6 @@ const ProcessTree: React.FC<IProps> = ({
   const insertNode = (type: any, parentNode: any) => {
     // ctx.refs['_root'].click()
     //缓存一下后面的节点
-
     let afterNode = parentNode.children;
     //插入新节点
     parentNode.children = {
@@ -405,6 +408,9 @@ const ProcessTree: React.FC<IProps> = ({
         break;
       case 'ORGANIZATIONAL':
         insertDeptGateWayNode(parentNode);
+        break;
+      case 'WORKFLOW':
+        insertWorkFlowNode(parentNode);
         break;
       default:
         break;
@@ -505,6 +511,10 @@ const ProcessTree: React.FC<IProps> = ({
         name: '其他',
       },
     ];
+  };
+  const insertWorkFlowNode = (parentNode: any) => {
+    parentNode.children.name = '子流程';
+    parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertConcurrentsNode = (parentNode: any) => {
     parentNode.children.name = '并行分支';

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
+import WorkFlowNode from './components/WorkFlowNode';
 import CcNode from './components/CcNode';
 import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
@@ -77,6 +78,14 @@ const FlowDrawer: React.FC<IProps> = ({
         case AddNodeType.APPROVAL:
           return (
             <ApprovalNode
+              current={current}
+              orgId={operateOrgId || designOrgId}
+              species={species}
+            />
+          );
+        case AddNodeType.WORKFLOW:
+          return (
+            <WorkFlowNode
               current={current}
               orgId={operateOrgId || designOrgId}
               species={species}
