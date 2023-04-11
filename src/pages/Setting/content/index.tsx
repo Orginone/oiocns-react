@@ -5,6 +5,7 @@ import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import AuthoritySetting from './Authority';
+import PropertySetting from './Property';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import React from 'react';
@@ -28,6 +29,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       return <CohortSetting current={selectMenu.item} />;
     case GroupMenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
+    case GroupMenuType.Property:
+      return <PropertySetting />;
     case GroupMenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
     default:

@@ -9,6 +9,7 @@ import {
 } from '../../core/';
 import { kernel, schema } from '@/ts/base';
 import { badRequest, ResultType } from '@/ts/base/model';
+import { Property } from '@/ts/core/thing/property';
 
 /**
  * 物的控制器
@@ -16,6 +17,7 @@ import { badRequest, ResultType } from '@/ts/base/model';
 class ThingController extends Emitter {
   public species: INullSpeciesItem;
   public speciesList: ISpeciesItem[] = [];
+  public property: Property | undefined;
 
   private lookForAll(data: any[], arr: any[]): any[] {
     for (let item of data) {
@@ -30,6 +32,7 @@ class ThingController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.Company], () => {
+      this.property = new Property(userCtrl.space.id);
       setTimeout(async () => {
         await this.loadSpeciesTree(true);
       }, 100);

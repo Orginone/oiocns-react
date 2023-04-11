@@ -260,6 +260,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 创建元属性
+   * @param {model.PropertyModel} params 请求参数
+   * @returns {model.ResultType<schema.XProperty>} 请求结果
+   */
+  public async createProperty(
+    params: model.PropertyModel,
+  ): Promise<model.ResultType<schema.XProperty>> {
+    return await this.request({
+      module: 'thing',
+      action: 'CreateProperty',
+      params: params,
+    });
+  }
+  /**
    * 创建度量标准
    * @param {model.AttributeModel} params 请求参数
    * @returns {model.ResultType<schema.XAttribute>} 请求结果
@@ -492,6 +506,20 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'ThingRemoveAttribute',
+      params: params,
+    });
+  }
+  /**
+   * 根据id查询分类
+   * @param {model.IdArrayReq} params 请求参数
+   * @returns {model.ResultType<schema.XPropertyArray>} 请求结果
+   */
+  public async queryPropertys(
+    params: model.IDBelongReq,
+  ): Promise<model.ResultType<schema.XPropertyArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QueryPropertys',
       params: params,
     });
   }

@@ -12,6 +12,7 @@ import { Modal } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
 import AuthorityModal from './content/Authority/AuthorityModal';
+import PropertyModal from './components/propertyModal';
 import { SettingOutlined } from '@ant-design/icons';
 import thingCtrl from '@/ts/controller/thing';
 
@@ -168,6 +169,23 @@ const TeamSetting: React.FC = () => {
             }
           }}
           current={selectMenu.item}
+        />
+      )}
+      {/** 权限模态框 */}
+      {selectMenu.itemType == '属性' && (
+        <PropertyModal
+          title={operateKeys[0] + selectMenu.itemType}
+          open={operateKeys[0] === '新增属性'}
+          handleCancel={function (): void {
+            setOperateKeys(['']);
+          }}
+          handleOk={(newItem) => {
+            if (newItem) {
+              refreshMenu();
+              setOperateKeys(['']);
+            }
+          }}
+          data={undefined}
         />
       )}
       {/* 分类转字典 */}

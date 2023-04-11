@@ -352,12 +352,8 @@ export type AttributeModel = {
   code: string;
   // 公开的
   public: boolean;
-  // 值类型
-  valueType: string;
   // 单位
   unit: string;
-  // 选择字典的类型ID
-  dictId: string;
   // 备注
   remark: string;
   // 创建组织/个人
@@ -368,6 +364,25 @@ export type AttributeModel = {
   speciesCode: string;
   // 工作权限Id
   authId: string;
+};
+
+export type PropertyModel = {
+  // 唯一ID
+  id?: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 值类型
+  valueType: string;
+  // 单位
+  unit: string;
+  // 选择字典的类型ID
+  dictId: string;
+  // 备注
+  remark: string;
+  // 创建组织/个人
+  belongId: string;
 };
 
 export type OperationModel = {

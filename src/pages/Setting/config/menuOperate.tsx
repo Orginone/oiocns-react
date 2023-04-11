@@ -144,6 +144,22 @@ export const loadStandardSetting = async () => {
       icon: <im.ImNewspaper />,
     });
   }
+  result.push({
+    children: [],
+    key: '属性定义',
+    label: '属性定义',
+    itemType: GroupMenuType.Property,
+    item: userCtrl.space,
+    icon: <im.ImNewspaper />,
+    menus: [
+      {
+        key: '新增属性',
+        icon: <im.ImPlus />,
+        label: '新增属性',
+        model: 'outside',
+      },
+    ],
+  });
   const species = await thingCtrl.loadSpeciesTree(true);
   if (species) {
     result.push({

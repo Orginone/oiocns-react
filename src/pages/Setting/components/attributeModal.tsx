@@ -7,6 +7,8 @@ import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import { targetsToTreeData } from '..';
 import { getUuid } from '@/utils/tools';
+import thing from '@/ts/controller/thing';
+import { common } from '@/ts/base';
 
 interface Iprops {
   title: string;
@@ -21,7 +23,6 @@ interface Iprops {
   特性编辑模态框
 */
 const AttributeModal = (props: Iprops) => {
-  const [selectType, setSelectType] = useState<string>();
   const { open, title, handleOk, data, current, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
   const [formKey, setFormKey] = useState<string>();
@@ -42,6 +43,25 @@ const AttributeModal = (props: Iprops) => {
         dataIndex: 'code',
         formItemProps: {
           rules: [{ required: true, message: '特性代码为必填项' }],
+        },
+      },
+      {
+        title: '选择属性',
+        dataIndex: 'propId',
+        valueType: 'select',
+        formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
+        request: async () => {
+          const res = await thing.property?.loadPropertys({
+            offset: 0,
+            limit: common.Constants.MAX_UINT_16,
+            filter: '',
+          });
+          if (res && res.result && res.result.length > 0) {
+            return res.result.map((item) => {
+              return { label: item.name, value: item.id };
+            });
+          }
+          return [];
         },
       },
       {
@@ -97,72 +117,7 @@ const AttributeModal = (props: Iprops) => {
           rules: [{ required: true, message: '是否公开为必填项' }],
         },
       },
-      {
-        title: '特性类型',
-        dataIndex: 'valueType',
-        valueType: 'select',
-        fieldProps: {
-          options: [
-            {
-              value: '数值型',
-              label: '数值型',
-            },
-            {
-              value: '描述型',
-              label: '描述型',
-            },
-            {
-              value: '选择型',
-              label: '选择型',
-            },
-            {
-              value: '分类型',
-              label: '分类型',
-            },
-            {
-              value: '附件型',
-              label: '附件型',
-            },
-            {
-              value: '日期型',
-              label: '日期型',
-            },
-            {
-              value: '时间型',
-              label: '时间型',
-            },
-            {
-              value: '用户型',
-              label: '用户型',
-            },
-          ],
-          onSelect: (select: string) => {
-            setSelectType(select);
-          },
-        },
-        formItemProps: {
-          rules: [{ required: true, message: '特性类型为必填项' }],
-        },
-      },
     ];
-    if (selectType === '选择型') {
-      columns.push({
-        title: '选择枚举分类',
-        dataIndex: 'dictId',
-        valueType: 'select',
-        formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
-        request: async () => {
-          const res = await current.loadDicts(false);
-          return res.map((item) => {
-            return { id: item.id, label: item.name, value: item.id };
-          });
-        },
-        fieldProps: {
-          disabled: selectType !== '选择型',
-          showSearch: true,
-        },
-      });
-    }
     columns.push({
       title: '特性定义',
       dataIndex: 'remark',
@@ -186,7 +141,6 @@ const AttributeModal = (props: Iprops) => {
           // console.log('props.target?.id', props.target?.id);
           // formRef.current?.setFieldsValue({ belongId: props.target?.id });
           if (title.includes('修改')) {
-            setSelectType(data?.valueType);
             formRef.current?.setFieldsValue(data);
           }
         } else {
