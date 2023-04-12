@@ -7,6 +7,7 @@ import { ISpeciesItem } from '@/ts/core';
 import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
+import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
   current: NodeType;
@@ -82,15 +83,23 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             message.warn('请选择办事');
             return;
           }
+          let name =
+            selectChildWork.name +
+            ' [' +
+            userCtrl.findTeamInfoById(selectChildWork.belongId).name +
+            ']';
           props.current.props.assignedUser = [
-            { name: selectChildWork.name, id: selectChildWork.id },
+            {
+              name: name,
+              id: selectChildWork.id,
+            },
           ];
           setCurrentData({
-            title: selectChildWork.name,
+            title: name,
             key: selectChildWork.id,
             data: {
               id: selectChildWork.id,
-              name: selectChildWork.name,
+              name: name,
             },
           });
           setIsOpen(false);
