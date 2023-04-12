@@ -54,7 +54,6 @@ const Design: React.FC<IProps> = ({
   setInstance,
   setModalType,
   onBack,
-  testModel,
   defaultEditable = true,
 }: IProps) => {
   const [scale, setScale] = useState<number>(90);
@@ -277,14 +276,7 @@ const Design: React.FC<IProps> = ({
       if (rootNode.destId == undefined) {
         errors.push(getErrorItem('ROOT节点缺少角色'));
       }
-      // let companyApprovalNodes = allNodes.filter(
-      //   (item) => item.type == 'APPROVAL' && item.belongId == rootNode.belongId,
-      // );
-      // if (companyApprovalNodes.length == 0) {
-      //   errors.push(getErrorItem('至少需要一个审批节点'));
-      // }
     }
-
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
       if (!node.belongId && node.type != 'ROOT') {

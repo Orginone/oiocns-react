@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
-import { Row, Button, Space, Modal } from 'antd';
+import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import { ISpeciesItem } from '@/ts/core';
@@ -22,7 +22,7 @@ interface IProps {
 
 const WorkFlowNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-
+  const [selectChildWork, setSelectChildWork] = useState<schema.XFlowDefine>();
   const [currentData, setCurrentData] = useState({
     title: props.current.props.assignedUser[0]?.name,
     key: props.current.props.assignedUser[0]?.id,
@@ -77,20 +77,29 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
         title="选择其他办事"
         open={isOpen}
         destroyOnClose={true}
-        footer={[]}
+        onOk={() => {
+          if (!selectChildWork) {
+            message.warn('请选择办事');
+            return;
+          }
+          props.current.props.assignedUser = [
+            { name: selectChildWork.name, id: selectChildWork.id },
+          ];
+          setCurrentData({
+            title: selectChildWork.name,
+            key: selectChildWork.id,
+            data: {
+              id: selectChildWork.id,
+              name: selectChildWork.name,
+            },
+          });
+          setIsOpen(false);
+        }}
         onCancel={() => setIsOpen(false)}>
         <WorkSelectTable
           disableIds={props.disableIds}
           searchFn={(params: schema.XFlowDefine) => {
-            props.current.props.assignedUser = [{ name: params.name, id: params.id }];
-            setCurrentData({
-              title: params.name,
-              key: params.id,
-              data: {
-                id: params.id,
-                name: params.name,
-              },
-            });
+            setSelectChildWork(params);
           }}
         />
       </Modal>
