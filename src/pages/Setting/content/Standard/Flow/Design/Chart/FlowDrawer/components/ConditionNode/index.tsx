@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import { dataType, FieldCondition, NodeType } from '../../processType';
 import ConditionGroupItemConfig from '../ConditionGroupItemConfig';
-import userCtrl from '@/ts/controller/setting';
 
 interface Iprops {
   current: NodeType;

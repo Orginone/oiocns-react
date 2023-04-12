@@ -8,7 +8,7 @@ import { Button, message, Modal } from 'antd';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import { PageRequest } from '@/ts/base/model';
-import JoinSearch from '@/bizcomponents/SearchCompany';
+import SearchCompany from '@/bizcomponents/SearchCompany';
 import userCtrl from '@/ts/controller/setting';
 import { XMarket, XTarget } from '@/ts/base/schema';
 import { MenuItemType } from 'typings/globelType';
@@ -66,7 +66,7 @@ const CommonApply: React.FC<IProps> = (props) => {
       case WorkType.CompanyApply:
       case WorkType.GroupApply:
       case WorkType.CohortApply:
-        return <JoinSearch searchCallback={setSelectTarget} searchType={targetType} />;
+        return <SearchCompany searchCallback={setSelectTarget} searchType={targetType} />;
       case WorkType.JoinStoreApply:
         return (
           <SearchShop
@@ -164,11 +164,11 @@ const CommonApply: React.FC<IProps> = (props) => {
                   (target as XTarget).typeName as TargetType,
                 );
                 break;
-              case WorkType.FriendApply:
-                success = await userCtrl.user.applyFriend(target as XTarget);
-                break;
               case WorkType.CohortApply:
                 success = await userCtrl.user.applyJoinCohort(target.id);
+                break;
+              case WorkType.FriendApply:
+                success = await userCtrl.user.applyFriend(target as XTarget);
                 break;
               case WorkType.GroupApply:
                 success = await userCtrl.company.applyJoinGroup(target.id);

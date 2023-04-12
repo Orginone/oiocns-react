@@ -1,20 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { IApplyItem, IApprovalItem, ITodoGroup } from '@/ts/core/todo/itodo';
 import { CommonStatus } from '@/ts/core';
 import { PageRequest } from '@/ts/base/model';
 import { ProColumns } from '@ant-design/pro-components';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { Button, Space } from 'antd';
 import PageCard from '@/components/PageCard';
 import { CardTabListType } from 'antd/lib/card';
 import cls from './index.module.less';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
+import todoCtrl from '@/ts/controller/todo/todoCtrl';
 
 // 卡片渲染
 interface IProps {
   todoGroup: ITodoGroup;
   reflashMenu: () => void;
-  tabList?: CardTabListType[];
+  tabList: CardTabListType[];
   columns: ProColumns<IApprovalItem>[];
 }
 /**
@@ -22,65 +23,57 @@ interface IProps {
  * @returns
  */
 const CommonTodo: React.FC<IProps> = (props) => {
-  const parentRef = useRef<any>(null);
-  const [tabKey, setTabKey] = useState('');
-  const [key, forceUpdate] = useObjectUpdate(props);
+  const [tabKey, setTabKey] = useState<string>(props.tabList[0].key);
+  const [key] = useObjectUpdate(props);
   const [selectedRows, setSelectRows] = useState<IApplyItem[] | IApprovalItem[]>([]);
 
   useEffect(() => {
-    if (props.tabList && props.tabList.length > 0) {
-      setTabKey(props.tabList[0].key);
-    }
+    let tabs = props.tabList.find((a) => a.key == todoCtrl.tabIndex);
+    setTabKey(tabs?.key ?? props.tabList[0].key);
   }, [props]);
-  const operation = () => {
-    switch (tabKey) {
-      case 'todo':
-      case 'complete':
-        return (
-          <Space>
-            <Button
-              type="link"
-              onClick={async () => {
-                let rows = selectedRows as IApprovalItem[];
-                rows.forEach(async (a) => {
-                  await (a as IApprovalItem).pass(CommonStatus.ApproveStartStatus, '');
-                });
-                forceUpdate();
-                props.reflashMenu();
-              }}>
-              同意
-            </Button>
-            <Button
-              type="link"
-              onClick={async () => {
-                selectedRows.forEach(async (a) => {
-                  await (a as IApprovalItem).reject(CommonStatus.RejectStartStatus, '');
-                });
-                forceUpdate();
-                props.reflashMenu();
-              }}
-              style={{ color: 'red' }}>
-              拒绝
-            </Button>
-          </Space>
-        );
-      default:
-        return <></>;
-    }
-  };
+
+  const operation = (
+    <Space>
+      <Button
+        type="link"
+        onClick={async () => {
+          let rows = selectedRows as IApprovalItem[];
+          rows.forEach(async (a) => {
+            await (a as IApprovalItem).pass(CommonStatus.ApproveStartStatus, '');
+          });
+          todoCtrl.changCallback();
+        }}>
+        同意
+      </Button>
+      <Button
+        type="link"
+        onClick={async () => {
+          selectedRows.forEach(async (a) => {
+            await (a as IApprovalItem).reject(CommonStatus.RejectStartStatus, '');
+          });
+          todoCtrl.changCallback();
+        }}
+        style={{ color: 'red' }}>
+        拒绝
+      </Button>
+    </Space>
+  );
 
   return (
     <PageCard
       bordered={false}
       tabList={props.tabList}
-      onTabChange={(key) => setTabKey(key)}
-      tabBarExtraContent={operation()}>
-      <div className={cls['page-content-table']} ref={parentRef}>
+      activeTabKey={tabKey}
+      onTabChange={(key) => {
+        setTabKey(key);
+        todoCtrl.setTabIndex(key);
+      }}
+      tabBarExtraContent={operation}>
+      <div className={cls['page-content-table']}>
         <CardOrTableComp<IApprovalItem>
           key={key}
           dataSource={[]}
           params={tabKey}
-          parentRef={parentRef}
           rowKey={(record: IApprovalItem) => record.Data?.id}
           columns={props.columns}
           request={async (page: PageRequest) => {
@@ -96,43 +89,37 @@ const CommonTodo: React.FC<IProps> = (props) => {
               }
               case 'complete':
                 return await props.todoGroup.getDoList(page);
-              default:
-                return { total: 0, result: [], offset: page.offset, limit: page.limit };
             }
           }}
           operation={(item: IApprovalItem) => {
-            switch (tabKey) {
-              case 'todo':
-              case 'complete':
-                return [
-                  {
-                    key: 'approve',
-                    label: '同意',
-                    onClick: async () => {
-                      await (item as IApprovalItem).pass(
-                        CommonStatus.ApproveStartStatus,
-                        '',
-                      );
-                      forceUpdate();
-                      props.reflashMenu();
-                    },
-                  },
-                  {
-                    key: 'refuse',
-                    label: '拒绝',
-                    onClick: async () => {
-                      await (item as IApprovalItem).reject(
-                        CommonStatus.RejectStartStatus,
-                        '',
-                      );
-                      forceUpdate();
-                      props.reflashMenu();
-                    },
-                  },
-                ];
-              default:
-                return [];
-            }
+            return [
+              {
+                key: 'approve',
+                label: '同意',
+                onClick: async () => {
+                  let res = await(item as IApprovalItem).pass(
+                    CommonStatus.ApproveStartStatus,
+                    '',
+                  );
+                  if (res) {
+                    todoCtrl.changCallback();
+                  }
+                },
+              },
+              {
+                key: 'refuse',
+                label: '拒绝',
+                onClick: async () => {
+                  let res = await(item as IApprovalItem).reject(
+                    CommonStatus.RejectStartStatus,
+                    '',
+                  );
+                  if (res) {
+                    todoCtrl.changCallback();
+                  }
+                },
+              },
+            ];
           }}
           rowSelection={{
             type: 'checkbox',

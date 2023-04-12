@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import userCtrl from '@/ts/controller/setting';
 interface IProps {
   current: NodeType;
   orgId?: string;

@@ -19,13 +19,13 @@ interface IProps {
 const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
   switch (selectMenu.itemType) {
     case WorkType.FriendTodo:
-    case WorkType.CohortTodo:
     case WorkType.CompanyTodo:
+    case WorkType.CohortTodo:
     case WorkType.GroupTodo:
       return (
         <CommonTodo
           todoGroup={selectMenu.item}
-          columns={OrgColumns(selectMenu.itemType) as ProColumns<IApprovalItem>[]}
+          columns={OrgColumns as ProColumns<IApprovalItem>[]}
           reflashMenu={reflashMenu}
           tabList={[
             { key: 'todo', tab: '待办' },
@@ -67,7 +67,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
         <CommonApply
           menu={selectMenu}
           todoGroup={loadOrgApply(userCtrl.space, selectMenu.itemType as WorkType)}
-          columns={OrgColumns(selectMenu.itemType) as ProColumns<IApplyItem>[]}
+          columns={OrgColumns as ProColumns<IApplyItem>[]}
           reflashMenu={reflashMenu}
         />
       );

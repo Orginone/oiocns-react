@@ -117,7 +117,6 @@ const FlowList: React.FC<IProps> = ({
                     .slice(page.offset, page.offset + page.limit)
                     .map((a) => a.target),
                 };
-                return;
               }}
               operation={renderOperation}
               rowKey={(record: XFlowDefine) => record.id}

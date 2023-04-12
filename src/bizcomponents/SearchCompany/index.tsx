@@ -19,10 +19,6 @@ type CompanySearchTableProps = {
   searchCallback: (target: XTarget[]) => void;
 };
 
-type PersonInfoCardProps = {
-  target: XTarget;
-};
-
 /*
   弹出框表格查询
 */
@@ -38,29 +34,29 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       case TargetType.Person:
         setSearchPlace('请输入用户的账号');
         break;
-      case TargetType.Cohort:
-        setSearchPlace('请输入群的代码');
-        break;
       case TargetType.Company:
         setSearchPlace('请输入单位的社会统一信用代码');
         break;
       case TargetType.Group:
         setSearchPlace('请输入集团的编码');
         break;
+      case TargetType.Cohort:
+        setSearchPlace('请输入群组的编码');
+        break;
     }
   }, []);
 
-  // 人员卡片渲染
+  // 单位卡片渲染
   const personInfoList = () => {
     return (
       <CheckCard.Group
         bordered={false}
         multiple
         style={{ width: '100%' }}
-        onChange={(value) => {
+        onChange={(value: string[]) => {
           let checkObjs: XTarget[] = [];
           for (const target of dataSource) {
-            if ((value as string[]).includes(target.id)) {
+            if (value.includes(target.id)) {
               checkObjs.push(target);
             }
           }
@@ -70,13 +66,13 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
           {dataSource.map((item) => (
             <Col span={24} key={item.id}>
               {tableProps.searchType === TargetType.Person && (
-                <PersonInfoCard key={item.id} target={item} />
-              )}
-              {tableProps.searchType === TargetType.Group && (
-                <GroupCard key={item.id} target={item} />
+                <PersonCard key={item.id} target={item} />
               )}
               {tableProps.searchType === TargetType.Cohort && (
                 <CohortCard key={item.id} target={item} />
+              )}
+              {tableProps.searchType === TargetType.Group && (
+                <GroupCard key={item.id} target={item} />
               )}
               {[
                 TargetType.Company,
@@ -98,7 +94,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
    * @param person 人员
    * @returns
    */
-  const PersonInfoCard: React.FC<PersonInfoCardProps> = ({ target }) => (
+  const PersonCard: React.FC<{ target: XTarget }> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
@@ -124,32 +120,39 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
     />
   );
 
-  // 集团卡片渲染
-  const CohortCard: React.FC<PersonInfoCardProps> = ({ target }) => (
+  /**
+   * 群组名片
+   * @param person 人员
+   * @returns
+   */
+  const CohortCard: React.FC<{ target: XTarget }> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
       className={`${styles.card}`}
-      avatar={
-        <TeamIcon
-          share={new Company(target, userCtrl.user.id).shareInfo}
-          size={60}
-          preview={true}
-        />
-      }
+      avatar={<TeamIcon share={new Person(target).shareInfo} size={60} preview={true} />}
       title={
         <Space>
           {target.name}
-          <Tag color="blue">群编码：{target.code}</Tag>
+          <Tag color="blue">编号：{target.code}</Tag>
         </Space>
       }
       value={target.id}
-      description={`群简介:${target.team?.remark}`}
+      key={target.id}
+      description={
+        <Descriptions column={2} size="small" style={{ marginTop: 16 }}>
+          <Descriptions.Item label="群名称">{target.team?.name}</Descriptions.Item>
+          <Descriptions.Item label="群编号">{target.team?.code}</Descriptions.Item>
+          <Descriptions.Item label="群签名" span={2}>
+            {target.team?.remark}
+          </Descriptions.Item>
+        </Descriptions>
+      }
     />
   );
 
   // 单位卡片渲染
-  const CompanyCard: React.FC<PersonInfoCardProps> = ({ target }) => (
+  const CompanyCard: React.FC<{ target: XTarget }> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
@@ -173,7 +176,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   );
 
   // 集团卡片渲染
-  const GroupCard: React.FC<PersonInfoCardProps> = ({ target }) => (
+  const GroupCard: React.FC<{ target: XTarget }> = ({ target }) => (
     <CheckCard
       bordered
       style={{ width: '100%' }}
@@ -209,9 +212,6 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
               case TargetType.Person:
                 res = await userCtrl.user.searchPerson(event.target.value);
                 break;
-              case TargetType.Cohort:
-                res = await userCtrl.user.searchCohort(event.target.value);
-                break;
               case TargetType.Company:
               case TargetType.University:
               case TargetType.Hospital:
@@ -219,6 +219,9 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
                 break;
               case TargetType.Group:
                 res = await userCtrl.company.searchGroup(event.target.value);
+                break;
+              case TargetType.Cohort:
+                res = await userCtrl.user.searchCohort(event.target.value);
                 break;
             }
             // 个人 查询公司 查询人， 公司查询集团

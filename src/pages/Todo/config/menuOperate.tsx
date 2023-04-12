@@ -6,8 +6,6 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import thingCtrl from '@/ts/controller/thing';
 import { ToTopOutlined } from '@ant-design/icons';
 import { MenuItemType } from 'typings/globelType';
-import { getUuid } from '@/utils/tools';
-import setting from '@/ts/controller/setting';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
@@ -26,28 +24,28 @@ export const loadPlatformTodoMenu = async () => {
       children: [
         ...friendTodo.children,
         {
-          key: WorkType.CohortTodo,
+          key: '群组待办',
           label: '群组',
-          itemType: WorkType.CohortTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...cohortTodo,
         },
         {
-          key: WorkType.CompanyTodo,
+          key: '单位待办',
           label: '单位',
-          itemType: WorkType.CompanyTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...companyTodo,
         },
         {
-          key: WorkType.GroupTodo,
+          key: '集团待办',
           label: '集团',
-          itemType: WorkType.GroupTodo,
+          itemType: WorkType.OrgTodo,
           icon: <im.ImTree />,
           ...groupTodo,
         },
       ],
-      count: friendTodo.count + companyTodo.count + groupTodo.count,
+      count: friendTodo.count + companyTodo.count + cohortTodo.count + groupTodo.count,
     },
     {
       key: WorkType.StoreTodo,
@@ -95,45 +93,42 @@ export const getCommonSpeciesMenus = () => {
 };
 
 export const loadPlatformApplyMenu = async () => {
-  let children = [
-    {
-      key: WorkType.FriendApply,
-      label: '加好友',
-      itemType: WorkType.FriendApply,
-      icon: <im.ImTree />,
-      children: [],
-    },
-    {
-      key: WorkType.CohortApply,
-      label: '加入群',
-      itemType: WorkType.CohortApply,
-      icon: <im.ImTree />,
-      children: [],
-    },
-    {
-      key: WorkType.CompanyApply,
-      label: '加单位',
-      itemType: WorkType.CompanyApply,
-      icon: <im.ImTree />,
-      children: [],
-    },
-  ];
-  if (setting.isCompanySpace) {
-    children.push({
-      key: WorkType.GroupApply,
-      label: '加集团',
-      itemType: WorkType.GroupApply,
-      icon: <im.ImTree />,
-      children: [],
-    });
-  }
   return [
     {
       key: WorkType.OrgApply,
       label: '组织',
       itemType: WorkType.OrgApply,
       icon: <im.ImTree />,
-      children: children,
+      children: [
+        {
+          key: WorkType.FriendApply,
+          label: '加好友',
+          itemType: WorkType.FriendApply,
+          icon: <im.ImTree />,
+          children: [],
+        },
+        {
+          key: WorkType.CohortApply,
+          label: '加群组',
+          itemType: WorkType.CohortApply,
+          icon: <im.ImTree />,
+          children: [],
+        },
+        {
+          key: WorkType.CompanyApply,
+          label: '加单位',
+          itemType: WorkType.CompanyApply,
+          icon: <im.ImTree />,
+          children: [],
+        },
+        {
+          key: WorkType.GroupApply,
+          label: '加集团',
+          itemType: WorkType.GroupApply,
+          icon: <im.ImTree />,
+          children: [],
+        },
+      ],
     },
     {
       key: WorkType.StoreApply,
@@ -193,7 +188,7 @@ const loadChildren = async (todoGroups: ITodoGroup[]) => {
     let count = todoGroup.id ? await todoGroup.getCount() : 0;
     children.push({
       icon: icon,
-      key: getUuid(),
+      key: todoGroup.name + todoGroup.type,
       label: todoGroup.name,
       itemType: todoGroup.type,
       item: todoGroup,
