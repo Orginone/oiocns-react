@@ -3,7 +3,6 @@ import { SettingOutlined } from '@ant-design/icons';
 import { Row, Button, Space, Modal } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem } from '@/ts/core';
 import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
@@ -24,10 +23,6 @@ interface IProps {
 const WorkFlowNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
 
-  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || userCtrl.space.id,
-  );
-
   const [currentData, setCurrentData] = useState({
     title: props.current.props.assignedUser[0]?.name,
     key: props.current.props.assignedUser[0]?.id,
@@ -38,7 +33,6 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
   });
   useEffect(() => {
     if (!props.current.belongId) {
-      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
       props.current.belongId = props.orgId;
     }
   }, []);
@@ -79,13 +73,11 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       </div>
 
       <Modal
-        width="900px"
+        width="80%"
         title="选择其他办事"
         open={isOpen}
         destroyOnClose={true}
-        onOk={() => {
-          setIsOpen(false);
-        }}
+        footer={[]}
         onCancel={() => setIsOpen(false)}>
         <WorkSelectTable
           disableIds={props.disableIds}

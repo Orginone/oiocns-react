@@ -156,8 +156,6 @@ const Design: React.FC<IProps> = ({
           };
         }
         if (instance) {
-          // let res = await species?.loadFlowInstances(true);
-          // let instance_: any = res[0];
           setInstance(instance);
           showTask(instance, resourceData);
         } else {
@@ -287,7 +285,7 @@ const Design: React.FC<IProps> = ({
       // }
     }
 
-    //每个节点的 belongId  审核和抄送的destId
+    //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
       if (!node.belongId && node.type != 'ROOT') {
         errors.push(
@@ -299,13 +297,13 @@ const Design: React.FC<IProps> = ({
         );
       }
       if (
-        (node.type == 'APPROVAL' || node.type == 'CC') &&
+        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
         (!node.destId || node.destId == '0' || node.destId == '')
       ) {
         errors.push(
           getErrorItem(
             <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作者
+              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
             </>,
           ),
         );
@@ -381,6 +379,7 @@ const Design: React.FC<IProps> = ({
           break;
         case '组织':
           resource.type = 'ORGANIZATIONAL';
+          break;
         case '子流程':
           resource.type = 'CHILDWORK';
           break;
@@ -766,6 +765,7 @@ const Design: React.FC<IProps> = ({
                   <ChartDesign
                     disableIds={[current?.id || '']}
                     // key={key}
+                    current={current}
                     defaultEditable={defaultEditable}
                     species={species}
                     operateOrgId={operateOrgId}

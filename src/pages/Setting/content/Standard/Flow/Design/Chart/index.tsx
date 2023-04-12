@@ -4,8 +4,10 @@ import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
 import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType';
 import { ISpeciesItem } from '@/ts/core';
+import { XFlowDefine } from '@/ts/base/schema';
 
 interface IProps {
+  current: XFlowDefine | undefined;
   operateOrgId?: string;
   designOrgId?: string;
   scale?: number;
@@ -41,6 +43,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
                   params.type !== AddNodeType.ORGANIZATIONA
                 ) {
                   //设置当前操作的节点，后续都是对当前节点的操作
+                  params.designId = props.current?.id;
                   setCurrentNode(params);
                   setIsOpen(true);
                 } else {
