@@ -5,6 +5,8 @@ import {
   SendOutlined,
   ClusterOutlined,
   HighlightOutlined,
+  ApartmentOutlined,
+  ForkOutlined,
 } from '@ant-design/icons';
 import React from 'react';
 import cls from './index.module.less';
@@ -52,6 +54,18 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
   const addConcurrentsNode = () => {
     props.onInsertNode('CONCURRENTS');
     // FlowSub.emit('insertNode', 'CONCURRENTS');
+  };
+  /**
+   * 组织网关
+   */
+  const addDeptGateWayNode = () => {
+    props.onInsertNode('ORGANIZATIONAL');
+  };
+  /**
+   * 子流程
+   */
+  const addWorkFlowNode = () => {
+    props.onInsertNode('WORKFLOW');
   };
 
   const content = (
@@ -103,6 +117,30 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
           }}
         />
         <span>同时审核</span>
+      </div>
+      <div onClick={addDeptGateWayNode}>
+        <ApartmentOutlined
+          style={{
+            color: '#7f6dac',
+            fontSize: '20px',
+            position: 'absolute',
+            top: '18px',
+            left: '25px',
+          }}
+        />
+        <span>组织网关</span>
+      </div>
+      <div onClick={addWorkFlowNode}>
+        <ForkOutlined
+          style={{
+            color: 'rgb(21, 188, 131)',
+            fontSize: '20px',
+            position: 'absolute',
+            top: '18px',
+            left: '25px',
+          }}
+        />
+        <span>子流程</span>
       </div>
     </div>
   );

@@ -85,7 +85,7 @@ const AttributeModal = (props: Iprops) => {
         valueType: 'treeSelect',
         formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
         request: async () => {
-          const data = await userCtrl.company.loadAuthorityTree(false);
+          const data = await userCtrl.space.loadAuthorityTree(false);
           return data ? [data] : [];
         },
         fieldProps: {
@@ -157,6 +157,7 @@ const AttributeModal = (props: Iprops) => {
         if (title.includes('新增')) {
           handleOk(await current.createAttr(values));
         } else {
+          console.log(values);
           handleOk(await current.updateAttr(values));
         }
       }}

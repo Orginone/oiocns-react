@@ -168,7 +168,6 @@ const TeamSetting: React.FC = () => {
               setOperateKeys(['']);
             }
           }}
-          current={selectMenu.item}
         />
       )}
       {/** 权限模态框 */}
@@ -184,6 +183,7 @@ const TeamSetting: React.FC = () => {
               refreshMenu();
               setOperateKeys(['']);
             }
+            setSelectMenu(selectMenu);
           }}
           data={undefined}
         />

@@ -217,6 +217,19 @@ export const PropertyColumns: ProColumns<any>[] = [
     width: 150,
   },
   {
+    title: '来源组织',
+    dataIndex: 'shareId',
+    key: 'shareId',
+    width: 200,
+    render: (_, record) => {
+      const team = userCtrl.findTeamInfoById(record.shareId);
+      if (team && team.name != '奥集能平台') {
+        return team.name;
+      }
+      return userCtrl.space.teamName;
+    },
+  },
+  {
     title: '归属组织',
     dataIndex: 'belongId',
     key: 'belongId',

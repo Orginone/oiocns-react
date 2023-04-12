@@ -33,24 +33,39 @@ const Attritube = ({
   const [editData, setEditData] = useState<XAttribute>();
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    return [
-      {
-        key: '修改特性',
-        label: '编辑特性',
-        onClick: () => {
-          setEditData(item);
-          setModalType('修改特性');
+    if (item.belongId === userCtrl.space.id) {
+      return [
+        {
+          key: '修改特性',
+          label: '编辑特性',
+          onClick: () => {
+            setEditData(item);
+            setModalType('修改特性');
+          },
         },
-      },
-      {
-        key: '删除特性',
-        label: '删除特性',
-        onClick: async () => {
-          await current?.deleteAttr(item.id);
-          tforceUpdate();
+        {
+          key: '删除特性',
+          label: '删除特性',
+          onClick: async () => {
+            await current?.deleteAttr(item.id);
+            tforceUpdate();
+          },
         },
-      },
-    ];
+      ];
+    }
+    if (item.belongId) {
+      return [
+        {
+          key: '关联属性',
+          label: '关联属性',
+          onClick: () => {
+            setEditData(item);
+            setModalType('关联属性');
+          },
+        },
+      ];
+    }
+    return [];
   };
 
   useEffect(() => {
@@ -99,6 +114,8 @@ const Attritube = ({
         target={target}
         current={current}
       />
+      {/** 关联属性模态框 */}
+      <div></div>
     </>
   );
 };

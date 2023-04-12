@@ -1,14 +1,16 @@
 import { Tooltip } from 'antd';
 import {
-  TagOutlined,
+  ForkOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
   MailOutlined,
 } from '@ant-design/icons';
 import InsertButton from '../InsertButton';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
+import userCtrl from '@/ts/controller/setting';
+import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
 
 type NodeProps = {
   //是否为根节点
@@ -23,6 +25,8 @@ type NodeProps = {
   content?: string;
   title?: string;
   placeholder?: string;
+  //创建组织
+  belongId?: string;
   //节点体左侧图标
   leftIcon?: string;
   //头部图标
@@ -36,6 +40,10 @@ type NodeProps = {
   onDelNode: Function;
   onSelected: Function;
   type?: AddNodeType;
+  //默认操作组织id
+  operateOrgId?: string;
+  config?: any;
+  defaultEditable: boolean;
 };
 
 /**
@@ -48,6 +56,8 @@ export enum AddNodeType {
   'CONCURRENTS' = 'CONCURRENTS',
   'EMPTY' = 'EMPTY',
   'START' = 'START',
+  'ORGANIZATIONAL' = 'ORGANIZATIONAL',
+  'WORKFLOW' = 'WORKFLOW',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -57,6 +67,8 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.CONCURRENTS]: '同时审核节点',
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
+  [AddNodeType.ORGANIZATIONAL]: '组织网关',
+  [AddNodeType.WORKFLOW]: '子流程',
 };
 
 /**
@@ -64,19 +76,41 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  * @returns
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
+  const [editable, setEditable] = useState<boolean>(true);
+
+  const [key, setKey] = useState<number>(0);
+  const isEditable = (): boolean => {
+    let editable = props.defaultEditable;
+    if (props.belongId && props.belongId != '' && props.belongId != userCtrl.space.id) {
+      editable = false;
+    }
+    return editable;
+  };
+  useEffect(() => {
+    setEditable(isEditable());
+  }, []);
   const delNode = (e: React.MouseEvent) => {
-    e.preventDefault();
     props.onDelNode();
   };
   const select = () => {
     props.onSelected();
   };
+  const onChange = (newValue: string) => {
+    // props.config.conditions[0].val = newValue;
+    setKey(key + 1);
+    props.config.props.assignedUser[0].id = newValue;
+  };
+  useEffect(() => {
+    setKey(key + 1);
+  }, [props.config]);
   const footer = (
-    <div className={cls['node-footer']}>
-      <div className={cls['btn']}>
-        <InsertButton onInsertNode={props.onInsertNode}></InsertButton>
+    <>
+      <div className={cls['node-footer']}>
+        <div className={cls['btn']}>
+          {editable && <InsertButton onInsertNode={props.onInsertNode}></InsertButton>}
+        </div>
       </div>
-    </div>
+    </>
   );
 
   const nodeHeader = (
@@ -89,6 +123,11 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       {props.type === AddNodeType.APPROVAL && (
         <UsergroupAddOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
+        />
+      )}
+      {props.type === AddNodeType.WORKFLOW && (
+        <ForkOutlined
+          style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
         />
       )}
       {props.type === AddNodeType.CC && (
@@ -107,29 +146,55 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
 
   const nodeContent = (
     <>
-      {props.isRoot && <div className={cls['node-root-body-right']}>开始</div>}
+      {props.isRoot && (
+        <div
+          className={cls['node-root-body-right']}
+          onClick={(e) => {
+            select();
+          }}>
+          <div style={{ width: '86%', height: '100%', paddingLeft: '7%' }}>
+            <SelectAuth
+              onChange={onChange}
+              readonly={!editable}
+              value={props.config.props.assignedUser[0]?.id}></SelectAuth>
+          </div>
+        </div>
+      )}
       {!props.isRoot && (
         <div className={cls['node-body-right']}>
-          <div onClick={select}>
+          <div
+            onClick={(e) => {
+              select();
+            }}>
             <span className={cls['name-title']}>{props.title}</span>
           </div>
           <div>
             {!props.content && (
-              <span onClick={select} className={cls['placeholder']}>
+              <span
+                onClick={(e) => {
+                  select();
+                }}
+                className={cls['placeholder']}>
                 {props.placeholder}
               </span>
             )}
             {props.content && (
-              <span onClick={select} className={cls['name-select-title']}>
+              <span
+                onClick={(e) => {
+                  select();
+                }}
+                className={cls['name-select-title']}>
                 {props.content}
               </span>
             )}
             {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-            <CloseOutlined
-              className={cls['iconPosition']}
-              style={{ fontSize: '12px', display: 'block' }}
-              onClick={delNode}
-            />
+            {editable && (
+              <CloseOutlined
+                className={cls['iconPosition']}
+                style={{ fontSize: '12px', display: 'block' }}
+                onClick={delNode}
+              />
+            )}
           </div>
         </div>
       )}
@@ -148,28 +213,37 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   if (props.show) {
     return (
       <div
-        className={`${cls['node']} ${props.isRoot || !props.show ? cls['root'] : ''}  ${
-          props.showError || (props._passed === 0 && !props._executable)
-            ? cls['node-error-state']
-            : ''
+        className={`${editable ? cls['node'] : cls['node-unEdit']} ${
+          props.isRoot || !props.show ? cls['root'] : ''
         }  ${
-          props._passed === 0 && props._executable ? cls['node-unCompleted-state'] : ''
+          props.showError || props.config?._passed === 0 ? cls['node-error-state'] : ''
         }
-        ${props._passed === 1 && !props._executable ? cls['node-ongoing-state'] : ''}  ${
-          props._passed === 2 ? cls['node-completed-state'] : ''
-        }`}>
-        <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
-          <div
-            className={
-              props.type === AddNodeType.APPROVAL
-                ? cls['nodeAproStyle']
-                : cls['nodeNewStyle']
-            }>
-            {nodeHeader}
-            {nodeContent}
-            {nodeError}
+        ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
+        ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
+        <Tooltip
+          title={
+            <span>
+              创建组织:
+              {
+                userCtrl.getBelongName(props.belongId || '')
+              }
+            </span>
+          }
+          placement="right">
+          <div className={`${cls['node-body']} ${props.showError ? cls['error'] : ''}`}>
+            <div
+              key={key}
+              className={
+                props.type === AddNodeType.APPROVAL
+                  ? cls['nodeAproStyle']
+                  : cls['nodeNewStyle']
+              }>
+              {nodeHeader}
+              {nodeContent}
+              {nodeError}
+            </div>
           </div>
-        </div>
+        </Tooltip>
         {footer}
       </div>
     );
