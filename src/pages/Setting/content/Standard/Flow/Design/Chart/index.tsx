@@ -13,6 +13,7 @@ interface IProps {
   conditions?: FieldCondition[]; //内置条件选择器
   species?: ISpeciesItem;
   defaultEditable: boolean;
+  disableIds: string[];
 }
 
 const ChartDesign: React.FC<IProps> = (props) => {
@@ -52,6 +53,7 @@ const ChartDesign: React.FC<IProps> = (props) => {
       </div>
       {/* 侧边数据填充 */}
       <FlowDrawer
+        disableIds={props.disableIds}
         defaultEditable={props.defaultEditable}
         species={props.species}
         operateOrgId={props.operateOrgId}

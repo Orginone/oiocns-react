@@ -24,6 +24,7 @@ interface IProps {
   conditions?: FieldCondition[];
   onClose: () => void;
   species?: ISpeciesItem;
+  disableIds: string[];
   defaultEditable: boolean;
 }
 
@@ -35,6 +36,7 @@ const FlowDrawer: React.FC<IProps> = ({
   operateOrgId,
   designOrgId,
   species,
+  disableIds,
   defaultEditable,
 }) => {
   const [key, setKey] = useState<string>();
@@ -86,6 +88,7 @@ const FlowDrawer: React.FC<IProps> = ({
         case AddNodeType.CHILDWORK:
           return (
             <WorkFlowNode
+              disableIds={disableIds}
               current={current}
               orgId={operateOrgId || designOrgId}
               species={species}

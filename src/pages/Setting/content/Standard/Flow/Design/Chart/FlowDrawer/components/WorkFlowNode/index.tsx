@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
 import { Row, Button, Space, Modal } from 'antd';
-import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import userCtrl from '@/ts/controller/setting';
@@ -14,6 +13,7 @@ interface IProps {
   current: NodeType;
   orgId?: string;
   species?: ISpeciesItem;
+  disableIds: string[];
 }
 
 /**
@@ -66,7 +66,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           {currentData?.title ? (
             <ShareShowComp
               departData={[currentData.data]}
-              deleteFuc={(id: string) => {
+              deleteFuc={(_id: string) => {
                 props.current.props.assignedUser = { id: '', name: '' };
                 setCurrentData({
                   title: '',
@@ -88,6 +88,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <WorkSelectTable
+          disableIds={props.disableIds}
           searchFn={(params: schema.XFlowDefine) => {
             props.current.props.assignedUser = [{ name: params.name, id: params.id }];
             setCurrentData({

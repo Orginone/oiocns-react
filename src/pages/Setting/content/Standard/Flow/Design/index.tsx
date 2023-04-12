@@ -764,6 +764,7 @@ const Design: React.FC<IProps> = ({
               <div>
                 {conditionData && (
                   <ChartDesign
+                    disableIds={[current?.id || '']}
                     // key={key}
                     defaultEditable={defaultEditable}
                     species={species}
