@@ -30,7 +30,7 @@ const WorkFlowNode: React.FC<WorkFlowNodeProps> = (props: WorkFlowNodeProps) => 
       props.config.props.assignedUser.forEach((org: any) => {
         texts.push(org.name);
       });
-      return null;
+      return String(texts).replaceAll(',', '、');
     } else {
       return null;
     }
@@ -50,7 +50,7 @@ const WorkFlowNode: React.FC<WorkFlowNodeProps> = (props: WorkFlowNodeProps) => 
       belongId={props.config.belongId}
       config={props?.config}
       errorInfo="错误信息"
-      placeholder="请选择子流程"
+      placeholder="请选择其他办事"
       headerBgc="#ffffff"
       headerIcon="el-icon-s-check"
     />

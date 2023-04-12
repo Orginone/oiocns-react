@@ -381,6 +381,8 @@ const Design: React.FC<IProps> = ({
           break;
         case '组织':
           resource.type = 'ORGANIZATIONAL';
+        case '子流程':
+          resource.type = 'CHILDWORK';
           break;
         //如果是空结点（下个流程的起始节点）
         case '空':

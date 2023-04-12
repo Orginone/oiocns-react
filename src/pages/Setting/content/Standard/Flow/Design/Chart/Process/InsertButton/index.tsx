@@ -65,7 +65,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
    * 子流程
    */
   const addWorkFlowNode = () => {
-    props.onInsertNode('WORKFLOW');
+    props.onInsertNode('CHILDWORK');
   };
 
   const content = (
@@ -140,7 +140,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
             left: '25px',
           }}
         />
-        <span>子流程</span>
+        <span>其他办事</span>
       </div>
     </div>
   );

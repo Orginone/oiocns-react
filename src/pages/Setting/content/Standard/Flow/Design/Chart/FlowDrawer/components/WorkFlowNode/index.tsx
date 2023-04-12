@@ -6,7 +6,9 @@ import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem } from '@/ts/core';
+import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import { schema } from '@/ts/base';
 
 interface IProps {
   current: NodeType;
@@ -46,7 +48,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
           <SettingOutlined style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>选择流程</span>
+          <span className={cls[`roval-node-title`]}>选择其他办事</span>
         </Row>
         <Space>
           <Button
@@ -57,7 +59,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
               props.current.props.assignedType = 'JOB';
               setIsOpen(true);
             }}>
-            选择流程
+            选择其他办事
           </Button>
         </Space>
         <div>
@@ -77,22 +79,25 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       </div>
 
       <Modal
-        width="650px"
-        title="选择流程"
+        width="900px"
+        title="选择其他办事"
         open={isOpen}
         destroyOnClose={true}
         onOk={() => {
           setIsOpen(false);
         }}
         onCancel={() => setIsOpen(false)}>
-        <IndentitySelect
-          multiple={false}
-          orgId={nodeOperateOrgId}
-          onChecked={(params: any) => {
-            props.current.props.assignedUser = [
-              { name: params.title, id: params.data.id },
-            ];
-            setCurrentData(params);
+        <WorkSelectTable
+          searchFn={(params: schema.XFlowDefine) => {
+            props.current.props.assignedUser = [{ name: params.name, id: params.id }];
+            setCurrentData({
+              title: params.name,
+              key: params.id,
+              data: {
+                id: params.id,
+                name: params.name,
+              },
+            });
           }}
         />
       </Modal>

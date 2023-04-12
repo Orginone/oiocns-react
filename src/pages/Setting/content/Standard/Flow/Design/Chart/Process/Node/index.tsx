@@ -57,7 +57,7 @@ export enum AddNodeType {
   'EMPTY' = 'EMPTY',
   'START' = 'START',
   'ORGANIZATIONAL' = 'ORGANIZATIONAL',
-  'WORKFLOW' = 'WORKFLOW',
+  'CHILDWORK' = 'CHILDWORK',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -68,7 +68,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
   [AddNodeType.ORGANIZATIONAL]: '组织网关',
-  [AddNodeType.WORKFLOW]: '子流程',
+  [AddNodeType.CHILDWORK]: '子流程',
 };
 
 /**
@@ -125,7 +125,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
       )}
-      {props.type === AddNodeType.WORKFLOW && (
+      {props.type === AddNodeType.CHILDWORK && (
         <ForkOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
         />
@@ -218,15 +218,13 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         }  ${
           props.showError || props.config?._passed === 0 ? cls['node-error-state'] : ''
         }
-        ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}  
+        ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
         ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
         <Tooltip
           title={
             <span>
               创建组织:
-              {
-                userCtrl.getBelongName(props.belongId || '')
-              }
+              {userCtrl.getBelongName(props.belongId || '')}
             </span>
           }
           placement="right">

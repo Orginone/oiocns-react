@@ -183,7 +183,7 @@ const ProcessTree: React.FC<IProps> = ({
       return Node;
     } else if (comp == 'approval') {
       return Approval;
-    } else if (comp == 'workflow') {
+    } else if (comp == 'childwork') {
       return WorkFlow;
     } else if (comp == 'cc') {
       return Cc;
@@ -308,7 +308,7 @@ const ProcessTree: React.FC<IProps> = ({
       node &&
       (node.type === 'ROOT' ||
         node.type === 'APPROVAL' ||
-        node.type === 'WORKFLOW' ||
+        node.type === 'CHILDWORK' ||
         node.type === 'CC' ||
         node.type === 'DELAY' ||
         node.type === 'TRIGGER')
@@ -409,7 +409,7 @@ const ProcessTree: React.FC<IProps> = ({
       case 'ORGANIZATIONAL':
         insertDeptGateWayNode(parentNode);
         break;
-      case 'WORKFLOW':
+      case 'CHILDWORK':
         insertWorkFlowNode(parentNode);
         break;
       default:
@@ -513,7 +513,7 @@ const ProcessTree: React.FC<IProps> = ({
     ];
   };
   const insertWorkFlowNode = (parentNode: any) => {
-    parentNode.children.name = '子流程';
+    parentNode.children.name = '其他办事';
     parentNode.children.props = deepCopy(APPROVAL_PROPS);
   };
   const insertConcurrentsNode = (parentNode: any) => {

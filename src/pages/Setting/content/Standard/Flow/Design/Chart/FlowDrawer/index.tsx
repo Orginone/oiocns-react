@@ -83,7 +83,7 @@ const FlowDrawer: React.FC<IProps> = ({
               species={species}
             />
           );
-        case AddNodeType.WORKFLOW:
+        case AddNodeType.CHILDWORK:
           return (
             <WorkFlowNode
               current={current}
