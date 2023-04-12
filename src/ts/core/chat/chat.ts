@@ -3,6 +3,7 @@ import { schema, kernel, model, common, parseAvatar } from '../../base';
 import { TargetType, MessageType } from '../enum';
 import { appendShare, appendTarget } from '../target/targetMap';
 import { ChatCache, IChat } from './ichat';
+import { XImMsg } from '@/ts/base/schema';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -25,6 +26,7 @@ class BaseChat implements IChat {
   noReadCount: number;
   userId: string;
   lastMsgTime: number = nullTime;
+  lastMessage: XImMsg | undefined;
   messageNotify?: (messages: schema.XImMsg[]) => void;
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     this.spaceId = id;
@@ -58,13 +60,24 @@ class BaseChat implements IChat {
       spaceName: this.spaceName,
       noReadCount: this.noReadCount,
       lastMsgTime: this.lastMsgTime,
+      lastMessage: this.lastMessage,
     };
   }
+
   loadCache(cache: ChatCache): void {
     this.target = cache.target;
     this.isToping = cache.isToping;
     this.noReadCount = cache.noReadCount;
     this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
+    if (cache.lastMessage && cache.lastMessage.id != this.lastMessage?.id) {
+      this.lastMessage = cache.lastMessage;
+      const index = this.messages.findIndex((i) => i.id === cache.lastMessage?.id);
+      if (index > -1) {
+        this.messages[index] = cache.lastMessage;
+      } else {
+        this.messages.push(cache.lastMessage);
+      }
+    }
   }
   onMessage(callback: (messages: schema.XImMsg[]) => void): void {
     this.messageNotify = callback;
@@ -153,6 +166,7 @@ class BaseChat implements IChat {
       }
       this.noReadCount += noread ? 1 : 0;
       this.lastMsgTime = new Date().getTime();
+      this.lastMessage = msg;
     }
     this.messageNotify?.apply(this, [this.messages]);
   }

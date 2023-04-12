@@ -4,8 +4,9 @@ import { emitter, findTargetShare, IChat } from '@/ts/core';
 import userCtrl from '../setting';
 import { DomainTypes, TargetType } from '@/ts/core/enum';
 import { Emitter } from '@/ts/base/common';
-import { ChatModel, TargetShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { TargetChat } from '@/ts/core/chat';
+import { ChatCache } from '@/ts/core/chat/ichat';
 
 // 会话缓存对象名称
 const chatsObjectName = 'chatscache';
@@ -16,16 +17,28 @@ class ChatController extends Emitter {
   private _userId: string = '';
   private _chats: IChat[] = [];
   private _curChat: IChat | undefined;
+  private _preMessages: XImMsg[] = [];
+  private _inited: boolean = false;
   constructor() {
     super();
     kernel.on('RecvMsg', (data) => {
-      this._recvMessage(data);
+      if (this._inited) {
+        this._recvMessage(data);
+      } else {
+        this._preMessages.push(data);
+      }
     });
     emitter.subscribePart(DomainTypes.User, () => {
       if (this._userId != userCtrl.user.target.id) {
+        this._inited = false;
         this._userId = userCtrl.user.target.id;
         setTimeout(async () => {
           await this._initialization();
+          this._preMessages.forEach((data) => {
+            this._recvMessage(data);
+          });
+          this._preMessages = [];
+          this._inited = true;
         }, 100);
       }
     });
@@ -58,7 +71,7 @@ class ChatController extends Emitter {
    */
   public getNoReadCount(): number {
     let sum = 0;
-    this.chats.forEach((i) => {
+    this._chats.forEach((i) => {
       sum += i.noReadCount;
     });
     return sum;
@@ -124,16 +137,21 @@ class ChatController extends Emitter {
   private async _initialization(): Promise<void> {
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
-        for (let item of data.chats) {
-          let lchat = TargetChat(item.target, this._userId, item.spaceId, item.spaceName);
-          if (lchat) {
-            lchat.loadCache(item);
-            let ids = this._chats.map((ct: IChat) => ct.fullId);
-            if (!ids.includes(lchat.fullId)) {
-              this._appendChats(lchat);
-            }
+        this._chats = data.chats.map((item: ChatCache) => {
+          let lchat = TargetChat(
+            item.target,
+            this._userId,
+            item.spaceId,
+            item.spaceName,
+            item.target.label,
+          );
+          const index = this._findChat(lchat.fullId);
+          if (index > -1) {
+            lchat = this._chats[index];
           }
-        }
+          lchat.loadCache(item);
+          return lchat;
+        });
         this.changCallback();
       }
     });
@@ -177,25 +195,11 @@ class ChatController extends Emitter {
     spaceName: string,
     label: string,
   ): IChat {
-    for (const item of this._chats) {
-      if (item.chatId === target.id && item.spaceId === spaceId) {
-        return item;
-      }
-    }
-    return TargetChat(
-      {
-        photo: target.avatar || '{}',
-        id: target.id,
-        name: target.team?.name || target.name,
-        label: label,
-        remark: target.team?.remark || '',
-        typeName: target.typeName,
-      } as ChatModel,
-      this._userId,
-      spaceId,
-      spaceName,
-    );
+    const index = this._findChat(spaceId + '-' + target.id);
+    if (index > -1) return this._chats[index];
+    return TargetChat(target, this._userId, spaceId, spaceName, label);
   }
+
   private async _createRevMsgChat(data: XImMsg, sessionId: string): Promise<void> {
     const res = await kernel.queryTargetById({
       ids: [data.spaceId, sessionId],
@@ -220,7 +224,7 @@ class ChatController extends Emitter {
       }
       const chat = this.findTargetChat(
         target,
-        spaceTarget.id,
+        spaceTarget.typeName === TargetType.Person ? this._userId : data.spaceId,
         spaceTarget.typeName === TargetType.Person
           ? '我的'
           : spaceTarget.team?.name || spaceTarget.name,
@@ -240,15 +244,23 @@ class ChatController extends Emitter {
    */
   private _appendChats(chat: IChat): void {
     if (chat) {
-      var index = this.chats.findIndex((item) => {
-        return item.chatId === chat.chatId && item.spaceId === chat.spaceId;
-      });
+      var index = this._findChat(chat.fullId);
       if (index > -1) {
-        this.chats[index] = chat;
+        this._chats[index] = chat;
       } else {
         this._chats.unshift(chat);
       }
     }
+  }
+  /**
+   * 本地查找回话
+   * @param fullId 回话唯一Id
+   * @returns 回话索引
+   */
+  private _findChat(fullId: string): number {
+    return this._chats.findIndex((item) => {
+      return item.fullId === fullId;
+    });
   }
   /**
    * 缓存会话
@@ -260,11 +272,9 @@ class ChatController extends Emitter {
       {
         operation: 'replaceAll',
         data: {
-          chats: this.chats
-            .map((item) => {
-              return item.getCache();
-            })
-            .reverse(),
+          chats: this._chats.map((item) => {
+            return item.getCache();
+          }),
         },
       },
       'user',
