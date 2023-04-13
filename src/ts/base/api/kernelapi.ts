@@ -274,6 +274,34 @@ export default class KernelApi {
     });
   }
   /**
+   * 更新元属性
+   * @param {model.PropertyModel} params 请求参数
+   * @returns {model.ResultType<schema.XProperty>} 请求结果
+   */
+  public async updateProperty(
+    params: model.PropertyModel,
+  ): Promise<model.ResultType<schema.XProperty>> {
+    return await this.request({
+      module: 'thing',
+      action: 'UpdateProperty',
+      params: params,
+    });
+  }
+  /**
+   * 删除元属性
+   * @param {string} params 请求参数
+   * @returns {model.ResultType<boolean>} 请求结果
+   */
+  public async deleteProperty(id: string): Promise<model.ResultType<boolean>> {
+    return await this.request({
+      module: 'thing',
+      action: 'DeleteProperty',
+      params: {
+        id: id,
+      },
+    });
+  }
+  /**
    * 创建度量标准
    * @param {model.AttributeModel} params 请求参数
    * @returns {model.ResultType<schema.XAttribute>} 请求结果

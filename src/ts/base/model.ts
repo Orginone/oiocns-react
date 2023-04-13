@@ -364,6 +364,8 @@ export type AttributeModel = {
   speciesCode: string;
   // 工作权限Id
   authId: string;
+  // 属性Id
+  propId: string;
 };
 
 export type PropertyModel = {
@@ -381,8 +383,10 @@ export type PropertyModel = {
   dictId: string;
   // 备注
   remark: string;
-  // 创建组织/个人
+  // 创建用户
   belongId: string;
+  // 来源用户
+  sourceId?: string;
 };
 
 export type OperationModel = {

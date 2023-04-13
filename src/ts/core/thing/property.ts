@@ -25,10 +25,13 @@ export class Property {
   /* 更新属性  */
   async updateProperty(data: PropertyModel): Promise<XProperty> {
     data.belongId = this.belongId;
-    const res = await kernel.createProperty(data);
+    const res = await kernel.updateProperty(data);
     return res.data;
   }
 
   /* 删除属性  */
-  async deleteProperty(id: string): Promise<void> {}
+  async deleteProperty(id: string): Promise<boolean> {
+    const res = await kernel.deleteProperty(id);
+    return res.data;
+  }
 }

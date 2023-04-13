@@ -7,6 +7,7 @@ import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AttributeModal from '../../../components/attributeModal';
+import thing from '@/ts/controller/thing';
 
 interface IProps {
   target?: ITarget;
@@ -61,6 +62,25 @@ const Attritube = ({
           onClick: () => {
             setEditData(item);
             setModalType('关联属性');
+          },
+        },
+        {
+          key: '复制属性',
+          label: '复制属性',
+          onClick: async () => {
+            if (item.property) {
+              const property = await thing.property?.createProperty({
+                ...item.property,
+                belongId: userCtrl.space.id,
+                sourceId: item.property.belongId,
+              });
+              if (property) {
+                await current.updateAttr({
+                  ...item,
+                  propId: property.id,
+                });
+              }
+            }
           },
         },
       ];
