@@ -196,6 +196,7 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
             <Tabs defaultActiveKey="1">
               <TabPane tab="实体" key="1">
                 <Thing
+                  keyExpr="Id"
                   dataSource={rows}
                   current={chooseThingModal[0]}
                   checkedList={chooseThingModal.map((e) => {
@@ -276,22 +277,6 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
               })}
               onSelectionChanged={(rows: any) => {}}
               height={'calc(80vh - 175px)'}
-              // toolBarItems={
-              //   chooseThingModal[0].name == '道'
-              //     ? [
-              //         <Item key={getUuid()}>
-              //           {' '}
-              //           <Button
-              //             icon={<PlusOutlined></PlusOutlined>}
-              //             onClick={() => {
-              //               setCreateThingByInputNumModal(true);
-              //             }}>
-              //             创建实体
-              //           </Button>
-              //         </Item>,
-              //       ]
-              //     : []
-              // }
               editingTool={
                 <Editing
                   allowAdding={false}

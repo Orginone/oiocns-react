@@ -23,24 +23,7 @@ const Todo: React.FC<any> = () => {
         todoCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
-      onMenuClick={async (data, key) => {
-        // if (key == '设为常用') {
-        //   let menu_ = data;
-        //   menu_.key = 'copy' + data.key;
-        //   menu_.children = [];
-        //   menu_.menus = data.menus?.filter((m: any) => !m.key.includes('常用'));
-        //   menu_.menus?.push({
-        //     key: '取消常用',
-        //     label: '取消常用',
-        //     icon: <im.ImHeartBroken />,
-        //   });
-        //   todoCtrl.setCommon(menu_, true);
-        //   message.success('设置成功');
-        // } else if (key == '取消常用') {
-        //   todoCtrl.setCommon(data, false);
-        //   message.success('取消成功');
-        // }
-      }}
+      onMenuClick={async (data, key) => {}}
       siderMenuData={menus}>
       <Content key={key} selectMenu={selectMenu} reflashMenu={refreshMenu} />
     </MainLayout>

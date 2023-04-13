@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, message, Modal } from 'antd';
+import { Button, Divider, Modal, Row } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import { XOperation } from '@/ts/base/schema';
@@ -7,6 +7,8 @@ import { ISpeciesItem } from '@/ts/core';
 import ViewFormModal from '@/pages/Setting/components/viewFormModal';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
+import { SettingOutlined } from '@ant-design/icons';
+import SelectAuth from '../../../../../Comp/selectAuth';
 interface IProps {
   current: NodeType;
   orgId?: string;
@@ -23,6 +25,9 @@ const RootNode: React.FC<IProps> = (props) => {
   const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
   const [editData, setEditData] = useState<XOperation>();
   const [showData, setShowData] = useState<any[]>([]);
+  const [selectAuthValue, setSelectAuthValue] = useState<any>(
+    props.current.props.assignedUser[0]?.id,
+  );
   // 操作内容渲染函数
   useEffect(() => {
     setOperations(props.current.props.operations || []);
@@ -30,17 +35,35 @@ const RootNode: React.FC<IProps> = (props) => {
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
-        <div style={{ marginBottom: '10px' }}>
-          <Button
-            type="primary"
-            shape="round"
-            size="small"
-            onClick={() => {
-              setOperationModal('');
-            }}>
-            绑定表单
-          </Button>
-        </div>
+        <Row style={{ marginBottom: '10px' }}>
+          <SettingOutlined style={{ marginTop: '3px' }} />
+          <span className={cls[`roval-node-title`]}>选择角色</span>
+        </Row>
+        <SelectAuth
+          onChange={(newValue: string, label: string) => {
+            if (props.current.props.assignedUser[0]) {
+              props.current.props.assignedUser[0].id = newValue;
+              props.current.props.assignedUser[0].name = label[0];
+              setSelectAuthValue(newValue);
+            }
+          }}
+          value={selectAuthValue}></SelectAuth>
+        <Divider />
+        <Row style={{ marginBottom: '10px' }}>
+          <SettingOutlined style={{ marginTop: '3px' }} />
+          <span className={cls[`roval-node-title`]}>绑定表单</span>
+        </Row>
+        {/* <div style={{ marginBottom: '10px' }}> */}
+        <Button
+          type="primary"
+          shape="round"
+          size="small"
+          onClick={() => {
+            setOperationModal('');
+          }}>
+          绑定表单
+        </Button>
+        {/* </div> */}
         <div>
           {operations && operations.length > 0 && (
             <span>
@@ -58,14 +81,6 @@ const RootNode: React.FC<IProps> = (props) => {
                 }}></ShareShowComp>
             </span>
           )}
-          {/* <ChooseOperation
-            open={operationModal != undefined}
-            onOk={(item: any) => {
-              props.current.props.operations = [item.operation];
-              setOperations([item.operation]);
-              setOperationModal(undefined);
-            }}
-            onCancel={() => setOperationModal(undefined)}></ChooseOperation> */}
           <Modal
             title={`选择表单`}
             width={800}

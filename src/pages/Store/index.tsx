@@ -42,22 +42,6 @@ const Package: React.FC = () => {
       onMenuClick={async (data, key) => {
         setOperateKey(key);
         setOperateTarget(data);
-        // if (key == '设为常用') {
-        //   let menu_ = data;
-        //   menu_.key = 'copy' + data.key;
-        //   menu_.children = [];
-        //   menu_.menus = data.menus?.filter((m: any) => !m.key.includes('常用'));
-        //   menu_.menus?.push({
-        //     key: '取消常用',
-        //     label: '取消常用',
-        //     icon: <im.ImHeartBroken />,
-        //   });
-        //   storeCtrl.setCommon(menu_, true);
-        //   message.success('设置成功');
-        // } else if (key == '取消常用') {
-        //   storeCtrl.setCommon(data, false);
-        //   message.success('取消成功');
-        // }
       }}
       siderMenuData={menus}>
       <FileSysOperate

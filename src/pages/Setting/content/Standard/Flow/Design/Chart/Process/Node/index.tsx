@@ -76,7 +76,6 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
-
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
@@ -95,7 +94,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     props.onSelected();
   };
   const onChange = (newValue: string) => {
-    // props.config.conditions[0].val = newValue;
     setKey(key + 1);
     props.config.props.assignedUser[0].id = newValue;
   };
@@ -136,16 +134,13 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       )}
       {props.type === AddNodeType.START && (
         <span className={cls['process-content']}>START</span>
-        // <TagOutlined
-        //   style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
-        // />
       )}
     </div>
   );
 
   const nodeContent = (
     <>
-      {props.isRoot && (
+      {/* {props.isRoot && (
         <div
           className={cls['node-root-body-right']}
           onClick={(e) => {
@@ -158,45 +153,44 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
               value={props.config.props.assignedUser[0]?.id}></SelectAuth>
           </div>
         </div>
-      )}
-      {!props.isRoot && (
-        <div className={cls['node-body-right']}>
-          <div
-            onClick={(e) => {
-              select();
-            }}>
-            <span className={cls['name-title']}>{props.title}</span>
-          </div>
-          <div>
-            {!props.content && (
-              <span
-                onClick={(e) => {
-                  select();
-                }}
-                className={cls['placeholder']}>
-                {props.placeholder}
-              </span>
-            )}
-            {props.content && (
-              <span
-                onClick={(e) => {
-                  select();
-                }}
-                className={cls['name-select-title']}>
-                {props.content}
-              </span>
-            )}
-            {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-            {editable && (
-              <CloseOutlined
-                className={cls['iconPosition']}
-                style={{ fontSize: '12px', display: 'block' }}
-                onClick={delNode}
-              />
-            )}
-          </div>
+      )} */}
+      {/* {!props.isRoot && ( */}
+      <div className={cls['node-body-right']}>
+        <div
+          onClick={(e) => {
+            select();
+          }}>
+          <span className={cls['name-title']}>{props.title}</span>
         </div>
-      )}
+        <div>
+          {!props.content && (
+            <span
+              onClick={(e) => {
+                select();
+              }}
+              className={cls['placeholder']}>
+              {props.placeholder}
+            </span>
+          )}
+          {props.content && (
+            <span
+              onClick={(e) => {
+                select();
+              }}
+              className={cls['name-select-title']}>
+              {props.content}
+            </span>
+          )}
+          {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
+          {editable && !props.isRoot && (
+            <CloseOutlined
+              className={cls['iconPosition']}
+              style={{ fontSize: '12px', display: 'block' }}
+              onClick={delNode}
+            />
+          )}
+        </div>
+      </div>
     </>
   );
 

@@ -2,7 +2,6 @@ import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import { ICompany, ITarget } from '@/ts/core';
-import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
   rootDisable?: boolean;
   company?: ICompany;
@@ -23,16 +22,6 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
 
     let targets = buildTargetTree(tree, false, 0);
     setTreeData(targets);
-  };
-  const getTreeData = (targets: ITarget[]): DefaultOptionType[] => {
-    return targets.map((item: ITarget) => {
-      return {
-        label: item.teamName,
-        value: item.id,
-        children:
-          item.subTeam && item.subTeam.length > 0 ? getTreeData(item.subTeam) : [],
-      };
-    });
   };
   /** 加载组织树 */
   const buildTargetTree = (targets: ITarget[], isChild: boolean, level: number) => {
