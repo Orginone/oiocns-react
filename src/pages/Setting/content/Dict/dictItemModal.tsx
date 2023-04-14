@@ -33,13 +33,6 @@ const DictItemModal = (props: Iprops) => {
       },
     },
     {
-      title: '代码',
-      dataIndex: 'code',
-      formItemProps: {
-        rules: [{ required: true, message: '字典项代码为必填项' }],
-      },
-    },
-    {
       title: '值',
       dataIndex: 'value',
       formItemProps: {

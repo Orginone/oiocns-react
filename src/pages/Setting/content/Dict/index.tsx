@@ -7,6 +7,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import thingCtrl from '@/ts/controller/thing';
 import DictItemModal from '@/pages/Setting/content/Dict/dictItemModal';
 import { EllipsisOutlined } from '@ant-design/icons';
+import cls from './index.module.less';
 /**
  * @description: 分类字典管理
  * @return {*}
@@ -68,6 +69,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
       </Descriptions>
 
       <PageCard
+        className={cls[`card-wrap`]}
         bordered={false}
         tabList={TitleItems}
         onTabChange={(_: any) => {}}
