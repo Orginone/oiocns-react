@@ -167,6 +167,7 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
             <Tabs defaultActiveKey="1">
               <TabPane tab="实体" key="1">
                 <Thing
+                  keyExpr="Id"
                   dataSource={rows}
                   current={chooseThingModal[0]}
                   checkedList={chooseThingModal.map((e) => {

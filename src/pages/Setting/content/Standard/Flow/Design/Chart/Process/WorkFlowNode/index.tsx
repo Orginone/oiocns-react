@@ -50,7 +50,7 @@ const WorkFlowNode: React.FC<WorkFlowNodeProps> = (props: WorkFlowNodeProps) => 
       belongId={props.config.belongId}
       config={props?.config}
       errorInfo="错误信息"
-      placeholder="请选择其他办事"
+      placeholder="请选择外部办事"
       headerBgc="#ffffff"
       headerIcon="el-icon-s-check"
     />

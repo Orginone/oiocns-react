@@ -47,6 +47,7 @@ interface IProps {
   setTabKey?: (tabKey: number) => void;
   setThingId?: (thingId: string) => void;
   scrolling?: any;
+  keyExpr?: string;
 }
 
 /**
@@ -61,7 +62,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     speciesArray: ISpeciesItem[],
     array: any[],
     front: boolean,
-  ): any[] => {
+  ): ISpeciesItem[] => {
     for (let species of speciesArray) {
       if (!array.includes(species)) {
         //没有就放在最前面 改为父级放前，子级放后
@@ -98,7 +99,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
         let attrs =
           attrArray?.filter((attr: XAttribute) => attr.speciesId == species.id) || [];
-        if (species.name == '道') {
+        if (!species.parent) {
           parentHeaders = [...parentHeaders, ...attrs];
         } else {
           parentHeaders.push({
@@ -268,6 +269,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   const getComponent = () => {
     return (
       <DataGrid
+        keyExpr={props.keyExpr}
         dataSource={
           props.dataSource ||
           new CustomStore({
@@ -328,12 +330,13 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         height={props.height || 'calc(100vh - 175px)'}
         width="100%"
         showBorders={true}>
+        {getColumns(thingAttrs)}
         <ColumnChooser
           enabled={true}
           title={'列选择器'}
           height={'500px'}
           allowSearch={true}
-          // mode="select"
+          // mode={'select'}
           sortOrder={'asc'}
         />
         <ColumnFixing enabled={true} />
@@ -374,7 +377,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           <Item name="columnChooserButton" locateInMenu="auto" location="after" />
         </Toolbar>
         <SearchPanel visible={true} highlightCaseSensitive={true} width={230} />
-        {getColumns(thingAttrs)}
+
         {menuItems && (
           <Column
             dataField="操作"

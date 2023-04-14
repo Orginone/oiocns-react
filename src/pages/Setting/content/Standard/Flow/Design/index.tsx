@@ -73,7 +73,7 @@ const Design: React.FC<IProps> = ({
     nodeId: `node_${getUuid()}`,
     parentId: '',
     type: 'ROOT',
-    name: '发起人',
+    name: '发起角色',
     props: {
       assignedType: 'JOB',
       mode: 'AND',
@@ -131,7 +131,7 @@ const Design: React.FC<IProps> = ({
             nodeId: `node_${getUuid()}`,
             parentId: '',
             type: 'ROOT',
-            name: '发起人',
+            name: '发起角色',
             props: {
               assignedType: 'JOB',
               mode: 'AND',

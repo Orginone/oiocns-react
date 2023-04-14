@@ -43,7 +43,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
           <SettingOutlined style={{ marginTop: '3px' }} />
-          <span className={cls[`roval-node-title`]}>选择其他办事</span>
+          <span className={cls[`roval-node-title`]}>选择外部办事</span>
         </Row>
         <Space>
           <Button
@@ -54,7 +54,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
               props.current.props.assignedType = 'JOB';
               setIsOpen(true);
             }}>
-            选择其他办事
+            选择外部办事
           </Button>
         </Space>
         <div>
@@ -75,7 +75,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
 
       <Modal
         width="80%"
-        title="选择其他办事"
+        title="选择外部办事"
         open={isOpen}
         destroyOnClose={true}
         onOk={() => {
