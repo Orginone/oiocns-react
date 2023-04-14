@@ -15,6 +15,7 @@ import PropertyModal from './components/propertyModal';
 import DictModal from '@/pages/Setting/content/Dict/dictModal';
 import { SettingOutlined } from '@ant-design/icons';
 import thingCtrl from '@/ts/controller/thing';
+import { getUuid } from '@/utils/tools';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -30,7 +31,7 @@ const TeamSetting: React.FC = () => {
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
-
+  const [refreshKey, setRefreshKey] = useState<string>();
   if (!selectMenu) return <></>;
 
   return (
@@ -193,7 +194,8 @@ const TeamSetting: React.FC = () => {
           }}
           handleOk={(newItem) => {
             if (newItem) {
-              refreshMenu();
+              // refreshMenu();
+              setRefreshKey(getUuid());
               setOperateKeys(['']);
             }
             setSelectMenu(selectMenu);
@@ -220,7 +222,7 @@ const TeamSetting: React.FC = () => {
           data={operateKeys[0].includes('新增') ? undefined : selectMenu.item}
         />
       )}
-      <Content key={key} selectMenu={selectMenu} />
+      <Content key={key} selectMenu={selectMenu} refreshKey={refreshKey} />
     </MainLayout>
   );
 };

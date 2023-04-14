@@ -6,6 +6,7 @@ import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import thingCtrl from '@/ts/controller/thing';
 import DictItemModal from '@/pages/Setting/content/Dict/dictItemModal';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 /**
  * @description: 分类字典管理
@@ -14,7 +15,8 @@ import cls from './index.module.less';
 const DictInfo: React.FC<any> = (props: { current: XDict }) => {
   const { current } = props;
   const [activeModel, setActiveModel] = useState<string>('');
-  const [dictItem] = useState<XDictItem>();
+  const [dictItem, setDictItem] = useState<XDictItem>();
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const renderBtns = () => {
     return (
       <>
@@ -27,6 +29,27 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
         </Button>
       </>
     );
+  };
+  // 操作内容渲染函数
+  const renderOperate = (item: XDictItem) => {
+    return [
+      {
+        key: '编辑字典项',
+        label: '编辑字典项',
+        onClick: () => {
+          setDictItem(item);
+          setActiveModel('编辑字典项');
+        },
+      },
+      {
+        key: '删除字典项',
+        label: '删除字典项',
+        onClick: async () => {
+          await thingCtrl.dict?.deleteDictItem(item.id);
+          tforceUpdate();
+        },
+      },
+    ];
   };
   const TitleItems = [
     {
@@ -60,8 +83,9 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<any>
           dataSource={[]}
-          key="member"
           rowKey={'id'}
+          params={tkey}
+          operation={renderOperate}
           request={(page) => thingCtrl.dict!.loadDictItem(current.id, page)}
           columns={DictItemColumns}
           showChangeBtn={false}
@@ -71,9 +95,12 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
         open={activeModel.includes('新增') || activeModel.includes('编辑')}
         data={dictItem}
         handleCancel={() => setActiveModel('')}
-        handleOk={(_: boolean | undefined) => {
-          message.success('操作成功');
-          setActiveModel('');
+        handleOk={(success: boolean | undefined) => {
+          if (success) {
+            message.success('操作成功');
+            setActiveModel('');
+            tforceUpdate();
+          }
         }}
         current={current}></DictItemModal>
     </Card>
