@@ -33,7 +33,7 @@ const ContentIndex = ({ selectMenu }: IProps) => {
     case GroupMenuType.Property:
       return <PropertySetting />;
     case GroupMenuType.Dict:
-      return <DictSetting />;
+      return <DictSetting current={selectMenu.item} />;
     case GroupMenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
     default:

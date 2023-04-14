@@ -8,6 +8,7 @@ import React from 'react';
 import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
+import { XDict } from '@/ts/base/schema';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -73,6 +74,31 @@ export const buildAuthorityTree = (authoritys: IAuthority) => {
   };
   return result;
 };
+export const buildDictMenus = (dict: XDict) => {
+  const result: MenuItemType = {
+    key: dict.id,
+    item: dict,
+    label: dict.name,
+    icon: <im.ImTree />,
+    itemType: GroupMenuType.Dict,
+    menus: [
+      {
+        key: '编辑字典',
+        icon: <im.ImPencil />,
+        label: '编辑字典',
+        model: 'outside',
+      },
+      {
+        key: '删除字典',
+        icon: <im.ImCross />,
+        label: '删除字典',
+        model: 'outside',
+      },
+    ],
+    children: [],
+  };
+  return result;
+};
 /** 获取空间菜单 */
 export const getSpaceMenu = async () => {
   let label = '个人信息';
@@ -134,6 +160,7 @@ export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]
 export const loadStandardSetting = async () => {
   const result: MenuItemType[] = [];
   const authors = await userCtrl.space.loadSpaceAuthorityTree();
+  const dicts = await thingCtrl.dict?.loadDict({ offset: 0, limit: 1000, filter: '' });
   if (authors) {
     result.push({
       children: [buildAuthorityTree(authors)],
@@ -152,10 +179,10 @@ export const loadStandardSetting = async () => {
     icon: <im.ImNewspaper />,
     children: [
       {
-        children: [],
+        children: dicts?.result?.map((item) => buildDictMenus(item)) || [],
         key: '字典定义',
         label: '字典定义',
-        itemType: GroupMenuType.Dict,
+        itemType: '字典定义',
         item: userCtrl.space,
         icon: <im.ImNewspaper />,
         menus: [
@@ -286,11 +313,6 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
       key: '新增',
       icon: <im.ImPlus />,
       label: '新增分类',
-    },
-    {
-      key: '转为字典',
-      icon: <im.ImBoxAdd />,
-      label: '转为字典',
     },
   ];
   if (item.target.belongId) {

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Descriptions, Space, Typography } from 'antd';
+import { Button, Card, Descriptions, Dropdown, Space, Typography } from 'antd';
 import { ISpeciesItem } from '@/ts/core';
 import cls from '../index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting';
+import { EllipsisOutlined } from '@ant-design/icons';
 
 /**
  * @description: 分类标准信息内容
@@ -20,6 +21,13 @@ const Description = (info: { current: ISpeciesItem }) => {
         });
     }
   }, [info.current]);
+  const speciesOperateMenu: any[] = [
+    {
+      key: 'toDict',
+      label: <Button type="link">转字典</Button>,
+      onClick: async () => {},
+    },
+  ];
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
@@ -28,7 +36,15 @@ const Description = (info: { current: ISpeciesItem }) => {
         bordered
         column={3}
         labelStyle={{ textAlign: 'center', color: '#606266', width: '160px' }}
-        contentStyle={{ textAlign: 'center', color: '#606266' }}>
+        contentStyle={{ textAlign: 'center', color: '#606266' }}
+        extra={[
+          <Dropdown menu={{ items: speciesOperateMenu }} placement="bottom" key="more">
+            <EllipsisOutlined
+              style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
+              rotate={90}
+            />
+          </Dropdown>,
+        ]}>
         <Descriptions.Item label="共享组织">
           <Space>
             {data.belongInfo ? (
@@ -41,7 +57,7 @@ const Description = (info: { current: ISpeciesItem }) => {
             )}
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="分类编码">{data.target.code}</Descriptions.Item>
+        <Descriptions.Item label="分类代码">{data.target.code}</Descriptions.Item>
         <Descriptions.Item label="开放域">
           {data.target.public ? '开放' : '私有'}
         </Descriptions.Item>
