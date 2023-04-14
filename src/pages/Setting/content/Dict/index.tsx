@@ -1,12 +1,11 @@
 import PageCard from '@/components/PageCard';
 import { XDict, XDictItem } from '@/ts/base/schema';
-import { Button, Card, Descriptions, Dropdown, message } from 'antd';
+import { Button, Card, Descriptions, message } from 'antd';
 import React, { useState } from 'react';
-import { PersonColumns } from '../../config/columns';
+import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import thingCtrl from '@/ts/controller/thing';
 import DictItemModal from '@/pages/Setting/content/Dict/dictItemModal';
-import { EllipsisOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 /**
  * @description: 分类字典管理
@@ -64,7 +63,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
           key="member"
           rowKey={'id'}
           request={(page) => thingCtrl.dict!.loadDictItem(current.id, page)}
-          columns={PersonColumns}
+          columns={DictItemColumns}
           showChangeBtn={false}
         />
       </PageCard>
