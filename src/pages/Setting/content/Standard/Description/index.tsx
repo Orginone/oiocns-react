@@ -21,13 +21,6 @@ const Description = (info: { current: ISpeciesItem }) => {
         });
     }
   }, [info.current]);
-  const speciesOperateMenu: any[] = [
-    {
-      key: 'toDict',
-      label: <Button type="link">转字典</Button>,
-      onClick: async () => {},
-    },
-  ];
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
@@ -36,15 +29,7 @@ const Description = (info: { current: ISpeciesItem }) => {
         bordered
         column={3}
         labelStyle={{ textAlign: 'center', color: '#606266', width: '160px' }}
-        contentStyle={{ textAlign: 'center', color: '#606266' }}
-        extra={[
-          <Dropdown menu={{ items: speciesOperateMenu }} placement="bottom" key="more">
-            <EllipsisOutlined
-              style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
-              rotate={90}
-            />
-          </Dropdown>,
-        ]}>
+        contentStyle={{ textAlign: 'center', color: '#606266' }}>
         <Descriptions.Item label="共享组织">
           <Space>
             {data.belongInfo ? (

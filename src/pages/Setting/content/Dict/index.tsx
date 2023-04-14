@@ -16,13 +16,6 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
   const { current } = props;
   const [activeModel, setActiveModel] = useState<string>('');
   const [dictItem] = useState<XDictItem>();
-  const dictOperateMenu: any[] = [
-    {
-      key: 'toSpecies',
-      label: <Button type="link">转分类</Button>,
-      onClick: async () => {},
-    },
-  ];
   const renderBtns = () => {
     return (
       <>
@@ -47,14 +40,6 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
       <Descriptions
         size="middle"
         title="字典"
-        extra={[
-          <Dropdown menu={{ items: dictOperateMenu }} placement="bottom" key="more">
-            <EllipsisOutlined
-              style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
-              rotate={90}
-            />
-          </Dropdown>,
-        ]}
         bordered
         column={2}
         labelStyle={{
