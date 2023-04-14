@@ -13,6 +13,8 @@ export interface IAuthority {
   belongId: string;
   /**备注 */
   remark: string;
+  /** 数据 */
+  target: schema.XAuthority;
   /** 子权限 */
   children: IAuthority[];
   /** 权限下的角色 */

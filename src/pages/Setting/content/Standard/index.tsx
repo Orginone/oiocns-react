@@ -4,7 +4,6 @@ import { Button, Segmented, Tabs } from 'antd';
 import React, { useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
-import Dict from '@/pages/Setting/content/Standard/Dict';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
@@ -25,7 +24,6 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
 
   const [flowDesign, setFlowDesign] = useState<XFlowDefine>();
-  const [showAddDict, setShowAddDict] = useState<boolean>(true);
   const [recursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [recursionSpecies, setRecursionSpecies] = useState<boolean>(true);
   // Tab 改变事件
@@ -54,21 +52,6 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
             }}>
             {'新增特性'}
           </Button>
-        );
-      case '字典定义':
-        return (
-          <>
-            {showAddDict && (
-              <Button
-                key="edit"
-                type="link"
-                onClick={() => {
-                  setModalType('新增字典项');
-                }}>
-                {'新增字典项'}
-              </Button>
-            )}
-          </>
         );
       case '表单设计':
         return (
@@ -130,21 +113,6 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           recursionOrg={recursionOrg}
           recursionSpecies={recursionSpecies}
           setModalType={setModalType}
-        />
-      ),
-    },
-    {
-      label: `字典定义`,
-      key: '字典定义',
-      children: (
-        <Dict
-          current={current}
-          target={settingCtrl.space}
-          modalType={modalType}
-          setModalType={setModalType}
-          recursionOrg={recursionOrg}
-          recursionSpecies={recursionSpecies}
-          setShowAddDict={setShowAddDict}
         />
       ),
     },

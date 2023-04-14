@@ -5,7 +5,6 @@ import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import TransToDict from '@/pages/Setting/content/Standard/Dict/transToDict';
 import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
 import { Modal } from 'antd';
@@ -168,6 +167,7 @@ const TeamSetting: React.FC = () => {
               setOperateKeys(['']);
             }
           }}
+          current={selectMenu.item}
         />
       )}
       {/** 权限模态框 */}
@@ -188,13 +188,6 @@ const TeamSetting: React.FC = () => {
           data={undefined}
         />
       )}
-      {/* 分类转字典 */}
-      {
-        <TransToDict
-          open={['转为字典'].includes(operateKeys[0])}
-          setOpen={() => setOperateKeys([''])}
-          currentSpeciesItem={selectMenu.item as ISpeciesItem}></TransToDict>
-      }
       <Content key={key} selectMenu={selectMenu} />
     </MainLayout>
   );

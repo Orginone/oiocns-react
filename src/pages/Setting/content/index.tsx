@@ -6,6 +6,7 @@ import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import AuthoritySetting from './Authority';
 import PropertySetting from './Property';
+import DictSetting from './Dict';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import React from 'react';
@@ -31,6 +32,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
       return <AuthoritySetting current={selectMenu.item} />;
     case GroupMenuType.Property:
       return <PropertySetting />;
+    case GroupMenuType.Dict:
+      return <DictSetting />;
     case GroupMenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
     default:

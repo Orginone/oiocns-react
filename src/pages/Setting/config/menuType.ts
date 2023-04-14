@@ -6,6 +6,7 @@ export enum GroupMenuType {
   'Company' = '单位',
   'Station' = '岗位',
   'Property' = '属性',
+  'Dict' = '字典',
   'Species' = '分类',
   'Authority' = '权限',
   'OutAgency' = '外部机构',

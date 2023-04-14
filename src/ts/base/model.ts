@@ -284,8 +284,6 @@ export type DictModel = {
   public: boolean;
   // 创建组织/个人
   belongId: string;
-  // 分类Id
-  speciesId: string;
   // 备注
   remark: string;
 };
