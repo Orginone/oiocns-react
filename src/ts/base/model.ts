@@ -89,6 +89,17 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type QueryDictModel = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 分页
+  page: PageRequest;
+};
+
 export type IdSpeciesReq = {
   // 唯一ID
   id: string;
@@ -101,6 +112,7 @@ export type IdSpeciesReq = {
   // 分页
   page: PageRequest;
 };
+
 export type IdOperationReq = {
   // 唯一ID
   id: string;
@@ -284,8 +296,6 @@ export type DictModel = {
   public: boolean;
   // 创建组织/个人
   belongId: string;
-  // 分类Id
-  speciesId: string;
   // 备注
   remark: string;
 };

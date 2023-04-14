@@ -92,11 +92,10 @@ export class SpeciesItem implements ISpeciesItem {
 
   async loadDicts(reload: boolean = false): Promise<IDict[]> {
     if (this.dicts == undefined || this.dicts.length == 0 || reload) {
-      const res = await kernel.querySpeciesDict({
+      const res = await kernel.queryDict({
         id: this.id,
         spaceId: this.curSpaceId,
         recursionOrg: true,
-        recursionSpecies: true,
         page: {
           offset: 0,
           limit: 1000,
@@ -117,11 +116,10 @@ export class SpeciesItem implements ISpeciesItem {
     recursionSpecies: boolean,
     page: PageRequest,
   ): Promise<IDict[]> {
-    const res = await kernel.querySpeciesDict({
+    const res = await kernel.queryDict({
       id: this.id,
       spaceId: spaceId,
       recursionOrg: recursionOrg,
-      recursionSpecies: recursionSpecies,
       page: {
         offset: page.offset,
         limit: page.limit,
@@ -216,7 +214,6 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.createDict({
       ...data,
       id: undefined,
-      speciesId: this.id,
     });
     if (res.success) {
       const newItem = new Dict(res.data, this.curSpaceId);

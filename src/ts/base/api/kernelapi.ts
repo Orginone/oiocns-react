@@ -638,15 +638,15 @@ export default class KernelApi {
   }
   /**
    * 查询分类字典
-   * @param {model.IdSpeciesReq} params 请求参数
+   * @param {model.QueryDictModel} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
-  public async querySpeciesDict(
-    params: model.IdSpeciesReq,
+  public async queryDict(
+    params: model.QueryDictModel,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
-      action: 'QuerySpeciesDict',
+      action: 'QueryDict',
       params: params,
     });
   }
