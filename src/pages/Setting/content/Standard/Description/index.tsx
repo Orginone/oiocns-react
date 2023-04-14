@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Descriptions, Dropdown, Space, Typography } from 'antd';
+import { Card, Descriptions, Space, Typography } from 'antd';
 import { ISpeciesItem } from '@/ts/core';
 import cls from '../index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting';
-import { EllipsisOutlined } from '@ant-design/icons';
 
 /**
  * @description: 分类标准信息内容
