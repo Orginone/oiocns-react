@@ -40,6 +40,7 @@ export class Dict {
     const res = await kernel.queryDictItems({
       id: id,
       page: page,
+      spaceId: this.belongId,
     });
     return res.data;
   }
