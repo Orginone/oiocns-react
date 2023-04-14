@@ -7,12 +7,12 @@ import { PageRequest } from '@/ts/base/model';
 
 export default class Authority implements IAuthority {
   private _belongId: string;
-  private readonly _authority: schema.XAuthority;
+  public readonly target: schema.XAuthority;
   public children: IAuthority[];
   public identitys: Identity[];
 
   constructor(auth: schema.XAuthority, belongId: string) {
-    this._authority = auth;
+    this.target = auth;
     this._belongId = belongId;
     this.children = [];
     this.identitys = [];
@@ -33,19 +33,19 @@ export default class Authority implements IAuthority {
     ];
   }
   public get id(): string {
-    return this._authority.id;
+    return this.target.id;
   }
   public get name(): string {
-    return this._authority.name;
+    return this.target.name;
   }
   public get code(): string {
-    return this._authority.code;
+    return this.target.code;
   }
   public get belongId(): string {
-    return this._authority.belongId;
+    return this.target.belongId;
   }
   public get remark(): string {
-    return this._authority.remark;
+    return this.target.remark;
   }
   public async createIdentity(
     name: string,
@@ -144,17 +144,17 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
-      id: this._authority.id,
+      id: this.target.id,
       public: ispublic,
-      belongId: this._authority.belongId,
-      parentId: this._authority.parentId,
+      belongId: this.target.belongId,
+      parentId: this.target.parentId,
     });
     if (res.success) {
-      this._authority.name = name;
-      this._authority.code = code;
-      this._authority.public = ispublic;
-      this._authority.remark = remark;
-      this._authority.updateTime = res.data?.updateTime;
+      this.target.name = name;
+      this.target.code = code;
+      this.target.public = ispublic;
+      this.target.remark = remark;
+      this.target.updateTime = res.data?.updateTime;
     }
     return res;
   }
@@ -163,7 +163,7 @@ export default class Authority implements IAuthority {
       return this.identitys;
     }
     const res = await kernel.queryAuthorityIdentitys({
-      id: this._authority.id,
+      id: this.target.id,
       spaceId: this.id,
       page: {
         offset: 0,
@@ -183,7 +183,7 @@ export default class Authority implements IAuthority {
     page: PageRequest,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     return await kernel.queryPersonByAuthority({
-      id: this._authority.id,
+      id: this.target.id,
       spaceId: spaceId,
       page: page,
     });

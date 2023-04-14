@@ -1,7 +1,6 @@
 import {
   XAttribute,
   XAttributeArray,
-  XDict,
   XFlowDefine,
   XFlowInstance,
 } from '@/ts/base/schema';
@@ -9,14 +8,11 @@ import { kernel, model, parseAvatar, schema } from '../../base';
 import {
   AttributeModel,
   CreateDefineReq,
-  DictModel,
   OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
 } from '../../base/model';
-import { Dict } from './dict';
-import { IDict, INullDict } from './idict';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 import { FlowDefine } from './flowDefine';
 import { IFlowDefine } from './iflowDefine';
@@ -35,7 +31,6 @@ export class SpeciesItem implements ISpeciesItem {
   attrs?: XAttribute[];
   defines?: IFlowDefine[];
   // instances?: XFlowInstance[];
-  dicts?: IDict[];
 
   constructor(target: schema.XSpecies, parent: INullSpeciesItem, curSpaceId: string) {
     this.children = [];
@@ -88,49 +83,6 @@ export class SpeciesItem implements ISpeciesItem {
       },
     });
     return res.data;
-  }
-
-  async loadDicts(reload: boolean = false): Promise<IDict[]> {
-    if (this.dicts == undefined || this.dicts.length == 0 || reload) {
-      const res = await kernel.queryDict({
-        id: this.id,
-        spaceId: this.curSpaceId,
-        recursionOrg: true,
-        page: {
-          offset: 0,
-          limit: 1000,
-          filter: '',
-        },
-      });
-      this.dicts =
-        res.data.result?.map((item: XDict) => {
-          return new Dict(item, this.curSpaceId);
-        }) || [];
-    }
-    return this.dicts || [];
-  }
-
-  async loadDictsByPage(
-    spaceId: string,
-    recursionOrg: boolean,
-    recursionSpecies: boolean,
-    page: PageRequest,
-  ): Promise<IDict[]> {
-    const res = await kernel.queryDict({
-      id: this.id,
-      spaceId: spaceId,
-      recursionOrg: recursionOrg,
-      page: {
-        offset: page.offset,
-        limit: page.limit,
-        filter: '',
-      },
-    });
-    return (
-      res.data.result?.map((item: XDict) => {
-        return new Dict(item, this.curSpaceId);
-      }) || []
-    );
   }
 
   async loadOperations(
@@ -208,47 +160,6 @@ export class SpeciesItem implements ISpeciesItem {
       return newItem;
     }
     return;
-  }
-
-  async createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict> {
-    const res = await kernel.createDict({
-      ...data,
-      id: undefined,
-    });
-    if (res.success) {
-      const newItem = new Dict(res.data, this.curSpaceId);
-      if (this.dicts) {
-        this.dicts.push(newItem);
-      }
-      return newItem;
-    }
-    return;
-  }
-
-  async updateDict(data: DictModel): Promise<boolean> {
-    const res = await kernel.updateDict({
-      ...data,
-    });
-    if (this.dicts && res.success) {
-      this.dicts = this.dicts.map((item: any) => {
-        if (item.id == res.data.id) {
-          return new Dict(res.data, this.curSpaceId);
-        }
-        return item;
-      });
-    }
-    return res.success;
-  }
-
-  async deleteDict(id: string): Promise<boolean> {
-    const res = await kernel.deleteDict({
-      id: id,
-      typeName: '',
-    });
-    if (this.dicts && res.success) {
-      this.dicts = this.dicts.filter((item: any) => item.id != id);
-    }
-    return res.success;
   }
 
   async update(

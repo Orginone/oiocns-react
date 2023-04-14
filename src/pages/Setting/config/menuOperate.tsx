@@ -145,18 +145,43 @@ export const loadStandardSetting = async () => {
     });
   }
   result.push({
-    children: [],
-    key: '属性定义',
-    label: '属性定义',
-    itemType: GroupMenuType.Property,
+    key: '数据标准',
+    label: '数据标准',
+    itemType: '数据标准',
     item: userCtrl.space,
     icon: <im.ImNewspaper />,
-    menus: [
+    children: [
       {
-        key: '新增属性',
-        icon: <im.ImPlus />,
-        label: '新增属性',
-        model: 'outside',
+        children: [],
+        key: '字典定义',
+        label: '字典定义',
+        itemType: GroupMenuType.Dict,
+        item: userCtrl.space,
+        icon: <im.ImNewspaper />,
+        menus: [
+          {
+            key: '新增字典',
+            icon: <im.ImPlus />,
+            label: '新增字典',
+            model: 'outside',
+          },
+        ],
+      },
+      {
+        children: [],
+        key: '属性定义',
+        label: '属性定义',
+        itemType: GroupMenuType.Property,
+        item: userCtrl.space,
+        icon: <im.ImNewspaper />,
+        menus: [
+          {
+            key: '新增属性',
+            icon: <im.ImPlus />,
+            label: '新增属性',
+            model: 'outside',
+          },
+        ],
       },
     ],
   });

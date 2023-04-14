@@ -193,28 +193,30 @@ export default class KernelApi {
   }
   /**
    * 删除字典类型
-   * @param {model.IdReqModel} params 请求参数
+   * @param {string} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDict(params: model.IdReqModel): Promise<model.ResultType<boolean>> {
+  public async deleteDict(id: string): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteDict',
-      params: params,
+      params: {
+        id,
+      },
     });
   }
   /**
    * 删除字典项
-   * @param {model.IdReqModel} params 请求参数
+   * @param {string} id 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDictItem(
-    params: model.IdReqModel,
-  ): Promise<model.ResultType<boolean>> {
+  public async deleteDictItem(id: string): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteDictItem',
-      params: params,
+      params: {
+        id,
+      },
     });
   }
   /**
@@ -638,11 +640,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类字典
-   * @param {model.IDBelongReq} params 请求参数
+   * @param {model.IdReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
   public async queryDict(
-    params: model.IDBelongReq,
+    params: model.IdReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',

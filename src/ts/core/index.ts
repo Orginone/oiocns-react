@@ -42,8 +42,6 @@ export {
   loadPublishApply,
   loadPublishTodo,
 } from './todo';
-export type { Dict } from '@/ts/core/thing/dict';
-export type { IDict } from '@/ts/core/thing/idict';
 
 export const createPerson = (data: XTarget) => {
   return new Person(data);
