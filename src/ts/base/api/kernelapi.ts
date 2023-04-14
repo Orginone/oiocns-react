@@ -638,11 +638,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类字典
-   * @param {model.QueryDictModel} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
   public async queryDict(
-    params: model.QueryDictModel,
+    params: model.IDBelongReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
