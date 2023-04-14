@@ -1,5 +1,5 @@
 import userCtrl from '@/ts/controller/setting';
-import { LockOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { LockOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown, MenuProps } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
@@ -35,6 +35,7 @@ const UserAvatar: React.FC = () => {
         icon: <UserOutlined />,
         label: '个人设置',
       },
+      { key: '/pageDesign', icon: <SettingOutlined />, label: '门户设置' },
       {
         type: 'divider' as const,
       },

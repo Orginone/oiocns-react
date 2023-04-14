@@ -32,7 +32,7 @@ class ThingController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.Company], () => {
-      this.property = new Property(userCtrl.space.id);
+      this.property = new Property(userCtrl.space?.id);
       setTimeout(async () => {
         await this.loadSpeciesTree(true);
       }, 100);

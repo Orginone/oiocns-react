@@ -11,6 +11,7 @@ import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
 import BasicLayout from '@/layouts/Basic';
+import PageDesign from '@/pages/PageDesign';
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
@@ -153,6 +154,7 @@ const Routers: IRouteConfig[] = [
         title: '第三方应用',
         component: React.lazy(() => import('@/pages/Online')),
       },
+      { path: '/pageDesign', title: '门户设置', component: PageDesign },
       {
         path: '*',
         title: '页面不存在',

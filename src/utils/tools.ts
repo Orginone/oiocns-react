@@ -267,13 +267,16 @@ const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
   }
   return undefined;
 };
-
+const getNowTime = () => {
+  return moment().format('YYYY-MM-DD HH:mm:ss');
+};
 export {
   dateFormat,
   debounce,
   findAimObj,
   findMenuItemByKey,
   getNewKeyWithString,
+  getNowTime,
   getUuid,
   handleFormatDate,
   pySegSort,
