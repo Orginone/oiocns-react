@@ -101,6 +101,7 @@ export type IdSpeciesReq = {
   // 分页
   page: PageRequest;
 };
+
 export type IdOperationReq = {
   // 唯一ID
   id: string;
