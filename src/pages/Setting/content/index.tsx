@@ -13,9 +13,10 @@ import React from 'react';
 
 interface IProps {
   selectMenu: MenuItemType;
+  refreshKey?: string;
 }
 
-const ContentIndex = ({ selectMenu }: IProps) => {
+const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case GroupMenuType.User:
@@ -31,7 +32,7 @@ const ContentIndex = ({ selectMenu }: IProps) => {
     case GroupMenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
     case GroupMenuType.Property:
-      return <PropertySetting />;
+      return <PropertySetting key={refreshKey} />;
     case GroupMenuType.Dict:
       return <DictSetting current={selectMenu.item} />;
     case GroupMenuType.Species:
