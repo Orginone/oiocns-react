@@ -5,7 +5,7 @@ import userCtrl from '../setting';
 import { DomainTypes, TargetType } from '@/ts/core/enum';
 import { Emitter } from '@/ts/base/common';
 import { TargetShare } from '@/ts/base/model';
-import { TargetChat } from '@/ts/core/chat';
+import { TargetChat, gpt3 } from '@/ts/core/chat';
 import { ChatCache } from '@/ts/core/chat/ichat';
 
 // 会话缓存对象名称
@@ -132,7 +132,9 @@ class ChatController extends Emitter {
   private async _initialization(): Promise<void> {
     kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
-        this._chats = data.chats.map((item: ChatCache) => {
+        this._chats = [];
+        this._chats.push(gpt3(this._userId));
+        data.chats.forEach((item: ChatCache) => {
           let lchat = TargetChat(
             item.target,
             this._userId,
@@ -145,7 +147,9 @@ class ChatController extends Emitter {
             lchat = this._chats[index];
           }
           lchat.loadCache(item);
-          return lchat;
+          if (lchat.chatId != this._userId) {
+            this._chats.push(lchat);
+          }
         });
       }
       this._preMessages = this._preMessages.sort((a: XImMsg, b: XImMsg) => {

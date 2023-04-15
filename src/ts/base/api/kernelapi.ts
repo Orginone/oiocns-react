@@ -2455,6 +2455,14 @@ export default class KernelApi {
   }
   /**
    * 请求一个内核方法
+   * @param {ForwardType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
+    return await this._restRequest('forward', req, 10);
+  }
+  /**
+   * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
    * @returns 异步结果
    */
@@ -2507,10 +2515,11 @@ export default class KernelApi {
   private async _restRequest(
     methodName: string,
     args: any,
+    timeout: number = 2,
   ): Promise<model.ResultType<any>> {
     const res = await this._axiosInstance({
       method: 'post',
-      timeout: 2 * 1000,
+      timeout: timeout * 1000,
       url: '/orginone/kernel/rest/' + methodName,
       headers: {
         Authorization: this._anystore.accessToken,

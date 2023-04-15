@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 
+import { type } from 'os';
 import { FlowNode as SchemaFlowNode, XOperation } from './schema';
 
 // 请求类型定义
@@ -10,6 +11,18 @@ export type ReqestType = {
   action: string;
   // 参数
   params: any;
+};
+
+// 代理请求类型定义
+export type ForwardType = {
+  // 目标地址
+  uri: string;
+  // 请求方法
+  method: string;
+  // 请求头
+  header: any;
+  // 请求体
+  content: any;
 };
 
 // 返回类型定义

@@ -7,6 +7,8 @@ import { XImMsg } from '@/ts/base/schema';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
+// 机器人会话ID
+const gptId = '27523442960172034';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 /**
@@ -84,10 +86,16 @@ class BaseChat implements IChat {
   }
   async clearMessage(): Promise<boolean> {
     if (this.spaceId === this.userId) {
+      let sessionId: any = this.target.id;
+      if (sessionId === this.userId) {
+        sessionId = {
+          _in_: [gptId, this.target.id],
+        };
+      }
       const res = await kernel.anystore.remove(
         hisMsgCollName,
         {
-          sessionId: this.target.id,
+          sessionId: sessionId,
           spaceId: this.spaceId,
         },
         'user',
@@ -146,7 +154,45 @@ class BaseChat implements IChat {
       fromId: this.userId,
       msgBody: common.StringPako.deflate(text),
     });
+    if (this.target.id === this.userId && res.data && res.data.id) {
+      await this.aiReqest(res.data, text);
+    }
     return res.success;
+  }
+  async aiReqest(data: XImMsg, text: string): Promise<void> {
+    data.id = 'A' + data.id.substring(1);
+    let res = await kernel.forward<string>({
+      uri: 'http://chatbot.vesoft-inc.com:5100/api/chat-stream',
+      method: 'POST',
+      header: {
+        Accept: '*/*',
+        path: 'v1/chat/completions',
+        'Content-Type': 'application/json',
+      },
+      content: {
+        messages: [{ role: 'system', content: text }],
+        stream: true,
+        temperature: 1,
+        presence_penalty: 0,
+      },
+    });
+    data.msgBody = common.StringPako.deflate(res.data);
+    data.fromId = gptId;
+    await kernel.anystore.insert(
+      hisMsgCollName,
+      {
+        chatId: data.id,
+        sessionId: gptId,
+        fromId: gptId,
+        toId: this.userId,
+        spaceId: this.userId,
+        createTime: 'sysdate()',
+        msgType: MessageType.Text,
+        msgBody: common.StringPako.deflate(res.data),
+      },
+      'user',
+    );
+    this.receiveMessage(data, false);
   }
   receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
     if (msg) {
@@ -184,11 +230,17 @@ class BaseChat implements IChat {
     this.messageNotify?.apply(this, [this.messages]);
   }
   protected async loadCacheMessages(): Promise<number> {
+    let sessionId: any = this.target.id;
+    if (sessionId === this.userId) {
+      sessionId = {
+        _in_: [gptId, this.target.id],
+      };
+    }
     const res = await kernel.anystore.aggregate(
       hisMsgCollName,
       {
         match: {
-          sessionId: this.target.id,
+          sessionId: sessionId,
           spaceId: this.spaceId,
         },
         sort: {

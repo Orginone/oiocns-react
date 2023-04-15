@@ -1,6 +1,7 @@
 import { ChatModel } from '@/ts/base/model';
 import { CreateChat } from './chat';
 import { XTarget } from '@/ts/base/schema';
+import { TargetType } from '..';
 
 /** 根据target生成会话 */
 export const TargetChat = (
@@ -27,6 +28,22 @@ export const TargetChat = (
     );
   }
   return CreateChat(spaceId, spaceName, target as ChatModel, userId);
+};
+
+export const gpt3 = (id: string) => {
+  return TargetChat(
+    {
+      id: id,
+      name: '奥集能',
+      label: 'GPT3',
+      remark: '免费的,有点慢,忍忍!',
+      typeName: TargetType.Person,
+    } as ChatModel,
+    id,
+    id,
+    '我的',
+    '奥集能',
+  );
 };
 
 export type { IChat, IChatGroup } from './ichat';
