@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import { Branche, FlowNode, XDictItem, XFlowDefine } from '@/ts/base/schema';
+import { Branche, FlowNode, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
-import { IDict } from '@/ts/core/thing/idict';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -19,7 +18,7 @@ import { ImWarning } from 'react-icons/im';
 import { IFlowDefine } from '@/ts/core/thing/iflowDefine';
 
 interface IProps {
-  current: XFlowDefine | undefined;
+  current: XFlowDefine;
   species?: ISpeciesItem;
   modalType: string;
   operateOrgId?: string;
@@ -31,19 +30,6 @@ interface IProps {
   testModel?: boolean;
   defaultEditable?: boolean;
 }
-
-type FlowDefine = {
-  id?: string;
-  name: string;
-  fields: any[];
-  remark: string;
-  authId: string;
-  belongId: string;
-  public: boolean | undefined;
-  operateOrgId?: string;
-  sourceIds?: string;
-  isCreate: boolean;
-};
 
 const Design: React.FC<IProps> = ({
   current,
@@ -58,17 +44,6 @@ const Design: React.FC<IProps> = ({
 }: IProps) => {
   const [scale, setScale] = useState<number>(90);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  const [conditionData, setConditionData] = useState<FlowDefine>({
-    name: '',
-    fields: [],
-    remark: '',
-    authId: '',
-    belongId: current?.belongId || userCtrl.space.id,
-    public: true,
-    operateOrgId: operateOrgId,
-    sourceIds: undefined,
-    isCreate: true,
-  });
   const [resource, setResource] = useState({
     nodeId: `node_${getUuid()}`,
     parentId: '',
@@ -92,24 +67,8 @@ const Design: React.FC<IProps> = ({
       friendDialogmode: false,
       num: 0,
     },
-    belongId: conditionData.belongId || userCtrl.space.id,
     children: {},
   });
-
-  const loadDictItems = async (dictId: any) => {
-    if (!species) {
-      return [];
-    }
-    let dicts: IDict[] = await species.loadDicts(false);
-    let dict: IDict = dicts.filter((item) => item.id == dictId)[0];
-    if (!dict) {
-      return [];
-    }
-    let res = await dict.loadItems();
-    return res.map((item: XDictItem) => {
-      return { label: item.name, value: item.value };
-    });
-  };
   useEffect(() => {
     const load = async () => {
       if (current && species) {
@@ -160,44 +119,10 @@ const Design: React.FC<IProps> = ({
         } else {
           setResource(resourceData);
         }
-
-        species.loadAttrs(false).then((res) => {
-          let attrs = res;
-          setConditionData({
-            name: current.name || '',
-            remark: current.remark,
-            authId: current.authId || '',
-            belongId: current.belongId,
-            public: current.public,
-            sourceIds: current.sourceIds,
-            operateOrgId: operateOrgId,
-            isCreate: current.isCreate,
-            fields: attrs.map((attr: any) => {
-              switch (attr.valueType) {
-                case '描述型':
-                  return { label: attr.name, value: attr.id, type: 'STRING' };
-                case '数值型':
-                  return { label: attr.name, value: attr.id, type: 'NUMERIC' };
-                case '选择型':
-                  return {
-                    label: attr.name,
-                    value: attr.id,
-                    type: 'DICT',
-                    dict: loadDictItems(attr.dictId),
-                  };
-                default:
-                  return { label: attr.name, value: attr.id, type: 'STRING' };
-              }
-            }),
-          });
-        });
       }
       // setLoaded(true);
     };
     load();
-    if (!current) {
-      onBack();
-    }
   }, [current]);
 
   useEffect(() => {
@@ -209,8 +134,8 @@ const Design: React.FC<IProps> = ({
         okType: 'danger',
         cancelText: '取消',
         onOk() {
-          onBack();
           setModalType('');
+          onBack();
         },
         onCancel() {
           setModalType('设计流程');
@@ -279,15 +204,6 @@ const Design: React.FC<IProps> = ({
     }
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
-      if (!node.belongId && node.type != 'ROOT') {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span color="blue">{node.name}</span> 缺少belongId
-            </>,
-          ),
-        );
-      }
       if (
         (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
         (!node.destId || node.destId == '0' || node.destId == '')
@@ -374,11 +290,6 @@ const Design: React.FC<IProps> = ({
           break;
         case '子流程':
           resource.type = 'CHILDWORK';
-          break;
-        //如果是空结点（下个流程的起始节点）
-        case '空':
-        case 'EMPTY':
-          resource.type = 'EMPTY';
           break;
         default:
           break;
@@ -537,14 +448,6 @@ const Design: React.FC<IProps> = ({
 
   const changeResource = (resource: any, type: string): any => {
     let obj: any;
-    let belongId = undefined;
-    if (resource.belongId && resource.belongId != '') {
-      belongId = resource.belongId;
-    } else if (operateOrgId && operateOrgId != '') {
-      belongId = operateOrgId;
-    } else {
-      belongId = conditionData.belongId || current?.belongId;
-    }
     if (type == 'flowNode') {
       let flowNode: FlowNode = {
         id: resource.id,
@@ -582,7 +485,6 @@ const Design: React.FC<IProps> = ({
               return changeResource(item, 'branch');
             })
           : [],
-        belongId: belongId,
       };
       obj = flowNode;
     } else if (type == 'branch') {
@@ -706,20 +608,15 @@ const Design: React.FC<IProps> = ({
                           setShowErrorsModal(errors);
                           return;
                         }
-                        let sourceIds_ = conditionData.sourceIds;
-                        if (Array.isArray(sourceIds_)) {
-                          sourceIds_ = sourceIds_.join(',');
-                        }
                         define = await species?.updateFlowDefine({
                           id: current?.id,
-                          code: conditionData.name,
-                          name: conditionData.name,
-                          sourceIds: sourceIds_,
-                          fields: JSON.stringify(conditionData.fields),
-                          remark: conditionData.remark,
+                          code: current.name,
+                          name: current.name,
+                          sourceIds: current.sourceIds,
+                          remark: current.remark,
                           resource: resource_,
                           belongId: operateOrgId,
-                          isCreate: conditionData.isCreate,
+                          isCreate: current.isCreate,
                         });
                         if (define) {
                           message.success('保存成功');
@@ -753,20 +650,16 @@ const Design: React.FC<IProps> = ({
             <Card bordered={false}>
               {/* 基本信息组件 */}
               <div>
-                {conditionData && (
-                  <ChartDesign
-                    disableIds={[current?.id || '']}
-                    // key={key}
-                    current={current}
-                    defaultEditable={defaultEditable}
-                    species={species}
-                    operateOrgId={operateOrgId}
-                    designOrgId={conditionData.belongId}
-                    conditions={conditionData.fields}
-                    resource={resource}
-                    scale={scale}
-                  />
-                )}
+                <ChartDesign
+                  disableIds={[current?.id || '']}
+                  // key={key}
+                  current={current}
+                  defaultEditable={defaultEditable}
+                  species={species}
+                  operateOrgId={operateOrgId}
+                  resource={resource}
+                  scale={scale}
+                />
               </div>
             </Card>
           </Layout.Content>
