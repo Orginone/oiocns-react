@@ -451,8 +451,6 @@ export type FlowNode = {
   children: FlowNode | undefined;
   // 分支节点
   branches: Branche[];
-  // 节点归属
-  belongId: string;
   // 节点绑定的表单
   operations: XOperation[];
 };
