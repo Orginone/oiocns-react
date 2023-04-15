@@ -177,6 +177,7 @@ class BaseChat implements IChat {
         presence_penalty: 0,
       },
     });
+    data.msgType = MessageType.Text;
     data.msgBody = common.StringPako.deflate(res.data);
     data.fromId = gptId;
     await kernel.anystore.insert(
