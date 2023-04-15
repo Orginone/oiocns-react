@@ -25,17 +25,17 @@ const Groupinputbox = (props: Iprops) => {
    * @return {*}
    */
   const submit = async () => {
-    const inputContent: any = document.getElementById('insterHtml')?.childNodes;
-    const text: any =
-      inputContent?.length > 0
-        ? reCreatChatContent(document.getElementById('insterHtml')?.childNodes ?? [])
-        : [document.getElementById('insterHtml')?.innerHTML];
-    let massage = text.join('').trim();
-    if (massage.length > 0) {
-      await chatCtrl.chat?.sendMessage(MessageType.Text, massage);
-    }
     const insterHtml = document.getElementById('insterHtml');
-    if (insterHtml) {
+    if (insterHtml != null) {
+      const text: any =
+        insterHtml.childNodes.length > 0
+          ? reCreatChatContent(insterHtml.childNodes ?? [])
+          : [insterHtml.innerHTML];
+      let massage = text.join('').trim();
+      if (massage.length > 0) {
+        insterHtml.innerHTML = '发送中,请稍后...';
+        await chatCtrl.chat?.sendMessage(MessageType.Text, massage);
+      }
       insterHtml.innerHTML = '';
     }
   };
