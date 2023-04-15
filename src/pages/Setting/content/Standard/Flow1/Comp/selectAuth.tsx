@@ -6,6 +6,7 @@ import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
   value?: string;
   onChange: any;
+  readonly?: boolean;
 }
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
@@ -36,7 +37,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
   return (
     <TreeSelect
       showSearch
-      style={{ width: '100%' }}
+      style={{ width: '100%', paddingTop: '10%' }}
       value={props.value}
       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
       placeholder="请选择角色"
@@ -46,6 +47,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
       }}
       onChange={props.onChange}
       treeData={treeData}
+      disabled={props.readonly}
     />
   );
 };

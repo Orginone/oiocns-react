@@ -6,7 +6,7 @@ import Description from './Description';
 import cls from './index.module.less';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
-import SettingFlow from '@/pages/Setting/content/Standard/Flow';
+import SettingFlow from '@/pages/Setting/content/Standard/Flow1';
 import { ImUndo2 } from 'react-icons/im';
 import { XFlowDefine } from '@/ts/base/schema';
 import settingCtrl from '@/ts/controller/setting';

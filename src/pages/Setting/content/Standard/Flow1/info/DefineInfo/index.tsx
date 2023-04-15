@@ -167,7 +167,7 @@ const DefineInfo = (props: Iprops) => {
             id: '0',
             code: getUuid(),
             type: 'ROOT',
-            name: '发起角色',
+            name: '发起人',
             num: 0,
             destType: '角色',
             destId: '0',
