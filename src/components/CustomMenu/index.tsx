@@ -13,21 +13,31 @@ import {
 import React, { useEffect, useState } from 'react';
 import { ImSearch, ImUndo2 } from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
+import { Checkbox } from 'antd';
 import style from './index.module.less';
+import { getUuid } from '@/utils/tools';
 
 interface CustomMenuType {
   selectMenu: MenuItemType;
   item: MenuItemType;
+  menuStyle?: any;
+  checkedList?: any[];
   onSelect?: (item: MenuItemType) => void;
+  onCheckedChange?: Function;
   onMenuClick?: (item: MenuItemType, menuKey: string) => void;
+  searchRightRegion?: any;
 }
 const CustomMenu = (props: CustomMenuType) => {
   const [filter, setFilter] = useState<string>('');
   const [selectedKeys, setSelectedKeys] = useState<string[]>([props.selectMenu.key]);
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
+  const [overItem, setOverItem] = useState<any>();
   const [data, setData] = useState<MenuProps['items']>([]);
   const [operateMenu, setOperateMenu] = useState<OperateMenuType>();
+  // const [checkedList, setCheckedList] = useState<MenuItemType[]>(props.checkedList || []);
+  const [checkboxKey, setCheckboxKey] = useState<string>();
+  // useEffect()
   useEffect(() => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
@@ -46,12 +56,25 @@ const CustomMenu = (props: CustomMenuType) => {
   }, [props]);
 
   useEffect(() => {
+    if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
+      const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
+      setData(loadMenus(loopFilterTree(props.item.children), expKeys));
+    }
+    if (operateMenu && props.selectMenu.menus) {
+      const menu = props.selectMenu.menus.find((i) => i.key == operateMenu?.key);
+      if (menu && menu.subMenu) {
+        setData(loadMenus(loopFilterTree([menu.subMenu])));
+      }
+    }
+  }, [checkboxKey]);
+
+  useEffect(() => {
     if (operateMenu) {
       setData(loadMenus(loopFilterTree([operateMenu.subMenu!]), openKeys));
     } else {
       setData(loadMenus(loopFilterTree(props.item.children), openKeys));
     }
-  }, [visibleMenu, filter]);
+  }, [overItem, visibleMenu, filter]);
 
   const loopFilterTree = (data: MenuItemType[]) => {
     const result: any[] = [];
@@ -84,6 +107,24 @@ const CustomMenu = (props: CustomMenuType) => {
           key: item.key,
           icon: (
             <span style={{ fontSize: 16, paddingTop: 2 }}>
+              {item.menuType == 'checkbox' && (
+                <Checkbox
+                  checked={props.checkedList?.map((it) => it.key).includes(item.key)}
+                  style={{ paddingRight: 10 }}
+                  onChange={(e: any) => {
+                    if (e.target.checked) {
+                      let checkedList = props.checkedList || [];
+                      checkedList.push(item);
+                      props.onCheckedChange?.call(this, checkedList);
+                      // setCheckedList(checkedList);
+                    } else {
+                      let list = props.checkedList?.filter((ky) => ky.key != item.key);
+                      props.onCheckedChange?.call(this, list);
+                      // setCheckedList(list);
+                    }
+                    setCheckboxKey(getUuid());
+                  }}></Checkbox>
+              )}
               {item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon}
             </span>
           ),
@@ -125,55 +166,57 @@ const CustomMenu = (props: CustomMenuType) => {
             setSelectedKeys([props.selectMenu.key, item.key]);
           }
         }}
-        className={style.customlabel}
+        style={{ flex: 1 }}
+        onMouseOver={() => {
+          setOverItem(item);
+        }}
         onMouseLeave={() => {
+          setOverItem(undefined);
           setVisibleMenu(false);
         }}>
-        <Typography.Text className={style.label} ellipsis={{ tooltip: item.label }}>
-          {item.label}
-        </Typography.Text>
+        {!item.display && <Typography.Text ellipsis>{item.label}</Typography.Text>}
+        {item.display}
         {item.count && item.count > 0 ? (
-          <span className={style.badge}>
+          <span style={{ float: 'right' }}>
             <Badge key={item.key} count={item.count} size="small" />
           </span>
         ) : (
           <></>
         )}
-        {Array.isArray(item.menus) && item.menus.length > 0 && (
-          <span onClick={(e: any) => e.stopPropagation()} className={style.moreButton}>
-            {props.selectMenu.key === item.key && (
-              <Dropdown
-                menu={{
-                  items: item.menus.map((i) => {
-                    return {
-                      key: i.key,
-                      icon: i.icon,
-                      label: i.label,
-                    };
-                  }),
-                  onClick: ({ key }) => {
-                    const menu = item.menus?.find((i) => i.key == key);
-                    if (menu && menu.subMenu) {
-                      setOperateMenu(menu);
-                      setSelectedKeys([props.selectMenu.key, menu.subMenu.key]);
-                      props.onSelect?.apply(this, [menu.subMenu]);
-                    } else {
-                      props.onMenuClick?.apply(this, [item, key]);
-                    }
-                    setVisibleMenu(false);
-                  },
-                }}
-                placement="bottom"
-                open={visibleMenu}
-                onOpenChange={(open: boolean) => {
-                  setVisibleMenu(open);
-                }}
-                trigger={['click', 'contextMenu']}>
-                <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
-              </Dropdown>
-            )}
-          </span>
-        )}
+        <span onClick={(e: any) => e.stopPropagation()} style={{ float: 'right' }}>
+          {item.menus && overItem?.key === item.key && (
+            <Dropdown
+              menu={{
+                items: item.menus?.map((i) => {
+                  return {
+                    key: i.key,
+                    icon: i.icon,
+                    label: i.label,
+                  };
+                }),
+                onClick: ({ key }) => {
+                  props.onSelect?.apply(this, [item]);
+                  const menu = item.menus?.find((i) => i.key == key);
+                  if (menu && menu.subMenu) {
+                    setOperateMenu(menu);
+                    setSelectedKeys([props.selectMenu.key, menu.subMenu.key]);
+                    props.onSelect?.apply(this, [menu.subMenu]);
+                  } else {
+                    props.onMenuClick?.apply(this, [item, key]);
+                  }
+                  setVisibleMenu(false);
+                },
+              }}
+              placement="bottom"
+              open={visibleMenu}
+              onOpenChange={(open: boolean) => {
+                setVisibleMenu(open);
+              }}
+              trigger={['click', 'contextMenu']}>
+              <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
+            </Dropdown>
+          )}
+        </span>
       </span>
     );
   };
@@ -211,11 +254,13 @@ const CustomMenu = (props: CustomMenuType) => {
             setFilter(e.target.value);
           }}
         />
+        {props.searchRightRegion}
       </span>
 
       <Menu
-        className={style.customMenu}
+        className={props.menuStyle ? props.menuStyle : style.customMenu}
         mode="inline"
+        // selectable={true}
         inlineIndent={10}
         items={data}
         triggerSubMenuAction="click"
@@ -229,6 +274,22 @@ const CustomMenu = (props: CustomMenuType) => {
           setOpenKeys(keys);
         }}
         selectedKeys={selectedKeys}></Menu>
+      {/* <Menu
+        className={props.menuStyle ? props.menuStyle : style.customMenu}
+        mode="inline"
+        inlineIndent={10}
+        items={data}
+        triggerSubMenuAction="click"
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setVisibleMenu(true);
+        }}
+        expandIcon={() => <></>}
+        openKeys={openKeys}
+        onOpenChange={(keys) => {
+          setOpenKeys(keys);
+        }}
+        selectedKeys={selectedKeys}></Menu> */}
     </>
   );
 };

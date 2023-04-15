@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import {CodepenSquareFilled} from "@ant-design/icons";
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -38,7 +39,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     {
       key: 'store',
       path: '/store',
-      title: '管理',
+      title: '仓库',
       icon: 'icon-store',
       count: 0,
       fath: '/store',
@@ -50,6 +51,13 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-setting',
       count: 0,
       fath: '/setting',
+    },{
+      key: 'DataManagement',
+      path: '/DataManagement',
+      title: '设置',
+      icon: <CodepenSquareFilled />,
+      count: 0,
+      fath: '/DataManagement',
     },
   ];
   useEffect(() => {

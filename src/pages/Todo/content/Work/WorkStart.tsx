@@ -175,9 +175,11 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
                   contentType: 'Text',
                   data: JSON.stringify({ ...data, ...values }),
                   title: currentDefine?.name || '',
-                  hook: '',
+                  hook: 'http://123.156.231.148:3000/internal/login',
                   thingIds: rows_.map((row: any) => row['Id']),
                 });
+                // console.log(JSON.stringify({ ...data, ...values }));
+                // debugger
                 if (res.success) {
                   setOperations([]);
                   setSuccessPage(true);
@@ -196,7 +198,6 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
             <Tabs defaultActiveKey="1">
               <TabPane tab="实体" key="1">
                 <Thing
-                  keyExpr="Id"
                   dataSource={rows}
                   current={chooseThingModal[0]}
                   checkedList={chooseThingModal.map((e) => {
@@ -277,6 +278,22 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
               })}
               onSelectionChanged={(rows: any) => {}}
               height={'calc(80vh - 175px)'}
+              // toolBarItems={
+              //   chooseThingModal[0].name == '道'
+              //     ? [
+              //         <Item key={getUuid()}>
+              //           {' '}
+              //           <Button
+              //             icon={<PlusOutlined></PlusOutlined>}
+              //             onClick={() => {
+              //               setCreateThingByInputNumModal(true);
+              //             }}>
+              //             创建实体
+              //           </Button>
+              //         </Item>,
+              //       ]
+              //     : []
+              // }
               editingTool={
                 <Editing
                   allowAdding={false}

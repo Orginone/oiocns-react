@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Drawer, Typography } from 'antd';
 import ApprovalNode from './components/ApprovalNode';
-import WorkFlowNode from './components/WorkFlowNode';
 import CcNode from './components/CcNode';
 import RootNode from './components/RootNode';
 import ConcurrentNode from './components/ConcurrentNode';
@@ -24,7 +23,6 @@ interface IProps {
   conditions?: FieldCondition[];
   onClose: () => void;
   species?: ISpeciesItem;
-  disableIds: string[];
   defaultEditable: boolean;
 }
 
@@ -36,7 +34,6 @@ const FlowDrawer: React.FC<IProps> = ({
   operateOrgId,
   designOrgId,
   species,
-  disableIds,
   defaultEditable,
 }) => {
   const [key, setKey] = useState<string>();
@@ -80,15 +77,6 @@ const FlowDrawer: React.FC<IProps> = ({
         case AddNodeType.APPROVAL:
           return (
             <ApprovalNode
-              current={current}
-              orgId={operateOrgId || designOrgId}
-              species={species}
-            />
-          );
-        case AddNodeType.CHILDWORK:
-          return (
-            <WorkFlowNode
-              disableIds={disableIds}
               current={current}
               orgId={operateOrgId || designOrgId}
               species={species}

@@ -235,7 +235,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.target.id != id;
+        return market.market.id != id;
       });
       return true;
     }
@@ -261,7 +261,7 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     });
     if (res.success) {
       this.joinedMarkets = this.joinedMarkets.filter((market) => {
-        return market.target.id != id;
+        return market.market.id != id;
       });
       return true;
     }

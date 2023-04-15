@@ -58,7 +58,7 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       outDir: 'dist', // 指定输出路径
       minify: 'terser', // 混淆器,terser构建后文件体积更小
       sourcemap: false, // 输出.map文件
-      chunkSizeWarningLimit: 8192,
+      chunkSizeWarningLimit: 4096,
       terserOptions: {
         compress: {
           drop_console: VITE_DROP_CONSOLE, // 生产环境移除console

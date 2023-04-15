@@ -141,7 +141,7 @@ const Station: React.FC<IProps> = (props) => {
   );
   /**人员列表 */
   const personCount = (
-    <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '0px' }}>
+    <div className={`${cls['dept-wrap-pages']}`} style={{ paddingTop: '10px' }}>
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false}>
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>

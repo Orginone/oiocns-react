@@ -78,11 +78,6 @@ class OrgTodo implements ITodoGroup {
             (a) => a.team?.target?.typeName == TargetType.Group,
           );
           break;
-        case WorkType.CohortApply:
-          res.data.result = res.data.result.filter(
-            (a) => a.team?.target?.typeName == TargetType.Cohort,
-          );
-          break;
         default:
           break;
       }

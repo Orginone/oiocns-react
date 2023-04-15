@@ -65,6 +65,7 @@ class AppController extends Emitter {
       kernel.anystore.subscribed(STORE_RECENTLY_APPS, 'user', (map: any) => {
         this._commonAppMap = map;
         this._caches = map[userCtrl.space.id] || [];
+        console.log('_caches', this._caches);
         this.changCallbackPart(STORE_RECENTLY_APPS);
       });
 

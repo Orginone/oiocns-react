@@ -1,0 +1,139 @@
+.containers {
+  padding: 0 0 0.4rem 0.4rem;
+  position: relative;
+  overflow-y: auto;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+.headerStyle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 11;
+  display: flex;
+  justify-content: center;
+}
+
+.contentStyle {
+  text-align: center;
+  background-color: #fff;
+}
+
+.containers img {
+  width: 100%;
+  height: 100%;
+}
+h1 {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  width: 80%;
+  user-select: none;
+}
+
+.nav-item {
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.3s;
+}
+
+.nav-item:hover {
+  color: #108ee9;
+}
+
+.top-imgs {
+  width: 100%;
+  height: 730px;
+}
+.item-bottom {
+  padding-bottom: 3rem;
+}
+
+.content-box {
+  padding: 2rem 0;
+  background: url('@/assets/newWeb/1.png') no-repeat;
+  background-size: 100% 100%;
+}
+
+.content-box .center-item {
+  padding: 2rem 20rem 0 20rem;
+}
+
+.content-box .center-item .myitem {
+  display: flex;
+  justify-content: space-around;
+}
+
+.content-box .center-item .myitem img {
+  height: 440px;
+  width: 440px;
+}
+
+.content-box .center-item .myitem .span0 {
+  width: 501px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 400px;
+}
+
+.content-box .center-item .myitem .span0 .span1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #04217a;
+  padding-bottom: 1.5rem;
+}
+
+.content-box .center-item .myitem .span0 .span2 {
+  color: #04217a;
+  word-wrap: break-word;
+}
+
+.content-box .title-content {
+  display: flex;
+  justify-content: center;
+}
+
+.content-box .title-content h1 {
+  position: relative;
+  text-align: center;
+  color: #333;
+  line-height: 60px;
+}
+
+.content-box .title-content h1::after {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  left: 106%;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #ced3f4 0.01%,
+    #ced3f4 52.03%,
+    rgba(237, 239, 252, 0) 96.35%
+  );
+}
+
+.content-box .title-content h1::before {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  right: 106%;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(237, 239, 252, 0.18) 0.83%,
+    #ced3f4 47.66%,
+    #ced3f4 100%
+  );
+}

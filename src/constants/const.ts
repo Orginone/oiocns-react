@@ -4,10 +4,7 @@ export const STORE_USER_MENU = 'STORE_MENU';
 export const STORE_RECENTLY_APPS = 'STORE_RECENTLY_APPS';
 // 购物车
 export const JOIN_SHOPING_CAR = 'JOIN_SHOPING_CAR';
-// 常用菜单(仓库)
-export const STORE_COMMON_MENU = 'STORE_COMMON_MENU';
-// 常用菜单(待办)
-export const TODO_COMMON_MENU = 'TODO_COMMON_MENU';
+
 // 分享分发 可选类型
 export const DestTypes = [
   {

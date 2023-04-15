@@ -347,8 +347,6 @@ export interface ISpace extends IFlow, IMTarget, ITarget {
 }
 /** 群组操作 */
 export interface ICohort extends ITarget {
-  /** 查询归属用户 */
-  queryBelong(): Promise<schema.XTarget | undefined>;
   /**
    * 查询人员
    * @param code 人员编号

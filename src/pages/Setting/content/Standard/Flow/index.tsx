@@ -15,7 +15,7 @@ interface IProps {
   target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
-  flowDesign: XFlowDefine | undefined;
+  flowDesign: XFlowDefine;
   curTabKey?: number;
   setFlowDesign: Function;
   setModalType: (modalType: string) => void;

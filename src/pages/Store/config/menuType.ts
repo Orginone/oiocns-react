@@ -1,7 +1,6 @@
 /** 分组菜单类型 */
 export enum GroupMenuType {
   'Data' = '数据',
-  'Common' = '我的常用',
   'Application' = '应用程序',
   'FileSystemItem' = '文件系统项',
   'Resource' = '资源',
@@ -9,4 +8,5 @@ export enum GroupMenuType {
   'Species' = '分类',
   'Thing' = '物',
   'Wel' = '财',
+  'Software'='代码',
 }

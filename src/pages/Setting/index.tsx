@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import userCtrl from '@/ts/controller/setting';
-import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
+import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -12,9 +12,7 @@ import { Modal } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
 import AuthorityModal from './content/Authority/AuthorityModal';
-import PropertyModal from './components/propertyModal';
 import { SettingOutlined } from '@ant-design/icons';
-import thingCtrl from '@/ts/controller/thing';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -27,11 +25,10 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 };
 
 const TeamSetting: React.FC = () => {
+  const [species, setSpecies] = useState<ISpeciesItem>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
-
-  if (!selectMenu) return <></>;
 
   return (
     <MainLayout
@@ -43,13 +40,24 @@ const TeamSetting: React.FC = () => {
         children: [],
       }}
       selectMenu={selectMenu}
+      tabKey={'1'}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
-        if (data.itemType === GroupMenuType.Agency) {
-          await (data.item as ITarget).loadSubTeam();
-          userCtrl.changCallback();
+        if (data.itemType === GroupMenuType.Species && data.item) {
+          setSpecies(data.item);
+        } else {
+          setSpecies(undefined);
+          userCtrl.currentKey = data.key;
+          const item = data.item as ITarget;
+          if (data.itemType === GroupMenuType.Agency) {
+            if (item.subTeam.length === 0) {
+              const subs = await item.loadSubTeam();
+              if (subs.length > 0) {
+                refreshMenu();
+              }
+            }
+          }
         }
-        userCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
@@ -59,7 +67,6 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -87,39 +94,27 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
             });
             break;
           default:
-            if (key.startsWith('重载')) {
-              const type = key.split('|')[1];
-              switch (type) {
-                case TargetType.Cohort:
-                  userCtrl.space.getCohorts(true);
-                  break;
-                case TargetType.Department:
-                  (userCtrl.space as ICompany).getDepartments(true);
-                  break;
-                case TargetType.Group:
-                  (userCtrl.space as ICompany).getJoinedGroups(true);
-                  break;
-                case TargetType.Station:
-                  (userCtrl.space as ICompany).getStations(true);
-                  break;
-              }
-              userCtrl.changCallback();
-            } else {
-              setEditTarget(data.item);
-              setOperateKeys(key.split('|'));
-            }
+            setEditTarget(data.item);
+            setOperateKeys(key.split('|'));
             break;
         }
       }}
       title={{ label: '设置', icon: <IconFont type={'icon-setting'} /> }}
-      siderMenuData={menus}>
+      tabs={menus}
+      siderMenuData={menus[0]?.menu}
+      onCheckedChange={(_: string[]) => {
+        refreshMenu();
+      }}
+      checkedList={[]}
+      onTabChanged={(tabKey) => {
+        refreshMenu(tabKey);
+      }}>
       {/** 组织模态框 */}
       <TeamModal
         title={operateKeys[0]}
@@ -144,14 +139,14 @@ const TeamSetting: React.FC = () => {
           handleCancel={function (): void {
             setOperateKeys(['']);
           }}
-          handleOk={async (newItem) => {
+          handleOk={(newItem) => {
             if (newItem) {
               refreshMenu();
               setOperateKeys(['']);
             }
           }}
           targetId={(selectMenu.item as ITarget)?.id}
-          current={selectMenu.item as ISpeciesItem}
+          current={species}
         />
       )}
       {/** 权限模态框 */}
@@ -168,34 +163,17 @@ const TeamSetting: React.FC = () => {
               setOperateKeys(['']);
             }
           }}
-        />
-      )}
-      {/** 权限模态框 */}
-      {selectMenu.itemType == '属性' && (
-        <PropertyModal
-          title={operateKeys[0] + selectMenu.itemType}
-          open={operateKeys[0] === '新增属性'}
-          handleCancel={function (): void {
-            setOperateKeys(['']);
-          }}
-          handleOk={(newItem) => {
-            if (newItem) {
-              refreshMenu();
-              setOperateKeys(['']);
-            }
-            setSelectMenu(selectMenu);
-          }}
-          data={undefined}
+          current={selectMenu.item}
         />
       )}
       {/* 分类转字典 */}
-      {
+      {species && (
         <TransToDict
           open={['转为字典'].includes(operateKeys[0])}
           setOpen={() => setOperateKeys([''])}
-          currentSpeciesItem={selectMenu.item as ISpeciesItem}></TransToDict>
-      }
-      <Content key={key} selectMenu={selectMenu} />
+          currentSpeciesItem={species}></TransToDict>
+      )}
+      <Content key={key} selectMenu={selectMenu} species={species} />
     </MainLayout>
   );
 };

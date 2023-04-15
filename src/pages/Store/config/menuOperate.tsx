@@ -6,7 +6,6 @@ import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import thingCtrl from '@/ts/controller/thing';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -102,16 +101,6 @@ export const getResourceMenus = () => {
   };
 };
 
-export const getCommonSpeciesMenus = () => {
-  return {
-    key: '我的常用',
-    label: '我的常用',
-    itemType: GroupMenuType.Common,
-    icon: <im.ImHeart />,
-    children: storeCtrl.caches || [],
-  };
-};
-
 /** 获取应用程序菜单 */
 export const getAppliactionMenus = () => {
   return {
@@ -136,6 +125,19 @@ export const getAssetMenus = () => {
   };
 };
 
+/** 获取代码菜单 */
+export const getSoftware = () => {
+  return {
+    key: '代码',
+    label: '代码',
+    itemType: GroupMenuType.Software,
+    icon: <im.ImCalculator />,
+    item: storeCtrl.root,
+    children: [],
+  };
+};
+
+
 /** 获取文件系统菜单 */
 export const getFileSystemMenus = () => {
   return {
@@ -149,116 +151,23 @@ export const getFileSystemMenus = () => {
   };
 };
 
-export const loadThingMenus = async () => {
+export const loadAnythingMenus = async () => {
   const root = await thingCtrl.loadSpeciesTree();
-  for (const item of root!.children) {
-    if (item.target.code === 'thing') {
-      return {
-        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, ''),
-        key: item.target.name,
-        label: item.target.name,
+  return root
+    ? {
+        children: buildSpeciesChildrenTree(
+          root.children,
+          GroupMenuType.Thing,
+          'checkbox',
+        ),
+        key: '实体',
+        label: '实体',
         itemType: GroupMenuType.Thing,
-        menus: loadSpeciesOperationMenus(item),
-        item: item,
+        menus: loadSpeciesOperationMenus(root),
+        item: root,
         icon: <im.ImCalculator />,
-      };
-    }
-  }
-};
-
-export const loadAdminMenus = async () => {
-  const anyThingMenus = await loadThingMenus();
-  const children: MenuItemType[] = [
-    // getCommonSpeciesMenus(),
-    getAppliactionMenus(),
-    getFileSystemMenus(),
-    getResourceMenus(),
-    getDataMenus(),
-  ];
-  if (anyThingMenus) {
-    children.push(anyThingMenus);
-  }
-  return children;
-};
-
-export const loadMarketMenus = async () => {
-  const markets = await marketCtrl.target.getJoinMarkets();
-  return [
-    {
-      key: '管理的商店',
-      label: '管理的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '管理的商店',
-      menus: [
-        {
-          key: '创建商店',
-          label: '创建商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId === marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            item: item,
-            children: [],
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-    {
-      key: '加入的商店',
-      label: '加入的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '加入的商店',
-      menus: [
-        {
-          key: '加入商店',
-          label: '加入商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId != marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            children: [],
-            item: item,
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-  ];
+      }
+    : undefined;
 };
 
 const buildSpeciesChildrenTree = (
@@ -284,8 +193,7 @@ const buildSpeciesChildrenTree = (
 };
 
 /** 加载右侧菜单 */
-export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
-  // let isCommon = storeCtrl.caches.map((cache) => cache.key).includes(item.id);
+export const loadSpeciesOperationMenus = (_: ISpeciesItem) => {
   const items: OperateMenuType[] = [
     {
       key: '创建实体',
@@ -293,18 +201,5 @@ export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
       icon: <im.ImFolderPlus />,
     },
   ];
-  // if (isCommon) {
-  //   items.push({
-  //     key: '取消常用',
-  //     label: '取消常用',
-  //     icon: <im.ImHeartBroken />,
-  //   });
-  // } else {
-  //   items.push({
-  //     key: '设为常用',
-  //     label: '设为常用',
-  //     icon: <im.ImHeart />,
-  //   });
-  // }
   return items;
 };

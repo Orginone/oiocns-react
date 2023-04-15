@@ -1,70 +1,104 @@
 import { emitter } from '@/ts/core';
 import chatCtrl from '@/ts/controller/chat';
 import { useEffect } from 'react';
-import { useState } from 'react';
-import { MenuItemType } from 'typings/globelType';
+import React, { useState } from 'react';
+import * as im from 'react-icons/im';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
-import { findMenuItemByKey } from '@/utils/tools';
 /**
  * 监听控制器刷新hook
  * @param ctrl 控制器
  * @returns hooks 常量
  */
-
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  TabItemType[],
   () => void,
-  MenuItemType | undefined,
+  string,
+  (item: string) => void,
+  MenuItemType,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenus] = useState<MenuItemType[]>([]);
-  const [selectMenu, setSelectMenu] = useState<MenuItemType>();
+  // const [viewkey, setViewkey] = useState<string>('');
+  const [menus, setMenu] = useState<TabItemType[]>([]);
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
+    key: '会话',
+    label: '会话',
+    itemType: '会话',
+    icon: <im.ImTree />,
+    children: [],
+  });
+  const [selectTab, setSelectTab] = useState<string>('1');
+
+  /** 查找菜单 */
+  const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
+    for (const item of items) {
+      if (item.key === key) {
+        return item;
+      } else if (Array.isArray(item.children)) {
+        const find = findMenuItemByKey(item.children, key);
+        if (find) {
+          return find;
+        }
+      }
+    }
+    return undefined;
+  };
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const chats = operate.loadChatMenu();
+    const chats = await operate.loadChatMenu();
     const books = await operate.loadBookMenu();
-    const newMenus = [
+
+    let menus = [];
+    menus.push(
       {
-        key: '会话',
+        key: '1',
         label: '会话',
-        itemType: 'Tab',
-        children: chats,
+        menu: chats,
       },
       {
-        key: '通讯录',
+        key: '2',
         label: '通讯录',
-        itemType: 'Tab',
-        children: books,
+        menu: books,
       },
-    ];
-    var item = findMenuItemByKey(newMenus, chatCtrl.currentKey);
-    if (item === undefined) {
-      if (chats.length > 0) {
-        item = chats[0];
-      } else if (books.length > 0) {
-        item = books[0];
+    );
+    setMenu(menus);
+    let children = [];
+    switch (chatCtrl.tabIndex) {
+      case '1':
+        children = chats.children;
+        break;
+      default:
+        children = books.children;
+        break;
+    }
+
+    const item: MenuItemType | undefined = findMenuItemByKey(
+      children,
+      chatCtrl.currentKey,
+    );
+    if (item) {
+      setSelectMenu(item);
+    } else {
+      if (children.length > 0) {
+        chatCtrl.currentKey = children[0].key;
+        setSelectMenu(children[0]);
       }
     }
-    chatCtrl.currentKey = item.key;
-    setSelectMenu(item);
-    setMenus(newMenus);
   };
 
   useEffect(() => {
-    const id = chatCtrl.subscribe((key) => {
-      if (chatCtrl.inited) {
-        setKey(key);
-        refreshMenu();
-      }
+    const id = emitter.subscribe((key) => {
+      setKey(key);
+      refreshMenu();
     });
     return () => {
       emitter.unsubscribe(id);
     };
   }, []);
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, menus, refreshMenu, selectTab, setSelectTab, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

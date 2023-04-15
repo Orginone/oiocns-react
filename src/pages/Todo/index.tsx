@@ -13,18 +13,24 @@ const Todo: React.FC<any> = () => {
     todoCtrl.loadWorkTodo();
   }, [userCtrl.space.id]);
 
-  if (!selectMenu) return <></>;
-
   return (
     <MainLayout
       title={{ label: '办事', icon: <IconFont type={'icon-todo'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        todoCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
-      onMenuClick={async (data, key) => {}}
-      siderMenuData={menus}>
+      checkedList={[]}
+      onTabChanged={(key) => {
+        let menu = menus.find((a) => a.key == key)?.menu;
+        if (menu) {
+          setSelectMenu(menu);
+        }
+      }}
+      tabKey={'1'}
+      onCheckedChange={(checkedList: any[]) => {}}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
       <Content key={key} selectMenu={selectMenu} reflashMenu={refreshMenu} />
     </MainLayout>
   );

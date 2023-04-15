@@ -99,8 +99,8 @@ const AppPutaway: React.FC = () => {
             <Select>
               {marketCtrl.target.joinedMarkets.map((item) => {
                 return (
-                  <Select.Option value={item.target.id} key={item.target.id}>
-                    {item.target.name}
+                  <Select.Option value={item.market.id} key={item.market.id}>
+                    {item.market.name}
                   </Select.Option>
                 );
               })}

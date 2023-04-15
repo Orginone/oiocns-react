@@ -8,8 +8,7 @@ import {
   ISpeciesItem,
 } from '../../core/';
 import { kernel, schema } from '@/ts/base';
-import { badRequest, ResultType } from '@/ts/base/model';
-import { Property } from '@/ts/core/thing/property';
+import { badRequest, PageRequest, ResultType } from '@/ts/base/model';
 
 /**
  * 物的控制器
@@ -17,7 +16,6 @@ import { Property } from '@/ts/core/thing/property';
 class ThingController extends Emitter {
   public species: INullSpeciesItem;
   public speciesList: ISpeciesItem[] = [];
-  public property: Property | undefined;
 
   private lookForAll(data: any[], arr: any[]): any[] {
     for (let item of data) {
@@ -32,7 +30,6 @@ class ThingController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.Company], () => {
-      this.property = new Property(userCtrl.space.id);
       setTimeout(async () => {
         await this.loadSpeciesTree(true);
       }, 100);
@@ -44,8 +41,8 @@ class ThingController extends Emitter {
     if (this.species == undefined || _reload) {
       this.species = await loadSpeciesTree(userCtrl.space.id);
       this.speciesList = this.lookForAll([this.species], []);
-      this.changCallback();
     }
+    this.changCallback();
     return this.species;
   }
 
@@ -63,6 +60,9 @@ class ThingController extends Emitter {
       1,
       userCtrl.isCompanySpace ? 'company' : 'user',
     );
+    // console.log(res);
+    // debugger
+    
     if (res.success) {
       return await kernel.perfectThing({
         id: (res.data as [{ Id: string }])[0].Id,
@@ -83,9 +83,12 @@ class ThingController extends Emitter {
     });
   }
 
-  public async loadFlowDefine(): Promise<ResultType<schema.XFlowDefineArray>> {
+  public async loadFlowDefine(
+    page: PageRequest,
+  ): Promise<ResultType<schema.XFlowDefineArray>> {
     return await kernel.queryDefine({
       spaceId: userCtrl.space.id,
+      page,
     });
   }
 }

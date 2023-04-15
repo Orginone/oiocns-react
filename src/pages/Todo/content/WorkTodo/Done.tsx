@@ -39,21 +39,23 @@ const Done: React.FC<IApproveProps> = ({ instanceId, setPageKey }) => {
   useEffect(() => {
     const loadNodes = async () => {
       if (instanceId) {
-        const res = await kernel.queryInstanceById({
+        const res = await kernel.queryInstance({
           id: instanceId,
+          page: { offset: 0, limit: 100000, filter: '' },
         });
-        if (res.success) {
+        const instances = res.data.result || [];
+        if (instances.length > 0) {
           const species_ = await thingCtrl.loadSpeciesTree();
           let allNodes: ISpeciesItem[] = lookForAll([species_], []);
-          setInstance(res.data);
-          let speciesIds = res.data.define?.sourceIds?.split(',');
+          setInstance(instances[0]);
+          let speciesIds = instances[0].define?.sourceIds?.split(',');
           let speciesItem = allNodes.filter((item) => speciesIds?.includes(item.id))[0];
           let flowSpeciesItem = allNodes.filter(
-            (item) => item.id == res.data.define?.speciesId,
+            (item) => item.id == instances[0].define?.speciesId,
           )[0];
           setSpeciesItem(speciesItem);
           setFlowSpeciesItem(flowSpeciesItem);
-          setTaskHistorys(res.data.historyTasks as XFlowTaskHistory[]);
+          setTaskHistorys(instances[0].historyTasks as XFlowTaskHistory[]);
         }
       }
     };

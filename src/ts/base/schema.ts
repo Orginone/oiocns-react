@@ -6,12 +6,14 @@ export type XAttribute = {
   name: string;
   // 编号
   code: string;
+  // 值类型
+  valueType: string;
   // 公开的
   public: boolean;
   // 单位
   unit: string;
-  // 属性Id
-  propId: string;
+  // 选择字典的类型ID
+  dictId: string;
   // 备注
   remark: string;
   // 类别ID
@@ -33,7 +35,7 @@ export type XAttribute = {
   // 更新时间
   updateTime: string;
   // 字典类型
-  property: XProperty | undefined;
+  dict: XDict | undefined;
   // 度量特性对应的类别
   species: XSpecies | undefined;
   // 工作权限
@@ -396,7 +398,7 @@ export type XFlowDefine = {
   // 更新时间
   updateTime: string;
   // 归属组织/个人
-  target: XTarget;
+  target: XTarget | undefined;
   // 分类id
   speciesId?: string;
   // 权限Id
@@ -1371,54 +1373,6 @@ export type XSpeciesArray = {
   total: number;
   // 结果
   result: XSpecies[] | undefined;
-};
-
-//度量特性定义
-export type XProperty = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 类型
-  valueType: string;
-  // 单位
-  unit: string;
-  // 字典Id
-  dictId: string;
-  // 备注
-  remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 字典类型
-  dict: XDict | undefined;
-  // 创建度量标准的组织/个人
-  belong: XTarget | undefined;
-};
-
-//度量特性定义查询返回集合
-export type XPropertyArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XProperty[] | undefined;
 };
 
 //商品暂存

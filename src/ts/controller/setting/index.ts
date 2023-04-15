@@ -10,7 +10,6 @@ import {
   ITarget,
   findTargetShare,
 } from '@/ts/core';
-import { XTarget } from '@/ts/base/schema';
 const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
 /**
@@ -20,13 +19,9 @@ class SettingController extends Emitter {
   public currentKey: string = '';
   private _user: IPerson | undefined;
   private _curSpace: ICompany | undefined;
-  public friends: XTarget[] = [];
   /**构造方法 */
   constructor() {
     super();
-    kernel.on('ChatRefresh', async () => {
-      await this.refresh();
-    });
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._user = createPerson(JSON.parse(userJson));
@@ -181,20 +176,12 @@ class SettingController extends Emitter {
   ): Promise<model.ResultType<any>> {
     return await kernel.resetPassword(account, password, privateKey);
   }
-  /** 重载 */
-  private async refresh(): Promise<void> {
-    const res = await this._user?.loadMembers({ offset: 0, limit: 10000, filter: '' });
-    if (res?.result?.length ?? 0 > 0) {
-      this.friends = res!.result!;
-    }
-    await this._user?.getJoinedCompanys();
-  }
 
   private async _loadUser(person: schema.XTarget): Promise<void> {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = createPerson(person);
     this._curSpace = undefined;
-    await this.refresh();
+    await this._user?.getJoinedCompanys();
     this.changCallbackPart(DomainTypes.User);
     emitter.changCallbackPart(DomainTypes.User);
   }

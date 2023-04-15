@@ -14,6 +14,7 @@ interface IProps {
 const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
   const [tabKey, setTabKey] = useState(0);
   const [thingId, setThingId] = useState<string>('');
+
   useEffect(() => {
     setTabKey(0);
   }, [species]);
@@ -21,51 +22,16 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
   switch (tabKey) {
     case 0:
       return (
+        <>        
+
         <Thing
           current={species}
-          checkedList={checkedList || []}
+          checkedList={checkedList}
           selectable={selectable}
           setTabKey={setTabKey}
           setThingId={setThingId}
-          menuItems={[
-            {
-              key: 'listStore',
-              label: '上架商店',
-              click(data) {
-                console.log(data);
-              },
-            },
-            {
-              key: 'nft',
-              label: '生成NFT',
-              click(data) {
-                console.log(data);
-              },
-            },
-            {
-              key: 'assign',
-              label: '分配',
-              click(data) {
-                console.log(data);
-              },
-            },
-            {
-              key: 'share',
-              label: '共享',
-              click(data) {
-                console.log(data);
-              },
-            },
-            {
-              key: 'handle',
-              label: '处置',
-              click(data) {
-                console.log(data);
-              },
-            },
-          ]}
-          toolBarItems={[]}
         />
+        </>
       );
     case 1:
       return <ThingView thingId={thingId} setTabKey={setTabKey} />;

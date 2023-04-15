@@ -1,6 +1,6 @@
-import { Tooltip } from 'antd';
+import { message, Tooltip } from 'antd';
 import {
-  ForkOutlined,
+  TagOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
   UsergroupAddOutlined,
@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
 import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
+import { createSecretKey } from 'crypto';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -56,7 +57,6 @@ export enum AddNodeType {
   'EMPTY' = 'EMPTY',
   'START' = 'START',
   'ORGANIZATIONAL' = 'ORGANIZATIONAL',
-  'CHILDWORK' = 'CHILDWORK',
 }
 
 export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
@@ -67,7 +67,6 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
   [AddNodeType.EMPTY]: '空节点',
   [AddNodeType.START]: '开始节点',
   [AddNodeType.ORGANIZATIONAL]: '组织网关',
-  [AddNodeType.CHILDWORK]: '子流程',
 };
 
 /**
@@ -76,6 +75,7 @@ export const AddNodeTypeAndNameMaps: Record<AddNodeType, string> = {
  */
 const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [editable, setEditable] = useState<boolean>(true);
+
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
@@ -94,6 +94,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     props.onSelected();
   };
   const onChange = (newValue: string) => {
+    // props.config.conditions[0].val = newValue;
     setKey(key + 1);
     props.config.props.assignedUser[0].id = newValue;
   };
@@ -122,11 +123,6 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
       )}
-      {props.type === AddNodeType.CHILDWORK && (
-        <ForkOutlined
-          style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
-        />
-      )}
       {props.type === AddNodeType.CC && (
         <MailOutlined
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
@@ -134,13 +130,16 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
       )}
       {props.type === AddNodeType.START && (
         <span className={cls['process-content']}>START</span>
+        // <TagOutlined
+        //   style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
+        // />
       )}
     </div>
   );
 
   const nodeContent = (
     <>
-      {/* {props.isRoot && (
+      {props.isRoot && (
         <div
           className={cls['node-root-body-right']}
           onClick={(e) => {
@@ -153,44 +152,45 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
               value={props.config.props.assignedUser[0]?.id}></SelectAuth>
           </div>
         </div>
-      )} */}
-      {/* {!props.isRoot && ( */}
-      <div className={cls['node-body-right']}>
-        <div
-          onClick={(e) => {
-            select();
-          }}>
-          <span className={cls['name-title']}>{props.title}</span>
+      )}
+      {!props.isRoot && (
+        <div className={cls['node-body-right']}>
+          <div
+            onClick={(e) => {
+              select();
+            }}>
+            <span className={cls['name-title']}>{props.title}</span>
+          </div>
+          <div>
+            {!props.content && (
+              <span
+                onClick={(e) => {
+                  select();
+                }}
+                className={cls['placeholder']}>
+                {props.placeholder}
+              </span>
+            )}
+            {props.content && (
+              <span
+                onClick={(e) => {
+                  select();
+                }}
+                className={cls['name-select-title']}>
+                {props.content}
+              </span>
+            )}
+            {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
+            {editable && (
+              <CloseOutlined
+                className={cls['iconPosition']}
+                style={{ fontSize: '12px', display: 'block' }}
+                onClick={delNode}
+              />
+            )}
+          </div>
         </div>
-        <div>
-          {!props.content && (
-            <span
-              onClick={(e) => {
-                select();
-              }}
-              className={cls['placeholder']}>
-              {props.placeholder}
-            </span>
-          )}
-          {props.content && (
-            <span
-              onClick={(e) => {
-                select();
-              }}
-              className={cls['name-select-title']}>
-              {props.content}
-            </span>
-          )}
-          {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
-          {editable && !props.isRoot && (
-            <CloseOutlined
-              className={cls['iconPosition']}
-              style={{ fontSize: '12px', display: 'block' }}
-              onClick={delNode}
-            />
-          )}
-        </div>
-      </div>
+      )}
     </>
   );
 
@@ -211,13 +211,16 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
         }  ${
           props.showError || props.config?._passed === 0 ? cls['node-error-state'] : ''
         }
-        ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}
+        ${props.config?._passed === 1 ? cls['node-ongoing-state'] : ''}  
         ${props.config?._passed === 2 ? cls['node-completed-state'] : ''}`}>
         <Tooltip
           title={
             <span>
-              创建组织:
-              {userCtrl.getBelongName(props.belongId || '')}
+              创建组织:{' '}
+              {
+                // userCtrl.getBelongName(props.belongId || '')
+                userCtrl.getBelongName(props.belongId || '')
+              }
             </span>
           }
           placement="right">

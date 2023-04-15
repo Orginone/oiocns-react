@@ -21,5 +21,6 @@ export const loadSpeciesTree = async (id: string) => {
   }
   return item;
 };
-export type { IFlowDefine } from './iflowDefine';
+
 export type { INullSpeciesItem, ISpeciesItem } from './ispecies';
+export type { IFlowDefine } from './iflowDefine';

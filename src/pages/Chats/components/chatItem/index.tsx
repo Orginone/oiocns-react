@@ -30,25 +30,24 @@ const ChatItem: React.FC<IProps> = (props) => {
     return '';
   };
   return (
-    <>
-      <div
-        key={props.current.fullId}
-        className={`${sideStyle.con_body_session} ${
-          chatCtrl.isCurrent(props.current) ? sideStyle.active : ''
-        } ${props.current.isToping ? sideStyle.session_toping : ''}`}
-        // onContextMenu={(e: any) => handleContextClick(e, props.current)}
-      >
-        {/* <div style={{ fontSize: 16, color: '#888', width: 30 }}>
+    <div
+      key={props.current.fullId}
+      className={`${sideStyle.con_body_session} ${
+        chatCtrl.isCurrent(props.current) ? sideStyle.active : ''
+      } ${props.current.isToping ? sideStyle.session_toping : ''}`}
+      // onContextMenu={(e: any) => handleContextClick(e, props.current)}
+    >
+      {/* <div style={{ fontSize: 16, color: '#888', width: 30 }}>
         <TeamIcon share={props.current.shareInfo} size={16} fontSize={16} />
       </div> */}
-        {/* {props.current.noReadCount > 0 ? (
+      {/* {props.current.noReadCount > 0 ? (
         <div className={`${sideStyle.group_con} ${sideStyle.dot}`}>
           <span>{props.current.noReadCount}</span>
         </div>
       ) : (
         ''
       )} */}
-        {/* <div
+      {/* <div
         className={sideStyle.group_con_show}
         onClick={() => {
           chatCtrl.setCurrent(props.current);
@@ -69,58 +68,57 @@ const ChatItem: React.FC<IProps> = (props) => {
           {getBarTxt(props.current)}
         </div>
       </div> */}
+      <div
+        style={{ padding: '0px' }}
+        onClick={() => {
+          chatCtrl.setCurrent(props.current);
+        }}>
         <div
-          style={{ padding: '0px' }}
-          onClick={() => {
-            chatCtrl.setCurrent(props.current);
+          style={{
+            display: 'flex',
+            height: '20px',
+            justifyContent: 'space-between',
           }}>
           <div
             style={{
-              display: 'flex',
+              fontSize: '14px',
+              fontWeight: 600,
               height: '20px',
-              justifyContent: 'space-between',
+              lineHeight: '20px',
+              overflow: 'hidden',
             }}>
-            <div
+            <Badge
+              count={props.current.noReadCount}
+              offset={[5, 0]}
               style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                height: '20px',
-                lineHeight: '20px',
-                overflow: 'hidden',
+                color: 'white',
+                backgroundColor: 'red',
+                borderRadius: '10%',
               }}>
-              <Badge
-                count={props.current.noReadCount}
-                offset={[5, 0]}
-                style={{
-                  color: 'white',
-                  backgroundColor: 'red',
-                  borderRadius: '10%',
-                }}>
-                <span>{props.current.target.name}</span>
-              </Badge>
-              {/*
+              <span>{props.current.target.name}</span>
+            </Badge>
+            {/*            
             {props.current.noReadCount == 0 && <>{props.current.target.name}</>} */}
-            </div>
-            <div style={{ fontSize: '8px', height: '20px', lineHeight: '20px' }}>
-              {handleFormatDate(
-                props.current.lastMessage?.createTime || props.current.target.msgTime,
-              )}
-            </div>
           </div>
-          {getBarTxt(props.current) != '' && (
-            <div
-              style={{
-                fontSize: '12px',
-                height: '20px',
-                lineHeight: '20px',
-                maxWidth: '150px',
-              }}>
-              {getBarTxt(props.current)}
-            </div>
-          )}
+          <div style={{ fontSize: '8px', height: '20px', lineHeight: '20px' }}>
+            {handleFormatDate(
+              props.current.lastMessage?.createTime || props.current.target.msgTime,
+            )}
+          </div>
         </div>
+        {getBarTxt(props.current) != '' && (
+          <div
+            style={{
+              fontSize: '12px',
+              height: '20px',
+              lineHeight: '20px',
+              maxWidth: '150px',
+            }}>
+            {getBarTxt(props.current)}
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 export default ChatItem;

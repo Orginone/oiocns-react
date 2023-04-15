@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { common } from 'typings/common';
 import AppCard from './card';
 import thingCtrl from '@/ts/controller/thing';
@@ -12,41 +12,13 @@ import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import userCtrl from '@/ts/controller/setting';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { ISpeciesItem } from '@/ts/core';
+import { PageRequest } from '@/ts/base/model';
 
-const InnerApp: React.FC<{ type: string }> = ({ type }) => {
+const InnerApp: React.FC = () => {
   const [tableKey, setTableKey] = useCtrlUpdate(appCtrl);
   // const [tableKey, setTabKey] = useState<string>();
   const [currentDefine, setCurrentDefine] = useState<XFlowDefine>();
   const [flowSpeciesItem, setFlowSpeciesItem] = useState<ISpeciesItem>();
-  const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
-  useEffect(() => {
-    setTimeout(async () => {
-      let res = await thingCtrl.loadFlowDefine();
-      if (res.success && res.data.result) {
-        let data = res.data.result!;
-        switch (type) {
-          case '共享的':
-            data = data.filter(
-              (a) =>
-                a.target.id != userCtrl.space.id &&
-                a.target.belongId != userCtrl.space.id,
-            );
-            break;
-          case '创建的':
-            data = data.filter(
-              (a) =>
-                a.target.id == userCtrl.space.id ||
-                a.target.belongId == userCtrl.space.id,
-            );
-            break;
-          default:
-            break;
-        }
-        setDataSource(data);
-        setTableKey();
-      }
-    }, 10);
-  }, [type]);
 
   const renderOperation = (item: XFlowDefine): common.OperationType[] => {
     let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
@@ -106,7 +78,10 @@ const InnerApp: React.FC<{ type: string }> = ({ type }) => {
       {!currentDefine && (
         <CardOrTable<XFlowDefine>
           key={tableKey}
-          dataSource={dataSource}
+          request={async (page: PageRequest) => {
+            return (await thingCtrl.loadFlowDefine(page))?.data || [];
+          }}
+          dataSource={[]}
           renderCardContent={renderCardFun}
           operation={renderOperation}
           columns={InnerApplicationColumns}

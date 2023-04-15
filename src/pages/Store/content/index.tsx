@@ -7,6 +7,8 @@ import Application from './App';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
+import Asset from '@/pages/Welfare/WelfareOrg/Asset';
+import Software from './Software';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -31,6 +33,8 @@ const ContentIndex = (props: IProps) => {
       return <Application />;
     case GroupMenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
+    case GroupMenuType.Asset:
+      return <Asset />;
     case GroupMenuType.Thing:
     case GroupMenuType.Wel:
       return (
@@ -39,6 +43,10 @@ const ContentIndex = (props: IProps) => {
           checkedList={props.checkedList}
           selectable={false}
         />
+      );
+    case GroupMenuType.Software:
+      return (
+        <Software />
       );
     default:
       return <></>;

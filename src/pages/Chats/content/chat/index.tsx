@@ -2,8 +2,9 @@ import chatCtrl from '@/ts/controller/chat';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import React, { useState } from 'react';
 import GroupContent from './GroupContent';
-import GroupInputBox from './GroupInputBox';
 import GroupDetail from './GroupDetail';
+import GroupHeader from './GroupHeader';
+import GroupInputBox from './GroupInputBox';
 import charsStyle from './index.module.less';
 import { WechatOutlined } from '@ant-design/icons';
 
@@ -11,9 +12,19 @@ import { WechatOutlined } from '@ant-design/icons';
  * @description: 沟通聊天
  * @return {*}
  */
-const Chat: React.FC<any> = ({ openDetail }: { openDetail: boolean }) => {
+
+const Chat: React.FC = () => {
   const [key] = useCtrlUpdate(chatCtrl);
+  const [isShowDetail, setIsShowDetail] = useState<boolean>(false); // 展开关闭详情
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
+
+  /**
+   * @description: 展开详情页
+   * @return {*}
+   */
+  const handleViewDetail = () => {
+    setIsShowDetail(!isShowDetail);
+  };
 
   /**
    * @description: 重新编辑
@@ -29,6 +40,8 @@ const Chat: React.FC<any> = ({ openDetail }: { openDetail: boolean }) => {
       {/* 主体 */}
       {chatCtrl.chat ? (
         <div className={charsStyle.chart_page}>
+          {/* 头部 */}
+          <GroupHeader handleViewDetail={handleViewDetail} />
           {/* 聊天区域 */}
           <GroupContent handleReWrites={handleReWrites} />
           {/* 输入区域 */}
@@ -43,8 +56,8 @@ const Chat: React.FC<any> = ({ openDetail }: { openDetail: boolean }) => {
           </div>
         </div>
       )}
-      {/**回话详情 */}
-      {openDetail && <GroupDetail />}
+      {/* 详情 */}
+      {isShowDetail ? <GroupDetail /> : ''}
     </div>
   );
 };

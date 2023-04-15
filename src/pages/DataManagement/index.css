@@ -1,0 +1,47 @@
+.containers{
+  padding: 0 0 .4rem .4rem;
+  position: relative;
+  overflow-y: auto;
+  width: 100%;
+  margin-bottom: .4rem;
+}
+.headerStyle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  
+  background: rgba(0,0,0 , .1);
+  z-index: 11;
+  display: flex;
+  justify-content: center;
+}
+
+.contentStyle {
+  text-align: center;
+  background-color: #fff;
+}
+
+
+
+.nav-header{
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  width: 80%;
+  user-select: none;
+}
+
+
+.nav-item{
+  cursor: pointer;
+  color: #ffffff;
+  transition: all .3s;
+}
+
+.nav-item:hover{
+  color: #108ee9;
+}
+
+
+

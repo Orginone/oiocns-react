@@ -5,10 +5,15 @@ export enum GroupMenuType {
 }
 
 export enum BookType {
+  'Common' = '特别关心',
+  'RecentlyContacts' = '常用联系人',
+  'NewFriend' = '新的好友',
   'Friend' = '我的好友',
-  'Cohort' = '我的群组',
+  'TypeGroup' = '[分组]',
+  'UserCohort' = '我的群组',
+  'Company' = '单位',
+  'Group' = '外设机构',
   'Innner' = '内设机构',
-  'Station' = '内设岗位',
-  'Working' = '工作群组',
-  'Authority' = '角色群',
+  'JoinStore' = '单位岗位',
+  'Application' = '单位群组',
 }

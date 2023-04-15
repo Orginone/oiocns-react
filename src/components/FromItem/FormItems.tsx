@@ -185,7 +185,6 @@ const OioFormItem = (props: any) => {
         />
       );
     case 'department':
-    case 'dept':
       return (
         <ProFormDept
           name={item.attrId}

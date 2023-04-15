@@ -11,6 +11,7 @@ import {
 import {
   XAttributeArray,
   XFlowDefine,
+  XFlowDefineArray,
   XOperationArray,
   XSpecies,
   XAttribute,
@@ -78,8 +79,10 @@ export interface ISpeciesItem {
   ): Promise<XOperationArray>;
   /** 加载流程设计 */
   loadFlowDefines(reload?: boolean): Promise<IFlowDefine[]>;
+  /** 查询流程设计 */
+  loadFlowDefinesByPage(id: string, page: PageRequest): Promise<XFlowDefineArray>;
   /**查询流程实例 */
-  loadFlowInstances(status: number[], page: PageRequest): Promise<XFlowInstance[]>;
+  loadFlowInstances(): Promise<XFlowInstance[]>;
   /**
    * 创建标准分类项
    * @param data 创建参数

@@ -180,75 +180,6 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   },
 ];
 
-export const PropertyColumns: ProColumns<any>[] = [
-  {
-    title: '序号',
-    valueType: 'index',
-    width: 50,
-  },
-  {
-    title: '属性代码',
-    dataIndex: 'code',
-    key: 'code',
-    width: 180,
-  },
-  {
-    title: '属性名称',
-    dataIndex: 'name',
-    key: 'name',
-    width: 200,
-  },
-  {
-    title: '属性类型',
-    dataIndex: 'valueType',
-    key: 'valueType',
-    width: 150,
-  },
-  {
-    title: '单位',
-    dataIndex: 'unit',
-    key: 'unit',
-    width: 150,
-  },
-  {
-    title: '选择字典',
-    dataIndex: ['dict', 'name'],
-    key: 'dictId',
-    width: 150,
-  },
-  {
-    title: '来源组织',
-    dataIndex: 'shareId',
-    key: 'shareId',
-    width: 200,
-    render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.shareId);
-      if (team && team.name != '奥集能平台') {
-        return team.name;
-      }
-      return userCtrl.space.teamName;
-    },
-  },
-  {
-    title: '归属组织',
-    dataIndex: 'belongId',
-    key: 'belongId',
-    width: 200,
-    render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
-    },
-  },
-  {
-    title: '属性定义',
-    dataIndex: 'remark',
-    ellipsis: true,
-    key: 'remark',
-  },
-];
-
 export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
   {
     title: '序号',
@@ -277,9 +208,15 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     },
   },
   {
-    title: '属性',
-    dataIndex: ['property', 'name'],
-    key: 'propId',
+    title: '特性类型',
+    dataIndex: 'valueType',
+    key: 'valueType',
+    width: 150,
+  },
+  {
+    title: '选择字典',
+    dataIndex: ['dict', 'name'],
+    key: 'dictId',
     width: 150,
   },
   {
@@ -301,6 +238,7 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'remark',
   },
 ];
+
 export const OperationColumns: ProColumns<schema.XOperation>[] = [
   {
     title: '序号',

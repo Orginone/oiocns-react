@@ -93,21 +93,19 @@ export const getSpaceMenu = async () => {
 };
 
 /** 加载分组菜单 */
-export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]) => {
+export const loadGroupMenus = async (param: groupMenuParams) => {
   let menus = [
     {
-      key: '重载|' + param.typeName,
+      key: '刷新',
       icon: <im.ImSpinner9 />,
-      label: '刷新' + param.typeName,
-      model: 'inside',
+      label: '刷新子组织',
     },
   ];
   if (await IsSuperAdmin(param.item)) {
     menus.unshift({
-      key: '新建|' + teamTypes.join('|'),
+      key: '新建|' + param.typeName,
       icon: <im.ImPlus />,
       label: '新建' + param.typeName,
-      model: 'outside',
     });
   }
   return {
@@ -144,29 +142,13 @@ export const loadStandardSetting = async () => {
       icon: <im.ImNewspaper />,
     });
   }
-  result.push({
-    children: [],
-    key: '属性定义',
-    label: '属性定义',
-    itemType: GroupMenuType.Property,
-    item: userCtrl.space,
-    icon: <im.ImNewspaper />,
-    menus: [
-      {
-        key: '新增属性',
-        icon: <im.ImPlus />,
-        label: '新增属性',
-        model: 'outside',
-      },
-    ],
-  });
-  const species = await thingCtrl.loadSpeciesTree(true);
+  const species = await thingCtrl.loadSpeciesTree();
   if (species) {
     result.push({
       children: [buildSpeciesTree(species)],
       key: '分类标准',
       label: '分类标准',
-      itemType: '分类标准',
+      itemType: GroupMenuType.Species,
       item: undefined,
       icon: <im.ImNewspaper />,
     });

@@ -1,0 +1,278 @@
+.containers {
+  padding: 0 0 0.4rem 0.4rem;
+  position: relative;
+  overflow-y: auto;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+.headerStyle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 11;
+  display: flex;
+  justify-content: center;
+}
+
+.contentStyle {
+  text-align: center;
+  background-color: #fff;
+}
+.containers img {
+  width: 100%;
+  height: 100%;
+}
+h1 {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  width: 80%;
+  user-select: none;
+}
+
+.nav-item {
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.3s;
+}
+
+.nav-item:hover {
+  color: #108ee9;
+}
+
+.top-imgs {
+  width: 100%;
+  height: 730px;
+}
+
+.main {
+  margin: 1rem 0;
+  text-align: left !important;
+}
+
+.main .title-content {
+  display: flex;
+  justify-content: center;
+}
+
+.main .title-content h1 {
+  position: relative;
+  text-align: center;
+  color: #333;
+  line-height: 60px;
+}
+
+.main .title-content h1::after {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  left: 106%;
+  width: 400px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #ced3f4 0.01%,
+    #ced3f4 52.03%,
+    rgba(237, 239, 252, 0) 96.35%
+  );
+}
+
+.main .title-content h1::before {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  right: 106%;
+  width: 400px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(237, 239, 252, 0.18) 0.83%,
+    #ced3f4 47.66%,
+    #ced3f4 100%
+  );
+}
+
+.main .title {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  color: #305eda;
+  opacity: 0.5;
+  margin-top: -0.8rem;
+}
+
+.main .price {
+  width: 89px;
+  height: 30px;
+  background: #eef6ff;
+  border-radius: 15px;
+  color: #0073f7;
+  text-align: center;
+  line-height: 30px;
+}
+
+.main .mod_main {
+  display: flex;
+  justify-content: center;
+}
+
+.main .mod_main .mod1s {
+  width: 264px;
+}
+
+.main .mod_main .mod1s .sousuo {
+  background: #eef6ff;
+  border: 1px solid #eef6ff;
+  border-radius: 10px;
+  width: 264px;
+  height: 40px;
+}
+
+.main .mod_main .mod1s .tree {
+  margin: 10px 0;
+  width: 250px;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.main .mod_main .mod1s .tree .treeMain {
+  display: flex;
+  align-items: center;
+}
+
+.main .mod_main .mod1s .tree .treeMain .imgs {
+  margin-right: 5px;
+}
+
+.main .mod_main .mod2s {
+  width: 1200px;
+  height: 300px;
+  display: flex;
+}
+
+.main .mod_main .mod2s .box1s {
+  box-sizing: border-box;
+  width: 44%;
+  height: 280px;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #f7f7f8;
+  box-shadow: 0 3px 5px rgba(0, 53, 116, 0.16);
+  border-radius: 10px;
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.main .mod_main .mod2s .box1s .lefts h3 {
+  font-size: 18px;
+}
+
+.main .mod_main .mod2s .box1s .lefts .p1 {
+  width: 242px;
+  margin: 10px 0;
+  color: #606266;
+}
+
+.main .mod_main .mod2s .box1s .rightss {
+  height: 80%;
+  width: 40%;
+}
+
+.main .mod_main .mod2s .box1s .rightss img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #eef6ff;
+}
+
+.main .mod_main .mod3 {
+  margin: 0 20px;
+}
+
+.main .mod_main .mod3 .title2 {
+  display: flex;
+  justify-content: space-between;
+  width: 1075px;
+  margin: 20px 0;
+}
+
+.main .mod_main .mod3 .title2 .p1 {
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 22px;
+  color: #303133;
+}
+
+.main .mod_main .mod3 .title2 .p2 {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: #0073f7;
+}
+
+.main .mod_main .mod3 .centent {
+  width: 1075px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.main .mod_main .mod3 .centent .cen {
+  width: 506px;
+}
+
+.main .mod_main .mod3 .centent .cen .mo {
+  height: 62px;
+  margin: 20px 0;
+  display: flex;
+}
+
+.main .mod_main .mod3 .centent .cen .mo .icon {
+  width: 50px;
+  height: 50px;
+  background: #fde1aa;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main .mod_main .mod3 .centent .cen .mo .mo-2 {
+  margin-left: 20px;
+  display: flex;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.main .mod_main .mod3 .centent .cen .mo .mo-2 .mo-3 {
+  width: 350px;
+}
+
+.main .mod_main .mod3 .centent .cen .mo .mo-2 .p1 {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 18px;
+  color: #303133;
+}
+
+.main .mod_main .mod3 .centent .cen .mo .mo-2 .p2 {
+  font-size: 12px;
+  margin: 10px 0;
+}
+.ant-tree-switcher {
+  width: 0 !important;
+}
+.ant-tree-node-content-wrapper {
+  display: flex;
+  align-items: center;
+  height: 44px;
+}

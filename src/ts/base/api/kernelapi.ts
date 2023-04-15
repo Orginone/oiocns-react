@@ -26,7 +26,7 @@ export default class KernelApi {
   private constructor(url: string) {
     this._methods = {};
     this._anystore = AnyStore.getInstance();
-    this._storeHub = new StoreHub(url, 'json');
+    this._storeHub = new StoreHub(url, 'txt');
     this._storeHub.on('Receive', (res: model.ReceiveType) => {
       const methods = this._methods[res.target.toLowerCase()];
       if (methods) {
@@ -257,48 +257,6 @@ export default class KernelApi {
       module: 'thing',
       action: 'CreateSpecies',
       params: params,
-    });
-  }
-  /**
-   * 创建元属性
-   * @param {model.PropertyModel} params 请求参数
-   * @returns {model.ResultType<schema.XProperty>} 请求结果
-   */
-  public async createProperty(
-    params: model.PropertyModel,
-  ): Promise<model.ResultType<schema.XProperty>> {
-    return await this.request({
-      module: 'thing',
-      action: 'CreateProperty',
-      params: params,
-    });
-  }
-  /**
-   * 更新元属性
-   * @param {model.PropertyModel} params 请求参数
-   * @returns {model.ResultType<schema.XProperty>} 请求结果
-   */
-  public async updateProperty(
-    params: model.PropertyModel,
-  ): Promise<model.ResultType<schema.XProperty>> {
-    return await this.request({
-      module: 'thing',
-      action: 'UpdateProperty',
-      params: params,
-    });
-  }
-  /**
-   * 删除元属性
-   * @param {string} params 请求参数
-   * @returns {model.ResultType<boolean>} 请求结果
-   */
-  public async deleteProperty(id: string): Promise<model.ResultType<boolean>> {
-    return await this.request({
-      module: 'thing',
-      action: 'DeleteProperty',
-      params: {
-        id: id,
-      },
     });
   }
   /**
@@ -534,20 +492,6 @@ export default class KernelApi {
     return await this.request({
       module: 'thing',
       action: 'ThingRemoveAttribute',
-      params: params,
-    });
-  }
-  /**
-   * 根据id查询分类
-   * @param {model.IdArrayReq} params 请求参数
-   * @returns {model.ResultType<schema.XPropertyArray>} 请求结果
-   */
-  public async queryPropertys(
-    params: model.IDBelongReq,
-  ): Promise<model.ResultType<schema.XPropertyArray>> {
-    return await this.request({
-      module: 'thing',
-      action: 'QueryPropertys',
       params: params,
     });
   }
@@ -1389,6 +1333,20 @@ export default class KernelApi {
     return await this.request({
       module: 'chat',
       action: 'RecallImMsg',
+      params: params,
+    });
+  }
+  /**
+   * 查询聊天会话
+   * @param {model.ChatsReqModel} params 请求参数
+   * @returns {model.ResultType<model.ChatResponse>} 请求结果
+   */
+  public async queryImChats(
+    params: model.ChatsReqModel,
+  ): Promise<model.ResultType<model.ChatResponse>> {
+    return await this.request({
+      module: 'chat',
+      action: 'QueryImChats',
       params: params,
     });
   }
@@ -2382,30 +2340,16 @@ export default class KernelApi {
     });
   }
   /**
-   * 根据Id查询流程实例
-   * @param {model.IdReq} params 请求参数
-   * @returns {model.ResultType<schema.XFlowInstanceArray>} 请求结果
-   */
-  public async queryInstanceById(
-    params: model.IdReq,
-  ): Promise<model.ResultType<schema.XFlowInstance>> {
-    return await this.request({
-      module: 'flow',
-      action: 'QueryInstanceById',
-      params: params,
-    });
-  }
-  /**
    * 查询发起的流程实例
    * @param {model.FlowReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowInstanceArray>} 请求结果
    */
-  public async queryInstanceByApply(
+  public async queryInstance(
     params: model.FlowReq,
   ): Promise<model.ResultType<schema.XFlowInstanceArray>> {
     return await this.request({
       module: 'flow',
-      action: 'QueryInstanceByApply',
+      action: 'QueryInstance',
       params: params,
     });
   }
@@ -2425,11 +2369,11 @@ export default class KernelApi {
   }
   /**
    * 查询审批记录
-   * @param {model.RecordReq} params 请求参数
+   * @param {model.IdSpaceReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowRecordArray>} 请求结果
    */
   public async queryRecord(
-    params: model.RecordReq,
+    params: model.IdSpaceReq,
   ): Promise<model.ResultType<schema.XFlowRecordArray>> {
     return await this.request({
       module: 'flow',

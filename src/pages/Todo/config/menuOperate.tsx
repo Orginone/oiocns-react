@@ -6,10 +6,10 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import thingCtrl from '@/ts/controller/thing';
 import { ToTopOutlined } from '@ant-design/icons';
 import { MenuItemType } from 'typings/globelType';
+import { getUuid } from '@/utils/tools';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
-  let cohortTodo = await loadChildren(todoCtrl.CohortTodo);
   let companyTodo = await loadChildren(todoCtrl.CompanyTodo);
   let groupTodo = await loadChildren(todoCtrl.GroupTodo);
 
@@ -24,28 +24,21 @@ export const loadPlatformTodoMenu = async () => {
       children: [
         ...friendTodo.children,
         {
-          key: '群组待办',
-          label: '群组',
-          itemType: WorkType.OrgTodo,
-          icon: <im.ImTree />,
-          ...cohortTodo,
-        },
-        {
-          key: '单位待办',
+          key: WorkType.CompanyTodo,
           label: '单位',
-          itemType: WorkType.OrgTodo,
+          itemType: WorkType.CompanyTodo,
           icon: <im.ImTree />,
           ...companyTodo,
         },
         {
-          key: '集团待办',
+          key: WorkType.GroupTodo,
           label: '集团',
-          itemType: WorkType.OrgTodo,
+          itemType: WorkType.GroupTodo,
           icon: <im.ImTree />,
           ...groupTodo,
         },
       ],
-      count: friendTodo.count + companyTodo.count + cohortTodo.count + groupTodo.count,
+      count: friendTodo.count + companyTodo.count + groupTodo.count,
     },
     {
       key: WorkType.StoreTodo,
@@ -82,16 +75,6 @@ export const loadPlatformTodoMenu = async () => {
   ];
 };
 
-export const getCommonSpeciesMenus = () => {
-  return {
-    key: '我的常用',
-    label: '我的常用',
-    itemType: '我的常用',
-    icon: <im.ImHeart />,
-    children: todoCtrl.caches || [],
-  };
-};
-
 export const loadPlatformApplyMenu = async () => {
   return [
     {
@@ -104,13 +87,6 @@ export const loadPlatformApplyMenu = async () => {
           key: WorkType.FriendApply,
           label: '加好友',
           itemType: WorkType.FriendApply,
-          icon: <im.ImTree />,
-          children: [],
-        },
-        {
-          key: WorkType.CohortApply,
-          label: '加群组',
-          itemType: WorkType.CohortApply,
           icon: <im.ImTree />,
           children: [],
         },
@@ -168,10 +144,8 @@ export const loadPlatformApplyMenu = async () => {
 /** 获取事菜单 */
 export const loadThingMenus = async (prefix: string, isWork: boolean = false) => {
   const root = await thingCtrl.loadSpeciesTree();
-  for (const item of root!.children) {
-    if (item.target.code === 'matters') {
-      return await buildSpeciesTree(item.children, prefix + '事', isWork);
-    }
+  if (root) {
+    return await buildSpeciesTree(root?.children, prefix + '事', isWork);
   }
   return [];
 };
@@ -188,7 +162,7 @@ const loadChildren = async (todoGroups: ITodoGroup[]) => {
     let count = todoGroup.id ? await todoGroup.getCount() : 0;
     children.push({
       icon: icon,
-      key: todoGroup.name + todoGroup.type,
+      key: getUuid(),
       label: todoGroup.name,
       itemType: todoGroup.type,
       item: todoGroup,
@@ -218,13 +192,7 @@ const buildSpeciesTree = async (
       icon: <im.ImNewspaper />,
       itemType: itemType,
       menuType: isWork ? 'checkbox' : undefined,
-      // menus: [
-      //   {
-      //     key: `设为常用`,
-      //     label: '设为常用',
-      //     icon: <im.ImHeart />,
-      //   },
-      // ],
+      menus: [],
       children: await buildSpeciesTree(item.children, itemType, isWork),
     });
   }

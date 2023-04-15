@@ -2,6 +2,7 @@ import OioForm from '@/components/Form';
 import Design from '@/pages/Setting/components/design';
 import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
+import { XOperation } from '@/ts/base/schema';
 import { OperationModel } from '@/ts/base/model';
 import { Button, Card, message } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
@@ -121,7 +122,7 @@ const ContentIndex = (props: IProps) => {
               operation={props.selectMenu.item.design}
               current={props.selectMenu.item.species}
               setOperationModel={setOperationModel}
-              toFlowDesign={(_operation) => {}}
+              toFlowDesign={(operation: XOperation) => {}}
             />
           </Card>
         );

@@ -28,7 +28,7 @@ const AppShowComp: React.FC = () => {
       const markets = marketCtrl.target.joinedMarkets;
       if (markets.length > 0) {
         const index = markets.findIndex((i) => {
-          return i.target.id === current?.target.id;
+          return i.market.id === current?.market.id;
         });
         if (index < 0) {
           setCurrent(markets[0]);
@@ -128,13 +128,13 @@ const AppShowComp: React.FC = () => {
         key={key}
         dataSource={[]}
         stripe
-        headerTitle={current?.target.name}
+        headerTitle={current?.market.name}
         parentRef={parentRef}
         renderCardContent={renderCardFun}
         operation={renderOperation}
         columns={marketColumns}
         rowKey={'id'}
-        params={{ id: current?.target.id }}
+        params={{ id: current?.market.id }}
         request={async (page) => {
           return await current?.getMerchandise(page);
         }}

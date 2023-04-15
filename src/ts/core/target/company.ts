@@ -27,16 +27,11 @@ import Authority from './authority/authority';
  * 公司的元操作
  */
 export default class Company extends MarketTarget implements ICompany {
-  stationsLoaded: boolean = false;
   stations: IStation[] = [];
-  departmentsLoaded: boolean = false;
   departments: IDepartment[] = [];
-  groupLoaded: boolean = false;
   joinedGroup: IGroup[] = [];
   userId: string;
-  cohortsLoaded: boolean = false;
   cohorts: ICohort[] = [];
-  workingsLoaded: boolean = false;
   workings: IWorking[] = [];
   departmentTypes: TargetType[] = [];
   spaceAuthorityTree: IAuthority | undefined;
@@ -70,18 +65,17 @@ export default class Company extends MarketTarget implements ICompany {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this.id);
+      this.authorityTree = new Authority(res.data, this.id);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   public get subTeam(): ITarget[] {
     return [...this.departments, ...this.workings];
   }
   public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {
-    if (!reload && this.cohortsLoaded) {
+    if (!reload && this.cohorts.length > 0) {
       return this.cohorts;
     }
-    this.cohortsLoaded = true;
     const res = await kernel.queryJoinedTargetById({
       id: this.userId,
       typeName: TargetType.Person,
@@ -93,15 +87,12 @@ export default class Company extends MarketTarget implements ICompany {
       spaceId: this.id,
       JoinTypeNames: [TargetType.Cohort],
     });
-    if (res.success) {
-      this.cohorts =
-        res.data.result?.map((a) => {
-          return new Cohort(a, () => {
-            this.cohorts = this.cohorts.filter((i) => i.id != a.id);
-          });
-        }) ?? [];
-    } else {
-      this.cohortsLoaded = false;
+    if (res.success && res.data.result) {
+      this.cohorts = res.data.result.map((a) => {
+        return new Cohort(a, () => {
+          this.cohorts = this.cohorts.filter((i) => i.id != a.id);
+        });
+      });
     }
     return this.cohorts;
   };
@@ -119,7 +110,7 @@ export default class Company extends MarketTarget implements ICompany {
         return this.createDepartment(data);
     }
   }
-  public async loadSubTeam(reload: boolean = false): Promise<ITarget[]> {
+  public async loadSubTeam(reload?: boolean): Promise<ITarget[]> {
     await this.getWorkings(reload);
     await this.getDepartments(reload);
     return [...this.departments, ...this.workings];
@@ -328,82 +319,66 @@ export default class Company extends MarketTarget implements ICompany {
     return false;
   }
   public async getDepartments(reload: boolean = false): Promise<IDepartment[]> {
-    if (!reload && this.departmentsLoaded) {
+    if (!reload && this.departments.length > 0) {
       return this.departments;
     }
-    this.departmentsLoaded = true;
     const res = await this.getSubTargets(this.departmentTypes);
-    if (res.success) {
-      this.departments =
-        res.data.result?.map((a) => {
-          return new Department(a, () => {
-            this.departments = this.departments.filter((item) => {
-              return item.id != a.id;
-            });
+    if (res.success && res.data.result) {
+      this.departments = res.data.result.map((a) => {
+        return new Department(a, () => {
+          this.departments = this.departments.filter((item) => {
+            return item.id != a.id;
           });
-        }) ?? [];
-    } else {
-      this.departmentsLoaded = false;
+        });
+      });
     }
     return this.departments;
   }
-  public async getStations(reload: boolean = false): Promise<IStation[]> {
-    if (!reload && this.stationsLoaded) {
+  public async getStations(reload?: boolean): Promise<IStation[]> {
+    if (!reload && this.stations.length > 0) {
       return this.stations;
     }
-    this.stationsLoaded = true;
     const res = await this.getSubTargets([TargetType.Station]);
-    if (res.success) {
-      this.stations =
-        res.data.result?.map((a) => {
-          return new Station(a, () => {
-            this.stations = this.stations.filter((item) => {
-              return item.id != a.id;
-            });
+    if (res.success && res.data.result) {
+      this.stations = res.data.result.map((a) => {
+        return new Station(a, () => {
+          this.stations = this.stations.filter((item) => {
+            return item.id != a.id;
           });
-        }) ?? [];
-    } else {
-      this.stationsLoaded = false;
+        });
+      });
     }
     return this.stations;
   }
   public async getWorkings(reload: boolean = false): Promise<IWorking[]> {
-    if (!reload && this.workingsLoaded) {
+    if (!reload && this.workings.length > 0) {
       return this.workings;
     }
-    this.workingsLoaded = true;
     const res = await this.getSubTargets([TargetType.Working]);
-    if (res.success) {
-      this.workings =
-        res.data.result?.map((a) => {
-          return new Working(a, () => {
-            this.workings = this.workings.filter((item) => {
-              return item.id != a.id;
-            });
+    if (res.success && res.data.result) {
+      this.workings = res.data.result?.map((a) => {
+        return new Working(a, () => {
+          this.workings = this.workings.filter((item) => {
+            return item.id != a.id;
           });
-        }) ?? [];
-    } else {
-      this.workingsLoaded = false;
+        });
+      });
     }
     return this.workings;
   }
   public async getJoinedGroups(reload: boolean = false): Promise<IGroup[]> {
-    if (!reload && this.groupLoaded) {
+    if (!reload && this.joinedGroup.length > 0) {
       return this.joinedGroup;
     }
-    this.groupLoaded = true;
     const res = await this.getjoinedTargets([TargetType.Group], this.userId);
-    if (res) {
-      this.joinedGroup =
-        res.result?.map((a) => {
-          return new Group(a, () => {
-            this.joinedGroup = this.joinedGroup.filter((item) => {
-              return item.id != a.id;
-            });
+    if (res && res.result) {
+      this.joinedGroup = res.result.map((a) => {
+        return new Group(a, () => {
+          this.joinedGroup = this.joinedGroup.filter((item) => {
+            return item.id != a.id;
           });
-        }) ?? [];
-    } else {
-      this.groupLoaded = false;
+        });
+      });
     }
     return this.joinedGroup;
   }

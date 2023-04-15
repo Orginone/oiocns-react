@@ -1,0 +1,407 @@
+.img-box {
+  height: 900px;
+  width: 100vw;
+}
+
+.imgs {
+  width: 100%;
+  height: 100%;
+}
+
+.web-price {
+}
+
+.price-titles {
+  box-sizing: border-box;
+  padding-top: 2rem;
+  position: relative;
+  text-align: center;
+  color: #333333;
+  font-weight: bold;
+  font-size: 28px;
+}
+
+.price-titles::after {
+  position: absolute;
+  content: '';
+  bottom: 20%;
+  left: 53.4%;
+  width: 400px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #ced3f4 0.01%,
+    #ced3f4 52.03%,
+    rgba(237, 239, 252, 0) 96.35%
+  );
+}
+
+.price-titles::before {
+  position: absolute;
+  content: '';
+  bottom: 20%;
+  right: 53.4%;
+  width: 400px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(237, 239, 252, 0.18) 0.83%,
+    #ced3f4 47.66%,
+    #ced3f4 100%
+  );
+}
+
+.price-box {
+  padding: 0 20rem;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+}
+
+.price-box-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.price-icons {
+  margin-right: 0.8rem;
+}
+
+.price-box-item:first-child ::after {
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  content: '';
+  width: 60%;
+  border-radius: 4px;
+  height: 4px;
+  background-color: #305eda;
+}
+
+.container-price {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 20rem 0 20rem;
+}
+
+.left-box {
+  padding: 2rem 2rem 1rem 2rem;
+  box-sizing: border-box;
+  width: 56%;
+  background-color: #fcfcff;
+  box-shadow: 0 4px 4px 0 #1e31df1a;
+  border-radius: 0.4rem;
+}
+
+.box {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left {
+  width: 58%;
+  color: #747774;
+  min-width: 300px;
+}
+
+.left > p {
+  font-size: 16px;
+  line-height: 36px;
+  white-space: normal;
+  text-align: left;
+}
+
+.left > h1 {
+  color: #333333;
+  font-size: 36px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.right > img {
+  max-height: 260px;
+  max-width: 260px;
+}
+
+.right-box1 {
+  width: 40%;
+}
+
+.right-box1 > img {
+  padding: 0.7rem 0;
+  width: 100%;
+}
+
+.hot-box {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+  background: linear-gradient(99.44deg, #060e3b 24.99%, #112072 103.01%);
+}
+
+.price-continer-box {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20rem;
+  box-sizing: border-box;
+  height: 400px;
+}
+
+.price-continer-box > .price-box-left {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.price-box-left-item {
+  position: relative;
+  width: 49%;
+  height: 190px;
+  background-color: #fff;
+  border-radius: 0.2rem;
+}
+
+.price-box-left-item::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  background: rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 100%;
+}
+
+.tips {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  width: 100%;
+  height: 40px;
+}
+
+.jr-imgs {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.4rem;
+}
+
+.price-box-right {
+  width: 460px;
+  height: 390px;
+  margin-left: 0.8rem;
+}
+
+.price-box-right > .price-box-right-item {
+  position: relative;
+  border-radius: 0.2rem;
+  background-color: #f00;
+  width: 100%;
+  height: 100%;
+}
+
+.price-box-right-item::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+}
+
+.right-tips {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  width: 100%;
+  height: 40px;
+}
+
+.data-information {
+  background: url('@/assets/dataService/data-phone-bgc.png') no-repeat;
+  -webkit-background-size: 100% 100%;
+  background-size: 100% 100%;
+  padding-bottom: 2rem;
+}
+
+.data-information-content {
+  padding: 0 20rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.data-left {
+  position: relative;
+  width: 36%;
+  background-color: #ffffff;
+  height: 570px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 0.2rem;
+  overflow: hidden;
+}
+
+.data-left::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '时政要闻';
+  color: #ffffff;
+  background: #0073f7;
+  text-align: center;
+  padding: 0.6rem 0.8rem;
+}
+
+.title-top {
+  height: 54%;
+  width: 100%;
+}
+
+.title-h2 {
+  font-weight: bold;
+  line-height: 50px;
+  text-align: left;
+  margin-left: 1rem;
+}
+
+.title-timer {
+  text-align: left;
+  margin-left: 1rem;
+}
+
+.title-content {
+  text-align: left;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  line-height: 20px;
+}
+
+.title-a {
+  text-align: left;
+  margin-left: 1rem;
+  margin-top: 1rem;
+  color: #91abec;
+  cursor: pointer;
+}
+
+.data-right {
+  width: 63%;
+}
+
+.right-box {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  background-color: #fff;
+  height: 180px;
+  border-radius: 0.2rem;
+  padding: 1rem 3rem 1.2rem 1.2rem;
+  box-sizing: border-box;
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.right-box:last-child {
+  margin-bottom: 0;
+}
+
+.box-left {
+  width: 20%;
+  height: 100%;
+  color: #606266;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-right: 2rem;
+  font-size: 14px;
+}
+
+.box-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.box-right::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '公司动态';
+  padding: 0.6rem 1.2rem;
+  background-color: #0073f7;
+  color: #ffffff;
+}
+
+.right-box {
+  width: 100%;
+}
+
+.box-right > h3 {
+  margin-top: 0.4rem;
+}
+
+.box-right > span {
+  color: #91abec;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.box-right > p {
+  color: #606266;
+  padding-bottom: 1.2rem;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.firend-content {
+  background: url('@/assets/firends/firends.png') no-repeat;
+  -webkit-background-size: 100% 100%;
+  background-size: 100% 100%;
+  padding-bottom: 2rem;
+}
+
+.firend-content-box {
+  padding: 0 20rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.firend-cards {
+  width: 24%;
+  background-color: #fff;
+  padding: 1rem 1.2rem 1rem 1rem;
+  box-sizing: border-box;
+  border-radius: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.firend-cards > img {
+  width: 100%;
+  height: 100%;
+}
+
+.firend-cards > p {
+  line-height: 24px;
+  color: #303133;
+  font-size: 16px;
+  margin-top: 1rem;
+}

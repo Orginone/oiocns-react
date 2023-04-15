@@ -1,61 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Content from './content';
-import MainLayout from '@/components/MainLayout';
+import ChatLayout from '@/components/ChatLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import chatCtrl from '@/ts/controller/chat';
 import { GroupMenuType } from './config/menuType';
-import { IconFont } from '@/components/IconFont';
 import { IChat } from '@/ts/core';
 const Setting: React.FC<any> = () => {
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  if (!selectMenu) return <></>;
+  const [key, menus, reFresh, selectTab, setSelectTab, selectMenu, setSelectMenu] =
+    useMenuUpdate();
+
+  const getChat = (id: string): IChat | undefined => {
+    for (var i = 0; i < chatCtrl.groups.length; i++) {
+      const group = chatCtrl.groups[i];
+      for (var j = 0; j < group.chats.length; j++) {
+        const chat = group.chats[j];
+        if (id == chat.target.id) {
+          return chat;
+        }
+      }
+    }
+    return undefined;
+  };
+  /**进入会话 */
+  const enterChat = (id: string) => {
+    setSelectTab('1');
+    let chat = getChat(id);
+    chatCtrl.setCurrent(chat);
+    reFresh();
+    chatCtrl.setTabIndex('1');
+  };
   return (
-    <MainLayout
-      title={{ label: '沟通', icon: <IconFont type={'icon-message'} /> }}
+    <ChatLayout
+      tabKey={selectTab}
+      onTabChanged={(tabKey) => {
+        setSelectTab(tabKey);
+        reFresh();
+        chatCtrl.setTabIndex(tabKey);
+      }}
+      showTopBar={selectMenu.itemType != GroupMenuType.Chat}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         if (data.itemType == GroupMenuType.Chat) {
-          await chatCtrl.setCurrent(data.item);
-        } else {
-          chatCtrl.currentKey = data.key;
-          setSelectMenu(data);
+          chatCtrl.setCurrent(data.item);
         }
+        setSelectMenu(data);
       }}
-      onMenuClick={async (data, key) => {
-        switch (key) {
-          case '打开会话':
-            chatCtrl.setCurrent(data.item.chat);
-            break;
-          case '置顶会话':
-            (data.item! as IChat).isToping = true;
-            refreshMenu();
-            break;
-          case '取消置顶':
-            (data.item! as IChat).isToping = false;
-            refreshMenu();
-            break;
-          case '清空消息':
-            await (data.item! as IChat).clearMessage();
-            chatCtrl.changCallback();
-            break;
-          case '删除会话':
-            chatCtrl.deleteChat(data.item);
-            break;
-          case '会话详情':
-            setOpenDetail(!openDetail);
-            break;
-          case '标记为未读':
-            if (chatCtrl.chat) {
-              chatCtrl.chat.noReadCount = 1;
-              chatCtrl.changCallback();
-            }
-            break;
-        }
-      }}
-      siderMenuData={menus}>
-      <Content key={key} selectMenu={selectMenu} openDetail={openDetail} />
-    </MainLayout>
+      onMenuClick={() => {}}
+      menuData={menus}>
+      <Content key={key} selectMenu={selectMenu} enterChat={enterChat} />
+    </ChatLayout>
   );
 };
 

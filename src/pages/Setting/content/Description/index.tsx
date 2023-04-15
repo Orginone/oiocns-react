@@ -39,9 +39,6 @@ const Description = (props: { title: any; current: ITarget; extra: any }) => {
         <Descriptions.Item label={'团队标识'}>
           {deptInfo?.team?.code || ''}
         </Descriptions.Item>
-        <Descriptions.Item label="所属单位">
-          {deptInfo && userCtrl.findTeamInfoById(deptInfo.belongId).name}
-        </Descriptions.Item>
         <Descriptions.Item label="创建人">
           {deptInfo && userCtrl.findTeamInfoById(deptInfo.createUser).name}
         </Descriptions.Item>

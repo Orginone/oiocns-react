@@ -2,9 +2,10 @@ import storeCtrl from '@/ts/controller/store';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { ImHome } from 'react-icons/im';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
-import { findMenuItemByKey } from '@/utils/tools';
+import userCtrl from '@/ts/controller/setting';
+import * as im from 'react-icons/im';
 /**
  * 仓库菜单刷新hook
  * @returns key 变更后的标识,
@@ -15,47 +16,82 @@ import { findMenuItemByKey } from '@/utils/tools';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  TabItemType[],
   () => void,
-  MenuItemType | undefined,
+  MenuItemType,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenus] = useState<MenuItemType[]>([]);
+  const [menus, setMenu] = useState<TabItemType[]>([]);
 
   const [selectMenu, setSelectMenu] = useState<MenuItemType>({
     key: '1',
-    label: '仓库',
+    label: '管理的',
     itemType: 'group',
     icon: <ImHome />,
     children: [],
   });
 
+  /** 查找菜单 */
+  const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
+    for (const item of items) {
+      if (item.key === key) {
+        return item;
+      } else if (Array.isArray(item.children)) {
+        const find = findMenuItemByKey(item.children, key);
+        if (find) {
+          return find;
+        }
+      }
+    }
+    return undefined;
+  };
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const adminMenus = await operate.loadAdminMenus();
-    const stores = await operate.loadMarketMenus();
-    const newMenus = [
-      {
-        key: '仓库',
-        label: '仓库',
-        itemType: 'Tab',
-        children: adminMenus,
-      },
-      {
-        key: '商店',
-        label: '商店',
-        itemType: 'Tab',
-        children: stores,
-      },
+    let tabName_1 = userCtrl.isCompanySpace ? '管理的' : '我的';
+    const anyThingMenus = await operate.loadAnythingMenus();
+    const children: MenuItemType[] = [
+      operate.getAppliactionMenus(),
+      operate.getFileSystemMenus(),
+      operate.getResourceMenus(),
+      operate.getDataMenus(),
+      operate.getSoftware()
     ];
-    var item = findMenuItemByKey(newMenus, storeCtrl.currentKey);
-    if (item === undefined) {
-      item = adminMenus[0];
+    if (anyThingMenus) {
+      children.push(anyThingMenus);
     }
-    storeCtrl.currentKey = item.key;
-    setSelectMenu(item);
-    setMenus(newMenus);
+    setMenu([
+      {
+        key: '1',
+        label: tabName_1,
+        menu: {
+          key: tabName_1,
+          label: tabName_1,
+          itemType: tabName_1,
+          icon: <im.ImTree />,
+          children,
+        },
+      },
+      {
+        key: '2',
+        label: '可见的',
+        menu: {
+          key: '可见的',
+          label: '可见的',
+          itemType: '可见的',
+          icon: <im.ImCoinDollar />,
+          children,
+        },
+      },
+    ]);
+
+    const item = findMenuItemByKey(children, storeCtrl.currentKey);
+    if (item) {
+      setSelectMenu(item);
+    } else {
+      storeCtrl.currentKey = children[0].key;
+      setSelectMenu(children[0]);
+    }
   };
 
   useEffect(() => {

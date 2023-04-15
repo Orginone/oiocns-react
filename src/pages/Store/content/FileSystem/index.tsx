@@ -18,6 +18,8 @@ interface IProps {
  * 仓库-文件系统
  */
 const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
+  console.log(storeCtrl.root);
+  
   const [key] = useCtrlUpdate(storeCtrl);
   const [operateKey, setOperateKey] = useState<string>();
   const [operateTarget, setOperateTarget] = useState<IFileSystemItem>();

@@ -1,5 +1,5 @@
 import PageCard from '@/components/PageCard';
-import { ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { Button, Segmented, Tabs } from 'antd';
 import React, { useRef, useState } from 'react';
 import Description from './Description';
@@ -9,22 +9,38 @@ import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
 import { ImUndo2 } from 'react-icons/im';
-import { XFlowDefine } from '@/ts/base/schema';
-import settingCtrl from '@/ts/controller/setting';
+import { XFlowDefine, XOperation } from '@/ts/base/schema';
 
 interface IProps {
+  target?: ITarget;
   current: ISpeciesItem;
 }
 /**
  * 标准设定
  * @returns
  */
-const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
+const SettingStandrad: React.FC<IProps> = ({ current, target }: IProps) => {
   const [modalType, setModalType] = useState('');
   const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom
 
-  const [flowDesign, setFlowDesign] = useState<XFlowDefine>();
+  const [flowTabKey, setFlowTabKey] = useState(0);
+  const [flowDesign, setFlowDesign] = useState<XFlowDefine>({
+    id: '',
+    name: '',
+    code: '',
+    belongId: '',
+    content: '',
+    remark: '',
+    status: 0,
+    createUser: '',
+    updateUser: '',
+    version: '',
+    createTime: '',
+    updateTime: '',
+    target: undefined,
+    isCreate: true,
+  });
   const [showAddDict, setShowAddDict] = useState<boolean>(true);
   const [recursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [recursionSpecies, setRecursionSpecies] = useState<boolean>(true);
@@ -34,7 +50,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   // 跳转到流程设计
-  const toFlowDesign = () => {
+  const toFlowDesign = (operation: XOperation) => {
     setTabKey('办事定义');
   };
 
@@ -90,7 +106,22 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
                 type="link"
                 onClick={() => {
                   setModalType('新增办事');
-                  setFlowDesign(undefined);
+                  setFlowDesign({
+                    id: '',
+                    name: '',
+                    code: '',
+                    belongId: '',
+                    content: '',
+                    remark: '',
+                    status: 0,
+                    createUser: '',
+                    updateUser: '',
+                    version: '',
+                    createTime: '',
+                    updateTime: '',
+                    target: undefined,
+                    isCreate: true,
+                  });
                 }}>
                 {'新增办事'}
               </Button>
@@ -125,7 +156,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
       children: (
         <Attritube
           current={current}
-          target={settingCtrl.space}
+          target={target}
           modalType={modalType}
           recursionOrg={recursionOrg}
           recursionSpecies={recursionSpecies}
@@ -139,7 +170,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
       children: (
         <Dict
           current={current}
-          target={settingCtrl.space}
+          target={target}
           modalType={modalType}
           setModalType={setModalType}
           recursionOrg={recursionOrg}
@@ -154,7 +185,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
       children: (
         <SpeciesForm
           current={current}
-          target={settingCtrl.space}
+          target={target}
           modalType={modalType}
           recursionOrg={recursionOrg}
           recursionSpecies={recursionSpecies}
@@ -162,35 +193,23 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           toFlowDesign={toFlowDesign}></SpeciesForm>
       ),
     },
-  ];
-
-  const findHasMatters = (species: ISpeciesItem): boolean => {
-    if (species.target.code === 'matters') {
-      return true;
-    } else if (species.parent) {
-      return findHasMatters(species.parent);
-    }
-    return false;
-  };
-
-  if (findHasMatters(current)) {
-    items.push({
+    {
       label: `办事定义`,
       key: '办事定义',
       children: (
         <SettingFlow
           key={tabKey}
           current={current}
-          target={settingCtrl.space}
+          target={target}
           modalType={modalType}
           setModalType={setModalType}
           flowDesign={flowDesign}
           setFlowDesign={setFlowDesign}
-          curTabKey={0}
+          curTabKey={flowTabKey}
         />
       ),
-    });
-  }
+    },
+  ];
 
   const renderTabBarExtraContent = () => {
     return (

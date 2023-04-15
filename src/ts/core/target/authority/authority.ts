@@ -179,12 +179,11 @@ export default class Authority implements IAuthority {
     return this.identitys;
   }
   public async queryAuthorityPerson(
-    spaceId: string,
     page: PageRequest,
   ): Promise<model.ResultType<schema.XTargetArray>> {
     return await kernel.queryPersonByAuthority({
       id: this._authority.id,
-      spaceId: spaceId,
+      spaceId: this.id,
       page: page,
     });
   }

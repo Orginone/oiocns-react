@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import userCtrl from '@/ts/controller/setting';
-import { ICohort } from '@/ts/core';
+import { IChat, ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
+import { useHistory } from 'react-router-dom';
 import { PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
@@ -15,7 +16,6 @@ import Description from '../Description';
 import chatCtrl from '@/ts/controller/chat';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
-import setting from '@/ts/controller/setting';
 interface IProps {
   current: ICohort;
 }
@@ -24,6 +24,7 @@ interface IProps {
  * @returns
  */
 const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
+  const history = useHistory();
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
@@ -65,6 +66,25 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
     );
   };
 
+  const getChat = (id: string): IChat | undefined => {
+    for (var i = 0; i < chatCtrl.groups.length; i++) {
+      const group = chatCtrl.groups[i];
+      for (var j = 0; j < group.chats.length; j++) {
+        const chat = group.chats[j];
+        if (id == chat.target.id) {
+          return chat;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  /**进入会话 */
+  const enterChat = (id: string) => {
+    chatCtrl.setCurrent(getChat(id));
+    history.push('/chat');
+  };
+
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
@@ -90,16 +110,9 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           },
           {
             key: 'enterChat',
-            label: '打开会话',
+            label: '发起会话',
             onClick: async () => {
-              chatCtrl.setCurrent(
-                chatCtrl.findTargetChat(
-                  item,
-                  setting.user.id,
-                  setting.user.teamName,
-                  item.typeName,
-                ),
-              );
+              enterChat(item.id);
             },
           },
         ],

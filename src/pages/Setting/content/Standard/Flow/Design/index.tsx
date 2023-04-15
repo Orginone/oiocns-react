@@ -19,7 +19,7 @@ import { ImWarning } from 'react-icons/im';
 import { IFlowDefine } from '@/ts/core/thing/iflowDefine';
 
 interface IProps {
-  current: XFlowDefine | undefined;
+  current: XFlowDefine;
   species?: ISpeciesItem;
   modalType: string;
   operateOrgId?: string;
@@ -54,6 +54,7 @@ const Design: React.FC<IProps> = ({
   setInstance,
   setModalType,
   onBack,
+  testModel,
   defaultEditable = true,
 }: IProps) => {
   const [scale, setScale] = useState<number>(90);
@@ -73,7 +74,7 @@ const Design: React.FC<IProps> = ({
     nodeId: `node_${getUuid()}`,
     parentId: '',
     type: 'ROOT',
-    name: '发起角色',
+    name: '发起人',
     props: {
       assignedType: 'JOB',
       mode: 'AND',
@@ -131,7 +132,7 @@ const Design: React.FC<IProps> = ({
             nodeId: `node_${getUuid()}`,
             parentId: '',
             type: 'ROOT',
-            name: '发起角色',
+            name: '发起人',
             props: {
               assignedType: 'JOB',
               mode: 'AND',
@@ -155,6 +156,8 @@ const Design: React.FC<IProps> = ({
           };
         }
         if (instance) {
+          // let res = await species?.loadFlowInstances(true);
+          // let instance_: any = res[0];
           setInstance(instance);
           showTask(instance, resourceData);
         } else {
@@ -276,8 +279,15 @@ const Design: React.FC<IProps> = ({
       if (rootNode.destId == undefined) {
         errors.push(getErrorItem('ROOT节点缺少角色'));
       }
+      // let companyApprovalNodes = allNodes.filter(
+      //   (item) => item.type == 'APPROVAL' && item.belongId == rootNode.belongId,
+      // );
+      // if (companyApprovalNodes.length == 0) {
+      //   errors.push(getErrorItem('至少需要一个审批节点'));
+      // }
     }
-    //每个节点的 belongId  审核和抄送和子流程的destId
+
+    //每个节点的 belongId  审核和抄送的destId
     for (let node of allNodes) {
       if (!node.belongId && node.type != 'ROOT') {
         errors.push(
@@ -289,13 +299,13 @@ const Design: React.FC<IProps> = ({
         );
       }
       if (
-        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
+        (node.type == 'APPROVAL' || node.type == 'CC') &&
         (!node.destId || node.destId == '0' || node.destId == '')
       ) {
         errors.push(
           getErrorItem(
             <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作者
             </>,
           ),
         );
@@ -371,9 +381,6 @@ const Design: React.FC<IProps> = ({
           break;
         case '组织':
           resource.type = 'ORGANIZATIONAL';
-          break;
-        case '子流程':
-          resource.type = 'CHILDWORK';
           break;
         //如果是空结点（下个流程的起始节点）
         case '空':
@@ -543,7 +550,7 @@ const Design: React.FC<IProps> = ({
     } else if (operateOrgId && operateOrgId != '') {
       belongId = operateOrgId;
     } else {
-      belongId = conditionData.belongId || current?.belongId;
+      belongId = conditionData.belongId || current.belongId;
     }
     if (type == 'flowNode') {
       let flowNode: FlowNode = {
@@ -711,7 +718,7 @@ const Design: React.FC<IProps> = ({
                           sourceIds_ = sourceIds_.join(',');
                         }
                         define = await species?.updateFlowDefine({
-                          id: current?.id,
+                          id: current.id,
                           code: conditionData.name,
                           name: conditionData.name,
                           sourceIds: sourceIds_,
@@ -755,9 +762,7 @@ const Design: React.FC<IProps> = ({
               <div>
                 {conditionData && (
                   <ChartDesign
-                    disableIds={[current?.id || '']}
                     // key={key}
-                    current={current}
                     defaultEditable={defaultEditable}
                     species={species}
                     operateOrgId={operateOrgId}

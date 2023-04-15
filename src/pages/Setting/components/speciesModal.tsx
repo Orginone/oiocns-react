@@ -46,7 +46,7 @@ const SpeciesModal = (props: Iprops) => {
         return targetsToTreeData(res);
       },
       fieldProps: {
-        // disabled: title === '修改' || title === '编辑',
+        disabled: title === '修改' || title === '编辑',
         showSearch: true,
       },
     },
@@ -60,7 +60,7 @@ const SpeciesModal = (props: Iprops) => {
         return data ? [data] : [];
       },
       fieldProps: {
-        // disabled: title === '修改',
+        disabled: title === '修改',
         fieldNames: { label: 'name', value: 'id' },
         showSearch: true,
         filterTreeNode: true,

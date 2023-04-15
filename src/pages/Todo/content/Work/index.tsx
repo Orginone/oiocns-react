@@ -23,12 +23,7 @@ const Work: React.FC<IProps> = ({ selectMenu }) => {
     {
       key: '2',
       label: `已发起`,
-      children: <WorkStartRecord selectMenu={selectMenu} status={[1]} />,
-    },
-    {
-      key: '3',
-      label: `已完结`,
-      children: <WorkStartRecord selectMenu={selectMenu} status={[100, 200]} />,
+      children: <WorkStartRecord selectMenu={selectMenu} />,
     },
   ];
 

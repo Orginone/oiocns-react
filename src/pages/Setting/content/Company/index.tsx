@@ -109,6 +109,9 @@ const CompanySetting: React.FC<IProps> = ({ current }: IProps) => {
             <Button type="link" onClick={() => setActiveModal('joinGroup')}>
               加入集团
             </Button>
+            {/* <Button type="link" onClick={() => history.push('/todo/org')}>
+              查看申请
+            </Button> */}
           </>
         )}
       </>

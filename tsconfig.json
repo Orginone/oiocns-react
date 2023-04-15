@@ -13,6 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "suppressImplicitAnyIndexErrors": true, //处理元素any 不能使用string作为二索引报错
     "noUnusedLocals": true /* 用于检查是否有定义了但是没有使用的变量*/,
     "noUnusedParameters": true /* 用于检查是否有在函数体中没有使用的参数 */,
     "noEmit": true,

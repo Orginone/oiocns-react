@@ -3,7 +3,7 @@ import { XMarketRelationArray, XMerchandiseArray } from '../../base/schema';
 import { TargetType } from '../enum';
 export default interface IMarket {
   /** 市场实体 */
-  target: schema.XMarket;
+  market: schema.XMarket;
   /** 可以拉取的成员类型 */
   pullTypes: TargetType[];
   /**

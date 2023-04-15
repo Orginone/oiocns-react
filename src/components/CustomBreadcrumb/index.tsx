@@ -1,5 +1,5 @@
 import { CaretRightOutlined } from '@ant-design/icons';
-import { Breadcrumb, Divider, Space, Tag, Typography } from 'antd';
+import { Breadcrumb, Divider, Space, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImArrowLeft2 } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
@@ -8,13 +8,13 @@ import css from './index.module.less';
 interface CustomBreadcrumbType {
   leftBar?: React.ReactNode;
   selectKey: string;
-  item: MenuItemType[];
+  item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
 }
 const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   const [items, setItems] = useState<MenuItemType[]>([]);
   useEffect(() => {
-    setItems(loadBreadItems(props.item, props.selectKey));
+    setItems(loadBreadItems([props.item], props.selectKey));
   }, [props.selectKey]);
 
   const loadBreadItems = (items: MenuItemType[], key: string) => {
@@ -79,15 +79,7 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
               <span style={{ fontSize: 16, paddingTop: 6, paddingRight: 4 }}>
                 {item.icon}
               </span>
-              {item.label}{' '}
-              {item.tag &&
-                item.tag.map((tag) => {
-                  return (
-                    <Tag key={tag} color="success">
-                      {tag}
-                    </Tag>
-                  );
-                })}
+              {item.label}
             </Breadcrumb.Item>
           );
         })}

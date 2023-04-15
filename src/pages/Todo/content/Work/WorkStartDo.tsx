@@ -134,6 +134,7 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
                     1,
                     userCtrl.isCompanySpace ? 'company' : 'user',
                   );
+                  message.info('创建了一个实体');
                   if (res && res.success) {
                     rows_ = res.data;
                   }
@@ -144,11 +145,15 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
                   SpaceId: userCtrl.space.id,
                   content: '',
                   contentType: 'Text',
-                  data: JSON.stringify({ ...data, ...values }),
+                  data: JSON.stringify({ ...data, ...values}),
                   title: currentDefine?.name || '',
-                  hook: '',
+                  hook: 'http://123.156.231.148:3000/internal/login',
                   thingIds: rows_.map((row: any) => row['Id']),
                 });
+                // console.log(res);
+                // debugger
+                // 427850480614510592
+                
                 if (res.success) {
                   setOperations([]);
                   setSuccessPage(true);
@@ -167,7 +172,6 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
             <Tabs defaultActiveKey="1">
               <TabPane tab="实体" key="1">
                 <Thing
-                  keyExpr="Id"
                   dataSource={rows}
                   current={chooseThingModal[0]}
                   checkedList={chooseThingModal.map((e) => {
@@ -187,20 +191,14 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
                       </Button>
                     </Item>,
                   ]}
-                  menuItems={[
-                    {
-                      key: 'remove',
-                      label: '删除',
-                      click(row) {
-                        if (rows.length > 1) {
-                          console.log(rows.filter((item: any) => item.Id != row.Id));
-                          setRows(rows.filter((item: any) => item.Id != row.Id));
-                        } else {
-                          message.error('删除失败,至少需要一条数据');
-                        }
-                      },
-                    },
-                  ]}
+                  showRemove={(row: any) => {
+                    if (rows.length > 1) {
+                      console.log(rows.filter((item: any) => item.Id != row.Id));
+                      setRows(rows.filter((item: any) => item.Id != row.Id));
+                    } else {
+                      message.error('删除失败,至少需要一条数据');
+                    }
+                  }}
                   editingTool={
                     <Editing
                       allowAdding={false}

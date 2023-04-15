@@ -174,9 +174,9 @@ const StoreApp: React.FC = () => {
           }
           tabList={[
             { tab: '全部', key: '全部' },
-            { tab: '创建的', key: '创建的' },
-            { tab: '共享的', key: '共享的' },
+            // { tab: '共享的', key: '共享的' },
             // { tab: '可用的', key: '可用的' },
+            // { tab: '创建的', key: '创建的' },
             // { tab: '购买的', key: '购买的' },
           ]}
           activeTabKey={tabKey}
@@ -184,7 +184,7 @@ const StoreApp: React.FC = () => {
             setTabKey(k);
           }}>
           <div className={cls['page-content-table']}>
-            <InnerApp type={tabKey} />
+            <InnerApp />
             {/* <AppShowComp
               list={showData}
               searchParams={{ status: tabKey }}

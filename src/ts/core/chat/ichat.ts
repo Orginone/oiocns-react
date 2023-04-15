@@ -1,7 +1,6 @@
-import { ChatModel, TargetShare } from '@/ts/base/model';
+import { TargetShare } from '@/ts/base/model';
 import { schema, model } from '../../base';
 import { MessageType } from '../enum';
-import { XImMsg } from '@/ts/base/schema';
 /**
  * 会话接口
  */
@@ -28,12 +27,10 @@ export interface IChat {
   messages: schema.XImMsg[];
   /** 群成员 */
   persons: schema.XTarget[];
+  /** 最后一条消息 */
+  lastMessage: schema.XImMsg | undefined;
   /** 共享信息 */
   shareInfo: TargetShare;
-  /** 最后一个消息的时间 */
-  lastMsgTime: number;
-  /** 消息变更通知 */
-  onMessage(callback: (messages: schema.XImMsg[]) => void): void;
   /**
    * 获取会话缓存
    */
@@ -96,18 +93,14 @@ export interface IChatGroup {
  * 会话缓存
  */
 export type ChatCache = {
-  /** 会话基本信息 */
-  target: ChatModel;
+  /** 会话ID */
+  chatId: string;
   /** 会话所在空间ID */
   spaceId: string;
-  /** 会话所在空间名称 */
-  spaceName: string;
   /** 是否置顶 */
   isToping: boolean;
   /** 会话未读消息数量 */
   noReadCount: number;
-  /** 最后一次消息时间 */
-  lastMsgTime: number;
   /** 最新消息 */
-  lastMessage: XImMsg | undefined;
+  lastMessage: schema.XImMsg | undefined;
 };

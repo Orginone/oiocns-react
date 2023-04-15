@@ -40,21 +40,28 @@ interface MenuItemType {
   item?: any;
   key: string;
   label: string;
+  display?: React.ReactNode;
   menuType?: string;
   checked?: boolean;
   itemType: string;
   count?: number;
-  tag?: string[];
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   expIcon?: React.ReactNode;
   menus?: OperateMenuType[];
   children: MenuItemType[];
 }
 
+interface TabItemType {
+  key: string;
+  label: string;
+  menu: MenuItemType;
+  icon?: React.ReactNode;
+  expIcon?: React.ReactNode;
+}
+
 interface OperateMenuType {
   key: string;
   label: string;
-  model?: string;
   icon: React.ReactNode;
   subMenu?: MenuItemType;
 }

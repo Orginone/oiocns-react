@@ -1,10 +1,9 @@
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { emitter, WorkType } from '@/ts/core';
-import { findMenuItemByKey } from '@/utils/tools';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { MenuItemType } from 'typings/globelType';
+import { MenuItemType, TabItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 
 /**
@@ -14,57 +13,66 @@ import * as operate from '../config/menuOperate';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  TabItemType[],
   () => void,
-  MenuItemType | undefined,
+  MenuItemType,
   (items: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenu] = useState<MenuItemType[]>([]);
-  const [selectMenu, setSelectMenu] = useState<MenuItemType>();
+  const [menus, setMenu] = useState<TabItemType[]>([]);
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
+    key: 'todo',
+    label: '待办',
+    itemType: 'group',
+    icon: <SettingOutlined />,
+    children: [],
+  });
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const newMenus = [
+    setMenu([
       {
-        key: '待办',
+        key: '1',
         label: '待办',
-        itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformTodoMenu()),
-          {
-            key: 'todoWork',
-            label: '事项',
-            itemType: WorkType.WorkTodo,
-            icon: <SettingOutlined />,
-            count: (await todoCtrl.loadWorkTodo()).length,
-            children: [],
-          },
-        ],
+        menu: {
+          key: 'todo',
+          label: '待办',
+          itemType: 'group',
+          icon: <SettingOutlined />,
+          children: [
+            ...(await operate.loadPlatformTodoMenu()),
+            {
+              key: 'todoWork',
+              label: '事项',
+              itemType: WorkType.WorkTodo,
+              icon: <SettingOutlined />,
+              count: (await todoCtrl.loadWorkTodo()).length,
+              children: [],
+            },
+          ],
+        },
       },
       {
-        key: '发起',
+        key: '2',
         label: '发起',
-        itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformApplyMenu()),
-          {
-            key: '办事项',
-            label: '办事项',
-            itemType: 'group',
-            icon: <SettingOutlined />,
-            children: await operate.loadThingMenus('work'),
-          },
-        ],
+        menu: {
+          key: 'work',
+          label: '发起',
+          itemType: 'group',
+          icon: <SettingOutlined />,
+          children: [
+            ...(await operate.loadPlatformApplyMenu()),
+            {
+              key: '办事项',
+              label: '办事项',
+              itemType: 'group',
+              icon: <SettingOutlined />,
+              children: await operate.loadThingMenus('work'),
+            },
+          ],
+        },
       },
-    ];
-    var item = findMenuItemByKey(newMenus, todoCtrl.currentKey);
-    if (item === undefined) {
-      item = newMenus[0].children[0];
-    }
-    todoCtrl.currentKey = item.key;
-    setSelectMenu(item);
-    setMenu(newMenus);
+    ]);
   };
 
   useEffect(() => {

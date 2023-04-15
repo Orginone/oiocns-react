@@ -37,7 +37,7 @@ export default class StoreHub implements IDisposable {
       .withUrl(url)
       .withHubProtocol(hubProtocol)
       .configureLogging(signalR.LogLevel.None)
-      .build();
+      .build();      
     this._connection.serverTimeoutInMilliseconds = timeout;
     this._connection.keepAliveIntervalInMilliseconds = interval;
     this._connection.onclose((err) => {
@@ -158,6 +158,7 @@ export default class StoreHub implements IDisposable {
         this._connection
           .invoke(methodName, ...args)
           .then((res: ResultType<any>) => {
+            console.log(res,'11111',methodName, ...args);
             if (!res.success) {
               if (res.code === 401) {
                 logger.unauth();

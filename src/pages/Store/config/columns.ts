@@ -1,4 +1,5 @@
 import { IProduct } from '@/ts/core';
+import { IFlowDefine } from '@/ts/core/thing';
 import { ProColumns } from '@ant-design/pro-table';
 import userCtrl from '@/ts/controller/setting';
 import thingCtrl from '@/ts/controller/thing';

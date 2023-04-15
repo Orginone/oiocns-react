@@ -1,0 +1,162 @@
+.containers {
+  padding: 0 0 0.4rem 0.4rem;
+  position: relative;
+  overflow-y: auto;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+.headerStyle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 11;
+  display: flex;
+  justify-content: center;
+}
+
+.contentStyle {
+  text-align: center;
+  background-color: #fff;
+}
+
+.containers img {
+  width: 100%;
+  height: 100%;
+}
+h1 {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.nav-header {
+  display: flex;
+  justify-content: space-between;
+  color: #ffffff;
+  width: 80%;
+  user-select: none;
+}
+
+.nav-item {
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.3s;
+}
+
+.nav-item:hover {
+  color: #108ee9;
+}
+
+.top-imgs {
+  width: 100%;
+  height: 730px;
+}
+
+li {
+  margin: 0 !important;
+}
+
+li .spans {
+  display: inline-block;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    #0073f7 0%,
+    #0db3c7 18.63%,
+    #17e3a2 54.05%,
+    #2cd971 92.23%,
+    #43cd38 106.25%
+  );
+  padding: 0.5rem 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.item-bottom {
+  padding-bottom: 4rem;
+}
+
+.content-boxs {
+  padding: 2rem 20rem;
+}
+
+.content-boxs .center-item {
+  padding-top: 0;
+}
+
+.content-boxs .center-item .myitem {
+  display: flex;
+  justify-content: space-around;
+}
+
+.content-boxs .center-item .myitem .span0 {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 440px;
+}
+
+.content-boxs .center-item .myitem .span0 .span1 {
+  font-size: 1.5rem;
+  font-weight: 550;
+  color: #1d54e7;
+  padding-bottom: 1rem;
+}
+
+.content-boxs .center-item .myitem .span0 .span2 {
+  padding-bottom: 2rem;
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #042166;
+  padding-top: 0.2rem;
+}
+
+.content-boxs .center-item .myitem .span0 li {
+  line-height: 3.5rem;
+  margin-left: 1.4rem;
+  color: #042166;
+  font-size: 1.3rem;
+}
+
+.content-boxs .title-content {
+  display: flex;
+  justify-content: center;
+}
+
+.content-boxs .title-content h1 {
+  position: relative;
+  text-align: center;
+  color: #333;
+  line-height: 60px;
+}
+
+.content-boxs .title-content h1::after {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  left: 106%;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #ced3f4 0.01%,
+    #ced3f4 52.03%,
+    rgba(237, 239, 252, 0) 96.35%
+  );
+}
+
+.content-boxs .title-content h1::before {
+  position: absolute;
+  content: '';
+  bottom: 40%;
+  right: 106%;
+  width: 300px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(237, 239, 252, 0.18) 0.83%,
+    #ced3f4 47.66%,
+    #ced3f4 100%
+  );
+}

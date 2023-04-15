@@ -5,19 +5,20 @@ import { GroupMenuType } from '../config/menuType';
 import { MenuItemType } from 'typings/globelType';
 
 interface IProps {
-  openDetail: boolean;
   selectMenu: MenuItemType;
+  enterChat: Function;
 }
 
-const TypeSetting = ({ selectMenu, openDetail }: IProps) => {
-  switch (selectMenu.itemType.split('-')[0]) {
+const TypeSetting = ({ selectMenu, enterChat }: IProps) => {
+  let preType =
+    selectMenu.itemType.indexOf('-') > 0
+      ? selectMenu.itemType.substring(0, selectMenu.itemType.indexOf('-'))
+      : selectMenu.itemType;
+  switch (preType) {
     case GroupMenuType.Chat:
-      return <Chat openDetail={openDetail} />;
+      return <Chat />;
     case GroupMenuType.Books:
-      if (selectMenu.itemType.includes('-')) {
-        return <Book selectMenu={selectMenu} />;
-      }
-      return <></>;
+      return <Book selectMenu={selectMenu} enterChat={enterChat} />;
     default:
       return <></>;
   }

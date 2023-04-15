@@ -14,8 +14,6 @@ import { Emitter } from '@/ts/base/common';
 import userCtrl from '../setting';
 import { XFlowTaskHistory, XTarget } from '@/ts/base/schema';
 import { kernel } from '@/ts/base';
-import { TODO_COMMON_MENU } from '@/constants/const';
-import { IsRelationAdmin } from '@/utils/authority';
 
 /** 待办控制器 */
 class TodoController extends Emitter {
@@ -23,7 +21,6 @@ class TodoController extends Emitter {
   public currentKey: string = '';
   private _friendTodo: ITodoGroup[] = [];
   private _groupTodo: ITodoGroup[] = [];
-  private _cohortTodo: ITodoGroup[] = [];
   private _companyTodo: ITodoGroup[] = [];
   private _pubApply: ITodoGroup | undefined;
   private _pubTodo: ITodoGroup[] = [];
@@ -32,33 +29,19 @@ class TodoController extends Emitter {
   private _marketTodo: ITodoGroup[] = [];
   private _curAppTodo: ITodoGroup | undefined;
   private _workTodo: XFlowTaskHistory[] = [];
-  private _caches: any[] = [];
-  private _commonMenuMap: any = {};
   constructor() {
     super();
-    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      if (userCtrl.user.id != '') {
+    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
+      setTimeout(async () => {
         let group: XTarget[] = [];
-        let cohorts: XTarget[] = [];
-        let companys: XTarget[] = [];
-        let res = await kernel.queryApproveTask({ id: userCtrl.space.id });
-        let cps = await userCtrl.user.getJoinedCompanys(false);
-        for (let company of cps) {
-          if (await IsRelationAdmin(company)) {
-            companys.push(company.target);
-          }
-          (await company.getJoinedGroups(false)).forEach(async (s) => {
-            if ((await IsRelationAdmin(s)) && group.findIndex((a) => a.id == s.id) < 0) {
-              group.push(s.target);
-            }
-          });
-        }
-        (await userCtrl.user.getCohorts(false)).forEach(async (a) => {
-          if (await IsRelationAdmin(a)) {
-            cohorts.push(a.target);
-          }
+        let companys = await userCtrl.user.getJoinedCompanys(false);
+        companys.forEach(async (company) => {
+          (await company.getJoinedGroups(false))
+            .filter((a) => group.findIndex((s) => a.id == s.id) < 0)
+            .forEach((a) => {
+              group.push(a.target);
+            });
         });
-
         this._friendTodo = await loadOrgTodo(
           [
             {
@@ -69,25 +52,21 @@ class TodoController extends Emitter {
           ],
           WorkType.FriendTodo,
         );
-        this._workTodo = res.data?.result || [];
+        this._groupTodo = await loadOrgTodo(group, WorkType.GroupTodo);
+        this._companyTodo = await loadOrgTodo(
+          companys.map((a) => a.target),
+          WorkType.CompanyTodo,
+        );
         this._pubTodo = await loadPublishTodo();
         this._pubApply = await loadPublishApply();
         this._orderTodo = await loadOrderTodo();
         this._marketTodo = await loadMarketTodo();
         this._marketApply = await loadMarketApply();
-        this._groupTodo = await loadOrgTodo(group, WorkType.GroupTodo);
-        this._cohortTodo = await loadOrgTodo(cohorts, WorkType.CohortTodo);
-        this._companyTodo = await loadOrgTodo(companys, WorkType.CompanyTodo);
-        kernel.anystore.subscribed(
-          TODO_COMMON_MENU + '.SP' + userCtrl.space.id,
-          'user',
-          (data: any) => {
-            this._caches = data;
-            this.changCallbackPart(TODO_COMMON_MENU);
-          },
-        );
+        this._workTodo =
+          (await kernel.queryApproveTask({ id: userCtrl.space.id })).data?.result || [];
+
         this.changCallback();
-      }
+      }, 800);
     });
   }
   /** 好友审批 */
@@ -97,10 +76,6 @@ class TodoController extends Emitter {
   /** 单位审批 */
   public get CompanyTodo(): ITodoGroup[] {
     return this._companyTodo!;
-  }
-  /** 群组审批 */
-  public get CohortTodo(): ITodoGroup[] {
-    return this._cohortTodo!;
   }
   /** 集团审批 */
   public get GroupTodo(): ITodoGroup[] {
@@ -148,9 +123,6 @@ class TodoController extends Emitter {
     for (let i = 0; i < this.FriendTodo.length; i++) {
       sum += await this.FriendTodo[i]?.getCount();
     }
-    for (let i = 0; i < this.CohortTodo.length; i++) {
-      sum += await this.CohortTodo[i]?.getCount();
-    }
     for (let i = 0; i < this.GroupTodo.length; i++) {
       sum += await this.GroupTodo[i]?.getCount();
     }
@@ -172,39 +144,11 @@ class TodoController extends Emitter {
   }
   public setTabIndex(index: string): void {
     this._tabIndex = index;
+    this.changCallback();
   }
 
   public refreshWorkTodo() {
     console.log('');
-  }
-
-  get commonMenuMap(): any {
-    return this._commonMenuMap;
-  }
-
-  get caches(): any[] {
-    return this._caches;
-  }
-
-  public async setCommon(menu: any, setCommon: boolean = true) {
-    this._caches = this._caches.filter(
-      (i) => i.key.replace('copy', '') != menu.key.replace('copy', ''),
-    );
-    if (setCommon) {
-      this._caches.unshift(menu);
-    }
-    this._caches = this._caches.slice(0, 10);
-    this._commonMenuMap[userCtrl.space.id] = this._caches;
-    let result = await kernel.anystore.set(
-      TODO_COMMON_MENU,
-      {
-        operation: 'replaceAll',
-        data: this._commonMenuMap,
-      },
-      'user',
-    );
-    console.log(result);
-    this.changCallbackPart(TODO_COMMON_MENU);
   }
 }
 

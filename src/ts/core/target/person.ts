@@ -43,9 +43,9 @@ export default class Person extends MarketTarget implements IPerson {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this.id);
+      this.authorityTree = new Authority(res.data, this.id);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);

@@ -20,9 +20,11 @@ import { useState } from 'react';
 import userCtrl from '@/ts/controller/setting';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
+// import SpeciesTabs from './SpeciesTabs';
+import SpeciesTreeModal from './SpeciesTreeModal';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { OperationItemModel, OperationModel } from '@/ts/base/model';
@@ -109,11 +111,11 @@ export const widgetsOpts = [
     value: 'person',
   },
   {
-    label: '内部组织',
+    label: '部门',
     value: 'dept',
   },
   {
-    label: '外部组织',
+    label: '集团',
     value: 'group',
   },
 ];
@@ -214,7 +216,7 @@ const transformAttrToOperationItem = (
   } else if (attr.valueType === '选择型') {
     widget = 'dict';
     dictId = attr.dictId;
-  } else if (attr.valueType === '分类' || attr.valueType === '分类型') {
+  } else if (attr.valueType === '分类') {
     widget = 'species';
     dictId = attr.dictId;
   } else if (attr.valueType === '日期型') {
@@ -223,21 +225,13 @@ const transformAttrToOperationItem = (
   } else if (attr.valueType === '时间型') {
     widget = 'datetime';
     dictId = attr.dictId;
-  } else if (
-    attr.valueType === '附件' ||
-    attr.valueType === '附件型' ||
-    attr.valueType === '文件'
-  ) {
+  } else if (attr.valueType === '附件') {
     widget = 'file';
     dictId = attr.dictId;
-  } else if (
-    attr.valueType === '人员' ||
-    attr.valueType === '用户' ||
-    attr.valueType === '用户型'
-  ) {
+  } else if (attr.valueType === '人员') {
     widget = 'person';
     dictId = attr.dictId;
-  } else if (attr.valueType === '部门' || attr.valueType === '内部机构') {
+  } else if (attr.valueType === '部门') {
     widget = 'department';
     dictId = attr.dictId;
   } // Todo 增加类型
@@ -290,7 +284,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
 
 type DesignProps = {
   operation: XOperation;
-  current: ISpeciesItem;
+  current: any;
   toFlowDesign: (operation: XOperation) => void;
   setOperationModel: (operationModel: OperationModel) => void;
 };
@@ -304,7 +298,12 @@ type FormLayout = {
  * 表单设计器
  * @param props
  */
-const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }) => {
+const Design: React.FC<DesignProps> = ({
+  operation,
+  current,
+  toFlowDesign,
+  setOperationModel,
+}) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const belongId = userCtrl.space.id;
   const [items, setItems] = useState<any>({
@@ -317,6 +316,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
   const [form] = Form.useForm();
   const [formLayout, setFormLayout] = useState<FormLayout>(JSON.parse(operation.remark));
   const [selectedItem, setSelectedItem] = useState<XOperationItem>();
+  const [showSpecies, setOpenSpeciesModal] = useState<boolean>(false);
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
 
   useEffect(() => {
@@ -328,7 +328,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         page: { offset: 0, limit: 100000, filter: '' },
       });
       // 查询特性
-      const attrRes = await current.loadAttrs(true);
+      const attrRes = await current.loadAttrs(false);
       let operateItems = operateItemRes.data?.result || [];
       operateItems = operateItems.map((item: any) => {
         if (item.containSpecies && item.containSpecies.length > 0) {
@@ -533,6 +533,43 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
     }
   };
 
+  // 添加表单子表项
+  const addOperationItem = (
+    operationItem: XOperationItem,
+    speciesArray: ISpeciesItem[],
+  ) => {
+    items['operationItems'] = [
+      ...items['operationItems'],
+      {
+        containSpecies: speciesArray.map((i) => i.target),
+        speciesIds: speciesArray.map((i) => i.target.id),
+        name: operationItem.name,
+        code: operationItem.code,
+        belongId: operationItem.belongId,
+        rule: '{}',
+        operationId: operation.id,
+      },
+    ];
+    setItems(items);
+    setOperationModel({
+      ...operation,
+      ...{ items: items['operationItems'] },
+    });
+    setOpenSpeciesModal(false);
+    tforceUpdate();
+  };
+
+  // // 删除表单子表项
+  // const deleteOperationItem = (code: string) => {
+  //   items['operationItems'] = items['operationItems'].filter((i: any) => i.code !== code);
+  //   setItems(items);
+  //   setOperationModel({
+  //     ...operation,
+  //     ...{ items: items['operationItems'] },
+  //   });
+  //   tforceUpdate();
+  // };
+
   return (
     <div key={tkey}>
       <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn}>
@@ -590,6 +627,11 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
                     />
                     <Space wrap>
                       <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => setOpenSpeciesModal(true)}>
+                        插入子表
+                      </Button>
+                      <Button
                         icon={<SearchOutlined />}
                         onClick={() => setOpenPreviewModal(true)}>
                         预览表单
@@ -625,6 +667,19 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
                           <OperateItem item={item} />
                         </Col>
                       ))}
+                    {/* {items['operationItems'].filter((i: XOperationItem) => !i.attrId)
+                      .length > 0 && (
+                      <Col span={24}>
+                        <SpeciesTabs
+                          operationItems={items['operationItems'].filter(
+                            (i: XOperationItem) => !i.attrId,
+                          )}
+                          setSelectedItem={setSelectedItem}
+                          deleteOperationItem={deleteOperationItem}
+                          setOpenSpeciesModal={setOpenSpeciesModal}
+                        />
+                      </Col>
+                    )} */}
                   </Row>
                 </ProForm>
               </Card>
@@ -685,6 +740,16 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
           </Col>
         </Row>
       </DndContext>
+      <SpeciesTreeModal
+        spaceId={belongId || userCtrl.space.id}
+        open={showSpecies}
+        operationItem={selectedItem}
+        handleCancel={() => setOpenSpeciesModal(false)}
+        speciesIds={[]}
+        handleOk={(operationItem, species: any[]) => {
+          addOperationItem(operationItem, species);
+        }}
+      />
       <Modal
         title={`${operation?.name}(预览)`}
         open={openPreviewModal}

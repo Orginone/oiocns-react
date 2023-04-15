@@ -110,7 +110,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           title: '提示',
           content: '确定删除该商店吗',
           onOk: async () => {
-            if (await marketCtrl.target.deleteMarket(node.target.id)) {
+            if (await marketCtrl.target.deleteMarket(node.market.id)) {
               message.success('删除成功');
               marketCtrl.changCallback();
             }
@@ -126,7 +126,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
           title: '提示',
           content: '是否确认退出',
           onOk: async () => {
-            if (await marketCtrl.target.quitMarket(node.target.id)) {
+            if (await marketCtrl.target.quitMarket(node.market.id)) {
               message.success('退出成功');
               marketCtrl.changCallback();
             }
@@ -153,26 +153,26 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const getTreeData = () => {
     const data = marketCtrl.target.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
-      if (itemModel.target.belongId === userCtrl.space.id) {
+      if (itemModel.market.belongId === userCtrl.space.id) {
         arrs.push('编辑商店');
         arrs.push('删除商店');
       } else {
         arrs.push('退出商店');
       }
       return {
-        title: itemModel.target.name,
-        key: itemModel.target.id,
+        title: itemModel.market.name,
+        key: itemModel.market.id,
         item: itemModel,
         tag:
-          itemModel.target.belongId === userCtrl.user.target.id
+          itemModel.market.belongId === userCtrl.user.target.id
             ? {
                 color: 'blue',
                 txt: '我的',
               }
             : null,
         children: [],
-        belongId: itemModel.target.belongId,
-        menus: itemModel.target.belongId ? arrs : undefined,
+        belongId: itemModel.market.belongId,
+        menus: itemModel.market.belongId ? arrs : undefined,
       };
     });
     setTreeData(data);
@@ -184,7 +184,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       <MarketClassifyTree
         parentIcon={<AppstoreFilled />}
         childIcon={<AppstoreFilled style={{ color: '#a6aec7' }} />}
-        selectedKeys={[props.current?.target.id]}
+        selectedKeys={[props.current?.market.id]}
         onSelect={(_: any, info: any) => props.setCurrent(info.node.item)}
         handleMenuClick={(key, node) => handleMenuClick(key, node.item)}
         treeData={treeData}
@@ -207,8 +207,8 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
       {editMarket && (
         <>
           <DetailDrawer
-            title={editMarket.target.name}
-            nodeDetail={editMarket.target}
+            title={editMarket.market.name}
+            nodeDetail={editMarket.market}
             open={activeModal === 'detail'}
             onClose={onCancel}
           />

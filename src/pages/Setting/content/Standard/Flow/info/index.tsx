@@ -4,16 +4,18 @@ import cls from './index.module.less';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XFlowDefine, XFlowDefineArray, XOperation } from '@/ts/base/schema';
+import { OperationColumns } from '@/pages/Setting/config/columns';
 import FlowCard from './FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { ISpeciesItem } from '@/ts/core/thing/ispecies';
+import { PageRequest } from '@/ts/base/model';
 import DefineInfo from '@/pages/Setting/content/Standard/Flow/info/DefineInfo';
 
 interface IProps {
   modalType: string;
-  species: ISpeciesItem;
+  species?: ISpeciesItem;
   operateOrgId?: string;
   setOperateOrgId: Function;
   isAdmin: boolean;
@@ -38,7 +40,11 @@ const FlowList: React.FC<IProps> = ({
   onCurrentChaned,
 }: IProps) => {
   const parentRef = useRef<any>(null);
+  const parentRef2 = useRef<any>(null);
   const [tkey, tforceUpdate] = useObjectUpdate(species);
+  const [key, setKey] = useState<string>();
+  const [binds, setBinds] = useState<any[]>([]);
+  const [operationModal, setOperationModal] = useState<string>();
   const [defineInfo, setDefineInfo] = useState<XFlowDefine>();
   useEffect(() => {
     if (modalType.includes('新增办事')) {
@@ -46,6 +52,10 @@ const FlowList: React.FC<IProps> = ({
       setDefineInfo(undefined);
     }
   }, [modalType]);
+
+  useEffect(() => {
+    setBinds([]);
+  }, [species]);
 
   const renderOperation = (record: XFlowDefine): any[] => {
     let operations: any[] = [
@@ -82,8 +92,9 @@ const FlowList: React.FC<IProps> = ({
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-              if (await species.deleteFlowDefine(record.id)) {
+              if (await species?.deleteFlowDefine(record.id)) {
                 message.success('删除成功');
+                setBinds([]);
                 tforceUpdate();
               }
             },
@@ -93,6 +104,22 @@ const FlowList: React.FC<IProps> = ({
       });
     }
     return operations;
+  };
+
+  const loadOperations = async (page: PageRequest) => {
+    let res = await species!.loadOperations(userCtrl.space.id, false, true, true, page);
+    return res;
+  };
+
+  // 操作内容渲染函数
+  const renderOperate = (item: XOperation) => {
+    return [
+      {
+        key: 'bind',
+        label: '绑定',
+        onClick: async () => {},
+      },
+    ];
   };
 
   return (
@@ -107,20 +134,14 @@ const FlowList: React.FC<IProps> = ({
               columns={FlowColumn}
               parentRef={parentRef}
               dataSource={[]}
-              request={async (page) => {
-                let data = await species.loadFlowDefines();
-                return {
-                  offset: page.offset,
-                  limit: page.limit,
-                  total: data.length,
-                  result: data
-                    .slice(page.offset, page.offset + page.limit)
-                    .map((a) => a.target),
-                };
-              }}
               operation={renderOperation}
               rowKey={(record: XFlowDefine) => record.id}
-              onRow={(_: any) => {
+              request={async (page) => {
+                let res: XFlowDefineArray | undefined =
+                  await species?.loadFlowDefinesByPage(userCtrl.space.id, page);
+                return res;
+              }}
+              onRow={(record: any) => {
                 return {
                   onClick: async () => {},
                 };
@@ -139,26 +160,65 @@ const FlowList: React.FC<IProps> = ({
           </div>
         </Card>
       </div>
-      <DefineInfo
-        data={defineInfo}
-        title={modalType}
-        open={modalType.includes('新增办事') || modalType.includes('编辑办事')}
-        handleCancel={function (): void {
-          setDefineInfo(undefined);
-          setModalType('');
-        }}
-        handleOk={async (res: any) => {
-          if (res) {
+      {binds.length > 0 && (
+        <div style={{ height: 200 }} ref={parentRef2}>
+          <Card
+            // key={tkey}
+            title={'已绑定业务'}
+            bordered={false}
+            style={{ paddingBottom: '10px' }}
+            bodyStyle={{ paddingTop: 0 }}>
+            <CardOrTable<XOperation>
+              parentRef={parentRef2}
+              key={key}
+              rowKey={'id'}
+              columns={OperationColumns}
+              showChangeBtn={false}
+              dataSource={binds}
+            />
+          </Card>
+        </div>
+      )}
+      <Modal
+        title={'绑定业务'}
+        footer={[]}
+        open={operationModal != undefined}
+        onCancel={() => setOperationModal(undefined)}
+        width={'60%'}>
+        <CardOrTable<XOperation>
+          rowKey={'id'}
+          columns={OperationColumns}
+          showChangeBtn={false}
+          operation={renderOperate}
+          request={async (page) => {
+            return await loadOperations(page);
+          }}
+          dataSource={[]}
+        />
+      </Modal>
+
+      {species && (
+        <DefineInfo
+          data={defineInfo}
+          title={modalType}
+          open={modalType.includes('新增办事') || modalType.includes('编辑办事')}
+          handleCancel={function (): void {
             setDefineInfo(undefined);
-            message.success('保存成功');
             setModalType('');
-            tforceUpdate();
-          } else {
-            message.error('保存失败');
-          }
-        }}
-        current={species}
-      />
+          }}
+          handleOk={async (res: any) => {
+            if (res) {
+              setDefineInfo(undefined);
+              message.success('保存成功');
+              setModalType('');
+              tforceUpdate();
+            } else {
+              message.error('保存失败');
+            }
+          }}
+          current={species}
+        />
+      )}
     </div>
   );
 };

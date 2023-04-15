@@ -10,7 +10,12 @@ import userCtrl from '@/ts/controller/setting';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { getUuid } from '@/utils/tools';
 
-const Groupdetail: React.FC = () => {
+/**
+ * @description:  个人、群聊详情
+ * @return {*}
+ */
+
+const Groupdetail = () => {
   const [key, forceUpdate] = useCtrlUpdate(chatCtrl); // 刷新页面
   const [open, setOpen] = useState<boolean>(false); // 邀请弹窗开关
   const [removeOpen, setRemoveOpen] = useState<boolean>(false); // 移出弹窗开关
@@ -46,11 +51,11 @@ const Groupdetail: React.FC = () => {
 
   const changeSilence = (e: any) => {};
 
-  // const changeTop = (e: any) => {
-  //   if (chatCtrl.chat) {
-  //     chatCtrl.setToping(chatCtrl.chat);
-  //   }
-  // };
+  const changeTop = (e: any) => {
+    if (chatCtrl.chat) {
+      chatCtrl.setToping(chatCtrl.chat);
+    }
+  };
 
   /**
    * @description: 移除确认
@@ -200,13 +205,7 @@ const Groupdetail: React.FC = () => {
             <span>
               {chatCtrl.chat.target.typeName !== '人员' ? '置顶群聊' : '置顶聊天'}
             </span>
-            <Checkbox
-              onChange={() => {
-                chatCtrl.chat!.isToping = true;
-                chatCtrl.changCallback();
-              }}
-              checked={chatCtrl.chat.isToping}
-            />
+            <Checkbox onChange={changeTop} checked={chatCtrl.chat.isToping} />
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
             <span>查找聊天记录</span>

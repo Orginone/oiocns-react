@@ -2,7 +2,7 @@ import { model } from '@/ts/base';
 import moment from 'moment';
 import { message } from 'antd';
 import { formatDate } from '@/utils/index';
-import { DataType, MenuItemType, PageData } from 'typings/globelType';
+import { DataType, PageData } from 'typings/globelType';
 
 const dateFormat: string = 'YYYY-MM-DD';
 
@@ -253,26 +253,10 @@ const pySegSortObj = (objArr: any[], field: string) => {
   return segs;
 };
 
-/** 查找菜单 */
-const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
-  for (const item of items) {
-    if (item.key === key) {
-      return item;
-    } else if (Array.isArray(item.children) && item.children.length > 0) {
-      const find = findMenuItemByKey(item.children, key);
-      if (find) {
-        return find;
-      }
-    }
-  }
-  return undefined;
-};
-
 export {
   dateFormat,
   debounce,
   findAimObj,
-  findMenuItemByKey,
   getNewKeyWithString,
   getUuid,
   handleFormatDate,

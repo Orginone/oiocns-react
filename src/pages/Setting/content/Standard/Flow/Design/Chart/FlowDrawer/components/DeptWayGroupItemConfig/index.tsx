@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Form } from 'antd';
+import { Select, InputNumber, Input, Form, message } from 'antd';
 import { NodeType, FieldCondition, conditiondType } from '../../processType';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import cls from './index.module.less';

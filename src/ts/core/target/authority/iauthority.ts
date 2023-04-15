@@ -1,6 +1,7 @@
 import { IIdentity } from './iidentity';
 import { model, schema } from '@/ts/base';
 import { PageRequest } from '@/ts/base/model';
+import { XTarget, XTargetArray } from '@/ts/base/schema';
 
 export interface IAuthority {
   /** 权限Id */
@@ -68,8 +69,5 @@ export interface IAuthority {
    *  @param reload 是否强制刷新
    * @returns
    */
-  queryAuthorityPerson(
-    spaceId: string,
-    page: PageRequest,
-  ): Promise<model.ResultType<schema.XTargetArray>>;
+  queryAuthorityPerson(page: PageRequest): Promise<model.ResultType<schema.XTargetArray>>;
 }

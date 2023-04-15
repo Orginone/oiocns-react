@@ -199,9 +199,9 @@ const AppInfoModal = (props: Iprops) => {
           }
         } else {
           if (props.current && props.title === '编辑商店') {
-            setAvatar(parseAvatar(props.current.target.photo));
+            setAvatar(parseAvatar(props.current.market.photo));
             formRef.current?.setFieldsValue({
-              ...props.current.target,
+              ...props.current.market,
             });
           }
         }

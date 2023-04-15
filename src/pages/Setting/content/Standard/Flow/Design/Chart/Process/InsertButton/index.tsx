@@ -6,7 +6,6 @@ import {
   ClusterOutlined,
   HighlightOutlined,
   ApartmentOutlined,
-  ForkOutlined,
 } from '@ant-design/icons';
 import React from 'react';
 import cls from './index.module.less';
@@ -60,12 +59,6 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
    */
   const addDeptGateWayNode = () => {
     props.onInsertNode('ORGANIZATIONAL');
-  };
-  /**
-   * 子流程
-   */
-  const addWorkFlowNode = () => {
-    props.onInsertNode('CHILDWORK');
   };
 
   const content = (
@@ -129,18 +122,6 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
           }}
         />
         <span>组织网关</span>
-      </div>
-      <div onClick={addWorkFlowNode}>
-        <ForkOutlined
-          style={{
-            color: 'rgb(21, 188, 131)',
-            fontSize: '20px',
-            position: 'absolute',
-            top: '18px',
-            left: '25px',
-          }}
-        />
-        <span>外部办事</span>
       </div>
     </div>
   );

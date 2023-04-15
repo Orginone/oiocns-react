@@ -2,7 +2,7 @@ import CardOrTableComp from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { XFlowInstance } from '@/ts/base/schema';
 import { SpeciesItem } from '@/ts/core/thing/species';
-import { Card, Modal, ModalFuncProps } from 'antd';
+import { Card } from 'antd';
 import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { WorkStartReocrdColumns } from '../../config/columns';
@@ -13,30 +13,16 @@ import Done from '../WorkTodo/Done';
 // 卡片渲染
 interface IProps {
   selectMenu: MenuItemType;
-  status: number[];
 }
 /**
  * 已发起记录
  */
-const WorkStartRecord: React.FC<IProps> = ({ selectMenu, status }) => {
+const WorkStartRecord: React.FC<IProps> = ({ selectMenu }) => {
   const [key] = useObjectUpdate(selectMenu);
   const species: SpeciesItem = selectMenu.item;
 
   const [pageKey, setPageKey] = useState<number>(0);
   const [instance, setInstance] = useState<XFlowInstance>();
-
-  let curInstance: XFlowInstance;
-  const [modal, contextHolder] = Modal.useModal();
-  const config: ModalFuncProps = {
-    title: '存证',
-    content: <h4>存证后将不能修改，是否存证？</h4>,
-    onOk: () => deposit(),
-  };
-
-  // Todo 存证
-  const deposit = () => {
-    console.log('curInstance', curInstance);
-  };
 
   const getRenderOperations = (data: XFlowInstance) => {
     const menus: any[] = [];
@@ -48,14 +34,6 @@ const WorkStartRecord: React.FC<IProps> = ({ selectMenu, status }) => {
         setPageKey(1);
       },
     });
-    menus.push({
-      key: 'deposit',
-      label: '存证',
-      onClick: () => {
-        curInstance = data;
-        modal.confirm(config);
-      },
-    });
     return menus;
   };
 
@@ -65,29 +43,33 @@ const WorkStartRecord: React.FC<IProps> = ({ selectMenu, status }) => {
         <Card>
           <CardOrTableComp<XFlowInstance>
             key={key}
-            dataSource={[]}
             rowKey={(record) => record?.id}
             columns={WorkStartReocrdColumns}
-            operation={(item) => getRenderOperations(item)}
-            request={async (page) => {
-              return (
-                (
-                  await kernel.queryInstanceByApply({
-                    page,
-                    speciesId: species.id,
-                    spaceId: userCtrl.space.id,
-                    status: status,
-                  })
-                )?.data || []
-              );
+            dataSource={[]}
+            request={async (params) => {
+              const res = await kernel.queryInstance({
+                speciesId: species.id,
+                spaceId: userCtrl.space.id,
+                page: {
+                  offset: params.offset,
+                  limit: params.limit,
+                  filter: params.filter,
+                },
+              });
+              return {
+                result: res.data.result,
+                total: res.data.total,
+                offset: res.data.offset,
+                limit: res.data.limit,
+              };
             }}
+            operation={(item) => getRenderOperations(item)}
           />
         </Card>
       )}
       {pageKey == 1 && (
         <Done selectMenu={selectMenu} instanceId={instance?.id} setPageKey={setPageKey} />
       )}
-      {contextHolder}
     </>
   );
 };

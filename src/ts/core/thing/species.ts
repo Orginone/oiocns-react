@@ -162,6 +162,11 @@ export class SpeciesItem implements ISpeciesItem {
       const res = await kernel.queryDefine({
         speciesId: this.target.id,
         spaceId: this.curSpaceId,
+        page: {
+          offset: 0,
+          limit: 1000,
+          filter: '',
+        },
       });
       this.defines =
         res.data.result?.map((item: XFlowDefine) => {
@@ -171,12 +176,27 @@ export class SpeciesItem implements ISpeciesItem {
     return this.defines;
   }
 
-  async loadFlowInstances(status: number[], page: PageRequest): Promise<XFlowInstance[]> {
-    let res = await kernel.queryInstanceByApply({
+  async loadFlowDefinesByPage(
+    id: string,
+    page: PageRequest,
+  ): Promise<schema.XFlowDefineArray> {
+    const res = await kernel.queryDefine({
+      speciesId: this.target.id,
+      spaceId: id,
+      page: {
+        offset: page.offset,
+        limit: page.limit,
+        filter: '',
+      },
+    });
+    return res.data;
+  }
+
+  async loadFlowInstances(): Promise<XFlowInstance[]> {
+    let res = await kernel.queryInstance({
       speciesId: this.id,
       spaceId: this.curSpaceId,
-      status,
-      page,
+      page: { offset: 0, limit: 1000, filter: '' },
     });
     return res.data.result || [];
   }
@@ -270,7 +290,6 @@ export class SpeciesItem implements ISpeciesItem {
       this.target.belongId = data.belongId;
       this.target.remark = data.remark;
     }
-
     return this;
   }
   async delete(): Promise<boolean> {

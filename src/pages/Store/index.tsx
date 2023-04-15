@@ -13,20 +13,23 @@ import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOp
 import OioForm from '@/components/Form';
 import { ProFormInstance } from '@ant-design/pro-components';
 import thingCtrl from '@/ts/controller/thing';
+import { create_repo,addssh} from "@/services/MyRequest/index";
+import userCtrl from '@/ts/controller/setting';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [checkedList, setCheckedList] = useState<any[]>([]);
   const [showData, setShowData] = useState<any[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
 
-  if (!selectMenu) return <></>;
-
+  const uname=userCtrl.user.target.id
+  const usdata:Object={token:"7c49b153d4b59f8c0cf8c3e18dc80cb7",uname:uname}
   return (
     <MainLayout
-      title={{ label: '管理', icon: <IconFont type={'icon-store'} /> }}
+      title={{ label: '仓库', icon: <IconFont type={'icon-store'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         storeCtrl.currentKey = data.key;
@@ -43,7 +46,19 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      checkedList={checkedList}
+      onTabChanged={(tabKey) => {
+        storeCtrl.setTabIndex(tabKey);
+        setCheckedList([]);
+        refreshMenu();
+      }}
+      tabKey={storeCtrl.tabIndex}
+      onCheckedChange={async (checks: any[]) => {
+        setCheckedList(checks);
+        refreshMenu();
+      }}
+      siderMenuData={menus[0]?.menu}
+      tabs={menus}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={
@@ -76,7 +91,6 @@ const Package: React.FC = () => {
             setOperateKey(undefined);
           }}>
           <SelectOperation
-            current={selectMenu.item}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
@@ -93,8 +107,26 @@ const Package: React.FC = () => {
             if (values) {
               /**调用创建物接口 */
               let res = await thingCtrl.createThing(values);
+              console.log(values);
+
               if (res.success) {
                 message.success('创建成功');
+                if (Object.keys(values)[0]=='428213504277876736') {
+                  addssh({...usdata,content:values['428213504277876736'],title:values['428551199910924288']}).then(res=>{
+                      message.info(res.data.msg)
+                    console.log(res);
+                    
+                    
+                  })
+                }
+                if(Object.keys(values)[0]=='428210428825440256'){
+                  create_repo({...usdata,repo_name:values['428210428825440256']}).then(res=>{
+                    message.success(res.data.msg)
+                    
+                  })
+                  
+                }
+
                 setShowForm(false);
               } else {
                 message.error('创建失败');
@@ -118,7 +150,12 @@ const Package: React.FC = () => {
           />
         </Modal>
       )}
-      <Content key={key} selectMenu={selectMenu} />
+
+      <Content
+        key={checkedList.length}
+        selectMenu={selectMenu}
+        checkedList={checkedList}
+      />
     </MainLayout>
   );
 };

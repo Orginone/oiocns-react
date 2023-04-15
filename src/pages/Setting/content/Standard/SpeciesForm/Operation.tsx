@@ -50,10 +50,6 @@ const Operation = ({
     tforceUpdate();
   }, [recursionSpecies]);
 
-  useEffect(() => {
-    tforceUpdate();
-  }, []);
-
   // 操作内容渲染函数
   const renderOperate = (item: XOperation) => {
     return [
@@ -148,7 +144,6 @@ const Operation = ({
           setModalType('');
           if (res) {
             message.success('保存成功');
-            setEditData(undefined);
             tforceUpdate();
           }
         }}

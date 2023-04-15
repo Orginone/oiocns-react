@@ -6,15 +6,13 @@ import cls from './index.module.less';
 import CustomTree from '@/components/CustomTreeComp';
 import thingCtrl from '@/ts/controller/thing';
 import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem } from '@/ts/core';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 interface IProps {
-  current?: ISpeciesItem;
   showData: any[];
   setShowData: Function;
 }
 
-const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) => {
+const SelectOperation: React.FC<IProps> = ({ showData, setShowData }) => {
   const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
   const [leftCheckedKeys, setLeftCheckedKeys] = useState<Key[]>([]);
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
@@ -84,7 +82,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
 
   useEffect(() => {
     const load = async () => {
-      const species = current || (await thingCtrl.loadSpeciesTree());
+      const species = await thingCtrl.loadSpeciesTree();
       setLeftTreeData(buildSpeciesChildrenTree([species]));
     };
     load();

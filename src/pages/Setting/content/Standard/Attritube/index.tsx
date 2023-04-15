@@ -7,7 +7,6 @@ import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AttributeModal from '../../../components/attributeModal';
-import thing from '@/ts/controller/thing';
 
 interface IProps {
   target?: ITarget;
@@ -34,58 +33,24 @@ const Attritube = ({
   const [editData, setEditData] = useState<XAttribute>();
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (item.belongId === userCtrl.space.id) {
-      return [
-        {
-          key: '修改特性',
-          label: '编辑特性',
-          onClick: () => {
-            setEditData(item);
-            setModalType('修改特性');
-          },
+    return [
+      {
+        key: '修改特性',
+        label: '编辑特性',
+        onClick: () => {
+          setEditData(item);
+          setModalType('修改特性');
         },
-        {
-          key: '删除特性',
-          label: '删除特性',
-          onClick: async () => {
-            await current?.deleteAttr(item.id);
-            tforceUpdate();
-          },
+      },
+      {
+        key: '删除特性',
+        label: '删除特性',
+        onClick: async () => {
+          await current?.deleteAttr(item.id);
+          tforceUpdate();
         },
-      ];
-    }
-    if (item.belongId) {
-      return [
-        {
-          key: '关联属性',
-          label: '关联属性',
-          onClick: () => {
-            setEditData(item);
-            setModalType('关联属性');
-          },
-        },
-        {
-          key: '复制属性',
-          label: '复制属性',
-          onClick: async () => {
-            if (item.property) {
-              const property = await thing.property?.createProperty({
-                ...item.property,
-                belongId: userCtrl.space.id,
-                sourceId: item.property.belongId,
-              });
-              if (property) {
-                await current.updateAttr({
-                  ...item,
-                  propId: property.id,
-                });
-              }
-            }
-          },
-        },
-      ];
-    }
-    return [];
+      },
+    ];
   };
 
   useEffect(() => {
@@ -134,8 +99,6 @@ const Attritube = ({
         target={target}
         current={current}
       />
-      {/** 关联属性模态框 */}
-      <div></div>
     </>
   );
 };

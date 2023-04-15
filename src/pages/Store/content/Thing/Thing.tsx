@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Dropdown } from 'antd';
+import { Card } from 'antd';
 import storeCtrl from '@/ts/controller/store';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
@@ -18,6 +18,7 @@ import DataGrid, {
   Selection,
   Toolbar,
   Item,
+  Button,
   HeaderFilter,
   Scrolling,
 } from 'devextreme-react/data-grid';
@@ -25,10 +26,6 @@ import { ISpeciesItem } from '@/ts/core';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { EllipsisOutlined } from '@ant-design/icons';
-import { ItemType } from 'antd/lib/menu/hooks/useItems';
-
-type ThingItemType = ItemType & { click: (data: any) => void };
 
 interface IProps {
   current: ISpeciesItem;
@@ -37,7 +34,7 @@ interface IProps {
   height?: any;
   width?: any;
   editingTool?: any;
-  menuItems?: ThingItemType[];
+  buttonList?: any[];
   toolBarItems?: any[];
   dataSource?: any;
   byIds?: string[];
@@ -47,22 +44,21 @@ interface IProps {
   setTabKey?: (tabKey: number) => void;
   setThingId?: (thingId: string) => void;
   scrolling?: any;
-  keyExpr?: string;
+  showRemove?: Function;
 }
 
 /**
  * 仓库-物
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
-  const { menuItems, selectable = true, deferred = false } = props;
+  const { selectable = true, deferred = false } = props;
   const [key] = useCtrlUpdate(storeCtrl);
   const [thingAttrs, setThingAttrs] = useState<any[]>([]);
-
   const getSortedList = (
     speciesArray: ISpeciesItem[],
     array: any[],
     front: boolean,
-  ): ISpeciesItem[] => {
+  ): any[] => {
     for (let species of speciesArray) {
       if (!array.includes(species)) {
         //没有就放在最前面 改为父级放前，子级放后
@@ -99,7 +95,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
         let attrs =
           attrArray?.filter((attr: XAttribute) => attr.speciesId == species.id) || [];
-        if (!species.parent) {
+        if (species.name == '道') {
           parentHeaders = [...parentHeaders, ...attrs];
         } else {
           parentHeaders.push({
@@ -110,15 +106,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       }
     }
     setThingAttrs(parentHeaders);
-  };
-
-  const allMenuItems: ThingItemType[] = [...(menuItems || [])];
-
-  const menuClick = (key: string, data: any) => {
-    const menu = allMenuItems.find((i) => i.key == key);
-    if (menu && menu.click) {
-      menu.click(data);
-    }
   };
 
   useEffect(() => {
@@ -269,7 +256,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   const getComponent = () => {
     return (
       <DataGrid
-        keyExpr={props.keyExpr}
+        keyExpr="Id"
         dataSource={
           props.dataSource ||
           new CustomStore({
@@ -330,13 +317,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         height={props.height || 'calc(100vh - 175px)'}
         width="100%"
         showBorders={true}>
-        {getColumns(thingAttrs)}
         <ColumnChooser
           enabled={true}
           title={'列选择器'}
           height={'500px'}
           allowSearch={true}
-          // mode={'select'}
+          mode={'select'}
           sortOrder={'asc'}
         />
         <ColumnFixing enabled={true} />
@@ -376,28 +362,30 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           <Item name="searchPanel" />
           <Item name="columnChooserButton" locateInMenu="auto" location="after" />
         </Toolbar>
-        <SearchPanel visible={true} highlightCaseSensitive={true} width={230} />
-
-        {menuItems && (
-          <Column
-            dataField="操作"
-            type={'buttons'}
-            width={30}
-            cellRender={(params) => {
-              return (
-                <Dropdown
-                  menu={{
-                    items: allMenuItems,
-                    onClick: (info) => menuClick(info.key, params.data),
-                  }}
-                  placement="bottom">
-                  <div style={{ cursor: 'pointer', width: '40px' }}>
-                    <EllipsisOutlined />
-                  </div>
-                </Dropdown>
-              );
-            }}></Column>
-        )}
+        <SearchPanel visible={true} highlightCaseSensitive={true} />
+        {getColumns(thingAttrs)}
+        <Column
+          type="buttons"
+          width={((props.buttonList?.length || 0) + 1) * 40}
+          visible={props.showRemove != undefined}>
+          <Button
+            hint="删除"
+            icon="remove"
+            visible={props.showRemove != undefined}
+            onClick={(e: any) => {
+              props.showRemove?.call(this, e.row.data);
+            }}
+          />
+          <Button
+            hint="删除"
+            icon="remove"
+            visible={props.showRemove != undefined}
+            onClick={(e: any) => {
+              props.showRemove?.call(this, e.row.data);
+            }}
+          />
+          {props.buttonList}
+        </Column>
       </DataGrid>
     );
   };

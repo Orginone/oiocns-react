@@ -137,6 +137,7 @@ const ContentMenu: React.FC<RouteComponentProps & ContentMenuProps> = (props) =>
         }
       }
     } else {
+      console.log(current);
       if (current!.render) {
         listenPrev(current!);
         console.log('current!.key', current!.key);

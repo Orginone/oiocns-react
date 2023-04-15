@@ -5,10 +5,10 @@ import { TargetType, companyTypes } from '../enum';
 import { XMarketRelationArray, XMerchandiseArray } from '@/ts/base/schema';
 
 export default class Market implements IMarket {
-  target: schema.XMarket;
+  market: schema.XMarket;
   pullTypes: TargetType[];
   constructor(store: schema.XMarket) {
-    this.target = store;
+    this.market = store;
     this.pullTypes = [TargetType.Person, ...companyTypes];
   }
   public async update(
@@ -22,7 +22,7 @@ export default class Market implements IMarket {
     photo: string,
   ): Promise<boolean> {
     const res = await kernel.updateMarket({
-      id: this.target.id,
+      id: this.market.id,
       name,
       code,
       samrId,
@@ -31,17 +31,17 @@ export default class Market implements IMarket {
       joinPublic: joinPublic,
       sellPublic: sellPublic,
       buyPublic: buyPublic,
-      belongId: this.target.belongId,
+      belongId: this.market.belongId,
     });
     if (res.success) {
-      this.target.name = name;
-      this.target.code = code;
-      this.target.samrId = samrId;
-      this.target.remark = remark;
-      this.target.joinPublic = joinPublic;
-      this.target.sellPublic = sellPublic;
-      this.target.buyPublic = buyPublic;
-      this.target.photo = photo;
+      this.market.name = name;
+      this.market.code = code;
+      this.market.samrId = samrId;
+      this.market.remark = remark;
+      this.market.joinPublic = joinPublic;
+      this.market.sellPublic = sellPublic;
+      this.market.buyPublic = buyPublic;
+      this.market.photo = photo;
       return true;
     }
     return false;
@@ -49,7 +49,7 @@ export default class Market implements IMarket {
   public async getMember(page: model.PageRequest): Promise<XMarketRelationArray> {
     return (
       await kernel.queryMarketMember({
-        id: this.target.id,
+        id: this.market.id,
         page: page,
       })
     ).data;
@@ -59,7 +59,7 @@ export default class Market implements IMarket {
   ): Promise<schema.XMarketRelationArray> {
     return (
       await kernel.queryJoinMarketApply({
-        id: this.target.id,
+        id: this.market.id,
         page,
       })
     ).data;
@@ -71,7 +71,7 @@ export default class Market implements IMarket {
     return (
       await kernel.pullAnyToMarket({
         targetIds: targetIds,
-        marketId: this.target.id,
+        marketId: this.market.id,
         typeNames: this.pullTypes,
       })
     ).success;
@@ -80,7 +80,7 @@ export default class Market implements IMarket {
     return (
       await kernel.removeMarketMember({
         targetIds,
-        marketId: this.target.id,
+        marketId: this.market.id,
         typeNames: this.pullTypes,
       })
     ).success;
@@ -88,7 +88,7 @@ export default class Market implements IMarket {
   public async getMerchandise(page: model.PageRequest): Promise<XMerchandiseArray> {
     return (
       await kernel.searchMerchandise({
-        id: this.target.id,
+        id: this.market.id,
         page: page,
       })
     ).data;
@@ -96,7 +96,7 @@ export default class Market implements IMarket {
   public async getMerchandiseApply(page: model.PageRequest): Promise<XMerchandiseArray> {
     return (
       await kernel.queryMerchandiesApplyByManager({
-        id: this.target.id,
+        id: this.market.id,
         page: page,
       })
     ).data;
@@ -108,7 +108,7 @@ export default class Market implements IMarket {
     return (
       await kernel.deleteMerchandiseByManager({
         id: merchandiseId,
-        belongId: this.target.belongId,
+        belongId: this.market.belongId,
       })
     ).success;
   }

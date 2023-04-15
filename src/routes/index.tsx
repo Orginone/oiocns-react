@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { HomeFilled } from '@ant-design/icons';
-import { Redirect as RouterRedirect } from 'react-router-dom';
-import { IRouteConfig } from '../../typings/globelType.d';
+import {HomeFilled} from '@ant-design/icons';
+import {Redirect as RouterRedirect} from 'react-router-dom';
+import {IRouteConfig} from '../../typings/globelType.d';
 
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
@@ -11,10 +11,13 @@ import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
 import BasicLayout from '@/layouts/Basic';
+
+
 export interface RouteComponentConfig extends Omit<IRouteConfig, 'component' | 'routes'> {
   routes?: RouteComponentConfig[];
   component?: React.LazyExoticComponent<React.FC<Record<string, unknown>>>;
 }
+
 /* 通行证 */
 const PassportRouter: IRouteConfig[] = [
   {
@@ -48,9 +51,48 @@ const HomeRouter: IRouteConfig[] = [
   {
     path: '/home',
     title: '首页',
-    icon: <HomeFilled />,
+    icon: <HomeFilled/>,
     component: React.lazy(() => import('@/pages/Home')),
   },
+];
+/* 数据治理 */
+const DataManagement: IRouteConfig[] = [
+  {
+    path: '/DataManagement',
+    title: '数据治理',
+    icon: <HomeFilled/>,
+    component: React.lazy(() => import('@/pages/DataManagement')),
+  },
+  {
+    path: '/DataManagement',
+    title: '首页',
+    icon: <HomeFilled/>,
+    component: React.lazy(() => import('@/pages/DataManagement')),
+  }, {
+    path: '/DataExchange',
+    title: '数据交易',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/DataExchange')),
+  }, {
+    path: '/OpenSharing',
+    title: '开发共享',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/OpenSharing')),
+  }, {
+    path: '/DataConsulting',
+    title: '数据咨询',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/DataConsulting')),
+  }, {
+    path: '/InnovateWeb',
+    title: '创新平台',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/InnovateWeb')),
+  }, {
+    path: '/CollaborationPlatform',
+    title: '协同平台',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/CollaborationPlatform')),
+  }, {
+    path: '/DesignPlatform',
+    title: '设计平台',
+    component: React.lazy(() => import('@/pages/DataManagement/Pages/DesignPlatform')),
+  }
 ];
 
 /* 沟通 */
@@ -90,7 +132,7 @@ const MarketRouter: IRouteConfig[] = [
       {
         path: '/market',
         title: '应用市场',
-        render: () => <RouterRedirect to="/market/shop" />,
+        render: () => <RouterRedirect to="/market/shop"/>,
       },
     ],
   },
@@ -122,6 +164,24 @@ const SettingRouter: IRouteConfig[] = [
   },
 ];
 
+const AppManagerRouter: IRouteConfig[] = [
+  {
+    path: '/appmanager',
+    title: '应用设置',
+    icon: 'icon-setting',
+    component: React.lazy(() => import('@/pages/App')),
+  },
+];
+
+const WelfareRouter: IRouteConfig[] = [
+  {
+    path: '/welfare',
+    title: '公益仓',
+    icon: 'icon-setting',
+    component: React.lazy(() => import('@/pages/Welfare')),
+  },
+];
+
 // 路由汇总
 const Routers: IRouteConfig[] = [
   {
@@ -148,6 +208,9 @@ const Routers: IRouteConfig[] = [
       ...StoreRouter,
       ...MarketRouter,
       ...SettingRouter,
+      ...WelfareRouter,
+      ...AppManagerRouter,
+      ...DataManagement,
       {
         path: '/online',
         title: '第三方应用',

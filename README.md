@@ -1,96 +1,92 @@
-# 奥集能平台前端
-
-TS功能文档: [ts功能划分](https://docs.qq.com/sheet/DQ2JhZGtJZFlsWWln)
+# sjzlsypt
 
 
-![Image text](https://user-images.githubusercontent.com/8328012/201800690-9f5e989e-4ed3-4817-85b9-b594ac89fd31.png)
 
-## 简介
+## Getting started
 
-奥集能是面向下一代互联网发展趋势，基于动态演化的复杂系统多主体建模方法，以所有权作为第一优先级，运用零信任安全机制，按自组织分形理念提炼和抽象“沟通、办事、仓库、商店、市场和设置”等基础功能，为b端和c端融合的全场景业务的提供新一代分布式应用架构。    
+To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
-本仓库是奥集能的前端 react 实现。
+Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-### 项目目录
+## Add your files
+
+- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
+- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
 ```
-├── .husky                              // husky git hooks配置目录
-    ├── _                               // husky 脚本生成的目录文件
-    ├── commit-msg                      // commit-msg钩子，用于验证 message格式
-    ├── pre-commit                      // pre-commit钩子，主要是和eslint配合
-├── config                              // 全局配置文件
-    ├── vite                            // vite 相关配置 代理相关
-    ├── constant.ts                     // 项目配置
-    ├── themeConfig.ts                  // 主题配置
-├── dist                                // 默认的 build 输出目录
-├── mock                                // 前端数据mock
-├── public                              // vite项目下的静态目录
-└── src                                 // 源码目录
-    ├── assets                          // 公共的文件（如image、css、font等）
-    ├── bizcomponents                   // 业务组件
-    ├── components                      // 项目组件
-    ├── enums                           // 自定义 常量（枚举写法）
-    ├── hooks                           // 自定义 hooks
-    ├── layouts                         // 全局布局
-    ├── routes                          // 路由
-    ├── services                        // api封装
-    ├── store                           // 状态管理器
-    ├── utils                           // 工具库
-    ├── pages                           // 页面模块目录 UI层
-        ├── Home                        // Home页面模块
-        ├── ...
-    ├── app.tsx                         // 顶层文件
-    ├── index.tsx                       // 项目入口文件
-    ├── typings                         // 项目type类型定义文件夹
-├── .editorconfig                       // IDE格式规范
-├── .env                                // 环境变量
-├── .eslintignore                       // eslint忽略
-├── .eslintrc                           // eslint配置文件
-├── .gitignore                          // git忽略
-├── .npmrc                              // npm配置文件
-├── .prettierignore                     // prettierc忽略
-├── .prettierrc                         // prettierc配置文件
-├── commitlint.config                   // git提交配置文件
-├── index.html                          // 入口文件
-├── LICENSE.md                          // LICENSE
-├── package.json                        // package
-├── postcss.config.js                   // postcss
-├── README.md                           // README
-├── tsconfig.json                       // typescript配置文件
-└── vite.config.ts                      // vite
+cd existing_repo
+git remote add origin http://git.jx868.com/ojnbsd/sjzlsypt.git
+git branch -M main
+git push -uf origin main
 ```
 
-### 技术栈及代码规范
+## Integrate with your tools
 
- 本项目开发使用的主要技术栈为 **React 全家桶、Type Script、Less**，用来完成项目的框架、样式以及逻辑交互。配合使用 **EsLint 语法检查规则**，**Ant Design**、**Ant Design Pro** UI 组件库，**React-Query**缓存技术，以及其它的一些前端第三方包。
+- [ ] [Set up project integrations](http://123.157.234.242:8099/ojnbsd/sjzlsypt/-/settings/integrations)
 
-代码规范请前往 **project/rules** 文件夹下查看编码规则和规范。
+## Collaborate with your team
 
-### 项目依赖环境、安装和运行
+- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
+- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
+- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
+- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
+- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
 
-奥集能是基于 **node 14+** 以上的环境运行，通过 **yarn** 或者 **npm install** 下载安装项目依赖包，并通过**npm run serve** 命令本地运行项目。
+## Test and Deploy
 
-### 参与贡献
+Use the built-in continuous integration in GitLab.
 
-1. fork 项目
-   1. 首先，找到 fork 按钮，点击以后，你的仓库内就会出现一个一模一样的项目。
-2. 项目开发
-   1. 按照奥集能项目的编码规则，对代码进行开发。
-3. 跟上主项目的步伐
-   1. 在你开发的过程中，主项目的代码也可能在更新。此时就需要你同步主项目的代码，找到 **Pull request** 按钮，点击。
-   2. 在左侧选择你的仓库的项目，右侧为主项目，此时你能在下面看到两个项目的区别，**点击 create pull request 按钮。**
-   3. 填写 title，**点击 create pull request 按钮。**
-   4. 进入 pull request 页面，拉到最下面，**点击 Merge pull request 按钮并确认，**现在你和主项目的代码就是同步的了。
-4. Pull request
-   1. 当你觉得你的代码开发完成，可以推送时，在确保你的修改全部推送到了你的仓库的项目中，然后进入你的仓库的项目页面，**点击 New pull request 按钮**，
-   2. 然后**点击 create pull request 按钮**进行代码提交。
-5. 审核
-   1. 待项目的开发者审批完成之后，就是贡献成功了。
+- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
+- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
+- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
+- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
+- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-## 进度
+***
 
-- [x] 本地 mockdata.json 完成基础页面逻辑
-- [ ] 完成接口调试,对 mock 进行替换
-- [ ] 完成最小可用功能,发布
-- [ ] 升级,补充
-- [ ] 移除多余组件
+# Editing this README
+
+When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+
+## Suggestions for a good README
+Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+
+## Name
+Choose a self-explaining name for your project.
+
+## Description
+Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+
+## Badges
+On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+
+## Visuals
+Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+
+## Installation
+Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+## Usage
+Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+
+## Support
+Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+
+## Roadmap
+If you have ideas for releases in the future, it is a good idea to list them in the README.
+
+## Contributing
+State if you are open to contributions and what your requirements are for accepting them.
+
+For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+
+You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+
+## Authors and acknowledgment
+Show your appreciation to those who have contributed to the project.
+
+## License
+For open source projects, say how it is licensed.
+
+## Project status
+If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.

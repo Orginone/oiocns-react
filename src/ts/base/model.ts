@@ -127,6 +127,8 @@ export type QueryDefineReq = {
   speciesId?: string;
   // 空间ID
   spaceId: string;
+  // 分页
+  page: PageRequest;
 };
 
 export type SpaceAuthReq = {
@@ -352,8 +354,12 @@ export type AttributeModel = {
   code: string;
   // 公开的
   public: boolean;
+  // 值类型
+  valueType: string;
   // 单位
   unit: string;
+  // 选择字典的类型ID
+  dictId: string;
   // 备注
   remark: string;
   // 创建组织/个人
@@ -364,29 +370,6 @@ export type AttributeModel = {
   speciesCode: string;
   // 工作权限Id
   authId: string;
-  // 属性Id
-  propId: string;
-};
-
-export type PropertyModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 值类型
-  valueType: string;
-  // 单位
-  unit: string;
-  // 选择字典的类型ID
-  dictId: string;
-  // 备注
-  remark: string;
-  // 创建用户
-  belongId: string;
-  // 来源用户
-  sourceId?: string;
 };
 
 export type OperationModel = {
@@ -986,21 +969,14 @@ export type FlowRelationModel = {
 };
 
 export type FlowReq = {
+  // 流程实例Id
+  id?: string;
   // 类别Id
   speciesId?: string;
   // 空间Id
-  spaceId: string;
+  spaceId?: string;
   // 状态
-  status: number[];
-  // 分页
-  page: PageRequest;
-};
-
-export type RecordReq = {
-  // 空间Id
-  spaceId: string;
-  // 状态
-  status: number[];
+  status?: number;
   // 分页
   page: PageRequest;
 };

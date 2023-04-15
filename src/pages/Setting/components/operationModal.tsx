@@ -41,7 +41,7 @@ export const defaultRemark: any = {
 const OperationModal = (props: Iprops) => {
   const { open, title, handleOk, data, current, handleCancel } = props;
   const [form] = useForm<OperationModel>();
-  if (data && (title.includes('修改') || title.includes('编辑'))) {
+  if (data) {
     form.setFieldsValue(data);
   }
 
@@ -54,7 +54,6 @@ const OperationModal = (props: Iprops) => {
           ...{ remark: JSON.stringify(defaultRemark) },
           ...data,
           ...form.getFieldsValue(),
-          speciesId: current.id,
         };
         if (title.includes('新增')) {
           const result = await current.createOperation(value);
