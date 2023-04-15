@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SettingOutlined } from '@ant-design/icons';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
-import { NodeType } from '../../processType';
+import { NodeData } from '../../processType';
 import { ISpeciesItem } from '@/ts/core';
 import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
@@ -10,7 +10,7 @@ import { schema } from '@/ts/base';
 import userCtrl from '@/ts/controller/setting';
 
 interface IProps {
-  current: NodeType;
+  current: NodeData;
   orgId?: string;
   species?: ISpeciesItem;
   disableIds: string[];
