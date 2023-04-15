@@ -172,6 +172,7 @@ class BaseChat implements IChat {
       content: {
         messages: [{ role: 'system', content: text }],
         stream: true,
+        model: 'gpt-4',
         temperature: 1,
         presence_penalty: 0,
       },

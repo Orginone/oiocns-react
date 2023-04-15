@@ -2459,7 +2459,7 @@ export default class KernelApi {
    * @returns 异步结果
    */
   public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
-    return await this._restRequest('forward', req, 10);
+    return await this._restRequest('forward', req, 20);
   }
   /**
    * 请求一个内核方法
