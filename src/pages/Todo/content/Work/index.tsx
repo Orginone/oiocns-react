@@ -3,22 +3,24 @@ import React, { useEffect, useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import WorkStartRecord from './WorkStartRecord';
 import WorkStartEntry from './WorkStartEntry';
+import { XFlowDefine } from '@/ts/base/schema';
 
 // 卡片渲染
 interface IProps {
   selectMenu: MenuItemType;
+  doWork?: XFlowDefine;
 }
 /**
  * 办事-业务流程发起
  * @returns
  */
-const Work: React.FC<IProps> = ({ selectMenu }) => {
+const Work: React.FC<IProps> = ({ selectMenu, doWork }) => {
   const [activeKey, setActiveKey] = useState('1');
   const items: TabsProps['items'] = [
     {
       key: '1',
       label: `发起事项`,
-      children: <WorkStartEntry selectMenu={selectMenu} />,
+      children: <WorkStartEntry selectMenu={selectMenu} doWork={doWork} />,
     },
     {
       key: '2',

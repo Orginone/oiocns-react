@@ -12,17 +12,21 @@ import WorkStartDo from './WorkStartDo';
 // 卡片渲染
 interface IProps {
   selectMenu: MenuItemType;
+  doWork?: XFlowDefine;
 }
 
 /**
  * 办事-业务流程--发起
  * @returns
  */
-const WorkStartEntry: React.FC<IProps> = ({ selectMenu }) => {
+const WorkStartEntry: React.FC<IProps> = ({ selectMenu, doWork }) => {
   const species: SpeciesItem = selectMenu.item;
   const [flowDefines, setFlowDefines] = useState<XFlowDefine[]>([]);
   const [defineKey, setDefineKey] = useState<string>();
   const [currentDefine, setCurrentDefine] = useState<XFlowDefine>();
+  useEffect(() => {
+    setCurrentDefine(doWork);
+  }, [doWork]);
 
   useEffect(() => {
     setCurrentDefine(undefined);

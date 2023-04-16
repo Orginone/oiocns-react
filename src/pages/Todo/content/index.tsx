@@ -10,13 +10,15 @@ import { ProColumns } from '@ant-design/pro-components';
 import BuyOrder from './Common/Order/Buy';
 import userCtrl from '@/ts/controller/setting';
 import WorkTodo from './WorkTodo';
+import { XFlowDefine } from '@/ts/base/schema';
 
 interface IProps {
   reflashMenu: () => void;
   selectMenu: MenuItemType;
+  doWork?: XFlowDefine;
 }
 
-const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
+const TypeSetting = ({ selectMenu, reflashMenu, doWork }: IProps) => {
   switch (selectMenu.itemType) {
     case WorkType.FriendTodo:
     case WorkType.CompanyTodo:
@@ -90,7 +92,7 @@ const TypeSetting = ({ selectMenu, reflashMenu }: IProps) => {
     case WorkType.OrderApply:
       return <BuyOrder typeName={selectMenu.key} todoGroup={selectMenu.item} />;
     case WorkType.WorkItem:
-      return <Work selectMenu={selectMenu} />;
+      return <Work selectMenu={selectMenu} doWork={doWork} />;
     case WorkType.WorkTodo:
       return <WorkTodo selectMenu={selectMenu} reflashMenu={reflashMenu} />;
     default:
