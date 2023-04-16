@@ -40,9 +40,9 @@ export const buildTargetTree = async (
   return result;
 };
 
-export const buildAuthorityTree = (authority: IAuthority) => {
+export const buildAuthorityTree = (authority: IAuthority, id: string) => {
   const result: MenuItemType = {
-    key: authority.id,
+    key: id + '_' + authority.id,
     label: authority.name,
     icon: <im.ImTree />,
     item: {
@@ -64,7 +64,7 @@ export const buildAuthorityTree = (authority: IAuthority) => {
     tag: [setting.space.teamName, '权限群'],
     menus: loadChatMenus(undefined),
     itemType: GroupMenuType.Books + '-' + BookType.Authority,
-    children: authority.children?.map((i) => buildAuthorityTree(i)) ?? [],
+    children: authority.children?.map((i) => buildAuthorityTree(i, id)) ?? [],
   };
   return result;
 };
@@ -72,8 +72,6 @@ export const buildAuthorityTree = (authority: IAuthority) => {
 export const loadBookMenu = async () => {
   const cohorts = await userCtrl.user.getCohorts(false);
   let companys = await userCtrl.user.getJoinedCompanys(false);
-  let authors = await userCtrl.space.loadSpaceAuthorityTree();
-  let authorMenus = authors ? [buildAuthorityTree(authors)] : [];
   let cohortInfos: any[] = [];
   for (const item of cohorts) {
     let spaceId = setting.user.id;
@@ -172,52 +170,70 @@ export const loadBookMenu = async () => {
             company.teamName,
           ),
         },
+        {
+          key: company.id + '单位权限群',
+          label: '单位权限群',
+          item: company,
+          itemType: '单位权限群',
+          icon: <im.ImUser />,
+          children: [
+            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company.id),
+          ],
+        },
       ],
     });
   }
   return [
     {
-      key: BookType.Friend,
-      label: BookType.Friend,
-      itemType: GroupMenuType.Books + '-' + TargetType.Person,
-      icon: <im.ImUser />,
-      children: [],
-      item: {
-        source: setting.user,
-        chat: chatCtrl.findTargetChat(
-          setting.user.target,
-          setting.user.id,
-          '我的',
-          '好友',
-        ),
-      },
-    },
-    {
-      key: BookType.Cohort,
-      label: BookType.Cohort,
-      itemType: GroupMenuType.Books,
-      icon: <im.ImUsers />,
-      children: cohortInfos.map((a) => {
-        return {
+      key: '我的通讯录',
+      label: '我的',
+      itemType: '我的',
+      item: setting.user,
+      children: [
+        {
+          key: BookType.Friend,
+          label: BookType.Friend,
+          itemType: GroupMenuType.Books + '-' + TargetType.Person,
+          icon: <im.ImUser />,
           children: [],
-          key: a.cohort.id,
-          label: a.cohort.name,
           item: {
-            source: a.cohort,
+            source: setting.user,
             chat: chatCtrl.findTargetChat(
-              a.cohort.target,
-              a.spaceId,
-              a.spaceName,
-              a.cohort.target.typeName,
+              setting.user.target,
+              setting.user.id,
+              '我的',
+              '好友',
             ),
           },
-          menus: loadChatMenus(undefined),
-          itemType: GroupMenuType.Books + '-' + a.cohort.typeName,
-          icon: <TeamIcon share={a.cohort.shareInfo} size={18} fontSize={16} />,
-        };
-      }),
+        },
+        {
+          key: BookType.Cohort,
+          label: BookType.Cohort,
+          itemType: GroupMenuType.Books,
+          icon: <im.ImUsers />,
+          children: cohortInfos.map((a) => {
+            return {
+              children: [],
+              key: a.cohort.id,
+              label: a.cohort.name,
+              item: {
+                source: a.cohort,
+                chat: chatCtrl.findTargetChat(
+                  a.cohort.target,
+                  a.spaceId,
+                  a.spaceName,
+                  a.cohort.target.typeName,
+                ),
+              },
+              menus: loadChatMenus(undefined),
+              itemType: GroupMenuType.Books + '-' + a.cohort.typeName,
+              icon: <TeamIcon share={a.cohort.shareInfo} size={18} fontSize={16} />,
+            };
+          }),
+        },
+      ],
+      icon: <TeamIcon share={setting.user.shareInfo} size={18} fontSize={16} />,
     },
-    ...authorMenus,
     ...companyItems,
   ];
 };

@@ -5,8 +5,8 @@ export enum GroupMenuType {
 }
 
 export enum BookType {
-  'Friend' = '我的好友',
-  'Cohort' = '我的群组',
+  'Friend' = '好友',
+  'Cohort' = '群组',
   'Innner' = '内设机构',
   'Station' = '内设岗位',
   'Working' = '工作群组',
