@@ -14,7 +14,7 @@ interface IProps {
  * 事--待办
  * @returns
  */
-const WorkTodo: React.FC<IProps> = ({ selectMenu, reflashMenu }) => {
+const WorkTodo: React.FC<IProps> = ({ selectMenu }) => {
   const [pageKey, setPageKey] = useState(0);
   const [tabKey, setTabKey] = useState('1');
   const [flowTask, setFlowTask] = useState<XFlowTaskHistory>();
@@ -36,9 +36,7 @@ const WorkTodo: React.FC<IProps> = ({ selectMenu, reflashMenu }) => {
         />
       );
     case 1:
-      return (
-        <Approve selectMenu={selectMenu} flowTask={flowTask} setPageKey={setPageKey} />
-      );
+      return <Approve flowTask={flowTask} setPageKey={setPageKey} />;
     case 2:
       return (
         <CarbonCopy selectMenu={selectMenu} flowTask={flowTask} setPageKey={setPageKey} />

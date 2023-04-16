@@ -10,12 +10,8 @@ import { GroupMenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
-import AuthorityModal from './content/Authority/AuthorityModal';
-import PropertyModal from './components/propertyModal';
-import DictModal from '@/pages/Setting/content/Dict/dictModal';
 import { SettingOutlined } from '@ant-design/icons';
 import thingCtrl from '@/ts/controller/thing';
-import { getUuid } from '@/utils/tools';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -165,61 +161,6 @@ const TeamSetting: React.FC = () => {
           }}
           targetId={(selectMenu.item as ITarget)?.id}
           current={selectMenu.item as ISpeciesItem}
-        />
-      )}
-      {/** 权限模态框 */}
-      {selectMenu.itemType == '权限' && (
-        <AuthorityModal
-          title={operateKeys[0] + selectMenu.itemType}
-          open={['新增', '修改'].includes(operateKeys[0])}
-          handleCancel={function (): void {
-            setOperateKeys(['']);
-          }}
-          handleOk={(newItem) => {
-            if (newItem) {
-              refreshMenu();
-              setOperateKeys(['']);
-            }
-          }}
-          current={selectMenu.item}
-        />
-      )}
-      {/** 属性模态框 */}
-      {selectMenu.itemType == '属性' && (
-        <PropertyModal
-          title={operateKeys[0] + selectMenu.itemType}
-          open={operateKeys[0] === '新增属性'}
-          handleCancel={function (): void {
-            setOperateKeys(['']);
-          }}
-          handleOk={(newItem) => {
-            if (newItem) {
-              // refreshMenu();
-              setRefreshKey(getUuid());
-              setOperateKeys(['']);
-            }
-            setSelectMenu(selectMenu);
-          }}
-          data={undefined}
-        />
-      )}
-      {/** 字典模态框 */}
-      {selectMenu.itemType.includes('字典') && (
-        <DictModal
-          title={operateKeys[0] + selectMenu.itemType}
-          open={operateKeys[0].includes('字典')}
-          handleCancel={function (): void {
-            setOperateKeys(['']);
-          }}
-          handleOk={(newItem) => {
-            message.success('操作成功');
-            if (newItem) {
-              refreshMenu();
-              setOperateKeys(['']);
-            }
-            setSelectMenu(selectMenu);
-          }}
-          data={operateKeys[0].includes('新增') ? undefined : selectMenu.item}
         />
       )}
       <Content key={key} selectMenu={selectMenu} refreshKey={refreshKey} />

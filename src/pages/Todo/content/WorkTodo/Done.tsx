@@ -24,8 +24,7 @@ const Done: React.FC<IApproveProps> = ({ instanceId, setPageKey }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [taskHistory, setTaskHistorys] = useState<XFlowTaskHistory[]>([]);
   const [instance, setInstance] = useState<any>();
-  const [speciesItem, setSpeciesItem] = useState<any>();
-  const [flowSpeciesItem, setFlowSpeciesItem] = useState<any>();
+  const [species, setSpecies] = useState<ISpeciesItem[]>();
 
   const lookForAll = (data: any[], arr: any[]) => {
     for (let item of data) {
@@ -46,13 +45,10 @@ const Done: React.FC<IApproveProps> = ({ instanceId, setPageKey }) => {
           const species_ = await thingCtrl.loadSpeciesTree();
           let allNodes: ISpeciesItem[] = lookForAll([species_], []);
           setInstance(res.data);
-          let speciesIds = res.data.define?.sourceIds?.split(',');
-          let speciesItem = allNodes.filter((item) => speciesIds?.includes(item.id))[0];
-          let flowSpeciesItem = allNodes.filter(
-            (item) => item.id == res.data.define?.speciesId,
-          )[0];
-          setSpeciesItem(speciesItem);
-          setFlowSpeciesItem(flowSpeciesItem);
+          let speciesItem = allNodes.filter((item) =>
+            res.data.define?.sourceIds?.includes(item.id),
+          );
+          setSpecies(speciesItem);
           setTaskHistorys(res.data.historyTasks as XFlowTaskHistory[]);
         }
       }
@@ -147,10 +143,9 @@ const Done: React.FC<IApproveProps> = ({ instanceId, setPageKey }) => {
               );
             })}
           </Timeline>
-
-          {speciesItem && (
+          {species && (
             <Thing
-              current={speciesItem}
+              species={species}
               height={'400px'}
               byIds={(instance?.thingIds ?? '')
                 .split(',')
@@ -165,22 +160,12 @@ const Done: React.FC<IApproveProps> = ({ instanceId, setPageKey }) => {
       key: '2',
       label: `流程图`,
       children: (
-        <>
-          {flowSpeciesItem && (
-            <Design
-              current={(instance?.define as XFlowDefine) || instance?.define}
-              species={flowSpeciesItem}
-              instance={instance}
-              setInstance={setInstance}
-              operateOrgId={userCtrl.space.id}
-              defaultEditable={false}
-              setOperateOrgId={() => {}}
-              onBack={() => {}}
-              modalType={'设计流程'}
-              setModalType={() => {}}
-            />
-          )}
-        </>
+        <Design
+          current={(instance?.define as XFlowDefine) || instance?.define}
+          instance={instance}
+          IsEdit={false}
+          onBack={() => {}}
+        />
       ),
     },
   ];

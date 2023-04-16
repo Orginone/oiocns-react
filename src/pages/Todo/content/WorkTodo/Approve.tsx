@@ -2,7 +2,7 @@ import OioForm from '@/components/Form';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
-import { XFlowDefine, XFlowTaskHistory } from '@/ts/base/schema';
+import { XFlowTaskHistory } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import thingCtrl from '@/ts/controller/thing';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
@@ -12,23 +12,20 @@ import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, message, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
-import { MenuItemType } from 'typings/globelType';
 import cls from './index.module.less';
 const { Panel } = Collapse;
 
 interface IApproveProps {
-  selectMenu: MenuItemType;
-  flowTask?: XFlowTaskHistory;
+  flowTask: XFlowTaskHistory;
   setPageKey: (pageKey: number) => void;
 }
 
-const Approve: React.FC<IApproveProps> = ({ selectMenu, flowTask, setPageKey }) => {
-  const formRef = useRef<ProFormInstance<any>>();
-  const [taskHistory, setTaskHistorys] = useState<XFlowTaskHistory[]>([]);
+const Approve: React.FC<IApproveProps> = ({ flowTask, setPageKey }) => {
   let comment = '';
+  const formRef = useRef<ProFormInstance<any>>();
+  const [taskHistory, setTaskHistorys] = useState<XFlowTaskHistory[]>();
   const [instance, setInstance] = useState<any>();
-  const [speciesItem, setSpeciesItem] = useState<any>();
-  const [flowSpeciesItem, setFlowSpeciesItem] = useState<any>();
+  const [speciesItem, setSpeciesItem] = useState<ISpeciesItem[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
   const lookForAll = (data: any[], arr: any[]) => {
@@ -41,27 +38,20 @@ const Approve: React.FC<IApproveProps> = ({ selectMenu, flowTask, setPageKey }) 
     return arr;
   };
   useEffect(() => {
-    const loadNodes = async () => {
+    setTimeout(async () => {
       if (flowTask) {
         const res = await kernel.queryInstanceById({
           id: flowTask.instanceId,
         });
         if (res.success) {
-          const species_ = await thingCtrl.loadSpeciesTree();
-          let allNodes: ISpeciesItem[] = lookForAll([species_], []);
           setInstance(res.data);
-          let speciesIds = res.data.define?.sourceIds?.split(',');
-          let speciesItem = allNodes.filter((item) => speciesIds?.includes(item.id))[0];
-          let flowSpeciesItem = allNodes.filter(
-            (item) => item.id == res.data.define?.speciesId,
-          )[0];
+          let speciesIds = res.data.define?.sourceIds?.split(',') || [];
+          let speciesItem: ISpeciesItem[] = await thingCtrl.getSpeciesByIds(speciesIds);
           setSpeciesItem(speciesItem);
-          setFlowSpeciesItem(flowSpeciesItem);
-          setTaskHistorys(res.data.historyTasks as XFlowTaskHistory[]);
+          setTaskHistorys(res.data.historyTasks);
         }
       }
-    };
-    loadNodes();
+    }, 100);
   }, [flowTask]);
 
   // 审批
@@ -94,7 +84,7 @@ const Approve: React.FC<IApproveProps> = ({ selectMenu, flowTask, setPageKey }) 
       children: (
         <>
           <Timeline>
-            {taskHistory.map((th, index) => {
+            {taskHistory?.map((th, index) => {
               const isCur = th.status != 100;
               const color = isCur ? 'red' : 'green';
               const title = index == 0 ? '发起人' : '审批人';
@@ -174,10 +164,9 @@ const Approve: React.FC<IApproveProps> = ({ selectMenu, flowTask, setPageKey }) 
               );
             })}
           </Timeline>
-
           {speciesItem && (
             <Thing
-              current={speciesItem}
+              species={speciesItem}
               height={'400px'}
               byIds={(flowTask?.instance?.thingIds ?? '')
                 .split(',')
@@ -225,22 +214,12 @@ const Approve: React.FC<IApproveProps> = ({ selectMenu, flowTask, setPageKey }) 
       key: '2',
       label: `流程图`,
       children: (
-        <>
-          {flowSpeciesItem && (
-            <Design
-              current={flowTask?.instance?.define as XFlowDefine}
-              species={flowSpeciesItem}
-              instance={instance}
-              setInstance={setInstance}
-              operateOrgId={userCtrl.space.id}
-              defaultEditable={false}
-              setOperateOrgId={() => {}}
-              onBack={() => {}}
-              modalType={'设计流程'}
-              setModalType={() => {}}
-            />
-          )}
-        </>
+        <Design
+          current={flowTask?.instance?.define!}
+          instance={instance}
+          IsEdit={false}
+          onBack={() => {}}
+        />
       ),
     },
   ];

@@ -7,10 +7,11 @@ import {
   loadSpeciesTree,
   ISpeciesItem,
 } from '../../core/';
-import { kernel, schema } from '@/ts/base';
+import { kernel } from '@/ts/base';
 import { badRequest, ResultType } from '@/ts/base/model';
 import { Dict } from '@/ts/core/thing/dict';
 import { Property } from '@/ts/core/thing/property';
+import { FlowDefine } from '@/ts/core/thing/flowDefine';
 
 /**
  * 物的控制器
@@ -20,6 +21,7 @@ class ThingController extends Emitter {
   public speciesList: ISpeciesItem[] = [];
   public dict: Dict | undefined;
   public property: Property | undefined;
+  public define: FlowDefine | undefined;
 
   private lookForAll(data: any[], arr: any[]): any[] {
     for (let item of data) {
@@ -35,6 +37,7 @@ class ThingController extends Emitter {
     super();
     emitter.subscribePart([DomainTypes.Company], () => {
       this.dict = new Dict(userCtrl.space.id);
+      this.define = new FlowDefine(userCtrl.space.id);
       this.property = new Property(userCtrl.space.id);
       setTimeout(async () => {
         await this.loadSpeciesTree(true);
@@ -83,12 +86,6 @@ class ThingController extends Emitter {
       id,
       data: JSON.stringify(data),
       belongId: userCtrl.space.id,
-    });
-  }
-
-  public async loadFlowDefine(): Promise<ResultType<schema.XFlowDefineArray>> {
-    return await kernel.queryDefine({
-      spaceId: userCtrl.space.id,
     });
   }
 }

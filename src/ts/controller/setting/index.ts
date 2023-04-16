@@ -18,8 +18,10 @@ const sessionSpaceName = 'sessionSpace';
  */
 class SettingController extends Emitter {
   public currentKey: string = '';
+  public currentTabKey: string = '';
   private _user: IPerson | undefined;
   private _curSpace: ICompany | undefined;
+  public target: ITarget | undefined;
   public friends: XTarget[] = [];
   /**构造方法 */
   constructor() {

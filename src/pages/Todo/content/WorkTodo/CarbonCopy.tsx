@@ -150,7 +150,7 @@ const CarbonCopy: React.FC<IApproveProps> = ({ flowTask, setPageKey }) => {
 
           {speciesItem && (
             <Thing
-              current={speciesItem}
+              species={speciesItem}
               height={'400px'}
               byIds={(flowTask?.instance?.thingIds ?? '')
                 .split(',')
@@ -169,15 +169,9 @@ const CarbonCopy: React.FC<IApproveProps> = ({ flowTask, setPageKey }) => {
           {flowSpeciesItem && (
             <Design
               current={flowTask?.instance?.define as XFlowDefine}
-              species={flowSpeciesItem}
               instance={instance}
-              setInstance={setInstance}
-              operateOrgId={userCtrl.space.id}
-              defaultEditable={false}
-              setOperateOrgId={() => {}}
+              IsEdit={false}
               onBack={() => {}}
-              modalType={'设计流程'}
-              setModalType={() => {}}
             />
           )}
         </>

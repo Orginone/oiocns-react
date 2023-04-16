@@ -41,7 +41,6 @@ export class Dict {
       id: id,
       spaceId: this.belongId,
       page: page,
-      spaceId: this.belongId,
     });
     return res.data;
   }

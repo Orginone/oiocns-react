@@ -1,20 +1,13 @@
-import {
-  XAttribute,
-  XAttributeArray,
-  XFlowDefine,
-  XFlowInstance,
-} from '@/ts/base/schema';
+import { XAttribute, XAttributeArray } from '@/ts/base/schema';
 import { kernel, model, parseAvatar, schema } from '../../base';
 import {
   AttributeModel,
-  CreateDefineReq,
   OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
 } from '../../base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
-import { FlowDefine } from './flowDefine';
 import { IFlowDefine } from './iflowDefine';
 /**
  * 分类系统项实现
@@ -107,30 +100,6 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadFlowDefines(reload: boolean = false): Promise<IFlowDefine[]> {
-    if (this.defines == undefined || this.defines.length == 0 || reload) {
-      const res = await kernel.queryDefine({
-        speciesId: this.target.id,
-        spaceId: this.curSpaceId,
-      });
-      this.defines =
-        res.data.result?.map((item: XFlowDefine) => {
-          return new FlowDefine(item, this.curSpaceId);
-        }) || [];
-    }
-    return this.defines;
-  }
-
-  async loadFlowInstances(status: number[], page: PageRequest): Promise<XFlowInstance[]> {
-    let res = await kernel.queryInstanceByApply({
-      speciesId: this.id,
-      spaceId: this.curSpaceId,
-      status,
-      page,
-    });
-    return res.data.result || [];
-  }
-
   async loadInfo(info: TargetShare): Promise<ISpeciesItem> {
     if (info.typeName != '未知') {
       this.belongInfo = info;
@@ -181,6 +150,7 @@ export class SpeciesItem implements ISpeciesItem {
 
     return this;
   }
+
   async delete(): Promise<boolean> {
     const res = await kernel.deleteSpecies({
       id: this.id,
@@ -193,6 +163,7 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return res.success;
   }
+
   async createAttr(
     data: Omit<AttributeModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
@@ -209,6 +180,7 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return res.success;
   }
+
   async updateAttr(
     data: Omit<AttributeModel, 'speciesId' | 'speciesCode'>,
   ): Promise<boolean> {
@@ -227,6 +199,7 @@ export class SpeciesItem implements ISpeciesItem {
     }
     return res.success;
   }
+
   async deleteAttr(id: string): Promise<boolean> {
     const res = await kernel.deleteAttribute({
       id: id,
@@ -261,43 +234,6 @@ export class SpeciesItem implements ISpeciesItem {
       id: id,
       typeName: '',
     });
-    return res.success;
-  }
-
-  async createFlowDefine(
-    data: Omit<CreateDefineReq, 'id' | 'speciesId'>,
-  ): Promise<XFlowDefine> {
-    const res = await kernel.publishDefine({ ...data, speciesId: this.id });
-    if (res.success) {
-      const newItem = new FlowDefine(res.data, this.curSpaceId);
-      if (this.defines) {
-        this.defines.push(newItem);
-      }
-    }
-    return res.data;
-  }
-
-  //错误返回
-  async updateFlowDefine(data: CreateDefineReq): Promise<boolean> {
-    const res = await kernel.publishDefine({
-      ...data,
-    });
-    if (res.success && this.defines) {
-      this.defines = this.defines.map((item: any) => {
-        if (item.id == res.data.id) {
-          return new FlowDefine(res.data, this.curSpaceId);
-        }
-        return item;
-      });
-    }
-    return res.success;
-  }
-
-  async deleteFlowDefine(id: string): Promise<boolean> {
-    const res = await kernel.deleteDefine({ id });
-    if (this.defines && res.success) {
-      this.defines = this.defines.filter((item: any) => item.id != id);
-    }
     return res.success;
   }
 }
