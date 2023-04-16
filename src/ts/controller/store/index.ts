@@ -22,17 +22,19 @@ class StoreController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.User, DomainTypes.Company], () => {
-      this._root = getFileSysItemRoot();
-      /** 订阅仓库常用操作 */
-      kernel.anystore.subscribed(userCtrl.space.id, STORE_COMMON_MENU, (map: any) => {
-        this._commonMenuMap = map;
-        this._caches = map[userCtrl.space.id] || [];
-        this.changCallbackPart(STORE_COMMON_MENU);
-      });
-      setTimeout(async () => {
-        this._home = await this._root.create('主目录');
-        this.changCallback();
-      }, 200);
+      if (userCtrl.space) {
+        this._root = getFileSysItemRoot();
+        /** 订阅仓库常用操作 */
+        kernel.anystore.subscribed(userCtrl.space.id, STORE_COMMON_MENU, (map: any) => {
+          this._commonMenuMap = map;
+          this._caches = map[userCtrl.space.id] || [];
+          this.changCallbackPart(STORE_COMMON_MENU);
+        });
+        setTimeout(async () => {
+          this._home = await this._root.create('主目录');
+          this.changCallback();
+        }, 200);
+      }
     });
   }
   /** 根目录 */
