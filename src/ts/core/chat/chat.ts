@@ -92,14 +92,10 @@ class BaseChat implements IChat {
           _in_: [gptId, this.target.id],
         };
       }
-      const res = await kernel.anystore.remove(
-        hisMsgCollName,
-        {
-          sessionId: sessionId,
-          spaceId: this.spaceId,
-        },
-        'user',
-      );
+      const res = await kernel.anystore.remove(this.userId, hisMsgCollName, {
+        sessionId: sessionId,
+        spaceId: this.spaceId,
+      });
       if (res.success) {
         this.messages = [];
         this.messageNotify?.apply(this, [this.messages]);
@@ -111,13 +107,9 @@ class BaseChat implements IChat {
   }
   async deleteMessage(id: string): Promise<boolean> {
     if (this.spaceId === this.userId) {
-      const res = await kernel.anystore.remove(
-        hisMsgCollName,
-        {
-          chatId: id,
-        },
-        'user',
-      );
+      const res = await kernel.anystore.remove(this.userId, hisMsgCollName, {
+        chatId: id,
+      });
       if (res.success && res.data > 0) {
         const index = this.messages.findIndex((i) => {
           return i.id === id;
@@ -180,20 +172,16 @@ class BaseChat implements IChat {
     data.msgType = MessageType.Text;
     data.msgBody = common.StringPako.deflate(res.data);
     data.fromId = gptId;
-    await kernel.anystore.insert(
-      hisMsgCollName,
-      {
-        chatId: data.id,
-        sessionId: gptId,
-        fromId: gptId,
-        toId: this.userId,
-        spaceId: this.userId,
-        createTime: 'sysdate()',
-        msgType: MessageType.Text,
-        msgBody: common.StringPako.deflate(res.data),
-      },
-      'user',
-    );
+    await kernel.anystore.insert(this.userId, hisMsgCollName, {
+      chatId: data.id,
+      sessionId: gptId,
+      fromId: gptId,
+      toId: this.userId,
+      spaceId: this.userId,
+      createTime: 'sysdate()',
+      msgType: MessageType.Text,
+      msgBody: common.StringPako.deflate(res.data),
+    });
     this.receiveMessage(data, false);
   }
   receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
@@ -238,21 +226,17 @@ class BaseChat implements IChat {
         _in_: [gptId, this.target.id],
       };
     }
-    const res = await kernel.anystore.aggregate(
-      hisMsgCollName,
-      {
-        match: {
-          sessionId: sessionId,
-          spaceId: this.spaceId,
-        },
-        sort: {
-          createTime: -1,
-        },
-        skip: this.messages.length,
-        limit: 30,
+    const res = await kernel.anystore.aggregate(this.userId, hisMsgCollName, {
+      match: {
+        sessionId: sessionId,
+        spaceId: this.spaceId,
       },
-      'user',
-    );
+      sort: {
+        createTime: -1,
+      },
+      skip: this.messages.length,
+      limit: 30,
+    });
     if (res && res.success && Array.isArray(res.data)) {
       this.loadMessages(res.data);
       return res.data.length;

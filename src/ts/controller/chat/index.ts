@@ -130,7 +130,7 @@ class ChatController extends Emitter {
   }
   /** 初始化 */
   private async _initialization(): Promise<void> {
-    kernel.anystore.subscribed(chatsObjectName, 'user', (data: any) => {
+    kernel.anystore.subscribed(userCtrl.space.id, chatsObjectName, (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
         this._chats = [];
         this._chats.push(gpt3(this._userId));
@@ -273,18 +273,14 @@ class ChatController extends Emitter {
    * @param message 新消息，无则为空
    */
   private _cacheChats(): void {
-    kernel.anystore.set(
-      chatsObjectName,
-      {
-        operation: 'replaceAll',
-        data: {
-          chats: this._chats.map((item) => {
-            return item.getCache();
-          }),
-        },
+    kernel.anystore.set(userCtrl.space.id, chatsObjectName, {
+      operation: 'replaceAll',
+      data: {
+        chats: this._chats.map((item) => {
+          return item.getCache();
+        }),
       },
-      'user',
-    );
+    });
   }
 }
 

@@ -79,8 +79,8 @@ class TodoController extends Emitter {
         this._cohortTodo = await loadOrgTodo(cohorts, WorkType.CohortTodo);
         this._companyTodo = await loadOrgTodo(companys, WorkType.CompanyTodo);
         kernel.anystore.subscribed(
+          userCtrl.space.id,
           TODO_COMMON_MENU + '.SP' + userCtrl.space.id,
-          'user',
           (data: any) => {
             this._caches = data;
             this.changCallbackPart(TODO_COMMON_MENU);
@@ -195,14 +195,10 @@ class TodoController extends Emitter {
     }
     this._caches = this._caches.slice(0, 10);
     this._commonMenuMap[userCtrl.space.id] = this._caches;
-    let result = await kernel.anystore.set(
-      TODO_COMMON_MENU,
-      {
-        operation: 'replaceAll',
-        data: this._commonMenuMap,
-      },
-      'user',
-    );
+    let result = await kernel.anystore.set(userCtrl.space.id, TODO_COMMON_MENU, {
+      operation: 'replaceAll',
+      data: this._commonMenuMap,
+    });
     console.log(result);
     this.changCallbackPart(TODO_COMMON_MENU);
   }

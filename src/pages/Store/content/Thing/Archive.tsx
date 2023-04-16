@@ -16,19 +16,16 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId }) => {
   const [archives, setArchives] = useState<any[]>([]);
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThingArchives(
-        {
-          options: {
-            match: {
-              _id: {
-                _eq_: thingId,
-              },
+      const res = await kernel.anystore.loadThingArchives(userCtrl.space.id, {
+        options: {
+          match: {
+            _id: {
+              _eq_: thingId,
             },
           },
-          userData: [],
         },
-        userCtrl.isCompanySpace ? 'company' : 'user',
-      );
+        userData: [],
+      });
       const resData = res.data as any;
       const ts = (resData?.data || [])[0];
       let data = [];

@@ -87,7 +87,7 @@ class MarketController extends Emitter {
       await this._target.getJoinMarkets();
 
       /* 获取 历史缓存的 购物车商品列表 */
-      kernel.anystore.subscribed(JOIN_SHOPING_CAR, 'user', (shoplist: any) => {
+      kernel.anystore.subscribed(userCtrl.space.id, JOIN_SHOPING_CAR, (shoplist: any) => {
         const { data = [] } = shoplist;
         this._shopinglist = data || [];
         this.changCallbackPart(JOIN_SHOPING_CAR);
@@ -96,14 +96,14 @@ class MarketController extends Emitter {
     });
 
     /** 订阅常用应用 */
-    kernel.anystore.subscribed(STORE_RECENTLY_APPS, 'user', (list: any) => {
+    kernel.anystore.subscribed(userCtrl.space.id, STORE_RECENTLY_APPS, (list: any) => {
       const { data = [] } = list;
       this._caches = data || [];
       this.changCallbackPart(STORE_RECENTLY_APPS);
     });
 
     /* 获取 历史缓存的 自定义目录 */
-    kernel.anystore.subscribed(STORE_USER_MENU, 'user', (data: TreeType[]) => {
+    kernel.anystore.subscribed(userCtrl.space.id, STORE_USER_MENU, (data: TreeType[]) => {
       if (data.length > 0) {
         this._customMenus = data;
       } else {
@@ -135,16 +135,12 @@ class MarketController extends Emitter {
   setCustomMenu(data: TreeType[]): void {
     this._customMenus = data;
     this.changCallbackPart(STORE_USER_MENU);
-    kernel.anystore.set(
-      STORE_USER_MENU,
-      {
-        operation: 'replaceAll',
-        data: {
-          data: this._customMenus,
-        },
+    kernel.anystore.set(userCtrl.space.id, STORE_USER_MENU, {
+      operation: 'replaceAll',
+      data: {
+        data: this._customMenus,
       },
-      'user',
-    );
+    });
   }
 
   /**
@@ -180,16 +176,12 @@ class MarketController extends Emitter {
    */
   private async updateShoppingCar(data: any) {
     this.changCallbackPart(JOIN_SHOPING_CAR);
-    await kernel.anystore.set(
-      JOIN_SHOPING_CAR,
-      {
-        operation: 'replaceAll',
-        data: {
-          data: data || [],
-        },
+    await kernel.anystore.set(userCtrl.space.id, JOIN_SHOPING_CAR, {
+      operation: 'replaceAll',
+      data: {
+        data: data || [],
       },
-      'user',
-    );
+    });
   }
 
   /**

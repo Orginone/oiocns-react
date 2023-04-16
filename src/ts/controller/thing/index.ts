@@ -62,10 +62,7 @@ class ThingController extends Emitter {
   }
 
   public async createThing(data: any): Promise<ResultType<boolean>> {
-    let res = await kernel.anystore.createThing(
-      1,
-      userCtrl.isCompanySpace ? 'company' : 'user',
-    );
+    let res = await kernel.anystore.createThing(userCtrl.space.id, 1);
     if (res.success) {
       return await kernel.perfectThing({
         id: (res.data as [{ Id: string }])[0].Id,

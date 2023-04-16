@@ -292,10 +292,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing(
-                request,
-                userCtrl.isCompanySpace ? 'company' : 'user',
-              );
+              const result = await kernel.anystore.loadThing(userCtrl.space.id, request);
               if (result.success) {
                 return result.data;
               }

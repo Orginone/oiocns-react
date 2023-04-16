@@ -130,10 +130,7 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
               onFinished={async (values: any) => {
                 let rows_ = rows;
                 if (currentDefine?.isCreate) {
-                  let res = await kernel.anystore.createThing(
-                    1,
-                    userCtrl.isCompanySpace ? 'company' : 'user',
-                  );
+                  let res = await kernel.anystore.createThing(userCtrl.space.id, 1);
                   if (res && res.success) {
                     rows_ = res.data;
                   }
@@ -252,8 +249,8 @@ const WorkStartDo: React.FC<IProps> = ({ currentDefine, goBack }) => {
             }}
             onOk={async () => {
               let res = await kernel.anystore.createThing(
+                userCtrl.space.id,
                 createThingNum || 1,
-                userCtrl.isCompanySpace ? 'company' : 'user',
               );
               if (res && res.success) {
                 message.success('创建成功');

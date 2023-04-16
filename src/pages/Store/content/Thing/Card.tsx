@@ -16,19 +16,16 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
   const [formValue, setFormValue] = useState<any>({});
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThing<any>(
-        {
-          options: {
-            match: {
-              _id: {
-                _eq_: thingId,
-              },
+      const res = await kernel.anystore.loadThing<any>(userCtrl.space.id, {
+        options: {
+          match: {
+            _id: {
+              _eq_: thingId,
             },
           },
-          userData: [],
         },
-        userCtrl.isCompanySpace ? 'company' : 'user',
-      );
+        userData: [],
+      });
       let thing: any;
       const data = res.data?.data;
       if (data && data.length > 0) {

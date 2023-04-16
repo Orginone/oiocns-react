@@ -24,7 +24,7 @@ class StoreController extends Emitter {
     emitter.subscribePart([DomainTypes.User, DomainTypes.Company], () => {
       this._root = getFileSysItemRoot();
       /** 订阅仓库常用操作 */
-      kernel.anystore.subscribed(STORE_COMMON_MENU, 'user', (map: any) => {
+      kernel.anystore.subscribed(userCtrl.space.id, STORE_COMMON_MENU, (map: any) => {
         this._commonMenuMap = map;
         this._caches = map[userCtrl.space.id] || [];
         this.changCallbackPart(STORE_COMMON_MENU);
@@ -69,14 +69,10 @@ class StoreController extends Emitter {
     }
     this._caches = this._caches.slice(0, 10);
     this._commonMenuMap[userCtrl.space.id] = this._caches;
-    let result = await kernel.anystore.set(
-      STORE_COMMON_MENU,
-      {
-        operation: 'replaceAll',
-        data: this._commonMenuMap,
-      },
-      'user',
-    );
+    let result = await kernel.anystore.set(userCtrl.space.id, STORE_COMMON_MENU, {
+      operation: 'replaceAll',
+      data: this._commonMenuMap,
+    });
     console.log(result);
     this.changCallbackPart(STORE_COMMON_MENU);
   }
