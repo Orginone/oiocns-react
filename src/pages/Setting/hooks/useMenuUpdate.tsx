@@ -82,19 +82,13 @@ const useMenuUpdate = (): [
     }
     const newMenus = [
       {
-        key: '关系',
-        label: '关系',
+        key: '设置',
+        label: '',
         itemType: 'Tab',
         children: children,
       },
-      {
-        key: '标准',
-        label: '标准',
-        itemType: 'Tab',
-        children: await operate.loadStandardSetting(),
-      },
     ];
-    var item = findMenuItemByKey(newMenus, userCtrl.currentKey);
+    var item = findMenuItemByKey(children, userCtrl.currentKey);
     if (item === undefined) {
       item = children[0];
     }

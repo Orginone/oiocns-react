@@ -1,79 +1,44 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import { Branche, FlowNode, XDictItem, XFlowDefine } from '@/ts/base/schema';
+import { Branche, FlowNode, XFlowDefine, XFlowInstance } from '@/ts/base/schema';
 import { Branche as BrancheModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
-import thingCtrl from '@/ts/controller/thing';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
   MinusOutlined,
   PlusOutlined,
   FormOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
-import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem } from '@/ts/core';
-import { getUuid } from '@/utils/tools';
 import { ImWarning } from 'react-icons/im';
-import { IFlowDefine } from '@/ts/core/thing/iflowDefine';
+import { getUuid } from '@/utils/tools';
+import { FlowDefine } from '@/ts/core/thing/flowDefine';
+import { ITarget } from '@/ts/core';
 
 interface IProps {
-  current: XFlowDefine | undefined;
-  species?: ISpeciesItem;
-  modalType: string;
-  operateOrgId?: string;
-  instance?: any;
-  setInstance: Function;
-  setOperateOrgId: Function;
-  setModalType: (modalType: string) => void;
+  IsEdit: boolean;
+  current: XFlowDefine;
+  target?: ITarget;
+  instance?: XFlowInstance;
   onBack: () => void;
-  testModel?: boolean;
-  defaultEditable?: boolean;
 }
 
-type FlowDefine = {
-  id?: string;
-  name: string;
-  fields: any[];
-  remark: string;
-  authId: string;
-  belongId: string;
-  public: boolean | undefined;
-  operateOrgId?: string;
-  sourceIds?: string;
-  isCreate: boolean;
-};
-
 const Design: React.FC<IProps> = ({
+  target,
   current,
-  species,
-  modalType,
-  operateOrgId,
   instance,
-  setInstance,
-  setModalType,
   onBack,
-  defaultEditable = true,
-}: IProps) => {
-  const [scale, setScale] = useState<number>(90);
+  IsEdit = true,
+}) => {
+  const [scale, setScale] = useState<number>(100);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  const [conditionData, setConditionData] = useState<FlowDefine>({
-    name: '',
-    fields: [],
-    remark: '',
-    authId: '',
-    belongId: current?.belongId || userCtrl.space.id,
-    public: true,
-    operateOrgId: operateOrgId,
-    sourceIds: undefined,
-    isCreate: true,
-  });
   const [resource, setResource] = useState({
     nodeId: `node_${getUuid()}`,
     parentId: '',
     type: 'ROOT',
-    name: '发起角色',
+    name: '发起',
     props: {
       assignedType: 'JOB',
       mode: 'AND',
@@ -92,128 +57,85 @@ const Design: React.FC<IProps> = ({
       friendDialogmode: false,
       num: 0,
     },
-    belongId: conditionData.belongId || userCtrl.space.id,
     children: {},
   });
 
-  const loadDictItems = async (dictId: any) => {
-    let res = await thingCtrl.dict?.loadDictItem(dictId, {
-      offset: 0,
-      limit: 1000,
-      filter: '',
-    });
-    return res?.result?.map((item: XDictItem) => {
-      return { label: item.name, value: item.value };
-    });
-  };
   useEffect(() => {
     const load = async () => {
-      if (current && species) {
-        // content字段可能取消
-        let resource_: any;
-        let defines = await species.loadFlowDefines();
-        if (!defines) {
-          return;
-        }
-        let flowDefine: IFlowDefine = defines.filter((item) => item.id == current.id)[0];
-        resource_ = await flowDefine.queryNodes(false);
-        let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
-        let nodes = getAllNodes(resourceData, []);
-        let spaceRootNodes = nodes.filter(
-          (item) => item.type == 'ROOT' && item.belongId == userCtrl.space.id,
-        );
-        if (spaceRootNodes.length == 0) {
-          resourceData = {
-            nodeId: `node_${getUuid()}`,
-            parentId: '',
-            type: 'ROOT',
-            name: '发起角色',
-            props: {
-              assignedType: 'JOB',
-              mode: 'AND',
-              assignedUser: [
-                {
-                  id: '0',
-                  name: undefined,
-                  type: undefined,
-                  orgIds: undefined,
-                },
-              ],
-              refuse: {
-                type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-                target: '', //驳回到指定ID的节点
+      // content字段可能取消
+      let resource_: any;
+      resource_ = await new FlowDefine(current.belongId).queryNodes(current.id);
+      let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
+      let nodes = getAllNodes(resourceData, []);
+      let spaceRootNodes = nodes.filter((item) => item.type == 'ROOT');
+      if (spaceRootNodes.length == 0) {
+        resourceData = {
+          nodeId: `node_${getUuid()}`,
+          parentId: '',
+          type: 'ROOT',
+          name: '发起角色',
+          props: {
+            assignedType: 'JOB',
+            mode: 'AND',
+            assignedUser: [
+              {
+                id: '0',
+                name: undefined,
+                type: undefined,
+                orgIds: undefined,
               },
-              friendDialogmode: false,
-              num: 0,
+            ],
+            refuse: {
+              type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+              target: '', //驳回到指定ID的节点
             },
-            belongId: userCtrl.space.id,
-            children: resourceData,
-          };
-        }
-        if (instance) {
-          setInstance(instance);
-          showTask(instance, resourceData);
-        } else {
-          setResource(resourceData);
-        }
-
-        species.loadAttrs(false).then((res) => {
-          let attrs = res;
-          setConditionData({
-            name: current.name || '',
-            remark: current.remark,
-            authId: current.authId || '',
-            belongId: current.belongId,
-            public: current.public,
-            sourceIds: current.sourceIds,
-            operateOrgId: operateOrgId,
-            isCreate: current.isCreate,
-            fields: attrs.map((attr: any) => {
-              switch (attr.valueType) {
-                case '描述型':
-                  return { label: attr.name, value: attr.id, type: 'STRING' };
-                case '数值型':
-                  return { label: attr.name, value: attr.id, type: 'NUMERIC' };
-                case '选择型':
-                  return {
-                    label: attr.name,
-                    value: attr.id,
-                    type: 'DICT',
-                    dict: loadDictItems(attr.dictId),
-                  };
-                default:
-                  return { label: attr.name, value: attr.id, type: 'STRING' };
-              }
-            }),
-          });
-        });
+            friendDialogmode: false,
+            num: 0,
+          },
+          children: resourceData,
+        };
       }
+      if (instance) {
+        showTask(instance, resourceData);
+      } else {
+        setResource(resourceData);
+      }
+      // if (IsEdit) {
+      //   new Dict(target!.id)
+      //   species.loadAttrs(false).then((res) => {
+      //     let attrs = res;
+      //     setConditionData({
+      //       name: current.name || '',
+      //       remark: current.remark,
+      //       authId: current.authId || '',
+      //       belongId: current.belongId,
+      //       public: current.public,
+      //       sourceIds: current.sourceIds,
+      //       isCreate: current.isCreate,
+      //       fields: attrs.map((attr: any) => {
+      //         switch (attr.valueType) {
+      //           case '描述型':
+      //             return { label: attr.name, value: attr.id, type: 'STRING' };
+      //           case '数值型':
+      //             return { label: attr.name, value: attr.id, type: 'NUMERIC' };
+      //           case '选择型':
+      //             return {
+      //               label: attr.name,
+      //               value: attr.id,
+      //               type: 'DICT',
+      //               dict: loadDictItems(attr.dictId),
+      //             };
+      //           default:
+      //             return { label: attr.name, value: attr.id, type: 'STRING' };
+      //         }
+      //       }),
+      //     });
+      //   });
+      // }
       // setLoaded(true);
     };
     load();
-    if (!current) {
-      onBack();
-    }
   }, [current]);
-
-  useEffect(() => {
-    if (modalType.includes('返回')) {
-      Modal.confirm({
-        title: '未发布的内容将不会被保存，是否直接退出?',
-        icon: <ExclamationCircleOutlined />,
-        okText: '确认',
-        okType: 'danger',
-        cancelText: '取消',
-        onOk() {
-          onBack();
-          setModalType('');
-        },
-        onCancel() {
-          setModalType('设计流程');
-        },
-      });
-    }
-  }, [modalType]);
 
   const getAllNodes = (resource: any, array: any[]): any[] => {
     array = [...array, resource];
@@ -229,6 +151,7 @@ const Design: React.FC<IProps> = ({
     }
     return array;
   };
+
   const getAllBranches = (resource: FlowNode, array: Branche[]): Branche[] => {
     if (resource.children) {
       array = getAllBranches(resource.children, array);
@@ -275,15 +198,6 @@ const Design: React.FC<IProps> = ({
     }
     //每个节点的 belongId  审核和抄送和子流程的destId
     for (let node of allNodes) {
-      if (!node.belongId && node.type != 'ROOT') {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span color="blue">{node.name}</span> 缺少belongId
-            </>,
-          ),
-        );
-      }
       if (
         (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
         (!node.destId || node.destId == '0' || node.destId == '')
@@ -533,14 +447,6 @@ const Design: React.FC<IProps> = ({
 
   const changeResource = (resource: any, type: string): any => {
     let obj: any;
-    let belongId = undefined;
-    if (resource.belongId && resource.belongId != '') {
-      belongId = resource.belongId;
-    } else if (operateOrgId && operateOrgId != '') {
-      belongId = operateOrgId;
-    } else {
-      belongId = conditionData.belongId || current?.belongId;
-    }
     if (type == 'flowNode') {
       let flowNode: FlowNode = {
         id: resource.id,
@@ -578,7 +484,6 @@ const Design: React.FC<IProps> = ({
               return changeResource(item, 'branch');
             })
           : [],
-        belongId: belongId,
       };
       obj = flowNode;
     } else if (type == 'branch') {
@@ -667,81 +572,96 @@ const Design: React.FC<IProps> = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <div style={{ width: '200px' }}></div>
-              <>
-                <div></div>
-              </>
-
-              <div style={{ width: '300px' }}>
-                <Steps
-                  current={0}
-                  items={[
-                    {
-                      title: '办事流程设计',
-                      icon: <FormOutlined />,
-                    },
-                  ]}></Steps>
-              </div>
+              {IsEdit && (
+                <>
+                  <div style={{ width: '200px' }}></div>
+                  <div style={{ width: '300px' }}>
+                    <Steps
+                      current={0}
+                      items={[
+                        {
+                          title: '办事流程设计',
+                          icon: <FormOutlined />,
+                        },
+                      ]}></Steps>
+                  </div>
+                </>
+              )}
               <div className={cls['publish']} style={{ width: '200px' }}>
-                {!instance && defaultEditable && (
-                  <Space>
-                    <Button
-                      className={cls['publis-issue']}
-                      size="small"
-                      type="primary"
-                      onClick={async () => {
-                        operateOrgId = operateOrgId || '';
-                        let define: any = undefined;
-                        //数据结构转化
-                        let resource_: FlowNode = changeResource(
-                          resource,
-                          'flowNode',
-                        ) as FlowNode;
-                        let errors = checkValid(resource_);
-                        if (errors.length > 0) {
-                          setShowErrorsModal(errors);
-                          return;
-                        }
-                        let sourceIds_ = conditionData.sourceIds;
-                        if (Array.isArray(sourceIds_)) {
-                          sourceIds_ = sourceIds_.join(',');
-                        }
-                        define = await species?.updateFlowDefine({
-                          id: current?.id,
-                          code: conditionData.name,
-                          name: conditionData.name,
-                          sourceIds: sourceIds_,
-                          fields: JSON.stringify(conditionData.fields),
-                          remark: conditionData.remark,
-                          resource: resource_,
-                          belongId: operateOrgId,
-                          isCreate: conditionData.isCreate,
-                        });
-                        if (define) {
-                          message.success('保存成功');
-                          onBack();
-                          setModalType('');
-                        }
-                      }}>
-                      <SendOutlined />
-                      发布
-                    </Button>
-                    <Button
-                      className={cls['scale']}
-                      size="small"
-                      disabled={scale <= 40}
-                      onClick={() => setScale(scale - 10)}>
-                      <MinusOutlined />
-                    </Button>
-                    <span>{scale}%</span>
-                    <Button
-                      size="small"
-                      disabled={scale >= 150}
-                      onClick={() => setScale(scale + 10)}>
-                      <PlusOutlined />
-                    </Button>
-                  </Space>
-                )}
+                <Space>
+                  <Button
+                    className={cls['scale']}
+                    size="small"
+                    disabled={scale <= 40}
+                    onClick={() => setScale(scale - 10)}>
+                    <MinusOutlined />
+                  </Button>
+                  <span>{scale}%</span>
+                  <Button
+                    size="small"
+                    disabled={scale >= 150}
+                    onClick={() => setScale(scale + 10)}>
+                    <PlusOutlined />
+                  </Button>
+                  {IsEdit && (
+                    <>
+                      <Button
+                        className={cls['publis-issue']}
+                        size="small"
+                        type="primary"
+                        onClick={async () => {
+                          //数据结构转化
+                          let resource_: FlowNode = changeResource(
+                            resource,
+                            'flowNode',
+                          ) as FlowNode;
+                          let errors = checkValid(resource_);
+                          if (errors.length > 0) {
+                            setShowErrorsModal(errors);
+                            return;
+                          }
+                          if (
+                            await target!.define.publishDefine({
+                              id: current?.id,
+                              code: current.name,
+                              name: current.name,
+                              sourceIds: current.sourceIds,
+                              remark: current.remark,
+                              resource: resource_,
+                              belongId: current.belongId,
+                              isCreate: current.isCreate,
+                            })
+                          ) {
+                            message.success('保存成功');
+                            onBack();
+                          }
+                        }}>
+                        <SendOutlined />
+                        发布
+                      </Button>
+                      <Button
+                        danger
+                        className={cls['publis-issue']}
+                        size="small"
+                        type="primary"
+                        onClick={async () => {
+                          Modal.confirm({
+                            title: '未发布的内容将不会被保存，是否直接退出?',
+                            icon: <ExclamationCircleOutlined />,
+                            okText: '确认',
+                            okType: 'danger',
+                            cancelText: '取消',
+                            onOk() {
+                              onBack();
+                            },
+                          });
+                        }}>
+                        <CloseCircleOutlined />
+                        返回
+                      </Button>
+                    </>
+                  )}
+                </Space>
               </div>
             </div>
           </Layout.Header>
@@ -749,31 +669,17 @@ const Design: React.FC<IProps> = ({
             <Card bordered={false}>
               {/* 基本信息组件 */}
               <div>
-                {conditionData && (
-                  <ChartDesign
-                    disableIds={[current?.id || '']}
-                    // key={key}
-                    current={current}
-                    defaultEditable={defaultEditable}
-                    species={species}
-                    operateOrgId={operateOrgId}
-                    designOrgId={conditionData.belongId}
-                    conditions={conditionData.fields}
-                    resource={resource}
-                    scale={scale}
-                  />
-                )}
+                <ChartDesign
+                  disableIds={[current?.id || '']}
+                  // key={key}
+                  current={current}
+                  defaultEditable={IsEdit}
+                  resource={resource}
+                  scale={scale}
+                />
               </div>
             </Card>
           </Layout.Content>
-          {instance && instance.status >= 100 && (
-            <Button
-              style={{ position: 'fixed', bottom: 0, zIndex: 100 }}
-              type="primary"
-              disabled>
-              流程已结束
-            </Button>
-          )}
         </Layout>
       </Card>
       <Modal

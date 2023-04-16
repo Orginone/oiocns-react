@@ -1,29 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
-import { getUuid } from '@/utils/tools';
-import thing from '@/ts/controller/thing';
 
 interface Iprops {
-  title: string;
   open: boolean;
   data: XProperty | undefined;
   handleCancel: () => void;
-  handleOk: (success: boolean) => void;
+  handleOk: (model: PropertyModel) => void;
 }
 /*
   特性编辑模态框
 */
-const PropertyModal = (props: Iprops) => {
+const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
   const [selectType, setSelectType] = useState<string>();
-  const { open, title, handleOk, data, handleCancel } = props;
   const formRef = useRef<ProFormInstance>();
-  const [formKey, setFormKey] = useState<string>();
-  useEffect(() => {
-    setFormKey(getUuid());
-  }, [open]);
   const getFromColumns = () => {
     const columns: ProFormColumnsType<PropertyModel>[] = [
       {
@@ -123,16 +115,17 @@ const PropertyModal = (props: Iprops) => {
     });
     return columns;
   };
+
   return (
     <SchemaForm<PropertyModel>
-      key={formKey}
+      key={'propertyModal'}
       formRef={formRef}
-      title={title}
+      title={`${data ? '编辑' : '新建'}属性`}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('修改')) {
+          if (data) {
             setSelectType(data?.valueType);
             formRef.current?.setFieldsValue(data);
           }
@@ -145,16 +138,7 @@ const PropertyModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       layoutType="ModalForm"
-      onFinish={async (values) => {
-        values = { ...data, ...values };
-        if (thing.property) {
-          if (title.includes('新增')) {
-            handleOk((await thing.property.createProperty(values)) !== undefined);
-          } else {
-            handleOk((await thing.property.updateProperty(values)) !== undefined);
-          }
-        }
-      }}
+      onFinish={handleOk}
       columns={getFromColumns()}></SchemaForm>
   );
 };

@@ -148,8 +148,6 @@ export type IdArraySpaceReq = {
 };
 
 export type QueryDefineReq = {
-  // 分类ID
-  speciesId?: string;
   // 空间ID
   spaceId: string;
 };
@@ -923,8 +921,6 @@ export type CreateDefineReq = {
   resource?: SchemaFlowNode;
   // 归属Id
   belongId: string;
-  // 流程字段json
-  fields?: string;
   //分类id
   speciesId?: string;
   // 权限ID

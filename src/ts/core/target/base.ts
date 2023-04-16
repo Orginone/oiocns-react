@@ -10,9 +10,15 @@ import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetModel, TargetShare } from '@/ts/base/model';
+import { FlowDefine } from '../thing/flowDefine';
+import { INullSpeciesItem } from '../thing';
+import { loadSpeciesTree } from '../../core/';
+
 export default class BaseTarget implements ITarget {
   public key: string;
   public typeName: TargetType;
+  public define: FlowDefine;
+  public species: INullSpeciesItem;
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
@@ -57,9 +63,16 @@ export default class BaseTarget implements ITarget {
     this.identitys = [];
     this.typeName = target.typeName as TargetType;
     appendTarget(target);
+    this.define = new FlowDefine(target.id);
   }
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');
+  }
+  async loadSpeciesTree(_reload: boolean = false): Promise<INullSpeciesItem> {
+    if (this.species == undefined || _reload) {
+      this.species = await loadSpeciesTree(this.id);
+    }
+    return this.species;
   }
   async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({

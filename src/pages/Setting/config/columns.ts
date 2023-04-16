@@ -394,6 +394,38 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   },
 ];
 
+export const DictColumns: ProColumns<schema.XDict>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 200,
+  },
+  {
+    title: '编号',
+    dataIndex: 'code',
+    key: 'code',
+    width: 200,
+  },
+  {
+    title: '备注',
+    dataIndex: 'remark',
+    key: 'remark',
+    width: 200,
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
+    width: 150,
+  },
+];
+
 export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
   {
     title: '序号',
@@ -412,18 +444,6 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     key: 'value',
     width: 150,
   },
-  // {
-  //   title: '共享组织',
-  //   dataIndex: 'rule',
-  //   key: 'rule',
-  //   width: 180,
-  //   render: (_, record) => {
-  //     const team = userCtrl.findTeamInfoById(record.belongId);
-  //     if (team) {
-  //       return team.name;
-  //     }
-  //   },
-  // },
   {
     title: '创建时间',
     dataIndex: 'createTime',

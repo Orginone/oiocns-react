@@ -31,7 +31,7 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 type ThingItemType = ItemType & { click: (data: any) => void };
 
 interface IProps {
-  current: ISpeciesItem;
+  species: ISpeciesItem[];
   selectable?: boolean;
   checkedList?: any[];
   height?: any;
@@ -124,10 +124,10 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   useEffect(() => {
     if (props.checkedList && props.checkedList.length > 0) {
       loadAttrs(props.checkedList.map((item) => item.item));
-    } else if (props.current && userCtrl.space.id) {
-      loadAttrs([props.current]);
+    } else if (props.species && userCtrl.space.id) {
+      loadAttrs(props.species);
     }
-  }, [props.current, props.checkedList]);
+  }, [props.species, props.checkedList]);
 
   const getColumns = (records: any[]) => {
     let columns = [];
@@ -277,7 +277,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             async load(loadOptions) {
               const species = [
                 ...(props.checkedList || []).map((item) => item.item.target),
-                props.current.target,
+                props.species.map((a) => a.target),
               ];
               loadOptions.userData = species
                 .filter((item) => item.code != 'anything')
