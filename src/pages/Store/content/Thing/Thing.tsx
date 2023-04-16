@@ -137,11 +137,11 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           <Column key={record.caption} caption={record.caption}>
             {record.children.map((attr: XAttribute) =>
               getColumn(
-                attr.property!.code,
+                attr.id,
                 attr.name,
-                attr.property!.valueType,
+                attr.property?.valueType ?? '',
                 attr.belongId ? `Propertys.T${attr.id}` : attr.code,
-                attr.property!.dict?.dictItems,
+                attr.property?.dict?.dictItems,
               ),
             )}
           </Column>,
@@ -149,11 +149,11 @@ const Thing: React.FC<IProps> = (props: IProps) => {
       } else {
         columns.push(
           getColumn(
-            record.property!.code,
+            record.id,
             record.name,
-            record.property!.valueType,
+            record.property?.valueType,
             record.belongId ? `Propertys.T${record.id}` : record.code,
-            record.property!.dict?.dictItems,
+            record.property?.dict?.dictItems,
           ),
         );
       }
