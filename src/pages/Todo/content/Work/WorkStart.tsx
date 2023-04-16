@@ -72,43 +72,45 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
     return arr;
   };
 
+  const startDo = async (data: XFlowDefine) => {
+    setCurrentDefine(data);
+    // 1、 选物
+    // 2、 通过流程，获取所有流程节点
+    // 3、 通过流程节点获取节点对应的表单
+    let defines = await species.loadFlowDefines(false);
+    let define = await defines.filter((item) => item.id == data.id)[0];
+    const resource = await define.queryNodes(false);
+    if (!resource.operations) {
+      message.error('流程未绑定表单');
+      return;
+    }
+    //设置起始节点绑定的表单
+    if (resource.operations && chooseThingModal.length == 0) {
+      setOperations(resource.operations);
+    }
+    let isCreate = data.isCreate;
+    if (!isCreate) {
+      const species_ = await thingCtrl.loadSpeciesTree();
+      if (data.sourceIds && data.sourceIds != '') {
+        let idArray = data.sourceIds?.split(',').filter((id) => id != '') || [];
+        let allNodes: ISpeciesItem[] = lookForAll([species_], []);
+        // getSpecies(species, idArray, []);
+        let speciess = allNodes.filter((item) => idArray.includes(item.id));
+        setChooseThingModal(speciess);
+      } else {
+        if (species_) {
+          setChooseThingModal([species_]);
+        }
+      }
+    }
+  };
+
   const getRenderOperations = (data: XFlowDefine) => {
     const menus: any[] = [];
     menus.push({
       key: 'retractApply',
       label: '发起',
-      onClick: async () => {
-        setCurrentDefine(data);
-        // 1、 选物
-        // 2、 通过流程，获取所有流程节点
-        // 3、 通过流程节点获取节点对应的表单
-        let defines = await species.loadFlowDefines(false);
-        let define = await defines.filter((item) => item.id == data.id)[0];
-        const resource = await define.queryNodes(false);
-        if (!resource.operations) {
-          message.error('流程未绑定表单');
-          return;
-        }
-        //设置起始节点绑定的表单
-        if (resource.operations && chooseThingModal.length == 0) {
-          setOperations(resource.operations);
-        }
-        let isCreate = data.isCreate;
-        if (!isCreate) {
-          const species_ = await thingCtrl.loadSpeciesTree();
-          if (data.sourceIds && data.sourceIds != '') {
-            let idArray = data.sourceIds?.split(',').filter((id) => id != '') || [];
-            let allNodes: ISpeciesItem[] = lookForAll([species_], []);
-            // getSpecies(species, idArray, []);
-            let speciess = allNodes.filter((item) => idArray.includes(item.id));
-            setChooseThingModal(speciess);
-          } else {
-            if (species_) {
-              setChooseThingModal([species_]);
-            }
-          }
-        }
-      },
+      onClick: async () => startDo(data),
     });
     return menus;
   };

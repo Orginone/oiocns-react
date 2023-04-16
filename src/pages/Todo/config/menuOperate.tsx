@@ -218,13 +218,6 @@ const buildSpeciesTree = async (
       icon: <im.ImNewspaper />,
       itemType: itemType,
       menuType: isWork ? 'checkbox' : undefined,
-      // menus: [
-      //   {
-      //     key: `设为常用`,
-      //     label: '设为常用',
-      //     icon: <im.ImHeart />,
-      //   },
-      // ],
       children: await buildSpeciesTree(item.children, itemType, isWork),
     });
   }

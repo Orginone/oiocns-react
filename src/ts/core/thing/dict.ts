@@ -39,7 +39,6 @@ export class Dict {
   async loadDictItem(id: string, page: PageRequest): Promise<XDictItemArray> {
     const res = await kernel.queryDictItems({
       id: id,
-      spaceId: this.belongId,
       page: page,
       spaceId: this.belongId,
     });
