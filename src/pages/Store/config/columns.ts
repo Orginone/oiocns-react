@@ -65,7 +65,7 @@ export const InnerApplicationColumns: ProColumns<XFlowDefine>[] = [
     ellipsis: true,
     dataIndex: ['speciesId'],
     render: (_, record) => {
-      return thingCtrl.speciesList.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      return thingCtrl.species.find((a) => a.id == record.speciesId)?.name ?? '未知';
     },
   },
   {

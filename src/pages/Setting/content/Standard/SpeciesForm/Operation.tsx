@@ -132,7 +132,7 @@ const Operation = ({
           return await loadOperations(page);
         }}
         operation={renderOperate}
-        columns={OperationColumns}
+        columns={OperationColumns(target?.species || [])}
         showChangeBtn={false}
         dataSource={[]}
       />

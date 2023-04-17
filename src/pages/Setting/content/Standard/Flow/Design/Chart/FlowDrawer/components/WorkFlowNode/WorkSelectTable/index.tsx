@@ -26,8 +26,8 @@ const WorkSelectTable: React.FC<indexType> = (props) => {
             },
           }}
           request={async (page) => {
-            let result = (await thingCtrl.loadFlowDefine()).data;
-            let data = result.result?.filter((a) => props.disableIds.indexOf(a.id) < 0);
+            let result = (await thingCtrl.define?.loadFlowDefine())?.result;
+            let data = result?.filter((a) => props.disableIds.indexOf(a.id) < 0);
             return {
               total: data?.length || 0,
               result: data,

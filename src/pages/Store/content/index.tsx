@@ -3,7 +3,7 @@ import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import FileSystem from './FileSystem';
 import ThingIndex from '@/pages/Store/content/Thing';
-import Application from './App';
+import Application from './App/innerApp';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';

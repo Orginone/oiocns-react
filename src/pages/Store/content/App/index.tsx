@@ -1,6 +1,5 @@
 import { Card, message, Modal, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
-import AppShowComp from '@/bizcomponents/AppTablePage';
 import cls from './index.module.less';
 import { Route, useHistory } from 'react-router-dom';
 import { GroupBtn } from '@/components/GroupBtn';
@@ -19,7 +18,6 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { IProduct, IResource } from '@/ts/core';
 import appCtrl from '@/ts/controller/store/appCtrl';
-import { ApplicationColumns } from '../../config/columns';
 import CreateAppByCustom from '@/pages/Store/content/App/CreateApp/createAppByCustom';
 import SelectAppTemplate from '@/pages/Store/content/App/CreateApp/selectAppTemplate';
 import AppInfoModal from '@/pages/Store/content/App/CreateApp/appInfoModal';
@@ -149,28 +147,29 @@ const StoreApp: React.FC = () => {
           title={<Typography.Title level={5}> 我的应用</Typography.Title>}
           className={cls['app-tabs']}
           extra={
-            <GroupBtn
-              list={[
-                {
-                  text: '购买',
-                  onClick: () => {
-                    history.push('/market/shop');
-                  },
-                },
-                {
-                  text: '创建',
-                  onClick: () => {
-                    history.push('/store/app/create');
-                  },
-                },
-                // {
-                //   text: '生成',
-                //   onClick: () => {
-                //     setChooseCreateWayOpen(true);
-                //   },
-                // },
-              ]}
-            />
+            []
+            // <GroupBtn
+            //   list={[
+            //     {
+            //       text: '购买',
+            //       onClick: () => {
+            //         history.push('/market/shop');
+            //       },
+            //     },
+            //     {
+            //       text: '创建',
+            //       onClick: () => {
+            //         history.push('/store/app/create');
+            //       },
+            //     },
+            // {
+            //   text: '生成',
+            //   onClick: () => {
+            //     setChooseCreateWayOpen(true);
+            //   },
+            // },
+            //   ]}
+            // />
           }
           tabList={[
             { tab: '全部', key: '全部' },
@@ -184,7 +183,7 @@ const StoreApp: React.FC = () => {
             setTabKey(k);
           }}>
           <div className={cls['page-content-table']}>
-            <InnerApp type={tabKey} />
+            <InnerApp />
             {/* <AppShowComp
               list={showData}
               searchParams={{ status: tabKey }}
@@ -239,55 +238,63 @@ const StoreApp: React.FC = () => {
       {AppIndex}
       <CreateAppByCustom
         open={createWay == 'createAppByCustom'}
-        setCreateWay={setCreateWay}></CreateAppByCustom>
-      <AppInfoModal
-        title="应用信息"
-        open={createWay == 'createBlankApp'}
-        // setCreateWay={setCreateWay}
-        handleOk={(values) => {
-          history.push({ pathname: '/appmanager', state: { appInfo: values } });
-          setCreateWay(undefined);
-        }}
-        handleCancel={() => {
-          setCreateWay(undefined);
-        }}></AppInfoModal>
-      <SelectAppTemplate
-        open={createWay == 'createAppByTemplate'}
-        setCreateWay={setCreateWay}></SelectAppTemplate>
-      <Modal
-        title={`应用${shareType}`}
-        width={800}
-        destroyOnClose={true}
-        open={showShareModal}
-        okText="确定"
-        onOk={handleSubmitShare}
-        onCancel={() => {
-          setShowShareModal(false);
-        }}>
-        <ShareComp
-          shareType={shareType}
-          onCheckeds={(teamId, type, createList, delList, resourceId) => {
-            setCheckNodes({ teamId, type, createList, delList, resourceId });
-          }}
-        />
-      </Modal>
-      <ChooseCreateWay
-        open={chooseCreateWayOpen}
-        setOpen={setChooseCreateWayOpen}
-        jump={(url: string) => history.push(url)}
-        setCreateWay={setCreateWay}></ChooseCreateWay>
-      {/* 创建应用页面*/}
-      <Route exact path="/store/app/createBlankApp" component={CreateBlankApp}></Route>
-      {/* 详情页面 /store/app/info*/}
-      <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
-      <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
-      <Route exact path="/store/app/create" component={CreatApp}></Route>
-      <Route exact path="/store/app/publish" component={PublishComp}></Route>
-      <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
-      {/* <TreeComp onClassifySelect={handleSelectClassify} /> */}
-      <MoveApp visible={moveModal} setVisible={setMoveModal} />
+        setCreateWay={setCreateWay}
+      />
     </>
   );
+  // <>
+  //   {AppIndex}
+  //   <CreateAppByCustom
+  //     open={createWay == 'createAppByCustom'}
+  //     setCreateWay={setCreateWay}></CreateAppByCustom>
+  //   <AppInfoModal
+  //     title="应用信息"
+  //     open={createWay == 'createBlankApp'}
+  //     // setCreateWay={setCreateWay}
+  //     handleOk={(values) => {
+  //       history.push({ pathname: '/appmanager', state: { appInfo: values } });
+  //       setCreateWay(undefined);
+  //     }}
+  //     handleCancel={() => {
+  //       setCreateWay(undefined);
+  //     }}></AppInfoModal>
+  //   <SelectAppTemplate
+  //     open={createWay == 'createAppByTemplate'}
+  //     setCreateWay={setCreateWay}></SelectAppTemplate>
+  //   <Modal
+  //     title={`应用${shareType}`}
+  //     width={800}
+  //     destroyOnClose={true}
+  //     open={showShareModal}
+  //     okText="确定"
+  //     onOk={handleSubmitShare}
+  //     onCancel={() => {
+  //       setShowShareModal(false);
+  //     }}>
+  //     <ShareComp
+  //       shareType={shareType}
+  //       onCheckeds={(teamId, type, createList, delList, resourceId) => {
+  //         setCheckNodes({ teamId, type, createList, delList, resourceId });
+  //       }}
+  //     />
+  //   </Modal>
+  //   <ChooseCreateWay
+  //     open={chooseCreateWayOpen}
+  //     setOpen={setChooseCreateWayOpen}
+  //     jump={(url: string) => history.push(url)}
+  //     setCreateWay={setCreateWay}></ChooseCreateWay>
+  //   {/* 创建应用页面*/}
+  //   <Route exact path="/store/app/createBlankApp" component={CreateBlankApp}></Route>
+  //   {/* 详情页面 /store/app/info*/}
+  //   <Route exact path="/store/app/info" render={() => <AppInfo />}></Route>
+  //   <Route exact path="/store/app/manage" render={() => <Manage />}></Route>
+  //   <Route exact path="/store/app/create" component={CreatApp}></Route>
+  //   <Route exact path="/store/app/publish" component={PublishComp}></Route>
+  //   <Route exact path="/store/app/putaway" render={() => <PutawayComp />}></Route>
+  //   {/* <TreeComp onClassifySelect={handleSelectClassify} /> */}
+  //   <MoveApp visible={moveModal} setVisible={setMoveModal} />
+  // </>
+  // );
 };
 
 export default React.memo(StoreApp);

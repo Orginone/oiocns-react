@@ -1,8 +1,23 @@
 import { schema } from '@/ts/base';
-import { IProduct } from '@/ts/core';
+import { IProduct, ISpeciesItem } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
+
+const getSpeciesName = (
+  id: string,
+  species: ISpeciesItem[],
+): ISpeciesItem | undefined => {
+  for (const item of species) {
+    if (id === item.id) {
+      return item;
+    }
+    const find = getSpeciesName(id, item.children);
+    if (find != undefined) {
+      return find;
+    }
+  }
+  return undefined;
+};
 
 export const PersonColumns: ProColumns<schema.XTarget>[] = [
   {
@@ -249,7 +264,9 @@ export const PropertyColumns: ProColumns<any>[] = [
   },
 ];
 
-export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
+export const AttributeColumns = (
+  species: ISpeciesItem[],
+): ProColumns<schema.XAttribute>[] => [
   {
     title: '序号',
     valueType: 'index',
@@ -273,7 +290,11 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      return thingCtrl.speciesList.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      const find = getSpeciesName(record.speciesId, species);
+      if (find != undefined) {
+        return find.name;
+      }
+      return '未知';
     },
   },
   {
@@ -301,7 +322,9 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'remark',
   },
 ];
-export const OperationColumns: ProColumns<schema.XOperation>[] = [
+export const OperationColumns = (
+  species: ISpeciesItem[],
+): ProColumns<schema.XOperation>[] => [
   {
     title: '序号',
     valueType: 'index',
@@ -325,7 +348,11 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      return thingCtrl.speciesList.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      const find = getSpeciesName(record.speciesId, species);
+      if (find != undefined) {
+        return find.name;
+      }
+      return '未知';
     },
   },
   {
@@ -394,6 +421,38 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   },
 ];
 
+export const DictColumns: ProColumns<schema.XDict>[] = [
+  {
+    title: '序号',
+    valueType: 'index',
+    width: 50,
+  },
+  {
+    title: '名称',
+    dataIndex: 'name',
+    key: 'name',
+    width: 200,
+  },
+  {
+    title: '编号',
+    dataIndex: 'code',
+    key: 'code',
+    width: 200,
+  },
+  {
+    title: '备注',
+    dataIndex: 'remark',
+    key: 'remark',
+    width: 200,
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
+    width: 150,
+  },
+];
+
 export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
   {
     title: '序号',
@@ -412,18 +471,6 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     key: 'value',
     width: 150,
   },
-  // {
-  //   title: '共享组织',
-  //   dataIndex: 'rule',
-  //   key: 'rule',
-  //   width: 180,
-  //   render: (_, record) => {
-  //     const team = userCtrl.findTeamInfoById(record.belongId);
-  //     if (team) {
-  //       return team.name;
-  //     }
-  //   },
-  // },
   {
     title: '创建时间',
     dataIndex: 'createTime',

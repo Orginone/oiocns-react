@@ -41,22 +41,39 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       itemType: parseGroupMenuType(item.typeName),
       menus: await loadTypeMenus(item),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
-      children: await buildTargetTree(item.subTeam),
+      children: [
+        ...(await buildTargetSpeciesTree(item)),
+        ...(await buildTargetTree(item.subTeam)),
+      ],
     });
   }
   return result;
 };
 
+const buildTargetSpeciesTree = async (target: ITarget) => {
+  const species = await target.loadSpeciesTree();
+  return [
+    {
+      children: species.map((i) => buildSpeciesTree(target.id, i)),
+      key: target.id + '-分类标准',
+      label: '分类标准',
+      itemType: '分类标准',
+      item: undefined,
+      icon: <im.ImNewspaper />,
+    },
+  ];
+};
+
 /** 编译分类树 */
-export const buildSpeciesTree = (species: ISpeciesItem) => {
+export const buildSpeciesTree = (prefix: string, species: ISpeciesItem) => {
   const result: MenuItemType = {
-    key: species.id,
+    key: prefix + species.id,
     item: species,
     label: species.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Species,
     menus: loadSpeciesMenus(species),
-    children: species.children?.map((i) => buildSpeciesTree(i)) ?? [],
+    children: species.children?.map((i) => buildSpeciesTree(prefix, i)) ?? [],
   };
   return result;
 };
@@ -114,7 +131,7 @@ export const getSpaceMenu = async () => {
     itemType: itemType,
     menus: await loadTypeMenus(userCtrl.space),
     icon: <TeamIcon share={userCtrl.space.shareInfo} size={18} fontSize={16} />,
-    children: [],
+    children: await buildTargetSpeciesTree(userCtrl.space),
   };
 };
 
@@ -212,17 +229,6 @@ export const loadStandardSetting = async () => {
       },
     ],
   });
-  const species = await thingCtrl.loadSpeciesTree(true);
-  if (species) {
-    result.push({
-      children: [buildSpeciesTree(species)],
-      key: '分类标准',
-      label: '分类标准',
-      itemType: '分类标准',
-      item: undefined,
-      icon: <im.ImNewspaper />,
-    });
-  }
   return result;
 };
 

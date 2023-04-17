@@ -6,7 +6,7 @@ import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
 import userCtrl from '@/ts/controller/setting';
 import { ITarget } from '@/ts/core';
-import { XFlowDefine, XTarget } from '@/ts/base/schema';
+import { XFlowDefine } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
 import { INullSpeciesItem, ISpeciesItem, loadSpeciesTree } from '@/ts/core/thing';
@@ -75,8 +75,8 @@ const FlowSelect = (props: Iprops) => {
     loadTeamTree();
   }, [props.orgId]);
 
-  const loadThingSpecies = async (root: INullSpeciesItem) => {
-    for (const item of root!.children) {
+  const loadThingSpecies = async (root: ISpeciesItem[]) => {
+    for (const item of root) {
       if (item.target.code === 'matters') {
         let res = await buildSpeciesTree(item.children);
         return res;
@@ -117,7 +117,7 @@ const FlowSelect = (props: Iprops) => {
         setResultData(resultData);
         setCurrent(newItem);
       }
-      let data = await item.loadFlowDefines();
+      let data = await item.loadFlowDefine();
       const result = data.map((i) => {
         return {
           title: i.name,
@@ -150,8 +150,9 @@ const FlowSelect = (props: Iprops) => {
       // }
       await item.loadSubTeam();
       loadTeamTree();
-      let speciesTree = await loadSpeciesTree(item.id);
-      let thingSpeciesTree = await loadThingSpecies(speciesTree);
+      let thingSpeciesTree = await loadThingSpecies(
+        await loadSpeciesTree(item.id, item.target.belongId),
+      );
       const result = thingSpeciesTree.map((i) => {
         return {
           title: i.item.name,

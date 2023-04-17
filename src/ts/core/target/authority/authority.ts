@@ -86,7 +86,6 @@ export default class Authority implements IAuthority {
   public async createSubAuthority(
     name: string,
     code: string,
-    belongId: string,
     ispublic: boolean,
     remark: string,
   ): Promise<model.ResultType<schema.XAuthority>> {
@@ -100,7 +99,7 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: belongId || this._belongId,
+      belongId: this._belongId,
     });
     if (res.success && res.data != undefined) {
       this.children.push(new Authority(res.data, this._belongId));

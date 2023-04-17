@@ -1,25 +1,26 @@
 import { kernel } from '../../base';
-import { INullSpeciesItem } from './ispecies';
+import { ISpeciesItem } from './ispecies';
 import { SpeciesItem } from './species';
 
 /**
  * 加载分类树
  * @param id 组织id
  */
-export const loadSpeciesTree = async (id: string) => {
-  let item: INullSpeciesItem;
+export const loadSpeciesTree = async (
+  id: string,
+  spaceId: string,
+  upTeam: boolean = false,
+) => {
+  const result: ISpeciesItem[] = [];
   const res = await kernel.querySpeciesTree({
     id: id,
-    page: {
-      offset: 0,
-      limit: 0,
-      filter: '',
-    },
+    upTeam: upTeam,
   });
-  if (res.success) {
-    item = new SpeciesItem(res.data, undefined, id);
+  if (res.success && res.data && res.data.result && res.data.result.length > 0) {
+    for (const item of res.data.result) {
+      result.push(new SpeciesItem(item, undefined, spaceId));
+    }
   }
-  return item;
+  return result;
 };
-export type { IFlowDefine } from './iflowDefine';
 export type { INullSpeciesItem, ISpeciesItem } from './ispecies';

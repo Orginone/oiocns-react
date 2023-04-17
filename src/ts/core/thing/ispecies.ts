@@ -1,7 +1,6 @@
 import { model, schema } from '@/ts/base';
 import {
   AttributeModel,
-  CreateDefineReq,
   OperationModel,
   PageRequest,
   SpeciesModel,
@@ -9,13 +8,12 @@ import {
 } from '../../base/model';
 import {
   XAttributeArray,
-  XFlowDefine,
   XOperationArray,
   XSpecies,
   XAttribute,
   XFlowInstance,
+  XFlowDefine,
 } from '../../base/schema';
-import { IFlowDefine } from './iflowDefine';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -40,8 +38,6 @@ export interface ISpeciesItem {
   belongInfo: TargetShare;
   /** 属性 */
   attrs?: XAttribute[];
-  /** 流程设计 */
-  defines?: IFlowDefine[];
   /** 流程实例 */
   instances?: XFlowInstance[];
   /** 加载信息 */
@@ -63,10 +59,6 @@ export interface ISpeciesItem {
     recursionSpecies: boolean,
     page: PageRequest,
   ): Promise<XOperationArray>;
-  /** 加载流程设计 */
-  loadFlowDefines(reload?: boolean): Promise<IFlowDefine[]>;
-  /**查询流程实例 */
-  loadFlowInstances(status: number[], page: PageRequest): Promise<XFlowInstance[]>;
   /**
    * 创建标准分类项
    * @param data 创建参数
@@ -95,22 +87,6 @@ export interface ISpeciesItem {
    */
   deleteAttr(id: string): Promise<boolean>;
   /**
-   * 创建流程设计
-   * @param data 创建参数
-   */
-  createFlowDefine(data: Omit<CreateDefineReq, 'id' | 'speciesId'>): Promise<XFlowDefine>;
-  /**
-   * 更新流程设计
-   * @param data 创建参数
-   */
-  updateFlowDefine(data: CreateDefineReq): Promise<boolean>;
-  /**
-   * 删除流程设计
-   * @param id 流程设计id
-   */
-  deleteFlowDefine(id: string): Promise<boolean>;
-
-  /**
    * 创建业务标准
    * @param data 创建参数
    */
@@ -133,4 +109,6 @@ export interface ISpeciesItem {
    * 删除标准分类项
    */
   delete(): Promise<boolean>;
+  /* 加载办事 */
+  loadFlowDefine(): Promise<XFlowDefine[]>;
 }

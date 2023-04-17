@@ -45,7 +45,6 @@ export class FileSystemItem implements IFileSystemItem {
     if (this.name != name && !(await this._findByName(name))) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
         name: name,
-        shareDomain: 'user',
         key: this._formatKey(),
         operate: BucketOpreates.Rename,
       });
@@ -62,7 +61,6 @@ export class FileSystemItem implements IFileSystemItem {
     const exist = await this._findByName(name);
     if (!exist) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel>({
-        shareDomain: 'user',
         key: this._formatKey(name),
         operate: BucketOpreates.Create,
       });
@@ -77,7 +75,6 @@ export class FileSystemItem implements IFileSystemItem {
   }
   async delete(): Promise<boolean> {
     const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
-      shareDomain: 'user',
       key: this._formatKey(),
       operate: BucketOpreates.Delete,
     });
@@ -95,7 +92,6 @@ export class FileSystemItem implements IFileSystemItem {
   async copy(destination: IFileSystemItem): Promise<boolean> {
     if (destination.target.isDirectory && this.key != destination.key) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
-        shareDomain: 'user',
         key: this._formatKey(),
         destination: destination.key,
         operate: BucketOpreates.Copy,
@@ -111,7 +107,6 @@ export class FileSystemItem implements IFileSystemItem {
   async move(destination: IFileSystemItem): Promise<boolean> {
     if (destination.target.isDirectory && this.key != destination.key) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
-        shareDomain: 'user',
         key: this._formatKey(),
         destination: destination.key,
         operate: BucketOpreates.Move,
@@ -133,7 +128,6 @@ export class FileSystemItem implements IFileSystemItem {
   async loadChildren(reload: boolean = false): Promise<boolean> {
     if (this.target.isDirectory && (reload || this.children.length < 1)) {
       const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
-        shareDomain: 'user',
         key: this._formatKey(),
         operate: BucketOpreates.List,
       });
@@ -159,7 +153,6 @@ export class FileSystemItem implements IFileSystemItem {
       };
       FileSystemItem._taskList.push(task);
       let data: BucketOpreateModel = {
-        shareDomain: 'user',
         key: this._formatKey(name),
         operate: BucketOpreates.Upload,
       };

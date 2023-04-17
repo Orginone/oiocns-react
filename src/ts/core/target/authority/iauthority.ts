@@ -30,7 +30,6 @@ export interface IAuthority {
   createSubAuthority(
     name: string,
     code: string,
-    belongId: string,
     ispublic: boolean,
     remark: string,
   ): Promise<model.ResultType<schema.XAuthority>>;

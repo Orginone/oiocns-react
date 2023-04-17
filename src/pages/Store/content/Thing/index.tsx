@@ -22,7 +22,7 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
     case 0:
       return (
         <Thing
-          current={species}
+          species={[species]}
           checkedList={checkedList || []}
           selectable={selectable}
           setTabKey={setTabKey}

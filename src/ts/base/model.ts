@@ -148,10 +148,10 @@ export type IdArraySpaceReq = {
 };
 
 export type QueryDefineReq = {
-  // 分类ID
-  speciesId?: string;
   // 空间ID
   spaceId: string;
+  // 分类ID
+  speciesId: string;
 };
 
 export type SpaceAuthReq = {
@@ -174,7 +174,12 @@ export type RelationReq = {
   // 子组织/个人ID
   subIds: string[];
 };
-
+export type GetSpeciesModel = {
+  // 唯一ID
+  id: string;
+  // 继承组织
+  upTeam: boolean;
+};
 export type ThingAttrReq = {
   // 唯一ID
   id?: string;
@@ -923,8 +928,6 @@ export type CreateDefineReq = {
   resource?: SchemaFlowNode;
   // 归属Id
   belongId: string;
-  // 流程字段json
-  fields?: string;
   //分类id
   speciesId?: string;
   // 权限ID
@@ -1100,8 +1103,6 @@ export type BucketOpreateModel = {
   key: string;
   /** 名称 */
   name?: string;
-  /** 共享域 */
-  shareDomain: string;
   /** 目标 */
   destination?: string;
   /** 操作 */
