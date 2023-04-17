@@ -57,7 +57,13 @@ const Home: React.FC = () => {
           const findObj = AllItem.find((v) => key == v.id);
           setSelectItem(findObj);
         }}
-        tabProps={{ style: { background: 'transparent' } }}
+        // tabProps={{
+        //   style: {
+        //     // background: 'transparent',
+        //     display: 'flex',
+        //     justifyContent: 'center',
+        //   },
+        // }}
         tabList={AllItem.map((v) => {
           return { tab: v.title, key: v.id };
         })}>
