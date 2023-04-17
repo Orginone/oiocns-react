@@ -1,59 +1,52 @@
-// import iconOne from '@/assets/budongchan/iconOne.png';
-// import iconTwo from '@/assets/budongchan/iconTwo.png';
-// import iconThree from '@/assets/budongchan/iconThree.png';
-// import iconFour from '@/assets/budongchan/iconFour.png';
-// import iconFive from '@/assets/budongchan/iconFive.png';
-// import iconSix from '@/assets/budongchan/iconSix.png';
-
 export const seriesData = [
   {
     type: 'line',
     data: [120, 132, 101, 134, 90, 230, 210],
-    name: '用电量',
+    name: '资产消耗均值',
     stack: 'Total',
   },
   {
     type: 'line',
     data: [220, 232, 201, 234, 20, 330, 310],
-    name: '用水量',
+    name: '资产核销量',
     stack: 'Total',
   },
 ];
 export const FooterTitle = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
 
 export const demo = {
-  title: '企业情况',
+  title: '资产情况',
   bcakImg: '',
   backgroundColor: '',
   list: [
-    { title: '企业数量', value: '100个' },
-    { title: '入驻企业员工总数', value: '100个' },
-    { title: '企业总产值', value: '100个' },
-    { title: '企业总税收', value: '100个' },
-    { title: '高级人才数', value: '100个' },
-    // { title: '企业专利总数', value: '100个' },
+    { title: '资产数量', value: '100个' },
+    { title: '资产种类总数', value: '100个' },
+    { title: '资产总产值', value: '100个' },
+    { title: '资产总税收', value: '100个' },
+    { title: '一级资产数', value: '100个' },
+    // { title: '资产专利总数', value: '100个' },
   ],
 };
 export const demo2 = {
-  title: '企业情况2',
+  title: '资产情况2',
   type: 'sub',
   list: [
     {
-      subtitle: '测试信息',
+      subtitle: '资产处置',
       icon: '',
       list: [
-        { title: '企业数量2', value: '100个' },
-        { title: '入驻企业员工总数2', value: '100个' },
-        { title: '企业总产值2', value: '100个' },
+        { title: '资产数量2', value: '100个' },
+        { title: '资产种类总数2', value: '300个' },
+        { title: '资产总产值2', value: '100万' },
       ],
     },
     {
-      subtitle: '测试信息2',
+      subtitle: '资产变更',
       icon: '',
       list: [
-        { title: '企业数量2', value: '100个' },
-        { title: '入驻企业员工总数2', value: '100个' },
-        { title: '企业总产值2', value: '100个' },
+        { title: '资产数量2', value: '100个' },
+        { title: '资产种类总数2', value: '50个' },
+        { title: '资产总产值2', value: '100万' },
       ],
     },
   ],
@@ -171,9 +164,9 @@ export const questionsList = [
     title: '国务院办公厅《关于暂停各类开发区的紧急通知》',
     time: '2023年3月1日',
   },
-  { id: '2', title: '显示企业法人已注册', time: '2023年3月1日' },
-  { id: '3', title: '显示企业法人已注册', time: '2023年3月1日' },
-  { id: '4', title: '显示企业法人已注册', time: '2023年3月1日' },
+  { id: '2', title: '优化营商环境专题', time: '2023年3月1日' },
+  { id: '3', title: '稳经济 一揽子政策措施和接续政策', time: '2023年3月1日' },
+  { id: '4', title: '杭州市“十四五”系列规划', time: '2023年3月1日' },
 ];
 
 /**
@@ -209,9 +202,21 @@ export const complaintList = [
     title: '《国家发展改革委、财政部关于推进园区循环化改造的意见》',
     time: '2023年3月1日',
   },
-  { id: '2', title: '电动车充电位置不足', time: '2023年3月1日' },
-  { id: '3', title: '电动车充电位置不足', time: '2023年3月1日' },
-  { id: '4', title: '电动车充电位置不足', time: '2023年3月1日' },
+  {
+    id: '2',
+    title: '在推进中国式现代化建设中走在前列”——习近平总书记考察广东纪实',
+    time: '2023年3月1日',
+  },
+  {
+    id: '3',
+    title: '中共杭州市委关于认真学习宣传贯彻党的二十大精神的通知',
+    time: '2023年3月1日',
+  },
+  {
+    id: '4',
+    title: '中共杭州市委 杭州市人民政府关于促进中医药传承创新发展的实施意见',
+    time: '2023年3月1日',
+  },
 ];
 
 /**
@@ -229,18 +234,18 @@ export const announcementList = [
     title: '国土资源部《进一步治理整顿土地市场秩序工作方案》通知',
     time: '2023年3月1日',
   },
-  { id: '3', title: '园区A幢将于5月1日闭园检修', time: '2023年3月1日' },
-  { id: '4', title: '园区A幢将于5月1日闭园检修', time: '2023年3月1日' },
+  { id: '3', title: '关于杭州市人才评定意见(暂行）', time: '2023年3月1日' },
+  { id: '4', title: '杭州“定制化”回访 教育激励担当作为', time: '2023年3月1日' },
 ];
 
 export const todoList = [
   {
     id: '1',
-    title: '待办事项1',
-    time: '2023年3月1日',
+    title: '好友申请：千与千寻 请求 成为您的好友',
+    time: '2023年3月19日',
   },
-  { id: '2', title: '待办事项2', time: '2023年3月1日' },
-  { id: '3', title: '待办事项3', time: '2023年3月1日' },
+  { id: '2', title: '资产处置：单位审批 处置损坏资产请求', time: '2023年3月13日' },
+  { id: '3', title: '组织审批：Tom 请求加入 组织 资产协同中心', time: '2023年3月2日' },
 ];
 
 // 无限滚动配置项

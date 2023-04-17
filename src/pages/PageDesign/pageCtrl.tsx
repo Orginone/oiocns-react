@@ -16,7 +16,6 @@ class HomeSettingServices extends Emitter {
     this.getCustomComp();
     this.getHomeSetting();
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
-      console.log('空间切换', ' this.getCustomComp');
       setTimeout(() => {
         this.getCustomComp();
         this.getHomeSetting();
@@ -140,7 +139,6 @@ class HomeSettingServices extends Emitter {
   // 移除 展示数据
   public RemoveCompItem = (item: CompTypeItem) => {
     this._PageData = this._PageData.filter((v) => v.i !== item.i);
-    console.log('移除item', item, this._PageData);
     this.changCallbackPart('PageData');
     this.changCallback();
   };
@@ -180,7 +178,7 @@ class HomeSettingServices extends Emitter {
       this.PageStyleData = { ...this.PageStyleData, ...compData };
     }
 
-    console.log('更新 展示数据UpdateCompItem', changeData, compData);
+    // console.log('更新 展示数据UpdateCompItem', changeData, compData);
     this.changCallbackPart('PageData');
     this.changCallback();
   }, 50);
@@ -315,6 +313,16 @@ class HomeSettingServices extends Emitter {
         return { ...v, sort: idx };
       }),
     );
+    // kernel.anystore.remove(DomainTypes.All, SCHEME, {
+    //   id: { _in_: arr.map((v) => v.id) },
+    // });
+    // kernel.anystore.insert(
+    //   DomainTypes.All,
+    //   SCHEME,
+    //   arr.map((v, idx) => {
+    //     return { ...v, sort: idx };
+    //   }),
+    // );
     this.setPageData = arr;
     this._homeSetting = arr;
     this.getHomeSetting();
@@ -386,6 +394,7 @@ class HomeSettingServices extends Emitter {
         });
     }
   }
+
   /**
    * @desc: 获取门户配置信息
    */
@@ -407,18 +416,8 @@ class HomeSettingServices extends Emitter {
       )
       .then((res) => {
         if (res.success) {
-          console.log(
-            '7777',
-            res,
-            isDominAll
-              ? DomainTypes.All
-              : setting.isCompanySpace
-              ? DomainTypes.Company
-              : DomainTypes.User,
-          );
-
-          if (res.data.length === 0) {
-            // this.getHomeSetting(true);
+          if (res.data.length === 0 && !isDominAll) {
+            this.getHomeSetting(true);
           } else {
             this._homeSetting = res.data;
           }

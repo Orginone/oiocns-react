@@ -17,37 +17,37 @@ interface indexType {
 }
 
 const demo = {
-  title: '企业情况',
+  title: '单位资产情况',
   bcakImg: '',
   backgroundColor: '',
   list: [
-    { title: '企业数量', value: '101个' },
-    { title: '入驻企业员工总数', value: '10050个' },
-    { title: '企业总产值', value: '10001亿' },
-    { title: '企业总税收', value: '5000万' },
-    { title: '高级人才数', value: '80个' },
+    { title: '可用资产数量', value: '101个' },
+    { title: '组织资产总数', value: '10050个' },
+    { title: '资产总产值', value: '10001亿' },
+    { title: '资产折旧总值', value: '5000万' },
+    { title: '当月核销数量', value: '80个' },
     // { title: '企业专利总数', value: '100个' },
   ],
 };
 const demo2 = {
-  title: '园区概况',
+  title: '资产使用概况',
   list: [
     {
-      subtitle: '博览中心',
+      subtitle: '单位使用信息',
       icon: '',
       list: [
-        { title: '园区数量', value: '100个' },
-        { title: '入驻园区员工总数2', value: '777个' },
-        { title: '园区总产值2', value: '999个' },
+        { title: '未使用数量', value: '100个' },
+        { title: '在用数量', value: '777个' },
+        { title: '采购申请数量', value: '999个' },
       ],
     },
     {
-      subtitle: '数据可视化',
+      subtitle: '核销处置',
       icon: '',
       list: [
-        { title: '展示数量', value: '66个' },
-        { title: '展示员工总数', value: '88个' },
-        { title: '展示总产值', value: '10000个' },
+        { title: '待处理数量', value: '66个' },
+        { title: '已处理', value: '88个' },
+        { title: '待处理总值', value: '10000万' },
       ],
     },
   ],

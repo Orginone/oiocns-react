@@ -162,11 +162,11 @@ const renderComp = (item: CompTypeItem, ref?: any) => {
     case '饼图':
       return (
         <StatisticCard
-          title="流量占用情况"
+          title="资产业务情况"
           chart={
             <img
               src="https://gw.alipayobjects.com/zos/alicdn/qoYmFMxWY/jieping2021-03-29%252520xiawu4.32.34.png"
-              alt="大盘"
+              alt="数据"
               width="100%"
             />
           }
