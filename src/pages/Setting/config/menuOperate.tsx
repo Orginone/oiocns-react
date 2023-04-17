@@ -1,7 +1,7 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting';
 import thingCtrl from '@/ts/controller/thing';
-import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
+import { ISpace, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { IsSuperAdmin } from '@/utils/authority';
 import React from 'react';
@@ -14,6 +14,7 @@ import { XDict } from '@/ts/base/schema';
 interface groupMenuParams {
   item: ITarget;
   key: string;
+  label: string;
   typeName: string;
   subTeam: ITarget[];
 }
@@ -42,7 +43,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       menus: await loadTypeMenus(item),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [
-        ...(await buildTargetSpeciesTree(item)),
+        await buildTargetSpeciesTree(item),
         ...(await buildTargetTree(item.subTeam)),
       ],
     });
@@ -52,16 +53,14 @@ export const buildTargetTree = async (targets: ITarget[]) => {
 
 const buildTargetSpeciesTree = async (target: ITarget) => {
   const species = await target.loadSpeciesTree();
-  return [
-    {
-      children: species.map((i) => buildSpeciesTree(target.id, i)),
-      key: target.id + '-分类标准',
-      label: '分类标准',
-      itemType: '分类标准',
-      item: undefined,
-      icon: <im.ImNewspaper />,
-    },
-  ];
+  return {
+    children: species.map((i) => buildSpeciesTree(target.id, i)),
+    key: target.id + '-分类标准',
+    label: '分类标准',
+    itemType: '分类标准',
+    item: undefined,
+    icon: <im.ImNewspaper />,
+  };
 };
 
 /** 编译分类树 */
@@ -117,21 +116,22 @@ export const buildDictMenus = (dict: XDict) => {
   return result;
 };
 /** 获取空间菜单 */
-export const getSpaceMenu = async () => {
-  let label = '个人信息';
+export const getSpaceMenu = async (user: ISpace, children: any[]) => {
+  let label = '我的';
   let itemType = GroupMenuType.User;
-  if (userCtrl.isCompanySpace) {
-    label = userCtrl.company.teamName;
+  if (user.typeName != TargetType.Person) {
+    label = user.teamName;
     itemType = GroupMenuType.Company;
   }
+  children.unshift(await buildTargetSpeciesTree(user));
   return {
-    key: userCtrl.space.key,
-    item: userCtrl.space,
+    key: user.key,
+    item: user,
     label: label,
     itemType: itemType,
-    menus: await loadTypeMenus(userCtrl.space),
-    icon: <TeamIcon share={userCtrl.space.shareInfo} size={18} fontSize={16} />,
-    children: await buildTargetSpeciesTree(userCtrl.space),
+    menus: await loadTypeMenus(user),
+    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
+    children: children,
   };
 };
 
@@ -155,7 +155,7 @@ export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]
   }
   return {
     key: param.key,
-    label: param.key,
+    label: param.label,
     itemType: param.key,
     icon: (
       <TeamIcon

@@ -27,57 +27,64 @@ const useMenuUpdate = (): [
   /** 刷新菜单 */
   const refreshMenu = async () => {
     const children: MenuItemType[] = [];
-    children.push(await operate.getSpaceMenu());
-    if (userCtrl.isCompanySpace) {
-      children.push(
+    children.push(
+      await operate.getSpaceMenu(userCtrl.user, [
         await operate.loadGroupMenus(
           {
-            key: GroupMenuType.InnerAgency,
-            item: userCtrl.company,
-            typeName: TargetType.Department,
-            subTeam: await userCtrl.company.loadSubTeam(),
-          },
-          userCtrl.company.subTeamTypes,
-        ),
-        await operate.loadGroupMenus(
-          {
-            key: GroupMenuType.OutAgency,
-            item: userCtrl.company,
-            typeName: TargetType.Group,
-            subTeam: await userCtrl.company.getJoinedGroups(),
-          },
-          [TargetType.Group],
-        ),
-        await operate.loadGroupMenus(
-          {
-            key: GroupMenuType.StationSetting,
-            item: userCtrl.company,
-            typeName: TargetType.Station,
-            subTeam: await userCtrl.company.getStations(),
-          },
-          [TargetType.Station],
-        ),
-        await operate.loadGroupMenus(
-          {
-            key: GroupMenuType.CompanyCohort,
-            item: userCtrl.company,
-            typeName: TargetType.Cohort,
-            subTeam: await userCtrl.company.getCohorts(),
-          },
-          [TargetType.Cohort],
-        ),
-      );
-    } else {
-      children.push(
-        await operate.loadGroupMenus(
-          {
-            key: GroupMenuType.UserCohort,
+            key: userCtrl.user.id + GroupMenuType.UserCohort,
+            label: GroupMenuType.UserCohort,
             item: userCtrl.user,
             typeName: TargetType.Cohort,
             subTeam: await userCtrl.user.getCohorts(),
           },
           [TargetType.Cohort],
         ),
+      ]),
+    );
+    for (const company of await userCtrl.user.getJoinedCompanys()) {
+      children.push(
+        await operate.getSpaceMenu(company, [
+          await operate.loadGroupMenus(
+            {
+              key: company.key + GroupMenuType.InnerAgency,
+              label: GroupMenuType.InnerAgency,
+              item: company,
+              typeName: TargetType.Department,
+              subTeam: await company.loadSubTeam(),
+            },
+            company.subTeamTypes,
+          ),
+          await operate.loadGroupMenus(
+            {
+              key: company.key + GroupMenuType.OutAgency,
+              label: GroupMenuType.OutAgency,
+              item: company,
+              typeName: TargetType.Group,
+              subTeam: await company.getJoinedGroups(),
+            },
+            [TargetType.Group],
+          ),
+          await operate.loadGroupMenus(
+            {
+              key: company.key + GroupMenuType.StationSetting,
+              label: GroupMenuType.StationSetting,
+              item: company,
+              typeName: TargetType.Station,
+              subTeam: await company.getStations(),
+            },
+            [TargetType.Station],
+          ),
+          await operate.loadGroupMenus(
+            {
+              key: company.key + GroupMenuType.CompanyCohort,
+              label: GroupMenuType.CompanyCohort,
+              item: company,
+              typeName: TargetType.Cohort,
+              subTeam: await company.getCohorts(),
+            },
+            [TargetType.Cohort],
+          ),
+        ]),
       );
     }
     const newMenus = [

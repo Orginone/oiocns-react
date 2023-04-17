@@ -32,7 +32,11 @@ const CustomMenu = (props: CustomMenuType) => {
     if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
       setOperateMenu(undefined);
       const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
-      setData(loadMenus(loopFilterTree(props.item.children), expKeys));
+      if (props.selectMenu.label != '') {
+        setData(loadMenus(loopFilterTree([props.selectMenu]), expKeys));
+      } else {
+        setData(loadMenus(loopFilterTree(props.item.children), expKeys));
+      }
       setOpenKeys(expKeys);
       setSelectedKeys([props.selectMenu.key]);
     }

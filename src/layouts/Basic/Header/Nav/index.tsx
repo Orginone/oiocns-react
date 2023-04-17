@@ -38,7 +38,15 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     {
       key: 'store',
       path: '/store',
-      title: '管理',
+      title: '仓库',
+      icon: 'icon-store',
+      count: 0,
+      fath: '/store',
+    },
+    {
+      key: 'setting',
+      path: '/setting',
+      title: '商店',
       icon: 'icon-store',
       count: 0,
       fath: '/store',
