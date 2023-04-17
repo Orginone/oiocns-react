@@ -2,7 +2,6 @@ import { model, schema } from '@/ts/base';
 import {
   AttributeModel,
   CreateDefineReq,
-  DictModel,
   OperationModel,
   PageRequest,
   SpeciesModel,
@@ -16,7 +15,6 @@ import {
   XAttribute,
   XFlowInstance,
 } from '../../base/schema';
-import { IDict, INullDict } from './idict';
 import { IFlowDefine } from './iflowDefine';
 
 /** 可为空的标准分类 */
@@ -46,8 +44,6 @@ export interface ISpeciesItem {
   defines?: IFlowDefine[];
   /** 流程实例 */
   instances?: XFlowInstance[];
-  /**字典 */
-  dicts?: IDict[];
   /** 加载信息 */
   loadInfo(info: TargetShare): Promise<ISpeciesItem>;
   /** 加载分类特性 */
@@ -59,15 +55,6 @@ export interface ISpeciesItem {
     recursionSpecies: boolean,
     page: PageRequest,
   ): Promise<XAttributeArray>;
-  /** 加载分类字典 */
-  loadDicts(reload: boolean): Promise<IDict[]>;
-  /** 加载分类字典实体 */
-  loadDictsByPage(
-    spaceId: string,
-    recursionOrg: boolean,
-    recursionSpecies: boolean,
-    page: PageRequest,
-  ): Promise<IDict[]>;
   /** 加载业务标准 */
   loadOperations(
     id: string,
@@ -107,21 +94,6 @@ export interface ISpeciesItem {
    * @param id 特性项id
    */
   deleteAttr(id: string): Promise<boolean>;
-  /**
-   * 创建字典
-   * @param data 创建参数
-   */
-  createDict(data: Omit<DictModel, 'id' | 'parentId'>): Promise<INullDict>;
-  /**
-   * 更新字典
-   * @param data 创建参数
-   */
-  updateDict(data: DictModel): Promise<boolean>;
-  /**
-   * 删除字典
-   * @param id 特性项id
-   */
-  deleteDict(id: string): Promise<boolean>;
   /**
    * 创建流程设计
    * @param data 创建参数

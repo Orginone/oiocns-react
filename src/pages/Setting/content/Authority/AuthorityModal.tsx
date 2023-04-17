@@ -10,14 +10,13 @@ interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: (result: boolean) => void;
-  current?: IAuthority;
+  current: IAuthority;
 }
 /*
   权限编辑模态框
 */
 const AuthorityModal = (props: Iprops) => {
   const { open, title, handleOk, current, handleCancel } = props;
-  const formValue = (current as IAuthority)['_authority'];
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<any>[] = [
     {
@@ -88,7 +87,7 @@ const AuthorityModal = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (open) {
           if (title.includes('修改') || title.includes('编辑')) {
-            formRef.current?.setFieldsValue(formValue);
+            formRef.current?.setFieldsValue(current.target);
           }
         } else {
           formRef.current?.resetFields();

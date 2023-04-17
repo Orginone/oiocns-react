@@ -4,7 +4,6 @@ import * as model from '../model';
 import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
-import { kernel } from '..';
 /**
  * 奥集能内核api
  */
@@ -147,23 +146,6 @@ export default class KernelApi {
     return res;
   }
   /**
-   * 生成单位token
-   * @param comapnyId 单位id
-   * @returns 生成后的token
-   */
-  public async genToken(comapnyId: string): Promise<model.ResultType<string>> {
-    var res: model.ResultType<any>;
-    if (this._storeHub.isConnected) {
-      res = await this._storeHub.invoke('GenToken', comapnyId);
-    } else {
-      res = await this._restRequest('gentoken', comapnyId);
-    }
-    if (res.success) {
-      kernel._anystore.updateToken(res.data);
-    }
-    return res;
-  }
-  /**
    * 创建字典类型
    * @param {model.DictModel} params 请求参数
    * @returns {model.ResultType<schema.XDict>} 请求结果
@@ -193,28 +175,30 @@ export default class KernelApi {
   }
   /**
    * 删除字典类型
-   * @param {model.IdReqModel} params 请求参数
+   * @param {string} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDict(params: model.IdReqModel): Promise<model.ResultType<boolean>> {
+  public async deleteDict(id: string): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteDict',
-      params: params,
+      params: {
+        id,
+      },
     });
   }
   /**
    * 删除字典项
-   * @param {model.IdReqModel} params 请求参数
+   * @param {string} id 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteDictItem(
-    params: model.IdReqModel,
-  ): Promise<model.ResultType<boolean>> {
+  public async deleteDictItem(id: string): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
       action: 'DeleteDictItem',
-      params: params,
+      params: {
+        id,
+      },
     });
   }
   /**
@@ -638,15 +622,15 @@ export default class KernelApi {
   }
   /**
    * 查询分类字典
-   * @param {model.IdSpeciesReq} params 请求参数
+   * @param {model.IDBelongReq} params 请求参数
    * @returns {model.ResultType<schema.XDictArray>} 请求结果
    */
-  public async querySpeciesDict(
-    params: model.IdSpeciesReq,
+  public async queryDict(
+    params: model.IDBelongReq,
   ): Promise<model.ResultType<schema.XDictArray>> {
     return await this.request({
       module: 'thing',
-      action: 'QuerySpeciesDict',
+      action: 'QueryDict',
       params: params,
     });
   }
@@ -2453,6 +2437,14 @@ export default class KernelApi {
   }
   /**
    * 请求一个内核方法
+   * @param {ForwardType} reqs 请求体
+   * @returns 异步结果
+   */
+  public async forward<T>(req: model.ForwardType): Promise<model.ResultType<T>> {
+    return await this._restRequest('forward', req, 20);
+  }
+  /**
+   * 请求一个内核方法
    * @param {ReqestType} reqs 请求体
    * @returns 异步结果
    */
@@ -2505,10 +2497,11 @@ export default class KernelApi {
   private async _restRequest(
     methodName: string,
     args: any,
+    timeout: number = 2,
   ): Promise<model.ResultType<any>> {
     const res = await this._axiosInstance({
       method: 'post',
-      timeout: 2 * 1000,
+      timeout: timeout * 1000,
       url: '/orginone/kernel/rest/' + methodName,
       headers: {
         Authorization: this._anystore.accessToken,

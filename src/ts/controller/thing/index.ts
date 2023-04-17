@@ -9,6 +9,7 @@ import {
 } from '../../core/';
 import { kernel, schema } from '@/ts/base';
 import { badRequest, ResultType } from '@/ts/base/model';
+import { Dict } from '@/ts/core/thing/dict';
 import { Property } from '@/ts/core/thing/property';
 
 /**
@@ -17,6 +18,7 @@ import { Property } from '@/ts/core/thing/property';
 class ThingController extends Emitter {
   public species: INullSpeciesItem;
   public speciesList: ISpeciesItem[] = [];
+  public dict: Dict | undefined;
   public property: Property | undefined;
 
   private lookForAll(data: any[], arr: any[]): any[] {
@@ -32,7 +34,8 @@ class ThingController extends Emitter {
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.Company], () => {
-      this.property = new Property(userCtrl.space?.id);
+      this.dict = new Dict(userCtrl.space.id);
+      this.property = new Property(userCtrl.space.id);
       setTimeout(async () => {
         await this.loadSpeciesTree(true);
       }, 100);
@@ -59,10 +62,7 @@ class ThingController extends Emitter {
   }
 
   public async createThing(data: any): Promise<ResultType<boolean>> {
-    let res = await kernel.anystore.createThing(
-      1,
-      userCtrl.isCompanySpace ? 'company' : 'user',
-    );
+    let res = await kernel.anystore.createThing(userCtrl.space.id, 1);
     if (res.success) {
       return await kernel.perfectThing({
         id: (res.data as [{ Id: string }])[0].Id,

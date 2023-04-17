@@ -4,7 +4,7 @@ import ChartDesign from './Chart';
 import { Branche, FlowNode, XDictItem, XFlowDefine } from '@/ts/base/schema';
 import { Branche as BrancheModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
-import { IDict } from '@/ts/core/thing/idict';
+import thingCtrl from '@/ts/controller/thing';
 import {
   ExclamationCircleOutlined,
   SendOutlined,
@@ -97,16 +97,12 @@ const Design: React.FC<IProps> = ({
   });
 
   const loadDictItems = async (dictId: any) => {
-    if (!species) {
-      return [];
-    }
-    let dicts: IDict[] = await species.loadDicts(false);
-    let dict: IDict = dicts.filter((item) => item.id == dictId)[0];
-    if (!dict) {
-      return [];
-    }
-    let res = await dict.loadItems();
-    return res.map((item: XDictItem) => {
+    let res = await thingCtrl.dict?.loadDictItem(dictId, {
+      offset: 0,
+      limit: 1000,
+      filter: '',
+    });
+    return res?.result?.map((item: XDictItem) => {
       return { label: item.name, value: item.value };
     });
   };

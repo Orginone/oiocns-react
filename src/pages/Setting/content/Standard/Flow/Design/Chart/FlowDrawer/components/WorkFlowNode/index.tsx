@@ -83,11 +83,9 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             message.warn('请选择办事');
             return;
           }
-          let name =
-            selectChildWork.name +
-            ' [' +
-            userCtrl.findTeamInfoById(selectChildWork.belongId).name +
-            ']';
+          let name = `${selectChildWork.name} [${
+            userCtrl.findTeamInfoById(selectChildWork.belongId).name
+          }]`;
           props.current.props.assignedUser = [
             {
               name: name,

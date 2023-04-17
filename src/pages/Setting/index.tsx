@@ -5,16 +5,17 @@ import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import TransToDict from '@/pages/Setting/content/Standard/Dict/transToDict';
 import SpeciesModal from './components/speciesModal';
 import { GroupMenuType } from './config/menuType';
-import { Modal } from 'antd';
+import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
 import AuthorityModal from './content/Authority/AuthorityModal';
 import PropertyModal from './components/propertyModal';
+import DictModal from '@/pages/Setting/content/Dict/dictModal';
 import { SettingOutlined } from '@ant-design/icons';
 import thingCtrl from '@/ts/controller/thing';
+import { getUuid } from '@/utils/tools';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -30,7 +31,7 @@ const TeamSetting: React.FC = () => {
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
-
+  const [refreshKey, setRefreshKey] = useState<string>();
   if (!selectMenu) return <></>;
 
   return (
@@ -54,6 +55,18 @@ const TeamSetting: React.FC = () => {
       }}
       onMenuClick={async (data, key) => {
         switch (key) {
+          case '删除字典':
+            Modal.confirm({
+              content: '确定要删除吗?',
+              onOk: async () => {
+                if (await thingCtrl.dict?.deleteDict(data.item.id)) {
+                  message.success('删除成功');
+                  await thingCtrl.loadSpeciesTree(true);
+                  refreshMenu();
+                }
+              },
+            });
+            break;
           case '删除':
             Modal.confirm({
               content: '确定要删除吗?',
@@ -168,9 +181,10 @@ const TeamSetting: React.FC = () => {
               setOperateKeys(['']);
             }
           }}
+          current={selectMenu.item}
         />
       )}
-      {/** 权限模态框 */}
+      {/** 属性模态框 */}
       {selectMenu.itemType == '属性' && (
         <PropertyModal
           title={operateKeys[0] + selectMenu.itemType}
@@ -180,7 +194,8 @@ const TeamSetting: React.FC = () => {
           }}
           handleOk={(newItem) => {
             if (newItem) {
-              refreshMenu();
+              // refreshMenu();
+              setRefreshKey(getUuid());
               setOperateKeys(['']);
             }
             setSelectMenu(selectMenu);
@@ -188,14 +203,26 @@ const TeamSetting: React.FC = () => {
           data={undefined}
         />
       )}
-      {/* 分类转字典 */}
-      {
-        <TransToDict
-          open={['转为字典'].includes(operateKeys[0])}
-          setOpen={() => setOperateKeys([''])}
-          currentSpeciesItem={selectMenu.item as ISpeciesItem}></TransToDict>
-      }
-      <Content key={key} selectMenu={selectMenu} />
+      {/** 字典模态框 */}
+      {selectMenu.itemType.includes('字典') && (
+        <DictModal
+          title={operateKeys[0] + selectMenu.itemType}
+          open={operateKeys[0].includes('字典')}
+          handleCancel={function (): void {
+            setOperateKeys(['']);
+          }}
+          handleOk={(newItem) => {
+            message.success('操作成功');
+            if (newItem) {
+              refreshMenu();
+              setOperateKeys(['']);
+            }
+            setSelectMenu(selectMenu);
+          }}
+          data={operateKeys[0].includes('新增') ? undefined : selectMenu.item}
+        />
+      )}
+      <Content key={key} selectMenu={selectMenu} refreshKey={refreshKey} />
     </MainLayout>
   );
 };

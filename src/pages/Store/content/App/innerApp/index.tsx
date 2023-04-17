@@ -1,4 +1,4 @@
-import { message } from 'antd';
+import { Modal, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { common } from 'typings/common';
 import AppCard from './card';
@@ -15,7 +15,6 @@ import { ISpeciesItem } from '@/ts/core';
 
 const InnerApp: React.FC<{ type: string }> = ({ type }) => {
   const [tableKey, setTableKey] = useCtrlUpdate(appCtrl);
-  // const [tableKey, setTabKey] = useState<string>();
   const [currentDefine, setCurrentDefine] = useState<XFlowDefine>();
   const [flowSpeciesItem, setFlowSpeciesItem] = useState<ISpeciesItem>();
   const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
@@ -55,6 +54,11 @@ const InnerApp: React.FC<{ type: string }> = ({ type }) => {
         key: 'open',
         label: '发起',
         onClick: () => {
+          // <WorkStartDo
+          //   currentDefine={currentDefine}
+          //   goBack={() => {
+          //     setCurrentDefine(undefined);
+          //   }}></WorkStartDo>;
           setFlowSpeciesItem(undefined);
           setCurrentDefine(item);
         },
@@ -63,9 +67,23 @@ const InnerApp: React.FC<{ type: string }> = ({ type }) => {
         key: 'detail',
         label: '详情',
         onClick: () => {
-          let species = thingCtrl.speciesList.filter((it) => it.id == item.speciesId)[0];
-          setFlowSpeciesItem(species);
-          setCurrentDefine(item);
+          Modal.confirm({
+            okText: '返回',
+            maskClosable: true,
+            content: (
+              <Design
+                current={currentDefine}
+                species={flowSpeciesItem}
+                setInstance={() => {}}
+                operateOrgId={userCtrl.space.id}
+                defaultEditable={false}
+                setOperateOrgId={() => {}}
+                onBack={() => {}}
+                modalType={'设计流程'}
+                setModalType={() => {}}
+              />
+            ),
+          });
         },
       },
       {
@@ -102,41 +120,14 @@ const InnerApp: React.FC<{ type: string }> = ({ type }) => {
   };
 
   return (
-    <>
-      {!currentDefine && (
-        <CardOrTable<XFlowDefine>
-          key={tableKey}
-          dataSource={dataSource}
-          renderCardContent={renderCardFun}
-          operation={renderOperation}
-          columns={InnerApplicationColumns}
-          rowKey={(record: any) => record?.target?.id}
-        />
-      )}
-      {currentDefine && !flowSpeciesItem && (
-        <WorkStartDo
-          currentDefine={currentDefine}
-          goBack={() => {
-            setCurrentDefine(undefined);
-          }}></WorkStartDo>
-      )}
-      {currentDefine && flowSpeciesItem && (
-        <Design
-          current={currentDefine}
-          species={flowSpeciesItem}
-          setInstance={() => {}}
-          operateOrgId={userCtrl.space.id}
-          defaultEditable={false}
-          setOperateOrgId={() => {}}
-          onBack={() => {
-            setCurrentDefine(undefined);
-            setFlowSpeciesItem(undefined);
-          }}
-          modalType={'设计流程'}
-          setModalType={() => {}}
-        />
-      )}
-    </>
+    <CardOrTable<XFlowDefine>
+      key={tableKey}
+      dataSource={dataSource}
+      renderCardContent={renderCardFun}
+      operation={renderOperation}
+      columns={InnerApplicationColumns}
+      rowKey={(record: any) => record?.target?.id}
+    />
   );
 };
 

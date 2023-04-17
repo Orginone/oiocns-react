@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 //所有可支持的消息列表
-import { APPFUNS } from '@/services';
-
+let APPFUNS: any = {};
 export default function (iframeRef: any, appInfo: any, link: string) {
   let funcs = {};
   useEffect(() => {

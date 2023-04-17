@@ -412,18 +412,18 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     key: 'value',
     width: 150,
   },
-  {
-    title: '共享组织',
-    dataIndex: 'rule',
-    key: 'rule',
-    width: 180,
-    render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
-    },
-  },
+  // {
+  //   title: '共享组织',
+  //   dataIndex: 'rule',
+  //   key: 'rule',
+  //   width: 180,
+  //   render: (_, record) => {
+  //     const team = userCtrl.findTeamInfoById(record.belongId);
+  //     if (team) {
+  //       return team.name;
+  //     }
+  //   },
+  // },
   {
     title: '创建时间',
     dataIndex: 'createTime',

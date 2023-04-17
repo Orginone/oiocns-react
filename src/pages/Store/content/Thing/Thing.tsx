@@ -139,9 +139,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
               getColumn(
                 attr.id,
                 attr.name,
-                attr.valueType,
-                attr.belongId ? `S${attr.speciesId}.T${attr.id}` : attr.code,
-                attr.dict?.dictItems,
+                attr.property?.valueType ?? '',
+                attr.belongId ? `Propertys.T${attr.id}` : attr.code,
+                attr.property?.dict?.dictItems,
               ),
             )}
           </Column>,
@@ -151,9 +151,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           getColumn(
             record.id,
             record.name,
-            record.valueType,
-            record.belongId ? `S${record.speciesId}.T${record.id}` : record.code,
-            record.dict?.dictItems,
+            record.property?.valueType,
+            record.belongId ? `Propertys.T${record.id}` : record.code,
+            record.property?.dict?.dictItems,
           ),
         );
       }
@@ -292,10 +292,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing(
-                request,
-                userCtrl.isCompanySpace ? 'company' : 'user',
-              );
+              const result = await kernel.anystore.loadThing(userCtrl.space.id, request);
               if (result.success) {
                 return result.data;
               }

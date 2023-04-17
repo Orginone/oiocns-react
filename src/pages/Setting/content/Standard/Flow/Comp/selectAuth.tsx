@@ -6,7 +6,6 @@ import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
   value?: string;
   onChange: any;
-  readonly?: boolean;
 }
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
@@ -47,7 +46,6 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
       }}
       onChange={props.onChange}
       treeData={treeData}
-      disabled={props.readonly}
     />
   );
 };

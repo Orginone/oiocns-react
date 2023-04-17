@@ -31,28 +31,24 @@ export default class AnyStore {
   private constructor(url: string) {
     this._subscribeCallbacks = {};
     this._storeHub = new StoreHub(url);
-    this._storeHub.on('updated', (key: string, domain: string, data: any) => {
-      this._updated(key, domain, data);
+    this._storeHub.on('updated', (belongId, key, data) => {
+      this._updated(belongId, key, data);
     });
     this._storeHub.onConnected(() => {
       if (this.accessToken.length > 0) {
         this._storeHub
-          .invoke('TokenAuth', this.accessToken, 'user')
+          .invoke('TokenAuth', this.accessToken)
           .then(() => {
-            // logger.info('连接到私有存储成功!');
             Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
               const key = fullKey.split('|')[0];
-              const domain = fullKey.split('|')[1];
-              this.subscribed(key, domain, this._subscribeCallbacks[fullKey]);
+              const belongId = fullKey.split('|')[1];
+              this.subscribed(belongId, key, this._subscribeCallbacks[fullKey]);
             });
           })
           .catch((err) => {
             logger.error(err);
           });
       }
-    });
-    this._storeHub.on('Updated', (key, domain, data) => {
-      this._updated(key, domain, data);
     });
     this._storeHub.start();
   }
@@ -88,18 +84,18 @@ export default class AnyStore {
   /**
    * 订阅对象变更
    * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @param {(data:any)=>void} callback 变更回调，默认回调一次
    * @returns {void} 无返回值
    */
   // eslint-disable-next-line no-unused-vars
-  public subscribed<T>(key: string, domain: string, callback: (data: T) => void): void {
+  public subscribed<T>(belongId: string, key: string, callback: (data: T) => void): void {
     if (callback) {
-      const fullKey = key + '|' + domain;
+      const fullKey = key + '|' + belongId;
       this._subscribeCallbacks[fullKey] = callback;
       if (this._storeHub.isConnected) {
         this._storeHub
-          .invoke('Subscribed', key, domain)
+          .invoke('Subscribed', belongId, key)
           .then((res: ResultType<T>) => {
             if (res.success && res.data) {
               callback.apply(this, [res.data]);
@@ -114,14 +110,14 @@ export default class AnyStore {
   /**
    * 取消订阅对象变更
    * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {void} 无返回值
    */
-  public unSubscribed(key: string, domain: string): void {
-    const fullKey = key + '|' + domain;
+  public unSubscribed(belongId: string, key: string): void {
+    const fullKey = key + '|' + belongId;
     if (this._subscribeCallbacks[fullKey] && this._storeHub.isConnected) {
       this._storeHub
-        .invoke('UnSubscribed', key, domain)
+        .invoke('UnSubscribed', belongId, key)
         .then(() => {
           console.debug(`${key}取消订阅成功.`);
         })
@@ -134,18 +130,18 @@ export default class AnyStore {
   /**
    * 查询对象
    * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 对象异步结果
    */
-  public async get<T>(key: string, domain: string): Promise<ResultType<T>> {
+  public async get<T>(belongId: string, key: string): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Get', key, domain);
+      return await this._storeHub.invoke('Get', belongId, key);
     }
     return await this._restRequest(
       'Object',
       'Get/' + key,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       {},
     );
@@ -154,18 +150,22 @@ export default class AnyStore {
    * 修改对象
    * @param {string} key 对象名称（eg: rootName.person.name）
    * @param {any} setData 对象新的值
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 变更异步结果
    */
-  public async set(key: string, setData: any, domain: string): Promise<ResultType<any>> {
+  public async set(
+    belongId: string,
+    key: string,
+    setData: any,
+  ): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Set', key, setData, domain);
+      return await this._storeHub.invoke('Set', belongId, key, setData);
     }
     return await this._restRequest(
       'Object',
       'Set/' + key,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       setData,
     );
@@ -173,18 +173,18 @@ export default class AnyStore {
   /**
    * 删除对象
    * @param {string} key 对象名称（eg: rootName.person.name）
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 删除异步结果
    */
-  public async delete(key: string, domain: string): Promise<ResultType<any>> {
+  public async delete(belongId: string, key: string): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Delete', key, domain);
+      return await this._storeHub.invoke('Delete', belongId, key);
     }
     return await this._restRequest(
       'Object',
       'Delete/' + key,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       {},
     );
@@ -193,22 +193,22 @@ export default class AnyStore {
    * 添加数据到数据集
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} data 要添加的数据，对象/数组
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 添加异步结果
    */
   public async insert(
+    belongId: string,
     collName: string,
     data: any,
-    domain: string,
   ): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Insert', collName, data, domain);
+      return await this._storeHub.invoke('Insert', belongId, collName, data);
     }
     return await this._restRequest(
       'Collection',
       'Update/' + collName,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       data,
     );
@@ -217,22 +217,22 @@ export default class AnyStore {
    * 更新数据到数据集
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} update 更新操作（match匹配，update变更,options参数）
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 更新异步结果
    */
   public async update(
+    belongId: string,
     collName: string,
     update: any,
-    domain: string,
   ): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Update', collName, update, domain);
+      return await this._storeHub.invoke('Update', belongId, collName, update);
     }
     return await this._restRequest(
       'Collection',
       'Update/' + collName,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       update,
     );
@@ -241,22 +241,22 @@ export default class AnyStore {
    * 从数据集移除数据
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} match 匹配信息
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 移除异步结果
    */
   public async remove(
+    belongId: string,
     collName: string,
     match: any,
-    domain: string,
   ): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Remove', collName, match, domain);
+      return await this._storeHub.invoke('Remove', belongId, collName, match);
     }
     return await this._restRequest(
       'Collection',
       'Remove/' + collName,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       match,
     );
@@ -265,22 +265,22 @@ export default class AnyStore {
    * 从数据集查询数据
    * @param {string} collName 数据集名称（eg: history-message）
    * @param {any} options 聚合管道(eg: {match:{a:1},skip:10,limit:10})
-   * @param {string} domain 对象所在域, 个人域(user),单位域(company),开放域(all)
+   * @param {string} belongId 对象所在域, 个人域(user),单位域(company),开放域(all)
    * @returns {ResultType} 移除异步结果
    */
   public async aggregate(
+    belongId: string,
     collName: string,
     options: any,
-    domain: string,
   ): Promise<ResultType<any>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Aggregate', collName, options, domain);
+      return await this._storeHub.invoke('Aggregate', belongId, collName, options);
     }
     return await this._restRequest(
       'Collection',
       'Aggregate/' + collName,
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       options,
     );
@@ -292,20 +292,27 @@ export default class AnyStore {
    */
   public async bucketOpreate<T>(data: BucketOpreateModel): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('BucketOpreate', data);
+      return await this._storeHub.invoke('BucketOpreate', '0', data);
     }
-    return await this._restRequest('Bucket', 'Operate', {}, data);
+    return await this._restRequest(
+      'Bucket',
+      'Operate',
+      {
+        belongId: '0',
+      },
+      data,
+    );
   }
   /**
    * 加载物
    * @param  过滤参数
    * @returns {ResultType<T>} 移除异步结果
    */
-  public async loadThing<T>(options: any, domain: string): Promise<ResultType<T>> {
+  public async loadThing<T>(belongId: string, options: any): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Load', options, domain);
+      return await this._storeHub.invoke('Load', belongId, options);
     }
-    options.shareDomain = domain;
+    options.belongId = belongId;
     return await this._restRequest('Thing', 'Load', options, {});
   }
   /**
@@ -314,13 +321,13 @@ export default class AnyStore {
    * @returns {ResultType<T>} 移除异步结果
    */
   public async loadThingArchives<T>(
+    belongId: string,
     options: any,
-    domain: string,
   ): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('LoadArchives', options, domain);
+      return await this._storeHub.invoke('LoadArchives', belongId, options);
     }
-    options.shareDomain = domain;
+    options.belongId = belongId;
     return await this._restRequest('Thing', 'LoadArchives', options, {});
   }
   /**
@@ -328,15 +335,15 @@ export default class AnyStore {
    * @param  创建数量
    * @returns {ResultType<T>} 移除异步结果
    */
-  public async createThing<T>(number: number, domain: string): Promise<ResultType<T>> {
+  public async createThing<T>(belongId: string, number: number): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('Create', number, domain);
+      return await this._storeHub.invoke('Create', belongId, number);
     }
     return await this._restRequest(
       'Thing',
       'Create',
       {
-        shareDomain: domain,
+        belongId: belongId,
       },
       number,
     );
@@ -347,8 +354,8 @@ export default class AnyStore {
    * @param data 数据
    * @returns {void} 无返回值
    */
-  private _updated(key: string, domain: string, data: any): void {
-    const lfullkey = key + '|' + domain;
+  private _updated(belongId: string, key: string, data: any): void {
+    const lfullkey = key + '|' + belongId;
     Object.keys(this._subscribeCallbacks).forEach((fullKey) => {
       if (fullKey === lfullkey) {
         const callback: (data: any) => void = this._subscribeCallbacks[fullKey];

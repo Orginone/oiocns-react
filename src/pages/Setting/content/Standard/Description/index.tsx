@@ -41,7 +41,7 @@ const Description = (info: { current: ISpeciesItem }) => {
             )}
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="分类编码">{data.target.code}</Descriptions.Item>
+        <Descriptions.Item label="分类代码">{data.target.code}</Descriptions.Item>
         <Descriptions.Item label="开放域">
           {data.target.public ? '开放' : '私有'}
         </Descriptions.Item>

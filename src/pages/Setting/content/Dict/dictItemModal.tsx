@@ -2,19 +2,16 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { DictItemModel } from '@/ts/base/model';
-import { IDict } from '@/ts/core';
-import userCtrl from '@/ts/controller/setting';
-import { XDictItem } from '@/ts/base/schema';
+import { XDict, XDictItem } from '@/ts/base/schema';
 import { message } from 'antd';
-import { targetsToTreeData } from '@/pages/Setting';
+import thingCtrl from '@/ts/controller/thing';
 
 interface Iprops {
   open: boolean;
   data?: XDictItem;
   handleCancel: () => void;
   handleOk: (newItem: boolean | undefined) => void;
-  current?: IDict;
-  targetId?: string;
+  current: XDict;
 }
 /*
   字典子项编辑模态框
@@ -43,39 +40,6 @@ const DictItemModal = (props: Iprops) => {
       },
     },
     {
-      title: '选择制定组织',
-      dataIndex: 'belongId',
-      valueType: 'treeSelect',
-      initialValue: userCtrl.space.id,
-      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-      request: async () => {
-        const res = await userCtrl.getTeamTree();
-        return targetsToTreeData(res);
-      },
-      fieldProps: {
-        disabled: title === '编辑' || title === '修改',
-        showSearch: true,
-      },
-    },
-    // {
-    //   title: '选择管理权限',
-    //   dataIndex: 'authId',
-    //   valueType: 'treeSelect',
-    //   formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
-    //   request: async () => {
-    //     const data = await userCtrl.space.loadAuthorityTree(false);
-    //     return data ? [data] : [];
-    //   },
-    //   fieldProps: {
-    //     disabled: title === '修改',
-    //     fieldNames: { label: 'name', value: 'id' },
-    //     showSearch: true,
-    //     filterTreeNode: true,
-    //     treeNodeFilterProp: 'name',
-    //     treeDefaultExpandAll: true,
-    //   },
-    // },
-    {
       title: '备注',
       dataIndex: 'remark',
       valueType: 'textarea',
@@ -90,7 +54,6 @@ const DictItemModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          // formRef.current?.setFieldValue('belongId', props.targetId);
           if (title.includes('修改')) {
             formRef.current?.setFieldsValue(data);
           }
@@ -105,10 +68,11 @@ const DictItemModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          handleOk(await current?.createItem(values));
+          values.dictId = current.id;
+          handleOk((await thingCtrl.dict?.createDictItem(values)) != undefined);
         } else {
           let formdata = Object.assign(data ? data : {}, values);
-          handleOk(await current?.updateItem(formdata));
+          handleOk((await thingCtrl.dict?.updateDictItem(formdata)) != undefined);
         }
       }}
       columns={columns}></SchemaForm>

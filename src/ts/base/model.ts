@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 
+import { type } from 'os';
 import { FlowNode as SchemaFlowNode, XOperation } from './schema';
 
 // 请求类型定义
@@ -10,6 +11,18 @@ export type ReqestType = {
   action: string;
   // 参数
   params: any;
+};
+
+// 代理请求类型定义
+export type ForwardType = {
+  // 目标地址
+  uri: string;
+  // 请求方法
+  method: string;
+  // 请求头
+  header: any;
+  // 请求体
+  content: any;
 };
 
 // 返回类型定义
@@ -89,6 +102,17 @@ export type IdSpaceReq = {
   page?: PageRequest;
 };
 
+export type QueryDictModel = {
+  // 唯一ID
+  id: string;
+  // 工作空间ID
+  spaceId: string;
+  // 是否递归组织
+  recursionOrg: boolean;
+  // 分页
+  page: PageRequest;
+};
+
 export type IdSpeciesReq = {
   // 唯一ID
   id: string;
@@ -101,6 +125,7 @@ export type IdSpeciesReq = {
   // 分页
   page: PageRequest;
 };
+
 export type IdOperationReq = {
   // 唯一ID
   id: string;
@@ -284,8 +309,6 @@ export type DictModel = {
   public: boolean;
   // 创建组织/个人
   belongId: string;
-  // 分类Id
-  speciesId: string;
   // 备注
   remark: string;
 };

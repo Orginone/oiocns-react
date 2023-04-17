@@ -66,8 +66,10 @@
     .ogo-menu-inline .ogo-menu-item-selected::after {
       opacity: 0;
     }
+
   }
 }
+
 .container {
   padding: 0 @padding-xs;
   position: relative;
@@ -95,4 +97,15 @@
   justify-content: space-between;
   background-color: @component-background;
   border-radius: @border-radius-base;
+}
+
+:global {
+  .ogo-card-head{
+    padding: 0 0;
+  }
+  .ogo-card-body{
+    .ogo-card-body{
+      padding: 0 0;
+    }
+  }
 }

@@ -4,7 +4,6 @@ import { ISpeciesItem } from '@/ts/core';
 import thingCtrl from '@/ts/controller/thing';
 import {
   ProForm,
-  ProFormColumnsType,
   ProFormDependency,
   ProFormSelect,
   ProFormText,
@@ -15,7 +14,6 @@ import { useForm } from 'antd/es/form/Form';
 import React from 'react';
 import { getUuid } from '@/utils/tools';
 import { IFlowDefine } from '@/ts/core/thing/iflowDefine';
-import SchemaForm from '@/components/SchemaForm';
 
 interface Iprops {
   title: string;

@@ -62,21 +62,25 @@ class AppController extends Emitter {
       this._target = userCtrl.space;
       await this._target.getOwnProducts(true);
       /** 订阅常用应用 */
-      kernel.anystore.subscribed(STORE_RECENTLY_APPS, 'user', (map: any) => {
+      kernel.anystore.subscribed(userCtrl.space.id, STORE_RECENTLY_APPS, (map: any) => {
         this._commonAppMap = map;
         this._caches = map[userCtrl.space.id] || [];
         this.changCallbackPart(STORE_RECENTLY_APPS);
       });
 
       /* 获取 历史缓存的 自定义目录 */
-      kernel.anystore.subscribed(STORE_USER_MENU, 'user', (data: TreeType[]) => {
-        if (data.length > 0) {
-          this._customMenus = data;
-        } else {
-          this._customMenus = [];
-        }
-        this.changCallbackPart(STORE_USER_MENU);
-      });
+      kernel.anystore.subscribed(
+        userCtrl.space.id,
+        STORE_USER_MENU,
+        (data: TreeType[]) => {
+          if (data.length > 0) {
+            this._customMenus = data;
+          } else {
+            this._customMenus = [];
+          }
+          this.changCallbackPart(STORE_USER_MENU);
+        },
+      );
       this.changCallback();
     });
   }
@@ -98,14 +102,10 @@ class AppController extends Emitter {
     this._caches = this._caches.slice(0, 10);
     this.commonAppMap[userCtrl.space.id] = this._caches;
     this.changCallbackPart(STORE_RECENTLY_APPS);
-    await kernel.anystore.set(
-      STORE_RECENTLY_APPS,
-      {
-        operation: 'replaceAll',
-        data: this.commonAppMap,
-      },
-      'user',
-    );
+    await kernel.anystore.set(userCtrl.space.id, STORE_RECENTLY_APPS, {
+      operation: 'replaceAll',
+      data: this.commonAppMap,
+    });
   }
 
   /**
@@ -115,16 +115,12 @@ class AppController extends Emitter {
   public setCustomMenu(data: TreeType[]): void {
     this._customMenus = data;
     this.changCallbackPart(STORE_USER_MENU);
-    kernel.anystore.set(
-      STORE_USER_MENU,
-      {
-        operation: 'replaceAll',
-        data: {
-          data: this._customMenus,
-        },
+    kernel.anystore.set(userCtrl.space.id, STORE_USER_MENU, {
+      operation: 'replaceAll',
+      data: {
+        data: this._customMenus,
       },
-      'user',
-    );
+    });
   }
 }
 
