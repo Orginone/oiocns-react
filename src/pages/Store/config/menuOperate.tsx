@@ -5,8 +5,8 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
-import thingCtrl from '@/ts/controller/thing';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
+import setting from '@/ts/controller/setting';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -150,8 +150,8 @@ export const getFileSystemMenus = () => {
 };
 
 export const loadThingMenus = async () => {
-  const root = await thingCtrl.loadSpeciesTree();
-  for (const item of root!.children) {
+  const root = await setting.space.loadSpeciesTree();
+  for (const item of root) {
     if (item.target.code === 'thing') {
       return {
         children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, ''),

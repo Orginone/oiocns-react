@@ -6,7 +6,7 @@ import {
   ProFormText,
   ProFormTreeSelect,
 } from '@ant-design/pro-components';
-import { message, Modal } from 'antd';
+import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React, { useEffect } from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
@@ -165,8 +165,7 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
                   required={true}
                   colProps={{ span: 12 }}
                   request={async () => {
-                    const species = await target.loadSpeciesTree();
-                    let tree = toTreeData([species]);
+                    let tree = toTreeData(await target.loadSpeciesTree());
                     return tree;
                   }}
                   fieldProps={{

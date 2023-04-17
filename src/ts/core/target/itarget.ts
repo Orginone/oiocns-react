@@ -7,7 +7,7 @@ import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
 import { FlowDefine } from '../thing/flowDefine';
-import { INullSpeciesItem } from '../thing';
+import { ISpeciesItem } from '../thing';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -53,7 +53,7 @@ export interface ITarget {
   /** 办事 */
   define: FlowDefine;
   /** 分类 */
-  species: INullSpeciesItem;
+  species: ISpeciesItem[];
   /**
    * 新增
    * @param data
@@ -72,7 +72,7 @@ export interface ITarget {
    * 加载分类树
    * @param reload
    */
-  loadSpeciesTree(reload?: boolean): Promise<INullSpeciesItem>;
+  loadSpeciesTree(reload?: boolean): Promise<ISpeciesItem[]>;
   /**
    * 获取权限树
    * @param reload 是否强制刷新

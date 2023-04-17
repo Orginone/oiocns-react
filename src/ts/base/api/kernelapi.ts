@@ -553,11 +553,11 @@ export default class KernelApi {
    * 查询分类树
    * @param {string} id 根分类ID
    * @param {model.PageRequest} page 分页参数
-   * @returns {model.ResultType<schema.XSpecies>} 请求结果
+   * @returns {model.ResultType<schema.XSpeciesArray>} 请求结果
    */
   public async querySpeciesTree(
-    params: model.IDBelongReq,
-  ): Promise<model.ResultType<schema.XSpecies>> {
+    params: model.GetSpeciesModel,
+  ): Promise<model.ResultType<schema.XSpeciesArray>> {
     return await this.request({
       module: 'thing',
       action: 'QuerySpeciesTree',

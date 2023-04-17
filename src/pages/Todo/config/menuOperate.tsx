@@ -3,9 +3,9 @@ import { Avatar } from 'antd';
 import * as im from 'react-icons/im';
 import { ISpeciesItem, ITodoGroup, WorkType } from '@/ts/core';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import thingCtrl from '@/ts/controller/thing';
 import { ToTopOutlined } from '@ant-design/icons';
 import { MenuItemType } from 'typings/globelType';
+import setting from '@/ts/controller/setting';
 
 export const loadPlatformTodoMenu = async () => {
   let friendTodo = await loadChildren(todoCtrl.FriendTodo);
@@ -167,8 +167,8 @@ export const loadPlatformApplyMenu = async () => {
 
 /** 获取事菜单 */
 export const loadThingMenus = async (prefix: string, isWork: boolean = false) => {
-  const root = await thingCtrl.loadSpeciesTree();
-  for (const item of root!.children) {
+  const root = await setting.space.loadSpeciesTree();
+  for (const item of root) {
     if (item.target.code === 'matters') {
       return await buildSpeciesTree(item.children, prefix + '事', isWork);
     }

@@ -471,7 +471,7 @@ export const WorkTodoColumns: ProColumns[] = [
     dataIndex: ['instance', 'define', 'speciesId'],
     render: (_, record) => {
       return (
-        thingCtrl.speciesList.find((a) => a.id == record.instance?.define?.speciesId)
+        thingCtrl.species.find((a) => a.id == record.instance?.define?.speciesId)
           ?.name ?? '未知'
       );
     },

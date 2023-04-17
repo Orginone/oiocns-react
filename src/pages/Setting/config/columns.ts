@@ -273,7 +273,7 @@ export const AttributeColumns: ProColumns<schema.XAttribute>[] = [
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      return thingCtrl.speciesList.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      return thingCtrl.species.find((a) => a.id == record.speciesId)?.name ?? '未知';
     },
   },
   {
@@ -325,7 +325,7 @@ export const OperationColumns: ProColumns<schema.XOperation>[] = [
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      return thingCtrl.speciesList.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      return thingCtrl.species.find((a) => a.id == record.speciesId)?.name ?? '未知';
     },
   },
   {

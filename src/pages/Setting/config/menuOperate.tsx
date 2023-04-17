@@ -51,20 +51,17 @@ export const buildTargetTree = async (targets: ITarget[]) => {
 };
 
 const buildTargetSpeciesTree = async (target: ITarget) => {
-  const species = await target.loadSpeciesTree(true);
-  if (species) {
-    return [
-      {
-        children: [buildSpeciesTree(target.id, species)],
-        key: target.id + '-' + species.id,
-        label: '分类标准',
-        itemType: '分类标准',
-        item: undefined,
-        icon: <im.ImNewspaper />,
-      },
-    ];
-  }
-  return [];
+  const species = await target.loadSpeciesTree();
+  return [
+    {
+      children: species.map((i) => buildSpeciesTree(target.id, i)),
+      key: target.id + '-分类标准',
+      label: '分类标准',
+      itemType: '分类标准',
+      item: undefined,
+      icon: <im.ImNewspaper />,
+    },
+  ];
 };
 
 /** 编译分类树 */

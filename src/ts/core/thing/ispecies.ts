@@ -1,7 +1,6 @@
 import { model, schema } from '@/ts/base';
 import {
   AttributeModel,
-  CreateDefineReq,
   OperationModel,
   PageRequest,
   SpeciesModel,
@@ -9,11 +8,11 @@ import {
 } from '../../base/model';
 import {
   XAttributeArray,
-  XFlowDefine,
   XOperationArray,
   XSpecies,
   XAttribute,
   XFlowInstance,
+  XFlowDefine,
 } from '../../base/schema';
 
 /** 可为空的标准分类 */
@@ -110,4 +109,6 @@ export interface ISpeciesItem {
    * 删除标准分类项
    */
   delete(): Promise<boolean>;
+  /* 加载办事 */
+  loadFlowDefine(): Promise<XFlowDefine[]>;
 }

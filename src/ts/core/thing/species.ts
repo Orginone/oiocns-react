@@ -1,4 +1,4 @@
-import { XAttribute, XAttributeArray } from '@/ts/base/schema';
+import { XAttribute, XAttributeArray, XFlowDefine } from '@/ts/base/schema';
 import { kernel, model, parseAvatar, schema } from '../../base';
 import {
   AttributeModel,
@@ -235,5 +235,14 @@ export class SpeciesItem implements ISpeciesItem {
       typeName: '',
     });
     return res.success;
+  }
+
+  /* 加载办事 */
+  async loadFlowDefine(): Promise<XFlowDefine[]> {
+    const res = await kernel.queryDefine({
+      spaceId: this.target.belongId,
+      speciesId: this.id,
+    });
+    return res.data.result || [];
   }
 }

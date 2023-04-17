@@ -4,12 +4,7 @@ import userCtrl from '@/ts/controller/setting';
 import { ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
-import {
-  DictColumns,
-  DictItemColumns,
-  PersonColumns,
-  PropertyColumns,
-} from '../../config/columns';
+import { PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -19,10 +14,9 @@ import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../../components/Description';
 import chatCtrl from '@/ts/controller/chat';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
-import { IsRelationAdmin, IsSuperAdmin, IsThingAdmin } from '@/utils/authority';
+import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 import setting from '@/ts/controller/setting';
 import { XDict, XDictItem, XProperty } from '@/ts/base/schema';
-import Authority from '../../components/authority';
 import { Property } from '@/ts/core/thing/property';
 import { Dict } from '@/ts/core/thing/dict';
 import PropertyModal from '../../components/propertyModal';
@@ -40,7 +34,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
-  const [isThingAdmin, SetIsThingAdmin] = useState(false);
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('');
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
@@ -63,7 +56,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsThingAdmin(await IsThingAdmin(current));
       SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
     }, 10);
   }, [current]);
@@ -73,18 +65,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
     {
       tab: `群组成员`,
       key: 'members',
-    },
-    {
-      tab: `权限标准`,
-      key: 'authority',
-    },
-    {
-      tab: `字典定义`,
-      key: 'dict',
-    },
-    {
-      tab: `属性定义`,
-      key: 'property',
     },
   ];
 
@@ -142,47 +122,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
     return operations;
   };
 
-  const dictItemRender = (dict: XDict) => {
-    return (
-      <CardOrTable<schema.XDictItem>
-        key="groups"
-        rowKey={'id'}
-        pagination={false}
-        dataSource={[]}
-        defaultExpandAllRows={true}
-        operation={(item) => {
-          return isThingAdmin
-            ? [
-                {
-                  key: 'edit',
-                  label: '编辑',
-                  onClick: async () => {
-                    setDictItem(item);
-                    setActiveModal('dictItem');
-                  },
-                },
-                {
-                  key: 'remove',
-                  label: '删除',
-                  onClick: async () => {
-                    if (await dictOperate.deleteDictItem(item.id)) {
-                      message.success('删除成功');
-                      forceUpdate();
-                    }
-                  },
-                },
-              ]
-            : [];
-        }}
-        columns={DictItemColumns}
-        showChangeBtn={false}
-        request={async (page) => {
-          return new Dict(current.id).loadDictItem(dict.id, page);
-        }}
-      />
-    );
-  };
-
   const content = () => {
     switch (activeTab) {
       case 'members':
@@ -200,140 +139,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             showChangeBtn={false}
           />
         );
-      case 'authority':
-        return <Authority current={current} isSuperAdmin={isSuperAdmin} />;
-      case 'dict':
-        return (
-          <CardOrTable<schema.XDict>
-            expandable={{
-              expandedRowRender: dictItemRender,
-              defaultExpandedRowKeys: ['0'],
-            }}
-            key="dicts"
-            rowKey={'id'}
-            pagination={false}
-            dataSource={[]}
-            defaultExpandAllRows={true}
-            operation={(dict) => {
-              return isThingAdmin
-                ? [
-                    {
-                      key: 'addItem',
-                      label: '新增子项',
-                      onClick: async () => {
-                        setDict(dict);
-                        setActiveModal('dictItem');
-                      },
-                    },
-                    {
-                      key: 'edit',
-                      label: '编辑',
-                      onClick: async () => {
-                        setDict(dict);
-                        setActiveModal('dict');
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: '删除',
-                      onClick: async () => {
-                        if (await dictOperate.deleteDict(dict.id)) {
-                          message.success('删除成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
-            }}
-            columns={DictColumns}
-            showChangeBtn={false}
-            request={async (page) => {
-              return await new Dict(current.id).loadDict(page);
-            }}
-          />
-        );
-      case 'property':
-        return (
-          <CardOrTable<schema.XProperty>
-            key="propertys"
-            rowKey={'id'}
-            pagination={false}
-            dataSource={[]}
-            defaultExpandAllRows={true}
-            operation={(property) => {
-              return isThingAdmin
-                ? [
-                    {
-                      key: 'edit',
-                      label: '编辑',
-                      onClick: async () => {
-                        setProperty(property);
-                        setActiveModal('property');
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: '删除',
-                      onClick: async () => {
-                        if (await propertyOperate.deleteProperty(property.id)) {
-                          message.success('删除成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
-            }}
-            columns={PropertyColumns}
-            showChangeBtn={false}
-            request={async (page) => {
-              return await new Property(current.id).loadPropertys(page);
-            }}
-          />
-        );
     }
-  };
-
-  // 按钮
-  const renderBtns = () => {
-    switch (activeTab) {
-      case 'dict':
-        return (
-          <>
-            {isThingAdmin && (
-              <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    setActiveModal('dict');
-                  }}>
-                  添加字典
-                </Button>
-              </>
-            )}
-          </>
-        );
-      case 'property':
-        return (
-          <>
-            {isThingAdmin && (
-              <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    setActiveModal('property');
-                  }}>
-                  添加属性
-                </Button>
-              </>
-            )}
-          </>
-        );
-      default:
-        break;
-    }
-    return <></>;
   };
 
   return (
@@ -364,8 +170,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             userCtrl.currentTabKey = key;
             setActiveTab(key);
           }}
-          activeTabKey={activeTab}
-          tabBarExtraContent={renderBtns()}>
+          activeTabKey={activeTab}>
           <div className={cls['page-content-table']} ref={parentRef}>
             {content()}
           </div>
