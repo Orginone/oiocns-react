@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import PageCtrl from '../pageCtrl';
 import { emitter } from '@/ts/core';
-import { findMenuItemByKey } from '@/utils/tools';
+import { debounce, findMenuItemByKey } from '@/utils/tools';
 import { SettingOutlined } from '@ant-design/icons';
 import React, { useEffect } from 'react';
 import { MenuItemType } from 'typings/globelType';
@@ -36,7 +36,6 @@ const useMenuUpdate = (): [
             key: '页面列表',
             label: '页面列表',
             itemType: 'group',
-            menus: await loadTypeMenus(item),
             icon: <SettingOutlined />,
             children: [],
           },
@@ -94,12 +93,12 @@ const useMenuUpdate = (): [
     setSelectMenu(item);
     setMenu(newMenus);
   };
-
+  const handleKeyChange = debounce((key: string) => {
+    setKey(key ?? 1);
+    refreshMenu();
+  }, 300);
   useEffect(() => {
-    const id = PageCtrl.subscribe((key) => {
-      setKey(key ?? 1);
-      refreshMenu();
-    });
+    const id = PageCtrl.subscribe((key) => handleKeyChange(key));
     return () => {
       emitter.unsubscribe(id);
     };

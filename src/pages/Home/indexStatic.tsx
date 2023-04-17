@@ -29,7 +29,7 @@ getImgAssets();
 const Home: React.FC = () => {
   useEffect(() => {}, []);
   return (
-    <div className="work-home">
+    <div className="work-home-wrap">
       {/* 顶部图片11111 */}
       <BannerCom imgList={imgList} />
       {/* 快捷入口及应用 */}

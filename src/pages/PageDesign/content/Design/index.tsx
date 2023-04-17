@@ -21,7 +21,7 @@ const MyResponsiveGrid: React.FC<PageType> = ({ className, isMask = false }) => 
   const [showList, setShowList] = useState<CompTypeItem[]>([]);
   const [styleData, setStyleData] = useState<any>();
   const [Open, setOpen] = useState<boolean>(true);
-  const treeRef = useRef<any>(null);
+  const Three3D = useRef<any>(null);
   useEffect(() => {
     // 设置背景色
     getCanvasBg();
@@ -62,18 +62,21 @@ const MyResponsiveGrid: React.FC<PageType> = ({ className, isMask = false }) => 
   }, 300);
   return (
     <div className={`layout-wrap ${className}`} id="SettingWrap" style={styleData}>
+      {/* 页面网格图 */}
       <canvas className="virtualBg" id="canvasID" />
+      {/* 用户配置区域 */}
       <div className="OverPage">
         <ResponsiveGridLayout
           className="layout"
           rowHeight={10}
           margin={[0, 0]}
           allowOverlap={false}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           onLayoutChange={(list: any) => handleLayoutChange(list, showList)}
           onResizeStop={(_layout: any[], _oldItem: any, newItem: any) => {
             let obj: CompTypeItem = showList.find((v) => v.i === newItem.i)!;
             if (obj.name === '3D模组') {
-              treeRef.current?.resize();
+              Three3D.current?.resize();
             } else {
               //处理echart 重绘
               setTimeout(() => {
@@ -106,20 +109,19 @@ const MyResponsiveGrid: React.FC<PageType> = ({ className, isMask = false }) => 
                 <DeleteOutlined
                   className="remove"
                   title="删除组件"
-                  onClick={() => {
-                    pageCtrl.RemoveCompItem(con);
-                  }}
+                  onClick={() => pageCtrl.RemoveCompItem(con)}
                 />
                 {/* 部分组件需要额外操作，例如echart three.js 组件 需要获取Dom 后重新触发渲染 以兼容拖拽后展示无碍 */}
                 {renderComp(
                   con,
-                  showList.find((v) => v.i === con.i)!.name === '3D模组' ? treeRef : '',
+                  showList.find((v) => v.i === con.i)!.name === '3D模组' ? Three3D : '',
                 )}
               </div>
             );
           })}
         </ResponsiveGridLayout>
       </div>
+      {/* 组件配置区域 */}
       <div className={`rightWrap ${Open ? '' : 'notOpenWrap'}`}>
         <div
           className="closeWrap"

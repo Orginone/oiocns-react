@@ -39,7 +39,7 @@ const PageSetting: React.FC<any> = () => {
         }
       }}
       siderMenuData={menus}>
-      <Content selectMenu={selectMenu as any} modalKey={OpenKeys} />
+      <Content selectMenu={selectMenu as any} />
     </MainLayout>
   );
 };

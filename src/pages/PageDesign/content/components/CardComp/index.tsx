@@ -18,7 +18,7 @@ const Index: React.FC<CardCompType> = ({ type }) => {
       <Row gutter={[10, 10]}>
         {list?.map((item: any, idx: number) => {
           return (
-            <Col span={6} key={item.i}>
+            <Col span={6} key={item.i + '-' + idx}>
               <Card title={item.name} extra={<span>序号：{idx + 1}</span>}>
                 <Meta
                   title={<Tag color="#55acee">{type}</Tag>}

@@ -28,7 +28,7 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
   const [Title, setTitle] = useState<string>(
     (PageCtrl.EditInfo.title as string) ?? '页面名称',
   );
-  const [activeTag, setActiveTag] = useState<'1' | '2'>('1'); //背景色
+  const [activeTag, setActiveTag] = useState<'1' | '2'>('1'); //组件列表。配置界面
   const [dataSource, setDataSource] = useState<any[]>([]);
   const [comp, setComp] = useState<any>({});
   useEffect(() => {
@@ -42,7 +42,7 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
       PageCtrl.unsubscribe(['SelectedComp', 'DataSource']);
     };
   }, []);
-
+  // 自定义添加组件按钮
   const CustomHead = (title: string) => {
     return (
       <div className="flex justify-between">
@@ -51,7 +51,7 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
       </div>
     );
   };
-  // 组件渲染
+  // 组件列表渲染
   const CompGroup = (
     <Collapse defaultActiveKey={['系统组件']} expandIconPosition={'end'}>
       {dataSource.map((item: DataType, idx: number) => {
@@ -74,6 +74,7 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
       })}
     </Collapse>
   );
+  // 配置信息展示
   const formGroup: () => any[] = () => {
     let extra = [];
     if (comp.name === '轮播图') {
@@ -84,33 +85,6 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
         limit: 10,
       });
     }
-    if (['通知公告', '待办事项', '投诉反馈'].includes(comp.name)) {
-      const arr = [
-        {
-          label: '数据源',
-          id: 'dataSource',
-          type: 'select',
-          options: [
-            { value: 'source1', label: '数据源1' },
-            { value: 'source2', label: '数据源2' },
-          ],
-        },
-        {
-          label: '标题',
-          id: 'compTitle',
-          type: 'input',
-          limit: 10,
-        },
-        {
-          label: '可选参数',
-          id: 'params',
-          type: 'checkbox',
-          options: ['名称', '数量', '提交人', '提交时间'],
-        },
-      ];
-      extra.push(...arr);
-    }
-
     return [
       {
         label: '背景色',
