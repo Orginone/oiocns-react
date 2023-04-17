@@ -16,13 +16,6 @@ import chatCtrl from '@/ts/controller/chat';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 import setting from '@/ts/controller/setting';
-import { XDict, XDictItem, XProperty } from '@/ts/base/schema';
-import { Property } from '@/ts/core/thing/property';
-import { Dict } from '@/ts/core/thing/dict';
-import PropertyModal from '../../components/propertyModal';
-import { DictModel, PropertyModel } from '@/ts/base/model';
-import DictItemModal from '../../components/dict/dictItemModal';
-import DictModal from '../../components/dict/dictModal';
 interface IProps {
   current: ICohort;
 }
@@ -38,12 +31,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const [activeTab, setActiveTab] = useState<string>('');
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-
-  const [dict, setDict] = useState<XDict>();
-  const [dictItem, setDictItem] = useState<XDictItem>();
-  const [property, setProperty] = useState<XProperty>();
-  const dictOperate = new Dict(current.id);
-  const propertyOperate = new Property(current.id);
 
   useEffect(() => {
     if (TitleItems.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
@@ -149,22 +136,23 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
         }
         current={current}
-        extra={
-          <>
-            <Button type="link" onClick={() => setActiveModal('indentity')}>
-              角色设置
-            </Button>
-            {isRelationAdmin && (
-              <Button type="link" onClick={() => setActiveModal('addOne')}>
-                邀请成员
-              </Button>
-            )}
-          </>
-        }
+        extra={[]}
       />
       <div className={cls['pages-wrap']}>
         <PageCard
           bordered={false}
+          extra={
+            <>
+              <Button type="link" onClick={() => setActiveModal('indentity')}>
+                角色设置
+              </Button>
+              {isRelationAdmin && (
+                <Button type="link" onClick={() => setActiveModal('addOne')}>
+                  邀请成员
+                </Button>
+              )}
+            </>
+          }
           tabList={TitleItems}
           onTabChange={(key) => {
             userCtrl.currentTabKey = key;
@@ -212,70 +200,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             columns={PersonColumns}
           />
         </Modal>
-        <DictModal
-          open={activeModal == 'dict'}
-          data={dict}
-          handleOk={async (req: DictModel) => {
-            let res;
-            if (dict) {
-              res = await new Dict(current.id).updateDict({ ...dict, ...req });
-            } else {
-              res = await new Dict(current.id).createDict(req);
-            }
-            if (res) {
-              message.success('操作成功');
-              setDict(undefined);
-              forceUpdate();
-              setActiveModal('');
-            }
-          }}
-          handleCancel={() => {
-            setDict(undefined);
-            setActiveModal('');
-          }}
-        />
-        <DictItemModal
-          open={activeModal == 'dictItem'}
-          data={dictItem}
-          handleOk={async (model) => {
-            let res;
-            if (dictItem) {
-              res = await dictOperate.updateDictItem({ ...dictItem, ...model });
-            } else if (dict) {
-              res = await dictOperate.createDictItem({ ...model, dictId: dict.id });
-            }
-            if (res) {
-              setDictItem(undefined);
-              setActiveModal('');
-              forceUpdate();
-            }
-          }}
-          handleCancel={() => {
-            setDictItem(undefined);
-            setActiveModal('');
-          }}
-        />
-        <PropertyModal
-          data={property}
-          open={activeModal == 'property'}
-          handleOk={async (model: PropertyModel) => {
-            let res;
-            if (property) {
-              res = await propertyOperate.updateProperty({ ...property, ...model });
-            } else {
-              res = await propertyOperate.createProperty(model);
-            }
-            if (res) {
-              setProperty(undefined);
-              forceUpdate();
-              setActiveModal('');
-            }
-          }}
-          handleCancel={() => {
-            setProperty(undefined);
-            setActiveModal('');
-          }}
-        />
       </div>
     </div>
   );

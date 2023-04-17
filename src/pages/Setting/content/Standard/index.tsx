@@ -3,7 +3,6 @@ import { ISpeciesItem } from '@/ts/core';
 import { Button, Segmented, message } from 'antd';
 import React, { useEffect, useState } from 'react';
 import Description from './Description';
-import cls from './index.module.less';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
 import SettingFlow from '@/pages/Setting/content/Standard/Flow';
@@ -11,6 +10,7 @@ import userCtrl from '@/ts/controller/setting';
 import DefineInfo from './Flow/info';
 import { CreateDefineReq } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
+import cls from './index.module.less';
 
 interface IProps {
   current: ISpeciesItem;
