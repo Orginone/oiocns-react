@@ -11,7 +11,6 @@ import userCtrl from '@/ts/controller/setting';
 import DefineInfo from './Flow/info';
 import { CreateDefineReq } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IsThingAdmin } from '@/utils/authority';
 
 interface IProps {
   current: ISpeciesItem;
@@ -28,13 +27,6 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const [isRecursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [isRecursionSpecies, setRecursionSpecies] = useState<boolean>(true);
   const [key, forceUpdate] = useObjectUpdate(current);
-  const [isThingAdmin, setIsThingAdmin] = useState<boolean>(false);
-
-  useEffect(() => {
-    setTimeout(async () => {
-      setIsThingAdmin(await IsThingAdmin(userCtrl.target!));
-    }, 100);
-  }, []);
 
   useEffect(() => {
     if (tabItems().findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
@@ -141,16 +133,14 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         );
       case 'work':
         return (
-          isThingAdmin && (
-            <Button
-              key="create"
-              type="link"
-              onClick={() => {
-                setModalType('新增办事');
-              }}>
-              新增办事
-            </Button>
-          )
+          <Button
+            key="create"
+            type="link"
+            onClick={() => {
+              setModalType('新增办事');
+            }}>
+            新增办事
+          </Button>
         );
       default:
         return <></>;

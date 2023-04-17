@@ -98,7 +98,7 @@ const Attritube = ({
 
   const loadAttrs = async (page: PageRequest) => {
     return await current!.loadAttrsByPage(
-      userCtrl.space.id,
+      target?.id || userCtrl.space.id,
       recursionOrg,
       recursionSpecies,
       page,
@@ -113,7 +113,7 @@ const Attritube = ({
           return await loadAttrs(page);
         }}
         operation={renderOperate}
-        columns={AttributeColumns}
+        columns={AttributeColumns(target?.species || [])}
         showChangeBtn={false}
         dataSource={[]}
       />
