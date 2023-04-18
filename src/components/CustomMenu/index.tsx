@@ -53,7 +53,7 @@ const CustomMenu = (props: CustomMenuType) => {
     if (operateMenu) {
       setData(loadMenus(loopFilterTree([operateMenu.subMenu!]), openKeys));
     } else {
-      setData(loadMenus(loopFilterTree(props.item.children), openKeys));
+      setData(loadMenus(loopFilterTree([props.selectMenu]), openKeys));
     }
   }, [visibleMenu, filter]);
 
