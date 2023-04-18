@@ -137,7 +137,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       <div className={cls['pages-wrap']}>
         <PageCard
           key={key}
-          extra={
+          tabBarExtraContent={
             <>
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置

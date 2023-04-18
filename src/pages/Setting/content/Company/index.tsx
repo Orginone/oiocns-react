@@ -14,28 +14,14 @@ import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
-import {
-  DictColumns,
-  DictItemColumns,
-  GroupColumn,
-  PersonColumns,
-  PropertyColumns,
-} from '../../config/columns';
+import { GroupColumn, PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IsRelationAdmin, IsSuperAdmin, IsThingAdmin } from '@/utils/authority';
-import { Property } from '@/ts/core/thing/property';
-import { XDict, XDictItem, XProperty } from '@/ts/base/schema';
-import { Dict } from '@/ts/core/thing/dict';
-import DictModal from '../../components/dict/dictModal';
-import DictItemModal from '../../components/dict/dictItemModal';
-import { DictModel, PropertyModel } from '@/ts/base/model';
-import Authority from '../../components/authority';
-import PropertyModal from '../../components/propertyModal';
+import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 
 interface IProps {
   current: ICompany;
@@ -50,15 +36,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
-  const [isThingAdmin, SetIsThingAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [activeTab, setActiveTab] = useState<string>('');
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-  const [dict, setDict] = useState<XDict>();
-  const [dictItem, setDictItem] = useState<XDictItem>();
-  const [property, setProperty] = useState<XProperty>();
-  const dictOperate = new Dict(current.id);
-  const propertyOperate = new Property(current.id);
 
   useEffect(() => {
     if (TitleItems.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
@@ -71,7 +51,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsThingAdmin(await IsThingAdmin(current));
       SetIsRelationAdmin(await IsRelationAdmin(current));
     }, 10);
   }, [current]);
@@ -113,47 +92,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       key: 'groups',
     },
   ];
-
-  const dictItemRender = (dict: XDict) => {
-    return (
-      <CardOrTable<schema.XDictItem>
-        key="groups"
-        rowKey={'id'}
-        pagination={false}
-        dataSource={[]}
-        defaultExpandAllRows={true}
-        operation={(item) => {
-          return isThingAdmin
-            ? [
-                {
-                  key: 'edit',
-                  label: '编辑',
-                  onClick: async () => {
-                    setDictItem(item);
-                    setActiveModal('dictItem');
-                  },
-                },
-                {
-                  key: 'remove',
-                  label: '删除',
-                  onClick: async () => {
-                    if (await dictOperate.deleteDictItem(item.id)) {
-                      message.success('删除成功');
-                      forceUpdate();
-                    }
-                  },
-                },
-              ]
-            : [];
-        }}
-        columns={DictItemColumns}
-        showChangeBtn={false}
-        request={async (page) => {
-          return new Dict(current.id).loadDictItem(dict.id, page);
-        }}
-      />
-    );
-  };
 
   const content = () => {
     switch (activeTab) {

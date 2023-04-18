@@ -5,13 +5,12 @@ import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import SpeciesModal from './components/speciesModal';
+import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
 import { GroupMenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
 import { SettingOutlined } from '@ant-design/icons';
-import thingCtrl from '@/ts/controller/thing';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -55,9 +54,9 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await thingCtrl.dict?.deleteDict(data.item.id)) {
+                if (await userCtrl.target!.dict.deleteDict(data.item.id)) {
                   message.success('删除成功');
-                  await thingCtrl.loadSpeciesTree(true);
+                  await userCtrl.target!.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -68,7 +67,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
+                  await userCtrl.target!.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -96,7 +95,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
+                  await userCtrl.target!.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },

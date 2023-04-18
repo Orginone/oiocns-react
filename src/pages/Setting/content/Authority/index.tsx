@@ -1,12 +1,12 @@
 import PageCard from '@/components/PageCard';
-import { ITarget } from '@/ts/core';
 import { Tabs } from 'antd';
 import React, { useRef, useState } from 'react';
 import Description from './Description';
 import cls from './index.module.less';
+import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface IProps {
-  current: ITarget;
+  current: IAuthority;
 }
 /**
  * 权限设定

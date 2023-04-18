@@ -4,7 +4,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import PropertyModal from '../../components/propertyModal';
+import PropertyModal from './modal';
 import thing from '@/ts/controller/thing';
 
 /**
@@ -57,7 +57,6 @@ const Property = () => {
       {/** 新增/编辑特性模态框 */}
       <PropertyModal
         data={editData}
-        title={modalType}
         open={modalType != ''}
         handleCancel={() => {
           setModalType('');

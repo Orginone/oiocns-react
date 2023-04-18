@@ -10,6 +10,7 @@ import userCtrl from '@/ts/controller/setting';
 import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
+import AuthoritySetting from './Authority';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -37,7 +38,9 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
     case GroupMenuType.Dict:
       return <DictSetting current={selectMenu.item} />;
     case GroupMenuType.Property:
-      return <PropertySetting current={selectMenu.item} />;
+      return <PropertySetting />;
+    case GroupMenuType.Authority:
+      return <AuthoritySetting current={selectMenu.item} />;
     default:
       return <></>;
   }

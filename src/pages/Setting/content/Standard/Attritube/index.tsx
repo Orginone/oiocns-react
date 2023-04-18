@@ -6,7 +6,7 @@ import { XAttribute } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import AttributeModal from '../../../components/attributeModal';
+import AttributeModal from './attributeModal';
 import thing from '@/ts/controller/thing';
 
 interface IProps {

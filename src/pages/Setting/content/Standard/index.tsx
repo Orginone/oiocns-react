@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Description from './Description';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
-import SettingFlow from '@/pages/Setting/content/Standard/Flow';
+import FlowList from '@/pages/Setting/content/Standard/Flow';
 import userCtrl from '@/ts/controller/setting';
 import DefineInfo from './Flow/info';
 import { CreateDefineReq } from '@/ts/base/model';
@@ -155,7 +155,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <Attritube
             current={current}
-            target={userCtrl.space}
+            target={userCtrl.target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -166,7 +166,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <SpeciesForm
             current={current}
-            target={userCtrl.space}
+            target={userCtrl.target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -177,7 +177,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           />
         );
       case 'work':
-        return <SettingFlow key={activeTab} target={userCtrl.space} />;
+        return <FlowList target={userCtrl.target!} species={current} />;
     }
   };
 
@@ -193,7 +193,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
             userCtrl.currentTabKey = key;
             setActiveTab(key);
           }}
-          extra={renderTabBarExtraContent()}
+          tabBarExtraContent={renderTabBarExtraContent()}
           bodyStyle={{ paddingTop: 16 }}>
           <div className={cls['page-content-table']}>{content()}</div>
         </PageCard>
@@ -207,7 +207,9 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           setModalType('');
         }}
         handleOk={async (req: CreateDefineReq) => {
-          if (await userCtrl.target!.define.publishDefine(req)) {
+          if (
+            await userCtrl.target!.define.publishDefine({ ...req, speciesId: current.id })
+          ) {
             message.success('保存成功');
             forceUpdate();
             setModalType('');

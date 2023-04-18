@@ -8,22 +8,23 @@ import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import DefineInfo from './info';
-import { ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { IsThingAdmin } from '@/utils/authority';
 import { CreateDefineReq } from '@/ts/base/model';
 import Design from './Design';
 
 interface IProps {
   target: ITarget;
+  species: ISpeciesItem;
 }
 
 /**
  * 流程设置
  * @returns
  */
-const FlowList: React.FC<IProps> = ({ target }: IProps) => {
+const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
   const parentRef = useRef<any>(null);
-  const [key, setForceUpdate] = useObjectUpdate(target.define);
+  const [key, setForceUpdate] = useObjectUpdate(target);
   const [define, setDefine] = useState<XFlowDefine>();
   const [modalType, setModalType] = useState('');
   const [isThingAdmin, setIsThingAdmin] = useState<boolean>(false);
@@ -105,7 +106,7 @@ const FlowList: React.FC<IProps> = ({ target }: IProps) => {
                   parentRef={parentRef}
                   dataSource={[]}
                   request={async (page) => {
-                    let data = await target.define.loadFlowDefine();
+                    let data = await target.define.loadFlowDefine(species.id);
                     return {
                       ...page,
                       total: data.total,

@@ -4,7 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { SpeciesModel } from '@/ts/base/model';
 import { ISpeciesItem } from '@/ts/core';
 import userCtrl from '@/ts/controller/setting';
-import { targetsToTreeData } from '..';
+import { targetsToTreeData } from '../../..';
 
 interface Iprops {
   title: string;
