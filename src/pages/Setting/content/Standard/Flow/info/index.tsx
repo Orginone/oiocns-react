@@ -1,9 +1,9 @@
-import userCtrl from '@/ts/controller/setting';
 import {
   ProForm,
   ProFormDependency,
   ProFormSelect,
   ProFormText,
+  ProFormTextArea,
   ProFormTreeSelect,
 } from '@ant-design/pro-components';
 import { Modal } from 'antd';
@@ -21,17 +21,6 @@ interface Iprops {
   handleOk: (res: CreateDefineReq) => void;
   handleCancel: () => void;
 }
-
-/**
- * 默认备注：表单默认布局
- */
-export const defaultRemark: any = {
-  type: 'object',
-  properties: {},
-  labelWidth: 120,
-  layout: 'horizontal',
-  col: 12,
-};
 
 export const toTreeData = (species: any[]): any[] => {
   return species.map((t) => {
@@ -61,7 +50,6 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
       open={open}
       onOk={async () => {
         const value = {
-          ...{ remark: JSON.stringify(defaultRemark) },
           ...current,
           ...form.getFieldsValue(),
         };
@@ -107,26 +95,8 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           label="办事名称"
           placeholder="请输入办事名称"
           required={true}
-          colProps={{ span: 12 }}
+          colProps={{ span: 24 }}
           rules={[{ required: true, message: '办事名称为必填项' }]}
-        />
-        <ProFormTreeSelect
-          width="md"
-          name="belongId"
-          label="制定组织"
-          placeholder="请选择制定组织"
-          required={true}
-          colProps={{ span: 12 }}
-          request={async () => {
-            return await userCtrl.getTeamTree();
-          }}
-          fieldProps={{
-            disabled: title === '修改' || title === '编辑',
-            showSearch: true,
-            fieldNames: { label: 'teamName', value: 'id', children: 'subTeam' },
-            filterTreeNode: true,
-            treeNodeFilterProp: 'teamName',
-          }}
         />
         <ProFormSelect
           width="md"
@@ -178,6 +148,14 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
             return null;
           }}
         </ProFormDependency>
+        <ProFormTextArea
+          width="md"
+          name="remark"
+          label="备注"
+          placeholder="请输入备注信息"
+          required={false}
+          colProps={{ span: 24 }}
+        />
       </ProForm>
     </Modal>
   );

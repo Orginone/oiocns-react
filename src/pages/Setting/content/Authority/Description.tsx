@@ -8,8 +8,15 @@ import { IAuthority } from '@/ts/core/target/authority/iauthority';
  * @description: 权限信息内容
  * @return {*}
  */
-const Description = (props: { title: any; current: IAuthority; extra: any }) => {
-  const { title, current, extra } = props;
+const Description = ({
+  title,
+  current,
+  extra,
+}: {
+  title: any;
+  current: IAuthority;
+  extra: any;
+}) => {
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
@@ -27,11 +34,7 @@ const Description = (props: { title: any; current: IAuthority; extra: any }) => 
         <Descriptions.Item label="权限名称">{current.target.name}</Descriptions.Item>
         <Descriptions.Item label="共享组织">
           <Space>
-            {current.target.belongId ? (
-              <strong>{userCtrl.findTeamInfoById(current.target.belongId).name}</strong>
-            ) : (
-              <strong>奥集能平台</strong>
-            )}
+            <strong>{userCtrl.findTeamInfoById(current.target.belongId).name}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="权限编码">

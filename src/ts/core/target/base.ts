@@ -13,6 +13,7 @@ import { TargetModel, TargetShare } from '@/ts/base/model';
 import { FlowDefine } from '../thing/flowDefine';
 import { ISpeciesItem } from '../thing';
 import { loadSpeciesTree } from '../../core/';
+import { Dict } from '../thing/dict';
 
 export default class BaseTarget implements ITarget {
   public key: string;
@@ -25,6 +26,7 @@ export default class BaseTarget implements ITarget {
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
+  public dict: Dict;
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -64,6 +66,7 @@ export default class BaseTarget implements ITarget {
     this.typeName = target.typeName as TargetType;
     appendTarget(target);
     this.define = new FlowDefine(target.id);
+    this.dict = new Dict(target.id);
   }
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');

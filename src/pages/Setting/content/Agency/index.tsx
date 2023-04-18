@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
-import { XDict, XDictItem, XProperty, XTarget } from '@/ts/base/schema';
+import { XTarget } from '@/ts/base/schema';
 import userCtrl from '@/ts/controller/setting';
 import { IGroup, ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
@@ -14,13 +14,6 @@ import { CompanyColumn, PersonColumns } from '../../config/columns';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import { schema } from '@/ts/base';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
-import { Dict } from '@/ts/core/thing/dict';
-import { Property } from '@/ts/core/thing/property';
-import DictItemModal from '../../components/dict/dictItemModal';
-import PropertyModal from '../../components/propertyModal';
-import { DictModel, PropertyModel } from '@/ts/base/model';
-import DictModal from '../../components/dict/dictModal';
-
 interface IProps {
   current: ITarget;
 }
@@ -37,11 +30,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
   const [activeTab, setActiveTab] = useState<string>('');
-  const [dict, setDict] = useState<XDict>();
-  const [dictItem, setDictItem] = useState<XDictItem>();
-  const [property, setProperty] = useState<XProperty>();
-  const dictOperate = new Dict(current.id);
-  const propertyOperate = new Property(current.id);
 
   useEffect(() => {
     let tabs = TitleItems();
@@ -144,29 +132,30 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
           <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
         }
         current={current}
-        extra={
-          <>
-            <Button type="link" onClick={() => setActiveModal('indentity')}>
-              角色设置
-            </Button>
-            {isRelationAdmin && (
-              <>
-                <Button type="link" onClick={() => setActiveModal('addOne')}>
-                  添加成员
-                </Button>
-                {current.typeName == TargetType.Group && (
-                  <Button type="link" onClick={() => setActiveModal('joinGroup')}>
-                    加入集团
-                  </Button>
-                )}
-              </>
-            )}
-          </>
-        }
+        extra={[]}
       />
       <div className={cls['pages-wrap']}>
         <PageCard
           key={key}
+          tabBarExtraContent={
+            <>
+              <Button type="link" onClick={() => setActiveModal('indentity')}>
+                角色设置
+              </Button>
+              {isRelationAdmin && (
+                <>
+                  <Button type="link" onClick={() => setActiveModal('addOne')}>
+                    添加成员
+                  </Button>
+                  {current.typeName == TargetType.Group && (
+                    <Button type="link" onClick={() => setActiveModal('joinGroup')}>
+                      加入集团
+                    </Button>
+                  )}
+                </>
+              )}
+            </>
+          }
           activeTabKey={activeTab}
           bordered={false}
           tabList={TitleItems()}
@@ -233,70 +222,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
         }}>
         <SearchCompany searchCallback={setSelectMember} searchType={TargetType.Group} />
       </Modal>
-      <DictModal
-        open={activeModal == 'dict'}
-        data={dict}
-        handleOk={async (req: DictModel) => {
-          let res;
-          if (dict) {
-            res = await new Dict(current.id).updateDict({ ...dict, ...req });
-          } else {
-            res = await new Dict(current.id).createDict(req);
-          }
-          if (res) {
-            message.success('操作成功');
-            setDict(undefined);
-            forceUpdate();
-            setActiveModal('');
-          }
-        }}
-        handleCancel={() => {
-          setDict(undefined);
-          setActiveModal('');
-        }}
-      />
-      <DictItemModal
-        open={activeModal == 'dictItem'}
-        data={dictItem}
-        handleOk={async (model) => {
-          let res;
-          if (dictItem) {
-            res = await dictOperate.updateDictItem({ ...dictItem, ...model });
-          } else if (dict) {
-            res = await dictOperate.createDictItem({ ...model, dictId: dict.id });
-          }
-          if (res) {
-            setDictItem(undefined);
-            setActiveModal('');
-            forceUpdate();
-          }
-        }}
-        handleCancel={() => {
-          setDictItem(undefined);
-          setActiveModal('');
-        }}
-      />
-      <PropertyModal
-        data={property}
-        open={activeModal == 'property'}
-        handleOk={async (model: PropertyModel) => {
-          let res;
-          if (property) {
-            res = await propertyOperate.updateProperty({ ...property, ...model });
-          } else {
-            res = await propertyOperate.createProperty(model);
-          }
-          if (res) {
-            setProperty(undefined);
-            forceUpdate();
-            setActiveModal('');
-          }
-        }}
-        handleCancel={() => {
-          setProperty(undefined);
-          setActiveModal('');
-        }}
-      />
     </div>
   );
 };

@@ -4,19 +4,20 @@ import SchemaForm from '@/components/SchemaForm';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import userCtrl from '@/ts/controller/setting';
 import { targetsToTreeData } from '../..';
-import { AuthorityModel } from '@/ts/base/model';
 
 interface Iprops {
-  openType: string;
+  title: string;
+  open: boolean;
   handleCancel: () => void;
-  handleOk: (result: AuthorityModel) => void;
-  current: IAuthority;
+  handleOk: (result: boolean) => void;
+  current?: IAuthority;
 }
 /*
   权限编辑模态框
 */
 const AuthorityModal = (props: Iprops) => {
-  const { openType, handleOk, current, handleCancel } = props;
+  const { open, title, handleOk, current, handleCancel } = props;
+  const formValue = (current as IAuthority)['_authority'];
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<any>[] = [
     {
@@ -31,6 +32,21 @@ const AuthorityModal = (props: Iprops) => {
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '编码为必填项' }],
+      },
+    },
+    {
+      title: '选择制定组织',
+      dataIndex: 'belongId',
+      valueType: 'treeSelect',
+      initialValue: userCtrl.space.id,
+      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+      request: async () => {
+        const res = await userCtrl.getTeamTree();
+        return targetsToTreeData(res);
+      },
+      fieldProps: {
+        disabled: title === '修改',
+        showSearch: true,
       },
     },
     {
@@ -66,13 +82,13 @@ const AuthorityModal = (props: Iprops) => {
   return (
     <SchemaForm
       formRef={formRef}
-      title={openType == 'edit' ? '修改权限' : '新建权限'}
-      open={openType != ''}
+      title={title}
+      open={open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (openType == 'edit' && current) {
-            formRef.current?.setFieldsValue(current.target);
+          if (title.includes('修改') || title.includes('编辑')) {
+            formRef.current?.setFieldsValue(formValue);
           }
         } else {
           formRef.current?.resetFields();
@@ -83,7 +99,23 @@ const AuthorityModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       layoutType="ModalForm"
-      onFinish={handleOk}
+      onFinish={async (values) => {
+        if (title.includes('新增')) {
+          const { name, code, remark, belongId } = values;
+          const res = await current?.createSubAuthority(
+            name,
+            code,
+            belongId,
+            values.public,
+            remark,
+          );
+          handleOk(res?.success || true);
+        } else {
+          const { name, code, remark } = values;
+          const res = await current?.updateAuthority(name, code, values.public, remark);
+          handleOk(res?.success || true);
+        }
+      }}
       columns={columns}></SchemaForm>
   );
 };

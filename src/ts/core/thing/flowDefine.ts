@@ -11,8 +11,9 @@ export class FlowDefine {
   }
 
   /* 加载办事 */
-  async loadFlowDefine(): Promise<XFlowDefineArray> {
+  async loadFlowDefine(speciesId: string = ''): Promise<XFlowDefineArray> {
     const res = await kernel.queryDefine({
+      speciesId,
       spaceId: this.belongId,
     });
     return res.data;
@@ -25,17 +26,11 @@ export class FlowDefine {
 
   /* 删除办事  */
   async deleteDefine(id: string): Promise<boolean> {
-    const res = await kernel.deleteDefine({ id });
-    return res.data;
+    return (await kernel.deleteDefine({ id })).data;
   }
 
   /** 查询办事节点 */
   async queryNodes(id: string): Promise<FlowNode> {
-    return (
-      await kernel.queryNodes({
-        id: id || '',
-        page: { offset: 0, limit: 1000, filter: '' },
-      })
-    ).data;
+    return (await kernel.queryNodes({ id })).data;
   }
 }

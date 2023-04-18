@@ -1,6 +1,5 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
 import { ISpace, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { IsSuperAdmin } from '@/utils/authority';
@@ -35,6 +34,19 @@ const parseGroupMenuType = (typeName: TargetType) => {
 export const buildTargetTree = async (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
+    let prefix = item.target.code;
+    let children: MenuItemType[] = [];
+    let authority = await item.loadAuthorityTree();
+    if (authority) {
+      children.push({
+        children: [buildAuthorityTree(prefix, authority)],
+        key: prefix + '权限标准',
+        label: '权限标准',
+        itemType: '权限标准',
+        item: userCtrl.space,
+        icon: <im.ImNewspaper />,
+      });
+    }
     result.push({
       key: item.key,
       item: item,
@@ -43,6 +55,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       menus: await loadTypeMenus(item),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [
+        ...children,
         await buildTargetSpeciesTree(item),
         ...(await buildTargetTree(item.subTeam)),
       ],
@@ -55,7 +68,7 @@ const buildTargetSpeciesTree = async (target: ITarget) => {
   const species = await target.loadSpeciesTree();
   return {
     children: species.map((i) => buildSpeciesTree(target.id, i)),
-    key: target.id + '-分类标准',
+    key: target.target.code + '-分类标准',
     label: '分类标准',
     itemType: '分类标准',
     item: undefined,
@@ -78,18 +91,19 @@ export const buildSpeciesTree = (prefix: string, species: ISpeciesItem) => {
 };
 
 /** 编译权限树 */
-export const buildAuthorityTree = (authoritys: IAuthority) => {
+export const buildAuthorityTree = (prefix: string, authoritys: IAuthority) => {
   const result: MenuItemType = {
-    key: authoritys.id,
+    key: prefix + authoritys.id,
     item: authoritys,
     label: authoritys.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Authority,
     menus: loadAuthorityMenus(authoritys),
-    children: authoritys.children?.map((i) => buildAuthorityTree(i)) ?? [],
+    children: authoritys.children?.map((i) => buildAuthorityTree(prefix, i)) ?? [],
   };
   return result;
 };
+
 export const buildDictMenus = (dict: XDict) => {
   const result: MenuItemType = {
     key: dict.id,
@@ -115,117 +129,53 @@ export const buildDictMenus = (dict: XDict) => {
   };
   return result;
 };
-/** 获取空间菜单 */
-export const getSpaceMenu = async (user: ISpace, children: any[]) => {
-  let label = '我的';
-  let itemType = GroupMenuType.User;
-  if (user.typeName != TargetType.Person) {
-    label = user.teamName;
-    itemType = GroupMenuType.Company;
-  }
-  children.unshift(await buildTargetSpeciesTree(user));
-  return {
-    key: user.key,
-    item: user,
-    label: label,
-    itemType: itemType,
-    menus: await loadTypeMenus(user),
-    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
-    children: children,
-  };
-};
 
-/** 加载分组菜单 */
-export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]) => {
-  let menus = [
-    {
-      key: '重载|' + param.typeName,
-      icon: <im.ImSpinner9 />,
-      label: '刷新' + param.typeName,
-      model: 'inside',
-    },
-  ];
-  if (await IsSuperAdmin(param.item)) {
-    menus.unshift({
-      key: '新建|' + teamTypes.join('|'),
-      icon: <im.ImPlus />,
-      label: '新建' + param.typeName,
-      model: 'outside',
-    });
-  }
-  return {
-    key: param.key,
-    label: param.label,
-    itemType: param.key,
-    icon: (
-      <TeamIcon
-        share={{
-          name: param.key,
-          typeName: param.typeName,
-        }}
-        size={18}
-        fontSize={16}
-        notAvatar={true}
-      />
-    ),
-    menus: menus,
-    item: param.item,
-    children: await buildTargetTree(param.subTeam),
-  };
-};
-
-export const loadStandardSetting = async () => {
+export const loadStandardSetting = async (target: ITarget) => {
+  let prefix = target.target.code;
   const result: MenuItemType[] = [];
-  const authors = await userCtrl.space.loadSpaceAuthorityTree();
-  const dicts = await thingCtrl.dict?.loadDict({ offset: 0, limit: 1000, filter: '' });
+  const authors = await target?.loadAuthorityTree();
+  const dicts = await target.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
   if (authors) {
     result.push({
-      children: [buildAuthorityTree(authors)],
-      key: '权限标准',
+      children: [buildAuthorityTree(prefix, authors)],
+      key: prefix + '权限标准',
       label: '权限标准',
       itemType: '权限标准',
       item: userCtrl.space,
       icon: <im.ImNewspaper />,
     });
   }
+  if (dicts) {
+    result.push({
+      children: dicts?.result?.map((item) => buildDictMenus(item)) || [],
+      key: prefix + '字典定义',
+      label: '字典定义',
+      itemType: '字典定义',
+      item: userCtrl.space,
+      icon: <im.ImNewspaper />,
+      menus: [
+        {
+          key: '新增字典',
+          icon: <im.ImPlus />,
+          label: '新增字典',
+          model: 'outside',
+        },
+      ],
+    });
+  }
   result.push({
-    key: '数据标准',
-    label: '数据标准',
-    itemType: '数据标准',
+    children: [],
+    key: prefix + '属性定义',
+    label: '属性定义',
+    itemType: GroupMenuType.Property,
     item: userCtrl.space,
     icon: <im.ImNewspaper />,
-    children: [
+    menus: [
       {
-        children: dicts?.result?.map((item) => buildDictMenus(item)) || [],
-        key: '字典定义',
-        label: '字典定义',
-        itemType: '字典定义',
-        item: userCtrl.space,
-        icon: <im.ImNewspaper />,
-        menus: [
-          {
-            key: '新增字典',
-            icon: <im.ImPlus />,
-            label: '新增字典',
-            model: 'outside',
-          },
-        ],
-      },
-      {
-        children: [],
-        key: '属性定义',
-        label: '属性定义',
-        itemType: GroupMenuType.Property,
-        item: userCtrl.space,
-        icon: <im.ImNewspaper />,
-        menus: [
-          {
-            key: '新增属性',
-            icon: <im.ImPlus />,
-            label: '新增属性',
-            model: 'outside',
-          },
-        ],
+        key: '新增属性',
+        icon: <im.ImPlus />,
+        label: '新增属性',
+        model: 'outside',
       },
     ],
   });
@@ -337,6 +287,64 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
   }
   return items;
 };
+/** 获取空间菜单 */
+export const getSpaceMenu = async (user: ISpace, children: any[]) => {
+  let label = '我的';
+  let itemType = GroupMenuType.User;
+  if (user.typeName != TargetType.Person) {
+    label = user.teamName;
+    itemType = GroupMenuType.Company;
+  }
+  children.unshift(await buildTargetSpeciesTree(user));
+  return {
+    key: user.key,
+    item: user,
+    label: label,
+    itemType: itemType,
+    menus: await loadTypeMenus(user),
+    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
+    children: [...(await loadStandardSetting(user)), ...children],
+  };
+};
+
+/** 加载分组菜单 */
+export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]) => {
+  let menus = [
+    {
+      key: '重载|' + param.typeName,
+      icon: <im.ImSpinner9 />,
+      label: '刷新' + param.typeName,
+      model: 'inside',
+    },
+  ];
+  if (await IsSuperAdmin(param.item)) {
+    menus.unshift({
+      key: '新建|' + teamTypes.join('|'),
+      icon: <im.ImPlus />,
+      label: '新建' + param.typeName,
+      model: 'outside',
+    });
+  }
+  return {
+    key: param.key,
+    label: param.label,
+    itemType: param.key,
+    icon: (
+      <TeamIcon
+        share={{
+          name: param.key,
+          typeName: param.typeName,
+        }}
+        size={18}
+        fontSize={16}
+        notAvatar={true}
+      />
+    ),
+    menus: menus,
+    item: param.item,
+    children: await buildTargetTree(param.subTeam),
+  };
+};
 
 /** 加载右侧菜单 */
 export const loadAuthorityMenus = (item: IAuthority) => {
@@ -363,6 +371,7 @@ export const loadAuthorityMenus = (item: IAuthority) => {
   }
   return items;
 };
+
 /** 加载类型更多操作 */
 export const loadTypeMenus = async (item: ITarget) => {
   const menus: OperateMenuType[] = [];

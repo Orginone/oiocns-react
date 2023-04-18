@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
-import Operation from './Operation';
+import Operation from './operation';
 import Design from './Design';
 
 interface IProps {
