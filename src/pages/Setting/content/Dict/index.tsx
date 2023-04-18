@@ -12,8 +12,8 @@ import cls from './index.module.less';
  * @description: 分类字典管理
  * @return {*}
  */
-const DictInfo: React.FC<any> = (props: { current: XDict }) => {
-  const { current } = props;
+const DictInfo: React.FC<any> = (props: { current: XDict; belongId: string }) => {
+  const { current, belongId } = props;
   const [activeModel, setActiveModel] = useState<string>('');
   const [dictItem, setDictItem] = useState<XDictItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
@@ -87,7 +87,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
           rowKey={'id'}
           params={tkey}
           operation={renderOperate}
-          request={(page) => thingCtrl.dict!.loadDictItem(current.id, page)}
+          request={(page) => thingCtrl.dict!.loadDictItem(current.id, belongId, page)}
           columns={DictItemColumns}
           showChangeBtn={false}
         />

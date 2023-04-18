@@ -1,18 +1,8 @@
 import { EllipsisOutlined } from '@ant-design/icons';
-import {
-  Dropdown,
-  Menu,
-  MenuProps,
-  Typography,
-  Input,
-  Layout,
-  Row,
-  Col,
-  Badge,
-} from 'antd';
+import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { ImSearch, ImUndo2 } from 'react-icons/im';
-import { MenuItemType, OperateMenuType } from 'typings/globelType';
+import { ImSearch } from 'react-icons/im';
+import { MenuItemType } from 'typings/globelType';
 import style from './index.module.less';
 
 interface CustomMenuType {
@@ -27,35 +17,35 @@ const CustomMenu = (props: CustomMenuType) => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
   const [data, setData] = useState<MenuProps['items']>([]);
-  const [operateMenu, setOperateMenu] = useState<OperateMenuType>();
   useEffect(() => {
-    if (!selectedKeys.includes(props.selectMenu.key) || !operateMenu) {
-      setOperateMenu(undefined);
-      const expKeys = loadOpenKeys(props.item.children, props.selectMenu.key);
-      if (props.selectMenu.label != '') {
-        setData(loadMenus(loopFilterTree([props.selectMenu]), expKeys));
-      } else {
-        setData(loadMenus(loopFilterTree(props.item.children), expKeys));
-      }
-      setOpenKeys(expKeys);
-      setSelectedKeys([props.selectMenu.key]);
-    }
-    if (operateMenu && props.selectMenu.menus) {
-      const menu = props.selectMenu.menus.find((i) => i.key == operateMenu?.key);
-      if (menu && menu.subMenu) {
-        setOperateMenu(menu);
-        setData(loadMenus(loopFilterTree([menu.subMenu])));
-      }
+    if (!selectedKeys.includes(props.selectMenu.key)) {
+      reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
     }
   }, [props]);
 
   useEffect(() => {
-    if (operateMenu) {
-      setData(loadMenus(loopFilterTree([operateMenu.subMenu!]), openKeys));
-    } else {
-      setData(loadMenus(loopFilterTree([props.selectMenu]), openKeys));
-    }
+    reloadData(openKeys);
   }, [visibleMenu, filter]);
+
+  const reloadData = (keys: string[]) => {
+    const node = findRootMenus(props.item) ?? props.item;
+    setData(loadMenus(loopFilterTree(node.children), keys));
+    setOpenKeys(keys);
+    setSelectedKeys([props.selectMenu.key]);
+  };
+
+  const findRootMenus = (item: MenuItemType): MenuItemType | undefined => {
+    for (const node of item.children) {
+      if (node.key === props.selectMenu.key) {
+        return item;
+      }
+      const find = findRootMenus(node);
+      if (find != undefined) {
+        return find;
+      }
+    }
+    return undefined;
+  };
 
   const loopFilterTree = (data: MenuItemType[]) => {
     const result: any[] = [];
@@ -86,13 +76,8 @@ const CustomMenu = (props: CustomMenuType) => {
       for (const item of items) {
         result.push({
           key: item.key,
-          icon: (
-            <span style={{ fontSize: 16, paddingTop: 2 }}>
-              {item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon}
-            </span>
-          ),
           title: item.label,
-          label: renderLabel(item),
+          label: renderLabel(item, expKeys),
           children: loadMenus(item.children, expKeys),
         });
       }
@@ -118,15 +103,12 @@ const CustomMenu = (props: CustomMenuType) => {
     return result;
   };
   /** 渲染标题,支持更多操作 */
-  const renderLabel = (item: MenuItemType) => {
+  const renderLabel = (item: MenuItemType, expKeys: string[]) => {
     return (
       <span
         onClick={() => {
           if (item.key != props.selectMenu.key) {
             props.onSelect?.apply(this, [item]);
-          }
-          if (operateMenu) {
-            setSelectedKeys([props.selectMenu.key, item.key]);
           }
         }}
         className={style.customlabel}
@@ -134,6 +116,11 @@ const CustomMenu = (props: CustomMenuType) => {
           setVisibleMenu(false);
         }}>
         <Typography.Text className={style.label} ellipsis={{ tooltip: item.label }}>
+          {item.icon && (
+            <span style={{ fontSize: 16, paddingRight: 5 }}>
+              {item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon}
+            </span>
+          )}
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (
@@ -156,14 +143,7 @@ const CustomMenu = (props: CustomMenuType) => {
                     };
                   }),
                   onClick: ({ key }) => {
-                    const menu = item.menus?.find((i) => i.key == key);
-                    if (menu && menu.subMenu) {
-                      setOperateMenu(menu);
-                      setSelectedKeys([props.selectMenu.key, menu.subMenu.key]);
-                      props.onSelect?.apply(this, [menu.subMenu]);
-                    } else {
-                      props.onMenuClick?.apply(this, [item, key]);
-                    }
+                    props.onMenuClick?.apply(this, [item, key]);
                     setVisibleMenu(false);
                   },
                 }}
@@ -184,28 +164,6 @@ const CustomMenu = (props: CustomMenuType) => {
 
   return (
     <>
-      {operateMenu && (
-        <Layout className={style.operateMenu}>
-          <Row justify="space-between">
-            <Col>
-              <div style={{ display: 'flex' }}>
-                <div style={{ paddingRight: '6px' }}>{operateMenu.icon}</div>
-                <div>{operateMenu.label}</div>
-              </div>
-            </Col>
-            <Col>
-              <ImUndo2
-                style={{ cursor: 'pointer' }}
-                title={'返回'}
-                onClick={() => {
-                  setOperateMenu(undefined);
-                  props.onSelect?.apply(this, [props.selectMenu]);
-                }}
-              />
-            </Col>
-          </Row>
-        </Layout>
-      )}
       <span style={{ display: 'flex' }}>
         <Input
           style={{ height: 36, fontSize: 15 }}

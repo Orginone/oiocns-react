@@ -67,7 +67,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           {!collapsed && <strong>{props.title.label}</strong>}
         </div>
         <div className={cls.container} id="templateMenu">
-          {siderMenuData.length > 0 && (
+          {siderMenuData.length > 1 ? (
             <Tabs
               centered
               activeKey={activeKey}
@@ -97,6 +97,19 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                 };
               })}
             />
+          ) : siderMenuData.length > 0 ? (
+            <CustomMenu
+              item={siderMenuData[0]}
+              selectMenu={props.selectMenu}
+              onSelect={(item) => {
+                props.onSelect?.apply(this, [item]);
+              }}
+              onMenuClick={(item, key) => {
+                props.onMenuClick?.apply(this, [item, key]);
+              }}
+            />
+          ) : (
+            <></>
           )}
         </div>
       </Sider>

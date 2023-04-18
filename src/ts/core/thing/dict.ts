@@ -36,9 +36,14 @@ export class Dict {
   }
 
   /* 加载字典项 */
-  async loadDictItem(id: string, page: PageRequest): Promise<XDictItemArray> {
+  async loadDictItem(
+    id: string,
+    belongId: string,
+    page: PageRequest,
+  ): Promise<XDictItemArray> {
     const res = await kernel.queryDictItems({
       id: id,
+      spaceId: belongId,
       page: page,
     });
     return res.data;

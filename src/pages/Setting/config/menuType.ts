@@ -1,6 +1,7 @@
 /** 分组菜单类型 */
 export enum GroupMenuType {
   'User' = '个人',
+  'Team' = '组织',
   'Agency' = '机构',
   'Cohort' = '群组',
   'Company' = '单位',
