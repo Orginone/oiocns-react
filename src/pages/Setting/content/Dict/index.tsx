@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import thingCtrl from '@/ts/controller/thing';
-import DictItemModal from '@/pages/Setting/content/Dict/dictItemModal';
+import DictItemModal from './dictItemModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 /**
@@ -57,6 +57,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
       key: 'dictItems',
     },
   ];
+
   return (
     <Card bordered={false}>
       <Descriptions
@@ -102,7 +103,8 @@ const DictInfo: React.FC<any> = (props: { current: XDict }) => {
             tforceUpdate();
           }
         }}
-        current={current}></DictItemModal>
+        current={current}
+      />
     </Card>
   );
 };
