@@ -16,6 +16,8 @@ import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
 import { MenuItemType } from 'typings/globelType';
 import { companyTypes } from '@/ts/core/enum';
+import chat from '@/ts/controller/chat';
+import { useHistory } from 'react-router-dom';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -28,6 +30,7 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 };
 
 const TeamSetting: React.FC = () => {
+  const history = useHistory();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
@@ -64,9 +67,7 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await userCtrl.target!.dict.deleteDict(data.item.id)) {
-                  message.success('删除成功');
-                  await userCtrl.target!.loadSpeciesTree(true);
+                if (await data.belong.dict.deleteDict(data.item.id)) {
                   refreshMenu();
                 }
               },
@@ -77,7 +78,6 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  await userCtrl.target!.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -105,7 +105,6 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  await userCtrl.target!.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -117,21 +116,32 @@ const TeamSetting: React.FC = () => {
           case '加入单位':
             setShowModal(true);
             break;
+          case '打开会话':
+            chat.setCurrent(
+              chat.findTargetChat(
+                data.item.target,
+                data.belong.id,
+                data.belong.id != userCtrl.user.id ? data.belong.teamName : '我的',
+                data.item.typeName,
+              ),
+            );
+            history.push('/chat');
+            break;
           default:
             if (key.startsWith('重载')) {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  userCtrl.space.getCohorts(true);
+                  data.belong.getCohorts(true);
                   break;
                 case TargetType.Department:
-                  (userCtrl.space as ICompany).getDepartments(true);
+                  (data.belong as ICompany).getDepartments(true);
                   break;
                 case TargetType.Group:
-                  (userCtrl.space as ICompany).getJoinedGroups(true);
+                  (data.belong as ICompany).getJoinedGroups(true);
                   break;
                 case TargetType.Station:
-                  (userCtrl.space as ICompany).getStations(true);
+                  (data.belong as ICompany).getStations(true);
                   break;
               }
               userCtrl.changCallback();
@@ -157,7 +167,7 @@ const TeamSetting: React.FC = () => {
             setOperateKeys(['']);
           }
         }}
-        current={editTarget || userCtrl.space}
+        current={editTarget || userCtrl.user}
         typeNames={operateKeys.slice(1)}
       />
       {/** 分类模态框 */}
@@ -187,7 +197,6 @@ const TeamSetting: React.FC = () => {
         }}
         handleOk={(item) => {
           if (item) {
-            userCtrl.setCurSpace(item.id);
             setShowFormModal(false);
             setRefreshKey(key);
             refreshMenu();

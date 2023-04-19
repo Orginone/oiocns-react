@@ -43,8 +43,8 @@ interface MenuItemType {
   menuType?: string;
   checked?: boolean;
   itemType: string;
-  belongId: string;
-  shareId: string;
+  belong?: any;
+  shareId?: string;
   count?: number;
   tag?: string[];
   icon?: React.ReactNode;

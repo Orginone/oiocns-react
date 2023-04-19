@@ -8,8 +8,8 @@ import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
 import { FlowDefine } from '../thing/flowDefine';
 import { ISpeciesItem } from '../thing';
-import { Dict } from '../thing/dict';
-import { Property } from '../thing/property';
+import { Dict } from './thing/dict';
+import { Property } from './thing/property';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -54,10 +54,6 @@ export interface ITarget {
   shareInfo: TargetShare;
   /** 办事 */
   define: FlowDefine;
-  /** 字典 */
-  dict: Dict;
-  /** 属性 */
-  property: Property;
   /** 分类 */
   species: ISpeciesItem[];
   /**
@@ -343,6 +339,10 @@ export interface ISpace extends IFlow, IMTarget, ITarget {
   spaceData: SpaceType;
   /** 空间权限树 */
   spaceAuthorityTree: IAuthority | undefined;
+  /** 属性 */
+  property: Property;
+  /** 字典 */
+  dict: Dict;
   /**
    * @description: 查询群
    * @param reload 是否强制刷新

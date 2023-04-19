@@ -1,6 +1,6 @@
-import { PageRequest, PropertyModel } from '../../base/model';
-import { XProperty, XPropertyArray } from '../../base/schema';
-import { kernel } from '../../base';
+import { PageRequest, PropertyModel } from '../../../base/model';
+import { XProperty, XPropertyArray } from '../../../base/schema';
+import { kernel } from '../../../base';
 
 export class Property {
   belongId: string;

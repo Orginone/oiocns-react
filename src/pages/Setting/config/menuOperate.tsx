@@ -1,6 +1,6 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem, ITarget, TargetType } from '@/ts/core';
+import { ISpace, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { IsSuperAdmin } from '@/utils/authority';
 import React from 'react';
@@ -31,12 +31,12 @@ const parseGroupMenuType = (typeName: TargetType) => {
 };
 
 /** 编译组织树 */
-export const buildTargetTree = async (targets: ITarget[], belongId: string) => {
+export const buildTargetTree = async (targets: ITarget[], belong: ISpace) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     result.push({
       key: item.key,
-      belongId: belongId,
+      belong: belong,
       shareId: item.id,
       item: item,
       label: item.teamName,
@@ -44,20 +44,20 @@ export const buildTargetTree = async (targets: ITarget[], belongId: string) => {
       menus: await loadTypeMenus(item),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [
-        await buildTargetSpeciesTree(item, belongId),
-        ...(await buildTargetTree(item.subTeam, belongId)),
+        await buildTargetSpeciesTree(item, belong),
+        ...(await buildTargetTree(item.subTeam, belong)),
       ],
     });
   }
   return result;
 };
 
-const buildTargetSpeciesTree = async (target: ITarget, belongId: string) => {
+const buildTargetSpeciesTree = async (target: ITarget, belong: ISpace) => {
   const species = await target.loadSpeciesTree();
   return {
-    children: species.map((i) => buildSpeciesTree(target.key, i, belongId)),
+    children: species.map((i) => buildSpeciesTree(target.key, i, belong)),
     key: target.key + '-分类标准',
-    belongId: belongId,
+    belong: belong,
     shareId: target.id,
     label: '分类标准',
     itemType: '分类标准',
@@ -70,18 +70,18 @@ const buildTargetSpeciesTree = async (target: ITarget, belongId: string) => {
 export const buildSpeciesTree = (
   prefix: string,
   species: ISpeciesItem,
-  belongId: string,
+  belong: ISpace,
 ) => {
   const result: MenuItemType = {
     key: prefix + species.id,
-    belongId: belongId,
+    belong: belong,
     shareId: species.target.belongId,
     item: species,
     label: species.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Species,
     menus: loadSpeciesMenus(species),
-    children: species.children?.map((i) => buildSpeciesTree(prefix, i, belongId)) ?? [],
+    children: species.children?.map((i) => buildSpeciesTree(prefix, i, belong)) ?? [],
   };
   return result;
 };
@@ -90,28 +90,28 @@ export const buildSpeciesTree = (
 export const buildAuthorityTree = (
   prefix: string,
   authoritys: IAuthority,
-  belongId: string,
+  belong: ISpace,
 ) => {
   const result: MenuItemType = {
     key: prefix + authoritys.id,
-    belongId: belongId,
-    shareId: belongId,
+    belong: belong,
+    shareId: belong.id,
     item: authoritys,
     label: authoritys.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Authority,
     menus: loadAuthorityMenus(authoritys),
     children:
-      authoritys.children?.map((i) => buildAuthorityTree(prefix, i, belongId)) ?? [],
+      authoritys.children?.map((i) => buildAuthorityTree(prefix, i, belong)) ?? [],
   };
   return result;
 };
 
-export const buildDictMenus = (dict: XDict, belongId: string) => {
+export const buildDictMenus = (dict: XDict, belong: ISpace) => {
   const result: MenuItemType = {
     key: dict.id,
-    belongId: belongId,
-    shareId: belongId,
+    belong: belong,
+    shareId: belong.id,
     item: dict,
     label: dict.name,
     icon: <im.ImTree />,
@@ -135,15 +135,15 @@ export const buildDictMenus = (dict: XDict, belongId: string) => {
   return result;
 };
 
-export const loadStandardSetting = async (target: ITarget, belongId: string) => {
+export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
   const result: MenuItemType[] = [];
   const authors = await target?.loadAuthorityTree();
-  const dicts = await target.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
+  const dicts = await belong.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
   if (authors) {
     result.push({
-      children: [buildAuthorityTree(target.key, authors, belongId)],
+      children: [buildAuthorityTree(target.key, authors, belong)],
       key: target.key + '权限标准',
-      belongId: belongId,
+      belong: belong,
       shareId: target.id,
       label: '权限标准',
       itemType: '权限标准',
@@ -153,9 +153,9 @@ export const loadStandardSetting = async (target: ITarget, belongId: string) => 
   }
   if (dicts) {
     result.push({
-      children: dicts?.result?.map((item) => buildDictMenus(item, belongId)) || [],
+      children: dicts?.result?.map((item) => buildDictMenus(item, belong)) || [],
       key: target.key + '字典定义',
-      belongId: belongId,
+      belong: belong,
       shareId: target.id,
       label: '字典定义',
       itemType: '字典定义',
@@ -174,7 +174,7 @@ export const loadStandardSetting = async (target: ITarget, belongId: string) => 
   result.push({
     children: [],
     key: target.key + '属性定义',
-    belongId: belongId,
+    belong: belong,
     shareId: target.id,
     label: '属性定义',
     itemType: GroupMenuType.Property,
@@ -189,7 +189,7 @@ export const loadStandardSetting = async (target: ITarget, belongId: string) => 
       },
     ],
   });
-  result.push(await buildTargetSpeciesTree(target, target.id));
+  result.push(await buildTargetSpeciesTree(target, belong));
   return result;
 };
 
@@ -230,7 +230,17 @@ export const getUserMenu = async () => {
     shareId: userCtrl.user.id,
     menus: await loadTypeMenus(userCtrl.user),
     children: [
-      ...(await loadStandardSetting(userCtrl.user, userCtrl.user.id)),
+      {
+        key: userCtrl.user.key + '标准设置',
+        item: userCtrl.user,
+        label: '标准设置',
+        itemType: '标准设置',
+        belongId: userCtrl.user.id,
+        shareId: userCtrl.user.id,
+        menus: [],
+        icon: <im.ImNewspaper />,
+        children: await loadStandardSetting(userCtrl.user, userCtrl.user),
+      },
       await loadGroupMenus(
         {
           key: userCtrl.user.id + GroupMenuType.UserCohort,
@@ -240,7 +250,7 @@ export const getUserMenu = async () => {
           subTeam: await userCtrl.user.getCohorts(),
         },
         [TargetType.Cohort],
-        userCtrl.user.id,
+        userCtrl.user,
       ),
     ],
   };
@@ -255,7 +265,7 @@ export const getTeamMenu = async () => {
       item: company,
       label: company.teamName,
       itemType: GroupMenuType.Company,
-      belongId: company.id,
+      belong: company,
       shareId: company.id,
       menus: await loadTypeMenus(company),
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
@@ -265,11 +275,11 @@ export const getTeamMenu = async () => {
           item: company,
           label: '标准设置',
           itemType: '标准设置',
-          belongId: company.id,
+          belong: company.id,
           shareId: company.id,
           menus: [],
           icon: <im.ImNewspaper />,
-          children: await loadStandardSetting(company, company.id),
+          children: await loadStandardSetting(company, company),
         },
         await loadGroupMenus(
           {
@@ -280,7 +290,7 @@ export const getTeamMenu = async () => {
             subTeam: await company.loadSubTeam(),
           },
           company.subTeamTypes,
-          company.id,
+          company,
         ),
         await loadGroupMenus(
           {
@@ -291,7 +301,7 @@ export const getTeamMenu = async () => {
             subTeam: await company.getJoinedGroups(),
           },
           [TargetType.Group],
-          company.id,
+          company,
         ),
         await loadGroupMenus(
           {
@@ -302,7 +312,7 @@ export const getTeamMenu = async () => {
             subTeam: await company.getStations(),
           },
           [TargetType.Station],
-          company.id,
+          company,
         ),
         await loadGroupMenus(
           {
@@ -313,7 +323,7 @@ export const getTeamMenu = async () => {
             subTeam: await company.getCohorts(),
           },
           [TargetType.Cohort],
-          company.id,
+          company,
         ),
       ],
     });
@@ -346,7 +356,7 @@ export const getTeamMenu = async () => {
 export const loadGroupMenus = async (
   param: groupMenuParams,
   teamTypes: string[],
-  belongId: string,
+  belong: ISpace,
 ) => {
   let menus = [
     {
@@ -381,9 +391,9 @@ export const loadGroupMenus = async (
     ),
     menus: menus,
     item: param.item,
-    belongId: belongId,
-    shareId: belongId,
-    children: await buildTargetTree(param.subTeam, belongId),
+    belong: belong,
+    shareId: belong.id,
+    children: await buildTargetTree(param.subTeam, belong),
   };
 };
 
@@ -416,6 +426,14 @@ export const loadAuthorityMenus = (item: IAuthority) => {
 /** 加载类型更多操作 */
 export const loadTypeMenus = async (item: ITarget) => {
   const menus: OperateMenuType[] = [];
+  if (item.typeName != TargetType.Group) {
+    menus.push({
+      key: '打开会话',
+      icon: <im.ImBubbles />,
+      label: '打开会话',
+      model: 'outside',
+    });
+  }
   let isAdmin = await IsSuperAdmin(item);
   if (item.subTeamTypes.length > 0) {
     if (isAdmin) {
