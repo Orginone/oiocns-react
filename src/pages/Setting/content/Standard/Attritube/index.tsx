@@ -10,7 +10,7 @@ import AttributeModal from './attributeModal';
 import thing from '@/ts/controller/thing';
 
 interface IProps {
-  target?: ITarget;
+  target: ITarget;
   current: ISpeciesItem;
   modalType: string;
   recursionOrg: boolean;
@@ -98,7 +98,7 @@ const Attritube = ({
 
   const loadAttrs = async (page: PageRequest) => {
     return await current!.loadAttrsByPage(
-      target?.id || userCtrl.space.id,
+      target.id,
       recursionOrg,
       recursionSpecies,
       page,

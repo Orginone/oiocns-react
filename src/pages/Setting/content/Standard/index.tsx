@@ -155,7 +155,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <Attritube
             current={current}
-            target={userCtrl.target}
+            target={userCtrl.target!}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}

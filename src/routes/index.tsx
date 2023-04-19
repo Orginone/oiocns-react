@@ -80,19 +80,6 @@ const MarketRouter: IRouteConfig[] = [
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
     icon: 'icon-guangshangcheng',
-    routes: [
-      {
-        path: '/market/shop',
-        title: '应用市场',
-        icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
-      },
-      {
-        path: '/market',
-        title: '应用市场',
-        render: () => <RouterRedirect to="/market/shop" />,
-      },
-    ],
   },
 ];
 
