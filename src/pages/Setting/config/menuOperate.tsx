@@ -289,10 +289,9 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
 };
 /** 获取空间菜单 */
 export const getSpaceMenu = async (user: ISpace, children: any[]) => {
-  let label = '我的';
+  let label = user.teamName;
   let itemType = GroupMenuType.User;
   if (user.typeName != TargetType.Person) {
-    label = user.teamName;
     itemType = GroupMenuType.Company;
   }
   children.unshift(await buildTargetSpeciesTree(user));

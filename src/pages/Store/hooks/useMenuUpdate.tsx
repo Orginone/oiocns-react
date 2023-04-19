@@ -5,6 +5,7 @@ import { ImHome } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { findMenuItemByKey } from '@/utils/tools';
+import userCtrl from '@/ts/controller/setting';
 /**
  * 仓库菜单刷新hook
  * @returns key 变更后的标识,
@@ -33,25 +34,27 @@ const useMenuUpdate = (): [
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const adminMenus = await operate.loadAdminMenus();
-    const stores = await operate.loadMarketMenus();
+    const children: MenuItemType[] = [await operate.loadAdminMenus(userCtrl.user)];
+    for (const company of await userCtrl.user.getJoinedCompanys()) {
+      children.push(await operate.loadAdminMenus(company));
+    }
     const newMenus = [
       {
         key: '仓库',
-        label: '仓库',
+        label: '',
         itemType: 'Tab',
-        children: adminMenus,
+        children: children,
       },
-      {
-        key: '商店',
-        label: '商店',
-        itemType: 'Tab',
-        children: stores,
-      },
+      // {
+      //   key: '商店',
+      //   label: '商店',
+      //   itemType: 'Tab',
+      //   children: stores,
+      // },
     ];
-    var item = findMenuItemByKey(newMenus, storeCtrl.currentKey);
+    var item = findMenuItemByKey(children, storeCtrl.currentKey);
     if (item === undefined) {
-      item = adminMenus[0];
+      item = children[0];
     }
     storeCtrl.currentKey = item.key;
     setSelectMenu(item);

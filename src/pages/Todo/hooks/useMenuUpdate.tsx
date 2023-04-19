@@ -1,11 +1,11 @@
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { emitter, WorkType } from '@/ts/core';
+import { emitter } from '@/ts/core';
 import { findMenuItemByKey } from '@/utils/tools';
-import { SettingOutlined } from '@ant-design/icons';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
+import userCtrl from '@/ts/controller/setting';
 
 /**
  * 监听控制器刷新hook
@@ -25,40 +25,19 @@ const useMenuUpdate = (): [
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
+    const children: MenuItemType[] = [await operate.getUserMenu(userCtrl.user)];
+    for (const company of await userCtrl.user.getJoinedCompanys()) {
+      children.push(await operate.getUserMenu(company));
+    }
     const newMenus = [
       {
-        key: '待办',
-        label: '待办',
+        key: '办事',
+        label: '',
         itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformTodoMenu()),
-          {
-            key: 'todoWork',
-            label: '事项',
-            itemType: WorkType.WorkTodo,
-            icon: <SettingOutlined />,
-            count: (await todoCtrl.loadWorkTodo()).length,
-            children: [],
-          },
-        ],
-      },
-      {
-        key: '发起',
-        label: '发起',
-        itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformApplyMenu()),
-          {
-            key: '办事项',
-            label: '办事项',
-            itemType: 'group',
-            icon: <SettingOutlined />,
-            children: await operate.loadThingMenus('work'),
-          },
-        ],
+        children: children,
       },
     ];
-    var item = findMenuItemByKey(newMenus, todoCtrl.currentKey);
+    var item = findMenuItemByKey(children, todoCtrl.currentKey);
     if (item === undefined) {
       item = newMenus[0].children[0];
     }
