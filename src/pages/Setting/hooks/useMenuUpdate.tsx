@@ -24,7 +24,7 @@ const useMenuUpdate = (): [
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children = [await operate.getUserMenu(), await operate.getTeamMenu()];
+    const children = [await operate.getUserMenu(), ...(await operate.getTeamMenu())];
     const newMenus = [
       {
         key: '设置',

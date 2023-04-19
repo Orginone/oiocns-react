@@ -5,7 +5,7 @@
   height: 100%;
   .container {
     padding: 0 @padding-xs;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 160px);
     overflow-y: scroll;
   }
   .title {
@@ -25,6 +25,19 @@
     color: @primary-color;
     font-size: 18px;
     padding-top: 4px;
+  }
+
+  .exit {
+    color: #666;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    border-top: #EFEFEF 1px solid;
+    padding: 5px 20px;
+
+    span {
+      margin-left: 2px;
+    }
   }
 
   :global {

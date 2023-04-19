@@ -14,6 +14,7 @@ import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import chat from '@/ts/controller/chat';
 
 /**
  * 个人信息
@@ -84,6 +85,21 @@ const PersonSetting: React.FC = () => {
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
+      {
+        key: 'openchats',
+        label: '打开会话',
+        onClick: async () => {
+          chat.setCurrent(
+            chat.findTargetChat(
+              item,
+              userCtrl.user.id,
+              userCtrl.user.teamName,
+              item.typeName,
+            ),
+          );
+          history.push('/chat');
+        },
+      },
       {
         key: 'remove',
         label: '移除',

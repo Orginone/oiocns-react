@@ -224,11 +224,31 @@ export const getUserMenu = async () => {
   return {
     key: userCtrl.user.key,
     item: userCtrl.user,
-    label: '个人',
+    label: userCtrl.user.teamName,
     itemType: GroupMenuType.User,
     belongId: userCtrl.user.id,
     shareId: userCtrl.user.id,
-    menus: await loadTypeMenus(userCtrl.user),
+    icon: <TeamIcon share={userCtrl.user.shareInfo} size={18} fontSize={16} />,
+    menus: [
+      {
+        key: '创建单位',
+        icon: <im.ImOffice />,
+        label: '创建单位',
+        model: 'outside',
+      },
+      {
+        key: '加入单位',
+        icon: <im.ImTree />,
+        label: '加入单位',
+        model: 'outside',
+      },
+      {
+        key: '编辑',
+        icon: <im.ImPencil />,
+        label: '编辑信息',
+        model: 'outside',
+      },
+    ],
     children: [
       {
         key: userCtrl.user.key + '标准设置',
@@ -328,29 +348,7 @@ export const getTeamMenu = async () => {
       ],
     });
   }
-  return {
-    key: userCtrl.user.key + '组织',
-    item: userCtrl.user,
-    label: '组织',
-    itemType: GroupMenuType.Team,
-    belongId: userCtrl.user.id,
-    shareId: userCtrl.user.id,
-    menus: [
-      {
-        key: '创建单位',
-        icon: <im.ImPlus />,
-        label: '创建单位',
-        model: 'outside',
-      },
-      {
-        key: '加入单位',
-        icon: <im.ImPlus />,
-        label: '加入单位',
-        model: 'outside',
-      },
-    ],
-    children: children,
-  };
+  return children;
 };
 /** 加载分组菜单 */
 export const loadGroupMenus = async (

@@ -3,7 +3,6 @@ import React from 'react';
 
 import styles from './index.module.less';
 import HeaderNav from './Nav';
-import UserAvatar from './UserAvatar';
 import userCtrl from '@/ts/controller/setting';
 import { PageLoading } from '@ant-design/pro-layout';
 import { Link } from 'react-router-dom';
@@ -28,7 +27,6 @@ const BasicHeader: React.FC = () => {
       </Space>
       <Space size={32} align="center">
         <HeaderNav />
-        <UserAvatar></UserAvatar>
       </Space>
     </Header>
   );
