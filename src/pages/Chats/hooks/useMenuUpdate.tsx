@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { findMenuItemByKey } from '@/utils/tools';
+import { IconFont } from '@/components/IconFont';
+import React from 'react';
 /**
  * 监听控制器刷新hook
  * @param ctrl 控制器
@@ -13,40 +15,32 @@ import { findMenuItemByKey } from '@/utils/tools';
 
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  MenuItemType,
   () => void,
   MenuItemType | undefined,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenus] = useState<MenuItemType[]>([]);
+  const [rootMenu, setRootMenu] = useState<MenuItemType>({
+    key: '沟通',
+    label: '沟通',
+    itemType: 'Tab',
+    children: [],
+    icon: <IconFont type={'icon-message'} />,
+  });
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    // const chats = operate.loadChatMenu();
-    const books = await operate.loadBookMenu();
-    const newMenus = [
-      // {
-      //   key: '会话',
-      //   label: '会话',
-      //   itemType: 'Tab',
-      //   children: chats,
-      // },
-      {
-        key: '沟通',
-        label: '沟通',
-        itemType: 'Tab',
-        children: books,
-      },
-    ];
-    var item = findMenuItemByKey(newMenus, chatCtrl.currentKey);
+    const newMenus = { ...rootMenu };
+    newMenus.children = await operate.loadBookMenu();
+    var item = findMenuItemByKey(newMenus.children, chatCtrl.currentKey);
     if (item === undefined) {
-      item = books[0];
+      item = newMenus;
     }
     chatCtrl.currentKey = item.key;
     setSelectMenu(item);
-    setMenus(newMenus);
+    setRootMenu(newMenus);
   };
 
   useEffect(() => {
@@ -60,7 +54,7 @@ const useMenuUpdate = (): [
       emitter.unsubscribe(id);
     };
   }, []);
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

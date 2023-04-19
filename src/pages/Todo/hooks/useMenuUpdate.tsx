@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import userCtrl from '@/ts/controller/setting';
+import { IconFont } from '@/components/IconFont';
+import React from 'react';
 
 /**
  * 监听控制器刷新hook
@@ -14,36 +16,35 @@ import userCtrl from '@/ts/controller/setting';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  MenuItemType,
   () => void,
   MenuItemType | undefined,
   (items: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenu] = useState<MenuItemType[]>([]);
+  const [rootMenu, setRootMenu] = useState<MenuItemType>({
+    key: '办事',
+    label: '办事',
+    itemType: 'Tab',
+    children: [],
+    icon: <IconFont type={'icon-todo'} />,
+  });
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children: MenuItemType[] = [await operate.getUserMenu(userCtrl.user)];
+    const newMenus = { ...rootMenu };
+    newMenus.children = [await operate.getUserMenu(userCtrl.user)];
     for (const company of await userCtrl.user.getJoinedCompanys()) {
-      children.push(await operate.getUserMenu(company));
+      newMenus.children.push(await operate.getUserMenu(company));
     }
-    const newMenus = [
-      {
-        key: '办事',
-        label: '',
-        itemType: 'Tab',
-        children: children,
-      },
-    ];
-    var item = findMenuItemByKey(children, todoCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus.children, todoCtrl.currentKey);
     if (item === undefined) {
-      item = newMenus[0].children[0];
+      item = newMenus;
     }
     todoCtrl.currentKey = item.key;
     setSelectMenu(item);
-    setMenu(newMenus);
+    setRootMenu(newMenus);
   };
 
   useEffect(() => {
@@ -55,7 +56,7 @@ const useMenuUpdate = (): [
       emitter.unsubscribe(id);
     };
   }, []);
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

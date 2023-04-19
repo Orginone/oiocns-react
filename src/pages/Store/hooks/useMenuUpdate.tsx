@@ -1,11 +1,11 @@
 import storeCtrl from '@/ts/controller/store';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { ImHome } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { findMenuItemByKey } from '@/utils/tools';
 import userCtrl from '@/ts/controller/setting';
+import { IconFont } from '@/components/IconFont';
 /**
  * 仓库菜单刷新hook
  * @returns key 变更后的标识,
@@ -16,49 +16,35 @@ import userCtrl from '@/ts/controller/setting';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  MenuItemType,
   () => void,
   MenuItemType | undefined,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenus] = useState<MenuItemType[]>([]);
-
-  const [selectMenu, setSelectMenu] = useState<MenuItemType>({
-    key: '1',
+  const [rootMenu, setRootMenu] = useState<MenuItemType>({
+    key: '仓库',
     label: '仓库',
     itemType: 'group',
-    icon: <ImHome />,
+    icon: <IconFont type={'icon-store'} />,
     children: [],
   });
+  const [selectMenu, setSelectMenu] = useState<MenuItemType>();
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children: MenuItemType[] = [await operate.loadAdminMenus(userCtrl.user)];
+    const newMenus = { ...rootMenu };
+    newMenus.children = [await operate.loadAdminMenus(userCtrl.user)];
     for (const company of await userCtrl.user.getJoinedCompanys()) {
-      children.push(await operate.loadAdminMenus(company));
+      newMenus.children.push(await operate.loadAdminMenus(company));
     }
-    const newMenus = [
-      {
-        key: '仓库',
-        label: '',
-        itemType: 'Tab',
-        children: children,
-      },
-      // {
-      //   key: '商店',
-      //   label: '商店',
-      //   itemType: 'Tab',
-      //   children: stores,
-      // },
-    ];
-    var item = findMenuItemByKey(children, storeCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus.children, storeCtrl.currentKey);
     if (item === undefined) {
-      item = children[0];
+      item = newMenus;
     }
     storeCtrl.currentKey = item.key;
     setSelectMenu(item);
-    setMenus(newMenus);
+    setRootMenu(newMenus);
   };
 
   useEffect(() => {
@@ -71,7 +57,7 @@ const useMenuUpdate = (): [
     };
   }, []);
 
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

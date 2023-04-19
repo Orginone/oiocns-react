@@ -9,12 +9,9 @@ import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
 import { GroupMenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
-import { IconFont } from '@/components/IconFont';
-import { SettingOutlined } from '@ant-design/icons';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
-import { MenuItemType } from 'typings/globelType';
 import { companyTypes } from '@/ts/core/enum';
 import chat from '@/ts/controller/chat';
 import { useHistory } from 'react-router-dom';
@@ -31,7 +28,7 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 
 const TeamSetting: React.FC = () => {
   const history = useHistory();
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   const [refreshKey, setRefreshKey] = useState<string>();
@@ -42,15 +39,6 @@ const TeamSetting: React.FC = () => {
 
   return (
     <MainLayout
-      headerMenu={
-        {
-          key: 'setting',
-          label: '设置',
-          itemType: 'setting',
-          icon: <SettingOutlined />,
-          children: [],
-        } as unknown as MenuItemType
-      }
       selectMenu={selectMenu}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
@@ -152,8 +140,7 @@ const TeamSetting: React.FC = () => {
             break;
         }
       }}
-      title={{ label: '设置', icon: <IconFont type={'icon-setting'} /> }}
-      siderMenuData={menus}>
+      siderMenuData={rootMenu}>
       {/** 组织模态框 */}
       <TeamModal
         title={operateKeys[0]}

@@ -28,23 +28,9 @@ const CustomMenu = (props: CustomMenuType) => {
   }, [visibleMenu, filter]);
 
   const reloadData = (keys: string[]) => {
-    const node = findRootMenus(props.item) ?? props.item;
-    setData(loadMenus(loopFilterTree(node.children), keys));
+    setData(loadMenus(loopFilterTree(props.item.children), keys));
     setOpenKeys(keys);
     setSelectedKeys([props.selectMenu.key]);
-  };
-
-  const findRootMenus = (item: MenuItemType): MenuItemType | undefined => {
-    for (const node of item.children) {
-      if (node.key === props.selectMenu.key) {
-        return item;
-      }
-      const find = findRootMenus(node);
-      if (find != undefined) {
-        return find;
-      }
-    }
-    return undefined;
   };
 
   const loopFilterTree = (data: MenuItemType[]) => {
@@ -79,6 +65,7 @@ const CustomMenu = (props: CustomMenuType) => {
           title: item.label,
           label: renderLabel(item, expKeys),
           children: loadMenus(item.children, expKeys),
+          icon: item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon,
         });
       }
     }
@@ -116,11 +103,6 @@ const CustomMenu = (props: CustomMenuType) => {
           setVisibleMenu(false);
         }}>
         <Typography.Text className={style.label} ellipsis={{ tooltip: item.label }}>
-          {item.icon && (
-            <span style={{ fontSize: 16, paddingRight: 5 }}>
-              {item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon}
-            </span>
-          )}
           {item.label}
         </Typography.Text>
         {item.count && item.count > 0 ? (

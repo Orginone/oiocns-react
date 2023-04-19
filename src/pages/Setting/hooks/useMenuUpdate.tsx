@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
+import { SettingOutlined } from '@ant-design/icons';
+import React from 'react';
 /**
  * 设置菜单刷新hook
  * @returns key ,变更后的标识
@@ -14,32 +16,31 @@ import * as operate from '../config/menuOperate';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  MenuItemType,
   () => void,
   MenuItemType | undefined,
   (item: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenus] = useState<MenuItemType[]>([]);
+  const [rootMenu, setRootMenu] = useState<MenuItemType>({
+    key: '设置',
+    label: '设置',
+    itemType: 'Tab',
+    children: [],
+    icon: <SettingOutlined />,
+  } as MenuItemType);
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const children = [await operate.getUserMenu(), ...(await operate.getTeamMenu())];
-    const newMenus = [
-      {
-        key: '设置',
-        label: '设置',
-        itemType: 'Tab',
-        children: children,
-      } as MenuItemType,
-    ];
-    var item = findMenuItemByKey(children, userCtrl.currentKey);
+    const newMenu = { ...rootMenu };
+    newMenu.children = [await operate.getUserMenu(), ...(await operate.getTeamMenu())];
+    var item = findMenuItemByKey(newMenu.children, userCtrl.currentKey);
     if (item === undefined) {
-      item = children[0];
+      item = newMenu;
     }
     userCtrl.currentKey = item.key;
     setSelectMenu(item);
-    setMenus(newMenus);
+    setRootMenu(newMenu);
   };
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const useMenuUpdate = (): [
       userCtrl.unsubscribe(id);
     };
   }, []);
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

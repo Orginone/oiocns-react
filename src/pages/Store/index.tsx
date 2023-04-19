@@ -7,7 +7,6 @@ import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
-import { IconFont } from '@/components/IconFont';
 import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '@/components/Form';
@@ -18,7 +17,7 @@ const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [showData, setShowData] = useState<any[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
 
@@ -26,7 +25,6 @@ const Package: React.FC = () => {
 
   return (
     <MainLayout
-      title={{ label: '管理', icon: <IconFont type={'icon-store'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         storeCtrl.currentKey = data.key;
@@ -43,7 +41,7 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      siderMenuData={rootMenu}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={
