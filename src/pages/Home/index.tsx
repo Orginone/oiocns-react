@@ -1,9 +1,12 @@
 import './index.less';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { CompTypeItem, renderComp } from '@/pages/PageDesign/content/list/funs';
+import {
+  CompTypeItem,
+  renderComp,
+} from '@/pages/Setting/content/PageDesign/content/list/funs';
 import OldPage from './indexStatic';
-import pageCtrl from '@/pages/PageDesign/pageCtrl';
+import pageCtrl from '@/pages/Setting/content/PageDesign/pageCtrl';
 import { PageContainer } from '@ant-design/pro-layout';
 let imgList: any[] = [];
 const ResponsiveGridLayout = WidthProvider(Responsive);

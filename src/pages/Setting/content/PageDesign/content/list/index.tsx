@@ -164,7 +164,6 @@ const Index: React.FC<indexType> = () => {
       {!openDesign ? (
         <Card
           className="schemeWrap"
-          title="门户展示页面"
           tabList={[
             { tab: '已发布', key: '1' },
             { tab: '未发布', key: '2' },
@@ -174,7 +173,7 @@ const Index: React.FC<indexType> = () => {
           onTabChange={(k) => {
             setActive(k);
           }}
-          extra={
+          tabBarExtraContent={
             <>
               <Button
                 type="primary"
@@ -188,6 +187,7 @@ const Index: React.FC<indexType> = () => {
           }>
           <DragSortTable
             toolBarRender={false}
+            className="ListWrap"
             columns={columns}
             rowKey="id"
             search={false}

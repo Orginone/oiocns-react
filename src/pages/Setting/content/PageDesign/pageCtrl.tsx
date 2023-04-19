@@ -9,6 +9,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React from 'react';
 import { ICommonParams } from 'typings/common';
 import moment from 'moment';
+import { defaultSetting } from './config/data';
 
 class HomeSettingServices extends Emitter {
   constructor() {
@@ -261,23 +262,17 @@ class HomeSettingServices extends Emitter {
         return { ...v, data: obj?.data || {} };
       }),
     };
-    kernel.anystore
-      .insert(
-        setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-        SCHEME,
-        params,
-      )
-      .then((res) => {
-        if (res.success) {
-          message.success('操作完成');
-          this.getHomeSetting();
-        }
-      });
+    kernel.anystore.insert(DomainTypes.All, SCHEME, params).then((res) => {
+      if (res.success) {
+        message.success('操作完成');
+        this.getHomeSetting();
+      }
+    });
   };
   // 更新 已保存数据
   public handleUpData = debounce((title: any) => {
     kernel.anystore
-      .update(setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User, SCHEME, {
+      .update(DomainTypes.All, SCHEME, {
         match: { id: this._EditInfo.id },
         update: {
           _set_: {
@@ -301,13 +296,11 @@ class HomeSettingServices extends Emitter {
   }, 300);
   // 保存排序数据
   public handleSaveSortData = (arr: any[]) => {
-    kernel.anystore.remove(
-      setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-      SCHEME,
-      { id: { _in_: arr.map((v) => v.id) } },
-    );
+    kernel.anystore.remove(DomainTypes.All, SCHEME, {
+      id: { _in_: arr.map((v) => v.id) },
+    });
     kernel.anystore.insert(
-      setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
+      DomainTypes.All,
       SCHEME,
       arr.map((v, idx) => {
         return { ...v, sort: idx };
@@ -332,11 +325,7 @@ class HomeSettingServices extends Emitter {
    */
   public getCustomComp() {
     kernel.anystore
-      .aggregate(
-        setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-        'custom_ifream',
-        { match: {}, skip: 0, limit: 100 },
-      )
+      .aggregate(DomainTypes.All, 'custom_ifream', { match: {}, skip: 0, limit: 100 })
       .then((result) => {
         let aimData = this.dataSource.find((item) => item.title === '自定义组件')!;
         if (result?.data?.length > 0) {
@@ -357,16 +346,12 @@ class HomeSettingServices extends Emitter {
     };
     if (data.id) {
       kernel.anystore
-        .update(
-          setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-          'custom_ifream',
-          {
-            match: { id: data.id },
-            update: {
-              _set_: params,
-            },
+        .update(DomainTypes.All, 'custom_ifream', {
+          match: { id: data.id },
+          update: {
+            _set_: params,
           },
-        )
+        })
         .then((res) => {
           if (res.success) {
             message.success('操作完成');
@@ -379,11 +364,11 @@ class HomeSettingServices extends Emitter {
         });
     } else {
       kernel.anystore
-        .insert(
-          'custom_ifream',
-          { id: getUuid(), CREAT_NAME: setting.user.name, ...params },
-          setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-        )
+        .insert(DomainTypes.All, 'custom_ifream', {
+          id: getUuid(),
+          CREAT_NAME: setting.user.name,
+          ...params,
+        })
         .then((res) => {
           if (res.success) {
             message.success('操作完成');
@@ -398,29 +383,17 @@ class HomeSettingServices extends Emitter {
   /**
    * @desc: 获取门户配置信息
    */
-  public getHomeSetting(isDominAll = false) {
+  public getHomeSetting() {
     kernel.anystore
-      .aggregate(
-        isDominAll
-          ? DomainTypes.All
-          : setting.isCompanySpace
-          ? DomainTypes.Company
-          : DomainTypes.User,
-        SCHEME,
-        {
-          match: { isPublish: true },
-          sort: { sort: 1 },
-          skip: 0,
-          limit: 20,
-        },
-      )
+      .aggregate(DomainTypes.All, SCHEME, {
+        match: { isPublish: true },
+        sort: { sort: 1 },
+        skip: 0,
+        limit: 20,
+      })
       .then((res) => {
         if (res.success) {
-          if (res.data.length === 0 && !isDominAll) {
-            this.getHomeSetting(true);
-          } else {
-            this._homeSetting = res.data;
-          }
+          this._homeSetting = res.data?.length > 0 ? res.data : defaultSetting;
         } else {
           this._homeSetting = [];
         }
@@ -447,11 +420,7 @@ class HomeSettingServices extends Emitter {
       skip,
       limit: pageSize,
     };
-    let resData = await kernel.anystore.aggregate(
-      setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-      tableKey,
-      matchParams,
-    );
+    let resData = await kernel.anystore.aggregate(DomainTypes.All, tableKey, matchParams);
     // console.log('打印请求台账', tableKey, matchParams, resData);
     return { ...resData, total: resData?.data?.length || 0 };
   };
@@ -463,11 +432,10 @@ class HomeSettingServices extends Emitter {
    */
   update = async (aimObj: any, data: Object, tableKey: string) => {
     const nowTime = moment().format('YYYY/MM/DD HH:mm:ss');
-    return await kernel.anystore.update(
-      setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-      tableKey,
-      { match: aimObj, update: { _set_: { ...data, UPDATE_TIME: nowTime } } },
-    );
+    return await kernel.anystore.update(DomainTypes.All, tableKey, {
+      match: aimObj,
+      update: { _set_: { ...data, UPDATE_TIME: nowTime } },
+    });
   };
 
   /**
@@ -477,11 +445,7 @@ class HomeSettingServices extends Emitter {
    */
 
   delById = async (ids: string[], tableKey: string) => {
-    return kernel.anystore.remove(
-      setting.isCompanySpace ? DomainTypes.Company : DomainTypes.User,
-      tableKey,
-      { id: { _in_: ids } },
-    );
+    return kernel.anystore.remove(DomainTypes.All, tableKey, { id: { _in_: ids } });
   };
 }
 

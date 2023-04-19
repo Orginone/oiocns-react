@@ -18,4 +18,6 @@ export enum GroupMenuType {
   'CompanyCohort' = '单位群组',
   'ResouceSetting' = '资源设置',
   'Template' = '业务设置',
+  'PageDesignList' = '门户页面',
+  'PageCompList' = '门户组件',
 }

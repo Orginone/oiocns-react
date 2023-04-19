@@ -6,9 +6,9 @@ import {
 } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import React from 'react';
-import pageCtrl from '../../pageCtrl';
+import pageCtrl from '../../../pageCtrl';
 
-const CreatIfreamComp = () => {
+const CreatIfreamComp: React.FC<{ title: string }> = ({ title }) => {
   const columns = [
     {
       title: '组件名称',
@@ -35,7 +35,7 @@ const CreatIfreamComp = () => {
           pattern:
             // /^((ht|f)tps?):\/\/([\w-]+(\.[\w-]+)*\/?)+(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?$/,
             // eslint-disable-next-line no-useless-escape
-            /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/,
+            /(http|https):\/\/\S*/,
           message: '请输入正确地址',
         },
       ],
@@ -74,7 +74,7 @@ const CreatIfreamComp = () => {
             onClick={(e) => {
               e.stopPropagation();
             }}>
-            新增
+            {title ?? '新增'}
           </Button>
         }
         colProps={{ span: 12 }}

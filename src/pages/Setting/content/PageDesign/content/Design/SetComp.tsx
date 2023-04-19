@@ -8,7 +8,6 @@ import PageCtrl from '../../pageCtrl';
 import type { TabsProps } from 'antd';
 import { Sticky, StickyContainer } from 'react-sticky';
 import { ProForm } from '@ant-design/pro-components';
-import CreatIfream from './addIfream';
 import RenderFormItem from '../components/RenderFormItem';
 import { CloseCircleOutlined } from '@ant-design/icons';
 const { Paragraph } = Typography;
@@ -42,23 +41,12 @@ const Operation: React.FC<OperationType> = ({ Open }) => {
       PageCtrl.unsubscribe(['SelectedComp', 'DataSource']);
     };
   }, []);
-  // 自定义添加组件按钮
-  const CustomHead = (title: string) => {
-    return (
-      <div className="flex justify-between">
-        <span>{title}</span>
-        <CreatIfream />
-      </div>
-    );
-  };
   // 组件列表渲染
   const CompGroup = (
     <Collapse defaultActiveKey={['系统组件']} expandIconPosition={'end'}>
       {dataSource.map((item: DataType, idx: number) => {
         return (
-          <Panel
-            header={item.title === '自定义组件' ? CustomHead(item.title) : item.title}
-            key={idx}>
+          <Panel header={item.title} key={idx}>
             {item.list.map((comp, index) => (
               <div
                 className="comp-con"

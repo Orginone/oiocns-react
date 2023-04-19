@@ -8,6 +8,7 @@ import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import { XDict } from '@/ts/base/schema';
+import { SettingOutlined } from '@ant-design/icons';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -250,6 +251,32 @@ export const getUserMenu = async () => {
       },
     ],
     children: [
+      {
+        key: userCtrl.user.key + '门户设置',
+        item: '个人门户',
+        label: '门户设置',
+        itemType: '门户设置',
+        belongId: userCtrl.user.id,
+        shareId: userCtrl.user.id,
+        menus: [],
+        icon: <im.ImNewspaper />,
+        children: [
+          {
+            key: '页面列表',
+            label: '页面列表',
+            itemType: '门户页面',
+            icon: <SettingOutlined />,
+            children: [],
+          },
+          {
+            key: '系统组件',
+            label: '组件列表',
+            itemType: '门户组件',
+            icon: <SettingOutlined />,
+            children: [],
+          },
+        ],
+      },
       {
         key: userCtrl.user.key + '标准设置',
         item: userCtrl.user,

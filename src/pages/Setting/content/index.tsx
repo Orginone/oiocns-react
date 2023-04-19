@@ -11,13 +11,16 @@ import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
-
+import PageDesignList from './PageDesign/content/list';
+import PageCompList from './PageDesign/content/components/CardComp';
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;
 }
 
 const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
+  console.log(2222, selectMenu.itemType);
+
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case GroupMenuType.User:
@@ -41,6 +44,10 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return <PropertySetting />;
     case GroupMenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
+    case GroupMenuType.PageDesignList:
+      return <PageDesignList current={selectMenu.item} />;
+    case GroupMenuType.PageCompList:
+      return <PageCompList current={selectMenu.item} />;
     default:
       return <></>;
   }
