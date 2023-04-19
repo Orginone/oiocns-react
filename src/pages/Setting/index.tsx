@@ -5,13 +5,19 @@ import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import SpeciesModal from './components/speciesModal';
+import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
 import { GroupMenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import { IconFont } from '@/components/IconFont';
 import { SettingOutlined } from '@ant-design/icons';
-import thingCtrl from '@/ts/controller/thing';
+import SearchCompany from '@/bizcomponents/SearchCompany';
+import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
+import { XTarget } from '@/ts/base/schema';
+import { MenuItemType } from 'typings/globelType';
+import { companyTypes } from '@/ts/core/enum';
+import chat from '@/ts/controller/chat';
+import { useHistory } from 'react-router-dom';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -24,21 +30,27 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 };
 
 const TeamSetting: React.FC = () => {
+  const history = useHistory();
   const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   const [refreshKey, setRefreshKey] = useState<string>();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showFormModal, setShowFormModal] = useState<boolean>(false);
+  const [searchCallback, setSearchCallback] = useState<XTarget[]>();
   if (!selectMenu) return <></>;
 
   return (
     <MainLayout
-      headerMenu={{
-        key: 'setting',
-        label: '设置',
-        itemType: 'setting',
-        icon: <SettingOutlined />,
-        children: [],
-      }}
+      headerMenu={
+        {
+          key: 'setting',
+          label: '设置',
+          itemType: 'setting',
+          icon: <SettingOutlined />,
+          children: [],
+        } as unknown as MenuItemType
+      }
       selectMenu={selectMenu}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
@@ -55,9 +67,7 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await thingCtrl.dict?.deleteDict(data.item.id)) {
-                  message.success('删除成功');
-                  await thingCtrl.loadSpeciesTree(true);
+                if (await data.belong.dict.deleteDict(data.item.id)) {
                   refreshMenu();
                 }
               },
@@ -68,7 +78,6 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
@@ -96,27 +105,43 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  await thingCtrl.loadSpeciesTree(true);
                   refreshMenu();
                 }
               },
             });
+            break;
+          case '创建单位':
+            setShowFormModal(true);
+            break;
+          case '加入单位':
+            setShowModal(true);
+            break;
+          case '打开会话':
+            chat.setCurrent(
+              chat.findTargetChat(
+                data.item.target,
+                data.belong.id,
+                data.belong.id != userCtrl.user.id ? data.belong.teamName : '我的',
+                data.item.typeName,
+              ),
+            );
+            history.push('/chat');
             break;
           default:
             if (key.startsWith('重载')) {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  userCtrl.space.getCohorts(true);
+                  data.belong.getCohorts(true);
                   break;
                 case TargetType.Department:
-                  (userCtrl.space as ICompany).getDepartments(true);
+                  (data.belong as ICompany).getDepartments(true);
                   break;
                 case TargetType.Group:
-                  (userCtrl.space as ICompany).getJoinedGroups(true);
+                  (data.belong as ICompany).getJoinedGroups(true);
                   break;
                 case TargetType.Station:
-                  (userCtrl.space as ICompany).getStations(true);
+                  (data.belong as ICompany).getStations(true);
                   break;
               }
               userCtrl.changCallback();
@@ -142,7 +167,7 @@ const TeamSetting: React.FC = () => {
             setOperateKeys(['']);
           }
         }}
-        current={editTarget || userCtrl.space}
+        current={editTarget || userCtrl.user}
         typeNames={operateKeys.slice(1)}
       />
       {/** 分类模态框 */}
@@ -163,6 +188,54 @@ const TeamSetting: React.FC = () => {
           current={selectMenu.item as ISpeciesItem}
         />
       )}
+      {/** 单位 */}
+      <CreateTeamModal
+        title={'新建'}
+        open={showFormModal}
+        handleCancel={function (): void {
+          setShowFormModal(false);
+        }}
+        handleOk={(item) => {
+          if (item) {
+            setShowFormModal(false);
+            setRefreshKey(key);
+            refreshMenu();
+          }
+        }}
+        current={userCtrl.user}
+        typeNames={companyTypes}
+      />
+      <Modal
+        title="加入单位"
+        width={670}
+        destroyOnClose={true}
+        open={showModal}
+        bodyStyle={{ padding: 0 }}
+        okText="确定"
+        onOk={async () => {
+          // 加入单位
+          setShowModal(false);
+          if (searchCallback && searchCallback.length > 0) {
+            searchCallback.forEach(async (company) => {
+              if (
+                await userCtrl.user.applyJoinCompany(
+                  company.id,
+                  company.typeName as TargetType,
+                )
+              ) {
+                message.success('已申请加入单位成功.');
+              }
+            });
+          }
+        }}
+        onCancel={() => {
+          setShowModal(false);
+        }}>
+        <SearchCompany
+          searchCallback={setSearchCallback}
+          searchType={TargetType.Company}
+        />
+      </Modal>
       <Content key={key} selectMenu={selectMenu} refreshKey={refreshKey} />
     </MainLayout>
   );

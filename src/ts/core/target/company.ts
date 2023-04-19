@@ -23,6 +23,8 @@ import { logger } from '@/ts/base/common';
 import Cohort from './cohort';
 import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
+import { Dict } from './thing/dict';
+import { Property } from './thing/property';
 /**
  * 公司的元操作
  */
@@ -40,10 +42,14 @@ export default class Company extends MarketTarget implements ICompany {
   workings: IWorking[] = [];
   departmentTypes: TargetType[] = [];
   spaceAuthorityTree: IAuthority | undefined;
+  property: Property;
+  dict: Dict;
 
   constructor(target: schema.XTarget, userId: string) {
     super(target);
     this.userId = userId;
+    this.dict = new Dict(target.id);
+    this.property = new Property(target.id);
     this.departmentTypes = departmentTypes;
     this.subTeamTypes = [...this.departmentTypes, TargetType.Working];
     this.extendTargetType = [...this.subTeamTypes, ...companyTypes];

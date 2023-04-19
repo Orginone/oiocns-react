@@ -24,29 +24,25 @@ const useMenuUpdate = (): [
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const chats = operate.loadChatMenu();
+    // const chats = operate.loadChatMenu();
     const books = await operate.loadBookMenu();
     const newMenus = [
+      // {
+      //   key: '会话',
+      //   label: '会话',
+      //   itemType: 'Tab',
+      //   children: chats,
+      // },
       {
-        key: '会话',
-        label: '会话',
-        itemType: 'Tab',
-        children: chats,
-      },
-      {
-        key: '通讯录',
-        label: '通讯录',
+        key: '沟通',
+        label: '沟通',
         itemType: 'Tab',
         children: books,
       },
     ];
     var item = findMenuItemByKey(newMenus, chatCtrl.currentKey);
     if (item === undefined) {
-      if (chats.length > 0) {
-        item = chats[0];
-      } else if (books.length > 0) {
-        item = books[0];
-      }
+      item = books[0];
     }
     chatCtrl.currentKey = item.key;
     setSelectMenu(item);

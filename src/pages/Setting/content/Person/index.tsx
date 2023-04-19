@@ -14,6 +14,7 @@ import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import chat from '@/ts/controller/chat';
 
 /**
  * 个人信息
@@ -31,17 +32,7 @@ const PersonSetting: React.FC = () => {
     if (searchCallback && searchCallback.length > 0) {
       if (searchCallback && searchCallback.length > 0) {
         searchCallback.forEach(async (item) => {
-          switch (modalType) {
-            case 'company':
-              success = await userCtrl.user.applyJoinCompany(
-                item.id,
-                item.typeName as TargetType,
-              );
-              break;
-            case 'friend':
-              success = await userCtrl.user.applyFriend(item);
-              break;
-          }
+          success = await userCtrl.user.applyFriend(item);
         });
       }
     }
@@ -55,10 +46,6 @@ const PersonSetting: React.FC = () => {
     {
       tab: `我的好友`,
       key: 'friends',
-    },
-    {
-      tab: `加入的单位`,
-      key: 'companys',
     },
   ];
   // 信息内容
@@ -99,14 +86,25 @@ const PersonSetting: React.FC = () => {
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     return [
       {
-        key: 'remove',
-        label: tabKey === 'companys' ? '退出' : '移除',
+        key: 'openchats',
+        label: '打开会话',
         onClick: async () => {
-          if (tabKey === 'companys') {
-            await userCtrl.user.quitCompany(item.id);
-          } else {
-            await userCtrl.user.removeMember(item);
-          }
+          chat.setCurrent(
+            chat.findTargetChat(
+              item,
+              userCtrl.user.id,
+              userCtrl.user.teamName,
+              item.typeName,
+            ),
+          );
+          history.push('/chat');
+        },
+      },
+      {
+        key: 'remove',
+        label: '移除',
+        onClick: async () => {
+          await userCtrl.user.removeMember(item);
           forceUpdate();
         },
       },
@@ -129,9 +127,6 @@ const PersonSetting: React.FC = () => {
               <Button type="link" onClick={() => setModalType('friend')}>
                 添加好友
               </Button>
-              <Button type="link" onClick={() => setModalType('company')}>
-                加入单位
-              </Button>
             </>
           }>
           <div className={cls['page-content-table']} ref={parentRef}>
@@ -143,17 +138,7 @@ const PersonSetting: React.FC = () => {
               params={tabKey}
               operation={renderOperation}
               request={async (page) => {
-                if (tabKey === 'companys') {
-                  const targets = userCtrl.user.joinedCompany?.map((i) => i.target);
-                  return {
-                    result: targets,
-                    limit: page.limit,
-                    offset: page.offset,
-                    total: targets.length,
-                  };
-                } else {
-                  return await userCtrl.user.loadMembers(page);
-                }
+                return await userCtrl.user.loadMembers(page);
               }}
               columns={tabKey === 'companys' ? CompanyColumn : PersonColumns}
               rowKey={'id'}
@@ -161,9 +146,9 @@ const PersonSetting: React.FC = () => {
           </div>
         </PageCard>
         <Modal
-          title={modalType === 'company' ? '加入单位' : '添加好友'}
+          title={'添加好友'}
           destroyOnClose={true}
-          open={modalType === 'company' || modalType === 'friend'}
+          open={modalType === 'friend'}
           onOk={handleOk}
           onCancel={() => setModalType('')}
           width={670}>
@@ -171,9 +156,7 @@ const PersonSetting: React.FC = () => {
           <div>
             <SearchCompany
               searchCallback={setSearchCallback}
-              searchType={
-                modalType === 'company' ? TargetType.Company : TargetType.Person
-              }
+              searchType={TargetType.Person}
             />
           </div>
         </Modal>

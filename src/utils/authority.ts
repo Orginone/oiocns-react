@@ -18,6 +18,9 @@ const IsAuthorityAdmin = async (
   if (target.id == userCtrl.user.id) {
     return true;
   }
+  if(!target || !target.judgeHasIdentity) {
+    debugger
+  }
   return await target.judgeHasIdentity(authoritys);
 };
 

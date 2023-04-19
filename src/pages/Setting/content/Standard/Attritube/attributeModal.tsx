@@ -3,9 +3,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
-import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
-import { targetsToTreeData } from '..';
 import { getUuid } from '@/utils/tools';
 import thing from '@/ts/controller/thing';
 import { common } from '@/ts/base';
@@ -17,7 +15,7 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   current: ISpeciesItem;
-  target?: ITarget;
+  target: ITarget;
 }
 /*
   特性编辑模态框
@@ -64,28 +62,28 @@ const AttributeModal = (props: Iprops) => {
           return [];
         },
       },
-      {
-        title: '选择制定组织',
-        dataIndex: 'belongId',
-        valueType: 'treeSelect',
-        initialValue: userCtrl.space.id,
-        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-        request: async () => {
-          const res = await userCtrl.getTeamTree();
-          return targetsToTreeData(res);
-        },
-        fieldProps: {
-          disabled: title === '修改',
-          showSearch: true,
-        },
-      },
+      // {
+      //   title: '选择制定组织',
+      //   dataIndex: 'belongId',
+      //   valueType: 'treeSelect',
+      //   initialValue: userCtrl.space.id,
+      //   formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+      //   request: async () => {
+      //     const res = await userCtrl.getTeamTree();
+      //     return targetsToTreeData(res);
+      //   },
+      //   fieldProps: {
+      //     disabled: title === '修改',
+      //     showSearch: true,
+      //   },
+      // },
       {
         title: '选择管理权限',
         dataIndex: 'authId',
         valueType: 'treeSelect',
         formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
         request: async () => {
-          const data = await userCtrl.space.loadAuthorityTree(false);
+          const data = await props.target.loadAuthorityTree(false);
           return data ? [data] : [];
         },
         fieldProps: {

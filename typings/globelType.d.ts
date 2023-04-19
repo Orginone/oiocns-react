@@ -43,6 +43,8 @@ interface MenuItemType {
   menuType?: string;
   checked?: boolean;
   itemType: string;
+  belong?: any;
+  shareId?: string;
   count?: number;
   tag?: string[];
   icon?: React.ReactNode;
@@ -56,5 +58,4 @@ interface OperateMenuType {
   label: string;
   model?: string;
   icon: React.ReactNode;
-  subMenu?: MenuItemType;
 }

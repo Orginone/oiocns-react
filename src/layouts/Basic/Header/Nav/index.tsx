@@ -8,6 +8,8 @@ import cls from './index.module.less';
 import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import setting from '@/ts/controller/setting';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -38,16 +40,24 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     {
       key: 'store',
       path: '/store',
-      title: '管理',
+      title: '仓库',
       icon: 'icon-store',
+      count: 0,
+      fath: '/store',
+    },
+    {
+      key: 'market',
+      path: '/market',
+      title: '商店',
+      icon: 'icon-guangshangcheng',
       count: 0,
       fath: '/store',
     },
     {
       key: 'setting',
       path: '/setting',
-      title: '设置',
-      icon: 'icon-setting',
+      title: setting.user.teamName,
+      icon: <TeamIcon share={setting.user.shareInfo} size={28} title="设置" />,
       count: 0,
       fath: '/setting',
     },

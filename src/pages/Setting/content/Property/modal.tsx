@@ -3,12 +3,13 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
+import thingCtrl from '@/ts/controller/thing';
 
 interface Iprops {
   open: boolean;
   data: XProperty | undefined;
   handleCancel: () => void;
-  handleOk: (model: PropertyModel) => void;
+  handleOk: (success: boolean) => void;
 }
 /*
   特性编辑模态框
@@ -138,7 +139,16 @@ const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
         gutter: [24, 0],
       }}
       layoutType="ModalForm"
-      onFinish={handleOk}
+      onFinish={async (model) => {
+        if (data) {
+          handleOk(
+            (await thingCtrl.property?.updateProperty({ ...data, ...model })) !=
+              undefined,
+          );
+        } else {
+          handleOk((await thingCtrl.property?.createProperty(model)) != undefined);
+        }
+      }}
       columns={getFromColumns()}></SchemaForm>
   );
 };

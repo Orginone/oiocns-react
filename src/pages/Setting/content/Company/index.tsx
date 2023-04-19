@@ -14,28 +14,14 @@ import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import userCtrl from '@/ts/controller/setting';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
-import {
-  DictColumns,
-  DictItemColumns,
-  GroupColumn,
-  PersonColumns,
-  PropertyColumns,
-} from '../../config/columns';
+import { GroupColumn, PersonColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IsRelationAdmin, IsSuperAdmin, IsThingAdmin } from '@/utils/authority';
-import { Property } from '@/ts/core/thing/property';
-import { XDict, XDictItem, XProperty } from '@/ts/base/schema';
-import { Dict } from '@/ts/core/thing/dict';
-import DictModal from '../../components/dict/dictModal';
-import DictItemModal from '../../components/dict/dictItemModal';
-import { DictModel, PropertyModel } from '@/ts/base/model';
-import Authority from '../../components/authority';
-import PropertyModal from '../../components/propertyModal';
+import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 
 interface IProps {
   current: ICompany;
@@ -50,15 +36,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
-  const [isThingAdmin, SetIsThingAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [activeTab, setActiveTab] = useState<string>('');
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-  const [dict, setDict] = useState<XDict>();
-  const [dictItem, setDictItem] = useState<XDictItem>();
-  const [property, setProperty] = useState<XProperty>();
-  const dictOperate = new Dict(current.id);
-  const propertyOperate = new Property(current.id);
 
   useEffect(() => {
     if (TitleItems.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
@@ -71,7 +51,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsThingAdmin(await IsThingAdmin(current));
       SetIsRelationAdmin(await IsRelationAdmin(current));
     }, 10);
   }, [current]);
@@ -112,60 +91,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       tab: `加入的集团`,
       key: 'groups',
     },
-    {
-      tab: `权限标准`,
-      key: 'authority',
-    },
-    {
-      tab: `字典定义`,
-      key: 'dict',
-    },
-    {
-      tab: `属性定义`,
-      key: 'property',
-    },
   ];
-
-  const dictItemRender = (dict: XDict) => {
-    return (
-      <CardOrTable<schema.XDictItem>
-        key="groups"
-        rowKey={'id'}
-        pagination={false}
-        dataSource={[]}
-        defaultExpandAllRows={true}
-        operation={(item) => {
-          return isThingAdmin
-            ? [
-                {
-                  key: 'edit',
-                  label: '编辑',
-                  onClick: async () => {
-                    setDictItem(item);
-                    setActiveModal('dictItem');
-                  },
-                },
-                {
-                  key: 'remove',
-                  label: '删除',
-                  onClick: async () => {
-                    if (await dictOperate.deleteDictItem(item.id)) {
-                      message.success('删除成功');
-                      forceUpdate();
-                    }
-                  },
-                },
-              ]
-            : [];
-        }}
-        columns={DictItemColumns}
-        showChangeBtn={false}
-        request={async (page) => {
-          return new Dict(current.id).loadDictItem(dict.id, page);
-        }}
-      />
-    );
-  };
 
   const content = () => {
     switch (activeTab) {
@@ -221,162 +147,12 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
             showChangeBtn={false}
           />
         );
-      case 'authority':
-        return <Authority current={current} isSuperAdmin={isSuperAdmin} />;
-      case 'dict':
-        return (
-          <CardOrTable<schema.XDict>
-            expandable={{
-              expandedRowRender: dictItemRender,
-              defaultExpandedRowKeys: ['0'],
-            }}
-            key="dicts"
-            rowKey={'id'}
-            pagination={false}
-            dataSource={[]}
-            defaultExpandAllRows={true}
-            operation={(dict) => {
-              return isThingAdmin
-                ? [
-                    {
-                      key: 'addItem',
-                      label: '新增子项',
-                      onClick: async () => {
-                        setDict(dict);
-                        setActiveModal('dictItem');
-                      },
-                    },
-                    {
-                      key: 'edit',
-                      label: '编辑',
-                      onClick: async () => {
-                        setDict(dict);
-                        setActiveModal('dict');
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: '删除',
-                      onClick: async () => {
-                        if (await dictOperate.deleteDict(dict.id)) {
-                          message.success('删除成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
-            }}
-            columns={DictColumns}
-            showChangeBtn={false}
-            request={async (page) => {
-              return await new Dict(current.id).loadDict(page);
-            }}
-          />
-        );
-      case 'property':
-        return (
-          <CardOrTable<schema.XProperty>
-            key="propertys"
-            rowKey={'id'}
-            pagination={false}
-            dataSource={[]}
-            defaultExpandAllRows={true}
-            operation={(property) => {
-              return isThingAdmin
-                ? [
-                    {
-                      key: 'edit',
-                      label: '编辑',
-                      onClick: async () => {
-                        setProperty(property);
-                        setActiveModal('property');
-                      },
-                    },
-                    {
-                      key: 'remove',
-                      label: '删除',
-                      onClick: async () => {
-                        if (await propertyOperate.deleteProperty(property.id)) {
-                          message.success('删除成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
-            }}
-            columns={PropertyColumns}
-            showChangeBtn={false}
-            request={async (page) => {
-              return await new Property(current.id).loadPropertys(page);
-            }}
-          />
-        );
     }
-  };
-
-  // 按钮
-  const renderBtns = () => {
-    switch (activeTab) {
-      case 'dict':
-        return (
-          <>
-            {isThingAdmin && (
-              <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    setActiveModal('dict');
-                  }}>
-                  添加字典
-                </Button>
-              </>
-            )}
-          </>
-        );
-      case 'property':
-        return (
-          <>
-            {isThingAdmin && (
-              <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    setActiveModal('property');
-                  }}>
-                  添加属性
-                </Button>
-              </>
-            )}
-          </>
-        );
-    }
-    return <></>;
   };
 
   return (
     <div className={cls.companyContainer}>
-      <Card
-        bordered={false}
-        className={cls['company-info-content']}
-        extra={
-          <>
-            <Button type="link" onClick={() => setActiveModal('indentity')}>
-              角色设置
-            </Button>
-            {isRelationAdmin && (
-              <>
-                <Button type="link" onClick={() => setActiveModal('addOne')}>
-                  邀请成员
-                </Button>
-                <Button type="link" onClick={() => setActiveModal('joinGroup')}>
-                  加入集团
-                </Button>
-              </>
-            )}
-          </>
-        }>
+      <Card bordered={false} className={cls['company-info-content']} extra={[]}>
         <Descriptions
           title={'当前单位'}
           bordered
@@ -428,7 +204,23 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
             userCtrl.currentTabKey = key;
             setActiveTab(key);
           }}
-          tabBarExtraContent={renderBtns()}>
+          tabBarExtraContent={
+            <>
+              <Button type="link" onClick={() => setActiveModal('indentity')}>
+                角色设置
+              </Button>
+              {isRelationAdmin && (
+                <>
+                  <Button type="link" onClick={() => setActiveModal('addOne')}>
+                    邀请成员
+                  </Button>
+                  <Button type="link" onClick={() => setActiveModal('joinGroup')}>
+                    加入集团
+                  </Button>
+                </>
+              )}
+            </>
+          }>
           <div className={cls['page-content-table']} ref={parentRef}>
             {content()}
           </div>
@@ -487,70 +279,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         }}>
         <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Group} />
       </Modal>
-      <DictModal
-        open={activeModal == 'dict'}
-        data={dict}
-        handleOk={async (req: DictModel) => {
-          let res;
-          if (dict) {
-            res = await new Dict(current.id).updateDict({ ...dict, ...req });
-          } else {
-            res = await new Dict(current.id).createDict(req);
-          }
-          if (res) {
-            message.success('操作成功');
-            setDict(undefined);
-            forceUpdate();
-            setActiveModal('');
-          }
-        }}
-        handleCancel={() => {
-          setDict(undefined);
-          setActiveModal('');
-        }}
-      />
-      <DictItemModal
-        open={activeModal == 'dictItem'}
-        data={dictItem}
-        handleOk={async (model) => {
-          let res;
-          if (dictItem) {
-            res = await dictOperate.updateDictItem({ ...dictItem, ...model });
-          } else if (dict) {
-            res = await dictOperate.createDictItem({ ...model, dictId: dict.id });
-          }
-          if (res) {
-            setDictItem(undefined);
-            setActiveModal('');
-            forceUpdate();
-          }
-        }}
-        handleCancel={() => {
-          setDictItem(undefined);
-          setActiveModal('');
-        }}
-      />
-      <PropertyModal
-        data={property}
-        open={activeModal == 'property'}
-        handleOk={async (model: PropertyModel) => {
-          let res;
-          if (property) {
-            res = await propertyOperate.updateProperty({ ...property, ...model });
-          } else {
-            res = await propertyOperate.createProperty(model);
-          }
-          if (res) {
-            setProperty(undefined);
-            forceUpdate();
-            setActiveModal('');
-          }
-        }}
-        handleCancel={() => {
-          setProperty(undefined);
-          setActiveModal('');
-        }}
-      />
     </div>
   );
 };

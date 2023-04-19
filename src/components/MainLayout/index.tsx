@@ -20,6 +20,8 @@ import {
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { findMenuItemByKey } from '@/utils/tools';
+import { ImUserTie } from 'react-icons/im';
+import { useHistory } from 'react-router-dom';
 const { Content, Sider } = Layout;
 
 /**
@@ -47,6 +49,7 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
+  const history = useHistory();
   const { className, siderMenuData, children } = props;
   const [collapsed, setCollapsed] = useState(false);
   if (props.siderMenuData.length < 1) return <></>;
@@ -67,7 +70,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           {!collapsed && <strong>{props.title.label}</strong>}
         </div>
         <div className={cls.container} id="templateMenu">
-          {siderMenuData.length > 0 && (
+          {siderMenuData.length > 1 ? (
             <Tabs
               centered
               activeKey={activeKey}
@@ -97,7 +100,29 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                 };
               })}
             />
+          ) : siderMenuData.length > 0 ? (
+            <CustomMenu
+              item={siderMenuData[0]}
+              selectMenu={props.selectMenu}
+              onSelect={(item) => {
+                props.onSelect?.apply(this, [item]);
+              }}
+              onMenuClick={(item, key) => {
+                props.onMenuClick?.apply(this, [item, key]);
+              }}
+            />
+          ) : (
+            <></>
           )}
+        </div>
+        <div
+          className={cls.exit}
+          onClick={() => {
+            sessionStorage.clear();
+            history.push('/passport/login');
+          }}>
+          <ImUserTie />
+          <span>退出登录</span>
         </div>
       </Sider>
       <Layout className={cls.container}>

@@ -8,6 +8,9 @@ import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType } from '../config/menuType';
 import userCtrl from '@/ts/controller/setting';
 import React from 'react';
+import DictSetting from './Dict';
+import PropertySetting from './Property';
+import AuthoritySetting from './Authority';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -32,6 +35,12 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return <CohortSetting current={selectMenu.item} />;
     case GroupMenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
+    case GroupMenuType.Dict:
+      return <DictSetting current={selectMenu.item} belongId={selectMenu.belong} />;
+    case GroupMenuType.Property:
+      return <PropertySetting />;
+    case GroupMenuType.Authority:
+      return <AuthoritySetting current={selectMenu.item} />;
     default:
       return <></>;
   }

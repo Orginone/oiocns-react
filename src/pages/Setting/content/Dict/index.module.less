@@ -5,7 +5,7 @@
   height: 100%;
   .container {
     padding: 0 @padding-xs;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 60px);
     overflow-y: scroll;
   }
   .title {
@@ -26,20 +26,6 @@
     font-size: 18px;
     padding-top: 4px;
   }
-
-  .exit {
-    color: #666;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    border-top: #efefef 1px solid;
-    padding: 5px 20px;
-
-    span {
-      margin-left: 2px;
-    }
-  }
-
   :global {
     .ogo-menu-item-group-title {
       padding-left: 0;
@@ -82,9 +68,9 @@
     }
   }
 }
+
 .container {
-  // padding: 0 @padding-xs;
-  border-left: rgba(227, 226, 226, 0.5) solid 1px;
+  padding: 0 @padding-xs;
   position: relative;
 }
 .content {
@@ -101,8 +87,7 @@
   background-color: @component-background;
   padding: @padding-md;
   border-radius: @border-radius-base;
-  // margin-bottom: @margin-xs;
-  border-bottom: rgba(227, 226, 226, 0.5) solid 1px;
+  margin-bottom: @margin-xs;
 }
 
 .contenttop {
@@ -111,4 +96,15 @@
   justify-content: space-between;
   background-color: @component-background;
   border-radius: @border-radius-base;
+}
+
+:global {
+  .ogo-card-head {
+    padding: 0 0;
+  }
+  .ogo-card-body {
+    .ogo-card-body {
+      padding: 0 0;
+    }
+  }
 }

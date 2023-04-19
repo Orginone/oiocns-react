@@ -18,21 +18,19 @@ export const buildTargetTree = async (
 ) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
+    const chat = chatCtrl.findTargetChat(
+      item.target,
+      spaceId,
+      spaceName,
+      item.typeName + '群',
+    );
     result.push({
-      key: item.key,
-      item: {
-        source: item,
-        chat: chatCtrl.findTargetChat(
-          item.target,
-          spaceId,
-          spaceName,
-          item.typeName + '群',
-        ),
-      },
-      menus: loadChatMenus(undefined),
-      label: item.teamName,
-      tag: [spaceName, item.typeName],
-      itemType: GroupMenuType.Books + '-' + item.typeName,
+      key: chat.fullId,
+      item: chat,
+      menus: [],
+      label: chat.target.name,
+      tag: [spaceName, chat.target.label],
+      itemType: GroupMenuType.Chat,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: await buildTargetTree(item.subTeam, spaceId, spaceName),
     });
@@ -72,48 +70,34 @@ export const buildAuthorityTree = (authority: IAuthority, id: string) => {
 export const loadBookMenu = async () => {
   const cohorts = await userCtrl.user.getCohorts(false);
   let companys = await userCtrl.user.getJoinedCompanys(false);
-  let cohortInfos: any[] = [];
+  let cohortChats: any[] = [];
   for (const item of cohorts) {
-    let spaceId = setting.user.id;
-    let spaceName = '我的';
-    if (item.target.belongId != spaceId) {
-      let share = setting.findTeamInfoById(item.target.belongId);
-      if (share) {
-        if (share.typeName != TargetType.Person) {
-          spaceId = item.target.belongId;
-          spaceName = share.name;
-        }
-      } else {
-        const res = await item.queryBelong();
-        if (res && res.typeName != TargetType.Person) {
-          spaceId = item.target.belongId;
-          spaceName = res.team?.name || res.name;
-        }
-      }
+    if (item.target.belongId == setting.user.id) {
+      cohortChats.push(
+        chatCtrl.findTargetChat(
+          item.target,
+          setting.user.id,
+          setting.user.teamName,
+          item.typeName,
+        ),
+      );
     }
-    cohortInfos.push({
-      cohort: item,
-      spaceId: spaceId,
-      spaceName: spaceName,
-    });
   }
   let companyItems = [];
   for (const company of companys) {
+    const chat = chatCtrl.findTargetChat(
+      company.target,
+      company.id,
+      company.teamName,
+      '单位群',
+    );
     companyItems.push({
-      key: company.id,
+      key: chat.fullId,
       label: company.teamName,
-      item: {
-        source: company,
-        chat: chatCtrl.findTargetChat(
-          company.target,
-          company.id,
-          company.teamName,
-          '单位群',
-        ),
-      },
+      item: chat,
       tag: [company.typeName],
-      menus: loadChatMenus(undefined),
-      itemType: GroupMenuType.Books + '-' + company.typeName,
+      menus: [],
+      itemType: GroupMenuType.Chat,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
@@ -186,8 +170,8 @@ export const loadBookMenu = async () => {
   return [
     {
       key: '我的通讯录',
-      label: '我的',
-      itemType: '我的',
+      label: setting.user.teamName,
+      itemType: setting.user.teamName,
       item: setting.user,
       children: [
         {
@@ -195,13 +179,23 @@ export const loadBookMenu = async () => {
           label: BookType.Friend,
           itemType: GroupMenuType.Books + '-' + TargetType.Person,
           icon: <im.ImUser />,
-          children: [],
+          children: userCtrl.friends.map((i) => {
+            const chat = chatCtrl.findTargetChat(i.target, i.id, i.teamName, '好友');
+            return {
+              key: chat.fullId,
+              label: chat.target.name,
+              item: chat,
+              itemType: GroupMenuType.Chat,
+              icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
+              children: [],
+            };
+          }),
           item: {
             source: setting.user,
             chat: chatCtrl.findTargetChat(
               setting.user.target,
               setting.user.id,
-              '我的',
+              setting.user.teamName,
               '好友',
             ),
           },
@@ -211,23 +205,15 @@ export const loadBookMenu = async () => {
           label: BookType.Cohort,
           itemType: GroupMenuType.Books,
           icon: <im.ImUsers />,
-          children: cohortInfos.map((a) => {
+          children: cohortChats.map((a: IChat) => {
             return {
               children: [],
-              key: a.cohort.id,
-              label: a.cohort.name,
-              item: {
-                source: a.cohort,
-                chat: chatCtrl.findTargetChat(
-                  a.cohort.target,
-                  a.spaceId,
-                  a.spaceName,
-                  a.cohort.target.typeName,
-                ),
-              },
-              menus: loadChatMenus(undefined),
-              itemType: GroupMenuType.Books + '-' + a.cohort.typeName,
-              icon: <TeamIcon share={a.cohort.shareInfo} size={18} fontSize={16} />,
+              key: a.fullId,
+              label: a.target.name,
+              item: a,
+              menus: [],
+              itemType: GroupMenuType.Chat,
+              icon: <TeamIcon share={a.shareInfo} size={18} fontSize={16} />,
             };
           }),
         },

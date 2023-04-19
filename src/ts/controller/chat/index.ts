@@ -7,6 +7,7 @@ import { Emitter } from '@/ts/base/common';
 import { TargetShare } from '@/ts/base/model';
 import { TargetChat, gpt3 } from '@/ts/core/chat';
 import { ChatCache } from '@/ts/core/chat/ichat';
+import setting from '../setting';
 
 // 会话缓存对象名称
 const chatsObjectName = 'chatscache';
@@ -133,7 +134,7 @@ class ChatController extends Emitter {
     kernel.anystore.subscribed(userCtrl.space.id, chatsObjectName, (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
         this._chats = [];
-        this._chats.push(gpt3(this._userId));
+        this._chats.push(gpt3(setting.user));
         data.chats.forEach((item: ChatCache) => {
           let lchat = TargetChat(
             item.target,

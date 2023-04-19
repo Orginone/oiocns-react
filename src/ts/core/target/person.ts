@@ -14,14 +14,20 @@ import { logger, sleep } from '@/ts/base/common';
 import { IProduct } from '../market';
 import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
+import { Dict } from './thing/dict';
+import { Property } from './thing/property';
 
 export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
   spaceAuthorityTree: IAuthority | undefined;
+  property: Property;
+  dict: Dict;
   constructor(target: schema.XTarget) {
     super(target);
+    this.dict = new Dict(target.id);
+    this.property = new Property(target.id);
     this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...companyTypes];
     this.subTeamTypes = [];
     this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...companyTypes];

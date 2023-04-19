@@ -13,13 +13,8 @@ const TypeSetting = ({ selectMenu, openDetail }: IProps) => {
   switch (selectMenu.itemType.split('-')[0]) {
     case GroupMenuType.Chat:
       return <Chat openDetail={openDetail} />;
-    case GroupMenuType.Books:
-      if (selectMenu.itemType.includes('-')) {
-        return <Book selectMenu={selectMenu} />;
-      }
-      return <></>;
     default:
-      return <></>;
+      return <Book />;
   }
 };
 

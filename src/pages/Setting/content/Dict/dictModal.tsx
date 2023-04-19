@@ -1,20 +1,22 @@
 import React, { useRef } from 'react';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel } from '@/ts/base/model';
 import { XDict } from '@/ts/base/schema';
+import userCtrl from '@/ts/controller/setting';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 
 interface Iprops {
+  title: string;
   open: boolean;
   data: XDict | undefined;
   handleCancel: () => void;
-  handleOk: (dict: DictModel) => void;
+  handleOk: (success: boolean) => void;
 }
 /*
   特性编辑模态框
 */
 const DictModal = (props: Iprops) => {
-  const { open, data, handleCancel, handleOk } = props;
+  const { title, open, data, handleCancel, handleOk } = props;
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<DictModel>[] = [
     {
@@ -46,12 +48,12 @@ const DictModal = (props: Iprops) => {
   return (
     <SchemaForm<DictModel>
       formRef={formRef}
-      title={data ? '编辑字典' : '新增字典'}
+      title={title}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (data) {
+          if (title.includes('编辑')) {
             formRef.current?.setFieldsValue(data);
           }
         } else {
@@ -63,8 +65,13 @@ const DictModal = (props: Iprops) => {
         gutter: [24, 0],
       }}
       layoutType="ModalForm"
-      onFinish={(values) => {
-        handleOk(values);
+      onFinish={async (values) => {
+        if (title.includes('新增')) {
+          handleOk((await userCtrl.target.dict?.createDict(values)) !== undefined);
+        } else {
+          let formdata = Object.assign(data ? data : {}, values);
+          handleOk((await userCtrl.target.dict?.updateDict(formdata)) !== undefined);
+        }
       }}
       columns={columns}></SchemaForm>
   );

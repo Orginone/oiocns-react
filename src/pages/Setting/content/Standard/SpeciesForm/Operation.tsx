@@ -7,7 +7,7 @@ import userCtrl from '@/ts/controller/setting';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
-import OperationModel from '../../../components/operationModal';
+import OperationModel from './operationModal';
 import ViewCardModal from '../../../components/viewCardModal';
 import ViewFormModal from '../../../components/viewFormModal';
 

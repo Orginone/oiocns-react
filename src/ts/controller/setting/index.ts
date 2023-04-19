@@ -10,7 +10,7 @@ import {
   ITarget,
   findTargetShare,
 } from '@/ts/core';
-import { XTarget } from '@/ts/base/schema';
+import Person from '@/ts/core/target/person';
 const sessionUserName = 'sessionUser';
 const sessionSpaceName = 'sessionSpace';
 /**
@@ -22,7 +22,7 @@ class SettingController extends Emitter {
   private _user: IPerson | undefined;
   private _curSpace: ICompany | undefined;
   public target: ITarget | undefined;
-  public friends: XTarget[] = [];
+  public friends: ITarget[] = [];
   /**构造方法 */
   constructor() {
     super();
@@ -185,7 +185,7 @@ class SettingController extends Emitter {
   private async refresh(): Promise<void> {
     const res = await this._user?.loadMembers({ offset: 0, limit: 10000, filter: '' });
     if (res?.result?.length ?? 0 > 0) {
-      this.friends = res!.result!;
+      this.friends = res!.result!.map((i) => new Person(i));
     }
     await this._user?.getJoinedCompanys();
   }

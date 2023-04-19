@@ -11,7 +11,7 @@ import {
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
-import { targetsToTreeData } from '..';
+import { targetsToTreeData } from '../../..';
 // import ProFormAuth from './render/widgets/ProFormAuth';
 
 interface Iprops {
@@ -133,11 +133,11 @@ const OperationModal = (props: Iprops) => {
           fieldProps={{
             options: [
               {
-                value: true,
+                value: 'true',
                 label: '公开',
               },
               {
-                value: false,
+                value: 'false',
                 label: '不公开',
               },
             ],
