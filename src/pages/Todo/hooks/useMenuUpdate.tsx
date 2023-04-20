@@ -1,11 +1,13 @@
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { emitter, WorkType } from '@/ts/core';
+import { emitter } from '@/ts/core';
 import { findMenuItemByKey } from '@/utils/tools';
-import { SettingOutlined } from '@ant-design/icons';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
+import userCtrl from '@/ts/controller/setting';
+import { IconFont } from '@/components/IconFont';
+import React from 'react';
 
 /**
  * 监听控制器刷新hook
@@ -14,57 +16,35 @@ import * as operate from '../config/menuOperate';
  */
 const useMenuUpdate = (): [
   string,
-  MenuItemType[],
+  MenuItemType,
   () => void,
   MenuItemType | undefined,
   (items: MenuItemType) => void,
 ] => {
   const [key, setKey] = useState<string>('');
-  const [menus, setMenu] = useState<MenuItemType[]>([]);
+  const [rootMenu, setRootMenu] = useState<MenuItemType>({
+    key: '办事',
+    label: '办事',
+    itemType: 'Tab',
+    children: [],
+    icon: <IconFont type={'icon-todo'} />,
+  });
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
 
   /** 刷新菜单 */
   const refreshMenu = async () => {
-    const newMenus = [
-      {
-        key: '待办',
-        label: '待办',
-        itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformTodoMenu()),
-          {
-            key: 'todoWork',
-            label: '事项',
-            itemType: WorkType.WorkTodo,
-            icon: <SettingOutlined />,
-            count: (await todoCtrl.loadWorkTodo()).length,
-            children: [],
-          },
-        ],
-      },
-      {
-        key: '发起',
-        label: '发起',
-        itemType: 'Tab',
-        children: [
-          ...(await operate.loadPlatformApplyMenu()),
-          {
-            key: '办事项',
-            label: '办事项',
-            itemType: 'group',
-            icon: <SettingOutlined />,
-            children: await operate.loadThingMenus('work'),
-          },
-        ],
-      },
-    ];
-    var item = findMenuItemByKey(newMenus, todoCtrl.currentKey);
+    const newMenus = { ...rootMenu };
+    newMenus.children = [await operate.getUserMenu(userCtrl.user)];
+    for (const company of await userCtrl.user.getJoinedCompanys()) {
+      newMenus.children.push(await operate.getUserMenu(company));
+    }
+    var item = findMenuItemByKey(newMenus.children, todoCtrl.currentKey);
     if (item === undefined) {
-      item = newMenus[0].children[0];
+      item = newMenus;
     }
     todoCtrl.currentKey = item.key;
     setSelectMenu(item);
-    setMenu(newMenus);
+    setRootMenu(newMenus);
   };
 
   useEffect(() => {
@@ -76,7 +56,7 @@ const useMenuUpdate = (): [
       emitter.unsubscribe(id);
     };
   }, []);
-  return [key, menus, refreshMenu, selectMenu, setSelectMenu];
+  return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];
 };
 
 export default useMenuUpdate;

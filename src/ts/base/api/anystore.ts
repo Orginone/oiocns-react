@@ -290,15 +290,18 @@ export default class AnyStore {
    * @param data 操作携带的数据
    * @returns {ResultType<T>} 移除异步结果
    */
-  public async bucketOpreate<T>(data: BucketOpreateModel): Promise<ResultType<T>> {
+  public async bucketOpreate<T>(
+    belongId: string,
+    data: BucketOpreateModel,
+  ): Promise<ResultType<T>> {
     if (this._storeHub.isConnected) {
-      return await this._storeHub.invoke('BucketOpreate', '0', data);
+      return await this._storeHub.invoke('BucketOpreate', belongId, data);
     }
     return await this._restRequest(
       'Bucket',
       'Operate',
       {
-        belongId: '0',
+        belongId: belongId,
       },
       data,
     );

@@ -4,15 +4,13 @@ import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import chatCtrl from '@/ts/controller/chat';
 import { GroupMenuType } from './config/menuType';
-import { IconFont } from '@/components/IconFont';
 import { IChat } from '@/ts/core';
 const Setting: React.FC<any> = () => {
   const [openDetail, setOpenDetail] = useState<boolean>(false);
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   if (!selectMenu) return <></>;
   return (
     <MainLayout
-      title={{ label: '沟通', icon: <IconFont type={'icon-message'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         if (data.itemType == GroupMenuType.Chat) {
@@ -53,7 +51,7 @@ const Setting: React.FC<any> = () => {
             break;
         }
       }}
-      siderMenuData={menus}>
+      siderMenuData={rootMenu}>
       <Content key={key} selectMenu={selectMenu} openDetail={openDetail} />
     </MainLayout>
   );

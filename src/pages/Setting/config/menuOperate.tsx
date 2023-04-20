@@ -1,5 +1,5 @@
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ISpace, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { IsSuperAdmin } from '@/utils/authority';
@@ -42,7 +42,7 @@ export const buildTargetTree = async (targets: ITarget[], belong: ISpace) => {
       item: item,
       label: item.teamName,
       itemType: parseGroupMenuType(item.typeName),
-      menus: await loadTypeMenus(item),
+      menus: await loadTypeMenus(item, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [
         await buildTargetSpeciesTree(item, belong),
@@ -148,7 +148,7 @@ export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
       shareId: target.id,
       label: '权限标准',
       itemType: '权限标准',
-      item: userCtrl.space,
+      item: target,
       icon: <im.ImNewspaper />,
     });
   }
@@ -160,7 +160,7 @@ export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
       shareId: target.id,
       label: '字典定义',
       itemType: '字典定义',
-      item: userCtrl.space,
+      item: target,
       icon: <im.ImNewspaper />,
       menus: [
         {
@@ -179,7 +179,7 @@ export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
     shareId: target.id,
     label: '属性定义',
     itemType: GroupMenuType.Property,
-    item: userCtrl.space,
+    item: target,
     icon: <im.ImNewspaper />,
     menus: [
       {
@@ -223,13 +223,13 @@ export const loadSpeciesMenus = (item: ISpeciesItem) => {
 /** 获取个人菜单 */
 export const getUserMenu = async () => {
   return {
-    key: userCtrl.user.key,
-    item: userCtrl.user,
-    label: userCtrl.user.teamName,
+    key: orgCtrl.user.key,
+    item: orgCtrl.user,
+    label: orgCtrl.user.teamName,
     itemType: GroupMenuType.User,
-    belongId: userCtrl.user.id,
-    shareId: userCtrl.user.id,
-    icon: <TeamIcon share={userCtrl.user.shareInfo} size={18} fontSize={16} />,
+    belongId: orgCtrl.user.id,
+    shareId: orgCtrl.user.id,
+    icon: <TeamIcon share={orgCtrl.user.shareInfo} size={18} fontSize={16} />,
     menus: [
       {
         key: '创建单位',
@@ -252,12 +252,12 @@ export const getUserMenu = async () => {
     ],
     children: [
       {
-        key: userCtrl.user.key + '门户设置',
+        key: orgCtrl.user.key + '门户设置',
         item: '个人门户',
         label: '门户设置',
         itemType: '门户设置',
-        belongId: userCtrl.user.id,
-        shareId: userCtrl.user.id,
+        belongId: orgCtrl.user.id,
+        shareId: orgCtrl.user.id,
         menus: [],
         icon: <im.ImNewspaper />,
         children: [
@@ -278,26 +278,26 @@ export const getUserMenu = async () => {
         ],
       },
       {
-        key: userCtrl.user.key + '标准设置',
-        item: userCtrl.user,
+        key: orgCtrl.user.key + '标准设置',
+        item: orgCtrl.user,
         label: '标准设置',
         itemType: '标准设置',
-        belongId: userCtrl.user.id,
-        shareId: userCtrl.user.id,
+        belongId: orgCtrl.user.id,
+        shareId: orgCtrl.user.id,
         menus: [],
         icon: <im.ImNewspaper />,
-        children: await loadStandardSetting(userCtrl.user, userCtrl.user),
+        children: await loadStandardSetting(orgCtrl.user, orgCtrl.user),
       },
       await loadGroupMenus(
         {
-          key: userCtrl.user.id + GroupMenuType.UserCohort,
+          key: orgCtrl.user.id + GroupMenuType.UserCohort,
           label: GroupMenuType.UserCohort,
-          item: userCtrl.user,
+          item: orgCtrl.user,
           typeName: TargetType.Cohort,
-          subTeam: await userCtrl.user.getCohorts(),
+          subTeam: await orgCtrl.user.getCohorts(),
         },
         [TargetType.Cohort],
-        userCtrl.user,
+        orgCtrl.user,
       ),
     ],
   };
@@ -306,7 +306,7 @@ export const getUserMenu = async () => {
 /** 获取组织菜单 */
 export const getTeamMenu = async () => {
   const children: MenuItemType[] = [];
-  for (const company of await userCtrl.user.getJoinedCompanys()) {
+  for (const company of await orgCtrl.user.getJoinedCompanys()) {
     children.push({
       key: company.key,
       item: company,
@@ -314,7 +314,7 @@ export const getTeamMenu = async () => {
       itemType: GroupMenuType.Company,
       belong: company,
       shareId: company.id,
-      menus: await loadTypeMenus(company),
+      menus: await loadTypeMenus(company, false),
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
@@ -475,7 +475,7 @@ export const loadAuthorityMenus = (item: IAuthority) => {
 };
 
 /** 加载类型更多操作 */
-export const loadTypeMenus = async (item: ITarget) => {
+export const loadTypeMenus = async (item: ITarget, allowDelete: boolean) => {
   const menus: OperateMenuType[] = [];
   if (item.typeName != TargetType.Group) {
     menus.push({
@@ -501,15 +501,15 @@ export const loadTypeMenus = async (item: ITarget) => {
       icon: <im.ImPencil />,
       label: '编辑信息',
     });
-    if (item != userCtrl.user && item != userCtrl.company) {
+    if (allowDelete) {
       menus.push({
         key: '删除',
         icon: <im.ImBin />,
         label: '删除' + item.typeName,
       });
     }
-  } else if (await IsSuperAdmin(userCtrl.space)) {
-    if (item != userCtrl.user && item != userCtrl.company) {
+  } else if (await IsSuperAdmin(item)) {
+    if (!allowDelete) {
       menus.push({
         key: '退出',
         icon: <im.ImBin />,

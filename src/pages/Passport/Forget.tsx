@@ -1,7 +1,7 @@
-import userCtrl from '@/ts/controller/setting';
 import { Button, Form, Input, message, Tabs } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import orgCtrl from '@/ts/controller';
 
 import cls from './index.module.less';
 
@@ -26,7 +26,7 @@ const PassportForget: React.FC = () => {
       message.warn('密码必须包含：数字、字母、特殊字符');
       return;
     }
-    const res = await userCtrl.resetPassword(
+    const res = await orgCtrl.provider.resetPassword(
       val.account,
       val.firstPassword,
       val.privateKey,

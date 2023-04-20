@@ -10,6 +10,7 @@ import { FlowDefine } from '../thing/flowDefine';
 import { ISpeciesItem } from '../thing';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
+import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -343,6 +344,8 @@ export interface ISpace extends IFlow, IMTarget, ITarget {
   property: Property;
   /** 字典 */
   dict: Dict;
+  /** 文件系统 */
+  root: IFileSystemItem;
   /**
    * @description: 查询群
    * @param reload 是否强制刷新
@@ -378,6 +381,8 @@ export interface IPerson extends ISpace, ITarget {
   joinedFriend: schema.XTarget[];
   /** 我加入的单位 */
   joinedCompany: ICompany[];
+  /** 主目录 */
+  home: IObjectItem;
   /**
    * 退出群组
    * @param id 群组Id
@@ -511,7 +516,7 @@ export interface ICompany extends ISpace, ITarget {
    * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getWorkings(reload: boolean): Promise<IWorking[]>;
+  getWorkings(reload?: boolean): Promise<IWorking[]>;
   /**
    * @description: 查询我加入的集团
    * @param reload 是否强制刷新

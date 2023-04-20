@@ -1,24 +1,23 @@
 import React, { useRef, useState } from 'react';
-import storeCtrl from '@/ts/controller/store';
+import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import { GroupMenuType } from './config/menuType';
-import { IFileSystemItem } from '@/ts/core';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
-import { IconFont } from '@/components/IconFont';
 import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '@/components/Form';
 import { ProFormInstance } from '@ant-design/pro-components';
 import thingCtrl from '@/ts/controller/thing';
+import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [showData, setShowData] = useState<any[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
 
@@ -26,10 +25,9 @@ const Package: React.FC = () => {
 
   return (
     <MainLayout
-      title={{ label: '管理', icon: <IconFont type={'icon-store'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        storeCtrl.currentKey = data.key;
+        orgCtrl.currentKey = data.key;
         if (data.itemType === GroupMenuType.FileSystemItem) {
           const item = data.item as IFileSystemItem;
           if (item.children.length === 0 && (await item.loadChildren())) {
@@ -43,7 +41,7 @@ const Package: React.FC = () => {
         setOperateKey(key);
         setOperateTarget(data);
       }}
-      siderMenuData={menus}>
+      siderMenuData={rootMenu}>
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={

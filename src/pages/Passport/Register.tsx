@@ -1,9 +1,9 @@
 import { RegisterType } from '@/ts/base/model';
-import userCtrl from '@/ts/controller/setting';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import orgCtrl from '@/ts/controller';
 
 import cls from './index.module.less';
 
@@ -72,7 +72,7 @@ const PassportRegister: React.FC = () => {
     body.motto = val.motto;
     body.avatar = '';
     // 请求
-    const res = await userCtrl.register(body);
+    const res = await orgCtrl.provider.register(body);
     if (res.success) {
       message.success('注册成功！');
       setPrivateKey(res.data.privateKey);

@@ -1,27 +1,29 @@
-import storeCtrl from '@/ts/controller/store';
-import { IFileSystemItem, ISpeciesItem } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
 import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import setting from '@/ts/controller/setting';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
+import { ISpace, ISpeciesItem } from '@/ts/core';
 
 /** 编译文件系统树 */
-const buildFileSysTree = (targets: IFileSystemItem[]) => {
+const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     if (item.target.isDirectory) {
       result.push({
-        key: item.key,
+        key: item.key + user.id,
         item: item,
         label: item.name,
+        belong: user,
         itemType: GroupMenuType.FileSystemItem,
         menus: loadFileSysItemMenus(item),
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
-        children: buildFileSysTree(item.children),
+        children: buildFileSysTree(item.children, user),
       });
     }
   }
@@ -51,7 +53,7 @@ export const loadFileSysItemMenus = (
     },
   ];
   if (rightClick) return menus;
-  if (item != storeCtrl.root && item != storeCtrl.home) {
+  if (item != orgCtrl.user.root && item != orgCtrl.user.home) {
     menus.push(
       {
         key: '重命名',
@@ -79,83 +81,83 @@ export const loadFileSysItemMenus = (
 };
 
 /** 获取数据菜单 */
-export const getDataMenus = () => {
+export const getDataMenus = (user: ISpace) => {
   return {
-    key: '数据',
+    key: '数据' + user.id,
     label: '数据',
     itemType: GroupMenuType.Data,
     icon: <im.ImDatabase></im.ImDatabase>,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
 
 /** 获取资源菜单 */
-export const getResourceMenus = () => {
+export const getResourceMenus = (user: ISpace) => {
   return {
-    key: '资源',
+    key: '资源' + user.id,
     label: '资源',
     itemType: GroupMenuType.Resource,
     icon: <im.ImCloudDownload></im.ImCloudDownload>,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
 
-export const getCommonSpeciesMenus = () => {
+export const getCommonSpeciesMenus = (user: ISpace) => {
   return {
-    key: '我的常用',
+    key: '我的常用' + user.id,
     label: '我的常用',
     itemType: GroupMenuType.Common,
     icon: <im.ImHeart />,
-    children: storeCtrl.caches || [],
+    children: [],
   };
 };
 
 /** 获取应用程序菜单 */
-export const getAppliactionMenus = () => {
+export const getAppliactionMenus = (user: ISpace) => {
   return {
-    key: '应用',
+    key: '应用' + user.id,
     label: '应用',
     itemType: GroupMenuType.Application,
     icon: <im.ImWindows8 />,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
 
 /** 获取资产菜单 */
-export const getAssetMenus = () => {
+export const getAssetMenus = (user: ISpace) => {
   return {
-    key: '资产',
+    key: '资产' + user.id,
     label: '资产',
     itemType: GroupMenuType.Asset,
     icon: <im.ImCalculator />,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
 
 /** 获取文件系统菜单 */
-export const getFileSystemMenus = () => {
+export const getFileSystemMenus = (user: ISpace) => {
   return {
-    key: '文件',
+    key: '文件' + user.id,
     label: '文件',
     itemType: GroupMenuType.FileSystemItem,
     icon: <im.ImDrive />,
-    item: storeCtrl.root,
-    menus: loadFileSysItemMenus(storeCtrl.root),
-    children: buildFileSysTree(storeCtrl.root.children),
+    item: user.root,
+    menus: loadFileSysItemMenus(user.root),
+    children: buildFileSysTree(user.root.children, user),
   };
 };
 
-export const loadThingMenus = async () => {
-  const root = await setting.space.loadSpeciesTree();
+export const loadThingMenus = async (user: ISpace) => {
+  const root = await user.loadSpeciesTree();
   for (const item of root) {
     if (item.target.code === 'thing') {
       return {
-        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, ''),
-        key: item.target.name,
+        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, user),
+        key: item.target.name + user.id,
         label: item.target.name,
         itemType: GroupMenuType.Thing,
         menus: loadSpeciesOperationMenus(item),
@@ -166,19 +168,26 @@ export const loadThingMenus = async () => {
   }
 };
 
-export const loadAdminMenus = async () => {
-  const anyThingMenus = await loadThingMenus();
+export const loadAdminMenus = async (user: ISpace) => {
   const children: MenuItemType[] = [
-    // getCommonSpeciesMenus(),
-    getAppliactionMenus(),
-    getFileSystemMenus(),
-    getResourceMenus(),
-    getDataMenus(),
+    getAppliactionMenus(user),
+    getFileSystemMenus(user),
+    getResourceMenus(user),
+    getDataMenus(user),
   ];
+  const anyThingMenus = await loadThingMenus(user);
   if (anyThingMenus) {
     children.push(anyThingMenus);
   }
-  return children;
+  return {
+    key: user.key,
+    item: user,
+    label: user.teamName,
+    itemType: user.typeName,
+    // menus: await loadTypeMenus(user),
+    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
+    children: children,
+  };
 };
 
 export const loadMarketMenus = async () => {
@@ -264,19 +273,20 @@ export const loadMarketMenus = async () => {
 const buildSpeciesChildrenTree = (
   parent: ISpeciesItem[],
   itemType: string,
+  user: ISpace,
   menuType?: string,
 ): MenuItemType[] => {
   if (parent.length > 0) {
     return parent.map((species) => {
       return {
-        key: species.id,
+        key: species.id + user.id,
         item: species,
         label: species.name,
         icon: <im.ImNewspaper />,
         itemType: itemType,
         menuType: menuType,
         menus: loadSpeciesOperationMenus(species),
-        children: buildSpeciesChildrenTree(species.children, itemType, menuType),
+        children: buildSpeciesChildrenTree(species.children, itemType, user, menuType),
       };
     });
   }
@@ -285,7 +295,6 @@ const buildSpeciesChildrenTree = (
 
 /** 加载右侧菜单 */
 export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
-  // let isCommon = storeCtrl.caches.map((cache) => cache.key).includes(item.id);
   const items: OperateMenuType[] = [
     {
       key: '创建实体',

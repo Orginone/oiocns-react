@@ -1,4 +1,3 @@
-import { IconFont } from '@/components/IconFont';
 import MainLayout from '@/components/MainLayout';
 import userCtrl from '@/ts/controller/setting';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
@@ -10,7 +9,7 @@ import { Modal, message } from 'antd';
 import { XFlowDefine } from '@/ts/base/schema';
 
 const Todo: React.FC<any> = () => {
-  const [key, menus, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
   const [openFlow, setOpenFlow] = useState<boolean>();
   const [selectData, setSelectData] = useState<any>();
   const [doWork, setDoWork] = useState<XFlowDefine>();
@@ -23,7 +22,6 @@ const Todo: React.FC<any> = () => {
 
   return (
     <MainLayout
-      title={{ label: '办事', icon: <IconFont type={'icon-todo'} /> }}
       selectMenu={selectMenu}
       onSelect={async (data) => {
         todoCtrl.currentKey = data.key;
@@ -39,7 +37,7 @@ const Todo: React.FC<any> = () => {
             break;
         }
       }}
-      siderMenuData={menus}>
+      siderMenuData={rootMenu}>
       <Modal
         width="800px"
         title="发起办事"

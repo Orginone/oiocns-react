@@ -1,6 +1,6 @@
 import { blobToDataUrl, generateUuid } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { model, kernel } from '../../base';
+import { model, kernel } from '@/ts/base';
 import { IFileSystemItem, IObjectItem, OnProgressType, TaskModel } from './ifilesys';
 /**
  * 文件系统项实现
@@ -14,14 +14,16 @@ export class FileSystemItem implements IFileSystemItem {
   target: model.FileItemModel;
   parent: IObjectItem;
   children: IFileSystemItem[];
+  belongId: string;
   static _taskList: TaskModel[] = [];
-  constructor(target: model.FileItemModel, parent: IObjectItem) {
+  constructor(target: model.FileItemModel, parent: IObjectItem, id: string) {
     this.children = [];
     this.target = target;
     this.parent = parent;
     this.key = target.key;
     this.name = target.name;
     this.isRoot = parent === undefined;
+    this.belongId = id;
   }
   get taskList(): TaskModel[] {
     return FileSystemItem._taskList;
@@ -43,7 +45,7 @@ export class FileSystemItem implements IFileSystemItem {
   }
   async rename(name: string): Promise<boolean> {
     if (this.name != name && !(await this._findByName(name))) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel>({
+      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
         name: name,
         key: this._formatKey(),
         operate: BucketOpreates.Rename,
@@ -60,13 +62,13 @@ export class FileSystemItem implements IFileSystemItem {
   async create(name: string): Promise<IObjectItem> {
     const exist = await this._findByName(name);
     if (!exist) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel>({
+      const res = await kernel.anystore.bucketOpreate<FileItemModel>(this.belongId, {
         key: this._formatKey(name),
         operate: BucketOpreates.Create,
       });
       if (res.success && res.data) {
         this.target.hasSubDirectories = true;
-        const node = new FileSystemItem(res.data, this);
+        const node = new FileSystemItem(res.data, this, this.belongId);
         this.children.push(node);
         return node;
       }
@@ -74,7 +76,7 @@ export class FileSystemItem implements IFileSystemItem {
     return exist;
   }
   async delete(): Promise<boolean> {
-    const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
+    const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
       key: this._formatKey(),
       operate: BucketOpreates.Delete,
     });
@@ -91,7 +93,7 @@ export class FileSystemItem implements IFileSystemItem {
   }
   async copy(destination: IFileSystemItem): Promise<boolean> {
     if (destination.target.isDirectory && this.key != destination.key) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
+      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: this._formatKey(),
         destination: destination.key,
         operate: BucketOpreates.Copy,
@@ -106,7 +108,7 @@ export class FileSystemItem implements IFileSystemItem {
   }
   async move(destination: IFileSystemItem): Promise<boolean> {
     if (destination.target.isDirectory && this.key != destination.key) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
+      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: this._formatKey(),
         destination: destination.key,
         operate: BucketOpreates.Move,
@@ -127,13 +129,13 @@ export class FileSystemItem implements IFileSystemItem {
   }
   async loadChildren(reload: boolean = false): Promise<boolean> {
     if (this.target.isDirectory && (reload || this.children.length < 1)) {
-      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>({
+      const res = await kernel.anystore.bucketOpreate<FileItemModel[]>(this.belongId, {
         key: this._formatKey(),
         operate: BucketOpreates.List,
       });
       if (res.success && res.data.length > 0) {
         this.children = res.data.map((item) => {
-          return new FileSystemItem(item, this);
+          return new FileSystemItem(item, this, this.belongId);
         });
         return true;
       }
@@ -171,10 +173,13 @@ export class FileSystemItem implements IFileSystemItem {
           data: [],
           dataUrl: await blobToDataUrl(file.slice(start, end)),
         };
-        const res = await kernel.anystore.bucketOpreate<FileItemModel>(data);
+        const res = await kernel.anystore.bucketOpreate<FileItemModel>(
+          this.belongId,
+          data,
+        );
         if (!res.success) {
           data.operate = BucketOpreates.AbortUpload;
-          await kernel.anystore.bucketOpreate<boolean>(data);
+          await kernel.anystore.bucketOpreate<boolean>(this.belongId, data);
           task.finished = -1;
           p?.apply(this, [-1]);
           return;
@@ -183,7 +188,7 @@ export class FileSystemItem implements IFileSystemItem {
         task.finished = end;
         p?.apply(this, [end]);
         if (end === file.size && res.data) {
-          const node = new FileSystemItem(res.data, this);
+          const node = new FileSystemItem(res.data, this, this.belongId);
           this.children.push(node);
           return node;
         }
@@ -250,6 +255,7 @@ export class FileSystemItem implements IFileSystemItem {
         hasSubDirectories: source.target.hasSubDirectories,
       },
       destination,
+      this.belongId,
     );
     for (const item of source.children) {
       node.children.push(this._newItemForDes(item, node));
@@ -259,7 +265,7 @@ export class FileSystemItem implements IFileSystemItem {
 }
 
 /** 获取文件系统的根 */
-export const getFileSysItemRoot = () => {
+export const getFileSysItemRoot = (belongId: string) => {
   FileSystemItem._taskList = [];
   return new FileSystemItem(
     {
@@ -276,5 +282,6 @@ export const getFileSysItemRoot = () => {
       dateModified: new Date(),
     },
     undefined,
+    belongId,
   );
 };

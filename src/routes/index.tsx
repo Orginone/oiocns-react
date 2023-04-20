@@ -1,12 +1,10 @@
 import React from 'react';
 
 import { HomeFilled } from '@ant-design/icons';
-import { Redirect as RouterRedirect } from 'react-router-dom';
 import { IRouteConfig } from '../../typings/globelType.d';
 
 import PassportLayout from '@/layouts/Passport';
 import PassportForget from '@/pages/Passport/Forget';
-import PassportLock from '@/pages/Passport/Lock';
 import PassportLogin from '@/pages/Passport/Login';
 import PassportRegister from '@/pages/Passport/Register';
 import Redirect from '@/pages/Redirect';
@@ -29,12 +27,6 @@ const PassportRouter: IRouteConfig[] = [
     component: PassportRegister,
     exact: true,
     title: '注册',
-  },
-  {
-    path: '/passport/lock',
-    component: PassportLock,
-    exact: true,
-    title: '锁屏',
   },
   {
     path: '/passport/forget',
@@ -81,19 +73,6 @@ const MarketRouter: IRouteConfig[] = [
     component: React.lazy(() => import('@/pages/Store/Market')),
     title: '市场',
     icon: 'icon-guangshangcheng',
-    routes: [
-      {
-        path: '/market/shop',
-        title: '应用市场',
-        icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
-      },
-      {
-        path: '/market',
-        title: '应用市场',
-        render: () => <RouterRedirect to="/market/shop" />,
-      },
-    ],
   },
 ];
 

@@ -1,10 +1,10 @@
-import storeCtrl from '@/ts/controller/store';
-import { IFileSystemItem } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
 import React, { useEffect, useRef, useState } from 'react';
 import { Input, message, Modal, Upload, UploadProps } from 'antd';
 import CopyOrMoveModal from './CopyOrMove';
 import FilePreview from './FilePreview';
 import { FileItemShare } from '@/ts/base/model';
+import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 
 interface IProps {
   operateKey?: string;
@@ -39,7 +39,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
           onOk: async () => {
             if (await target.delete()) {
               message.success('删除成功!');
-              storeCtrl.changCallback();
+              orgCtrl.changCallback();
             }
           },
         });
@@ -71,15 +71,15 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         break;
       case '双击':
         if (target.target.isDirectory) {
-          storeCtrl.currentKey = target.key;
+          orgCtrl.currentKey = target.key;
           await target.loadChildren();
-          storeCtrl.changCallback();
+          orgCtrl.changCallback();
         } else {
           setPreview(target.shareInfo());
         }
         return;
     }
-    storeCtrl.changCallback();
+    orgCtrl.changCallback();
   };
   const uploadProps: UploadProps = {
     multiple: true,
@@ -88,7 +88,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
       const file = options.file as File;
       if (file && target) {
         if (await target.upload(file.name, file)) {
-          storeCtrl.changCallback();
+          orgCtrl.changCallback();
         }
       }
     },
@@ -123,7 +123,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
             onChange={(success) => {
               setModalType('');
               if (success) {
-                storeCtrl.changCallback();
+                orgCtrl.changCallback();
               }
             }}
           />

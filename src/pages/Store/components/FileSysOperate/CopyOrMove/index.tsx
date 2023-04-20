@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { useState } from 'react';
 import { Modal, Tree } from 'antd';
-import storeCtrl from '@/ts/controller/store';
+import orgCtrl from '@/ts/controller';
 import { ImFolder, ImFolderOpen } from 'react-icons/im';
-import { IFileSystemItem, IObjectItem } from '@/ts/core';
+import { IFileSystemItem, IObjectItem } from '@/ts/core/target/store/ifilesys';
 const { DirectoryTree } = Tree;
 
 /** 移动或复制复选框 */
@@ -32,7 +32,7 @@ const CopyOrMoveModal = (props: {
       }
       return result;
     };
-    const data = loadTreeData(storeCtrl.root);
+    const data = loadTreeData(orgCtrl.user.root);
     return [data];
   }, [currentTaget]);
 
@@ -55,11 +55,11 @@ const CopyOrMoveModal = (props: {
           await selectNode.loadChildren();
           if (title === '移动') {
             if (await currentTaget.move(selectNode)) {
-              storeCtrl.currentKey = selectNode.key;
+              orgCtrl.currentKey = selectNode.key;
             }
           } else {
             if (await currentTaget?.copy(selectNode)) {
-              storeCtrl.currentKey = selectNode.key;
+              orgCtrl.currentKey = selectNode.key;
             }
           }
         }
@@ -84,7 +84,7 @@ const CopyOrMoveModal = (props: {
           treeData={treeData}
           onSelect={(keys) => {
             if (keys.length > 0) {
-              setSelectNode(searchItemByKey(storeCtrl.root, keys[0].toString()));
+              setSelectNode(searchItemByKey(orgCtrl.user.root, keys[0].toString()));
             }
           }}
           defaultExpandedKeys={['']}

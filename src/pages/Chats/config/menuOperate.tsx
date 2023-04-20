@@ -3,11 +3,10 @@ import chatCtrl from '@/ts/controller/chat';
 import { BookType, GroupMenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import userCtrl from '@/ts/controller/setting';
-import { IChat, ITarget, TargetType } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { IChat, ISpace, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import setting from '@/ts/controller/setting';
 import { XTarget } from '@/ts/base/schema';
 
 /** 编译组织树 */
@@ -27,10 +26,10 @@ export const buildTargetTree = async (
     result.push({
       key: chat.fullId,
       item: chat,
-      menus: [],
       label: chat.target.name,
-      tag: [spaceName, chat.target.label],
+      tag: [chat.target.label],
       itemType: GroupMenuType.Chat,
+      menus: loadChatMenus(chat, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: await buildTargetTree(item.subTeam, spaceId, spaceName),
     });
@@ -38,9 +37,9 @@ export const buildTargetTree = async (
   return result;
 };
 
-export const buildAuthorityTree = (authority: IAuthority, id: string) => {
+export const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
   const result: MenuItemType = {
-    key: id + '_' + authority.id,
+    key: user.id + '_' + authority.id,
     label: authority.name,
     icon: <im.ImTree />,
     item: {
@@ -54,30 +53,31 @@ export const buildAuthorityTree = (authority: IAuthority, id: string) => {
           },
           typeName: TargetType.Cohort,
         } as XTarget,
-        setting.space.id,
-        setting.space.teamName,
+        user.id,
+        user.teamName,
         '权限群',
       ),
     },
-    tag: [setting.space.teamName, '权限群'],
+    tag: [user.teamName, '权限群'],
     menus: loadChatMenus(undefined),
     itemType: GroupMenuType.Books + '-' + BookType.Authority,
-    children: authority.children?.map((i) => buildAuthorityTree(i, id)) ?? [],
+    children: authority.children?.map((i) => buildAuthorityTree(i, user)) ?? [],
   };
   return result;
 };
 
 export const loadBookMenu = async () => {
-  const cohorts = await userCtrl.user.getCohorts(false);
-  let companys = await userCtrl.user.getJoinedCompanys(false);
+  const orginoneGpt = chatCtrl.getOrginoneGpt();
+  const cohorts = await orgCtrl.user.getCohorts(false);
+  let companys = await orgCtrl.user.getJoinedCompanys(false);
   let cohortChats: any[] = [];
   for (const item of cohorts) {
-    if (item.target.belongId == setting.user.id) {
+    if (item.target.belongId == orgCtrl.user.id) {
       cohortChats.push(
         chatCtrl.findTargetChat(
           item.target,
-          setting.user.id,
-          setting.user.teamName,
+          orgCtrl.user.id,
+          orgCtrl.user.teamName,
           item.typeName,
         ),
       );
@@ -92,19 +92,29 @@ export const loadBookMenu = async () => {
       '单位群',
     );
     companyItems.push({
-      key: chat.fullId,
+      key: company.teamName,
       label: company.teamName,
       item: chat,
-      tag: [company.typeName],
-      menus: [],
-      itemType: GroupMenuType.Chat,
+      belong: company,
+      itemType: GroupMenuType.Books,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
+        {
+          key: chat.fullId,
+          label: company.teamName,
+          item: chat,
+          tag: [company.typeName, '全员群'],
+          children: [],
+          itemType: GroupMenuType.Chat,
+          menus: loadChatMenus(chat, true),
+          icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
+        },
         {
           key: company.id + BookType.Innner,
           label: BookType.Innner,
           item: company,
           itemType: BookType.Innner,
+          belong: company,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Department, name: BookType.Innner }}
@@ -123,6 +133,7 @@ export const loadBookMenu = async () => {
           label: BookType.Station,
           item: company,
           itemType: BookType.Station,
+          belong: company,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Department, name: BookType.Innner }}
@@ -141,6 +152,7 @@ export const loadBookMenu = async () => {
           label: BookType.Working,
           item: company,
           itemType: BookType.Working,
+          belong: company,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Working, name: BookType.Working }}
@@ -160,8 +172,9 @@ export const loadBookMenu = async () => {
           item: company,
           itemType: '单位权限群',
           icon: <im.ImUser />,
+          belong: company,
           children: [
-            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company.id),
+            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company),
           ],
         },
       ],
@@ -170,17 +183,33 @@ export const loadBookMenu = async () => {
   return [
     {
       key: '我的通讯录',
-      label: setting.user.teamName,
-      itemType: setting.user.teamName,
-      item: setting.user,
+      label: orgCtrl.user.teamName,
+      itemType: orgCtrl.user.teamName,
+      item: orgCtrl.user,
+      belong: orgCtrl.user,
       children: [
+        {
+          key: orginoneGpt.fullId,
+          label: orginoneGpt.target.name,
+          itemType: GroupMenuType.Chat,
+          icon: <TeamIcon share={orginoneGpt.shareInfo} size={18} fontSize={16} />,
+          children: [],
+          item: orginoneGpt,
+          menus: loadChatMenus(orginoneGpt, true),
+        },
         {
           key: BookType.Friend,
           label: BookType.Friend,
           itemType: GroupMenuType.Books + '-' + TargetType.Person,
           icon: <im.ImUser />,
-          children: userCtrl.friends.map((i) => {
-            const chat = chatCtrl.findTargetChat(i.target, i.id, i.teamName, '好友');
+          belong: orgCtrl.user,
+          children: orgCtrl.user.joinedFriend.map((i) => {
+            const chat = chatCtrl.findTargetChat(
+              i,
+              orgCtrl.user.id,
+              orgCtrl.user.teamName,
+              '好友',
+            );
             return {
               key: chat.fullId,
               label: chat.target.name,
@@ -188,14 +217,15 @@ export const loadBookMenu = async () => {
               itemType: GroupMenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
+              menus: loadChatMenus(chat, true),
             };
           }),
           item: {
-            source: setting.user,
+            source: orgCtrl.user,
             chat: chatCtrl.findTargetChat(
-              setting.user.target,
-              setting.user.id,
-              setting.user.teamName,
+              orgCtrl.user.target,
+              orgCtrl.user.id,
+              orgCtrl.user.teamName,
               '好友',
             ),
           },
@@ -205,20 +235,21 @@ export const loadBookMenu = async () => {
           label: BookType.Cohort,
           itemType: GroupMenuType.Books,
           icon: <im.ImUsers />,
-          children: cohortChats.map((a: IChat) => {
+          belong: orgCtrl.user,
+          children: cohortChats.map((chat: IChat) => {
             return {
               children: [],
-              key: a.fullId,
-              label: a.target.name,
-              item: a,
-              menus: [],
+              key: chat.fullId,
+              label: chat.target.name,
+              item: chat,
+              menus: loadChatMenus(chat, true),
               itemType: GroupMenuType.Chat,
-              icon: <TeamIcon share={a.shareInfo} size={18} fontSize={16} />,
+              icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
             };
           }),
         },
       ],
-      icon: <TeamIcon share={setting.user.shareInfo} size={18} fontSize={16} />,
+      icon: <TeamIcon share={orgCtrl.user.shareInfo} size={18} fontSize={16} />,
     },
     ...companyItems,
   ];

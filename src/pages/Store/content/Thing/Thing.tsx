@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Dropdown } from 'antd';
-import storeCtrl from '@/ts/controller/store';
+import orgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
@@ -55,7 +55,7 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const { menuItems, selectable = true, deferred = false } = props;
-  const [key] = useCtrlUpdate(storeCtrl);
+  const [key] = useCtrlUpdate(orgCtrl);
   const [thingAttrs, setThingAttrs] = useState<any[]>([]);
 
   const getSortedList = (

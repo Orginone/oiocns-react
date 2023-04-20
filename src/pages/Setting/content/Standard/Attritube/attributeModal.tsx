@@ -5,7 +5,7 @@ import { AttributeModel } from '@/ts/base/model';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
 import { getUuid } from '@/utils/tools';
-import thing from '@/ts/controller/thing';
+import userCtrl from '@/ts/controller/setting';
 import { common } from '@/ts/base';
 
 interface Iprops {
@@ -49,7 +49,7 @@ const AttributeModal = (props: Iprops) => {
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
         request: async () => {
-          const res = await thing.property?.loadPropertys({
+          const res = await userCtrl.target!.property?.loadPropertys({
             offset: 0,
             limit: common.Constants.MAX_UINT_16,
             filter: '',

@@ -1,20 +1,19 @@
 import { CaretRightOutlined } from '@ant-design/icons';
-import { Breadcrumb, Divider, Space, Tag, Typography } from 'antd';
+import { Breadcrumb, Divider, Space, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { ImArrowLeft2 } from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import css from './index.module.less';
 
 interface CustomBreadcrumbType {
   leftBar?: React.ReactNode;
   selectKey: string;
-  item: MenuItemType[];
+  item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
 }
 const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   const [items, setItems] = useState<MenuItemType[]>([]);
   useEffect(() => {
-    setItems(loadBreadItems(props.item, props.selectKey));
+    setItems(loadBreadItems([props.item], props.selectKey));
   }, [props.selectKey]);
 
   const loadBreadItems = (items: MenuItemType[], key: string) => {
@@ -60,13 +59,6 @@ const CustomBreadcrumb = (props: CustomBreadcrumbType) => {
   return (
     <Space wrap split={<Divider type="vertical" />} size={2}>
       {props.leftBar && props.leftBar}
-      <Typography.Link
-        disabled={items.length === 1}
-        onClick={() => {
-          props.onSelect?.apply(this, [items[items.length - 2]]);
-        }}>
-        <ImArrowLeft2 fontSize={16} />
-      </Typography.Link>
       <Breadcrumb separator={<CaretRightOutlined />} className={css.customBreadcrumb}>
         {items.map((item) => {
           return (

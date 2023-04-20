@@ -32,6 +32,8 @@ export interface IChat {
   shareInfo: TargetShare;
   /** 最后一个消息的时间 */
   lastMsgTime: number;
+  /** 最后一个消息 */
+  lastMessage: XImMsg | undefined;
   /** 消息变更通知 */
   onMessage(callback: (messages: schema.XImMsg[]) => void): void;
   /**

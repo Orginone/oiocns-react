@@ -270,11 +270,26 @@ const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
 const getNowTime = (format?: string) => {
   return moment().format(format ?? 'YYYY-MM-DD HH:mm:ss');
 };
+
+const findParentMenus = (item: MenuItemType, key: string): MenuItemType | undefined => {
+  for (const node of item.children) {
+    if (node.key === key) {
+      return item;
+    }
+    const find = findParentMenus(node, key);
+    if (find != undefined) {
+      return find;
+    }
+  }
+  return undefined;
+};
+
 export {
   dateFormat,
   debounce,
   findAimObj,
   findMenuItemByKey,
+  findParentMenus,
   getNewKeyWithString,
   getNowTime,
   getUuid,
