@@ -10,6 +10,7 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import setting from '@/ts/controller/setting';
+import store from '@/ts/controller/store';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -28,6 +29,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-message',
       count: chatCtrl.getNoReadCount(),
       fath: '/chat',
+      onClick: () => {
+        chatCtrl.currentKey = '';
+        chatCtrl.changCallback();
+      },
     },
     {
       key: 'todo',
@@ -36,6 +41,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-todo',
       count: taskNum,
       fath: '/todo',
+      onClick: () => {
+        todoCtrl.currentKey = '';
+        chatCtrl.changCallback();
+      },
     },
     {
       key: 'store',
@@ -44,6 +53,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-store',
       count: 0,
       fath: '/store',
+      onClick: () => {
+        store.currentKey = '';
+        store.changCallback();
+      },
     },
     {
       key: 'market',
@@ -52,6 +65,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-guangshangcheng',
       count: 0,
       fath: '/store',
+      onClick: () => {},
     },
     {
       key: 'setting',
@@ -60,6 +74,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: <TeamIcon share={setting.user.shareInfo} size={28} title="设置" />,
       count: 0,
       fath: '/setting',
+      onClick: () => {
+        setting.currentKey = '';
+        setting.changCallback();
+      },
     },
   ];
   useEffect(() => {
@@ -77,6 +95,9 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
         key={item.path}
         to={item.path}
         title={item.title}
+        onClick={() => {
+          item.onClick();
+        }}
         className={`${
           location.hash.startsWith('#' + item.fath)
             ? `${cls['active-icon']}`

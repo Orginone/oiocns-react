@@ -37,6 +37,10 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
           dataSource={chats}
           renderItem={(item: IChat) => (
             <List.Item
+              style={{ cursor: 'pointer' }}
+              onClick={async () => {
+                await chatCtrl.setCurrent(item);
+              }}
               actions={[
                 <a
                   key="打开会话"
@@ -53,7 +57,16 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
                   <div>
                     <span style={{ marginRight: 10 }}>{item.target.name}</span>
                     <Tag color="success">{item.target.label}</Tag>
-                    {item.noReadCount > 0 && <Tag color="error">{item.noReadCount}</Tag>}
+                    {item.noReadCount > 0 && (
+                      <Tag
+                        style={{
+                          color: 'white',
+                          borderRadius: 6,
+                          backgroundColor: '#ff4d4f',
+                        }}>
+                        {item.noReadCount}
+                      </Tag>
+                    )}
                   </div>
                 }
                 description={showMessage(item)}
