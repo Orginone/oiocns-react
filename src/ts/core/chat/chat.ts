@@ -8,7 +8,7 @@ import { XImMsg } from '@/ts/base/schema';
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
 // 机器人会话ID
-const gptId = '27523442960172034';
+const gptId = '889856358221262448';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
 /**
@@ -85,24 +85,16 @@ class BaseChat implements IChat {
     this.messageNotify = callback;
   }
   async clearMessage(): Promise<boolean> {
-    if (this.spaceId === this.userId) {
-      let sessionId: any = this.target.id;
-      if (sessionId === this.userId) {
-        sessionId = {
-          _in_: [gptId, this.target.id],
-        };
-      }
-      const res = await kernel.anystore.remove(this.userId, hisMsgCollName, {
-        sessionId: sessionId,
-        spaceId: this.spaceId,
-      });
-      if (res.success) {
-        this.messages = [];
-        this.messageNotify?.apply(this, [this.messages]);
-        return true;
-      }
-      this.lastMsgTime = new Date().getTime();
+    const res = await kernel.anystore.remove(this.userId, hisMsgCollName, {
+      sessionId: this.target.id,
+      belongId: this.spaceId,
+    });
+    if (res.success) {
+      this.messages = [];
+      this.messageNotify?.apply(this, [this.messages]);
+      return true;
     }
+    this.lastMsgTime = new Date().getTime();
     return false;
   }
   async deleteMessage(id: string): Promise<boolean> {
@@ -135,7 +127,21 @@ class BaseChat implements IChat {
     await common.sleep(0);
   }
   async moreMessage(filter: string): Promise<number> {
-    await common.sleep(0);
+    const res = await kernel.anystore.aggregate(this.userId, hisMsgCollName, {
+      match: {
+        sessionId: this.target.id,
+        belongId: this.spaceId,
+      },
+      sort: {
+        createTime: -1,
+      },
+      skip: this.messages.length,
+      limit: 30,
+    });
+    if (res && res.success && Array.isArray(res.data)) {
+      this.loadMessages(res.data);
+      return res.data.length;
+    }
     return 0;
   }
   async sendMessage(type: MessageType, text: string): Promise<boolean> {
@@ -173,11 +179,11 @@ class BaseChat implements IChat {
     data.msgBody = common.StringPako.deflate(res.data);
     data.fromId = gptId;
     await kernel.anystore.insert(this.userId, hisMsgCollName, {
-      chatId: data.id,
-      sessionId: gptId,
       fromId: gptId,
+      chatId: data.id,
       toId: this.userId,
-      spaceId: this.userId,
+      belongId: this.userId,
+      sessionId: this.userId,
       createTime: 'sysdate()',
       msgType: MessageType.Text,
       msgBody: common.StringPako.deflate(res.data),
@@ -219,30 +225,6 @@ class BaseChat implements IChat {
     }
     this.messageNotify?.apply(this, [this.messages]);
   }
-  protected async loadCacheMessages(): Promise<number> {
-    let sessionId: any = this.target.id;
-    if (sessionId === this.userId) {
-      sessionId = {
-        _in_: [gptId, this.target.id],
-      };
-    }
-    const res = await kernel.anystore.aggregate(this.userId, hisMsgCollName, {
-      match: {
-        sessionId: sessionId,
-        spaceId: this.spaceId,
-      },
-      sort: {
-        createTime: -1,
-      },
-      skip: this.messages.length,
-      limit: 30,
-    });
-    if (res && res.success && Array.isArray(res.data)) {
-      this.loadMessages(res.data);
-      return res.data.length;
-    }
-    return 0;
-  }
 }
 
 /**
@@ -252,26 +234,6 @@ class PersonChat extends BaseChat {
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     super(id, name, m, userId);
   }
-  override async moreMessage(filter: string): Promise<number> {
-    if (this.spaceId === this.userId) {
-      return await this.loadCacheMessages();
-    } else {
-      let res = await kernel.queryFriendImMsgs({
-        id: this.target.id,
-        spaceId: this.spaceId,
-        page: {
-          limit: 30,
-          offset: this.messages.length,
-          filter: filter,
-        },
-      });
-      if (res.data.result && res.data.result.length > 0) {
-        this.loadMessages(res.data.result);
-        return res.data.result.length;
-      }
-    }
-    return 0;
-  }
 }
 
 /**
@@ -280,25 +242,6 @@ class PersonChat extends BaseChat {
 class CohortChat extends BaseChat {
   constructor(id: string, name: string, m: model.ChatModel, userId: string) {
     super(id, name, m, userId);
-  }
-  override async moreMessage(filter: string): Promise<number> {
-    if (this.spaceId === this.userId) {
-      return await this.loadCacheMessages();
-    } else {
-      const res = await kernel.queryCohortImMsgs({
-        id: this.target.id,
-        page: {
-          limit: 30,
-          offset: this.messages.length,
-          filter: filter,
-        },
-      });
-      if (res.data.result && res.data.result.length > 0) {
-        this.loadMessages(res.data.result);
-        return res.data.result.length;
-      }
-    }
-    return 0;
   }
   override async morePerson(filter: string): Promise<void> {
     let res = await kernel.querySubTargetById({

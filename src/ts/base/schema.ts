@@ -757,6 +757,8 @@ export type XImMsg = {
   id: string;
   // 工作空间Id
   spaceId: string;
+  // 归属用户Id
+  belongId: string;
   // 发起方Id
   fromId: string;
   // 接收方Id

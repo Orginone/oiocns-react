@@ -45,10 +45,8 @@ const useMenuUpdate = (): [
 
   useEffect(() => {
     const id = chatCtrl.subscribe((key) => {
-      if (chatCtrl.inited) {
-        setKey(key);
-        refreshMenu();
-      }
+      setKey(key);
+      refreshMenu();
     });
     return () => {
       emitter.unsubscribe(id);

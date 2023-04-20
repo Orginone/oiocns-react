@@ -51,10 +51,6 @@ class ChatController extends Emitter {
   public get userId() {
     return this._userId;
   }
-  /** 初始化状态 */
-  public get inited() {
-    return this._inited;
-  }
 
   /**
    * 查询组织信息
@@ -79,7 +75,6 @@ class ChatController extends Emitter {
    * @param chat 会话
    */
   public async setCurrent(chat: IChat | undefined): Promise<void> {
-    if (chat && this.isCurrent(chat)) return;
     if (chat) {
       this.currentKey = chat.fullId;
       chat.noReadCount = 0;
@@ -129,12 +124,16 @@ class ChatController extends Emitter {
       this.changCallback();
     }
   }
+  /** 奥集能GPT */
+  public getOrginoneGpt(): IChat {
+    return gpt3(setting.user);
+  }
   /** 初始化 */
   private async _initialization(): Promise<void> {
     kernel.anystore.subscribed(userCtrl.space.id, chatsObjectName, (data: any) => {
       if ((data?.chats?.length ?? 0) > 0) {
         this._chats = [];
-        this._chats.push(gpt3(setting.user));
+        this._chats.push(this.getOrginoneGpt());
         data.chats.forEach((item: ChatCache) => {
           let lchat = TargetChat(
             item.target,
@@ -175,12 +174,12 @@ class ChatController extends Emitter {
       sessionId = data.fromId;
     }
     for (const c of this._chats) {
-      let isMatch = sessionId === c.target.id;
+      let isMatch = sessionId === c.chatId;
       if (c.target.typeName == TargetType.Person && isMatch) {
-        isMatch = data.spaceId == c.spaceId;
+        isMatch = data.belongId == c.spaceId;
       }
       if (isMatch) {
-        c.receiveMessage(data, !this.isCurrent(c));
+        c.receiveMessage(data, c.fullId != this.currentKey);
         this._appendChats(c);
         this._cacheChats();
         if (!this.isCurrent(c)) {

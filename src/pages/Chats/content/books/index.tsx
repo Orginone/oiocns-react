@@ -10,14 +10,31 @@ import { WechatOutlined } from '@ant-design/icons';
  * @return {*}
  */
 
-const Book: React.FC = () => {
+const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
+  const chats = chatCtrl.chats
+    .filter((item) => {
+      return belongId === '' || item.spaceId === belongId;
+    })
+    .sort((a, b) => {
+      const num = (b.isToping ? 10 : 0) - (a.isToping ? 10 : 0);
+      if (num === 0) {
+        return b.lastMsgTime > a.lastMsgTime ? 1 : -1;
+      }
+      return num;
+    });
+  const showMessage = (chat: IChat) => {
+    if (chat.lastMessage) {
+      return '最新消息[' + chat.lastMessage.createTime + ']:' + chat.lastMessage.showTxt;
+    }
+    return '简介信息:' + chat.target.remark;
+  };
   return (
     <Card>
-      {chatCtrl.chats.length > 0 && (
+      {chats.length > 0 && (
         <List
           className="demo-loadmore-list"
           itemLayout="horizontal"
-          dataSource={chatCtrl.chats}
+          dataSource={chats}
           renderItem={(item: IChat) => (
             <List.Item
               actions={[
@@ -36,9 +53,10 @@ const Book: React.FC = () => {
                   <div>
                     <span style={{ marginRight: 10 }}>{item.target.name}</span>
                     <Tag color="success">{item.target.label}</Tag>
+                    {item.noReadCount > 0 && <Tag color="error">{item.noReadCount}</Tag>}
                   </div>
                 }
-                description={item.target.remark}
+                description={showMessage(item)}
               />
             </List.Item>
           )}
