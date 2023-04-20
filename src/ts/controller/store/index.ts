@@ -16,14 +16,14 @@ class StoreController extends Emitter {
   private _tabIndex: string = '1';
   public currentKey: string = '';
   private _home: IObjectItem;
-  private _root: IFileSystemItem = getFileSysItemRoot();
+  private _root: IFileSystemItem = getFileSysItemRoot(userCtrl.user.id);
   private _caches: any[] = [];
   private _commonMenuMap: any = {};
   constructor() {
     super();
     emitter.subscribePart([DomainTypes.User, DomainTypes.Company], () => {
       if (userCtrl.space) {
-        this._root = getFileSysItemRoot();
+        this._root = getFileSysItemRoot(userCtrl.user.id);
         /** 订阅仓库常用操作 */
         kernel.anystore.subscribed(userCtrl.space.id, STORE_COMMON_MENU, (map: any) => {
           this._commonMenuMap = map;

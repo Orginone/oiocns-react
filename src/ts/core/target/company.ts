@@ -25,6 +25,8 @@ import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
+import { IFileSystemItem } from '../store/ifilesys';
+import { getFileSysItemRoot } from '../store/filesys';
 /**
  * 公司的元操作
  */
@@ -44,9 +46,10 @@ export default class Company extends MarketTarget implements ICompany {
   spaceAuthorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
-
+  root: IFileSystemItem;
   constructor(target: schema.XTarget, userId: string) {
     super(target);
+    this.root = getFileSysItemRoot(target.id);
     this.userId = userId;
     this.dict = new Dict(target.id);
     this.property = new Property(target.id);

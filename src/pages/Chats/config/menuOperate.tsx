@@ -3,7 +3,7 @@ import chatCtrl from '@/ts/controller/chat';
 import { BookType, GroupMenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IChat, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
@@ -69,8 +69,8 @@ export const buildAuthorityTree = (authority: IAuthority, id: string) => {
 
 export const loadBookMenu = async () => {
   const orginoneGpt = chatCtrl.getOrginoneGpt();
-  const cohorts = await userCtrl.user.getCohorts(false);
-  let companys = await userCtrl.user.getJoinedCompanys(false);
+  const cohorts = await orgCtrl.user.getCohorts(false);
+  let companys = await orgCtrl.user.getJoinedCompanys(false);
   let cohortChats: any[] = [];
   for (const item of cohorts) {
     if (item.target.belongId == setting.user.id) {
@@ -204,9 +204,9 @@ export const loadBookMenu = async () => {
           itemType: GroupMenuType.Books + '-' + TargetType.Person,
           icon: <im.ImUser />,
           belong: setting.user,
-          children: userCtrl.friends.map((i) => {
+          children: orgCtrl.user.joinedFriend.map((i) => {
             const chat = chatCtrl.findTargetChat(
-              i.target,
+              i,
               setting.user.id,
               setting.user.teamName,
               '好友',

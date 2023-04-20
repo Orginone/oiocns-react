@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { findMenuItemByKey } from '@/utils/tools';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 /**
  * 仓库菜单刷新hook
@@ -34,8 +34,8 @@ const useMenuUpdate = (): [
   /** 刷新菜单 */
   const refreshMenu = async () => {
     const newMenus = { ...rootMenu };
-    newMenus.children = [await operate.loadAdminMenus(userCtrl.user)];
-    for (const company of await userCtrl.user.getJoinedCompanys()) {
+    newMenus.children = [await operate.loadAdminMenus(orgCtrl.user)];
+    for (const company of await orgCtrl.user.getJoinedCompanys()) {
       newMenus.children.push(await operate.loadAdminMenus(company));
     }
     var item = findMenuItemByKey(newMenus.children, storeCtrl.currentKey);

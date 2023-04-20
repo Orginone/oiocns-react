@@ -6,23 +6,23 @@ import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
-import setting from '@/ts/controller/setting';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 
 /** 编译文件系统树 */
-const buildFileSysTree = (targets: IFileSystemItem[]) => {
+const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     if (item.target.isDirectory) {
       result.push({
-        key: item.key,
+        key: item.key + user.id,
         item: item,
         label: item.name,
+        belong: user,
         itemType: GroupMenuType.FileSystemItem,
         menus: loadFileSysItemMenus(item),
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
-        children: buildFileSysTree(item.children),
+        children: buildFileSysTree(item.children, user),
       });
     }
   }
@@ -80,9 +80,9 @@ export const loadFileSysItemMenus = (
 };
 
 /** 获取数据菜单 */
-export const getDataMenus = (suffix: string) => {
+export const getDataMenus = (user: ISpace) => {
   return {
-    key: '数据' + suffix,
+    key: '数据' + user.id,
     label: '数据',
     itemType: GroupMenuType.Data,
     icon: <im.ImDatabase></im.ImDatabase>,
@@ -92,9 +92,9 @@ export const getDataMenus = (suffix: string) => {
 };
 
 /** 获取资源菜单 */
-export const getResourceMenus = (suffix: string) => {
+export const getResourceMenus = (user: ISpace) => {
   return {
-    key: '资源' + suffix,
+    key: '资源' + user.id,
     label: '资源',
     itemType: GroupMenuType.Resource,
     icon: <im.ImCloudDownload></im.ImCloudDownload>,
@@ -103,9 +103,9 @@ export const getResourceMenus = (suffix: string) => {
   };
 };
 
-export const getCommonSpeciesMenus = (suffix: string) => {
+export const getCommonSpeciesMenus = (user: ISpace) => {
   return {
-    key: '我的常用' + suffix,
+    key: '我的常用' + user.id,
     label: '我的常用',
     itemType: GroupMenuType.Common,
     icon: <im.ImHeart />,
@@ -114,9 +114,9 @@ export const getCommonSpeciesMenus = (suffix: string) => {
 };
 
 /** 获取应用程序菜单 */
-export const getAppliactionMenus = (suffix: string) => {
+export const getAppliactionMenus = (user: ISpace) => {
   return {
-    key: '应用' + suffix,
+    key: '应用' + user.id,
     label: '应用',
     itemType: GroupMenuType.Application,
     icon: <im.ImWindows8 />,
@@ -126,9 +126,9 @@ export const getAppliactionMenus = (suffix: string) => {
 };
 
 /** 获取资产菜单 */
-export const getAssetMenus = (suffix: string) => {
+export const getAssetMenus = (user: ISpace) => {
   return {
-    key: '资产' + suffix,
+    key: '资产' + user.id,
     label: '资产',
     itemType: GroupMenuType.Asset,
     icon: <im.ImCalculator />,
@@ -138,25 +138,25 @@ export const getAssetMenus = (suffix: string) => {
 };
 
 /** 获取文件系统菜单 */
-export const getFileSystemMenus = (suffix: string) => {
+export const getFileSystemMenus = (user: ISpace) => {
   return {
-    key: '文件' + suffix,
+    key: '文件' + user.id,
     label: '文件',
     itemType: GroupMenuType.FileSystemItem,
     icon: <im.ImDrive />,
-    item: storeCtrl.root,
-    menus: loadFileSysItemMenus(storeCtrl.root),
-    children: buildFileSysTree(storeCtrl.root.children),
+    item: user.root,
+    menus: loadFileSysItemMenus(user.root),
+    children: buildFileSysTree(user.root.children, user),
   };
 };
 
-export const loadThingMenus = async (suffix: string) => {
-  const root = await setting.space.loadSpeciesTree();
+export const loadThingMenus = async (user: ISpace) => {
+  const root = await user.loadSpeciesTree();
   for (const item of root) {
     if (item.target.code === 'thing') {
       return {
-        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, suffix),
-        key: item.target.name + suffix,
+        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, user),
+        key: item.target.name + user.id,
         label: item.target.name,
         itemType: GroupMenuType.Thing,
         menus: loadSpeciesOperationMenus(item),
@@ -169,13 +169,12 @@ export const loadThingMenus = async (suffix: string) => {
 
 export const loadAdminMenus = async (user: ISpace) => {
   const children: MenuItemType[] = [
-    // getCommonSpeciesMenus(),
-    getAppliactionMenus(user.id),
-    getFileSystemMenus(user.id),
-    getResourceMenus(user.id),
-    getDataMenus(user.id),
+    getAppliactionMenus(user),
+    getFileSystemMenus(user),
+    getResourceMenus(user),
+    getDataMenus(user),
   ];
-  const anyThingMenus = await loadThingMenus(user.id);
+  const anyThingMenus = await loadThingMenus(user);
   if (anyThingMenus) {
     children.push(anyThingMenus);
   }
@@ -273,20 +272,20 @@ export const loadMarketMenus = async () => {
 const buildSpeciesChildrenTree = (
   parent: ISpeciesItem[],
   itemType: string,
-  suffix: string,
+  user: ISpace,
   menuType?: string,
 ): MenuItemType[] => {
   if (parent.length > 0) {
     return parent.map((species) => {
       return {
-        key: species.id + suffix,
+        key: species.id + user.id,
         item: species,
         label: species.name,
         icon: <im.ImNewspaper />,
         itemType: itemType,
         menuType: menuType,
         menus: loadSpeciesOperationMenus(species),
-        children: buildSpeciesChildrenTree(species.children, itemType, suffix, menuType),
+        children: buildSpeciesChildrenTree(species.children, itemType, user, menuType),
       };
     });
   }

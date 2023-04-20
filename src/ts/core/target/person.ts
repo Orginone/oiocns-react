@@ -16,6 +16,8 @@ import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
+import { IFileSystemItem, IObjectItem } from '../store/ifilesys';
+import { getFileSysItemRoot } from '../store/filesys';
 
 export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];
@@ -24,16 +26,21 @@ export default class Person extends MarketTarget implements IPerson {
   spaceAuthorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
+  root: IFileSystemItem;
+  home: IObjectItem;
   constructor(target: schema.XTarget) {
     super(target);
+    this.root = getFileSysItemRoot(target.id);
     this.dict = new Dict(target.id);
     this.property = new Property(target.id);
     this.searchTargetType = [TargetType.Cohort, TargetType.Person, ...companyTypes];
     this.subTeamTypes = [];
     this.joinTargetType = [TargetType.Person, TargetType.Cohort, ...companyTypes];
     this.createTargetType = [TargetType.Cohort, ...companyTypes];
-
     this.extendTargetType = [TargetType.Cohort, TargetType.Person];
+    setTimeout(async () => {
+      this.home = await this.root.create('主目录');
+    }, 200);
   }
   async loadSpaceAuthorityTree(reload: boolean = false): Promise<IAuthority | undefined> {
     if (!reload && this.spaceAuthorityTree != undefined) {
