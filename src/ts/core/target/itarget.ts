@@ -511,7 +511,7 @@ export interface ICompany extends ISpace, ITarget {
    * @param reload 是否强制刷新
    * @returns 返回好友列表
    */
-  getWorkings(reload: boolean): Promise<IWorking[]>;
+  getWorkings(reload?: boolean): Promise<IWorking[]>;
   /**
    * @description: 查询我加入的集团
    * @param reload 是否强制刷新

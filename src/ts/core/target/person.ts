@@ -272,9 +272,9 @@ export default class Person extends MarketTarget implements IPerson {
   public async loadMembers(page: PageRequest): Promise<schema.XTargetArray> {
     if (this.joinedFriend.length == 0) {
       let data = await super.loadMembers({
-        offset: 0,
-        limit: common.Constants.MAX_UINT_16,
-        filter: '',
+        offset: page.offset,
+        limit: page.limit,
+        filter: page.filter,
       });
       if (data.result) {
         this.joinedFriend = data.result;

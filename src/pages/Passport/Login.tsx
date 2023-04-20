@@ -1,8 +1,8 @@
-import userCtrl from '@/ts/controller/setting';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
+import orgCtrl from '@/ts/controller';
 
 import cls from './index.module.less';
 
@@ -15,7 +15,7 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
         onFinish={async ({ account, password }) => {
           if (account && password) {
             setLoading(true);
-            const res = await userCtrl.login(account, password);
+            const res = await orgCtrl.provider.login(account, password);
             setLoading(false);
             if (res.success) {
               props.history.push('/home');

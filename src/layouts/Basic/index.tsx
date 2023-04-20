@@ -1,10 +1,10 @@
-import { Layout, message } from 'antd';
-import React, { useEffect } from 'react';
+import { Layout, Spin, message } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { logger, LoggerLevel } from '@/ts/base/common';
 
 type BasicLayoutProps = {
@@ -13,11 +13,17 @@ type BasicLayoutProps = {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
+  const [inited, setInited] = useState(orgCtrl.inited);
   const { route, history } = props;
   useEffect(() => {
-    if (!userCtrl.logined) {
+    if (!orgCtrl.logined) {
       return history.push('/passport/login');
     }
+    orgCtrl.subscribe(() => {
+      if (inited != orgCtrl.inited) {
+        setInited(orgCtrl.inited);
+      }
+    });
   }, []);
 
   logger.onLogger = (level, msg) => {
@@ -38,7 +44,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   };
   return (
     <Layout className={styles['page-layout']}>
-      {userCtrl.logined ? (
+      {inited ? (
         <>
           {/* 公共头部 */}
           <BasicHeader />
@@ -47,7 +53,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
           <Layout className={styles['main-content']}>{renderRoutes(route.routes)}</Layout>
         </>
       ) : (
-        ''
+        <Spin
+          tip="加载中,请稍后..."
+          size="large"
+          style={{ marginTop: 'calc(50vh - 50px)' }}></Spin>
       )}
     </Layout>
   );
