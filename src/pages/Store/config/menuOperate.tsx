@@ -1,5 +1,4 @@
-import storeCtrl from '@/ts/controller/store';
-import { IFileSystemItem, ISpace, ISpeciesItem } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
 import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
@@ -7,6 +6,8 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
 import marketCtrl from '@/ts/controller/store/marketCtrl';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
+import { ISpace, ISpeciesItem } from '@/ts/core';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
@@ -52,7 +53,7 @@ export const loadFileSysItemMenus = (
     },
   ];
   if (rightClick) return menus;
-  if (item != storeCtrl.root && item != storeCtrl.home) {
+  if (item != orgCtrl.user.root && item != orgCtrl.user.home) {
     menus.push(
       {
         key: '重命名',
@@ -86,7 +87,7 @@ export const getDataMenus = (user: ISpace) => {
     label: '数据',
     itemType: GroupMenuType.Data,
     icon: <im.ImDatabase></im.ImDatabase>,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
@@ -98,7 +99,7 @@ export const getResourceMenus = (user: ISpace) => {
     label: '资源',
     itemType: GroupMenuType.Resource,
     icon: <im.ImCloudDownload></im.ImCloudDownload>,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
@@ -109,7 +110,7 @@ export const getCommonSpeciesMenus = (user: ISpace) => {
     label: '我的常用',
     itemType: GroupMenuType.Common,
     icon: <im.ImHeart />,
-    children: storeCtrl.caches || [],
+    children: [],
   };
 };
 
@@ -120,7 +121,7 @@ export const getAppliactionMenus = (user: ISpace) => {
     label: '应用',
     itemType: GroupMenuType.Application,
     icon: <im.ImWindows8 />,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
@@ -132,7 +133,7 @@ export const getAssetMenus = (user: ISpace) => {
     label: '资产',
     itemType: GroupMenuType.Asset,
     icon: <im.ImCalculator />,
-    item: storeCtrl.root,
+    item: orgCtrl.user.root,
     children: [],
   };
 };
@@ -294,7 +295,6 @@ const buildSpeciesChildrenTree = (
 
 /** 加载右侧菜单 */
 export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
-  // let isCommon = storeCtrl.caches.map((cache) => cache.key).includes(item.id);
   const items: OperateMenuType[] = [
     {
       key: '创建实体',

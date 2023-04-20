@@ -10,7 +10,6 @@ import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import store from '@/ts/controller/store';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -54,8 +53,8 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       count: 0,
       fath: '/store',
       onClick: () => {
-        store.currentKey = '';
-        store.changCallback();
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
       },
     },
     {

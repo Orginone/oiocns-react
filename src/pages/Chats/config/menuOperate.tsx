@@ -4,10 +4,9 @@ import { BookType, GroupMenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { IChat, ITarget, TargetType } from '@/ts/core';
+import { IChat, ISpace, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import setting from '@/ts/controller/setting';
 import { XTarget } from '@/ts/base/schema';
 
 /** 编译组织树 */
@@ -38,9 +37,9 @@ export const buildTargetTree = async (
   return result;
 };
 
-export const buildAuthorityTree = (authority: IAuthority, id: string) => {
+export const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
   const result: MenuItemType = {
-    key: id + '_' + authority.id,
+    key: user.id + '_' + authority.id,
     label: authority.name,
     icon: <im.ImTree />,
     item: {
@@ -54,15 +53,15 @@ export const buildAuthorityTree = (authority: IAuthority, id: string) => {
           },
           typeName: TargetType.Cohort,
         } as XTarget,
-        setting.space.id,
-        setting.space.teamName,
+        user.id,
+        user.teamName,
         '权限群',
       ),
     },
-    tag: [setting.space.teamName, '权限群'],
+    tag: [user.teamName, '权限群'],
     menus: loadChatMenus(undefined),
     itemType: GroupMenuType.Books + '-' + BookType.Authority,
-    children: authority.children?.map((i) => buildAuthorityTree(i, id)) ?? [],
+    children: authority.children?.map((i) => buildAuthorityTree(i, user)) ?? [],
   };
   return result;
 };
@@ -73,12 +72,12 @@ export const loadBookMenu = async () => {
   let companys = await orgCtrl.user.getJoinedCompanys(false);
   let cohortChats: any[] = [];
   for (const item of cohorts) {
-    if (item.target.belongId == setting.user.id) {
+    if (item.target.belongId == orgCtrl.user.id) {
       cohortChats.push(
         chatCtrl.findTargetChat(
           item.target,
-          setting.user.id,
-          setting.user.teamName,
+          orgCtrl.user.id,
+          orgCtrl.user.teamName,
           item.typeName,
         ),
       );
@@ -175,7 +174,7 @@ export const loadBookMenu = async () => {
           icon: <im.ImUser />,
           belong: company,
           children: [
-            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company.id),
+            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company),
           ],
         },
       ],
@@ -184,10 +183,10 @@ export const loadBookMenu = async () => {
   return [
     {
       key: '我的通讯录',
-      label: setting.user.teamName,
-      itemType: setting.user.teamName,
-      item: setting.user,
-      belong: setting.user,
+      label: orgCtrl.user.teamName,
+      itemType: orgCtrl.user.teamName,
+      item: orgCtrl.user,
+      belong: orgCtrl.user,
       children: [
         {
           key: orginoneGpt.fullId,
@@ -203,12 +202,12 @@ export const loadBookMenu = async () => {
           label: BookType.Friend,
           itemType: GroupMenuType.Books + '-' + TargetType.Person,
           icon: <im.ImUser />,
-          belong: setting.user,
+          belong: orgCtrl.user,
           children: orgCtrl.user.joinedFriend.map((i) => {
             const chat = chatCtrl.findTargetChat(
               i,
-              setting.user.id,
-              setting.user.teamName,
+              orgCtrl.user.id,
+              orgCtrl.user.teamName,
               '好友',
             );
             return {
@@ -222,11 +221,11 @@ export const loadBookMenu = async () => {
             };
           }),
           item: {
-            source: setting.user,
+            source: orgCtrl.user,
             chat: chatCtrl.findTargetChat(
-              setting.user.target,
-              setting.user.id,
-              setting.user.teamName,
+              orgCtrl.user.target,
+              orgCtrl.user.id,
+              orgCtrl.user.teamName,
               '好友',
             ),
           },
@@ -236,7 +235,7 @@ export const loadBookMenu = async () => {
           label: BookType.Cohort,
           itemType: GroupMenuType.Books,
           icon: <im.ImUsers />,
-          belong: setting.user,
+          belong: orgCtrl.user,
           children: cohortChats.map((chat: IChat) => {
             return {
               children: [],
@@ -250,7 +249,7 @@ export const loadBookMenu = async () => {
           }),
         },
       ],
-      icon: <TeamIcon share={setting.user.shareInfo} size={18} fontSize={16} />,
+      icon: <TeamIcon share={orgCtrl.user.shareInfo} size={18} fontSize={16} />,
     },
     ...companyItems,
   ];

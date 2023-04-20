@@ -1,6 +1,6 @@
 import { blobToDataUrl, generateUuid } from '@/ts/base/common';
 import { BucketOpreateModel, BucketOpreates, FileItemModel } from '@/ts/base/model';
-import { model, kernel } from '../../base';
+import { model, kernel } from '@/ts/base';
 import { IFileSystemItem, IObjectItem, OnProgressType, TaskModel } from './ifilesys';
 /**
  * 文件系统项实现

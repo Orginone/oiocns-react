@@ -1,4 +1,4 @@
-import { FileItemModel, FileItemShare } from '../../base/model';
+import { FileItemModel, FileItemShare } from '@/ts/base/model';
 
 /** 可为空的文件系统 */
 export type IObjectItem = IFileSystemItem | undefined;

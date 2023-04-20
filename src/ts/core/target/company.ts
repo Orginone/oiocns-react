@@ -25,8 +25,8 @@ import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
-import { IFileSystemItem } from '../store/ifilesys';
-import { getFileSysItemRoot } from '../store/filesys';
+import { IFileSystemItem } from './store/ifilesys';
+import { getFileSysItemRoot } from './store/filesys';
 /**
  * 公司的元操作
  */

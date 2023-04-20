@@ -10,7 +10,7 @@ import { FlowDefine } from '../thing/flowDefine';
 import { ISpeciesItem } from '../thing';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
-import { IFileSystemItem, IObjectItem } from '../store/ifilesys';
+import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */

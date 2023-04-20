@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
-import storeCtrl from '@/ts/controller/store';
+import orgCtrl from '@/ts/controller';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
 import { BankOutlined } from '@ant-design/icons';
@@ -35,7 +35,7 @@ const CreateTeamModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await storeCtrl.home?.create('头像');
+      const docDir = await orgCtrl.user.home?.create('头像');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file);
         if (result) {

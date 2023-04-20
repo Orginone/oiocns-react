@@ -16,8 +16,8 @@ import { IAuthority } from './authority/iauthority';
 import Authority from './authority/authority';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
-import { IFileSystemItem, IObjectItem } from '../store/ifilesys';
-import { getFileSysItemRoot } from '../store/filesys';
+import { IFileSystemItem, IObjectItem } from './store/ifilesys';
+import { getFileSysItemRoot } from './store/filesys';
 
 export default class Person extends MarketTarget implements IPerson {
   joinedFriend: schema.XTarget[] = [];

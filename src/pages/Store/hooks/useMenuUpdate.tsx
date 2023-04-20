@@ -1,10 +1,9 @@
-import storeCtrl from '@/ts/controller/store';
+import orgCtrl from '@/ts/controller';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { findMenuItemByKey } from '@/utils/tools';
-import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 /**
  * 仓库菜单刷新hook
@@ -38,22 +37,22 @@ const useMenuUpdate = (): [
     for (const company of await orgCtrl.user.getJoinedCompanys()) {
       newMenus.children.push(await operate.loadAdminMenus(company));
     }
-    var item = findMenuItemByKey(newMenus.children, storeCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus.children, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;
     }
-    storeCtrl.currentKey = item.key;
+    orgCtrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenus);
   };
 
   useEffect(() => {
-    const id = storeCtrl.subscribe((key) => {
+    const id = orgCtrl.subscribe((key) => {
       setKey(key);
       refreshMenu();
     });
     return () => {
-      storeCtrl.unsubscribe(id);
+      orgCtrl.unsubscribe(id);
     };
   }, []);
 
