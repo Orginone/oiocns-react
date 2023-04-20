@@ -7,7 +7,7 @@ import setting from '@/ts/controller/setting';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { getNowTime } from '@/utils/tools';
 import PageCtrl from '../../pageCtrl';
-import { MenuOutlined, RightOutlined } from '@ant-design/icons';
+import { HeartOutlined, MenuOutlined, RightOutlined } from '@ant-design/icons';
 import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';
 interface indexType {}
@@ -279,12 +279,9 @@ const Index: React.FC<indexType> = () => {
                   collapsible
                   defaultCollapsed
                   extra={
-                    <RightOutlined
-                      rotate={!collapsed ? 90 : undefined}
-                      onClick={() => {
-                        setCollapsed(!collapsed);
-                      }}
-                    />
+                    <Tag icon={<HeartOutlined color="red" />} color="#3b5999">
+                      设为默认
+                    </Tag>
                   }
                   style={{ marginBlockStart: 16 }}>
                   <Table
