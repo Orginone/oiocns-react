@@ -12,15 +12,19 @@ import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
 import PageDesignList from './PageDesign/content/list';
-import PageCompList from './PageDesign/content/components/CardComp';
+import PageCompList from './PageDesign/content/CompList';
+import pageCtrl from './PageDesign/pageCtrl';
+import { Empty } from 'antd';
+import OgoImg from '../../../../public/img/logo/logo2.jpg';
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;
 }
 
 const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
-  console.log(2222, selectMenu.itemType);
-
+  if (selectMenu.itemType === '门户设置') {
+    pageCtrl.setBelongId = selectMenu.belong;
+  }
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case GroupMenuType.User:
@@ -44,12 +48,26 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return <PropertySetting />;
     case GroupMenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
-    case GroupMenuType.PageDesignList:
-      return <PageDesignList current={selectMenu.item} />;
+    case GroupMenuType.PageDesignList: {
+      return <PageDesignList />;
+    }
+
     case GroupMenuType.PageCompList:
-      return <PageCompList current={selectMenu.item} />;
+      return <PageCompList />;
     default:
-      return <></>;
+      return (
+        <Empty
+          image={OgoImg}
+          imageStyle={{
+            marginTop: '15vh',
+            height: 200,
+          }}
+          description={
+            <span>
+              请选择 <a>{selectMenu?.label}</a> 子菜单
+            </span>
+          }></Empty>
+      );
   }
 };
 

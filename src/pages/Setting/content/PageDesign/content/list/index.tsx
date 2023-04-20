@@ -1,5 +1,5 @@
 import './index.less';
-import { Button, Card, message, Popconfirm, Space, Tag } from 'antd';
+import { Button, Card, message, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataType, SCHEME } from './funs';
 import PageDesign from '../Design';
@@ -7,8 +7,8 @@ import setting from '@/ts/controller/setting';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { getNowTime } from '@/utils/tools';
 import PageCtrl from '../../pageCtrl';
-import { MenuOutlined } from '@ant-design/icons';
-import { DragSortTable } from '@ant-design/pro-components';
+import { MenuOutlined, RightOutlined } from '@ant-design/icons';
+import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';
 interface indexType {}
 
@@ -16,6 +16,7 @@ const Index: React.FC<indexType> = () => {
   const [openDesign, setOpenDesign] = useState<boolean>(false);
   const [tableList, setTableList] = useState<any[]>([]);
   const [active, setActive] = useState<string>('1');
+  const [collapsed, setCollapsed] = useState(true);
   const [key] = useCtrlUpdate(setting);
   useEffect(() => {
     PageCtrl.subscribePart('Goback', () => {
@@ -103,6 +104,52 @@ const Index: React.FC<indexType> = () => {
       },
     },
   ];
+  const columns2: any = [
+    {
+      title: '序号',
+      dataIndex: 'name',
+      width: 60,
+      render: (_key: any, _record: any, index: number) => {
+        return index + 1;
+      },
+    },
+    {
+      title: '页面名称',
+      dataIndex: 'title',
+      className: 'drag-visible',
+    },
+    {
+      title: '创建人',
+      dataIndex: 'CREAT_NAME',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'UPDATE_TIME',
+      key: 'address',
+    },
+    {
+      title: '操作',
+      dataIndex: 'other',
+      width: 200,
+      render: (_txt: any, record: DataType) => {
+        return (
+          <Space>
+            <Button type="link" onClick={() => handleSettingPublish(record, true)}>
+              使用
+            </Button>
+            <Button
+              type="link"
+              onClick={() => {
+                setOpenDesign(true);
+                PageCtrl.setEditInfo = record;
+              }}>
+              预览
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
   function queryPublishList() {
     PageCtrl.query({}, SCHEME).then((res) => {
       if (res.success) {
@@ -111,7 +158,7 @@ const Index: React.FC<indexType> = () => {
     });
   }
   function handleRemove(id: string, isPublish = false) {
-    if (tableList.length === 1) {
+    if (tableList.filter((v) => v.isPublish).length === 1) {
       return message.warning('请至少保留一个页面');
     }
     // if (isPublish && setting.user.id !== setting.space.target.belongId) {
@@ -119,31 +166,42 @@ const Index: React.FC<indexType> = () => {
     // }
     PageCtrl.delById([id], SCHEME).then((result) => {
       if (result.success) {
-        message.success('删除成功');
+        message.success('操作成功');
         queryPublishList();
       }
     });
   }
-  function handleSettingPublish(data: any) {
+  function handleSettingPublish(data: any, isUseOther: boolean = false) {
     // if (setting.user.id !== setting.space.target.belongId) {
     //   return message.error('单位门户，您无权操作，请联系管理员！');
     // }
-    // 新增默认字段
-    PageCtrl.update(
-      { id: data.id },
-      { isPublish: !data.isPublish, UPDATE_TIME: getNowTime() },
-      SCHEME,
-    ).then((_res) => {
-      PageCtrl.query({ id: data.id }, SCHEME).then((res) => {
-        if (res.success) {
-          queryPublishList();
-          message.success('操作完成');
-          PageCtrl.getHomeSetting();
-        } else {
-          message.warning('操作失败，请稍后重试');
-        }
+    // 选择使用其他的页面组件
+    if (isUseOther) {
+      PageCtrl.handleUseOtherCompanyPage({ ...data, source: 'other' });
+    } else {
+      if (data.source === 'other') {
+        // 处理下架 其他来源的页面
+        return handleRemove(data.id);
+      }
+      // 使用自己创建的页面组件
+
+      // 新增默认字段
+      PageCtrl.update(
+        { id: data.id },
+        { isPublish: !data.isPublish, UPDATE_TIME: getNowTime() },
+        SCHEME,
+      ).then((_res) => {
+        PageCtrl.query({ id: data.id }, SCHEME).then((res) => {
+          if (res.success) {
+            queryPublishList();
+            message.success('操作完成');
+            // PageCtrl.getHomeSetting();
+          } else {
+            message.warning('操作失败，请稍后重试');
+          }
+        });
       });
-    });
+    }
   }
 
   const handleDragSortEnd = (newDataSource: any) => {
@@ -167,6 +225,11 @@ const Index: React.FC<indexType> = () => {
           tabList={[
             { tab: '已发布', key: '1' },
             { tab: '未发布', key: '2' },
+            {
+              tab: '其他可用',
+              disabled: PageCtrl.belongId !== setting.user.id,
+              key: '3',
+            },
           ]}
           defaultActiveTabKey={'1'}
           activeTabKey={active}
@@ -185,22 +248,59 @@ const Index: React.FC<indexType> = () => {
               </Button>
             </>
           }>
-          <DragSortTable
-            toolBarRender={false}
-            className="ListWrap"
-            columns={columns}
-            rowKey="id"
-            search={false}
-            pagination={false}
-            dataSource={dataSource}
-            dragSortKey="sort"
-            dragSortHandlerRender={() => (
-              <MenuOutlined style={{ cursor: 'grab', color: 'gold' }} />
-            )}
-            onDragSortEnd={handleDragSortEnd}
-          />
+          {/* 一般表格 */}
+          {active !== '3' && (
+            <DragSortTable
+              toolBarRender={false}
+              className="ListWrap"
+              columns={columns}
+              rowKey="id"
+              search={false}
+              pagination={false}
+              dataSource={dataSource}
+              dragSortKey="sort"
+              dragSortHandlerRender={() => (
+                <MenuOutlined style={{ cursor: 'grab', color: 'gold' }} />
+              )}
+              onDragSortEnd={handleDragSortEnd}
+            />
+          )}
+          {/* 次级表格 */}
+          {active === '3' &&
+            PageCtrl.AllCompanyPages.map((item, index) => {
+              if (item?.list.length == 0) {
+                return <></>;
+              }
+              return (
+                <ProCard
+                  title={item.CompanyName}
+                  key={index}
+                  headerBordered
+                  collapsible
+                  defaultCollapsed
+                  extra={
+                    <RightOutlined
+                      rotate={!collapsed ? 90 : undefined}
+                      onClick={() => {
+                        setCollapsed(!collapsed);
+                      }}
+                    />
+                  }
+                  style={{ marginBlockStart: 16 }}>
+                  <Table
+                    className="ListWrap"
+                    columns={columns2}
+                    size="small"
+                    rowKey="id"
+                    pagination={false}
+                    dataSource={item?.list || []}
+                  />
+                </ProCard>
+              );
+            })}
         </Card>
       ) : (
+        // 设计页面
         useDomTemplate(
           'DialogTempalte',
           <PageDesign className="TempWrap" isMask={true} />,

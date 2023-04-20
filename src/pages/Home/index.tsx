@@ -30,6 +30,7 @@ const Home: React.FC = () => {
   const [AllItem, setAllItem] = useState<any[]>([]);
   const [selectItem, setSelectItem] = useState<any>({});
   useEffect(() => {
+    pageCtrl.getHomeSetting();
     pageCtrl.subscribe(() => {
       setAllItem(pageCtrl.homeSetting);
       setTimeout(() => {
@@ -70,7 +71,7 @@ const Home: React.FC = () => {
         tabList={AllItem.map((v) => {
           return { tab: v.title, key: v.id };
         })}>
-        {selectItem.id && (
+        {selectItem?.id && (
           <ResponsiveGridLayout
             className="layout"
             rowHeight={10}

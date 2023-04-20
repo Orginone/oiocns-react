@@ -2,7 +2,7 @@ export const defaultSetting = [
   {
     title: '工作台',
     id: '5888ad0d-d3ff-4280-ae09-4663a403e819',
-    CREAT_NAME: '常森',
+    CREAT_NAME: '--',
     UPDATE_TIME: '2023/04/19 16:34:48',
     styleData: {},
     list: [
@@ -14,10 +14,6 @@ export const defaultSetting = [
         x: 0,
         y: 0,
         i: '43d7a629-7cb2-4e35-af14-8317c675b335',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -28,10 +24,6 @@ export const defaultSetting = [
         x: 12,
         y: 30,
         i: '7a559beb-6baf-41c2-81da-e22ad2a39215',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -42,10 +34,6 @@ export const defaultSetting = [
         x: 0,
         y: 30,
         i: '3c98fc19-6be8-4a19-be7c-6fd7f2ef8c3d',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
     ],
@@ -55,7 +43,7 @@ export const defaultSetting = [
   {
     title: '驾驶舱',
     id: '0ca0eac3-faa1-4cde-81f1-fb6d6e685c21',
-    CREAT_NAME: '常森',
+    CREAT_NAME: '--',
     UPDATE_TIME: '2023/04/19 13:55:37',
     styleData: {},
     list: [
@@ -67,10 +55,6 @@ export const defaultSetting = [
         x: 0,
         y: 27,
         i: '65b5c955-92de-4cc1-82ea-93135db80338',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -81,10 +65,6 @@ export const defaultSetting = [
         x: 16,
         y: 27,
         i: '771dadfc-75c4-459c-ac49-fec444da52ab',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -95,10 +75,6 @@ export const defaultSetting = [
         x: 16,
         y: 47,
         i: '095d902b-ee0a-45e9-a5eb-b83e5b83b8ea',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -109,10 +85,6 @@ export const defaultSetting = [
         x: 0,
         y: 47,
         i: '31da8292-9c9c-4d37-a99a-9b94c3468904',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -123,10 +95,6 @@ export const defaultSetting = [
         x: 0,
         y: 68,
         i: '1bb8d2dd-333a-4710-85e9-6f025d963fb9',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -137,10 +105,6 @@ export const defaultSetting = [
         x: 16,
         y: 68,
         i: '0899c810-f097-4ae0-80ac-3ed434bb5604',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -151,10 +115,6 @@ export const defaultSetting = [
         x: 8,
         y: 0,
         i: 'fde41800-98cf-4e8c-ab47-753860a07859',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -165,10 +125,6 @@ export const defaultSetting = [
         x: 16,
         y: 0,
         i: '41bd2a3d-c9aa-4aed-b87e-ec6f3542da94',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -179,10 +135,6 @@ export const defaultSetting = [
         x: 0,
         y: 0,
         i: '79a4a616-d727-43cf-be73-fd4c68fe042a',
-        static: false,
-        minW: 2,
-        minH: 4,
-        moved: false,
         data: {},
       },
       {
@@ -206,7 +158,7 @@ export const defaultSetting = [
   {
     title: '新闻公告',
     id: '7b3bc943-57d8-409b-a006-521136475dd7',
-    CREAT_NAME: '常森',
+    CREAT_NAME: '--',
     UPDATE_TIME: '2023-04-19 14:06:53.000',
     styleData: {},
     list: [

@@ -318,6 +318,32 @@ export const getTeamMenu = async () => {
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
+          key: company.key + '单位门户',
+          item: company,
+          label: '门户设置',
+          itemType: '门户设置',
+          belong: company.id,
+          shareId: company.id,
+          menus: [],
+          icon: <im.ImNewspaper />,
+          children: [
+            {
+              key: company.key + '页面列表',
+              label: '页面列表',
+              itemType: '门户页面',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+            {
+              key: company.key + '系统组件',
+              label: '组件列表',
+              itemType: '门户组件',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+          ],
+        },
+        {
           key: company.key + '标准设置',
           item: company,
           label: '标准设置',

@@ -25,41 +25,50 @@ const Index: React.FC<CardCompType> = () => {
       )?.list || []
     );
   }, [active]);
-  const columns: any = [
-    {
-      title: '序号',
-      dataIndex: 'name',
-      width: 60,
-      render: (_key: any, _record: any, index: number) => {
-        return index + 1;
+  const columns: any = useMemo(() => {
+    const extra = [];
+    if (active === '3') {
+      extra.push(
+        {
+          title: '创建人',
+          dataIndex: 'CREAT_NAME',
+        },
+        {
+          title: '更新时间',
+          dataIndex: 'UPDATE_TIME',
+          key: 'address',
+        },
+        {
+          title: '操作',
+          dataIndex: 'other',
+          width: 200,
+        },
+      );
+    }
+    return [
+      {
+        title: '序号',
+        dataIndex: 'name',
+        width: 60,
+        render: (_key: any, _record: any, index: number) => {
+          return index + 1;
+        },
       },
-    },
-    {
-      title: '页面名称',
-      dataIndex: 'name',
-    },
-    {
-      title: '组件类型',
-      dataIndex: 'type',
-      render: (text: any) => {
-        return text ?? '自定义组件';
+      {
+        title: '页面名称',
+        dataIndex: 'name',
       },
-    },
-    {
-      title: '创建人',
-      dataIndex: 'CREAT_NAME',
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'UPDATE_TIME',
-      key: 'address',
-    },
-    {
-      title: '操作',
-      dataIndex: 'other',
-      width: 200,
-    },
-  ];
+      {
+        title: '组件类型',
+        dataIndex: 'type',
+        render: (text: any) => {
+          return text ?? '自定义组件';
+        },
+      },
+
+      ...extra,
+    ];
+  }, [active]);
 
   return (
     <>
@@ -79,29 +88,10 @@ const Index: React.FC<CardCompType> = () => {
         <Table
           className="ListWrap"
           columns={columns}
+          scroll={{ y: 600 }}
           pagination={false}
           dataSource={DataSource}
         />
-        {/* <Row gutter={[10, 10]}>
-          {(
-            pageCtrl.dataSource.find(
-              (v) => v.title === (active == '1' ? '系统组件' : '图形组件'),
-            )?.list || []
-          )?.map((item: any, idx: number) => {
-            return (
-              <Col span={6} key={item.i + '-' + idx}>
-                <Card title={item.name} extra={<span>序号：{idx + 1}</span>}>
-                  <Meta
-                    title={
-                      <Tag color="#55acee">{active == '1' ? '系统组件' : '图形组件'}</Tag>
-                    }
-                    description={item.remark ?? '--'}
-                  />
-                </Card>
-              </Col>
-            );
-          })}
-        </Row> */}
       </Card>
     </>
   );

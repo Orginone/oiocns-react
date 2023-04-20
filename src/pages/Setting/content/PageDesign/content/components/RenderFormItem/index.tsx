@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { UploadProps, message } from 'antd';
 import {
+  ProField,
   ProForm,
   ProFormCheckbox,
-  // ProFormDateRangePicker,
-  // ProFormDigit,
   ProFormRadio,
   ProFormSelect,
   ProFormText,
@@ -108,7 +107,12 @@ const RenderFormItem = ({ comp, col }: any) => {
     case 'upload':
       return <ProFormUpload width="md" {..._props} placeholder="请设置" />;
     case 'color':
+      // {
+      //   const color1 = comp?.data?.[_props.name] ?? undefined;
+      //   return <ProField text={color1} valueType="color" mode="edit" />;
+      // }
       return <ProFormColor {..._props} placeholder="请设置" />;
+
     case 'select':
       return <ProFormSelect {..._props} options={options} />;
     case 'radio':

@@ -6,7 +6,7 @@ import {
 } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import React from 'react';
-import pageCtrl from '../../../pageCtrl';
+import pageCtrl from '../../pageCtrl';
 
 const CreatIfreamComp: React.FC<{ title: string }> = ({ title }) => {
   const columns = [

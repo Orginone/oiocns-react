@@ -3,20 +3,23 @@ import { CompTypeItem, DataType, CompTypes, SCHEME } from './content/list/funs';
 import { Emitter } from '@/ts/base/common';
 import setting from '@/ts/controller/setting';
 import { kernel } from '@/ts/base';
-import { DomainTypes, emitter } from '@/ts/core';
+import { DomainTypes, ICompany, emitter } from '@/ts/core';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React from 'react';
 import { ICommonParams } from 'typings/common';
-import moment from 'moment';
 import { defaultSetting } from './config/data';
 
 class HomeSettingServices extends Emitter {
   constructor() {
     super();
-    this.getCustomComp();
-    this.getHomeSetting();
+
+    setTimeout(() => {
+      this.getCustomComp();
+      this.getHomeSetting();
+    }, 50);
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
+      this.belongId = setting?.user?.id;
       setTimeout(() => {
         this.getCustomComp();
         this.getHomeSetting();
@@ -29,7 +32,9 @@ class HomeSettingServices extends Emitter {
   private _EditInfo: DataType = {} as any; //所选预览 门户数据
   private _resultData: CompTypeItem[] = []; // 拖拽后 最终待保存数据
   private _SelectedComp: CompTypeItem | any = {}; // 记录当前所选 可编辑-单个组件
+  public AllCompanyPages: { CompanyName: string; list: DataType[] }[] = []; // 获取所有单位可使用门户列表
   public currentKey: string = '';
+  public belongId: string = setting?.user?.id;
   // 默认组建信息
   public dataSource: DataType[] = [
     {
@@ -95,6 +100,16 @@ class HomeSettingServices extends Emitter {
    */
   public get SelectedComp(): CompTypeItem {
     return this._SelectedComp;
+  }
+  //设置当前单位 BelongId
+  public set setBelongId(id: string) {
+    this.belongId = id ?? setting.user.id;
+    console.log('设置 BelongId', id, setting.user.id);
+    setTimeout(() => {
+      this.getCustomComp();
+      this.getHomeSetting();
+      (!id || id === setting.user.id) && this.getAllPublishPage();
+    }, 50);
   }
   //设置 最终 展示数据
   public set setResultData(list: CompTypeItem[]) {
@@ -262,17 +277,31 @@ class HomeSettingServices extends Emitter {
         return { ...v, data: obj?.data || {} };
       }),
     };
-    kernel.anystore.insert(DomainTypes.All, SCHEME, params).then((res) => {
+    kernel.anystore.insert(this.belongId, SCHEME, params).then((res) => {
       if (res.success) {
         message.success('操作完成');
         this.getHomeSetting();
       }
     });
   };
+  handleUseOtherCompanyPage = (data: CompTypeItem) => {
+    kernel.anystore
+      .insert(this.belongId, SCHEME, {
+        ...data,
+        id: getUuid(),
+        sort: this.homeSetting.length + 1,
+      })
+      .then((res) => {
+        if (res.success) {
+          message.success('操作完成');
+          this.getHomeSetting();
+        }
+      });
+  };
   // 更新 已保存数据
   public handleUpData = debounce((title: any) => {
     kernel.anystore
-      .update(DomainTypes.All, SCHEME, {
+      .update(this.belongId, SCHEME, {
         match: { id: this._EditInfo.id },
         update: {
           _set_: {
@@ -296,28 +325,18 @@ class HomeSettingServices extends Emitter {
   }, 300);
   // 保存排序数据
   public handleSaveSortData = (arr: any[]) => {
-    kernel.anystore.remove(DomainTypes.All, SCHEME, {
+    kernel.anystore.remove(this.belongId, SCHEME, {
       id: { _in_: arr.map((v) => v.id) },
     });
     kernel.anystore.insert(
-      DomainTypes.All,
+      this.belongId,
       SCHEME,
       arr.map((v, idx) => {
         return { ...v, sort: idx };
       }),
     );
-    // kernel.anystore.remove(DomainTypes.All, SCHEME, {
-    //   id: { _in_: arr.map((v) => v.id) },
-    // });
-    // kernel.anystore.insert(
-    //   DomainTypes.All,
-    //   SCHEME,
-    //   arr.map((v, idx) => {
-    //     return { ...v, sort: idx };
-    //   }),
-    // );
     this.setPageData = arr;
-    this._homeSetting = arr;
+    // this._homeSetting = arr;
     this.getHomeSetting();
   };
   /**
@@ -325,7 +344,7 @@ class HomeSettingServices extends Emitter {
    */
   public getCustomComp() {
     kernel.anystore
-      .aggregate(DomainTypes.All, 'custom_ifream', { match: {}, skip: 0, limit: 100 })
+      .aggregate(this.belongId, 'custom_ifream', { match: {}, skip: 0, limit: 100 })
       .then((result) => {
         let aimData = this.dataSource.find((item) => item.title === '自定义组件')!;
         if (result?.data?.length > 0) {
@@ -337,7 +356,7 @@ class HomeSettingServices extends Emitter {
       });
   }
   /**
-   * creatIfream
+   * creatIfream 自定义组件注册
    */
   public creatIfream(data: any) {
     let params = {
@@ -346,7 +365,7 @@ class HomeSettingServices extends Emitter {
     };
     if (data.id) {
       kernel.anystore
-        .update(DomainTypes.All, 'custom_ifream', {
+        .update(this.belongId, 'custom_ifream', {
           match: { id: data.id },
           update: {
             _set_: params,
@@ -364,7 +383,7 @@ class HomeSettingServices extends Emitter {
         });
     } else {
       kernel.anystore
-        .insert(DomainTypes.All, 'custom_ifream', {
+        .insert(this.belongId, 'custom_ifream', {
           id: getUuid(),
           CREAT_NAME: setting.user.name,
           ...params,
@@ -381,15 +400,17 @@ class HomeSettingServices extends Emitter {
   }
 
   /**
-   * @desc: 获取门户配置信息
+   * @desc: 获取门户配置信息 //TODO: 配置 预请求 {是否请求个人域设置，是否具备组合门户，是否展示默认单位门户}
+   * 临时仅请求个人配置
    */
   public getHomeSetting() {
+    console.log('获取门户配置信息', this.belongId);
     kernel.anystore
-      .aggregate(DomainTypes.All, SCHEME, {
+      .aggregate(setting.user.id, SCHEME, {
         match: { isPublish: true },
         sort: { sort: 1 },
         skip: 0,
-        limit: 20,
+        limit: 50,
       })
       .then((res) => {
         if (res.success) {
@@ -398,8 +419,26 @@ class HomeSettingServices extends Emitter {
           this._homeSetting = [];
         }
         this.changCallbackPart('Goback');
-        this.changCallback();
       });
+  }
+  public getAllPublishPage() {
+    this.AllCompanyPages = [];
+    setting.user.joinedCompany.forEach((CompItem: ICompany) => {
+      kernel.anystore
+        .aggregate(CompItem.id, SCHEME, {
+          match: { isPublish: true },
+          sort: { sort: 1 },
+          skip: 0,
+          limit: 20,
+        })
+        .then((res) => {
+          if (res.success) {
+            this.AllCompanyPages.push({ CompanyName: CompItem.name, list: res.data });
+            // 向页面提示数据更新
+            this.changCallbackPart('AllPages');
+          }
+        });
+    });
   }
 
   // 数据操作
@@ -409,8 +448,7 @@ class HomeSettingServices extends Emitter {
    */
   public query = async (params: ICommonParams, tableKey: string) => {
     // 删除操作：{} --删除全部
-    // const RemoveParams = { ASSET_NAME: '23' };  //条件删除
-    // kernel.anystore.remove(ASSETS_DATA, RemoveParams, 'company');
+    // kernel.anystore.remove(ASSETS_DATA, {}, 'company');
     // objUtils.removeNull(params);
     const { current = 1, pageSize = 100000, ...resParams } = params;
     let skip = current > 1 ? (current - 1) * pageSize : 0;
@@ -420,8 +458,7 @@ class HomeSettingServices extends Emitter {
       skip,
       limit: pageSize,
     };
-    let resData = await kernel.anystore.aggregate(DomainTypes.All, tableKey, matchParams);
-    // console.log('打印请求台账', tableKey, matchParams, resData);
+    let resData = await kernel.anystore.aggregate(this.belongId, tableKey, matchParams);
     return { ...resData, total: resData?.data?.length || 0 };
   };
   /**
@@ -431,10 +468,9 @@ class HomeSettingServices extends Emitter {
    * @return {*}
    */
   update = async (aimObj: any, data: Object, tableKey: string) => {
-    const nowTime = moment().format('YYYY/MM/DD HH:mm:ss');
-    return await kernel.anystore.update(DomainTypes.All, tableKey, {
+    return await kernel.anystore.update(this.belongId, tableKey, {
       match: aimObj,
-      update: { _set_: { ...data, UPDATE_TIME: nowTime } },
+      update: { _set_: { ...data, UPDATE_TIME: getNowTime() } },
     });
   };
 
@@ -445,7 +481,7 @@ class HomeSettingServices extends Emitter {
    */
 
   delById = async (ids: string[], tableKey: string) => {
-    return kernel.anystore.remove(DomainTypes.All, tableKey, { id: { _in_: ids } });
+    return kernel.anystore.remove(this.belongId, tableKey, { id: { _in_: ids } });
   };
 }
 
