@@ -124,13 +124,6 @@ const Groupinputbox = (props: Iprops) => {
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image');
-      if (!isImage) {
-        message.error(`${file.name} 不是一个图片文件`);
-      }
-      return isImage;
-    },
     async customRequest(options) {
       const file = options.file as File;
       const docDir = await storeCtrl.home?.create('沟通');
@@ -147,7 +140,7 @@ const Groupinputbox = (props: Iprops) => {
         setTask(undefined);
         if (result) {
           await chatCtrl.chat?.sendMessage(
-            MessageType.Image,
+            result.target.thumbnail ? MessageType.Image : MessageType.File,
             JSON.stringify(result.shareInfo()),
           );
         }

@@ -22,6 +22,7 @@ export enum TargetType {
 
 /** 消息类型 */
 export enum MessageType {
+  File = '文件',
   Text = '文本',
   Image = '图片',
   Video = '视频',

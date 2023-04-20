@@ -81,6 +81,18 @@ const GroupContent = (props: Iprops) => {
             </div>
           </>
         );
+      case MessageType.File:
+        // eslint-disable-next-line no-case-declarations
+        const file: FileItemShare = parseAvatar(item.showTxt);
+        return (
+          <>
+            <div className={`${css.con_content_link}`}></div>
+            <div className={`${css.con_content_txt} ${css.con_content_img}`}>
+              <Image src={file.thumbnail} preview={{ src: file.shareLink }} />
+              {file.name}
+            </div>
+          </>
+        );
       default:
         return (
           <>

@@ -1,6 +1,6 @@
 import { Card, Empty, List, Tag } from 'antd';
 import React from 'react';
-import { IChat } from '@/ts/core';
+import { IChat, MessageType } from '@/ts/core';
 import chatCtrl from '@/ts/controller/chat';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { WechatOutlined } from '@ant-design/icons';
@@ -24,7 +24,11 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
     });
   const showMessage = (chat: IChat) => {
     if (chat.lastMessage) {
-      return '最新消息[' + chat.lastMessage.createTime + ']:' + chat.lastMessage.showTxt;
+      let text = '最新消息[' + chat.lastMessage.createTime + ']:';
+      if (chat.lastMessage.msgType === MessageType.Text) {
+        return text + chat.lastMessage.showTxt;
+      }
+      return text + '[' + chat.lastMessage.msgType + ']';
     }
     return '简介信息:' + chat.target.remark;
   };
