@@ -5,7 +5,6 @@ import React, { useState, useEffect, Key } from 'react';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import CustomTree from '@/components/CustomTreeComp';
 import { ImTree } from 'react-icons/im';
-import thingCtrl from '@/ts/controller/thing';
 interface Iprops {
   open: boolean;
   close: Function;

@@ -1,6 +1,6 @@
 import { OperationModel } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import {
   ProForm,
@@ -115,7 +115,7 @@ const OperationModal = (props: Iprops) => {
           required={true}
           colProps={{ span: 12 }}
           request={async () => {
-            const res = await userCtrl.getTeamTree();
+            const res = await orgCtrl.getTeamTree();
             return targetsToTreeData(res);
           }}
           fieldProps={{

@@ -51,6 +51,9 @@ const TeamIcon = (info: teamTypeInfo) => {
     case TargetType.Group:
       icon = <im.ImTree fontSize={fontSize} />;
       break;
+    case '权限':
+      icon = <im.ImAddressBook fontSize={fontSize} />;
+      break;
     case TargetType.Company:
       icon = <im.ImOffice fontSize={fontSize} />;
       break;

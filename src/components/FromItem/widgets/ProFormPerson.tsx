@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProFormSelect } from '@ant-design/pro-components';
 
 /**
@@ -9,7 +9,7 @@ const ProFormPerson = (props: any) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
   useEffect(() => {
     const initOptions = async () => {
-      const res = await userCtrl.company.loadMembers({
+      const res = await orgCtrl.user.loadMembers({
         offset: 0,
         limit: 1000000,
         filter: '',

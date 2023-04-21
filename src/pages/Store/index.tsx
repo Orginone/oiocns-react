@@ -10,7 +10,6 @@ import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '@/components/Form';
 import { ProFormInstance } from '@ant-design/pro-components';
-import thingCtrl from '@/ts/controller/thing';
 import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 /** 仓库模块 */
 const Package: React.FC = () => {
@@ -90,7 +89,7 @@ const Package: React.FC = () => {
             let values = await formRef.current?.validateFields();
             if (values) {
               /**调用创建物接口 */
-              let res = await thingCtrl.createThing(values);
+              let res = await selectMenu.belong.createThing(values);
               if (res.success) {
                 message.success('创建成功');
                 setShowForm(false);

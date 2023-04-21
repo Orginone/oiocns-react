@@ -8,7 +8,7 @@ import ConcurrentNode from './components/ConcurrentNode';
 import DeptWayNode from './components/DeptWayNode';
 import ConditionNode from './components/ConditionNode';
 import { AddNodeType, dataType, FieldCondition, NodeType } from './processType';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
 import { ISpeciesItem } from '@/ts/core';
 /**
@@ -49,7 +49,7 @@ const FlowDrawer: React.FC<IProps> = ({
         }
         return (
           <>
-            <div>审核人：{userCtrl.getBelongName(record.createUser)}</div>
+            <div>审核人：{orgCtrl.provider.findNameById(record.createUser)}</div>
             <div>审核结果：{handleResult}</div>
             <div>审核意见：{record.comment}</div>
             <div>审核时间：{record.createTime}</div>
@@ -57,12 +57,13 @@ const FlowDrawer: React.FC<IProps> = ({
         );
       });
       // return (<div><div>审核人：{}</dev></div>)
-    } else if (current?.belongId && current?.belongId != userCtrl.space.id) {
+      // TODO 这里有问题
+    } else if (current?.belongId && current?.belongId != orgCtrl.user.id) {
       return (
         <div>
           此节点由{' '}
           <span style={{ color: 'blue' }}>
-            {userCtrl.getBelongName(current.belongId)}
+            {orgCtrl.provider.findNameById(current.belongId)}
           </span>{' '}
           创建,无法编辑
         </div>

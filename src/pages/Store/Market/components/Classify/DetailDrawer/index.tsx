@@ -2,7 +2,6 @@ import React from 'react';
 import { Drawer, Row, Col, Tag, Space, Typography, Avatar, Image } from 'antd';
 import cls from './index.module.less';
 import { XMarket } from '@/ts/base/schema';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 
 /**
  * @description: 我的商店 基础详情抽屉

@@ -1,18 +1,18 @@
 import PageCard from '@/components/PageCard';
-import { ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { Button, Segmented, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Description from './Description';
 import SpeciesForm from './SpeciesForm';
 import Attritube from './Attritube';
 import FlowList from '@/pages/Setting/content/Standard/Flow';
-import userCtrl from '@/ts/controller/setting';
 import DefineInfo from './Flow/info';
 import { CreateDefineReq } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 
 interface IProps {
+  target: ITarget;
   current: ISpeciesItem;
 }
 
@@ -20,21 +20,13 @@ interface IProps {
  * 标准设定
  * @returns
  */
-const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
+const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('');
 
   const [isRecursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [isRecursionSpecies, setRecursionSpecies] = useState<boolean>(true);
   const [key, forceUpdate] = useObjectUpdate(current);
-
-  useEffect(() => {
-    if (tabItems().findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
-      setActiveTab('info');
-    } else {
-      setActiveTab(userCtrl.currentTabKey);
-    }
-  }, []);
 
   const tabItems = () => {
     let items = [
@@ -155,7 +147,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <Attritube
             current={current}
-            target={userCtrl.target!}
+            target={target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -166,7 +158,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <SpeciesForm
             current={current}
-            target={userCtrl.target}
+            target={target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -177,7 +169,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           />
         );
       case 'work':
-        return <FlowList target={userCtrl.target!} species={current} />;
+        return <FlowList target={target} species={current} />;
     }
   };
 
@@ -189,17 +181,13 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           bordered={false}
           activeTabKey={activeTab}
           tabList={tabItems()}
-          onTabChange={(key) => {
-            userCtrl.currentTabKey = key;
-            setActiveTab(key);
-          }}
           tabBarExtraContent={renderTabBarExtraContent()}
           bodyStyle={{ paddingTop: 16 }}>
           <div className={cls['page-content-table']}>{content()}</div>
         </PageCard>
       </div>
       <DefineInfo
-        target={userCtrl.target!}
+        target={target}
         current={undefined}
         title={'新增办事'}
         open={modalType == '新增办事'}
@@ -207,9 +195,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           setModalType('');
         }}
         handleOk={async (req: CreateDefineReq) => {
-          if (
-            await userCtrl.target!.define.publishDefine({ ...req, speciesId: current.id })
-          ) {
+          if (await target.define.publishDefine({ ...req, speciesId: current.id })) {
             message.success('保存成功');
             forceUpdate();
             setModalType('');

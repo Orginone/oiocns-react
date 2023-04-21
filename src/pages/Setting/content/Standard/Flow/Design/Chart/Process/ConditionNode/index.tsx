@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import { FieldCondition } from '../../FlowDrawer/processType';
 import { Tooltip } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 type IProps = {
   //默认操作组织id
@@ -89,12 +89,13 @@ const ConditionNode: React.FC<IProps> = (props) => {
     }
     return name;
   };
+  // TODO 这里有问题
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
     if (
       props.config.belongId &&
       props.config.belongId != '' &&
-      props.config.belongId != userCtrl.space.id
+      props.config.belongId != orgCtrl.user.id
     ) {
       editable = false;
     }
@@ -178,7 +179,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
             创建组织:{' '}
             {
               // userCtrl.getBelongName(props.config.belongId)
-              userCtrl.getBelongName(props.config.belongId)
+              orgCtrl.provider.findNameById(props.config.belongId)
             }
           </span>
         }

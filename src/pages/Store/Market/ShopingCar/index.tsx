@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 import AppCard from '../components/AppCardShopCar';
 import { MarketTypes } from 'typings/marketType';
 import { Button, Col, Layout, message, Modal, PageHeader, Row, Space } from 'antd';

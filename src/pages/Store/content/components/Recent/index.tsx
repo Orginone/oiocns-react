@@ -6,7 +6,6 @@ import React from 'react';
 import useClcik from '@/hooks/useClcik';
 
 import cls from './index.module.less';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import { useHistory } from 'react-router-dom';
 interface Props {
   dataSource: IProduct[];

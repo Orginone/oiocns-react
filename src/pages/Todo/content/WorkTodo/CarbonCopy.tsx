@@ -3,8 +3,7 @@ import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
 import { XFlowDefine, XFlowTaskHistory } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
+import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Card, Collapse, Tabs, TabsProps, Timeline } from 'antd';
@@ -84,14 +83,14 @@ const CarbonCopy: React.FC<IApproveProps> = ({ flowTask, setPageKey }) => {
                                 {th.node?.nodeType}
                               </div>
                               <div style={{ paddingRight: '24px' }}>
-                                {userCtrl.findTeamInfoById(th.node?.belongId!).name}
+                                {orgCtrl.provider.findNameById(th.node?.belongId!)}
                               </div>
                               <div style={{ paddingRight: '24px' }}>
                                 {th.createTime.substring(0, th.createTime.length - 4)}
                               </div>
                               <div style={{ paddingRight: '24px' }}>
                                 {title}：
-                                {userCtrl.findTeamInfoById(record.createUser).name}
+                                {orgCtrl.provider.findNameById(record.createUser)}
                               </div>
                               <div>
                                 {record.comment && <div>审批意见：{record.comment}</div>}

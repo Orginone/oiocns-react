@@ -4,23 +4,34 @@ import { AuthorityType } from '../../enum';
 import consts from '@/ts/core/consts';
 import Identity from './identity';
 import { PageRequest } from '@/ts/base/model';
+import { IChat } from '../chat/ichat';
+import { CreateAuthChat } from '../chat/chat';
+import { ISpace } from '../itarget';
 
 export default class Authority implements IAuthority {
-  private _belongId: string;
+  public userId: string;
   public readonly target: schema.XAuthority;
   public children: IAuthority[];
   public identitys: Identity[];
+  chat: IChat;
+  space: ISpace;
 
-  constructor(auth: schema.XAuthority, belongId: string) {
+  constructor(auth: schema.XAuthority, space: ISpace, userId: string) {
     this.target = auth;
-    this._belongId = belongId;
+    this.space = space;
+    this.userId = userId;
     this.children = [];
     this.identitys = [];
     if (auth.nodes && auth.nodes.length > 0) {
       for (const item of auth.nodes) {
-        this.children.push(new Authority(item, belongId));
+        this.children.push(new Authority(item, space, userId));
       }
     }
+    this.chat = CreateAuthChat(userId, space.id, space.teamName, auth);
+  }
+
+  get belongId(): string {
+    return this.target.belongId;
   }
 
   private get existAuthority(): string[] {
@@ -41,9 +52,6 @@ export default class Authority implements IAuthority {
   public get code(): string {
     return this.target.code;
   }
-  public get belongId(): string {
-    return this.target.belongId;
-  }
   public get remark(): string {
     return this.target.remark;
   }
@@ -57,7 +65,7 @@ export default class Authority implements IAuthority {
       code,
       remark,
       authId: this.id,
-      belongId: this._belongId,
+      belongId: this.belongId,
     });
     if (res.success && res.data != undefined) {
       this.identitys.push(new Identity(res.data));
@@ -71,7 +79,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteIdentity({
         id,
-        belongId: this._belongId,
+        belongId: this.belongId,
         typeName: '',
       });
       if (res.success) {
@@ -99,17 +107,17 @@ export default class Authority implements IAuthority {
       remark,
       public: ispublic,
       parentId: this.id,
-      belongId: this._belongId,
+      belongId: this.belongId,
     });
     if (res.success && res.data != undefined) {
-      this.children.push(new Authority(res.data, this._belongId));
+      this.children.push(new Authority(res.data, this.space, this.userId));
     }
     return res;
   }
   public async delete(): Promise<model.ResultType<any>> {
     const res = await kernel.deleteAuthority({
       id: this.id,
-      belongId: this._belongId,
+      belongId: this.belongId,
       typeName: '',
     });
     return res;
@@ -121,7 +129,7 @@ export default class Authority implements IAuthority {
     if (index > 0) {
       const res = await kernel.deleteAuthority({
         id,
-        belongId: this._belongId,
+        belongId: this.belongId,
         typeName: '',
       });
       if (res.success) {

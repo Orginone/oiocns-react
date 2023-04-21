@@ -1,25 +1,19 @@
 import UserProvider from '@/ts/core/user';
 import { Emitter } from '../base/common';
-import { IPerson } from '../core';
+import { ICompany, IPerson, ISpace, ITarget } from '../core';
 /**
  * 设置控制器
  */
 class IndexController extends Emitter {
   public currentKey: string = '';
-  private _inited: boolean = false;
   private _provider: UserProvider;
   constructor() {
     super();
     this._provider = new UserProvider();
     this._provider.subscribe(async () => {
       await this._provider.refresh();
-      this._inited = true;
       this.changCallback();
     });
-  }
-  /** 是否完成初始化 */
-  get inited(): boolean {
-    return this._inited;
   }
   /** 是否已登录 */
   get logined(): boolean {
@@ -32,6 +26,50 @@ class IndexController extends Emitter {
   /** 当前用户 */
   get user(): IPerson {
     return this._provider.user!;
+  }
+
+  /** 组织树 */
+  public async getTeamTree(
+    isShare: boolean = true,
+    space: ISpace = this.user,
+  ): Promise<ITarget[]> {
+    const result: any[] = [];
+    result.push(space);
+    if (space === this.user) {
+      result.push(...(await this.user.getCohorts(false)));
+    } else if (isShare) {
+      result.push(...(await (space as ICompany).getJoinedGroups(false)));
+    }
+    return result;
+  }
+
+  /** 组织树 */
+  public async getCompanyTeamTree(
+    company: ICompany,
+    isShare: boolean = true,
+  ): Promise<ITarget[]> {
+    const result: any[] = [];
+    result.push(company);
+    if (isShare) {
+      const groups = await company.getJoinedGroups(false);
+      result.push(...groups);
+    }
+    return result;
+  }
+  /** 加载组织树 */
+  public buildTargetTree(targets: ITarget[], menus?: (item: ITarget) => any[]) {
+    const result: any[] = [];
+    for (const item of targets) {
+      result.push({
+        id: item.id,
+        item: item,
+        isLeaf: item.subTeam.length == 0,
+        menus: menus ? menus(item) : [],
+        name: item === this.user ? '我的好友' : item.name,
+        children: this.buildTargetTree(item.subTeam, menus),
+      });
+    }
+    return result;
   }
 }
 

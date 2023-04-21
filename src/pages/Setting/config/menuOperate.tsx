@@ -55,13 +55,13 @@ export const buildTargetTree = async (targets: ITarget[], belong: ISpace) => {
 const buildTargetSpeciesTree = async (target: ITarget, belong: ISpace) => {
   const species = await target.loadSpeciesTree();
   return {
-    children: species.map((i) => buildSpeciesTree(target.key, i, belong)),
+    children: species.map((i) => buildSpeciesTree(target.key, i, target)),
     key: target.key + '-分类标准',
     belong: belong,
     shareId: target.id,
     label: '分类标准',
     itemType: '分类标准',
-    item: undefined,
+    item: target,
     icon: <im.ImNewspaper />,
   };
 };
@@ -70,7 +70,7 @@ const buildTargetSpeciesTree = async (target: ITarget, belong: ISpace) => {
 export const buildSpeciesTree = (
   prefix: string,
   species: ISpeciesItem,
-  belong: ISpace,
+  belong: ITarget,
 ) => {
   const result: MenuItemType = {
     key: prefix + species.id,
@@ -111,7 +111,6 @@ export const buildDictMenus = (dict: XDict, belong: ISpace) => {
   const result: MenuItemType = {
     key: dict.id,
     belong: belong,
-    shareId: belong.id,
     item: dict,
     label: dict.name,
     icon: <im.ImTree />,
@@ -135,31 +134,29 @@ export const buildDictMenus = (dict: XDict, belong: ISpace) => {
   return result;
 };
 
-export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
+export const loadStandardSetting = async (space: ISpace) => {
   const result: MenuItemType[] = [];
-  const authors = await target?.loadAuthorityTree();
-  const dicts = await belong.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
+  const authors = await space.loadSpaceAuthorityTree();
+  const dicts = await space.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
   if (authors) {
     result.push({
-      children: [buildAuthorityTree(target.key, authors, belong)],
-      key: target.key + '权限标准',
-      belong: belong,
-      shareId: target.id,
+      children: [buildAuthorityTree(space.key, authors, space)],
+      key: space.key + '权限标准',
+      belong: space,
+      shareId: space.id,
       label: '权限标准',
       itemType: '权限标准',
-      item: target,
+      item: space,
       icon: <im.ImNewspaper />,
     });
   }
   if (dicts) {
     result.push({
-      children: dicts?.result?.map((item) => buildDictMenus(item, belong)) || [],
-      key: target.key + '字典定义',
-      belong: belong,
-      shareId: target.id,
+      children: dicts?.result?.map((item) => buildDictMenus(item, space)) || [],
+      key: space.key + '字典定义',
       label: '字典定义',
       itemType: '字典定义',
-      item: target,
+      item: space,
       icon: <im.ImNewspaper />,
       menus: [
         {
@@ -173,12 +170,10 @@ export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
   }
   result.push({
     children: [],
-    key: target.key + '属性定义',
-    belong: belong,
-    shareId: target.id,
+    key: space.key + '属性定义',
     label: '属性定义',
     itemType: GroupMenuType.Property,
-    item: target,
+    item: space,
     icon: <im.ImNewspaper />,
     menus: [
       {
@@ -189,7 +184,7 @@ export const loadStandardSetting = async (target: ITarget, belong: ISpace) => {
       },
     ],
   });
-  result.push(await buildTargetSpeciesTree(target, belong));
+  result.push(await buildTargetSpeciesTree(space, space));
   return result;
 };
 
@@ -259,7 +254,7 @@ export const getUserMenu = async () => {
         shareId: orgCtrl.user.id,
         menus: [],
         icon: <im.ImNewspaper />,
-        children: await loadStandardSetting(orgCtrl.user, orgCtrl.user),
+        children: await loadStandardSetting(orgCtrl.user),
       },
       await loadGroupMenus(
         {
@@ -299,7 +294,7 @@ export const getTeamMenu = async () => {
           shareId: company.id,
           menus: [],
           icon: <im.ImNewspaper />,
-          children: await loadStandardSetting(company, company),
+          children: await loadStandardSetting(company),
         },
         await loadGroupMenus(
           {

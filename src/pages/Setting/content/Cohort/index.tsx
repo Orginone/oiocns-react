@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
-import userCtrl from '@/ts/controller/setting';
 import { ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { common } from 'typings/common';
@@ -12,10 +11,9 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../../components/Description';
-import chatCtrl from '@/ts/controller/chat';
 import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
-import setting from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 interface IProps {
   current: ICohort;
 }
@@ -28,22 +26,13 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>('');
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
 
   useEffect(() => {
-    if (TitleItems.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
-      setActiveTab('members');
-    } else {
-      setActiveTab(userCtrl.currentTabKey);
-    }
-  }, []);
-
-  useEffect(() => {
     setTimeout(async () => {
       SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(userCtrl.company));
+      SetIsRelationAdmin(await IsRelationAdmin(current.space));
     }, 10);
   }, [current]);
 
@@ -58,7 +47,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
-    if (item.id != userCtrl.user.id) {
+    if (item.id != orgCtrl.user.id) {
       operations.push(
         ...[
           {
@@ -72,24 +61,10 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                  await userCtrl.user?.applyFriend(item);
+                  await orgCtrl.user.applyFriend(item);
                   message.success('发起申请成功');
                 },
               });
-            },
-          },
-          {
-            key: 'enterChat',
-            label: '打开会话',
-            onClick: async () => {
-              chatCtrl.setCurrent(
-                chatCtrl.findTargetChat(
-                  item,
-                  setting.user.id,
-                  setting.user.teamName,
-                  item.typeName,
-                ),
-              );
             },
           },
         ],
@@ -110,23 +85,20 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   const content = () => {
-    switch (activeTab) {
-      case 'members':
-        return (
-          <CardOrTable<schema.XTarget>
-            dataSource={[]}
-            key={key}
-            rowKey={'id'}
-            request={(page) => {
-              return current.loadMembers(page);
-            }}
-            parentRef={parentRef}
-            operation={renderOperation}
-            columns={PersonColumns}
-            showChangeBtn={false}
-          />
-        );
-    }
+    return (
+      <CardOrTable<schema.XTarget>
+        dataSource={[]}
+        key={key}
+        rowKey={'id'}
+        request={(page) => {
+          return current.loadMembers(page);
+        }}
+        parentRef={parentRef}
+        operation={renderOperation}
+        columns={PersonColumns}
+        showChangeBtn={false}
+      />
+    );
   };
 
   return (
@@ -153,12 +125,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
               )}
             </>
           }
-          tabList={TitleItems}
-          onTabChange={(key) => {
-            userCtrl.currentTabKey = key;
-            setActiveTab(key);
-          }}
-          activeTabKey={activeTab}>
+          tabList={TitleItems}>
           <div className={cls['page-content-table']} ref={parentRef}>
             {content()}
           </div>
@@ -193,7 +160,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           }}>
           <AssignModal<schema.XTarget>
             placeholder="请输入用户账号"
-            request={async (page: any) => await userCtrl.space.loadMembers(page)}
+            request={async (page: any) => await orgCtrl.user.loadMembers(page)}
             onFinish={(data) => {
               setSelectMember(data);
             }}

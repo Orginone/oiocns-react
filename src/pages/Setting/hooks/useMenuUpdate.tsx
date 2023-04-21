@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { findMenuItemByKey } from '@/utils/tools';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -34,22 +34,22 @@ const useMenuUpdate = (): [
   const refreshMenu = async () => {
     const newMenu = { ...rootMenu };
     newMenu.children = [await operate.getUserMenu(), ...(await operate.getTeamMenu())];
-    var item = findMenuItemByKey(newMenu.children, userCtrl.currentKey);
+    var item = findMenuItemByKey(newMenu.children, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenu;
     }
-    userCtrl.currentKey = item.key;
+    orgCtrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenu);
   };
 
   useEffect(() => {
-    const id = userCtrl.subscribe((key) => {
+    const id = orgCtrl.subscribe((key) => {
       setKey(key);
       refreshMenu();
     });
     return () => {
-      userCtrl.unsubscribe(id);
+      orgCtrl.unsubscribe(id);
     };
   }, []);
   return [key, rootMenu, refreshMenu, selectMenu, setSelectMenu];

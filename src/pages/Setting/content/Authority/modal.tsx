@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { targetsToTreeData } from '../..';
 
 interface Iprops {
@@ -38,10 +38,10 @@ const AuthorityModal = (props: Iprops) => {
       title: '选择制定组织',
       dataIndex: 'belongId',
       valueType: 'treeSelect',
-      initialValue: userCtrl.space.id,
+      initialValue: orgCtrl.user.id,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       request: async () => {
-        const res = await userCtrl.getTeamTree();
+        const res = await orgCtrl.getTeamTree();
         return targetsToTreeData(res);
       },
       fieldProps: {

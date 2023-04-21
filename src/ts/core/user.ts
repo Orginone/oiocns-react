@@ -1,10 +1,24 @@
-import { IPerson, createPerson } from '@/ts/core';
+import { IPerson, TargetType, createPerson, findTargetShare } from '@/ts/core';
 import { schema, model, kernel, common, pageAll } from '@/ts/base';
+import { allChats, clearChats } from './target/chat/chat';
+import { IChat } from './target/chat/ichat';
 const sessionUserName = 'sessionUser';
 export default class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
+  private _inited: boolean = false;
+  private _preMessages: schema.XImMsg[] = [];
   constructor() {
     super();
+    kernel.on('ChatRefresh', async () => {
+      await this.refresh();
+    });
+    kernel.on('RecvMsg', (data) => {
+      if (this._inited) {
+        this._recvMessage(data);
+      } else {
+        this._preMessages.push(data);
+      }
+    });
     const userJson = sessionStorage.getItem(sessionUserName);
     if (userJson && userJson.length > 0) {
       this._loadUser(JSON.parse(userJson));
@@ -13,6 +27,14 @@ export default class UserProvider extends common.Emitter {
   /** 当前用户 */
   get user(): IPerson | undefined {
     return this._user;
+  }
+  /** 所有会话 */
+  get chats(): IChat[] {
+    return allChats();
+  }
+  /** 是否完成初始化 */
+  get inited(): boolean {
+    return this._inited;
   }
   /**
    * 登录
@@ -51,14 +73,10 @@ export default class UserProvider extends common.Emitter {
   ): Promise<model.ResultType<any>> {
     return await kernel.resetPassword(account, password, privateKey);
   }
-  /** 加载用户 */
-  public _loadUser(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    this._user = createPerson(person);
-    this.changCallback();
-  }
   /** 重载数据 */
   public async refresh(): Promise<void> {
+    clearChats();
+    this._inited = false;
     await this._user?.loadMembers(pageAll());
     await this._user?.getCohorts();
     const companys = await this._user?.getJoinedCompanys();
@@ -69,6 +87,45 @@ export default class UserProvider extends common.Emitter {
       await company.getStations();
       await company.getWorkings();
       await company.loadMembers(pageAll());
+    }
+    this._inited = true;
+    this._preMessages = this._preMessages.filter((item) => {
+      this._recvMessage(item);
+      return false;
+    });
+  }
+  /** 检索用户信息 */
+  public findUserById(id: string): model.TargetShare {
+    return findTargetShare(id);
+  }
+  /** 根据ID查询名称 */
+  public findNameById(id: string): string {
+    return findTargetShare(id).name;
+  }
+  /** 加载用户 */
+  private _loadUser(person: schema.XTarget) {
+    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
+    this._user = createPerson(person);
+    this.changCallback();
+  }
+  /**
+   * 接收到新信息
+   * @param data 新消息
+   * @param cache 是否缓存
+   */
+  private _recvMessage(data: schema.XImMsg): void {
+    let sessionId = data.toId;
+    if (data.toId === this._user!.id) {
+      sessionId = data.fromId;
+    }
+    for (const c of this.chats) {
+      let isMatch = sessionId === c.chatId;
+      if (c.target.typeName == TargetType.Person && isMatch) {
+        isMatch = data.belongId == c.spaceId;
+      }
+      if (isMatch) {
+        c.receiveMessage(data);
+      }
     }
   }
 }

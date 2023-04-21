@@ -7,7 +7,7 @@ import Design from '../../../components/design/index';
 import { SaveOutlined } from '@ant-design/icons';
 import { OperationModel } from '@/ts/base/model';
 import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   target?: ITarget;
@@ -26,15 +26,15 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
 
   const save = async () => {
     if (operationModel) {
-      if (operationModel.belongId === userCtrl.space.id) {
+      if (operationModel.belongId === orgCtrl.user.id) {
         const res = await kernel.updateOperation(operationModel);
         console.log(res);
       }
       const res = await kernel.createOperationItems({
-        spaceId: userCtrl.space.id,
+        spaceId: orgCtrl.user.id,
         operationId: operationModel.id!,
         operationItems: operationModel.items
-          .filter((i: any) => i.belongId == userCtrl.space.id)
+          .filter((i: any) => i.belongId == orgCtrl.user.id)
           .map((a) => ({
             name: a.name,
             code: a.code,

@@ -13,15 +13,15 @@ type BasicLayoutProps = {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
-  const [inited, setInited] = useState(orgCtrl.inited);
+  const [inited, setInited] = useState(orgCtrl.provider.inited);
   const { route, history } = props;
   useEffect(() => {
     if (!orgCtrl.logined) {
       return history.push('/passport/login');
     }
     orgCtrl.subscribe(() => {
-      if (inited != orgCtrl.inited) {
-        setInited(orgCtrl.inited);
+      if (inited != orgCtrl.provider.inited) {
+        setInited(orgCtrl.provider.inited);
       }
     });
   }, []);

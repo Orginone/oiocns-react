@@ -3,7 +3,7 @@ import { Select, Form } from 'antd';
 import { NodeType, FieldCondition, conditiondType } from '../../processType';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 interface IProps {
   orgId?: string;
@@ -58,7 +58,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                       <SelectOrg
                         key={key}
                         onChange={onChange}
-                        orgId={userCtrl.space.id}
+                        orgId={orgCtrl.user.id}
                         value={condition.val}
                         rootDisable={false}></SelectOrg>
                     </div>

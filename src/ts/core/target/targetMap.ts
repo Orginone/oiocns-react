@@ -1,22 +1,34 @@
-import { orginoneAvatar, parseAvatar } from '@/ts/base';
+import { kernel, orginoneAvatar, parseAvatar } from '@/ts/base';
 import { TargetShare } from '@/ts/base/model';
 import { XTarget, XTargetArray } from '../../base/schema';
 
-const targetMap = new Map<string, XTarget | TargetShare>();
+const targetMap = new Map<string, TargetShare>();
 
 export const appendTarget = (targets: XTarget | XTarget[] | XTargetArray) => {
   if ('id' in targets) {
-    targetMap.set(targets.id, targets);
+    targetMap.set(targets.id, {
+      name: targets.team?.name ?? targets.name,
+      avatar: parseAvatar(targets.avatar),
+      typeName: targets.typeName,
+    });
   } else if ('result' in targets) {
     if (targets.result) {
       for (const item of targets.result) {
-        targetMap.set(item.id, item);
+        targetMap.set(item.id, {
+          name: item.team?.name ?? item.name,
+          avatar: parseAvatar(item.avatar),
+          typeName: item.typeName,
+        });
       }
     }
   } else {
     if (Array.isArray(targets)) {
       for (const item of targets) {
-        targetMap.set(item.id, item);
+        targetMap.set(item.id, {
+          name: item.team?.name ?? item.name,
+          avatar: parseAvatar(item.avatar),
+          typeName: item.typeName,
+        });
       }
     }
   }
@@ -34,17 +46,19 @@ export const findTargetShare = (targetId: string) => {
     typeName: '人员',
     avatar: orginoneAvatar(),
   };
-  if (targetMap.has(targetId)) {
-    const item = targetMap.get(targetId)!;
-    if ('code' in item) {
-      result.avatar = parseAvatar(item.avatar);
-      result.name = item.team?.name ?? item.name;
-      result.typeName = item.typeName;
-    } else {
-      result.avatar = item.avatar;
-      result.name = item.name;
-      result.typeName = item.typeName;
-    }
+  if (!targetMap.has(targetId)) {
+    kernel
+      .queryTargetById({
+        ids: [targetId],
+      })
+      .then((res) => {
+        if (res.success) {
+          appendTarget(res.data);
+        }
+      });
+  }
+  if (targetMap.get(targetId)) {
+    return targetMap.get(targetId)!;
   }
   return result;
 };

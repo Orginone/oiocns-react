@@ -2,7 +2,6 @@ import cls from './index.module.less';
 
 import React from 'react';
 // import { useHistory } from 'react-router-dom';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import { EditOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 interface indexType {}

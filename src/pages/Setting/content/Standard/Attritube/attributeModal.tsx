@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpace, ISpeciesItem } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
 import { getUuid } from '@/utils/tools';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { common } from '@/ts/base';
 
 interface Iprops {
@@ -15,7 +15,7 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
   current: ISpeciesItem;
-  target: ITarget;
+  target: ISpace;
 }
 /*
   特性编辑模态框
@@ -49,7 +49,7 @@ const AttributeModal = (props: Iprops) => {
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
         request: async () => {
-          const res = await userCtrl.target!.property?.loadPropertys({
+          const res = await orgCtrl.user.property?.loadPropertys({
             offset: 0,
             limit: common.Constants.MAX_UINT_16,
             filter: '',
@@ -83,7 +83,7 @@ const AttributeModal = (props: Iprops) => {
         valueType: 'treeSelect',
         formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
         request: async () => {
-          const data = await props.target.loadAuthorityTree(false);
+          const data = await props.target.loadSpaceAuthorityTree(false);
           return data ? [data] : [];
         },
         fieldProps: {

@@ -2,7 +2,7 @@ import { TargetModel } from './../../base/model';
 import BaseTarget from '@/ts/core/target/base';
 import { departmentTypes, subDepartmentTypes, TargetType } from '../enum';
 import { schema } from '../../base';
-import { IDepartment, ITarget, IWorking, TargetParam } from './itarget';
+import { IDepartment, ISpace, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
 import { logger } from '@/ts/base/common';
 
@@ -17,8 +17,13 @@ export default class Department extends BaseTarget implements IDepartment {
   departments: IDepartment[];
   private _onDeleted: Function;
 
-  constructor(target: schema.XTarget, onDeleted: Function) {
-    super(target);
+  constructor(
+    target: schema.XTarget,
+    space: ISpace,
+    userId: string,
+    onDeleted: Function,
+  ) {
+    super(target, space, userId);
     this.person = [];
     this.workings = [];
     this.departments = [];
@@ -68,7 +73,7 @@ export default class Department extends BaseTarget implements IDepartment {
     if (res.success) {
       this.departments =
         res.data.result?.map((a) => {
-          return new Department(a, () => {
+          return new Department(a, this.space, this.userId, () => {
             this.departments = this.departments.filter((i) => {
               return i.id != a.id;
             });
@@ -88,7 +93,7 @@ export default class Department extends BaseTarget implements IDepartment {
     if (res.success) {
       this.workings =
         res.data.result?.map((a) => {
-          return new Working(a, () => {
+          return new Working(a, this.space, this.userId, () => {
             this.workings = this.workings.filter((i) => {
               return i.id != a.id;
             });
@@ -109,7 +114,7 @@ export default class Department extends BaseTarget implements IDepartment {
     }
     const res = await super.createSubTarget({ ...data, belongId: this.target.belongId });
     if (res.success) {
-      const department = new Department(res.data, () => {
+      const department = new Department(res.data, this.space, this.userId, () => {
         this.departments = this.departments.filter((i) => {
           return i.id != department.id;
         });
@@ -141,7 +146,7 @@ export default class Department extends BaseTarget implements IDepartment {
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     const res = await super.createSubTarget(data);
     if (res.success) {
-      const working = new Working(res.data, () => {
+      const working = new Working(res.data, this.space, this.userId, () => {
         this.workings = this.workings.filter((i) => {
           return i.id != working.id;
         });

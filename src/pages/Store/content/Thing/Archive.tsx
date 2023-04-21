@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import OioForm from '@/components/Form';
 
@@ -16,7 +16,8 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId }) => {
   const [archives, setArchives] = useState<any[]>([]);
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThingArchives(userCtrl.space.id, {
+      // TODO 注意，这里不对
+      const res = await kernel.anystore.loadThingArchives(orgCtrl.user.id, {
         options: {
           match: {
             _id: {
@@ -60,10 +61,10 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId }) => {
                     {record.createTime.substring(0, record.createTime.length - 4)}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    {userCtrl.findTeamInfoById(a.node?.belongId!).name}
+                    {orgCtrl.provider.findNameById(a.node?.belongId!)}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    操作人：{userCtrl.findTeamInfoById(record.createUser).name}
+                    操作人：{orgCtrl.provider.findNameById(record.createUser)}
                   </div>
                   <div>{record.comment && <div>审批意见：{record.comment}</div>}</div>
                 </div>

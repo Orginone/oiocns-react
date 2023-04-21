@@ -3,7 +3,7 @@ import { Card, Descriptions, Space, Typography } from 'antd';
 import { ISpeciesItem } from '@/ts/core';
 import cls from '../index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 /**
  * @description: 分类标准信息内容
@@ -14,7 +14,7 @@ const Description = (info: { current: ISpeciesItem }) => {
   useEffect(() => {
     if (info.current) {
       info.current
-        .loadInfo(userCtrl.findTeamInfoById(data.target.belongId))
+        .loadInfo(orgCtrl.provider.findUserById(data.target.belongId))
         .then((item) => {
           setData(item);
         });
@@ -46,7 +46,7 @@ const Description = (info: { current: ISpeciesItem }) => {
           {data.target.public ? '开放' : '私有'}
         </Descriptions.Item>
         <Descriptions.Item label="创建人">
-          {userCtrl.findTeamInfoById(data.target.createUser).name}
+          {orgCtrl.provider.findNameById(data.target.belongId)}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间" span={3}>
           {data.target.createTime}

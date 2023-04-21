@@ -3,7 +3,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { SpeciesModel } from '@/ts/base/model';
 import { ISpeciesItem } from '@/ts/core';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { targetsToTreeData } from '../../..';
 
 interface Iprops {
@@ -39,10 +39,10 @@ const SpeciesModal = (props: Iprops) => {
       title: '选择制定组织',
       dataIndex: 'belongId',
       valueType: 'treeSelect',
-      initialValue: userCtrl.space.id,
+      initialValue: orgCtrl.user.id,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       request: async () => {
-        const res = await userCtrl.getTeamTree();
+        const res = await orgCtrl.getTeamTree();
         return targetsToTreeData(res);
       },
       fieldProps: {
@@ -56,7 +56,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await userCtrl.space.loadAuthorityTree(false);
+        const data = await orgCtrl.user.loadAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {

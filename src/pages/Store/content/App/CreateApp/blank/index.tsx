@@ -4,7 +4,7 @@ import SchemaForm from '@/components/SchemaForm';
 import { columns, DataItem, Resources } from './config';
 import { Form, Card, Row, Col, Space, PageHeader, message } from 'antd';
 import { RouteComponentProps } from 'react-router-dom';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 const CreateApp: React.FC<RouteComponentProps> = (props) => {
   const { history } = props;
@@ -22,7 +22,7 @@ const CreateApp: React.FC<RouteComponentProps> = (props) => {
         flows: n.flows ? JSON.stringify(n.flows) : undefined,
       };
     });
-    const res = await userCtrl.space.createProduct({
+    const res = await orgCtrl.space.createProduct({
       ...values,
       photo: '',
       resources: list,

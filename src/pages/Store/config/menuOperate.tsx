@@ -4,7 +4,6 @@ import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType } from './menuType';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 import { ISpace, ISpeciesItem } from '@/ts/core';
@@ -188,86 +187,6 @@ export const loadAdminMenus = async (user: ISpace) => {
     icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
     children: children,
   };
-};
-
-export const loadMarketMenus = async () => {
-  const markets = await marketCtrl.target.getJoinMarkets();
-  return [
-    {
-      key: '管理的商店',
-      label: '管理的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '管理的商店',
-      menus: [
-        {
-          key: '创建商店',
-          label: '创建商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId === marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            item: item,
-            children: [],
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-    {
-      key: '加入的商店',
-      label: '加入的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '加入的商店',
-      menus: [
-        {
-          key: '加入商店',
-          label: '加入商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId != marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            children: [],
-            item: item,
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-  ];
 };
 
 const buildSpeciesChildrenTree = (

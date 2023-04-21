@@ -1,5 +1,5 @@
 import MainLayout from '@/components/MainLayout';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import React, { useEffect, useState } from 'react';
 import Content from './content';
@@ -16,7 +16,7 @@ const Todo: React.FC<any> = () => {
   useEffect(() => {
     refreshMenu();
     todoCtrl.loadWorkTodo();
-  }, [userCtrl.space.id]);
+  }, [orgCtrl.user.id]);
 
   if (!selectMenu) return <></>;
 
@@ -54,7 +54,7 @@ const Todo: React.FC<any> = () => {
         onCancel={() => setOpenFlow(false)}>
         <FlowSelect
           multiple={false}
-          orgId={userCtrl.space.id}
+          orgId={orgCtrl.user.id}
           onCheckeds={(params: any) => setSelectData(params)}
         />
       </Modal>

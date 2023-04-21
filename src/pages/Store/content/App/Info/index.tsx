@@ -14,7 +14,6 @@ import Meta from 'antd/lib/card/Meta';
 import { IconFont } from '@/components/IconFont';
 import { useHistory } from 'react-router-dom';
 import { DestTypes } from '@/constants/const';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import SchemaForm from '@/components/SchemaForm';
 import { IProduct } from '@/ts/core';
 // 根据以获取数据 动态产生tab

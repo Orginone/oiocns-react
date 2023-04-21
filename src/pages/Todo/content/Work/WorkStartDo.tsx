@@ -2,8 +2,7 @@ import OioForm from '@/components/Form';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
 import { XFlowDefine } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
+import orgCtrl from '@/ts/controller';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { ISpeciesItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
@@ -36,7 +35,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack }) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      const resource = await userCtrl.space.define.queryNodes(current.id);
+      const resource = await orgCtrl.space.define.queryNodes(current.id);
       if (!resource.operations) {
         message.error('流程未绑定表单');
         goBack();
@@ -72,7 +71,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack }) => {
             onFinished={async (values: any) => {
               let rows_ = rows;
               if (current?.isCreate) {
-                let res = await kernel.anystore.createThing(userCtrl.space.id, 1);
+                let res = await kernel.anystore.createThing(orgCtrl.space.id, 1);
                 if (res && res.success) {
                   rows_ = res.data;
                 }
@@ -80,7 +79,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack }) => {
               //发起流程tableKey
               let res = await kernel.createInstance({
                 defineId: current?.id || '',
-                SpaceId: userCtrl.space.id,
+                SpaceId: orgCtrl.space.id,
                 content: '',
                 contentType: 'Text',
                 data: JSON.stringify({ ...data, ...values }),

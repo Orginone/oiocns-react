@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import Content from './content';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import chatCtrl from '@/ts/controller/chat';
-import { GroupMenuType } from './config/menuType';
-import { IChat } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { IChat } from '@/ts/core/target/chat/ichat';
 const Setting: React.FC<any> = () => {
   const [openDetail, setOpenDetail] = useState<boolean>(false);
   const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
@@ -13,17 +12,14 @@ const Setting: React.FC<any> = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        if (data.itemType == GroupMenuType.Chat) {
-          await chatCtrl.setCurrent(data.item);
-        } else {
-          chatCtrl.currentKey = data.key;
-          setSelectMenu(data);
-        }
+        orgCtrl.currentKey = data.key;
+        setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
         switch (key) {
           case '打开会话':
-            chatCtrl.setCurrent(data.item.chat);
+            orgCtrl.currentKey = data.item.chat.fullId;
+            refreshMenu();
             break;
           case '置顶会话':
             (data.item! as IChat).isToping = true;
@@ -35,20 +31,20 @@ const Setting: React.FC<any> = () => {
             break;
           case '清空消息':
             await (data.item! as IChat).clearMessage();
-            chatCtrl.changCallback();
+            orgCtrl.changCallback();
             break;
-          case '删除会话':
-            chatCtrl.deleteChat(data.item);
-            break;
+          // case '删除会话':
+          //   chatCtrl.deleteChat(data.item);
+          //   break;
           case '会话详情':
             setOpenDetail(!openDetail);
             break;
-          case '标记为未读':
-            if (chatCtrl.chat) {
-              chatCtrl.chat.noReadCount = 1;
-              chatCtrl.changCallback();
-            }
-            break;
+          // case '标记为未读':
+          //   if (chatCtrl.chat) {
+          //     chatCtrl.chat.noReadCount = 1;
+          //     chatCtrl.changCallback();
+          //   }
+          //   break;
         }
       }}
       siderMenuData={rootMenu}>

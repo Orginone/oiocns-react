@@ -13,7 +13,7 @@ interface IProps {
 const TypeSetting = ({ key, selectMenu, openDetail }: IProps) => {
   switch (selectMenu.itemType.split('-')[0]) {
     case GroupMenuType.Chat:
-      return <Chat openDetail={openDetail} />;
+      return <Chat chat={selectMenu.item} openDetail={openDetail} />;
     default:
       return <Book key={key} belongId={selectMenu.belong?.id ?? ''} />;
   }

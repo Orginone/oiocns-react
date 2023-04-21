@@ -4,8 +4,7 @@ import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
-import appCtrl from '@/ts/controller/store/appCtrl';
+import orgCtrl from '@/ts/controller';
 import { ICompany, IResource, ITarget } from '@/ts/core';
 import CustomTree from '@/components/CustomTreeComp';
 interface Iprops {
@@ -80,10 +79,10 @@ const ShareRecent = (props: Iprops) => {
     setTimeout(async () => {
       if (appCtrl.curProduct) {
         if (shareType === '共享') {
-          setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree()));
+          setLeftTreeData(orgCtrl.buildTargetTree(await orgCtrl.getTeamTree()));
           await appCtrl.curProduct.queryExtend('组织');
         } else {
-          if (userCtrl.isCompanySpace) {
+          if (orgCtrl.isCompanySpace) {
             const resource = appCtrl.curProduct.resource || [];
             setResourceList(resource);
             if (resource?.length > 0) {
@@ -92,7 +91,7 @@ const ShareRecent = (props: Iprops) => {
               setCurResourceId(resource[0].resource.id);
             }
           }
-          setLeftTreeData(userCtrl.buildTargetTree(await userCtrl.getTeamTree(false)));
+          setLeftTreeData(orgCtrl.buildTargetTree(await orgCtrl.getTeamTree(false)));
         }
       }
     }, 10);

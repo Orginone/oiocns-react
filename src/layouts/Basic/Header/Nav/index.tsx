@@ -5,9 +5,7 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { IconFont } from '@/components/IconFont';
 
 import cls from './index.module.less';
-import chatCtrl from '@/ts/controller/chat';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 // import { HeartFilled } from '@ant-design/icons';
@@ -18,19 +16,22 @@ import orgCtrl from '@/ts/controller';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
-  const [chatKey] = useCtrlUpdate(chatCtrl);
+  // TODO 加载未读消息数量
+  // const [chatKey] = useCtrlUpdate(chatCtrl);
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
-      key: chatKey,
+      // key: chatKey,
+      key: '沟通',
       path: '/chat',
       title: '沟通',
       icon: 'icon-message',
-      count: chatCtrl.getNoReadCount(),
+      count: 0,
+      // count: chatCtrl.getNoReadCount(),
       fath: '/chat',
       onClick: () => {
-        chatCtrl.currentKey = '';
-        chatCtrl.changCallback();
+        // chatCtrl.currentKey = '';
+        // chatCtrl.changCallback();
       },
     },
     {
@@ -42,7 +43,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/todo',
       onClick: () => {
         todoCtrl.currentKey = '';
-        chatCtrl.changCallback();
       },
     },
     {

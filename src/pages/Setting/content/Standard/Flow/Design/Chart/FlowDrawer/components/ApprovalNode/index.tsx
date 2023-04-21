@@ -4,7 +4,7 @@ import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } fro
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
 import ViewFormModal from '@/pages/Setting/components/viewFormModal';
@@ -43,7 +43,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
 
   // const [processValue, setProcessValue] = useState(1);
   const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || userCtrl.space.id,
+    props.current.belongId || props.orgId || orgCtrl.user.id,
   );
 
   const [currentData, setCurrentData] = useState({
@@ -56,7 +56,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   });
   useEffect(() => {
     if (!props.current.belongId) {
-      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
+      setNodeOperateOrgId(props.orgId || orgCtrl.user.id);
       props.current.belongId = props.orgId;
     }
   }, []);

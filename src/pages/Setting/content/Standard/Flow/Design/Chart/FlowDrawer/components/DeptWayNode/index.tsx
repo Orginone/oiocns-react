@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import { NodeType, dataType, FieldCondition } from '../../processType';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import DeptWayGroupItemConfig from '../DeptWayGroupItemConfig';
 interface IProps {
   current: NodeType;
@@ -37,7 +37,7 @@ const DeptWayNode: React.FC<IProps> = (props) => {
         key: 'EQ',
         label: '=',
         type: dataType.BELONG,
-        val: userCtrl.space.id,
+        val: orgCtrl.user.id,
       });
     }
   }, []);

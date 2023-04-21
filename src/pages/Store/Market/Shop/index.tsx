@@ -4,7 +4,6 @@ import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppShopCard';
 import { common } from 'typings/common';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
 import MerchandiseDetail from '../components/MerchandiseDetail';
 import MarketClassify from '../components/Classify';
 import ReactDOM from 'react-dom';

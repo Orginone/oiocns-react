@@ -3,7 +3,6 @@ import { XMarket, XTarget } from '../base/schema';
 import { Market } from './market';
 import Person from './target/person';
 
-export type { IChat, IChatGroup } from './chat';
 export {
   AuthorityType,
   CommonStatus,

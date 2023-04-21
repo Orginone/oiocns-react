@@ -1,6 +1,6 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ICompany, ITarget } from '@/ts/core';
 interface IProps {
   rootDisable?: boolean;
@@ -15,9 +15,9 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const loadTreeData = async () => {
     let tree;
     if (props.company) {
-      tree = await userCtrl.getCompanyTeamTree(props.company);
+      tree = await orgCtrl.getCompanyTeamTree(props.company);
     } else {
-      tree = await userCtrl.getTeamTree();
+      tree = await orgCtrl.getTeamTree();
     }
 
     let targets = buildTargetTree(tree, false, 0);
@@ -59,7 +59,7 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   };
   useEffect(() => {
     loadTreeData();
-  }, [userCtrl.space, props]);
+  }, [orgCtrl.user, props]);
   return (
     <TreeSelect
       showSearch

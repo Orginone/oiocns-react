@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { SearchOutlined } from '@ant-design/icons';
@@ -246,7 +246,7 @@ const transformAttrToOperationItem = (
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: userCtrl.space.id,
+      belongId: orgCtrl.user.id,
       operationId: operationId,
       attrId: attr.id,
       attr: attr,
@@ -275,7 +275,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
       id: operationItem.attrId,
       name: operationItem.name,
       code: operationItem.code,
-      belongId: userCtrl.space.id,
+      belongId: orgCtrl.user.id,
       remark: rule.description,
       dictId: rule.dictId || undefined,
       valueType:
@@ -306,7 +306,7 @@ type FormLayout = {
  */
 const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const belongId = userCtrl.space.id;
+  const belongId = orgCtrl.user.id;
   const [items, setItems] = useState<any>({
     // 特性
     attrs: [],

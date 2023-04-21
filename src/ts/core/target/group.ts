@@ -1,6 +1,6 @@
 import BaseTarget from './base';
 import { XTarget } from '@/ts/base/schema';
-import { IGroup, ITarget, TargetParam } from './itarget';
+import { IGroup, ISpace, ITarget, TargetParam } from './itarget';
 import { companyTypes, TargetType } from '../enum';
 import { kernel } from '@/ts/base';
 import { logger } from '@/ts/base/common';
@@ -10,8 +10,8 @@ export default class Group extends BaseTarget implements IGroup {
   subGroupLoaded: boolean = false;
   subGroup: IGroup[];
   private _onDeleted: Function;
-  constructor(target: XTarget, onDeleted: Function) {
-    super(target);
+  constructor(target: XTarget, space: ISpace, userId: string, onDeleted: Function) {
+    super(target, space, userId);
     this.subGroup = [];
     this._onDeleted = onDeleted;
     this.memberTypes = companyTypes;
@@ -54,7 +54,7 @@ export default class Group extends BaseTarget implements IGroup {
         belongId: this.target.belongId,
       });
       if (res.success) {
-        const group = new Group(res.data, () => {
+        const group = new Group(res.data, this.space, this.userId, () => {
           this.subGroup = this.subGroup.filter((item) => {
             return item.id != group.id;
           });
@@ -95,7 +95,7 @@ export default class Group extends BaseTarget implements IGroup {
     if (res.success) {
       this.subGroup =
         res.data.result?.map((a) => {
-          return new Group(a, () => {
+          return new Group(a, this.space, this.userId, () => {
             this.subGroup = this.subGroup.filter((item) => {
               return item.id != a.id;
             });

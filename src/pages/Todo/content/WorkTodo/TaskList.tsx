@@ -8,7 +8,7 @@ import { MenuItemType } from 'typings/globelType';
 import { WorkReocrdColumns, WorkTodoColumns } from '../../config/columns';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 // 卡片渲染
 interface IProps {
@@ -129,7 +129,7 @@ const TaskList: React.FC<IProps> = ({
                 await kernel.queryRecord({
                   status: [1],
                   page,
-                  spaceId: userCtrl.space.id,
+                  spaceId: orgCtrl.space.id,
                 })
               )?.data || []
             );
@@ -164,7 +164,7 @@ const TaskList: React.FC<IProps> = ({
                 await kernel.queryRecord({
                   status: [100, 200],
                   page,
-                  spaceId: userCtrl.space.id,
+                  spaceId: orgCtrl.space.id,
                 })
               )?.data || []
             );

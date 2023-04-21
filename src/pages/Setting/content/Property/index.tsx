@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { emitter } from '@/ts/core';
+import { ISpace, emitter } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import PropertyModal from './modal';
-import thing from '@/ts/controller/thing';
-
 /**
  * @description: 分类特性标准
  * @return {*}
  */
-const Property = () => {
+const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
   const [modalType, setModalType] = useState('');
   const [tkey, tforceUpdate] = useObjectUpdate(emitter);
   const [editData, setEditData] = useState<XProperty>();
@@ -30,7 +28,7 @@ const Property = () => {
         key: '删除属性',
         label: '删除属性',
         onClick: async () => {
-          await thing.property?.deleteProperty(item.id);
+          await current.property.deleteProperty(item.id);
           tforceUpdate();
         },
       },
@@ -47,7 +45,7 @@ const Property = () => {
         rowKey={'id'}
         params={tkey}
         request={async (page) => {
-          return await thing.property?.loadPropertys(page);
+          return await current.property.loadPropertys(page);
         }}
         operation={renderOperate}
         columns={PropertyColumns}

@@ -3,7 +3,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import { PageRequest } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -111,9 +111,9 @@ const Operation = ({
   };
   // 加载业务表单列表
   const loadOperations = async (page: PageRequest) => {
-    if (userCtrl.space.id && page) {
+    if (orgCtrl.user.id && page) {
       return await current!.loadOperations(
-        userCtrl.space.id,
+        orgCtrl.user.id,
         false,
         recursionOrg,
         recursionSpecies,

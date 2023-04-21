@@ -9,7 +9,7 @@ import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import { PageRequest } from '@/ts/base/model';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { XMarket, XTarget } from '@/ts/base/schema';
 import { MenuItemType } from 'typings/globelType';
 import SearchShop from '@/bizcomponents/SearchShop';
@@ -83,7 +83,7 @@ const CommonApply: React.FC<IProps> = (props) => {
   const operation = () => {
     return (
       <>
-        {(targetType != TargetType.Group || userCtrl.isCompanySpace) && (
+        {(targetType != TargetType.Group || orgCtrl.isCompanySpace) && (
           <Button
             type="link"
             onClick={() => {
@@ -159,22 +159,22 @@ const CommonApply: React.FC<IProps> = (props) => {
           for (let target of selectTarget) {
             switch (props.menu.itemType) {
               case WorkType.CompanyApply:
-                success = await userCtrl.user.applyJoinCompany(
+                success = await orgCtrl.user.applyJoinCompany(
                   target.id,
                   (target as XTarget).typeName as TargetType,
                 );
                 break;
               case WorkType.CohortApply:
-                success = await userCtrl.user.applyJoinCohort(target.id);
+                success = await orgCtrl.user.applyJoinCohort(target.id);
                 break;
               case WorkType.FriendApply:
-                success = await userCtrl.user.applyFriend(target as XTarget);
+                success = await orgCtrl.user.applyFriend(target as XTarget);
                 break;
               case WorkType.GroupApply:
-                success = await userCtrl.company.applyJoinGroup(target.id);
+                success = await orgCtrl.company.applyJoinGroup(target.id);
                 break;
               case WorkType.JoinStoreApply:
-                success = await userCtrl.space.applyJoinMarket(target.id);
+                success = await orgCtrl.space.applyJoinMarket(target.id);
                 break;
               case WorkType.PublishApply:
                 success = true;

@@ -1,9 +1,10 @@
 import { Card, Empty, List, Tag } from 'antd';
 import React from 'react';
-import { IChat, MessageType } from '@/ts/core';
-import chatCtrl from '@/ts/controller/chat';
+import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { WechatOutlined } from '@ant-design/icons';
+import { MessageType } from '@/ts/core';
+import { IChat } from '@/ts/core/target/chat/ichat';
 
 /**
  * @description: 通讯录
@@ -11,7 +12,7 @@ import { WechatOutlined } from '@ant-design/icons';
  */
 
 const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
-  const chats = chatCtrl.chats
+  const chats = orgCtrl.provider.chats
     .filter((item) => {
       return belongId === '' || item.spaceId === belongId;
     })
@@ -43,14 +44,16 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
             <List.Item
               style={{ cursor: 'pointer' }}
               onClick={async () => {
-                await chatCtrl.setCurrent(item);
+                orgCtrl.currentKey = item.fullId;
+                orgCtrl.changCallback();
               }}
               actions={[
                 <a
                   key="打开会话"
                   title="打开会话"
                   onClick={async () => {
-                    await chatCtrl.setCurrent(item);
+                    orgCtrl.currentKey = item.fullId;
+                    orgCtrl.changCallback();
                   }}>
                   <WechatOutlined style={{ fontSize: 18 }}></WechatOutlined>
                 </a>,
@@ -60,7 +63,15 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
                 title={
                   <div>
                     <span style={{ marginRight: 10 }}>{item.target.name}</span>
-                    <Tag color="success">{item.target.label}</Tag>
+                    {item.target.labels
+                      .filter((i) => i.length > 0)
+                      .map((label) => {
+                        return (
+                          <Tag key={label} color="success">
+                            {label}
+                          </Tag>
+                        );
+                      })}
                     {item.noReadCount > 0 && (
                       <Tag
                         style={{
@@ -80,7 +91,9 @@ const Book: React.FC<any> = ({ belongId }: { belongId: string }) => {
         />
       )}
 
-      {chatCtrl.chats.length == 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
+      {orgCtrl.provider.chats.length == 0 && (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+      )}
     </Card>
   );
 };

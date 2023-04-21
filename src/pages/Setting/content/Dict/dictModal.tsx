@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel } from '@/ts/base/model';
 import { XDict } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 
 interface Iprops {
@@ -67,10 +67,10 @@ const DictModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          handleOk((await userCtrl.target.dict?.createDict(values)) !== undefined);
+          handleOk((await orgCtrl.user.dict.createDict(values)) !== undefined);
         } else {
           let formdata = Object.assign(data ? data : {}, values);
-          handleOk((await userCtrl.target.dict?.updateDict(formdata)) !== undefined);
+          handleOk((await orgCtrl.user.dict.updateDict(formdata)) !== undefined);
         }
       }}
       columns={columns}></SchemaForm>

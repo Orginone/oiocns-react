@@ -3,9 +3,8 @@ import { TargetType } from '../enum';
 import { appendTarget } from './targetMap';
 import { kernel, model, common, schema, parseAvatar } from '../../base';
 import Authority from './authority/authority';
-import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
-import { ITarget, TargetParam } from './itarget';
+import { ISpace, ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
@@ -13,6 +12,8 @@ import { TargetModel, TargetShare } from '@/ts/base/model';
 import { FlowDefine } from '../thing/flowDefine';
 import { ISpeciesItem } from '../thing';
 import { loadSpeciesTree } from '../../core/';
+import { CreateChat } from './chat/chat';
+import { IChat } from './chat/ichat';
 
 export default class BaseTarget implements ITarget {
   public key: string;
@@ -25,6 +26,9 @@ export default class BaseTarget implements ITarget {
   public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
+  public chat: IChat;
+  userId: string;
+  space: ISpace;
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -53,7 +57,8 @@ export default class BaseTarget implements ITarget {
     return result;
   }
 
-  constructor(target: schema.XTarget) {
+  constructor(target: schema.XTarget, space: ISpace | undefined, userId: string) {
+    this.userId = userId;
     this.key = generateUuid();
     this.target = target;
     this.createTargetType = [];
@@ -62,8 +67,13 @@ export default class BaseTarget implements ITarget {
     this.ownIdentitys = [];
     this.identitys = [];
     this.typeName = target.typeName as TargetType;
+    this.space = space || (this as unknown as ISpace);
     appendTarget(target);
     this.define = new FlowDefine(target.id);
+    this.chat = CreateChat(userId, this.space.id, target, [
+      this.space.teamName,
+      target.typeName + '群',
+    ]);
   }
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');
@@ -457,32 +467,5 @@ export default class BaseTarget implements ITarget {
       this.ownIdentitys = res.data.result;
     }
     return this.ownIdentitys;
-  }
-
-  /**
-   * 查询组织权限树
-   * @param id
-   * @returns
-   */
-  public async loadAuthorityTree(
-    reload: boolean = false,
-  ): Promise<IAuthority | undefined> {
-    if (!reload && this.authorityTree != undefined) {
-      return this.authorityTree;
-    }
-    await this.getOwnIdentitys(reload);
-    const res = await kernel.queryAuthorityTree({
-      id: this.target.id,
-      spaceId: '0',
-      page: {
-        offset: 0,
-        filter: '',
-        limit: common.Constants.MAX_UINT_16,
-      },
-    });
-    if (res.success) {
-      this.authorityTree = new Authority(res.data, this.id);
-    }
-    return this.authorityTree;
   }
 }

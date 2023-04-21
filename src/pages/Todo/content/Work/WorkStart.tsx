@@ -4,8 +4,7 @@ import { FlowColumn } from '@/pages/Setting/config/columns';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
 import { XFlowDefine } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
+import orgCtrl from '@/ts/controller';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { ISpeciesItem } from '@/ts/core';
 import { IFlowDefine } from '@/ts/core/thing/iflowDefine';
@@ -163,7 +162,7 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
                 if (!currentDefine?.isCreate) {
                   let res = await kernel.anystore.createThing(
                     1,
-                    userCtrl.isCompanySpace ? 'company' : 'user',
+                    orgCtrl.isCompanySpace ? 'company' : 'user',
                   );
                   if (res && res.success) {
                     rows_ = res.data;
@@ -172,7 +171,7 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
                 //发起流程tableKey
                 let res = await kernel.createInstance({
                   defineId: currentDefine?.id || '',
-                  SpaceId: userCtrl.space.id,
+                  SpaceId: orgCtrl.space.id,
                   content: '',
                   contentType: 'Text',
                   data: JSON.stringify({ ...data, ...values }),
@@ -249,7 +248,7 @@ const WorkStart: React.FC<IProps> = ({ selectMenu }) => {
             onOk={async () => {
               let res = await kernel.anystore.createThing(
                 createThingNum || 1,
-                userCtrl.isCompanySpace ? 'company' : 'user',
+                orgCtrl.isCompanySpace ? 'company' : 'user',
               );
               if (res && res.success) {
                 message.success('创建成功');

@@ -1,7 +1,6 @@
 import React from 'react';
 import cls from './index.module.less';
 import { schema } from '@/ts/base';
-import thingCtrl from '@/ts/controller/thing';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import CardOrTableComp from '@/components/CardOrTableComp';
 interface indexType {

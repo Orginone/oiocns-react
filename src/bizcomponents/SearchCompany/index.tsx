@@ -6,7 +6,7 @@ import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { TargetType } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import Person from '@/ts/core/target/person';
@@ -159,7 +159,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       className={`${styles.card}`}
       avatar={
         <TeamIcon
-          share={new Company(target, userCtrl.user.id).shareInfo}
+          share={new Company(target, orgCtrl.user.id).shareInfo}
           size={60}
           preview={true}
         />
@@ -183,7 +183,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
       className={`${styles.card}`}
       avatar={
         <TeamIcon
-          share={new Company(target, userCtrl.user.id).shareInfo}
+          share={new Company(target, orgCtrl.user.id).shareInfo}
           size={60}
           preview={true}
         />
@@ -210,18 +210,18 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
             let res: any;
             switch (tableProps.searchType) {
               case TargetType.Person:
-                res = await userCtrl.user.searchPerson(event.target.value);
+                res = await orgCtrl.user.searchPerson(event.target.value);
                 break;
               case TargetType.Company:
               case TargetType.University:
               case TargetType.Hospital:
-                res = await userCtrl.user.searchCompany(event.target.value);
+                res = await orgCtrl.user.searchCompany(event.target.value);
                 break;
               case TargetType.Group:
-                res = await userCtrl.company.searchGroup(event.target.value);
+                // res = await orgCtrl.company.searchGroup(event.target.value);
                 break;
               case TargetType.Cohort:
-                res = await userCtrl.user.searchCohort(event.target.value);
+                res = await orgCtrl.user.searchCohort(event.target.value);
                 break;
             }
             // 个人 查询公司 查询人， 公司查询集团

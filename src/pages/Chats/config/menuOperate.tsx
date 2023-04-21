@@ -1,37 +1,25 @@
 import React from 'react';
-import chatCtrl from '@/ts/controller/chat';
 import { BookType, GroupMenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { IChat, ISpace, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
-import { XTarget } from '@/ts/base/schema';
+import { ISpace, ITarget, TargetType } from '@/ts/core';
 
 /** 编译组织树 */
-export const buildTargetTree = async (
-  targets: ITarget[],
-  spaceId: string,
-  spaceName: string,
-) => {
+export const buildTargetTree = async (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
-    const chat = chatCtrl.findTargetChat(
-      item.target,
-      spaceId,
-      spaceName,
-      item.typeName + '群',
-    );
     result.push({
-      key: chat.fullId,
-      item: chat,
-      label: chat.target.name,
-      tag: [chat.target.label],
+      key: item.chat.fullId,
+      item: item.chat,
+      label: item.teamName,
+      tag: [item.typeName + '群'],
       itemType: GroupMenuType.Chat,
-      menus: loadChatMenus(chat, true),
+      menus: loadChatMenus(false, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
-      children: await buildTargetTree(item.subTeam, spaceId, spaceName),
+      children: await buildTargetTree(item.subTeam),
     });
   }
   return result;
@@ -42,71 +30,45 @@ export const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
     key: user.id + '_' + authority.id,
     label: authority.name,
     icon: <im.ImTree />,
-    item: {
-      source: authority,
-      chat: chatCtrl.findTargetChat(
-        {
-          id: authority.id,
-          name: authority.name,
-          team: {
-            remark: authority.remark,
-          },
-          typeName: TargetType.Cohort,
-        } as XTarget,
-        user.id,
-        user.teamName,
-        '权限群',
-      ),
-    },
-    tag: [user.teamName, '权限群'],
-    menus: loadChatMenus(undefined),
-    itemType: GroupMenuType.Books + '-' + BookType.Authority,
+    item: authority.chat,
+    tag: authority.chat.target.labels,
+    menus: loadChatMenus(false, true),
+    itemType: GroupMenuType.Chat,
     children: authority.children?.map((i) => buildAuthorityTree(i, user)) ?? [],
   };
   return result;
 };
 
 export const loadBookMenu = async () => {
-  const orginoneGpt = chatCtrl.getOrginoneGpt();
-  const cohorts = await orgCtrl.user.getCohorts(false);
   let companys = await orgCtrl.user.getJoinedCompanys(false);
-  let cohortChats: any[] = [];
-  for (const item of cohorts) {
-    if (item.target.belongId == orgCtrl.user.id) {
-      cohortChats.push(
-        chatCtrl.findTargetChat(
-          item.target,
-          orgCtrl.user.id,
-          orgCtrl.user.teamName,
-          item.typeName,
-        ),
-      );
-    }
-  }
   let companyItems = [];
   for (const company of companys) {
-    const chat = chatCtrl.findTargetChat(
-      company.target,
-      company.id,
-      company.teamName,
-      '单位群',
-    );
     companyItems.push({
-      key: company.teamName,
+      key: company.id + '同事',
       label: company.teamName,
-      item: chat,
+      item: company.chat,
       belong: company,
       itemType: GroupMenuType.Books,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
-          key: chat.fullId,
+          key: company.chat.fullId,
           label: company.teamName,
-          item: chat,
-          tag: [company.typeName, '全员群'],
-          children: [],
+          item: company.chat,
           itemType: GroupMenuType.Chat,
-          menus: loadChatMenus(chat, true),
+          tag: [company.typeName, '全员群'],
+          menus: loadChatMenus(false, true),
+          children: company.memberChats.map((chat) => {
+            return {
+              key: chat.fullId,
+              label: chat.target.name,
+              item: chat,
+              itemType: GroupMenuType.Chat,
+              icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
+              children: [],
+              menus: loadChatMenus(true, true),
+            };
+          }),
           icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
         },
         {
@@ -122,11 +84,7 @@ export const loadBookMenu = async () => {
               fontSize={16}
             />
           ),
-          children: await buildTargetTree(
-            await company.loadSubTeam(),
-            company.id,
-            company.teamName,
-          ),
+          children: await buildTargetTree(await company.loadSubTeam()),
         },
         {
           key: company.id + BookType.Station,
@@ -141,11 +99,7 @@ export const loadBookMenu = async () => {
               fontSize={16}
             />
           ),
-          children: await buildTargetTree(
-            await company.getStations(),
-            company.id,
-            company.teamName,
-          ),
+          children: await buildTargetTree(await company.getStations()),
         },
         {
           key: company.id + BookType.Working,
@@ -160,11 +114,7 @@ export const loadBookMenu = async () => {
               fontSize={16}
             />
           ),
-          children: await buildTargetTree(
-            await company.getCohorts(),
-            company.id,
-            company.teamName,
-          ),
+          children: await buildTargetTree(await company.getCohorts()),
         },
         {
           key: company.id + '单位权限群',
@@ -189,13 +139,13 @@ export const loadBookMenu = async () => {
       belong: orgCtrl.user,
       children: [
         {
-          key: orginoneGpt.fullId,
-          label: orginoneGpt.target.name,
+          key: orgCtrl.user.chat.fullId,
+          label: orgCtrl.user.chat.target.name,
           itemType: GroupMenuType.Chat,
-          icon: <TeamIcon share={orginoneGpt.shareInfo} size={18} fontSize={16} />,
+          icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
           children: [],
-          item: orginoneGpt,
-          menus: loadChatMenus(orginoneGpt, true),
+          item: orgCtrl.user.chat,
+          menus: loadChatMenus(true, true),
         },
         {
           key: BookType.Friend,
@@ -203,13 +153,7 @@ export const loadBookMenu = async () => {
           itemType: GroupMenuType.Books + '-' + TargetType.Person,
           icon: <im.ImUser />,
           belong: orgCtrl.user,
-          children: orgCtrl.user.joinedFriend.map((i) => {
-            const chat = chatCtrl.findTargetChat(
-              i,
-              orgCtrl.user.id,
-              orgCtrl.user.teamName,
-              '好友',
-            );
+          children: orgCtrl.user.memberChats.map((chat) => {
             return {
               key: chat.fullId,
               label: chat.target.name,
@@ -217,18 +161,10 @@ export const loadBookMenu = async () => {
               itemType: GroupMenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
-              menus: loadChatMenus(chat, true),
+              menus: loadChatMenus(true, true),
             };
           }),
-          item: {
-            source: orgCtrl.user,
-            chat: chatCtrl.findTargetChat(
-              orgCtrl.user.target,
-              orgCtrl.user.id,
-              orgCtrl.user.teamName,
-              '好友',
-            ),
-          },
+          item: orgCtrl.user,
         },
         {
           key: BookType.Cohort,
@@ -236,15 +172,15 @@ export const loadBookMenu = async () => {
           itemType: GroupMenuType.Books,
           icon: <im.ImUsers />,
           belong: orgCtrl.user,
-          children: cohortChats.map((chat: IChat) => {
+          children: orgCtrl.user.cohorts.map((cohort) => {
             return {
               children: [],
-              key: chat.fullId,
-              label: chat.target.name,
-              item: chat,
-              menus: loadChatMenus(chat, true),
+              key: cohort.chat.fullId,
+              label: cohort.chat.target.name,
+              item: cohort.chat,
+              menus: loadChatMenus(true, true),
               itemType: GroupMenuType.Chat,
-              icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
+              icon: <TeamIcon share={cohort.chat.shareInfo} size={18} fontSize={16} />,
             };
           }),
         },
@@ -256,7 +192,7 @@ export const loadBookMenu = async () => {
 };
 
 /** 加载右侧菜单 */
-export const loadChatMenus = (chat: IChat | undefined, isChat: boolean = false) => {
+export const loadChatMenus = (allowDelete: boolean, isChat: boolean = false) => {
   const items = [];
   if (isChat) {
     items.push({
@@ -265,22 +201,7 @@ export const loadChatMenus = (chat: IChat | undefined, isChat: boolean = false) 
       icon: <im.ImProfile />,
       model: 'outside',
     });
-    if (chat?.isToping) {
-      items.push({
-        key: '取消置顶',
-        label: '取消置顶',
-        icon: <im.ImDownload3 />,
-        model: 'outside',
-      });
-    } else {
-      items.push({
-        key: '置顶会话',
-        label: '置顶会话',
-        icon: <im.ImUpload3 />,
-        model: 'outside',
-      });
-    }
-    if (chat && chat.spaceName === '我的') {
+    if (allowDelete) {
       items.push({
         key: '清空消息',
         label: '清空消息',
@@ -309,67 +230,4 @@ export const loadChatMenus = (chat: IChat | undefined, isChat: boolean = false) 
     });
   }
   return items;
-};
-
-export const loadChatMenu = () => {
-  let groups: {
-    names: string[];
-    spaces: any[];
-  } = { names: [], spaces: [] };
-  chatCtrl.chats.forEach((item) => {
-    if (groups.names.indexOf(item.spaceName) < 0) {
-      groups.names.push(item.spaceName);
-      let sortId = parseInt(item.spaceId.substring(6));
-      if (item.spaceName === '我的') {
-        sortId = Number.MAX_VALUE;
-      }
-      groups.spaces.push({
-        sortId: sortId,
-        label: item.spaceName,
-        key: item.spaceId + '-' + item.spaceName,
-      });
-    }
-  });
-  groups.spaces = groups.spaces.sort((a, b) => {
-    return b.sortId - a.sortId;
-  });
-  return groups.spaces.map((item) => {
-    const chats = chatCtrl.chats.filter((i) => i.spaceName === item.label);
-    let noReadCount = 0;
-    for (const i of chats) {
-      noReadCount += i.noReadCount;
-    }
-    var children: MenuItemType[] = chats
-      .map((a) => {
-        return {
-          key: a.fullId,
-          label: a.target.name + (a.isToping ? '(置顶)' : ''),
-          menus: loadChatMenus(a, true),
-          itemType: GroupMenuType.Chat,
-          item: a,
-          children: [],
-          count: a.noReadCount,
-          tag: [a.spaceName, a.target.label],
-          icon: <TeamIcon share={a.shareInfo} size={22} fontSize={22} />,
-        };
-      })
-      .sort((a, b) => {
-        const num = (b.item.isToping ? 10 : 0) - (a.item.isToping ? 10 : 0);
-        if (num === 0) {
-          return b.item.lastMsgTime > a.item.lastMsgTime ? 1 : -1;
-        }
-        return num;
-      });
-    return {
-      key: item.key,
-      label: item.label,
-      item: null,
-      itemType: '空间',
-      count: noReadCount,
-      tag: ['空间'],
-      icon: <im.ImUsers />,
-      menus: [],
-      children: children,
-    };
-  });
 };

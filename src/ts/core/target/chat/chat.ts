@@ -1,9 +1,8 @@
 import { TargetShare } from '@/ts/base/model';
-import { schema, kernel, model, common, parseAvatar } from '../../base';
-import { TargetType, MessageType } from '../enum';
-import { appendShare, appendTarget } from '../target/targetMap';
+import { schema, kernel, common, parseAvatar, model } from '@/ts/base';
+import { TargetType, MessageType } from '../../enum';
+import { appendShare, appendTarget } from '../targetMap';
 import { ChatCache, IChat } from './ichat';
-import { XImMsg } from '@/ts/base/schema';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -11,6 +10,8 @@ const hisMsgCollName = 'chat-message';
 const gptId = '889856358221262448';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
+// 所有会话
+let chats: IChat[] = [];
 /**
  * 会话基类
  * @abstract
@@ -19,7 +20,6 @@ class BaseChat implements IChat {
   fullId: string;
   chatId: string;
   spaceId: string;
-  spaceName: string;
   isToping: boolean;
   target: model.ChatModel;
   messages: schema.XImMsg[];
@@ -28,21 +28,30 @@ class BaseChat implements IChat {
   noReadCount: number;
   userId: string;
   lastMsgTime: number = nullTime;
-  lastMessage: XImMsg | undefined;
+  lastMessage: schema.XImMsg | undefined;
   messageNotify?: (messages: schema.XImMsg[]) => void;
-  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
-    this.spaceId = id;
-    this.spaceName = name;
-    this.target = m;
+  constructor(spaceId: string, target: model.ChatModel, userId: string) {
+    this.spaceId = spaceId;
+    this.target = target;
     this.messages = [];
     this.persons = [];
     this.personCount = 0;
-    this.chatId = m.id;
+    this.chatId = target.id;
     this.noReadCount = 0;
     this.isToping = false;
     this.userId = userId;
     this.fullId = this.spaceId + '-' + this.chatId;
-    appendShare(m.id, this.shareInfo);
+    appendShare(target.id, this.shareInfo);
+    kernel.anystore.subscribed(
+      userId,
+      hisMsgCollName + '.T' + this.fullId,
+      (data: ChatCache) => {
+        this.loadCache(data);
+      },
+    );
+    if (target.typeName != TargetType.Group) {
+      chats.push(this);
+    }
   }
 
   public get shareInfo(): TargetShare {
@@ -54,20 +63,20 @@ class BaseChat implements IChat {
     return result;
   }
 
-  getCache(): ChatCache {
-    return {
-      target: this.target,
-      spaceId: this.spaceId,
-      isToping: this.isToping,
-      spaceName: this.spaceName,
-      noReadCount: this.noReadCount,
-      lastMsgTime: this.lastMsgTime,
-      lastMessage: this.lastMessage,
-    };
+  cache(): void {
+    kernel.anystore.set(this.userId, hisMsgCollName + '.T' + this.fullId, {
+      operation: 'replaceAll',
+      data: {
+        fullId: this.fullId,
+        isToping: this.isToping,
+        noReadCount: this.noReadCount,
+        lastMsgTime: this.lastMsgTime,
+        lastMessage: this.lastMessage,
+      },
+    });
   }
 
   loadCache(cache: ChatCache): void {
-    this.target = cache.target;
     this.isToping = cache.isToping;
     this.noReadCount = cache.noReadCount;
     this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
@@ -78,11 +87,20 @@ class BaseChat implements IChat {
         this.messages[index] = cache.lastMessage;
       } else {
         this.messages.push(cache.lastMessage);
+        this.messageNotify?.apply(this, [this.messages]);
       }
     }
   }
   onMessage(callback: (messages: schema.XImMsg[]) => void): void {
     this.messageNotify = callback;
+    this.noReadCount = 0;
+    this.cache();
+    if (this.messages.length < 1) {
+      this.moreMessage('');
+    }
+  }
+  unMessage(): void {
+    this.messageNotify = undefined;
   }
   async clearMessage(): Promise<boolean> {
     const res = await kernel.anystore.remove(this.userId, hisMsgCollName, {
@@ -157,7 +175,7 @@ class BaseChat implements IChat {
     }
     return res.success;
   }
-  async aiReqest(data: XImMsg, text: string): Promise<void> {
+  async aiReqest(data: schema.XImMsg, text: string): Promise<void> {
     data.id = 'A' + data.id.substring(1);
     let res = await kernel.forward<string>({
       uri: 'http://chatbot.vesoft-inc.com:5100/api/chat-stream',
@@ -188,9 +206,9 @@ class BaseChat implements IChat {
       msgType: MessageType.Text,
       msgBody: common.StringPako.deflate(res.data),
     });
-    this.receiveMessage(data, false);
+    this.receiveMessage(data);
   }
-  receiveMessage(msg: schema.XImMsg, noread: boolean = true) {
+  receiveMessage(msg: schema.XImMsg) {
     if (msg) {
       if (msg.msgType === 'recall') {
         msg.showTxt = '撤回一条消息';
@@ -206,9 +224,10 @@ class BaseChat implements IChat {
         msg.showTxt = common.StringPako.inflate(msg.msgBody);
         this.messages.push(msg);
       }
-      this.noReadCount += noread ? 1 : 0;
+      this.noReadCount += this.messageNotify ? 0 : 1;
       this.lastMsgTime = new Date().getTime();
       this.lastMessage = msg;
+      this.cache();
     }
     this.messageNotify?.apply(this, [this.messages]);
   }
@@ -231,8 +250,8 @@ class BaseChat implements IChat {
  * 人员会话
  */
 class PersonChat extends BaseChat {
-  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
-    super(id, name, m, userId);
+  constructor(spaceId: string, target: model.ChatModel, userId: string) {
+    super(spaceId, target, userId);
   }
 }
 
@@ -240,8 +259,8 @@ class PersonChat extends BaseChat {
  * 群会话
  */
 class CohortChat extends BaseChat {
-  constructor(id: string, name: string, m: model.ChatModel, userId: string) {
-    super(id, name, m, userId);
+  constructor(spaceId: string, target: model.ChatModel, userId: string) {
+    super(spaceId, target, userId);
   }
   override async morePerson(filter: string): Promise<void> {
     let res = await kernel.querySubTargetById({
@@ -256,7 +275,7 @@ class CohortChat extends BaseChat {
     });
     if (res.success && res.data && res.data.result) {
       appendTarget(res.data.result);
-      res.data.result.forEach((item) => {
+      res.data.result.forEach((item: schema.XTarget) => {
         item.name = item.team?.name ?? item.name;
         let idArray = this.persons.map((r: schema.XTarget) => r.id);
         if (!idArray.includes(item.id)) {
@@ -269,14 +288,53 @@ class CohortChat extends BaseChat {
 }
 
 export const CreateChat = (
-  id: string,
-  name: string,
-  m: model.ChatModel,
   userId: string,
+  spaceId: string,
+  target: schema.XTarget,
+  labels: string[],
 ): IChat => {
-  if (m.typeName === TargetType.Person) {
-    return new PersonChat(id, name, m, userId);
-  } else {
-    return new CohortChat(id, name, m, userId);
+  if (userId === target.id) {
+    labels = ['本人'];
   }
+  const data: model.ChatModel = {
+    id: target.id,
+    labels: labels,
+    typeName: target.typeName,
+    photo: target.avatar ?? '{}',
+    remark: target.team?.remark ?? '',
+    name: target.team?.name ?? target.name,
+  };
+  if (target.typeName === TargetType.Person) {
+    return new PersonChat(spaceId, data, userId);
+  } else {
+    return new CohortChat(spaceId, data, userId);
+  }
+};
+
+export const CreateAuthChat = (
+  userId: string,
+  spaceId: string,
+  spaceName: string,
+  target: schema.XAuthority,
+): IChat => {
+  const data: model.ChatModel = {
+    id: target.id,
+    labels: [spaceName, '权限群'],
+    typeName: '权限',
+    photo: '{}',
+    remark: target.remark,
+    name: target.name,
+  };
+  return new CohortChat(spaceId, data, userId);
+};
+
+export const clearChats = () => {
+  chats.forEach((chat) => {
+    kernel.anystore.unSubscribed(chat.userId, hisMsgCollName + '.T' + chat.fullId);
+  });
+  chats = [];
+};
+
+export const allChats = () => {
+  return chats;
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { XOperation } from '@/ts/base/schema';
 import CardDescriptions from '@/components/CardDescriptions';
@@ -16,7 +16,7 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
   const [formValue, setFormValue] = useState<any>({});
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThing<any>(userCtrl.space.id, {
+      const res = await kernel.anystore.loadThing<any>(orgCtrl.user.id, {
         options: {
           match: {
             _id: {
@@ -56,7 +56,7 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
         // 2、查询表单
         const operationsRes = await kernel.queryOperationBySpeciesIds({
           ids: speciesIds,
-          spaceId: userCtrl.space.id,
+          spaceId: orgCtrl.user.id,
         });
         let operations = operationsRes.data.result || [];
         operations = operations.filter((operation) => {

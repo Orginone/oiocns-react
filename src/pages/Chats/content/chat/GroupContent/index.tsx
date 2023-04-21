@@ -5,13 +5,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import css from './index.module.less';
-import chatCtrl from '@/ts/controller/chat';
 import { showChatTime } from '@/utils/tools';
 import { XImMsg } from '@/ts/base/schema';
 import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { parseAvatar } from '@/ts/base';
+import { IChat } from '@/ts/core/target/chat/ichat';
 
 /**
  * @description: 聊天区域
@@ -19,6 +19,7 @@ import { parseAvatar } from '@/ts/base';
  */
 
 interface Iprops {
+  chat: IChat;
   handleReWrites: Function;
 }
 
@@ -31,13 +32,14 @@ const GroupContent = (props: Iprops) => {
   const [beforescrollHeight, setBeforescrollHeight] = useState(0);
 
   useEffect(() => {
-    if (chatCtrl.chat) {
-      setMessages([...chatCtrl.chat.messages]);
-      chatCtrl.chat.onMessage((ms) => {
-        setMessages([...ms]);
-      });
-    }
-  }, []);
+    setMessages([...props.chat.messages]);
+    props.chat.onMessage((ms) => {
+      setMessages([...ms]);
+    });
+    return () => {
+      props.chat.unMessage();
+    };
+  }, [props]);
 
   useEffect(() => {
     if (body && body.current) {
@@ -56,10 +58,10 @@ const GroupContent = (props: Iprops) => {
   };
   // 滚动事件
   const onScroll = async () => {
-    if (!loading && body.current && chatCtrl.chat && body.current.scrollTop < 10) {
+    if (!loading && body.current && props.chat && body.current.scrollTop < 10) {
       setLoading(true);
       setBeforescrollHeight(body.current.scrollHeight);
-      if ((await chatCtrl.chat.moreMessage('')) < 1) {
+      if ((await props.chat.moreMessage('')) < 1) {
         setLoading(false);
       }
     }
@@ -111,12 +113,12 @@ const GroupContent = (props: Iprops) => {
         <>
           <div className={`${css.con_content}`}>{parseMsg(item)}</div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
-            <TeamIcon share={userCtrl.user.shareInfo} preview size={36} fontSize={32} />
+            <TeamIcon share={orgCtrl.user.shareInfo} preview size={36} fontSize={32} />
           </div>
         </>
       );
     } else {
-      const share = userCtrl.findTeamInfoById(item.fromId);
+      const share = orgCtrl.provider.findUserById(item.fromId);
       return (
         <>
           <div style={{ color: '#888', paddingRight: 10 }}>
@@ -169,7 +171,7 @@ const GroupContent = (props: Iprops) => {
                   ''
                 )}
                 {/* 左侧聊天内容显示 */}
-                {item.fromId !== chatCtrl.userId ? (
+                {item.fromId !== props.chat.userId ? (
                   <div className={`${css.group_content_left} ${css.con}`}>
                     <Popover
                       trigger="hover"
@@ -181,7 +183,7 @@ const GroupContent = (props: Iprops) => {
                         setSelectId('');
                       }}
                       content={
-                        chatCtrl.chat?.spaceId === item.spaceId ? (
+                        props.chat.spaceId === item.spaceId ? (
                           <>
                             <CopyToClipboard text={item.showTxt}>
                               <Button type="text" style={{ color: '#3e5ed8' }}>
@@ -192,7 +194,7 @@ const GroupContent = (props: Iprops) => {
                               type="text"
                               danger
                               onClick={async () => {
-                                await chatCtrl.chat?.deleteMessage(item.id);
+                                await props.chat.deleteMessage(item.id);
                               }}>
                               删除
                             </Button>
@@ -243,16 +245,16 @@ const GroupContent = (props: Iprops) => {
                               type="text"
                               style={{ color: '#3e5ed8' }}
                               onClick={async () => {
-                                await chatCtrl.chat?.reCallMessage(item.id);
+                                await props.chat.reCallMessage(item.id);
                               }}>
                               撤回
                             </Button>
-                            {item.spaceId === chatCtrl.chat?.spaceId ? (
+                            {item.spaceId === props.chat.spaceId ? (
                               <Button
                                 type="text"
                                 danger
                                 onClick={async () => {
-                                  await chatCtrl.chat?.deleteMessage(item.id);
+                                  await props.chat.deleteMessage(item.id);
                                 }}>
                                 删除
                               </Button>

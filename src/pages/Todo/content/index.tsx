@@ -8,7 +8,7 @@ import SellOrder from './Common/Order/Sell';
 import Work from './Work';
 import { ProColumns } from '@ant-design/pro-components';
 import BuyOrder from './Common/Order/Buy';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import WorkTodo from './WorkTodo';
 import { XFlowDefine } from '@/ts/base/schema';
 
@@ -68,7 +68,7 @@ const TypeSetting = ({ selectMenu, reflashMenu, doWork }: IProps) => {
       return (
         <CommonApply
           menu={selectMenu}
-          todoGroup={loadOrgApply(userCtrl.space, selectMenu.itemType as WorkType)}
+          todoGroup={loadOrgApply(orgCtrl.user, selectMenu.itemType as WorkType)}
           columns={OrgColumns as ProColumns<IApplyItem>[]}
           reflashMenu={reflashMenu}
         />

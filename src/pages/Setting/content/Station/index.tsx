@@ -12,7 +12,7 @@ import { TargetType } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IsSuperAdmin } from '@/utils/authority';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 interface IProps {
   current: IStation;
@@ -33,7 +33,7 @@ const Station: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(userCtrl.space));
+      SetIsSuperAdmin(await IsSuperAdmin(orgCtrl.user));
     }, 10);
   }, [current]);
 

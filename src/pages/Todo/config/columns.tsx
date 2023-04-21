@@ -1,10 +1,9 @@
 import React from 'react';
 import { Space, Tag } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { XOrderDetail } from '@/ts/base/schema';
 import { ProColumns } from '@ant-design/pro-table';
 import { IApplyItem, IApprovalItem, IOrderApplyItem, TargetType } from '@/ts/core';
-import thingCtrl from '@/ts/controller/thing';
 import { schema } from '@/ts/base';
 
 export const OrgColumns = [
@@ -94,10 +93,7 @@ export const MarketColumns = [
       if (record.Data.target) {
         return record.Data.target.name;
       }
-      const team = userCtrl.findTeamInfoById(record.Data.targetId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.Data.targetId);
     },
   },
   {
@@ -247,10 +243,7 @@ export const BuyOrderItemColumns: ProColumns<XOrderDetail>[] = [
     key: 'rule',
     width: 180,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.sellerId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.sellerId);
     },
   },
   {
@@ -308,10 +301,7 @@ export const SaleColumns: ProColumns<IApprovalItem>[] = [
     key: 'rule',
     width: 180,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.Data.order.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.Data.order.belongId);
     },
   },
   {
@@ -364,10 +354,7 @@ export const ApplicationColumns: ProColumns<IApprovalItem>[] = [
     key: 'rule',
     width: 180,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.Data.createUser);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.Data.createUser);
     },
   },
   { title: '事项', dataIndex: ['Data', 'flowInstance', 'content'] },
@@ -470,8 +457,9 @@ export const WorkTodoColumns: ProColumns[] = [
     title: '类别',
     dataIndex: ['instance', 'define', 'speciesId'],
     render: (_, record) => {
+      // TODO 注意，这里不对
       return (
-        thingCtrl.species.find((a) => a.id == record.instance?.define?.speciesId)
+        orgCtrl.user.species.find((a) => a.id == record.instance?.define?.speciesId)
           ?.name ?? '未知'
       );
     },
@@ -492,10 +480,7 @@ export const WorkTodoColumns: ProColumns[] = [
     title: '申请人',
     dataIndex: ['instance', 'createUser'],
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.instance.createUser);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.instance.createUser);
     },
   },
   {
@@ -564,4 +549,4 @@ const statusMap = new Map([
       text: '已退货',
     },
   ],
-]); ;
+]);

@@ -6,7 +6,7 @@ import { Card, Modal, ModalFuncProps } from 'antd';
 import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { WorkStartReocrdColumns } from '../../config/columns';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import Done from '../WorkTodo/Done';
 
@@ -75,7 +75,7 @@ const WorkStartRecord: React.FC<IProps> = ({ selectMenu, status }) => {
                   await kernel.queryInstanceByApply({
                     page,
                     speciesId: species.id,
-                    spaceId: userCtrl.space.id,
+                    spaceId: orgCtrl.space.id,
                     status: status,
                   })
                 )?.data || []

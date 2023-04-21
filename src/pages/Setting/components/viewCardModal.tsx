@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { XOperation } from '@/ts/base/schema';
 import { Descriptions, Modal } from 'antd';
 import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 interface FormDesignProps {
   open: boolean;
@@ -23,7 +23,7 @@ const ViewCardModal = (props: FormDesignProps) => {
       const queryItems = async () => {
         const res = await kernel.queryOperationItems({
           id: data?.id as string,
-          spaceId: userCtrl.space.id,
+          spaceId: orgCtrl.user.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
         const operationItems = (res.data?.result || [])

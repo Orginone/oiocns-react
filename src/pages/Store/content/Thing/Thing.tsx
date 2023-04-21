@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Dropdown } from 'antd';
 import orgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import userCtrl from '@/ts/controller/setting';
 import { XAttribute } from '@/ts/base/schema';
 import DataGrid, {
   Column,
@@ -124,7 +123,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   useEffect(() => {
     if (props.checkedList && props.checkedList.length > 0) {
       loadAttrs(props.checkedList.map((item) => item.item));
-    } else if (props.species && userCtrl.space.id) {
+    } else if (props.species && orgCtrl.user.id) {
       loadAttrs(props.species);
     }
   }, [props.species, props.checkedList]);
@@ -239,7 +238,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             width={150}
             allowFiltering={false}
             cellRender={(data: any) => {
-              var share = userCtrl.findTeamInfoById(data.value);
+              var share = orgCtrl.provider.findUserById(data.value);
               if (data) {
                 return (
                   <>
@@ -292,7 +291,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing(userCtrl.space.id, request);
+              const result = await kernel.anystore.loadThing(orgCtrl.user.id, request);
               if (result.success) {
                 return result.data;
               }

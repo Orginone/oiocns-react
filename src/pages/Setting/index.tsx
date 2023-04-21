@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
@@ -13,7 +13,6 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
 import { companyTypes } from '@/ts/core/enum';
-import chat from '@/ts/controller/chat';
 import { useHistory } from 'react-router-dom';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
@@ -44,9 +43,9 @@ const TeamSetting: React.FC = () => {
       onSelect={async (data) => {
         if (data.itemType === GroupMenuType.Agency) {
           await (data.item as ITarget).loadSubTeam();
-          userCtrl.changCallback();
+          orgCtrl.changCallback();
         }
-        userCtrl.currentKey = data.key;
+        orgCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
@@ -78,10 +77,10 @@ const TeamSetting: React.FC = () => {
                 let item = data.item as ITarget;
                 switch (item.typeName) {
                   case TargetType.Group:
-                    userCtrl.company.quitGroup((data.item as ITarget).id);
+                    // orgCtrl.company.quitGroup((data.item as ITarget).id);
                     break;
                   case TargetType.Cohort:
-                    userCtrl.user.quitCohorts((data.item as ITarget).id);
+                    orgCtrl.user.quitCohorts((data.item as ITarget).id);
                     break;
                 }
                 refreshMenu();
@@ -105,14 +104,6 @@ const TeamSetting: React.FC = () => {
             setShowModal(true);
             break;
           case '打开会话':
-            chat.setCurrent(
-              chat.findTargetChat(
-                data.item.target,
-                data.belong.id,
-                data.belong.id != userCtrl.user.id ? data.belong.teamName : '我的',
-                data.item.typeName,
-              ),
-            );
             history.push('/chat');
             break;
           default:
@@ -132,7 +123,7 @@ const TeamSetting: React.FC = () => {
                   (data.belong as ICompany).getStations(true);
                   break;
               }
-              userCtrl.changCallback();
+              orgCtrl.changCallback();
             } else {
               setEditTarget(data.item);
               setOperateKeys(key.split('|'));
@@ -154,7 +145,7 @@ const TeamSetting: React.FC = () => {
             setOperateKeys(['']);
           }
         }}
-        current={editTarget || userCtrl.user}
+        current={editTarget || orgCtrl.user}
         typeNames={operateKeys.slice(1)}
       />
       {/** 分类模态框 */}
@@ -189,7 +180,7 @@ const TeamSetting: React.FC = () => {
             refreshMenu();
           }
         }}
-        current={userCtrl.user}
+        current={orgCtrl.user}
         typeNames={companyTypes}
       />
       <Modal
@@ -205,7 +196,7 @@ const TeamSetting: React.FC = () => {
           if (searchCallback && searchCallback.length > 0) {
             searchCallback.forEach(async (company) => {
               if (
-                await userCtrl.user.applyJoinCompany(
+                await orgCtrl.user.applyJoinCompany(
                   company.id,
                   company.typeName as TargetType,
                 )

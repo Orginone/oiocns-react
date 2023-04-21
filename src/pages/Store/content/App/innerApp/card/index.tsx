@@ -4,7 +4,7 @@ import React from 'react';
 import './index.less';
 import AppLogo from '/img/appLogo.png';
 import { common } from 'typings/common';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { XFlowDefine } from '@/ts/base/schema';
 
 interface IProps {
@@ -27,7 +27,7 @@ const AppCard: React.FC<IProps> = ({ className, current, onClick, operation }) =
               <Tag color="success">{current.isCreate ? '创建类' : '附加类'}</Tag>
             </div>
             <span className="app-size">
-              需求主体: {userCtrl.findTeamInfoById(current.belongId)?.name}
+              需求主体: {orgCtrl.provider.findNameById(current.belongId)}
             </span>
           </div>
         </div>

@@ -6,8 +6,7 @@ import MarketClassifyTree from '@/components/CustomTreeComp';
 import CreateMarketModal from '@/bizcomponents/GlobalComps/createMarket';
 import DetailDrawer from './DetailDrawer';
 import SearchShop from '@/bizcomponents/SearchShop';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import UserManagement from '../UserManagement';
 import { IMarket } from '@/ts/core';
 import { XMarket } from '@/ts/base/schema';
@@ -153,7 +152,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
   const getTreeData = () => {
     const data = marketCtrl.target.joinedMarkets.map((itemModel) => {
       let arrs = ['基础详情', '用户管理'];
-      if (itemModel.target.belongId === userCtrl.space.id) {
+      if (itemModel.target.belongId === orgCtrl.user.id) {
         arrs.push('编辑商店');
         arrs.push('删除商店');
       } else {
@@ -164,7 +163,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         key: itemModel.target.id,
         item: itemModel,
         tag:
-          itemModel.target.belongId === userCtrl.user.target.id
+          itemModel.target.belongId === orgCtrl.user.target.id
             ? {
                 color: 'blue',
                 txt: '我的',
@@ -231,7 +230,7 @@ const MarketClassify: React.FC<Iprops> = (props: Iprops) => {
         onCancel={onCancel}
         onOk={async () => {
           for (const market of selectMarkets) {
-            await userCtrl.user.applyJoinMarket(market.id);
+            await orgCtrl.user.applyJoinMarket(market.id);
           }
           setActiveModal('');
         }}>

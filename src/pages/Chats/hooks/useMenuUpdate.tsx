@@ -1,5 +1,5 @@
 import { emitter } from '@/ts/core';
-import chatCtrl from '@/ts/controller/chat';
+import orgCtrl from '@/ts/controller';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
@@ -34,17 +34,17 @@ const useMenuUpdate = (): [
   const refreshMenu = async () => {
     const newMenus = { ...rootMenu };
     newMenus.children = await operate.loadBookMenu();
-    var item = findMenuItemByKey(newMenus.children, chatCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus.children, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;
     }
-    chatCtrl.currentKey = item.key;
+    orgCtrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenus);
   };
 
   useEffect(() => {
-    const id = chatCtrl.subscribe((key) => {
+    const id = orgCtrl.subscribe((key) => {
       setKey(key);
       refreshMenu();
     });

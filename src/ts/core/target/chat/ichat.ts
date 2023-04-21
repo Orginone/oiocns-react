@@ -1,7 +1,6 @@
-import { ChatModel, TargetShare } from '@/ts/base/model';
-import { schema, model } from '../../base';
-import { MessageType } from '../enum';
-import { XImMsg } from '@/ts/base/schema';
+import { TargetShare } from '@/ts/base/model';
+import { MessageType } from '../../enum';
+import { model, schema } from '@/ts/base';
 /**
  * 会话接口
  */
@@ -16,8 +15,6 @@ export interface IChat {
   isToping: boolean;
   /** 所在空间ID */
   spaceId: string;
-  /** 所在空间名称 */
-  spaceName: string;
   /** 未读消息数量 */
   noReadCount: number;
   /** 群成员总数 */
@@ -33,13 +30,15 @@ export interface IChat {
   /** 最后一个消息的时间 */
   lastMsgTime: number;
   /** 最后一个消息 */
-  lastMessage: XImMsg | undefined;
+  lastMessage: schema.XImMsg | undefined;
+  /** 禁用通知 */
+  unMessage(): void;
   /** 消息变更通知 */
   onMessage(callback: (messages: schema.XImMsg[]) => void): void;
   /**
-   * 获取会话缓存
+   * 缓存会话
    */
-  getCache(): ChatCache;
+  cache(): void;
   /**
    * 加载缓存
    * @param cache 缓存数据
@@ -79,7 +78,7 @@ export interface IChat {
    * 会话接收到消息
    * @param msg 消息
    */
-  receiveMessage(msg: schema.XImMsg, noread: boolean): void;
+  receiveMessage(msg: schema.XImMsg): void;
 }
 /**
  * 分组会话接口
@@ -98,12 +97,8 @@ export interface IChatGroup {
  * 会话缓存
  */
 export type ChatCache = {
-  /** 会话基本信息 */
-  target: ChatModel;
-  /** 会话所在空间ID */
-  spaceId: string;
-  /** 会话所在空间名称 */
-  spaceName: string;
+  /** 会话完整Id */
+  fullId: string;
   /** 是否置顶 */
   isToping: boolean;
   /** 会话未读消息数量 */
@@ -111,5 +106,5 @@ export type ChatCache = {
   /** 最后一次消息时间 */
   lastMsgTime: number;
   /** 最新消息 */
-  lastMessage: XImMsg | undefined;
+  lastMessage: schema.XImMsg | undefined;
 };

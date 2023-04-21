@@ -1,4 +1,4 @@
-import { IWorking } from './itarget';
+import { ISpace, IWorking } from './itarget';
 import { schema } from '../../base';
 import BaseTarget from './base';
 import { TargetType } from '../enum';
@@ -9,8 +9,8 @@ import { XTarget } from '@/ts/base/schema';
  */
 export default class Working extends BaseTarget implements IWorking {
   private _onDeleted: Function;
-  constructor(target: XTarget, onDeleted: Function) {
-    super(target);
+  constructor(target: XTarget, space: ISpace, userId: string, onDeleted: Function) {
+    super(target, space, userId);
     this._onDeleted = onDeleted;
   }
   async delete(): Promise<boolean> {

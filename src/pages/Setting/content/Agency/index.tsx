@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
 import { IGroup, ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
@@ -29,16 +28,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<XTarget[]>([]); // 选中的要拉的人
-  const [activeTab, setActiveTab] = useState<string>('');
-
-  useEffect(() => {
-    let tabs = TitleItems();
-    if (tabs.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
-      setActiveTab('members');
-    } else {
-      setActiveTab(userCtrl.currentTabKey);
-    }
-  }, []);
 
   useEffect(() => {
     setTimeout(async () => {
@@ -84,45 +73,42 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             placeholder="请输入用户账号"
             onFinish={setSelectMember}
             columns={PersonColumns}
-            request={async (page: any) => await userCtrl.company.loadMembers(page)}
+            request={async (page: any) => await current.space.loadMembers(page)}
           />
         );
     }
   };
 
   const content = () => {
-    switch (activeTab) {
-      case 'members':
-        return (
-          <CardOrTable<schema.XTarget>
-            dataSource={[]}
-            key="member"
-            rowKey={'id'}
-            request={(page) => {
-              return current.loadMembers(page);
-            }}
-            parentRef={parentRef}
-            operation={(item) => {
-              return isSuperAdmin
-                ? [
-                    {
-                      key: 'remove',
-                      label: '踢出',
-                      onClick: async () => {
-                        if (await current.removeMember(item)) {
-                          message.success('踢出成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
-            }}
-            columns={getColumns()}
-            showChangeBtn={false}
-          />
-        );
-    }
+    return (
+      <CardOrTable<schema.XTarget>
+        dataSource={[]}
+        key="member"
+        rowKey={'id'}
+        request={(page) => {
+          return current.loadMembers(page);
+        }}
+        parentRef={parentRef}
+        operation={(item) => {
+          return isSuperAdmin
+            ? [
+                {
+                  key: 'remove',
+                  label: '踢出',
+                  onClick: async () => {
+                    if (await current.removeMember(item)) {
+                      message.success('踢出成功');
+                      forceUpdate();
+                    }
+                  },
+                },
+              ]
+            : [];
+        }}
+        columns={getColumns()}
+        showChangeBtn={false}
+      />
+    );
   };
 
   return (
@@ -156,13 +142,8 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
               )}
             </>
           }
-          activeTabKey={activeTab}
           bordered={false}
           tabList={TitleItems()}
-          onTabChange={(key) => {
-            userCtrl.currentTabKey = key;
-            setActiveTab(key);
-          }}
           bodyStyle={{ paddingTop: 16 }}>
           <div className={cls['page-content-table']} ref={parentRef}>
             {content()}
@@ -214,7 +195,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
           selectMember.forEach(async (group) => {
             if (await (current as IGroup).applyJoinGroup(group.id)) {
               message.success('添加成功');
-              userCtrl.changCallback();
               setSelectMember([]);
               setActiveModal('');
             }

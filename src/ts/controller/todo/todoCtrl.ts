@@ -4,18 +4,16 @@ import {
   loadOrgTodo,
   loadPublishTodo,
   ITodoGroup,
-  DomainTypes,
-  emitter,
   WorkType,
   loadPublishApply,
   loadMarketApply,
 } from '@/ts/core';
 import { Emitter } from '@/ts/base/common';
-import userCtrl from '../setting';
 import { XFlowTaskHistory, XTarget } from '@/ts/base/schema';
 import { kernel } from '@/ts/base';
 import { TODO_COMMON_MENU } from '@/constants/const';
 import { IsRelationAdmin } from '@/utils/authority';
+import orgCtrl from '../index';
 
 /** 待办控制器 */
 class TodoController extends Emitter {
@@ -36,13 +34,14 @@ class TodoController extends Emitter {
   private _commonMenuMap: any = {};
   constructor() {
     super();
-    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], async () => {
-      if (userCtrl.user.id != '') {
+
+    orgCtrl.subscribe(async () => {
+      if (orgCtrl.user.id != '') {
         let group: XTarget[] = [];
         let cohorts: XTarget[] = [];
         let companys: XTarget[] = [];
-        let res = await kernel.queryApproveTask({ id: userCtrl.space.id });
-        let cps = await userCtrl.user.getJoinedCompanys(false);
+        let res = await kernel.queryApproveTask({ id: orgCtrl.user.id });
+        let cps = await orgCtrl.user.getJoinedCompanys();
         for (let company of cps) {
           if (await IsRelationAdmin(company)) {
             companys.push(company.target);
@@ -53,7 +52,7 @@ class TodoController extends Emitter {
             }
           });
         }
-        (await userCtrl.user.getCohorts(false)).forEach(async (a) => {
+        (await orgCtrl.user.getCohorts(false)).forEach(async (a) => {
           if (await IsRelationAdmin(a)) {
             cohorts.push(a.target);
           }
@@ -62,9 +61,9 @@ class TodoController extends Emitter {
         this._friendTodo = await loadOrgTodo(
           [
             {
-              id: userCtrl.user.id,
+              id: orgCtrl.user.id,
               name: '好友',
-              avatar: userCtrl.user.target.avatar,
+              avatar: orgCtrl.user.target.avatar,
             },
           ],
           WorkType.FriendTodo,
@@ -79,8 +78,8 @@ class TodoController extends Emitter {
         this._cohortTodo = await loadOrgTodo(cohorts, WorkType.CohortTodo);
         this._companyTodo = await loadOrgTodo(companys, WorkType.CompanyTodo);
         kernel.anystore.subscribed(
-          userCtrl.space.id,
-          TODO_COMMON_MENU + '.SP' + userCtrl.space.id,
+          orgCtrl.user.id,
+          TODO_COMMON_MENU + '.SP' + orgCtrl.user.id,
           (data: any) => {
             this._caches = data;
             this.changCallbackPart(TODO_COMMON_MENU);
@@ -137,7 +136,7 @@ class TodoController extends Emitter {
   /** 加载办事项 */
   public async loadWorkTodo(): Promise<XFlowTaskHistory[]> {
     this._workTodo =
-      (await kernel.queryApproveTask({ id: userCtrl.space.id })).data?.result || [];
+      (await kernel.queryApproveTask({ id: orgCtrl.user.id })).data?.result || [];
     return this._workTodo;
   }
   /** 获取总的待办数量 */
@@ -194,8 +193,8 @@ class TodoController extends Emitter {
       this._caches.unshift(menu);
     }
     this._caches = this._caches.slice(0, 10);
-    this._commonMenuMap[userCtrl.space.id] = this._caches;
-    let result = await kernel.anystore.set(userCtrl.space.id, TODO_COMMON_MENU, {
+    this._commonMenuMap[orgCtrl.user.id] = this._caches;
+    let result = await kernel.anystore.set(orgCtrl.user.id, TODO_COMMON_MENU, {
       operation: 'replaceAll',
       data: this._commonMenuMap,
     });

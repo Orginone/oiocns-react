@@ -1,6 +1,7 @@
 import { IIdentity } from './iidentity';
 import { model, schema } from '@/ts/base';
 import { PageRequest } from '@/ts/base/model';
+import { IChat } from '../chat/ichat';
 
 export interface IAuthority {
   /** 权限Id */
@@ -9,6 +10,8 @@ export interface IAuthority {
   name: string;
   /** 权限编号 */
   code: string;
+  /** 用户ID */
+  userId: string;
   /** 权限归属ID */
   belongId: string;
   /**备注 */
@@ -19,6 +22,8 @@ export interface IAuthority {
   children: IAuthority[];
   /** 权限下的角色 */
   identitys: IIdentity[];
+  /** 权限群 */
+  chat: IChat;
   /**
    * 创建子权限
    * @param name 名称

@@ -5,7 +5,7 @@ import { Card } from 'antd';
 import React, { useState } from 'react';
 import WorkStartDo from './WorkStartDo';
 import { FlowDefine } from '@/ts/core/thing/flowDefine';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 /**
  * 办事-业务流程--发起
@@ -34,7 +34,7 @@ const WorkStartEntry: React.FC = () => {
           columns={FlowColumn}
           dataSource={[]}
           request={async (page) => {
-            let res = await new FlowDefine(userCtrl.space.id).loadFlowDefine();
+            let res = await new FlowDefine(orgCtrl.space.id).loadFlowDefine();
             return {
               result: res.result?.slice(page.offset, page.offset + page.limit) || [],
               offset: page.offset,

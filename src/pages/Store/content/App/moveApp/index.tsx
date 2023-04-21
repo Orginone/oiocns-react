@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from 'antd';
 
 import MenuTree from '@/components/CustomTreeComp';
-import appCtrl from '@/ts/controller/store/appCtrl';
 interface indexType {
   visible: boolean; //props
   setVisible: Function;

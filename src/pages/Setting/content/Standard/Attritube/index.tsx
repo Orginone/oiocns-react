@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { XAttribute } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AttributeModal from './attributeModal';
-import thing from '@/ts/controller/thing';
 
 interface IProps {
   target: ITarget;
@@ -34,7 +33,7 @@ const Attritube = ({
   const [editData, setEditData] = useState<XAttribute>();
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (item.belongId === userCtrl.space.id) {
+    if (item.belongId === orgCtrl.user.id) {
       return [
         {
           key: '修改特性',
@@ -69,9 +68,9 @@ const Attritube = ({
           label: '复制属性',
           onClick: async () => {
             if (item.property) {
-              const property = await thing.property?.createProperty({
+              const property = await target.space.property?.createProperty({
                 ...item.property,
-                belongId: userCtrl.space.id,
+                belongId: orgCtrl.user.id,
                 sourceId: item.property.belongId,
               });
               if (property) {
@@ -131,7 +130,7 @@ const Attritube = ({
             tforceUpdate();
           }
         }}
-        target={target}
+        target={target as ISpace}
         current={current}
       />
       {/** 关联属性模态框 */}

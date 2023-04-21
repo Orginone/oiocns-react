@@ -3,7 +3,7 @@ import { Button, Modal } from 'antd';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 
 interface IProps {
@@ -30,11 +30,11 @@ const CcNode: React.FC<IProps> = (props) => {
     },
   });
   const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || userCtrl.space.id,
+    props.current.belongId || props.orgId || orgCtrl.user.id,
   );
   useEffect(() => {
     if (!props.current.belongId) {
-      setNodeOperateOrgId(props.orgId || userCtrl.space.id);
+      setNodeOperateOrgId(props.orgId || orgCtrl.user.id);
       props.current.belongId = props.orgId;
     }
   });

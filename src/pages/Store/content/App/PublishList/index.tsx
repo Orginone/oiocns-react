@@ -4,7 +4,6 @@ import { Card, message, Modal, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 // import { AppPublishColumns } from '../Config';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 interface indexType {}
 const columns: any = [
