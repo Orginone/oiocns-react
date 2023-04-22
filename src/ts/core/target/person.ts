@@ -20,8 +20,7 @@ import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 import { getFileSysItemRoot } from './store/filesys';
 import { IChat } from './chat/ichat';
 import { CreateChat } from './chat/chat';
-import IWork from './work/iwork';
-import Work from './work/work';
+import { Work } from './work/work';
 
 export default class Person extends MarketTarget implements IPerson {
   cohorts: ICohort[] = [];
@@ -33,7 +32,7 @@ export default class Person extends MarketTarget implements IPerson {
   home: IObjectItem;
   members: schema.XTarget[] = [];
   memberChats: IChat[] = [];
-  work: IWork;
+  work: Work;
   constructor(target: schema.XTarget) {
     super(target, undefined, target.id);
     this.work = new Work();

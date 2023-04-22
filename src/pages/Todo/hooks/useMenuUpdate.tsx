@@ -1,4 +1,3 @@
-import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import { emitter } from '@/ts/core';
 import { findMenuItemByKey } from '@/utils/tools';
 import { useEffect } from 'react';
@@ -7,6 +6,7 @@ import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
 import { IconFont } from '@/components/IconFont';
 import React from 'react';
+import orgCtrl from '@/ts/controller/';
 
 /**
  * 监听控制器刷新hook
@@ -34,17 +34,17 @@ const useMenuUpdate = (): [
   const refreshMenu = async () => {
     const newMenus = { ...rootMenu };
     newMenus.children = await operate.loadWorkMenu();
-    var item = findMenuItemByKey(newMenus.children, todoCtrl.currentKey);
+    var item = findMenuItemByKey(newMenus.children, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;
     }
-    todoCtrl.currentKey = item.key;
+    orgCtrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenus);
   };
 
   useEffect(() => {
-    const id = todoCtrl.subscribe((key) => {
+    const id = orgCtrl.subscribe((key) => {
       setKey(key);
       refreshMenu();
     });
