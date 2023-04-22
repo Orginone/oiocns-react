@@ -12,11 +12,11 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
   var result: MenuItemType[] = [];
   for (let item of species) {
     let subSpecies = await buildSpeciesTree(item.children);
-    works.push(item.id);
+    works.push(item);
     result.push({
       key: item.key,
       label: item.name,
-      item: [item.id, subSpecies.item],
+      item: [item, subSpecies.item],
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
       children: subSpecies.children,
@@ -44,7 +44,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       key: item.space.id + '-' + item.id,
       label: item.teamName,
       tag: [item.typeName + '群'],
-      item: item.id,
+      item: [item],
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [...children, ...species.children],
@@ -109,6 +109,7 @@ export const loadWorkMenu = async () => {
       label: orgCtrl.user.teamName,
       itemType: GroupMenuType.Organization,
       item: [orgCtrl.user],
+      icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
       children: [
         {
           key: '群组',

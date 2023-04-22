@@ -5,10 +5,10 @@ import { Link, RouteComponentProps, useHistory, withRouter } from 'react-router-
 import { IconFont } from '@/components/IconFont';
 
 import cls from './index.module.less';
-import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgNotify } from '@/ts/core';
+import { workNotify } from '@/ts/core/target/work/work';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -19,6 +19,7 @@ import { msgNotify } from '@/ts/core';
 const HeaderNav: React.FC<RouteComponentProps> = () => {
   const history = useHistory();
   const [msgKey, setMsgKey] = useState('');
+  const [todoCount, setTodoCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   useEffect(() => {
     const id = msgNotify.subscribe((key) => {
@@ -29,12 +30,16 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setMsgCount(noReadCount);
       setMsgKey(key);
     });
+    const workId = workNotify.subscribe(async (key) => {
+      let todos = await orgCtrl.user.work.loadTodo();
+      setTodoCount(todos.length);
+      setMsgKey(key);
+    });
     return () => {
       msgNotify.unsubscribe(id);
+      workNotify.unsubscribe(workId);
     };
   }, []);
-  // TODO 加载未读消息数量
-  const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
       key: msgKey,
@@ -54,10 +59,12 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       path: '/todo',
       title: '办事',
       icon: 'icon-todo',
-      count: taskNum,
+      count: todoCount,
       fath: '/todo',
       onClick: () => {
-        todoCtrl.currentKey = '';
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
+        history.push('/todo');
       },
     },
     {
@@ -94,14 +101,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       },
     },
   ];
-  useEffect(() => {
-    const id = todoCtrl.subscribe(async () => {
-      setTaskNum(await todoCtrl.getTaskCount());
-    });
-    return () => {
-      return todoCtrl.unsubscribe(id);
-    };
-  }, []);
 
   const getLinkItem = (item: any) => {
     return (

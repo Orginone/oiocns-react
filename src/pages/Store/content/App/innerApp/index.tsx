@@ -5,7 +5,6 @@ import AppCard from './card';
 import CardOrTable from '@/components/CardOrTableComp';
 import { InnerApplicationColumns } from '@/pages/Store/config/columns';
 import { XFlowDefine } from '@/ts/base/schema';
-import WorkStartDo from '@/pages/Todo/content/Work/WorkStartDo';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import orgCtrl from '@/ts/controller';
 import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
@@ -98,12 +97,13 @@ const InnerApp: React.FC = () => {
     switch (modalType) {
       case 'start':
         return (
-          <WorkStartDo
-            current={define!}
-            goBack={() => {
-              setModalType('');
-            }}
-          />
+          <></>
+          // <WorkStartDo
+          //   current={define!}
+          //   goBack={() => {
+          //     setModalType('');
+          //   }}
+          // />
         );
       default:
         return (
