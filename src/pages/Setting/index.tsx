@@ -55,7 +55,7 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await data.belong.dict.deleteDict(data.item.id)) {
+                if (await data.item.belong.dict.deleteDict(data.item.id)) {
                   refreshMenu();
                 }
               },
@@ -112,16 +112,16 @@ const TeamSetting: React.FC = () => {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  data.belong.getCohorts(true);
+                  data.item.getCohorts(true);
                   break;
                 case TargetType.Department:
-                  (data.belong as ICompany).getDepartments(true);
+                  (data.item as ICompany).getDepartments(true);
                   break;
                 case TargetType.Group:
-                  (data.belong as ICompany).getJoinedGroups(true);
+                  (data.item as ICompany).getJoinedGroups(true);
                   break;
                 case TargetType.Station:
-                  (data.belong as ICompany).getStations(true);
+                  (data.item as ICompany).getStations(true);
                   break;
               }
               orgCtrl.changCallback();

@@ -30,9 +30,11 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
     case GroupMenuType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
     case GroupMenuType.Species:
-      return <StandardSetting current={selectMenu.item} target={selectMenu.belong} />;
+      return <StandardSetting current={selectMenu.item} />;
     case GroupMenuType.Dict:
-      return <DictSetting current={selectMenu.item} belong={selectMenu.belong} />;
+      return (
+        <DictSetting current={selectMenu.item.dict} belong={selectMenu.item.belong} />
+      );
     case GroupMenuType.Property:
       return <PropertySetting current={selectMenu.item} />;
     case GroupMenuType.Authority:

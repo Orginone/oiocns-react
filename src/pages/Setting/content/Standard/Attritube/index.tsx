@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import orgCtrl from '@/ts/controller';
 import { XAttribute } from '@/ts/base/schema';
@@ -9,7 +9,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AttributeModal from './attributeModal';
 
 interface IProps {
-  target: ITarget;
   current: ISpeciesItem;
   modalType: string;
   recursionOrg: boolean;
@@ -23,7 +22,6 @@ interface IProps {
  */
 const Attritube = ({
   current,
-  target,
   modalType,
   recursionOrg,
   recursionSpecies,
@@ -68,7 +66,7 @@ const Attritube = ({
           label: '复制属性',
           onClick: async () => {
             if (item.property) {
-              const property = await target.space.property?.createProperty({
+              const property = await current.team.space.property?.createProperty({
                 ...item.property,
                 belongId: orgCtrl.user.id,
                 sourceId: item.property.belongId,
@@ -97,7 +95,7 @@ const Attritube = ({
 
   const loadAttrs = async (page: PageRequest) => {
     return await current!.loadAttrsByPage(
-      target.id,
+      current.team.id,
       recursionOrg,
       recursionSpecies,
       page,
@@ -112,7 +110,7 @@ const Attritube = ({
           return await loadAttrs(page);
         }}
         operation={renderOperate}
-        columns={AttributeColumns(target?.species || [])}
+        columns={AttributeColumns(current.team.species || [])}
         showChangeBtn={false}
         dataSource={[]}
       />
@@ -130,7 +128,7 @@ const Attritube = ({
             tforceUpdate();
           }
         }}
-        target={target as ISpace}
+        target={current.team.space}
         current={current}
       />
       {/** 关联属性模态框 */}

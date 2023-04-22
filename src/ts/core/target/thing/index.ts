@@ -1,6 +1,7 @@
 import { kernel } from '@/ts/base';
 import { ISpeciesItem } from './ispecies';
 import { SpeciesItem } from './species';
+import { ITarget } from '../itarget';
 
 /**
  * 加载分类树
@@ -8,7 +9,7 @@ import { SpeciesItem } from './species';
  */
 export const loadSpeciesTree = async (
   id: string,
-  spaceId: string,
+  team: ITarget,
   upTeam: boolean = false,
 ) => {
   const result: ISpeciesItem[] = [];
@@ -18,7 +19,7 @@ export const loadSpeciesTree = async (
   });
   if (res.success && res.data && res.data.result && res.data.result.length > 0) {
     for (const item of res.data.result) {
-      result.push(new SpeciesItem(item, undefined, spaceId));
+      result.push(new SpeciesItem(item, undefined, team));
     }
   }
   return result;

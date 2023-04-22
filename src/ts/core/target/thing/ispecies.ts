@@ -14,6 +14,7 @@ import {
   XFlowInstance,
   XFlowDefine,
 } from '@/ts/base/schema';
+import { ITarget } from '../itarget';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;
@@ -40,8 +41,8 @@ export interface ISpeciesItem {
   attrs?: XAttribute[];
   /** 流程实例 */
   instances?: XFlowInstance[];
-  /** 加载信息 */
-  loadInfo(info: TargetShare): Promise<ISpeciesItem>;
+  /** 团队 */
+  team: ITarget;
   /** 加载分类特性 */
   loadAttrs(reload: boolean): Promise<XAttribute[]>;
   /** 分页查询分类特性 */

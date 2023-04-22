@@ -1,6 +1,6 @@
 import { Badge, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 
 import { IconFont } from '@/components/IconFont';
 
@@ -16,22 +16,24 @@ import orgCtrl from '@/ts/controller';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
+  const history = useHistory();
   // TODO 加载未读消息数量
-  // const [chatKey] = useCtrlUpdate(chatCtrl);
+  let noReadCount = 0;
+  for (const item of orgCtrl.user.allChats()) {
+    noReadCount += item.noReadCount;
+  }
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
-      // key: chatKey,
       key: '沟通',
       path: '/chat',
       title: '沟通',
       icon: 'icon-message',
-      count: 0,
-      // count: chatCtrl.getNoReadCount(),
+      count: noReadCount,
       fath: '/chat',
       onClick: () => {
-        // chatCtrl.currentKey = '';
-        // chatCtrl.changCallback();
+        orgCtrl.currentKey = '';
+        history.push('/chat');
       },
     },
     {
@@ -91,7 +93,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   const getLinkItem = (item: any) => {
     return (
       <Link
-        key={item.path}
+        key={item.key}
         to={item.path}
         title={item.title}
         onClick={() => {

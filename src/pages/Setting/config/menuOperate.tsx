@@ -31,34 +31,30 @@ const parseGroupMenuType = (typeName: TargetType) => {
 };
 
 /** 编译组织树 */
-export const buildTargetTree = async (targets: ITarget[], belong: ISpace) => {
+export const buildTargetTree = async (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     result.push({
       key: item.key,
-      belong: belong,
-      shareId: item.id,
       item: item,
       label: item.teamName,
       itemType: parseGroupMenuType(item.typeName),
       menus: await loadTypeMenus(item, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [
-        await buildTargetSpeciesTree(item, belong),
-        ...(await buildTargetTree(item.subTeam, belong)),
+        await buildTargetSpeciesTree(item),
+        ...(await buildTargetTree(item.subTeam)),
       ],
     });
   }
   return result;
 };
 
-const buildTargetSpeciesTree = async (target: ITarget, belong: ISpace) => {
+const buildTargetSpeciesTree = async (target: ITarget) => {
   const species = await target.loadSpeciesTree();
   return {
-    children: species.map((i) => buildSpeciesTree(target.key, i, target)),
+    children: species.map((i) => buildSpeciesTree(target.key, i)),
     key: target.key + '-分类标准',
-    belong: belong,
-    shareId: target.id,
     label: '分类标准',
     itemType: '分类标准',
     item: target,
@@ -67,51 +63,41 @@ const buildTargetSpeciesTree = async (target: ITarget, belong: ISpace) => {
 };
 
 /** 编译分类树 */
-export const buildSpeciesTree = (
-  prefix: string,
-  species: ISpeciesItem,
-  belong: ITarget,
-) => {
+export const buildSpeciesTree = (prefix: string, species: ISpeciesItem) => {
   const result: MenuItemType = {
     key: prefix + species.id,
-    belong: belong,
-    shareId: species.target.belongId,
     item: species,
     label: species.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Species,
     menus: loadSpeciesMenus(species),
-    children: species.children?.map((i) => buildSpeciesTree(prefix, i, belong)) ?? [],
+    children: species.children?.map((i) => buildSpeciesTree(prefix, i)) ?? [],
   };
   return result;
 };
 
 /** 编译权限树 */
-export const buildAuthorityTree = (
-  prefix: string,
-  authoritys: IAuthority,
-  belong: ISpace,
-) => {
+export const buildAuthorityTree = (prefix: string, authoritys: IAuthority) => {
   const result: MenuItemType = {
     key: prefix + authoritys.id,
-    belong: belong,
-    shareId: belong.id,
     item: authoritys,
     label: authoritys.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Authority,
     menus: loadAuthorityMenus(authoritys),
-    children:
-      authoritys.children?.map((i) => buildAuthorityTree(prefix, i, belong)) ?? [],
+    children: authoritys.children?.map((i) => buildAuthorityTree(prefix, i)) ?? [],
   };
   return result;
 };
 
+/** 加载字典菜单 */
 export const buildDictMenus = (dict: XDict, belong: ISpace) => {
   const result: MenuItemType = {
     key: dict.id,
-    belong: belong,
-    item: dict,
+    item: {
+      dict,
+      belong,
+    },
     label: dict.name,
     icon: <im.ImTree />,
     itemType: GroupMenuType.Dict,
@@ -134,16 +120,15 @@ export const buildDictMenus = (dict: XDict, belong: ISpace) => {
   return result;
 };
 
+/** 加载标准菜单 */
 export const loadStandardSetting = async (space: ISpace) => {
   const result: MenuItemType[] = [];
   const authors = await space.loadSpaceAuthorityTree();
   const dicts = await space.dict.loadDict({ offset: 0, limit: 1000, filter: '' });
   if (authors) {
     result.push({
-      children: [buildAuthorityTree(space.key, authors, space)],
+      children: [buildAuthorityTree(space.key, authors)],
       key: space.key + '权限标准',
-      belong: space,
-      shareId: space.id,
       label: '权限标准',
       itemType: '权限标准',
       item: space,
@@ -184,7 +169,7 @@ export const loadStandardSetting = async (space: ISpace) => {
       },
     ],
   });
-  result.push(await buildTargetSpeciesTree(space, space));
+  result.push(await buildTargetSpeciesTree(space));
   return result;
 };
 
@@ -250,8 +235,6 @@ export const getUserMenu = async () => {
         item: orgCtrl.user,
         label: '标准设置',
         itemType: '标准设置',
-        belongId: orgCtrl.user.id,
-        shareId: orgCtrl.user.id,
         menus: [],
         icon: <im.ImNewspaper />,
         children: await loadStandardSetting(orgCtrl.user),
@@ -265,7 +248,6 @@ export const getUserMenu = async () => {
           subTeam: await orgCtrl.user.getCohorts(),
         },
         [TargetType.Cohort],
-        orgCtrl.user,
       ),
     ],
   };
@@ -280,8 +262,6 @@ export const getTeamMenu = async () => {
       item: company,
       label: company.teamName,
       itemType: GroupMenuType.Company,
-      belong: company,
-      shareId: company.id,
       menus: await loadTypeMenus(company, false),
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
@@ -290,8 +270,6 @@ export const getTeamMenu = async () => {
           item: company,
           label: '标准设置',
           itemType: '标准设置',
-          belong: company.id,
-          shareId: company.id,
           menus: [],
           icon: <im.ImNewspaper />,
           children: await loadStandardSetting(company),
@@ -305,7 +283,6 @@ export const getTeamMenu = async () => {
             subTeam: await company.loadSubTeam(),
           },
           company.subTeamTypes,
-          company,
         ),
         await loadGroupMenus(
           {
@@ -316,7 +293,6 @@ export const getTeamMenu = async () => {
             subTeam: await company.getJoinedGroups(),
           },
           [TargetType.Group],
-          company,
         ),
         await loadGroupMenus(
           {
@@ -327,7 +303,6 @@ export const getTeamMenu = async () => {
             subTeam: await company.getStations(),
           },
           [TargetType.Station],
-          company,
         ),
         await loadGroupMenus(
           {
@@ -338,19 +313,15 @@ export const getTeamMenu = async () => {
             subTeam: await company.getCohorts(),
           },
           [TargetType.Cohort],
-          company,
         ),
       ],
     });
   }
   return children;
 };
+
 /** 加载分组菜单 */
-export const loadGroupMenus = async (
-  param: groupMenuParams,
-  teamTypes: string[],
-  belong: ISpace,
-) => {
+export const loadGroupMenus = async (param: groupMenuParams, teamTypes: string[]) => {
   let menus = [
     {
       key: '重载|' + param.typeName,
@@ -384,9 +355,7 @@ export const loadGroupMenus = async (
     ),
     menus: menus,
     item: param.item,
-    belong: belong,
-    shareId: belong.id,
-    children: await buildTargetTree(param.subTeam, belong),
+    children: await buildTargetTree(param.subTeam),
   };
 };
 

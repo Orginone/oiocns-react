@@ -1,7 +1,7 @@
 import { OperationModel } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { ITarget, ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import {
   ProForm,
   ProFormSelect,
@@ -21,7 +21,6 @@ interface Iprops {
   handleCancel: () => void;
   handleOk: (res: any) => void;
   current: ISpeciesItem;
-  target?: ITarget;
 }
 
 /**

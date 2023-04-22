@@ -1,5 +1,5 @@
 import PageCard from '@/components/PageCard';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { Button, Segmented, message } from 'antd';
 import React, { useState } from 'react';
 import Description from './Description';
@@ -12,7 +12,6 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 
 interface IProps {
-  target: ITarget;
   current: ISpeciesItem;
 }
 
@@ -20,7 +19,7 @@ interface IProps {
  * 标准设定
  * @returns
  */
-const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
+const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('');
 
@@ -147,7 +146,6 @@ const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
         return (
           <Attritube
             current={current}
-            target={target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -158,7 +156,6 @@ const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
         return (
           <SpeciesForm
             current={current}
-            target={target}
             modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
@@ -169,7 +166,7 @@ const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
           />
         );
       case 'work':
-        return <FlowList target={target} species={current} />;
+        return <FlowList current={current} />;
     }
   };
 
@@ -187,7 +184,7 @@ const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
         </PageCard>
       </div>
       <DefineInfo
-        target={target}
+        target={current.team}
         current={undefined}
         title={'新增办事'}
         open={modalType == '新增办事'}
@@ -195,7 +192,9 @@ const SettingStandrad: React.FC<IProps> = ({ target, current }: IProps) => {
           setModalType('');
         }}
         handleOk={async (req: CreateDefineReq) => {
-          if (await target.define.publishDefine({ ...req, speciesId: current.id })) {
+          if (
+            await current.team.define.publishDefine({ ...req, speciesId: current.id })
+          ) {
             message.success('保存成功');
             forceUpdate();
             setModalType('');

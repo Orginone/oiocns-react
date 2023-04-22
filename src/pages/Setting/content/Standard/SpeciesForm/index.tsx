@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
 import Operation from './Operation';
 import Design from './Design';
 
 interface IProps {
-  target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
   recursionOrg: boolean;
@@ -20,7 +19,6 @@ interface IProps {
  */
 const SpeciesForm = ({
   current,
-  target,
   modalType,
   recursionOrg,
   recursionSpecies,
@@ -37,7 +35,6 @@ const SpeciesForm = ({
   return tabKey == 0 ? (
     <Operation
       current={current}
-      target={target}
       modalType={modalType}
       setModalType={setModalType}
       setTabKey={setTabKey}
@@ -47,7 +44,6 @@ const SpeciesForm = ({
     />
   ) : (
     <Design
-      target={target}
       current={current}
       operation={selectedOperation as XOperation}
       setTabKey={setTabKey}

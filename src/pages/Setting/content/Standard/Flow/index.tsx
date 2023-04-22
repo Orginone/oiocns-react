@@ -8,30 +8,29 @@ import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import DefineInfo from './info';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { IsThingAdmin } from '@/utils/authority';
 import { CreateDefineReq } from '@/ts/base/model';
 import Design from './Design';
 
 interface IProps {
-  target: ITarget;
-  species: ISpeciesItem;
+  current: ISpeciesItem;
 }
 
 /**
  * 流程设置
  * @returns
  */
-const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
+const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
-  const [key, setForceUpdate] = useObjectUpdate(target);
+  const [key, setForceUpdate] = useObjectUpdate(current);
   const [define, setDefine] = useState<XFlowDefine>();
   const [modalType, setModalType] = useState('');
   const [isThingAdmin, setIsThingAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     setTimeout(async () => {
-      setIsThingAdmin(await IsThingAdmin(target));
+      setIsThingAdmin(await IsThingAdmin(current.team));
     }, 100);
   }, []);
 
@@ -67,7 +66,7 @@ const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-              if (await target.define.deleteDefine(record.id)) {
+              if (await current.team.define.deleteDefine(record.id)) {
                 message.success('删除成功');
                 setForceUpdate();
               }
@@ -87,7 +86,7 @@ const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
             <Design
               IsEdit={true}
               current={define!}
-              target={target}
+              target={current.team}
               onBack={() => setModalType('')}
             />
           );
@@ -106,7 +105,7 @@ const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
                   parentRef={parentRef}
                   dataSource={[]}
                   request={async (page) => {
-                    let data = await target.define.loadFlowDefine(species.id);
+                    let data = await current.team.define.loadFlowDefine(current.id);
                     return {
                       ...page,
                       total: data.total,
@@ -139,7 +138,7 @@ const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
       {content()}
       {define && (
         <DefineInfo
-          target={target}
+          target={current.team}
           current={define}
           title={'编辑办事'}
           open={modalType == 'edit'}
@@ -147,7 +146,7 @@ const FlowList: React.FC<IProps> = ({ target, species }: IProps) => {
             setModalType('');
           }}
           handleOk={async (req: CreateDefineReq) => {
-            if (await target.define.publishDefine(req)) {
+            if (await current.team.define.publishDefine(req)) {
               message.success('保存成功');
               setForceUpdate();
               setModalType('');
