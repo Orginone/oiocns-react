@@ -3,6 +3,7 @@ import { schema, kernel, common, parseAvatar, model } from '@/ts/base';
 import { TargetType, MessageType } from '../../enum';
 import { appendShare, appendTarget } from '../targetMap';
 import { ChatCache, IChat } from './ichat';
+import { Emitter } from '@/ts/base/common';
 
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
@@ -76,7 +77,10 @@ class BaseChat implements IChat {
 
   loadCache(cache: ChatCache): void {
     this.isToping = cache.isToping;
-    this.noReadCount = cache.noReadCount;
+    if (cache.noReadCount && this.noReadCount != cache.noReadCount) {
+      this.noReadCount = cache.noReadCount;
+      msgNotify.changCallback();
+    }
     this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
     if (cache.lastMessage && cache.lastMessage.id != this.lastMessage?.id) {
       this.lastMessage = cache.lastMessage;
@@ -91,7 +95,10 @@ class BaseChat implements IChat {
   }
   onMessage(callback: (messages: schema.XImMsg[]) => void): void {
     this.messageNotify = callback;
-    this.noReadCount = 0;
+    if (this.noReadCount > 0) {
+      this.noReadCount = 0;
+      msgNotify.changCallback();
+    }
     this.cache();
     if (this.messages.length < 10) {
       this.moreMessage('');
@@ -222,7 +229,10 @@ class BaseChat implements IChat {
         msg.showTxt = common.StringPako.inflate(msg.msgBody);
         this.messages.push(msg);
       }
-      this.noReadCount += this.messageNotify ? 0 : 1;
+      if (!this.messageNotify) {
+        this.noReadCount += 1;
+        msgNotify.changCallback();
+      }
       this.lastMsgTime = new Date().getTime();
       this.lastMessage = msg;
       this.cache();
@@ -284,7 +294,9 @@ class CohortChat extends BaseChat {
     }
   }
 }
-
+// 消息变更推送
+export const msgNotify = new Emitter();
+/** 创建用户会话 */
 export const CreateChat = (
   userId: string,
   spaceId: string,
@@ -308,7 +320,7 @@ export const CreateChat = (
     return new CohortChat(spaceId, data, userId);
   }
 };
-
+/** 创建权限会话 */
 export const CreateAuthChat = (
   userId: string,
   spaceId: string,

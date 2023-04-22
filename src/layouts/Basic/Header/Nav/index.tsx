@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
+import { msgNotify } from '@/ts/core';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -17,19 +18,30 @@ import orgCtrl from '@/ts/controller';
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
   const history = useHistory();
+  const [msgKey, setMsgKey] = useState('');
+  const [msgCount, setMsgCount] = useState(0);
+  useEffect(() => {
+    const id = msgNotify.subscribe((key) => {
+      let noReadCount = 0;
+      for (const item of orgCtrl.user.allChats()) {
+        noReadCount += item.noReadCount;
+      }
+      setMsgCount(noReadCount);
+      setMsgKey(key);
+    });
+    return () => {
+      msgNotify.unsubscribe(id);
+    };
+  }, []);
   // TODO 加载未读消息数量
-  let noReadCount = 0;
-  for (const item of orgCtrl.user.allChats()) {
-    noReadCount += item.noReadCount;
-  }
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
-      key: '沟通',
+      key: msgKey,
       path: '/chat',
       title: '沟通',
       icon: 'icon-message',
-      count: noReadCount,
+      count: msgCount,
       fath: '/chat',
       onClick: () => {
         orgCtrl.currentKey = '';

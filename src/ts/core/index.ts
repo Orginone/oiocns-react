@@ -14,6 +14,8 @@ export {
   WorkType,
 } from './enum';
 export type { IMarket, IMerchandise, IProduct, IResource } from './market';
+export { msgNotify } from './target/chat/chat';
+export type { IChat } from './target/chat/ichat';
 export type {
   ICohort,
   ICompany,

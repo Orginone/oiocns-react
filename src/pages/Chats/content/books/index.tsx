@@ -3,8 +3,9 @@ import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { WechatOutlined } from '@ant-design/icons';
-import { MessageType } from '@/ts/core';
+import { MessageType, msgNotify } from '@/ts/core';
 import { IChat } from '@/ts/core/target/chat/ichat';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 /**
  * @description: 通讯录
@@ -12,6 +13,7 @@ import { IChat } from '@/ts/core/target/chat/ichat';
  */
 
 const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string }) => {
+  const [msgKey] = useCtrlUpdate(msgNotify);
   if (chats === undefined) {
     chats = orgCtrl.user.allChats();
   }
@@ -39,7 +41,7 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
     return '简介信息:' + chat.target.remark;
   };
   return (
-    <Card>
+    <Card key={msgKey}>
       {chats.length > 0 && (
         <List
           className="demo-loadmore-list"
