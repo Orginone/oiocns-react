@@ -45,6 +45,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/chat',
       onClick: () => {
         orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
         history.push('/chat');
       },
     },
