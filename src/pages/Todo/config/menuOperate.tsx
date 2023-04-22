@@ -1,232 +1,137 @@
 import React from 'react';
-import { Avatar } from 'antd';
 import * as im from 'react-icons/im';
-import { ISpace, ISpeciesItem, ITodoGroup, TargetType, WorkType } from '@/ts/core';
-import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import { ToTopOutlined } from '@ant-design/icons';
+import { IGroup, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-
-export const getCommonSpeciesMenus = () => {
-  return {
-    key: '我的常用',
-    label: '我的常用',
-    itemType: '我的常用',
-    icon: <im.ImHeart />,
-    children: todoCtrl.caches || [],
-  };
-};
-
-export const loadPlatformApplyMenu = async () => {
-  return [
-    {
-      key: WorkType.OrgApply,
-      label: '组织',
-      itemType: WorkType.OrgApply,
-      icon: <im.ImTree />,
-      children: [
-        {
-          key: WorkType.FriendApply,
-          label: '加好友',
-          itemType: WorkType.FriendApply,
-          icon: <im.ImTree />,
-          children: [],
-        },
-        {
-          key: WorkType.CohortApply,
-          label: '加群组',
-          itemType: WorkType.CohortApply,
-          icon: <im.ImTree />,
-          children: [],
-        },
-        {
-          key: WorkType.CompanyApply,
-          label: '加单位',
-          itemType: WorkType.CompanyApply,
-          icon: <im.ImTree />,
-          children: [],
-        },
-        {
-          key: WorkType.GroupApply,
-          label: '加集团',
-          itemType: WorkType.GroupApply,
-          icon: <im.ImTree />,
-          children: [],
-        },
-      ],
-    },
-    {
-      key: WorkType.StoreApply,
-      label: '商店',
-      itemType: WorkType.StoreApply,
-      icon: <im.ImCart />,
-      children: [
-        {
-          key: WorkType.PublishApply,
-          label: '上架',
-          itemType: WorkType.PublishApply,
-          icon: <ToTopOutlined />,
-          item: todoCtrl.PublishApply,
-          children: [],
-        },
-        {
-          key: WorkType.JoinStoreApply,
-          label: '加入',
-          itemType: WorkType.JoinStoreApply,
-          icon: <im.ImBarcode />,
-          item: todoCtrl.MarketApply,
-          children: [],
-        },
-      ],
-    },
-    {
-      key: WorkType.OrderApply,
-      label: '订单',
-      item: todoCtrl.OrderTodo,
-      itemType: WorkType.OrderApply,
-      icon: <im.ImBarcode />,
-      children: [],
-    },
-  ];
-};
-
-const loadChildren = async (targetId: string, todoGroups: ITodoGroup[]) => {
-  let sum = 0;
-  let children = [];
-  for (const todoGroup of todoGroups) {
-    const icon = todoGroup.icon ? (
-      <Avatar size={18} src={todoGroup.icon} />
-    ) : (
-      <im.ImOffice />
-    );
-    let count = todoGroup.id ? await todoGroup.getCount() : 0;
-    children.push({
-      icon: icon,
-      key: todoGroup.name + todoGroup.type + targetId,
-      label: todoGroup.name,
-      itemType: todoGroup.type,
-      item: todoGroup,
-      count: count,
-      children: [],
-    });
-    sum += count;
-  }
-  return {
-    children: children,
-    count: sum,
-  };
-};
-
-export const getUserMenu = async (user: ISpace) => {
-  let children: MenuItemType[] = [];
-  children.push(
-    ...(await getOrgMenu(user)),
-    await getStoreMenu(user),
-    await getOrderMenu(user),
-  );
-  const root = await user.loadSpeciesTree();
-  for (const item of root) {
-    if (item.target.code === 'matters') {
-      children.push(...(await buildSpeciesTree(user.id, [item], 'work')));
-    }
-  }
-  return {
-    key: user.target.id,
-    item: user.target,
-    label: user.teamName,
-    itemType: user.target.typeName,
-    menus: [],
-    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
-    children: children,
-  };
-};
-
-const getStoreMenu = async (user: ISpace) => {
-  let PublishTodo = await loadChildren(user.id, todoCtrl.PublishTodo);
-  let MarketTodo = await loadChildren(user.id, todoCtrl.MarketTodo);
-  return {
-    key: WorkType.StoreTodo,
-    label: '商店',
-    itemType: WorkType.StoreTodo,
-    icon: <im.ImCart />,
-    children: [
-      {
-        key: WorkType.PublishTodo,
-        label: '上架',
-        itemType: WorkType.PublishTodo,
-        icon: <ToTopOutlined />,
-        ...PublishTodo,
-      },
-      {
-        key: WorkType.JoinStoreTodo,
-        label: '加入',
-        itemType: WorkType.JoinStoreTodo,
-        icon: <im.ImBarcode />,
-        ...MarketTodo,
-      },
-    ],
-    count: PublishTodo.count + MarketTodo.count,
-  };
-};
-
-const getOrderMenu = async (user: ISpace) => {
-  return {
-    children: [],
-    key: WorkType.OrderTodo + user.id,
-    label: '订单',
-    itemType: WorkType.OrderTodo,
-    item: todoCtrl.OrderTodo,
-    count: await todoCtrl.OrderTodo?.getCount(),
-    icon: <im.ImBarcode />,
-  };
-};
-
-const getOrgMenu = async (user: ISpace) => {
-  let menus: MenuItemType[] = [];
-  if (user.typeName == TargetType.Person) {
-    let friendTodo = await loadChildren(user.id, todoCtrl.FriendTodo);
-    menus.push(...friendTodo.children, {
-      key: '单位待办',
-      label: '单位',
-      itemType: WorkType.OrgTodo,
-      icon: <im.ImTree />,
-      children: [],
-    });
-  } else {
-    menus.push({
-      key: '集团待办' + user.id,
-      label: '集团',
-      itemType: WorkType.OrgTodo,
-      icon: <im.ImTree />,
-      ...(await loadChildren(user.id, todoCtrl.GroupTodo)),
-    });
-  }
-  menus.push({
-    key: '群组待办' + user.id,
-    label: '群组',
-    itemType: WorkType.OrgTodo,
-    icon: <im.ImTree />,
-    ...(await loadChildren(user.id, todoCtrl.CohortTodo)),
-  });
-  return menus;
-};
+import orgCtrl from '@/ts/controller';
+import { GroupMenuType, OrganizationType } from '@/pages/Todo/config/menuType';
 
 /** 编译分类树 */
-const buildSpeciesTree = async (
-  prefix: string,
-  species: ISpeciesItem[],
-  itemType: string,
-): Promise<MenuItemType[]> => {
+const buildSpeciesTree = async (species: ISpeciesItem[]) => {
+  let works = [];
   var result: MenuItemType[] = [];
   for (let item of species) {
+    let subSpecies = await buildSpeciesTree(item.children);
+    let itemWorks = orgCtrl.user
+      .allWorks()
+      .filter(
+        (a) =>
+          a.shareId == item.shareId &&
+          a.spaceId == item.spaceId &&
+          a.speciesId == item.id,
+      );
+    works.push(...itemWorks);
     result.push({
-      key: prefix + item.id,
-      item: item,
+      key: item.fullId,
       label: item.name,
+      item: [...itemWorks, subSpecies.item],
       icon: <im.ImNewspaper />,
-      itemType: itemType,
-      children: await buildSpeciesTree(prefix, item.children, itemType),
+      itemType: GroupMenuType.Species,
+      children: subSpecies.children,
     });
   }
-  return result;
+  return {
+    item: works,
+    children: result,
+  };
+};
+
+/** 编译组织树 */
+export const buildTargetTree = async (targets: ITarget[]) => {
+  let parentItem = [];
+  const result: MenuItemType[] = [];
+  for (const item of targets) {
+    let works = orgCtrl.user
+      .allWorks()
+      .filter((a) => a.shareId == item.id && a.spaceId == item.space.id);
+    parentItem.push(works);
+    let species = await buildSpeciesTree(
+      (await item.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
+    );
+    let children = [];
+    if (item.typeName == TargetType.Group) {
+      let subGroup = await buildTargetTree(await(item as IGroup).getSubGroups());
+      children.push(...subGroup.children);
+    }
+    result.push({
+      key: item.space.id + '-' + item.id,
+      label: item.teamName,
+      tag: [item.typeName + '群'],
+      item: works,
+      itemType: GroupMenuType.Work,
+      icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
+      children: [...children, ...species.children],
+    });
+  }
+  return { item: parentItem, children: result };
+};
+
+export const loadWorkMenu = async () => {
+  let companys = await orgCtrl.user.getJoinedCompanys(false);
+  let companyItems = [];
+  for (const company of companys) {
+    let ret = await buildSpeciesTree(
+      (await company.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
+    );
+    companyItems.push({
+      key: company.id + '单位',
+      label: company.teamName,
+      item: orgCtrl.user.allWorks().filter((a) => a.spaceId == company.id),
+      itemType: GroupMenuType.Work,
+      icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
+      children: [
+        {
+          key: company.id + OrganizationType.Group,
+          label: OrganizationType.Group,
+          itemType: GroupMenuType.Work,
+          tag: [company.typeName, '集团'],
+          icon: (
+            <TeamIcon
+              share={{ typeName: TargetType.Working, name: OrganizationType.Working }}
+              size={18}
+              fontSize={16}
+            />
+          ),
+          ...(await buildTargetTree(company.joinedGroup)),
+        },
+        {
+          key: company.id + OrganizationType.Working,
+          label: OrganizationType.Working,
+          itemType: GroupMenuType.Work,
+          icon: (
+            <TeamIcon
+              share={{ typeName: TargetType.Working, name: OrganizationType.Working }}
+              size={18}
+              fontSize={16}
+            />
+          ),
+          ...(await buildTargetTree(await company.getCohorts())),
+        },
+        ...ret.children,
+      ],
+    });
+  }
+  let person = await buildSpeciesTree(
+    (await orgCtrl.user.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
+  );
+  return [
+    {
+      key: '个人',
+      label: orgCtrl.user.teamName,
+      itemType: GroupMenuType.Work,
+      belong: orgCtrl.user,
+      item: orgCtrl.user.allWorks().filter((a) => a.spaceId == orgCtrl.user.id),
+      children: [
+        {
+          key: '群组',
+          label: '群组',
+          itemType: GroupMenuType.Work,
+          icon: <im.ImUsers />,
+          ...(await buildTargetTree(await orgCtrl.user.getCohorts())),
+        },
+        ...person.children,
+      ],
+    },
+    ...companyItems,
+  ];
 };

@@ -24,10 +24,16 @@ export type OnProgressType = (p: number) => void | undefined;
  * 标准分类系统项接口
  */
 export interface ISpeciesItem {
+  /** 完整Id */
+  fullId: string;
   /** 主键,唯一 */
   id: string;
   /** 名称 */
   name: string;
+  /** 空间组织 */
+  spaceId: string;
+  /** 分享组织 */
+  shareId: string;
   /** 标准分类项对应的目标 */
   target: XSpecies;
   /** 上级标准分类项 */

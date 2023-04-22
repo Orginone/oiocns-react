@@ -14,37 +14,46 @@ import { IFlowDefine } from './iflowDefine';
  */
 export class SpeciesItem implements ISpeciesItem {
   id: string;
+  fullId: string;
   name: string;
   isRoot: boolean;
   target: schema.XSpecies;
   parent: INullSpeciesItem;
   children: ISpeciesItem[];
   belongInfo: TargetShare;
-  curSpaceId: string;
+  shareId: string;
+  spaceId: string;
   attrs?: XAttribute[];
   defines?: IFlowDefine[];
   // instances?: XFlowInstance[];
 
-  constructor(target: schema.XSpecies, parent: INullSpeciesItem, curSpaceId: string) {
+  constructor(
+    target: schema.XSpecies,
+    parent: INullSpeciesItem,
+    shareId: string,
+    spaceId: string,
+  ) {
     this.children = [];
     this.target = target;
     this.parent = parent;
     this.id = target.id;
     this.name = target.name;
     this.isRoot = parent === undefined;
-    this.curSpaceId = curSpaceId;
+    this.shareId = shareId;
+    this.spaceId = spaceId;
     if (target.nodes && target.nodes.length > 0) {
       for (const item of target.nodes) {
-        this.children.push(new SpeciesItem(item, this, curSpaceId));
+        this.children.push(new SpeciesItem(item, this, shareId, spaceId));
       }
     }
+    this.fullId = `${spaceId}-${shareId}-${target.id}`;
     this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
   async loadAttrs(reload: boolean = false): Promise<XAttribute[]> {
     if (this.attrs == undefined || this.attrs.length == 0 || reload) {
       const res = await kernel.querySpeciesAttrs({
         id: this.id,
-        spaceId: this.curSpaceId,
+        spaceId: this.shareId,
         recursionOrg: true,
         recursionSpecies: true,
         page: {
@@ -124,7 +133,7 @@ export class SpeciesItem implements ISpeciesItem {
       id: undefined,
     });
     if (res.success) {
-      const newItem = new SpeciesItem(res.data, this, this.curSpaceId);
+      const newItem = new SpeciesItem(res.data, this, this.shareId, this.spaceId);
       this.children.push(newItem);
       return newItem;
     }

@@ -20,6 +20,7 @@ import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 import { getFileSysItemRoot } from './store/filesys';
 import { IChat } from './chat/ichat';
 import { CreateChat } from './chat/chat';
+import { ITodo } from './work/iwork';
 
 export default class Person extends MarketTarget implements IPerson {
   cohorts: ICohort[] = [];
@@ -86,6 +87,11 @@ export default class Person extends MarketTarget implements IPerson {
     chats.push(...this.memberChats);
     return chats;
   }
+
+  allWorks(): ITodo[] {
+    return [];
+  }
+
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.University:

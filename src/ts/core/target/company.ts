@@ -28,6 +28,7 @@ import { IFileSystemItem } from './store/ifilesys';
 import { getFileSysItemRoot } from './store/filesys';
 import { IChat } from './chat/ichat';
 import { CreateChat } from './chat/chat';
+import { ITodo } from './work/iwork';
 /**
  * 公司的元操作
  */
