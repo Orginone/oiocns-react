@@ -16,6 +16,7 @@ export enum MenuType {
 /** 分组菜单类型 */
 export enum GroupMenuType {
   'DictGroup' = '字典定义',
+  'StandardGroup' = '标准设置',
   'SpeciesGroup' = '分类定义',
   'AuthortyGroup' = '权限定义',
   'InnerAgency' = '内部机构',

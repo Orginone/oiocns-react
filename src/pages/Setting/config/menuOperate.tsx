@@ -224,10 +224,10 @@ export const getUserMenu = async () => {
     ],
     children: [
       {
-        key: orgCtrl.user.key + GroupMenuType.SpeciesGroup,
+        key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
-        label: GroupMenuType.SpeciesGroup,
-        itemType: GroupMenuType.SpeciesGroup,
+        label: GroupMenuType.StandardGroup,
+        itemType: GroupMenuType.StandardGroup,
         menus: [],
         icon: <im.ImNewspaper />,
         children: await loadStandardSetting(orgCtrl.user),
@@ -259,10 +259,10 @@ export const getTeamMenu = async () => {
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
-          key: company.key + GroupMenuType.SpeciesGroup,
+          key: company.key + GroupMenuType.StandardGroup,
           item: company,
-          label: GroupMenuType.SpeciesGroup,
-          itemType: GroupMenuType.SpeciesGroup,
+          label: GroupMenuType.StandardGroup,
+          itemType: GroupMenuType.StandardGroup,
           menus: [],
           icon: <im.ImNewspaper />,
           children: await loadStandardSetting(company),
