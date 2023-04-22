@@ -4,7 +4,7 @@ export enum GroupMenuType {
   'Company' = '单位',
   'Things' = '财物',
   'Cohorts' = '群组',
-  'Asset' = '资产',
+  'Asset' = '标准分类',
   'InnerAgency' = '内部机构',
   'Station' = '内部岗位',
   'OutAgency' = '外部机构',

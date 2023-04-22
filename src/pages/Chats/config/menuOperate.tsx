@@ -98,7 +98,7 @@ export const loadBookMenu = async () => {
           itemType: GroupMenuType.Books,
           icon: (
             <TeamIcon
-              share={{ typeName: TargetType.Department, name: BookType.Innner }}
+              share={{ typeName: TargetType.Station, name: BookType.Innner }}
               size={18}
               fontSize={16}
             />
@@ -124,7 +124,13 @@ export const loadBookMenu = async () => {
           label: '单位权限群',
           item: company.authorityTree?.allChats() ?? [],
           itemType: GroupMenuType.Books,
-          icon: <im.ImUser />,
+          icon: (
+            <TeamIcon
+              share={{ typeName: TargetType.Cohort, name: BookType.Working }}
+              size={18}
+              fontSize={16}
+            />
+          ),
           children: company.authorityTree
             ? [buildAuthorityTree(company.authorityTree, company)]
             : [],
