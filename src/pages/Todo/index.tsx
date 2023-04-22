@@ -58,12 +58,7 @@ const Todo: React.FC<any> = () => {
           onCheckeds={(params: any) => setSelectData(params)}
         /> */}
       </Modal>
-      <Content
-        key={key}
-        selectMenu={selectMenu}
-        reflashMenu={refreshMenu}
-        doWork={doWork}
-      />
+      <Content selectMenu={selectMenu} />
     </MainLayout>
   );
 };

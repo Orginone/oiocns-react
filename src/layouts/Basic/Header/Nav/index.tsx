@@ -1,6 +1,6 @@
 import { Badge, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
 
 import { IconFont } from '@/components/IconFont';
 
@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
+import { msgNotify } from '@/ts/core';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -16,22 +17,36 @@ import orgCtrl from '@/ts/controller';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
+  const history = useHistory();
+  const [msgKey, setMsgKey] = useState('');
+  const [msgCount, setMsgCount] = useState(0);
+  useEffect(() => {
+    const id = msgNotify.subscribe((key) => {
+      let noReadCount = 0;
+      for (const item of orgCtrl.user.allChats()) {
+        noReadCount += item.noReadCount;
+      }
+      setMsgCount(noReadCount);
+      setMsgKey(key);
+    });
+    return () => {
+      msgNotify.unsubscribe(id);
+    };
+  }, []);
   // TODO 加载未读消息数量
-  // const [chatKey] = useCtrlUpdate(chatCtrl);
   const [taskNum, setTaskNum] = useState(0);
   const navs = [
     {
-      // key: chatKey,
-      key: '沟通',
+      key: msgKey,
       path: '/chat',
       title: '沟通',
       icon: 'icon-message',
-      count: 0,
-      // count: chatCtrl.getNoReadCount(),
+      count: msgCount,
       fath: '/chat',
       onClick: () => {
-        // chatCtrl.currentKey = '';
-        // chatCtrl.changCallback();
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
+        history.push('/chat');
       },
     },
     {
@@ -91,7 +106,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   const getLinkItem = (item: any) => {
     return (
       <Link
-        key={item.path}
+        key={item.key}
         to={item.path}
         title={item.title}
         onClick={() => {

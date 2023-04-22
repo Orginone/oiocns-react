@@ -124,9 +124,9 @@ export const loadBookMenu = async () => {
           item: company.authorityTree?.allChats() ?? [],
           itemType: GroupMenuType.Books,
           icon: <im.ImUser />,
-          children: [
-            buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company),
-          ],
+          children: company.authorityTree
+            ? [buildAuthorityTree(company.authorityTree, company)]
+            : [],
         },
       ],
     });

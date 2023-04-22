@@ -1,5 +1,5 @@
 import { XAttribute, XAttributeArray, XFlowDefine } from '@/ts/base/schema';
-import { kernel, model, parseAvatar, schema } from '@/ts/base';
+import { kernel, model, schema } from '@/ts/base';
 import {
   AttributeModel,
   OperationModel,
@@ -9,51 +9,45 @@ import {
 } from '@/ts/base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 import { IFlowDefine } from './iflowDefine';
+import { ITarget } from '../itarget';
 /**
  * 分类系统项实现
  */
 export class SpeciesItem implements ISpeciesItem {
+  key: string;
   id: string;
-  fullId: string;
   name: string;
   isRoot: boolean;
   target: schema.XSpecies;
   parent: INullSpeciesItem;
   children: ISpeciesItem[];
   belongInfo: TargetShare;
-  shareId: string;
-  spaceId: string;
   attrs?: XAttribute[];
   defines?: IFlowDefine[];
-  // instances?: XFlowInstance[];
+  instances?: schema.XFlowInstance[];
+  team: ITarget;
 
-  constructor(
-    target: schema.XSpecies,
-    parent: INullSpeciesItem,
-    shareId: string,
-    spaceId: string,
-  ) {
+  constructor(target: schema.XSpecies, parent: INullSpeciesItem, team: ITarget) {
     this.children = [];
     this.target = target;
     this.parent = parent;
     this.id = target.id;
     this.name = target.name;
     this.isRoot = parent === undefined;
-    this.shareId = shareId;
-    this.spaceId = spaceId;
+    this.team = team;
+    this.key = team.key + '-' + this.target.id;
     if (target.nodes && target.nodes.length > 0) {
       for (const item of target.nodes) {
-        this.children.push(new SpeciesItem(item, this, shareId, spaceId));
+        this.children.push(new SpeciesItem(item, this, team));
       }
     }
-    this.fullId = `${spaceId}-${shareId}-${target.id}`;
     this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
   async loadAttrs(reload: boolean = false): Promise<XAttribute[]> {
     if (this.attrs == undefined || this.attrs.length == 0 || reload) {
       const res = await kernel.querySpeciesAttrs({
         id: this.id,
-        spaceId: this.shareId,
+        spaceId: this.team.space.id,
         recursionOrg: true,
         recursionSpecies: true,
         page: {
@@ -109,23 +103,6 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
-  async loadInfo(info: TargetShare): Promise<ISpeciesItem> {
-    if (info.typeName != '未知') {
-      this.belongInfo = info;
-    }
-    if (!this.belongInfo && this.target.belongId) {
-      const res = await kernel.queryNameBySnowId(this.target.belongId);
-      if (res.success && res.data) {
-        this.belongInfo = { name: res.data.name, typeName: '未知' } as TargetShare;
-        const avator = parseAvatar(res.data.photo);
-        if (avator) {
-          this.belongInfo = { ...avator, name: res.data.name, typeName: '未知' };
-        }
-      }
-    }
-    return this;
-  }
-
   async create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem> {
     const res = await kernel.createSpecies({
       parentId: this.id,
@@ -133,7 +110,7 @@ export class SpeciesItem implements ISpeciesItem {
       id: undefined,
     });
     if (res.success) {
-      const newItem = new SpeciesItem(res.data, this, this.shareId, this.spaceId);
+      const newItem = new SpeciesItem(res.data, this, this.team);
       this.children.push(newItem);
       return newItem;
     }

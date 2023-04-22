@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ITarget, TargetType } from '@/ts/core';
+import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -42,9 +42,15 @@ const TeamSetting: React.FC = () => {
       selectMenu={selectMenu}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
-        if (data.itemType === GroupMenuType.Agency) {
-          await (data.item as ITarget).loadSubTeam();
-          orgCtrl.changCallback();
+        switch (data.itemType) {
+          case GroupMenuType.SpeciesGroup:
+            await (data.item as ITarget).loadSpeciesTree();
+            refreshMenu();
+            break;
+          case GroupMenuType.DictGroup:
+            await (data.item as ISpace).dict.loadDict();
+            refreshMenu();
+            break;
         }
         orgCtrl.currentKey = data.key;
         setSelectMenu(data);
@@ -55,7 +61,7 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await data.belong.dict.deleteDict(data.item.id)) {
+                if (await data.item.belong.dict.deleteDict(data.item.id)) {
                   refreshMenu();
                 }
               },
@@ -112,16 +118,16 @@ const TeamSetting: React.FC = () => {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  data.belong.getCohorts(true);
+                  data.item.getCohorts(true);
                   break;
                 case TargetType.Department:
-                  (data.belong as ICompany).getDepartments(true);
+                  (data.item as ICompany).getDepartments(true);
                   break;
                 case TargetType.Group:
-                  (data.belong as ICompany).getJoinedGroups(true);
+                  (data.item as ICompany).getJoinedGroups(true);
                   break;
                 case TargetType.Station:
-                  (data.belong as ICompany).getStations(true);
+                  (data.item as ICompany).getStations(true);
                   break;
               }
               orgCtrl.changCallback();
@@ -169,7 +175,7 @@ const TeamSetting: React.FC = () => {
       )}
       {/** 单位 */}
       <CreateTeamModal
-        title={'新建'}
+        title={'新建单位'}
         open={showFormModal}
         handleCancel={function (): void {
           setShowFormModal(false);

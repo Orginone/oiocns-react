@@ -5,11 +5,11 @@ import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
-import { GroupMenuType } from '../config/menuType';
 import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
+import { MenuType } from '../config/menuType';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -19,23 +19,25 @@ interface IProps {
 const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
   /** 加载内容区 */
   switch (selectMenu.itemType) {
-    case GroupMenuType.User:
+    case MenuType.User:
       return <PersonSetting />;
-    case GroupMenuType.Company:
+    case MenuType.Company:
       return <CompanySetting current={selectMenu.item} />;
-    case GroupMenuType.Agency:
+    case MenuType.Agency:
       return <AgencySetting current={selectMenu.item} />;
-    case GroupMenuType.Station:
+    case MenuType.Station:
       return <StationSetting current={selectMenu.item} />;
-    case GroupMenuType.Cohort:
+    case MenuType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
-    case GroupMenuType.Species:
-      return <StandardSetting current={selectMenu.item} target={selectMenu.belong} />;
-    case GroupMenuType.Dict:
-      return <DictSetting current={selectMenu.item} belong={selectMenu.belong} />;
-    case GroupMenuType.Property:
+    case MenuType.Species:
+      return <StandardSetting current={selectMenu.item} />;
+    case MenuType.Dict:
+      return (
+        <DictSetting current={selectMenu.item.dict} belong={selectMenu.item.belong} />
+      );
+    case MenuType.Property:
       return <PropertySetting current={selectMenu.item} />;
-    case GroupMenuType.Authority:
+    case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
     default:
       return <></>;

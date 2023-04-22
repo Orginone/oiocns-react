@@ -173,7 +173,7 @@ export default class Company extends MarketTarget implements ICompany {
     for (const item of this.departments) {
       await item.deepLoad(reload);
     }
-    await this.loadSpaceAuthorityTree(reload);
+    await this.loadSpaceAuthorityTree();
   }
   allChats(): IChat[] {
     const chats = [this.chat];

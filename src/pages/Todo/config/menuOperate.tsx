@@ -12,19 +12,11 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
   var result: MenuItemType[] = [];
   for (let item of species) {
     let subSpecies = await buildSpeciesTree(item.children);
-    let itemWorks = orgCtrl.user
-      .allWorks()
-      .filter(
-        (a) =>
-          a.shareId == item.shareId &&
-          a.spaceId == item.spaceId &&
-          a.speciesId == item.id,
-      );
-    works.push(...itemWorks);
+    works.push(item.id);
     result.push({
-      key: item.fullId,
+      key: item.key,
       label: item.name,
-      item: [...itemWorks, subSpecies.item],
+      item: [item.id, subSpecies.item],
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
       children: subSpecies.children,
@@ -38,32 +30,27 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
 
 /** 编译组织树 */
 export const buildTargetTree = async (targets: ITarget[]) => {
-  let parentItem = [];
   const result: MenuItemType[] = [];
   for (const item of targets) {
-    let works = orgCtrl.user
-      .allWorks()
-      .filter((a) => a.shareId == item.id && a.spaceId == item.space.id);
-    parentItem.push(works);
     let species = await buildSpeciesTree(
       (await item.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
     );
     let children = [];
     if (item.typeName == TargetType.Group) {
-      let subGroup = await buildTargetTree(await(item as IGroup).getSubGroups());
-      children.push(...subGroup.children);
+      let subGroup = await buildTargetTree(await (item as IGroup).getSubGroups());
+      children.push(...subGroup);
     }
     result.push({
       key: item.space.id + '-' + item.id,
       label: item.teamName,
       tag: [item.typeName + '群'],
-      item: works,
-      itemType: GroupMenuType.Work,
+      item: item.id,
+      itemType: GroupMenuType.Organization,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [...children, ...species.children],
     });
   }
-  return { item: parentItem, children: result };
+  return result;
 };
 
 export const loadWorkMenu = async () => {
@@ -76,14 +63,14 @@ export const loadWorkMenu = async () => {
     companyItems.push({
       key: company.id + '单位',
       label: company.teamName,
-      item: orgCtrl.user.allWorks().filter((a) => a.spaceId == company.id),
-      itemType: GroupMenuType.Work,
+      item: [company],
+      itemType: GroupMenuType.Organization,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
           key: company.id + OrganizationType.Group,
           label: OrganizationType.Group,
-          itemType: GroupMenuType.Work,
+          itemType: GroupMenuType.Organization,
           tag: [company.typeName, '集团'],
           icon: (
             <TeamIcon
@@ -92,12 +79,13 @@ export const loadWorkMenu = async () => {
               fontSize={16}
             />
           ),
-          ...(await buildTargetTree(company.joinedGroup)),
+          item: company.joinedGroup,
+          children: await buildTargetTree(company.joinedGroup),
         },
         {
           key: company.id + OrganizationType.Working,
           label: OrganizationType.Working,
-          itemType: GroupMenuType.Work,
+          itemType: GroupMenuType.Organization,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Working, name: OrganizationType.Working }}
@@ -105,31 +93,32 @@ export const loadWorkMenu = async () => {
               fontSize={16}
             />
           ),
-          ...(await buildTargetTree(await company.getCohorts())),
+          item: company.cohorts,
+          children: await buildTargetTree(await company.getCohorts()),
         },
         ...ret.children,
       ],
     });
   }
-  let person = await buildSpeciesTree(
+  let personSpecies = await buildSpeciesTree(
     (await orgCtrl.user.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
   );
   return [
     {
       key: '个人',
       label: orgCtrl.user.teamName,
-      itemType: GroupMenuType.Work,
-      belong: orgCtrl.user,
-      item: orgCtrl.user.allWorks().filter((a) => a.spaceId == orgCtrl.user.id),
+      itemType: GroupMenuType.Organization,
+      item: [orgCtrl.user],
       children: [
         {
           key: '群组',
           label: '群组',
-          itemType: GroupMenuType.Work,
+          itemType: GroupMenuType.Organization,
           icon: <im.ImUsers />,
-          ...(await buildTargetTree(await orgCtrl.user.getCohorts())),
+          item: orgCtrl.user.cohorts,
+          children: await buildTargetTree(await orgCtrl.user.getCohorts()),
         },
-        ...person.children,
+        ...personSpecies.children,
       ],
     },
     ...companyItems,

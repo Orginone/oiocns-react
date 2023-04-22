@@ -5,6 +5,42 @@ import { XOrderDetail } from '@/ts/base/schema';
 import { ProColumns } from '@ant-design/pro-table';
 import { IApplyItem, IApprovalItem, IOrderApplyItem, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
+import ITodo from '@/ts/core/target/work/todo';
+
+export const WorkColumns: ProColumns<any>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '事项',
+    dataIndex: ['name'],
+  },
+  {
+    key: 'shareId',
+    width: 200,
+    title: '申请人',
+    dataIndex: 'createUser',
+    render: (_: any, record: ITodo) => {
+      return orgCtrl.provider.findNameById(record.shareId);
+    },
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    render: (_: any, record: ITodo) => {
+      const status = getStatus(record.status as number);
+      return <Tag color={status!.color}>{status!.text}</Tag>;
+    },
+  },
+  {
+    title: '申请时间',
+    dataIndex: ['Data', 'createTime'],
+    valueType: 'dateTime',
+  },
+];
 
 export const OrgColumns = [
   {

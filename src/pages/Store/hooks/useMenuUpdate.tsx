@@ -33,10 +33,7 @@ const useMenuUpdate = (): [
   /** 刷新菜单 */
   const refreshMenu = async () => {
     const newMenus = { ...rootMenu };
-    newMenus.children = [await operate.loadAdminMenus(orgCtrl.user)];
-    for (const company of await orgCtrl.user.getJoinedCompanys()) {
-      newMenus.children.push(await operate.loadAdminMenus(company));
-    }
+    newMenus.children = [await operate.getUserMenu(), ...(await operate.getTeamMenu())];
     var item = findMenuItemByKey(newMenus.children, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;

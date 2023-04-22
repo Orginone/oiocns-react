@@ -2,6 +2,7 @@ import { IIdentity } from './iidentity';
 import { model, schema } from '@/ts/base';
 import { PageRequest } from '@/ts/base/model';
 import { IChat } from '../chat/ichat';
+import { ISpace } from '../itarget';
 
 export interface IAuthority {
   /** 权限Id */
@@ -22,6 +23,8 @@ export interface IAuthority {
   children: IAuthority[];
   /** 权限下的角色 */
   identitys: IIdentity[];
+  /** 加载的空间 */
+  space: ISpace;
   /** 权限群 */
   chat: IChat;
   /** 当前的会话 */

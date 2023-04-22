@@ -1,4 +1,4 @@
-import { FlowNode, XFlowDefine } from '../../base/schema';
+import { FlowNode, XFlowDefine } from '@/ts/base/schema';
 
 /**
  * 字典系统项接口

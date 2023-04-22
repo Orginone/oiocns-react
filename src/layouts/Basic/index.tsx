@@ -1,5 +1,5 @@
 import { Layout, Spin, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
@@ -13,17 +13,11 @@ type BasicLayoutProps = {
 };
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
-  const [inited, setInited] = useState(orgCtrl.provider.inited);
   const { route, history } = props;
   useEffect(() => {
     if (!orgCtrl.logined) {
       return history.push('/passport/login');
     }
-    orgCtrl.subscribe(() => {
-      if (inited != orgCtrl.provider.inited) {
-        setInited(orgCtrl.provider.inited);
-      }
-    });
   }, []);
 
   logger.onLogger = (level, msg) => {
@@ -45,11 +39,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   };
   return (
     <Layout className={styles['page-layout']}>
-      {inited ? (
+      {orgCtrl.logined ? (
         <>
           {/* 公共头部 */}
           <BasicHeader />
-          {/* 内Header />
           {/* 内容区域 */}
           <Layout className={styles['main-content']}>{renderRoutes(route.routes)}</Layout>
         </>

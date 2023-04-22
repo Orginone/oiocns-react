@@ -11,7 +11,7 @@ import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 import { IChat } from './chat/ichat';
-import { ITodo } from './work/iwork';
+import IWork from './work/iwork';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -385,8 +385,8 @@ export interface ICohort extends ITarget {
 }
 /** 人员操作 */
 export interface IPerson extends ISpace, ITarget {
-  /** 所有的待办 */
-  allWorks(): ITodo[];
+  /** 办事 */
+  work: IWork;
   /** 我加入的单位 */
   joinedCompany: ICompany[];
   /** 主目录 */

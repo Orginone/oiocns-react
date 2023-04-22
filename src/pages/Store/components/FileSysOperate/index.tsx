@@ -71,7 +71,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         break;
       case '双击':
         if (target.target.isDirectory) {
-          orgCtrl.currentKey = target.key;
+          orgCtrl.currentKey = target.fullKey;
           await target.loadChildren();
           orgCtrl.changCallback();
         } else {

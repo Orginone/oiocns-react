@@ -84,7 +84,7 @@ export default class BaseTarget implements ITarget {
     upTeam: boolean = false,
   ): Promise<ISpeciesItem[]> {
     if (this.species.length < 1 || _reload) {
-      this.species = await loadSpeciesTree(this.id, this.space.id, upTeam);
+      this.species = await loadSpeciesTree(this.id, this, upTeam);
     }
     return this.species;
   }

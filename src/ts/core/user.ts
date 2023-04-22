@@ -67,6 +67,20 @@ export default class UserProvider extends common.Emitter {
   ): Promise<model.ResultType<any>> {
     return await kernel.resetPassword(account, password, privateKey);
   }
+  /** 检索用户信息 */
+  public findUserById(id: string): model.TargetShare {
+    return findTargetShare(id);
+  }
+  /** 根据ID查询名称 */
+  public findNameById(id: string): string {
+    return findTargetShare(id).name;
+  }
+  /** 加载用户 */
+  private _loadUser(person: schema.XTarget) {
+    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
+    this._user = createPerson(person);
+    this.changCallback();
+  }
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;
@@ -82,20 +96,6 @@ export default class UserProvider extends common.Emitter {
       this._recvMessage(item);
       return false;
     });
-  }
-  /** 检索用户信息 */
-  public findUserById(id: string): model.TargetShare {
-    return findTargetShare(id);
-  }
-  /** 根据ID查询名称 */
-  public findNameById(id: string): string {
-    return findTargetShare(id).name;
-  }
-  /** 加载用户 */
-  private _loadUser(person: schema.XTarget) {
-    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
-    this._user = createPerson(person);
-    this.changCallback();
   }
   /**
    * 接收到新信息

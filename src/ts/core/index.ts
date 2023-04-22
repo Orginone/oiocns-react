@@ -14,6 +14,8 @@ export {
   WorkType,
 } from './enum';
 export type { IMarket, IMerchandise, IProduct, IResource } from './market';
+export { msgNotify } from './target/chat/chat';
+export type { IChat } from './target/chat/ichat';
 export type {
   ICohort,
   ICompany,
@@ -26,6 +28,7 @@ export type {
   ITarget,
   IWorking,
 } from './target/itarget';
+export type { IFileSystemItem, TaskModel } from './target/store/ifilesys';
 export { findTargetShare } from './target/targetMap';
 export type { INullSpeciesItem, ISpeciesItem } from './target/thing';
 export type { IApplyItem, IApprovalItem, IOrderApplyItem, ITodoGroup } from './todo';

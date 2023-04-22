@@ -1,7 +1,7 @@
 /** 分组菜单类型 */
 export enum GroupMenuType {
+  'Organization' = '组织',
   'Species' = '分类',
-  'Work' = '办事',
 }
 
 export enum OrganizationType {

@@ -1,19 +1,24 @@
 import { DictItemModel, DictModel, PageRequest } from '@/ts/base/model';
 import { XDict, XDictArray, XDictItem, XDictItemArray } from '@/ts/base/schema';
-import { kernel } from '@/ts/base';
+import { kernel, pageAll } from '@/ts/base';
 
 export class Dict {
   belongId: string;
+  dicts: XDict[];
   constructor(id: string) {
     this.belongId = id;
+    this.dicts = [];
   }
 
   /* 加载字典 */
-  async loadDict(page: PageRequest): Promise<XDictArray> {
+  async loadDict(): Promise<XDictArray> {
     const res = await kernel.queryDict({
       id: this.belongId,
-      page: page,
+      page: pageAll(),
     });
+    if (res.data && res.data.result) {
+      this.dicts = res.data.result;
+    }
     return res.data;
   }
   /* 创建字典  */

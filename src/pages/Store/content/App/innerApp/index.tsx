@@ -15,25 +15,23 @@ import cls from './index.module.less';
 
 const InnerApp: React.FC = () => {
   const [tableKey, setTableKey] = useState('全部');
-  const [key, forceUpdate] = useObjectUpdate(orgCtrl.space);
+  const [key, forceUpdate] = useObjectUpdate(orgCtrl.user);
   const [modalType, setModalType] = useState('');
   const [define, setDefine] = useState<XFlowDefine>();
   const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
 
   useEffect(() => {
     setTimeout(async () => {
-      let data = (await new FlowDefine(orgCtrl.space.id).loadFlowDefine()).result || [];
+      let data = (await new FlowDefine(orgCtrl.user.id).loadFlowDefine()).result || [];
       switch (tableKey) {
         case '共享的':
           data = data.filter(
-            (a) =>
-              a.target.id != orgCtrl.space.id && a.target.belongId != orgCtrl.space.id,
+            (a) => a.target.id != orgCtrl.user.id && a.target.belongId != orgCtrl.user.id,
           );
           break;
         case '创建的':
           data = data.filter(
-            (a) =>
-              a.target.id == orgCtrl.space.id || a.target.belongId == orgCtrl.space.id,
+            (a) => a.target.id == orgCtrl.user.id || a.target.belongId == orgCtrl.user.id,
           );
           break;
         default:
