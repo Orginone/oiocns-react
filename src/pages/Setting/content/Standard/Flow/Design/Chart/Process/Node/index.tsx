@@ -10,7 +10,6 @@ import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
-import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;

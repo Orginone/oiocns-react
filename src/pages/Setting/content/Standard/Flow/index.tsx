@@ -85,8 +85,8 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
           return (
             <Design
               IsEdit={true}
-              current={define!}
-              target={current.team}
+              current={define}
+              species={current}
               onBack={() => setModalType('')}
             />
           );

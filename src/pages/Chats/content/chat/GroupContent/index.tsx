@@ -12,7 +12,6 @@ import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
 import { parseAvatar } from '@/ts/base';
 import { IChat } from '@/ts/core/target/chat/ichat';
-import { filter } from '@/ts/base/common';
 
 /**
  * @description: 聊天区域
