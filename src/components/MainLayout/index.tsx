@@ -46,22 +46,21 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
       className={`${props.className}`}
       style={{ height: '100%', position: 'relative' }}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
-        <div className={cls.title} title={parentMenu.label}>
+        <div
+          className={cls.title}
+          title={parentMenu.label}
+          onClick={() => {
+            props.onSelect?.apply(this, [parentMenu]);
+          }}>
           {parentMenu.key != props.siderMenuData.key && (
-            <div
-              className={cls.backup}
-              onClick={() => {
-                props.onSelect?.apply(this, [parentMenu]);
-              }}>
+            <div className={cls.backup}>
               <ImArrowLeft2 fontSize={20} />
             </div>
           )}
           {!collapsed && (
             <>
-              <span style={{ fontSize: 20, margin: '0 6px' }}>
-                {props.selectMenu.icon}
-              </span>
-              <strong>{props.selectMenu.label}</strong>
+              <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
+              <strong>{parentMenu.label}</strong>
             </>
           )}
         </div>
