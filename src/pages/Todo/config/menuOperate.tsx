@@ -41,7 +41,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       children.push(...subGroup);
     }
     result.push({
-      key: item.space.id + '-' + item.id,
+      key: item.key,
       label: item.teamName,
       tag: [item.typeName + '群'],
       item: [item],
@@ -61,14 +61,14 @@ export const loadWorkMenu = async () => {
       (await company.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
     );
     companyItems.push({
-      key: company.id + '单位',
+      key: company.key,
       label: company.teamName,
       item: [company],
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
-          key: company.id + OrganizationType.Group,
+          key: company.key + OrganizationType.Group,
           label: OrganizationType.Group,
           itemType: GroupMenuType.Organization,
           tag: [company.typeName, '集团'],
@@ -83,7 +83,7 @@ export const loadWorkMenu = async () => {
           children: await buildTargetTree(company.joinedGroup),
         },
         {
-          key: company.id + OrganizationType.Working,
+          key: company.key + OrganizationType.Working,
           label: OrganizationType.Working,
           itemType: GroupMenuType.Organization,
           icon: (
