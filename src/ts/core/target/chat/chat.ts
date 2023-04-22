@@ -93,7 +93,7 @@ class BaseChat implements IChat {
     this.messageNotify = callback;
     this.noReadCount = 0;
     this.cache();
-    if (this.messages.length < 1) {
+    if (this.messages.length < 10) {
       this.moreMessage('');
     }
   }

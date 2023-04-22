@@ -16,7 +16,11 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
     chats = orgCtrl.user.allChats();
   }
   chats = chats
-    .filter((a) => a.target.name.includes(filter))
+    .filter(
+      (a) =>
+        a.target.name.includes(filter) ||
+        a.target.labels.filter((l) => l.includes(filter)).length > 0,
+    )
     .sort((a, b) => {
       const num = (b.isToping ? 10 : 0) - (a.isToping ? 10 : 0);
       if (num === 0) {
