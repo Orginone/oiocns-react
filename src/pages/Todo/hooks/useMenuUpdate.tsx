@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
-import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 import React from 'react';
 
@@ -34,10 +33,7 @@ const useMenuUpdate = (): [
   /** 刷新菜单 */
   const refreshMenu = async () => {
     const newMenus = { ...rootMenu };
-    newMenus.children = [await operate.getUserMenu(orgCtrl.user)];
-    for (const company of await orgCtrl.user.getJoinedCompanys()) {
-      newMenus.children.push(await operate.getUserMenu(company));
-    }
+    newMenus.children = await operate.loadWorkMenu();
     var item = findMenuItemByKey(newMenus.children, todoCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;

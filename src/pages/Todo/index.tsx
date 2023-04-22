@@ -1,18 +1,15 @@
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
 import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import FlowSelect from '@/bizcomponents/FlowManage';
-import { Modal, message } from 'antd';
-import { XFlowDefine } from '@/ts/base/schema';
 
 const Todo: React.FC<any> = () => {
   const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  const [openFlow, setOpenFlow] = useState<boolean>();
-  const [selectData, setSelectData] = useState<any>();
-  const [doWork, setDoWork] = useState<XFlowDefine>();
+  // const [openFlow, setOpenFlow] = useState<boolean>();
+  // const [selectData, setSelectData] = useState<any>();
+  // const [doWork, setDoWork] = useState<XFlowDefine>();
   useEffect(() => {
     refreshMenu();
     todoCtrl.loadWorkTodo();
@@ -31,14 +28,14 @@ const Todo: React.FC<any> = () => {
       onMenuClick={async (data, key) => {
         switch (key) {
           case '发起':
-            setOpenFlow(true);
+            // setOpenFlow(true);
             break;
           default:
             break;
         }
       }}
       siderMenuData={rootMenu}>
-      <Modal
+      {/* <Modal
         width="800px"
         title="发起办事"
         open={openFlow}
@@ -57,13 +54,8 @@ const Todo: React.FC<any> = () => {
           orgId={orgCtrl.user.id}
           onCheckeds={(params: any) => setSelectData(params)}
         />
-      </Modal>
-      <Content
-        key={key}
-        selectMenu={selectMenu}
-        reflashMenu={refreshMenu}
-        doWork={doWork}
-      />
+      </Modal> */}
+      <Content key={key} selectMenu={selectMenu} />
     </MainLayout>
   );
 };
