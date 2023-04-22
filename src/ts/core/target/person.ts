@@ -86,7 +86,6 @@ export default class Person extends MarketTarget implements IPerson {
     chats.push(...this.memberChats);
     return chats;
   }
-
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.University:

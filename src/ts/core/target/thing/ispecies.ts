@@ -4,7 +4,6 @@ import {
   OperationModel,
   PageRequest,
   SpeciesModel,
-  TargetShare,
 } from '@/ts/base/model';
 import {
   XAttributeArray,
@@ -37,8 +36,6 @@ export interface ISpeciesItem {
   parent: INullSpeciesItem;
   /** 下级标准分类项数组 */
   children: ISpeciesItem[];
-  /** 归属信息 */
-  belongInfo: TargetShare;
   /** 属性 */
   attrs?: XAttribute[];
   /** 流程实例 */

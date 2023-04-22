@@ -7,7 +7,11 @@ import { ITarget } from '../itarget';
  * 加载分类树
  * @param id 组织id
  */
-export const loadSpeciesTree = async (id: string, team: ITarget, upTeam: boolean = false) => {
+export const loadSpeciesTree = async (
+  id: string,
+  team: ITarget,
+  upTeam: boolean = false,
+) => {
   const result: ISpeciesItem[] = [];
   const res = await kernel.querySpeciesTree({
     id: id,

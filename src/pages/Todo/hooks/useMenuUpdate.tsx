@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
 import * as operate from '../config/menuOperate';
-import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 import React from 'react';
 

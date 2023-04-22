@@ -21,7 +21,7 @@ interface IProps {
  */
 const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const [modalType, setModalType] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('info');
 
   const [isRecursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [isRecursionSpecies, setRecursionSpecies] = useState<boolean>(true);
@@ -178,6 +178,9 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           bordered={false}
           activeTabKey={activeTab}
           tabList={tabItems()}
+          onTabChange={(key) => {
+            setActiveTab(key);
+          }}
           tabBarExtraContent={renderTabBarExtraContent()}
           bodyStyle={{ paddingTop: 16 }}>
           <div className={cls['page-content-table']}>{content()}</div>
