@@ -56,7 +56,9 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   });
   useEffect(() => {
     if (!props.current.belongId) {
-      setNodeOperateOrgId(props.orgId || orgCtrl.user.id);
+      setNodeOperateOrgId(
+        props.orgId || (props.species?.team.space.id ?? orgCtrl.user.id),
+      );
       props.current.belongId = props.orgId;
     }
   }, []);
@@ -205,6 +207,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             ];
             setCurrentData(params);
           }}
+          space={props.species?.team.space ?? orgCtrl.user}
         />
       </Modal>
       <ViewFormModal

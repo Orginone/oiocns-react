@@ -5,7 +5,7 @@ import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IFileSystemItem } from '@/ts/core';
+import { IFileSystemItem, TargetType } from '@/ts/core';
 import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
 
 /** 编译文件系统树 */
@@ -200,6 +200,24 @@ const buildTargetTree = (targets: ITarget[]) => {
   return result;
 };
 
+/** 机构分组加载 */
+const loadAgencyGroup = (
+  space: ISpace,
+  children: MenuItemType[],
+  type: string,
+  typeName: string,
+) => {
+  return {
+    key: space.key + type,
+    item: space,
+    label: type,
+    itemType: type,
+    icon: <TeamIcon share={{ name: type, typeName: typeName }} size={18} fontSize={16} />,
+    menus: [],
+    children: children,
+  };
+};
+
 /** 获取个人菜单 */
 export const getUserMenu = async () => {
   return {
@@ -265,42 +283,30 @@ export const getTeamMenu = async () => {
             loadThingMenus(company),
           ],
         },
-        {
-          key: company.key + GroupMenuType.InnerAgency,
-          item: company,
-          label: GroupMenuType.InnerAgency,
-          itemType: GroupMenuType.InnerAgency,
-          icon: <im.ImNewspaper />,
-          menus: [],
-          children: buildTargetTree(company.subTeam),
-        },
-        {
-          key: company.key + GroupMenuType.OutAgency,
-          item: company,
-          label: GroupMenuType.OutAgency,
-          itemType: GroupMenuType.OutAgency,
-          icon: <im.ImNewspaper />,
-          menus: [],
-          children: buildTargetTree(company.joinedGroup),
-        },
-        {
-          key: company.key + GroupMenuType.Station,
-          item: company,
-          label: GroupMenuType.Station,
-          itemType: GroupMenuType.Station,
-          icon: <im.ImNewspaper />,
-          menus: [],
-          children: buildTargetTree(company.stations),
-        },
-        {
-          key: company.key + GroupMenuType.Cohorts,
-          item: company,
-          label: GroupMenuType.Cohorts,
-          itemType: GroupMenuType.Cohorts,
-          icon: <im.ImNewspaper />,
-          menus: [],
-          children: buildTargetTree(company.cohorts),
-        },
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.subTeam),
+          GroupMenuType.InnerAgency,
+          TargetType.Department,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.joinedGroup),
+          GroupMenuType.OutAgency,
+          TargetType.Group,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.stations),
+          GroupMenuType.Station,
+          TargetType.Station,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.cohorts),
+          GroupMenuType.Cohorts,
+          TargetType.Cohort,
+        ),
       ],
     });
   }

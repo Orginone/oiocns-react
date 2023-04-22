@@ -46,7 +46,7 @@ export const findTargetShare = (targetId: string) => {
     typeName: '人员',
     avatar: orginoneAvatar(),
   };
-  if (!targetMap.has(targetId)) {
+  if (targetId && !targetMap.has(targetId)) {
     kernel
       .queryTargetById({
         ids: [targetId],
