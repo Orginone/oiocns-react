@@ -24,6 +24,8 @@ export interface IAuthority {
   identitys: IIdentity[];
   /** 权限群 */
   chat: IChat;
+  /** 当前的会话 */
+  allChats(): IChat[];
   /**
    * 创建子权限
    * @param name 名称

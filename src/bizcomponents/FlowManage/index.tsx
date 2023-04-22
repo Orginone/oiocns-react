@@ -5,21 +5,21 @@ import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
-import { ITarget } from '@/ts/core';
+import { ISpace, ITarget } from '@/ts/core';
 import { XFlowDefine } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
-import { INullSpeciesItem, ISpeciesItem, loadSpeciesTree } from '@/ts/core/thing';
+import { INullSpeciesItem, ISpeciesItem } from '@/ts/core/target/thing/ispecies';
+import { loadSpeciesTree } from '@/ts/core/target/thing';
 export type ResultType = {
   id: string;
-  // target: XTarget;
   target: ISpeciesItem;
   flows: XFlowDefine[];
 };
 interface Iprops {
   multiple: boolean;
   orgId?: string;
-  // onChecked?: (select: ResultType) => void;
+  space: ISpace;
   onCheckeds?: (selects: ResultType[]) => void;
 }
 const FlowSelect = (props: Iprops) => {
@@ -31,7 +31,7 @@ const FlowSelect = (props: Iprops) => {
   const [resultData, setResultData] = useState<ResultType[]>([]);
 
   const loadTeamTree = async () => {
-    const targets = await orgCtrl.getTeamTree();
+    const targets = await orgCtrl.getTeamTree(props.space);
     setData(buildTargetTree(targets, false));
   };
 

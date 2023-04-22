@@ -11,7 +11,6 @@ import {
   ICompany,
   IDepartment,
   IWorking,
-  SpaceType,
   ITarget,
   TargetParam,
   ICohort,
@@ -44,7 +43,7 @@ export default class Company extends MarketTarget implements ICompany {
   workingsLoaded: boolean = false;
   workings: IWorking[] = [];
   departmentTypes: TargetType[] = [];
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
   root: IFileSystemItem;
@@ -68,8 +67,8 @@ export default class Company extends MarketTarget implements ICompany {
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
   async loadSpaceAuthorityTree(reload: boolean = false): Promise<IAuthority | undefined> {
-    if (!reload && this.spaceAuthorityTree != undefined) {
-      return this.spaceAuthorityTree;
+    if (!reload && this.authorityTree != undefined) {
+      return this.authorityTree;
     }
     const res = await kernel.queryAuthorityTree({
       id: '0',
@@ -81,9 +80,9 @@ export default class Company extends MarketTarget implements ICompany {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this, this.userId);
+      this.authorityTree = new Authority(res.data, this, this.userId);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   public get subTeam(): ITarget[] {
     return [...this.departments, ...this.workings];
@@ -158,20 +157,45 @@ export default class Company extends MarketTarget implements ICompany {
     }
   }
   public async loadSubTeam(reload: boolean = false): Promise<ITarget[]> {
+    await this.getCohorts(reload);
     await this.getWorkings(reload);
+    await this.getStations(reload);
     await this.getDepartments(reload);
     return [...this.departments, ...this.workings];
   }
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSubTeam(reload);
+    await this.getJoinedGroups(reload);
+    for (const item of this.joinedGroup) {
+      await item.deepLoad(reload);
+    }
+    for (const item of this.departments) {
+      await item.deepLoad(reload);
+    }
+    await this.loadSpaceAuthorityTree(reload);
+  }
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.departments) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.workings) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.stations) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.cohorts) {
+      chats.push(...item.allChats());
+    }
+    if (this.authorityTree) {
+      chats.push(...this.authorityTree.allChats());
+    }
+    chats.push(...this.memberChats);
+    return chats;
+  }
   public async searchGroup(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Group]);
-  }
-  public get spaceData(): SpaceType {
-    return {
-      id: this.target.id,
-      name: this.target.team!.name,
-      share: this.shareInfo,
-      typeName: this.target.typeName as TargetType,
-    };
   }
   private async createGroup(data: TargetParam): Promise<IGroup | undefined> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
@@ -284,6 +308,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, department.target.typeName, this.id);
       if (res.success) {
         this.departments = this.departments.filter((department) => {
+          department.chat.destroy();
           return department.id != id;
         });
       }
@@ -300,6 +325,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, station.target.typeName, this.id);
       if (res.success) {
         this.stations = this.stations.filter((station) => {
+          station.chat.destroy();
           return station.id != id;
         });
       }
@@ -316,6 +342,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, TargetType.Working, this.id);
       if (res.success) {
         this.workings = this.workings.filter((working) => {
+          working.chat.destroy();
           return working.id != id;
         });
       }

@@ -8,7 +8,7 @@ import { XFlowDefine } from '@/ts/base/schema';
 import WorkStartDo from '@/pages/Todo/content/Work/WorkStartDo';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import orgCtrl from '@/ts/controller';
-import { FlowDefine } from '@/ts/core/thing/flowDefine';
+import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import { Popup, ScrollView } from 'devextreme-react';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';

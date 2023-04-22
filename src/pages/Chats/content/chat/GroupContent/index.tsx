@@ -12,6 +12,7 @@ import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
 import { parseAvatar } from '@/ts/base';
 import { IChat } from '@/ts/core/target/chat/ichat';
+import { filter } from '@/ts/base/common';
 
 /**
  * @description: 聊天区域
@@ -20,6 +21,7 @@ import { IChat } from '@/ts/core/target/chat/ichat';
 
 interface Iprops {
   chat: IChat;
+  filter: string;
   handleReWrites: Function;
 }
 
@@ -137,91 +139,44 @@ const GroupContent = (props: Iprops) => {
     <div className={css.chart_content} ref={body} onScroll={onScroll}>
       <Spin tip="加载中..." spinning={loading}>
         <div className={css.group_content_wrap}>
-          {messages.map((item, index: any) => {
-            return (
-              <React.Fragment key={item.fromId + index}>
-                {/* 聊天间隔时间3分钟则 显示时间 */}
-                {isShowTime(
-                  item.createTime,
-                  index > 0 ? messages[index - 1].createTime : '',
-                ) ? (
-                  <div className={css.chats_space_Time}>
-                    <span>{showChatTime(item.createTime)}</span>
-                  </div>
-                ) : (
-                  ''
-                )}
-                {/* 重新编辑 */}
-                {item.msgType === 'recall' ? (
-                  <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
-                    撤回了一条消息
-                    {item.allowEdit ? (
-                      <span
-                        className={css.reWrite}
-                        onClick={() => {
-                          handleReWrites(item.msgBody);
-                        }}>
-                        重新编辑
-                      </span>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                ) : (
-                  ''
-                )}
-                {/* 左侧聊天内容显示 */}
-                {item.fromId !== props.chat.userId ? (
-                  <div className={`${css.group_content_left} ${css.con}`}>
-                    <Popover
-                      trigger="hover"
-                      overlayClassName={css.targerBoxClass}
-                      open={selectId == item.id}
-                      key={item.id}
-                      placement="bottom"
-                      onOpenChange={() => {
-                        setSelectId('');
-                      }}
-                      content={
-                        props.chat.spaceId === item.spaceId ? (
-                          <>
-                            <CopyToClipboard text={item.showTxt}>
-                              <Button type="text" style={{ color: '#3e5ed8' }}>
-                                复制
-                              </Button>
-                            </CopyToClipboard>
-                            <Button
-                              type="text"
-                              danger
-                              onClick={async () => {
-                                await props.chat.deleteMessage(item.id);
-                              }}>
-                              删除
-                            </Button>
-                          </>
-                        ) : (
-                          ''
-                        )
-                      }>
-                      {item.msgType === 'recall' ? (
-                        ''
-                      ) : (
-                        <div
-                          className={css.con_body}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setSelectId(item.id);
+          {messages
+            .filter((i) => i.showTxt.includes(props.filter))
+            .map((item, index: any) => {
+              return (
+                <React.Fragment key={item.fromId + index}>
+                  {/* 聊天间隔时间3分钟则 显示时间 */}
+                  {isShowTime(
+                    item.createTime,
+                    index > 0 ? messages[index - 1].createTime : '',
+                  ) ? (
+                    <div className={css.chats_space_Time}>
+                      <span>{showChatTime(item.createTime)}</span>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {/* 重新编辑 */}
+                  {item.msgType === 'recall' ? (
+                    <div className={`${css.group_content_left} ${css.con} ${css.recall}`}>
+                      撤回了一条消息
+                      {item.allowEdit ? (
+                        <span
+                          className={css.reWrite}
+                          onClick={() => {
+                            handleReWrites(item.msgBody);
                           }}>
-                          {viewMsg(item)}
-                        </div>
+                          重新编辑
+                        </span>
+                      ) : (
+                        ''
                       )}
-                    </Popover>
-                  </div>
-                ) : (
-                  <>
-                    {/* 右侧聊天内容显示 */}
-                    <div className={`${css.group_content_right} ${css.con}`}>
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                  {/* 左侧聊天内容显示 */}
+                  {item.fromId !== props.chat.userId ? (
+                    <div className={`${css.group_content_left} ${css.con}`}>
                       <Popover
                         trigger="hover"
                         overlayClassName={css.targerBoxClass}
@@ -232,24 +187,13 @@ const GroupContent = (props: Iprops) => {
                           setSelectId('');
                         }}
                         content={
-                          <>
-                            <CopyToClipboard text={item.showTxt}>
-                              <Button type="text" style={{ color: '#3e5ed8' }}>
-                                复制
-                              </Button>
-                            </CopyToClipboard>
-                            <Button type="text" style={{ color: '#3e5ed8' }}>
-                              转发
-                            </Button>
-                            <Button
-                              type="text"
-                              style={{ color: '#3e5ed8' }}
-                              onClick={async () => {
-                                await props.chat.reCallMessage(item.id);
-                              }}>
-                              撤回
-                            </Button>
-                            {item.spaceId === props.chat.spaceId ? (
+                          props.chat.spaceId === item.spaceId ? (
+                            <>
+                              <CopyToClipboard text={item.showTxt}>
+                                <Button type="text" style={{ color: '#3e5ed8' }}>
+                                  复制
+                                </Button>
+                              </CopyToClipboard>
                               <Button
                                 type="text"
                                 danger
@@ -258,10 +202,10 @@ const GroupContent = (props: Iprops) => {
                                 }}>
                                 删除
                               </Button>
-                            ) : (
-                              ''
-                            )}
-                          </>
+                            </>
+                          ) : (
+                            ''
+                          )
                         }>
                         {item.msgType === 'recall' ? (
                           ''
@@ -273,16 +217,76 @@ const GroupContent = (props: Iprops) => {
                               e.stopPropagation();
                               setSelectId(item.id);
                             }}>
-                            {viewMsg(item, true)}
+                            {viewMsg(item)}
                           </div>
                         )}
                       </Popover>
                     </div>
-                  </>
-                )}
-              </React.Fragment>
-            );
-          })}
+                  ) : (
+                    <>
+                      {/* 右侧聊天内容显示 */}
+                      <div className={`${css.group_content_right} ${css.con}`}>
+                        <Popover
+                          trigger="hover"
+                          overlayClassName={css.targerBoxClass}
+                          open={selectId == item.id}
+                          key={item.id}
+                          placement="bottom"
+                          onOpenChange={() => {
+                            setSelectId('');
+                          }}
+                          content={
+                            <>
+                              <CopyToClipboard text={item.showTxt}>
+                                <Button type="text" style={{ color: '#3e5ed8' }}>
+                                  复制
+                                </Button>
+                              </CopyToClipboard>
+                              <Button type="text" style={{ color: '#3e5ed8' }}>
+                                转发
+                              </Button>
+                              <Button
+                                type="text"
+                                style={{ color: '#3e5ed8' }}
+                                onClick={async () => {
+                                  await props.chat.reCallMessage(item.id);
+                                }}>
+                                撤回
+                              </Button>
+                              {item.spaceId === props.chat.spaceId ? (
+                                <Button
+                                  type="text"
+                                  danger
+                                  onClick={async () => {
+                                    await props.chat.deleteMessage(item.id);
+                                  }}>
+                                  删除
+                                </Button>
+                              ) : (
+                                ''
+                              )}
+                            </>
+                          }>
+                          {item.msgType === 'recall' ? (
+                            ''
+                          ) : (
+                            <div
+                              className={css.con_body}
+                              onContextMenu={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setSelectId(item.id);
+                              }}>
+                              {viewMsg(item, true)}
+                            </div>
+                          )}
+                        </Popover>
+                      </div>
+                    </>
+                  )}
+                </React.Fragment>
+              );
+            })}
         </div>
       </Spin>
     </div>

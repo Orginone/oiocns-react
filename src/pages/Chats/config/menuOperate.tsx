@@ -6,6 +6,7 @@ import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { ISpace, ITarget, TargetType } from '@/ts/core';
+import { IChat } from '@/ts/core/target/chat/ichat';
 
 /** 编译组织树 */
 export const buildTargetTree = async (targets: ITarget[]) => {
@@ -43,11 +44,14 @@ export const loadBookMenu = async () => {
   let companys = await orgCtrl.user.getJoinedCompanys(false);
   let companyItems = [];
   for (const company of companys) {
+    const innnerChats: IChat[] = [];
+    for (const item of company.departments) {
+      innnerChats.push(...item.allChats());
+    }
     companyItems.push({
       key: company.id + '同事',
       label: company.teamName,
-      item: company.chat,
-      belong: company,
+      item: company.allChats(),
       itemType: GroupMenuType.Books,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
@@ -74,8 +78,8 @@ export const loadBookMenu = async () => {
         {
           key: company.id + BookType.Innner,
           label: BookType.Innner,
-          item: company,
-          itemType: BookType.Innner,
+          item: innnerChats,
+          itemType: GroupMenuType.Books,
           belong: company,
           icon: (
             <TeamIcon
@@ -89,9 +93,8 @@ export const loadBookMenu = async () => {
         {
           key: company.id + BookType.Station,
           label: BookType.Station,
-          item: company,
-          itemType: BookType.Station,
-          belong: company,
+          item: company.stations.map((i) => i.chat),
+          itemType: GroupMenuType.Books,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Department, name: BookType.Innner }}
@@ -104,9 +107,8 @@ export const loadBookMenu = async () => {
         {
           key: company.id + BookType.Working,
           label: BookType.Working,
-          item: company,
-          itemType: BookType.Working,
-          belong: company,
+          item: company.workings.map((i) => i.chat),
+          itemType: GroupMenuType.Books,
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Working, name: BookType.Working }}
@@ -119,10 +121,9 @@ export const loadBookMenu = async () => {
         {
           key: company.id + '单位权限群',
           label: '单位权限群',
-          item: company,
-          itemType: '单位权限群',
+          item: company.authorityTree?.allChats() ?? [],
+          itemType: GroupMenuType.Books,
           icon: <im.ImUser />,
-          belong: company,
           children: [
             buildAuthorityTree((await company.loadSpaceAuthorityTree())!, company),
           ],
@@ -132,10 +133,10 @@ export const loadBookMenu = async () => {
   }
   return [
     {
-      key: '我的通讯录',
+      key: '通讯录',
       label: orgCtrl.user.teamName,
       itemType: orgCtrl.user.teamName,
-      item: orgCtrl.user,
+      item: orgCtrl.user.allChats().filter((i) => i.spaceId === orgCtrl.user.id),
       belong: orgCtrl.user,
       children: [
         {
@@ -150,9 +151,9 @@ export const loadBookMenu = async () => {
         {
           key: BookType.Friend,
           label: BookType.Friend,
-          itemType: GroupMenuType.Books + '-' + TargetType.Person,
+          itemType: GroupMenuType.Books,
           icon: <im.ImUser />,
-          belong: orgCtrl.user,
+          item: orgCtrl.user.memberChats,
           children: orgCtrl.user.memberChats.map((chat) => {
             return {
               key: chat.fullId,
@@ -164,14 +165,13 @@ export const loadBookMenu = async () => {
               menus: loadChatMenus(true, true),
             };
           }),
-          item: orgCtrl.user,
         },
         {
           key: BookType.Cohort,
           label: BookType.Cohort,
           itemType: GroupMenuType.Books,
           icon: <im.ImUsers />,
-          belong: orgCtrl.user,
+          item: orgCtrl.user.cohorts.map((i) => i.chat),
           children: orgCtrl.user.cohorts.map((cohort) => {
             return {
               children: [],

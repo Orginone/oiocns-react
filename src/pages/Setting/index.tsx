@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
+import { ICompany, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -14,6 +14,7 @@ import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
 import { companyTypes } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
+import { ISpeciesItem } from '@/ts/core';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {

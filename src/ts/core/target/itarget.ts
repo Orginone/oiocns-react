@@ -5,8 +5,8 @@ import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
-import { FlowDefine } from '../thing/flowDefine';
-import { ISpeciesItem } from '../thing';
+import { FlowDefine } from './thing/flowDefine';
+import { ISpeciesItem } from './thing';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem, IObjectItem } from './store/ifilesys';
@@ -61,6 +61,8 @@ export interface ITarget {
   species: ISpeciesItem[];
   /** 会话 */
   chat: IChat;
+  /** 当前的会话 */
+  allChats(): IChat[];
   /**
    * 新增
    * @param data
@@ -335,10 +337,8 @@ export interface IFlow {
 export interface ISpace extends IFlow, IMTarget, ITarget {
   /** 我的群组 */
   cohorts: ICohort[];
-  /** 空间类型数据 */
-  spaceData: SpaceType;
   /** 空间权限树 */
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   /** 属性 */
   property: Property;
   /** 字典 */
@@ -474,6 +474,8 @@ export interface ICompany extends ISpace, ITarget {
   workings: IWorking[];
   /** 我加入的集团 */
   joinedGroup: IGroup[];
+  /** 岗位 */
+  stations: IStation[];
   /**
    * 删除集团
    * @param id 集团Id
@@ -547,6 +549,8 @@ export interface ICompany extends ISpace, ITarget {
    * @param code 集团编号
    */
   searchGroup(code: string): Promise<schema.XTargetArray>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 集团操作 */
 export interface IGroup extends ITarget {
@@ -575,6 +579,8 @@ export interface IGroup extends ITarget {
    * @returns
    */
   getSubGroups(reload?: boolean): Promise<IGroup[]>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 部门操作 */
 export interface IDepartment extends ITarget {
@@ -600,6 +606,8 @@ export interface IDepartment extends ITarget {
   deleteDepartment(id: string): Promise<boolean>;
   /** 删除工作组 */
   deleteWorking(id: string): Promise<boolean>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 工作组 */
 export interface IWorking extends ITarget {

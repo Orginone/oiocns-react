@@ -27,8 +27,7 @@ export type {
   IWorking,
 } from './target/itarget';
 export { findTargetShare } from './target/targetMap';
-export type { INullSpeciesItem, ISpeciesItem } from './thing';
-export { loadSpeciesTree } from './thing';
+export type { INullSpeciesItem, ISpeciesItem } from './target/thing';
 export type { IApplyItem, IApprovalItem, IOrderApplyItem, ITodoGroup } from './todo';
 export {
   loadMarketApply,

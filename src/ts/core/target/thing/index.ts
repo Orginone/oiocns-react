@@ -1,4 +1,4 @@
-import { kernel } from '../../base';
+import { kernel } from '@/ts/base';
 import { ISpeciesItem } from './ispecies';
 import { SpeciesItem } from './species';
 

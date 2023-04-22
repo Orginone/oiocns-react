@@ -1,7 +1,5 @@
 import { IPerson, TargetType, createPerson, findTargetShare } from '@/ts/core';
 import { schema, model, kernel, common, pageAll } from '@/ts/base';
-import { allChats, clearChats } from './target/chat/chat';
-import { IChat } from './target/chat/ichat';
 const sessionUserName = 'sessionUser';
 export default class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
@@ -27,10 +25,6 @@ export default class UserProvider extends common.Emitter {
   /** 当前用户 */
   get user(): IPerson | undefined {
     return this._user;
-  }
-  /** 所有会话 */
-  get chats(): IChat[] {
-    return allChats();
   }
   /** 是否完成初始化 */
   get inited(): boolean {
@@ -75,17 +69,12 @@ export default class UserProvider extends common.Emitter {
   }
   /** 重载数据 */
   public async refresh(): Promise<void> {
-    clearChats();
     this._inited = false;
-    await this._user?.loadMembers(pageAll());
     await this._user?.getCohorts();
+    await this._user?.loadMembers(pageAll());
     const companys = await this._user?.getJoinedCompanys();
     for (const company of companys || []) {
-      await company.getCohorts();
-      await company.getDepartments();
-      await company.getJoinedGroups();
-      await company.getStations();
-      await company.getWorkings();
+      await company.deepLoad();
       await company.loadMembers(pageAll());
     }
     this._inited = true;
@@ -118,7 +107,7 @@ export default class UserProvider extends common.Emitter {
     if (data.toId === this._user!.id) {
       sessionId = data.fromId;
     }
-    for (const c of this.chats) {
+    for (const c of this.user!.allChats()) {
       let isMatch = sessionId === c.chatId;
       if (c.target.typeName == TargetType.Person && isMatch) {
         isMatch = data.belongId == c.spaceId;

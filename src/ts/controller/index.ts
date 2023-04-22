@@ -30,8 +30,8 @@ class IndexController extends Emitter {
 
   /** 组织树 */
   public async getTeamTree(
-    isShare: boolean = true,
     space: ISpace = this.user,
+    isShare: boolean = true,
   ): Promise<ITarget[]> {
     const result: any[] = [];
     result.push(space);

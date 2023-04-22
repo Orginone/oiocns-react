@@ -39,6 +39,8 @@ export interface IChat {
    * 缓存会话
    */
   cache(): void;
+  /** 销毁会话 */
+  destroy(): void;
   /**
    * 加载缓存
    * @param cache 缓存数据

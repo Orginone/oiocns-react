@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { SpeciesModel } from '@/ts/base/model';
-import { ISpeciesItem } from '@/ts/core';
 import orgCtrl from '@/ts/controller';
 import { targetsToTreeData } from '../../..';
+import { ISpeciesItem } from '@/ts/core';
 
 interface Iprops {
   title: string;
@@ -56,7 +56,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await orgCtrl.user.loadAuthorityTree(false);
+        const data = await orgCtrl.user.loadSpaceAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {

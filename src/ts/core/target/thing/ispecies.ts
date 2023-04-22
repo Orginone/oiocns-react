@@ -5,7 +5,7 @@ import {
   PageRequest,
   SpeciesModel,
   TargetShare,
-} from '../../base/model';
+} from '@/ts/base/model';
 import {
   XAttributeArray,
   XOperationArray,
@@ -13,7 +13,7 @@ import {
   XAttribute,
   XFlowInstance,
   XFlowDefine,
-} from '../../base/schema';
+} from '@/ts/base/schema';
 
 /** 可为空的标准分类 */
 export type INullSpeciesItem = ISpeciesItem | undefined;

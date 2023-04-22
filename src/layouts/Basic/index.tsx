@@ -39,6 +39,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
         break;
       case LoggerLevel.unauth:
         message.warn(msg);
+        sessionStorage.clear();
         return history.push('/passport/login');
     }
   };

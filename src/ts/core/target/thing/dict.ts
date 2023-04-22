@@ -1,6 +1,6 @@
-import { DictItemModel, DictModel, PageRequest } from '../../../base/model';
-import { XDict, XDictArray, XDictItem, XDictItemArray } from '../../../base/schema';
-import { kernel } from '../../../base';
+import { DictItemModel, DictModel, PageRequest } from '@/ts/base/model';
+import { XDict, XDictArray, XDictItem, XDictItemArray } from '@/ts/base/schema';
+import { kernel } from '@/ts/base';
 
 export class Dict {
   belongId: string;

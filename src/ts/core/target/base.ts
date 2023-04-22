@@ -2,18 +2,16 @@ import consts from '../consts';
 import { TargetType } from '../enum';
 import { appendTarget } from './targetMap';
 import { kernel, model, common, schema, parseAvatar } from '../../base';
-import Authority from './authority/authority';
 import { IIdentity } from './authority/iidentity';
 import { ISpace, ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
 import { XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetModel, TargetShare } from '@/ts/base/model';
-import { FlowDefine } from '../thing/flowDefine';
-import { ISpeciesItem } from '../thing';
-import { loadSpeciesTree } from '../../core/';
+import { FlowDefine } from './thing/flowDefine';
 import { CreateChat } from './chat/chat';
 import { IChat } from './chat/ichat';
+import { ISpeciesItem, loadSpeciesTree } from './thing';
 
 export default class BaseTarget implements ITarget {
   public key: string;
@@ -23,12 +21,12 @@ export default class BaseTarget implements ITarget {
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
   public readonly target: schema.XTarget;
-  public authorityTree: Authority | undefined;
   public ownIdentitys: schema.XIdentity[];
   public identitys: IIdentity[];
   public chat: IChat;
   userId: string;
   space: ISpace;
+  identityLoaded: boolean = false;
 
   public createTargetType: TargetType[];
   public joinTargetType: TargetType[];
@@ -74,6 +72,9 @@ export default class BaseTarget implements ITarget {
       this.space.teamName,
       target.typeName + '群',
     ]);
+  }
+  allChats(): IChat[] {
+    return [this.chat];
   }
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');
@@ -232,6 +233,7 @@ export default class BaseTarget implements ITarget {
   }
 
   protected async deleteTarget(): Promise<model.ResultType<any>> {
+    this.chat.destroy();
     return await kernel.deleteTarget({
       id: this.id,
       typeName: this.target.typeName,
@@ -450,7 +452,7 @@ export default class BaseTarget implements ITarget {
    * @param codes 权限编号集合
    */
   async judgeHasIdentity(codes: string[]): Promise<boolean> {
-    if (this.ownIdentitys.length == 0) {
+    if (!this.identityLoaded) {
       await this.getOwnIdentitys(true);
     }
     return (
@@ -463,7 +465,10 @@ export default class BaseTarget implements ITarget {
       return this.ownIdentitys;
     }
     const res = await kernel.querySpaceIdentitys({ id: this.target.id });
-    if (res.success && res.data.result) {
+    if (res.success) {
+      this.identityLoaded = true;
+    }
+    if (Array.isArray(res.data.result)) {
       this.ownIdentitys = res.data.result;
     }
     return this.ownIdentitys;

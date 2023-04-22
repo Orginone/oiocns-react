@@ -29,6 +29,13 @@ export default class Authority implements IAuthority {
     }
     this.chat = CreateAuthChat(userId, space.id, space.teamName, auth);
   }
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.children) {
+      chats.push(...item.allChats());
+    }
+    return chats;
+  }
 
   get belongId(): string {
     return this.target.belongId;

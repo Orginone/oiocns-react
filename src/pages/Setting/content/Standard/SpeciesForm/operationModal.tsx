@@ -1,7 +1,7 @@
 import { OperationModel } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ITarget, ISpeciesItem } from '@/ts/core';
 import {
   ProForm,
   ProFormSelect,

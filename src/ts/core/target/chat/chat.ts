@@ -10,8 +10,6 @@ const hisMsgCollName = 'chat-message';
 const gptId = '889856358221262448';
 // 空时间
 const nullTime = new Date('2022-07-01').getTime();
-// 所有会话
-let chats: IChat[] = [];
 /**
  * 会话基类
  * @abstract
@@ -49,9 +47,9 @@ class BaseChat implements IChat {
         this.loadCache(data);
       },
     );
-    if (target.typeName != TargetType.Group) {
-      chats.push(this);
-    }
+  }
+  destroy(): void {
+    kernel.anystore.unSubscribed(this.userId, hisMsgCollName + '.T' + this.fullId);
   }
 
   public get shareInfo(): TargetShare {
@@ -326,15 +324,4 @@ export const CreateAuthChat = (
     name: target.name,
   };
   return new CohortChat(spaceId, data, userId);
-};
-
-export const clearChats = () => {
-  chats.forEach((chat) => {
-    kernel.anystore.unSubscribed(chat.userId, hisMsgCollName + '.T' + chat.fullId);
-  });
-  chats = [];
-};
-
-export const allChats = () => {
-  return chats;
 };

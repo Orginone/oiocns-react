@@ -28,6 +28,13 @@ export default class Group extends BaseTarget implements IGroup {
     return this.subGroup;
   }
 
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSubTeam(reload);
+    for (const item of this.subGroup) {
+      await item.deepLoad(reload);
+    }
+  }
+
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.Group:

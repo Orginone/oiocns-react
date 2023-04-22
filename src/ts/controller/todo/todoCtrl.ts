@@ -34,8 +34,8 @@ class TodoController extends Emitter {
   private _commonMenuMap: any = {};
   constructor() {
     super();
-
     orgCtrl.subscribe(async () => {
+      return;
       if (orgCtrl.user.id != '') {
         let group: XTarget[] = [];
         let cohorts: XTarget[] = [];

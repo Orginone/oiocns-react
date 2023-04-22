@@ -1,12 +1,12 @@
 import { XAttribute, XAttributeArray, XFlowDefine } from '@/ts/base/schema';
-import { kernel, model, parseAvatar, schema } from '../../base';
+import { kernel, model, parseAvatar, schema } from '@/ts/base';
 import {
   AttributeModel,
   OperationModel,
   PageRequest,
   SpeciesModel,
   TargetShare,
-} from '../../base/model';
+} from '@/ts/base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 import { IFlowDefine } from './iflowDefine';
 /**

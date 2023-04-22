@@ -5,6 +5,7 @@ import { schema } from '../../base';
 import { IDepartment, ISpace, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
 import { logger } from '@/ts/base/common';
+import { IChat } from './chat/ichat';
 
 /**
  * 部门的元操作
@@ -45,6 +46,24 @@ export default class Department extends BaseTarget implements IDepartment {
     await this.getDepartments(reload);
     await this.getWorkings(reload);
     return [...this.departments, ...this.workings];
+  }
+
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSubTeam(reload);
+    for (const item of this.departments) {
+      await item.deepLoad(reload);
+    }
+  }
+
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.departments) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.workings) {
+      chats.push(...item.allChats());
+    }
+    return chats;
   }
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
@@ -132,6 +151,7 @@ export default class Department extends BaseTarget implements IDepartment {
     );
     if (res.success) {
       this.departments = this.departments.filter((a) => {
+        a.chat.destroy();
         return a.target.id != id;
       });
       return true;
@@ -160,6 +180,7 @@ export default class Department extends BaseTarget implements IDepartment {
     const res = await super.deleteSubTarget(id, TargetType.Working, this.target.belongId);
     if (res.success) {
       this.workings = this.workings.filter((a) => {
+        a.chat.destroy();
         return a.target.id != id;
       });
       return true;

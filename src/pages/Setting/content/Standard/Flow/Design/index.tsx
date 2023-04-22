@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
-import { FlowDefine } from '@/ts/core/thing/flowDefine';
+import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import { ITarget } from '@/ts/core';
 
 interface IProps {

@@ -7,7 +7,7 @@ import { companyTypes, TargetType } from '../enum';
 import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { ICompany, IPerson, ICohort, SpaceType, ITarget } from './itarget';
+import { ICompany, IPerson, ICohort, ITarget } from './itarget';
 import { schema, model, kernel, common } from '@/ts/base';
 import { PageRequest, TargetModel } from '@/ts/base/model';
 import { logger, sleep } from '@/ts/base/common';
@@ -24,7 +24,7 @@ import { CreateChat } from './chat/chat';
 export default class Person extends MarketTarget implements IPerson {
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
   root: IFileSystemItem;
@@ -46,8 +46,8 @@ export default class Person extends MarketTarget implements IPerson {
     }, 200);
   }
   async loadSpaceAuthorityTree(reload: boolean = false): Promise<IAuthority | undefined> {
-    if (!reload && this.spaceAuthorityTree != undefined) {
-      return this.spaceAuthorityTree;
+    if (!reload && this.authorityTree != undefined) {
+      return this.authorityTree;
     }
     const res = await kernel.queryAuthorityTree({
       id: '0',
@@ -59,23 +59,33 @@ export default class Person extends MarketTarget implements IPerson {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this, this.id);
+      this.authorityTree = new Authority(res.data, this, this.id);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);
     return [];
   }
-  public get spaceData(): SpaceType {
-    return {
-      id: this.id,
-      name: '个人空间',
-      share: this.shareInfo,
-      typeName: this.target.typeName as TargetType,
-    };
+
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSpaceAuthorityTree(reload);
   }
 
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.joinedCompany) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.cohorts) {
+      chats.push(...item.allChats());
+    }
+    if (this.authorityTree) {
+      chats.push(...this.authorityTree.allChats());
+    }
+    chats.push(...this.memberChats);
+    return chats;
+  }
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.University:

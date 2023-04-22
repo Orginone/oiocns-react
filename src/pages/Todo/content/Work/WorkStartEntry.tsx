@@ -4,7 +4,7 @@ import { XFlowDefine } from '@/ts/base/schema';
 import { Card } from 'antd';
 import React, { useState } from 'react';
 import WorkStartDo from './WorkStartDo';
-import { FlowDefine } from '@/ts/core/thing/flowDefine';
+import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import orgCtrl from '@/ts/controller';
 
 /**

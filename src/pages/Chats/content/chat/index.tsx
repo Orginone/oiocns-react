@@ -12,9 +12,11 @@ import { IChat } from '@/ts/core/target/chat/ichat';
 const Chat: React.FC<any> = ({
   openDetail,
   chat,
+  filter,
 }: {
   openDetail: boolean;
   chat: IChat;
+  filter: string;
 }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑
 
@@ -32,7 +34,7 @@ const Chat: React.FC<any> = ({
       {/* 主体 */}
       <div className={charsStyle.chart_page}>
         {/* 聊天区域 */}
-        <GroupContent chat={chat} handleReWrites={handleReWrites} />
+        <GroupContent chat={chat} handleReWrites={handleReWrites} filter={filter} />
         {/* 输入区域 */}
         <div className={charsStyle.chart_input}>
           <GroupInputBox chat={chat} writeContent={writeContent} />

@@ -27,7 +27,7 @@ class Logger {
   }
   unauth(): void {
     console.warn('登录已过期');
-    this._callback(LoggerLevel.error, '登录已过期');
+    this._callback(LoggerLevel.unauth, '登录已过期');
   }
   private _callback(level: LoggerLevel, message: MessageType): void {
     if (this.onLogger) {

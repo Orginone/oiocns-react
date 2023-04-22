@@ -1,5 +1,5 @@
 import { FlowNode, XFlowDefine, XFlowDefineArray } from '@/ts/base/schema';
-import { kernel } from '../../base';
+import { kernel } from '../../../base';
 import { CreateDefineReq } from '@/ts/base/model';
 /**
  * 分类系统项实现
