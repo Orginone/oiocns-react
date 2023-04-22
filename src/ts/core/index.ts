@@ -26,6 +26,7 @@ export type {
   ITarget,
   IWorking,
 } from './target/itarget';
+export type { IFileSystemItem, TaskModel } from './target/store/ifilesys';
 export { findTargetShare } from './target/targetMap';
 export type { INullSpeciesItem, ISpeciesItem } from './target/thing';
 export type { IApplyItem, IApprovalItem, IOrderApplyItem, ITodoGroup } from './todo';

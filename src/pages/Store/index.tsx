@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import { GroupMenuType } from './config/menuType';
+import { MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
@@ -27,7 +27,7 @@ const Package: React.FC = () => {
       selectMenu={selectMenu}
       onSelect={async (data) => {
         orgCtrl.currentKey = data.key;
-        if (data.itemType === GroupMenuType.FileSystemItem) {
+        if (data.itemType === MenuType.FileSystemItem) {
           const item = data.item as IFileSystemItem;
           if (item.children.length === 0 && (await item.loadChildren())) {
             refreshMenu();
@@ -44,7 +44,7 @@ const Package: React.FC = () => {
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={
-          operateTarget?.itemType === GroupMenuType.FileSystemItem
+          operateTarget?.itemType === MenuType.FileSystemItem
             ? operateTarget.item
             : undefined
         }
@@ -89,7 +89,7 @@ const Package: React.FC = () => {
             let values = await formRef.current?.validateFields();
             if (values) {
               /**调用创建物接口 */
-              let res = await selectMenu.belong.createThing(values);
+              let res = await selectMenu.item.space.createThing(values);
               if (res.success) {
                 message.success('创建成功');
                 setShowForm(false);

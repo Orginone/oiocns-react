@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ITarget, TargetType } from '@/ts/core';
+import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -42,9 +42,14 @@ const TeamSetting: React.FC = () => {
       selectMenu={selectMenu}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
-        if (data.itemType === GroupMenuType.Agency) {
-          await (data.item as ITarget).loadSubTeam();
-          orgCtrl.changCallback();
+        switch (data.itemType) {
+          case GroupMenuType.SpeciesGroup:
+            await (data.item as ITarget).loadSpeciesTree();
+            orgCtrl.changCallback();
+            break;
+          case GroupMenuType.DictGroup:
+            await (data.item as ISpace).dict.loadDict();
+            break;
         }
         orgCtrl.currentKey = data.key;
         setSelectMenu(data);
@@ -169,7 +174,7 @@ const TeamSetting: React.FC = () => {
       )}
       {/** 单位 */}
       <CreateTeamModal
-        title={'新建'}
+        title={'新建单位'}
         open={showFormModal}
         handleCancel={function (): void {
           setShowFormModal(false);

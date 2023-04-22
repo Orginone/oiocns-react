@@ -17,6 +17,8 @@ export type TaskModel = {
  */
 export interface IFileSystemItem {
   /** 主键,唯一 */
+  fullKey: string;
+  /** 路径 */
   key: string;
   /** 名称 */
   name: string;

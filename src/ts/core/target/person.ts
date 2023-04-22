@@ -68,10 +68,6 @@ export default class Person extends MarketTarget implements IPerson {
     return [];
   }
 
-  public async deepLoad(reload: boolean = false): Promise<void> {
-    await this.loadSpaceAuthorityTree(reload);
-  }
-
   allChats(): IChat[] {
     const chats = [this.chat];
     for (const item of this.joinedCompany) {
