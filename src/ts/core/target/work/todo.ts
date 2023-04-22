@@ -17,6 +17,8 @@ export default interface ITodo {
   speciesId: string;
   /** 对象 */
   target: any;
+  /** 创建时间 */
+  createTime: string;
   /** 发起人 */
   createUser: string;
   /** 状态 */
@@ -32,6 +34,7 @@ export class FlowTodo implements ITodo {
   spaceId: string;
   speciesId: string;
   createUser: string;
+  createTime: string;
   status: number;
   target: XFlowTaskHistory;
   constructor(task: XFlowTaskHistory) {
@@ -41,6 +44,7 @@ export class FlowTodo implements ITodo {
     this.type = '事项';
     this.remark = '';
     this.status = task.status;
+    this.createTime = task.createTime;
     this.shareId = task.instance!.belongId;
     this.spaceId = task.instance!.belongId;
     this.createUser = task.instance!.createUser;
@@ -56,6 +60,7 @@ export class OrgTodo implements ITodo {
   shareId: string;
   spaceId: string;
   speciesId: string;
+  createTime: string;
   createUser: string;
   status: number;
   target: XRelation;
@@ -66,6 +71,7 @@ export class OrgTodo implements ITodo {
     this.remark = '';
     this.speciesId = '';
     this.status = task.status;
+    this.createTime = task.createTime;
     this.name = `申请加入${task.team?.name}`;
     this.shareId = task.team?.targetId || '0';
     this.spaceId = task.team?.targetId || '0';

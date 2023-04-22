@@ -18,13 +18,44 @@ interface IProps {
 }
 
 const TypeSetting = ({ filter, selectMenu }: IProps) => {
-  const [workKey, foreUpdate] = useCtrlUpdate(workNotify);
+  const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
-  if (selectMenu == undefined) return <></>;
+  const [dataSource, setDataSource] = useState<ITodo[]>([]);
 
   useEffect(() => {
-    foreUpdate();
-  }, [filter, selectMenu]);
+    let data = orgCtrl.user.work.todos.filter(
+      (a) =>
+        a.name.includes(filter) || a.type.includes(filter) || a.remark.includes(filter),
+    );
+    switch (selectMenu.itemType) {
+      case GroupMenuType.Organization:
+        {
+          let targets = selectMenu.item as ITarget[];
+          if (targets.length == 1 && targets[0].space.id == targets[0].id) {
+            data = data.filter((a) => a.spaceId == targets[0].space.id);
+          } else {
+            data = data.filter(
+              (a) =>
+                a.spaceId == targets[0].space.id &&
+                targets.findIndex((s) => s.id == a.shareId) > 0,
+            );
+          }
+        }
+        break;
+      case GroupMenuType.Species:
+        let species = selectMenu.item as ISpeciesItem[];
+        data = data.filter(
+          (a) =>
+            a.spaceId == species[0].team.space.id &&
+            species.findIndex((s) => s.id == a.speciesId) > 0,
+        );
+        break;
+      default:
+        break;
+    }
+    setDataSource(data);
+    forceUpdate();
+  }, [selectMenu, filter]);
 
   const operation = (
     <Space>
@@ -60,7 +91,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     <PageCard key={workKey} bordered={false} tabBarExtraContent={operation}>
       <div className={cls['page-content-table']}>
         <CardOrTableComp<ITodo>
-          dataSource={[]}
+          dataSource={dataSource}
           rowKey={(record: ITodo) => record.id}
           columns={WorkColumns}
           operation={(item: ITodo) => {
@@ -90,50 +121,6 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
                 },
               },
             ];
-          }}
-          request={async (page) => {
-            let res = await orgCtrl.user.work.loadTodo();
-            switch (selectMenu.itemType) {
-              case GroupMenuType.Organization:
-                {
-                  let targets = selectMenu.item as ITarget[];
-                  if (targets.length == 1 && targets[0].space.id == targets[0].id) {
-                    res = res.filter(
-                      (a) =>
-                        a.spaceId == targets[0].space.id &&
-                        (a.name.includes(filter) || a.remark.includes(filter)),
-                    );
-                  } else {
-                    res = res.filter(
-                      (a) =>
-                        a.spaceId == targets[0].space.id &&
-                        targets.findIndex((s) => s.id == a.shareId) > 0 &&
-                        (a.name.includes(filter) || a.remark.includes(filter)),
-                    );
-                  }
-                }
-                break;
-              case GroupMenuType.Species:
-                let species = selectMenu.item as ISpeciesItem[];
-                res = res.filter(
-                  (a) =>
-                    a.spaceId == species[0].team.space.id &&
-                    species.findIndex((s) => s.id == a.speciesId) > 0 &&
-                    (a.name.includes(filter) || a.remark.includes(filter)),
-                );
-                break;
-              default:
-                res = res.filter(
-                  (a) => a.name.includes(filter) || a.remark.includes(filter),
-                );
-                break;
-            }
-            return {
-              offset: page.offset,
-              limit: page.limit,
-              result: res.slice(page.offset, page.offset + page.limit),
-              total: res.length,
-            };
           }}
           rowSelection={{
             type: 'checkbox',

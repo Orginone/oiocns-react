@@ -12,7 +12,11 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     width: 60,
   },
   {
-    title: '事项',
+    title: '类型',
+    dataIndex: ['type'],
+  },
+  {
+    title: '内容',
     dataIndex: ['name'],
   },
   {
@@ -47,7 +51,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '申请时间',
-    dataIndex: ['Data', 'createTime'],
+    dataIndex: 'createTime',
     valueType: 'dateTime',
   },
 ];
