@@ -16,7 +16,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       key: item.chat.fullId,
       item: item.chat,
       label: item.teamName,
-      tag: [item.typeName + '群'],
+      tag: item.chat.target.labels,
       itemType: GroupMenuType.Chat,
       menus: loadChatMenus(false, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
@@ -28,7 +28,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
 
 export const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
   const result: MenuItemType = {
-    key: user.id + '_' + authority.id,
+    key: authority.chat.fullId,
     label: authority.name,
     icon: <im.ImTree />,
     item: authority.chat,
@@ -70,6 +70,7 @@ export const loadBookMenu = async () => {
               itemType: GroupMenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
+              tag: chat.target.labels,
               menus: loadChatMenus(true, true),
             };
           }),
@@ -137,7 +138,6 @@ export const loadBookMenu = async () => {
       label: orgCtrl.user.teamName,
       itemType: orgCtrl.user.teamName,
       item: orgCtrl.user.allChats().filter((i) => i.spaceId === orgCtrl.user.id),
-      belong: orgCtrl.user,
       children: [
         {
           key: orgCtrl.user.chat.fullId,
@@ -145,6 +145,7 @@ export const loadBookMenu = async () => {
           itemType: GroupMenuType.Chat,
           icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
           children: [],
+          tag: orgCtrl.user.chat.target.labels,
           item: orgCtrl.user.chat,
           menus: loadChatMenus(true, true),
         },
@@ -162,6 +163,7 @@ export const loadBookMenu = async () => {
               itemType: GroupMenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
+              tag: chat.target.labels,
               menus: loadChatMenus(true, true),
             };
           }),
@@ -180,6 +182,7 @@ export const loadBookMenu = async () => {
               item: cohort.chat,
               menus: loadChatMenus(true, true),
               itemType: GroupMenuType.Chat,
+              tag: cohort.chat.target.labels,
               icon: <TeamIcon share={cohort.chat.shareInfo} size={18} fontSize={16} />,
             };
           }),

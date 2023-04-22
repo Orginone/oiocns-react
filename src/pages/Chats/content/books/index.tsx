@@ -1,4 +1,4 @@
-import { Card, Empty, List, Tag } from 'antd';
+import { Badge, Card, Empty, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -67,7 +67,11 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
                   </a>,
                 ]}>
                 <List.Item.Meta
-                  avatar={<TeamIcon share={item.shareInfo} size={40} fontSize={40} />}
+                  avatar={
+                    <Badge count={item.noReadCount} overflowCount={99} size="small">
+                      <TeamIcon share={item.shareInfo} size={40} fontSize={40} />
+                    </Badge>
+                  }
                   title={
                     <div>
                       <span style={{ marginRight: 10 }}>{item.target.name}</span>
@@ -80,16 +84,6 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
                             </Tag>
                           );
                         })}
-                      {item.noReadCount > 0 && (
-                        <Tag
-                          style={{
-                            color: 'white',
-                            borderRadius: 6,
-                            backgroundColor: '#ff4d4f',
-                          }}>
-                          {item.noReadCount}
-                        </Tag>
-                      )}
                     </div>
                   }
                   description={showMessage(item)}

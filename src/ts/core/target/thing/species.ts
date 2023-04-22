@@ -5,7 +5,6 @@ import {
   OperationModel,
   PageRequest,
   SpeciesModel,
-  TargetShare,
 } from '@/ts/base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
 import { IFlowDefine } from './iflowDefine';
@@ -21,7 +20,6 @@ export class SpeciesItem implements ISpeciesItem {
   target: schema.XSpecies;
   parent: INullSpeciesItem;
   children: ISpeciesItem[];
-  belongInfo: TargetShare;
   attrs?: XAttribute[];
   defines?: IFlowDefine[];
   instances?: schema.XFlowInstance[];
@@ -41,7 +39,6 @@ export class SpeciesItem implements ISpeciesItem {
         this.children.push(new SpeciesItem(item, this, team));
       }
     }
-    this.belongInfo = { name: '奥集能平台', typeName: '平台' };
   }
   async loadAttrs(reload: boolean = false): Promise<XAttribute[]> {
     if (this.attrs == undefined || this.attrs.length == 0 || reload) {
