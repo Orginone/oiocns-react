@@ -45,10 +45,11 @@ const TeamSetting: React.FC = () => {
         switch (data.itemType) {
           case GroupMenuType.SpeciesGroup:
             await (data.item as ITarget).loadSpeciesTree();
-            orgCtrl.changCallback();
+            refreshMenu();
             break;
           case GroupMenuType.DictGroup:
             await (data.item as ISpace).dict.loadDict();
+            refreshMenu();
             break;
         }
         orgCtrl.currentKey = data.key;

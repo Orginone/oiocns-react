@@ -25,7 +25,9 @@ export type OnProgressType = (p: number) => void | undefined;
  * 标准分类系统项接口
  */
 export interface ISpeciesItem {
-  /** 主键,唯一 */
+  /** 主键 */
+  key: string;
+  /** 唯一 */
   id: string;
   /** 名称 */
   name: string;

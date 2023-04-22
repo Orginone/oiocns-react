@@ -14,6 +14,7 @@ import { ITarget } from '../itarget';
  * 分类系统项实现
  */
 export class SpeciesItem implements ISpeciesItem {
+  key: string;
   id: string;
   name: string;
   isRoot: boolean;
@@ -34,6 +35,7 @@ export class SpeciesItem implements ISpeciesItem {
     this.name = target.name;
     this.isRoot = parent === undefined;
     this.team = team;
+    this.key = team.key + '-' + this.target.id;
     if (target.nodes && target.nodes.length > 0) {
       for (const item of target.nodes) {
         this.children.push(new SpeciesItem(item, this, team));

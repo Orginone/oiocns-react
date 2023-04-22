@@ -170,7 +170,7 @@ const buildSpeciesTree = (parent: ISpeciesItem[]): MenuItemType[] => {
   if (parent.length > 0) {
     return parent.map((species) => {
       return {
-        key: species.id + species.target.id,
+        key: species.key,
         item: species,
         label: species.name,
         icon: <im.ImNewspaper />,

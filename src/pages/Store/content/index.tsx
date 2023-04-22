@@ -31,7 +31,7 @@ const ContentIndex = (props: IProps) => {
       return <Application />;
     case MenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
-    case MenuType.Thing:
+    case MenuType.Species:
       return (
         <ThingIndex
           species={props.selectMenu.item}
