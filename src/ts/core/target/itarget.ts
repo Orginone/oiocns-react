@@ -11,7 +11,7 @@ import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 import { IChat } from './chat/ichat';
-import IWork from './work/work';
+import { IWork } from './work/work';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
