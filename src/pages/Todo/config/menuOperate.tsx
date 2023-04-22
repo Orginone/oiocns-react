@@ -20,6 +20,14 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
       children: subSpecies.children,
+      menus: [
+        {
+          key: '发起办事',
+          icon: <im.ImOffice />,
+          label: '发起办事',
+          model: 'outside',
+        },
+      ],
     });
   }
   return {

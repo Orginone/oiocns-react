@@ -3,12 +3,18 @@ import React, { useState } from 'react';
 import Content from './content';
 import orgCtrl from '@/ts/controller/';
 import useMenuUpdate from './hooks/useMenuUpdate';
-import { Input } from 'antd';
+import { Input, Modal } from 'antd';
 import { ImSearch } from 'react-icons/im';
+import { XFlowDefine } from '@/ts/base/schema';
+import CardOrTableComp from '@/components/CardOrTableComp';
+import { ISpeciesItem } from '@/ts/core';
+import { FlowColumn } from '../Setting/config/columns';
+import WorkStart from './work/WorkStartDo';
 
 const Todo: React.FC<any> = () => {
   const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-
+  const [openFlow, setOpenFlow] = useState(false);
+  const [selectData, setSelectData] = useState<XFlowDefine>();
   const [filter, setFilter] = useState('');
   if (!selectMenu) return <></>;
 
@@ -17,6 +23,7 @@ const Todo: React.FC<any> = () => {
       selectMenu={selectMenu}
       onSelect={async (data) => {
         orgCtrl.currentKey = data.key;
+        setSelectData(undefined);
         setSelectMenu(data);
       }}
       rightBar={
@@ -28,38 +35,57 @@ const Todo: React.FC<any> = () => {
             setFilter(e.target.value);
           }}></Input>
       }
-      // onMenuClick={async (data, key) => {}}
       onMenuClick={async (data, key) => {
         switch (key) {
-          case '发起':
-            // setOpenFlow(true);
+          case '发起办事':
+            setOpenFlow(true);
             break;
           default:
             break;
         }
       }}
       siderMenuData={rootMenu}>
-      {/* <Modal
+      <Modal
         width="800px"
         title="发起办事"
         open={openFlow}
         destroyOnClose={true}
         onOk={() => {
-          if (!selectData) {
-            message.error('请先选择办事');
-            return;
-          }
-          setDoWork(selectData[0].data);
           setOpenFlow(false);
         }}
         onCancel={() => setOpenFlow(false)}>
-        <FlowSelect
-          multiple={false}
-          orgId={orgCtrl.user.id}
-          onCheckeds={(params: any) => setSelectData(params)}
+        <CardOrTableComp<XFlowDefine>
+          dataSource={[]}
+          rowSelection={{
+            type: 'radio',
+            onSelect: (record: XFlowDefine, _: any) => {
+              setSelectData(record);
+            },
+          }}
+          request={async (page) => {
+            let species = (selectMenu.item as ISpeciesItem[])[0];
+            let defines = await species.loadFlowDefine();
+            return {
+              offset: page.offset,
+              limit: page.limit,
+              total: defines.length,
+              result: defines.slice(page.offset, page.offset + page.limit),
+            };
+          }}
+          hideOperation={true}
+          scroll={{ y: 300 }}
+          columns={FlowColumn}
+          rowKey={'id'}
         />
-      </Modal> */}
-      <Content key={key} selectMenu={selectMenu} filter={filter} />
+      </Modal>
+      {selectData ? (
+        <WorkStart
+          current={selectData}
+          target={(selectMenu.item as ISpeciesItem[])[0].team}
+          goBack={() => setSelectData(undefined)}></WorkStart>
+      ) : (
+        <Content key={key} selectMenu={selectMenu} filter={filter} />
+      )}
     </MainLayout>
   );
 };

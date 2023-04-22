@@ -83,7 +83,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
 
   useEffect(() => {
     const load = async () => {
-      const species = current || (await orgCtrl.user.loadSpeciesTree());
+      const species = current?.team.loadSpeciesTree();
       setLeftTreeData(buildSpeciesChildrenTree([species]));
     };
     load();

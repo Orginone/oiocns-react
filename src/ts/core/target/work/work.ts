@@ -36,24 +36,7 @@ export class Work implements IWork {
     data: string,
   ): Promise<boolean> {
     for (let todo of todos) {
-      switch (todo.type) {
-        case '事项':
-          await kernel.approvalTask({
-            id: todo.id,
-            comment: comment,
-            status: status,
-            data: data,
-          });
-          break;
-        case '组织':
-          await kernel.joinTeamApproval({
-            id: todo.id,
-            status: status,
-          });
-          break;
-        default:
-          break;
-      }
+    await todo.approval(status, comment, data);
     }
     this.orgTodo = this.orgTodo.filter((a) => !todos.includes(a));
     this.flowTodo = this.flowTodo.filter((a) => !todos.includes(a));
@@ -67,29 +50,7 @@ export class Work implements IWork {
     data: string,
   ): Promise<boolean> {
     let success = false;
-    switch (todo.type) {
-      case '事项':
-        success = (
-          await kernel.approvalTask({
-            id: todo.id,
-            comment: comment,
-            status: status,
-            data: data,
-          })
-        ).success;
-        break;
-      case '组织':
-        success = (
-          await kernel.joinTeamApproval({
-            id: todo.id,
-            status: status,
-          })
-        ).success;
-        break;
-      default:
-        break;
-    }
-    if (success) {
+    if (await todo.approval(status, comment, data)) {
       this.orgTodo = this.orgTodo.filter((a) => a.id != todo.id);
       this.flowTodo = this.flowTodo.filter((a) => a.id != todo.id);
       workNotify.changCallback();

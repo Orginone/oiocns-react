@@ -223,7 +223,7 @@ export class SpeciesItem implements ISpeciesItem {
   /* 加载办事 */
   async loadFlowDefine(): Promise<XFlowDefine[]> {
     const res = await kernel.queryDefine({
-      spaceId: this.target.belongId,
+      spaceId: this.team.id,
       speciesId: this.id,
     });
     return res.data.result || [];

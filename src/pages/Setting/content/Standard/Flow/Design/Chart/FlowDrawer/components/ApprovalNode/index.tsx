@@ -185,6 +185,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
+            current={props.species}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
