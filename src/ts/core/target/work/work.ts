@@ -7,7 +7,7 @@ export const workNotify = new Emitter();
 /**
  * 办事接口
  */
-export default interface IWork {
+export interface IWork {
   /** 查询待办 */
   loadTodo(reload?: boolean): Promise<ITodo[]>;
   /** 批量审批办事 */
@@ -22,7 +22,7 @@ export default interface IWork {
 }
 
 // 办事
-export default class Work implements IWork {
+export class Work implements IWork {
   private orgTodo: ITodo[] = [];
   private flowTodo: ITodo[] = [];
   async approvals(
