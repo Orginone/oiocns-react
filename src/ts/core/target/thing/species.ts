@@ -101,10 +101,10 @@ export class SpeciesItem implements ISpeciesItem {
   }
 
   async create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem> {
+    console.log(data);
     const res = await kernel.createSpecies({
       parentId: this.id,
       ...data,
-      id: undefined,
     });
     if (res.success) {
       const newItem = new SpeciesItem(res.data, this, this.team);
@@ -124,6 +124,7 @@ export class SpeciesItem implements ISpeciesItem {
       parentId: this.target.parentId,
     });
     if (res.success) {
+      this.name = data.name;
       this.target.name = data.name;
       this.target.public = data.public;
       this.target.authId = data.authId;

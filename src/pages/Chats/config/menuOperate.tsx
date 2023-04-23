@@ -7,9 +7,10 @@ import { MenuItemType } from 'typings/globelType';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { ISpace, ITarget, TargetType } from '@/ts/core';
 import { IChat } from '@/ts/core/target/chat/ichat';
+import { IconFont } from '@/components/IconFont';
 
 /** 编译组织树 */
-export const buildTargetTree = async (targets: ITarget[]) => {
+const buildTargetTree = async (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     result.push({
@@ -18,7 +19,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       label: item.teamName,
       tag: item.chat.target.labels,
       itemType: GroupMenuType.Chat,
-      menus: loadChatMenus(false, true),
+      menus: loadChatMoreMenus(false, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: await buildTargetTree(item.subTeam),
     });
@@ -26,21 +27,21 @@ export const buildTargetTree = async (targets: ITarget[]) => {
   return result;
 };
 
-export const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
+const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
   const result: MenuItemType = {
     key: authority.chat.fullId,
     label: authority.name,
     icon: <im.ImTree />,
     item: authority.chat,
     tag: authority.chat.target.labels,
-    menus: loadChatMenus(false, true),
+    menus: loadChatMoreMenus(false, true),
     itemType: GroupMenuType.Chat,
     children: authority.children?.map((i) => buildAuthorityTree(i, user)) ?? [],
   };
   return result;
 };
 
-export const loadBookMenu = async () => {
+const loadBookMenu = async () => {
   let companys = await orgCtrl.user.getJoinedCompanys(false);
   let companyItems = [];
   for (const company of companys) {
@@ -61,7 +62,7 @@ export const loadBookMenu = async () => {
           item: company.chat,
           itemType: GroupMenuType.Chat,
           tag: [company.typeName, '全员群'],
-          menus: loadChatMenus(false, true),
+          menus: loadChatMoreMenus(false, true),
           children: company.memberChats.map((chat) => {
             return {
               key: chat.fullId,
@@ -71,7 +72,7 @@ export const loadBookMenu = async () => {
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
               tag: chat.target.labels,
-              menus: loadChatMenus(true, true),
+              menus: loadChatMoreMenus(true, true),
             };
           }),
           icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
@@ -153,7 +154,7 @@ export const loadBookMenu = async () => {
           children: [],
           tag: orgCtrl.user.chat.target.labels,
           item: orgCtrl.user.chat,
-          menus: loadChatMenus(true, true),
+          menus: loadChatMoreMenus(true, true),
         },
         {
           key: BookType.Friend,
@@ -170,7 +171,7 @@ export const loadBookMenu = async () => {
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
               tag: chat.target.labels,
-              menus: loadChatMenus(true, true),
+              menus: loadChatMoreMenus(true, true),
             };
           }),
         },
@@ -186,7 +187,7 @@ export const loadBookMenu = async () => {
               key: cohort.chat.fullId,
               label: cohort.chat.target.name,
               item: cohort.chat,
-              menus: loadChatMenus(true, true),
+              menus: loadChatMoreMenus(true, true),
               itemType: GroupMenuType.Chat,
               tag: cohort.chat.target.labels,
               icon: <TeamIcon share={cohort.chat.shareInfo} size={18} fontSize={16} />,
@@ -201,7 +202,7 @@ export const loadBookMenu = async () => {
 };
 
 /** 加载右侧菜单 */
-export const loadChatMenus = (allowDelete: boolean, isChat: boolean = false) => {
+const loadChatMoreMenus = (allowDelete: boolean, isChat: boolean = false) => {
   const items = [];
   if (isChat) {
     items.push({
@@ -239,4 +240,17 @@ export const loadChatMenus = (allowDelete: boolean, isChat: boolean = false) => 
     });
   }
   return items;
+};
+
+/** 加载会话菜单 */
+export const loadChatMenu = async () => {
+  const chatMenus = {
+    key: '沟通',
+    label: '沟通',
+    itemType: 'Tab',
+    children: [],
+    icon: <IconFont type={'icon-message'} />,
+  } as MenuItemType;
+  chatMenus.children = await loadBookMenu();
+  return chatMenus;
 };

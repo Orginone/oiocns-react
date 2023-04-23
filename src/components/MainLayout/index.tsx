@@ -11,7 +11,6 @@ import {
 } from '@ant-design/icons';
 import { ImArrowLeft2 } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
-import { findParentMenus } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 const { Content, Sider } = Layout;
@@ -38,8 +37,7 @@ type MainLayoutType = {
 const MainLayout: React.FC<MainLayoutType> = (props) => {
   const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
-  const parentMenu =
-    findParentMenus(props.siderMenuData, props.selectMenu.key) ?? props.siderMenuData;
+  const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
   const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];

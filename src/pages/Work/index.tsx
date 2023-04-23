@@ -2,16 +2,15 @@ import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
 import orgCtrl from '@/ts/controller/';
-import useMenuUpdate from './hooks/useMenuUpdate';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
+import * as config from './config/menuOperate';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 
 const Todo: React.FC<any> = () => {
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadWorkMenu);
   const [filter, setFilter] = useState('');
-  if (!selectMenu) return <></>;
-
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Content from './content';
+import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
-import useMenuUpdate from './hooks/useMenuUpdate';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 import orgCtrl from '@/ts/controller';
 import { IChat } from '@/ts/core/target/chat/ichat';
 import { Input } from 'antd';
@@ -9,9 +10,8 @@ import { ImSearch } from 'react-icons/im';
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
   const [openDetail, setOpenDetail] = useState<boolean>(false);
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-  if (!selectMenu) return <></>;
-
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadChatMenu);
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -31,20 +31,18 @@ const Setting: React.FC<any> = () => {
       onMenuClick={async (data, key) => {
         switch (key) {
           case '打开会话':
-            orgCtrl.currentKey = data.item.chat.fullId;
-            refreshMenu();
+            setSelectMenu(data);
             break;
           case '置顶会话':
             (data.item! as IChat).isToping = true;
-            refreshMenu();
+            setSelectMenu(data);
             break;
           case '取消置顶':
             (data.item! as IChat).isToping = false;
-            refreshMenu();
+            setSelectMenu(data);
             break;
           case '清空消息':
             await (data.item! as IChat).clearMessage();
-            orgCtrl.changCallback();
             break;
           // case '删除会话':
           //   chatCtrl.deleteChat(data.item);

@@ -1,16 +1,15 @@
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
-import useMenuUpdate from './hooks/useMenuUpdate';
+import * as config from './config/menuOperate';
 import { GroupMenuType } from './config/menuType';
 import Content from './content';
 import { ITarget } from '@/ts/core';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 /** 仓库模块 */
 const Package: React.FC = () => {
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
-
-  if (!selectMenu) return <></>;
-
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadMarketMenu);
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -19,7 +18,6 @@ const Package: React.FC = () => {
         switch (data.itemType) {
           case GroupMenuType.Things:
             (data.item as ITarget).loadSpeciesTree();
-            refreshMenu();
             break;
         }
         setSelectMenu(data);

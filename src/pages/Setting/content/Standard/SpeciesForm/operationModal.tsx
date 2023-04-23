@@ -1,6 +1,5 @@
 import { OperationModel } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 import {
   ProForm,
@@ -11,7 +10,6 @@ import {
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
-import { targetsToTreeData } from '../../..';
 // import ProFormAuth from './render/widgets/ProFormAuth';
 
 interface Iprops {
@@ -49,10 +47,12 @@ const OperationModal = (props: Iprops) => {
       title={data?.name || title}
       open={open}
       onOk={async () => {
+        const formData: any = form.getFieldsValue();
+        formData.public = formData.public != 'false' && formData.public != false;
         const value = {
           ...{ remark: JSON.stringify(defaultRemark) },
           ...data,
-          ...form.getFieldsValue(),
+          ...formData,
           speciesId: current.id,
         };
         if (title.includes('新增')) {
@@ -114,8 +114,12 @@ const OperationModal = (props: Iprops) => {
           required={true}
           colProps={{ span: 12 }}
           request={async () => {
-            const res = await orgCtrl.getTeamTree();
-            return targetsToTreeData(res);
+            return [
+              {
+                label: current.team.teamName,
+                value: current.team.id,
+              },
+            ];
           }}
           fieldProps={{
             disabled: title === '修改' || title === '编辑',

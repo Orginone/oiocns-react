@@ -49,6 +49,7 @@ interface MenuItemType {
   expIcon?: React.ReactNode;
   menus?: OperateMenuType[];
   children: MenuItemType[];
+  parentMenu?: MenuItemType;
 }
 
 interface OperateMenuType {

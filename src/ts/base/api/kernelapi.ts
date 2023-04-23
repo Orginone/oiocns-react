@@ -307,6 +307,7 @@ export default class KernelApi {
   public async createOperation(
     params: model.OperationModel,
   ): Promise<model.ResultType<schema.XOperation>> {
+    console.log(params);
     return await this.request({
       module: 'thing',
       action: 'CreateOperation',

@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
-import useMenuUpdate from './hooks/useMenuUpdate';
 import { GroupMenuType, MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
@@ -12,17 +11,17 @@ import OioForm from '@/components/Form';
 import { ProFormInstance } from '@ant-design/pro-components';
 import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 import { ITarget } from '@/ts/core';
+import * as config from './config/menuOperate';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadStoreMenu);
   const [showData, setShowData] = useState<any[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
-
-  if (!selectMenu) return <></>;
-
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -31,11 +30,9 @@ const Package: React.FC = () => {
         switch (data.itemType) {
           case GroupMenuType.Things:
             (data.item as ITarget).loadSpeciesTree();
-            refreshMenu();
             break;
           case MenuType.FileSystemItem:
             await (data.item as IFileSystemItem).loadChildren();
-            refreshMenu();
             break;
         }
         setSelectMenu(data);

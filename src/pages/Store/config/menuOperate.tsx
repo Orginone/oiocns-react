@@ -7,6 +7,7 @@ import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { IFileSystemItem, TargetType } from '@/ts/core';
 import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
+import { IconFont } from '@/components/IconFont';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
@@ -219,7 +220,7 @@ const loadAgencyGroup = (
 };
 
 /** 获取个人菜单 */
-export const getUserMenu = async () => {
+const getUserMenu = async () => {
   return {
     key: orgCtrl.user.key,
     item: orgCtrl.user,
@@ -257,7 +258,7 @@ export const getUserMenu = async () => {
 };
 
 /** 获取组织菜单 */
-export const getTeamMenu = async () => {
+const getTeamMenu = async () => {
   const children: MenuItemType[] = [];
   for (const company of await orgCtrl.user.getJoinedCompanys()) {
     children.push({
@@ -311,4 +312,15 @@ export const getTeamMenu = async () => {
     });
   }
   return children;
+};
+
+/** 获取仓库模块菜单 */
+export const loadStoreMenu = async () => {
+  return {
+    key: '仓库',
+    label: '仓库',
+    itemType: 'group',
+    icon: <IconFont type={'icon-store'} />,
+    children: [await getUserMenu(), ...(await getTeamMenu())],
+  };
 };
