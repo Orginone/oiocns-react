@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookType, GroupMenuType } from './menuType';
+import { GroupMenuType, MenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
@@ -18,7 +18,7 @@ const buildTargetTree = async (targets: ITarget[]) => {
       item: item.chat,
       label: item.teamName,
       tag: item.chat.target.labels,
-      itemType: GroupMenuType.Chat,
+      itemType: MenuType.Chat,
       menus: loadChatMoreMenus(false, true),
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: await buildTargetTree(item.subTeam),
@@ -35,7 +35,7 @@ const buildAuthorityTree = (authority: IAuthority, user: ISpace) => {
     item: authority.chat,
     tag: authority.chat.target.labels,
     menus: loadChatMoreMenus(false, true),
-    itemType: GroupMenuType.Chat,
+    itemType: MenuType.Chat,
     children: authority.children?.map((i) => buildAuthorityTree(i, user)) ?? [],
   };
   return result;
@@ -53,14 +53,14 @@ const loadBookMenu = async () => {
       key: company.id + '同事',
       label: company.teamName,
       item: company.allChats(),
-      itemType: GroupMenuType.Books,
+      itemType: MenuType.Books,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
         {
           key: company.chat.fullId,
           label: company.teamName,
           item: company.chat,
-          itemType: GroupMenuType.Chat,
+          itemType: MenuType.Chat,
           tag: [company.typeName, '全员群'],
           menus: loadChatMoreMenus(false, true),
           children: company.memberChats.map((chat) => {
@@ -68,7 +68,7 @@ const loadBookMenu = async () => {
               key: chat.fullId,
               label: chat.target.name,
               item: chat,
-              itemType: GroupMenuType.Chat,
+              itemType: MenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
               tag: chat.target.labels,
@@ -78,14 +78,14 @@ const loadBookMenu = async () => {
           icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
         },
         {
-          key: company.id + BookType.Innner,
-          label: BookType.Innner,
+          key: company.id + GroupMenuType.InnerAgency,
+          label: GroupMenuType.InnerAgency,
           item: innnerChats,
-          itemType: GroupMenuType.Books,
+          itemType: MenuType.Books,
           belong: company,
           icon: (
             <TeamIcon
-              share={{ typeName: TargetType.Department, name: BookType.Innner }}
+              share={{ typeName: TargetType.Department, name: GroupMenuType.InnerAgency }}
               size={18}
               fontSize={16}
             />
@@ -93,13 +93,13 @@ const loadBookMenu = async () => {
           children: await buildTargetTree(await company.loadSubTeam()),
         },
         {
-          key: company.id + BookType.Station,
-          label: BookType.Station,
+          key: company.id + GroupMenuType.Station,
+          label: GroupMenuType.Station,
           item: company.stations.map((i) => i.chat),
-          itemType: GroupMenuType.Books,
+          itemType: MenuType.Books,
           icon: (
             <TeamIcon
-              share={{ typeName: TargetType.Station, name: BookType.Innner }}
+              share={{ typeName: TargetType.Station, name: GroupMenuType.Station }}
               size={18}
               fontSize={16}
             />
@@ -107,13 +107,27 @@ const loadBookMenu = async () => {
           children: await buildTargetTree(await company.getStations()),
         },
         {
-          key: company.id + BookType.Working,
-          label: BookType.Working,
+          key: company.id + GroupMenuType.Working,
+          label: GroupMenuType.Working,
           item: company.workings.map((i) => i.chat),
-          itemType: GroupMenuType.Books,
+          itemType: MenuType.Books,
           icon: (
             <TeamIcon
-              share={{ typeName: TargetType.Working, name: BookType.Working }}
+              share={{ typeName: TargetType.Working, name: GroupMenuType.Working }}
+              size={18}
+              fontSize={16}
+            />
+          ),
+          children: await buildTargetTree(await company.getWorkings()),
+        },
+        {
+          key: company.id + GroupMenuType.CompanyCohort,
+          label: GroupMenuType.CompanyCohort,
+          item: company.cohorts.map((i) => i.chat),
+          itemType: MenuType.Books,
+          icon: (
+            <TeamIcon
+              share={{ typeName: TargetType.Cohort, name: GroupMenuType.CompanyCohort }}
               size={18}
               fontSize={16}
             />
@@ -124,10 +138,10 @@ const loadBookMenu = async () => {
           key: company.id + '单位权限群',
           label: '单位权限群',
           item: company.authorityTree?.allChats() ?? [],
-          itemType: GroupMenuType.Books,
+          itemType: MenuType.Books,
           icon: (
             <TeamIcon
-              share={{ typeName: TargetType.Cohort, name: BookType.Working }}
+              share={{ typeName: TargetType.Cohort, name: GroupMenuType.Working }}
               size={18}
               fontSize={16}
             />
@@ -149,7 +163,7 @@ const loadBookMenu = async () => {
         {
           key: orgCtrl.user.chat.fullId,
           label: orgCtrl.user.chat.target.name,
-          itemType: GroupMenuType.Chat,
+          itemType: MenuType.Chat,
           icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
           children: [],
           tag: orgCtrl.user.chat.target.labels,
@@ -157,9 +171,9 @@ const loadBookMenu = async () => {
           menus: loadChatMoreMenus(true, true),
         },
         {
-          key: BookType.Friend,
-          label: BookType.Friend,
-          itemType: GroupMenuType.Books,
+          key: GroupMenuType.Friends,
+          label: GroupMenuType.Friends,
+          itemType: MenuType.Books,
           icon: <im.ImUser />,
           item: orgCtrl.user.memberChats,
           children: orgCtrl.user.memberChats.map((chat) => {
@@ -167,7 +181,7 @@ const loadBookMenu = async () => {
               key: chat.fullId,
               label: chat.target.name,
               item: chat,
-              itemType: GroupMenuType.Chat,
+              itemType: MenuType.Chat,
               icon: <TeamIcon share={chat.shareInfo} size={18} fontSize={16} />,
               children: [],
               tag: chat.target.labels,
@@ -176,9 +190,9 @@ const loadBookMenu = async () => {
           }),
         },
         {
-          key: BookType.Cohort,
-          label: BookType.Cohort,
-          itemType: GroupMenuType.Books,
+          key: GroupMenuType.UserCohort,
+          label: GroupMenuType.UserCohort,
+          itemType: MenuType.Books,
           icon: <im.ImUsers />,
           item: orgCtrl.user.cohorts.map((i) => i.chat),
           children: orgCtrl.user.cohorts.map((cohort) => {
@@ -188,7 +202,7 @@ const loadBookMenu = async () => {
               label: cohort.chat.target.name,
               item: cohort.chat,
               menus: loadChatMoreMenus(true, true),
-              itemType: GroupMenuType.Chat,
+              itemType: MenuType.Chat,
               tag: cohort.chat.target.labels,
               icon: <TeamIcon share={cohort.chat.shareInfo} size={18} fontSize={16} />,
             };

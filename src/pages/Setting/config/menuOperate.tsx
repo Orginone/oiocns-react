@@ -287,13 +287,23 @@ const getTeamMenu = async () => {
         ),
         await loadGroupMenus(
           {
-            key: company.key + GroupMenuType.StationSetting,
-            label: GroupMenuType.StationSetting,
+            key: company.key + GroupMenuType.Station,
+            label: GroupMenuType.Station,
             item: company,
             typeName: TargetType.Station,
             subTeam: company.stations,
           },
           [TargetType.Station],
+        ),
+        await loadGroupMenus(
+          {
+            key: company.key + GroupMenuType,
+            label: GroupMenuType.Working,
+            item: company,
+            typeName: TargetType.Working,
+            subTeam: company.workings,
+          },
+          [TargetType.Cohort],
         ),
         await loadGroupMenus(
           {

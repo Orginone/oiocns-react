@@ -92,10 +92,10 @@ const getUserMenu = async () => {
     children: [
       await loadThingMenus(orgCtrl.user),
       {
-        key: orgCtrl.user.key + GroupMenuType.Cohorts,
+        key: orgCtrl.user.key + GroupMenuType.UserCohort,
         item: orgCtrl.user,
-        label: GroupMenuType.Cohorts,
-        itemType: GroupMenuType.Cohorts,
+        label: GroupMenuType.UserCohort,
+        itemType: GroupMenuType.UserCohort,
         icon: <im.ImNewspaper />,
         menus: [],
         children: await buildTargetTree(orgCtrl.user.cohorts),
@@ -137,8 +137,14 @@ const getTeamMenu = async () => {
         ),
         loadAgencyGroup(
           company,
+          await buildTargetTree(company.workings),
+          GroupMenuType.Working,
+          TargetType.Working,
+        ),
+        loadAgencyGroup(
+          company,
           await buildTargetTree(company.cohorts),
-          GroupMenuType.Cohorts,
+          GroupMenuType.CompanyCohort,
           TargetType.Cohort,
         ),
       ],
