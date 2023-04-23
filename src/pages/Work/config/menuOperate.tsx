@@ -4,7 +4,7 @@ import { IGroup, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { GroupMenuType, OrganizationType } from '@/pages/Todo/config/menuType';
+import { GroupMenuType, OrganizationType } from './menuType';
 
 /** 编译分类树 */
 const buildSpeciesTree = async (species: ISpeciesItem[]) => {

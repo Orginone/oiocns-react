@@ -9,9 +9,11 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import { ImArrowLeft2, ImUserTie } from 'react-icons/im';
+import { ImArrowLeft2 } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
 import { findParentMenus } from '@/utils/tools';
+import orgCtrl from '@/ts/controller';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 const { Content, Sider } = Layout;
 
 /**
@@ -82,7 +84,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             history.push('/passport/login');
           }}>
-          <ImUserTie />
+          <TeamIcon share={orgCtrl.user.shareInfo} />
           <span>退出登录</span>
         </div>
       </Sider>
