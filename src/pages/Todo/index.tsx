@@ -68,16 +68,6 @@ const Todo: React.FC<any> = () => {
       onMenuClick={async (_data, key) => {
         switch (key) {
           case '发起办事':
-            await kernel.createInstance({
-              hook: '',
-              content: '',
-              SpaceId: '358270379577446400',
-              contentType: 'Text',
-              title: 'current.name',
-              defineId: '433904503612379136',
-              data: '',
-              thingIds: [''],
-            });
             setOpenFlow(true);
             break;
           default:
