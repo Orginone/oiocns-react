@@ -234,22 +234,9 @@ const loadChatMoreMenus = (allowDelete: boolean, isChat: boolean = false) => {
       });
     }
     items.push({
-      key: '删除会话',
-      label: '删除会话',
-      icon: <im.ImBin2 />,
-      model: 'inside',
-    });
-    items.push({
       key: '标记为未读',
       label: '标记为未读',
       icon: <im.ImBell />,
-      model: 'outside',
-    });
-  } else {
-    items.push({
-      key: '打开会话',
-      icon: <im.ImBubbles />,
-      label: '打开会话',
       model: 'outside',
     });
   }
