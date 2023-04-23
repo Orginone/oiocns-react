@@ -293,6 +293,7 @@ class CohortChat extends BaseChat {
       });
       this.personCount = res.data?.total ?? 0;
     }
+    msgNotify.changCallback();
   }
 }
 // 消息变更推送
