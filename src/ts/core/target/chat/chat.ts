@@ -81,6 +81,7 @@ class BaseChat implements IChat {
       this.noReadCount = cache.noReadCount;
       msgNotify.changCallback();
     }
+    // debugger;
     this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
     if (cache.lastMessage && cache.lastMessage.id != this.lastMessage?.id) {
       this.lastMessage = cache.lastMessage;

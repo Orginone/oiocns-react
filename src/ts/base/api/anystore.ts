@@ -31,6 +31,7 @@ export default class AnyStore {
   private constructor(url: string) {
     this._subscribeCallbacks = {};
     this._storeHub = new StoreHub(url);
+    this._storeHub.flag = 'anystore';
     this._storeHub.on('updated', (belongId, key, data) => {
       this._updated(belongId, key, data);
     });
@@ -39,6 +40,7 @@ export default class AnyStore {
         this._storeHub
           .invoke('TokenAuth', this.accessToken)
           .then(() => {
+            logger.info('连接到存储成功!');
             Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
               const key = fullKey.split('|')[0];
               const belongId = fullKey.split('|')[1];
