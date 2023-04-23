@@ -103,6 +103,7 @@ class BaseChat implements IChat {
     if (this.messages.length < 10) {
       this.moreMessage('');
     }
+    this.morePerson('');
   }
   unMessage(): void {
     this.messageNotify = undefined;

@@ -131,7 +131,7 @@ const getFileSystemMenus = (user: ISpace) => {
 /** 获取财物菜单 */
 const loadThingMenus = (target: ITarget) => {
   return {
-    key: target.id + GroupMenuType.Things,
+    key: target.key + GroupMenuType.Things,
     label: GroupMenuType.Things,
     itemType: GroupMenuType.Things,
     menus: [],
