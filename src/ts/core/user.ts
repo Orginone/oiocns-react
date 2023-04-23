@@ -92,10 +92,14 @@ export default class UserProvider extends common.Emitter {
       await company.loadMembers(pageAll());
     }
     this._inited = true;
-    this._preMessages = this._preMessages.filter((item) => {
-      this._recvMessage(item);
-      return false;
-    });
+    this._preMessages = this._preMessages
+      .sort((a, b) => {
+        return new Date(a.createTime).getTime() - new Date(b.createTime).getTime();
+      })
+      .filter((item) => {
+        this._recvMessage(item);
+        return false;
+      });
   }
   /**
    * 接收到新信息

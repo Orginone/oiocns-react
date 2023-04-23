@@ -8,8 +8,6 @@ import { TxtHubProtocol } from '../protocol';
  * 存储层Hub
  */
 export default class StoreHub implements IDisposable {
-  // 标识符
-  public flag: string = '';
   // 超时重试时间
   private _timeout: number;
   // 是否已经启动
@@ -47,7 +45,6 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        logger.info(this.flag);
         logger.warn(`连接断开,${this._timeout}ms后重试。` + (err ? err!.message : ''));
         setTimeout(() => {
           this._starting();

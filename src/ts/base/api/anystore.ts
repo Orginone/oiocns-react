@@ -31,7 +31,6 @@ export default class AnyStore {
   private constructor(url: string) {
     this._subscribeCallbacks = {};
     this._storeHub = new StoreHub(url);
-    this._storeHub.flag = 'anystore';
     this._storeHub.on('updated', (belongId, key, data) => {
       this._updated(belongId, key, data);
     });
