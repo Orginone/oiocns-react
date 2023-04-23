@@ -14,7 +14,6 @@ import {
 } from '@ant-design/icons';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
-import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import { ISpeciesItem } from '@/ts/core';
 
 interface IProps {
@@ -63,8 +62,7 @@ const Design: React.FC<IProps> = ({
   useEffect(() => {
     const load = async () => {
       // content字段可能取消
-      let resource_: any;
-      resource_ = await new FlowDefine(current.belongId).queryNodes(current.id);
+      let resource_ = await species?.loadWorkNode(current.id);
       let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
       let nodes = getAllNodes(resourceData, []);
       let spaceRootNodes = nodes.filter((item) => item.type == 'ROOT');
@@ -621,7 +619,7 @@ const Design: React.FC<IProps> = ({
                             return;
                           }
                           if (
-                            await species?.team.define.publishDefine({
+                            await species?.publishWork({
                               id: current?.id,
                               code: current.name,
                               name: current.name,

@@ -5,8 +5,9 @@ import { AttributeModel } from '@/ts/base/model';
 import { ISpace, ISpeciesItem } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
 import { getUuid } from '@/utils/tools';
-import orgCtrl from '@/ts/controller';
 import { common } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
+import { targetsToTreeData } from '@/pages/Setting';
 
 interface Iprops {
   title: string;
@@ -49,7 +50,7 @@ const AttributeModal = (props: Iprops) => {
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
         request: async () => {
-          const res = await orgCtrl.user.property?.loadPropertys({
+          const res = await props.current.team.space.property.loadPropertys({
             offset: 0,
             limit: common.Constants.MAX_UINT_16,
             filter: '',
@@ -62,21 +63,21 @@ const AttributeModal = (props: Iprops) => {
           return [];
         },
       },
-      // {
-      //   title: '选择制定组织',
-      //   dataIndex: 'belongId',
-      //   valueType: 'treeSelect',
-      //   initialValue: userCtrl.space.id,
-      //   formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-      //   request: async () => {
-      //     const res = await userCtrl.getTeamTree();
-      //     return targetsToTreeData(res);
-      //   },
-      //   fieldProps: {
-      //     disabled: title === '修改',
-      //     showSearch: true,
-      //   },
-      // },
+      {
+        title: '选择制定组织',
+        dataIndex: 'belongId',
+        valueType: 'treeSelect',
+        initialValue: current.team.space.id,
+        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+        request: async () => {
+          const res = await orgCtrl.getTeamTree(current.team.space);
+          return targetsToTreeData(res);
+        },
+        fieldProps: {
+          disabled: title === '修改',
+          showSearch: true,
+        },
+      },
       {
         title: '选择管理权限',
         dataIndex: 'authId',

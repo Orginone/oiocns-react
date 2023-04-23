@@ -12,6 +12,8 @@ import React, { useEffect } from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import { CreateDefineReq } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
+import orgCtrl from '@/ts/controller/index';
+import { targetsToTreeData } from '@/pages/Setting';
 
 interface Iprops {
   open: boolean;
@@ -97,6 +99,23 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           required={true}
           colProps={{ span: 24 }}
           rules={[{ required: true, message: '办事名称为必填项' }]}
+        />
+        <ProFormTreeSelect
+          width="md"
+          name="belongId"
+          label="制定组织"
+          placeholder="请选择制定组织"
+          required={true}
+          colProps={{ span: 12 }}
+          initialValue={target.id}
+          request={async () => {
+            const res = await orgCtrl.getTeamTree(target.space);
+            return targetsToTreeData(res);
+          }}
+          fieldProps={{
+            disabled: title === '修改' || title === '编辑',
+            showSearch: true,
+          }}
         />
         <ProFormSelect
           width="md"

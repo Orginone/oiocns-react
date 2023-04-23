@@ -1,4 +1,10 @@
-import { XAttribute, XAttributeArray, XFlowDefine } from '@/ts/base/schema';
+import {
+  FlowNode,
+  XAttribute,
+  XAttributeArray,
+  XFlowDefine,
+  XFlowDefineArray,
+} from '@/ts/base/schema';
 import { kernel, model, schema } from '@/ts/base';
 import {
   AttributeModel,
@@ -7,7 +13,6 @@ import {
   SpeciesModel,
 } from '@/ts/base/model';
 import { INullSpeciesItem, ISpeciesItem } from './ispecies';
-import { IFlowDefine } from './iflowDefine';
 import { ITarget } from '../itarget';
 /**
  * 分类系统项实现
@@ -21,7 +26,7 @@ export class SpeciesItem implements ISpeciesItem {
   parent: INullSpeciesItem;
   children: ISpeciesItem[];
   attrs?: XAttribute[];
-  defines?: IFlowDefine[];
+  defines?: XFlowDefine[];
   instances?: schema.XFlowInstance[];
   team: ITarget;
 
@@ -100,6 +105,25 @@ export class SpeciesItem implements ISpeciesItem {
     return res.data;
   }
 
+  async loadWork(page: PageRequest): Promise<XFlowDefineArray> {
+    let res = (
+      await kernel.queryDefine({
+        spaceId: this.team.id,
+        speciesId: this.id,
+      })
+    ).data;
+    return {
+      result: res.result,
+      offset: page.offset,
+      limit: page.limit,
+      total: res.total,
+    };
+  }
+
+  async loadWorkNode(id: string): Promise<FlowNode> {
+    return (await kernel.queryNodes({ id: id })).data;
+  }
+
   async create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem> {
     const res = await kernel.createSpecies({
       parentId: this.id,
@@ -130,7 +154,6 @@ export class SpeciesItem implements ISpeciesItem {
       this.target.belongId = data.belongId;
       this.target.remark = data.remark;
     }
-
     return this;
   }
 
@@ -220,12 +243,11 @@ export class SpeciesItem implements ISpeciesItem {
     return res.success;
   }
 
-  /* 加载办事 */
-  async loadFlowDefine(): Promise<XFlowDefine[]> {
-    const res = await kernel.queryDefine({
-      spaceId: this.team.id,
-      speciesId: this.id,
-    });
-    return res.data.result || [];
+  async publishWork(data: model.CreateDefineReq): Promise<schema.XFlowDefine> {
+    return (await kernel.publishDefine(data)).data;
+  }
+
+  async deleteWork(id: string): Promise<boolean> {
+    return (await kernel.deleteDefine({ id })).success;
   }
 }

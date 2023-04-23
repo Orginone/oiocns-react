@@ -6,6 +6,17 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType, OrganizationType } from '@/pages/Todo/config/menuType';
 
+const buildGroupMenu = () => {
+  return [
+    {
+      key: '发起办事',
+      icon: <im.ImPlus />,
+      label: '发起办事',
+      model: 'outside',
+    },
+  ];
+};
+
 /** 编译分类树 */
 const buildSpeciesTree = async (species: ISpeciesItem[]) => {
   let works = [];
@@ -20,14 +31,7 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
       children: subSpecies.children,
-      menus: [
-        {
-          key: '发起办事',
-          icon: <im.ImOffice />,
-          label: '发起办事',
-          model: 'outside',
-        },
-      ],
+      menus: buildGroupMenu(),
     });
   }
   return {
@@ -53,6 +57,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       label: item.teamName,
       tag: [item.typeName + '群'],
       item: [item],
+      menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [...children, ...species.children],
@@ -72,6 +77,7 @@ export const loadWorkMenu = async () => {
       key: company.key,
       label: company.teamName,
       item: [company],
+      menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [

@@ -5,7 +5,6 @@ import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
-import { FlowDefine } from './thing/flowDefine';
 import { ISpeciesItem } from './thing';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
@@ -56,14 +55,22 @@ export interface ITarget {
   subTeam: ITarget[];
   /** 共享信息 */
   shareInfo: TargetShare;
-  /** 办事 */
-  define: FlowDefine;
   /** 分类 */
   species: ISpeciesItem[];
   /** 会话 */
   chat: IChat;
   /** 当前的会话 */
   allChats(): IChat[];
+  /**
+   * 获取办事
+   * @param reload 是否强制刷新
+   */
+  loadWork(page: PageRequest, reload?: boolean): Promise<schema.XFlowDefineArray>;
+  /**
+   * 获取办事节点
+   * @param reload 是否强制刷新
+   */
+  loadWorkNode(id: string): Promise<schema.FlowNode>;
   /**
    * 新增
    * @param data
@@ -309,33 +316,7 @@ export interface IMTarget {
     merchandiseIds: string[],
   ): Promise<schema.XOrder>;
 }
-export interface IFlow {
-  /** 流程定义 */
-  defines: schema.XFlowDefine[];
-  /**
-   * 获取流程定义列表
-   * @param reload 是否强制刷新
-   */
-  getDefines(reload: boolean): Promise<schema.XFlowDefine[]>;
-  /**
-   * 发布流程定义（包含创建、更新）
-   * @param data
-   */
-  publishDefine(
-    data: Omit<model.CreateDefineReq, 'belongId'>,
-  ): Promise<schema.XFlowDefine>;
-  /**
-   * 删除流程定义
-   * @param id 流程定义Id
-   */
-  deleteDefine(id: string): Promise<boolean>;
-  /**
-   * 发起流程实例
-   * @param data 流程实例参数
-   */
-  createInstance(data: model.FlowInstanceModel): Promise<schema.XFlowInstance>;
-}
-export interface ISpace extends IFlow, IMTarget, ITarget {
+export interface ISpace extends IMTarget, ITarget {
   /** 我的群组 */
   cohorts: ICohort[];
   /** 空间权限树 */
