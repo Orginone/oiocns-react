@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, Radio, RadioChangeEvent, Tree, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '../ShareShowComp';
@@ -385,7 +385,7 @@ const ShareRecent = (props: Iprops) => {
         <div style={{ width: radio !== 1 ? '33%' : '50%' }} className={cls.left}>
           <Input
             className={cls.leftInput}
-            prefix={<SearchOutlined />}
+            prefix={<AiOutlineSearch />}
             placeholder="请设置关键字"
           />
           <div className={cls.leftContent}>
@@ -410,7 +410,7 @@ const ShareRecent = (props: Iprops) => {
           <div className={cls.center}>
             <Input
               className={cls.centerInput}
-              prefix={<SearchOutlined />}
+              prefix={<AiOutlineSearch />}
               placeholder="搜索"
             />
             <div className={cls.centerContent}>

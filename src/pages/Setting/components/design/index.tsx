@@ -20,7 +20,7 @@ import { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
 import { ISpeciesItem } from '@/ts/core';
@@ -594,7 +594,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
                     />
                     <Space wrap>
                       <Button
-                        icon={<SearchOutlined />}
+                        icon={<AiOutlineSearch />}
                         onClick={() => setOpenPreviewModal(true)}>
                         预览表单
                       </Button>

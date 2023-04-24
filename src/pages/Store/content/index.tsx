@@ -3,7 +3,7 @@ import { MenuItemType } from 'typings/globelType';
 import { MenuType } from '../config/menuType';
 import FileSystem from './FileSystem';
 import ThingIndex from '@/pages/Store/content/Thing';
-import Application from './App/innerApp';
+import Application from './InnerApp';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
@@ -28,7 +28,7 @@ const ContentIndex = (props: IProps) => {
   /** 加载内容区 */
   switch (props.selectMenu.itemType) {
     case MenuType.Application:
-      return <Application />;
+      return <Application current={props.selectMenu.item} />;
     case MenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
     case MenuType.Species:

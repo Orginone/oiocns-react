@@ -4,7 +4,7 @@ import { Button, Card, message } from 'antd';
 import React, { useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import Design from '../../../components/design/index';
-import { SaveOutlined } from '@ant-design/icons';
+import { AiOutlineSave } from 'react-icons/ai';
 import { OperationModel } from '@/ts/base/model';
 import { kernel } from '@/ts/base';
 
@@ -57,7 +57,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
               }
             }}
             type="primary"
-            icon={<SaveOutlined />}
+            icon={<AiOutlineSave />}
             disabled={!operationModel}>
             保存
           </Button>

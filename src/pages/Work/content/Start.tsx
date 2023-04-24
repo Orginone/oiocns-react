@@ -4,7 +4,7 @@ import { kernel } from '@/ts/base';
 import { XFlowDefine, XOperation } from '@/ts/base/schema';
 import { ISpace, ISpeciesItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
-import { PlusOutlined } from '@ant-design/icons';
+import { AiOutlinePlus } from 'react-icons/ai';
 import { ProFormInstance } from '@ant-design/pro-components';
 import { Button, message, Modal, Tabs } from 'antd';
 import TabPane from 'antd/lib/tabs/TabPane';
@@ -122,7 +122,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
               toolBarItems={[
                 <Item key={getUuid()}>
                   <Button
-                    icon={<PlusOutlined></PlusOutlined>}
+                    icon={<AiOutlinePlus></AiOutlinePlus>}
                     onClick={() => {
                       setNeedBack(false);
                     }}>

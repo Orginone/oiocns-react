@@ -110,7 +110,7 @@ const getAppliactionMenus = (user: ISpace) => {
     label: '应用',
     itemType: MenuType.Application,
     icon: <im.ImWindows8 />,
-    item: orgCtrl.user.root,
+    item: user,
     children: [],
   };
 };

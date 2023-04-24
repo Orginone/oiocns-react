@@ -5,10 +5,10 @@ import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
 import {
-  EllipsisOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from '@ant-design/icons';
+  AiOutlineEllipsis,
+  AiOutlineMenuFold,
+  AiOutlineMenuUnfold,
+} from 'react-icons/ai';
 import { ImArrowLeft2 } from 'react-icons/im';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -94,7 +94,11 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   onClick={() => {
                     setCollapsed(!collapsed);
                   }}>
-                  {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  {collapsed ? (
+                    <AiOutlineMenuUnfold fontSize={16} />
+                  ) : (
+                    <AiOutlineMenuFold fontSize={16} />
+                  )}
                 </Typography.Link>
               }
               selectKey={props.selectMenu.key}
@@ -133,7 +137,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   )}
                   placement="bottom"
                   trigger={['click', 'contextMenu']}>
-                  <EllipsisOutlined
+                  <AiOutlineEllipsis
                     title={'右键操作'}
                     style={{ fontSize: 18 }}
                     rotate={90}

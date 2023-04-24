@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import InsertButton from '../InsertButton';
-import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
+import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
 import orgCtrl from '@/ts/controller';
@@ -93,11 +93,11 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
       </span>
       {editable && props.config.readonly && (
         <span className={cls['option']}>
-          <CopyOutlined
+          <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
             onClick={copy}
           />
-          <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
+          <AiOutlineClose style={{ fontSize: '12px' }} onClick={delNode} />
         </span>
       )}
     </div>

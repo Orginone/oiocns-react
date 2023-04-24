@@ -1,4 +1,4 @@
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
@@ -99,7 +99,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
         <div style={{ width: '33%' }} className={cls.left}>
           <Input
             className={cls.leftInput}
-            prefix={<SearchOutlined />}
+            prefix={<AiOutlineSearch />}
             placeholder="请设置关键字"
           />
           <div className={cls.leftContent}>
@@ -117,7 +117,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
         <div className={cls.center}>
           <Input
             className={cls.centerInput}
-            prefix={<SearchOutlined />}
+            prefix={<AiOutlineSearch />}
             placeholder="搜索"
           />
           <div className={cls.centerContent}>

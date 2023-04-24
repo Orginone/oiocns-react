@@ -3,14 +3,11 @@ import React from 'react';
 
 import styles from './index.module.less';
 import HeaderNav from './Nav';
-import orgCtrl from '@/ts/controller';
-import { PageLoading } from '@ant-design/pro-layout';
 import { Link } from 'react-router-dom';
 
 const { Header } = Layout;
 
 const BasicHeader: React.FC = () => {
-  if (!orgCtrl.user) return <PageLoading />;
   return (
     <Header className={styles['basic-header']}>
       <Space>

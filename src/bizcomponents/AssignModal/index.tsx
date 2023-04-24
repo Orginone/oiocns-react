@@ -3,8 +3,8 @@
  */
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
 import { Input, Tooltip } from 'antd';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import cls from './index.module.less';
 import { PageRequest } from '@/ts/base/model';
@@ -37,7 +37,7 @@ const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElemen
           placeholder={placeholder || '请输入搜索内容'}
           suffix={
             <Tooltip>
-              <SearchOutlined />
+              <AiOutlineSearch />
             </Tooltip>
           }
           value={keyword}

@@ -1,5 +1,5 @@
 import { Layout, Spin, message } from 'antd';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
@@ -14,10 +14,14 @@ type BasicLayoutProps = {
 
 const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   const { route, history } = props;
+  const [inited, setInited] = useState(false);
   useEffect(() => {
     if (!orgCtrl.logined) {
       return history.push('/passport/login');
     }
+    setTimeout(() => {
+      setInited(true);
+    }, 500);
   }, []);
 
   logger.onLogger = (level, msg) => {
@@ -39,7 +43,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
   };
   return (
     <Layout className={styles['page-layout']}>
-      {orgCtrl.logined ? (
+      {inited ? (
         <>
           {/* 公共头部 */}
           <BasicHeader />

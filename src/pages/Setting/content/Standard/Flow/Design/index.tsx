@@ -5,13 +5,13 @@ import { Branche, FlowNode, XFlowDefine, XFlowInstance } from '@/ts/base/schema'
 import { Branche as BrancheModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
 import {
-  ExclamationCircleOutlined,
-  SendOutlined,
-  MinusOutlined,
-  PlusOutlined,
-  FormOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons';
+  AiOutlineExclamationCircle,
+  AiOutlineSend,
+  AiOutlineMinus,
+  AiOutlinePlus,
+  AiOutlineForm,
+  AiOutlineClockCircle,
+} from 'react-icons/ai';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
 import { ISpeciesItem } from '@/ts/core';
@@ -579,7 +579,7 @@ const Design: React.FC<IProps> = ({
                       items={[
                         {
                           title: '办事流程设计',
-                          icon: <FormOutlined />,
+                          icon: <AiOutlineForm />,
                         },
                       ]}></Steps>
                   </div>
@@ -592,14 +592,14 @@ const Design: React.FC<IProps> = ({
                     size="small"
                     disabled={scale <= 40}
                     onClick={() => setScale(scale - 10)}>
-                    <MinusOutlined />
+                    <AiOutlineMinus />
                   </Button>
                   <span>{scale}%</span>
                   <Button
                     size="small"
                     disabled={scale >= 150}
                     onClick={() => setScale(scale + 10)}>
-                    <PlusOutlined />
+                    <AiOutlinePlus />
                   </Button>
                   {IsEdit && (
                     <>
@@ -634,7 +634,7 @@ const Design: React.FC<IProps> = ({
                             onBack();
                           }
                         }}>
-                        <SendOutlined />
+                        <AiOutlineSend />
                         发布
                       </Button>
                       <Button
@@ -645,7 +645,7 @@ const Design: React.FC<IProps> = ({
                         onClick={async () => {
                           Modal.confirm({
                             title: '未发布的内容将不会被保存，是否直接退出?',
-                            icon: <ExclamationCircleOutlined />,
+                            icon: <AiOutlineExclamationCircle />,
                             okText: '确认',
                             okType: 'danger',
                             cancelText: '取消',
@@ -654,7 +654,7 @@ const Design: React.FC<IProps> = ({
                             },
                           });
                         }}>
-                        <CloseCircleOutlined />
+                        <AiOutlineClockCircle />
                         返回
                       </Button>
                     </>

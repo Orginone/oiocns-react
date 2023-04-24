@@ -24,7 +24,7 @@ import { ISpeciesItem } from '@/ts/core';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { ItemType } from 'antd/lib/menu/hooks/useItems';
 
 type ThingItemType = ItemType & { click: (data: any) => void };
@@ -388,7 +388,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   }}
                   placement="bottom">
                   <div style={{ cursor: 'pointer', width: '40px' }}>
-                    <EllipsisOutlined />
+                    <AiOutlineEllipsis />
                   </div>
                 </Dropdown>
               );

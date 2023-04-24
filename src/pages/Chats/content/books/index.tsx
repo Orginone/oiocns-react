@@ -2,7 +2,7 @@ import { Badge, Card, Empty, List, Tag } from 'antd';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { WechatOutlined } from '@ant-design/icons';
+import { AiOutlineWechat } from 'react-icons/ai';
 import { MessageType, msgNotify } from '@/ts/core';
 import { IChat } from '@/ts/core/target/chat/ichat';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
@@ -63,7 +63,7 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
                       orgCtrl.currentKey = item.fullId;
                       orgCtrl.changCallback();
                     }}>
-                    <WechatOutlined style={{ fontSize: 18 }}></WechatOutlined>
+                    <AiOutlineWechat style={{ fontSize: 18 }}></AiOutlineWechat>
                   </a>,
                 ]}>
                 <List.Item.Meta

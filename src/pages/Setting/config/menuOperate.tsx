@@ -8,7 +8,7 @@ import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import { XDict } from '@/ts/base/schema';
-import { SettingOutlined } from '@ant-design/icons';
+import { AiOutlineSetting } from 'react-icons/ai';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -439,6 +439,6 @@ export const loadSettingMenu = async () => {
     label: '设置',
     itemType: 'Tab',
     children: [await getUserMenu(), ...(await getTeamMenu())],
-    icon: <SettingOutlined />,
+    icon: <AiOutlineSetting />,
   };
 };

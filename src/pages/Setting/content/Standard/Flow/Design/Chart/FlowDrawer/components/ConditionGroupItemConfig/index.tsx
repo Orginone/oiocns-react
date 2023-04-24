@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DeleteOutlined } from '@ant-design/icons';
+import { AiOutlineDelete } from 'react-icons/ai';
 import { Select, InputNumber, Input, Form } from 'antd';
 import {
   NodeType,
@@ -91,7 +91,7 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                   setCurrentNode(currentNode);
                   setKey(key + 1);
                 }}>
-                <DeleteOutlined />
+                <AiOutlineDelete />
               </div>
               <span className={cls['group-name']}>参数{index}</span>
 

@@ -1,4 +1,4 @@
-import { DownOutlined, RightOutlined } from '@ant-design/icons';
+import { AiOutlineDown, AiOutlineRight } from 'react-icons/ai';
 import { Button, Checkbox, Col, Modal, Row, Typography } from 'antd';
 import React, { useState } from 'react';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -149,7 +149,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IChat }) => {
                 }}>
                 查看更多
                 <span className={detailStyle.more_btn_icon}>
-                  <DownOutlined />
+                  <AiOutlineDown />
                 </span>
               </span>
             ) : (
@@ -189,7 +189,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IChat }) => {
           </div>
           <div className={`${detailStyle.con} ${detailStyle.check_con}`}>
             <span>查找聊天记录</span>
-            <RightOutlined />
+            <AiOutlineRight />
           </div>
         </div>
         {chat.spaceId === chat.userId ? (

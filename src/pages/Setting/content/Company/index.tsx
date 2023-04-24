@@ -10,7 +10,7 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis, AiOutlineExclamationCircle } from 'react-icons/ai';
 import orgCtrl from '@/ts/controller';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
@@ -55,7 +55,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       onClick: async () => {
         Modal.confirm({
           title: `是否退出${current.name}?`,
-          icon: <ExclamationCircleOutlined />,
+          icon: <AiOutlineExclamationCircle />,
           okText: '确认',
           okType: 'danger',
           cancelText: '取消',
@@ -152,7 +152,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           labelStyle={{ textAlign: 'center', width: '200px' }}
           extra={[
             <Dropdown menu={{ items: menu }} placement="bottom" key="more">
-              <EllipsisOutlined
+              <AiOutlineEllipsis
                 style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
                 rotate={90}
               />
