@@ -402,7 +402,7 @@ export type XFlowDefine = {
   // 公开的
   public?: boolean;
   //数据源id
-  sourceIds?: string;
+  sourceIds: string;
   //是否创建实体  bool值
   isCreate: boolean;
 };

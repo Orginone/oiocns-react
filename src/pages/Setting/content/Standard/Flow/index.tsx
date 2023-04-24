@@ -66,7 +66,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-              if (await current.team.define.deleteDefine(record.id)) {
+              if (await current.deleteWork(record.id)) {
                 message.success('删除成功');
                 setForceUpdate();
               }
@@ -104,15 +104,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                   columns={FlowColumn}
                   parentRef={parentRef}
                   dataSource={[]}
-                  request={async (page) => {
-                    let data = await current.team.define.loadFlowDefine(current.id);
-                    return {
-                      ...page,
-                      total: data.total,
-                      result:
-                        data.result?.slice(page.offset, page.offset + page.limit) || [],
-                    };
-                  }}
+                  request={async (page) => await current.loadWork(page)}
                   operation={renderOperation}
                   rowKey={(record: XFlowDefine) => record.id}
                   renderCardContent={(items) => {
@@ -146,7 +138,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             setModalType('');
           }}
           handleOk={async (req: CreateDefineReq) => {
-            if (await current.team.define.publishDefine(req)) {
+            if (await current.publishWork(req)) {
               message.success('保存成功');
               setForceUpdate();
               setModalType('');

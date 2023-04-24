@@ -2,20 +2,58 @@ import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
 import orgCtrl from '@/ts/controller/';
-import { Input } from 'antd';
+import { Input, Modal } from 'antd';
 import { ImSearch } from 'react-icons/im';
-import * as config from './config/menuOperate';
+import { XFlowDefine } from '@/ts/base/schema';
+import CardOrTableComp from '@/components/CardOrTableComp';
+import { ISpeciesItem, ITarget } from '@/ts/core';
+import { FlowColumn } from '../Setting/config/columns';
+import WorkStart from './content/Start';
+import { GroupMenuType } from './config/menuType';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import { loadWorkMenu } from './config/menuOperate';
 
 const Todo: React.FC<any> = () => {
-  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadWorkMenu);
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(loadWorkMenu);
+  const [openFlow, setOpenFlow] = useState(false);
+  const [selectWork, setSelectWork] = useState<XFlowDefine>();
   const [filter, setFilter] = useState('');
   if (!selectMenu || !rootMenu) return <></>;
+
+  const content = () => {
+    if (selectWork) {
+      switch (selectMenu.itemType) {
+        case GroupMenuType.Organization:
+          let target = (selectMenu.item as ITarget[])[0];
+          return (
+            <WorkStart
+              space={target.space}
+              current={selectWork}
+              goBack={() => setSelectWork(undefined)}
+            />
+          );
+        case GroupMenuType.Species:
+          let species = (selectMenu.item as ISpeciesItem[])[0];
+          return (
+            <WorkStart
+              current={selectWork}
+              space={species.team.space}
+              goBack={() => setSelectWork(undefined)}
+            />
+          );
+        default:
+          break;
+      }
+    }
+    return <Content key={key} selectMenu={selectMenu} filter={filter} />;
+  };
+
   return (
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
         orgCtrl.currentKey = data.key;
+        setSelectWork(undefined);
         setSelectMenu(data);
       }}
       rightBar={
@@ -27,38 +65,49 @@ const Todo: React.FC<any> = () => {
             setFilter(e.target.value);
           }}></Input>
       }
-      // onMenuClick={async (data, key) => {}}
-      onMenuClick={async (data, key) => {
+      onMenuClick={async (_data, key) => {
         switch (key) {
-          case '发起':
-            // setOpenFlow(true);
+          case '发起办事':
+            setOpenFlow(true);
             break;
           default:
             break;
         }
       }}
       siderMenuData={rootMenu}>
-      {/* <Modal
+      <Modal
         width="800px"
         title="发起办事"
         open={openFlow}
         destroyOnClose={true}
-        onOk={() => {
-          if (!selectData) {
-            message.error('请先选择办事');
-            return;
-          }
-          setDoWork(selectData[0].data);
-          setOpenFlow(false);
-        }}
+        onOk={() => setOpenFlow(false)}
         onCancel={() => setOpenFlow(false)}>
-        <FlowSelect
-          multiple={false}
-          orgId={orgCtrl.user.id}
-          onCheckeds={(params: any) => setSelectData(params)}
+        <CardOrTableComp<XFlowDefine>
+          rowKey={'id'}
+          columns={FlowColumn}
+          hideOperation={true}
+          dataSource={[]}
+          rowSelection={{
+            type: 'radio',
+            onSelect: (record: XFlowDefine, _: any) => {
+              setSelectWork(record);
+            },
+          }}
+          request={async (page) => {
+            switch (selectMenu.itemType) {
+              case GroupMenuType.Organization:
+                let target = (selectMenu.item as ITarget[])[0];
+                return await target.loadWork(page);
+              case GroupMenuType.Species:
+                let species = (selectMenu.item as ISpeciesItem[])[0];
+                return await species.loadWork(page);
+              default:
+                break;
+            }
+          }}
         />
-      </Modal> */}
-      <Content key={key} selectMenu={selectMenu} filter={filter} />
+      </Modal>
+      {content()}
     </MainLayout>
   );
 };

@@ -1,4 +1,4 @@
-import { Card, Typography, message } from 'antd';
+import { Card, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { common } from 'typings/common';
 import AppCard from './card';
@@ -7,10 +7,10 @@ import { InnerApplicationColumns } from '@/pages/Store/config/columns';
 import { XFlowDefine } from '@/ts/base/schema';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import orgCtrl from '@/ts/controller';
-import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import { Popup, ScrollView } from 'devextreme-react';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
+import { pageAll } from '@/ts/base';
 
 const InnerApp: React.FC = () => {
   const [tableKey, setTableKey] = useState('全部');
@@ -21,7 +21,7 @@ const InnerApp: React.FC = () => {
 
   useEffect(() => {
     setTimeout(async () => {
-      let data = (await new FlowDefine(orgCtrl.user.id).loadFlowDefine()).result || [];
+      let data = (await orgCtrl.user.loadWork(pageAll())).result || [];
       switch (tableKey) {
         case '共享的':
           data = data.filter(
@@ -42,7 +42,7 @@ const InnerApp: React.FC = () => {
   }, [tableKey]);
 
   const renderOperation = (item: XFlowDefine): common.OperationType[] => {
-    let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
+    // let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
     return [
       {
         key: 'open',
@@ -60,23 +60,23 @@ const InnerApp: React.FC = () => {
           setModalType('detail');
         },
       },
-      {
-        key: 'common',
-        label: isCommon ? '取消常用' : '设为常用',
-        onClick: () => {
-          appCtrl.setCommon(
-            {
-              title: item.name,
-              url: '/img/appLogo.png',
-              desc: item.remark,
-              key: item.id,
-            },
-            !isCommon,
-          );
-          forceUpdate();
-          message.success('设置成功');
-        },
-      },
+      // {
+      //   key: 'common',
+      //   label: isCommon ? '取消常用' : '设为常用',
+      //   onClick: () => {
+      //       appCtrl.setCommon(
+      //         {
+      //           title: item.name,
+      //           url: '/img/appLogo.png',
+      //           desc: item.remark,
+      //           key: item.id,
+      //         },
+      //         !isCommon,
+      //       );
+      //       forceUpdate();
+      //       message.success('设置成功');
+      //   },
+      // },
     ];
   };
   //卡片内容渲染函数;

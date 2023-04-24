@@ -1,12 +1,13 @@
 import { kernel } from '@/ts/base';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import OioFormItem from '../FromItem/FormItems';
+import { ITarget } from '@/ts/core';
 
-type OioFormProps = {
+type IProps = {
+  target: ITarget;
   operation: XOperation;
   operationItems?: any[];
   submitter?: any;
@@ -20,7 +21,8 @@ type OioFormProps = {
 /**
  * 奥集能表单
  */
-const OioForm: React.FC<OioFormProps> = ({
+const OioForm: React.FC<IProps> = ({
+  target,
   operation,
   operationItems,
   submitter,
@@ -50,7 +52,7 @@ const OioForm: React.FC<OioFormProps> = ({
         // 表单项
         const operateItemRes = await kernel.queryOperationItems({
           id: operation.id,
-          spaceId: orgCtrl.user.id,
+          spaceId: target.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
         const operateItems = (operateItemRes.data.result || []) as XOperationItem[];
