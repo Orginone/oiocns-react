@@ -10,7 +10,6 @@ import {
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { ImArrowLeft2 } from 'react-icons/im';
-import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 const { Content, Sider } = Layout;
@@ -35,7 +34,6 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
@@ -80,7 +78,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           className={cls.exit}
           onClick={() => {
             sessionStorage.clear();
-            history.push('/passport/login');
+            location.reload();
           }}>
           <TeamIcon share={orgCtrl.user.shareInfo} />
           <span>退出登录</span>
