@@ -20,7 +20,6 @@ export type {
   ICohort,
   ICompany,
   IDepartment,
-  IFlow,
   IGroup,
   IMTarget,
   IPerson,

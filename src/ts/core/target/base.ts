@@ -6,9 +6,8 @@ import { IIdentity } from './authority/iidentity';
 import { ISpace, ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
-import { XTarget, XTargetArray } from '@/ts/base/schema';
-import { TargetModel, TargetShare } from '@/ts/base/model';
-import { FlowDefine } from './thing/flowDefine';
+import { XFlowDefine, XTarget, XTargetArray } from '@/ts/base/schema';
+import { PageRequest, TargetModel, TargetShare } from '@/ts/base/model';
 import { CreateChat } from './chat/chat';
 import { IChat } from './chat/ichat';
 import { ISpeciesItem, loadSpeciesTree } from './thing';
@@ -16,7 +15,6 @@ import { ISpeciesItem, loadSpeciesTree } from './thing';
 export default class BaseTarget implements ITarget {
   public key: string;
   public typeName: TargetType;
-  public define: FlowDefine;
   public species: ISpeciesItem[] = [];
   public subTeamTypes: TargetType[] = [];
   protected memberTypes: TargetType[] = [TargetType.Person];
@@ -67,7 +65,6 @@ export default class BaseTarget implements ITarget {
     this.typeName = target.typeName as TargetType;
     this.space = space || (this as unknown as ISpace);
     appendTarget(target);
-    this.define = new FlowDefine(target.id);
     this.chat = CreateChat(userId, this.space.id, target, [
       this.space.teamName,
       target.typeName + '群',
@@ -78,6 +75,18 @@ export default class BaseTarget implements ITarget {
   }
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');
+  }
+  async loadWork(page: PageRequest, _reload: boolean): Promise<schema.XFlowDefineArray> {
+    let res = (await kernel.queryDefine({ spaceId: this.id, speciesId: '0' })).data;
+    return {
+      total: res.total,
+      limit: res.limit,
+      offset: res.offset,
+      result: res.result?.slice(page.offset, page.offset + page.limit),
+    };
+  }
+  async loadWorkNode(id: string): Promise<schema.FlowNode> {
+    return (await kernel.queryNodes({ id })).data;
   }
   async loadSpeciesTree(
     _reload: boolean = false,
