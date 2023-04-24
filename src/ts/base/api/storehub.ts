@@ -96,9 +96,9 @@ export default class StoreHub implements IDisposable {
    * 开始连接
    * @returns {void} 无返回值
    */
-  private _starting(): void {
+  private async _starting(): Promise<void> {
     if (this.isConnected) {
-      this._connection.stop();
+      await this._connection.stop();
     }
     this._connection
       .start()

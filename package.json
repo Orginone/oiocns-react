@@ -59,7 +59,6 @@
     "antd": "^4.24.4",
     "antd-img-crop": "^4.2.8",
     "axios": "^1.1.2",
-    "copy-to-clipboard": "^3.3.2",
     "dayjs": "^1.10.6",
     "devextreme": "22.2.4",
     "devextreme-react": "22.2.4",
