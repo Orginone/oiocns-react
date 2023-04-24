@@ -61,7 +61,7 @@ const TodoRouter: IRouteConfig[] = [
     path: '/todo',
     title: '办事',
     icon: 'icon-todo',
-    component: React.lazy(() => import('@/pages/Todo')),
+    component: React.lazy(() => import('@/pages/work')),
   },
 ];
 
