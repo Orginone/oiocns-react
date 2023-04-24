@@ -41,7 +41,7 @@ export default class StoreHub implements IDisposable {
     this._connection.serverTimeoutInMilliseconds = timeout;
     this._connection.keepAliveIntervalInMilliseconds = interval;
     this._connection.onclose((err) => {
-      if (!this.isConnected) {
+      if (this._isStarted) {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
@@ -78,18 +78,22 @@ export default class StoreHub implements IDisposable {
   public start(): void {
     if (!this._isStarted) {
       this._isStarted = true;
-      this._starting();
+      if (!this.isConnected) {
+        this._starting();
+      }
     }
   }
   /**
    * 重新建立连接
    * @returns {void} 无返回值
    */
-  public restart(): void {
+  public async restart(): Promise<void> {
     if (this.isConnected) {
-      this._connection.stop().then(() => {
-        this._starting();
-      });
+      this._isStarted = false;
+      await this._connection.stop();
+      setTimeout(() => {
+        this.start();
+      }, 1000);
     }
   }
   /**
@@ -97,9 +101,6 @@ export default class StoreHub implements IDisposable {
    * @returns {void} 无返回值
    */
   private async _starting(): Promise<void> {
-    if (this.isConnected) {
-      await this._connection.stop();
-    }
     this._connection
       .start()
       .then(() => {

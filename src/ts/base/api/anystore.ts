@@ -76,10 +76,10 @@ export default class AnyStore {
    * 更新token
    * @param accessToken token
    */
-  public updateToken(accessToken: string): void {
+  public async updateToken(accessToken: string): Promise<void> {
     if (this.accessToken != accessToken) {
       this.accessToken = accessToken;
-      this._storeHub.restart();
+      await this._storeHub.restart();
     }
   }
   /**

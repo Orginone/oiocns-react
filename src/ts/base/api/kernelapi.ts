@@ -95,7 +95,7 @@ export default class KernelApi {
       res = await this._restRequest('login', req);
     }
     if (res.success) {
-      this._anystore.updateToken(res.data.accessToken);
+      await this._anystore.updateToken(res.data.accessToken);
     }
     return res;
   }
@@ -141,7 +141,7 @@ export default class KernelApi {
       res = await this._restRequest('Register', params);
     }
     if (res.success) {
-      this._anystore.updateToken(res.data.accessToken);
+      await this._anystore.updateToken(res.data.accessToken);
     }
     return res;
   }
