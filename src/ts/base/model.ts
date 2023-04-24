@@ -147,7 +147,7 @@ export type IdArraySpaceReq = {
   spaceId: string;
 };
 
-export type QueryDefineReq = {
+export type SpeciesReq = {
   // 空间ID
   spaceId: string;
   // 分类ID
@@ -920,6 +920,8 @@ export type CreateDefineReq = {
   remark: string;
   // 节点信息
   resource?: SchemaFlowNode;
+  // 共享组织
+  shareId: string;
   // 归属Id
   belongId: string;
   //分类id

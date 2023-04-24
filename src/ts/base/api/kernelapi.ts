@@ -2326,11 +2326,11 @@ export default class KernelApi {
   }
   /**
    * 查询分类下的流程定义
-   * @param {model.QueryDefineReq} params 请求参数
+   * @param {model.SpeciesReq} params 请求参数
    * @returns {model.ResultType<schema.XFlowDefineArray>} 请求结果
    */
   public async queryDefine(
-    params: model.QueryDefineReq,
+    params: model.SpeciesReq,
   ): Promise<model.ResultType<schema.XFlowDefineArray>> {
     return await this.request({
       module: 'flow',
@@ -2399,13 +2399,13 @@ export default class KernelApi {
    * @param {model.IdReq} params 查询参数
    * @returns {model.ResultType<schema.XFlowTaskArray>} 请求结果
    */
-  public async queryApproveTask(
-    params: model.IdReq,
-  ): Promise<model.ResultType<schema.XFlowTaskHistoryArray>> {
+  public async queryApproveTask(): Promise<
+    model.ResultType<schema.XFlowTaskHistoryArray>
+  > {
     return await this.request({
       module: 'flow',
       action: 'QueryApproveTask',
-      params: params,
+      params: {},
     });
   }
   /**

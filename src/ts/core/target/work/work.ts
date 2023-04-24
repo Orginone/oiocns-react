@@ -65,7 +65,7 @@ export class Work implements IWork {
       }
     }
     if (reload || this.flowTodo.length == 0) {
-      let res = await kernel.queryApproveTask({ id: '0' });
+      let res = await kernel.queryApproveTask();
       if (res.success) {
         this.flowTodo = res.data.result?.map((a) => new FlowTodo(a)) || [];
       }

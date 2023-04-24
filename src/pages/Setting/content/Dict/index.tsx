@@ -24,15 +24,9 @@ const DictInfo: React.FC<any> = ({
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const renderBtns = () => {
     return (
-      <>
-        <Button
-          type="link"
-          onClick={() => {
-            setActiveModel('新增字典项');
-          }}>
-          新增字典项
-        </Button>
-      </>
+      <Button type="link" onClick={() => setActiveModel('新增')}>
+        新增字典项
+      </Button>
     );
   };
   // 操作内容渲染函数
@@ -43,7 +37,7 @@ const DictInfo: React.FC<any> = ({
         label: '编辑字典项',
         onClick: () => {
           setDictItem(item);
-          setActiveModel('编辑字典项');
+          setActiveModel('编辑');
         },
       },
       {
@@ -98,8 +92,10 @@ const DictInfo: React.FC<any> = ({
         />
       </PageCard>
       <DictItemModal
-        open={activeModel.includes('新增') || activeModel.includes('编辑')}
+        open={['新增', '编辑'].includes(activeModel)}
         data={dictItem}
+        space={belong}
+        current={current}
         handleCancel={() => setActiveModel('')}
         handleOk={(success: boolean | undefined) => {
           if (success) {
@@ -108,7 +104,6 @@ const DictInfo: React.FC<any> = ({
             tforceUpdate();
           }
         }}
-        current={current}
       />
     </Card>
   );

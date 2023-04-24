@@ -103,7 +103,7 @@ export interface ISpeciesItem {
     data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
   /** 发布办事 */
-  publishWork(data: CreateDefineReq): Promise<XFlowDefine>;
+  publishWork(data: Omit<CreateDefineReq, 'belongId'>): Promise<XFlowDefine>;
   /**
    * 删除标准分类项
    */

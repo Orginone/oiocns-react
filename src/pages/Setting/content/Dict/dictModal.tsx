@@ -2,12 +2,13 @@ import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel } from '@/ts/base/model';
 import { XDict } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ISpace } from '@/ts/core';
 
 interface Iprops {
   title: string;
   open: boolean;
+  space: ISpace;
   data: XDict | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
@@ -51,9 +52,10 @@ const DictModal = (props: Iprops) => {
       title={title}
       open={open}
       width={640}
+      layoutType="ModalForm"
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('编辑')) {
+          if (title.includes('修改')) {
             formRef.current?.setFieldsValue(data);
           }
         } else {
@@ -64,16 +66,16 @@ const DictModal = (props: Iprops) => {
       rowProps={{
         gutter: [24, 0],
       }}
-      layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          handleOk((await orgCtrl.user.dict.createDict(values)) !== undefined);
+          handleOk((await props.space.dict.createDict(values)) !== undefined);
         } else {
           let formdata = Object.assign(data ? data : {}, values);
-          handleOk((await orgCtrl.user.dict.updateDict(formdata)) !== undefined);
+          handleOk((await props.space.dict.updateDict(formdata)) !== undefined);
         }
       }}
-      columns={columns}></SchemaForm>
+      columns={columns}
+    />
   );
 };
 

@@ -375,6 +375,8 @@ export type XFlowDefine = {
   name: string;
   // 编码
   code: string;
+  // 共享组织
+  shareId: string;
   // 归属组织/个人Id
   belongId: string;
   // 流程内容Json

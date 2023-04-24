@@ -38,25 +38,23 @@ const OperationModal = (props: Iprops) => {
     {
       title: '表单名称',
       dataIndex: 'name',
-      // placeholder="请输入表单名称",
       formItemProps: {
-        rules: [{ required: true, message: '表单名称为必填项' }],
+        rules: [{ required: true, message: '请输入表单名称' }],
       },
     },
     {
       title: '表单代码',
       dataIndex: 'code',
-      // placeholder="请输入表单代码",
       formItemProps: {
-        rules: [{ required: true, message: '表单代码为必填项' }],
+        rules: [{ required: true, message: '请输入表单代码' }],
       },
     },
     {
-      title: '选择制定组织',
+      title: '选择共享组织',
       dataIndex: 'belongId',
       valueType: 'treeSelect',
       initialValue: current.team.space.id,
-      formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
+      formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
       request: async () => {
         const res = await orgCtrl.getTeamTree(current.team.space);
         return targetsToTreeData(res);
@@ -83,7 +81,7 @@ const OperationModal = (props: Iprops) => {
         ],
       },
       formItemProps: {
-        rules: [{ required: true, message: '是否公开为必填项' }],
+        rules: [{ required: true, message: '请选择是否对下级组织公开' }],
       },
     },
   ];

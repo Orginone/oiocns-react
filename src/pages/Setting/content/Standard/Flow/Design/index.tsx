@@ -626,7 +626,7 @@ const Design: React.FC<IProps> = ({
                               sourceIds: current.sourceIds,
                               remark: current.remark,
                               resource: resource_,
-                              belongId: current.belongId,
+                              shareId: current.shareId,
                               isCreate: current.isCreate,
                             })
                           ) {

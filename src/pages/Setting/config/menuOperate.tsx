@@ -100,7 +100,7 @@ const buildDictMenus = (dict: XDict, belong: ISpace) => {
     itemType: MenuType.Dict,
     menus: [
       {
-        key: '编辑字典',
+        key: '修改|字典',
         icon: <im.ImPencil />,
         label: '编辑字典',
         model: 'outside',
@@ -139,7 +139,7 @@ const loadStandardSetting = async (space: ISpace) => {
     icon: <im.ImNewspaper />,
     menus: [
       {
-        key: '新增字典',
+        key: '新增',
         icon: <im.ImPlus />,
         label: '新增字典',
         model: 'outside',
@@ -155,7 +155,7 @@ const loadStandardSetting = async (space: ISpace) => {
     icon: <im.ImNewspaper />,
     menus: [
       {
-        key: '新增属性',
+        key: '新增',
         icon: <im.ImPlus />,
         label: '新增属性',
         model: 'outside',

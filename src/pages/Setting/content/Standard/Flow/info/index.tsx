@@ -1,5 +1,6 @@
 import {
   ProForm,
+  ProFormColumnsType,
   ProFormDependency,
   ProFormSelect,
   ProFormText,
@@ -24,7 +25,7 @@ interface Iprops {
   handleCancel: () => void;
 }
 
-export const toTreeData = (species: any[]): any[] => {
+const toTreeData = (species: any[]): any[] => {
   return species.map((t) => {
     return {
       label: t.name,
@@ -39,12 +40,14 @@ export const toTreeData = (species: any[]): any[] => {
 */
 const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Iprops) => {
   const [form] = useForm<any>();
-  useEffect(() => {
+  if (current) {
     form.setFieldsValue({
       ...current,
-      sourceIds: current?.sourceIds?.split(',').filter((id: any) => id != '') || [],
+      operationIds: current?.sourceIds?.split(',').filter((id: any) => id != '') || [],
     });
-  });
+  } else {
+    form.setFieldsValue({});
+  }
 
   return (
     <Modal
@@ -59,9 +62,10 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           id: current?.id,
           code: value.name,
           name: value.name,
-          sourceIds: value.sourceIds?.join(','),
+          sourceIds: value.isCreate ? '' : value.operationIds?.join(','),
           remark: value.remark,
-          belongId: value.belongId,
+          shareId: value.shareId,
+          belongId: '',
           isCreate: value.isCreate,
         });
       }}
@@ -102,9 +106,9 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
         />
         <ProFormTreeSelect
           width="md"
-          name="belongId"
-          label="制定组织"
-          placeholder="请选择制定组织"
+          name="shareId"
+          label="共享组织"
+          placeholder="请选择共享组织"
           required={true}
           colProps={{ span: 12 }}
           initialValue={target.id}
@@ -149,7 +153,7 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
               return (
                 <ProFormTreeSelect
                   width="md"
-                  name="sourceIds"
+                  name="operationIds"
                   label="操作实体"
                   placeholder="请选择操作实体"
                   required={true}

@@ -245,7 +245,13 @@ export class SpeciesItem implements ISpeciesItem {
   }
 
   async publishWork(data: model.CreateDefineReq): Promise<schema.XFlowDefine> {
-    return (await kernel.publishDefine({ ...data, speciesId: this.id })).data;
+    return (
+      await kernel.publishDefine({
+        ...data,
+        belongId: this.team.space.id,
+        speciesId: this.id,
+      })
+    ).data;
   }
 
   async deleteWork(id: string): Promise<boolean> {
