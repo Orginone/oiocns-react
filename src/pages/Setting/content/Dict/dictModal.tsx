@@ -55,7 +55,7 @@ const DictModal = (props: Iprops) => {
       layoutType="ModalForm"
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('修改')) {
+          if (data) {
             formRef.current?.setFieldsValue(data);
           }
         } else {

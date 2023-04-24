@@ -57,7 +57,9 @@ const DictItemModal = ({
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          formRef.current?.setFieldsValue(data);
+          if (data) {
+            formRef.current?.setFieldsValue(data);
+          }
         } else {
           formRef.current?.resetFields();
           handleCancel();

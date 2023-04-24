@@ -108,6 +108,7 @@ const AuthorityModal = (props: Iprops) => {
                 values.code,
                 values.public,
                 values.remark,
+                values.belongId,
               )
             ).success,
           );
@@ -119,6 +120,7 @@ const AuthorityModal = (props: Iprops) => {
                 values.code,
                 values.public,
                 values.remark,
+                values.belongId,
               )
             ).success,
           );

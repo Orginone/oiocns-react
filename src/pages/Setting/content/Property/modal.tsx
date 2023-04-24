@@ -82,16 +82,17 @@ const PropertyModal = ({ open, handleOk, space, data, handleCancel }: Iprops) =>
     ];
     if (selectType === '选择型') {
       columns.push({
-        title: '选择枚举分类',
+        title: '选择枚举字典',
         dataIndex: 'dictId',
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
         request: async () => {
-          // const res = await thing.loadDicts();
-          // return res.map((item) => {
-          //   return { id: item.id, label: item.name, value: item.id };
-          // });
-          return [];
+          const res = await space.dict.loadDict();
+          return (
+            res.result?.map((item) => {
+              return { id: item.id, label: item.name, value: item.id };
+            }) || []
+          );
         },
         fieldProps: {
           disabled: selectType !== '选择型',

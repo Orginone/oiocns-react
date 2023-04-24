@@ -1,6 +1,5 @@
 import {
   ProForm,
-  ProFormColumnsType,
   ProFormDependency,
   ProFormSelect,
   ProFormText,
@@ -9,7 +8,7 @@ import {
 } from '@ant-design/pro-components';
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
 import { CreateDefineReq } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';

@@ -5,7 +5,7 @@ import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import PropertyModal from './modal';
-import { Space, message } from 'antd';
+import { message } from 'antd';
 /**
  * @description: 分类特性标准
  * @return {*}

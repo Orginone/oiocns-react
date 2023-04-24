@@ -217,6 +217,12 @@ export const PropertyColumns: ProColumns<any>[] = [
     width: 150,
   },
   {
+    title: '属性定义',
+    dataIndex: 'remark',
+    key: 'remark',
+    width: 250,
+  },
+  {
     title: '单位',
     dataIndex: 'unit',
     key: 'unit',

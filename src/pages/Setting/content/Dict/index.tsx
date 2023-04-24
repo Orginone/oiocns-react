@@ -96,10 +96,14 @@ const DictInfo: React.FC<any> = ({
         data={dictItem}
         space={belong}
         current={current}
-        handleCancel={() => setActiveModel('')}
+        handleCancel={() => {
+          setActiveModel('');
+          setDictItem(undefined);
+        }}
         handleOk={(success: boolean | undefined) => {
           if (success) {
             message.success('操作成功');
+            setDictItem(undefined);
             setActiveModel('');
             tforceUpdate();
           }

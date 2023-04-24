@@ -42,7 +42,7 @@ const EditCustomModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '设置权限为必填项' }] },
       request: async () => {
-        const data = await current.loadAuthorityTree(false);
+        const data = await current.space.loadSpaceAuthorityTree(false);
         return data ? [data] : [];
       },
       fieldProps: {
