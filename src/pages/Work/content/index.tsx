@@ -1,7 +1,7 @@
 import { MenuItemType } from 'typings/globelType';
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import { GroupMenuType } from '@/pages/Todo/config/menuType';
+import { GroupMenuType } from '../config/menuType';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import { workNotify } from '@/ts/core/target/work/work';
 import PageCard from '@/components/PageCard';
@@ -43,7 +43,8 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         }
         break;
       case GroupMenuType.Species:
-        let species = selectMenu.item as ISpeciesItem[];
+        // eslint-disable-next-line no-case-declarations
+        const species = selectMenu.item as ISpeciesItem[];
         data = data.filter(
           (a) =>
             a.spaceId == species[0].team.space.id &&

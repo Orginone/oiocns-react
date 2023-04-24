@@ -2,23 +2,23 @@ import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
 import orgCtrl from '@/ts/controller/';
-import useMenuUpdate from './hooks/useMenuUpdate';
 import { Input, Modal } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { XFlowDefine } from '@/ts/base/schema';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { FlowColumn } from '../Setting/config/columns';
-import WorkStart from './work/WorkStartDo';
+import WorkStart from './content/Start';
 import { GroupMenuType } from './config/menuType';
-import { kernel } from '@/ts/base';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import { loadWorkMenu } from './config/menuOperate';
 
 const Todo: React.FC<any> = () => {
-  const [key, rootMenu, _refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(loadWorkMenu);
   const [openFlow, setOpenFlow] = useState(false);
   const [selectWork, setSelectWork] = useState<XFlowDefine>();
   const [filter, setFilter] = useState('');
-  if (!selectMenu) return <></>;
+  if (!selectMenu || !rootMenu) return <></>;
 
   const content = () => {
     if (selectWork) {

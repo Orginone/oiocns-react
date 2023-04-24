@@ -1,11 +1,11 @@
 import { XOperation } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import React, { useEffect, useRef, useState } from 'react';
 import { targetsToTreeData } from '../../..';
 import SchemaForm from '@/components/SchemaForm';
 import { getUuid } from '@/utils/tools';
+import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   title: string;

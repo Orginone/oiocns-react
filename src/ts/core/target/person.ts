@@ -77,7 +77,9 @@ export default class Person extends MarketTarget implements IPerson {
       chats.push(...item.allChats());
     }
     for (const item of this.cohorts) {
-      chats.push(...item.allChats());
+      if (chats.filter((i) => i.chatId === item.chat.chatId).length < 1) {
+        chats.push(...item.allChats());
+      }
     }
     if (this.authorityTree) {
       chats.push(...this.authorityTree.allChats());

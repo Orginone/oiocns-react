@@ -7,6 +7,7 @@ import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { IFileSystemItem, TargetType } from '@/ts/core';
 import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
+import { IconFont } from '@/components/IconFont';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
@@ -130,7 +131,7 @@ const getFileSystemMenus = (user: ISpace) => {
 /** 获取财物菜单 */
 const loadThingMenus = (target: ITarget) => {
   return {
-    key: target.id + GroupMenuType.Things,
+    key: target.key + GroupMenuType.Things,
     label: GroupMenuType.Things,
     itemType: GroupMenuType.Things,
     menus: [],
@@ -219,7 +220,7 @@ const loadAgencyGroup = (
 };
 
 /** 获取个人菜单 */
-export const getUserMenu = async () => {
+const getUserMenu = async () => {
   return {
     key: orgCtrl.user.key,
     item: orgCtrl.user,
@@ -244,10 +245,10 @@ export const getUserMenu = async () => {
         ],
       },
       {
-        key: orgCtrl.user.key + GroupMenuType.Cohorts,
+        key: orgCtrl.user.key + GroupMenuType.UserCohort,
         item: orgCtrl.user,
-        label: GroupMenuType.Cohorts,
-        itemType: GroupMenuType.Cohorts,
+        label: GroupMenuType.UserCohort,
+        itemType: GroupMenuType.UserCohort,
         icon: <im.ImNewspaper />,
         menus: [],
         children: buildTargetTree(orgCtrl.user.cohorts),
@@ -257,7 +258,7 @@ export const getUserMenu = async () => {
 };
 
 /** 获取组织菜单 */
-export const getTeamMenu = async () => {
+const getTeamMenu = async () => {
   const children: MenuItemType[] = [];
   for (const company of await orgCtrl.user.getJoinedCompanys()) {
     children.push({
@@ -303,12 +304,29 @@ export const getTeamMenu = async () => {
         ),
         loadAgencyGroup(
           company,
+          buildTargetTree(company.workings),
+          GroupMenuType.Working,
+          TargetType.Working,
+        ),
+        loadAgencyGroup(
+          company,
           buildTargetTree(company.cohorts),
-          GroupMenuType.Cohorts,
+          GroupMenuType.CompanyCohort,
           TargetType.Cohort,
         ),
       ],
     });
   }
   return children;
+};
+
+/** 获取仓库模块菜单 */
+export const loadStoreMenu = async () => {
+  return {
+    key: '仓库',
+    label: '仓库',
+    itemType: 'group',
+    icon: <IconFont type={'icon-store'} />,
+    children: [await getUserMenu(), ...(await getTeamMenu())],
+  };
 };

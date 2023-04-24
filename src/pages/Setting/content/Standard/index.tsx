@@ -195,7 +195,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           setModalType('');
         }}
         handleOk={async (req: CreateDefineReq) => {
-          if (await current.publishWork(req)) {
+          if (await current.publishWork({ ...req, resource: undefined })) {
             message.success('保存成功');
             forceUpdate();
             setModalType('');

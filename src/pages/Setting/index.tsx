@@ -3,10 +3,9 @@ import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
 import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
-import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
-import { GroupMenuType } from './config/menuType';
+import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import SearchCompany from '@/bizcomponents/SearchCompany';
@@ -15,6 +14,8 @@ import { XTarget } from '@/ts/base/schema';
 import { companyTypes } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
 import { ISpeciesItem } from '@/ts/core';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import * as config from './config/menuOperate';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -28,15 +29,16 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 
 const TeamSetting: React.FC = () => {
   const history = useHistory();
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    config.loadSettingMenu,
+  );
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   const [refreshKey, setRefreshKey] = useState<string>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
   const [searchCallback, setSearchCallback] = useState<XTarget[]>();
-  if (!selectMenu) return <></>;
-
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
@@ -45,14 +47,11 @@ const TeamSetting: React.FC = () => {
         switch (data.itemType) {
           case GroupMenuType.SpeciesGroup:
             await (data.item as ITarget).loadSpeciesTree();
-            refreshMenu();
             break;
           case GroupMenuType.DictGroup:
             await (data.item as ISpace).dict.loadDict();
-            refreshMenu();
             break;
         }
-        orgCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
@@ -62,7 +61,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await data.item.belong.dict.deleteDict(data.item.id)) {
-                  refreshMenu();
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -72,7 +71,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  refreshMenu();
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -90,7 +89,7 @@ const TeamSetting: React.FC = () => {
                     orgCtrl.user.quitCohorts((data.item as ITarget).id);
                     break;
                 }
-                refreshMenu();
+                setSelectMenu(selectMenu.parentMenu!);
               },
             });
             break;
@@ -99,7 +98,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  refreshMenu();
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -148,7 +147,7 @@ const TeamSetting: React.FC = () => {
         }}
         handleOk={(newItem) => {
           if (newItem) {
-            refreshMenu();
+            setSelectMenu(selectMenu);
             setOperateKeys(['']);
           }
         }}
@@ -156,7 +155,7 @@ const TeamSetting: React.FC = () => {
         typeNames={operateKeys.slice(1)}
       />
       {/** 分类模态框 */}
-      {selectMenu.itemType !== '权限' && (
+      {selectMenu.itemType === MenuType.Species && (
         <SpeciesModal
           title={operateKeys[0]}
           open={['新增', '修改'].includes(operateKeys[0])}
@@ -165,12 +164,11 @@ const TeamSetting: React.FC = () => {
           }}
           handleOk={async (newItem) => {
             if (newItem) {
-              refreshMenu();
+              setSelectMenu(selectMenu);
               setOperateKeys(['']);
             }
           }}
-          targetId={(selectMenu.item as ITarget)?.id}
-          current={selectMenu.item as ISpeciesItem}
+          current={selectMenu.item}
         />
       )}
       {/** 单位 */}
@@ -184,7 +182,7 @@ const TeamSetting: React.FC = () => {
           if (item) {
             setShowFormModal(false);
             setRefreshKey(key);
-            refreshMenu();
+            setSelectMenu(selectMenu);
           }
         }}
         current={orgCtrl.user}

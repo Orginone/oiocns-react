@@ -45,7 +45,7 @@ export default class StoreHub implements IDisposable {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        logger.warn(`连接断开,${this._timeout}ms后重试。` + err ? err!.message : '');
+        logger.warn(`连接断开,${this._timeout}ms后重试。` + (err ? err!.message : ''));
         setTimeout(() => {
           this._starting();
         }, this._timeout);

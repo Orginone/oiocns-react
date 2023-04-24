@@ -4,7 +4,8 @@ import { IGroup, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { GroupMenuType, OrganizationType } from '@/pages/Todo/config/menuType';
+import { GroupMenuType, OrganizationType } from './menuType';
+import { IconFont } from '@/components/IconFont';
 
 const buildGroupMenu = () => {
   return [
@@ -66,9 +67,9 @@ export const buildTargetTree = async (targets: ITarget[]) => {
   return result;
 };
 
-export const loadWorkMenu = async () => {
+export const loadWorkMenu = async (): Promise<MenuItemType> => {
   let companys = await orgCtrl.user.getJoinedCompanys(false);
-  let companyItems = [];
+  let companyItems: MenuItemType[] = [];
   for (const company of companys) {
     let ret = await buildSpeciesTree(
       (await company.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
@@ -117,25 +118,32 @@ export const loadWorkMenu = async () => {
   let personSpecies = await buildSpeciesTree(
     (await orgCtrl.user.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
   );
-  return [
-    {
-      key: '个人',
-      label: orgCtrl.user.teamName,
-      itemType: GroupMenuType.Organization,
-      item: [orgCtrl.user],
-      icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
-      children: [
-        {
-          key: '群组',
-          label: '群组',
-          itemType: GroupMenuType.Organization,
-          icon: <im.ImUsers />,
-          item: orgCtrl.user.cohorts,
-          children: await buildTargetTree(await orgCtrl.user.getCohorts()),
-        },
-        ...personSpecies.children,
-      ],
-    },
-    ...companyItems,
-  ];
+  return {
+    key: '办事',
+    label: '办事',
+    itemType: 'Tab',
+    icon: <IconFont type={'icon-todo'} />,
+    children: [
+      {
+        key: '个人',
+        label: orgCtrl.user.teamName,
+        itemType: GroupMenuType.Organization,
+        item: [orgCtrl.user],
+        menus: buildGroupMenu(),
+        icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
+        children: [
+          {
+            key: '群组',
+            label: '群组',
+            itemType: GroupMenuType.Organization,
+            icon: <im.ImUsers />,
+            item: orgCtrl.user.cohorts,
+            children: await buildTargetTree(await orgCtrl.user.getCohorts()),
+          },
+          ...personSpecies.children,
+        ],
+      },
+      ...companyItems,
+    ],
+  };
 };

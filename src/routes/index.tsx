@@ -58,10 +58,10 @@ const ChatRouter: IRouteConfig[] = [
 /* 办事 */
 const TodoRouter: IRouteConfig[] = [
   {
-    path: '/todo',
+    path: '/work',
     title: '办事',
     icon: 'icon-todo',
-    component: React.lazy(() => import('@/pages/work')),
+    component: React.lazy(() => import('@/pages/Work')),
   },
 ];
 
@@ -69,7 +69,7 @@ const TodoRouter: IRouteConfig[] = [
 const MarketRouter: IRouteConfig[] = [
   {
     path: '/market',
-    component: React.lazy(() => import('@/pages/Store/Market')),
+    component: React.lazy(() => import('@/pages/Market')),
     title: '市场',
     icon: 'icon-guangshangcheng',
   },
@@ -81,14 +81,7 @@ const StoreRouter: IRouteConfig[] = [
     title: '仓库',
     icon: 'icon-setting',
     component: React.lazy(() => import('@/pages/Store')),
-    routes: [
-      {
-        path: '/store/market/shop',
-        title: '应用市场',
-        icon: 'icon-message',
-        component: React.lazy(() => import('@/pages/Store/Market/Shop')),
-      },
-    ],
+    routes: [],
   },
 ];
 

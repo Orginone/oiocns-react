@@ -1,6 +1,6 @@
 import { Badge, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Link, RouteComponentProps, useHistory, withRouter } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { IconFont } from '@/components/IconFont';
 
@@ -17,9 +17,8 @@ import { workNotify } from '@/ts/core/target/work/work';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
-  const history = useHistory();
   const [msgKey, setMsgKey] = useState('');
-  const [todoCount, setTodoCount] = useState(0);
+  const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   useEffect(() => {
     const id = msgNotify.subscribe((key) => {
@@ -32,7 +31,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     });
     const workId = workNotify.subscribe(async (key) => {
       let todos = await orgCtrl.user.work.loadTodo();
-      setTodoCount(todos.length);
+      setWorkCount(todos.length);
       setMsgKey(key);
     });
     return () => {
@@ -51,20 +50,18 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       onClick: () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
-        history.push('/chat');
       },
     },
     {
-      key: 'todo',
-      path: '/todo',
+      key: 'work',
+      path: '/work',
       title: '办事',
       icon: 'icon-todo',
-      count: todoCount,
-      fath: '/todo',
+      count: workCount,
+      fath: '/work',
       onClick: () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
-        history.push('/todo');
       },
     },
     {
@@ -86,7 +83,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-guangshangcheng',
       count: 0,
       fath: '/store',
-      onClick: () => {},
+      onClick: () => {
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
+      },
     },
     {
       key: 'setting',

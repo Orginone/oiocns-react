@@ -77,7 +77,7 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
         grid={true}
         form={form}
         rowProps={{
-          gutter: [24, 0],
+          gutter: [12, 0],
         }}
         submitter={{
           searchConfig: {
@@ -97,7 +97,7 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           label="办事名称"
           placeholder="请输入办事名称"
           required={true}
-          colProps={{ span: 24 }}
+          colProps={{ span: 12 }}
           rules={[{ required: true, message: '办事名称为必填项' }]}
         />
         <ProFormTreeSelect
@@ -124,6 +124,7 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           placeholder="请选择是否创建实体"
           required={true}
           colProps={{ span: 12 }}
+          initialValue={current?.isCreate}
           request={async () => {
             let array: any[] = [
               {
