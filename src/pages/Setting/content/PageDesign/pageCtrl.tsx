@@ -1,9 +1,9 @@
 import { debounce, getUuid } from '@/utils/tools';
-import { CompTypeItem, DataType, CompTypes, SCHEME } from './content/list/funs';
+import { CompTypeItem, DataType, CompTypes, SCHEME } from './PageList/funs';
 import { Emitter } from '@/ts/base/common';
 import OrgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import { DomainTypes, ICompany, emitter } from '@/ts/core';
+import { ICompany } from '@/ts/core';
 import { Input, message, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React from 'react';
@@ -19,13 +19,6 @@ class HomeSettingServices extends Emitter {
       this.getCustomComp();
       this.getHomeSetting();
     }, 50);
-    emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
-      this.belongId = OrgCtrl.user?.id;
-      setTimeout(() => {
-        this.getCustomComp();
-        this.getHomeSetting();
-      }, 50);
-    });
   }
   private _homeSetting: any = {};
   public PageStyleData: any = {};
@@ -42,7 +35,6 @@ class HomeSettingServices extends Emitter {
       title: '系统组件',
       list: [
         { name: '轮播图', w: 24, h: 30, type: CompTypes.System },
-        { name: '常用推荐', w: 6, h: 14, type: CompTypes.System },
         { name: '应用列表', w: 6, h: 14, type: CompTypes.System },
         { name: '快捷入口', w: 6, h: 14, type: CompTypes.System },
         { name: '咨询问答', w: 6, h: 14, type: CompTypes.System },
@@ -150,14 +142,12 @@ class HomeSettingServices extends Emitter {
     }
     this._PageData.push({ ...comp, ...obj });
     this.changCallbackPart('PageData');
-    this.changCallback();
   }, 300);
 
   // 移除 展示数据
   public RemoveCompItem = (item: CompTypeItem) => {
     this._PageData = this._PageData.filter((v) => v.i !== item.i);
     this.changCallbackPart('PageData');
-    this.changCallback();
   };
   // 更新 展示数据
   public UpdateCompItem = debounce((changeData: any) => {
@@ -285,6 +275,7 @@ class HomeSettingServices extends Emitter {
       }
     });
   };
+  //使用其他单位的页面设置
   handleUseOtherCompanyPage = (data: CompTypeItem) => {
     kernel.anystore
       .insert(this.belongId, SCHEME, {
@@ -405,7 +396,6 @@ class HomeSettingServices extends Emitter {
    * 临时仅请求个人配置
    */
   public getHomeSetting() {
-    console.log('获取门户配置信息', this.belongId);
     kernel.anystore
       .aggregate(OrgCtrl.user.id, SCHEME, {
         match: { isPublish: true },
@@ -438,7 +428,6 @@ class HomeSettingServices extends Emitter {
             // 向页面提示数据更新
             this.changCallbackPart('AllPages');
           }
-          console.log('打印', this.AllCompanyPages);
         });
     });
   }, 500);

@@ -5,7 +5,7 @@ import { DataType, SCHEME } from './funs';
 import PageDesign from '../Design';
 import OrgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import PageCtrl from '../../pageCtrl';
+import PageCtrl from '../pageCtrl';
 import { HeartOutlined, MenuOutlined } from '@ant-design/icons';
 import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';

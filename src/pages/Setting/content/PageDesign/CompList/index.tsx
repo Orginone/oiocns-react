@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Card, Table } from 'antd';
 import './index.less';
-import pageCtrl from '@/pages/Setting/content/PageDesign/pageCtrl';
+import pageCtrl from '../pageCtrl';
 import CreatIfream from './addIfream';
 interface CardCompType {}
 const Index: React.FC<CardCompType> = () => {

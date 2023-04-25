@@ -10,8 +10,8 @@ import {
   ProFormUploadButton,
 } from '@ant-design/pro-components';
 import { Colorpicker } from 'antd-colorpicker';
-import orgCtrl from '@/ts/controller';
-import PageCtrl from '../../../pageCtrl';
+import OrgCtrl from '@/ts/controller';
+import PageCtrl from '../../pageCtrl';
 const RenderFormItem = ({ comp, col }: any) => {
   const { type, id, label, limit = 0, options = [] } = col;
   const _props = { name: id, key: id, label, limit, tooltip: label };
@@ -47,7 +47,7 @@ const RenderFormItem = ({ comp, col }: any) => {
       },
       async customRequest(options: any) {
         const file = options.file as File;
-        const docDir = await  orgCtrl.user.home?.create('门户设置');
+        const docDir = await OrgCtrl.user.home?.create('门户设置');
         if (docDir && file) {
           const result = await docDir.upload(file.name, file);
           if (result) {
