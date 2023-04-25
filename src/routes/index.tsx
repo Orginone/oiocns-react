@@ -127,11 +127,6 @@ const Routers: IRouteConfig[] = [
         component: React.lazy(() => import('@/pages/Online')),
       },
       {
-        path: '/pageDesign',
-        title: '门户设置',
-        component: React.lazy(() => import('@/pages/PageDesign')),
-      },
-      {
         path: '*',
         title: '页面不存在',
         component: React.lazy(() => import('@/pages/NoFond')),

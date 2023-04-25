@@ -3,7 +3,7 @@ import Shortcuts from '@/pages/Home/components/ShortcutsCom';
 import BannerCom from '@/pages/Home/components/BannerCom';
 import { StatisticCard } from '@ant-design/pro-components';
 import Echart from '@/pages/Home/components/Echarts';
-import Questions from '../components/Inform/Questions';
+import Questions from '../components/ListwithTitle';
 import React from 'react';
 import {
   demo,
