@@ -13,7 +13,7 @@ const ContentIndex = ({ todo, onBack }: IProps) => {
     orgCtrl.user.joinedCompany.find((a) => a.id == todo.spaceId) || orgCtrl.user;
   /** 加载内容区 */
   switch (todo.type) {
-    case '办事':
+    case '事项':
       return <FlowDetail todo={todo} space={space} onBack={onBack} />;
     default:
       return <></>;

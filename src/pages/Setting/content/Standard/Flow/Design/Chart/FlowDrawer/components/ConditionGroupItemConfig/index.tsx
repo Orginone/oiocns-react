@@ -103,21 +103,13 @@ const ConditionGroupItemConfig: React.FC<IProps> = (props) => {
                     allowClear
                     options={conditions}
                     onChange={(e) => {
-                      conditions.forEach((element: any) => {
+                      conditions.forEach((element: FieldCondition) => {
                         if (element.value == e) {
                           condition.type = element.type;
                           condition.paramKey = e;
                           condition.paramLabel = element.label;
                           if (element.dict) {
-                            element.dict.then((dicts: any[]) => {
-                              condition.dict = dicts.map((a: any) => {
-                                return {
-                                  label: a.label,
-                                  value: a.value,
-                                };
-                              });
-                              setKey(key + 1);
-                            });
+                            condition.dict = element.dict;
                           } else {
                             setKey(key + 1);
                           }

@@ -1,20 +1,30 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import { Branche, FlowNode, XFlowDefine, XFlowInstance } from '@/ts/base/schema';
+import {
+  Branche,
+  FlowNode,
+  XAttribute,
+  XFlowDefine,
+  XFlowInstance,
+} from '@/ts/base/schema';
 import { Branche as BrancheModel } from '@/ts/base/model';
-import { Button, Card, Layout, message, Modal, Space, Steps } from 'antd';
+import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
 import {
   AiOutlineExclamationCircle,
   AiOutlineSend,
   AiOutlineMinus,
   AiOutlinePlus,
-  AiOutlineForm,
   AiOutlineClockCircle,
 } from 'react-icons/ai';
+import orgCtrl from '@/ts/controller';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
 import { ISpeciesItem } from '@/ts/core';
+import { pageAll } from '@/ts/base';
+import { FieldCondition } from './Chart/FlowDrawer/processType';
+import { dataType } from './Chart/FlowDrawer/processType';
+import { Label } from 'devextreme-react/data-grid';
 
 interface IProps {
   IsEdit: boolean;
@@ -32,6 +42,7 @@ const Design: React.FC<IProps> = ({
   IsEdit = true,
 }) => {
   const [scale, setScale] = useState<number>(100);
+  const [conditions, setConditions] = useState<FieldCondition[]>([]);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
   const [resource, setResource] = useState({
     nodeId: `node_${getUuid()}`,
@@ -62,7 +73,9 @@ const Design: React.FC<IProps> = ({
   useEffect(() => {
     const load = async () => {
       // content字段可能取消
-      let resource_ = await species?.loadWorkNode(current.id);
+      let resource_ = await (species || orgCtrl.user.species[0])?.loadWorkNode(
+        current.id,
+      );
       let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
       let nodes = getAllNodes(resourceData, []);
       let spaceRootNodes = nodes.filter((item) => item.type == 'ROOT');
@@ -98,39 +111,38 @@ const Design: React.FC<IProps> = ({
       } else {
         setResource(resourceData);
       }
-      // if (IsEdit) {
-      //   new Dict(target!.id)
-      //   species.loadAttrs(false).then((res) => {
-      //     let attrs = res;
-      //     setConditionData({
-      //       name: current.name || '',
-      //       remark: current.remark,
-      //       authId: current.authId || '',
-      //       belongId: current.belongId,
-      //       public: current.public,
-      //       sourceIds: current.sourceIds,
-      //       isCreate: current.isCreate,
-      //       fields: attrs.map((attr: any) => {
-      //         switch (attr.valueType) {
-      //           case '描述型':
-      //             return { label: attr.name, value: attr.id, type: 'STRING' };
-      //           case '数值型':
-      //             return { label: attr.name, value: attr.id, type: 'NUMERIC' };
-      //           case '选择型':
-      //             return {
-      //               label: attr.name,
-      //               value: attr.id,
-      //               type: 'DICT',
-      //               dict: loadDictItems(attr.dictId),
-      //             };
-      //           default:
-      //             return { label: attr.name, value: attr.id, type: 'STRING' };
-      //         }
-      //       }),
-      //     });
-      //   });
-      // }
-      // setLoaded(true);
+      if (IsEdit && species) {
+        let attrs = await species.loadAttrs(false);
+        let fields: FieldCondition[] = [];
+        for (let attr of attrs) {
+          switch (attr.property!.valueType) {
+            case '数值型':
+              fields.push({ label: attr.name, value: attr.id, type: dataType.NUMERIC });
+              break;
+            case '选择型':
+              fields.push({
+                label: attr.name,
+                value: attr.id,
+                type: dataType.DICT,
+                dict:
+                  (
+                    await species.team.space.dict.loadDictItem(
+                      attr.property!.dictId,
+                      species.team.space.id,
+                      pageAll(),
+                    )
+                  ).result?.map((a) => {
+                    return { label: a.name, value: a.value };
+                  }) || [],
+              });
+              break;
+            default:
+              fields.push({ label: attr.name, value: attr.id, type: dataType.STRING });
+              break;
+          }
+        }
+        setConditions(fields);
+      }
     };
     load();
   }, [current]);
@@ -553,38 +565,25 @@ const Design: React.FC<IProps> = ({
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
         <Layout>
-          <Layout.Header
-            style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 100,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <div
+          {IsEdit && (
+            <Layout.Header
               style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 100,
                 width: '100%',
-                display: 'flex',
+                textAlign: 'center',
+                justifyContent: 'center',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                fontSize: '22px',
               }}>
-              {IsEdit && (
-                <>
-                  <div style={{ width: '200px' }}></div>
-                  <div style={{ width: '300px' }}>
-                    <Steps
-                      current={0}
-                      items={[
-                        {
-                          title: '办事流程设计',
-                          icon: <AiOutlineForm />,
-                        },
-                      ]}></Steps>
-                  </div>
-                </>
-              )}
+              <Typography.Title level={3} style={{ margin: 0 }}>
+                办事设计
+              </Typography.Title>
+            </Layout.Header>
+          )}
+          <Layout.Content>
+            <Card bordered={false}>
               <div className={cls['publish']} style={{ width: '200px' }}>
                 <Space>
                   <Button
@@ -597,6 +596,7 @@ const Design: React.FC<IProps> = ({
                   <span>{scale}%</span>
                   <Button
                     size="small"
+                    className={cls['scale']}
                     disabled={scale >= 150}
                     onClick={() => setScale(scale + 10)}>
                     <AiOutlinePlus />
@@ -661,16 +661,13 @@ const Design: React.FC<IProps> = ({
                   )}
                 </Space>
               </div>
-            </div>
-          </Layout.Header>
-          <Layout.Content>
-            <Card bordered={false}>
               {/* 基本信息组件 */}
               <div>
                 <ChartDesign
                   disableIds={[current?.id || '']}
                   // key={key}
                   current={current}
+                  conditions={conditions}
                   species={species}
                   defaultEditable={IsEdit}
                   resource={resource}

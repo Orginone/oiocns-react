@@ -9,7 +9,7 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import { pageAll } from '@/ts/base';
 import { ISpace } from '@/ts/core';
-import WorkStartDo from '@/pages/Work/content/Start';
+import WorkStartDo from '@/pages/Work/content/work/start';
 
 const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
   const [tableKey, setTableKey] = useState('全部');

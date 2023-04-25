@@ -63,7 +63,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
                   return [
                     {
                       key: 'detail',
-                      label: '同意',
+                      label: '详情',
                       onClick: async () => {
                         setSelectTodo(item);
                         setPageKey('Detail');
@@ -92,7 +92,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
                   },
                 }}
                 request={async (page) => {
-                  let todos = (await orgCtrl.user.work.loadTodo()).filter(
+                  let todos = (await orgCtrl.user.work.loadTodo(true)).filter(
                     (a) =>
                       a.name.includes(filter) ||
                       a.type.includes(filter) ||

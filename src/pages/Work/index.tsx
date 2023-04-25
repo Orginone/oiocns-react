@@ -8,7 +8,7 @@ import { XFlowDefine } from '@/ts/base/schema';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { ISpeciesItem, ITarget } from '@/ts/core';
 import { FlowColumn } from '../Setting/config/columns';
-import WorkStart from './content/work/start/Start';
+import WorkStart from './content/work/start';
 import { GroupMenuType } from './config/menuType';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';
