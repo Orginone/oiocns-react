@@ -276,7 +276,7 @@ const Index: React.FC<indexType> = () => {
               return (
                 <ProCard
                   title={item.CompanyName}
-                  key={index}
+                  key={item.CompanyName}
                   headerBordered
                   collapsible
                   defaultCollapsed

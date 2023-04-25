@@ -422,7 +422,7 @@ class HomeSettingServices extends Emitter {
         this.changCallbackPart('Goback');
       });
   }
-  public getAllPublishPage() {
+  public getAllPublishPage = debounce(() => {
     this.AllCompanyPages = [];
     OrgCtrl.user.joinedCompany.forEach((CompItem: ICompany) => {
       kernel.anystore
@@ -438,9 +438,10 @@ class HomeSettingServices extends Emitter {
             // 向页面提示数据更新
             this.changCallbackPart('AllPages');
           }
+          console.log('打印', this.AllCompanyPages);
         });
     });
-  }
+  }, 500);
 
   // 数据操作
   /**

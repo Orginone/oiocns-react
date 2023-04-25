@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Col, Row, Table, Tag } from 'antd';
+import { Card, Table } from 'antd';
 import './index.less';
 import pageCtrl from '@/pages/Setting/content/PageDesign/pageCtrl';
 import CreatIfream from './addIfream';
@@ -9,7 +9,7 @@ const Index: React.FC<CardCompType> = () => {
   useEffect(() => {
     pageCtrl.subscribePart('DataSource', () => {
       setTimeout(() => {
-        console.log('777777', pageCtrl.dataSource);
+        console.log('DataSource变化', pageCtrl.dataSource);
       }, 50);
     });
     return () => {
@@ -88,6 +88,9 @@ const Index: React.FC<CardCompType> = () => {
         <Table
           className="ListWrap"
           columns={columns}
+          rowKey={(record) => {
+            return record.name + record.i;
+          }}
           scroll={{ y: 600 }}
           pagination={false}
           dataSource={DataSource}
