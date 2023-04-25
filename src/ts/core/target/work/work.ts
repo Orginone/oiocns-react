@@ -15,11 +15,16 @@ export interface IWork {
   approvals(
     todos: ITodo[],
     status: number,
-    comment: string,
-    data: string,
+    comment?: string,
+    data?: string,
   ): Promise<boolean>;
   /** 审批办事 */
-  approval(todo: ITodo, status: number, comment: string, data: string): Promise<boolean>;
+  approval(
+    todo: ITodo,
+    status: number,
+    comment?: string,
+    data?: string,
+  ): Promise<boolean>;
 }
 
 // 办事
@@ -32,11 +37,11 @@ export class Work implements IWork {
   async approvals(
     todos: ITodo[],
     status: number,
-    comment: string,
-    data: string,
+    comment: string = '',
+    data: string = '',
   ): Promise<boolean> {
     for (let todo of todos) {
-    await todo.approval(status, comment, data);
+      await todo.approval(status, comment, data);
     }
     this.orgTodo = this.orgTodo.filter((a) => !todos.includes(a));
     this.flowTodo = this.flowTodo.filter((a) => !todos.includes(a));
@@ -46,8 +51,8 @@ export class Work implements IWork {
   async approval(
     todo: ITodo,
     status: number,
-    comment: string,
-    data: string,
+    comment: string = '',
+    data: string = '',
   ): Promise<boolean> {
     let success = false;
     if (await todo.approval(status, comment, data)) {

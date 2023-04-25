@@ -5,7 +5,7 @@ import { XFlowDefine, XOperation } from '@/ts/base/schema';
 import { ISpace, ISpeciesItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { ProFormInstance } from '@ant-design/pro-components';
+import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, message, Modal, Tabs } from 'antd';
 import TabPane from 'antd/lib/tabs/TabPane';
 import { Editing, Item } from 'devextreme-react/data-grid';
