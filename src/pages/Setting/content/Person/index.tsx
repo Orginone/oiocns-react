@@ -2,7 +2,7 @@ import { Button, Card, Descriptions, message, Modal, Typography } from 'antd';
 import Layout from 'antd/lib/layout/layout';
 import React, { useRef, useState } from 'react';
 
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { useHistory } from 'react-router-dom';
@@ -13,8 +13,6 @@ import SearchCompany from '@/bizcomponents/SearchCompany';
 import { TargetType } from '@/ts/core';
 import PageCard from '@/components/PageCard';
 import { common } from 'typings/common';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import chat from '@/ts/controller/chat';
 
 /**
  * 个人信息
@@ -23,7 +21,6 @@ import chat from '@/ts/controller/chat';
 const PersonSetting: React.FC = () => {
   const history = useHistory();
   const parentRef = useRef<any>(null);
-  const [key, forceUpdate] = useCtrlUpdate(userCtrl);
   const [tabKey, setTabKey] = useState<string>('friends');
   const [modalType, setModalType] = useState('');
   const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
@@ -32,7 +29,7 @@ const PersonSetting: React.FC = () => {
     if (searchCallback && searchCallback.length > 0) {
       if (searchCallback && searchCallback.length > 0) {
         searchCallback.forEach(async (item) => {
-          success = await userCtrl.user.applyFriend(item);
+          success = await orgCtrl.user.applyFriend(item);
         });
       }
     }
@@ -63,20 +60,20 @@ const PersonSetting: React.FC = () => {
             </Button>,
           ]}>
           <Descriptions.Item label="昵称">
-            <TeamIcon share={userCtrl.user.shareInfo} size={40} preview={true} />
-            {userCtrl.user.name}
+            <TeamIcon share={orgCtrl.user.shareInfo} size={40} preview={true} />
+            {orgCtrl.user.name}
           </Descriptions.Item>
-          <Descriptions.Item label="姓名">{userCtrl.user.teamName}</Descriptions.Item>
+          <Descriptions.Item label="姓名">{orgCtrl.user.teamName}</Descriptions.Item>
           <Descriptions.Item label="账号">
             <Typography.Paragraph copyable>
-              {userCtrl.user.target.code}
+              {orgCtrl.user.target.code}
             </Typography.Paragraph>
           </Descriptions.Item>
           <Descriptions.Item label="联系方式">
-            {userCtrl.user.target.team?.code}
+            {orgCtrl.user.target.team?.code}
           </Descriptions.Item>
           <Descriptions.Item label="座右铭">
-            {userCtrl.user.target.team?.remark}
+            {orgCtrl.user.target.team?.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -89,14 +86,6 @@ const PersonSetting: React.FC = () => {
         key: 'openchats',
         label: '打开会话',
         onClick: async () => {
-          chat.setCurrent(
-            chat.findTargetChat(
-              item,
-              userCtrl.user.id,
-              userCtrl.user.teamName,
-              item.typeName,
-            ),
-          );
           history.push('/chat');
         },
       },
@@ -104,8 +93,7 @@ const PersonSetting: React.FC = () => {
         key: 'remove',
         label: '移除',
         onClick: async () => {
-          await userCtrl.user.removeMember(item);
-          forceUpdate();
+          await orgCtrl.user.removeMember(item);
         },
       },
     ];
@@ -131,14 +119,13 @@ const PersonSetting: React.FC = () => {
           }>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<schema.XTarget>
-              key={key}
               dataSource={[]}
               showChangeBtn={false}
               parentRef={parentRef}
               params={tabKey}
               operation={renderOperation}
               request={async (page) => {
-                return await userCtrl.user.loadMembers(page);
+                return await orgCtrl.user.loadMembers(page);
               }}
               columns={tabKey === 'companys' ? CompanyColumn : PersonColumns}
               rowKey={'id'}

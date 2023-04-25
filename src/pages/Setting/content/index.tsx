@@ -5,8 +5,6 @@ import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
-import { GroupMenuType } from '../config/menuType';
-import userCtrl from '@/ts/controller/setting';
 import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
@@ -16,6 +14,8 @@ import PageCompList from './PageDesign/content/CompList';
 import pageCtrl from './PageDesign/pageCtrl';
 import { Empty } from 'antd';
 import OgoImg from '../../../../public/img/logo/logo2.jpg';
+import { MenuType, GroupMenuType } from '../config/menuType';
+
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;
@@ -23,30 +23,29 @@ interface IProps {
 
 const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
   if (selectMenu.itemType === '门户设置') {
-    pageCtrl.setBelongId = selectMenu.belong;
+    pageCtrl.setBelongId = selectMenu.item.id;
   }
   /** 加载内容区 */
   switch (selectMenu.itemType) {
-    case GroupMenuType.User:
+    case MenuType.User:
       return <PersonSetting />;
-    case GroupMenuType.Company:
-      userCtrl.target = selectMenu.item;
+    case MenuType.Company:
       return <CompanySetting current={selectMenu.item} />;
-    case GroupMenuType.Agency:
-      userCtrl.target = selectMenu.item;
+    case MenuType.Agency:
       return <AgencySetting current={selectMenu.item} />;
-    case GroupMenuType.Station:
+    case MenuType.Station:
       return <StationSetting current={selectMenu.item} />;
-    case GroupMenuType.Cohort:
-      userCtrl.target = selectMenu.item;
+    case MenuType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
-    case GroupMenuType.Species:
+    case MenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
-    case GroupMenuType.Dict:
-      return <DictSetting current={selectMenu.item} belongId={selectMenu.belong} />;
-    case GroupMenuType.Property:
-      return <PropertySetting />;
-    case GroupMenuType.Authority:
+    case MenuType.Dict:
+      return (
+        <DictSetting current={selectMenu.item.dict} belong={selectMenu.item.belong} />
+      );
+    case MenuType.Property:
+      return <PropertySetting current={selectMenu.item} />;
+    case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
     case GroupMenuType.PageDesignList: {
       return <PageDesignList />;

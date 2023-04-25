@@ -3,7 +3,7 @@ import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 type ConcurrentNodeProps = {
   //默认操作组织id
   operateOrgId?: string;
@@ -37,12 +37,13 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   const select = () => {
     props.onSelected();
   };
+  // TODO 这里有问题
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
     if (
       props.config.belongId &&
       props.config.belongId != '' &&
-      props.config.belongId != userCtrl.space.id
+      props.config.belongId != orgCtrl.user.id
     ) {
       editable = false;
     }
@@ -86,7 +87,9 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
   return (
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
-        title={<span>创建组织: {userCtrl.getBelongName(props.config.belongId)}</span>}
+        title={
+          <span>创建组织: {orgCtrl.provider.findNameById(props.config.belongId)}</span>
+        }
         placement="right">
         <div className={cls['node-body']}>
           <div className={cls['node-body-main']}>

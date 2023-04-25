@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Descriptions, Space } from 'antd';
 import cls from '../Agency/index.module.less';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 /**
@@ -34,14 +34,14 @@ const Description = ({
         <Descriptions.Item label="权限名称">{current.target.name}</Descriptions.Item>
         <Descriptions.Item label="共享组织">
           <Space>
-            <strong>{userCtrl.findTeamInfoById(current.target.belongId).name}</strong>
+            <strong>{orgCtrl.provider.findNameById(current.target.belongId)}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="权限编码">
           {current.target.code || ''}
         </Descriptions.Item>
         <Descriptions.Item label="创建人">
-          {userCtrl.findTeamInfoById(current.target.createUser).name}
+          {orgCtrl.provider.findNameById(current.target.belongId)}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {current.target?.createTime || ''}

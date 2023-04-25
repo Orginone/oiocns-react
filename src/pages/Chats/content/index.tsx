@@ -6,17 +6,18 @@ import { MenuItemType } from 'typings/globelType';
 
 interface IProps {
   key: string;
+  filter: string;
   openDetail: boolean;
   selectMenu: MenuItemType;
 }
 
-const TypeSetting = ({ key, selectMenu, openDetail }: IProps) => {
+const TypeChat = ({ filter, selectMenu, openDetail }: IProps) => {
   switch (selectMenu.itemType.split('-')[0]) {
     case GroupMenuType.Chat:
-      return <Chat openDetail={openDetail} />;
+      return <Chat chat={selectMenu.item} openDetail={openDetail} filter={filter} />;
     default:
-      return <Book key={key} belongId={selectMenu.belong?.id ?? ''} />;
+      return <Book chats={selectMenu.item} filter={filter} />;
   }
 };
 
-export default TypeSetting;
+export default TypeChat;

@@ -1,16 +1,17 @@
 import { model, schema } from '@/ts/base';
 import { PageRequest, TargetModel, TargetShare } from '@/ts/base/model';
-import { XIdentity, XTarget, XTargetArray } from '@/ts/base/schema';
 import { TargetType } from '../enum';
 import { IMarket, Market } from '../market';
 import IProduct from '../market/iproduct';
 import { IAuthority } from './authority/iauthority';
 import { IIdentity } from './authority/iidentity';
-import { FlowDefine } from '../thing/flowDefine';
-import { ISpeciesItem } from '../thing';
+import { FlowDefine } from './thing/flowDefine';
+import { ISpeciesItem } from './thing';
 import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem, IObjectItem } from './store/ifilesys';
+import { IChat } from './chat/ichat';
+import { IWork } from './work/work';
 export type TargetParam = Omit<TargetModel, 'id' | 'belongId'>;
 
 /** 空间类型数据 */
@@ -35,10 +36,12 @@ export interface ITarget {
   teamName: string;
   /** 实体对象 */
   target: schema.XTarget;
+  /** 当前用户ID */
+  userId: string;
+  /** 加载组织的空间 */
+  space: ISpace;
   /** 类型 */
   typeName: TargetType;
-  /** 权限树 */
-  authorityTree: IAuthority | undefined;
   /** 拥有的角色 */
   ownIdentitys: schema.XIdentity[];
   /** 组织的角色 */
@@ -57,6 +60,10 @@ export interface ITarget {
   define: FlowDefine;
   /** 分类 */
   species: ISpeciesItem[];
+  /** 会话 */
+  chat: IChat;
+  /** 当前的会话 */
+  allChats(): IChat[];
   /**
    * 新增
    * @param data
@@ -76,11 +83,6 @@ export interface ITarget {
    * @param reload
    */
   loadSpeciesTree(reload?: boolean): Promise<ISpeciesItem[]>;
-  /**
-   * 获取权限树
-   * @param reload 是否强制刷新
-   */
-  loadAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
   /**
    * 判断是否拥有该角色
    * @param id 角色id
@@ -109,12 +111,12 @@ export interface ITarget {
    * 加载组织成员
    * @param page 分页请求
    */
-  loadMembers(page: PageRequest): Promise<XTargetArray>;
+  loadMembers(page: PageRequest): Promise<schema.XTargetArray>;
   /**
    * 拉取成员加入群组
    * @param {XTarget} target 成员
    */
-  pullMember(target: XTarget): Promise<boolean>;
+  pullMember(target: schema.XTarget): Promise<boolean>;
   /**
    * 拉取成员加入群组
    * @param {string[]} ids 成员ID数组
@@ -125,7 +127,7 @@ export interface ITarget {
    * 移除群成员
    * @param {XTarget} target 成员
    */
-  removeMember(target: XTarget): Promise<boolean>;
+  removeMember(target: schema.XTarget): Promise<boolean>;
   /**
    * 移除群成员
    * @param {string[]} ids 成员ID数组
@@ -336,16 +338,18 @@ export interface IFlow {
 export interface ISpace extends IFlow, IMTarget, ITarget {
   /** 我的群组 */
   cohorts: ICohort[];
-  /** 空间类型数据 */
-  spaceData: SpaceType;
   /** 空间权限树 */
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   /** 属性 */
   property: Property;
   /** 字典 */
   dict: Dict;
   /** 文件系统 */
   root: IFileSystemItem;
+  /** 成员会话 */
+  memberChats: IChat[];
+  /** 全员 */
+  members: schema.XTarget[];
   /**
    * @description: 查询群
    * @param reload 是否强制刷新
@@ -364,6 +368,10 @@ export interface ISpace extends IFlow, IMTarget, ITarget {
    * @param reload 重新加载
    */
   loadSpaceAuthorityTree(reload?: boolean): Promise<IAuthority | undefined>;
+
+  createThing(data: any): Promise<boolean>;
+
+  perfectThing(id: string, data: any): Promise<boolean>;
 }
 /** 群组操作 */
 export interface ICohort extends ITarget {
@@ -377,8 +385,8 @@ export interface ICohort extends ITarget {
 }
 /** 人员操作 */
 export interface IPerson extends ISpace, ITarget {
-  /** 我的好友列表 */
-  joinedFriend: schema.XTarget[];
+  /** 办事 */
+  work: IWork;
   /** 我加入的单位 */
   joinedCompany: ICompany[];
   /** 主目录 */
@@ -469,8 +477,8 @@ export interface ICompany extends ISpace, ITarget {
   workings: IWorking[];
   /** 我加入的集团 */
   joinedGroup: IGroup[];
-  /** 当前用户Id */
-  userId: string;
+  /** 岗位 */
+  stations: IStation[];
   /**
    * 删除集团
    * @param id 集团Id
@@ -544,6 +552,8 @@ export interface ICompany extends ISpace, ITarget {
    * @param code 集团编号
    */
   searchGroup(code: string): Promise<schema.XTargetArray>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 集团操作 */
 export interface IGroup extends ITarget {
@@ -572,6 +582,8 @@ export interface IGroup extends ITarget {
    * @returns
    */
   getSubGroups(reload?: boolean): Promise<IGroup[]>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 部门操作 */
 export interface IDepartment extends ITarget {
@@ -597,6 +609,8 @@ export interface IDepartment extends ITarget {
   deleteDepartment(id: string): Promise<boolean>;
   /** 删除工作组 */
   deleteWorking(id: string): Promise<boolean>;
+  /** 加载所有相关组织 */
+  deepLoad(reload?: boolean): Promise<void>;
 }
 /** 工作组 */
 export interface IWorking extends ITarget {
@@ -619,7 +633,7 @@ export interface IStation extends ITarget {
    * 添加岗位角色
    * @param {string[]} identitys 角色数组
    */
-  pullIdentitys(identitys: XIdentity[]): Promise<boolean>;
+  pullIdentitys(identitys: schema.XIdentity[]): Promise<boolean>;
   /**
    * 移除岗位角色
    * @param {string[]} ids 角色ID数组

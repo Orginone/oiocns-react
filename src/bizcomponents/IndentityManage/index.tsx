@@ -4,8 +4,8 @@ import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
-import { ITarget } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { ISpace, ITarget } from '@/ts/core';
 import { XIdentity, XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
@@ -17,6 +17,7 @@ export type ResultType = {
 interface Iprops {
   multiple: boolean;
   orgId?: string;
+  space: ISpace;
   onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
@@ -28,7 +29,7 @@ const ShareRecent = (props: Iprops) => {
   const [resultData, setResultData] = useState<ResultType[]>([]);
 
   const loadTeamTree = async () => {
-    const targets = await userCtrl.getTeamTree();
+    const targets = await orgCtrl.getTeamTree(props.space);
     setData(buildTargetTree(targets, false));
   };
 

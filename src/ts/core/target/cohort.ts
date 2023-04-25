@@ -1,13 +1,18 @@
 import { TargetType } from '../enum';
 import BaseTarget from './base';
 import { kernel, schema } from '../../base';
-import { ICohort } from './itarget';
+import { ICohort, ISpace } from './itarget';
 import { XTarget } from '@/ts/base/schema';
 
 export default class Cohort extends BaseTarget implements ICohort {
   private _onDeleted: Function;
-  constructor(target: schema.XTarget, onDeleted: Function) {
-    super(target);
+  constructor(
+    target: schema.XTarget,
+    space: ISpace,
+    userId: string,
+    onDeleted: Function,
+  ) {
+    super(target, space, userId);
     this._onDeleted = onDeleted;
     this.searchTargetType = [TargetType.Person];
   }

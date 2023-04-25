@@ -1,5 +1,5 @@
 import IndentitySelect from '@/bizcomponents/IndentityManage';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { SelectOutlined } from '@ant-design/icons';
 import { ProForm } from '@ant-design/pro-components';
 import { Button, Input, Modal } from 'antd';
@@ -11,7 +11,7 @@ const { Search } = Input;
  * 角色组件(Todo 待完善)
  */
 const ProFormIdentity = (props: any) => {
-  const nodeOperateOrgId = props.orgId || userCtrl.space.id;
+  const nodeOperateOrgId = props.orgId || orgCtrl.user.id;
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [identity, setIdentity] = useState<any>({});

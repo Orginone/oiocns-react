@@ -905,6 +905,8 @@ export type XMarketRelation = {
   updateTime: string;
   // 组织/个人ID
   target: XTarget | undefined;
+  // 商店
+  market: XMarket | undefined;
 };
 
 //组织/个人与市场关系查询返回集合

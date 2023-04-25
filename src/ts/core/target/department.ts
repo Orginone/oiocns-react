@@ -2,9 +2,10 @@ import { TargetModel } from './../../base/model';
 import BaseTarget from '@/ts/core/target/base';
 import { departmentTypes, subDepartmentTypes, TargetType } from '../enum';
 import { schema } from '../../base';
-import { IDepartment, ITarget, IWorking, TargetParam } from './itarget';
+import { IDepartment, ISpace, ITarget, IWorking, TargetParam } from './itarget';
 import Working from './working';
 import { logger } from '@/ts/base/common';
+import { IChat } from './chat/ichat';
 
 /**
  * 部门的元操作
@@ -17,8 +18,13 @@ export default class Department extends BaseTarget implements IDepartment {
   departments: IDepartment[];
   private _onDeleted: Function;
 
-  constructor(target: schema.XTarget, onDeleted: Function) {
-    super(target);
+  constructor(
+    target: schema.XTarget,
+    space: ISpace,
+    userId: string,
+    onDeleted: Function,
+  ) {
+    super(target, space, userId);
     this.person = [];
     this.workings = [];
     this.departments = [];
@@ -40,6 +46,24 @@ export default class Department extends BaseTarget implements IDepartment {
     await this.getDepartments(reload);
     await this.getWorkings(reload);
     return [...this.departments, ...this.workings];
+  }
+
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSubTeam(reload);
+    for (const item of this.departments) {
+      await item.deepLoad(reload);
+    }
+  }
+
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.departments) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.workings) {
+      chats.push(...item.allChats());
+    }
+    return chats;
   }
 
   public async create(data: TargetModel): Promise<ITarget | undefined> {
@@ -68,7 +92,7 @@ export default class Department extends BaseTarget implements IDepartment {
     if (res.success) {
       this.departments =
         res.data.result?.map((a) => {
-          return new Department(a, () => {
+          return new Department(a, this.space, this.userId, () => {
             this.departments = this.departments.filter((i) => {
               return i.id != a.id;
             });
@@ -88,7 +112,7 @@ export default class Department extends BaseTarget implements IDepartment {
     if (res.success) {
       this.workings =
         res.data.result?.map((a) => {
-          return new Working(a, () => {
+          return new Working(a, this.space, this.userId, () => {
             this.workings = this.workings.filter((i) => {
               return i.id != a.id;
             });
@@ -109,7 +133,7 @@ export default class Department extends BaseTarget implements IDepartment {
     }
     const res = await super.createSubTarget({ ...data, belongId: this.target.belongId });
     if (res.success) {
-      const department = new Department(res.data, () => {
+      const department = new Department(res.data, this.space, this.userId, () => {
         this.departments = this.departments.filter((i) => {
           return i.id != department.id;
         });
@@ -127,6 +151,7 @@ export default class Department extends BaseTarget implements IDepartment {
     );
     if (res.success) {
       this.departments = this.departments.filter((a) => {
+        a.chat.destroy();
         return a.target.id != id;
       });
       return true;
@@ -141,7 +166,7 @@ export default class Department extends BaseTarget implements IDepartment {
     data.teamName = data.teamName == '' ? data.name : data.teamName;
     const res = await super.createSubTarget(data);
     if (res.success) {
-      const working = new Working(res.data, () => {
+      const working = new Working(res.data, this.space, this.userId, () => {
         this.workings = this.workings.filter((i) => {
           return i.id != working.id;
         });
@@ -155,6 +180,7 @@ export default class Department extends BaseTarget implements IDepartment {
     const res = await super.deleteSubTarget(id, TargetType.Working, this.target.belongId);
     if (res.success) {
       this.workings = this.workings.filter((a) => {
+        a.chat.destroy();
         return a.target.id != id;
       });
       return true;

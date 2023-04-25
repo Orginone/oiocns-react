@@ -4,37 +4,33 @@ import { common } from 'typings/common';
 import AppCard from './card';
 import CardOrTable from '@/components/CardOrTableComp';
 import { InnerApplicationColumns } from '@/pages/Store/config/columns';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import { XFlowDefine } from '@/ts/base/schema';
-import WorkStartDo from '@/pages/Todo/content/Work/WorkStartDo';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
-import userCtrl from '@/ts/controller/setting';
-import { FlowDefine } from '@/ts/core/thing/flowDefine';
+import orgCtrl from '@/ts/controller';
+import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
 import { Popup, ScrollView } from 'devextreme-react';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 
 const InnerApp: React.FC = () => {
   const [tableKey, setTableKey] = useState('全部');
-  const [key, forceUpdate] = useObjectUpdate(userCtrl.space);
+  const [key, forceUpdate] = useObjectUpdate(orgCtrl.user);
   const [modalType, setModalType] = useState('');
   const [define, setDefine] = useState<XFlowDefine>();
   const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
 
   useEffect(() => {
     setTimeout(async () => {
-      let data = (await new FlowDefine(userCtrl.space.id).loadFlowDefine()).result || [];
+      let data = (await new FlowDefine(orgCtrl.user.id).loadFlowDefine()).result || [];
       switch (tableKey) {
         case '共享的':
           data = data.filter(
-            (a) =>
-              a.target.id != userCtrl.space.id && a.target.belongId != userCtrl.space.id,
+            (a) => a.target.id != orgCtrl.user.id && a.target.belongId != orgCtrl.user.id,
           );
           break;
         case '创建的':
           data = data.filter(
-            (a) =>
-              a.target.id == userCtrl.space.id || a.target.belongId == userCtrl.space.id,
+            (a) => a.target.id == orgCtrl.user.id || a.target.belongId == orgCtrl.user.id,
           );
           break;
         default:
@@ -101,12 +97,13 @@ const InnerApp: React.FC = () => {
     switch (modalType) {
       case 'start':
         return (
-          <WorkStartDo
-            current={define!}
-            goBack={() => {
-              setModalType('');
-            }}
-          />
+          <></>
+          // <WorkStartDo
+          //   current={define!}
+          //   goBack={() => {
+          //     setModalType('');
+          //   }}
+          // />
         );
       default:
         return (

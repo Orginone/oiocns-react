@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Drawer, Tag, TreeSelect } from 'antd';
-import thingCtrl from '@/ts/controller/thing';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Tooltip } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import cls from './index.module.less';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import { PageRequest } from '@/ts/base/model';
@@ -53,7 +52,7 @@ const selectAppTemplate: React.FC<Iprops> = (props) => {
   };
   useEffect(() => {
     init();
-  }, [userCtrl.space.id]);
+  }, [orgCtrl.space.id]);
 
   const tProps = {
     treeData,
@@ -71,7 +70,7 @@ const selectAppTemplate: React.FC<Iprops> = (props) => {
     return (
       await kernel.querySpeciesOperation({
         id: '',
-        spaceId: userCtrl.space.id,
+        spaceId: orgCtrl.space.id,
         filterAuth: false,
         recursionOrg: true,
         recursionSpecies: true,

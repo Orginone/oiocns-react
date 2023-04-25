@@ -253,30 +253,13 @@ const pySegSortObj = (objArr: any[], field: string) => {
   return segs;
 };
 
-/** 查找菜单 */
-const findMenuItemByKey: any = (items: MenuItemType[], key: string) => {
-  for (const item of items) {
-    if (item.key === key) {
-      return item;
-    } else if (Array.isArray(item.children) && item.children.length > 0) {
-      const find = findMenuItemByKey(item.children, key);
-      if (find) {
-        return find;
-      }
-    }
-  }
-  return undefined;
-};
-const getNowTime = (format?: string) => {
-  return moment().format(format ?? 'YYYY-MM-DD HH:mm:ss');
-};
-
-const findParentMenus = (item: MenuItemType, key: string): MenuItemType | undefined => {
+const findMenuItemByKey = (item: MenuItemType, key: string): MenuItemType | undefined => {
   for (const node of item.children) {
     if (node.key === key) {
-      return item;
+      node.parentMenu = item;
+      return node;
     }
-    const find = findParentMenus(node, key);
+    const find = findMenuItemByKey(node, key);
     if (find != undefined) {
       return find;
     }
@@ -289,9 +272,7 @@ export {
   debounce,
   findAimObj,
   findMenuItemByKey,
-  findParentMenus,
   getNewKeyWithString,
-  getNowTime,
   getUuid,
   handleFormatDate,
   pySegSort,

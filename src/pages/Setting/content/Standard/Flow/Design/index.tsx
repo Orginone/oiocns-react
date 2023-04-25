@@ -14,19 +14,19 @@ import {
 } from '@ant-design/icons';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
-import { FlowDefine } from '@/ts/core/thing/flowDefine';
-import { ITarget } from '@/ts/core';
+import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
+import { ISpeciesItem } from '@/ts/core';
 
 interface IProps {
   IsEdit: boolean;
   current: XFlowDefine;
-  target?: ITarget;
+  species?: ISpeciesItem;
   instance?: XFlowInstance;
   onBack: () => void;
 }
 
 const Design: React.FC<IProps> = ({
-  target,
+  species,
   current,
   instance,
   onBack,
@@ -621,7 +621,7 @@ const Design: React.FC<IProps> = ({
                             return;
                           }
                           if (
-                            await target!.define.publishDefine({
+                            await species?.team.define.publishDefine({
                               id: current?.id,
                               code: current.name,
                               name: current.name,
@@ -673,6 +673,7 @@ const Design: React.FC<IProps> = ({
                   disableIds={[current?.id || '']}
                   // key={key}
                   current={current}
+                  species={species}
                   defaultEditable={IsEdit}
                   resource={resource}
                   scale={scale}

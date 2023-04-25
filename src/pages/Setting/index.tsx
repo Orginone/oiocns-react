@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
-import userCtrl from '@/ts/controller/setting';
-import { ICompany, ISpeciesItem, ITarget, TargetType } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
-import useMenuUpdate from './hooks/useMenuUpdate';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
-import { GroupMenuType } from './config/menuType';
+import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
 import { companyTypes } from '@/ts/core/enum';
-import chat from '@/ts/controller/chat';
 import { useHistory } from 'react-router-dom';
+import { ISpeciesItem } from '@/ts/core';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
+import * as config from './config/menuOperate';
 
 export const targetsToTreeData = (targets: ITarget[]): any[] => {
   return targets.map((t) => {
@@ -28,25 +29,29 @@ export const targetsToTreeData = (targets: ITarget[]): any[] => {
 
 const TeamSetting: React.FC = () => {
   const history = useHistory();
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(
+    config.loadSettingMenu,
+  );
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
   const [refreshKey, setRefreshKey] = useState<string>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
   const [searchCallback, setSearchCallback] = useState<XTarget[]>();
-  if (!selectMenu) return <></>;
-
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
-        if (data.itemType === GroupMenuType.Agency) {
-          await (data.item as ITarget).loadSubTeam();
-          userCtrl.changCallback();
+        switch (data.itemType) {
+          case GroupMenuType.SpeciesGroup:
+            await (data.item as ITarget).loadSpeciesTree();
+            break;
+          case GroupMenuType.DictGroup:
+            await (data.item as ISpace).dict.loadDict();
+            break;
         }
-        userCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
@@ -55,8 +60,8 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await data.belong.dict.deleteDict(data.item.id)) {
-                  refreshMenu();
+                if (await data.item.belong.dict.deleteDict(data.item.id)) {
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -66,7 +71,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ITarget).delete()) {
-                  refreshMenu();
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -78,13 +83,13 @@ const TeamSetting: React.FC = () => {
                 let item = data.item as ITarget;
                 switch (item.typeName) {
                   case TargetType.Group:
-                    userCtrl.company.quitGroup((data.item as ITarget).id);
+                    // orgCtrl.company.quitGroup((data.item as ITarget).id);
                     break;
                   case TargetType.Cohort:
-                    userCtrl.user.quitCohorts((data.item as ITarget).id);
+                    orgCtrl.user.quitCohorts((data.item as ITarget).id);
                     break;
                 }
-                refreshMenu();
+                setSelectMenu(selectMenu.parentMenu!);
               },
             });
             break;
@@ -93,7 +98,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要删除吗?',
               onOk: async () => {
                 if (await (data.item as ISpeciesItem).delete()) {
-                  refreshMenu();
+                  setSelectMenu(selectMenu.parentMenu!);
                 }
               },
             });
@@ -105,14 +110,6 @@ const TeamSetting: React.FC = () => {
             setShowModal(true);
             break;
           case '打开会话':
-            chat.setCurrent(
-              chat.findTargetChat(
-                data.item.target,
-                data.belong.id,
-                data.belong.id != userCtrl.user.id ? data.belong.teamName : '我的',
-                data.item.typeName,
-              ),
-            );
             history.push('/chat');
             break;
           default:
@@ -120,19 +117,19 @@ const TeamSetting: React.FC = () => {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  data.belong.getCohorts(true);
+                  data.item.getCohorts(true);
                   break;
                 case TargetType.Department:
-                  (data.belong as ICompany).getDepartments(true);
+                  (data.item as ICompany).getDepartments(true);
                   break;
                 case TargetType.Group:
-                  (data.belong as ICompany).getJoinedGroups(true);
+                  (data.item as ICompany).getJoinedGroups(true);
                   break;
                 case TargetType.Station:
-                  (data.belong as ICompany).getStations(true);
+                  (data.item as ICompany).getStations(true);
                   break;
               }
-              userCtrl.changCallback();
+              orgCtrl.changCallback();
             } else {
               setEditTarget(data.item);
               setOperateKeys(key.split('|'));
@@ -150,15 +147,15 @@ const TeamSetting: React.FC = () => {
         }}
         handleOk={(newItem) => {
           if (newItem) {
-            refreshMenu();
+            setSelectMenu(selectMenu);
             setOperateKeys(['']);
           }
         }}
-        current={editTarget || userCtrl.user}
+        current={editTarget || orgCtrl.user}
         typeNames={operateKeys.slice(1)}
       />
       {/** 分类模态框 */}
-      {selectMenu.itemType !== '权限' && (
+      {selectMenu.itemType === MenuType.Species && (
         <SpeciesModal
           title={operateKeys[0]}
           open={['新增', '修改'].includes(operateKeys[0])}
@@ -167,17 +164,16 @@ const TeamSetting: React.FC = () => {
           }}
           handleOk={async (newItem) => {
             if (newItem) {
-              refreshMenu();
+              setSelectMenu(selectMenu);
               setOperateKeys(['']);
             }
           }}
-          targetId={(selectMenu.item as ITarget)?.id}
-          current={selectMenu.item as ISpeciesItem}
+          current={selectMenu.item}
         />
       )}
       {/** 单位 */}
       <CreateTeamModal
-        title={'新建'}
+        title={'新建单位'}
         open={showFormModal}
         handleCancel={function (): void {
           setShowFormModal(false);
@@ -186,10 +182,10 @@ const TeamSetting: React.FC = () => {
           if (item) {
             setShowFormModal(false);
             setRefreshKey(key);
-            refreshMenu();
+            setSelectMenu(selectMenu);
           }
         }}
-        current={userCtrl.user}
+        current={orgCtrl.user}
         typeNames={companyTypes}
       />
       <Modal
@@ -205,7 +201,7 @@ const TeamSetting: React.FC = () => {
           if (searchCallback && searchCallback.length > 0) {
             searchCallback.forEach(async (company) => {
               if (
-                await userCtrl.user.applyJoinCompany(
+                await orgCtrl.user.applyJoinCompany(
                   company.id,
                   company.typeName as TargetType,
                 )

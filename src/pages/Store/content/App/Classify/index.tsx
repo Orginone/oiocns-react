@@ -7,7 +7,6 @@ import StoreClassifyTree from '@/components/CustomTreeComp';
 import { getUuid, findAimObj, getNewKeyWithString } from '@/utils/tools';
 
 import ReactDOM from 'react-dom';
-import appCtrl, { TreeType } from '@/ts/controller/store/appCtrl';
 import { STORE_USER_MENU } from '@/constants/const';
 import { EllipsisOutlined } from '@ant-design/icons';
 

@@ -6,8 +6,6 @@ import { IconFont } from '@/components/IconFont';
 const { TextArea } = Input;
 import { useHistory } from 'react-router-dom';
 import React from 'react';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
-import appCtrl from '@/ts/controller/store/appCtrl';
 
 /*******
  * @desc: 应用上架

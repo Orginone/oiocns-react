@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProFormSelect } from '@ant-design/pro-components';
 
 /**
@@ -20,7 +20,7 @@ const ProFormDict = (props: any) => {
     const initOptions = async () => {
       const res = await kernel.queryDictItems({
         id: props.props.dictId,
-        spaceId: userCtrl.space.id,
+        spaceId: orgCtrl.user.id,
         page: { offset: 0, limit: 100000, filter: '' },
       });
       const dictItems =

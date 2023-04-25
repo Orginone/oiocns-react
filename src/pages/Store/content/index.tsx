@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MenuItemType } from 'typings/globelType';
-import { GroupMenuType } from '../config/menuType';
+import { MenuType } from '../config/menuType';
 import FileSystem from './FileSystem';
 import ThingIndex from '@/pages/Store/content/Thing';
 import Application from './App/innerApp';
@@ -27,12 +27,11 @@ const ContentIndex = (props: IProps) => {
   }
   /** 加载内容区 */
   switch (props.selectMenu.itemType) {
-    case GroupMenuType.Application:
+    case MenuType.Application:
       return <Application />;
-    case GroupMenuType.FileSystemItem:
+    case MenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
-    case GroupMenuType.Thing:
-    case GroupMenuType.Wel:
+    case MenuType.Species:
       return (
         <ThingIndex
           species={props.selectMenu.item}
@@ -51,7 +50,7 @@ export const TopBarExtra = ({ selectMenu }: IProps) => {
   const [taskNum, setTaskNum] = useState(0);
   /** 加载工具区 */
   switch (selectMenu.itemType) {
-    case GroupMenuType.FileSystemItem:
+    case MenuType.FileSystemItem:
       return (
         <>
           <Badge count={taskNum}>

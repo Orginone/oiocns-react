@@ -3,8 +3,8 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { OperationColumns } from '@/pages/Setting/config/columns';
 import { PageRequest } from '@/ts/base/model';
 import { XOperation } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
+import { ISpeciesItem } from '@/ts/core';
 import { message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
 import OperationModel from './operationModal';
@@ -12,7 +12,6 @@ import ViewCardModal from '../../../components/viewCardModal';
 import ViewFormModal from '../../../components/viewFormModal';
 
 interface IProps {
-  target?: ITarget;
   current: ISpeciesItem;
   modalType: string;
   recursionOrg: boolean;
@@ -28,7 +27,6 @@ interface IProps {
  */
 const Operation = ({
   current,
-  target,
   modalType,
   recursionOrg,
   recursionSpecies,
@@ -111,9 +109,9 @@ const Operation = ({
   };
   // 加载业务表单列表
   const loadOperations = async (page: PageRequest) => {
-    if (userCtrl.space.id && page) {
+    if (orgCtrl.user.id && page) {
       return await current!.loadOperations(
-        userCtrl.space.id,
+        orgCtrl.user.id,
         false,
         recursionOrg,
         recursionSpecies,
@@ -132,7 +130,7 @@ const Operation = ({
           return await loadOperations(page);
         }}
         operation={renderOperate}
-        columns={OperationColumns(target?.species || [])}
+        columns={OperationColumns(current.team.species || [])}
         showChangeBtn={false}
         dataSource={[]}
       />
@@ -152,7 +150,6 @@ const Operation = ({
             tforceUpdate();
           }
         }}
-        target={target}
         current={current}
       />
       <ViewFormModal

@@ -1,4 +1,4 @@
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
 import { DefaultOptionType } from 'antd/lib/select';
@@ -10,7 +10,7 @@ import React, { useEffect, useState } from 'react';
 const ProFormAuth = (props: any) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await userCtrl.space.loadAuthorityTree(false);
+    let tree = await orgCtrl.user.loadSpaceAuthorityTree(false);
     if (tree) {
       setTreeData([
         ...[{ label: '全员', value: '0', key: '0', children: [] }],
@@ -32,7 +32,7 @@ const ProFormAuth = (props: any) => {
 
   useEffect(() => {
     loadTreeData();
-  }, [userCtrl.space]);
+  }, []);
 
   return (
     <ProFormTreeSelect

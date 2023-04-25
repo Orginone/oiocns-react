@@ -2,7 +2,7 @@ import Group from './group';
 import consts from '../consts';
 import MarketTarget from './mbase';
 import { companyTypes, departmentTypes, TargetType } from '../enum';
-import { TargetModel } from '@/ts/base/model';
+import { PageRequest, TargetModel } from '@/ts/base/model';
 import Department from './department';
 import { validIsSocialCreditCode } from '@/utils/tools';
 import { schema, kernel, common } from '@/ts/base';
@@ -11,7 +11,6 @@ import {
   ICompany,
   IDepartment,
   IWorking,
-  SpaceType,
   ITarget,
   TargetParam,
   ICohort,
@@ -27,6 +26,8 @@ import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem } from './store/ifilesys';
 import { getFileSysItemRoot } from './store/filesys';
+import { IChat } from './chat/ichat';
+import { CreateChat } from './chat/chat';
 /**
  * 公司的元操作
  */
@@ -37,20 +38,20 @@ export default class Company extends MarketTarget implements ICompany {
   departments: IDepartment[] = [];
   groupLoaded: boolean = false;
   joinedGroup: IGroup[] = [];
-  userId: string;
   cohortsLoaded: boolean = false;
   cohorts: ICohort[] = [];
   workingsLoaded: boolean = false;
   workings: IWorking[] = [];
   departmentTypes: TargetType[] = [];
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
   root: IFileSystemItem;
+  memberChats: IChat[] = [];
+  members: schema.XTarget[] = [];
   constructor(target: schema.XTarget, userId: string) {
-    super(target);
+    super(target, undefined, userId);
     this.root = getFileSysItemRoot(target.id);
-    this.userId = userId;
     this.dict = new Dict(target.id);
     this.property = new Property(target.id);
     this.departmentTypes = departmentTypes;
@@ -66,8 +67,8 @@ export default class Company extends MarketTarget implements ICompany {
     this.searchTargetType = [TargetType.Person, TargetType.Group];
   }
   async loadSpaceAuthorityTree(reload: boolean = false): Promise<IAuthority | undefined> {
-    if (!reload && this.spaceAuthorityTree != undefined) {
-      return this.spaceAuthorityTree;
+    if (!reload && this.authorityTree != undefined) {
+      return this.authorityTree;
     }
     const res = await kernel.queryAuthorityTree({
       id: '0',
@@ -79,12 +80,39 @@ export default class Company extends MarketTarget implements ICompany {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this.id);
+      this.authorityTree = new Authority(res.data, this, this.userId);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   public get subTeam(): ITarget[] {
     return [...this.departments, ...this.workings];
+  }
+  public async loadMembers(page: PageRequest): Promise<schema.XTargetArray> {
+    if (this.members.length == 0) {
+      let data = await super.loadMembers({
+        offset: page.offset,
+        limit: page.limit,
+        filter: page.filter,
+      });
+      if (data.result) {
+        this.members = [];
+        this.memberChats = [];
+        for (const item of data.result) {
+          this.members.push(item);
+          this.memberChats.push(
+            CreateChat(this.userId, this.id, item, [this.teamName, '同事']),
+          );
+        }
+      }
+    }
+    return {
+      offset: page.offset,
+      limit: page.limit,
+      result: this.members
+        .filter((a) => a.code.includes(page.filter) || a.name.includes(page.filter))
+        .splice(page.offset, page.limit),
+      total: this.members.length,
+    };
   }
   public getCohorts = async (reload?: boolean): Promise<ICohort[]> => {
     if (!reload && this.cohortsLoaded) {
@@ -105,7 +133,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (res.success) {
       this.cohorts =
         res.data.result?.map((a) => {
-          return new Cohort(a, () => {
+          return new Cohort(a, this, this.userId, () => {
             this.cohorts = this.cohorts.filter((i) => i.id != a.id);
           });
         }) ?? [];
@@ -129,27 +157,52 @@ export default class Company extends MarketTarget implements ICompany {
     }
   }
   public async loadSubTeam(reload: boolean = false): Promise<ITarget[]> {
+    await this.getCohorts(reload);
     await this.getWorkings(reload);
+    await this.getStations(reload);
     await this.getDepartments(reload);
     return [...this.departments, ...this.workings];
   }
+  public async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadSubTeam(reload);
+    await this.getJoinedGroups(reload);
+    for (const item of this.joinedGroup) {
+      await item.deepLoad(reload);
+    }
+    for (const item of this.departments) {
+      await item.deepLoad(reload);
+    }
+    await this.loadSpaceAuthorityTree();
+  }
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.departments) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.workings) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.stations) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.cohorts) {
+      chats.push(...item.allChats());
+    }
+    if (this.authorityTree) {
+      chats.push(...this.authorityTree.allChats());
+    }
+    chats.push(...this.memberChats);
+    return chats;
+  }
   public async searchGroup(code: string): Promise<schema.XTargetArray> {
     return await this.searchTargetByName(code, [TargetType.Group]);
-  }
-  public get spaceData(): SpaceType {
-    return {
-      id: this.target.id,
-      name: this.target.team!.name,
-      share: this.shareInfo,
-      typeName: this.target.typeName as TargetType,
-    };
   }
   private async createGroup(data: TargetParam): Promise<IGroup | undefined> {
     const tres = await this.searchTargetByName(data.code, [TargetType.Group]);
     if (!tres.result) {
       const res = await this.createTarget({ ...data, belongId: this.target.id });
       if (res.success) {
-        const group = new Group(res.data, () => {
+        const group = new Group(res.data, this, this.userId, () => {
           this.joinedGroup = this.joinedGroup.filter((item) => {
             return item.id != group.id;
           });
@@ -173,7 +226,7 @@ export default class Company extends MarketTarget implements ICompany {
     }
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
-      const department = new Department(res.data, () => {
+      const department = new Department(res.data, this, this.userId, () => {
         this.departments = this.departments.filter((item) => {
           return item.id != department.id;
         });
@@ -190,7 +243,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.typeName = TargetType.Station;
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
-      const station = new Station(res.data, () => {
+      const station = new Station(res.data, this, this.userId, () => {
         this.stations = this.stations.filter((item) => {
           return item.id != station.id;
         });
@@ -207,7 +260,7 @@ export default class Company extends MarketTarget implements ICompany {
     data.typeName = TargetType.Working;
     const res = await this.createSubTarget({ ...data, belongId: this.target.id });
     if (res.success) {
-      const working = new Working(res.data, () => {
+      const working = new Working(res.data, this, this.userId, () => {
         this.workings = this.workings.filter((item) => {
           return item.id != working.id;
         });
@@ -228,7 +281,7 @@ export default class Company extends MarketTarget implements ICompany {
       teamRemark: data.teamRemark,
     });
     if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data, () => {
+      const cohort = new Cohort(res.data, this, this.userId, () => {
         this.cohorts = this.cohorts.filter((i) => i.id != res.data.id);
       });
       this.cohorts.push(cohort);
@@ -255,6 +308,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, department.target.typeName, this.id);
       if (res.success) {
         this.departments = this.departments.filter((department) => {
+          department.chat.destroy();
           return department.id != id;
         });
       }
@@ -271,6 +325,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, station.target.typeName, this.id);
       if (res.success) {
         this.stations = this.stations.filter((station) => {
+          station.chat.destroy();
           return station.id != id;
         });
       }
@@ -287,6 +342,7 @@ export default class Company extends MarketTarget implements ICompany {
       let res = await this.deleteSubTarget(id, TargetType.Working, this.id);
       if (res.success) {
         this.workings = this.workings.filter((working) => {
+          working.chat.destroy();
           return working.id != id;
         });
       }
@@ -345,7 +401,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (res.success) {
       this.departments =
         res.data.result?.map((a) => {
-          return new Department(a, () => {
+          return new Department(a, this, this.userId, () => {
             this.departments = this.departments.filter((item) => {
               return item.id != a.id;
             });
@@ -365,7 +421,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (res.success) {
       this.stations =
         res.data.result?.map((a) => {
-          return new Station(a, () => {
+          return new Station(a, this, this.userId, () => {
             this.stations = this.stations.filter((item) => {
               return item.id != a.id;
             });
@@ -385,7 +441,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (res.success) {
       this.workings =
         res.data.result?.map((a) => {
-          return new Working(a, () => {
+          return new Working(a, this, this.userId, () => {
             this.workings = this.workings.filter((item) => {
               return item.id != a.id;
             });
@@ -405,7 +461,7 @@ export default class Company extends MarketTarget implements ICompany {
     if (res) {
       this.joinedGroup =
         res.result?.map((a) => {
-          return new Group(a, () => {
+          return new Group(a, this, this.userId, () => {
             this.joinedGroup = this.joinedGroup.filter((item) => {
               return item.id != a.id;
             });
@@ -462,5 +518,31 @@ export default class Company extends MarketTarget implements ICompany {
       belongId: this.target.id,
     });
     return res.success;
+  }
+
+  public async createThing(data: any): Promise<boolean> {
+    let res = await kernel.anystore.createThing(this.id, 1);
+    if (res.success) {
+      return (
+        await kernel.perfectThing({
+          id: (res.data as [{ Id: string }])[0].Id,
+          data: JSON.stringify(data),
+          belongId: this.id,
+        })
+      ).success;
+    } else {
+      logger.error(res.msg);
+      return false;
+    }
+  }
+
+  public async perfectThing(id: string, data: any): Promise<boolean> {
+    return (
+      await kernel.perfectThing({
+        id,
+        data: JSON.stringify(data),
+        belongId: this.id,
+      })
+    ).success;
   }
 }

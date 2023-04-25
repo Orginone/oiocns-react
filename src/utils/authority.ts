@@ -1,5 +1,5 @@
 import { ITarget } from '../ts/core';
-import userCtrl from '../ts/controller/setting';
+import orgCtrl from '../ts/controller';
 import { XMarket } from '@/ts/base/schema';
 
 // 平台角色
@@ -15,7 +15,7 @@ const IsAuthorityAdmin = async (
   target: ITarget,
   authoritys: string[],
 ): Promise<boolean> => {
-  if (target.id == userCtrl.user.id) {
+  if (target.id == orgCtrl.user.id) {
     return true;
   }
   if(!target || !target.judgeHasIdentity) {
@@ -43,10 +43,10 @@ export const IsRelationAdmin = async (target: ITarget): Promise<boolean> => {
 };
 
 export const IsMarketAdmin = async (market: XMarket): Promise<boolean> => {
-  if (market.belongId == userCtrl.user.id) {
+  if (market.belongId == orgCtrl.user.id) {
     return true;
   }
-  let companys = await userCtrl.user.getJoinedCompanys();
+  let companys = await orgCtrl.user.getJoinedCompanys();
   let company = companys.find((a) => a.id == market.belongId);
   if (company) {
     return await IsAuthorityAdmin(company, [

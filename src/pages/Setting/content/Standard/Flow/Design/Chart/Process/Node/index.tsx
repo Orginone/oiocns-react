@@ -9,8 +9,7 @@ import {
 import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
-import SelectAuth from '@/pages/Setting/content/Standard/Flow/Comp/selectAuth';
+import orgCtrl from '@/ts/controller';
 type NodeProps = {
   //是否为根节点
   isRoot?: boolean;
@@ -79,7 +78,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
   const [key, setKey] = useState<number>(0);
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
-    if (props.belongId && props.belongId != '' && props.belongId != userCtrl.space.id) {
+    if (props.belongId && props.belongId != '' && props.belongId != orgCtrl.user.id) {
       editable = false;
     }
     return editable;
@@ -217,7 +216,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           title={
             <span>
               创建组织:
-              {userCtrl.getBelongName(props.belongId || '')}
+              {orgCtrl.provider.findNameById(props.belongId || '')}
             </span>
           }
           placement="right">

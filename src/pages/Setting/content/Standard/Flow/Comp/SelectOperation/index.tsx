@@ -4,8 +4,7 @@ import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTreeComp';
-import thingCtrl from '@/ts/controller/thing';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 interface IProps {
@@ -24,7 +23,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     setLeftTreeSelectedKeys(selectedKeys);
     const species: any = info.node.item;
-    let res = await species.loadOperations(userCtrl.space.id, false, true, true, {
+    let res = await species.loadOperations(orgCtrl.user.id, false, true, true, {
       offset: 0,
       limit: 1000,
       filter: '',
@@ -84,7 +83,7 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
 
   useEffect(() => {
     const load = async () => {
-      const species = current || (await thingCtrl.loadSpeciesTree());
+      const species = current || (await orgCtrl.user.loadSpeciesTree());
       setLeftTreeData(buildSpeciesChildrenTree([species]));
     };
     load();

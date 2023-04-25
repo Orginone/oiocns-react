@@ -4,16 +4,21 @@ import { Button, Card, Descriptions, message } from 'antd';
 import React, { useState } from 'react';
 import { DictItemColumns } from '../../config/columns';
 import CardOrTable from '@/components/CardOrTableComp';
-import thingCtrl from '@/ts/controller/thing';
 import DictItemModal from './dictItemModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
+import { ISpace } from '@/ts/core';
 /**
  * @description: 分类字典管理
  * @return {*}
  */
-const DictInfo: React.FC<any> = (props: { current: XDict; belongId: string }) => {
-  const { current, belongId } = props;
+const DictInfo: React.FC<any> = ({
+  current,
+  belong,
+}: {
+  current: XDict;
+  belong: ISpace;
+}) => {
   const [activeModel, setActiveModel] = useState<string>('');
   const [dictItem, setDictItem] = useState<XDictItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
@@ -45,7 +50,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict; belongId: string }) =>
         key: '删除字典项',
         label: '删除字典项',
         onClick: async () => {
-          await thingCtrl.dict?.deleteDictItem(item.id);
+          await belong.dict?.deleteDictItem(item.id);
           tforceUpdate();
         },
       },
@@ -87,7 +92,7 @@ const DictInfo: React.FC<any> = (props: { current: XDict; belongId: string }) =>
           rowKey={'id'}
           params={tkey}
           operation={renderOperate}
-          request={(page) => thingCtrl.dict!.loadDictItem(current.id, belongId, page)}
+          request={(page) => belong.dict.loadDictItem(current.id, belong.id, page)}
           columns={DictItemColumns}
           showChangeBtn={false}
         />

@@ -2,7 +2,7 @@ import { IMarket, WebApp } from '@/ts/core/market';
 import { common, kernel, model, schema } from '../../base';
 import { Market } from '../market';
 import { ProductType, TargetType } from '../enum';
-import { IMTarget } from './itarget';
+import { IMTarget, ISpace } from './itarget';
 import FlowTarget from './flow';
 import IProduct from '../market/iproduct';
 import { XOrder } from '@/ts/base/schema';
@@ -16,8 +16,8 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
   joinMarketApplys: schema.XMarketRelation[];
   protected extendTargetType: TargetType[];
 
-  constructor(target: schema.XTarget) {
-    super(target);
+  constructor(target: schema.XTarget, space: ISpace | undefined, userId: string) {
+    super(target, space, userId);
     this.ownProducts = [];
     this.joinedMarkets = [];
     this.joinMarketApplys = [];
@@ -284,8 +284,11 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
     id: string,
     reload: boolean = false,
   ): Promise<schema.XResource[]> {
-    if (!reload && this.usefulResource.has(id) && this.usefulResource[id].length > 0) {
-      return this.usefulResource[id];
+    if (
+      (!reload && this.usefulResource.has(id) && this.usefulResource.get(id)?.length) ??
+      0 > 0
+    ) {
+      return this.usefulResource.get(id) ?? [];
     }
     const res = await kernel.queryUsefulResource({
       productId: id,
@@ -293,9 +296,9 @@ export default class MarketTarget extends FlowTarget implements IMTarget {
       typeNames: this.extendTargetType,
     });
     if (res.success && res.data.result) {
-      this.usefulResource[id] = res.data.result;
+      this.usefulResource.set(id, res.data.result);
     }
-    return this.usefulResource[id];
+    return this.usefulResource.get(id)!;
   }
   public async createOrder(
     nftId: string,

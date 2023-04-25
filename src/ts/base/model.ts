@@ -883,17 +883,11 @@ export type ChatModel = {
   // 头像
   photo: string;
   // 标签
-  label: string;
+  labels: string[];
   // 备注
   remark: string;
   // 类型名称
   typeName: string;
-  // 消息体
-  msgType: string;
-  // 消息体
-  msgBody: string;
-  // 消息时间
-  msgTime: string;
 };
 
 export type FlowInstanceModel = {

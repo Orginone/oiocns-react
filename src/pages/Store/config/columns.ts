@@ -1,7 +1,6 @@
 import { IProduct } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
-import userCtrl from '@/ts/controller/setting';
-import thingCtrl from '@/ts/controller/thing';
+import orgCtrl from '@/ts/controller';
 import { XFlowDefine } from '@/ts/base/schema';
 
 export const ApplicationColumns: ProColumns<IProduct>[] = [
@@ -57,7 +56,7 @@ export const InnerApplicationColumns: ProColumns<XFlowDefine>[] = [
     title: '需求主体',
     dataIndex: ['belongId'],
     render: (_, record) => {
-      return userCtrl.findTeamInfoById(record.belongId)?.name;
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
   {
@@ -65,7 +64,8 @@ export const InnerApplicationColumns: ProColumns<XFlowDefine>[] = [
     ellipsis: true,
     dataIndex: ['speciesId'],
     render: (_, record) => {
-      return thingCtrl.species.find((a) => a.id == record.speciesId)?.name ?? '未知';
+      // TODO 这里有问题
+      return orgCtrl.user.species.find((a) => a.id == record.speciesId)?.name ?? '未知';
     },
   },
   {

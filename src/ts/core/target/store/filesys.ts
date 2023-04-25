@@ -25,6 +25,9 @@ export class FileSystemItem implements IFileSystemItem {
     this.isRoot = parent === undefined;
     this.belongId = id;
   }
+  get fullKey(): string {
+    return this.belongId + '-' + this.key;
+  }
   get taskList(): TaskModel[] {
     return FileSystemItem._taskList;
   }

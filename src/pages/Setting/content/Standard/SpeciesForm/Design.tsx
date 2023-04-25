@@ -1,5 +1,5 @@
 import { XOperation } from '@/ts/base/schema';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { Button, Card, message } from 'antd';
 import React, { useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
@@ -7,10 +7,8 @@ import Design from '../../../components/design/index';
 import { SaveOutlined } from '@ant-design/icons';
 import { OperationModel } from '@/ts/base/model';
 import { kernel } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
 
 interface Iprops {
-  target?: ITarget;
   current: ISpeciesItem;
   operation: XOperation;
   toFlowDesign: (operation: XOperation) => void;
@@ -26,15 +24,15 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
 
   const save = async () => {
     if (operationModel) {
-      if (operationModel.belongId === userCtrl.space.id) {
+      if (operationModel.belongId === current.team.space.id) {
         const res = await kernel.updateOperation(operationModel);
         console.log(res);
       }
       const res = await kernel.createOperationItems({
-        spaceId: userCtrl.space.id,
+        spaceId: current.team.space.id,
         operationId: operationModel.id!,
         operationItems: operationModel.items
-          .filter((i: any) => i.belongId == userCtrl.space.id)
+          .filter((i: any) => i.belongId == current.team.space.id)
           .map((a) => ({
             name: a.name,
             code: a.code,

@@ -1,4 +1,4 @@
-import { IStation } from './itarget';
+import { ISpace, IStation } from './itarget';
 import { common, kernel, schema } from '../../base';
 import BaseTarget from './base';
 import { TargetType } from '../enum';
@@ -10,8 +10,8 @@ import { XIdentity, XTarget } from '@/ts/base/schema';
 export default class Station extends BaseTarget implements IStation {
   private _onDeleted: Function;
   private _identitys: XIdentity[] = [];
-  constructor(target: XTarget, onDeleted: Function) {
-    super(target);
+  constructor(target: XTarget, space: ISpace, userId: string, onDeleted: Function) {
+    super(target, space, userId);
     this._onDeleted = onDeleted;
   }
   async delete(): Promise<boolean> {

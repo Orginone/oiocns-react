@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, Card, Descriptions, Space } from 'antd';
 import { ITarget } from '@/ts/core';
 import cls from './index.module.less';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 /**
  * @description: 机构信息内容
  * @return {*}
@@ -40,10 +40,10 @@ const Description = (props: { title: any; current: ITarget; extra: any }) => {
           {deptInfo?.team?.code || ''}
         </Descriptions.Item>
         <Descriptions.Item label="所属单位">
-          {deptInfo && userCtrl.findTeamInfoById(deptInfo.belongId).name}
+          {deptInfo && orgCtrl.provider.findNameById(deptInfo.belongId)}
         </Descriptions.Item>
         <Descriptions.Item label="创建人">
-          {deptInfo && userCtrl.findTeamInfoById(deptInfo.createUser).name}
+          {deptInfo && orgCtrl.provider.findNameById(deptInfo.createUser)}
         </Descriptions.Item>
         <Descriptions.Item label="创建时间">
           {deptInfo?.createTime || ''}

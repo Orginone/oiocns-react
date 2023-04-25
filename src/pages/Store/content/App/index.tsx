@@ -15,9 +15,8 @@ import { common } from 'typings/common';
 import MoveApp from './moveApp';
 import PublishComp from './PublishList';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IProduct, IResource } from '@/ts/core';
-import appCtrl from '@/ts/controller/store/appCtrl';
 import CreateAppByCustom from '@/pages/Store/content/App/CreateApp/createAppByCustom';
 import SelectAppTemplate from '@/pages/Store/content/App/CreateApp/selectAppTemplate';
 import AppInfoModal from '@/pages/Store/content/App/CreateApp/appInfoModal';
@@ -37,7 +36,7 @@ const StoreApp: React.FC = () => {
 
   const renderOperation = (item: IProduct): common.OperationType[] => {
     const shareArr = [];
-    if (item.prod.belongId == userCtrl.space.id) {
+    if (item.prod.belongId == orgCtrl.space.id) {
       shareArr.push({
         key: 'share',
         label: '共享',
@@ -47,7 +46,7 @@ const StoreApp: React.FC = () => {
           setShowShareModal(true);
         },
       });
-      if (userCtrl.isCompanySpace) {
+      if (orgCtrl.isCompanySpace) {
         shareArr.push({
           key: 'share2',
           label: '分配',
@@ -110,7 +109,7 @@ const StoreApp: React.FC = () => {
           Modal.confirm({
             content: `确认移除《 ${item.prod.name} 》?`,
             async onOk() {
-              await userCtrl.space.deleteProduct(item.id);
+              await orgCtrl.space.deleteProduct(item.id);
               appCtrl.changCallback();
             },
           });

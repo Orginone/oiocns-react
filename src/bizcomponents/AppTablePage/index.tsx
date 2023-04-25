@@ -4,7 +4,7 @@ import CardOrTable from '@/components/CardOrTableComp';
 import AppCard from '@/components/AppCardComp';
 import type { ProColumns } from '@ant-design/pro-components';
 import { IProduct } from '@/ts/core';
-import useCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 interface IProps {
   tkey?: string;
   list: IProduct[];
@@ -37,19 +37,19 @@ const AppShowComp: React.FC<IProps> = ({
       case '创建的':
         setData(
           list.filter(
-            (a) => a.prod.source == '创建的' && a.prod.belongId == useCtrl.space.id,
+            (a) => a.prod.source == '创建的' && a.prod.belongId == orgCtrl.user.id,
           ),
         );
         break;
       case '购买的':
         setData(
           list.filter(
-            (a) => a.prod.source == '购买的' && a.prod.belongId == useCtrl.space.id,
+            (a) => a.prod.source == '购买的' && a.prod.belongId == orgCtrl.user.id,
           ),
         );
         break;
       case '共享的':
-        setData(list.filter((a) => a.prod.belongId != useCtrl.space.id));
+        setData(list.filter((a) => a.prod.belongId != orgCtrl.user.id));
         break;
       case '可用的':
         break;

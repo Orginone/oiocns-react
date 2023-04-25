@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './index.less';
 import CardWidthTitle from '@/components/CardWidthTitle';
-import appCtrl from '@/ts/controller/store/appCtrl';
-import { emitter } from '@/ts/core';
 interface SelfAppComType {
   props: []; //入口列表
 }
 const BannerCom: React.FC<SelfAppComType> = () => {
   const [dataSource, setDataSource] = useState<any[]>([]);
-  useEffect(() => {
-    const id = appCtrl.subscribe((key) => {
-      setDataSource(appCtrl.caches);
-    });
-    return () => {
-      emitter.unsubscribe(id);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const id = appCtrl.subscribe((key) => {
+  //     setDataSource(appCtrl.caches);
+  //   });
+  //   return () => {
+  //     emitter.unsubscribe(id);
+  //   };
+  // }, []);
   return (
     <CardWidthTitle className="self-app" title={'常用应用'}>
       <div className="app-content">

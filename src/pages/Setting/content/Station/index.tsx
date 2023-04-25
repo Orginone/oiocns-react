@@ -12,7 +12,7 @@ import { TargetType } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IsSuperAdmin } from '@/utils/authority';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 interface IProps {
   current: IStation;
@@ -21,8 +21,7 @@ interface IProps {
  * 岗位设置
  * @returns
  */
-const Station: React.FC<IProps> = (props) => {
-  const { current } = props;
+const Station: React.FC<IProps> = ({ current }: IProps) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const parentRef = useRef<any>(null); //父级容器Dom
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
@@ -33,7 +32,7 @@ const Station: React.FC<IProps> = (props) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(userCtrl.space));
+      SetIsSuperAdmin(await IsSuperAdmin(orgCtrl.user));
     }, 10);
   }, [current]);
 
@@ -233,7 +232,7 @@ const Station: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsOpenIdentityModal(false)}
         width="1050px">
-        <IndentityManage multiple={true} onCheckeds={onCheckeds} />
+        <IndentityManage space={current.space} multiple={true} onCheckeds={onCheckeds} />
       </Modal>
       <Modal
         title="添加岗位成员"

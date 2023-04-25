@@ -1,7 +1,7 @@
 import { schema } from '@/ts/base';
 import { IProduct, ISpeciesItem } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 
 const getSpeciesName = (
   id: string,
@@ -115,10 +115,7 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
     key: 'rule',
     width: 180,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
 ];
@@ -237,11 +234,7 @@ export const PropertyColumns: ProColumns<any>[] = [
     key: 'shareId',
     width: 200,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.shareId);
-      if (team && team.name != '奥集能平台') {
-        return team.name;
-      }
-      return userCtrl.space.teamName;
+      return orgCtrl.provider.findNameById(record.shareId);
     },
   },
   {
@@ -250,10 +243,7 @@ export const PropertyColumns: ProColumns<any>[] = [
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
   {
@@ -309,10 +299,7 @@ export const AttributeColumns = (
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
   {
@@ -361,10 +348,7 @@ export const OperationColumns = (
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
 ];
@@ -379,10 +363,7 @@ export const OperationItemColumns: ProColumns<schema.XOperationItem>[] = [
     key: 'rule',
     width: 180,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
   { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
@@ -404,10 +385,7 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      const team = userCtrl.findTeamInfoById(record.belongId);
-      if (team) {
-        return team.name;
-      }
+      return orgCtrl.provider.findNameById(record.belongId);
     },
   },
   {

@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { Col, Result, Row, Space, Tag } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { CheckCard } from '@ant-design/pro-components';
 import { XMarket } from '@/ts/base/schema';
 import TeamIcon from '../GlobalComps/teamIcon';
@@ -81,7 +81,7 @@ const ShopSearchList: React.FC<ShopSearchTableProps> = (props) => {
         onChange={(event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
-            userCtrl.space.getMarketByCode(event.target.value).then((a) => {
+            orgCtrl.user.getMarketByCode(event.target.value).then((a) => {
               setDataSource(a.result || []);
             });
           } else {

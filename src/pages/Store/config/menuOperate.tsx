@@ -3,11 +3,11 @@ import React from 'react';
 import * as im from 'react-icons/im';
 import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
-import { GroupMenuType } from './menuType';
-import marketCtrl from '@/ts/controller/store/marketCtrl';
+import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
-import { ISpace, ISpeciesItem } from '@/ts/core';
+import { IFileSystemItem, TargetType } from '@/ts/core';
+import { ISpace, ISpeciesItem, ITarget } from '@/ts/core';
+import { IconFont } from '@/components/IconFont';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
@@ -15,11 +15,10 @@ const buildFileSysTree = (targets: IFileSystemItem[], user: ISpace) => {
   for (const item of targets) {
     if (item.target.isDirectory) {
       result.push({
-        key: item.key + user.id,
+        key: item.fullKey,
         item: item,
         label: item.name,
-        belong: user,
-        itemType: GroupMenuType.FileSystemItem,
+        itemType: MenuType.FileSystemItem,
         menus: loadFileSysItemMenus(item),
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
@@ -81,11 +80,11 @@ export const loadFileSysItemMenus = (
 };
 
 /** 获取数据菜单 */
-export const getDataMenus = (user: ISpace) => {
+const getDataMenus = (user: ISpace) => {
   return {
     key: '数据' + user.id,
     label: '数据',
-    itemType: GroupMenuType.Data,
+    itemType: MenuType.Data,
     icon: <im.ImDatabase></im.ImDatabase>,
     item: orgCtrl.user.root,
     children: [],
@@ -93,57 +92,35 @@ export const getDataMenus = (user: ISpace) => {
 };
 
 /** 获取资源菜单 */
-export const getResourceMenus = (user: ISpace) => {
+const getResourceMenus = (user: ISpace) => {
   return {
     key: '资源' + user.id,
     label: '资源',
-    itemType: GroupMenuType.Resource,
+    itemType: MenuType.Resource,
     icon: <im.ImCloudDownload></im.ImCloudDownload>,
     item: orgCtrl.user.root,
     children: [],
   };
 };
 
-export const getCommonSpeciesMenus = (user: ISpace) => {
-  return {
-    key: '我的常用' + user.id,
-    label: '我的常用',
-    itemType: GroupMenuType.Common,
-    icon: <im.ImHeart />,
-    children: [],
-  };
-};
-
 /** 获取应用程序菜单 */
-export const getAppliactionMenus = (user: ISpace) => {
+const getAppliactionMenus = (user: ISpace) => {
   return {
     key: '应用' + user.id,
     label: '应用',
-    itemType: GroupMenuType.Application,
+    itemType: MenuType.Application,
     icon: <im.ImWindows8 />,
     item: orgCtrl.user.root,
     children: [],
   };
 };
 
-/** 获取资产菜单 */
-export const getAssetMenus = (user: ISpace) => {
-  return {
-    key: '资产' + user.id,
-    label: '资产',
-    itemType: GroupMenuType.Asset,
-    icon: <im.ImCalculator />,
-    item: orgCtrl.user.root,
-    children: [],
-  };
-};
-
 /** 获取文件系统菜单 */
-export const getFileSystemMenus = (user: ISpace) => {
+const getFileSystemMenus = (user: ISpace) => {
   return {
     key: '文件' + user.id,
     label: '文件',
-    itemType: GroupMenuType.FileSystemItem,
+    itemType: MenuType.FileSystemItem,
     icon: <im.ImDrive />,
     item: user.root,
     menus: loadFileSysItemMenus(user.root),
@@ -151,150 +128,21 @@ export const getFileSystemMenus = (user: ISpace) => {
   };
 };
 
-export const loadThingMenus = async (user: ISpace) => {
-  const root = await user.loadSpeciesTree();
-  for (const item of root) {
-    if (item.target.code === 'thing') {
-      return {
-        children: buildSpeciesChildrenTree(item.children, GroupMenuType.Thing, user),
-        key: item.target.name + user.id,
-        label: item.target.name,
-        itemType: GroupMenuType.Thing,
-        menus: loadSpeciesOperationMenus(item),
-        item: item,
-        icon: <im.ImCalculator />,
-      };
-    }
-  }
-};
-
-export const loadAdminMenus = async (user: ISpace) => {
-  const children: MenuItemType[] = [
-    getAppliactionMenus(user),
-    getFileSystemMenus(user),
-    getResourceMenus(user),
-    getDataMenus(user),
-  ];
-  const anyThingMenus = await loadThingMenus(user);
-  if (anyThingMenus) {
-    children.push(anyThingMenus);
-  }
+/** 获取财物菜单 */
+const loadThingMenus = (target: ITarget) => {
   return {
-    key: user.key,
-    item: user,
-    label: user.teamName,
-    itemType: user.typeName,
-    // menus: await loadTypeMenus(user),
-    icon: <TeamIcon share={user.shareInfo} size={18} fontSize={16} />,
-    children: children,
+    key: target.id + GroupMenuType.Things,
+    label: GroupMenuType.Things,
+    itemType: GroupMenuType.Things,
+    menus: [],
+    item: target,
+    icon: <im.ImCalculator />,
+    children: buildSpeciesTree(target.species),
   };
 };
 
-export const loadMarketMenus = async () => {
-  const markets = await marketCtrl.target.getJoinMarkets();
-  return [
-    {
-      key: '管理的商店',
-      label: '管理的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '管理的商店',
-      menus: [
-        {
-          key: '创建商店',
-          label: '创建商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId === marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            item: item,
-            children: [],
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-    {
-      key: '加入的商店',
-      label: '加入的商店',
-      icon: <im.ImNewspaper />,
-      itemType: '加入的商店',
-      menus: [
-        {
-          key: '加入商店',
-          label: '加入商店',
-          icon: <im.ImFolderPlus />,
-        },
-      ],
-      children: markets
-        .filter((i) => i.target.belongId != marketCtrl.target.id)
-        .map((item) => {
-          return {
-            key: item.target.name,
-            label: item.target.name,
-            itemType: GroupMenuType.Thing,
-            menus: [
-              {
-                key: '编辑信息',
-                label: '编辑信息',
-                icon: <im.ImFolderPlus />,
-              },
-              {
-                key: '删除商店',
-                label: '删除商店',
-                icon: <im.ImFolderPlus />,
-              },
-            ],
-            children: [],
-            item: item,
-            icon: <im.ImCalculator />,
-          };
-        }),
-    },
-  ];
-};
-
-const buildSpeciesChildrenTree = (
-  parent: ISpeciesItem[],
-  itemType: string,
-  user: ISpace,
-  menuType?: string,
-): MenuItemType[] => {
-  if (parent.length > 0) {
-    return parent.map((species) => {
-      return {
-        key: species.id + user.id,
-        item: species,
-        label: species.name,
-        icon: <im.ImNewspaper />,
-        itemType: itemType,
-        menuType: menuType,
-        menus: loadSpeciesOperationMenus(species),
-        children: buildSpeciesChildrenTree(species.children, itemType, user, menuType),
-      };
-    });
-  }
-  return [];
-};
-
 /** 加载右侧菜单 */
-export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
+const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
   const items: OperateMenuType[] = [
     {
       key: '创建实体',
@@ -316,4 +164,163 @@ export const loadSpeciesOperationMenus = (item: ISpeciesItem) => {
   //   });
   // }
   return items;
+};
+
+/** 编译组织分类树 */
+const buildSpeciesTree = (parent: ISpeciesItem[]): MenuItemType[] => {
+  if (parent.length > 0) {
+    return parent.map((species) => {
+      return {
+        key: species.key,
+        item: species,
+        label: species.name,
+        icon: <im.ImNewspaper />,
+        itemType: MenuType.Species,
+        menus: loadSpeciesOperationMenus(species),
+        children: buildSpeciesTree(species.children),
+      };
+    });
+  }
+  return [];
+};
+
+/** 编译组织树 */
+const buildTargetTree = (targets: ITarget[]) => {
+  const result: MenuItemType[] = [];
+  for (const item of targets) {
+    result.push({
+      key: item.key,
+      item: item,
+      label: item.teamName,
+      itemType: item.typeName,
+      menus: [],
+      icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
+      children: [loadThingMenus(item), ...buildTargetTree(item.subTeam)],
+    });
+  }
+  return result;
+};
+
+/** 机构分组加载 */
+const loadAgencyGroup = (
+  space: ISpace,
+  children: MenuItemType[],
+  type: string,
+  typeName: string,
+) => {
+  return {
+    key: space.key + type,
+    item: space,
+    label: type,
+    itemType: type,
+    icon: <TeamIcon share={{ name: type, typeName: typeName }} size={18} fontSize={16} />,
+    menus: [],
+    children: children,
+  };
+};
+
+/** 获取个人菜单 */
+const getUserMenu = async () => {
+  return {
+    key: orgCtrl.user.key,
+    item: orgCtrl.user,
+    label: orgCtrl.user.teamName,
+    itemType: GroupMenuType.User,
+    icon: <TeamIcon share={orgCtrl.user.shareInfo} size={18} fontSize={16} />,
+    menus: [],
+    children: [
+      {
+        key: orgCtrl.user.key + GroupMenuType.Asset,
+        item: orgCtrl.user,
+        label: GroupMenuType.Asset,
+        itemType: GroupMenuType.Asset,
+        icon: <im.ImNewspaper />,
+        menus: [],
+        children: [
+          getAppliactionMenus(orgCtrl.user),
+          getFileSystemMenus(orgCtrl.user),
+          getResourceMenus(orgCtrl.user),
+          getDataMenus(orgCtrl.user),
+          loadThingMenus(orgCtrl.user),
+        ],
+      },
+      {
+        key: orgCtrl.user.key + GroupMenuType.Cohorts,
+        item: orgCtrl.user,
+        label: GroupMenuType.Cohorts,
+        itemType: GroupMenuType.Cohorts,
+        icon: <im.ImNewspaper />,
+        menus: [],
+        children: buildTargetTree(orgCtrl.user.cohorts),
+      },
+    ],
+  };
+};
+
+/** 获取组织菜单 */
+const getTeamMenu = async () => {
+  const children: MenuItemType[] = [];
+  for (const company of await orgCtrl.user.getJoinedCompanys()) {
+    children.push({
+      key: company.key,
+      item: company,
+      label: company.teamName,
+      itemType: GroupMenuType.Company,
+      menus: [],
+      icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
+      children: [
+        {
+          key: company.key + GroupMenuType.Asset,
+          item: company,
+          label: GroupMenuType.Asset,
+          itemType: GroupMenuType.Asset,
+          icon: <im.ImNewspaper />,
+          menus: [],
+          children: [
+            getAppliactionMenus(company),
+            getFileSystemMenus(company),
+            getResourceMenus(company),
+            getDataMenus(company),
+            loadThingMenus(company),
+          ],
+        },
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.subTeam),
+          GroupMenuType.InnerAgency,
+          TargetType.Department,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.joinedGroup),
+          GroupMenuType.OutAgency,
+          TargetType.Group,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.stations),
+          GroupMenuType.Station,
+          TargetType.Station,
+        ),
+        loadAgencyGroup(
+          company,
+          buildTargetTree(company.cohorts),
+          GroupMenuType.Cohorts,
+          TargetType.Cohort,
+        ),
+      ],
+    });
+  }
+  return children;
+};
+
+/** 获取仓库模块菜单 */
+export const loadStoreMenu = async () => {
+  return {
+    key: '仓库',
+    label: '仓库',
+    itemType: 'group',
+    icon: <IconFont type={'icon-store'} />,
+    children: [await getUserMenu(), ...(await getTeamMenu())],
+  };
 };

@@ -5,11 +5,10 @@ import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 import { IconFont } from '@/components/IconFont';
 
 import cls from './index.module.less';
-import chatCtrl from '@/ts/controller/chat';
-import todoCtrl from '@/ts/controller/todo/todoCtrl';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
+import { msgNotify } from '@/ts/core';
+import { workNotify } from '@/ts/core/target/work/work';
 // import { HeartFilled } from '@ant-design/icons';
 
 /**
@@ -18,31 +17,51 @@ import orgCtrl from '@/ts/controller';
  * @returns
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
-  const [chatKey] = useCtrlUpdate(chatCtrl);
-  const [taskNum, setTaskNum] = useState(0);
+  const [msgKey, setMsgKey] = useState('');
+  const [workCount, setWorkCount] = useState(0);
+  const [msgCount, setMsgCount] = useState(0);
+  useEffect(() => {
+    const id = msgNotify.subscribe((key) => {
+      let noReadCount = 0;
+      for (const item of orgCtrl.user.allChats()) {
+        noReadCount += item.noReadCount;
+      }
+      setMsgCount(noReadCount);
+      setMsgKey(key);
+    });
+    const workId = workNotify.subscribe(async (key) => {
+      let todos = await orgCtrl.user.work.loadTodo();
+      setWorkCount(todos.length);
+      setMsgKey(key);
+    });
+    return () => {
+      msgNotify.unsubscribe(id);
+      workNotify.unsubscribe(workId);
+    };
+  }, []);
   const navs = [
     {
-      key: chatKey,
+      key: msgKey,
       path: '/chat',
       title: '沟通',
       icon: 'icon-message',
-      count: chatCtrl.getNoReadCount(),
+      count: msgCount,
       fath: '/chat',
       onClick: () => {
-        chatCtrl.currentKey = '';
-        chatCtrl.changCallback();
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
       },
     },
     {
-      key: 'todo',
-      path: '/todo',
+      key: 'work',
+      path: '/work',
       title: '办事',
       icon: 'icon-todo',
-      count: taskNum,
-      fath: '/todo',
+      count: workCount,
+      fath: '/work',
       onClick: () => {
-        todoCtrl.currentKey = '';
-        chatCtrl.changCallback();
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
       },
     },
     {
@@ -64,7 +83,10 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       icon: 'icon-guangshangcheng',
       count: 0,
       fath: '/store',
-      onClick: () => {},
+      onClick: () => {
+        orgCtrl.currentKey = '';
+        orgCtrl.changCallback();
+      },
     },
     {
       key: 'setting',
@@ -79,19 +101,11 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       },
     },
   ];
-  useEffect(() => {
-    const id = todoCtrl.subscribe(async () => {
-      setTaskNum(await todoCtrl.getTaskCount());
-    });
-    return () => {
-      return todoCtrl.unsubscribe(id);
-    };
-  }, []);
 
   const getLinkItem = (item: any) => {
     return (
       <Link
-        key={item.path}
+        key={item.key}
         to={item.path}
         title={item.title}
         onClick={() => {

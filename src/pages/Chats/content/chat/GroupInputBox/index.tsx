@@ -1,4 +1,3 @@
-import chatCtrl from '@/ts/controller/chat';
 import orgCtrl from '@/ts/controller';
 import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
@@ -6,6 +5,7 @@ import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
 import { TaskModel } from '@/ts/core/target/store/ifilesys';
+import { IChat } from '@/ts/core/target/chat/ichat';
 
 /**
  * @description: 输入区域
@@ -13,6 +13,7 @@ import { TaskModel } from '@/ts/core/target/store/ifilesys';
  */
 
 interface Iprops {
+  chat: IChat;
   writeContent: any;
 }
 
@@ -34,7 +35,7 @@ const Groupinputbox = (props: Iprops) => {
       let massage = text.join('').trim();
       if (massage.length > 0) {
         insterHtml.innerHTML = '发送中,请稍后...';
-        await chatCtrl.chat?.sendMessage(MessageType.Text, massage);
+        await props.chat.sendMessage(MessageType.Text, massage);
       }
       insterHtml.innerHTML = '';
     }
@@ -139,7 +140,7 @@ const Groupinputbox = (props: Iprops) => {
         });
         setTask(undefined);
         if (result) {
-          await chatCtrl.chat?.sendMessage(
+          await props.chat.sendMessage(
             result.target.thumbnail ? MessageType.Image : MessageType.File,
             JSON.stringify(result.shareInfo()),
           );

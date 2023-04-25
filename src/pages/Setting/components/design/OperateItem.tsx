@@ -1,11 +1,11 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import OioFormItem from '../../../../components/FromItem/FormItems';
 
 const OperateItem = (props: any) => {
-  const belongId = userCtrl.space.id;
+  const belongId = orgCtrl.user.id;
   const { item } = props;
   const { setNodeRef, listeners, transform } = useSortable({ id: item.id });
   const styles = {

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { companyTypes, TargetType } from '@/ts/core/enum';
 import { schema } from '@/ts/base';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import { useHistory } from 'react-router-dom';
 import SearchCompany from '@/bizcomponents/SearchCompany';
@@ -101,7 +101,7 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
   const handleOk = async () => {
     setIsModalOpen(false);
     for (const friend of friends) {
-      await userCtrl.user.applyFriend(friend);
+      await orgCtrl.user.applyFriend(friend);
     }
   };
 
@@ -125,11 +125,10 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
         handleCancel={onCancel}
         handleOk={(item) => {
           if (item) {
-            userCtrl.setCurSpace(item.id);
             setShowFormModal(false);
           }
         }}
-        current={userCtrl.user}
+        current={orgCtrl.user}
         typeNames={companyTypes}
       />
     </CardWidthTitle>

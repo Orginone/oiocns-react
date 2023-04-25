@@ -7,7 +7,7 @@ import { companyTypes, TargetType } from '../enum';
 import University from './university';
 import { CommonStatus } from './../enum';
 import { validIsSocialCreditCode } from '@/utils/tools';
-import { ICompany, IPerson, ICohort, SpaceType, ITarget } from './itarget';
+import { ICompany, IPerson, ICohort, ITarget } from './itarget';
 import { schema, model, kernel, common } from '@/ts/base';
 import { PageRequest, TargetModel } from '@/ts/base/model';
 import { logger, sleep } from '@/ts/base/common';
@@ -18,18 +18,24 @@ import { Dict } from './thing/dict';
 import { Property } from './thing/property';
 import { IFileSystemItem, IObjectItem } from './store/ifilesys';
 import { getFileSysItemRoot } from './store/filesys';
+import { IChat } from './chat/ichat';
+import { CreateChat } from './chat/chat';
+import { Work } from './work/work';
 
 export default class Person extends MarketTarget implements IPerson {
-  joinedFriend: schema.XTarget[] = [];
   cohorts: ICohort[] = [];
   joinedCompany: ICompany[] = [];
-  spaceAuthorityTree: IAuthority | undefined;
+  authorityTree: IAuthority | undefined;
   property: Property;
   dict: Dict;
   root: IFileSystemItem;
   home: IObjectItem;
+  members: schema.XTarget[] = [];
+  memberChats: IChat[] = [];
+  work: Work;
   constructor(target: schema.XTarget) {
-    super(target);
+    super(target, undefined, target.id);
+    this.work = new Work();
     this.root = getFileSysItemRoot(target.id);
     this.dict = new Dict(target.id);
     this.property = new Property(target.id);
@@ -43,8 +49,8 @@ export default class Person extends MarketTarget implements IPerson {
     }, 200);
   }
   async loadSpaceAuthorityTree(reload: boolean = false): Promise<IAuthority | undefined> {
-    if (!reload && this.spaceAuthorityTree != undefined) {
-      return this.spaceAuthorityTree;
+    if (!reload && this.authorityTree != undefined) {
+      return this.authorityTree;
     }
     const res = await kernel.queryAuthorityTree({
       id: '0',
@@ -56,23 +62,29 @@ export default class Person extends MarketTarget implements IPerson {
       },
     });
     if (res.success) {
-      this.spaceAuthorityTree = new Authority(res.data, this.id);
+      this.authorityTree = new Authority(res.data, this, this.id);
     }
-    return this.spaceAuthorityTree;
+    return this.authorityTree;
   }
   async loadSubTeam(_: boolean): Promise<ITarget[]> {
     await sleep(0);
     return [];
   }
-  public get spaceData(): SpaceType {
-    return {
-      id: this.id,
-      name: '个人空间',
-      share: this.shareInfo,
-      typeName: this.target.typeName as TargetType,
-    };
-  }
 
+  allChats(): IChat[] {
+    const chats = [this.chat];
+    for (const item of this.joinedCompany) {
+      chats.push(...item.allChats());
+    }
+    for (const item of this.cohorts) {
+      chats.push(...item.allChats());
+    }
+    if (this.authorityTree) {
+      chats.push(...this.authorityTree.allChats());
+    }
+    chats.push(...this.memberChats);
+    return chats;
+  }
   public async create(data: TargetModel): Promise<ITarget | undefined> {
     switch (data.typeName as TargetType) {
       case TargetType.University:
@@ -99,7 +111,7 @@ export default class Person extends MarketTarget implements IPerson {
     const res = await this.getjoinedTargets([TargetType.Cohort], this.id);
     if (res && res.result) {
       this.cohorts = res.result.map((a) => {
-        return new Cohort(a, () => {
+        return new Cohort(a, this, this.id, () => {
           this.cohorts = this.cohorts.filter((i) => i.id != a.id);
         });
       });
@@ -148,7 +160,7 @@ export default class Person extends MarketTarget implements IPerson {
       teamRemark: remark,
     });
     if (res.success && res.data != undefined) {
-      const cohort = new Cohort(res.data, () => {
+      const cohort = new Cohort(res.data, this, this.id, () => {
         this.cohorts = this.cohorts.filter((i) => i.id != res.data.id);
       });
       this.cohorts.push(cohort);
@@ -277,27 +289,32 @@ export default class Person extends MarketTarget implements IPerson {
     return res.success;
   }
   public async loadMembers(page: PageRequest): Promise<schema.XTargetArray> {
-    if (this.joinedFriend.length == 0) {
+    if (this.members.length == 0) {
       let data = await super.loadMembers({
         offset: page.offset,
         limit: page.limit,
         filter: page.filter,
       });
       if (data.result) {
-        this.joinedFriend = data.result;
+        this.members = [];
+        this.memberChats = [];
+        for (const item of data.result) {
+          this.members.push(item);
+          this.memberChats.push(CreateChat(this.userId, this.id, item, ['好友']));
+        }
       }
     }
     return {
       offset: page.offset,
       limit: page.limit,
-      result: this.joinedFriend
+      result: this.members
         .filter((a) => a.code.includes(page.filter) || a.name.includes(page.filter))
         .splice(page.offset, page.limit),
-      total: this.joinedFriend.length,
+      total: this.members.length,
     };
   }
   public async applyFriend(target: schema.XTarget): Promise<boolean> {
-    const joinedTarget = this.joinedFriend.find((a) => {
+    const joinedTarget = this.members.find((a) => {
       return a.id == target.id;
     });
     if (joinedTarget == undefined) {
@@ -318,8 +335,11 @@ export default class Person extends MarketTarget implements IPerson {
           targetType: TargetType.Person,
         });
       });
-      this.joinedFriend = this.joinedFriend.filter((item) => {
+      this.members = this.members.filter((item) => {
         return !ids.includes(item.id);
+      });
+      this.memberChats = this.memberChats.filter((item) => {
+        return !ids.includes(item.target.id);
       });
       return true;
     }
@@ -336,7 +356,8 @@ export default class Person extends MarketTarget implements IPerson {
       res.success &&
       relation.target != undefined
     ) {
-      this.joinedFriend.push(relation.target);
+      this.members.push(relation.target);
+      this.memberChats.push(CreateChat(this.userId, this.id, relation.target, ['好友']));
     }
     return false;
   }
@@ -373,5 +394,31 @@ export default class Person extends MarketTarget implements IPerson {
   public async resetPassword(password: string, privateKey: string): Promise<boolean> {
     const res = await kernel.resetPassword(this.target.code, password, privateKey);
     return res.success;
+  }
+
+  public async createThing(data: any): Promise<boolean> {
+    let res = await kernel.anystore.createThing(this.id, 1);
+    if (res.success) {
+      return (
+        await kernel.perfectThing({
+          id: (res.data as [{ Id: string }])[0].Id,
+          data: JSON.stringify(data),
+          belongId: this.id,
+        })
+      ).success;
+    } else {
+      logger.error(res.msg);
+      return false;
+    }
+  }
+
+  public async perfectThing(id: string, data: any): Promise<boolean> {
+    return (
+      await kernel.perfectThing({
+        id,
+        data: JSON.stringify(data),
+        belongId: this.id,
+      })
+    ).success;
   }
 }

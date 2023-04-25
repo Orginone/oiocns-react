@@ -1,6 +1,6 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { DefaultOptionType } from 'rc-select/lib/Select';
 interface IProps {
@@ -10,7 +10,7 @@ interface IProps {
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await userCtrl.space.loadAuthorityTree(false);
+    let tree = await orgCtrl.user.loadSpaceAuthorityTree(false);
     if (tree) {
       setTreeData([
         ...[{ label: '全员', value: '0', children: [] }],
@@ -31,7 +31,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
 
   useEffect(() => {
     loadTreeData();
-  }, [userCtrl.space]);
+  }, [orgCtrl.user]);
 
   return (
     <TreeSelect

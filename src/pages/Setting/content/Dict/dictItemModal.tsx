@@ -4,7 +4,6 @@ import SchemaForm from '@/components/SchemaForm';
 import { DictItemModel } from '@/ts/base/model';
 import { XDict, XDictItem } from '@/ts/base/schema';
 import { message } from 'antd';
-import thingCtrl from '@/ts/controller/thing';
 
 interface Iprops {
   open: boolean;

@@ -11,7 +11,7 @@ import {
   Typography,
 } from 'antd';
 import { EllipsisOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
 import { GroupColumn, PersonColumns } from '../../config/columns';
@@ -37,16 +37,8 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('members');
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-
-  useEffect(() => {
-    if (TitleItems.findIndex((a) => a.key == userCtrl.currentTabKey) < 0) {
-      setActiveTab('members');
-    } else {
-      setActiveTab(userCtrl.currentTabKey);
-    }
-  }, []);
 
   useEffect(() => {
     setTimeout(async () => {
@@ -68,10 +60,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           okType: 'danger',
           cancelText: '取消',
           async onOk() {
-            const success = await userCtrl.user.quitCompany(current.id);
+            const success = await orgCtrl.user.quitCompany(current.id);
             if (success) {
               message.success(`退出${current.name}单位成功!`);
-              userCtrl.setCurSpace(userCtrl.user.target.id);
             } else {
               message.error('退出单位失败!');
             }
@@ -102,7 +93,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
             key="member"
             rowKey={'id'}
             request={(page) => {
-              return userCtrl.space.loadMembers(page);
+              return current.loadMembers(page);
             }}
             parentRef={parentRef}
             operation={(item) => {
@@ -112,7 +103,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
                       key: 'remove',
                       label: '踢出',
                       onClick: async () => {
-                        if (await userCtrl.space.removeMember(item)) {
+                        if (await current.removeMember(item)) {
                           message.success('踢出成功');
                           forceUpdate();
                         }
@@ -200,9 +191,8 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           bordered={false}
           activeTabKey={activeTab}
           tabList={TitleItems}
-          onTabChange={(key) => {
-            userCtrl.currentTabKey = key;
-            setActiveTab(key);
+          onTabChange={(tabKey) => {
+            setActiveTab(tabKey);
           }}
           tabBarExtraContent={
             <>
@@ -229,7 +219,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       <IndentityManage
         isAdmin={isSuperAdmin}
         open={activeModal === 'indentity'}
-        current={userCtrl.space}
+        current={current}
         onCancel={() => setActiveModal('')}
       />
       {/* 邀请成员*/}
@@ -240,15 +230,15 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         width={600}
         onCancel={() => setActiveModal('')}
         onOk={async () => {
-          if (selectPerson && userCtrl.company) {
-            const success = await userCtrl.company.pullMembers(
+          if (selectPerson) {
+            const success = await current.pullMembers(
               selectPerson.map((n) => n.id),
               selectPerson[0].typeName,
             );
             if (success) {
               setActiveModal('');
               message.success('添加成功');
-              userCtrl.changCallback();
+              orgCtrl.changCallback();
             } else {
               message.error('添加失败');
             }
@@ -264,12 +254,12 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         width={600}
         onCancel={() => setActiveModal('')}
         onOk={async () => {
-          if (selectPerson && userCtrl.company) {
+          if (selectPerson) {
             selectPerson.forEach(async (group) => {
-              const success = await userCtrl.company.applyJoinGroup(group.id);
+              const success = await current.applyJoinGroup(group.id);
               if (success) {
                 message.success('添加成功');
-                userCtrl.changCallback();
+                orgCtrl.changCallback();
                 setActiveModal('');
               } else {
                 message.error('添加失败');

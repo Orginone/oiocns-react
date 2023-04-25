@@ -43,14 +43,13 @@ interface MenuItemType {
   menuType?: string;
   checked?: boolean;
   itemType: string;
-  belong?: any;
-  shareId?: string;
   count?: number;
   tag?: string[];
   icon?: React.ReactNode;
   expIcon?: React.ReactNode;
   menus?: OperateMenuType[];
   children: MenuItemType[];
+  parentMenu?: MenuItemType;
 }
 
 interface OperateMenuType {

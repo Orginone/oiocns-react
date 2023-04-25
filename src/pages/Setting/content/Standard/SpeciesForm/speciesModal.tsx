@@ -3,16 +3,13 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { SpeciesModel } from '@/ts/base/model';
 import { ISpeciesItem } from '@/ts/core';
-import userCtrl from '@/ts/controller/setting';
-import { targetsToTreeData } from '../../..';
 
 interface Iprops {
   title: string;
   open: boolean;
   handleCancel: () => void;
   handleOk: (newItem: ISpeciesItem | undefined) => void;
-  current?: ISpeciesItem;
-  targetId?: string;
+  current: ISpeciesItem;
 }
 /*
   分类编辑模态框
@@ -39,11 +36,15 @@ const SpeciesModal = (props: Iprops) => {
       title: '选择制定组织',
       dataIndex: 'belongId',
       valueType: 'treeSelect',
-      initialValue: userCtrl.space.id,
+      initialValue: current.team.id,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       request: async () => {
-        const res = await userCtrl.getTeamTree();
-        return targetsToTreeData(res);
+        return [
+          {
+            label: current.team.teamName,
+            value: current.team.id,
+          },
+        ];
       },
       fieldProps: {
         // disabled: title === '修改' || title === '编辑',
@@ -56,7 +57,7 @@ const SpeciesModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await userCtrl.space.loadAuthorityTree(false);
+        const data = await current.team.space.loadSpaceAuthorityTree();
         return data ? [data] : [];
       },
       fieldProps: {
@@ -110,6 +111,7 @@ const SpeciesModal = (props: Iprops) => {
           if (title.includes('修改')) {
             formRef.current?.setFieldsValue(current?.target);
           }
+          formRef.current?.setFieldValue('belongId', current.team.id);
         } else {
           formRef.current?.resetFields();
           handleCancel();
@@ -121,9 +123,9 @@ const SpeciesModal = (props: Iprops) => {
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          handleOk(await current?.create(values));
+          handleOk(await current.create(values));
         } else {
-          handleOk(await current?.update(values));
+          handleOk(await current.update(values));
         }
       }}
       columns={columns}></SchemaForm>

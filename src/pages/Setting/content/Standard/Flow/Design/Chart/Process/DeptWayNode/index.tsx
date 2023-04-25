@@ -3,7 +3,7 @@ import InsertButton from '../InsertButton';
 import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
 import cls from './index.module.less';
 import { Tooltip } from 'antd';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import SelectOrg from '@/pages/Setting/content/Standard/Flow/Comp/selectOrg';
 import { dataType } from '../../FlowDrawer/processType';
 type DeptWayNodeProps = {
@@ -41,12 +41,13 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   const select = () => {
     props.onSelected();
   };
+  // TODO 这里有问题
   const isEditable = (): boolean => {
     let editable = props.defaultEditable;
     if (
       props.config.belongId &&
       props.config.belongId != '' &&
-      props.config.belongId != userCtrl.space.id
+      props.config.belongId != orgCtrl.user.id
     ) {
       editable = false;
     }
@@ -63,7 +64,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
           key: 'EQ',
           label: '=',
           type: dataType.BELONG,
-          val: userCtrl.space.id,
+          val: orgCtrl.user.id,
         },
       ];
       setKey(key + 1);
@@ -71,7 +72,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     if (!isEditable()) {
       setOrgId(props.config.conditions[0]?.val);
     } else {
-      setOrgId(userCtrl.space.id);
+      setOrgId(orgCtrl.user.id);
     }
   }, []);
 
@@ -121,7 +122,7 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             readonly={props.config.readonly}
             rootDisable={false}></SelectOrg>
         )}
-        {!editable && userCtrl.getBelongName(props.config.conditions[0]?.val)}
+        {!editable && orgCtrl.provider.findNameById(props.config.conditions[0]?.val)}
       </span>
     </div>
   );
@@ -129,7 +130,9 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
   return (
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
-        title={<span>创建组织: {userCtrl.getBelongName(props.config.belongId)}</span>}
+        title={
+          <span>创建组织: {orgCtrl.provider.findNameById(props.config.belongId)}</span>
+        }
         placement="right">
         <div className={cls['node-body']}>
           <div className={cls['node-body-main']}>

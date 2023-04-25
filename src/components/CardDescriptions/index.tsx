@@ -1,6 +1,6 @@
 import { kernel } from '@/ts/base';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProDescriptions } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import OioField from './OioField';
@@ -29,7 +29,7 @@ const CardDescriptions: React.FC<CardDescriptionsProps> = ({
         // 表单项
         const operateItemRes = await kernel.queryOperationItems({
           id: operation.id,
-          spaceId: userCtrl.space.id,
+          spaceId: orgCtrl.user.id,
           page: { offset: 0, limit: 100000, filter: '' },
         });
         const operateItems = (operateItemRes.data.result || []) as XOperationItem[];

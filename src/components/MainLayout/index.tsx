@@ -9,9 +9,10 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import { ImArrowLeft2, ImUserTie } from 'react-icons/im';
+import { ImArrowLeft2 } from 'react-icons/im';
 import { useHistory } from 'react-router-dom';
-import { findParentMenus } from '@/utils/tools';
+import orgCtrl from '@/ts/controller';
+import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 const { Content, Sider } = Layout;
 
 /**
@@ -36,8 +37,7 @@ type MainLayoutType = {
 const MainLayout: React.FC<MainLayoutType> = (props) => {
   const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
-  const parentMenu =
-    findParentMenus(props.siderMenuData, props.selectMenu.key) ?? props.siderMenuData;
+  const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
   const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];
@@ -46,22 +46,21 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
       className={`${props.className}`}
       style={{ height: '100%', position: 'relative' }}>
       <Sider className={cls.sider} width={250} collapsed={collapsed}>
-        <div className={cls.title} title={parentMenu.label}>
+        <div
+          className={cls.title}
+          title={parentMenu.label}
+          onClick={() => {
+            props.onSelect?.apply(this, [parentMenu]);
+          }}>
           {parentMenu.key != props.siderMenuData.key && (
-            <div
-              className={cls.backup}
-              onClick={() => {
-                props.onSelect?.apply(this, [parentMenu]);
-              }}>
+            <div className={cls.backup}>
               <ImArrowLeft2 fontSize={20} />
             </div>
           )}
           {!collapsed && (
             <>
-              <span style={{ fontSize: 20, margin: '0 6px' }}>
-                {props.selectMenu.icon}
-              </span>
-              <strong>{props.selectMenu.label}</strong>
+              <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
+              <strong>{parentMenu.label}</strong>
             </>
           )}
         </div>
@@ -83,7 +82,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             history.push('/passport/login');
           }}>
-          <ImUserTie />
+          <TeamIcon share={orgCtrl.user.shareInfo} />
           <span>退出登录</span>
         </div>
       </Sider>

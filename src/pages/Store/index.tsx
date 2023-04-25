@@ -1,8 +1,7 @@
 import React, { useRef, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
-import useMenuUpdate from './hooks/useMenuUpdate';
-import { GroupMenuType } from './config/menuType';
+import { GroupMenuType, MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
@@ -10,29 +9,31 @@ import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '@/components/Form';
 import { ProFormInstance } from '@ant-design/pro-components';
-import thingCtrl from '@/ts/controller/thing';
 import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
+import { ITarget } from '@/ts/core';
+import * as config from './config/menuOperate';
+import useMenuUpdate from '@/hooks/useMenuUpdate';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();
   const [operateKey, setOperateKey] = useState<string>();
-  const [key, rootMenu, refreshMenu, selectMenu, setSelectMenu] = useMenuUpdate();
+  const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(config.loadStoreMenu);
   const [showData, setShowData] = useState<any[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
-
-  if (!selectMenu) return <></>;
-
+  if (!selectMenu || !rootMenu) return <></>;
   return (
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
         orgCtrl.currentKey = data.key;
-        if (data.itemType === GroupMenuType.FileSystemItem) {
-          const item = data.item as IFileSystemItem;
-          if (item.children.length === 0 && (await item.loadChildren())) {
-            refreshMenu();
-          }
+        switch (data.itemType) {
+          case GroupMenuType.Things:
+            (data.item as ITarget).loadSpeciesTree();
+            break;
+          case MenuType.FileSystemItem:
+            await (data.item as IFileSystemItem).loadChildren();
+            break;
         }
         setSelectMenu(data);
       }}
@@ -45,7 +46,7 @@ const Package: React.FC = () => {
       <FileSysOperate
         operateKey={operateKey}
         operateTarget={
-          operateTarget?.itemType === GroupMenuType.FileSystemItem
+          operateTarget?.itemType === MenuType.FileSystemItem
             ? operateTarget.item
             : undefined
         }
@@ -90,7 +91,7 @@ const Package: React.FC = () => {
             let values = await formRef.current?.validateFields();
             if (values) {
               /**调用创建物接口 */
-              let res = await thingCtrl.createThing(values);
+              let res = await selectMenu.item.space.createThing(values);
               if (res.success) {
                 message.success('创建成功');
                 setShowForm(false);

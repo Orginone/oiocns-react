@@ -3,7 +3,6 @@ import cls from './index.module.less';
 import React, { useRef, useEffect, useState } from 'react';
 import usePostMessage from '@/hooks/usePostMessage';
 import { useHistory, useLocation } from 'react-router-dom';
-import appCtrl from '@/ts/controller/store/appCtrl';
 
 const Index: React.FC = () => {
   const ifmRef = useRef<any>(null);

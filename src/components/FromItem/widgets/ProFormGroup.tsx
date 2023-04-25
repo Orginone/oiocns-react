@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import userCtrl from '@/ts/controller/setting';
+import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
 import { targetsToTreeData } from '@/pages/Setting';
 
@@ -18,8 +18,8 @@ const ProFormGroup = (props: any) => {
 
   useEffect(() => {
     const initTreeData = async () => {
-      const res = await userCtrl.getTeamTree();
-      const data = targetsToTreeData(res).filter((d) => d.value == userCtrl.company.id);
+      const res = await orgCtrl.getTeamTree();
+      const data = targetsToTreeData(res).filter((d) => d.value == orgCtrl.user.id);
       setTreeData(data);
     };
     initTreeData();
