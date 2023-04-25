@@ -297,6 +297,37 @@ class CohortChat extends BaseChat {
     msgNotify.changCallback();
   }
 }
+
+/**
+ * 权限群
+ */
+class AuthorityChat extends BaseChat {
+  constructor(spaceId: string, target: model.ChatModel, userId: string) {
+    super(spaceId, target, userId);
+  }
+  override async morePerson(filter: string): Promise<void> {
+    let res = await kernel.QueryAuthorityPerson({
+      id: this.target.id,
+      page: {
+        offset: this.persons.length,
+        limit: 1000,
+        filter: filter,
+      },
+    });
+    if (res.success && res.data && res.data.result) {
+      appendTarget(res.data.result);
+      res.data.result.forEach((item: schema.XTarget) => {
+        item.name = item.team?.name ?? item.name;
+        let idArray = this.persons.map((r: schema.XTarget) => r.id);
+        if (!idArray.includes(item.id)) {
+          this.persons.push(item);
+        }
+      });
+      this.personCount = res.data?.total ?? 0;
+    }
+    msgNotify.changCallback();
+  }
+}
 // 消息变更推送
 export const msgNotify = new Emitter();
 /** 创建用户会话 */
@@ -338,5 +369,5 @@ export const CreateAuthChat = (
     remark: target.remark,
     name: target.name,
   };
-  return new CohortChat(spaceId, data, userId);
+  return new AuthorityChat(spaceId, data, userId);
 };

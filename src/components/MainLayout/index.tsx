@@ -4,14 +4,10 @@ import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
-import {
-  AiOutlineEllipsis,
-  AiOutlineMenuFold,
-  AiOutlineMenuUnfold,
-} from 'react-icons/ai';
 import { ImArrowLeft2 } from 'react-icons/im';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
 const { Content, Sider } = Layout;
 
 /**
@@ -95,9 +91,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                     setCollapsed(!collapsed);
                   }}>
                   {collapsed ? (
-                    <AiOutlineMenuUnfold fontSize={16} />
+                    <RiMenuUnfoldFill fontSize={22} />
                   ) : (
-                    <AiOutlineMenuFold fontSize={16} />
+                    <RiMenuFoldFill fontSize={22} />
                   )}
                 </Typography.Link>
               }
@@ -137,11 +133,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   )}
                   placement="bottom"
                   trigger={['click', 'contextMenu']}>
-                  <AiOutlineEllipsis
-                    title={'右键操作'}
-                    style={{ fontSize: 18 }}
-                    rotate={90}
-                  />
+                  <RiMore2Fill fontSize={22} style={{ cursor: 'pointer' }} />
                 </Dropdown>
               )}
             </Space>

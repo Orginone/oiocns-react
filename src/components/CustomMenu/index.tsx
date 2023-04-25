@@ -1,4 +1,4 @@
-import { AiOutlineEllipsis } from 'react-icons/ai';
+import { RiMore2Fill } from 'react-icons/ri';
 import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImSearch } from 'react-icons/im';
@@ -135,7 +135,7 @@ const CustomMenu = (props: CustomMenuType) => {
                   setVisibleMenu(open);
                 }}
                 trigger={['click', 'contextMenu']}>
-                <AiOutlineEllipsis style={{ fontSize: 18 }} rotate={90} />
+                <RiMore2Fill style={{ fontSize: 22, marginTop: 10 }} />
               </Dropdown>
             )}
           </span>

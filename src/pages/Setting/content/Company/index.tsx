@@ -10,7 +10,7 @@ import {
   Space,
   Typography,
 } from 'antd';
-import { AiOutlineEllipsis, AiOutlineExclamationCircle } from 'react-icons/ai';
+import { AiOutlineExclamationCircle } from 'react-icons/ai';
 import orgCtrl from '@/ts/controller';
 import { ICompany, TargetType } from '@/ts/core';
 import { schema } from '@/ts/base';
@@ -22,6 +22,7 @@ import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
+import { RiMore2Fill } from 'react-icons/ri';
 
 interface IProps {
   current: ICompany;
@@ -152,10 +153,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           labelStyle={{ textAlign: 'center', width: '200px' }}
           extra={[
             <Dropdown menu={{ items: menu }} placement="bottom" key="more">
-              <AiOutlineEllipsis
-                style={{ fontSize: '20px', marginLeft: '10px', cursor: 'pointer' }}
-                rotate={90}
-              />
+              <RiMore2Fill fontSize={20} />
             </Dropdown>,
           ]}>
           <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
