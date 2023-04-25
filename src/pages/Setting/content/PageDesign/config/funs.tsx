@@ -14,9 +14,9 @@ import {
   announcementList,
   todoList,
   cardList,
-} from '../config/demo';
+} from './demo';
 import DataCard from '../components/DataCockpit/DataCardBox';
-import { seriesA, FooterTitle, seriesData } from '../config/demo';
+import { seriesA, FooterTitle, seriesData } from './demo';
 import DealutHome from '@/pages/Home/indexStatic';
 import CardList from '@/pages/Home/components/CardList';
 import './index.less'

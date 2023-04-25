@@ -1,5 +1,5 @@
 import { debounce, getUuid } from '@/utils/tools';
-import { CompTypeItem, DataType, CompTypes, SCHEME } from './PageList/funs';
+import { CompTypeItem, DataType, CompTypes, SCHEME } from './config/funs';
 import { Emitter } from '@/ts/base/common';
 import OrgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';

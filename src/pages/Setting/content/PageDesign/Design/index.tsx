@@ -1,7 +1,7 @@
 import './index.less';
 import React, { useEffect, useState, useRef } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { CompTypeItem, getCanvasBg, renderComp } from '../PageList/funs';
+import { CompTypeItem, getCanvasBg, renderComp } from '../config/funs';
 import {
   DeleteOutlined,
   DoubleLeftOutlined,

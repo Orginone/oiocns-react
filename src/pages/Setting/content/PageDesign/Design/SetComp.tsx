@@ -3,7 +3,7 @@ import './index.less';
 import { Button, Collapse, Descriptions, Space, Tabs, Typography } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 // import { SearchOutlined } from '@ant-design/icons';
-import { DataType } from '../PageList/funs';
+import { DataType } from '../config/funs';
 import PageCtrl from '../pageCtrl';
 import type { TabsProps } from 'antd';
 import { Sticky, StickyContainer } from 'react-sticky';

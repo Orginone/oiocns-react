@@ -1,7 +1,7 @@
 import './index.less';
 import { Button, Card, message, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import { DataType, SCHEME } from './funs';
+import { DataType, SCHEME } from '../config/funs';
 import PageDesign from '../Design';
 import OrgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
