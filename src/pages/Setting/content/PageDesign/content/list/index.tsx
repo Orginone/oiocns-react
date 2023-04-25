@@ -3,21 +3,20 @@ import { Button, Card, message, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataType, SCHEME } from './funs';
 import PageDesign from '../Design';
-import setting from '@/ts/controller/setting';
+import OrgCtrl from '@/ts/controller';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { getNowTime } from '@/utils/tools';
 import PageCtrl from '../../pageCtrl';
-import { HeartOutlined, MenuOutlined, RightOutlined } from '@ant-design/icons';
+import { HeartOutlined, MenuOutlined } from '@ant-design/icons';
 import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';
+import moment from 'moment';
 interface indexType {}
 
 const Index: React.FC<indexType> = () => {
   const [openDesign, setOpenDesign] = useState<boolean>(false);
   const [tableList, setTableList] = useState<any[]>([]);
   const [active, setActive] = useState<string>('1');
-  const [collapsed, setCollapsed] = useState(true);
-  const [key] = useCtrlUpdate(setting);
+  const [key] = useCtrlUpdate(OrgCtrl);
   useEffect(() => {
     PageCtrl.subscribePart('Goback', () => {
       setTimeout(() => {
@@ -188,7 +187,10 @@ const Index: React.FC<indexType> = () => {
       // 新增默认字段
       PageCtrl.update(
         { id: data.id },
-        { isPublish: !data.isPublish, UPDATE_TIME: getNowTime() },
+        {
+          isPublish: !data.isPublish,
+          UPDATE_TIME: moment().format('YYYY-MM-DD HH:mm:ss'),
+        },
         SCHEME,
       ).then((_res) => {
         PageCtrl.query({ id: data.id }, SCHEME).then((res) => {
@@ -227,7 +229,7 @@ const Index: React.FC<indexType> = () => {
             { tab: '未发布', key: '2' },
             {
               tab: '其他可用',
-              disabled: PageCtrl.belongId !== setting.user.id,
+              disabled: PageCtrl.belongId !== OrgCtrl.user.id,
               key: '3',
             },
           ]}

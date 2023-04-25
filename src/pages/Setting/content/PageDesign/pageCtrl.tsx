@@ -1,7 +1,7 @@
-import { debounce, getNowTime, getUuid } from '@/utils/tools';
+import { debounce, getUuid } from '@/utils/tools';
 import { CompTypeItem, DataType, CompTypes, SCHEME } from './content/list/funs';
 import { Emitter } from '@/ts/base/common';
-import setting from '@/ts/controller/setting';
+import OrgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { DomainTypes, ICompany, emitter } from '@/ts/core';
 import { Input, message, Modal } from 'antd';
@@ -9,7 +9,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React from 'react';
 import { ICommonParams } from 'typings/common';
 import { defaultSetting } from './config/data';
-
+import moment from 'moment';
+const getNowTime = () => moment().format('YYYY-MM-DD HH:mm:ss');
 class HomeSettingServices extends Emitter {
   constructor() {
     super();
@@ -19,7 +20,7 @@ class HomeSettingServices extends Emitter {
       this.getHomeSetting();
     }, 50);
     emitter.subscribePart([DomainTypes.Company, DomainTypes.User], () => {
-      this.belongId = setting?.user?.id;
+      this.belongId = OrgCtrl.user?.id;
       setTimeout(() => {
         this.getCustomComp();
         this.getHomeSetting();
@@ -34,7 +35,7 @@ class HomeSettingServices extends Emitter {
   private _SelectedComp: CompTypeItem | any = {}; // 记录当前所选 可编辑-单个组件
   public AllCompanyPages: { CompanyName: string; list: DataType[] }[] = []; // 获取所有单位可使用门户列表
   public currentKey: string = '';
-  public belongId: string = setting?.user?.id;
+  public belongId: string = OrgCtrl?.user?.id;
   // 默认组建信息
   public dataSource: DataType[] = [
     {
@@ -103,12 +104,12 @@ class HomeSettingServices extends Emitter {
   }
   //设置当前单位 BelongId
   public set setBelongId(id: string) {
-    this.belongId = id ?? setting.user.id;
-    console.log('设置 BelongId', id, setting.user.id);
+    this.belongId = id ?? OrgCtrl.user.id;
+    console.log('设置 BelongId', id, OrgCtrl.user.id);
     setTimeout(() => {
       this.getCustomComp();
       this.getHomeSetting();
-      (!id || id === setting.user.id) && this.getAllPublishPage();
+      (!id || id === OrgCtrl.user.id) && this.getAllPublishPage();
     }, 50);
   }
   //设置 最终 展示数据
@@ -269,7 +270,7 @@ class HomeSettingServices extends Emitter {
     const params = {
       title,
       id: getUuid(),
-      CREAT_NAME: setting.user.name,
+      CREAT_NAME: OrgCtrl.user.name,
       UPDATE_TIME: getNowTime(),
       styleData: this.PageStyleData,
       list: this._resultData.map((v) => {
@@ -385,7 +386,7 @@ class HomeSettingServices extends Emitter {
       kernel.anystore
         .insert(this.belongId, 'custom_ifream', {
           id: getUuid(),
-          CREAT_NAME: setting.user.name,
+          CREAT_NAME: OrgCtrl.user.name,
           ...params,
         })
         .then((res) => {
@@ -406,7 +407,7 @@ class HomeSettingServices extends Emitter {
   public getHomeSetting() {
     console.log('获取门户配置信息', this.belongId);
     kernel.anystore
-      .aggregate(setting.user.id, SCHEME, {
+      .aggregate(OrgCtrl.user.id, SCHEME, {
         match: { isPublish: true },
         sort: { sort: 1 },
         skip: 0,
@@ -423,7 +424,7 @@ class HomeSettingServices extends Emitter {
   }
   public getAllPublishPage() {
     this.AllCompanyPages = [];
-    setting.user.joinedCompany.forEach((CompItem: ICompany) => {
+    OrgCtrl.user.joinedCompany.forEach((CompItem: ICompany) => {
       kernel.anystore
         .aggregate(CompItem.id, SCHEME, {
           match: { isPublish: true },
