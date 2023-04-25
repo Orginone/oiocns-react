@@ -1,10 +1,7 @@
 import './index.less';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import {
-  CompTypeItem,
-  renderComp,
-} from '@/pages/Setting/content/PageDesign/content/list/funs';
+import { CompTypeItem, renderComp } from '@/pages/Setting/content/PageDesign/config/funs';
 import OldPage from './indexStatic';
 import pageCtrl from '@/pages/Setting/content/PageDesign/pageCtrl';
 import { PageContainer } from '@ant-design/pro-layout';
