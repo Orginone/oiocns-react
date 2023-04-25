@@ -29,7 +29,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setMsgKey(key);
     });
     const workId = workNotify.subscribe(async (key) => {
-      let todos = await orgCtrl.user.work.loadTodo();
+      let todos = await orgCtrl.user.work.loadTodo(true);
       setWorkCount(todos.length);
       setMsgKey(key);
     });

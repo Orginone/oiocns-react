@@ -20,41 +20,8 @@ interface IProps {
 const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
-  const [dataSource, setDataSource] = useState<ITodo[]>([]);
 
   useEffect(() => {
-    let data = orgCtrl.user.work.todos.filter(
-      (a) =>
-        a.name.includes(filter) || a.type.includes(filter) || a.remark.includes(filter),
-    );
-    switch (selectMenu.itemType) {
-      case GroupMenuType.Organization:
-        {
-          let targets = selectMenu.item as ITarget[];
-          if (targets.length == 1 && targets[0].space.id == targets[0].id) {
-            data = data.filter((a) => a.spaceId == targets[0].space.id);
-          } else {
-            data = data.filter(
-              (a) =>
-                a.spaceId == targets[0].space.id &&
-                targets.findIndex((s) => s.id == a.shareId) > 0,
-            );
-          }
-        }
-        break;
-      case GroupMenuType.Species:
-        // eslint-disable-next-line no-case-declarations
-        const species = selectMenu.item as ISpeciesItem[];
-        data = data.filter(
-          (a) =>
-            a.spaceId == species[0].team.space.id &&
-            species.findIndex((s) => s.id == a.speciesId) > 0,
-        );
-        break;
-      default:
-        break;
-    }
-    setDataSource(data);
     forceUpdate();
   }, [selectMenu, filter]);
 
@@ -92,7 +59,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     <PageCard key={workKey} bordered={false} tabBarExtraContent={operation}>
       <div className={cls['page-content-table']}>
         <CardOrTableComp<ITodo>
-          dataSource={dataSource}
+          dataSource={[]}
           rowKey={(record: ITodo) => record.id}
           columns={WorkColumns}
           operation={(item: ITodo) => {
@@ -128,6 +95,46 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
             onChange: (_: React.Key[], selectedRows: ITodo[]) => {
               setSelectRows(selectedRows);
             },
+          }}
+          request={async (page) => {
+            let todos = (await orgCtrl.user.work.loadTodo()).filter(
+              (a) =>
+                a.name.includes(filter) ||
+                a.type.includes(filter) ||
+                a.remark.includes(filter),
+            );
+            switch (selectMenu.itemType) {
+              case GroupMenuType.Organization:
+                {
+                  let targets = selectMenu.item as ITarget[];
+                  if (targets.length == 1 && targets[0].space.id == targets[0].id) {
+                    todos = todos.filter((a) => a.spaceId == targets[0].space.id);
+                  } else {
+                    todos = todos.filter(
+                      (a) =>
+                        a.spaceId == targets[0].space.id &&
+                        targets.findIndex((s) => s.id == a.shareId) > 0,
+                    );
+                  }
+                }
+                break;
+              case GroupMenuType.Species:
+                const species = selectMenu.item as ISpeciesItem[];
+                todos = todos.filter(
+                  (a) =>
+                    a.spaceId == species[0].team.space.id &&
+                    species.findIndex((s) => s.id == a.speciesId) > 0,
+                );
+                break;
+              default:
+                break;
+            }
+            return {
+              total: todos.length,
+              offset: page.offset,
+              limit: page.limit,
+              result: todos.slice(page.offset, page.offset + page.limit),
+            };
           }}
         />
       </div>
