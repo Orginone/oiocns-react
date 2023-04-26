@@ -1,5 +1,4 @@
 import React from 'react';
-import { CiCoinInsert, CiBadgeDollar, CiMenuKebab } from 'react-icons/ci';
 import cls from './index.module.less';
 
 interface indexType {}
