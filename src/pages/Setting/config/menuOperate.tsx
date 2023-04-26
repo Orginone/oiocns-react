@@ -9,6 +9,7 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import { XDict } from '@/ts/base/schema';
 import { AiOutlineSetting } from 'react-icons/ai';
+import { SettingOutlined } from '@ant-design/icons';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {

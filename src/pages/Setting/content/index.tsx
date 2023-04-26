@@ -9,13 +9,13 @@ import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
-import PageDesignList from './PageDesign/content/list';
-import PageCompList from './PageDesign/content/CompList';
+import PageDesignList from './PageDesign/PageList';
+import PageCompList from './PageDesign/CompList';
 import pageCtrl from './PageDesign/pageCtrl';
 import { Empty } from 'antd';
 import OgoImg from '../../../../public/img/logo/logo2.jpg';
 import { MenuType, GroupMenuType } from '../config/menuType';
-
+// import Test from './PageDesign/components/TodoCard';
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;

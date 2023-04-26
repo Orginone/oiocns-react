@@ -1,7 +1,7 @@
 import './index.less';
 import React, { useEffect, useState, useRef } from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { CompTypeItem, getCanvasBg, renderComp } from '../list/funs';
+import { CompTypeItem, getCanvasBg, renderComp } from '../config/funs';
 import {
   DeleteOutlined,
   DoubleLeftOutlined,
@@ -10,7 +10,7 @@ import {
 import { useDebounce } from '@/hooks/useDebounceFn';
 import * as echarts from 'echarts';
 import SetComp from './SetComp';
-import pageCtrl from '../../pageCtrl';
+import pageCtrl from '../pageCtrl';
 const ResponsiveGridLayout = WidthProvider(Responsive);
 interface PageType {
   isMask?: boolean;

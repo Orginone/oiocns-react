@@ -3,7 +3,7 @@ import Shortcuts from '@/pages/Home/components/ShortcutsCom';
 import BannerCom from '@/pages/Home/components/BannerCom';
 import { StatisticCard } from '@ant-design/pro-components';
 import Echart from '@/pages/Home/components/Echarts';
-import Questions from '../components/Inform/Questions';
+import Questions from '../components/ListwithTitle';
 import React from 'react';
 import {
   demo,
@@ -14,9 +14,9 @@ import {
   announcementList,
   todoList,
   cardList,
-} from '../components/fastComp/demo';
+} from './demo';
 import DataCard from '../components/DataCockpit/DataCardBox';
-import { seriesA, FooterTitle, seriesData } from '../components/fastComp/demo';
+import { seriesA, FooterTitle, seriesData } from './demo';
 import DealutHome from '@/pages/Home/indexStatic';
 import CardList from '@/pages/Home/components/CardList';
 import './index.less'
@@ -132,9 +132,6 @@ const renderComp = (item: CompTypeItem, ref?: any) => {
 
       return <BannerCom imgList={showList} />;
     }
-
-    case '常用推荐':
-      return <SelfAppCom props={[]} />;
     case '快捷入口':
       return <Shortcuts props={[]} />;
     case '应用列表':

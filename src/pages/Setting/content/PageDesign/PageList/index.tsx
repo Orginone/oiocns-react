@@ -1,11 +1,11 @@
 import './index.less';
 import { Button, Card, message, Popconfirm, Space, Table, Tag } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
-import { DataType, SCHEME } from './funs';
+import { DataType, SCHEME } from '../config/funs';
 import PageDesign from '../Design';
 import OrgCtrl from '@/ts/controller';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import PageCtrl from '../../pageCtrl';
+// import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import PageCtrl from '../pageCtrl';
 import { HeartOutlined, MenuOutlined } from '@ant-design/icons';
 import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';
@@ -16,21 +16,19 @@ const Index: React.FC<indexType> = () => {
   const [openDesign, setOpenDesign] = useState<boolean>(false);
   const [tableList, setTableList] = useState<any[]>([]);
   const [active, setActive] = useState<string>('1');
-  const [key] = useCtrlUpdate(OrgCtrl);
+  // const [key] = useCtrlUpdate(OrgCtrl);
   useEffect(() => {
     PageCtrl.subscribePart('Goback', () => {
-      setTimeout(() => {
-        queryPublishList();
-        setOpenDesign(false);
-      }, 50);
+      queryPublishList();
+      setOpenDesign(false);
     });
     return () => {
       PageCtrl.unsubscribe(['Goback']);
     };
   }, []);
-  useEffect(() => {
-    queryPublishList();
-  }, [key]);
+  // useEffect(() => {
+  //   queryPublishList();
+  // }, [key]);
   const columns: any = [
     {
       title: '序号',
@@ -290,7 +288,7 @@ const Index: React.FC<indexType> = () => {
                     className="ListWrap"
                     columns={columns2}
                     size="small"
-                    rowKey="id"
+                    rowKey={(record) => record.title + index}
                     pagination={false}
                     dataSource={item?.list || []}
                   />

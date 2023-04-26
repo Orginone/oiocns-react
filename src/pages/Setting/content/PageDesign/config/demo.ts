@@ -52,7 +52,7 @@ export const demo2 = {
   ],
 };
 export const flowTableData = {
-  header: ['辖区', '园区名称', '消控点位覆盖率', '消控报警处置率', '消控报警完成率'],
+  header: ['辖区', '名称', '覆盖率', '报警处置率', '报警完成率'],
   data: [
     ['<span style="color:#37a2da;">滨江</span>', 'A区', '100%', '90%', '100%'],
     ['上城', '<span style="color:#32c5e9;">B区</span>', '100%', '90%', '100%'],
