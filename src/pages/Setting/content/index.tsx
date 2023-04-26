@@ -15,7 +15,7 @@ import pageCtrl from './PageDesign/pageCtrl';
 import { Empty } from 'antd';
 import OgoImg from '../../../../public/img/logo/logo2.jpg';
 import { MenuType, GroupMenuType } from '../config/menuType';
-
+import Test from './PageDesign/components/TodoCard'
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;
@@ -55,17 +55,18 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return <PageCompList />;
     default:
       return (
-        <Empty
-          image={OgoImg}
-          imageStyle={{
-            marginTop: '15vh',
-            height: 200,
-          }}
-          description={
-            <span>
-              请选择 <a>{selectMenu?.label}</a> 子菜单
-            </span>
-          }></Empty>
+        <Test />
+        // <Empty
+        //   image={OgoImg}
+        //   imageStyle={{
+        //     marginTop: '15vh',
+        //     height: 200,
+        //   }}
+        //   description={
+        //     <span>
+        //       请选择 <a>{selectMenu?.label}</a> 子菜单
+        //     </span>
+        //   }></Empty>
       );
   }
 };
