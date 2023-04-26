@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
@@ -50,7 +50,7 @@ const MemberList: React.FC<indexType> = (props) => {
           placeholder="请输入用户账号/昵称/姓名"
           suffix={
             <Tooltip title="筛选用户">
-              <SearchOutlined />
+              <AiOutlineSearch />
             </Tooltip>
           }
           onChange={keyWordChange}

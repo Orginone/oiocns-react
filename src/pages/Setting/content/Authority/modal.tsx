@@ -10,14 +10,14 @@ interface Iprops {
   open: boolean;
   handleCancel: () => void;
   handleOk: (result: boolean) => void;
-  current?: IAuthority;
+  current: IAuthority;
 }
 /*
   权限编辑模态框
 */
 const AuthorityModal = (props: Iprops) => {
   const { open, title, handleOk, current, handleCancel } = props;
-  const formValue = (current as IAuthority)['_authority'];
+  const formValue = current.target;
   const formRef = useRef<ProFormInstance>();
   const columns: ProFormColumnsType<any>[] = [
     {
@@ -38,10 +38,10 @@ const AuthorityModal = (props: Iprops) => {
       title: '选择制定组织',
       dataIndex: 'belongId',
       valueType: 'treeSelect',
-      initialValue: orgCtrl.user.id,
+      initialValue: current.space.id,
       formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
       request: async () => {
-        const res = await orgCtrl.getTeamTree();
+        const res = await orgCtrl.getTeamTree(current.space);
         return targetsToTreeData(res);
       },
       fieldProps: {
@@ -85,6 +85,10 @@ const AuthorityModal = (props: Iprops) => {
       title={title}
       open={open}
       width={640}
+      layoutType="ModalForm"
+      rowProps={{
+        gutter: [24, 0],
+      }}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (title.includes('修改') || title.includes('编辑')) {
@@ -95,25 +99,31 @@ const AuthorityModal = (props: Iprops) => {
           handleCancel();
         }
       }}
-      rowProps={{
-        gutter: [24, 0],
-      }}
-      layoutType="ModalForm"
       onFinish={async (values) => {
         if (title.includes('新增')) {
-          const { name, code, remark, belongId } = values;
-          const res = await current?.createSubAuthority(
-            name,
-            code,
-            belongId,
-            values.public,
-            remark,
+          handleOk(
+            (
+              await current?.createSubAuthority(
+                values.name,
+                values.code,
+                values.public,
+                values.remark,
+                values.belongId,
+              )
+            ).success,
           );
-          handleOk(res?.success || true);
         } else {
-          const { name, code, remark } = values;
-          const res = await current?.updateAuthority(name, code, values.public, remark);
-          handleOk(res?.success || true);
+          handleOk(
+            (
+              await current?.updateAuthority(
+                values.name,
+                values.code,
+                values.public,
+                values.remark,
+                values.belongId,
+              )
+            ).success,
+          );
         }
       }}
       columns={columns}></SchemaForm>

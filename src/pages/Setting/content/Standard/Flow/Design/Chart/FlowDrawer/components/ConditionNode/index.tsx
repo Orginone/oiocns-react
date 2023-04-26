@@ -15,12 +15,6 @@ interface Iprops {
  */
 
 const ConditionNode: React.FC<Iprops> = (props) => {
-  const [conditions, setConditions] = useState<FieldCondition[]>();
-
-  useEffect(() => {
-    setConditions(props.conditions);
-  }, []);
-
   const [key, setKey] = useState(0);
   /**点击添加的时候默认增加一行 */
   const addConditionGroup = () => {
@@ -36,14 +30,14 @@ const ConditionNode: React.FC<Iprops> = (props) => {
     setKey(key + 1);
   };
 
-  return conditions ? (
+  return props.conditions ? (
     <div>
       <div style={{ marginBottom: '10px' }}>
         <Button type="primary" onClick={addConditionGroup}>
           添加条件
         </Button>
       </div>
-      <ConditionGroupItemConfig currnet={props.current} conditions={conditions} />
+      <ConditionGroupItemConfig currnet={props.current} conditions={props.conditions} />
     </div>
   ) : (
     <></>

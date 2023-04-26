@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
+import { AiOutlineSetting } from 'react-icons/ai';
 import { Row, Button, Space, Modal, message } from 'antd';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
@@ -42,7 +42,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
-          <SettingOutlined style={{ marginTop: '3px' }} />
+          <AiOutlineSetting style={{ marginTop: '3px' }} />
           <span className={cls[`roval-node-title`]}>选择外部办事</span>
         </Row>
         <Space>

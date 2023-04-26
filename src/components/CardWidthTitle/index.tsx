@@ -1,5 +1,5 @@
 import './index.less';
-import { EditOutlined } from '@ant-design/icons';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { Button, Divider } from 'antd';
 import React, { ReactNode } from 'react';
 
@@ -20,7 +20,7 @@ const CardWidthTitle: React.FC<IProps> = ({ title, children, className }) => {
               {title}
             </Divider>
           </li>
-          <Button className="head-btn" icon={<EditOutlined />} size={'small'}></Button>
+          <Button className="head-btn" icon={<AiOutlineEdit />} size={'small'}></Button>
         </ul>
         {children}
       </div>

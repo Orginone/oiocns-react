@@ -1,4 +1,4 @@
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { AiOutlineClockCircle } from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
 type ShareShowRecentProps = {
@@ -20,7 +20,7 @@ const ShareShowRecent: React.FC<ShareShowRecentProps> = (props) => {
               key={el.id}
               className={cls.row}>
               <div>{el.name}</div>
-              <CloseCircleOutlined
+              <AiOutlineClockCircle
                 onClick={() => {
                   props.deleteFuc(el.id);
                 }}

@@ -1,4 +1,4 @@
-import { EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis, AiOutlineSearch } from 'react-icons/ai';
 import { Badge, Dropdown, Input, MenuProps, Tag, Tree } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import cls from './index.module.less';
@@ -170,7 +170,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
                     setVisibleMenu(open);
                   }}
                   trigger={['click', 'contextMenu']}>
-                  <EllipsisOutlined className={cls.titleIcon} rotate={90} />
+                  <AiOutlineEllipsis className={cls.titleIcon} rotate={90} />
                 </Dropdown>
               ) : (
                 ''
@@ -193,7 +193,7 @@ const StoreClassifyTree: React.FC<TreeType> = ({
       )}
       {searchable && (
         <div className={cls.title}>
-          <Input prefix={<SearchOutlined />} onChange={onChange} placeholder="搜索内容" />
+          <Input prefix={<AiOutlineSearch />} onChange={onChange} placeholder="搜索内容" />
         </div>
       )}
       {isDirectoryTree ? (

@@ -1,36 +1,35 @@
-import { Card, Typography, message } from 'antd';
+import { Card, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { common } from 'typings/common';
 import AppCard from './card';
 import CardOrTable from '@/components/CardOrTableComp';
 import { InnerApplicationColumns } from '@/pages/Store/config/columns';
 import { XFlowDefine } from '@/ts/base/schema';
-import Design from '@/pages/Setting/content/Standard/Flow/Design';
-import orgCtrl from '@/ts/controller';
-import { FlowDefine } from '@/ts/core/target/thing/flowDefine';
-import { Popup, ScrollView } from 'devextreme-react';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
+import { pageAll } from '@/ts/base';
+import { ISpace } from '@/ts/core';
+import WorkStartDo from '@/pages/Work/content/work/start';
 
-const InnerApp: React.FC = () => {
+const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
   const [tableKey, setTableKey] = useState('全部');
-  const [key, forceUpdate] = useObjectUpdate(orgCtrl.user);
+  const [key, forceUpdate] = useObjectUpdate(current);
   const [modalType, setModalType] = useState('');
   const [define, setDefine] = useState<XFlowDefine>();
   const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
 
   useEffect(() => {
     setTimeout(async () => {
-      let data = (await new FlowDefine(orgCtrl.user.id).loadFlowDefine()).result || [];
+      let data = (await current.loadWork(pageAll())).result || [];
       switch (tableKey) {
         case '共享的':
           data = data.filter(
-            (a) => a.target.id != orgCtrl.user.id && a.target.belongId != orgCtrl.user.id,
+            (a) => a.target.id != current.id && a.target.belongId != current.id,
           );
           break;
         case '创建的':
           data = data.filter(
-            (a) => a.target.id == orgCtrl.user.id || a.target.belongId == orgCtrl.user.id,
+            (a) => a.target.id == current.id || a.target.belongId == current.id,
           );
           break;
         default:
@@ -42,7 +41,7 @@ const InnerApp: React.FC = () => {
   }, [tableKey]);
 
   const renderOperation = (item: XFlowDefine): common.OperationType[] => {
-    let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
+    // let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
     return [
       {
         key: 'open',
@@ -60,23 +59,23 @@ const InnerApp: React.FC = () => {
           setModalType('detail');
         },
       },
-      {
-        key: 'common',
-        label: isCommon ? '取消常用' : '设为常用',
-        onClick: () => {
-          appCtrl.setCommon(
-            {
-              title: item.name,
-              url: '/img/appLogo.png',
-              desc: item.remark,
-              key: item.id,
-            },
-            !isCommon,
-          );
-          forceUpdate();
-          message.success('设置成功');
-        },
-      },
+      // {
+      //   key: 'common',
+      //   label: isCommon ? '取消常用' : '设为常用',
+      //   onClick: () => {
+      //       appCtrl.setCommon(
+      //         {
+      //           title: item.name,
+      //           url: '/img/appLogo.png',
+      //           desc: item.remark,
+      //           key: item.id,
+      //         },
+      //         !isCommon,
+      //       );
+      //       forceUpdate();
+      //       message.success('设置成功');
+      //   },
+      // },
     ];
   };
   //卡片内容渲染函数;
@@ -97,13 +96,13 @@ const InnerApp: React.FC = () => {
     switch (modalType) {
       case 'start':
         return (
-          <></>
-          // <WorkStartDo
-          //   current={define!}
-          //   goBack={() => {
-          //     setModalType('');
-          //   }}
-          // />
+          <WorkStartDo
+            current={define!}
+            goBack={() => {
+              setModalType('');
+            }}
+            space={current}
+          />
         );
       default:
         return (
@@ -138,29 +137,7 @@ const InnerApp: React.FC = () => {
     }
   };
 
-  return (
-    <>
-      {content()}
-      {define && (
-        <Popup
-          width={800}
-          height={600}
-          showTitle={false}
-          title={'流程展示'}
-          dragEnabled={false}
-          hideOnOutsideClick={true}
-          visible={modalType == 'detail'}
-          hideOnParentScroll={true}
-          onHidden={() => {
-            setModalType('');
-          }}>
-          <ScrollView width="100%" height="100%">
-            <Design current={define!} IsEdit={false} onBack={() => {}} />
-          </ScrollView>
-        </Popup>
-      )}
-    </>
-  );
+  return content();
 };
 
 export default React.memo(InnerApp);

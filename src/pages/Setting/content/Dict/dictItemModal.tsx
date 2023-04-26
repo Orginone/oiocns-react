@@ -3,11 +3,12 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { DictItemModel } from '@/ts/base/model';
 import { XDict, XDictItem } from '@/ts/base/schema';
-import { message } from 'antd';
+import { ISpace } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
   data?: XDictItem;
+  space: ISpace;
   handleCancel: () => void;
   handleOk: (newItem: boolean | undefined) => void;
   current: XDict;
@@ -15,14 +16,16 @@ interface Iprops {
 /*
   字典子项编辑模态框
 */
-const DictItemModal = (props: Iprops) => {
-  const { open, handleOk, current, data, handleCancel } = props;
-  if (!current) {
-    message.warn('请先选择代码字典');
-  }
-
-  let title: string = data ? '修改字典项' : '新增字典项';
+const DictItemModal = ({
+  open,
+  handleOk,
+  current,
+  data,
+  space,
+  handleCancel,
+}: Iprops) => {
   const formRef = useRef<ProFormInstance>();
+
   const columns: ProFormColumnsType<DictItemModel>[] = [
     {
       title: '名称',
@@ -45,15 +48,16 @@ const DictItemModal = (props: Iprops) => {
       colProps: { span: 24 },
     },
   ];
+
   return (
     <SchemaForm<DictItemModel>
       formRef={formRef}
-      title={title}
+      title={data ? '修改字典项' : '新增字典项'}
       open={open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (title.includes('修改')) {
+          if (data) {
             formRef.current?.setFieldsValue(data);
           }
         } else {
@@ -66,15 +70,17 @@ const DictItemModal = (props: Iprops) => {
       }}
       layoutType="ModalForm"
       onFinish={async (values) => {
-        if (title.includes('新增')) {
-          values.dictId = current.id;
-          handleOk((await thingCtrl.dict?.createDictItem(values)) != undefined);
+        if (data) {
+          handleOk(
+            (await space.dict?.updateDictItem({ ...data, ...values })) != undefined,
+          );
         } else {
-          let formdata = Object.assign(data ? data : {}, values);
-          handleOk((await thingCtrl.dict?.updateDictItem(formdata)) != undefined);
+          values.dictId = current.id;
+          handleOk((await space.dict?.createDictItem(values)) != undefined);
         }
       }}
-      columns={columns}></SchemaForm>
+      columns={columns}
+    />
   );
 };
 

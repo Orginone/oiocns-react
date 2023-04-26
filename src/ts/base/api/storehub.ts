@@ -41,11 +41,11 @@ export default class StoreHub implements IDisposable {
     this._connection.serverTimeoutInMilliseconds = timeout;
     this._connection.keepAliveIntervalInMilliseconds = interval;
     this._connection.onclose((err) => {
-      if (!this.isConnected) {
+      if (this._isStarted) {
         this._disconnectedCallbacks.forEach((c) => {
           c.apply(this, [err]);
         });
-        logger.warn(`连接断开,${this._timeout}ms后重试。` + err ? err!.message : '');
+        logger.warn(`连接断开,${this._timeout}ms后重试。` + (err ? err!.message : ''));
         setTimeout(() => {
           this._starting();
         }, this._timeout);
@@ -78,28 +78,29 @@ export default class StoreHub implements IDisposable {
   public start(): void {
     if (!this._isStarted) {
       this._isStarted = true;
-      this._starting();
+      if (!this.isConnected) {
+        this._starting();
+      }
     }
   }
   /**
    * 重新建立连接
    * @returns {void} 无返回值
    */
-  public restart(): void {
+  public async restart(): Promise<void> {
     if (this.isConnected) {
-      this._connection.stop().then(() => {
-        this._starting();
-      });
+      this._isStarted = false;
+      await this._connection.stop();
+      setTimeout(() => {
+        this.start();
+      }, 1000);
     }
   }
   /**
    * 开始连接
    * @returns {void} 无返回值
    */
-  private _starting(): void {
-    if (this.isConnected) {
-      this._connection.stop();
-    }
+  private async _starting(): Promise<void> {
     this._connection
       .start()
       .then(() => {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ISpeciesItem } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
-import orgCtrl from '@/ts/controller';
 import { XAttribute } from '@/ts/base/schema';
 import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
@@ -31,7 +30,7 @@ const Attritube = ({
   const [editData, setEditData] = useState<XAttribute>();
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (item.belongId === orgCtrl.user.id) {
+    if (item.belongId === current.team.id || item.belongId === current.team.space.id) {
       return [
         {
           key: '修改特性',
@@ -68,7 +67,7 @@ const Attritube = ({
             if (item.property) {
               const property = await current.team.space.property?.createProperty({
                 ...item.property,
-                belongId: orgCtrl.user.id,
+                belongId: current.team.target.belongId,
                 sourceId: item.property.belongId,
               });
               if (property) {

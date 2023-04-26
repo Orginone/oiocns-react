@@ -9,7 +9,6 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgNotify } from '@/ts/core';
 import { workNotify } from '@/ts/core/target/work/work';
-// import { HeartFilled } from '@ant-design/icons';
 
 /**
  * 顶部导航
@@ -30,7 +29,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setMsgKey(key);
     });
     const workId = workNotify.subscribe(async (key) => {
-      let todos = await orgCtrl.user.work.loadTodo();
+      let todos = await orgCtrl.user.work.loadTodo(true);
       setWorkCount(todos.length);
       setMsgKey(key);
     });

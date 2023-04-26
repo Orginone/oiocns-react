@@ -1,4 +1,4 @@
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai';
 import { Button, Checkbox, Form, Input, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link, RouteComponentProps } from 'react-router-dom';
@@ -25,12 +25,12 @@ const PassportLogin: React.FC<RouteComponentProps> = (props) => {
           }
         }}>
         <Form.Item name="account" rules={[{ required: true, message: '请输入用户名' }]}>
-          <Input size="large" prefix={<UserOutlined />} placeholder="请输入用户名" />
+          <Input size="large" prefix={<AiOutlineUser />} placeholder="请输入用户名" />
         </Form.Item>
         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
           <Input.Password
             size="large"
-            prefix={<LockOutlined />}
+            prefix={<AiOutlineLock />}
             placeholder="请输入密码"
           />
         </Form.Item>

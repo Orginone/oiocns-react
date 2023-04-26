@@ -30,32 +30,16 @@ const Setting: React.FC<any> = () => {
       }
       onMenuClick={async (data, key) => {
         switch (key) {
-          case '打开会话':
-            setSelectMenu(data);
-            break;
-          case '置顶会话':
-            (data.item! as IChat).isToping = true;
-            setSelectMenu(data);
-            break;
-          case '取消置顶':
-            (data.item! as IChat).isToping = false;
-            setSelectMenu(data);
-            break;
           case '清空消息':
             await (data.item! as IChat).clearMessage();
             break;
-          // case '删除会话':
-          //   chatCtrl.deleteChat(data.item);
-          //   break;
           case '会话详情':
             setOpenDetail(!openDetail);
             break;
-          // case '标记为未读':
-          //   if (chatCtrl.chat) {
-          //     chatCtrl.chat.noReadCount = 1;
-          //     chatCtrl.changCallback();
-          //   }
-          //   break;
+          case '标记为未读':
+            setSelectMenu(rootMenu);
+            (data.item! as IChat).noReadCount += 1;
+            break;
         }
       }}
       siderMenuData={rootMenu}>

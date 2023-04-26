@@ -5,6 +5,7 @@ import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import PropertyModal from './modal';
+import { message } from 'antd';
 /**
  * @description: 分类特性标准
  * @return {*}
@@ -54,6 +55,7 @@ const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
       />
       {/** 新增/编辑特性模态框 */}
       <PropertyModal
+        space={current}
         data={editData}
         open={modalType != ''}
         handleCancel={() => {
@@ -62,6 +64,7 @@ const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
         handleOk={function (success: boolean): void {
           setModalType('');
           if (success) {
+            message.success('操作成功');
             tforceUpdate();
           }
         }}

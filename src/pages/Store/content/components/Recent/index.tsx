@@ -1,5 +1,5 @@
 import IProduct from '@/ts/core/market/iproduct';
-import { EllipsisOutlined, SendOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis, AiOutlineSend, AiOutlineUnderline } from 'react-icons/ai';
 import { CheckCard } from '@ant-design/pro-components';
 import { Dropdown, MenuProps, Typography } from 'antd';
 import React from 'react';
@@ -20,7 +20,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
       {
         label: '打开',
         key: 'open',
-        icon: <SendOutlined />,
+        icon: <AiOutlineSend />,
         onClick: () => {
           history.push({
             pathname: '/online',
@@ -31,7 +31,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
       {
         label: '详情',
         key: 'info',
-        icon: <UnorderedListOutlined />,
+        icon: <AiOutlineUnderline />,
         onClick: () => {
           history.push({ pathname: '/store/app/info' });
         },
@@ -39,7 +39,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
       // {
       //   label: '管理',
       //   key: 'manage',
-      //   icon: <SettingOutlined />,
+      //   icon: <AiOutlineSetting />,
       // },
     ],
   };
@@ -80,7 +80,7 @@ const StoreRecent: React.FC<Props> = ({ dataSource }) => {
                 onOpenChange={() => {
                   appCtrl.setCurProduct(item);
                 }}>
-                <EllipsisOutlined
+                <AiOutlineEllipsis
                   style={{ fontSize: 22, color: 'rgba(0,0,0,0.5)' }}
                   onClick={(e) => e.stopPropagation()}
                 />

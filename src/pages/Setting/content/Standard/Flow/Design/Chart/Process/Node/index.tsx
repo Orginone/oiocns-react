@@ -1,11 +1,11 @@
 import { Tooltip } from 'antd';
 import {
-  ForkOutlined,
-  CloseOutlined,
-  ExclamationCircleOutlined,
-  UsergroupAddOutlined,
-  MailOutlined,
-} from '@ant-design/icons';
+  AiOutlineFork,
+  AiOutlineClose,
+  AiOutlineExclamation,
+  AiOutlineUsergroupAdd,
+  AiOutlineMail,
+} from 'react-icons/ai';
 import InsertButton from '../InsertButton';
 import React, { useEffect, useState } from 'react';
 import cls from './index.module.less';
@@ -117,17 +117,17 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           : cls['node-body-left']
       }>
       {props.type === AddNodeType.APPROVAL && (
-        <UsergroupAddOutlined
+        <AiOutlineUsergroupAdd
           style={{ fontSize: '24px', paddingRight: '5px', color: '#FFFFFF' }}
         />
       )}
       {props.type === AddNodeType.CHILDWORK && (
-        <ForkOutlined
+        <AiOutlineFork
           style={{ fontSize: '24px', paddingRight: '5px', color: 'rgb(21, 188, 131)' }}
         />
       )}
       {props.type === AddNodeType.CC && (
-        <MailOutlined
+        <AiOutlineMail
           style={{ fontSize: '24px', paddingRight: '5px', color: '#ff9e3a' }}
         />
       )}
@@ -182,7 +182,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           )}
           {/* <RightOutlined className={cls['node-body-rightOutlined']} /> */}
           {editable && !props.isRoot && (
-            <CloseOutlined
+            <AiOutlineClose
               className={cls['iconPosition']}
               style={{ fontSize: '12px', display: 'block' }}
               onClick={delNode}
@@ -197,7 +197,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
     <div className={cls['node-error']}>
       {props.showError && (
         <Tooltip placement="topLeft" title={props.errorInfo}>
-          <ExclamationCircleOutlined style={{ fontSize: '20px' }} />
+          <AiOutlineExclamation style={{ fontSize: '20px' }} />
         </Tooltip>
       )}
     </div>

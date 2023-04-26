@@ -1,4 +1,4 @@
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { Col, Input, Row } from 'antd';
 import React from 'react';
 import styles from './index.module.less';
@@ -19,7 +19,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       <Col span={extra ? 16 : 24}>
         <div className={styles[`search-input`]}>
           <Input
-            prefix={<SearchOutlined className={styles.icon} />}
+            prefix={<AiOutlineSearch className={styles.icon} />}
             placeholder={placeholder || '请输入'}
             bordered={false}
             onChange={onChange}

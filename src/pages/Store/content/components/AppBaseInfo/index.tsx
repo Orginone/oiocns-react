@@ -2,7 +2,7 @@ import cls from './index.module.less';
 
 import React from 'react';
 // import { useHistory } from 'react-router-dom';
-import { EditOutlined } from '@ant-design/icons';
+import { AiOutlineEdit } from 'react-icons/ai';
 import { Tooltip } from 'antd';
 interface indexType {}
 const Index: React.FC<indexType> = () => {
@@ -18,7 +18,7 @@ const Index: React.FC<indexType> = () => {
       <ul className={`${cls['base-info']} flex flex-direction-col`}>
         <li className={`${cls['con']} flex `}>
           <div className={cls['con-title']}>{prod.name}</div>
-          <EditOutlined
+          <AiOutlineEdit
             className={cls['con-name-edit-btn']}
             style={{ fontSize: '1.5em' }}
           />

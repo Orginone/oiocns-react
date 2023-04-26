@@ -1,3 +1,4 @@
+import { kernel } from '@/ts/base';
 import { XFlowTaskHistory, XRelation } from '@/ts/base/schema';
 
 export default interface ITodo {
@@ -23,6 +24,8 @@ export default interface ITodo {
   createUser: string;
   /** 状态 */
   status: number;
+  /** 审批办事 */
+  approval(status: number, comment: string, data: string): Promise<boolean>;
 }
 
 export class FlowTodo implements ITodo {
@@ -50,6 +53,16 @@ export class FlowTodo implements ITodo {
     this.createUser = task.instance!.createUser;
     this.speciesId = task.instance!.define?.speciesId || '';
   }
+  async approval(status: number, comment: string, data: string): Promise<boolean> {
+    return (
+      await kernel.approvalTask({
+        id: this.id,
+        comment: comment,
+        status: status,
+        data: data,
+      })
+    ).success;
+  }
 }
 
 export class OrgTodo implements ITodo {
@@ -76,5 +89,13 @@ export class OrgTodo implements ITodo {
     this.shareId = task.team?.targetId || '0';
     this.spaceId = task.team?.targetId || '0';
     this.createUser = task.targetId;
+  }
+  async approval(status: number, _: string, _data: string): Promise<boolean> {
+    return (
+      await kernel.joinTeamApproval({
+        id: this.id,
+        status: status,
+      })
+    ).success;
   }
 }

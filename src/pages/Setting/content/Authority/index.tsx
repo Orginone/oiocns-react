@@ -1,8 +1,8 @@
 import PageCard from '@/components/PageCard';
-import { Tabs } from 'antd';
-import React, { useRef, useState } from 'react';
-import Description from './Description';
+import { Card, Descriptions, Space, Tabs } from 'antd';
+import React, { useRef } from 'react';
 import cls from './index.module.less';
+import orgCtrl from '@/ts/controller';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 
 interface IProps {
@@ -13,25 +13,7 @@ interface IProps {
  * @returns
  */
 const AuthorityStandrad: React.FC<IProps> = ({ current }: IProps) => {
-  const [tabKey, setTabKey] = useState('基本信息');
   const parentRef = useRef<any>(null); //父级容器Dom
-
-  // Tab 改变事件
-  const tabChange = (key: string) => {
-    setTabKey(key);
-  };
-  const items = [
-    {
-      label: `基本信息`,
-      key: '基本信息',
-      children: <Description current={current} title={'权限'} extra={undefined} />,
-    },
-    // {
-    //   label: `角色管理`,
-    //   key: '角色管理',
-    //   children: <div>角色</div>,
-    // },
-  ];
 
   return (
     <div className={cls[`dept-content-box`]}>
@@ -41,7 +23,53 @@ const AuthorityStandrad: React.FC<IProps> = ({ current }: IProps) => {
           <div className={cls['pages-wrap']}>
             <PageCard bordered={false} bodyStyle={{ paddingTop: 16 }}>
               <div className={cls['page-content-table']} ref={parentRef}>
-                <Tabs activeKey={tabKey} items={items} onChange={tabChange} />
+                <Tabs
+                  items={[
+                    {
+                      label: `基本信息`,
+                      key: '基本信息',
+                      children: (
+                        <Card bordered={false} className={cls['company-dept-content']}>
+                          <Descriptions
+                            size="middle"
+                            title={'权限'}
+                            extra={[]}
+                            bordered
+                            column={2}
+                            labelStyle={{
+                              textAlign: 'left',
+                              color: '#606266',
+                              width: 120,
+                            }}
+                            contentStyle={{ textAlign: 'left', color: '#606266' }}>
+                            <Descriptions.Item label="权限名称">
+                              {current.target.name}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="共享组织">
+                              <Space>
+                                <strong>
+                                  {orgCtrl.provider.findNameById(current.target.belongId)}
+                                </strong>
+                              </Space>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="权限编码">
+                              {current.target.code || ''}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="创建人">
+                              {orgCtrl.provider.findNameById(current.target.belongId)}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="创建时间">
+                              {current.target?.createTime || ''}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="备注" span={2}>
+                              {current.target?.remark}
+                            </Descriptions.Item>
+                          </Descriptions>
+                        </Card>
+                      ),
+                    },
+                  ]}
+                />
               </div>
             </PageCard>
           </div>

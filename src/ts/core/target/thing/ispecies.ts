@@ -1,6 +1,7 @@
 import { model, schema } from '@/ts/base';
 import {
   AttributeModel,
+  CreateDefineReq,
   OperationModel,
   PageRequest,
   SpeciesModel,
@@ -12,6 +13,8 @@ import {
   XAttribute,
   XFlowInstance,
   XFlowDefine,
+  XFlowDefineArray,
+  FlowNode,
 } from '@/ts/base/schema';
 import { ITarget } from '../itarget';
 
@@ -59,16 +62,15 @@ export interface ISpeciesItem {
     recursionSpecies: boolean,
     page: PageRequest,
   ): Promise<XOperationArray>;
+  /* 加载办事 */
+  loadWork(page: PageRequest): Promise<XFlowDefineArray>;
+  /* 加载办事 */
+  loadWorkNode(id: string): Promise<FlowNode>;
   /**
    * 创建标准分类项
    * @param data 创建参数
    */
   create(data: Omit<SpeciesModel, 'id' | 'parentId'>): Promise<INullSpeciesItem>;
-  /**
-   * 更新标准分类项
-   * @param data 创建参数
-   */
-  update(data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>): Promise<ISpeciesItem>;
   /**
    * 创建分类特性项
    * @param data 创建参数
@@ -77,16 +79,6 @@ export interface ISpeciesItem {
     data: Omit<AttributeModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
   /**
-   * 更新分类特性项
-   * @param data 创建参数
-   */
-  updateAttr(data: Omit<AttributeModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
-  /**
-   * 删除分类特性项
-   * @param id 特性项id
-   */
-  deleteAttr(id: string): Promise<boolean>;
-  /**
    * 创建业务标准
    * @param data 创建参数
    */
@@ -94,21 +86,38 @@ export interface ISpeciesItem {
     data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
   ): Promise<model.ResultType<schema.XOperation>>;
   /**
+   * 更新标准分类项
+   * @param data 创建参数
+   */
+  update(data: Omit<SpeciesModel, 'id' | 'parentId' | 'code'>): Promise<ISpeciesItem>;
+  /**
+   * 更新分类特性项
+   * @param data 创建参数
+   */
+  updateAttr(data: Omit<AttributeModel, 'speciesId' | 'speciesCode'>): Promise<boolean>;
+  /**
    * 更新业务标准
    * @param data 创建参数
    */
   updateOperation(
     data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
   ): Promise<boolean>;
+  /** 发布办事 */
+  publishWork(data: Omit<CreateDefineReq, 'belongId'>): Promise<XFlowDefine>;
+  /**
+   * 删除标准分类项
+   */
+  delete(): Promise<boolean>;
+  /**
+   * 删除分类特性项
+   * @param id 特性项id
+   */
+  deleteAttr(id: string): Promise<boolean>;
   /**
    * 删除业务标准
    * @param id 特性项id
    */
   deleteOperation(id: string): Promise<boolean>;
-  /**
-   * 删除标准分类项
-   */
-  delete(): Promise<boolean>;
-  /* 加载办事 */
-  loadFlowDefine(): Promise<XFlowDefine[]>;
+  /** 删除办事 */
+  deleteWork(id: string): Promise<boolean>;
 }

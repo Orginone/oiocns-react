@@ -1,4 +1,4 @@
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Dropdown, Menu, MenuProps, Typography, Input, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { ImSearch } from 'react-icons/im';
@@ -135,7 +135,7 @@ const CustomMenu = (props: CustomMenuType) => {
                   setVisibleMenu(open);
                 }}
                 trigger={['click', 'contextMenu']}>
-                <EllipsisOutlined style={{ fontSize: 18 }} rotate={90} />
+                <AiOutlineEllipsis style={{ fontSize: 18 }} rotate={90} />
               </Dropdown>
             )}
           </span>

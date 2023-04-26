@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { AiOutlineSetting, AiOutlineUser } from 'react-icons/ai';
 import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } from 'antd';
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
@@ -67,7 +67,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
-          <SettingOutlined style={{ marginTop: '3px' }} />
+          <AiOutlineSetting style={{ marginTop: '3px' }} />
           <span className={cls[`roval-node-title`]}>选择审批对象</span>
         </Row>
         <Space>
@@ -124,7 +124,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
                 }}
                 value={props.current.props.num}
                 placeholder="请设置会签人数"
-                addonBefore={<UserOutlined />}
+                addonBefore={<AiOutlineUser />}
                 style={{ width: '60%' }}
               />
             </Form.Item>
@@ -185,6 +185,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
+            current={props.species}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>

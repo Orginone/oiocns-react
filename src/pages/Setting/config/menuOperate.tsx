@@ -8,7 +8,7 @@ import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import { XDict } from '@/ts/base/schema';
-import { SettingOutlined } from '@ant-design/icons';
+import { AiOutlineSetting } from 'react-icons/ai';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -100,7 +100,7 @@ const buildDictMenus = (dict: XDict, belong: ISpace) => {
     itemType: MenuType.Dict,
     menus: [
       {
-        key: '编辑字典',
+        key: '修改|字典',
         icon: <im.ImPencil />,
         label: '编辑字典',
         model: 'outside',
@@ -139,7 +139,7 @@ const loadStandardSetting = async (space: ISpace) => {
     icon: <im.ImNewspaper />,
     menus: [
       {
-        key: '新增字典',
+        key: '新增',
         icon: <im.ImPlus />,
         label: '新增字典',
         model: 'outside',
@@ -155,7 +155,7 @@ const loadStandardSetting = async (space: ISpace) => {
     icon: <im.ImNewspaper />,
     menus: [
       {
-        key: '新增属性',
+        key: '新增',
         icon: <im.ImPlus />,
         label: '新增属性',
         model: 'outside',
@@ -337,13 +337,23 @@ const getTeamMenu = async () => {
         ),
         await loadGroupMenus(
           {
-            key: company.key + GroupMenuType.StationSetting,
-            label: GroupMenuType.StationSetting,
+            key: company.key + GroupMenuType.Station,
+            label: GroupMenuType.Station,
             item: company,
             typeName: TargetType.Station,
             subTeam: company.stations,
           },
           [TargetType.Station],
+        ),
+        await loadGroupMenus(
+          {
+            key: company.key + GroupMenuType,
+            label: GroupMenuType.Working,
+            item: company,
+            typeName: TargetType.Working,
+            subTeam: company.workings,
+          },
+          [TargetType.Cohort],
         ),
         await loadGroupMenus(
           {
@@ -479,6 +489,6 @@ export const loadSettingMenu = async () => {
     label: '设置',
     itemType: 'Tab',
     children: [await getUserMenu(), ...(await getTeamMenu())],
-    icon: <SettingOutlined />,
+    icon: <AiOutlineSetting />,
   };
 };

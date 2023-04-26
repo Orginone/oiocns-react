@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ProTable } from '@ant-design/pro-components';
 import { Space, Image, Dropdown, Button, Typography } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import style from '../../index.module.less';
 import { formatSize } from '@/ts/base/common';
 import { IFileSystemItem } from '@/ts/core';
@@ -106,7 +106,7 @@ const TableContent = ({
                   key={record.key}
                   trigger={['click']}>
                   <Button shape="round" size="small">
-                    <EllipsisOutlined />
+                    <AiOutlineEllipsis />
                   </Button>
                 </Dropdown>
               );

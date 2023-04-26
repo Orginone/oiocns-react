@@ -1,13 +1,13 @@
 import { Popover, Tooltip, Button } from 'antd';
 import {
-  PlusOutlined,
-  ShareAltOutlined,
-  SendOutlined,
-  ClusterOutlined,
-  HighlightOutlined,
-  ApartmentOutlined,
-  ForkOutlined,
-} from '@ant-design/icons';
+  AiOutlinePlus,
+  AiOutlineShareAlt,
+  AiOutlineSend,
+  AiOutlineCluster,
+  AiOutlineHighlight,
+  AiOutlineApartment,
+  AiOutlineFork,
+} from 'react-icons/ai';
 import React from 'react';
 import cls from './index.module.less';
 
@@ -71,7 +71,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
   const content = (
     <div className={cls[`node-select`]}>
       <div onClick={addApprovalNode}>
-        <HighlightOutlined
+        <AiOutlineHighlight
           style={{
             color: 'rgb(50, 150, 250)',
             fontSize: '20px',
@@ -83,7 +83,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
         <span>审批</span>
       </div>
       <div onClick={addCcNode}>
-        <SendOutlined
+        <AiOutlineSend
           style={{
             color: 'rgb(255, 148, 62)',
             fontSize: '20px',
@@ -95,7 +95,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
         <span>抄送</span>
       </div>
       <div onClick={addConditionsNode}>
-        <ShareAltOutlined
+        <AiOutlineShareAlt
           style={{
             color: 'rgb(21, 188, 131)',
             fontSize: '20px',
@@ -107,7 +107,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
         <span>条件审核</span>
       </div>
       <div onClick={addConcurrentsNode}>
-        <ClusterOutlined
+        <AiOutlineCluster
           style={{
             color: '#718dff',
             fontSize: '20px',
@@ -119,7 +119,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
         <span>同时审核</span>
       </div>
       <div onClick={addDeptGateWayNode}>
-        <ApartmentOutlined
+        <AiOutlineApartment
           style={{
             color: '#7f6dac',
             fontSize: '20px',
@@ -131,7 +131,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
         <span>组织网关</span>
       </div>
       <div onClick={addWorkFlowNode}>
-        <ForkOutlined
+        <AiOutlineFork
           style={{
             color: 'rgb(21, 188, 131)',
             fontSize: '20px',
@@ -147,7 +147,7 @@ const InsertButton: React.FC<InsertButtonProps> = (props: any) => {
   return (
     <Popover placement="bottomLeft" title={text} content={content} trigger="click">
       <Tooltip title="添加节点" placement="right">
-        <Button type="primary" shape="circle" icon={<PlusOutlined />} />
+        <Button type="primary" shape="circle" icon={<AiOutlinePlus />} />
       </Tooltip>
     </Popover>
   );

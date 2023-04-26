@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
 import { IIdentity } from '@/ts/core/target/authority/iidentity';
@@ -58,7 +58,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   const positionList = (
     <MarketClassifyTree
       searchable
-      childIcon={<UserOutlined />}
+      childIcon={<AiOutlineUser />}
       selectedKeys={[selectMenu]}
       treeData={changeData(indentitys!)}
       onSelect={onSelect}
@@ -72,7 +72,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
           <Button
             className={cls.creatgroup}
             type="text"
-            icon={<PlusOutlined className={cls.addIcon} />}
+            icon={<AiOutlinePlus className={cls.addIcon} />}
             onClick={() => {
               setIsOpenModal(true);
             }}
