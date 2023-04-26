@@ -103,6 +103,7 @@ export default class Authority implements IAuthority {
     code: string,
     ispublic: boolean,
     remark: string,
+    belongId: string,
   ): Promise<model.ResultType<schema.XAuthority>> {
     if (this.existAuthority.includes(code)) {
       throw new Error(consts.UnauthorizedError);
@@ -112,9 +113,9 @@ export default class Authority implements IAuthority {
       name,
       code,
       remark,
+      belongId,
       public: ispublic,
       parentId: this.id,
-      belongId: this.belongId,
     });
     if (res.success && res.data != undefined) {
       this.children.push(new Authority(res.data, this.space, this.userId));
@@ -153,14 +154,15 @@ export default class Authority implements IAuthority {
     code: string,
     ispublic: boolean,
     remark: string,
+    belongId: string,
   ): Promise<model.ResultType<schema.XAuthority>> {
     const res = await kernel.updateAuthority({
       name,
       code,
       remark,
+      belongId,
       id: this.target.id,
       public: ispublic,
-      belongId: this.target.belongId,
       parentId: this.target.parentId,
     });
     if (res.success) {
@@ -168,6 +170,7 @@ export default class Authority implements IAuthority {
       this.target.code = code;
       this.target.public = ispublic;
       this.target.remark = remark;
+      this.target.belongId = belongId;
       this.target.updateTime = res.data?.updateTime;
     }
     return res;

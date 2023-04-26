@@ -1,4 +1,4 @@
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Avatar, Tag, Dropdown } from 'antd';
 import React from 'react';
 import './index.less';
@@ -36,7 +36,7 @@ const AppCard: React.FC<IProps> = ({ className, current, onClick, operation }) =
             className="card-title-extra"
             menu={{ items: operation(current) }}
             placement="bottom">
-            <EllipsisOutlined rotate={90} />
+            <AiOutlineEllipsis rotate={90} />
           </Dropdown>
         )}
       </div>

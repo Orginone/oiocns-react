@@ -3,9 +3,11 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
+import { ISpace } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
+  space: ISpace;
   data: XProperty | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
@@ -13,7 +15,7 @@ interface Iprops {
 /*
   特性编辑模态框
 */
-const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
+const PropertyModal = ({ open, handleOk, space, data, handleCancel }: Iprops) => {
   const [selectType, setSelectType] = useState<string>();
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
@@ -80,16 +82,17 @@ const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
     ];
     if (selectType === '选择型') {
       columns.push({
-        title: '选择枚举分类',
+        title: '选择枚举字典',
         dataIndex: 'dictId',
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
         request: async () => {
-          // const res = await thing.loadDicts();
-          // return res.map((item) => {
-          //   return { id: item.id, label: item.name, value: item.id };
-          // });
-          return [];
+          const res = await space.dict.loadDict();
+          return (
+            res.result?.map((item) => {
+              return { id: item.id, label: item.name, value: item.id };
+            }) || []
+          );
         },
         fieldProps: {
           disabled: selectType !== '选择型',
@@ -120,9 +123,10 @@ const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
     <SchemaForm<PropertyModel>
       key={'propertyModal'}
       formRef={formRef}
-      title={`${data ? '编辑' : '新建'}属性`}
       open={open}
       width={640}
+      layoutType="ModalForm"
+      title={`${data ? '编辑' : '新建'}属性`}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (data) {
@@ -137,18 +141,17 @@ const PropertyModal = ({ open, handleOk, data, handleCancel }: Iprops) => {
       rowProps={{
         gutter: [24, 0],
       }}
-      layoutType="ModalForm"
       onFinish={async (model) => {
         if (data) {
           handleOk(
-            (await thingCtrl.property?.updateProperty({ ...data, ...model })) !=
-              undefined,
+            (await space.property?.updateProperty({ ...data, ...model })) != undefined,
           );
         } else {
-          handleOk((await thingCtrl.property?.createProperty(model)) != undefined);
+          handleOk((await space.property?.createProperty(model)) != undefined);
         }
       }}
-      columns={getFromColumns()}></SchemaForm>
+      columns={getFromColumns()}
+    />
   );
 };
 

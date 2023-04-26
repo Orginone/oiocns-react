@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { HomeFilled } from '@ant-design/icons';
+import { AiFillHome } from 'react-icons/ai';
 import { IRouteConfig } from '../../typings/globelType.d';
 
 import PassportLayout from '@/layouts/Passport';
@@ -41,7 +41,7 @@ const HomeRouter: IRouteConfig[] = [
   {
     path: '/home',
     title: '首页',
-    icon: <HomeFilled />,
+    icon: <AiFillHome />,
     component: React.lazy(() => import('@/pages/Home')),
   },
 ];

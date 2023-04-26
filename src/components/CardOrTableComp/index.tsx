@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { Dropdown, Pagination, Result } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { PageShowType } from 'typings/globelType';
 import { PageRequest } from '@/ts/base/model';
 
@@ -90,7 +90,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
               className={cls['operation-btn']}
               menu={{ items: operation(record) }}
               key="key">
-              <EllipsisOutlined />
+              <AiOutlineEllipsis />
             </Dropdown>,
           ];
         },

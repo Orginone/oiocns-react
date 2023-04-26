@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { SmileOutlined } from '@ant-design/icons';
+import { AiOutlineSmile } from 'react-icons/ai';
 import { Result, Row, Col, Descriptions, Space, Tag } from 'antd';
 import { CheckCard } from '@ant-design/pro-components';
 import SearchInput from '@/components/SearchInput';
@@ -236,7 +236,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
 
       {dataSource.length > 0 && personInfoList()}
       {searchKey && dataSource.length == 0 && (
-        <Result icon={<SmileOutlined />} title={`抱歉，没有查询到相关的结果`} />
+        <Result icon={<AiOutlineSmile />} title={`抱歉，没有查询到相关的结果`} />
       )}
     </div>
   );

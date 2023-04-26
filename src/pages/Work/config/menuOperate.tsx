@@ -7,6 +7,17 @@ import orgCtrl from '@/ts/controller';
 import { GroupMenuType, OrganizationType } from './menuType';
 import { IconFont } from '@/components/IconFont';
 
+const buildGroupMenu = () => {
+  return [
+    {
+      key: '发起办事',
+      icon: <im.ImPlus />,
+      label: '发起办事',
+      model: 'outside',
+    },
+  ];
+};
+
 /** 编译分类树 */
 const buildSpeciesTree = async (species: ISpeciesItem[]) => {
   let works = [];
@@ -21,6 +32,7 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
       children: subSpecies.children,
+      menus: buildGroupMenu(),
     });
   }
   return {
@@ -46,6 +58,7 @@ export const buildTargetTree = async (targets: ITarget[]) => {
       label: item.teamName,
       tag: [item.typeName + '群'],
       item: [item],
+      menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
       children: [...children, ...species.children],
@@ -54,9 +67,9 @@ export const buildTargetTree = async (targets: ITarget[]) => {
   return result;
 };
 
-export const loadWorkMenu = async () => {
+export const loadWorkMenu = async (): Promise<MenuItemType> => {
   let companys = await orgCtrl.user.getJoinedCompanys(false);
-  let companyItems = [];
+  let companyItems: MenuItemType[] = [];
   for (const company of companys) {
     let ret = await buildSpeciesTree(
       (await company.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
@@ -65,6 +78,7 @@ export const loadWorkMenu = async () => {
       key: company.key,
       label: company.teamName,
       item: [company],
+      menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
@@ -115,6 +129,7 @@ export const loadWorkMenu = async () => {
         label: orgCtrl.user.teamName,
         itemType: GroupMenuType.Organization,
         item: [orgCtrl.user],
+        menus: buildGroupMenu(),
         icon: <TeamIcon share={orgCtrl.user.chat.shareInfo} size={18} fontSize={16} />,
         children: [
           {

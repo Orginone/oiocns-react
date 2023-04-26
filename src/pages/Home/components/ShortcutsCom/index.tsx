@@ -1,5 +1,5 @@
 import './index.less';
-import { SendOutlined } from '@ant-design/icons';
+import { AiOutlineSend } from 'react-icons/ai';
 import { Button, Modal } from 'antd';
 import React, { useState } from 'react';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
@@ -14,12 +14,12 @@ interface ShortcutsComType {
   props: []; //入口列表
 }
 const btns = [
-  { label: '加好友', icon: <SendOutlined /> },
-  { label: '创单位', icon: <SendOutlined /> },
-  { label: '邀成员', icon: <SendOutlined /> },
-  { label: '建应用', icon: <SendOutlined /> },
-  { label: '逛商场', icon: <SendOutlined /> },
-  { label: '添数据', icon: <SendOutlined /> },
+  { label: '加好友', icon: <AiOutlineSend /> },
+  { label: '创单位', icon: <AiOutlineSend /> },
+  { label: '邀成员', icon: <AiOutlineSend /> },
+  { label: '建应用', icon: <AiOutlineSend /> },
+  { label: '逛商场', icon: <AiOutlineSend /> },
+  { label: '添数据', icon: <AiOutlineSend /> },
 ];
 
 const BannerCom: React.FC<ShortcutsComType> = () => {

@@ -1,4 +1,4 @@
-import { kernel } from '@/ts/base';
+import { kernel, pageAll } from '@/ts/base';
 import { DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import {
@@ -20,7 +20,7 @@ import { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
 import { ISpeciesItem } from '@/ts/core';
@@ -31,7 +31,7 @@ import OioForm from '../../../../components/Form';
 /**
  * 组件选择
  */
-export const widgetsOpts = [
+const widgetsOpts = [
   {
     label: '文本',
     value: 'text',
@@ -121,7 +121,7 @@ export const widgetsOpts = [
 /**
  * 正则表达式
  */
-export const regexpOpts: SelectProps['options'] = [
+const regexpOpts: SelectProps['options'] = [
   {
     label: '固定电话号码',
     value: '(\\d{4}-|\\d{3}-)?(\\d{8}|\\d{7})',
@@ -204,6 +204,7 @@ export const regexpOpts: SelectProps['options'] = [
 const transformAttrToOperationItem = (
   attr: any,
   operationId: string,
+  belongId: string,
 ): OperationItemModel => {
   let widget = 'text';
   let type = 'string';
@@ -246,7 +247,7 @@ const transformAttrToOperationItem = (
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: orgCtrl.user.id,
+      belongId: belongId,
       operationId: operationId,
       attrId: attr.id,
       attr: attr,
@@ -288,7 +289,7 @@ const transformOperationItemToAttr = (operationItem: any) => {
   );
 };
 
-type DesignProps = {
+type IProps = {
   operation: XOperation;
   current: ISpeciesItem;
   toFlowDesign: (operation: XOperation) => void;
@@ -304,9 +305,9 @@ type FormLayout = {
  * 表单设计器
  * @param props
  */
-const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }) => {
+const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const belongId = orgCtrl.user.id;
+  const belongId = current.team.id;
   const [items, setItems] = useState<any>({
     // 特性
     attrs: [],
@@ -325,7 +326,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       const operateItemRes = await kernel.queryOperationItems({
         id: operation.id,
         spaceId: belongId,
-        page: { offset: 0, limit: 100000, filter: '' },
+        page: pageAll(),
       });
       // 查询特性
       const attrRes = await current.loadAttrs(true);
@@ -350,22 +351,24 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
   }, [belongId, operation.id]);
 
   // 找到容器
-  function findContaniner(id: string) {
+  const findContaniner = (id: string) => {
     if (id in items) {
       return id;
     }
-    return Object.keys(items).find((key) => {
-      return items[key].find((item: any) => item.id === id || item.attrId === id);
-    });
-  }
+    return (
+      Object.keys(items).find((key) => {
+        return items[key].find((item: any) => item.id === id || item.attrId === id);
+      }) || ''
+    );
+  };
 
   // 设置从一个容器到另一个容器时候的变化
   const dragMoveEvent = (props: any) => {
     const { active, over } = props;
     const overId = over?.id;
     if (!overId) return;
-    const activeContainer = findContaniner(active?.id) || '';
-    const overContainer = findContaniner(over?.id) || '';
+    const activeContainer = findContaniner(active?.id);
+    const overContainer = findContaniner(over?.id);
 
     // 将activeContainer里删除拖拽元素，在overContainer中添加拖拽元素
     if (activeContainer !== overContainer) {
@@ -375,7 +378,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
       // attr 转 operationItem
       if (activeContainer === 'attrs') {
         const attr = items[activeContainer].find((attr: any) => attr.id === active.id);
-        dragItem = transformAttrToOperationItem(attr, operation.id);
+        dragItem = transformAttrToOperationItem(attr, operation.id, belongId);
         itemClick(dragItem);
       } else if (items[activeContainer]) {
         const operationItem = items[activeContainer].find(
@@ -409,8 +412,8 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
     const { over, active } = props;
     const overId = over?.id;
     const activeId = active?.id;
-    const activeContainer = findContaniner(activeId) || '';
-    const overContainer = findContaniner(overId) || '';
+    const activeContainer = findContaniner(activeId);
+    const overContainer = findContaniner(overId);
 
     const activeItems = items[activeContainer];
     const overItems = items[overContainer];
@@ -422,7 +425,11 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         if (activeContainer === 'attrs') {
           // 特性转表单项
           const attr = items['attrs'].find((attr: any) => attr.id === active.id);
-          const operationItem = transformAttrToOperationItem(attr, operation.id);
+          const operationItem = transformAttrToOperationItem(
+            attr,
+            operation.id,
+            belongId,
+          );
           const data = {
             attrs: items['attrs'].filter((item: any) => {
               return item.id !== active.id;
@@ -499,14 +506,11 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
   const layoutChange = (value: any) => {
     const newFormLayout = { ...formLayout, ...value };
     setFormLayout(newFormLayout);
-    const newOperationModel = {
+    setOperationModel({
       ...operation,
-      ...{ items: items['operationItems'] },
-      ...{
-        remark: JSON.stringify({ ...JSON.parse(operation.remark), ...newFormLayout }),
-      },
-    };
-    setOperationModel(newOperationModel);
+      items: items['operationItems'],
+      remark: JSON.stringify({ ...JSON.parse(operation.remark), ...newFormLayout }),
+    });
   };
 
   // 项配置改变
@@ -590,7 +594,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
                     />
                     <Space wrap>
                       <Button
-                        icon={<SearchOutlined />}
+                        icon={<AiOutlineSearch />}
                         onClick={() => setOpenPreviewModal(true)}>
                         预览表单
                       </Button>
@@ -694,6 +698,7 @@ const Design: React.FC<DesignProps> = ({ operation, current, setOperationModel }
         maskClosable={false}
         width={900}>
         <OioForm
+          target={current.team}
           operation={operation}
           operationItems={items['operationItems']}
           formRef={undefined}

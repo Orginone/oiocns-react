@@ -10,7 +10,7 @@ import SearchSpecies from '@/pages/Setting/content/Standard/Matcher/SearchSpecie
 import { XAttribute, XDictItem, XTarget, XTargetArray } from '@/ts/base/schema';
 import BaseTarget from '@/ts/core/target/base';
 import { getUuid } from '@/utils/tools';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { kernel } from '@/ts/base';
 import { ResultType } from '@/ts/base/model';
 
@@ -506,7 +506,7 @@ const Matcher = (props: any, ref: any) => {
       title: '匹配字典状态',
       dataIndex: 'matchedDict',
       readonly: true,
-      render: (_, row) => (row?.matchedDict ? <CheckOutlined /> : <CloseOutlined />),
+      render: (_, row) => (row?.matchedDict ? <AiOutlineCheck /> : <AiOutlineClose />),
     },
     {
       title: '操作',

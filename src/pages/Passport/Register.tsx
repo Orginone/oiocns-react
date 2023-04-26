@@ -1,5 +1,5 @@
 import { RegisterType } from '@/ts/base/model';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { AiOutlineArrowRight } from 'react-icons/ai';
 import { Alert, Button, Form, Input, message, Modal, Steps } from 'antd';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
@@ -176,7 +176,7 @@ const PassportRegister: React.FC = () => {
             footer={[
               <Button key="login" type="primary" onClick={handleOk}>
                 已记住？去登录
-                <ArrowRightOutlined />
+                <AiOutlineArrowRight />
               </Button>,
             ]}>
             <Alert message="请妥善保管账户私钥，请勿告诉他人！" type="warning" showIcon />

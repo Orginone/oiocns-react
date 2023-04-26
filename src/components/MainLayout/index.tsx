@@ -5,12 +5,11 @@ import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
 import {
-  EllipsisOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from '@ant-design/icons';
+  AiOutlineEllipsis,
+  AiOutlineMenuFold,
+  AiOutlineMenuUnfold,
+} from 'react-icons/ai';
 import { ImArrowLeft2 } from 'react-icons/im';
-import { useHistory } from 'react-router-dom';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 const { Content, Sider } = Layout;
@@ -35,7 +34,6 @@ type MainLayoutType = {
  * @returns
  */
 const MainLayout: React.FC<MainLayoutType> = (props) => {
-  const history = useHistory();
   const [collapsed, setCollapsed] = useState(false);
   const parentMenu = props.selectMenu.parentMenu ?? props.siderMenuData;
   const outside =
@@ -80,7 +78,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           className={cls.exit}
           onClick={() => {
             sessionStorage.clear();
-            history.push('/passport/login');
+            location.reload();
           }}>
           <TeamIcon share={orgCtrl.user.shareInfo} />
           <span>退出登录</span>
@@ -96,7 +94,11 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   onClick={() => {
                     setCollapsed(!collapsed);
                   }}>
-                  {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                  {collapsed ? (
+                    <AiOutlineMenuUnfold fontSize={16} />
+                  ) : (
+                    <AiOutlineMenuFold fontSize={16} />
+                  )}
                 </Typography.Link>
               }
               selectKey={props.selectMenu.key}
@@ -135,7 +137,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   )}
                   placement="bottom"
                   trigger={['click', 'contextMenu']}>
-                  <EllipsisOutlined
+                  <AiOutlineEllipsis
                     title={'右键操作'}
                     style={{ fontSize: 18 }}
                     rotate={90}

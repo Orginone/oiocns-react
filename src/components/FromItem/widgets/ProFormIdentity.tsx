@@ -1,6 +1,6 @@
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import orgCtrl from '@/ts/controller';
-import { SelectOutlined } from '@ant-design/icons';
+import { AiOutlineSelect } from 'react-icons/ai';
 import { ProForm } from '@ant-design/pro-components';
 import { Button, Input, Modal } from 'antd';
 import React, { useState } from 'react';
@@ -31,7 +31,7 @@ const ProFormIdentity = (props: any) => {
           readOnly={true}
           enterButton={
             <Button
-              icon={<SelectOutlined />}
+              icon={<AiOutlineSelect />}
               type="primary"
               onClick={() => setIsOpen(true)}></Button>
           }

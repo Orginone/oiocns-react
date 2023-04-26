@@ -39,6 +39,7 @@ export default class AnyStore {
         this._storeHub
           .invoke('TokenAuth', this.accessToken)
           .then(() => {
+            logger.info('连接到存储成功!');
             Object.keys(this._subscribeCallbacks).forEach(async (fullKey) => {
               const key = fullKey.split('|')[0];
               const belongId = fullKey.split('|')[1];
@@ -75,10 +76,10 @@ export default class AnyStore {
    * 更新token
    * @param accessToken token
    */
-  public updateToken(accessToken: string): void {
+  public async updateToken(accessToken: string): Promise<void> {
     if (this.accessToken != accessToken) {
       this.accessToken = accessToken;
-      this._storeHub.restart();
+      await this._storeHub.restart();
     }
   }
   /**

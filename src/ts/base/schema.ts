@@ -375,6 +375,8 @@ export type XFlowDefine = {
   name: string;
   // 编码
   code: string;
+  // 共享组织
+  shareId: string;
   // 归属组织/个人Id
   belongId: string;
   // 流程内容Json
@@ -402,7 +404,7 @@ export type XFlowDefine = {
   // 公开的
   public?: boolean;
   //数据源id
-  sourceIds?: string;
+  sourceIds: string;
   //是否创建实体  bool值
   isCreate: boolean;
 };

@@ -1,4 +1,4 @@
-import { EllipsisOutlined } from '@ant-design/icons';
+import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Dropdown } from 'antd';
 import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
@@ -27,7 +27,7 @@ const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation 
           className="card-title-extra"
           menu={{ items: operation && operation(data) }}
           placement="bottom">
-          <EllipsisOutlined rotate={90} />
+          <AiOutlineEllipsis rotate={90} />
         </Dropdown>
       </div>
     );

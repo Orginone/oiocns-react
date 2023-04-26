@@ -81,6 +81,7 @@ class BaseChat implements IChat {
       this.noReadCount = cache.noReadCount;
       msgNotify.changCallback();
     }
+    // debugger;
     this.lastMsgTime = Number.isInteger(cache.lastMsgTime) ? cache.lastMsgTime : nullTime;
     if (cache.lastMessage && cache.lastMessage.id != this.lastMessage?.id) {
       this.lastMessage = cache.lastMessage;
@@ -103,6 +104,7 @@ class BaseChat implements IChat {
     if (this.messages.length < 10) {
       this.moreMessage('');
     }
+    this.morePerson('');
   }
   unMessage(): void {
     this.messageNotify = undefined;
@@ -292,6 +294,7 @@ class CohortChat extends BaseChat {
       });
       this.personCount = res.data?.total ?? 0;
     }
+    msgNotify.changCallback();
   }
 }
 // 消息变更推送

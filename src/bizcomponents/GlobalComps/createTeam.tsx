@@ -5,7 +5,7 @@ import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
-import { BankOutlined } from '@ant-design/icons';
+import { AiOutlineBank } from 'react-icons/ai';
 import { parseAvatar } from '@/ts/base';
 
 interface Iprops {
@@ -59,7 +59,7 @@ const CreateTeamModal = (props: Iprops) => {
                 avatar ? (
                   <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
                 ) : (
-                  <BankOutlined style={{ fontSize: 16 }} />
+                  <AiOutlineBank style={{ fontSize: 16 }} />
                 )
               }
             />

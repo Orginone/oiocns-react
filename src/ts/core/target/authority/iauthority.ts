@@ -42,6 +42,7 @@ export interface IAuthority {
     code: string,
     ispublic: boolean,
     remark: string,
+    belongId: string,
   ): Promise<model.ResultType<schema.XAuthority>>;
   /**
    * 删除权限
@@ -67,6 +68,7 @@ export interface IAuthority {
     code: string,
     ispublic: boolean,
     remark: string,
+    belongId: string,
   ): Promise<model.ResultType<schema.XAuthority>>;
   /**
    * 查询指定权限下的角色列表

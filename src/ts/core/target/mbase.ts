@@ -3,11 +3,11 @@ import { common, kernel, model, schema } from '../../base';
 import { Market } from '../market';
 import { ProductType, TargetType } from '../enum';
 import { IMTarget, ISpace } from './itarget';
-import FlowTarget from './flow';
 import IProduct from '../market/iproduct';
 import { XOrder } from '@/ts/base/schema';
+import BaseTarget from './base';
 
-export default class MarketTarget extends FlowTarget implements IMTarget {
+export default class MarketTarget extends BaseTarget implements IMTarget {
   joinedMarkets: Market[];
   publicMarkets: Market[];
   ownProducts: IProduct[];

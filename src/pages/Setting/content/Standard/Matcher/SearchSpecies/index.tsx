@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { SearchOutlined } from '@ant-design/icons';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { Input, message, Modal, TreeProps } from 'antd';
 import React, { useState, useEffect, Key } from 'react';
 import { ISpeciesItem, ITarget } from '@/ts/core';
@@ -94,7 +94,7 @@ const SearchSpecies = (props: Iprops) => {
         }}>
         <div style={{ display: 'flex' }}>
           <div style={{ width: '100%' }}>
-            <Input prefix={<SearchOutlined />} placeholder="请设置关键字" />
+            <Input prefix={<AiOutlineSearch />} placeholder="请设置关键字" />
             <div>
               <CustomTree
                 checkable={false}

@@ -68,7 +68,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const renderTabBarExtraContent = () => {
     return (
       <div>
-        {activeTab != 'work' && (
+        {(activeTab == 'attr' || activeTab == 'form') && (
           <>
             <Segmented
               options={['全部', '本组织']}
@@ -195,9 +195,7 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           setModalType('');
         }}
         handleOk={async (req: CreateDefineReq) => {
-          if (
-            await current.team.define.publishDefine({ ...req, speciesId: current.id })
-          ) {
+          if (await current.publishWork({ ...req, resource: undefined })) {
             message.success('保存成功');
             forceUpdate();
             setModalType('');

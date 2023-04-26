@@ -110,7 +110,7 @@ const getAppliactionMenus = (user: ISpace) => {
     label: '应用',
     itemType: MenuType.Application,
     icon: <im.ImWindows8 />,
-    item: orgCtrl.user.root,
+    item: user,
     children: [],
   };
 };
@@ -131,7 +131,7 @@ const getFileSystemMenus = (user: ISpace) => {
 /** 获取财物菜单 */
 const loadThingMenus = (target: ITarget) => {
   return {
-    key: target.id + GroupMenuType.Things,
+    key: target.key + GroupMenuType.Things,
     label: GroupMenuType.Things,
     itemType: GroupMenuType.Things,
     menus: [],
@@ -245,10 +245,10 @@ const getUserMenu = async () => {
         ],
       },
       {
-        key: orgCtrl.user.key + GroupMenuType.Cohorts,
+        key: orgCtrl.user.key + GroupMenuType.UserCohort,
         item: orgCtrl.user,
-        label: GroupMenuType.Cohorts,
-        itemType: GroupMenuType.Cohorts,
+        label: GroupMenuType.UserCohort,
+        itemType: GroupMenuType.UserCohort,
         icon: <im.ImNewspaper />,
         menus: [],
         children: buildTargetTree(orgCtrl.user.cohorts),
@@ -304,8 +304,14 @@ const getTeamMenu = async () => {
         ),
         loadAgencyGroup(
           company,
+          buildTargetTree(company.workings),
+          GroupMenuType.Working,
+          TargetType.Working,
+        ),
+        loadAgencyGroup(
+          company,
           buildTargetTree(company.cohorts),
-          GroupMenuType.Cohorts,
+          GroupMenuType.CompanyCohort,
           TargetType.Cohort,
         ),
       ],

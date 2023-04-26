@@ -11,9 +11,9 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../../components/Description';
-import ExclamationCircleOutlined from '@ant-design/icons/lib/icons/ExclamationCircleOutlined';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 import orgCtrl from '@/ts/controller';
+import { AiOutlineExclamationCircle } from 'react-icons/ai';
 interface IProps {
   current: ICohort;
 }
@@ -56,7 +56,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
             onClick: async () => {
               Modal.confirm({
                 title: '提示',
-                icon: <ExclamationCircleOutlined />,
+                icon: <AiOutlineExclamationCircle />,
                 content: '是否申请添加好友',
                 okText: '确认',
                 cancelText: '取消',

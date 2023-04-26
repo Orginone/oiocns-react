@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import InsertButton from '../InsertButton';
 import cls from './index.module.less';
-import { CopyOutlined, CloseOutlined } from '@ant-design/icons';
+import { AiOutlineCopy, AiOutlineClose } from 'react-icons/ai';
 import { FieldCondition } from '../../FlowDrawer/processType';
 import { Tooltip } from 'antd';
 import orgCtrl from '@/ts/controller';
@@ -148,11 +148,11 @@ const ConditionNode: React.FC<IProps> = (props) => {
       </span>
       {editable && (
         <span className={cls['option']}>
-          <CopyOutlined
+          <AiOutlineCopy
             style={{ fontSize: '12px', paddingRight: '5px' }}
             onClick={copy}
           />
-          <CloseOutlined style={{ fontSize: '12px' }} onClick={delNode} />
+          <AiOutlineClose style={{ fontSize: '12px' }} onClick={delNode} />
         </span>
       )}
     </div>

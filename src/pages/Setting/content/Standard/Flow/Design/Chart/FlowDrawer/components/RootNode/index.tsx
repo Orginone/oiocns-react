@@ -7,7 +7,7 @@ import { ISpeciesItem } from '@/ts/core';
 import ViewFormModal from '@/pages/Setting/components/viewFormModal';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import { SettingOutlined } from '@ant-design/icons';
+import { AiOutlineSetting } from 'react-icons/ai';
 import SelectAuth from '../../../../../Comp/selectAuth';
 interface IProps {
   current: NodeType;
@@ -36,7 +36,7 @@ const RootNode: React.FC<IProps> = (props) => {
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>
         <Row style={{ marginBottom: '10px' }}>
-          <SettingOutlined style={{ marginTop: '3px' }} />
+          <AiOutlineSetting style={{ marginTop: '3px' }} />
           <span className={cls[`roval-node-title`]}>选择角色</span>
         </Row>
         <SelectAuth
@@ -50,7 +50,7 @@ const RootNode: React.FC<IProps> = (props) => {
           value={selectAuthValue}></SelectAuth>
         <Divider />
         <Row style={{ marginBottom: '10px' }}>
-          <SettingOutlined style={{ marginTop: '3px' }} />
+          <AiOutlineSetting style={{ marginTop: '3px' }} />
           <span className={cls[`roval-node-title`]}>绑定表单</span>
         </Row>
         {/* <div style={{ marginBottom: '10px' }}> */}
@@ -94,6 +94,7 @@ const RootNode: React.FC<IProps> = (props) => {
             }}
             onCancel={() => setOperationModal(undefined)}>
             <SelectOperation
+              current={props.species}
               showData={showData}
               setShowData={setShowData}></SelectOperation>
           </Modal>
