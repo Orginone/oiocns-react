@@ -255,7 +255,7 @@ const transformAttrToOperationItem = (
         title: attr.name,
         type,
         widget,
-        required: true,
+        required: false,
         readOnly: false,
         hidden: attr.code === 'thingId',
         placeholder: `请输入${attr.name}`,

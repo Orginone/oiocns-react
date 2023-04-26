@@ -288,7 +288,7 @@ const Index: React.FC<indexType> = () => {
                     className="ListWrap"
                     columns={columns2}
                     size="small"
-                    rowKey="id"
+                    rowKey={(record) => record.title + index}
                     pagination={false}
                     dataSource={item?.list || []}
                   />
