@@ -1,0 +1,83 @@
+// 四角边框样式
+
+.base-card {
+  position: relative;
+  height: 3.875rem;
+  width: 32%;
+  margin: 0 0.5%;
+  border: 1px solid #19ba8b2b;
+  background: #ffffff0a;
+  padding: 0 0.1875rem 0;
+  margin-bottom: 0.1875rem;
+  color: #fff;
+  margin-bottom: 10px;
+
+  &:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid #1f59cf;
+    border-left: 2px solid #1f59cf;
+  }
+
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid #1f59cf;
+    border-right: 2px solid #1f59cf;
+  }
+
+  &.empty {
+    opacity: 0;
+    // background-color: red !important;
+  }
+
+  .border_corner {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #4f5f814d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    &:before {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-bottom: 2px solid #1f59cf;
+      border-left: 2px solid #1f59cf;
+    }
+
+    &:after {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-bottom: 2px solid #1f59cf;
+      border-right: 2px solid #1f59cf;
+    }
+
+    // 内部展示数据区域
+    &-title {
+    }
+
+    &-value {
+    }
+  }
+}

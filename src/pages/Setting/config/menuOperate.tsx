@@ -9,6 +9,7 @@ import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import { XDict } from '@/ts/base/schema';
 import { AiOutlineSetting } from 'react-icons/ai';
+import { SettingOutlined } from '@ant-design/icons';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -222,6 +223,32 @@ const getUserMenu = async () => {
     ],
     children: [
       {
+        key: orgCtrl.user.key + '门户设置',
+        item: orgCtrl.user,
+        label: '门户设置',
+        itemType: '门户设置',
+        belongId: orgCtrl.user.id,
+        shareId: orgCtrl.user.id,
+        menus: [],
+        icon: <im.ImNewspaper />,
+        children: [
+          {
+            key: '页面列表',
+            label: '页面列表',
+            itemType: '门户页面',
+            icon: <SettingOutlined />,
+            children: [],
+          },
+          {
+            key: '系统组件',
+            label: '组件列表',
+            itemType: '门户组件',
+            icon: <SettingOutlined />,
+            children: [],
+          },
+        ],
+      },
+      {
         key: orgCtrl.user.key + GroupMenuType.StandardGroup,
         item: orgCtrl.user,
         label: GroupMenuType.StandardGroup,
@@ -256,6 +283,30 @@ const getTeamMenu = async () => {
       menus: await loadTypeMenus(company, false),
       icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
       children: [
+        {
+          key: company.key + '单位门户',
+          item: company,
+          label: '门户设置',
+          itemType: '门户设置',
+          menus: [],
+          icon: <im.ImNewspaper />,
+          children: [
+            {
+              key: company.key + '页面列表',
+              label: '页面列表',
+              itemType: '门户页面',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+            {
+              key: company.key + '系统组件',
+              label: '组件列表',
+              itemType: '门户组件',
+              icon: <SettingOutlined />,
+              children: [],
+            },
+          ],
+        },
         {
           key: company.key + GroupMenuType.StandardGroup,
           item: company,

@@ -4,3 +4,5 @@ declare module 'less-vars-to-js';
 declare module 'vite-plugin-style-import';
 declare module 'pako';
 declare module 'react-file-viewer';
+declare module 'react-grid-layout'
+declare module 'react-sticky'

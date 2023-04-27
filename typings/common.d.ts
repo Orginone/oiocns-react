@@ -11,3 +11,9 @@ export namespace common {
     onClick?: () => void;
   }
 }
+
+interface ICommonParams {
+  current?: number;
+  pageSize?: number;
+  [key: string]: any;
+}

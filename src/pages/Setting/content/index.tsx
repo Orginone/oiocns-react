@@ -9,14 +9,22 @@ import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
-import { MenuType } from '../config/menuType';
-
+import PageDesignList from './PageDesign/PageList';
+import PageCompList from './PageDesign/CompList';
+import pageCtrl from './PageDesign/pageCtrl';
+import { Empty } from 'antd';
+import OgoImg from '../../../../public/img/logo/logo2.jpg';
+import { MenuType, GroupMenuType } from '../config/menuType';
+// import Test from './PageDesign/components/TodoCard';
 interface IProps {
   selectMenu: MenuItemType;
   refreshKey?: string;
 }
 
 const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
+  if (selectMenu.itemType === '门户设置') {
+    pageCtrl.setBelongId = selectMenu.item.id;
+  }
   /** 加载内容区 */
   switch (selectMenu.itemType) {
     case MenuType.User:
@@ -39,8 +47,26 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return <PropertySetting current={selectMenu.item} />;
     case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
+    case GroupMenuType.PageDesignList: {
+      return <PageDesignList />;
+    }
+
+    case GroupMenuType.PageCompList:
+      return <PageCompList />;
     default:
-      return <></>;
+      return (
+        <Empty
+          image={OgoImg}
+          imageStyle={{
+            marginTop: '15vh',
+            height: 200,
+          }}
+          description={
+            <span>
+              请选择 <a>{selectMenu?.label}</a> 子菜单
+            </span>
+          }></Empty>
+      );
   }
 };
 

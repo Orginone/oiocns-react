@@ -1,3 +1,4 @@
+import { debounce } from '@/utils/tools';
 import { generateUuid } from './uuid';
 
 export class Emitter {
@@ -72,7 +73,7 @@ export class Emitter {
    * @desc 局部变更回调
    * @param {string} p 订阅方法名称
    */
-  public changCallbackPart(p: string): void {
+  public changCallbackPart = debounce((p: string) => {
     this.changCallback();
     Object.keys(this._partRefreshCallback).forEach((key) => {
       const callback = this._partRefreshCallback[key][p];
@@ -80,5 +81,5 @@ export class Emitter {
         callback.apply(this, [generateUuid()]);
       }
     });
-  }
+  }, 100);
 }
