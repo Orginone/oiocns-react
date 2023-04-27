@@ -3,11 +3,11 @@ import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
-import OioFormItem from '../FromItem/FormItems';
-import { ITarget } from '@/ts/core';
+import OioFormItem from './FormItems';
+import { ISpace } from '@/ts/core';
 
 type IProps = {
-  target: ITarget;
+  space: ISpace;
   operation: XOperation;
   operationItems?: XOperationItem[];
   submitter?: any;
@@ -22,7 +22,7 @@ type IProps = {
  * 奥集能表单
  */
 const OioForm: React.FC<IProps> = ({
-  target,
+  space,
   operation,
   operationItems,
   submitter,
@@ -50,7 +50,7 @@ const OioForm: React.FC<IProps> = ({
       const queryItems = async () => {
         const operateItemRes = await kernel.queryOperationItems({
           id: operation.id,
-          spaceId: target.id,
+          spaceId: space.id,
           page: pageAll(),
         });
         setItems(operateItemRes.data.result || []);
@@ -94,7 +94,7 @@ const OioForm: React.FC<IProps> = ({
         {items.length > 0 ? (
           items.map((item: XOperationItem) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem item={item} />
+              <OioFormItem item={item} space={space} />
             </Col>
           ))
         ) : (

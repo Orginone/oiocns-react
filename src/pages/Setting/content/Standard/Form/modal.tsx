@@ -14,6 +14,16 @@ interface Iprops {
   handleOk: (res: any) => void;
   current: ISpeciesItem;
 }
+/**
+ * 默认备注：表单默认布局
+ */
+export const defaultRemark: any = {
+  type: 'object',
+  properties: {},
+  labelWidth: 120,
+  layout: 'horizontal',
+  col: 12,
+};
 
 /*
   业务标准编辑模态框
@@ -95,7 +105,11 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
       onFinish={async (values: XOperation) => {
         let success = false;
         if (data) {
-          success = await current.updateOperation({ ...data, ...values });
+          success = await current.updateOperation({
+            ...data,
+            ...values,
+            ...{ remark: JSON.stringify(defaultRemark) },
+          });
         } else {
           success = (await current.createOperation(values)) != undefined;
         }

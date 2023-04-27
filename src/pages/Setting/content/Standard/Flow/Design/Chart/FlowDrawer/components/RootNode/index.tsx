@@ -4,7 +4,7 @@ import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import { XOperation } from '@/ts/base/schema';
 import { ISpeciesItem } from '@/ts/core';
-import ViewFormModal from '@/pages/Setting/components/viewFormModal';
+import ViewFormModal from '@/pages/Setting/content/Standard/Form/Design/viewFormModal';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import { AiOutlineSetting } from 'react-icons/ai';
@@ -40,6 +40,7 @@ const RootNode: React.FC<IProps> = (props) => {
           <span className={cls[`roval-node-title`]}>选择角色</span>
         </Row>
         <SelectAuth
+          space={props.species!.team.space}
           onChange={(newValue: string, label: string) => {
             if (props.current.props.assignedUser[0]) {
               props.current.props.assignedUser[0].id = newValue;
@@ -98,16 +99,19 @@ const RootNode: React.FC<IProps> = (props) => {
               showData={showData}
               setShowData={setShowData}></SelectOperation>
           </Modal>
-          <ViewFormModal
-            data={editData}
-            open={viewFormOpen}
-            handleCancel={() => {
-              setViewFormOpen(false);
-            }}
-            handleOk={() => {
-              setViewFormOpen(false);
-            }}
-          />
+          {props.species && (
+            <ViewFormModal
+              species={props.species!}
+              data={editData}
+              open={viewFormOpen}
+              handleCancel={() => {
+                setViewFormOpen(false);
+              }}
+              handleOk={() => {
+                setViewFormOpen(false);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -123,7 +123,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   useEffect(() => {
     if (props.checkedList && props.checkedList.length > 0) {
       loadAttrs(props.checkedList.map((item) => item.item));
-    } else if (props.species && orgCtrl.user.id) {
+    } else if (props.species) {
       loadAttrs(props.species);
     }
   }, [props.species, props.checkedList]);

@@ -11,7 +11,7 @@ interface IProps {
 /**
  * 仓库-物
  */
-const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
+const ThingIndex: React.FC<IProps> = ({ species, selectable }) => {
   const [tabKey, setTabKey] = useState(0);
   const [thingId, setThingId] = useState<string>('');
   useEffect(() => {
@@ -23,9 +23,8 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
       return (
         <Thing
           species={[species]}
-          checkedList={checkedList || []}
           selectable={selectable}
-          setTabKey={setTabKey}
+          onBack={() => setTabKey(1)}
           setThingId={setThingId}
           menuItems={[
             {
@@ -68,7 +67,7 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
         />
       );
     case 1:
-      return <ThingView thingId={thingId} setTabKey={setTabKey} />;
+      return <ThingView thingId={thingId} setTabKey={setTabKey} species={species} />;
     default:
       return <></>;
   }

@@ -1,17 +1,22 @@
 import IndentitySelect from '@/bizcomponents/IndentityManage';
-import orgCtrl from '@/ts/controller';
 import { AiOutlineSelect } from 'react-icons/ai';
 import { ProForm } from '@ant-design/pro-components';
 import { Button, Input, Modal } from 'antd';
 import React, { useState } from 'react';
+import { ISpace } from '@/ts/core';
 
 const { Search } = Input;
+
+interface IProps {
+  space: ISpace;
+  [key: string]: any; // 其他属性方法
+}
 
 /**
  * 角色组件(Todo 待完善)
  */
-const ProFormIdentity = (props: any) => {
-  const nodeOperateOrgId = props.orgId || orgCtrl.user.id;
+const ProFormIdentity = (props: IProps) => {
+  const nodeOperateOrgId = props.space.id;
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [identity, setIdentity] = useState<any>({});
@@ -24,9 +29,8 @@ const ProFormIdentity = (props: any) => {
     <>
       <ProForm.Item {...props} label={props.label || '角色'}>
         <Search
-          placeholder={props.placeholder || '请选择角色'}
+          placeholder={'请选择角色'}
           allowClear
-          defaultValue={props.defaultValue}
           value={name || id}
           readOnly={true}
           enterButton={
@@ -49,6 +53,7 @@ const ProFormIdentity = (props: any) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
+          space={props.space}
           multiple={false}
           orgId={nodeOperateOrgId}
           onChecked={(params: any) => {

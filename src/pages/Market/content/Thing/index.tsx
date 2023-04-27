@@ -68,7 +68,9 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable, checkedList }) => {
         />
       );
     case 1:
-      return <ThingView thingId={thingId} setTabKey={setTabKey} />;
+      return (
+        <ThingView thingId={thingId} setTabKey={setTabKey} space={species.team.space} />
+      );
     default:
       return <></>;
   }

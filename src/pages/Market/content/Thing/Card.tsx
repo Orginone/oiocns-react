@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { XOperation } from '@/ts/base/schema';
 import CardDescriptions from '@/components/CardDescriptions';
+import { ISpace } from '@/ts/core';
 
 interface IThingCardProps {
+  space: ISpace;
   thingId: string;
 }
 /**
  * 仓库-物-卡片
  */
-const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
+const ThingCard: React.FC<IThingCardProps> = ({ thingId, space }) => {
   const [operations, setOperations] = useState<XOperation[]>([]);
   const [formValue, setFormValue] = useState<any>({});
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThing<any>(orgCtrl.user.id, {
+      const res = await kernel.anystore.loadThing<any>(space.id, {
         options: {
           match: {
             _id: {
@@ -56,7 +57,7 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
         // 2、查询表单
         const operationsRes = await kernel.queryOperationBySpeciesIds({
           ids: speciesIds,
-          spaceId: orgCtrl.user.id,
+          spaceId: space.id,
         });
         let operations = operationsRes.data.result || [];
         operations = operations.filter((operation) => {

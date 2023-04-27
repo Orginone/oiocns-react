@@ -1,9 +1,11 @@
 import React from 'react';
 import cls from './index.module.less';
-import { schema } from '@/ts/base';
+import { pageAll, schema } from '@/ts/base';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import CardOrTableComp from '@/components/CardOrTableComp';
+import { ISpace } from '@/ts/core';
 interface indexType {
+  space: ISpace;
   searchFn: Function;
   disableIds: string[];
 }
@@ -25,7 +27,7 @@ const WorkSelectTable: React.FC<indexType> = (props) => {
             },
           }}
           request={async (page) => {
-            let result = (await thingCtrl.define?.loadFlowDefine())?.result;
+            let result = (await props.space.loadWork(pageAll()))?.result;
             let data = result?.filter((a) => props.disableIds.indexOf(a.id) < 0);
             return {
               total: data?.length || 0,

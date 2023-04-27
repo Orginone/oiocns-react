@@ -57,17 +57,6 @@ const FlowDrawer: React.FC<IProps> = ({
         );
       });
       // return (<div><div>审核人：{}</dev></div>)
-      // TODO 这里有问题
-    } else if (current?.belongId && current?.belongId != orgCtrl.user.id) {
-      return (
-        <div>
-          此节点由{' '}
-          <span style={{ color: 'blue' }}>
-            {orgCtrl.provider.findNameById(current.belongId)}
-          </span>{' '}
-          创建,无法编辑
-        </div>
-      );
     } else {
       switch (current?.type) {
         case AddNodeType.ROOT:
@@ -96,7 +85,13 @@ const FlowDrawer: React.FC<IProps> = ({
             />
           );
         case AddNodeType.CC:
-          return <CcNode current={current} orgId={operateOrgId || designOrgId} />;
+          return (
+            <CcNode
+              current={current}
+              orgId={operateOrgId || designOrgId}
+              species={species}
+            />
+          );
         case AddNodeType.CONDITION:
           if (conditions) {
             return (

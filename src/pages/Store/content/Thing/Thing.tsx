@@ -32,7 +32,6 @@ type ThingItemType = ItemType & { click: (data: any) => void };
 interface IProps {
   species: ISpeciesItem[];
   selectable?: boolean;
-  checkedList?: any[];
   height?: any;
   width?: any;
   editingTool?: any;
@@ -42,10 +41,9 @@ interface IProps {
   byIds?: string[];
   deferred?: boolean;
   setGridInstance?: Function;
-  onSelectionChanged?: Function;
-  setTabKey?: (tabKey: number) => void;
+  onBack?: () => void;
   setThingId?: (thingId: string) => void;
-  scrolling?: any;
+  scrolling?: boolean;
   keyExpr?: string;
 }
 
@@ -59,7 +57,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
 
   const getSortedList = (
     speciesArray: ISpeciesItem[],
-    array: any[],
+    array: ISpeciesItem[],
     front: boolean,
   ): ISpeciesItem[] => {
     for (let species of speciesArray) {
@@ -121,12 +119,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   };
 
   useEffect(() => {
-    if (props.checkedList && props.checkedList.length > 0) {
-      loadAttrs(props.checkedList.map((item) => item.item));
-    } else if (props.species && orgCtrl.user.id) {
-      loadAttrs(props.species);
-    }
-  }, [props.species, props.checkedList]);
+    loadAttrs(props.species);
+  }, [props.species]);
 
   const getColumns = (records: any[]) => {
     let columns = [];
@@ -139,7 +133,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 attr.id,
                 attr.name,
                 attr.property?.valueType ?? '',
-                attr.belongId ? `Propertys.T${attr.id}` : attr.code,
+                attr.belongId ? `T${attr.id}` : attr.property?.code || '',
                 attr.property?.dict?.dictItems,
               ),
             )}
@@ -151,7 +145,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             record.id,
             record.name,
             record.property?.valueType,
-            record.belongId ? `Propertys.T${record.id}` : record.code,
+            // record.belongId ? `Propertys.T${record.id}` : record.code,
+            record.belongId ? `T${record.id}` : record.property?.code || '',
             record.property?.dict?.dictItems,
           ),
         );
@@ -274,12 +269,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           new CustomStore({
             key: 'Id',
             async load(loadOptions) {
-              const species = [
-                ...(props.checkedList || []).map((item) => item.item.target),
-                props.species.map((a) => a.target),
-              ];
-              loadOptions.userData = species
-                .filter((item) => item.code != 'anything')
+              loadOptions.userData = props.species
+                .filter((item) => item.target.code != 'anything')
                 .map((item) => `S${item.id}`);
               let request: any = { ...loadOptions };
               if (props.byIds) {
@@ -291,7 +282,10 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing(orgCtrl.user.id, request);
+              const result = await kernel.anystore.loadThing(
+                props.species[0].team.space.id,
+                request,
+              );
               if (result.success) {
                 return result.data;
               }
@@ -311,15 +305,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         showRowLines={true}
         rowAlternationEnabled={true}
         hoverStateEnabled={true}
-        onSelectionChanged={(e) => {
-          props.onSelectionChanged?.call(this, e.selectedRowsData);
-        }}
         onRowDblClick={(e) => {
           if (props.setThingId) {
             props.setThingId(e.key);
           }
-          if (props.setTabKey) {
-            props.setTabKey(1);
+          if (props.onBack) {
+            props.onBack();
           }
         }}
         columnResizingMode={'widget'}

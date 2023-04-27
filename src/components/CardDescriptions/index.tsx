@@ -1,19 +1,21 @@
-import { kernel } from '@/ts/base';
+import { kernel, pageAll } from '@/ts/base';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
-import orgCtrl from '@/ts/controller';
 import { ProDescriptions } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import OioField from './OioField';
+import { ISpace } from '@/ts/core';
 
 type CardDescriptionsProps = {
   operation: XOperation;
   fieldsValue?: any;
+  space: ISpace;
 };
 
 /**
  * 奥集能--万物卡片
  */
 const CardDescriptions: React.FC<CardDescriptionsProps> = ({
+  space,
   operation,
   fieldsValue,
 }) => {
@@ -29,8 +31,8 @@ const CardDescriptions: React.FC<CardDescriptionsProps> = ({
         // 表单项
         const operateItemRes = await kernel.queryOperationItems({
           id: operation.id,
-          spaceId: orgCtrl.user.id,
-          page: { offset: 0, limit: 100000, filter: '' },
+          spaceId: space.id,
+          page: pageAll(),
         });
         const operateItems = (operateItemRes.data.result || []) as XOperationItem[];
         setItems(operateItems);

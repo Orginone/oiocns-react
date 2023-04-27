@@ -3,8 +3,10 @@ import React from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import ThingArchive from './Archive';
 import ThingCard from './Card';
+import { ISpace } from '@/ts/core';
 
 interface IThingViewProps {
+  space: ISpace;
   thingId: string;
   setTabKey?: (tabKey: number) => void;
 }
@@ -13,17 +15,17 @@ interface IThingViewProps {
  * 物-查看
  * @returns
  */
-const ThingView: React.FC<IThingViewProps> = ({ thingId, setTabKey }) => {
+const ThingView: React.FC<IThingViewProps> = ({ thingId, setTabKey, space }) => {
   const items: TabsProps['items'] = [
     {
       key: '1',
       label: `资产卡片`,
-      children: <ThingCard thingId={thingId} />,
+      children: <ThingCard thingId={thingId} space={space} />,
     },
     {
       key: '2',
       label: `归档痕迹`,
-      children: <ThingArchive thingId={thingId} />,
+      children: <ThingArchive thingId={thingId} space={space} />,
     },
   ];
 

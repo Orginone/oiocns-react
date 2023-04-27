@@ -7,7 +7,7 @@ import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
 import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import OioForm from '@/components/Form';
+import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import { ProFormInstance } from '@ant-design/pro-components';
 import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
 import { ITarget } from '@/ts/core';
@@ -114,7 +114,7 @@ const Package: React.FC = () => {
                 style: { display: 'none' },
               },
             }}
-            target={selectMenu.item.space}
+            space={selectMenu.item.space}
           />
         </Modal>
       )}

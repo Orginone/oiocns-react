@@ -2,7 +2,7 @@ import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Dropdown } from 'antd';
 import React from 'react';
 import { XFlowDefine } from '@/ts/base/schema';
-import './index.less';
+import './index.module.less';
 import { ImStackoverflow } from 'react-icons/im';
 interface FlowCardType {
   data: XFlowDefine;

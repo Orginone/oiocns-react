@@ -6,7 +6,6 @@ import { ImUndo2 } from 'react-icons/im';
 import { SaveOutlined } from '@ant-design/icons';
 import { OperationModel } from '@/ts/base/model';
 import { kernel } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 import Design from './design';
 
 interface Iprops {
@@ -25,15 +24,17 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
 
   const save = async () => {
     if (operationModel) {
-      if (operationModel.belongId === orgCtrl.user.id) {
+      if (operationModel.belongId === current.team.space.id) {
         const res = await kernel.updateOperation(operationModel);
         console.log(res);
       }
       const res = await kernel.createOperationItems({
-        spaceId: orgCtrl.user.id,
+        spaceId: current.team.space.id,
         operationId: operationModel.id!,
         operationItems: operationModel.items
-          .filter((i: any) => i.belongId == orgCtrl.user.id)
+          .filter(
+            (i: any) => i.belongId == undefined || i.belongId == current.team.space.id,
+          )
           .map((a) => ({
             name: a.name,
             code: a.code,

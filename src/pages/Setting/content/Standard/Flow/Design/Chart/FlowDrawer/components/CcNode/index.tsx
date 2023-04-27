@@ -5,10 +5,12 @@ import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import orgCtrl from '@/ts/controller';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
+import { ISpeciesItem } from '@/ts/core';
 
 interface IProps {
   current: NodeType;
   orgId?: string;
+  species?: ISpeciesItem;
 }
 /**
  * @description: 抄送对象
@@ -72,6 +74,7 @@ const CcNode: React.FC<IProps> = (props) => {
       </div>
       <Modal
         title="添加角色"
+        width="650px"
         key="addApproval"
         open={isApprovalOpen}
         destroyOnClose={true}
@@ -81,9 +84,9 @@ const CcNode: React.FC<IProps> = (props) => {
           ];
           setIsApprovalOpen(false);
         }}
-        onCancel={() => setIsApprovalOpen(false)}
-        width="650px">
+        onCancel={() => setIsApprovalOpen(false)}>
         <IndentityManage
+          space={props.species?.team.space ?? orgCtrl.user}
           multiple={false}
           orgId={nodeOperateOrgId}
           onChecked={(params: any) => {

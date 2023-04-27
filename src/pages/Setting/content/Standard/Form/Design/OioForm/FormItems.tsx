@@ -22,12 +22,18 @@ import ProFormDict from './widgets/ProFormDict';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
+import { XOperationItem } from '@/ts/base/schema';
+import { ISpace } from '@/ts/core';
+
+interface IProps {
+  space: ISpace;
+  item: XOperationItem;
+}
 
 /**
  * 表单项渲染
  */
-const OioFormItem = (props: any) => {
-  const { item } = props;
+const OioFormItem = ({ item, space }: IProps) => {
   const rule = JSON.parse(item.rule);
   // 规则校验
   let rules: Rule[] = [];
@@ -176,6 +182,7 @@ const OioFormItem = (props: any) => {
     case 'dict':
       return (
         <ProFormDict
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -188,6 +195,7 @@ const OioFormItem = (props: any) => {
     case 'dept':
       return (
         <ProFormDept
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -198,6 +206,7 @@ const OioFormItem = (props: any) => {
     case 'person':
       return (
         <ProFormPerson
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -208,6 +217,7 @@ const OioFormItem = (props: any) => {
     case 'group':
       return (
         <ProFormGroup
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -218,6 +228,7 @@ const OioFormItem = (props: any) => {
     case 'auth':
       return (
         <ProFormAuth
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -228,6 +239,7 @@ const OioFormItem = (props: any) => {
     case 'identity':
       return (
         <ProFormIdentity
+          space={space}
           name={item.attrId}
           label={rule.title}
           rules={rules}

@@ -1,4 +1,4 @@
-import OioForm from '@/components/Form';
+import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
 import { XFlowDefine, XOperation } from '@/ts/base/schema';
@@ -68,7 +68,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
         operations.map((operation: XOperation) => (
           <OioForm
             key={operation.id}
-            target={space}
+            space={space}
             operation={operation}
             formRef={formRef}
             submitter={{
@@ -115,9 +115,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
               keyExpr="Id"
               dataSource={rows}
               species={filterSpecies}
-              checkedList={filterSpecies.map((e) => {
-                return { item: e };
-              })}
               selectable={false}
               toolBarItems={[
                 <Item key={getUuid()}>
@@ -187,10 +184,6 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
             setGridInstance={setGridInstance}
             deferred={true}
             species={filterSpecies}
-            checkedList={filterSpecies.map((e) => {
-              return { item: e };
-            })}
-            onSelectionChanged={(rows: any) => {}}
             height={'calc(80vh - 175px)'}
             editingTool={
               <Editing

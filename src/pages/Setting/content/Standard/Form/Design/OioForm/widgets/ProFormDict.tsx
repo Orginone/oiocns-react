@@ -1,27 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
+import { pageAll } from '@/ts/base';
 import { ProFormSelect } from '@ant-design/pro-components';
+import { ISpace } from '@/ts/core';
 
+interface IProps {
+  space: ISpace;
+  [key: string]: any;
+}
 /**
- * 人员组件
+ * 字典组件
  */
-const ProFormPerson = (props: any) => {
+const ProFormDict = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
-  useEffect(() => {
-    const initOptions = async () => {
-      const res = await orgCtrl.user.loadMembers({
-        offset: 0,
-        limit: 1000000,
-        filter: '',
-      });
-      const persons =
-        res.result?.map((xtarget) => {
-          return { label: xtarget.name, value: xtarget.id };
-        }) || [];
-      setOptions(persons);
-    };
-    initOptions();
-  }, []);
 
   const filterOption = (input: any, option: any) =>
     ((option?.label ?? '') as string).includes(input);
@@ -30,6 +20,21 @@ const ProFormPerson = (props: any) => {
       .toLowerCase()
       .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
 
+  useEffect(() => {
+    const initOptions = async () => {
+      const res = await props.space.dict.loadDictItem(
+        props.props.dictId,
+        props.space.id,
+        pageAll(),
+      );
+      const dictItems =
+        res.result?.map((item) => {
+          return { label: item.name, value: item.value };
+        }) || [];
+      setOptions(dictItems);
+    };
+    initOptions();
+  }, []);
   return (
     <ProFormSelect
       name={props.name}
@@ -47,4 +52,4 @@ const ProFormPerson = (props: any) => {
   );
 };
 
-export default ProFormPerson;
+export default ProFormDict;

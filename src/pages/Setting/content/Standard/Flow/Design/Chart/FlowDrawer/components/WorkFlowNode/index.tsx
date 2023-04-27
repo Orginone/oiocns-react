@@ -103,12 +103,15 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
           setIsOpen(false);
         }}
         onCancel={() => setIsOpen(false)}>
-        <WorkSelectTable
-          disableIds={props.disableIds}
-          searchFn={(params: schema.XFlowDefine) => {
-            setSelectChildWork(params);
-          }}
-        />
+        {props.species && (
+          <WorkSelectTable
+            space={props.species?.team.space}
+            disableIds={props.disableIds}
+            searchFn={(params: schema.XFlowDefine) => {
+              setSelectChildWork(params);
+            }}
+          />
+        )}
       </Modal>
     </div>
   );

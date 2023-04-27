@@ -6,6 +6,7 @@ import cls from './index.module.less';
 import CustomTree from '@/components/CustomTreeComp';
 import { ISpeciesItem } from '@/ts/core';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
+
 interface IProps {
   current?: ISpeciesItem;
   showData: any[];

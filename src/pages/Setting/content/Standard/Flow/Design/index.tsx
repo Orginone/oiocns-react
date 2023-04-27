@@ -1,13 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import {
-  Branche,
-  FlowNode,
-  XAttribute,
-  XFlowDefine,
-  XFlowInstance,
-} from '@/ts/base/schema';
+import { Branche, FlowNode, XFlowDefine, XFlowInstance } from '@/ts/base/schema';
 import { Branche as BrancheModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
 import {
@@ -24,7 +18,6 @@ import { ISpeciesItem } from '@/ts/core';
 import { pageAll } from '@/ts/base';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
-import { Label } from 'devextreme-react/data-grid';
 
 interface IProps {
   IsEdit: boolean;

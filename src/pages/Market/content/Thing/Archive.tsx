@@ -2,22 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import OioForm from '@/components/Form';
+import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
+import { ISpace } from '@/ts/core';
 
 const { Panel } = Collapse;
 
 interface IThingCardProps {
+  space: ISpace;
   thingId: string;
 }
 /**
  * 仓库-物-归档日志
  */
-const ThingArchive: React.FC<IThingCardProps> = ({ thingId }) => {
+const ThingArchive: React.FC<IThingCardProps> = ({ thingId, space }) => {
   const [archives, setArchives] = useState<any[]>([]);
   useEffect(() => {
     const findThing = async () => {
       // TODO 注意，这里不对
-      const res = await kernel.anystore.loadThingArchives(orgCtrl.user.id, {
+      const res = await kernel.anystore.loadThingArchives(space.id, {
         options: {
           match: {
             _id: {
@@ -77,6 +79,7 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId }) => {
                     return (
                       <Panel header={operation.name} key={operation.id}>
                         <OioForm
+                          space={space}
                           key={operation.id}
                           operation={operation}
                           formRef={undefined}

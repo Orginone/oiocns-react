@@ -7,7 +7,7 @@ import { NodeType } from '../../processType';
 import orgCtrl from '@/ts/controller';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation } from '@/ts/base/schema';
-import ViewFormModal from '@/pages/Setting/components/viewFormModal';
+import ViewFormModal from '@/pages/Setting/content/Standard/Form/Design/viewFormModal';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 interface IProps {
@@ -212,6 +212,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         />
       </Modal>
       <ViewFormModal
+        species={props.species!}
         data={editData}
         open={viewFormOpen}
         handleCancel={() => {

@@ -1,4 +1,4 @@
-import OioForm from '@/components/Form';
+import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
@@ -123,7 +123,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                                         formRef={undefined}
                                         fieldsValue={formValue}
                                         disabled={th.status == 100}
-                                        target={space}></OioForm>
+                                        space={space}></OioForm>
                                     </Panel>
                                   );
                                 })}
@@ -151,7 +151,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                                   key={operation.id}
                                   operation={operation}
                                   formRef={formRef}
-                                  target={space}
+                                  space={space}
                                   disabled={th.status == 100}></OioForm>
                               </Card>
                             );

@@ -17,7 +17,6 @@ import {
 } from 'antd';
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import orgCtrl from '@/ts/controller';
 import { ProForm } from '@ant-design/pro-components';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { AiOutlineSearch } from 'react-icons/ai';
@@ -26,7 +25,7 @@ import OperateItem from './OperateItem';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { OperationItemModel, OperationModel } from '@/ts/base/model';
-import OioForm from '@/components/Form';
+import OioForm from './OioForm';
 
 /**
  * 组件选择
@@ -276,7 +275,6 @@ const transformOperationItemToAttr = (operationItem: any) => {
       id: operationItem.attrId,
       name: operationItem.name,
       code: operationItem.code,
-      belongId: orgCtrl.user.id,
       remark: rule.description,
       dictId: rule.dictId || undefined,
       valueType:
@@ -315,7 +313,17 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
   });
   // 表单项--子表
   const [form] = Form.useForm();
-  const [formLayout, setFormLayout] = useState<FormLayout>(JSON.parse(operation.remark));
+  const [formLayout, setFormLayout] = useState<FormLayout>(
+    operation.remark
+      ? JSON.parse(operation.remark)
+      : {
+          type: 'object',
+          properties: {},
+          labelWidth: 120,
+          layout: 'horizontal',
+          col: 12,
+        },
+  );
   const [selectedItem, setSelectedItem] = useState<XOperationItem>();
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
 
@@ -518,7 +526,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
       const rule = { ...JSON.parse(selectedItem.rule), ...changedValues };
       setSelectedItem({
         ...selectedItem,
-        ...{ rule: JSON.stringify(rule) },
+        rule: JSON.stringify(rule),
       });
       const operationItems = items['operationItems'].map((oi: any) => {
         if (oi.id === selectedItem.id) {
@@ -540,7 +548,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
     <div key={tkey}>
       <DndContext onDragMove={dragMoveEvent} onDragEnd={dragEndFn}>
         <Row>
-          <Col span={3}>
+          <Col span={4}>
             <SortableContext items={items['attrs']}>
               <h3 style={{ paddingLeft: '6px' }}>特性</h3>
               <div
@@ -625,7 +633,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
                       .filter((i: XOperationItem) => i.attrId)
                       .map((item: any) => (
                         <Col span={formLayout.col} key={item.id}>
-                          <OperateItem item={item} />
+                          <OperateItem item={item} space={current.team.space} />
                         </Col>
                       ))}
                   </Row>
@@ -633,13 +641,15 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
               </Card>
             </SortableContext>
           </Col>
-
-          <Col span={5}>
+          <Col span={4}>
             <Card title="表单项配置">
               <Card bordered={false} title={selectedItem?.name}>
                 <Form
                   form={form}
-                  disabled={selectedItem?.belongId !== belongId}
+                  disabled={
+                    selectedItem?.belongId != undefined &&
+                    selectedItem?.belongId !== belongId
+                  }
                   onValuesChange={formValuesChange}>
                   <Form.Item label="组件" name="widget">
                     <Select options={widgetsOpts} />
@@ -697,7 +707,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
         maskClosable={false}
         width={900}>
         <OioForm
-          target={current.team.space}
+          space={current.team.space}
           operation={operation}
           operationItems={items['operationItems']}
           formRef={undefined}

@@ -1,11 +1,16 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
-import orgCtrl from '@/ts/controller';
-import OioFormItem from '@/components/FromItem/FormItems';
+import OioFormItem from './OioForm/FormItems';
+import { ISpace } from '@/ts/core';
 
-const OperateItem = (props: any) => {
-  const belongId = orgCtrl.user.id;
+interface IProps {
+  space: ISpace;
+  [key: string]: any;
+}
+
+const OperateItem = (props: IProps) => {
+  const belongId = props.space.id;
   const { item } = props;
   const { setNodeRef, listeners, transform } = useSortable({ id: item.id });
   const styles = {
@@ -16,11 +21,13 @@ const OperateItem = (props: any) => {
   return (
     <>
       {item.belongId !== belongId && (
-        <div style={{ cursor: 'no-drop' }}>{<OioFormItem item={item} />}</div>
+        <div style={{ cursor: 'no-drop' }}>
+          {<OioFormItem item={item} space={props.space} />}
+        </div>
       )}
       {item.belongId == belongId && (
         <div style={styles} ref={setNodeRef} {...listeners}>
-          {<OioFormItem item={item} />}
+          {<OioFormItem item={item} space={props.space} />}
         </div>
       )}
     </>

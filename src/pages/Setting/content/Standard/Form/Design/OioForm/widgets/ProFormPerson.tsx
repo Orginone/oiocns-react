@@ -1,13 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { kernel } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 import { ProFormSelect } from '@ant-design/pro-components';
+import { ISpace } from '@/ts/core';
+
+interface IProps {
+  space: ISpace;
+  [key: string]: any;
+}
 
 /**
- * 字典组件
+ * 人员组件
  */
-const ProFormDict = (props: any) => {
+const ProFormPerson = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
+  useEffect(() => {
+    const initOptions = async () => {
+      const res = await props.space.loadMembers({
+        offset: 0,
+        limit: 1000000,
+        filter: '',
+      });
+      const persons =
+        res.result?.map((xtarget) => {
+          return { label: xtarget.name, value: xtarget.id };
+        }) || [];
+      setOptions(persons);
+    };
+    initOptions();
+  }, []);
 
   const filterOption = (input: any, option: any) =>
     ((option?.label ?? '') as string).includes(input);
@@ -16,21 +35,6 @@ const ProFormDict = (props: any) => {
       .toLowerCase()
       .localeCompare(((optionB?.label ?? '') as string).toLowerCase());
 
-  useEffect(() => {
-    const initOptions = async () => {
-      const res = await kernel.queryDictItems({
-        id: props.props.dictId,
-        spaceId: orgCtrl.user.id,
-        page: { offset: 0, limit: 100000, filter: '' },
-      });
-      const dictItems =
-        res.data.result?.map((item) => {
-          return { label: item.name, value: item.value };
-        }) || [];
-      setOptions(dictItems);
-    };
-    initOptions();
-  }, []);
   return (
     <ProFormSelect
       name={props.name}
@@ -48,4 +52,4 @@ const ProFormDict = (props: any) => {
   );
 };
 
-export default ProFormDict;
+export default ProFormPerson;

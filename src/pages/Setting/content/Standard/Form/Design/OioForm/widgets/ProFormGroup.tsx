@@ -2,6 +2,12 @@ import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
 import { targetsToTreeData } from '@/pages/Setting';
+import { ISpace } from '@/ts/core';
+
+interface IProps {
+  space: ISpace;
+  [key: string]: any;
+}
 
 type OptionType = {
   key: string;
@@ -11,16 +17,15 @@ type OptionType = {
 };
 
 /**
- * 部门组件
+ * 集团组件
  */
-const ProFormDept = (props: any) => {
+const ProFormGroup = (props: IProps) => {
   const [treeData, setTreeData] = useState<OptionType[]>([]);
 
   useEffect(() => {
     const initTreeData = async () => {
-      const res = await orgCtrl.getTeamTree();
-      const data = targetsToTreeData(res).filter((d) => d.value == orgCtrl.user.id);
-      setTreeData(data);
+      const res = await orgCtrl.getTeamTree(props.space);
+      setTreeData(targetsToTreeData(res));
     };
     initTreeData();
   }, []);
@@ -40,4 +45,4 @@ const ProFormDept = (props: any) => {
   );
 };
 
-export default ProFormDept;
+export default ProFormGroup;

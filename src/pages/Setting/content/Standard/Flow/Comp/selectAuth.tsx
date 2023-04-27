@@ -1,16 +1,17 @@
 import { TreeSelect } from 'antd';
 import React, { useEffect, useState } from 'react';
-import orgCtrl from '@/ts/controller';
 import { IAuthority } from '@/ts/core/target/authority/iauthority';
 import { DefaultOptionType } from 'rc-select/lib/Select';
+import { ISpace } from '@/ts/core';
 interface IProps {
   value?: string;
   onChange: any;
+  space: ISpace;
 }
 const SelectAuth: React.FC<IProps> = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await orgCtrl.user.loadSpaceAuthorityTree(false);
+    let tree = await props.space.loadSpaceAuthorityTree(false);
     if (tree) {
       setTreeData([
         ...[{ label: '全员', value: '0', children: [] }],
@@ -31,7 +32,7 @@ const SelectAuth: React.FC<IProps> = (props: IProps) => {
 
   useEffect(() => {
     loadTreeData();
-  }, [orgCtrl.user]);
+  }, [props.space]);
 
   return (
     <TreeSelect
