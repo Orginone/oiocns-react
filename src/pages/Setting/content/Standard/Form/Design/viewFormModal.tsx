@@ -1,8 +1,8 @@
 import React from 'react';
 import { XOperation } from '@/ts/base/schema';
 import { Modal } from 'antd';
-import OioForm from '../../../components/Form';
 import { ISpeciesItem } from '@/ts/core';
+import OioForm from '@/components/Form';
 
 interface IProps {
   open: boolean;
