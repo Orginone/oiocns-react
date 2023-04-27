@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import cls from './index.module.less';
-
+import OrgCtrl from '@/ts/controller';
 interface indexType {}
 const Index: React.FC<indexType> = () => {
   console.log('打印index');
+  useEffect(() => {
+    getodoList();
+  }, []);
 
+  async function getodoList() {
+    let todos = await OrgCtrl.user.work.loadTodo(true);
+    console.log('dasdad', todos);
+  }
   const data = [
     {
       label: '待办',

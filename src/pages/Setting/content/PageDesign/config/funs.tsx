@@ -4,6 +4,7 @@ import BannerCom from '@/pages/Home/components/BannerCom';
 import { StatisticCard } from '@ant-design/pro-components';
 import Echart from '@/pages/Home/components/Echarts';
 import Questions from '../components/ListwithTitle';
+import TodoList from '../components/TodoList';
 import React from 'react';
 import {
   demo,
@@ -19,7 +20,7 @@ import DataCard from '../components/DataCockpit/DataCardBox';
 import { seriesA, FooterTitle, seriesData } from './demo';
 import DealutHome from '@/pages/Home/indexStatic';
 import CardList from '@/pages/Home/components/CardList';
-import './index.less'
+import './index.less';
 const SCHEME = 'scheme-list';
 let imgList: any[] = [];
 export enum CompTypes {
@@ -31,7 +32,7 @@ export interface DataType {
   title: string;
   id?: string;
   list: CompTypeItem[];
-  styleData?:any;
+  styleData?: any;
   isPublish?: boolean;
 }
 export interface CompTypeItem {
@@ -193,7 +194,7 @@ const renderComp = (item: CompTypeItem, ref?: any) => {
     case '通知公告':
       return <Questions title="通知公告" dataSourceList={announcementList} />;
     case '待办事项':
-      return <Questions title="待办事项" dataSourceList={todoList} />;
+      return <TodoList />;
     case '卡片标题':
       return <CardList List={cardList} />;
     default:

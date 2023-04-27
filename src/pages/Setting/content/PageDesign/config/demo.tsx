@@ -1,4 +1,10 @@
-import { FcBiotech, FcBrokenLink, FcPieChart, FcShipped, FcStumbleupon } from 'react-icons/fc';
+import {
+  FcBiotech,
+  FcBrokenLink,
+  FcPieChart,
+  FcShipped,
+  FcStumbleupon,
+} from 'react-icons/fc';
 import React from 'react';
 export const seriesData = [
   {
