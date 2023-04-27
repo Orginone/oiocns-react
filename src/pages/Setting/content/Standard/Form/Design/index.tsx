@@ -26,7 +26,7 @@ import OperateItem from './OperateItem';
 import { ISpeciesItem } from '@/ts/core';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { OperationItemModel, OperationModel } from '@/ts/base/model';
-import OioForm from '../../../../components/Form';
+import OioForm from '@/components/Form';
 
 /**
  * 组件选择
@@ -292,7 +292,6 @@ const transformOperationItemToAttr = (operationItem: any) => {
 type IProps = {
   operation: XOperation;
   current: ISpeciesItem;
-  toFlowDesign: (operation: XOperation) => void;
   setOperationModel: (operationModel: OperationModel) => void;
 };
 
@@ -698,7 +697,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
         maskClosable={false}
         width={900}>
         <OioForm
-          target={current.team}
+          target={current.team.space}
           operation={operation}
           operationItems={items['operationItems']}
           formRef={undefined}

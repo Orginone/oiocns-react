@@ -12,7 +12,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import { FlowTodo } from '@/ts/core/target/work/todo';
-import { ColorBox } from 'devextreme-react';
 const { Panel } = Collapse;
 
 interface IApproveProps {

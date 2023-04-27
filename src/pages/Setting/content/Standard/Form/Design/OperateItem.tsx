@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
 import orgCtrl from '@/ts/controller';
-import OioFormItem from '../../../../components/FromItem/FormItems';
+import OioFormItem from '@/components/FromItem/FormItems';
 
 const OperateItem = (props: any) => {
   const belongId = orgCtrl.user.id;

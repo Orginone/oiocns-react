@@ -83,7 +83,7 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   createOperation(
-    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode'>,
+    data: Omit<OperationModel, 'id' | 'speciesId' | 'speciesCode' | 'items'>,
   ): Promise<model.ResultType<schema.XOperation>>;
   /**
    * 更新标准分类项
@@ -100,7 +100,7 @@ export interface ISpeciesItem {
    * @param data 创建参数
    */
   updateOperation(
-    data: Omit<OperationModel, 'speciesId' | 'speciesCode'>,
+    data: Omit<OperationModel, 'speciesId' | 'speciesCode' | 'items'>,
   ): Promise<boolean>;
   /** 发布办事 */
   publishWork(data: Omit<CreateDefineReq, 'belongId'>): Promise<XFlowDefine>;

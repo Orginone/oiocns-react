@@ -4,7 +4,7 @@ import orgCtrl from '@/ts/controller';
 import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import SpeciesModal from './content/Standard/SpeciesForm/speciesModal';
+import SpeciesModal from './content/Standard/modal';
 import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import { TopBarExtra } from '../Store/content';

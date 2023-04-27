@@ -114,7 +114,7 @@ const Package: React.FC = () => {
                 style: { display: 'none' },
               },
             }}
-            target={selectMenu.item}
+            target={selectMenu.item.space}
           />
         </Modal>
       )}

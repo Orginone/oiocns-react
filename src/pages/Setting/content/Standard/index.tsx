@@ -3,10 +3,11 @@ import { ISpeciesItem } from '@/ts/core';
 import { Button, Segmented, message } from 'antd';
 import React, { useState } from 'react';
 import Description from './Description';
-import SpeciesForm from './SpeciesForm';
+import SpeciesForm from './Form';
+import OperationModel from './Form/modal';
 import Attritube from './Attritube';
 import FlowList from '@/pages/Setting/content/Standard/Flow';
-import DefineInfo from './Flow/info';
+import WorkModal from './Flow/info';
 import { CreateDefineReq } from '@/ts/base/model';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
@@ -156,13 +157,8 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
         return (
           <SpeciesForm
             current={current}
-            modalType={modalType}
             recursionOrg={isRecursionOrg}
             recursionSpecies={isRecursionSpecies}
-            setModalType={setModalType}
-            toFlowDesign={() => {
-              setActiveTab('办事定义');
-            }}
           />
         );
       case 'work':
@@ -186,7 +182,24 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
           <div className={cls['page-content-table']}>{content()}</div>
         </PageCard>
       </div>
-      <DefineInfo
+      {/** 表单模态框 */}
+      <OperationModel
+        title={modalType}
+        current={current}
+        open={modalType.includes('表单')}
+        handleCancel={function (): void {
+          setModalType('');
+        }}
+        handleOk={async (res: any) => {
+          if (res) {
+            message.success('保存成功');
+            forceUpdate();
+            setModalType('');
+          }
+        }}
+      />
+      {/** 办事模态框 */}
+      <WorkModal
         target={current.team}
         current={undefined}
         title={'新增办事'}

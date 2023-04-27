@@ -1,4 +1,4 @@
-import { kernel } from '@/ts/base';
+import { kernel, pageAll } from '@/ts/base';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
@@ -9,7 +9,7 @@ import { ITarget } from '@/ts/core';
 type IProps = {
   target: ITarget;
   operation: XOperation;
-  operationItems?: any[];
+  operationItems?: XOperationItem[];
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -33,9 +33,8 @@ const OioForm: React.FC<IProps> = ({
   disabled,
 }) => {
   const [items, setItems] = useState<XOperationItem[]>([]);
-  // const formRef = useRef<ProFormInstance<any>>();
   let config: any = { col: 12, layout: 'horizontal' };
-  if (operation?.remark) {
+  if (operation.remark != '') {
     config = JSON.parse(operation.remark);
   }
   useEffect(() => {
@@ -49,22 +48,21 @@ const OioForm: React.FC<IProps> = ({
       setItems(operationItems);
     } else {
       const queryItems = async () => {
-        // 表单项
         const operateItemRes = await kernel.queryOperationItems({
           id: operation.id,
           spaceId: target.id,
-          page: { offset: 0, limit: 100000, filter: '' },
+          page: pageAll(),
         });
-        const operateItems = (operateItemRes.data.result || []) as XOperationItem[];
-        setItems(operateItems);
+        setItems(operateItemRes.data.result || []);
       };
       queryItems();
     }
-  }, [operation?.id]);
+  }, [operation]);
 
   return (
     <ProForm
       disabled={disabled === true}
+      formRef={formRef}
       initialValues={fieldsValue}
       submitter={
         submitter || {
@@ -80,7 +78,6 @@ const OioForm: React.FC<IProps> = ({
           },
         }
       }
-      formRef={formRef}
       onFinish={async (values) => {
         await formRef.current?.validateFields();
         onFinished?.call(this, values);
@@ -94,13 +91,15 @@ const OioForm: React.FC<IProps> = ({
         sm: { span: 10 },
       }}>
       <Row gutter={24}>
-        {items
-          .filter((i: XOperationItem) => i.attrId)
-          .map((item: any) => (
+        {items.length > 0 ? (
+          items.map((item: XOperationItem) => (
             <Col span={config.col} key={item.id}>
               <OioFormItem item={item} />
             </Col>
-          ))}
+          ))
+        ) : (
+          <>请先完成设计表单!</>
+        )}
       </Row>
     </ProForm>
   );

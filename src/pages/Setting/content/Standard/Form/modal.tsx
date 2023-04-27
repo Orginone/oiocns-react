@@ -1,39 +1,25 @@
 import { XOperation } from '@/ts/base/schema';
 import { ISpeciesItem } from '@/ts/core';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import React, { useEffect, useRef, useState } from 'react';
-import { targetsToTreeData } from '../../..';
+import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
-import { getUuid } from '@/utils/tools';
 import orgCtrl from '@/ts/controller';
+import { targetsToTreeData } from '@/pages/Setting';
 
 interface Iprops {
   title: string;
   open: boolean;
-  data: XOperation | undefined;
+  data?: XOperation;
   handleCancel: () => void;
   handleOk: (res: any) => void;
   current: ISpeciesItem;
 }
 
-/**
- * 默认备注：表单默认布局
- */
-export const defaultRemark: any = {
-  type: 'object',
-  properties: {},
-  labelWidth: 120,
-  layout: 'horizontal',
-  col: 12,
-};
-
 /*
   业务标准编辑模态框
 */
-const OperationModal = (props: Iprops) => {
-  const { open, title, handleOk, data, current, handleCancel } = props;
+const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const [formKey, setFormKey] = useState<string>();
   const columns: ProFormColumnsType<XOperation>[] = [
     {
       title: '表单名称',
@@ -85,14 +71,8 @@ const OperationModal = (props: Iprops) => {
       },
     },
   ];
-
-  useEffect(() => {
-    setFormKey(getUuid());
-  }, [open, current]);
-
   return (
     <SchemaForm<XOperation>
-      key={formKey}
       formRef={formRef}
       layoutType="ModalForm"
       width={640}
@@ -104,7 +84,7 @@ const OperationModal = (props: Iprops) => {
       columns={columns}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (data && (title.includes('修改') || title.includes('编辑'))) {
+          if (data) {
             formRef.current?.setFieldsValue(data);
           }
         } else {
@@ -113,24 +93,19 @@ const OperationModal = (props: Iprops) => {
         }
       }}
       onFinish={async (values: XOperation) => {
-        const value = {
-          ...{ remark: JSON.stringify(defaultRemark) },
-          ...data,
-          ...values,
-          speciesId: current.id,
-        };
         let success = false;
-        if (title.includes('新增')) {
-          success = (await current.createOperation({ ...value, items: [] })) != undefined;
+        if (data) {
+          success = await current.updateOperation({ ...data, ...values });
         } else {
-          success = await current.updateOperation({ ...value, items: [] });
+          success = (await current.createOperation(values)) != undefined;
         }
         if (success) {
           handleOk(true);
           formRef.current?.resetFields();
         }
-      }}></SchemaForm>
+      }}
+    />
   );
 };
 
-export default OperationModal;
+export default Modal;

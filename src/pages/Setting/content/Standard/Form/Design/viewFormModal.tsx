@@ -2,10 +2,12 @@ import React from 'react';
 import { XOperation } from '@/ts/base/schema';
 import { Modal } from 'antd';
 import OioForm from '../../../components/Form';
+import { ISpeciesItem } from '@/ts/core';
 
-interface FormDesignProps {
+interface IProps {
   open: boolean;
   data: XOperation | undefined;
+  species: ISpeciesItem;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
 }
@@ -13,9 +15,7 @@ interface FormDesignProps {
 /*
   表单设计模态框
 */
-const ViewFormModal = (props: FormDesignProps) => {
-  const { open, data, handleCancel, handleOk } = props;
-
+const ViewFormModal = ({ open, data, handleCancel, handleOk, species }: IProps) => {
   return (
     <Modal
       title={data?.name}
@@ -25,7 +25,11 @@ const ViewFormModal = (props: FormDesignProps) => {
       destroyOnClose={true}
       cancelText={'关闭'}
       width={1000}>
-      <OioForm operation={data as XOperation} formRef={undefined} />
+      <OioForm
+        operation={data as XOperation}
+        formRef={undefined}
+        target={species.team.space}
+      />
     </Modal>
   );
 };

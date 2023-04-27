@@ -225,6 +225,7 @@ export class SpeciesItem implements ISpeciesItem {
       id: undefined,
       speciesId: this.id,
       ...data,
+      items: [],
     });
   }
 
@@ -232,6 +233,7 @@ export class SpeciesItem implements ISpeciesItem {
     const res = await kernel.updateOperation({
       ...data,
       speciesId: data.speciesId || this.target.id,
+      items: [],
     });
     return res.success;
   }
