@@ -6,6 +6,7 @@ type ListType = {
   title: string;
   number: number;
   iconUrl: string;
+  icon?: React.ReactElement;
 };
 
 interface Iprops {
@@ -19,7 +20,11 @@ const CardList: React.FC<Iprops> = ({ List }) => {
         return (
           <div key={item.id} className="work-center-btmitem">
             <div className="work-center-btmitem-icon">
-              <img src={`${item.iconUrl}`} className="work-center-btmitem-icon-img" />
+              {item.icon ? (
+                item.icon
+              ) : (
+                <img src={`${item.iconUrl}`} className="work-center-btmitem-icon-img" />
+              )}
             </div>
             <div className="work-center-btmitem-name">
               <div className="list-i">{item.title}</div>

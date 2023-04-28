@@ -1,3 +1,11 @@
+import {
+  FcBiotech,
+  FcBrokenLink,
+  FcPieChart,
+  FcShipped,
+  FcStumbleupon,
+} from 'react-icons/fc';
+import React from 'react';
 export const seriesData = [
   {
     type: 'line',
@@ -272,35 +280,41 @@ export const cardList = [
     title: '我的资产',
     number: 2868,
     iconUrl: 'https://xsgames.co/randomusers/avatar.php?g=pixel',
+    icon: <FcPieChart size={40} />,
   },
   {
     id: '2',
     title: '资产总数',
     number: 2868,
     iconUrl: imgUrl,
+    icon: <FcStumbleupon size={40} />,
   },
   {
     id: '3',
     title: '处置资产',
     number: 2868,
     iconUrl: imgUrl,
+    icon: <FcBrokenLink size={40} />,
   },
   {
     id: '4',
     title: '资产价值（亿元）',
     number: 2868,
     iconUrl: imgUrl,
+    icon: <FcPieChart size={40} />,
   },
   {
     id: '5',
     title: '待处理',
     number: 2868,
     iconUrl: imgUrl,
+    icon: <FcBiotech size={40} />,
   },
   {
     id: '6',
     title: '可分配',
     number: 2868,
     iconUrl: imgUrl,
+    icon: <FcShipped size={40} />,
   },
 ];
