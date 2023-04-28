@@ -1,6 +1,6 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import './index.less';
 import { Button, Card, message, Popconfirm, Space, Table, Tag } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
 import { DataType, SCHEME } from '../config/funs';
 import PageDesign from '../Design';
 import OrgCtrl from '@/ts/controller';
@@ -9,7 +9,7 @@ import PageCtrl from '../pageCtrl';
 import { HeartOutlined, MenuOutlined } from '@ant-design/icons';
 import { DragSortTable, ProCard } from '@ant-design/pro-components';
 import useDomTemplate from '@/hooks/useDomTemplate';
-import moment from 'moment';
+import dayjs from 'dayjs';
 interface indexType {}
 
 const Index: React.FC<indexType> = () => {
@@ -187,7 +187,7 @@ const Index: React.FC<indexType> = () => {
         { id: data.id },
         {
           isPublish: !data.isPublish,
-          UPDATE_TIME: moment().format('YYYY-MM-DD HH:mm:ss'),
+          UPDATE_TIME: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         },
         SCHEME,
       ).then((_res) => {

@@ -48,7 +48,7 @@
     "not ie <= 10"
   ],
   "dependencies": {
-    "@ant-design/icons": "^4.6.2",
+    "@ant-design/icons": "^5.0.1",
     "@ant-design/pro-components": "^2.3.37",
     "@dnd-kit/core": "^6.0.7",
     "@dnd-kit/sortable": "^7.0.2",
