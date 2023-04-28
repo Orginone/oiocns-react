@@ -11,7 +11,7 @@ const Index: React.FC<indexType> = () => {
   const histore = useHistory();
 
   async function getodoList() {
-    let todos = await OrgCtrl.user.work.loadTodo(true);
+    let todos = await OrgCtrl.user?.work.loadTodo(true);
     setDataSource(todos);
   }
 
