@@ -1,3 +1,4 @@
+import React from 'react';
 import CompanySetting from './Company';
 import StationSetting from './Station';
 import AgencySetting from './Agency';
@@ -5,7 +6,6 @@ import CohortSetting from './Cohort';
 import PersonSetting from './Person';
 import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
-import React from 'react';
 import DictSetting from './Dict';
 import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
@@ -13,7 +13,7 @@ import PageDesignList from './PageDesign/PageList';
 import PageCompList from './PageDesign/CompList';
 import pageCtrl from './PageDesign/pageCtrl';
 import { Empty } from 'antd';
-import OgoImg from '../../../../public/img/logo/logo2.jpg';
+// import OgoImg from '../../../../public/img/logo/logo2.jpg';
 import { MenuType, GroupMenuType } from '../config/menuType';
 // import Test from './PageDesign/components/TodoCard';
 interface IProps {
@@ -56,7 +56,7 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
     default:
       return (
         <Empty
-          image={OgoImg}
+          // image={OgoImg}
           imageStyle={{
             marginTop: '15vh',
             height: 200,
