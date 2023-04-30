@@ -12,6 +12,7 @@ import {
 import { ImArrowLeft2 } from 'react-icons/im';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import MenuIcon from "@/bizcomponents/GlobalComps/MenuIcon"
 const { Content, Sider } = Layout;
 
 /**
@@ -80,7 +81,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             location.reload();
           }}>
-          <TeamIcon share={orgCtrl.user.shareInfo} />
+            <MenuIcon menuinfo={orgCtrl.MenuList("loginout")} />
           <span>退出登录</span>
         </div>
       </Sider>

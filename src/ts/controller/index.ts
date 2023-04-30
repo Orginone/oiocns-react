@@ -1,4 +1,5 @@
 import UserProvider from '@/ts/core/user';
+import MenuTypeList from "@/ts/core/Menu"
 import { Emitter } from '../base/common';
 import { ICompany, IPerson, ISpace, ITarget } from '../core';
 /**
@@ -7,9 +8,11 @@ import { ICompany, IPerson, ISpace, ITarget } from '../core';
 class IndexController extends Emitter {
   public currentKey: string = '';
   private _provider: UserProvider;
+  private _menuIcon:MenuTypeList;
   constructor() {
     super();
     this._provider = new UserProvider();
+    this._menuIcon = new MenuTypeList()
     this._provider.subscribe(async () => {
       await this._provider.refresh();
       this.changCallback();
@@ -27,7 +30,10 @@ class IndexController extends Emitter {
   get user(): IPerson {
     return this._provider.user!;
   }
-
+  /** 框架结构icon */
+  public MenuList(code:any){
+     return this._menuIcon.GetMenuInfo(code)
+  }
   /** 组织树 */
   public async getTeamTree(
     space: ISpace = this.user,

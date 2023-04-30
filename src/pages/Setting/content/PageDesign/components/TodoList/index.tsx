@@ -11,7 +11,8 @@ const Index: React.FC<indexType> = () => {
   const histore = useHistory();
 
   async function getodoList() {
-    let todos = await OrgCtrl.user?.work.loadTodo(true);
+    let todos = await OrgCtrl.user.work.loadTodo(true);
+    console.log('dasdad', todos);
     setDataSource(todos);
   }
 
@@ -31,10 +32,7 @@ const Index: React.FC<indexType> = () => {
         title={`待办事项 ${dataSource.length > 3 ? '(' + dataSource.length + ')' : ''}`}
         extra={extras}>
         {dataSource.length === 0 && <Empty />}
-        {dataSource.map((item: any, index: number) => {
-          if (index > 3) {
-            return <></>;
-          }
+        {dataSource.map((item: any) => {
           return (
             <div className="questions-all" key={item.id}>
               <p>{item.createUser === OrgCtrl.user.id ? '我的发起' : '待处理'}</p>

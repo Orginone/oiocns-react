@@ -26,6 +26,7 @@ export type {
   ISpace,
   ITarget,
   IWorking,
+  Menulist
 } from './target/itarget';
 export type { IFileSystemItem, TaskModel } from './target/store/ifilesys';
 export { findTargetShare } from './target/targetMap';

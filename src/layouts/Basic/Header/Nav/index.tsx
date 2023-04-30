@@ -71,6 +71,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       count: 0,
       fath: '/store',
       onClick: () => {
+        console.log(123);
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
       },
@@ -115,11 +116,11 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
             ? `${cls['active-icon']}`
             : `${cls['un-active-icon']}`
         }`}>
+          {/* {item.fath} */}
         {typeof item.icon !== 'string' ? item.icon : <IconFont type={item.icon} />}
       </Link>
     );
   };
-
   return (
     <div className={cls['header-nav-container']}>
       <Space size={30}>

@@ -27,22 +27,14 @@ const Home: React.FC = () => {
   const [AllItem, setAllItem] = useState<any[]>([]);
   const [selectItem, setSelectItem] = useState<any>({});
   useEffect(() => {
-    Init();
-    const id = pageCtrl.subscribe(() => {
+    pageCtrl.getHomeSetting();
+    pageCtrl.subscribe(() => {
       setAllItem(pageCtrl.homeSetting);
       setTimeout(() => {
         setSelectItem(pageCtrl.homeSetting[0]);
       }, 10);
     });
-    return () => {
-      pageCtrl.unsubscribe(id);
-    };
   }, []);
-  function Init() {
-    setTimeout(() => {
-      pageCtrl.getHomeSetting();
-    }, 100);
-  }
   const styleD = (data: any) => {
     const style: React.CSSProperties = {};
     let styleData1 = data?.styleData ?? {};
@@ -107,7 +99,7 @@ const Home: React.FC = () => {
               );
             })}
           </ResponsiveGridLayout>
-        )}
+       ) }
       </PageContainer>
     ) : (
       <OldPage />

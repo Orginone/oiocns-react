@@ -1,4 +1,3 @@
-import React from 'react';
 import { debounce, getUuid } from '@/utils/tools';
 import { CompTypeItem, DataType, CompTypes, SCHEME } from './config/funs';
 import { Emitter } from '@/ts/base/common';
@@ -6,10 +5,12 @@ import OrgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { ICompany } from '@/ts/core';
 import { Input, message, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import React from 'react';
 import { ICommonParams } from 'typings/common';
 import { defaultSetting } from './config/data';
-import dayjs from 'dayjs';
-const getNowTime = () => dayjs().format('YYYY-MM-DD HH:mm:ss');
+import moment from 'moment';
+const getNowTime = () => moment().format('YYYY-MM-DD HH:mm:ss');
 class HomeSettingServices extends Emitter {
   constructor() {
     super();
@@ -204,6 +205,7 @@ class HomeSettingServices extends Emitter {
     let title = that._EditInfo.title;
     Modal.confirm({
       title: str === 'save' ? '当前页面名称：' : '操作提示',
+      icon: <ExclamationCircleOutlined />,
       cancelText: '取消',
       okText: '确认',
       content:

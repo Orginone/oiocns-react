@@ -24,6 +24,7 @@ export default class UserProvider extends common.Emitter {
   }
   /** 当前用户 */
   get user(): IPerson | undefined {
+    // console.log(this._user);
     return this._user;
   }
   /** 是否完成初始化 */

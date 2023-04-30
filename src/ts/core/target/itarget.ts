@@ -364,6 +364,15 @@ export interface ICohort extends ITarget {
    */
   searchPerson(code: string): Promise<schema.XTargetArray>;
 }
+/**菜单icon */
+export interface Menulist {
+  type:string
+  fontSize:number
+  size:number
+  info:string
+  typeof:string
+  name:string
+}
 /** 人员操作 */
 export interface IPerson extends ISpace, ITarget {
   /** 办事 */
