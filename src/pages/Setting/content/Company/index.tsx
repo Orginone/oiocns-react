@@ -55,15 +55,14 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       label: <span style={{ color: 'red' }}>退出</span>,
       onClick: async () => {
         Modal.confirm({
-          title: `是否退出${current.name}?`,
+          title: `是否退出${current.metadata.name}?`,
           icon: <AiOutlineExclamationCircle />,
           okText: '确认',
           okType: 'danger',
           cancelText: '取消',
           async onOk() {
-            const success = await orgCtrl.user.quitCompany(current.id);
-            if (success) {
-              message.success(`退出${current.name}单位成功!`);
+            if (await current.exit()) {
+              message.success(`退出${current.metadata.name}单位成功!`);
             } else {
               message.error('退出单位失败!');
             }
@@ -90,28 +89,23 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       case 'members':
         return (
           <CardOrTable<schema.XTarget>
-            dataSource={[]}
+            dataSource={current.members}
             key="member"
             rowKey={'id'}
-            request={(page) => {
-              return current.loadMembers(page);
-            }}
             parentRef={parentRef}
             operation={(item) => {
-              return isSuperAdmin
-                ? [
-                    {
-                      key: 'remove',
-                      label: '踢出',
-                      onClick: async () => {
-                        if (await current.removeMember(item)) {
-                          message.success('踢出成功');
-                          forceUpdate();
-                        }
-                      },
-                    },
-                  ]
-                : [];
+              return [
+                {
+                  key: 'remove',
+                  label: '踢出',
+                  onClick: async () => {
+                    if (await current.removeMembers([item])) {
+                      message.success('踢出成功');
+                      forceUpdate();
+                    }
+                  },
+                },
+              ];
             }}
             columns={PersonColumns}
             showChangeBtn={false}
@@ -123,17 +117,8 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
             key="groups"
             rowKey={'id'}
             pagination={false}
-            dataSource={[]}
+            dataSource={current.groups.map((i) => i.metadata)}
             defaultExpandAllRows={true}
-            request={async (page) => {
-              const targets = await current.getJoinedGroups();
-              return {
-                result: targets?.map((i) => i.target),
-                limit: page.limit,
-                offset: page.offset,
-                total: targets?.length ?? 0,
-              };
-            }}
             hideOperation={true}
             columns={GroupColumn}
             showChangeBtn={false}
@@ -158,27 +143,19 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
           ]}>
           <Descriptions.Item label="单位名称" contentStyle={{ textAlign: 'center' }}>
             <Space>
-              {current.shareInfo.avatar && (
-                <Avatar src={current.shareInfo.avatar.thumbnail} />
-              )}
-              <strong>{current.teamName}</strong>
+              {current.share.avatar && <Avatar src={current.share.avatar.thumbnail} />}
+              <strong>{current.metadata.name}</strong>
             </Space>
           </Descriptions.Item>
           <Descriptions.Item
             label="社会统一信用代码"
             contentStyle={{ textAlign: 'center' }}>
-            {current.target.code}
-          </Descriptions.Item>
-          <Descriptions.Item label="团队简称" contentStyle={{ textAlign: 'center' }}>
-            {current.name}
-          </Descriptions.Item>
-          <Descriptions.Item label="团队代号" contentStyle={{ textAlign: 'center' }}>
-            {current.teamName}
+            {current.metadata.code}
           </Descriptions.Item>
           <Descriptions.Item label="单位简介" span={2}>
             <Typography.Paragraph
               ellipsis={ellipsis ? { rows: 2, expandable: true, symbol: '更多' } : false}>
-              {current.target.team?.remark}
+              {current.metadata.remark}
             </Typography.Paragraph>
           </Descriptions.Item>
         </Descriptions>
@@ -229,11 +206,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         onCancel={() => setActiveModal('')}
         onOk={async () => {
           if (selectPerson) {
-            const success = await current.pullMembers(
-              selectPerson.map((n) => n.id),
-              selectPerson[0].typeName,
-            );
-            if (success) {
+            if (await current.pullMembers(selectPerson)) {
               setActiveModal('');
               message.success('添加成功');
               orgCtrl.changCallback();
@@ -254,8 +227,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         onOk={async () => {
           if (selectPerson) {
             selectPerson.forEach(async (group) => {
-              const success = await current.applyJoinGroup(group.id);
-              if (success) {
+              if (await current.applyJoin([group])) {
                 message.success('添加成功');
                 orgCtrl.changCallback();
                 setActiveModal('');

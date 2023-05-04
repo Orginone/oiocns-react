@@ -4,7 +4,6 @@ import { renderRoutes } from 'react-router-config';
 import type { IRouteConfig } from 'typings/globelType';
 
 import cls from './index.module.less';
-
 const PassportLayout: React.FC<{ route: IRouteConfig }> = ({ route }) => {
   return (
     <div className={cls.contaner}>

@@ -3,7 +3,6 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
-import { ISpace } from '@/ts/core';
 
 interface Iprops {
   open: boolean;

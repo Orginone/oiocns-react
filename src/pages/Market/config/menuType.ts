@@ -3,7 +3,6 @@ export enum GroupMenuType {
   'User' = '人员',
   'Company' = '单位',
   'Things' = '商品',
-  'Working' = '内部群组',
   'Authority' = '角色群',
   'InnerAgency' = '内部机构',
   'OutAgency' = '外部机构',

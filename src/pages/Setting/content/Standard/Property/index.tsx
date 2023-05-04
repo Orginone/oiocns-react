@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { ISpace, emitter } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
@@ -53,7 +52,7 @@ const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
         showChangeBtn={false}
         dataSource={[]}
       />
-      {/** 新增/编辑特性模态框 */}
+      {/** 新增/编辑属性模态框 */}
       <PropertyModal
         space={current}
         data={editData}

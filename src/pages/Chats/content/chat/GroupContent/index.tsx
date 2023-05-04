@@ -6,12 +6,10 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import css from './index.module.less';
 import { showChatTime } from '@/utils/tools';
-import { XImMsg } from '@/ts/base/schema';
-import { MessageType } from '@/ts/core/enum';
 import { FileItemShare } from '@/ts/base/model';
 import orgCtrl from '@/ts/controller';
-import { parseAvatar } from '@/ts/base';
-import { IChat } from '@/ts/core/target/chat/ichat';
+import { IMsgChat, MessageType } from '@/ts/core';
+import { model, parseAvatar } from '@/ts/base';
 
 /**
  * @description: 聊天区域
@@ -19,14 +17,14 @@ import { IChat } from '@/ts/core/target/chat/ichat';
  */
 
 interface Iprops {
-  chat: IChat;
+  chat: IMsgChat;
   filter: string;
   handleReWrites: Function;
 }
 
 const GroupContent = (props: Iprops) => {
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<XImMsg[]>([]);
+  const [messages, setMessages] = useState(props.chat.messages);
   const { handleReWrites } = props;
   const [selectId, setSelectId] = useState<string>('');
   const body = useRef<HTMLDivElement>(null);
@@ -62,7 +60,7 @@ const GroupContent = (props: Iprops) => {
     if (!loading && body.current && props.chat && body.current.scrollTop < 10) {
       setLoading(true);
       setBeforescrollHeight(body.current.scrollHeight);
-      if ((await props.chat.moreMessage('')) < 1) {
+      if ((await props.chat.moreMessage()) < 1) {
         setLoading(false);
       }
     }
@@ -71,10 +69,9 @@ const GroupContent = (props: Iprops) => {
    * 显示消息
    * @param msg 消息
    */
-  const parseMsg = (item: XImMsg) => {
+  const parseMsg = (item: model.MsgSaveModel) => {
     switch (item.msgType) {
-      case MessageType.Image:
-        // eslint-disable-next-line no-case-declarations
+      case MessageType.Image: {
         const img: FileItemShare = parseAvatar(item.showTxt);
         return (
           <>
@@ -84,8 +81,8 @@ const GroupContent = (props: Iprops) => {
             </div>
           </>
         );
-      case MessageType.File:
-        // eslint-disable-next-line no-case-declarations
+      }
+      case MessageType.File: {
         const file: FileItemShare = parseAvatar(item.showTxt);
         return (
           <>
@@ -96,6 +93,7 @@ const GroupContent = (props: Iprops) => {
             </div>
           </>
         );
+      }
       default:
         return (
           <>
@@ -108,18 +106,18 @@ const GroupContent = (props: Iprops) => {
     }
   };
 
-  const viewMsg = (item: XImMsg, right: boolean = false) => {
+  const viewMsg = (item: model.MsgSaveModel, right: boolean = false) => {
     if (right) {
       return (
         <>
           <div className={`${css.con_content}`}>{parseMsg(item)}</div>
           <div style={{ color: '#888', paddingLeft: 10 }}>
-            <TeamIcon share={orgCtrl.user.shareInfo} preview size={36} fontSize={32} />
+            <TeamIcon share={orgCtrl.user.share} preview size={36} fontSize={32} />
           </div>
         </>
       );
     } else {
-      const share = orgCtrl.provider.findUserById(item.fromId);
+      const share = orgCtrl.user.findShareById(item.fromId);
       return (
         <>
           <div style={{ color: '#888', paddingRight: 10 }}>
@@ -132,6 +130,37 @@ const GroupContent = (props: Iprops) => {
         </>
       );
     }
+  };
+
+  const msgAction = (item: model.MsgSaveModel) => {
+    return (
+      <>
+        <CopyToClipboard text={item.showTxt}>
+          <Button type="text" style={{ color: '#3e5ed8' }}>
+            复制
+          </Button>
+        </CopyToClipboard>
+        <Button type="text" style={{ color: '#3e5ed8' }}>
+          转发
+        </Button>
+        <Button
+          type="text"
+          style={{ color: '#3e5ed8' }}
+          onClick={async () => {
+            await props.chat.recallMessage(item.id);
+          }}>
+          撤回
+        </Button>
+        <Button
+          type="text"
+          danger
+          onClick={async () => {
+            await props.chat.deleteMessage(item.id);
+          }}>
+          删除
+        </Button>
+      </>
+    );
   };
 
   return (
@@ -174,7 +203,7 @@ const GroupContent = (props: Iprops) => {
                     ''
                   )}
                   {/* 左侧聊天内容显示 */}
-                  {item.fromId !== props.chat.userId ? (
+                  {item.fromId !== orgCtrl.user.metadata.id ? (
                     <div className={`${css.group_content_left} ${css.con}`}>
                       <Popover
                         trigger="hover"
@@ -185,27 +214,7 @@ const GroupContent = (props: Iprops) => {
                         onOpenChange={() => {
                           setSelectId('');
                         }}
-                        content={
-                          props.chat.spaceId === item.spaceId ? (
-                            <>
-                              <CopyToClipboard text={item.showTxt}>
-                                <Button type="text" style={{ color: '#3e5ed8' }}>
-                                  复制
-                                </Button>
-                              </CopyToClipboard>
-                              <Button
-                                type="text"
-                                danger
-                                onClick={async () => {
-                                  await props.chat.deleteMessage(item.id);
-                                }}>
-                                删除
-                              </Button>
-                            </>
-                          ) : (
-                            ''
-                          )
-                        }>
+                        content={msgAction(item)}>
                         {item.msgType === 'recall' ? (
                           ''
                         ) : (
@@ -234,38 +243,7 @@ const GroupContent = (props: Iprops) => {
                           onOpenChange={() => {
                             setSelectId('');
                           }}
-                          content={
-                            <>
-                              <CopyToClipboard text={item.showTxt}>
-                                <Button type="text" style={{ color: '#3e5ed8' }}>
-                                  复制
-                                </Button>
-                              </CopyToClipboard>
-                              <Button type="text" style={{ color: '#3e5ed8' }}>
-                                转发
-                              </Button>
-                              <Button
-                                type="text"
-                                style={{ color: '#3e5ed8' }}
-                                onClick={async () => {
-                                  await props.chat.reCallMessage(item.id);
-                                }}>
-                                撤回
-                              </Button>
-                              {item.spaceId === props.chat.spaceId ? (
-                                <Button
-                                  type="text"
-                                  danger
-                                  onClick={async () => {
-                                    await props.chat.deleteMessage(item.id);
-                                  }}>
-                                  删除
-                                </Button>
-                              ) : (
-                                ''
-                              )}
-                            </>
-                          }>
+                          content={msgAction(item)}>
                           {item.msgType === 'recall' ? (
                             ''
                           ) : (

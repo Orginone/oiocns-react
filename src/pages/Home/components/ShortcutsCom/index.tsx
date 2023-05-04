@@ -3,12 +3,12 @@ import { AiOutlineSend } from 'react-icons/ai';
 import { Button, Modal } from 'antd';
 import React, { useState } from 'react';
 import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import { companyTypes, TargetType } from '@/ts/core/enum';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import CardWidthTitle from '@/components/CardWidthTitle';
 import { useHistory } from 'react-router-dom';
 import SearchCompany from '@/bizcomponents/SearchCompany';
+import { TargetType, companyTypes } from '@/ts/core';
 
 interface ShortcutsComType {
   props: []; //入口列表
@@ -101,7 +101,7 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
   const handleOk = async () => {
     setIsModalOpen(false);
     for (const friend of friends) {
-      await orgCtrl.user.applyFriend(friend);
+      await orgCtrl.user.applyJoin([friend]);
     }
   };
 

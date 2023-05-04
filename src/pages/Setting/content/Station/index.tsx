@@ -1,14 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { Card, Modal, Button, Space } from 'antd';
+import { Card, Modal, Button } from 'antd';
 import React, { useState, useRef, useEffect } from 'react';
 import cls from './index.module.less';
 import CardOrTable from '@/components/CardOrTableComp';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { schema } from '@/ts/base';
 import IndentityManage, { ResultType } from '@/bizcomponents/IndentityManage';
-import { XIdentity } from '@/ts/base/schema';
-import { IStation } from '@/ts/core/target/itarget';
-import { TargetType } from '@/ts/core';
+import { IIdentity, IStation } from '@/ts/core';
 import { IdentityColumn, PersonColumns } from '../../config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { IsSuperAdmin } from '@/utils/authority';
@@ -27,7 +25,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
   const [isOpenPerson, setIsOpenPerson] = useState<boolean>(false);
   const [selectPersons, setSelectPersons] = useState<schema.XTarget[]>(); //选中的待指派人员列表
-  const [selectIdentitys, setSelectIdentitys] = useState<XIdentity[]>(); //待添加的角色数据集
+  const [selectIdentitys, setSelectIdentitys] = useState<IIdentity[]>(); //待添加的角色数据集
   const [isOpenSelectIdentityModal, setIsOpenIdentityModal] = useState<boolean>(false); //角色选择模态框
 
   useEffect(() => {
@@ -44,7 +42,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
           key: 'remove',
           label: <span style={{ color: 'red' }}>移除</span>,
           onClick: async () => {
-            if (await current.removeMember(item)) {
+            if (await current.removeMembers([item])) {
               forceUpdate();
             }
           },
@@ -56,7 +54,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
   };
 
   // 角色表格操作内容渲染函数
-  const identityOperation = (item: XIdentity): any[] => {
+  const identityOperation = (item: IIdentity): any[] => {
     return [
       isSuperAdmin ? (
         {
@@ -68,7 +66,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
               okText: '确认',
               cancelText: '取消',
               onOk: async () => {
-                if (await current.removeIdentitys([item.id])) {
+                if (await current.removeIdentitys([item])) {
                   forceUpdate();
                 }
               },
@@ -83,7 +81,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
 
   /**添加框内选中组织后的数据转换 */
   const onCheckeds = (result: ResultType[]) => {
-    const identityData: XIdentity[] = [];
+    const identityData: IIdentity[] = [];
     result.map((item) => {
       item.identitys.map((obj) => {
         obj.belong = item.target;
@@ -99,7 +97,9 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
       <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
         <Card className={cls['app-tabs']} bordered={false} title={'岗位设置'}>
           <div className={cls.topMes} style={{ marginRight: '25px' }}>
-            <strong style={{ marginLeft: '20px', fontSize: 15 }}>{current.name}</strong>
+            <strong style={{ marginLeft: '20px', fontSize: 15 }}>
+              {current.metadata.name}
+            </strong>
             {isSuperAdmin && (
               <Button
                 className={cls.creatgroup}
@@ -115,19 +115,10 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
           <div className={`pages-wrap flex flex-direction-col ${cls['pages-wrap']}`}>
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
-                dataSource={[]}
+                dataSource={current.identitys}
                 rowKey={'id'}
                 params={key}
                 operation={identityOperation}
-                request={async (page) => {
-                  let data = await current.loadIdentitys(true);
-                  return {
-                    offset: page.offset,
-                    limit: page.limit,
-                    total: data.length,
-                    result: data.slice(page.offset, page.limit),
-                  };
-                }}
                 columns={IdentityColumn}
                 parentRef={parentRef}
                 showChangeBtn={false}
@@ -147,34 +138,9 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
             <div className={cls['page-content-table']} ref={parentRef}>
               <CardOrTable
                 headerTitle={'岗位人员'}
-                dataSource={[] as any}
+                dataSource={current.members}
                 rowKey={'id'}
                 params={key}
-                tableAlertOptionRender={(selectedRowKeys: any) => {
-                  return (
-                    isSuperAdmin && (
-                      <Space size={16}>
-                        <a
-                          onClick={() => {
-                            Modal.confirm({
-                              content: '是否将人员从该岗位移出？',
-                              okText: '确认',
-                              cancelText: '取消',
-                              onOk: async () => {
-                                await current.removeMembers(
-                                  selectedRowKeys.selectedRowKeys,
-                                  TargetType.Person,
-                                );
-                                forceUpdate();
-                              },
-                            });
-                          }}>
-                          批量删除
-                        </a>
-                      </Space>
-                    )
-                  );
-                }}
                 toolBarRender={() => [
                   isSuperAdmin ? (
                     <Button
@@ -199,9 +165,6 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
                   search: true,
                 }}
                 operation={personOperation}
-                request={async (page) => {
-                  return await current.loadMembers(page);
-                }}
                 columns={PersonColumns}
                 parentRef={parentRef}
                 showChangeBtn={false}
@@ -242,12 +205,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         onOk={async () => {
           setIsOpenPerson(false);
           if (selectPersons) {
-            if (
-              await current?.pullMembers(
-                selectPersons?.map((a) => a.id),
-                TargetType.Person,
-              )
-            ) {
+            if (await current.pullMembers(selectPersons)) {
               forceUpdate();
             }
           }

@@ -1,11 +1,9 @@
 import orgCtrl from '@/ts/controller';
-import { MessageType } from '@/ts/core/enum';
 import { IconFont } from '@/components/IconFont';
 import { Button, message, Popover, Spin, Upload, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import inputboxStyle from './index.module.less';
-import { TaskModel } from '@/ts/core/target/store/ifilesys';
-import { IChat } from '@/ts/core/target/chat/ichat';
+import { IMsgChat, MessageType, TaskModel } from '@/ts/core';
 
 /**
  * @description: 输入区域
@@ -13,7 +11,7 @@ import { IChat } from '@/ts/core/target/chat/ichat';
  */
 
 interface Iprops {
-  chat: IChat;
+  chat: IMsgChat;
   writeContent: any;
 }
 
@@ -127,21 +125,21 @@ const Groupinputbox = (props: Iprops) => {
     showUploadList: false,
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await orgCtrl.user.home?.create('沟通');
+      const docDir = await orgCtrl.user.filesys?.home?.create('沟通');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file, (p: number) => {
           return setTask({
             finished: p,
             size: file.size,
             name: file.name,
-            group: docDir.name,
+            group: docDir.metadata.name,
             createTime: new Date(),
           });
         });
         setTask(undefined);
         if (result) {
           await props.chat.sendMessage(
-            result.target.thumbnail ? MessageType.Image : MessageType.File,
+            result.metadata.thumbnail ? MessageType.Image : MessageType.File,
             JSON.stringify(result.shareInfo()),
           );
         }

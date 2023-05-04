@@ -6,8 +6,8 @@ import { IIdentity } from './authority/iidentity';
 import { ISpace, ITarget, TargetParam } from './itarget';
 import Identity from './authority/identity';
 import { generateUuid, logger, sleep } from '@/ts/base/common';
-import { XFlowDefine, XTarget, XTargetArray } from '@/ts/base/schema';
-import { PageRequest, TargetModel, TargetShare } from '@/ts/base/model';
+import { XTarget, XTargetArray } from '@/ts/base/schema';
+import { PageModel, TargetModel, TargetShare } from '@/ts/base/model';
 import { CreateChat } from './chat/chat';
 import { IChat } from './chat/ichat';
 import { ISpeciesItem, loadSpeciesTree } from './thing';
@@ -49,7 +49,7 @@ export default class BaseTarget implements ITarget {
       name: this.teamName,
       typeName: this.typeName,
     };
-    result.avatar = parseAvatar(this.target.avatar);
+    result.avatar = parseAvatar(this.target.icon);
     return result;
   }
 
@@ -76,18 +76,6 @@ export default class BaseTarget implements ITarget {
   delete(): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
-  async loadWork(page: PageRequest, _reload: boolean): Promise<schema.XFlowDefineArray> {
-    let res = (await kernel.queryDefine({ spaceId: this.id, speciesId: '0' })).data;
-    return {
-      total: res.total,
-      limit: res.limit,
-      offset: res.offset,
-      result: res.result?.slice(page.offset, page.offset + page.limit),
-    };
-  }
-  async loadWorkNode(id: string): Promise<schema.FlowNode> {
-    return (await kernel.queryNodes({ id })).data;
-  }
   async loadSpeciesTree(
     _reload: boolean = false,
     upTeam: boolean = false,
@@ -97,7 +85,7 @@ export default class BaseTarget implements ITarget {
     }
     return this.species;
   }
-  async loadMembers(page: model.PageRequest): Promise<XTargetArray> {
+  async loadMembers(page: model.PageModel): Promise<XTargetArray> {
     const res = await kernel.querySubTargetById({
       page: {
         limit: page.limit,
@@ -445,7 +433,7 @@ export default class BaseTarget implements ITarget {
     if (res.success) {
       this.target.name = data.name;
       this.target.code = data.code;
-      this.target.avatar = data.avatar;
+      this.target.icon = data.icon;
       this.target.belongId = data.belongId;
       if (this.target.team != undefined) {
         this.target.team.name = data.teamName;

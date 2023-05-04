@@ -3,42 +3,48 @@ import React from 'react';
 import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { AiOutlineWechat } from 'react-icons/ai';
-import { MessageType, msgNotify } from '@/ts/core';
-import { IChat } from '@/ts/core/target/chat/ichat';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';
 
 /**
  * @description: 通讯录
  * @return {*}
  */
 
-const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string }) => {
-  const [msgKey] = useCtrlUpdate(msgNotify);
+const Book: React.FC<any> = ({
+  chats,
+  filter,
+}: {
+  chats: IMsgChat[];
+  filter: string;
+}) => {
+  const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
-    chats = orgCtrl.user.allChats();
+    chats = orgCtrl.user.chats;
   }
   chats = chats
     .filter(
       (a) =>
-        a.target.name.includes(filter) ||
-        a.target.labels.filter((l) => l.includes(filter)).length > 0,
+        a.chatdata.chatName.includes(filter) ||
+        a.chatdata.chatRemark.includes(filter) ||
+        a.chatdata.labels.filter((l) => l.includes(filter)).length > 0,
     )
     .sort((a, b) => {
-      const num = (b.isToping ? 10 : 0) - (a.isToping ? 10 : 0);
+      const num = (b.chatdata.isToping ? 10 : 0) - (a.chatdata.isToping ? 10 : 0);
       if (num === 0) {
-        return b.lastMsgTime > a.lastMsgTime ? 1 : -1;
+        return b.chatdata.lastMsgTime > a.chatdata.lastMsgTime ? 1 : -1;
       }
       return num;
     });
-  const showMessage = (chat: IChat) => {
-    if (chat.lastMessage) {
-      let text = '最新消息[' + chat.lastMessage.createTime + ']:';
-      if (chat.lastMessage.msgType === MessageType.Text) {
-        return text + chat.lastMessage.showTxt;
+  const showMessage = (chat: IMsgChat) => {
+    if (chat.chatdata.lastMessage) {
+      let text = '最新消息[' + chat.chatdata.lastMessage.createTime + ']:';
+      if (chat.chatdata.lastMessage.msgType === MessageType.Text) {
+        return text + chat.chatdata.lastMessage.showTxt;
       }
-      return text + '[' + chat.lastMessage.msgType + ']';
+      return text + '[' + chat.chatdata.lastMessage.msgType + ']';
     }
-    return '简介信息:' + chat.target.remark;
+    return '简介信息:' + chat.chatdata.chatRemark;
   };
   return (
     <Card key={msgKey}>
@@ -47,12 +53,12 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
           className="demo-loadmore-list"
           itemLayout="horizontal"
           dataSource={chats}
-          renderItem={(item: IChat) => {
+          renderItem={(item: IMsgChat) => {
             return (
               <List.Item
                 style={{ cursor: 'pointer' }}
                 onClick={async () => {
-                  orgCtrl.currentKey = item.fullId;
+                  orgCtrl.currentKey = item.chatdata.fullId;
                   orgCtrl.changCallback();
                 }}
                 actions={[
@@ -60,7 +66,7 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
                     key="打开会话"
                     title="打开会话"
                     onClick={async () => {
-                      orgCtrl.currentKey = item.fullId;
+                      orgCtrl.currentKey = item.chatdata.fullId;
                       orgCtrl.changCallback();
                     }}>
                     <AiOutlineWechat style={{ fontSize: 18 }}></AiOutlineWechat>
@@ -68,14 +74,17 @@ const Book: React.FC<any> = ({ chats, filter }: { chats: IChat[]; filter: string
                 ]}>
                 <List.Item.Meta
                   avatar={
-                    <Badge count={item.noReadCount} overflowCount={99} size="small">
-                      <TeamIcon share={item.shareInfo} size={40} fontSize={40} />
+                    <Badge
+                      count={item.chatdata.noReadCount}
+                      overflowCount={99}
+                      size="small">
+                      <TeamIcon share={item.share} size={40} fontSize={40} />
                     </Badge>
                   }
                   title={
                     <div>
-                      <span style={{ marginRight: 10 }}>{item.target.name}</span>
-                      {item.target.labels
+                      <span style={{ marginRight: 10 }}>{item.chatdata.chatName}</span>
+                      {item.chatdata.labels
                         .filter((i) => i.length > 0)
                         .map((label) => {
                           return (

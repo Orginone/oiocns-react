@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import { XTarget } from '@/ts/base/schema';
-import { IGroup, ITarget, TargetType } from '@/ts/core';
+import { ITarget, TargetType } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import PageCard from '@/components/PageCard';
 import IndentityManage from '@/bizcomponents/Indentity';
@@ -40,26 +40,22 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const TitleItems = () => {
     let items = [
       {
-        tab: (current?.typeName ?? '机构') + `成员`,
+        tab: current.metadata.typeName + `成员`,
         key: 'members',
-      },
-      {
-        tab: (current?.typeName ?? '机构') + `应用`,
-        key: 'apps',
       },
     ];
     return items;
   };
 
   const getColumns = () => {
-    if (current.typeName === TargetType.Group) {
+    if (current.metadata.typeName === TargetType.Group) {
       return CompanyColumn;
     }
     return PersonColumns;
   };
 
   const getFindMember = () => {
-    switch (current.typeName) {
+    switch (current.metadata.typeName) {
       case TargetType.Group:
         return (
           <SearchCompany
@@ -73,7 +69,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
             placeholder="请输入用户账号"
             onFinish={setSelectMember}
             columns={PersonColumns}
-            request={async (page: any) => await current.space.loadMembers(page)}
+            datasource={current.space.members}
           />
         );
     }
@@ -82,12 +78,9 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
   const content = () => {
     return (
       <CardOrTable<schema.XTarget>
-        dataSource={[]}
+        dataSource={current.members}
         key="member"
         rowKey={'id'}
-        request={(page) => {
-          return current.loadMembers(page);
-        }}
         parentRef={parentRef}
         operation={(item) => {
           return isSuperAdmin
@@ -96,7 +89,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
                   key: 'remove',
                   label: '踢出',
                   onClick: async () => {
-                    if (await current.removeMember(item)) {
+                    if (await current.removeMembers([item])) {
                       message.success('踢出成功');
                       forceUpdate();
                     }
@@ -115,7 +108,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
     <div className={cls[`dept-content-box`]}>
       <Description
         title={
-          <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
+          <Typography.Title level={5}>{current.metadata.typeName}信息</Typography.Title>
         }
         current={current}
         extra={[]}
@@ -133,11 +126,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
                   <Button type="link" onClick={() => setActiveModal('addOne')}>
                     添加成员
                   </Button>
-                  {current.typeName == TargetType.Group && (
-                    <Button type="link" onClick={() => setActiveModal('joinGroup')}>
-                      加入集团
-                    </Button>
-                  )}
                 </>
               )}
             </>
@@ -168,39 +156,13 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
           setSelectMember([]);
         }}
         onOk={async () => {
-          if (selectMember && selectMember.length > 0) {
-            const ids = selectMember.map((e) => {
-              return e.id;
-            });
-            if (await current.pullMembers(ids, selectMember[0].typeName)) {
-              forceUpdate();
-              setActiveModal('');
-            }
+          if (await current.pullMembers(selectMember)) {
+            forceUpdate();
+            setActiveModal('');
           }
           setSelectMember([]);
         }}>
         {getFindMember()}
-      </Modal>
-      {/* 申请加入集团*/}
-      <Modal
-        title="申请加入集团"
-        destroyOnClose
-        open={activeModal === 'joinGroup'}
-        width={600}
-        onCancel={() => {
-          setActiveModal('');
-          setSelectMember([]);
-        }}
-        onOk={async () => {
-          selectMember.forEach(async (group) => {
-            if (await (current as IGroup).applyJoinGroup(group.id)) {
-              message.success('添加成功');
-              setSelectMember([]);
-              setActiveModal('');
-            }
-          });
-        }}>
-        <SearchCompany searchCallback={setSelectMember} searchType={TargetType.Group} />
       </Modal>
     </div>
   );

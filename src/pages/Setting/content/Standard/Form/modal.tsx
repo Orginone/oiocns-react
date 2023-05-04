@@ -4,7 +4,6 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
-import { targetsToTreeData } from '@/pages/Setting';
 
 interface Iprops {
   title: string;
@@ -48,16 +47,16 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
     {
       title: '选择共享组织',
       dataIndex: 'belongId',
-      valueType: 'treeSelect',
-      initialValue: current.team.space.id,
+      valueType: 'select',
+      initialValue: current.current.metadata.id,
       formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
-      request: async () => {
-        const res = await orgCtrl.getTeamTree(current.team.space);
-        return targetsToTreeData(res);
-      },
       fieldProps: {
-        disabled: title === '修改',
-        showSearch: true,
+        options: [
+          {
+            value: current.current.metadata.id,
+            label: current.current.metadata.name,
+          },
+        ],
       },
     },
     {

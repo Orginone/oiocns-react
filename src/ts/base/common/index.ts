@@ -1,5 +1,7 @@
 export { CharCode } from './charCode';
 export { Emitter } from './emitter';
+export type { IEntity } from './entity';
+export { Entity } from './entity';
 export { blobToDataUrl, blobToNumberArray, formatSize, StringPako } from './format';
 export type { IDisposable } from './lifecycle';
 export { sleep } from './lifecycle';

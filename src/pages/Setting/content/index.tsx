@@ -7,27 +7,22 @@ import StandardSetting from './Standard';
 import { MenuItemType } from 'typings/globelType';
 import React from 'react';
 import DictSetting from './Dict';
-import PropertySetting from './Property';
 import AuthoritySetting from './Authority';
 import { MenuType } from '../config/menuType';
+import { TargetType, companyTypes, departmentTypes } from '@/ts/core';
 
 interface IProps {
   selectMenu: MenuItemType;
-  refreshKey?: string;
 }
 
-const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
+const ContentIndex = ({ selectMenu }: IProps) => {
   /** 加载内容区 */
   switch (selectMenu.itemType) {
-    case MenuType.User:
+    case TargetType.Person:
       return <PersonSetting />;
-    case MenuType.Company:
-      return <CompanySetting current={selectMenu.item} />;
-    case MenuType.Agency:
-      return <AgencySetting current={selectMenu.item} />;
-    case MenuType.Station:
+    case TargetType.Station:
       return <StationSetting current={selectMenu.item} />;
-    case MenuType.Cohort:
+    case TargetType.Cohort:
       return <CohortSetting current={selectMenu.item} />;
     case MenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
@@ -35,11 +30,15 @@ const ContentIndex = ({ selectMenu, refreshKey }: IProps) => {
       return (
         <DictSetting current={selectMenu.item.dict} belong={selectMenu.item.belong} />
       );
-    case MenuType.Property:
-      return <PropertySetting current={selectMenu.item} />;
     case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
     default:
+      if (companyTypes.includes(selectMenu.itemType as TargetType)) {
+        return <CompanySetting current={selectMenu.item} />;
+      }
+      if (departmentTypes.includes(selectMenu.itemType as TargetType)) {
+        return <AgencySetting current={selectMenu.item} />;
+      }
       return <></>;
   }
 };

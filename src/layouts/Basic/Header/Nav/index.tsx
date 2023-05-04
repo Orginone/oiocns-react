@@ -7,8 +7,7 @@ import { IconFont } from '@/components/IconFont';
 import cls from './index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { msgNotify } from '@/ts/core';
-import { workNotify } from '@/ts/core/target/work/work';
+import { msgChatNotify } from '@/ts/core';
 
 /**
  * 顶部导航
@@ -20,22 +19,22 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   useEffect(() => {
-    const id = msgNotify.subscribe((key) => {
+    const id = msgChatNotify.subscribe((key) => {
       let noReadCount = 0;
-      for (const item of orgCtrl.user.allChats()) {
-        noReadCount += item.noReadCount;
+      for (const item of orgCtrl.user.chats) {
+        noReadCount += item.chatdata.noReadCount;
       }
       setMsgCount(noReadCount);
       setMsgKey(key);
     });
-    const workId = workNotify.subscribe(async (key) => {
-      let todos = await orgCtrl.user.work.loadTodo(true);
-      setWorkCount(todos.length);
-      setMsgKey(key);
-    });
+    // const workId = workNotify.subscribe(async (key) => {
+    //   let todos = await orgCtrl.user.work.loadTodo(true);
+    //   setWorkCount(todos.length);
+    //   setMsgKey(key);
+    // });
     return () => {
-      msgNotify.unsubscribe(id);
-      workNotify.unsubscribe(workId);
+      msgChatNotify.unsubscribe(id);
+      // workNotify.unsubscribe(workId);
     };
   }, []);
   const navs = [
@@ -90,8 +89,8 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     {
       key: 'setting',
       path: '/setting',
-      title: orgCtrl.user.teamName,
-      icon: <TeamIcon share={orgCtrl.user.shareInfo} size={28} title="设置" />,
+      title: orgCtrl.user.metadata.name,
+      icon: <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />,
       count: 0,
       fath: '/setting',
       onClick: () => {

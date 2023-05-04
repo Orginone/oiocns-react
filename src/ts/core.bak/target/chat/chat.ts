@@ -238,8 +238,8 @@ class BaseChat implements IChat {
       this.lastMsgTime = new Date().getTime();
       this.lastMessage = msg;
       this.cache();
+      this.messageNotify?.apply(this, [this.messages]);
     }
-    this.messageNotify?.apply(this, [this.messages]);
   }
   protected loadMessages(msgs: schema.XImMsg[]): void {
     msgs.forEach((item: any) => {

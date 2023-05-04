@@ -3,7 +3,7 @@ import GroupContent from './GroupContent';
 import GroupInputBox from './GroupInputBox';
 import GroupDetail from './GroupDetail';
 import charsStyle from './index.module.less';
-import { IChat } from '@/ts/core/target/chat/ichat';
+import { IMsgChat } from '@/ts/core';
 
 /**
  * @description: 沟通聊天
@@ -15,7 +15,7 @@ const Chat: React.FC<any> = ({
   filter,
 }: {
   openDetail: boolean;
-  chat: IChat;
+  chat: IMsgChat;
   filter: string;
 }) => {
   const [writeContent, setWriteContent] = useState<any>(null); // 重新编辑

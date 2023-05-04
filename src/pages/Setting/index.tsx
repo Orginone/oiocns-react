@@ -1,34 +1,28 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import { ICompany, ISpace, ITarget, TargetType } from '@/ts/core';
+import {
+  ICohort,
+  ICompany,
+  IDepartment,
+  IGroup,
+  IStation,
+  ITarget,
+  TargetType,
+  companyTypes,
+} from '@/ts/core';
 import Content from './content';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
-import SpeciesModal from './content/Standard/modal';
+import SpeciesModal from '@/bizcomponents/GlobalComps/createSpecies';
+import AuthorityModal from '@/bizcomponents/GlobalComps/createAuthority';
 import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
-import { TopBarExtra } from '../Store/content';
 import SearchCompany from '@/bizcomponents/SearchCompany';
-import CreateTeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import { XTarget } from '@/ts/base/schema';
-import { companyTypes } from '@/ts/core/enum';
 import { useHistory } from 'react-router-dom';
-import { ISpeciesItem } from '@/ts/core';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import * as config from './config/menuOperate';
 import DictModal from './content/Dict/dictModal';
-import PropertyModal from './content/Property/modal';
-import AuthorityModal from './content/Authority/modal';
-
-export const targetsToTreeData = (targets: ITarget[]): any[] => {
-  return targets.map((t) => {
-    return {
-      label: t.teamName,
-      value: t.id,
-      children: targetsToTreeData(t.subTeam),
-    };
-  });
-};
 
 const TeamSetting: React.FC = () => {
   const history = useHistory();
@@ -37,7 +31,6 @@ const TeamSetting: React.FC = () => {
   );
   const [editTarget, setEditTarget] = useState<ITarget>();
   const [operateKeys, setOperateKeys] = useState<string[]>(['']);
-  const [refreshKey, setRefreshKey] = useState<string>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showFormModal, setShowFormModal] = useState<boolean>(false);
   const [searchCallback, setSearchCallback] = useState<XTarget[]>();
@@ -45,16 +38,7 @@ const TeamSetting: React.FC = () => {
   return (
     <MainLayout
       selectMenu={selectMenu}
-      rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}
       onSelect={async (data) => {
-        switch (data.itemType) {
-          case GroupMenuType.SpeciesGroup:
-            await (data.item as ITarget).loadSpeciesTree();
-            break;
-          case GroupMenuType.DictGroup:
-            await (data.item as ISpace).dict.loadDict();
-            break;
-        }
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
@@ -84,14 +68,7 @@ const TeamSetting: React.FC = () => {
               content: '确定要退出吗?',
               onOk: async () => {
                 let item = data.item as ITarget;
-                switch (item.typeName) {
-                  case TargetType.Group:
-                    // orgCtrl.company.quitGroup((data.item as ITarget).id);
-                    break;
-                  case TargetType.Cohort:
-                    orgCtrl.user.quitCohorts((data.item as ITarget).id);
-                    break;
-                }
+                await item.exit();
                 setSelectMenu(selectMenu.parentMenu!);
               },
             });
@@ -100,9 +77,9 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                if (await (data.item as ISpeciesItem).delete()) {
-                  setSelectMenu(selectMenu.parentMenu!);
-                }
+                // if (await (data.item as ISpeciesItem).delete()) {
+                //   setSelectMenu(selectMenu.parentMenu!);
+                // }
               },
             });
             break;
@@ -120,16 +97,21 @@ const TeamSetting: React.FC = () => {
               const type = key.split('|')[1];
               switch (type) {
                 case TargetType.Cohort:
-                  data.item.getCohorts(true);
+                  await (data.item as ICohort).deepLoad(true);
+                  break;
+                case TargetType.Company:
+                case TargetType.Hospital:
+                case TargetType.University:
+                  await (data.item as ICompany).deepLoad(true);
                   break;
                 case TargetType.Department:
-                  (data.item as ICompany).getDepartments(true);
+                  await (data.item as IDepartment).deepLoad(true);
                   break;
                 case TargetType.Group:
-                  (data.item as ICompany).getJoinedGroups(true);
+                  await (data.item as IGroup).deepLoad(true);
                   break;
                 case TargetType.Station:
-                  (data.item as ICompany).getStations(true);
+                  await (data.item as IStation).deepLoad(true);
                   break;
               }
               orgCtrl.changCallback();
@@ -179,25 +161,9 @@ const TeamSetting: React.FC = () => {
             }}
           />
         )}
-      {/** 属性模态框 */}
-      {selectMenu.itemType == MenuType.Property && '新增' == operateKeys[0] && (
-        <PropertyModal
-          space={selectMenu.item}
-          data={undefined}
-          open={'新增' == operateKeys[0]}
-          handleCancel={() => {
-            setOperateKeys(['']);
-          }}
-          handleOk={(success) => {
-            if (success) {
-              message.success('操作成功');
-              setOperateKeys(['']);
-            }
-          }}
-        />
-      )}
       {/** 分类模态框 */}
-      {selectMenu.itemType === MenuType.Species && (
+      {(selectMenu.itemType === GroupMenuType.SpeciesGroup ||
+        selectMenu.itemType === MenuType.Species) && (
         <SpeciesModal
           title={operateKeys[0]}
           open={['新增', '修改'].includes(operateKeys[0])}
@@ -209,6 +175,7 @@ const TeamSetting: React.FC = () => {
             }
           }}
           current={selectMenu.item}
+          species={selectMenu.itemType === MenuType.Species ? selectMenu.item : undefined}
         />
       )}
       {/** 权限模态框 */}
@@ -228,7 +195,7 @@ const TeamSetting: React.FC = () => {
           />
         )}
       {/** 单位 */}
-      <CreateTeamModal
+      <TeamModal
         title={'新建单位'}
         open={showFormModal}
         handleCancel={function (): void {
@@ -237,7 +204,6 @@ const TeamSetting: React.FC = () => {
         handleOk={(item) => {
           if (item) {
             setShowFormModal(false);
-            setRefreshKey(key);
             setSelectMenu(selectMenu);
           }
         }}
@@ -254,18 +220,8 @@ const TeamSetting: React.FC = () => {
         onOk={async () => {
           // 加入单位
           setShowModal(false);
-          if (searchCallback && searchCallback.length > 0) {
-            searchCallback.forEach(async (company) => {
-              if (
-                await orgCtrl.user.applyJoinCompany(
-                  company.id,
-                  company.typeName as TargetType,
-                )
-              ) {
-                message.success('已申请加入单位成功.');
-              }
-            });
-          }
+          await orgCtrl.user.applyJoin(searchCallback || []);
+          message.success('已申请加入单位成功.');
         }}
         onCancel={() => {
           setShowModal(false);
@@ -275,7 +231,7 @@ const TeamSetting: React.FC = () => {
           searchType={TargetType.Company}
         />
       </Modal>
-      <Content key={key} selectMenu={selectMenu} refreshKey={refreshKey} />
+      <Content key={key} selectMenu={selectMenu} />
     </MainLayout>
   );
 };

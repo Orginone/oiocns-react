@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { kernel } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 
 interface DictFieldProps {
   dictId: string;
@@ -17,7 +16,6 @@ const DictField: React.FC<DictFieldProps> = ({ dictId, value }) => {
     const initOptions = async () => {
       const res = await kernel.queryDictItems({
         id: dictId,
-        spaceId: orgCtrl.user.id,
         page: { offset: 0, limit: 100000, filter: '' },
       });
       const dictItems: any[] =

@@ -1,9 +1,7 @@
-import { kernel, pageAll } from '@/ts/base';
 import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { ProDescriptions } from '@ant-design/pro-components';
 import React, { useEffect, useState } from 'react';
 import OioField from './OioField';
-import { ISpace } from '@/ts/core';
 
 type CardDescriptionsProps = {
   operation: XOperation;

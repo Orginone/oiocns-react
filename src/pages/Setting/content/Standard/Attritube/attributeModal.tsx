@@ -6,8 +6,6 @@ import { ISpace, ISpeciesItem } from '@/ts/core';
 import { XAttribute } from '@/ts/base/schema';
 import { getUuid } from '@/utils/tools';
 import { common } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
-import { targetsToTreeData } from '@/pages/Setting';
 
 interface Iprops {
   title: string;
@@ -64,18 +62,18 @@ const AttributeModal = (props: Iprops) => {
         },
       },
       {
-        title: '选择制定组织',
+        title: '选择共享组织',
         dataIndex: 'belongId',
-        valueType: 'treeSelect',
-        initialValue: current.team.space.id,
-        formItemProps: { rules: [{ required: true, message: '组织为必填项' }] },
-        request: async () => {
-          const res = await orgCtrl.getTeamTree(current.team.space);
-          return targetsToTreeData(res);
-        },
+        valueType: 'select',
+        initialValue: current.metadata.shareId,
+        formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
         fieldProps: {
-          disabled: title === '修改',
-          showSearch: true,
+          options: [
+            {
+              value: current.current.metadata.id,
+              label: current.current.metadata.name,
+            },
+          ],
         },
       },
       {

@@ -9,7 +9,7 @@ import { IconFont } from '@/components/IconFont';
 import { FileItemModel } from '@/ts/base/model';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import FileSysOperate from '../../components/FileSysOperate';
-import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
+import { IFileSystemItem } from '@/ts/core';
 
 interface IProps {
   current: IFileSystemItem;
@@ -25,13 +25,13 @@ const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>();
 
   const getThumbnail = (item: FileItemModel) => {
-    if (item.thumbnail.length > 0) {
+    if (item.thumbnail && item.thumbnail.length > 0) {
       return item.thumbnail;
     }
-    if (item.extension === '') {
-      return '/icons/default_folder.svg';
+    if (item.extension && item.extension.length > 0) {
+      return `/icons/file_type_${item.extension.replace('.', '')}.svg`;
     }
-    return `/icons/file_type_${item.extension.replace('.', '')}.svg`;
+    return '/icons/default_folder.svg';
   };
 
   return (

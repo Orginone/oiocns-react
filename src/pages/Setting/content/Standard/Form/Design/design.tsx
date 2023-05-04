@@ -1,4 +1,3 @@
-import { kernel, pageAll } from '@/ts/base';
 import { DndContext } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import {

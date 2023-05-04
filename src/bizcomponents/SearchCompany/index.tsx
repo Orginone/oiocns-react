@@ -7,14 +7,12 @@ import SearchInput from '@/components/SearchInput';
 import styles from './index.module.less';
 import { XTarget } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { TargetType } from '@/ts/core';
+import { TargetType, companyTypes } from '@/ts/core';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import Person from '@/ts/core/target/person';
-import Company from '@/ts/core/target/company';
+import { parseAvatar } from '@/ts/base';
 
 type CompanySearchTableProps = {
   [key: string]: any;
-  // 需要搜索的类型
   searchType: TargetType;
   searchCallback: (target: XTarget[]) => void;
 };
@@ -28,6 +26,14 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
   const [searchKey, setSearchKey] = useState<string>();
   const [dataSource, setDataSource] = useState<XTarget[]>([]);
   const [searchPlace, setSearchPlace] = useState<string>();
+  /** 生产用户共享信息 */
+  const generateShare = (target: XTarget) => {
+    return {
+      name: target.name,
+      typeName: target.typeName,
+      avatar: parseAvatar(target.icon),
+    };
+  };
 
   useEffect(() => {
     switch (tableProps.searchType) {
@@ -53,7 +59,7 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         bordered={false}
         multiple
         style={{ width: '100%' }}
-        onChange={(value: string[]) => {
+        onChange={(value: any) => {
           let checkObjs: XTarget[] = [];
           for (const target of dataSource) {
             if (value.includes(target.id)) {
@@ -63,141 +69,37 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
           tableProps.searchCallback(checkObjs);
         }}>
         <Row gutter={16} style={{ width: '100%' }}>
-          {dataSource.map((item) => (
-            <Col span={24} key={item.id}>
-              {tableProps.searchType === TargetType.Person && (
-                <PersonCard key={item.id} target={item} />
-              )}
-              {tableProps.searchType === TargetType.Cohort && (
-                <CohortCard key={item.id} target={item} />
-              )}
-              {tableProps.searchType === TargetType.Group && (
-                <GroupCard key={item.id} target={item} />
-              )}
-              {[
-                TargetType.Company,
-                TargetType.University,
-                TargetType.Hospital,
-                TargetType.Research,
-              ].includes(tableProps.searchType) && (
-                <CompanyCard key={item.id} target={item} />
-              )}
+          {dataSource.map((target) => (
+            <Col span={24} key={target.id}>
+              <CheckCard
+                bordered
+                style={{ width: '100%' }}
+                className={`${styles.card}`}
+                avatar={
+                  <TeamIcon share={generateShare(target)} size={60} preview={true} />
+                }
+                title={
+                  <Space>
+                    {target.name}
+                    <Tag color="blue">账号：{target.code}</Tag>
+                  </Space>
+                }
+                value={target.id}
+                key={target.id}
+                description={
+                  <Descriptions column={2} size="small" style={{ marginTop: 16 }}>
+                    <Descriptions.Item label="简介" span={2}>
+                      {target.remark}
+                    </Descriptions.Item>
+                  </Descriptions>
+                }
+              />
             </Col>
           ))}
         </Row>
       </CheckCard.Group>
     );
   };
-
-  /**
-   * 人员名片
-   * @param person 人员
-   * @returns
-   */
-  const PersonCard: React.FC<{ target: XTarget }> = ({ target }) => (
-    <CheckCard
-      bordered
-      style={{ width: '100%' }}
-      className={`${styles.card}`}
-      avatar={<TeamIcon share={new Person(target).shareInfo} size={60} preview={true} />}
-      title={
-        <Space>
-          {target.name}
-          <Tag color="blue">账号：{target.code}</Tag>
-        </Space>
-      }
-      value={target.id}
-      key={target.id}
-      description={
-        <Descriptions column={2} size="small" style={{ marginTop: 16 }}>
-          <Descriptions.Item label="姓名">{target.team?.name}</Descriptions.Item>
-          <Descriptions.Item label="手机号">{target.team?.code}</Descriptions.Item>
-          <Descriptions.Item label="座右铭" span={2}>
-            {target.team?.remark}
-          </Descriptions.Item>
-        </Descriptions>
-      }
-    />
-  );
-
-  /**
-   * 群组名片
-   * @param person 人员
-   * @returns
-   */
-  const CohortCard: React.FC<{ target: XTarget }> = ({ target }) => (
-    <CheckCard
-      bordered
-      style={{ width: '100%' }}
-      className={`${styles.card}`}
-      avatar={<TeamIcon share={new Person(target).shareInfo} size={60} preview={true} />}
-      title={
-        <Space>
-          {target.name}
-          <Tag color="blue">编号：{target.code}</Tag>
-        </Space>
-      }
-      value={target.id}
-      key={target.id}
-      description={
-        <Descriptions column={2} size="small" style={{ marginTop: 16 }}>
-          <Descriptions.Item label="群名称">{target.team?.name}</Descriptions.Item>
-          <Descriptions.Item label="群编号">{target.team?.code}</Descriptions.Item>
-          <Descriptions.Item label="群签名" span={2}>
-            {target.team?.remark}
-          </Descriptions.Item>
-        </Descriptions>
-      }
-    />
-  );
-
-  // 单位卡片渲染
-  const CompanyCard: React.FC<{ target: XTarget }> = ({ target }) => (
-    <CheckCard
-      bordered
-      style={{ width: '100%' }}
-      className={`${styles.card}`}
-      avatar={
-        <TeamIcon
-          share={new Company(target, orgCtrl.user.id).shareInfo}
-          size={60}
-          preview={true}
-        />
-      }
-      title={
-        <Space>
-          {target.name}
-          <Tag color="blue">统一社会信用代码：{target.code}</Tag>
-        </Space>
-      }
-      value={target.id}
-      description={`公司简介:${target.team?.remark}`}
-    />
-  );
-
-  // 集团卡片渲染
-  const GroupCard: React.FC<{ target: XTarget }> = ({ target }) => (
-    <CheckCard
-      bordered
-      style={{ width: '100%' }}
-      className={`${styles.card}`}
-      avatar={
-        <TeamIcon
-          share={new Company(target, orgCtrl.user.id).shareInfo}
-          size={60}
-          preview={true}
-        />
-      }
-      title={
-        <Space>
-          {target.name}
-          <Tag color="blue">集团编码：{target.code}</Tag>
-        </Space>
-      }
-      value={target.id}
-      description={`集团简介:${target.team?.remark}`}
-    />
-  );
 
   return (
     <div className={styles[`search-card`]}>
@@ -207,29 +109,38 @@ const CompanySearchList: React.FC<CompanySearchTableProps> = (props) => {
         onChange={async (event) => {
           setSearchKey(event.target.value);
           if (event.target.value) {
-            let res: any;
+            const res: XTarget[] = [];
             switch (tableProps.searchType) {
               case TargetType.Person:
-                res = await orgCtrl.user.searchPerson(event.target.value);
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Person,
+                  ])),
+                );
                 break;
               case TargetType.Company:
               case TargetType.University:
               case TargetType.Hospital:
-                res = await orgCtrl.user.searchCompany(event.target.value);
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, companyTypes)),
+                );
                 break;
               case TargetType.Group:
-                // res = await orgCtrl.company.searchGroup(event.target.value);
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Group,
+                  ])),
+                );
                 break;
               case TargetType.Cohort:
-                res = await orgCtrl.user.searchCohort(event.target.value);
+                res.push(
+                  ...(await orgCtrl.user.searchTargets(event.target.value, [
+                    TargetType.Cohort,
+                  ])),
+                );
                 break;
             }
-            // 个人 查询公司 查询人， 公司查询集团
-            if (res.total && res.result) {
-              setDataSource(res.result);
-            } else {
-              setDataSource([]);
-            }
+            setDataSource(res);
           }
         }}
       />

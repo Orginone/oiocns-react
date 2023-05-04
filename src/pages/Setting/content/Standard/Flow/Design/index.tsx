@@ -15,7 +15,6 @@ import orgCtrl from '@/ts/controller';
 import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
 import { ISpeciesItem } from '@/ts/core';
-import { pageAll } from '@/ts/base';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
 

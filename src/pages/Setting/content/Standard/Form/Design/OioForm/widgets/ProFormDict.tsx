@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { pageAll } from '@/ts/base';
 import { ProFormSelect } from '@ant-design/pro-components';
-import { ISpace } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
-  space: ISpace;
+  space: IBelong;
   [key: string]: any;
 }
 /**

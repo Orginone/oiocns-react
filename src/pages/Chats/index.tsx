@@ -4,9 +4,9 @@ import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import orgCtrl from '@/ts/controller';
-import { IChat } from '@/ts/core/target/chat/ichat';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
+import { IMsgChat, msgChatNotify } from '@/ts/core';
 const Setting: React.FC<any> = () => {
   const [filter, setFilter] = useState('');
   const [openDetail, setOpenDetail] = useState<boolean>(false);
@@ -29,16 +29,18 @@ const Setting: React.FC<any> = () => {
           }}></Input>
       }
       onMenuClick={async (data, key) => {
+        const chat = data.item as IMsgChat;
         switch (key) {
           case '清空消息':
-            await (data.item! as IChat).clearMessage();
+            await chat.clearMessage();
             break;
           case '会话详情':
             setOpenDetail(!openDetail);
             break;
           case '标记为未读':
             setSelectMenu(rootMenu);
-            (data.item! as IChat).noReadCount += 1;
+            chat.chatdata.noReadCount += 1;
+            msgChatNotify.changCallback();
             break;
         }
       }}

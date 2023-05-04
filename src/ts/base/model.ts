@@ -1,8 +1,4 @@
-/* eslint-disable no-unused-vars */
-
-import { type } from 'os';
-import { FlowNode as SchemaFlowNode, XOperation } from './schema';
-
+import { XForm } from './schema';
 // 请求类型定义
 export type ReqestType = {
   // 模块
@@ -65,208 +61,13 @@ export type RegisterType = {
   avatar: string;
 };
 
-export type IdReq = {
+export type IdPair = {
   // 唯一ID
   id: string;
+  value: string;
 };
 
-export type NameModel = {
-  // 结果
-  name: string;
-  // 图片
-  photo: string;
-};
-
-export type IdReqModel = {
-  // 唯一ID
-  id: string;
-  // 实体类型
-  typeName: string;
-  // 归属ID
-  belongId?: string;
-};
-
-export type IdArrayReq = {
-  // 唯一ID数组
-  ids: string[];
-  // 分页
-  page?: PageRequest;
-};
-
-export type IdSpaceReq = {
-  // 唯一ID
-  id: string;
-  // 工作空间ID
-  spaceId?: string;
-  // 分页
-  page?: PageRequest;
-};
-
-export type QueryDictModel = {
-  // 唯一ID
-  id: string;
-  // 工作空间ID
-  spaceId: string;
-  // 是否递归组织
-  recursionOrg: boolean;
-  // 分页
-  page: PageRequest;
-};
-
-export type IdSpeciesReq = {
-  // 唯一ID
-  id: string;
-  // 工作空间ID
-  spaceId: string;
-  // 是否递归组织
-  recursionOrg: boolean;
-  // 是否递归分类
-  recursionSpecies: boolean;
-  // 分页
-  page: PageRequest;
-};
-
-export type IdOperationReq = {
-  // 唯一ID
-  id: string;
-  // 工作空间ID
-  spaceId: string;
-  // 是否权限过滤
-  filterAuth: boolean;
-  // 是否递归组织
-  recursionOrg: boolean;
-  // 是否递归分类
-  recursionSpecies: boolean;
-  // 分页
-  page: PageRequest;
-};
-export type IdArraySpaceReq = {
-  // 唯一ID
-  ids: string[];
-  // 工作空间ID
-  spaceId: string;
-};
-
-export type SpeciesReq = {
-  // 空间ID
-  spaceId: string;
-  // 分类ID
-  speciesId: string;
-};
-
-export type SpaceAuthReq = {
-  // 权限ID
-  authId: string;
-  // 工作空间ID
-  spaceId: string;
-};
-
-export type IDBelongReq = {
-  // 唯一ID
-  id?: string;
-  // 分页
-  page?: PageRequest;
-};
-
-export type RelationReq = {
-  // 唯一ID
-  id: string;
-  // 子组织/个人ID
-  subIds: string[];
-};
-export type GetSpeciesModel = {
-  // 唯一ID
-  id: string;
-  // 继承组织
-  upTeam: boolean;
-};
-export type ThingAttrReq = {
-  // 唯一ID
-  id?: string;
-  //类别Id
-  specId: string;
-  //类别代码
-  specCode: string;
-  //特性Id
-  attrId: string;
-  //特性代码
-  attrCode: string;
-  //关系Id
-  relationId: string;
-  //是否公开
-  public: boolean;
-  // 分页
-  page?: PageRequest;
-};
-
-export type IDWithBelongReq = {
-  // 唯一ID
-  id: string;
-  // 归属ID
-  belongId?: string;
-};
-
-export type IDWithBelongPageReq = {
-  // 唯一ID
-  id: string;
-  // 归属ID
-  belongId: string;
-  // 分页
-  page?: PageRequest;
-};
-
-export type IDStatusPageReq = {
-  // 唯一ID
-  id?: string;
-  // 状态
-  status: number;
-  // 分页
-  page?: PageRequest;
-};
-
-export type IDBelongTargetReq = {
-  // 唯一ID
-  id: string;
-  // 类型
-  targetType: string;
-  // 分页
-  page?: PageRequest;
-};
-
-export type IDReqSubModel = {
-  // 唯一ID
-  id: string;
-  // 实体类型
-  typeNames: string[];
-  // 子节点类型
-  subTypeNames: string[];
-  // 分页
-  page?: PageRequest;
-};
-
-export type IDReqJoinedModel = {
-  // 唯一ID
-  id?: string;
-  // 实体类型
-  typeName: string;
-  // 加入的节点类型
-  JoinTypeNames: string[];
-  // 工作空间ID
-  spaceId: string;
-  // 分页
-  page?: PageRequest;
-};
-
-export type ChatsReqModel = {
-  // 工作空间ID
-  spaceId: string;
-  // 群组名称
-  cohortName: string;
-  // 空间类型名称
-  spaceTypeName: string;
-};
-
-export type PageRequest = {
+export type PageModel = {
   // 偏移量
   offset: number;
   // 最大数量
@@ -275,25 +76,100 @@ export type PageRequest = {
   filter: string;
 };
 
-export type RecursiveReqModel = {
+export type IdModel = {
   // 唯一ID
   id: string;
-  // 实体类型
-  typeName: string;
-  // 字节点类型
-  subNodeTypeNames: string[];
+  // 分页
+  page: PageModel;
 };
 
-export type IdWithNameModel = {
+export type IdArrayModel = {
+  // 唯一ID数组
+  ids: string[];
+  // 分页
+  page: PageModel;
+};
+
+export type LogModel = {
+  // 唯一ID
+  id: string;
+  //类型
+  type: string;
+  //模块
+  module: string;
+  //内容
+  content: string;
+};
+
+export type AuthorityModel = {
   // 唯一ID
   id: string;
   // 名称
   name: string;
+  // 编号
+  code: string;
+  // 图标
+  icon: string;
+  // 是否公开
+  public: boolean;
+  // 父类别ID
+  parentId: string;
+  // 共享用户
+  shareId: string;
+  // 备注
+  remark: string;
 };
 
-export type IdNameArray = {
-  // 唯一ID数组
-  result?: IdWithNameModel[];
+export type IdentityModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 职权Id
+  authId: string;
+  // 共享用户Id
+  shareId: string;
+  // 备注
+  remark: string;
+};
+
+export type TargetModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 类型名
+  typeName: string;
+  // 开放组织?
+  public: boolean;
+  // 图标
+  icon: string;
+  // 简介
+  remark: string;
+  // 归属用户Id
+  belongId: string;
+  // 团队名称
+  teamName: string;
+  // 团队代号
+  teamCode: string;
+};
+
+export type GiveModel = {
+  // 主ID
+  id: string;
+  // 子ID数组
+  subIds: string[];
+};
+
+export type GainModel = {
+  // 主ID
+  id: string;
+  // 子ID
+  subId: string;
 };
 
 export type ApprovalModel = {
@@ -303,554 +179,60 @@ export type ApprovalModel = {
   status: number;
 };
 
-export type DictModel = {
-  // 唯一ID
-  id?: string;
+export type SearchModel = {
   // 名称
   name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 创建组织/个人
-  belongId: string;
-  // 备注
-  remark: string;
-};
-
-export type DictItemModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  value: string;
-  // 公开的
-  public: boolean;
-  // 创建组织/个人
-  belongId: string;
-  // 备注
-  dictId: string;
-};
-
-export type FlowDefineModel = {
-  id?: string;
-  // 类别Id
-  speciesId?: string;
-  // 空间Id
-  spaceId?: string;
-  // 状态
-  status?: number;
-};
-
-export type ThingModel = {
-  // 唯一ID
-  id: string;
-  // 内容
-  data: string;
-  // 归属id
-  belongId: string;
-};
-
-export type SpeciesModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 父类别ID
-  parentId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 工作权限Id
-  authId: string;
-  // 备注
-  remark: string;
-};
-
-export type AttributeModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 单位
-  unit: string;
-  // 备注
-  remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 类别Id
-  speciesId: string;
-  // 类别代码
-  speciesCode: string;
-  // 工作权限Id
-  authId: string;
-  // 属性Id
-  propId: string;
-};
-
-export type PropertyModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 值类型
-  valueType: string;
-  // 单位
-  unit: string;
-  // 选择字典的类型ID
-  dictId: string;
-  // 备注
-  remark: string;
-  // 创建用户
-  belongId: string;
-  // 来源用户
-  sourceId?: string;
-};
-
-export type OperationModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 备注
-  remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 类别Id
-  speciesId: string;
-  // 流程定义Id
-  defineId?: string;
-  // 业务发起权限Id
-  beginAuthId?: string;
-  // 子项列表
-  items: OperationItem[];
-};
-
-export type OperationItemModel = {
-  // 创建组织/个人
-  spaceId: string;
-  // 业务Id
-  operationId: string;
-  // 子项集合
-  operationItems: OperationItem[];
-};
-
-export type OperationRelation = {
-  // 规则
-  rule: string;
-  // 备注
-  speciesId: string;
-};
-
-export type OperationItem = {
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 绑定的特性ID
-  attrId: string;
-  // 规则
-  rule: string;
-  // 备注
-  remark: string;
-  // 子表项下的分类Id集合
-  speciesIds: string[];
-};
-
-export type AuthorityModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 父类别ID
-  parentId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 备注
-  remark: string;
-};
-
-export type IdentityModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 权限Id
-  authId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 备注
-  remark: string;
-};
-
-export type TargetModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 类型名
-  typeName: string;
-  // 头像
-  avatar: string;
-  // 创建组织/个人
-  belongId: string;
-  // 团队名称
-  teamName: string;
-  // 团队代号
-  teamCode: string;
-  // 团队备注
-  teamRemark: string;
-};
-
-export type RuleStdModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 组织/个人ID
-  targetId: string;
-  // 类型
-  typeName: string;
-  // 备注
-  remark: string;
-  // 标准
-  attrs: string[];
-};
-
-export type LogModel = {
-  // 唯一ID
-  id?: string;
-  //类型
-  type: string;
-  //模块
-  module: string;
-  //内容
-  content: string;
-};
-
-export type MarketModel = {
-  // 唯一ID
-  id?: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 创建组织/个人
-  belongId: string;
-  // 监管组织/个人
-  samrId: string;
-  // 备注
-  remark: string;
-  // 加入操作是否公开
-  joinPublic: boolean;
-  // 售卖操作是否公开
-  sellPublic: boolean;
-  // 购买操作是否公开
-  buyPublic: boolean;
-  // 图片
-  photo: string;
-};
-
-export type MerchandiseModel = {
-  // 唯一ID
-  id?: string;
-  // 标题
-  caption: string;
-  // 产品ID
-  productId: string;
-  // 单价
-  price: number;
-  // 出售权属
-  sellAuth: string;
-  // 商品出售市场ID
-  marketId: string;
-  // 描述信息
-  information: string;
-  // 有效期
-  days: string;
-};
-
-export type OrderModel = {
-  // 唯一ID
-  id?: string;
-  // 存证ID
-  nftId: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 创建组织/个人
-  belongId: string;
-  // 商品ID集合
-  merchandiseIds: string[];
-};
-
-export type OrderModelByStags = {
-  // 唯一ID
-  id?: string;
-  // 存证ID
-  nftId: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 创建组织/个人
-  belongId: string;
-  // 暂存区ID集合
-  stagingIds: string[];
-};
-
-export type OrderDetailModel = {
-  // 唯一ID
-  id?: string;
-  // 订单
-  caption: string;
-  // 商品
-  days: string;
-  // 单价
-  // 卖方ID
-  status: number;
-  // 空间ID
-  spaceId: string;
-};
-
-export type OrderPayModel = {
-  // 唯一ID
-  id?: string;
-  // 订单
-  orderDetailId: string;
-  // 支付总价
-  price: number;
-  // 支付方式
-  paymentType: string;
-};
-
-export type ProductModel = {
-  // 名称
-  name: string;
-  // 唯一ID
-  id?: string;
-  // 编号
-  code: string;
-  // 元数据Id
-  thingId?: string;
-  // 产品类型名
-  typeName: string;
-  // 备注
-  remark: string;
-  // 所属ID
-  belongId: string;
-  // 图片
-  photo: string;
-  // 资源列
-  resources?: ResourceModel[];
-};
-
-export type ResourceModel = {
-  // 唯一ID
-  id?: string;
-  // 编号
-  code: string;
-  // 名称
-  name: string;
-  // 产品ID
-  productId?: string;
-  // 访问私钥
-  privateKey: string;
-  // 入口地址
-  link: string;
-  // 流程项
-  flows?: string;
-  // 组件
-  components: string;
-};
-
-export type StagingModel = {
-  // 唯一ID
-  id?: string;
-  // 商品
-  merchandiseId: string;
-  // 创建组织/个人
-  belongId: string;
-};
-
-export type ThingSpeciesModel = {
-  // 物的唯一ID
-  id?: string;
-  // 赋予的类别Id
-  speciesId: string;
-  // 赋予的类别代码
-  speciesCode: string;
-};
-
-export type ThingAttrModel = {
-  // 物的唯一ID
-  id?: string;
-  // 基于关系ID的度量
-  relationId: string;
-  // 类别Id
-  speciesId: string;
-  //类别代码
-  specCode: string;
-  //特性Id
-  attrId: string;
-  //特性代码
-  attrCode: string;
-  // 字符串类型的值
-  strValue: string;
-  // 数值类型的值
-  numValue: number;
-};
-
-export type JoinTeamModel = {
-  // 团队ID
-  id: string;
-  // 团队类型
-  teamType: string;
-  // 待加入团队组织/个人ID
-  targetId: string;
-  // 待拉入组织/个人类型
-  targetType: string;
-};
-
-export type ExitTeamModel = {
-  // 团队ID
-  id: string;
-  // 团队类型
-  teamTypes: string[];
-  // 待退出团队组织/个人ID
-  targetId: string;
-  // 待退出组织/个人类型
-  targetType: string;
-};
-
-export type TeamPullModel = {
-  // 团队ID
-  id: string;
-  // 团队类型
-  teamTypes: string[];
-  // 待拉入的组织/个人ID集合
-  targetIds: string[];
-  // 待拉入组织/个人类型
-  targetType: string;
-};
-
-export type CreateOrderByStagingModel = {
-  // 订单名称
-  name: string;
-  // 订单编号
-  code: string;
-  // 所属ID
-  belongId: string;
-  // 暂存区ID
-  StagingIds: string[];
-};
-
-export type GiveIdentityModel = {
-  // 角色ID
-  id: string;
-  // 人员ID
-  targetIds: string[];
-};
-
-export type SearchExtendReq = {
-  // 源ID
-  sourceId: string;
-  // 源类型
-  sourceType: string;
-  // 分配对象类型
-  destType: string;
-  // 归属ID
-  spaceId: string;
-  // TeamID
-  teamId?: string;
-};
-
-export type MarketPullModel = {
-  // 团队ID
-  marketId: string;
-  // 待拉入的组织/个人ID集合
-  targetIds: string[];
-  // 待拉入组织/个人类型
-  typeNames: string[];
-};
-
-export type UsefulProductReq = {
-  // 工作空间ID
-  spaceId: string;
-  // 拓展目标所属对象类型
-  typeNames: string[];
-};
-
-export type UsefulResourceReq = {
-  // 工作空间ID
-  spaceId: string;
-  // 产品ID
-  productId: string;
-  // 拓展目标所属对象类型
-  typeNames: string[];
-};
-
-export type SourceExtendModel = {
-  // 源对象ID
-  sourceId: string;
-  // 源对象类型
-  sourceType: string;
-  // 目标对象类型
-  destType: string;
-  // 目标对象ID
-  destIds: string[];
-  // 组织ID
-  teamId: string;
-  // 归属ID
-  spaceId: string;
-};
-
-export type NameTypeModel = {
-  // 名称
-  name: string;
-  // 类型名
+  // 类型数组
   typeNames: string[];
   // 分页
-  page?: PageRequest;
+  page: PageModel;
 };
 
-export type NameCodeModel = {
-  // 名称
-  name: string;
-  // 代码
-  code: string;
+export type GetSubsModel = {
+  // 唯一ID
+  id: string;
+  // 子节点类型
+  subTypeNames: string[];
   // 分页
-  page?: PageRequest;
+  page: PageModel;
 };
 
-export type ImMsgModel = {
-  // 工作空间ID
-  spaceId: string;
+export type GetJoinedModel = {
+  // 唯一ID
+  id: string;
+  // 类型数组
+  typeNames: string[];
+  // 分页
+  page: PageModel;
+};
+
+export type MsgSendModel = {
+  // 接收方Id
+  toId: string;
+  // 归属用户ID
+  belongId: string;
+  // 消息类型
+  msgType: string;
+  // 消息体
+  msgBody: string;
+};
+
+export type MsgTagModel = {
+  // 会话ID
+  id: string;
+  // 会话归属用户ID
+  belongId: string;
+  // 消息ID
+  ids: string[];
+  // 标记
+  tags: string[];
+};
+
+export type MsgSaveModel = {
+  // 唯一ID
+  id: string;
+  // 归属用户ID
+  belongId: string;
   // 发起方Id
   fromId: string;
   // 接收方Id
@@ -859,172 +241,302 @@ export type ImMsgModel = {
   msgType: string;
   // 消息体
   msgBody: string;
+  // 消息创建时间
+  createTime: string;
+  // 消息变更时间
+  updateTime: string;
+  // 消息显示文本
+  showTxt: string;
+  // 允许编辑
+  allowEdit: boolean;
 };
 
-export type ChatResponse = {
-  // 会话分组
-  groups?: GroupChatModel[];
-};
-
-export type GroupChatModel = {
-  // 分组ID
+export type PropertyModel = {
+  // 唯一ID
   id: string;
   // 名称
   name: string;
-  // 会话
-  chats: ChatModel[];
-};
-
-export type ChatModel = {
-  // 会话ID
-  id: string;
-  // 名称
-  name: string;
-  // 头像
-  photo: string;
-  // 标签
-  labels: string[];
+  // 编号
+  code: string;
+  // 值类型
+  valueType: string;
+  // 计量单位
+  unit: string;
+  // 类别ID
+  speciesId: string;
+  // 字典的类型ID
+  dictId: string;
+  // 来源用户ID
+  sourceId: string;
   // 备注
   remark: string;
-  // 类型名称
+};
+
+export type DictModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 图标
+  icon: string;
+  // 备注
+  remark: string;
+  // 归属用户ID
+  belongId: string;
+};
+
+export type DictItemModel = {
+  // 唯一ID
+  id: string;
+  // 键
+  name: string;
+  // 值
+  value: string;
+  // 图标
+  icon: string;
+  // 字典的类型ID
+  dictId: string;
+  // 备注
+  remark: string;
+};
+
+export type SpeciesModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 图标
+  icon: string;
+  // 类型
   typeName: string;
+  // 父类别Id
+  parentId: string;
+  // 共享用户Id
+  shareId: string;
+  // 工作职权Id
+  authId: string;
+  // 备注
+  remark: string;
 };
 
-export type FlowInstanceModel = {
-  // 流程定义Id
-  defineId: string;
-  // 空间Id
-  SpaceId: string;
-  // 展示内容
-  content: string;
-  // 内容类型
-  contentType: string;
-  // 表单数据内容
-  data: string;
-  // 标题
-  title: string;
-  // 回调地址
-  hook: string;
-  // 操作主体对象集合
-  thingIds: string[];
+export type AttributeModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 类别Id
+  speciesId: string;
+  // 属性Id
+  propId: string;
+  // 工作职权Id
+  authId: string;
+  // 共享用户Id
+  shareId: string;
+  // 备注
+  remark: string;
 };
 
-export type CreateDefineReq = {
-  // 唯一Id
-  id?: string;
+export type FormModel = {
+  // 唯一ID
+  id: string;
   // 名称
   name: string;
   // 编号
   code: string;
   // 备注
   remark: string;
-  // 节点信息
-  resource?: SchemaFlowNode;
-  // 共享组织
+  // 类别Id
+  speciesId: string;
+  // 共享用户Id
   shareId: string;
-  // 归属Id
+  // 单项集合
+  items: FormItemModel[] | undefined;
+};
+
+export type FormItemModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 规则
+  rule: string;
+  // 备注
+  remark: string;
+  // 特性Id
+  attrId: string;
+};
+
+export type ThingModel = {
+  // 唯一ID
+  id: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 链上ID
+  chainId: string;
+  // 共享用户Id
+  shareId: string;
+  // 备注
+  remark: string;
+};
+
+export type SetPropModel = {
+  // 物的唯一ID
+  id: string;
+  // 特性数据
+  data: IdPair[] | undefined;
+};
+
+export type GetSpeciesModel = {
+  // 唯一ID
+  id: string;
+  // 是否向上递归用户
+  upTeam: boolean;
+  // 当前归属用户ID
   belongId: string;
-  //分类id
-  speciesId?: string;
-  // 权限ID
-  authId?: string;
-  //是否公开
-  public?: boolean;
-  //数据源id
-  sourceIds?: string;
-  //是否创建实体
+  // 过滤信息
+  filter: string;
+};
+
+export type GetSpeciesResourceModel = {
+  // 唯一ID
+  id: string;
+  // 分类唯一ID
+  speciesId: string;
+  // 当前归属用户ID
+  belongId: string;
+  // 是否向上递归用户
+  upTeam: boolean;
+  // 是否向上递归分类
+  upSpecies: boolean;
+  // 分页
+  page: PageModel;
+};
+
+export type OrderModel = {
+  // 唯一ID
+  id: string;
+  // 存证ID
+  nftId: string;
+  // 名称
+  name: string;
+  // 编号
+  code: string;
+  // 价格
+  price: number;
+  // 归属用户ID
+  belongId: string;
+  // 市场ID
+  marketId: string;
+  // 订单内容
+  content: string;
+};
+
+export type OrderPayModel = {
+  // 唯一ID
+  id: string;
+  // 支付总价
+  price: number;
+  // 支付方式
+  paymentType: string;
+  // 备注
+  remark: string;
+};
+
+export type WorkDefineModel = {
+  // 流程Id
+  id: string;
+  // 流程名称
+  name: string;
+  // 流程编号
+  code: string;
+  // 流程节点
+  resource: WorkNodeModel | undefined;
+  // 备注
+  remark: string;
+  // 共享组织Id
+  shareId: string;
+  // 归属分类Id
+  speciesId: string;
+  // 源数据分类Id
+  sourceIds: string;
+  // 是否创建实体
   isCreate: boolean;
 };
 
-export type FlowNode = {
-  id?: string;
-  nodeId: string;
-  parentId: string;
+export type WorkInstanceModel = {
+  // 流程定义Id
+  defineId: string;
+  // 展示内容
+  content: string;
+  // 内容类型
+  contentType: string;
+  // 单数据内容
+  data: string;
+  // 标题
+  title: string;
+  // 回调地址
+  hook: string;
+  // 对应父流程实例节点任务Id
+  taskId: string;
+  // 操作对象Id集合
+  thingIds: string[];
+};
+
+export type WorkNodeModel = {
+  id: string;
+  // 节点编号
+  code: string;
+  // 节点类型
   type: string;
+  // 节点名称
   name: string;
-  desc: string;
-  props: Prop;
-  children: FlowNode;
-  branches: Branche[];
+  // 子节点
+  children: WorkNodeModel | undefined;
+  // 节点分支
+  branches: Branche[] | undefined;
+  // 节点审批数量
+  num: number;
+  // 节点审批目标类型
+  destType: string;
+  // 节点审批目标Id
+  destId: string;
+  // 节点目标名称
+  destName: string;
+  // 节点归属组织
   belongId: string;
-  // 绑定的表单信息
-  operations: XOperation[];
+  // 节点归属定义Id
+  defineId: string;
+  // 绑定的单信息
+  forms: XForm[] | undefined;
 };
 
 export type Branche = {
-  id: string;
-  nodeId: string;
-  parentId: string;
-  name: string;
-  type: string;
-  conditions: Condition[];
-  children: FlowNode;
-  belongId?: string;
+  conditions: Condition[] | undefined;
+  children: WorkNodeModel | undefined;
 };
 
 export type Condition = {
-  pos: number;
-  paramKey: string;
-  paramLabel: string;
   key: string;
-  label: string;
-  type: string;
+  paramKey: string;
   val: string;
-  valLabel: string;
-};
-
-export type Prop = {
-  assignedType: string;
-  mode: string;
-  assignedUser: Assigned[];
-  refuse: Refuse;
-  friendDialogmode: boolean;
-  num: number;
-};
-
-export type Assigned = {
-  id: string;
-  name: string;
   type: string;
-  orgIds: string;
 };
 
-export type Refuse = {
-  type: string;
-  target: string;
-};
 export type QueryTaskReq = {
   // 流程定义Id
   defineId: string;
   // 任务类型 审批、抄送
   typeName: string;
-};
-
-export type FlowRelationModel = {
-  //流程定义Id
-  defineId: string;
-  // 业务标准Id
-  operationId: string;
-};
-
-export type FlowReq = {
-  // 类别Id
-  speciesId?: string;
-  // 空间Id
-  spaceId: string;
-  // 状态
-  status: number[];
-  // 分页
-  page: PageRequest;
-};
-
-export type RecordReq = {
-  // 空间Id
-  spaceId: string;
-  // 状态
-  status: number[];
-  // 分页
-  page: PageRequest;
 };
 
 export type ApprovalTaskReq = {
@@ -1037,10 +549,11 @@ export type ApprovalTaskReq = {
   // 数据
   data: string;
 };
+
 /**
  * 文件系统项分享数据
  */
-export type TargetShare = {
+export type ShareIcon = {
   /** 名称 */
   name: string;
   /** 类型 */
@@ -1057,11 +570,11 @@ export type FileItemShare = {
   /** 名称 */
   name: string;
   /** 共享链接 */
-  shareLink: string;
+  shareLink?: string;
   /** 拓展名 */
-  extension: string;
+  extension?: string;
   /** 缩略图 */
-  thumbnail: string;
+  thumbnail?: string;
 };
 /**
  * 文件系统项数据模型
@@ -1074,7 +587,7 @@ export type FileItemModel = {
   /** 修改时间 */
   dateModified: Date;
   /** 文件类型 */
-  contentType: string;
+  contentType?: string;
   /** 是否是目录 */
   isDirectory: boolean;
   /** 是否包含子目录 */
@@ -1083,14 +596,14 @@ export type FileItemModel = {
 
 /** 桶支持的操作 */
 export enum BucketOpreates {
-  List = 'List',
-  Create = 'Create',
-  Rename = 'Rename',
-  Move = 'Move',
-  Copy = 'Copy',
-  Delete = 'Delete',
-  Upload = 'Upload',
-  AbortUpload = 'AbortUpload',
+  'List' = 'List',
+  'Create' = 'Create',
+  'Rename' = 'Rename',
+  'Move' = 'Move',
+  'Copy' = 'Copy',
+  'Delete' = 'Delete',
+  'Upload' = 'Upload',
+  'AbortUpload' = 'AbortUpload',
 }
 
 /** 桶操作携带的数据模型 */

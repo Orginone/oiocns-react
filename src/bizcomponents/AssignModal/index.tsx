@@ -7,27 +7,18 @@ import { Input, Tooltip } from 'antd';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import cls from './index.module.less';
-import { PageRequest } from '@/ts/base/model';
 
 interface indexType<T> {
   placeholder?: string;
   columns: ProColumns<T>[];
   onFinish: (data: T[]) => void;
-  request: (params: PageRequest & { [key: string]: any }) => Promise<
-    | {
-        result: T[] | undefined;
-        offset: number;
-        limit: number;
-        total: number;
-      }
-    | undefined
-  >;
+  datasource: any[];
 }
 const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElement = (
   props,
 ) => {
   const [keyword, setKeyword] = useState('');
-  const { request, onFinish, columns, placeholder } = props;
+  const { datasource, onFinish, columns, placeholder } = props;
 
   return (
     <div className={cls.tableBox}>
@@ -46,6 +37,7 @@ const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElemen
       </div>
       <div className={cls.tableContent}>
         <ProTable
+          dataSource={datasource}
           cardProps={{ bodyStyle: { padding: 0 } }}
           scroll={{ y: 300 }}
           options={false}
@@ -61,28 +53,6 @@ const AssignModal: <T extends unknown>(props: indexType<T>) => React.ReactElemen
             onSelect: (_record: any, _selected: any, selectedRows: any) => {
               onFinish(selectedRows);
             },
-          }}
-          request={async (params) => {
-            const {
-              current: pageIndex = 1,
-              pageSize = 10,
-              filter = '',
-              ...other
-            } = params;
-            const page: PageRequest = {
-              filter: filter,
-              limit: pageSize,
-              offset: (pageIndex - 1) * pageSize,
-            };
-            const res = await request(other ? { ...other, ...page } : page);
-            if (res) {
-              return {
-                total: res.total || 0,
-                data: (res.result as []) || [],
-                success: true,
-              };
-            }
-            return { total: 0, data: [], success: true };
           }}
         />
       </div>

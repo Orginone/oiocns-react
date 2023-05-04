@@ -18,7 +18,7 @@ const CardListContent = ({
   const FileCard = (el: IFileSystemItem) => (
     <Dropdown
       menu={{
-        items: loadFileSysItemMenus(el),
+        items: loadFileSysItemMenus(),
         onClick: ({ key }) => {
           handleMenuClick(key, el);
         },
@@ -38,14 +38,14 @@ const CardListContent = ({
         <div className={cls.fileImage}>
           <Image
             preview={false}
-            height={el.target.thumbnail.length > 0 ? 'auto' : 60}
-            src={getThumbnail(el.target)}
+            height={el.metadata.thumbnail ? 'auto' : 60}
+            src={getThumbnail(el.metadata)}
             fallback="/icons/default_file.svg"
           />
         </div>
-        <div className={cls.fileName} title={el.name}>
-          <Typography.Text title={el.name} ellipsis>
-            {el.name}
+        <div className={cls.fileName} title={el.metadata.name}>
+          <Typography.Text title={el.metadata.name} ellipsis>
+            {el.metadata.name}
           </Typography.Text>
         </div>
       </Card>
@@ -54,7 +54,7 @@ const CardListContent = ({
   return (
     <Dropdown
       menu={{
-        items: loadFileSysItemMenus(current, true),
+        items: loadFileSysItemMenus(),
         onClick: ({ key }) => {
           handleMenuClick(key, current);
         },

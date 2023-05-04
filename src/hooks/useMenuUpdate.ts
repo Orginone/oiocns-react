@@ -10,7 +10,7 @@ import { findMenuItemByKey } from '@/utils/tools';
  */
 
 const useMenuUpdate = (
-  loadMenu: () => Promise<MenuItemType>,
+  loadMenu: () => MenuItemType,
 ): [
   string,
   MenuItemType | undefined,

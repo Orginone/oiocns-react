@@ -1,3 +1,43 @@
+//特性和属性的关系
+export type XAttrLinkProp = {
+  // 雪花ID
+  id: string;
+  // 特性ID
+  attrId: string;
+  // 属性ID
+  propId: string;
+  // 归属用户ID
+  belongId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 关联的属性
+  property: XProperty | undefined;
+  // 关联的特性
+  attribute: XAttribute | undefined;
+};
+
+//特性和属性的关系查询返回集合
+export type XAttrLinkPropArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XAttrLinkProp[] | undefined;
+};
+
 //度量特性定义
 export type XAttribute = {
   // 雪花ID
@@ -6,20 +46,18 @@ export type XAttribute = {
   name: string;
   // 编号
   code: string;
-  // 公开的
-  public: boolean;
-  // 单位
-  unit: string;
-  // 属性Id
-  propId: string;
   // 备注
   remark: string;
   // 类别ID
   speciesId: string;
-  // 创建组织/个人
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
   belongId: string;
-  // 工作权限Id
+  // 工作职权Id
   authId: string;
+  // 属性Id
+  propId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -32,19 +70,25 @@ export type XAttribute = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 字典类型
+  // 附加过属性的物
+  linkPropertys: XProperty[] | undefined;
+  // 属性关系
+  links: XAttrLinkProp[] | undefined;
+  // 关联属性
   property: XProperty | undefined;
-  // 度量特性对应的类别
+  // 单设计项
+  formItems: XFormItem[] | undefined;
+  // 特性对应的类别
   species: XSpecies | undefined;
-  // 工作权限
+  // 工作职权
   authority: XAuthority | undefined;
-  // 创建度量标准的组织/个人
+  // 创建度量标准的用户
   belong: XTarget | undefined;
 };
 
 //度量特性定义查询返回集合
 export type XAttributeArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -52,143 +96,6 @@ export type XAttributeArray = {
   total: number;
   // 结果
   result: XAttribute[] | undefined;
-};
-
-export type XOperationRelation = {
-  // 雪花ID
-  id: string;
-  // 子表分类ID
-  speciesId: string;
-  // 表单设计
-  operationId: string;
-  // 归属个人/组织
-  belongId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-};
-
-//度量特性定义查询返回集合
-export type XOperationRelationArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XOperationRelation[] | undefined;
-};
-
-//业务标准定义
-export type XOperation = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 公开的
-  public: boolean;
-  // 备注
-  remark: string;
-  // 类别ID
-  speciesId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 度量特性对应的类别
-  species: XSpecies | undefined;
-  // 创建度量标准的组织/个人
-  belong: XTarget | undefined;
-  // 子项
-  items: XOperationItem[] | undefined;
-};
-
-//业务标准查询返回集合
-export type XOperationArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XOperation[] | undefined;
-};
-
-//业务标准定义项
-export type XOperationItem = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 规则
-  rule: string;
-  // 备注
-  remark: string;
-  // 业务ID
-  operationId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 绑定的特性ID
-  attrId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 度量特性对应的类别
-  operation: XOperation | undefined;
-  // 创建度量标准的组织/个人
-  belong: XTarget | undefined;
-  // 绑定的特性
-  attr: XAttribute | undefined;
-  // 子表关联的分类
-  containSpecies: XSpecies[] | undefined;
-  // 子项与分类的关联
-  operationRelations: XOperationRelation[] | undefined;
-};
-
-//业务标准查询返回集合
-export type XOperationItemArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XOperationItem[] | undefined;
 };
 
 //权限定义
@@ -201,11 +108,15 @@ export type XAuthority = {
   code: string;
   // 备注
   remark: string;
+  // 图标
+  icon: string;
   // 公开的
   public: boolean;
   // 上级权限ID
   parentId: string;
-  // 创建组织/个人
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
   belongId: string;
   // 状态
   status: number;
@@ -223,13 +134,19 @@ export type XAuthority = {
   parent: XAuthority | undefined;
   // 上下级权限
   nodes: XAuthority[] | undefined;
-  // 创建权限标准的组织/个人
+  // 归属用户
   belong: XTarget | undefined;
+  // 权限对应的身份
+  identitys: XIdentity[] | undefined;
+  // 权限可操作的类别
+  authSpecies: XSpecies[] | undefined;
+  // 权限可操作的度量
+  autAttrs: XAttribute[] | undefined;
 };
 
 //权限定义查询返回集合
 export type XAuthorityArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -247,11 +164,11 @@ export type XDict = {
   name: string;
   // 编号
   code: string;
+  // 图标
+  icon: string;
   // 备注
   remark: string;
-  // 公开的
-  public: boolean;
-  // 创建组织/个人
+  // 归属用户ID
   belongId: string;
   // 状态
   status: number;
@@ -267,7 +184,9 @@ export type XDict = {
   updateTime: string;
   // 字典项
   dictItems: XDictItem[] | undefined;
-  // 创建类别标准的组织/个人
+  // 使用该字典的度量属性
+  dictProps: XProperty[] | undefined;
+  // 创建类别标准的用户
   belong: XTarget | undefined;
 };
 
@@ -291,12 +210,14 @@ export type XDictItem = {
   name: string;
   // 值
   value: string;
-  // 公开的
-  public: boolean;
-  // 创建组织/个人
+  // 图标
+  icon: string;
+  // 创建用户ID
   belongId: string;
   // 字典类型ID
   dictId: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -311,7 +232,7 @@ export type XDictItem = {
   updateTime: string;
   // 字典类型
   dict: XDict | undefined;
-  // 创建类别标准的组织/个人
+  // 创建类别标准的用户
   belong: XTarget | undefined;
 };
 
@@ -327,62 +248,22 @@ export type XDictItemArray = {
   result: XDictItem[] | undefined;
 };
 
-//应用资源分发
-export type XExtend = {
-  // 雪花ID
-  id: string;
-  // 源对象
-  sourceId: string;
-  // 目标类型
-  destType: string;
-  // 目标对象Id
-  destId: string;
-  // 所属组织/个人
-  belongId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 资源归属的组织/个人
-  belong: XTarget | undefined;
-};
-
-//应用资源分发查询返回集合
-export type XExtendArray = {
-  // 便宜量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XExtend[] | undefined;
-};
-
-//流程定义
-export type XFlowDefine = {
+//单定义
+export type XForm = {
   // 雪花ID
   id: string;
   // 名称
   name: string;
-  // 编码
+  // 编号
   code: string;
-  // 共享组织
-  shareId: string;
-  // 归属组织/个人Id
-  belongId: string;
-  // 流程内容Json
-  content: string;
   // 备注
   remark: string;
+  // 类别ID
+  speciesId: string;
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
+  belongId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -395,120 +276,44 @@ export type XFlowDefine = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 归属组织/个人
-  target: XTarget;
-  // 分类id
-  speciesId?: string;
-  // 权限Id
-  authId?: string;
-  // 公开的
-  public?: boolean;
-  //数据源id
-  sourceIds: string;
-  //是否创建实体  bool值
-  isCreate: boolean;
+  // 单设计详情项
+  items: XFormItem[] | undefined;
+  // 单设计针对的分类
+  bindNodes: XWorkNode[] | undefined;
+  // 单设计针对的分类
+  species: XSpecies | undefined;
+  // 创建度量标准的用户
+  belong: XTarget | undefined;
 };
 
-export type XFlowNode = {
+//单定义查询返回集合
+export type XFormArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XForm[] | undefined;
+};
+
+//单项定义
+export type XFormItem = {
   // 雪花ID
   id: string;
-  // 前端定义的编码 代替原先的NodeId
-  code: string;
-  // 节点类型
-  nodeType: string;
-  // 节点名称
+  // 名称
   name: string;
-  // 审批数量
-  count: number;
-  // 节点审批操作人类型 暂只支持 '角色'
-  destType: string;
-  // 节点审批操作Id 如 '角色Id'
-  destId: number | undefined;
-  // 节点审批操作名称 如 '角色名称'
-  destName: string;
-  // 节点归属
-  belongId: string;
-  // 节点绑定的表单
-  bindOperations: XOperation[];
-};
-
-export type FlowNode = {
-  // 雪花ID
-  id: string;
-  // 前端定义的编码 代替原先的NodeId
+  // 编号
   code: string;
-  // 节点类型
-  type: string;
-  // 节点名称
-  name: string;
-  // 审批数量
-  num: number;
-  // 节点审批操作人类型 暂只支持 '角色'
-  destType: string;
-  // 节点审批操作Id 如 '角色Id'
-  destId: string | undefined;
-  // 节点审批操作名称 如 '角色名称'
-  destName: string;
-  // 子节点
-  children: FlowNode | undefined;
-  // 分支节点
-  branches: Branche[];
-  // 节点绑定的表单
-  operations: XOperation[];
-};
-
-export type Branche = {
-  //名称
-  name?: string;
-  //父节点
-  parentId?: string;
-  // 分支条件
-  conditions: Condition[];
-  // 分支子节点
-  children: FlowNode;
-};
-
-export type Condition = {
   // 规则
-  paramKey: string;
-  // 键
-  key: string;
-  // 类型
-  type: string;
-  // 值
-  val: string;
-};
-
-//流程定义查询返回集合
-export type XFlowDefineArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XFlowDefine[] | undefined;
-};
-
-//流程实例
-export type XFlowInstance = {
-  // 雪花ID
-  id: string;
-  // 流程定义Id
-  defineId: string;
-  // 应用Id
-  productId: string;
-  // 标题
-  title: string;
-  // 展示内容类型
-  contentType: string;
-  // 展示内容
-  content: string;
-  // 表单数据
-  data: string;
-  // 回调钩子
-  hook: string;
+  rule: string;
+  // 备注
+  remark: string;
+  // 特性Id
+  attrId: string;
+  // 业务Id
+  formId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -521,58 +326,14 @@ export type XFlowInstance = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 流程的定义
-  define: XFlowDefine | undefined;
-  // 审批任务
-  historyTasks: XFlowTaskHistory[] | undefined;
-  // 归属
-  belongId: string;
-  // 填写的表单Id集合
-  operationIds: string;
-  // 物的Id集合
-  thingIds: string;
+  // 业务单
+  form: XForm | undefined;
+  // 单项关联的特性
+  attr: XAttribute | undefined;
 };
 
-//流程实例查询返回集合
-export type XFlowInstanceArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XFlowInstance[] | undefined;
-};
-
-//流程节点数据
-export type XFlowRecord = {
-  // 雪花ID
-  id: string;
-  // 节点任务
-  taskId: string;
-  // 评论
-  comment: string;
-  // 内容
-  data: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 历史
-  historyTask: XFlowTaskHistory;
-};
-
-//流程节点数据查询返回集合
-export type XFlowRecordArray = {
+//单项定义查询返回集合
+export type XFormItemArray = {
   // 便宜量
   offset: number;
   // 最大数量
@@ -580,17 +341,17 @@ export type XFlowRecordArray = {
   // 总数
   total: number;
   // 结果
-  result: XFlowRecord[] | undefined;
+  result: XFormItem[] | undefined;
 };
 
-//流程对应
-export type XFlowRelation = {
+//身份证明
+export type XIdProof = {
   // 雪花ID
   id: string;
-  // 业务标准Id
-  operationId: string;
-  // 流程定义Id
-  defineId: string;
+  // 身份ID
+  identityId: string;
+  // 对象ID
+  targetId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -603,14 +364,14 @@ export type XFlowRelation = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 流程的定义
-  define: XFlowDefine | undefined;
-  // 业务标准
-  operation: XOperation | undefined;
+  // 身份证明证明的用户
+  target: XTarget | undefined;
+  // 身份证明证明的身份
+  identity: XIdentity | undefined;
 };
 
-//流程对应查询返回集合
-export type XFlowRelationArray = {
+//身份证明查询返回集合
+export type XIdProofArray = {
   // 便宜量
   offset: number;
   // 最大数量
@@ -618,96 +379,10 @@ export type XFlowRelationArray = {
   // 总数
   total: number;
   // 结果
-  result: XFlowRelation[] | undefined;
+  result: XIdProof[] | undefined;
 };
 
-//流程任务
-export type XFlowTask = {
-  // 雪花ID
-  id: string;
-  // 流程定义节点id
-  nodeId: string;
-  // 流程实例id
-  instanceId: string;
-  // 节点分配目标Id
-  identityId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 任务审批的角色
-  identity: XIdentity | undefined;
-  // 流程的定义
-  flowInstance: XFlowInstance | undefined;
-  // 流程节点
-  node: XFlowNode | undefined;
-};
-
-//流程任务查询返回集合
-export type XFlowTaskArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XFlowTask[] | undefined;
-};
-
-//流程任务
-export type XFlowTaskHistory = {
-  // 雪花ID
-  id: string;
-  // 流程定义节点id
-  nodeId: string;
-  // 流程实例id
-  instanceId: string;
-  // 节点分配目标Id
-  identityId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 流程节点记录
-  records: XFlowRecord[] | undefined;
-  // 任务审批的角色
-  identity: XIdentity | undefined;
-  // 流程的定义
-  instance: XFlowInstance | undefined;
-  // 流程节点
-  node: XFlowNode | undefined;
-};
-
-//流程任务查询返回集合
-export type XFlowTaskHistoryArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XFlowTaskHistory[] | undefined;
-};
-
-//角色
+//身份
 export type XIdentity = {
   // 雪花ID
   id: string;
@@ -717,9 +392,11 @@ export type XIdentity = {
   code: string;
   // 备注
   remark: string;
-  // 权限Id
+  // 职权Id
   authId: string;
-  // 创建组织/个人
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
   belongId: string;
   // 状态
   status: number;
@@ -733,17 +410,25 @@ export type XIdentity = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 赋予角色的组织/个人
+  // 身份证明
+  idProofs: XIdProof[] | undefined;
+  // 身份集关系
+  identityTeams: XTeamIdentity[] | undefined;
+  // 赋予身份的用户
   givenTargets: XTarget[] | undefined;
-  // 角色的类别
+  // 身份集对于组织
+  teams: XTeam[] | undefined;
+  // 身份的类别
   authority: XAuthority | undefined;
-  // 创建角色的组织/个人
+  // 共享用户
+  share: XTarget | undefined;
+  // 归属用户
   belong: XTarget | undefined;
 };
 
-//角色查询返回集合
+//身份查询返回集合
 export type XIdentityArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -751,52 +436,6 @@ export type XIdentityArray = {
   total: number;
   // 结果
   result: XIdentity[] | undefined;
-};
-
-//及时通讯
-export type XImMsg = {
-  // 雪花ID
-  id: string;
-  // 工作空间Id
-  spaceId: string;
-  // 归属用户Id
-  belongId: string;
-  // 发起方Id
-  fromId: string;
-  // 接收方Id
-  toId: string;
-  // 消息类型
-  msgType: string;
-  // 消息体
-  msgBody: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 显示文本
-  showTxt: string;
-  // 允许编辑
-  allowEdit: boolean;
-};
-
-//及时通讯查询返回集合
-export type XImMsgArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XImMsg[] | undefined;
 };
 
 //操作日志
@@ -809,6 +448,8 @@ export type XLog = {
   module: string;
   // 内容
   content: string;
+  // 归属用户ID
+  belongId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -835,138 +476,6 @@ export type XLogArray = {
   result: XLog[] | undefined;
 };
 
-//交易市场
-export type XMarket = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 备注
-  remark: string;
-  // 图片
-  photo?: string;
-  // 加入操作是否公开的
-  joinPublic: boolean;
-  // 售卖操作是否公开
-  sellPublic: boolean;
-  // 购买操作是否公开
-  buyPublic: boolean;
-  // 创建组织/个人
-  belongId: string;
-  // 市场监管组织/个人
-  samrId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 市场归属的组织/个人
-  belong: XTarget | undefined;
-};
-
-//交易市场查询返回集合
-export type XMarketArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XMarket[] | undefined;
-};
-
-//组织/个人与市场关系
-export type XMarketRelation = {
-  // 雪花ID
-  id: string;
-  // 市场ID
-  marketId: string;
-  // 组织/个人ID
-  targetId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 组织/个人ID
-  target: XTarget | undefined;
-  // 商店
-  market: XMarket | undefined;
-};
-
-//组织/个人与市场关系查询返回集合
-export type XMarketRelationArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XMarketRelation[] | undefined;
-};
-
-//商品信息
-export type XMerchandise = {
-  // 雪花ID
-  id: string;
-  // 标题
-  caption: string;
-  // 产品ID
-  productId: string;
-  // 单价
-  price: number;
-  // 出售权属
-  sellAuth: string;
-  // 有效期
-  days: string | number;
-  // 商品出售市场ID
-  marketId: string;
-  // 描述信息
-  information: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-};
-
-//商品信息查询返回集合
-export type XMerchandiseArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XMerchandise[] | undefined;
-};
-
 //采购订单
 export type XOrder = {
   // 雪花ID
@@ -979,8 +488,12 @@ export type XOrder = {
   code: string;
   // 总价
   price: number;
-  // 创建组织/个人
+  // 市场ID
+  marketId: string;
+  // 归属用户ID
   belongId: string;
+  // 订单内容
+  content: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -993,13 +506,15 @@ export type XOrder = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 相关商品
-  details?: XOrderDetail[];
+  // 支付详情
+  pays: XOrderPay[] | undefined;
+  // 创建订单的用户
+  belong: XTarget | undefined;
 };
 
 //采购订单查询返回集合
 export type XOrderArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1009,66 +524,18 @@ export type XOrderArray = {
   result: XOrder[] | undefined;
 };
 
-//订单详情
-export type XOrderDetail = {
-  // 雪花ID
-  id: string;
-  // 订单ID
-  orderId: string;
-  // 商品ID
-  merchandiseId: string;
-  // 商品信息
-  merchandise?: XMerchandise[];
-  // 卖方ID
-  sellerId: string;
-  // 卖方产品来源
-  productSource: string;
-  // 出售权属
-  sellAuth: string;
-  // 总价
-  price: number;
-  // 有效期
-  days: string;
-  // 标题
-  caption: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 采购订单
-  order?: XOrder;
-};
-
-//订单详情查询返回集合
-export type XOrderDetailArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XOrderDetail[] | undefined;
-};
-
 //支付详情
 export type XOrderPay = {
   // 雪花ID
   id: string;
   // 订单ID
-  orderDetailId: string;
+  orderId: string;
   // 支付总价
   price: number;
   // 支付方式
   paymentType: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1082,12 +549,12 @@ export type XOrderPay = {
   // 更新时间
   updateTime: string;
   // 订单
-  orderDetail: XOrderDetail | undefined;
+  orderDetail: XOrder | undefined;
 };
 
 //支付详情查询返回集合
 export type XOrderPayArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1097,30 +564,28 @@ export type XOrderPayArray = {
   result: XOrderPay[] | undefined;
 };
 
-//产品信息
-export type XProduct = {
+//属性定义
+export type XProperty = {
   // 雪花ID
   id: string;
   // 名称
   name: string;
   // 编号
   code: string;
-  // 来源
-  source: string;
-  // 权属
-  authority: string;
-  // 对哪一类制定的标准
-  typeName: string;
-  // 归属组织/个人
-  belongId: string;
-  // 元数据Id
-  thingId: string;
-  // 订单ID
-  orderId: string;
-  // 过期时间
-  endTime: string;
+  // 值类型
+  valueType: string;
+  // 计量单位
+  unit: string;
   // 备注
   remark: string;
+  // 类别ID
+  speciesId: string;
+  // 字典的类型ID
+  dictId: string;
+  // 来源用户ID
+  sourceId: string;
+  // 归属用户ID
+  belongId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1133,27 +598,37 @@ export type XProduct = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 产品的资源
-  resource: XResource[] | undefined;
-  // 产品的本质
-  thing: XThing | undefined;
-  // 产品归属的组织/个人
+  // 给物的度量标准
+  linkAttributes: XAttribute[] | undefined;
+  // 特性关系
+  links: XAttrLinkProp[] | undefined;
+  // 创建的特性集
+  attributes: XAttribute[] | undefined;
+  // 附加过属性的物
+  things: XThing[] | undefined;
+  // 属性的物的度量
+  propThingValues: XThingProp[] | undefined;
+  // 属性对应的类别
+  species: XSpecies | undefined;
+  // 字典类型
+  dict: XDict | undefined;
+  // 归属的用户
   belong: XTarget | undefined;
 };
 
-//产品信息查询返回集合
-export type XProductArray = {
-  // 偏移量
+//属性定义查询返回集合
+export type XPropertyArray = {
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
   // 总数
   total: number;
   // 结果
-  result: XProduct[] | undefined;
+  result: XProperty[] | undefined;
 };
 
-//组织/个人关系
+//用户关系
 export type XRelation = {
   // 雪花ID
   id: string;
@@ -1173,17 +648,15 @@ export type XRelation = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 关系的度量
-  attrValues: XThingAttr[] | undefined;
   // 关联的组织团队
   team: XTeam | undefined;
   // 关联的组织实体
   target: XTarget | undefined;
 };
 
-//组织/个人关系查询返回集合
+//用户关系查询返回集合
 export type XRelationArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1191,136 +664,6 @@ export type XRelationArray = {
   total: number;
   // 结果
   result: XRelation[] | undefined;
-};
-
-//应用资源
-export type XResource = {
-  // 雪花ID
-  id: string;
-  // 编号
-  code: string;
-  // 名称
-  name: string;
-  // 产品ID
-  productId: string;
-  // 访问私钥
-  privateKey: string;
-  // 入口
-  link: string;
-  // 流程项
-  flows: string;
-  // 组件
-  components: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  //
-  product: XProduct | undefined;
-};
-
-//应用资源查询返回集合
-export type XResourceArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XResource[] | undefined;
-};
-
-//规则与度量标准关系
-export type XRuleAttr = {
-  // 雪花ID
-  id: string;
-  // 规则ID
-  ruleId: string;
-  // 度量标准ID
-  attrId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 规则
-  ruleStd: XRuleStd | undefined;
-  // 标准
-  attribute: XAttribute | undefined;
-};
-
-//规则与度量标准关系查询返回集合
-export type XRuleAttrArray = {
-  // 便宜量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XRuleAttr[] | undefined;
-};
-
-//标准要求
-export type XRuleStd = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 备注
-  remark: string;
-  // 对哪一类制定的标准
-  typeName: string;
-  // 组织/个人ID
-  targetId: string;
-  // 容器ID
-  containerId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 标准要求
-  ruleAttrs: XRuleAttr[] | undefined;
-  // 组织/个人
-  target: XTarget | undefined;
-};
-
-//标准要求查询返回集合
-export type XRuleStdArray = {
-  // 便宜量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XRuleStd[] | undefined;
 };
 
 //类别定义
@@ -1333,14 +676,18 @@ export type XSpecies = {
   code: string;
   // 备注
   remark: string;
-  // 公开的
-  public: boolean;
+  // 图标
+  icon: string;
+  // 类型
+  typeName: string;
   // 父类别ID
   parentId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 工作权限Id
+  // 工作职权Id
   authId: string;
+  // 共享容器ID
+  shareId: string;
+  // 归属用户ID
+  belongId: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1353,13 +700,21 @@ export type XSpecies = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 分类下的办事
+  defines: XWorkDefine[] | undefined;
+  // 类别下的属性
+  propertys: XProperty[] | undefined;
+  // 类别的度量标准
+  attributes: XAttribute[] | undefined;
+  // 类别的业务单
+  forms: XForm[] | undefined;
   // 分类的结构
   parent: XSpecies | undefined;
   // 分类的结构
   nodes: XSpecies[] | undefined;
-  // 工作权限
+  // 工作职权
   authority: XAuthority | undefined;
-  // 创建类别标准的组织/个人
+  // 创建类别标准的用户
   belong: XTarget | undefined;
 };
 
@@ -1375,99 +730,7 @@ export type XSpeciesArray = {
   result: XSpecies[] | undefined;
 };
 
-//度量特性定义
-export type XProperty = {
-  // 雪花ID
-  id: string;
-  // 名称
-  name: string;
-  // 编号
-  code: string;
-  // 类型
-  valueType: string;
-  // 单位
-  unit: string;
-  // 字典Id
-  dictId: string;
-  // 备注
-  remark: string;
-  // 创建组织/个人
-  belongId: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 字典类型
-  dict: XDict | undefined;
-  // 创建度量标准的组织/个人
-  belong: XTarget | undefined;
-};
-
-//度量特性定义查询返回集合
-export type XPropertyArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XProperty[] | undefined;
-};
-
-//商品暂存
-export type XStaging = {
-  // 雪花ID
-  id: string;
-  // 商品ID
-  merchandiseId: string;
-  // 创建组织/个人
-  belongId: string;
-  // 订单采购的市场
-  marketId: string;
-  // 数量
-  number: string;
-  // 状态
-  status: number;
-  // 创建人员ID
-  createUser: string;
-  // 更新人员ID
-  updateUser: string;
-  // 修改次数
-  version: string;
-  // 创建时间
-  createTime: string;
-  // 更新时间
-  updateTime: string;
-  // 暂存区针对的市场
-  market: XMarket | undefined;
-  // 创建的组织/个人
-  belong: XTarget | undefined;
-  // 暂存的商品
-  merchandise: XMerchandise | undefined;
-};
-
-//商品暂存查询返回集合
-export type XStagingArray = {
-  // 偏移量
-  offset: number;
-  // 最大数量
-  limit: number;
-  // 总数
-  total: number;
-  // 结果
-  result: XStaging[] | undefined;
-};
-
-//组织/个人
+//用户
 export type XTarget = {
   // 雪花ID
   id: string;
@@ -1477,7 +740,13 @@ export type XTarget = {
   code: string;
   // 类型
   typeName: string;
-  // 归属
+  // 开放组织
+  public: boolean;
+  // 图标
+  icon: string;
+  // 备注
+  remark: string;
+  // 归属用户ID
   belongId: string;
   // 元数据
   thingId: string;
@@ -1493,21 +762,55 @@ export type XTarget = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 头像
-  avatar: string | undefined;
+  // 采购订单
+  orders: XOrder[] | undefined;
+  // 身份证明
+  idProofs: XIdProof[] | undefined;
+  // 组织的身份
+  shareIdentitys: XIdentity[] | undefined;
+  // 归属的身份
+  identitys: XIdentity[] | undefined;
+  // 属于该用户的物
+  things: XThing[] | undefined;
+  // 加入团队的关系
+  relations: XRelation[] | undefined;
   // 作为团队的影子
   team: XTeam | undefined;
-  // 赋予该组织/个人创建的角色
+  // 该用户创建的字典类型
+  dicts: XDict[] | undefined;
+  // 卖出的订单
+  sellOrder: XOrder[] | undefined;
+  // 该用户创建的字典项
+  dictItems: XDictItem[] | undefined;
+  // 该用户创建的类别标准
+  species: XSpecies[] | undefined;
+  // 该用户创建的度量标准
+  attributes: XAttribute[] | undefined;
+  // 该用户创建的属性
+  propertys: XProperty[] | undefined;
+  // 该用户创建的职权标准
+  authority: XAuthority[] | undefined;
+  // 加入的团队
+  relTeams: XTeam[] | undefined;
+  // 该用户创建的业务单
+  forms: XForm[] | undefined;
+  // 赋予该用户创建的身份
   givenIdentitys: XIdentity[] | undefined;
-  // 该组织或个人所属的组织/个人
+  // 该组织或个人所属的用户
   belong: XTarget | undefined;
-  // 组织/个人物的本质
+  // 该组织或个人所属的用户
+  targets: XTarget[] | undefined;
+  // 用户物的本质
   thing: XThing | undefined;
+  // 归属用户的办事定义
+  defines: XWorkDefine[] | undefined;
+  // 归属用户的办事实例
+  instances: XWorkInstance[] | undefined;
 };
 
-//组织/个人查询返回集合
+//用户查询返回集合
 export type XTargetArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1527,8 +830,6 @@ export type XTeam = {
   code: string;
   // 实体
   targetId: string;
-  // 备注
-  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1541,13 +842,21 @@ export type XTeam = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 加入团队的用户
+  relTargets: XTarget[] | undefined;
+  // 组织身份集关系
+  teamIdentitys: XTeamIdentity[] | undefined;
+  // 加入团队的用户的关系
+  relations: XRelation[] | undefined;
   // 团队的实体
   target: XTarget | undefined;
+  // 组织的身份集
+  identitys: XIdentity[] | undefined;
 };
 
 //虚拟组织查询返回集合
 export type XTeamArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1555,6 +864,44 @@ export type XTeamArray = {
   total: number;
   // 结果
   result: XTeam[] | undefined;
+};
+
+//用户身份
+export type XTeamIdentity = {
+  // 雪花ID
+  id: string;
+  // 身份ID
+  identityId: string;
+  // 用户ID
+  teamId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 身份加入的组织
+  team: XTeam | undefined;
+  // 组织包含的身份
+  identity: XIdentity | undefined;
+};
+
+//用户身份查询返回集合
+export type XTeamIdentityArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XTeamIdentity[] | undefined;
 };
 
 //(物/存在)
@@ -1567,7 +914,9 @@ export type XThing = {
   name: string;
   // 编号
   code: string;
-  // 归属
+  // 共享容器ID
+  shareId: string;
+  // 归属用户ID
   belongId: string;
   // 备注
   remark: string;
@@ -1583,23 +932,19 @@ export type XThing = {
   createTime: string;
   // 更新时间
   updateTime: string;
-  // 零件
-  nodes: XThing[] | undefined;
-  // 整件
-  parent: XThing[] | undefined;
-  // 物的特性度量值
-  thingAttrValues: XThingAttr[] | undefined;
-  // 给物的分类类别
-  givenSpecies: XSpecies[] | undefined;
+  // 物的属性集
+  thingPropValues: XThingProp[] | undefined;
+  // 物作为管理对象的映射
+  target: XTarget | undefined;
   // 给物的度量标准
-  givenAttributes: XAttribute[] | undefined;
+  givenPropertys: XProperty[] | undefined;
   // 物的归属
   belong: XTarget | undefined;
 };
 
 //(物/存在)查询返回集合
 export type XThingArray = {
-  // 偏移量
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
@@ -1609,20 +954,16 @@ export type XThingArray = {
   result: XThing[] | undefined;
 };
 
-//物的度量特性
-export type XThingAttr = {
+//物的属性值
+export type XThingProp = {
   // 雪花ID
   id: string;
   // 属性ID
-  attrId: string;
+  propId: string;
   // 元数据ID
   thingId: string;
-  // 关系ID
-  relationId: string;
-  // 数值
-  numValue: number;
-  // 描述
-  strValue: string;
+  // 值
+  value: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1636,35 +977,33 @@ export type XThingAttr = {
   // 更新时间
   updateTime: string;
   // 历史度量
-  histroy: XThingAttrHistroy[] | undefined;
+  histroy: XThingPropHistroy[] | undefined;
   // 度量的标准
-  attribute: XAttribute | undefined;
+  property: XProperty | undefined;
   // 度量的物
   thing: XThing | undefined;
 };
 
-//物的度量特性查询返回集合
-export type XThingAttrArray = {
-  // 偏移量
+//物的属性值查询返回集合
+export type XThingPropArray = {
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
   // 总数
   total: number;
   // 结果
-  result: XThingAttr[] | undefined;
+  result: XThingProp[] | undefined;
 };
 
-//物的度量特性历史
-export type XThingAttrHistroy = {
+//物的属性历史
+export type XThingPropHistroy = {
   // 雪花ID
   id: string;
   // 最新度量ID
-  thingAttrId: string;
-  // 数值
-  numValue: number;
-  // 描述
-  strValue: string;
+  thingPropId: string;
+  // 值
+  value: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1678,17 +1017,341 @@ export type XThingAttrHistroy = {
   // 更新时间
   updateTime: string;
   // 最新度量
-  thingAttr: XThingAttr | undefined;
+  thingProp: XThingProp | undefined;
 };
 
-//物的度量特性历史查询返回集合
-export type XThingAttrHistroyArray = {
-  // 偏移量
+//物的属性历史查询返回集合
+export type XThingPropHistroyArray = {
+  // 便宜量
   offset: number;
   // 最大数量
   limit: number;
   // 总数
   total: number;
   // 结果
-  result: XThingAttrHistroy[] | undefined;
+  result: XThingPropHistroy[] | undefined;
+};
+
+//办事定义
+export type XWorkDefine = {
+  // 雪花ID
+  id: string;
+  // 编码
+  code: string;
+  // 名称
+  name: string;
+  // 是否创建实体
+  isCreate: boolean;
+  // 备注
+  remark: string;
+  // 类别ID
+  speciesId: string;
+  // 操作主体的分类集合
+  sourceIds: string;
+  // 共享用户ID
+  shareId: string;
+  // 归属用户ID
+  belongId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事定义节点
+  nodes: XWorkNode[] | undefined;
+  // 办事的实例
+  instances: XWorkInstance[] | undefined;
+  // 归属用户
+  target: XTarget | undefined;
+  // 办事的归属类别
+  species: XSpecies | undefined;
+};
+
+//办事定义查询返回集合
+export type XWorkDefineArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkDefine[] | undefined;
+};
+
+//办事实例
+export type XWorkInstance = {
+  // 雪花ID
+  id: string;
+  // 标题
+  title: string;
+  // 办事定义Id
+  defineId: string;
+  // 展示内容类型
+  contentType: string;
+  // 对应父流程实例的节点任务
+  taskId: string;
+  // 展示内容
+  content: string;
+  // 携带的数据
+  data: string;
+  // 操作主体Id集合
+  thingIds: string;
+  // 回调钩子
+  hook: string;
+  // 归属用户ID
+  belongId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事任务
+  tasks: XWorkTask[] | undefined;
+  // 办事实例任务
+  historyTasks: XWorkTaskHistory[] | undefined;
+  // 办事的定义
+  define: XWorkDefine | undefined;
+  // 归属用户
+  target: XTarget | undefined;
+};
+
+//办事实例查询返回集合
+export type XWorkInstanceArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkInstance[] | undefined;
+};
+
+//办事定义节点
+export type XWorkNode = {
+  // 雪花ID
+  id: string;
+  // 节点规则
+  rule: string;
+  // 节点编号
+  code: string;
+  // 节点名称
+  name: string;
+  // 审批人数
+  count: number;
+  // 办事定义Id
+  defineId: string;
+  // 节点分配目标Id
+  destId: string;
+  // 节点分配目标名称
+  destName: string;
+  // 兄弟节点Id集合
+  brotherIds: string;
+  // 分支Id
+  branchId: string;
+  // 分支类型
+  branchType: number;
+  // 备注
+  remark: string;
+  // destType
+  destType: string;
+  // 节点类型
+  nodeType: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事实例任务
+  tasks: XWorkTask[] | undefined;
+  // 赋予身份的用户
+  bindFroms: XForm[] | undefined;
+  // 办事实例任务
+  historyTasks: XWorkTaskHistory[] | undefined;
+  // 办事的定义
+  define: XWorkDefine | undefined;
+};
+
+//办事定义节点查询返回集合
+export type XWorkNodeArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkNode[] | undefined;
+};
+
+//办事节点绑定
+export type XWorkNodeRelation = {
+  // 雪花ID
+  id: string;
+  // 办事节点
+  nodeId: string;
+  // 单设计
+  operationId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+};
+
+//办事节点绑定查询返回集合
+export type XWorkNodeRelationArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkNodeRelation[] | undefined;
+};
+
+//办事节点数据
+export type XWorkRecord = {
+  // 雪花ID
+  id: string;
+  // 节点任务
+  taskId: string;
+  // 评论
+  comment: string;
+  // 内容
+  data: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事的定义
+  historyTask: XWorkTaskHistory | undefined;
+};
+
+//办事节点数据查询返回集合
+export type XWorkRecordArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkRecord[] | undefined;
+};
+
+//办事任务
+export type XWorkTask = {
+  // 雪花ID
+  id: string;
+  // 办事定义节点id
+  nodeId: string;
+  // 办事实例id
+  instanceId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事节点
+  node: XWorkNode | undefined;
+  // 办事的定义
+  instance: XWorkInstance | undefined;
+};
+
+//办事任务查询返回集合
+export type XWorkTaskArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkTask[] | undefined;
+};
+
+//办事任务
+export type XWorkTaskHistory = {
+  // 雪花ID
+  id: string;
+  // 办事定义节点id
+  nodeId: string;
+  // 办事实例id
+  instanceId: string;
+  // 状态
+  status: number;
+  // 创建人员ID
+  createUser: string;
+  // 更新人员ID
+  updateUser: string;
+  // 修改次数
+  version: string;
+  // 创建时间
+  createTime: string;
+  // 更新时间
+  updateTime: string;
+  // 办事节点记录
+  records: XWorkRecord[] | undefined;
+  // 办事节点
+  node: XWorkNode | undefined;
+  // 办事的定义
+  instance: XWorkInstance | undefined;
+};
+
+//办事任务查询返回集合
+export type XWorkTaskHistoryArray = {
+  // 便宜量
+  offset: number;
+  // 最大数量
+  limit: number;
+  // 总数
+  total: number;
+  // 结果
+  result: XWorkTaskHistory[] | undefined;
 };

@@ -1,9 +1,7 @@
 import React from 'react';
 import cls from './index.module.less';
-import { pageAll, schema } from '@/ts/base';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { ISpace } from '@/ts/core';
 interface indexType {
   space: ISpace;
   searchFn: Function;

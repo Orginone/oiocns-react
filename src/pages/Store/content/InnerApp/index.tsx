@@ -7,8 +7,6 @@ import { InnerApplicationColumns } from '@/pages/Store/config/columns';
 import { XFlowDefine } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
-import { pageAll } from '@/ts/base';
-import { ISpace } from '@/ts/core';
 import WorkStartDo from '@/pages/Work/content/work/start';
 
 const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {

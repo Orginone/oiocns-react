@@ -4,7 +4,7 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
-import { ITarget } from '@/ts/core';
+import { ITeam } from '@/ts/core';
 import { AiOutlineBank } from 'react-icons/ai';
 import { parseAvatar } from '@/ts/base';
 
@@ -12,8 +12,8 @@ interface Iprops {
   title: string;
   open: boolean;
   handleCancel: () => void;
-  handleOk: (newItem: ITarget | undefined) => void;
-  current: ITarget;
+  handleOk: (newItem: ITeam | undefined) => void;
+  current: ITeam;
   typeNames: string[];
 }
 /*
@@ -35,7 +35,7 @@ const CreateTeamModal = (props: Iprops) => {
     },
     async customRequest(options) {
       const file = options.file as File;
-      const docDir = await orgCtrl.user.home?.create('头像');
+      const docDir = await orgCtrl.user.filesys?.home?.create('头像');
       if (docDir && file) {
         const result = await docDir.upload(file.name, file);
         if (result) {
@@ -47,7 +47,7 @@ const CreateTeamModal = (props: Iprops) => {
   const columns: ProFormColumnsType<TargetModel>[] = [
     {
       title: '图标',
-      dataIndex: 'avatar',
+      dataIndex: 'icon',
       colProps: { span: 24 },
       renderFormItem: () => {
         return (
@@ -135,12 +135,12 @@ const CreateTeamModal = (props: Iprops) => {
         if (open) {
           formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           if (props.title === '编辑') {
-            setAvatar(parseAvatar(props.current.target.avatar));
+            setAvatar(parseAvatar(props.current.metadata.icon));
             formRef.current?.setFieldsValue({
-              ...props.current.target,
-              teamName: props.current.target.team?.name,
-              teamCode: props.current.target.team?.code,
-              teamRemark: props.current.target.team?.remark,
+              ...props.current.metadata,
+              teamName: props.current.metadata.team?.name,
+              teamCode: props.current.metadata.team?.code,
+              teamRemark: props.current.metadata.remark,
             });
           }
         } else {
@@ -156,11 +156,12 @@ const CreateTeamModal = (props: Iprops) => {
       onFinish={async (values) => {
         values.teamName = values.teamName ?? values.name;
         values.teamCode = values.teamCode ?? values.code;
-        values.avatar = JSON.stringify(avatar);
+        values.icon = JSON.stringify(avatar);
         if (props.title === '编辑') {
-          props.handleOk(await props.current.update(values));
+          await props.current.update(values);
+          props.handleOk(props.current);
         } else {
-          props.handleOk(await props.current.create(values));
+          props.handleOk(await props.current.createTarget(values));
         }
       }}
       columns={columns}></SchemaForm>

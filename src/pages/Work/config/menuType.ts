@@ -7,5 +7,4 @@ export enum GroupMenuType {
 export enum OrganizationType {
   'Cohort' = '群组',
   'Group' = '外部机构',
-  'Working' = '工作群组',
 }

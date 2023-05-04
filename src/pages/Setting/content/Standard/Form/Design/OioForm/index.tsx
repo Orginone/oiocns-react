@@ -1,10 +1,7 @@
-import { kernel, pageAll } from '@/ts/base';
-import { XOperation, XOperationItem } from '@/ts/base/schema';
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import OioFormItem from './FormItems';
-import { ISpace } from '@/ts/core';
 
 type IProps = {
   space: ISpace;

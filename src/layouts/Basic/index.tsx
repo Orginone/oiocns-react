@@ -1,11 +1,10 @@
-import { Layout, Spin, message } from 'antd';
+import { Layout, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { renderRoutes } from 'react-router-config';
 import { IRouteConfig } from 'typings/globelType';
 import BasicHeader from './Header';
 import styles from './index.module.less';
 import orgCtrl from '@/ts/controller';
-import { logger, LoggerLevel } from '@/ts/base/common';
 
 type BasicLayoutProps = {
   route: IRouteConfig;
@@ -23,24 +22,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       setInited(true);
     }, 500);
   }, []);
-
-  logger.onLogger = (level, msg) => {
-    switch (level) {
-      case LoggerLevel.info:
-        message.info(msg);
-        break;
-      case LoggerLevel.warn:
-        message.warn(msg);
-        break;
-      case LoggerLevel.error:
-        message.error(msg);
-        break;
-      case LoggerLevel.unauth:
-        message.warn(msg);
-        sessionStorage.clear();
-        return history.push('/passport/login');
-    }
-  };
   return (
     <Layout className={styles['page-layout']}>
       {inited ? (

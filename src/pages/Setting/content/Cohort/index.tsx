@@ -47,7 +47,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   // 操作内容渲染函数
   const renderOperation = (item: schema.XTarget): common.OperationType[] => {
     let operations: common.OperationType[] = [];
-    if (item.id != orgCtrl.user.id) {
+    if (item.id != orgCtrl.user.metadata.id) {
       operations.push(
         ...[
           {
@@ -61,7 +61,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                  await orgCtrl.user.applyFriend(item);
+                  await orgCtrl.user.applyJoin([item]);
                   message.success('发起申请成功');
                 },
               });
@@ -74,7 +74,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           key: 'remove',
           label: '踢出',
           onClick: async () => {
-            if (await current.removeMember(item)) {
+            if (await current.removeMembers([item])) {
               forceUpdate();
             }
           },
@@ -87,12 +87,9 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const content = () => {
     return (
       <CardOrTable<schema.XTarget>
-        dataSource={[]}
+        dataSource={current.members}
         key={key}
         rowKey={'id'}
-        request={(page) => {
-          return current.loadMembers(page);
-        }}
         parentRef={parentRef}
         operation={renderOperation}
         columns={PersonColumns}
@@ -105,7 +102,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
     <div key={key} className={cls.companyContainer}>
       <Description
         title={
-          <Typography.Title level={5}>{current.target.typeName}信息</Typography.Title>
+          <Typography.Title level={5}>{current.metadata.typeName}信息</Typography.Title>
         }
         current={current}
         extra={[]}
@@ -145,11 +142,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           onCancel={() => setActiveModal('')}
           onOk={async () => {
             if (selectMember) {
-              const success = await current.pullMembers(
-                selectMember.map((n) => n.id),
-                selectMember[0].typeName,
-              );
-              if (success) {
+              if (await current.pullMembers(selectMember)) {
                 setActiveModal('');
                 message.success('添加成功');
                 forceUpdate();
@@ -160,7 +153,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           }}>
           <AssignModal<schema.XTarget>
             placeholder="请输入用户账号"
-            request={async (page: any) => await orgCtrl.user.loadMembers(page)}
+            datasource={orgCtrl.user.members}
             onFinish={(data) => {
               setSelectMember(data);
             }}

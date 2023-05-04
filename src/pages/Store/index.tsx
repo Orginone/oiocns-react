@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
-import { GroupMenuType, MenuType } from './config/menuType';
+import { MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
@@ -9,8 +9,7 @@ import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import { ProFormInstance } from '@ant-design/pro-components';
-import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
-import { ITarget } from '@/ts/core';
+import { IFileSystem, IFileSystemItem } from '@/ts/core';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 /** 仓库模块 */
@@ -28,8 +27,8 @@ const Package: React.FC = () => {
       onSelect={async (data) => {
         orgCtrl.currentKey = data.key;
         switch (data.itemType) {
-          case GroupMenuType.Things:
-            (data.item as ITarget).loadSpeciesTree();
+          case MenuType.FileSystem:
+            await (data.item as IFileSystem).home?.loadChildren();
             break;
           case MenuType.FileSystemItem:
             await (data.item as IFileSystemItem).loadChildren();

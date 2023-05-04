@@ -5,12 +5,10 @@ export enum MenuType {
 }
 
 export enum GroupMenuType {
-  'Working' = '内部群组',
   'Authority' = '角色群',
   'InnerAgency' = '内部机构',
   'OutAgency' = '外部机构',
   'Friends' = '我的好友',
-  'UserCohort' = '我的群组',
   'Station' = '单位岗位',
-  'CompanyCohort' = '对外群组',
+  'Cohort' = '我的群组',
 }

@@ -55,7 +55,7 @@ const TableContent = ({
                     width={32}
                     height={32}
                     preview={false}
-                    src={getThumbnail(record.target)}
+                    src={getThumbnail(record.metadata)}
                     fallback="/icons/default_file.svg"
                   />
                   <Typography.Text
@@ -74,7 +74,7 @@ const TableContent = ({
             valueType: 'number',
             width: 100,
             render: (_, record) => (
-              <Typography>{formatSize(record.target.size)}</Typography>
+              <Typography>{formatSize(record.metadata.size)}</Typography>
             ),
           },
           {
@@ -98,7 +98,7 @@ const TableContent = ({
                 <Dropdown
                   className={style['operation-btn']}
                   menu={{
-                    items: loadFileSysItemMenus(record),
+                    items: loadFileSysItemMenus(),
                     onClick: ({ key }) => {
                       handleMenuClick(key, record);
                     },

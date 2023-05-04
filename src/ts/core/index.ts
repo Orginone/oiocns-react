@@ -1,42 +1,21 @@
-import { Emitter } from '../base/common';
-import { XMarket, XTarget } from '../base/schema';
-import { Market } from './market';
-import Person from './target/person';
-
-export {
-  AuthorityType,
-  CommonStatus,
-  DomainTypes,
-  MessageType,
-  OrderStatus,
-  ProductType,
-  TargetType,
-  WorkType,
-} from './enum';
-export type { IMarket, IMerchandise, IProduct, IResource } from './market';
-export { msgNotify } from './target/chat/chat';
-export type { IChat } from './target/chat/ichat';
-export type {
-  ICohort,
-  ICompany,
-  IDepartment,
-  IGroup,
-  IMTarget,
-  IPerson,
-  ISpace,
-  ITarget,
-  IWorking,
-} from './target/itarget';
-export type { IFileSystemItem, TaskModel } from './target/store/ifilesys';
-export { findTargetShare } from './target/targetMap';
-export type { INullSpeciesItem, ISpeciesItem } from './target/thing';
-
-export const createPerson = (data: XTarget) => {
-  return new Person(data);
-};
-
-export const createMarket = (data: XMarket) => {
-  return new Market(data);
-};
-
-export const emitter = new Emitter();
+export type { IMsgChat } from './chat/message/msgchat';
+export { msgChatNotify } from './chat/message/msgchat';
+export { companyTypes, departmentTypes, orgAuth as OrgAuth } from './public/consts';
+export { MessageType, SpeciesType, TargetType } from './public/enums';
+export type { IAuthority } from './target/authority/authority';
+export type { IBelong } from './target/base/belong';
+export type { ITarget } from './target/base/target';
+export type { ITeam } from './target/base/team';
+export type { IIdentity } from './target/identity/identity';
+export type { IDepartment } from './target/innerTeam/department';
+export type { IStation } from './target/innerTeam/station';
+export type { ICohort } from './target/outTeam/cohort';
+export type { IGroup } from './target/outTeam/group';
+export type { IPerson } from './target/person';
+export type { ICompany } from './target/team/company';
+export type { ISpeciesItem } from './thing/base/species';
+export type { IDict } from './thing/dict/dict';
+export type { IFileSystemItem } from './thing/filesys/filesysItem';
+export type { IFileSystem } from './thing/filesys/filesystem';
+export type { TaskModel } from './thing/filesys/filesystem';
+export { UserProvider } from './user';

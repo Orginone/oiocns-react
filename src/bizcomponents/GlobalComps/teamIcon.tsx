@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { TargetType } from '@/ts/core';
 import * as im from 'react-icons/im';
-import { TargetShare } from '@/ts/base/model';
+import { ShareIcon } from '@/ts/base/model';
 import { Avatar, Image } from 'antd';
+import { TargetType } from '@/ts/core';
 
 interface teamTypeInfo {
   preview?: boolean;
   size?: number;
   fontSize?: number;
-  share: TargetShare;
+  share: ShareIcon;
   notAvatar?: boolean;
   title?: string;
 }

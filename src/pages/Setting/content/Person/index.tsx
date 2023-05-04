@@ -25,15 +25,7 @@ const PersonSetting: React.FC = () => {
   const [modalType, setModalType] = useState('');
   const [searchCallback, setSearchCallback] = useState<schema.XTarget[]>();
   const handleOk = async () => {
-    let success = false;
-    if (searchCallback && searchCallback.length > 0) {
-      if (searchCallback && searchCallback.length > 0) {
-        searchCallback.forEach(async (item) => {
-          success = await orgCtrl.user.applyFriend(item);
-        });
-      }
-    }
-    if (success) {
+    if (await orgCtrl.user.applyJoin(searchCallback || [])) {
       message.success('操作成功!');
       setModalType('');
     }
@@ -60,20 +52,16 @@ const PersonSetting: React.FC = () => {
             </Button>,
           ]}>
           <Descriptions.Item label="昵称">
-            <TeamIcon share={orgCtrl.user.shareInfo} size={40} preview={true} />
-            {orgCtrl.user.name}
+            <TeamIcon share={orgCtrl.user.share} size={40} preview={true} />
+            {orgCtrl.user.metadata.name}
           </Descriptions.Item>
-          <Descriptions.Item label="姓名">{orgCtrl.user.teamName}</Descriptions.Item>
           <Descriptions.Item label="账号">
             <Typography.Paragraph copyable>
-              {orgCtrl.user.target.code}
+              {orgCtrl.user.metadata.code}
             </Typography.Paragraph>
           </Descriptions.Item>
-          <Descriptions.Item label="联系方式">
-            {orgCtrl.user.target.team?.code}
-          </Descriptions.Item>
           <Descriptions.Item label="座右铭">
-            {orgCtrl.user.target.team?.remark}
+            {orgCtrl.user.metadata.remark}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -93,7 +81,7 @@ const PersonSetting: React.FC = () => {
         key: 'remove',
         label: '移除',
         onClick: async () => {
-          await orgCtrl.user.removeMember(item);
+          await orgCtrl.user.removeMembers([item]);
         },
       },
     ];
@@ -109,9 +97,6 @@ const PersonSetting: React.FC = () => {
           onTabChange={(key) => setTabKey(key)}
           tabBarExtraContent={
             <>
-              <Button type="link" onClick={() => history.push('/todo/org')}>
-                查看申请记录
-              </Button>
               <Button type="link" onClick={() => setModalType('friend')}>
                 添加好友
               </Button>
@@ -119,14 +104,11 @@ const PersonSetting: React.FC = () => {
           }>
           <div className={cls['page-content-table']} ref={parentRef}>
             <CardOrTable<schema.XTarget>
-              dataSource={[]}
+              dataSource={orgCtrl.user.members}
               showChangeBtn={false}
               parentRef={parentRef}
               params={tabKey}
               operation={renderOperation}
-              request={async (page) => {
-                return await orgCtrl.user.loadMembers(page);
-              }}
               columns={tabKey === 'companys' ? CompanyColumn : PersonColumns}
               rowKey={'id'}
             />

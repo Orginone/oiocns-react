@@ -5,14 +5,14 @@ import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
 import orgCtrl from '@/ts/controller';
-import { ISpace, ITarget } from '@/ts/core';
-import { XIdentity, XTarget } from '@/ts/base/schema';
+import { IIdentity, ITarget } from '@/ts/core';
+import { XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
 export type ResultType = {
   id: string;
   target: XTarget;
-  identitys: XIdentity[];
+  identitys: IIdentity[];
 };
 interface Iprops {
   multiple: boolean;

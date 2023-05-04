@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
-import { targetsToTreeData } from '@/pages/Setting';
 import { ISpace } from '@/ts/core';
 
 interface IProps {
