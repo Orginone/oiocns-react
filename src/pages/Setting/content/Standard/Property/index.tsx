@@ -3,16 +3,22 @@ import CardOrTable from '@/components/CardOrTableComp';
 import { XProperty } from '@/ts/base/schema';
 import { PropertyColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import PropertyModal from './modal';
+import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import { message } from 'antd';
+import { IPropClass } from '@/ts/core';
 /**
  * @description: 分类特性标准
  * @return {*}
  */
-const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
+const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
   const [modalType, setModalType] = useState('');
-  const [tkey, tforceUpdate] = useObjectUpdate(emitter);
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XProperty>();
+  useEffect(() => {
+    current.loadPropertys().then(() => {
+      tforceUpdate();
+    });
+  }, []);
   // 操作内容渲染函数
   const renderOperate = (item: XProperty) => {
     return [
@@ -28,7 +34,7 @@ const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
         key: '删除属性',
         label: '删除属性',
         onClick: async () => {
-          await current.property.deleteProperty(item.id);
+          await current.deleteProperty(item);
           tforceUpdate();
         },
       },
@@ -44,17 +50,14 @@ const Property: React.FC<any> = ({ current }: { current: ISpace }) => {
       <CardOrTable<XProperty>
         rowKey={'id'}
         params={tkey}
-        request={async (page) => {
-          return await current.property.loadPropertys(page);
-        }}
         operation={renderOperate}
         columns={PropertyColumns}
         showChangeBtn={false}
-        dataSource={[]}
+        dataSource={current.propertys}
       />
       {/** 新增/编辑属性模态框 */}
       <PropertyModal
-        space={current}
+        species={current}
         data={editData}
         open={modalType != ''}
         handleCancel={() => {

@@ -3,10 +3,11 @@ import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components'
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
+import { IPropClass } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
-  space: ISpace;
+  species: IPropClass;
   data: XProperty | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
@@ -14,7 +15,7 @@ interface Iprops {
 /*
   特性编辑模态框
 */
-const PropertyModal = ({ open, handleOk, space, data, handleCancel }: Iprops) => {
+const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) => {
   const [selectType, setSelectType] = useState<string>();
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
@@ -85,17 +86,15 @@ const PropertyModal = ({ open, handleOk, space, data, handleCancel }: Iprops) =>
         dataIndex: 'dictId',
         valueType: 'select',
         formItemProps: { rules: [{ required: true, message: '枚举分类为必填项' }] },
-        request: async () => {
-          const res = await space.dict.loadDict();
-          return (
-            res.result?.map((item) => {
-              return { id: item.id, label: item.name, value: item.id };
-            }) || []
-          );
-        },
         fieldProps: {
           disabled: selectType !== '选择型',
           showSearch: true,
+          options: species.current.space.dicts.map((i) => {
+            return {
+              value: i.metadata.id,
+              label: i.metadata.name,
+            };
+          }),
         },
       });
     }
@@ -142,11 +141,10 @@ const PropertyModal = ({ open, handleOk, space, data, handleCancel }: Iprops) =>
       }}
       onFinish={async (model) => {
         if (data) {
-          handleOk(
-            (await space.property?.updateProperty({ ...data, ...model })) != undefined,
-          );
+          model.id = data.id;
+          handleOk((await species.updateProperty(model)) != undefined);
         } else {
-          handleOk((await space.property?.createProperty(model)) != undefined);
+          handleOk((await species.createProperty(model)) != undefined);
         }
       }}
       columns={getFromColumns()}

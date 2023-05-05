@@ -1,4 +1,4 @@
-import { kernel, schema } from '../../../base';
+import { kernel, model, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { SpeciesType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
@@ -10,6 +10,12 @@ export interface IPropClass extends ISpeciesItem {
   propertys: schema.XProperty[];
   /** 加载属性 */
   loadPropertys(reload?: boolean): Promise<schema.XProperty[]>;
+  /** 新建表单特性 */
+  createProperty(data: model.PropertyModel): Promise<schema.XProperty | undefined>;
+  /** 更新表单特性 */
+  updateProperty(data: model.PropertyModel): Promise<boolean>;
+  /** 删除表单特性 */
+  deleteProperty(data: schema.XProperty): Promise<boolean>;
 }
 
 /** 属性分类的基类实现 */
@@ -35,5 +41,39 @@ export class PropClass extends SpeciesItem implements IPropClass {
       }
     }
     return this.propertys;
+  }
+  async createProperty(data: model.PropertyModel): Promise<schema.XProperty | undefined> {
+    data.speciesId = this.metadata.id;
+    const res = await kernel.createProperty(data);
+    if (res.success && res.data.id) {
+      this.propertys.push(res.data);
+      return res.data;
+    }
+  }
+  async updateProperty(data: model.PropertyModel): Promise<boolean> {
+    const index = this.propertys.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      data.speciesId = this.metadata.id;
+      const res = await kernel.updateProperty(data);
+      if (res.success && res.data.id) {
+        this.propertys[index] = res.data;
+      }
+      return res.success;
+    }
+    return false;
+  }
+  async deleteProperty(data: schema.XProperty): Promise<boolean> {
+    const index = this.propertys.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      const res = await kernel.deleteProperty({
+        id: data.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.propertys = this.propertys.splice(index, 1);
+      }
+      return res.success;
+    }
+    return false;
   }
 }

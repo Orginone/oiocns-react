@@ -16,6 +16,6 @@ export type { ICompany } from './target/team/company';
 export type { ISpeciesItem } from './thing/base/species';
 export type { IDict } from './thing/dict/dict';
 export type { IFileSystemItem } from './thing/filesys/filesysItem';
-export type { IFileSystem } from './thing/filesys/filesystem';
-export type { TaskModel } from './thing/filesys/filesystem';
+export type { IFileSystem, TaskModel } from './thing/filesys/filesystem';
+export type { IPropClass } from './thing/store/propclass';
 export { UserProvider } from './user';

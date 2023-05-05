@@ -6,6 +6,7 @@ import {
   ICompany,
   IDepartment,
   IGroup,
+  ISpeciesItem,
   IStation,
   ITarget,
   TargetType,
@@ -77,9 +78,9 @@ const TeamSetting: React.FC = () => {
             Modal.confirm({
               content: '确定要删除吗?',
               onOk: async () => {
-                // if (await (data.item as ISpeciesItem).delete()) {
-                //   setSelectMenu(selectMenu.parentMenu!);
-                // }
+                if (await (data.item as ISpeciesItem).delete()) {
+                  setSelectMenu(selectMenu.parentMenu!);
+                }
               },
             });
             break;

@@ -83,7 +83,7 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     label: species.metadata.name,
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: MenuType.Species,
-    menus: loadSpeciesMenus(),
+    menus: loadSpeciesMenus(species),
     children: species.children.map((i) => buildSpeciesTree(i)),
   };
   return result;
@@ -157,13 +157,16 @@ const loadStandardSetting = (belong: IBelong) => {
 };
 
 /** 加载右侧菜单 */
-const loadSpeciesMenus = () => {
-  const items = [
-    {
+const loadSpeciesMenus = (species: ISpeciesItem) => {
+  const items = [];
+  if (species.speciesTypes.length > 0) {
+    items.push({
       key: '新增',
       icon: <im.ImPlus />,
       label: '新增分类',
-    },
+    });
+  }
+  items.push(
     {
       key: '修改',
       icon: <im.ImCog />,
@@ -174,7 +177,7 @@ const loadSpeciesMenus = () => {
       icon: <im.ImBin />,
       label: '删除分类',
     },
-  ];
+  );
   return items;
 };
 

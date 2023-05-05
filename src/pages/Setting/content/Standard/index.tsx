@@ -1,5 +1,6 @@
-import { ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, SpeciesType } from '@/ts/core';
 import React from 'react';
+import Property from './Property';
 
 interface IProps {
   current: ISpeciesItem;
@@ -10,7 +11,12 @@ interface IProps {
  * @returns
  */
 const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
-  return <></>;
+  switch (current.metadata.typeName) {
+    case SpeciesType.PropClass:
+      return <Property current={current} />;
+    default:
+      return <></>;
+  }
 };
 
 export default SettingStandrad;
