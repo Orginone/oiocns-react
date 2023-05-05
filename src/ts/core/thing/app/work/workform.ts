@@ -1,7 +1,9 @@
-import { model, schema } from '../../../../base';
+import { PageAll } from '@/ts/core/public/consts';
+import { kernel, model, schema } from '../../../../base';
 import { ITarget } from '../../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../../base/species';
 import { IAppModule } from '../appmodule';
+import { TargetType } from '@/ts/core/public/enums';
 export interface IWorkForm extends ISpeciesItem {
   /** 表单 */
   forms: schema.XForm[];
@@ -32,30 +34,114 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
   }
   forms: schema.XForm[] = [];
   attributes: schema.XAttribute[] = [];
-  async loadForms(reload?: boolean | undefined): Promise<schema.XForm[]> {
-    throw new Error('Method not implemented.');
+  private _formLoaded: boolean = false;
+  private _attributeLoaded: boolean = false;
+  async loadForms(reload: boolean = false): Promise<schema.XForm[]> {
+    if (!this._formLoaded || reload) {
+      const res = await kernel.querySpeciesForms({
+        id: this.current.metadata.id,
+        speciesId: this.metadata.id,
+        belongId: this.current.space.metadata.id,
+        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upSpecies: true,
+        page: PageAll,
+      });
+      if (res.success) {
+        this._formLoaded = true;
+        this.forms = res.data.result || [];
+      }
+    }
+    return this.forms;
   }
   async createForm(data: model.FormModel): Promise<schema.XForm | undefined> {
-    throw new Error('Method not implemented.');
+    data.shareId = this.current.metadata.id;
+    data.speciesId = this.metadata.id;
+    const res = await kernel.createFrom(data);
+    if (res.success && res.data.id) {
+      this.forms.push(res.data);
+      return res.data;
+    }
   }
   async updateForm(data: model.FormModel): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.forms.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      data.shareId = this.current.metadata.id;
+      data.speciesId = this.metadata.id;
+      const res = await kernel.updateFrom(data);
+      if (res.success && res.data.id) {
+        this.forms[index] = res.data;
+      }
+      return res.success;
+    }
+    return false;
   }
   async deleteForm(data: schema.XForm): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.forms.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      const res = await kernel.deleteFrom({
+        id: data.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.forms = this.forms.splice(index, 1);
+      }
+      return res.success;
+    }
+    return false;
   }
   async loadAttributes(reload: boolean = false): Promise<schema.XAttribute[]> {
-    throw new Error('Method not implemented.');
+    if (!this._attributeLoaded || reload) {
+      const res = await kernel.querySpeciesAttrs({
+        id: this.current.metadata.id,
+        speciesId: this.metadata.id,
+        belongId: this.current.space.metadata.id,
+        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upSpecies: true,
+        page: PageAll,
+      });
+      if (res.success) {
+        this._attributeLoaded = true;
+        this.attributes = res.data.result || [];
+      }
+    }
+    return this.attributes;
   }
   async createAttribute(
     data: model.AttributeModel,
   ): Promise<schema.XAttribute | undefined> {
-    throw new Error('Method not implemented.');
+    data.shareId = this.current.metadata.id;
+    data.speciesId = this.metadata.id;
+    const res = await kernel.createAttribute(data);
+    if (res.success && res.data.id) {
+      this.attributes.push(res.data);
+      return res.data;
+    }
   }
   async updateAttribute(data: model.AttributeModel): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.attributes.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      data.shareId = this.current.metadata.id;
+      data.speciesId = this.metadata.id;
+      const res = await kernel.updateAttribute(data);
+      if (res.success && res.data.id) {
+        this.attributes[index] = res.data;
+      }
+      return res.success;
+    }
+    return false;
   }
   async deleteAttribute(data: schema.XAttribute): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.attributes.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      const res = await kernel.deleteAttribute({
+        id: data.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.attributes = this.attributes.splice(index, 1);
+      }
+      return res.success;
+    }
+    return false;
   }
 }

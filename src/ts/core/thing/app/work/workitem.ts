@@ -1,7 +1,9 @@
-import { model, schema } from '../../../../base';
+import { PageAll } from '@/ts/core/public/consts';
+import { kernel, model, schema } from '../../../../base';
 import { ITarget } from '../../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../../base/species';
 import { IAppModule } from '../appmodule';
+import { TargetType } from '@/ts/core/public/enums';
 export interface IWorkItem extends ISpeciesItem {
   /** 流程定义 */
   defines: schema.XWorkDefine[];
@@ -21,18 +23,60 @@ export class WorkItem extends SpeciesItem implements IWorkItem {
     this.speciesTypes = [];
   }
   defines: schema.XWorkDefine[] = [];
-  async loadWorkDefines(reload?: boolean | undefined): Promise<schema.XWorkDefine[]> {
-    throw new Error('Method not implemented.');
+  private _defineLoaded: boolean = false;
+  async loadWorkDefines(reload: boolean = false): Promise<schema.XWorkDefine[]> {
+    if (!this._defineLoaded || reload) {
+      const res = await kernel.queryWorkDefine({
+        id: this.current.metadata.id,
+        speciesId: this.metadata.id,
+        belongId: this.current.space.metadata.id,
+        upTeam: this.current.metadata.typeName === TargetType.Group,
+        upSpecies: true,
+        page: PageAll,
+      });
+      if (res.success) {
+        this._defineLoaded = true;
+        this.defines = res.data.result || [];
+      }
+    }
+    return this.defines;
   }
   async createWorkDefine(
     data: model.WorkDefineModel,
   ): Promise<schema.XWorkDefine | undefined> {
-    throw new Error('Method not implemented.');
+    data.shareId = this.current.metadata.id;
+    data.speciesId = this.metadata.id;
+    const res = await kernel.createWorkDefine(data);
+    if (res.success && res.data.id) {
+      this.defines.push(res.data);
+      return res.data;
+    }
   }
   async updateWorkDefine(data: model.WorkDefineModel): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.defines.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      data.shareId = this.current.metadata.id;
+      data.speciesId = this.metadata.id;
+      const res = await kernel.createWorkDefine(data);
+      if (res.success && res.data.id) {
+        this.defines[index] = res.data;
+      }
+      return res.success;
+    }
+    return false;
   }
   async deleteWorkDefine(data: schema.XWorkDefine): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    const index = this.defines.findIndex((i) => i.id === data.id);
+    if (index > -1) {
+      const res = await kernel.deleteWorkDefine({
+        id: data.id,
+        page: PageAll,
+      });
+      if (res.success) {
+        this.defines = this.defines.splice(index, 1);
+      }
+      return res.success;
+    }
+    return false;
   }
 }

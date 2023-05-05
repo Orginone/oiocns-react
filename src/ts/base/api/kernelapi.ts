@@ -973,6 +973,20 @@ export default class KernelApi {
     });
   }
   /**
+   * 查询分类的表单
+   * @param {model.GetSpeciesResourceModel} params 请求参数
+   * @returns {model.ResultType<schema.XAttributeArray>} 请求结果
+   */
+  public async querySpeciesForms(
+    params: model.GetSpeciesResourceModel,
+  ): Promise<model.ResultType<schema.XFormArray>> {
+    return await this.request({
+      module: 'thing',
+      action: 'QuerySpeciesForms',
+      params: params,
+    });
+  }
+  /**
    * 物的属性值查询
    * @param {model.GiveModel} params 请求参数
    * @returns {model.ResultType<schema.XThingPropArray>} 请求结果

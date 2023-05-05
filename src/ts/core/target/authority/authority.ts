@@ -146,7 +146,10 @@ export class Authority extends MsgChat implements IAuthority {
   }
   hasAuthoritys(authIds: string[]): boolean {
     authIds = this.loadParentAuthIds(authIds);
-    const orgIds = [this.metadata.belongId, this.metadata.shareId];
+    const orgIds = [this.metadata.belongId];
+    if (this.metadata.shareId && this.metadata.shareId.length > 0) {
+      orgIds.push(this.metadata.shareId);
+    }
     return this.space.user.authenticate(orgIds, authIds);
   }
 }
