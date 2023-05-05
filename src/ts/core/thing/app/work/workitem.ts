@@ -7,13 +7,15 @@ import { TargetType } from '@/ts/core/public/enums';
 export interface IWorkItem extends ISpeciesItem {
   /** 流程定义 */
   defines: schema.XWorkDefine[];
-  /** 加载表单 */
+  /** 加载办事 */
   loadWorkDefines(reload?: boolean): Promise<schema.XWorkDefine[]>;
-  /** 新建表单 */
+  /** 加载办事节点 */
+  loadWorkNode(id: string): Promise<model.WorkNodeModel>;
+  /** 新建办事 */
   createWorkDefine(data: model.WorkDefineModel): Promise<schema.XWorkDefine | undefined>;
-  /** 更新表单 */
+  /** 更新办事 */
   updateWorkDefine(data: model.WorkDefineModel): Promise<boolean>;
-  /** 删除表单 */
+  /** 删除办事 */
   deleteWorkDefine(data: schema.XWorkDefine): Promise<boolean>;
 }
 
@@ -40,6 +42,14 @@ export class WorkItem extends SpeciesItem implements IWorkItem {
       }
     }
     return this.defines;
+  }
+  async loadWorkNode(id: string): Promise<model.WorkNodeModel> {
+    return (
+      await kernel.queryWorkNodes({
+        id,
+        page: PageAll,
+      })
+    ).data;
   }
   async createWorkDefine(
     data: model.WorkDefineModel,
