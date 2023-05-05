@@ -28,8 +28,8 @@ export interface IWorkForm extends ISpeciesItem {
 }
 
 export class WorkForm extends SpeciesItem implements IWorkForm {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IAppModule) {
-    super(_metadata, _current);
+  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent: IAppModule) {
+    super(_metadata, _current, _parent);
     this.speciesTypes = [];
   }
   forms: schema.XForm[] = [];

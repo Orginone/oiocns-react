@@ -39,7 +39,6 @@ export abstract class Target extends Team implements ITarget {
     super(_metadata, _labels, _space, _memberTypes);
     this.speciesTypes = [
       SpeciesType.AppPackage,
-      SpeciesType.FileSystem,
       SpeciesType.Market,
       SpeciesType.Resource,
       SpeciesType.Store,
@@ -78,6 +77,12 @@ export abstract class Target extends Team implements ITarget {
         this.species = (res.data.result || []).map((item) => {
           return createSpecies(item, this);
         });
+        const index = this.species.findIndex(
+          (i) => i.metadata.typeName === SpeciesType.FileSystem,
+        );
+        if (index < 1) {
+          this.speciesTypes.unshift(SpeciesType.FileSystem);
+        }
       }
     }
     return this.species;

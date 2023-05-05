@@ -1,6 +1,6 @@
 import { createSpecies } from '..';
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
-import { ShareIdSet } from '../../public/consts';
+import { PageAll, ShareIdSet } from '../../public/consts';
 import { ITarget } from '../../target/base/target';
 
 /** 分类的抽象接口 */
@@ -17,6 +17,8 @@ export interface ISpeciesItem extends common.IEntity {
   children: ISpeciesItem[];
   /** 共享信息 */
   share: model.ShareIcon;
+  /** 删除 */
+  delete(): Promise<boolean>;
   /** 更新 */
   update(data: model.SpeciesModel): Promise<boolean>;
   /** 创建子类 */
@@ -24,9 +26,10 @@ export interface ISpeciesItem extends common.IEntity {
 }
 
 /** 分类的基类实现 */
-export class SpeciesItem extends common.Entity implements ISpeciesItem {
-  constructor(_metadata: schema.XSpecies, _current: ITarget) {
+export abstract class SpeciesItem extends common.Entity implements ISpeciesItem {
+  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
     super();
+    this.parent = _parent;
     this.current = _current;
     this.metadata = _metadata;
     this.share = {
@@ -42,6 +45,20 @@ export class SpeciesItem extends common.Entity implements ISpeciesItem {
   current: ITarget;
   metadata: schema.XSpecies;
   speciesTypes: string[] = [];
+  async delete(): Promise<boolean> {
+    const res = await kernel.deleteSpecies({
+      id: this.metadata.id,
+      page: PageAll,
+    });
+    if (res.success) {
+      if (this.parent) {
+        this.parent.children = this.parent.children.filter((i) => i.key != this.key);
+      } else {
+        this.current.species = this.current.species.filter((i) => i.key != this.key);
+      }
+    }
+    return res.success;
+  }
   async update(data: model.SpeciesModel): Promise<boolean> {
     data.shareId = this.metadata.shareId;
     data.parentId = this.metadata.parentId;

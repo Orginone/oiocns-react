@@ -5,8 +5,8 @@ import { IAppModule } from '../appmodule';
 export interface IReportBI extends ISpeciesItem {}
 
 export class ReportBI extends SpeciesItem implements IReportBI {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IAppModule) {
-    super(_metadata, _current);
+  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent: IAppModule) {
+    super(_metadata, _current, _parent);
     this.speciesTypes = [];
   }
 }

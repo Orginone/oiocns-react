@@ -18,8 +18,8 @@ export interface IWorkItem extends ISpeciesItem {
 }
 
 export class WorkItem extends SpeciesItem implements IWorkItem {
-  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IAppModule) {
-    super(_metadata, _current);
+  constructor(_metadata: schema.XSpecies, _current: ITarget, _parent: IAppModule) {
+    super(_metadata, _current, _parent);
     this.speciesTypes = [];
   }
   defines: schema.XWorkDefine[] = [];

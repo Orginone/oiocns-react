@@ -15,8 +15,7 @@ export interface IPropClass extends ISpeciesItem {
 /** 属性分类的基类实现 */
 export class PropClass extends SpeciesItem implements IPropClass {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IPropClass) {
-    super(_metadata, _current);
-    this.parent = _parent;
+    super(_metadata, _current, _parent);
     for (const item of _metadata.nodes || []) {
       this.children.push(new PropClass(item, this.current, this));
     }

@@ -12,7 +12,7 @@ export interface IApplication extends IAppModule {
 /** 应用的基类实现 */
 export class Application extends AppModule implements IApplication {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _package: IAppPackage) {
-    super(_metadata, _current);
+    super(_metadata, _current, _package);
     this.package = _package;
   }
   package: IAppPackage;
