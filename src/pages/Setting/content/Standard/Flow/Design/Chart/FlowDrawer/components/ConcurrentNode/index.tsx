@@ -10,7 +10,7 @@ interface IProps {
  * @return {*}
  */
 
-const ConcurrentNode: React.FC<IProps> = (props) => {
+const ConcurrentNode: React.FC<IProps> = (_props) => {
   return (
     <div className={cls[`app-roval-node`]}>
       <div className={cls[`roval-node`]}>

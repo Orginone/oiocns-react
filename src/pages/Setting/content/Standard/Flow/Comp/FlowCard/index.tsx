@@ -1,14 +1,14 @@
 import { AiOutlineEllipsis } from 'react-icons/ai';
 import { Dropdown } from 'antd';
 import React from 'react';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XWorkDefine } from '@/ts/base/schema';
 import './index.module.less';
 import { ImStackoverflow } from 'react-icons/im';
 interface FlowCardType {
-  data: XFlowDefine;
+  data: XWorkDefine;
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: XFlowDefine) => any[];
+  operation?: (_item: XWorkDefine) => any[];
 }
 
 const FlowCard: React.FC<FlowCardType> = ({ className, data, onClick, operation }) => {

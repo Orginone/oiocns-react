@@ -10,14 +10,16 @@ import orgCtrl from '@/ts/controller';
  * @return {*}
  */
 const Description = ({ current }: { current: ISpeciesItem }) => {
-  const belongInfo = orgCtrl.provider.findUserById(current.target.belongId);
-  const createInfo = orgCtrl.provider.findUserById(current.target.createUser);
+  const belongInfo = orgCtrl.provider.user!.findShareById(current.metadata.belongId);
+  const createInfo = orgCtrl.provider.user!.findShareById(current.metadata.createUser);
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
         size="middle"
         title={
-          <Typography.Title level={5}>分类[{current.name}]基本信息</Typography.Title>
+          <Typography.Title level={5}>
+            分类[{current.metadata.name}]基本信息
+          </Typography.Title>
         }
         bordered
         column={3}
@@ -29,25 +31,22 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
             <strong>{belongInfo.name}</strong>
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="分类代码">{current.target.code}</Descriptions.Item>
-        <Descriptions.Item label="开放域">
-          {current.target.public ? '开放' : '私有'}
-        </Descriptions.Item>
         <Descriptions.Item label="创建人">
           <Space>
             <TeamIcon share={createInfo} />
             <strong>{createInfo.name}</strong>
           </Space>
         </Descriptions.Item>
+        <Descriptions.Item label="分类代码">{current.metadata.code}</Descriptions.Item>
         <Descriptions.Item label="创建时间" span={3}>
-          {current.target.createTime}
+          {current.metadata.createTime}
         </Descriptions.Item>
         <Descriptions.Item
           contentStyle={{ textAlign: 'left' }}
           labelStyle={{ textAlign: 'center' }}
           label="分类定义"
           span={3}>
-          {current.target.remark}
+          {current.metadata.remark}
         </Descriptions.Item>
       </Descriptions>
     </Card>

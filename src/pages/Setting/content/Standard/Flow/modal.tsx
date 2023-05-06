@@ -9,34 +9,30 @@ import {
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
-import { XFlowDefine } from '@/ts/base/schema';
-import { CreateDefineReq } from '@/ts/base/model';
+import { XWorkDefine } from '@/ts/base/schema';
+import { WorkDefineModel } from '@/ts/base/model';
 import { ITarget } from '@/ts/core';
-import orgCtrl from '@/ts/controller/index';
 
 interface Iprops {
   open: boolean;
   title: string;
-  current?: XFlowDefine;
+  current?: XWorkDefine;
   target: ITarget;
-  handleOk: (res: CreateDefineReq) => void;
+  handleOk: (res: WorkDefineModel) => void;
   handleCancel: () => void;
 }
-
-const toTreeData = (species: any[]): any[] => {
-  return species.map((t) => {
-    return {
-      label: t.name,
-      value: t.id,
-      children: toTreeData(t.children),
-    };
-  });
-};
 
 /*
   业务标准编辑模态框
 */
-const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Iprops) => {
+const DefineModal = ({
+  open,
+  title,
+  handleOk,
+  handleCancel,
+  target,
+  current,
+}: Iprops) => {
   const [form] = useForm<any>();
   if (current) {
     form.setFieldsValue({
@@ -57,13 +53,14 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
           ...form.getFieldsValue(),
         };
         handleOk({
-          id: current?.id,
+          id: current?.id || '0',
+          resource: undefined,
+          speciesId: '',
           code: value.name,
           name: value.name,
           sourceIds: value.isCreate ? '' : value.operationIds?.join(','),
           remark: value.remark,
           shareId: value.shareId,
-          belongId: '',
           isCreate: value.isCreate,
         });
       }}
@@ -153,10 +150,11 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
                   required={true}
                   colProps={{ span: 12 }}
                   request={async () => {
-                    let tree = toTreeData(await target.loadSpeciesTree());
-                    return tree;
+                    let tree = await target.loadSpecies();
+                    return tree.map((a) => a.metadata);
                   }}
                   fieldProps={{
+                    fieldNames: { label: 'name', value: 'id', children: 'nodes' },
                     showSearch: true,
                     multiple: true,
                     allowClear: true,
@@ -179,4 +177,4 @@ const DefineInfo = ({ open, title, handleOk, handleCancel, target, current }: Ip
   );
 };
 
-export default DefineInfo;
+export default DefineModal;

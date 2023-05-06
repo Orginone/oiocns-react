@@ -4,16 +4,16 @@ import ProcessTree from './ProcessTree';
 import React, { useEffect, useState } from 'react';
 import { AddNodeType, FieldCondition, NodeType } from './FlowDrawer/processType';
 import { ISpeciesItem } from '@/ts/core';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XWorkDefine } from '@/ts/base/schema';
 
 interface IProps {
-  current: XFlowDefine | undefined;
+  current: XWorkDefine | undefined;
   operateOrgId?: string;
   designOrgId?: string;
   scale?: number;
   resource: any;
   conditions?: FieldCondition[]; //内置条件选择器
-  species?: ISpeciesItem;
+  species: ISpeciesItem;
   defaultEditable: boolean;
   disableIds: string[];
 }

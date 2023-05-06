@@ -3,6 +3,8 @@ import React from 'react';
 import Property from './Property';
 import WorkForm from './WorkForm';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import WorkItem from './Flow';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 
 interface IProps {
   current: ISpeciesItem;
@@ -18,6 +20,8 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
       return <Property current={current} />;
     case SpeciesType.WorkForm:
       return <WorkForm current={current as IWorkForm} />;
+    case SpeciesType.WorkItem:
+      return <WorkItem current={current as IWorkItem} />;
     default:
       return <></>;
   }

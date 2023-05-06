@@ -40,28 +40,31 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   const renderTabBarExtraContent = () => {
     return (
       <div>
-        <>
-          <Segmented
-            options={['全部', '本组织']}
-            onChange={(value) => {
-              if (value === '本组织') {
-                setRecursionOrg(false);
-              } else {
-                setRecursionOrg(true);
-              }
-            }}
-          />
-          <Segmented
-            options={['全部', '本分类']}
-            onChange={(value) => {
-              if (value === '本分类') {
-                setRecursionSpecies(false);
-              } else {
-                setRecursionSpecies(true);
-              }
-            }}
-          />
-        </>
+        {activeTab != 'info' && (
+          <>
+            {' '}
+            <Segmented
+              options={['全部', '本组织']}
+              onChange={(value) => {
+                if (value === '本组织') {
+                  setRecursionOrg(false);
+                } else {
+                  setRecursionOrg(true);
+                }
+              }}
+            />
+            <Segmented
+              options={['全部', '本分类']}
+              onChange={(value) => {
+                if (value === '本分类') {
+                  setRecursionSpecies(false);
+                } else {
+                  setRecursionSpecies(true);
+                }
+              }}
+            />
+          </>
+        )}
         {renderButton()}
       </div>
     );

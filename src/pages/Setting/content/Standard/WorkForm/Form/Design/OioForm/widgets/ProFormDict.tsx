@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { IBelong } from '@/ts/core';
+import { Rule } from 'antd/lib/form';
+import { FormLabelAlign } from 'antd/lib/form/interface';
+import { LabelTooltipType } from 'antd/es/form/FormItemLabel';
 
 interface IProps {
-  belong: IBelong;
   dictId: string;
-  [key: string]: any;
+  rules: Rule[];
+  name: string;
+  belong: IBelong;
+  label: React.ReactNode;
+  labelAlign: FormLabelAlign;
+  tooltip: LabelTooltipType;
+  props: any;
 }
 /**
  * 字典组件
@@ -40,7 +48,7 @@ const ProFormDict = (props: IProps) => {
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
       fieldProps={{
-        ...props.rule,
+        ...props.rules,
         ...{ options },
         ...{ filterOption },
         ...{ filterSort },

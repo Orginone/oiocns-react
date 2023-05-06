@@ -4,11 +4,13 @@ import React, { useState, useEffect, Key } from 'react';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import cls from './index.module.less';
 import CustomTree from '@/components/CustomTreeComp';
-import { ISpeciesItem } from '@/ts/core';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { IAppModule } from '@/ts/core/thing/app/appmodule';
+import { SpeciesType } from '@/ts/core';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 
 interface IProps {
-  current?: ISpeciesItem;
+  current: IAppModule;
   showData: any[];
   setShowData: Function;
 }
@@ -22,13 +24,9 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
 
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     setLeftTreeSelectedKeys(selectedKeys);
-    const species: ISpeciesItem = info.node.item;
-    let res = await species.loadOperations(current?.team.id || '', false, true, true, {
-      offset: 0,
-      limit: 1000,
-      filter: '',
-    });
-    setCenterTreeData(buildSpeciesChildrenTree(res.result || []));
+    const species: IWorkForm = info.node.item;
+    let res = await species.loadForms();
+    setCenterTreeData(buildSpeciesChildrenTree(res));
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
@@ -83,8 +81,11 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
 
   useEffect(() => {
     const load = async () => {
-      const species = (await current?.team.loadSpeciesTree()) || [];
-      setLeftTreeData(buildSpeciesChildrenTree([...species]));
+      setLeftTreeData(
+        buildSpeciesChildrenTree(
+          current.children.filter((a) => a.metadata.typeName == SpeciesType.WorkForm),
+        ),
+      );
     };
     load();
   }, []);

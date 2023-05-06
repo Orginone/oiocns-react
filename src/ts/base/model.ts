@@ -512,8 +512,6 @@ export type WorkNodeModel = {
   destId: string;
   // 节点目标名称
   destName: string;
-  // 节点归属组织
-  belongId: string;
   // 节点归属定义Id
   defineId: string;
   // 绑定的单信息

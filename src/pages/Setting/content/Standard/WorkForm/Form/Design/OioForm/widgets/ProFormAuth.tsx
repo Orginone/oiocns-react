@@ -1,11 +1,18 @@
 import { IAuthority, IBelong } from '@/ts/core';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
+import { Rule } from 'antd/lib/form';
+import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
+import { FormLabelAlign } from 'antd/lib/form/interface';
 import { DefaultOptionType } from 'antd/lib/select';
 import React, { useEffect, useState } from 'react';
 
 interface IProps {
+  rules: Rule[];
+  name: string;
   belong: IBelong;
-  [key: string]: any;
+  label: React.ReactNode;
+  labelAlign: FormLabelAlign;
+  tooltip: LabelTooltipType;
 }
 
 /**
@@ -44,10 +51,9 @@ const ProFormAuth = (props: IProps) => {
       label={props.label || '角色'}
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
-      colProps={props.colProps}
       allowClear
       fieldProps={{
-        ...props.rule,
+        ...props.rules,
         ...{ treeData },
       }}
       rules={props.rules}

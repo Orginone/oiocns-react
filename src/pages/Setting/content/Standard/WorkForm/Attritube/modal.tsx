@@ -59,12 +59,11 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
-        const data = await props.current.current.space.loadSuperAuth(false);
-        return data ? [data] : [];
+        const data = await props.current.current.space.loadSuperAuth();
+        return data ? [data.metadata] : [];
       },
       fieldProps: {
-        disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id' },
+        fieldNames: { label: 'name', value: 'id', children: 'nodes' },
         showSearch: true,
         filterTreeNode: true,
         treeNodeFilterProp: 'name',

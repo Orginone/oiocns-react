@@ -1,8 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
-import { Branche, FlowNode, XFlowDefine, XFlowInstance } from '@/ts/base/schema';
-import { Branche as BrancheModel } from '@/ts/base/model';
+import { Branche, WorkNodeModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
 import {
   AiOutlineExclamationCircle,
@@ -11,18 +10,19 @@ import {
   AiOutlinePlus,
   AiOutlineClockCircle,
 } from 'react-icons/ai';
-import orgCtrl from '@/ts/controller';
-import { ImWarning } from 'react-icons/im';
 import { getUuid } from '@/utils/tools';
-import { ISpeciesItem } from '@/ts/core';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
+import { XAttribute, XWorkDefine, XWorkInstance } from '@/ts/base/schema';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { SpeciesType } from '@/ts/core';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface IProps {
   IsEdit: boolean;
-  current: XFlowDefine;
-  species?: ISpeciesItem;
-  instance?: XFlowInstance;
+  current: XWorkDefine;
+  species: IWorkItem;
+  instance?: XWorkInstance;
   onBack: () => void;
 }
 
@@ -36,42 +36,14 @@ const Design: React.FC<IProps> = ({
   const [scale, setScale] = useState<number>(100);
   const [conditions, setConditions] = useState<FieldCondition[]>([]);
   const [showErrorsModal, setShowErrorsModal] = useState<ReactNode[]>([]);
-  const [resource, setResource] = useState({
-    nodeId: `node_${getUuid()}`,
-    parentId: '',
-    type: 'ROOT',
-    name: '发起',
-    props: {
-      assignedType: 'JOB',
-      mode: 'AND',
-      assignedUser: [
-        {
-          id: '0',
-          name: undefined,
-          type: undefined,
-          orgIds: undefined,
-        },
-      ],
-      refuse: {
-        type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-        target: '', //驳回到指定ID的节点
-      },
-      friendDialogmode: false,
-      num: 0,
-    },
-    children: {},
-  });
+  const [resource, setResource] = useState<WorkNodeModel>();
 
   useEffect(() => {
     const load = async () => {
       // content字段可能取消
-      let resource_ = await (species || orgCtrl.user.species[0])?.loadWorkNode(
-        current.id,
-      );
+      let resource_ = await species.loadWorkNode(current.id);
       let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
-      let nodes = getAllNodes(resourceData, []);
-      let spaceRootNodes = nodes.filter((item) => item.type == 'ROOT');
-      if (spaceRootNodes.length == 0) {
+      if (resource_ == undefined) {
         resourceData = {
           nodeId: `node_${getUuid()}`,
           parentId: '',
@@ -95,7 +67,7 @@ const Design: React.FC<IProps> = ({
             friendDialogmode: false,
             num: 0,
           },
-          children: resourceData,
+          children: {},
         };
       }
       if (instance) {
@@ -104,7 +76,12 @@ const Design: React.FC<IProps> = ({
         setResource(resourceData);
       }
       if (IsEdit && species) {
-        let attrs = await species.loadAttrs(false);
+        let attrs: XAttribute[] = [];
+        for (let form of species!.parent!.children?.filter(
+          (a) => a.metadata.typeName == SpeciesType.WorkForm,
+        )) {
+          attrs.push(...(form as IWorkForm).attributes);
+        }
         let fields: FieldCondition[] = [];
         for (let attr of attrs) {
           switch (attr.property!.valueType) {
@@ -112,21 +89,20 @@ const Design: React.FC<IProps> = ({
               fields.push({ label: attr.name, value: attr.id, type: dataType.NUMERIC });
               break;
             case '选择型':
-              fields.push({
-                label: attr.name,
-                value: attr.id,
-                type: dataType.DICT,
-                dict:
-                  (
-                    await species.team.space.dict.loadDictItem(
-                      attr.property!.dictId,
-                      species.team.space.id,
-                      pageAll(),
-                    )
-                  ).result?.map((a) => {
-                    return { label: a.name, value: a.value };
-                  }) || [],
-              });
+              const dict = species.current.space.dicts.find(
+                (a) => a.metadata.id == attr.property?.dictId,
+              );
+              if (dict) {
+                fields.push({
+                  label: attr.name,
+                  value: attr.id,
+                  type: dataType.DICT,
+                  dict:
+                    (await dict.loadItems())?.map((a) => {
+                      return { label: a.name, value: a.value };
+                    }) || [],
+                });
+              }
               break;
             default:
               fields.push({ label: attr.name, value: attr.id, type: dataType.STRING });
@@ -139,121 +115,121 @@ const Design: React.FC<IProps> = ({
     load();
   }, [current]);
 
-  const getAllNodes = (resource: any, array: any[]): any[] => {
-    array = [...array, resource];
-    if (resource.children) {
-      array = getAllNodes(resource.children, array);
-    }
-    if (resource.branches && resource.branches.length > 0) {
-      for (let branch of resource.branches) {
-        if (branch.children) {
-          array = getAllNodes(branch.children, array);
-        }
-      }
-    }
-    return array;
-  };
+  // const getAllNodes = (resource: any, array: any[]): any[] => {
+  //   array = [...array, resource];
+  //   if (resource.children) {
+  //     array = getAllNodes(resource.children, array);
+  //   }
+  //   if (resource.branches && resource.branches.length > 0) {
+  //     for (let branch of resource.branches) {
+  //       if (branch.children) {
+  //         array = getAllNodes(branch.children, array);
+  //       }
+  //     }
+  //   }
+  //   return array;
+  // };
 
-  const getAllBranches = (resource: FlowNode, array: Branche[]): Branche[] => {
-    if (resource.children) {
-      array = getAllBranches(resource.children, array);
-    }
-    if (resource.branches && resource.branches.length > 0) {
-      resource.branches = resource.branches.map((item: Branche) => {
-        item.parentId = resource.code;
-        return item;
-      });
-      array = [...array, ...resource.branches];
-      for (let branch of resource.branches) {
-        if (branch.children) {
-          array = getAllBranches(branch.children, array);
-        }
-      }
-    }
-    return array;
-  };
+  // const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
+  //   if (resource.children) {
+  //     array = getAllBranches(resource.children, array);
+  //   }
+  //   if (resource.branches && resource.branches.length > 0) {
+  //     resource.branches = resource.branches.map((item) => {
+  //       item.parentId = resource.code;
+  //       return item;
+  //     });
+  //     array = [...array, ...resource.branches];
+  //     for (let branch of resource.branches) {
+  //       if (branch.children) {
+  //         array = getAllBranches(branch.children, array);
+  //       }
+  //     }
+  //   }
+  //   return array;
+  // };
 
-  const getErrorItem = (text: string | ReactNode): ReactNode => {
-    return (
-      <div style={{ padding: 10 }}>
-        <ImWarning color="orange" />
-        {text}
-      </div>
-    );
-  };
+  // const getErrorItem = (text: string | ReactNode): ReactNode => {
+  //   return (
+  //     <div style={{ padding: 10 }}>
+  //       <ImWarning color="orange" />
+  //       {text}
+  //     </div>
+  //   );
+  // };
 
-  const checkValid = (resource: FlowNode): ReactNode[] => {
-    let errors: ReactNode[] = [];
-    //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
-    let allNodes: FlowNode[] = getAllNodes(resource, []);
-    let allBranches: Branche[] = getAllBranches(resource, []);
-    //校验Root根节点角色不为空
-    if (!resource.operations || resource.operations.length == 0) {
-      errors.push(getErrorItem('ROOT节点未绑定表单'));
-    }
-    //校验Root类型节点角色不为空
-    let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
-    for (let rootNode of rootNodes) {
-      if (rootNode.destId == undefined) {
-        errors.push(getErrorItem('ROOT节点缺少角色'));
-      }
-    }
-    //每个节点的 belongId  审核和抄送和子流程的destId
-    for (let node of allNodes) {
-      if (
-        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
-        (!node.destId || node.destId == '0' || node.destId == '')
-      ) {
-        errors.push(
-          getErrorItem(
-            <>
-              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
-            </>,
-          ),
-        );
-      }
-    }
-    //条件节点条件不为空  分支下最多只能有n个分支children为空
-    let n = 0;
-    let parentIdSet: Set<string> = new Set();
-    for (let branch of allBranches) {
-      if (branch.conditions && branch.conditions.length > 0) {
-        for (let condition of branch.conditions) {
-          if (!condition.key || !condition.paramKey || !condition.val) {
-            errors.push(getErrorItem(`分支: branch.name的条件未完成`));
-          }
-        }
-      } else {
-        let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
-        if (parent.type == 'CONDITIONS') {
-          errors.push(getErrorItem(`条件分支: 缺少条件`));
-        }
-        if (parent.type == 'ORGANIZATIONAL') {
-          errors.push(getErrorItem(`组织分支: 请选择组织`));
-        }
-      }
-      parentIdSet.add(branch.parentId as string);
-    }
+  // const checkValid = (resource: WorkNodeModel): ReactNode[] => {
+  //   let errors: ReactNode[] = [];
+  //   //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
+  //   let allNodes: WorkNodeModel[] = getAllNodes(resource, []);
+  //   let allBranches: Branche[] = getAllBranches(resource, []);
+  //   //校验Root根节点角色不为空
+  //   if (!resource.forms || resource.forms.length == 0) {
+  //     errors.push(getErrorItem('ROOT节点未绑定表单'));
+  //   }
+  //   //校验Root类型节点角色不为空
+  //   let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
+  //   for (let rootNode of rootNodes) {
+  //     if (rootNode.destId == undefined) {
+  //       errors.push(getErrorItem('ROOT节点缺少角色'));
+  //     }
+  //   }
+  //   //每个节点的 belongId  审核和抄送和子流程的destId
+  //   for (let node of allNodes) {
+  //     if (
+  //       (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
+  //       (!node.destId || node.destId == '0' || node.destId == '')
+  //     ) {
+  //       errors.push(
+  //         getErrorItem(
+  //           <>
+  //             节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+  //           </>,
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   //条件节点条件不为空  分支下最多只能有n个分支children为空
+  //   let n = 0;
+  //   let parentIdSet: Set<string> = new Set();
+  //   for (let branch of allBranches) {
+  //     if (branch.conditions && branch.conditions.length > 0) {
+  //       for (let condition of branch.conditions) {
+  //         if (!condition.key || !condition.paramKey || !condition.val) {
+  //           errors.push(getErrorItem(`分支: branch.name的条件未完成`));
+  //         }
+  //       }
+  //     } else {
+  //       let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
+  //       if (parent.type == 'CONDITIONS') {
+  //         errors.push(getErrorItem(`条件分支: 缺少条件`));
+  //       }
+  //       if (parent.type == 'ORGANIZATIONAL') {
+  //         errors.push(getErrorItem(`组织分支: 请选择组织`));
+  //       }
+  //     }
+  //     parentIdSet.add(branch.parentId as string);
+  //   }
 
-    for (let parentId of Array.from(parentIdSet)) {
-      let parent = allNodes.filter((item) => item.code == parentId)[0];
-      let branches = allBranches.filter(
-        (item) => item.parentId == parentId && !item.children,
-      );
-      if (branches.length > n) {
-        errors.push(
-          getErrorItem(
-            n == 0
-              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-              : `${
-                  parent.type == 'CONDITIONS' ? '条件' : '并行'
-                }节点分支下最多只能有${n}个分支节点为空`,
-          ),
-        );
-      }
-    }
-    return errors;
-  };
+  //   for (let parentId of Array.from(parentIdSet)) {
+  //     let parent = allNodes.filter((item) => item.code == parentId)[0];
+  //     let branches = allBranches.filter(
+  //       (item) => item.parentId == parentId && !item.children,
+  //     );
+  //     if (branches.length > n) {
+  //       errors.push(
+  //         getErrorItem(
+  //           n == 0
+  //             ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+  //             : `${
+  //                 parent.type == 'CONDITIONS' ? '条件' : '并行'
+  //               }节点分支下最多只能有${n}个分支节点为空`,
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   return errors;
+  // };
 
   const loadResource = (
     resource: any,
@@ -389,7 +365,7 @@ const Design: React.FC<IProps> = ({
       obj = flowNode;
     } else if (type == 'branch') {
       let nodeId = getUuid();
-      let branch: BrancheModel = {
+      let branch: any = {
         id: getUuid(),
         nodeId: nodeId,
         parentId: parentId,
@@ -450,14 +426,15 @@ const Design: React.FC<IProps> = ({
   const changeResource = (resource: any, type: string): any => {
     let obj: any;
     if (type == 'flowNode') {
-      let flowNode: FlowNode = {
+      let flowNode: WorkNodeModel = {
         id: resource.id,
+        defineId: current.id,
         code: resource.nodeId,
         type: resource.type,
         name: resource.name,
         num: resource.props == undefined ? 0 : resource.props.num,
         destType: resource.type == 'ROOT' ? '角色' : '身份',
-        operations: resource.props.operations,
+        forms: resource.props.operations,
         destId:
           resource.props != undefined &&
           resource.props.assignedUser != undefined &&
@@ -601,18 +578,19 @@ const Design: React.FC<IProps> = ({
                         type="primary"
                         onClick={async () => {
                           //数据结构转化
-                          let resource_: FlowNode = changeResource(
+                          let resource_: WorkNodeModel = changeResource(
                             resource,
                             'flowNode',
-                          ) as FlowNode;
-                          let errors = checkValid(resource_);
-                          if (errors.length > 0) {
-                            setShowErrorsModal(errors);
-                            return;
-                          }
+                          ) as WorkNodeModel;
+                          // let errors = checkValid(resource_);
+                          // if (errors.length > 0) {
+                          //   setShowErrorsModal(errors);
+                          //   return;
+                          // }
                           if (
-                            await species?.publishWork({
+                            await species?.updateWorkDefine({
                               id: current?.id,
+                              speciesId: species.metadata.id,
                               code: current.name,
                               name: current.name,
                               sourceIds: current.sourceIds,

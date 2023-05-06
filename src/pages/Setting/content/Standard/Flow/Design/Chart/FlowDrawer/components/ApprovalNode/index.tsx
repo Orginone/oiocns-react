@@ -5,15 +5,15 @@ import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
 import orgCtrl from '@/ts/controller';
-import { ISpeciesItem } from '@/ts/core';
-import { XOperation } from '@/ts/base/schema';
-import ViewFormModal from '@/pages/Setting/content/Standard/Form/Design/viewFormModal';
+import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import ViewFormModal from '@/pages/Setting/content/Standard/WorkForm/Form/Design/viewFormModal';
 interface IProps {
   current: NodeType;
   orgId?: string;
-  species?: ISpeciesItem;
+  species: IWorkItem;
 }
 
 /**
@@ -24,10 +24,10 @@ interface IProps {
 const ApprovalNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
   const [radioValue, setRadioValue] = useState(1);
-  const [operations, setOperations] = useState<XOperation[]>([]);
+  const [operations, setOperations] = useState<XForm[]>([]);
   const [operationModal, setOperationModal] = useState<any>();
   const [viewFormOpen, setViewFormOpen] = useState<boolean>(false);
-  const [editData, setEditData] = useState<XOperation>();
+  const [editData, setEditData] = useState<XForm>();
   const [showData, setShowData] = useState<any[]>([]);
   // 操作内容渲染函数
   useEffect(() => {
@@ -43,7 +43,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
 
   // const [processValue, setProcessValue] = useState(1);
   const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || orgCtrl.user.id,
+    props.current.belongId || props.orgId || orgCtrl.user.metadata.id,
   );
 
   const [currentData, setCurrentData] = useState({
@@ -57,7 +57,8 @@ const ApprovalNode: React.FC<IProps> = (props) => {
   useEffect(() => {
     if (!props.current.belongId) {
       setNodeOperateOrgId(
-        props.orgId || (props.species?.team.space.id ?? orgCtrl.user.id),
+        props.orgId ||
+          (props.species?.current.space.metadata.id ?? orgCtrl.user.metadata.id),
       );
       props.current.belongId = props.orgId;
     }
@@ -86,7 +87,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           {currentData?.title ? (
             <ShareShowComp
               departData={[currentData.data]}
-              deleteFuc={(id: string) => {
+              deleteFuc={(_id: string) => {
                 props.current.props.assignedUser = { id: '', name: '' };
                 setCurrentData({
                   title: '',
@@ -185,7 +186,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
-            current={props.species}
+            current={props.species.parent!}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
@@ -208,11 +209,11 @@ const ApprovalNode: React.FC<IProps> = (props) => {
             ];
             setCurrentData(params);
           }}
-          space={props.species?.team.space ?? orgCtrl.user}
+          target={props.species.current.space}
         />
       </Modal>
       <ViewFormModal
-        species={props.species!}
+        belong={props.species.current.space}
         data={editData}
         open={viewFormOpen}
         handleCancel={() => {

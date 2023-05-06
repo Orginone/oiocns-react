@@ -11,6 +11,7 @@ import { AddNodeType, dataType, FieldCondition, NodeType } from './processType';
 import orgCtrl from '@/ts/controller';
 import { getUuid } from '@/utils/tools';
 import { ISpeciesItem } from '@/ts/core';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 /**
  * @description: 流程设置抽屉
  * @return {*}
@@ -23,7 +24,7 @@ interface IProps {
   current?: NodeType;
   conditions?: FieldCondition[];
   onClose: () => void;
-  species?: ISpeciesItem;
+  species: ISpeciesItem;
   disableIds: string[];
   defaultEditable: boolean;
 }
@@ -37,7 +38,6 @@ const FlowDrawer: React.FC<IProps> = ({
   designOrgId,
   species,
   disableIds,
-  defaultEditable,
 }) => {
   const [key, setKey] = useState<string>();
   const Component = (current: any) => {
@@ -49,7 +49,9 @@ const FlowDrawer: React.FC<IProps> = ({
         }
         return (
           <>
-            <div>审核人：{orgCtrl.provider.findNameById(record.createUser)}</div>
+            <div>
+              审核人：{orgCtrl.provider.user?.findShareById(record.createUser).name}
+            </div>
             <div>审核结果：{handleResult}</div>
             <div>审核意见：{record.comment}</div>
             <div>审核时间：{record.createTime}</div>
@@ -72,7 +74,7 @@ const FlowDrawer: React.FC<IProps> = ({
             <ApprovalNode
               current={current}
               orgId={operateOrgId || designOrgId}
-              species={species}
+              species={species as IWorkItem}
             />
           );
         case AddNodeType.CHILDWORK:
@@ -89,7 +91,7 @@ const FlowDrawer: React.FC<IProps> = ({
             <CcNode
               current={current}
               orgId={operateOrgId || designOrgId}
-              species={species}
+              species={species as IWorkItem}
             />
           );
         case AddNodeType.CONDITION:

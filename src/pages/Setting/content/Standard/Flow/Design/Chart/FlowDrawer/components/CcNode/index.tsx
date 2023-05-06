@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Modal } from 'antd';
 import IndentityManage from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import orgCtrl from '@/ts/controller';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
-import { ISpeciesItem } from '@/ts/core';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 
 interface IProps {
   current: NodeType;
   orgId?: string;
-  species?: ISpeciesItem;
+  species: IWorkItem;
 }
 /**
  * @description: 抄送对象
@@ -30,15 +29,6 @@ const CcNode: React.FC<IProps> = (props) => {
       id: props.current.props.assignedUser[0]?.id,
       name: props.current.props.assignedUser[0]?.name,
     },
-  });
-  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || orgCtrl.user.id,
-  );
-  useEffect(() => {
-    if (!props.current.belongId) {
-      setNodeOperateOrgId(props.orgId || orgCtrl.user.id);
-      props.current.belongId = props.orgId;
-    }
   });
   return (
     <div className={cls[`app-roval-node`]}>
@@ -61,7 +51,7 @@ const CcNode: React.FC<IProps> = (props) => {
             // </span>
             <ShareShowComp
               departData={[currentData.data]}
-              deleteFuc={(id: string) => {
+              deleteFuc={(_id: string) => {
                 props.current.props.assignedUser = { id: '', name: '' };
                 setCurrentData({
                   title: '',
@@ -86,9 +76,8 @@ const CcNode: React.FC<IProps> = (props) => {
         }}
         onCancel={() => setIsApprovalOpen(false)}>
         <IndentityManage
-          space={props.species?.team.space ?? orgCtrl.user}
+          target={props.species.current.space}
           multiple={false}
-          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
             props.current.props.assignedUser = [
               { name: params.title, id: params.data.id },

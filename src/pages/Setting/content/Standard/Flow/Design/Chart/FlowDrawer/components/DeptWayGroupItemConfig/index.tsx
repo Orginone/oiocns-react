@@ -28,7 +28,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
   }, [props]);
 
   const onChange = (newValue: string) => {
-    currentNode?.conditions.map((item: conditiondType, index: number) => {
+    currentNode?.conditions.map((item: conditiondType, _index: number) => {
       item.val = newValue;
     });
     setKey(key + 1);
@@ -58,7 +58,7 @@ const DeptWayGroupItemConfig: React.FC<IProps> = (props) => {
                       <SelectOrg
                         key={key}
                         onChange={onChange}
-                        orgId={orgCtrl.user.id}
+                        orgId={orgCtrl.user.metadata.id}
                         value={condition.val}
                         rootDisable={false}></SelectOrg>
                     </div>

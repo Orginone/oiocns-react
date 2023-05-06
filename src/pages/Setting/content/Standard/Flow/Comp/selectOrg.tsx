@@ -15,9 +15,9 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
   const loadTreeData = async () => {
     let tree;
     if (props.company) {
-      tree = await orgCtrl.getCompanyTeamTree(props.company);
+      tree = [props.company];
     } else {
-      tree = await orgCtrl.getTeamTree();
+      tree = [orgCtrl.user];
     }
 
     let targets = buildTargetTree(tree, false, 0);
@@ -29,28 +29,28 @@ const SelectOrg: React.FC<IProps> = (props: IProps) => {
     if (targets) {
       for (const item of targets) {
         if (props.orgId && !isChild) {
-          if (item.id == props.orgId) {
+          if (item.metadata.id == props.orgId) {
             result.push({
-              label: item.teamName,
-              value: item.id,
+              label: item.metadata.name,
+              value: item.metadata.id,
               disabled: props.rootDisable && level == 0,
               children: [
                 ...[{ label: '其他', value: '0' }],
-                ...buildTargetTree(item.subTeam, true, level + 1),
+                ...buildTargetTree(item.subTarget, true, level + 1),
               ],
             });
           } else {
-            let children = buildTargetTree(item.subTeam, false, level + 1);
+            let children = buildTargetTree(item.subTarget, false, level + 1);
             for (let child of children) {
               result.push(child);
             }
           }
         } else {
           result.push({
-            label: item.teamName,
-            value: item.id,
+            label: item.metadata.name,
+            value: item.metadata.id,
             disabled: props.rootDisable && level == 0,
-            children: buildTargetTree(item.subTeam, isChild, level + 1),
+            children: buildTargetTree(item.subTarget, isChild, level + 1),
           });
         }
       }

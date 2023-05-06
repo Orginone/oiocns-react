@@ -4,7 +4,6 @@ import StoreClassifyTree from '@/components/CustomTreeComp';
 import React, { useState, useEffect } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-import orgCtrl from '@/ts/controller';
 import { IIdentity, ITarget } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
@@ -17,7 +16,7 @@ export type ResultType = {
 interface Iprops {
   multiple: boolean;
   orgId?: string;
-  space: ISpace;
+  target: ITarget;
   onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
@@ -29,8 +28,7 @@ const ShareRecent = (props: Iprops) => {
   const [resultData, setResultData] = useState<ResultType[]>([]);
 
   const loadTeamTree = async () => {
-    const targets = await orgCtrl.getTeamTree(props.space);
-    setData(buildTargetTree(targets, false));
+    setData(buildTargetTree([props.target], false));
   };
 
   /** 加载组织树 */
@@ -39,29 +37,29 @@ const ShareRecent = (props: Iprops) => {
     if (targets) {
       for (const item of targets) {
         if (props.orgId && !isChild) {
-          if (item.id == props.orgId) {
+          if (item.metadata.id == props.orgId) {
             result.push({
-              key: item.id,
-              title: item.name,
+              key: item.metadata.id,
+              title: item.metadata.name,
               item: item,
-              isLeaf: item.subTeam.length === 0,
-              icon: <TeamIcon share={item.shareInfo} size={18} />,
-              children: buildTargetTree(item.subTeam, true),
+              isLeaf: item.subTarget.length === 0,
+              icon: <TeamIcon share={item.share} size={18} />,
+              children: buildTargetTree(item.subTarget, true),
             });
           } else {
-            let children = buildTargetTree(item.subTeam, false);
+            let children = buildTargetTree(item.subTarget, false);
             for (let child of children) {
               result.push(child);
             }
           }
         } else {
           result.push({
-            key: item.id,
-            title: item.name,
+            key: item.metadata.id,
+            title: item.metadata.name,
             item: item,
-            isLeaf: item.subTeam.length === 0,
-            icon: <TeamIcon share={item.shareInfo} size={18} />,
-            children: buildTargetTree(item.subTeam, isChild),
+            isLeaf: item.subTarget.length === 0,
+            icon: <TeamIcon share={item.share} size={18} />,
+            children: buildTargetTree(item.subTarget, isChild),
           });
         }
       }
@@ -77,28 +75,27 @@ const ShareRecent = (props: Iprops) => {
     const item: ITarget = info.node.item;
     if (item) {
       const index = resultData.findIndex((i) => {
-        return i.id === item.id;
+        return i.id === item.metadata.id;
       });
       if (index > -1) {
         setCurrent(resultData[index]);
       } else {
         const newItem: ResultType = {
-          id: item.id,
-          target: item.target,
+          id: item.metadata.id,
+          target: item.metadata,
           identitys: [],
         };
         resultData.push(newItem);
         setResultData(resultData);
         setCurrent(newItem);
       }
-      await item.loadSubTeam();
       loadTeamTree();
-      const result = (await item.getIdentitys()).map((i) => {
+      const result = (await item.loadIdentitys()).map((i) => {
         // i.target.name = `[${item.name}]` + i.target.name;
         return {
-          title: `[${item.name}]` + i.name,
-          key: i.id,
-          data: i.target,
+          title: `[${item.metadata.name}]` + i.metadata.name,
+          key: i.metadata.id,
+          data: i.metadata,
         };
       });
       setIdentitys(result);
@@ -135,8 +132,8 @@ const ShareRecent = (props: Iprops) => {
     for (const item of resultData) {
       for (const id of item.identitys) {
         result.push({
-          id: id.id,
-          name: id.name,
+          id: id.metadata.id,
+          name: id.metadata.name,
           type: 'add',
         });
       }
@@ -146,7 +143,7 @@ const ShareRecent = (props: Iprops) => {
 
   const getSelectKeys = () => {
     if (current) {
-      return current.identitys.map((item) => item.id);
+      return current.identitys.map((item) => item.metadata.id);
     }
     return [];
   };
@@ -154,7 +151,7 @@ const ShareRecent = (props: Iprops) => {
   const deleteItem = (id: string) => {
     for (const item of resultData) {
       item.identitys = item.identitys.filter((i) => {
-        return i.id != id;
+        return i.metadata.id != id;
       });
     }
     setKey(generateUuid());

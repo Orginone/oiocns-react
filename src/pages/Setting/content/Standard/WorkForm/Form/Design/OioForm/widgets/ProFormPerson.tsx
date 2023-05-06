@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-components';
 import { IBelong } from '@/ts/core';
+import { Rule } from 'antd/lib/form';
+import { FormLabelAlign } from 'antd/lib/form/interface';
+import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 
 interface IProps {
-  space: IBelong;
-  [key: string]: any;
+  rules: Rule[];
+  name: string;
+  belong: IBelong;
+  label: React.ReactNode;
+  labelAlign: FormLabelAlign;
+  tooltip: LabelTooltipType;
 }
 
 /**
@@ -15,7 +22,7 @@ const ProFormPerson = (props: IProps) => {
   useEffect(() => {
     const initOptions = async () => {
       setOptions(
-        props.space.members?.map((xtarget) => {
+        props.belong.members?.map((xtarget) => {
           return { label: xtarget.name, value: xtarget.id };
         }) || [],
       );
@@ -37,7 +44,7 @@ const ProFormPerson = (props: IProps) => {
       tooltip={props.tooltip}
       labelAlign={props.labelAlign}
       fieldProps={{
-        ...props.rule,
+        ...props.rules,
         ...{ options },
         ...{ filterOption },
         ...{ filterSort },

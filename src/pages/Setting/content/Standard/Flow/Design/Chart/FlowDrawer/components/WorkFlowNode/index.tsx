@@ -8,11 +8,12 @@ import WorkSelectTable from './WorkSelectTable';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import { schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
+import { IAppModule } from '@/ts/core/thing/app/appmodule';
 
 interface IProps {
   current: NodeType;
   orgId?: string;
-  species?: ISpeciesItem;
+  species: ISpeciesItem;
   disableIds: string[];
 }
 
@@ -23,7 +24,7 @@ interface IProps {
 
 const WorkFlowNode: React.FC<IProps> = (props) => {
   const [isOpen, setIsOpen] = useState<boolean>(false); // 打开弹窗
-  const [selectChildWork, setSelectChildWork] = useState<schema.XFlowDefine>();
+  const [selectChildWork, setSelectChildWork] = useState<schema.XWorkDefine>();
   const [currentData, setCurrentData] = useState({
     title: props.current.props.assignedUser[0]?.name,
     key: props.current.props.assignedUser[0]?.id,
@@ -83,7 +84,7 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
             message.warn('请选择办事');
             return;
           }
-          let name = `${selectChildWork.name} [${orgCtrl.provider.findNameById(
+          let name = `${selectChildWork.name} [${orgCtrl.provider.user?.findShareById(
             selectChildWork.belongId,
           )}]`;
           props.current.props.assignedUser = [
@@ -105,9 +106,10 @@ const WorkFlowNode: React.FC<IProps> = (props) => {
         onCancel={() => setIsOpen(false)}>
         {props.species && (
           <WorkSelectTable
-            space={props.species?.team.space}
+            species={props.species.parent as IAppModule}
+            space={props.species?.current.space}
             disableIds={props.disableIds}
-            searchFn={(params: schema.XFlowDefine) => {
+            searchFn={(params: schema.XWorkDefine) => {
               setSelectChildWork(params);
             }}
           />

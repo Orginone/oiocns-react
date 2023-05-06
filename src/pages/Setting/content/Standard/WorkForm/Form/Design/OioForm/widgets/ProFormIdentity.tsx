@@ -4,19 +4,26 @@ import { ProForm } from '@ant-design/pro-components';
 import { Button, Input, Modal } from 'antd';
 import React, { useState } from 'react';
 import { IBelong } from '@/ts/core';
+import { Rule } from 'antd/lib/form';
+import { FormLabelAlign } from 'antd/lib/form/interface';
+import { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 
 const { Search } = Input;
 
 interface IProps {
-  space: IBelong;
-  [key: string]: any; // 其他属性方法
+  rules: Rule[];
+  name: string;
+  belong: IBelong;
+  label: React.ReactNode;
+  labelAlign: FormLabelAlign;
+  tooltip: LabelTooltipType;
 }
 
 /**
  * 角色组件(Todo 待完善)
  */
 const ProFormIdentity = (props: IProps) => {
-  const nodeOperateOrgId = props.space.metadata.id;
+  const nodeOperateOrgId = props.belong.metadata.id;
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [identity, setIdentity] = useState<any>({});
@@ -53,7 +60,7 @@ const ProFormIdentity = (props: IProps) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
-          space={props.space}
+          target={props.belong}
           multiple={false}
           orgId={nodeOperateOrgId}
           onChecked={(params: any) => {

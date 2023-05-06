@@ -27,7 +27,7 @@ const buildSpeciesTree = async (species: ISpeciesItem[]) => {
     works.push(item);
     result.push({
       key: item.key,
-      label: item.name,
+      label: item.metadata.name,
       item: [item, subSpecies.item],
       icon: <im.ImNewspaper />,
       itemType: GroupMenuType.Species,
@@ -46,21 +46,21 @@ export const buildTargetTree = async (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
     let species = await buildSpeciesTree(
-      (await item.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
+      (await item.loadSpecies()).filter((a) => a.target.code == 'matters'),
     );
     let children = [];
-    if (item.typeName == TargetType.Group) {
-      let subGroup = await buildTargetTree(await (item as IGroup).getSubGroups());
+    if (item.metadata.typeName == TargetType.Group) {
+      let subGroup = await buildTargetTree((item as IGroup).subTarget);
       children.push(...subGroup);
     }
     result.push({
       key: item.key,
-      label: item.teamName,
-      tag: [item.typeName + '群'],
+      label: item.metadata.name,
+      tag: [item.metadata.typeName + '群'],
       item: [item],
       menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
-      icon: <TeamIcon notAvatar={true} share={item.shareInfo} size={18} fontSize={16} />,
+      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
       children: [...children, ...species.children],
     });
   }
@@ -68,25 +68,25 @@ export const buildTargetTree = async (targets: ITarget[]) => {
 };
 
 export const loadWorkMenu = async (): Promise<MenuItemType> => {
-  let companys = await orgCtrl.user.getJoinedCompanys(false);
+  let companys = orgCtrl.user.companys;
   let companyItems: MenuItemType[] = [];
   for (const company of companys) {
     let ret = await buildSpeciesTree(
-      (await company.loadSpeciesTree()).filter((a) => a.target.code == 'matters'),
+      company.species.filter((a) => a.target.code == 'matters'),
     );
     companyItems.push({
       key: company.key,
-      label: company.teamName,
+      label: company.metadata.name,
       item: [company],
       menus: buildGroupMenu(),
       itemType: GroupMenuType.Organization,
-      icon: <TeamIcon share={company.shareInfo} size={18} fontSize={16} />,
+      icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
         {
           key: company.key + OrganizationType.Group,
           label: OrganizationType.Group,
           itemType: GroupMenuType.Organization,
-          tag: [company.typeName, '集团'],
+          tag: [company.metadata.name, '集团'],
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Working, name: OrganizationType.Working }}
@@ -94,7 +94,7 @@ export const loadWorkMenu = async (): Promise<MenuItemType> => {
               fontSize={16}
             />
           ),
-          item: company.joinedGroup,
+          item: company.parentTarget,
           children: await buildTargetTree(company.joinedGroup),
         },
         {

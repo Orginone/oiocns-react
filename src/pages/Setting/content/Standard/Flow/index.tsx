@@ -1,20 +1,20 @@
 import { Card, Modal, message } from 'antd';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import cls from './index.module.less';
 import { AiOutlineExclamation } from 'react-icons/ai';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XWorkDefine } from '@/ts/base/schema';
 import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import DefineInfo from './info';
-import { ISpeciesItem } from '@/ts/core';
-import { IsThingAdmin } from '@/utils/authority';
-import { CreateDefineReq } from '@/ts/base/model';
+import DefineModal from './modal';
+import { WorkDefineModel } from '@/ts/base/model';
 import Design from './Design';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
-  current: ISpeciesItem;
+  current: IWorkItem;
 }
 
 /**
@@ -24,17 +24,10 @@ interface IProps {
 const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [key, setForceUpdate] = useObjectUpdate(current);
-  const [define, setDefine] = useState<XFlowDefine>();
+  const [define, setDefine] = useState<XWorkDefine>();
   const [modalType, setModalType] = useState('');
-  const [isThingAdmin, setIsThingAdmin] = useState<boolean>(false);
 
-  useEffect(() => {
-    setTimeout(async () => {
-      setIsThingAdmin(await IsThingAdmin(current.team));
-    }, 100);
-  }, []);
-
-  const renderOperation = (record: XFlowDefine): any[] => {
+  const renderOperation = (record: XWorkDefine): any[] => {
     let operations: any[] = [
       {
         key: 'editor',
@@ -53,7 +46,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
         },
       },
     ];
-    if (isThingAdmin) {
+    if (current.current.hasAuthoritys([orgAuth.ThingAuthId])) {
       operations.push({
         key: 'delete',
         label: '删除',
@@ -66,7 +59,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-              if (await current.deleteWork(record.id)) {
+              if (await current.deleteWorkDefine(record)) {
                 message.success('删除成功');
                 setForceUpdate();
               }
@@ -95,18 +88,14 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       default:
         return (
           <div style={{ background: '#EFF4F8' }}>
-            <Card
-              bordered={false}
-              // style={{ paddingBottom: '10px' }}
-              bodyStyle={{ paddingTop: 0 }}>
+            <Card bordered={false} bodyStyle={{ paddingTop: 0 }}>
               <div className={cls['app-wrap']} ref={parentRef}>
-                <CardOrTable<XFlowDefine>
+                <CardOrTable<XWorkDefine>
                   columns={FlowColumn}
                   parentRef={parentRef}
-                  dataSource={[]}
-                  request={async (page) => await current.loadWork(page)}
+                  dataSource={current.defines}
                   operation={renderOperation}
-                  rowKey={(record: XFlowDefine) => record.id}
+                  rowKey={(record: XWorkDefine) => record.id}
                   renderCardContent={(items) => {
                     return items.map((item) => (
                       <FlowCard
@@ -129,16 +118,16 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
     <div className={cls['company-top-content']} key={key}>
       {content()}
       {define && (
-        <DefineInfo
-          target={current.team}
+        <DefineModal
+          target={current.current}
           current={define}
           title={'编辑办事'}
           open={modalType == 'edit'}
           handleCancel={function (): void {
             setModalType('');
           }}
-          handleOk={async (req: CreateDefineReq) => {
-            if (await current.publishWork(req)) {
+          handleOk={async (req: WorkDefineModel) => {
+            if (await current.createWorkDefine(req)) {
               message.success('保存成功');
               setForceUpdate();
               setModalType('');

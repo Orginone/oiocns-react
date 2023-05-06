@@ -196,7 +196,7 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'dept':
       return (
         <ProFormDept
-          space={belong}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -207,7 +207,7 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'person':
       return (
         <ProFormPerson
-          space={belong}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -218,7 +218,7 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'group':
       return (
         <ProFormGroup
-          space={belong}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -240,7 +240,7 @@ const OioFormItem = ({ item, belong }: IProps) => {
     case 'identity':
       return (
         <ProFormIdentity
-          space={belong}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
