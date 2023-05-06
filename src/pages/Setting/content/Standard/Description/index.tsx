@@ -38,7 +38,12 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="分类代码">{current.metadata.code}</Descriptions.Item>
-        <Descriptions.Item label="创建时间" span={3}>
+        <Descriptions.Item label="类型">
+          <Space>
+            <strong>{current.metadata.typeName}</strong>
+          </Space>
+        </Descriptions.Item>
+        <Descriptions.Item label="创建时间" span={2}>
           {current.metadata.createTime}
         </Descriptions.Item>
         <Descriptions.Item

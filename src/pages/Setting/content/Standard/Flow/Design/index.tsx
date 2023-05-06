@@ -43,7 +43,7 @@ const Design: React.FC<IProps> = ({
       // content字段可能取消
       let resource_ = await species.loadWorkNode(current.id);
       let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
-      if (resource_ == undefined) {
+      if (resource_.id == undefined) {
         resourceData = {
           nodeId: `node_${getUuid()}`,
           parentId: '',

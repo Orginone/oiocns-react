@@ -122,7 +122,8 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
             readonly={props.config.readonly}
             rootDisable={false}></SelectOrg>
         )}
-        {!editable && orgCtrl.provider.findNameById(props.config.conditions[0]?.val)}
+        {!editable &&
+          orgCtrl.provider.user?.findShareById(props.config.conditions[0]?.val).name}
       </span>
     </div>
   );
@@ -131,7 +132,9 @@ const DeptWayNode: React.FC<DeptWayNodeProps> = (props: DeptWayNodeProps) => {
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
         title={
-          <span>创建组织: {orgCtrl.provider.findNameById(props.config.belongId)}</span>
+          <span>
+            创建组织: {orgCtrl.provider.user?.findShareById(props.config.belongId).name}
+          </span>
         }
         placement="right">
         <div className={cls['node-body']}>

@@ -18,6 +18,8 @@ import {
   SpeciesType,
   TargetType,
 } from '@/ts/core';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 /** 加载分组菜单参数 */
 interface groupMenuParams {
@@ -86,6 +88,19 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: species.children.map((i) => buildSpeciesTree(i)),
+    onClick: async () => {
+      switch (species.metadata.typeName) {
+        case SpeciesType.WorkForm:
+          await (species as IWorkForm).loadForms();
+          await (species as IWorkForm).loadAttributes();
+          break;
+        case SpeciesType.WorkItem:
+          await (species as IWorkItem).loadWorkDefines();
+          break;
+        default:
+          break;
+      }
+    },
   };
   return result;
 };

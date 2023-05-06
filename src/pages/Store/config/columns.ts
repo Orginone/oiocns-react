@@ -56,7 +56,7 @@ export const InnerApplicationColumns: ProColumns<XFlowDefine>[] = [
     title: '需求主体',
     dataIndex: ['belongId'],
     render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
+      return orgCtrl.provider.user?.findShareById(record.belongId).name;
     },
   },
   {

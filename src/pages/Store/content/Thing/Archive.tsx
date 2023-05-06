@@ -62,10 +62,10 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
                     {record.createTime.substring(0, record.createTime.length - 4)}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    {orgCtrl.provider.findNameById(a.node?.belongId!)}
+                    {orgCtrl.provider.user?.findShareById(a.node?.belongId!).name}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    操作人：{orgCtrl.provider.findNameById(record.createUser)}
+                    操作人：{orgCtrl.provider.user?.findShareById(record.createUser).name}
                   </div>
                   <div>{record.comment && <div>审批意见：{record.comment}</div>}</div>
                 </div>

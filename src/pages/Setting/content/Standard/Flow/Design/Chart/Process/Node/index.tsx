@@ -216,7 +216,7 @@ const Node: React.FC<NodeProps> = (props: NodeProps) => {
           title={
             <span>
               创建组织:
-              {orgCtrl.provider.findNameById(props.belongId || '')}
+              {orgCtrl.provider.user?.findShareById(props.belongId || '0').name}
             </span>
           }
           placement="right">

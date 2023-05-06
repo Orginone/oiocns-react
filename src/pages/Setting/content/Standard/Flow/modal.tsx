@@ -106,7 +106,7 @@ const DefineModal = ({
           placeholder="请选择共享组织"
           required={true}
           colProps={{ span: 12 }}
-          initialValue={target.metadata.belongId}
+          initialValue={target.metadata.name}
           fieldProps={{
             disabled: title === '修改' || title === '编辑',
             showSearch: true,

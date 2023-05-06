@@ -88,7 +88,9 @@ const ConcurrentNode: React.FC<ConcurrentNodeProps> = (props: ConcurrentNodeProp
     <div className={editable ? cls['node'] : cls['node-unEdit']}>
       <Tooltip
         title={
-          <span>创建组织: {orgCtrl.provider.findNameById(props.config.belongId)}</span>
+          <span>
+            创建组织: {orgCtrl.provider.user?.findShareById(props.config.belongId).name}
+          </span>
         }
         placement="right">
         <div className={cls['node-body']}>
