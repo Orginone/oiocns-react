@@ -3,7 +3,8 @@ import { ProFormSelect } from '@ant-design/pro-components';
 import { IBelong } from '@/ts/core';
 
 interface IProps {
-  space: IBelong;
+  belong: IBelong;
+  dictId: string;
   [key: string]: any;
 }
 /**
@@ -21,16 +22,14 @@ const ProFormDict = (props: IProps) => {
 
   useEffect(() => {
     const initOptions = async () => {
-      const res = await props.space.dict.loadDictItem(
-        props.props.dictId,
-        props.space.id,
-        pageAll(),
-      );
-      const dictItems =
-        res.result?.map((item) => {
+      const dicts = await props.belong.loadDicts();
+      const dict = dicts.find((a) => a.metadata.id == props.dictId);
+      const dictItems = await dict?.loadItems();
+      setOptions(
+        dictItems?.map((item) => {
           return { label: item.name, value: item.value };
-        }) || [];
-      setOptions(dictItems);
+        }) || [],
+      );
     };
     initOptions();
   }, []);

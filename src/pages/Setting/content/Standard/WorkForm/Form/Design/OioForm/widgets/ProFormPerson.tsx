@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ProFormSelect } from '@ant-design/pro-components';
-import { ISpace } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
-  space: ISpace;
+  space: IBelong;
   [key: string]: any;
 }
 
@@ -14,16 +14,11 @@ const ProFormPerson = (props: IProps) => {
   const [options, setOptions] = useState<{ label: string; value: string }[]>([]);
   useEffect(() => {
     const initOptions = async () => {
-      const res = await props.space.loadMembers({
-        offset: 0,
-        limit: 1000000,
-        filter: '',
-      });
-      const persons =
-        res.result?.map((xtarget) => {
+      setOptions(
+        props.space.members?.map((xtarget) => {
           return { label: xtarget.name, value: xtarget.id };
-        }) || [];
-      setOptions(persons);
+        }) || [],
+      );
     };
     initOptions();
   }, []);

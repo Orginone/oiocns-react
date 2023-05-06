@@ -1,17 +1,17 @@
-import { XOperation } from '@/ts/base/schema';
-import { ISpeciesItem, ITarget } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
+import { ITarget } from '@/ts/core';
 import { Button, Card, message } from 'antd';
 import React, { useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import { SaveOutlined } from '@ant-design/icons';
-import { OperationModel } from '@/ts/base/model';
-import { kernel } from '@/ts/base';
+import { FormModel } from '@/ts/base/model';
 import Design from './design';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface Iprops {
   target?: ITarget;
-  current: ISpeciesItem;
-  operation: XOperation;
+  current: IWorkForm;
+  form: XForm;
   onBack: () => void;
 }
 
@@ -19,49 +19,32 @@ interface Iprops {
   表单设计
 */
 const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
-  const { current, operation, onBack } = props;
-  const [operationModel, setOperationModel] = useState<OperationModel>();
+  const { current, form, onBack } = props;
+  const [formModel, setFormModel] = useState<FormModel>();
 
   const save = async () => {
-    if (operationModel) {
-      if (operationModel.belongId === current.team.space.id) {
-        const res = await kernel.updateOperation(operationModel);
+    if (formModel) {
+      if (formModel.shareId === current.current.space.metadata.id) {
+        const res = await current.updateForm(formModel);
         console.log(res);
       }
-      const res = await kernel.createOperationItems({
-        spaceId: current.team.space.id,
-        operationId: operationModel.id!,
-        operationItems: operationModel.items
-          .filter(
-            (i: any) => i.belongId == undefined || i.belongId == current.team.space.id,
-          )
-          .map((a) => ({
-            name: a.name,
-            code: a.code,
-            attrId: a.attrId,
-            rule: a.rule,
-            remark: a.remark,
-            speciesIds: a.speciesIds || [],
-          })),
-      });
-      if (res.success) {
+      const res = await current.createForm(formModel);
+      if (res) {
         message.success('保存成功！');
-      } else {
-        message.error(res.msg);
       }
     }
   };
 
   return (
     <Card
-      title={operation?.name}
+      title={form?.name}
       extra={
         <>
           <Button
-            onClick={() => save()}
+            onClick={save}
             type="primary"
             icon={<SaveOutlined />}
-            disabled={!operationModel}>
+            disabled={!formModel}>
             保存
           </Button>
           <Button
@@ -79,11 +62,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
           </Button>
         </>
       }>
-      <Design
-        operation={operation}
-        current={current}
-        setOperationModel={setOperationModel}
-      />
+      <Design form={form} current={current as IWorkForm} setFormModel={setFormModel} />
     </Card>
   );
 };

@@ -31,7 +31,7 @@ const SpeciesForm = ({ current, recursionOrg, recursionSpecies }: IProps) => {
       setSelectedOperation={setSelectedForm}
     />
   ) : selectedForm ? (
-    <Design current={current} operation={selectedForm} onBack={() => setTabKey(0)} />
+    <Design current={current} form={selectedForm} onBack={() => setTabKey(0)} />
   ) : (
     <></>
   );

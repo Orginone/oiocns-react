@@ -3,12 +3,12 @@ import { AiOutlineSelect } from 'react-icons/ai';
 import { ProForm } from '@ant-design/pro-components';
 import { Button, Input, Modal } from 'antd';
 import React, { useState } from 'react';
-import { ISpace } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 
 const { Search } = Input;
 
 interface IProps {
-  space: ISpace;
+  space: IBelong;
   [key: string]: any; // 其他属性方法
 }
 
@@ -16,7 +16,7 @@ interface IProps {
  * 角色组件(Todo 待完善)
  */
 const ProFormIdentity = (props: IProps) => {
-  const nodeOperateOrgId = props.space.id;
+  const nodeOperateOrgId = props.space.metadata.id;
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [identity, setIdentity] = useState<any>({});
