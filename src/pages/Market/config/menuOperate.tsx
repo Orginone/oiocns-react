@@ -4,44 +4,48 @@ import * as im from 'react-icons/im';
 import { MenuItemType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IBelong, TargetType } from '@/ts/core';
-import { ISpeciesItem, ITarget } from '@/ts/core';
 import { IconFont } from '@/components/IconFont';
-/** 获取商品菜单 */
-const loadThingMenus = (target: ITarget) => {
-  const children: MenuItemType[] = [];
-  for (const item of target.species) {
-    if (item.metadata.name === GroupMenuType.Things) {
-      children.push(...buildSpeciesTree(item.children));
-    }
-  }
-  return {
-    key: target.key + GroupMenuType.Things,
-    label: GroupMenuType.Things,
-    itemType: GroupMenuType.Things,
-    menus: [],
-    item: target,
-    icon: <im.ImCalculator />,
-    children: children,
-  };
-};
+import {
+  IBelong,
+  IForm,
+  ISpeciesItem,
+  ITarget,
+  IWork,
+  SpeciesType,
+  TargetType,
+} from '@/ts/core';
 
 /** 编译组织分类树 */
-const buildSpeciesTree = (parent: ISpeciesItem[]): MenuItemType[] => {
-  if (parent.length > 0) {
-    return parent.map((species) => {
-      return {
-        key: species.key,
-        item: species,
-        label: species.metadata.name,
-        icon: <im.ImNewspaper />,
-        itemType: MenuType.Species,
-        menus: [],
-        children: buildSpeciesTree(species.children),
-      };
-    });
+const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
+  const result: MenuItemType[] = [];
+  for (const item of species) {
+    switch (item.metadata.typeName) {
+      case SpeciesType.Market:
+      case SpeciesType.Commodity:
+        result.push({
+          key: item.key,
+          item: item,
+          label: item.metadata.name,
+          icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+          itemType: MenuType.Species,
+          menus: [],
+          children: buildSpeciesTree(item.children),
+          onClick: async () => {
+            switch (item.metadata.typeName) {
+              case SpeciesType.Market:
+                await (item as IWork).loadWorkDefines();
+                break;
+              case SpeciesType.Commodity:
+                await (item as IForm).loadAttributes();
+                await (item as IForm).loadForms();
+                break;
+            }
+          },
+        });
+        break;
+    }
   }
-  return [];
+  return result;
 };
 
 /** 编译组织树 */
@@ -55,7 +59,7 @@ const buildTargetTree = (targets: ITarget[]) => {
       itemType: item.metadata.typeName,
       menus: [],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
-      children: [loadThingMenus(item), ...buildTargetTree(item.subTarget)],
+      children: buildSpeciesTree(item.species),
     });
   }
   return result;
@@ -89,7 +93,15 @@ const getUserMenu = () => {
     icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
     menus: [],
     children: [
-      loadThingMenus(orgCtrl.user),
+      {
+        key: orgCtrl.user.key + GroupMenuType.User,
+        item: orgCtrl.user,
+        label: GroupMenuType.User,
+        itemType: GroupMenuType.User,
+        icon: <im.ImNewspaper />,
+        menus: [],
+        children: buildSpeciesTree(orgCtrl.user.species),
+      },
       {
         key: orgCtrl.user.key + GroupMenuType.UserCohort,
         item: orgCtrl.user,
@@ -115,10 +127,18 @@ const getTeamMenu = () => {
       menus: [],
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
-        loadThingMenus(company),
+        {
+          key: company.key + GroupMenuType.Company,
+          item: company,
+          label: GroupMenuType.Company,
+          itemType: GroupMenuType.Company,
+          icon: <im.ImNewspaper />,
+          menus: [],
+          children: buildSpeciesTree(company.species),
+        },
         loadAgencyGroup(
           company,
-          buildTargetTree(company.subTarget),
+          buildTargetTree(company.departments),
           GroupMenuType.InnerAgency,
           TargetType.Department,
         ),

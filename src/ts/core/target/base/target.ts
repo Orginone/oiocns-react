@@ -37,11 +37,7 @@ export abstract class Target extends Team implements ITarget {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(_metadata, _labels, _space, _memberTypes);
-    this.speciesTypes = [
-      SpeciesType.Application,
-      SpeciesType.Market,
-      SpeciesType.Resource,
-    ];
+    this.speciesTypes = [SpeciesType.Application, SpeciesType.Resource];
   }
   speciesTypes: string[] = [];
   identitys: IIdentity[] = [];
@@ -76,11 +72,16 @@ export abstract class Target extends Team implements ITarget {
         this.species = (res.data.result || []).map((item) => {
           return createSpecies(item, this);
         });
-        const index = this.species.findIndex(
-          (i) => i.metadata.typeName === SpeciesType.FileSystem,
-        );
-        if (index < 1) {
-          this.speciesTypes.unshift(SpeciesType.FileSystem);
+        if (
+          this.species.findIndex((i) => i.metadata.typeName === SpeciesType.FileSystem) <
+          0
+        ) {
+          this.speciesTypes.push(SpeciesType.FileSystem);
+        }
+        if (
+          this.species.findIndex((i) => i.metadata.typeName === SpeciesType.Market) < 0
+        ) {
+          this.speciesTypes.push(SpeciesType.Market);
         }
       }
     }

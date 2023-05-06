@@ -10,10 +10,10 @@ import {
   IBelong,
   IFileSystem,
   IFileSystemItem,
-  IPropClass,
+  IForm,
   ISpeciesItem,
   ITarget,
-  IWorkForm,
+  IWork,
   SpeciesType,
   TargetType,
 } from '@/ts/core';
@@ -111,8 +111,10 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
         }
         break;
       case SpeciesType.Store:
+      case SpeciesType.Market:
       case SpeciesType.WorkForm:
       case SpeciesType.AppModule:
+      case SpeciesType.Commodity:
       case SpeciesType.Application:
         result.push({
           key: item.key,
@@ -124,11 +126,14 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           children: buildSpeciesTree(item.children),
           onClick: async () => {
             switch (item.metadata.typeName) {
-              case SpeciesType.Store:
-                await (item as IPropClass).loadPropertys();
+              case SpeciesType.Market:
+              case SpeciesType.WorkItem:
+                await (item as IWork).loadWorkDefines();
                 break;
               case SpeciesType.WorkForm:
-                await (item as IWorkForm).loadAttributes();
+              case SpeciesType.Commodity:
+                await (item as IForm).loadAttributes();
+                await (item as IForm).loadForms();
                 break;
             }
           },

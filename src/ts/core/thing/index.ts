@@ -5,6 +5,7 @@ import { ISpeciesItem } from './base/species';
 import { PropClass } from './store/propclass';
 import { FileSystem } from './filesys/filesystem';
 import { Application } from './app/application';
+import { Market } from './market/market';
 
 export type { ISpeciesItem } from './base/species';
 
@@ -21,8 +22,8 @@ export const createSpecies = (
       return new FileSystem(_metadata, _current);
     // case SpeciesType.Resource:
     //   break;
-    // case SpeciesType.Market:
-    //   break;
+    case SpeciesType.Market:
+      return new Market(_metadata, _current);
     default:
       return new PropClass(_metadata, _current);
   }

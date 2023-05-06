@@ -29,8 +29,7 @@ export enum SpeciesType {
   'Resource' = '服务资源',
   'Store' = '仓库物资',
   /** 类别类目 */
-  'Thing' = '财务分类',
-  'Species' = '货品类别',
+  'Commodity' = '商品类别',
   'SpeciesForm' = '表单类别',
   'Application' = '软件应用',
   'AppModule' = '应用模块',

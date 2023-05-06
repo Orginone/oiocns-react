@@ -19,7 +19,7 @@ import DataGrid, {
   HeaderFilter,
   Scrolling,
 } from 'devextreme-react/data-grid';
-import { IPropClass, ISpeciesItem, IWorkForm, SpeciesType } from '@/ts/core';
+import { IForm, IPropClass, ISpeciesItem, SpeciesType } from '@/ts/core';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -66,7 +66,8 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     const temp: XProperty[] = [];
     switch (props.species.metadata.typeName) {
       case SpeciesType.WorkForm:
-        (props.species as IWorkForm).attributes.forEach((i) => {
+      case SpeciesType.Commodity:
+        (props.species as IForm).attributes.forEach((i) => {
           if (i.linkPropertys && i.linkPropertys.length > 0) {
             const item = i.linkPropertys.find(
               (a) => a.belongId === props.species.current.space.metadata.id,
