@@ -46,7 +46,7 @@ export abstract class Belong extends Target implements IBelong {
   ) {
     super(_metadata, _labels, undefined, _memberTypes);
     this.user = _user || (this as unknown as IPerson);
-    this.speciesTypes.unshift(SpeciesType.PropClass);
+    this.speciesTypes.unshift(SpeciesType.Store);
     this.message = new ChatMessage(this);
   }
   user: IPerson;

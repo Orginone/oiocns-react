@@ -38,10 +38,9 @@ export abstract class Target extends Team implements ITarget {
   ) {
     super(_metadata, _labels, _space, _memberTypes);
     this.speciesTypes = [
-      SpeciesType.AppPackage,
+      SpeciesType.Application,
       SpeciesType.Market,
       SpeciesType.Resource,
-      SpeciesType.Store,
     ];
   }
   speciesTypes: string[] = [];

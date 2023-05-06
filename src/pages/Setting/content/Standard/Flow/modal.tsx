@@ -10,29 +10,21 @@ import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
 import { XWorkDefine } from '@/ts/base/schema';
-import { WorkDefineModel } from '@/ts/base/model';
-import { ITarget } from '@/ts/core';
+import { IWorkItem, SpeciesType } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
   title: string;
   current?: XWorkDefine;
-  target: ITarget;
-  handleOk: (res: WorkDefineModel) => void;
+  item: IWorkItem;
+  handleOk: () => void;
   handleCancel: () => void;
 }
 
 /*
   业务标准编辑模态框
 */
-const DefineModal = ({
-  open,
-  title,
-  handleOk,
-  handleCancel,
-  target,
-  current,
-}: Iprops) => {
+const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Iprops) => {
   const [form] = useForm<any>();
   if (current) {
     form.setFieldsValue({
@@ -52,17 +44,14 @@ const DefineModal = ({
           ...current,
           ...form.getFieldsValue(),
         };
-        handleOk({
-          id: current?.id || '0',
-          resource: undefined,
-          speciesId: '',
-          code: value.name,
-          name: value.name,
-          sourceIds: value.isCreate ? '' : value.operationIds?.join(','),
-          remark: value.remark,
-          shareId: value.shareId,
-          isCreate: value.isCreate,
-        });
+        value.sourceIds = value.isCreate ? '' : value.operationIds?.join(',');
+        if (current) {
+          value.id = current.id;
+          await item.updateWorkDefine(value);
+        } else {
+          await item.createWorkDefine(value);
+        }
+        handleOk();
       }}
       onCancel={() => {
         form.resetFields();
@@ -99,18 +88,14 @@ const DefineModal = ({
           colProps={{ span: 12 }}
           rules={[{ required: true, message: '办事名称为必填项' }]}
         />
-        <ProFormTreeSelect
+        <ProFormText
           width="md"
-          name="shareId"
-          label="共享组织"
-          placeholder="请选择共享组织"
+          name="code"
+          label="办事标识"
+          placeholder="请输入办事标识"
           required={true}
           colProps={{ span: 12 }}
-          initialValue={target.metadata.name}
-          fieldProps={{
-            disabled: title === '修改' || title === '编辑',
-            showSearch: true,
-          }}
+          rules={[{ required: true, message: '办事标识为必填项' }]}
         />
         <ProFormSelect
           width="md"
@@ -150,7 +135,9 @@ const DefineModal = ({
                   required={true}
                   colProps={{ span: 12 }}
                   request={async () => {
-                    let tree = await target.loadSpecies();
+                    let tree = (await item.current.loadSpecies()).filter(
+                      (i) => i.metadata.typeName === SpeciesType.Store,
+                    );
                     return tree.map((a) => a.metadata);
                   }}
                   fieldProps={{

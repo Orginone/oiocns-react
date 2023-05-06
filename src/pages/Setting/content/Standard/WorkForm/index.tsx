@@ -1,4 +1,3 @@
-import Description from '../Description';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { Button, Segmented, message } from 'antd';
 import React, { useState } from 'react';
@@ -15,16 +14,11 @@ interface IProps {
 const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
   const [key, forceUpdate] = useObjectUpdate(current);
   const [modalType, setModalType] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('info');
+  const [activeTab, setActiveTab] = useState<string>('attr');
   const [isRecursionOrg, setRecursionOrg] = useState<boolean>(true);
   const [isRecursionSpecies, setRecursionSpecies] = useState<boolean>(true);
 
   const items = [
-    {
-      label: `基本信息`,
-      tab: '基本信息',
-      key: 'info',
-    },
     {
       label: `分类特性`,
       tab: '分类特性',
@@ -102,8 +96,6 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
 
   const content = () => {
     switch (activeTab) {
-      case 'info':
-        return <Description current={current} />;
       case 'attr':
         return (
           <Attritube

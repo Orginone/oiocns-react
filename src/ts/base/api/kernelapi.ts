@@ -681,12 +681,12 @@ export default class KernelApi {
    * @param {model.FormModel} params 请求参数
    * @returns {model.ResultType<schema.XForm>} 请求结果
    */
-  public async createFrom(
+  public async createForm(
     params: model.FormModel,
   ): Promise<model.ResultType<schema.XForm>> {
     return await this.request({
       module: 'thing',
-      action: 'CreateFrom',
+      action: 'CreateForm',
       params: params,
     });
   }
@@ -771,10 +771,10 @@ export default class KernelApi {
    * @param {model.IdModel} params 请求参数
    * @returns {model.ResultType<boolean>} 请求结果
    */
-  public async deleteFrom(params: model.IdModel): Promise<model.ResultType<boolean>> {
+  public async deleteForm(params: model.IdModel): Promise<model.ResultType<boolean>> {
     return await this.request({
       module: 'thing',
-      action: 'DeleteFrom',
+      action: 'DeleteForm',
       params: params,
     });
   }
@@ -865,12 +865,12 @@ export default class KernelApi {
    * @param {model.FormModel} params 请求参数
    * @returns {model.ResultType<schema.XForm>} 请求结果
    */
-  public async updateFrom(
+  public async updateForm(
     params: model.FormModel,
   ): Promise<model.ResultType<schema.XForm>> {
     return await this.request({
       module: 'thing',
-      action: 'UpdateFrom',
+      action: 'UpdateForm',
       params: params,
     });
   }

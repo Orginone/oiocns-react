@@ -1213,7 +1213,7 @@ export type XWorkNodeRelation = {
   // 办事节点
   nodeId: string;
   // 单设计
-  operationId: string;
+  formId: string;
   // 状态
   status: number;
   // 创建人员ID

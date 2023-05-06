@@ -73,14 +73,6 @@ const List = ({
           setViewFormOpen(true);
         },
       },
-      // {
-      //   key: '预览卡片',
-      //   label: '预览卡片',
-      //   onClick: () => {
-      //     setEditData(item);
-      //     setViewCardOpen(true);
-      //   },
-      // },
       {
         key: '删除',
         label: (
@@ -140,17 +132,6 @@ const List = ({
           setViewFormOpen(false);
         }}
       />
-      {/** 预览卡片 */}
-      {/* <ViewCardModal
-        data={editData}
-        open={viewCardOpen}
-        handleCancel={() => {
-          setViewCardOpen(false);
-        }}
-        handleOk={() => {
-          setViewCardOpen(false);
-        }}
-      /> */}
     </>
   );
 };

@@ -42,11 +42,11 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'select',
       formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
       request: async () => {
-        const propClass = props.current.current.species.filter(
-          (a) => a.metadata.typeName == SpeciesType.PropClass,
+        const propClasses = props.current.current.species.filter(
+          (a) => a.metadata.typeName == SpeciesType.Store,
         );
         let data: XProperty[] = [];
-        for (let prop of propClass) {
+        for (let prop of propClasses) {
           data.push(...(await (prop as PropClass).loadPropertys()));
         }
         return data.map((item) => {

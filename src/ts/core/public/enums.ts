@@ -25,11 +25,9 @@ export enum TargetType {
 export enum SpeciesType {
   /** 类别目录 */
   'FileSystem' = '文件系统',
-  'AppPackage' = '应用类别',
   'Market' = '流通市场',
   'Resource' = '服务资源',
   'Store' = '仓库物资',
-  'PropClass' = '属性分类',
   /** 类别类目 */
   'Thing' = '财务分类',
   'Species' = '货品类别',

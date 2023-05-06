@@ -158,12 +158,6 @@ export const PropertyColumns = (
     width: 150,
   },
   {
-    title: '属性定义',
-    dataIndex: 'remark',
-    key: 'remark',
-    width: 250,
-  },
-  {
     title: '单位',
     dataIndex: 'unit',
     key: 'unit',
@@ -185,7 +179,7 @@ export const PropertyColumns = (
     },
   },
   {
-    title: '特性分类',
+    title: '物资类别',
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
@@ -267,19 +261,19 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     width: 50,
   },
   {
-    title: '业务编号',
+    title: '编号',
     dataIndex: 'code',
     key: 'code',
     width: 150,
   },
   {
-    title: '业务名称',
+    title: '名称',
     dataIndex: 'name',
     key: 'name',
     width: 200,
   },
   {
-    title: '特性分类',
+    title: '表单类别',
     dataIndex: 'speciesId',
     key: 'speciesId',
     width: 150,
@@ -292,12 +286,21 @@ export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] =
     },
   },
   {
-    title: '共享组织',
+    title: '共享用户',
     dataIndex: 'shareId',
     key: 'shareId',
     width: 200,
     render: (_, record) => {
       return orgCtrl.user.findShareById(record.shareId).name;
+    },
+  },
+  {
+    title: '归属用户',
+    dataIndex: 'belongId',
+    key: 'belongId',
+    width: 200,
+    render: (_, record) => {
+      return orgCtrl.user.findShareById(record.belongId).name;
     },
   },
 ];
@@ -320,13 +323,8 @@ export const FlowColumn: ProColumns<schema.XWorkDefine>[] = [
     dataIndex: 'name',
   },
   {
-    title: '需求主体',
-    dataIndex: 'shareId',
-    key: 'shareId',
-    width: 200,
-    render: (_, record) => {
-      return orgCtrl.user.findShareById(record.shareId).name;
-    },
+    title: '办事标识',
+    dataIndex: 'code',
   },
   {
     title: '创建时间',

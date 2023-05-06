@@ -56,7 +56,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
   async createForm(data: model.FormModel): Promise<schema.XForm | undefined> {
     data.shareId = this.current.metadata.id;
     data.speciesId = this.metadata.id;
-    const res = await kernel.createFrom(data);
+    const res = await kernel.createForm(data);
     if (res.success && res.data.id) {
       this.forms.push(res.data);
       return res.data;
@@ -67,7 +67,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
     if (index > -1) {
       data.shareId = this.current.metadata.id;
       data.speciesId = this.metadata.id;
-      const res = await kernel.updateFrom(data);
+      const res = await kernel.updateForm(data);
       if (res.success && res.data.id) {
         this.forms[index] = res.data;
       }
@@ -78,7 +78,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
   async deleteForm(data: schema.XForm): Promise<boolean> {
     const index = this.forms.findIndex((i) => i.id === data.id);
     if (index > -1) {
-      const res = await kernel.deleteFrom({
+      const res = await kernel.deleteForm({
         id: data.id,
         page: PageAll,
       });

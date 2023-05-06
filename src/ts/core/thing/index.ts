@@ -3,8 +3,8 @@ import { SpeciesType } from '../public/enums';
 import { ITarget } from '../target/base/target';
 import { ISpeciesItem } from './base/species';
 import { PropClass } from './store/propclass';
-import { AppPackage } from './app/package';
 import { FileSystem } from './filesys/filesystem';
+import { Application } from './app/application';
 
 export type { ISpeciesItem } from './base/species';
 
@@ -13,17 +13,15 @@ export const createSpecies = (
   _current: ITarget,
 ): ISpeciesItem => {
   switch (_metadata.typeName as SpeciesType) {
-    case SpeciesType.PropClass:
+    case SpeciesType.Store:
       return new PropClass(_metadata, _current);
-    case SpeciesType.AppPackage:
-      return new AppPackage(_metadata, _current);
+    case SpeciesType.Application:
+      return new Application(_metadata, _current);
     case SpeciesType.FileSystem:
       return new FileSystem(_metadata, _current);
     // case SpeciesType.Resource:
     //   break;
     // case SpeciesType.Market:
-    //   break;
-    // case SpeciesType.Store:
     //   break;
     default:
       return new PropClass(_metadata, _current);

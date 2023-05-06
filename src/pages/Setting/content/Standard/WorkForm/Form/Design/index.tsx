@@ -24,12 +24,7 @@ const SpeciesFormDesign: React.FC<Iprops> = (props: Iprops) => {
 
   const save = async () => {
     if (formModel) {
-      if (formModel.shareId === current.current.space.metadata.id) {
-        const res = await current.updateForm(formModel);
-        console.log(res);
-      }
-      const res = await current.createForm(formModel);
-      if (res) {
+      if (await current.updateForm(formModel)) {
         message.success('保存成功！');
       }
     }

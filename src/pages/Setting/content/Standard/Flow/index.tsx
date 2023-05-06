@@ -8,12 +8,10 @@ import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import DefineModal from './modal';
-import { WorkDefineModel } from '@/ts/base/model';
 import Design from './Design';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import Description from '../Description';
 
 interface IProps {
   current: IWorkItem;
@@ -25,16 +23,11 @@ interface IProps {
  */
 const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
-  const [activeTab, setActiveTab] = useState<string>('info');
+  const [activeTab, setActiveTab] = useState<string>('work');
   const [key, setForceUpdate] = useObjectUpdate(current);
   const [define, setDefine] = useState<XWorkDefine>();
   const [modalType, setModalType] = useState('');
   const items = [
-    {
-      label: `基本信息`,
-      tab: '基本信息',
-      key: 'info',
-    },
     {
       label: `办事定义`,
       tab: '办事定义',
@@ -105,8 +98,6 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
 
   const content = () => {
     switch (activeTab) {
-      case 'info':
-        return <Description current={current} />;
       case 'work':
         switch (modalType) {
           case 'design':
@@ -179,20 +170,17 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       </PageCard>
       {
         <DefineModal
-          target={current.current}
+          item={current}
           current={define}
           title={modalType == 'create' ? '新增办事' : '编辑办事'}
           open={['edit', 'create'].includes(modalType)}
           handleCancel={function (): void {
             setModalType('');
           }}
-          handleOk={async (req: WorkDefineModel) => {
-            if (await current.createWorkDefine(req)) {
-              message.success('保存成功');
-              setDefine(undefined);
-              setForceUpdate();
-              setModalType('');
-            }
+          handleOk={() => {
+            setDefine(undefined);
+            setForceUpdate();
+            setModalType('');
           }}
         />
       }

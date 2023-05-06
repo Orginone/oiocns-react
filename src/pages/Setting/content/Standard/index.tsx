@@ -5,6 +5,7 @@ import WorkForm from './WorkForm';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import WorkItem from './Flow';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import Description from './Description';
 
 interface IProps {
   current: ISpeciesItem;
@@ -16,8 +17,10 @@ interface IProps {
  */
 const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   switch (current.metadata.typeName) {
-    case SpeciesType.PropClass:
+    case SpeciesType.Store:
       return <Property current={current} />;
+    case SpeciesType.Application:
+      return <Description current={current} />;
     case SpeciesType.WorkForm:
       return <WorkForm current={current as IWorkForm} />;
     case SpeciesType.WorkItem:

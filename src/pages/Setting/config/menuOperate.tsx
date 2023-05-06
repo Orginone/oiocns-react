@@ -181,7 +181,7 @@ const loadStandardSetting = (belong: IBelong) => {
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
-  if (species.metadata.typeName === SpeciesType.PropClass) {
+  if (species.metadata.typeName === SpeciesType.Store) {
     items.push({
       key: '添加属性',
       icon: <im.ImPlus />,
