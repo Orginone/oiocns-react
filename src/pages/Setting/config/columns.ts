@@ -1,5 +1,5 @@
 import { schema } from '@/ts/base';
-import { IProduct, ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import orgCtrl from '@/ts/controller';
 
@@ -8,7 +8,7 @@ const getSpeciesName = (
   species: ISpeciesItem[],
 ): ISpeciesItem | undefined => {
   for (const item of species) {
-    if (id === item.id) {
+    if (id === item.metadata.id) {
       return item;
     }
     const find = getSpeciesName(id, item.children);
@@ -99,64 +99,19 @@ export const CohortColumn: ProColumns<schema.XTarget>[] = [
   },
   {
     title: '群组名称',
-    dataIndex: ['target', 'name'],
+    dataIndex: ['name'],
   },
   {
     title: '群组编号',
-    dataIndex: ['target', 'code'],
+    dataIndex: ['code'],
   },
   {
     title: '群组简介',
-    dataIndex: ['target', 'team', 'remark'],
+    dataIndex: ['remark'],
   },
   {
-    title: '归属',
-    dataIndex: 'rule',
-    key: 'rule',
-    width: 180,
-    render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
-    },
-  },
-];
-
-export const ApplicationColumns: ProColumns<IProduct>[] = [
-  {
-    title: '序号',
-    valueType: 'index',
-    width: 50,
-  },
-  {
-    title: '应用图标',
-    dataIndex: ['prod', 'belongId'],
-  },
-  {
-    title: '应用名称',
-    dataIndex: ['prod', 'name'],
-  },
-  {
-    title: '版本号',
-    dataIndex: ['prod', 'version'],
-    width: 100,
-  },
-  {
-    title: '应用类型',
-    dataIndex: ['prod', 'typeName'],
-  },
-  {
-    title: '应用来源',
-    ellipsis: true,
-    dataIndex: ['prod', 'source'],
-  },
-  {
-    title: '创建时间',
-    valueType: 'dateTime',
-    dataIndex: ['prod', 'createTime'],
-  },
-  {
-    title: '备注',
-    ellipsis: true,
-    dataIndex: ['prod', 'remark'],
+    title: '群组归属',
+    dataIndex: ['belong', 'name'],
   },
 ];
 
@@ -192,7 +147,9 @@ export const IdentityColumn: ProColumns<schema.XIdentity>[] = [
   },
 ];
 
-export const PropertyColumns: ProColumns<any>[] = [
+export const PropertyColumns = (
+  species: ISpeciesItem,
+): ProColumns<schema.XProperty>[] => [
   {
     title: '序号',
     valueType: 'index',
@@ -235,21 +192,25 @@ export const PropertyColumns: ProColumns<any>[] = [
     width: 150,
   },
   {
-    title: '来源组织',
-    dataIndex: 'shareId',
-    key: 'shareId',
-    width: 200,
-    render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.shareId);
-    },
-  },
-  {
     title: '归属组织',
     dataIndex: 'belongId',
     key: 'belongId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
+      return orgCtrl.user.findShareById(record.belongId).name;
+    },
+  },
+  {
+    title: '特性分类',
+    dataIndex: 'speciesId',
+    key: 'speciesId',
+    width: 150,
+    render: (_, record) => {
+      const find = getSpeciesName(record.speciesId, [species]);
+      if (find != undefined) {
+        return find.metadata.name;
+      }
+      return '未知';
     },
   },
   {
@@ -261,7 +222,7 @@ export const PropertyColumns: ProColumns<any>[] = [
 ];
 
 export const AttributeColumns = (
-  species: ISpeciesItem[],
+  species: ISpeciesItem,
 ): ProColumns<schema.XAttribute>[] => [
   {
     title: '序号',
@@ -286,9 +247,9 @@ export const AttributeColumns = (
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      const find = getSpeciesName(record.speciesId, species);
+      const find = getSpeciesName(record.speciesId, [species]);
       if (find != undefined) {
-        return find.name;
+        return find.metadata.name;
       }
       return '未知';
     },
@@ -301,11 +262,11 @@ export const AttributeColumns = (
   },
   {
     title: '共享组织',
-    dataIndex: 'belongId',
-    key: 'belongId',
+    dataIndex: 'shareId',
+    key: 'shareId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
+      return orgCtrl.user.findShareById(record.shareId).name;
     },
   },
   {
@@ -315,9 +276,7 @@ export const AttributeColumns = (
     key: 'remark',
   },
 ];
-export const OperationColumns = (
-  species: ISpeciesItem[],
-): ProColumns<schema.XOperation>[] => [
+export const FormColumns = (species: ISpeciesItem): ProColumns<schema.XForm>[] => [
   {
     title: '序号',
     valueType: 'index',
@@ -341,41 +300,32 @@ export const OperationColumns = (
     key: 'speciesId',
     width: 150,
     render: (_, record) => {
-      const find = getSpeciesName(record.speciesId, species);
+      const find = getSpeciesName(record.speciesId, [species]);
       if (find != undefined) {
-        return find.name;
+        return find.metadata.name;
       }
       return '未知';
     },
   },
   {
     title: '共享组织',
-    dataIndex: 'belongId',
-    key: 'belongId',
+    dataIndex: 'shareId',
+    key: 'shareId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
+      return orgCtrl.user.findShareById(record.shareId).name;
     },
   },
 ];
 
-export const OperationItemColumns: ProColumns<schema.XOperationItem>[] = [
+export const FormItemColumns: ProColumns<schema.XFormItem>[] = [
   { title: '字段名称', dataIndex: 'name', key: 'name', width: 140 },
   { title: '字段编码', dataIndex: 'code', key: 'code', width: 160 },
   { title: '字段类型', dataIndex: 'remark', key: 'remark', width: 120 },
-  {
-    title: '共享组织',
-    dataIndex: 'rule',
-    key: 'rule',
-    width: 180,
-    render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
-    },
-  },
   { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
 ];
 
-export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
+export const FlowColumn: ProColumns<schema.XWorkDefine>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -387,11 +337,11 @@ export const FlowColumn: ProColumns<schema.XFlowDefine>[] = [
   },
   {
     title: '需求主体',
-    dataIndex: 'belongId',
-    key: 'belongId',
+    dataIndex: 'shareId',
+    key: 'shareId',
     width: 200,
     render: (_, record) => {
-      return orgCtrl.provider.findNameById(record.belongId);
+      return orgCtrl.user.findShareById(record.shareId).name;
     },
   },
   {
@@ -453,6 +403,12 @@ export const DictItemColumns: ProColumns<schema.XDictItem>[] = [
     title: '值',
     dataIndex: 'value',
     key: 'value',
+    width: 150,
+  },
+  {
+    title: '备注',
+    dataIndex: 'remark',
+    key: 'remark',
     width: 150,
   },
   {

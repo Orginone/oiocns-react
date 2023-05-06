@@ -2,28 +2,20 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { DictItemModel } from '@/ts/base/model';
-import { XDict, XDictItem } from '@/ts/base/schema';
-import { ISpace } from '@/ts/core';
+import { XDictItem } from '@/ts/base/schema';
+import { IDict } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
   data?: XDictItem;
-  space: ISpace;
   handleCancel: () => void;
   handleOk: (newItem: boolean | undefined) => void;
-  current: XDict;
+  current: IDict;
 }
 /*
   字典子项编辑模态框
 */
-const DictItemModal = ({
-  open,
-  handleOk,
-  current,
-  data,
-  space,
-  handleCancel,
-}: Iprops) => {
+const DictItemModal = ({ open, handleOk, current, data, handleCancel }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
 
   const columns: ProFormColumnsType<DictItemModel>[] = [
@@ -71,12 +63,10 @@ const DictItemModal = ({
       layoutType="ModalForm"
       onFinish={async (values) => {
         if (data) {
-          handleOk(
-            (await space.dict?.updateDictItem({ ...data, ...values })) != undefined,
-          );
+          values.id = data.id;
+          handleOk(await current.updateItem(values));
         } else {
-          values.dictId = current.id;
-          handleOk((await space.dict?.createDictItem(values)) != undefined);
+          handleOk((await current.createItem(values)) != undefined);
         }
       }}
       columns={columns}

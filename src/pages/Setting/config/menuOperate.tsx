@@ -15,6 +15,7 @@ import {
   ITarget,
   ITeam,
   OrgAuth,
+  SpeciesType,
   TargetType,
 } from '@/ts/core';
 
@@ -123,9 +124,15 @@ const buildDictMenus = (dict: IDict) => {
         icon: <im.ImCross />,
         label: '删除字典',
         model: 'outside',
+        onClick: async () => {
+          return await dict.delete();
+        },
       },
     ],
     children: [],
+    onClick: async () => {
+      await dict.loadItems();
+    },
   };
   return result;
 };
@@ -158,7 +165,15 @@ const loadStandardSetting = (belong: IBelong) => {
 
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
-  const items = [];
+  const items: OperateMenuType[] = [];
+  if (species.metadata.typeName === SpeciesType.PropClass) {
+    items.push({
+      key: '添加属性',
+      icon: <im.ImPlus />,
+      label: '添加属性',
+      model: 'outside',
+    });
+  }
   if (species.speciesTypes.length > 0) {
     items.push({
       key: '新增',
@@ -176,6 +191,9 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       key: '移除',
       icon: <im.ImBin />,
       label: '删除分类',
+      onClick: async () => {
+        return await species.delete();
+      },
     },
   );
   return items;
@@ -298,12 +316,16 @@ const getTeamMenu = () => {
 
 /** 加载分组菜单 */
 const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
-  let menus = [
+  let menus: OperateMenuType[] = [
     {
-      key: '重载|' + param.typeName,
+      key: '刷新',
       icon: <im.ImSpinner9 />,
       label: '刷新' + param.typeName,
       model: 'inside',
+      onClick: async () => {
+        await param.item.deepLoad(true);
+        return false;
+      },
     },
   ];
   if (param.item.hasAuthoritys([OrgAuth.RelationAuthId])) {
@@ -337,7 +359,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
 
 /** 加载右侧菜单 */
 const loadAuthorityMenus = (item: IAuthority) => {
-  const items = [
+  const items: OperateMenuType[] = [
     {
       key: '新增',
       icon: <im.ImPlus />,
@@ -355,6 +377,9 @@ const loadAuthorityMenus = (item: IAuthority) => {
         key: '移除',
         icon: <im.ImBin />,
         label: '删除权限',
+        onClick: async () => {
+          return await item.delete();
+        },
       },
     );
   }
@@ -388,12 +413,18 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
         key: '删除',
         icon: <im.ImBin />,
         label: '删除' + item.metadata.typeName,
+        onClick: async () => {
+          return await item.delete();
+        },
       });
     } else {
       menus.push({
         key: '退出',
         icon: <im.ImBin />,
         label: '退出' + item.metadata.typeName,
+        // onClick: async () => {
+        //   return await item.exit();
+        // },
       });
     }
   }

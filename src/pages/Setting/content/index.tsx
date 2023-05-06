@@ -27,9 +27,7 @@ const ContentIndex = ({ selectMenu }: IProps) => {
     case MenuType.Species:
       return <StandardSetting current={selectMenu.item} />;
     case MenuType.Dict:
-      return (
-        <DictSetting current={selectMenu.item.dict} belong={selectMenu.item.belong} />
-      );
+      return <DictSetting current={selectMenu.item} />;
     case MenuType.Authority:
       return <AuthoritySetting current={selectMenu.item} />;
     default:

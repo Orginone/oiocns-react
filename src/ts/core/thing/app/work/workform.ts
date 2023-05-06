@@ -83,7 +83,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
         page: PageAll,
       });
       if (res.success) {
-        this.forms = this.forms.splice(index, 1);
+        this.forms.splice(index, 1);
       }
       return res.success;
     }
@@ -138,7 +138,7 @@ export class WorkForm extends SpeciesItem implements IWorkForm {
         page: PageAll,
       });
       if (res.success) {
-        this.attributes = this.attributes.splice(index, 1);
+        this.attributes.splice(index, 1);
       }
       return res.success;
     }

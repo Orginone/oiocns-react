@@ -1,5 +1,5 @@
 import PageCard from '@/components/PageCard';
-import { XDict, XDictItem } from '@/ts/base/schema';
+import { XDictItem } from '@/ts/base/schema';
 import { Button, Card, Descriptions, message } from 'antd';
 import React, { useState } from 'react';
 import { DictItemColumns } from '../../config/columns';
@@ -7,18 +7,12 @@ import CardOrTable from '@/components/CardOrTableComp';
 import DictItemModal from './dictItemModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
-import { ISpace } from '@/ts/core';
+import { IDict } from '@/ts/core';
 /**
  * @description: 分类字典管理
  * @return {*}
  */
-const DictInfo: React.FC<any> = ({
-  current,
-  belong,
-}: {
-  current: XDict;
-  belong: ISpace;
-}) => {
+const DictInfo: React.FC<any> = ({ current }: { current: IDict }) => {
   const [activeModel, setActiveModel] = useState<string>('');
   const [dictItem, setDictItem] = useState<XDictItem>();
   const [tkey, tforceUpdate] = useObjectUpdate(current);
@@ -44,7 +38,7 @@ const DictInfo: React.FC<any> = ({
         key: '删除字典项',
         label: '删除字典项',
         onClick: async () => {
-          await belong.dict?.deleteDictItem(item.id);
+          await current.deleteItem(item);
           tforceUpdate();
         },
       },
@@ -70,9 +64,9 @@ const DictInfo: React.FC<any> = ({
           width: 120,
         }}
         contentStyle={{ textAlign: 'left', color: '#606266' }}>
-        <Descriptions.Item label="字典名称">{current.name}</Descriptions.Item>
-        <Descriptions.Item label="字典代码">{current.code}</Descriptions.Item>
-        <Descriptions.Item label="备注">{current.remark}</Descriptions.Item>
+        <Descriptions.Item label="字典名称">{current.metadata.name}</Descriptions.Item>
+        <Descriptions.Item label="字典代码">{current.metadata.code}</Descriptions.Item>
+        <Descriptions.Item label="备注">{current.metadata.remark}</Descriptions.Item>
       </Descriptions>
 
       <PageCard
@@ -82,11 +76,10 @@ const DictInfo: React.FC<any> = ({
         onTabChange={(_: any) => {}}
         tabBarExtraContent={renderBtns()}>
         <CardOrTable<any>
-          dataSource={[]}
+          dataSource={current.items}
           rowKey={'id'}
           params={tkey}
           operation={renderOperate}
-          request={(page) => belong.dict.loadDictItem(current.id, belong.id, page)}
           columns={DictItemColumns}
           showChangeBtn={false}
         />
@@ -94,7 +87,6 @@ const DictInfo: React.FC<any> = ({
       <DictItemModal
         open={['新增', '编辑'].includes(activeModel)}
         data={dictItem}
-        space={belong}
         current={current}
         handleCancel={() => {
           setActiveModel('');

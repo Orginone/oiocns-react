@@ -73,7 +73,7 @@ export class WorkItem extends SpeciesItem implements IWorkItem {
         page: PageAll,
       });
       if (res.success) {
-        this.defines = this.defines.splice(index, 1);
+        this.defines.splice(index, 1);
       }
       return res.success;
     }

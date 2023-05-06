@@ -12,6 +12,10 @@ export interface IDict extends common.IEntity {
   share: model.ShareIcon;
   /** 字典项 */
   items: schema.XDictItem[];
+  /** 更新字典 */
+  update(data: model.DictModel): Promise<boolean>;
+  /** 删除字典 */
+  delete(): Promise<boolean>;
   /** 加载字典项 */
   loadItems(reload?: boolean): Promise<schema.XDictItem[]>;
   /** 新增字典项 */
@@ -40,6 +44,25 @@ export class Dict extends common.Entity implements IDict {
   metadata: schema.XDict;
   items: schema.XDictItem[] = [];
   private _itemLoaded: boolean = false;
+  async update(data: model.DictModel): Promise<boolean> {
+    data.id = this.metadata.id;
+    data.belongId = this.space.metadata.id;
+    const res = await kernel.updateDict(data);
+    if (res.success && res.data?.id) {
+      this.metadata = res.data;
+    }
+    return res.success;
+  }
+  async delete(): Promise<boolean> {
+    const res = await kernel.deleteDict({
+      id: this.metadata.id,
+      page: PageAll,
+    });
+    if (res.success) {
+      this.space.dicts = this.space.dicts.filter((i) => i.key != this.key);
+    }
+    return res.success;
+  }
   async loadItems(reload: boolean = false): Promise<schema.XDictItem[]> {
     if (!this._itemLoaded || reload) {
       const res = await kernel.queryDictItems({

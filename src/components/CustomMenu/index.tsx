@@ -117,16 +117,10 @@ const CustomMenu = (props: CustomMenuType) => {
             {props.selectMenu.key === item.key && (
               <Dropdown
                 menu={{
-                  items: item.menus.map((i) => {
-                    return {
-                      key: i.key,
-                      icon: i.icon,
-                      label: i.label,
-                    };
-                  }),
+                  items: item.menus,
                   onClick: ({ key }) => {
-                    props.onMenuClick?.apply(this, [item, key]);
                     setVisibleMenu(false);
+                    props.onMenuClick?.apply(this, [item, key]);
                   },
                 }}
                 placement="bottom"

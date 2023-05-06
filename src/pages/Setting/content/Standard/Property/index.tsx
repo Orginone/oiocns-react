@@ -51,7 +51,7 @@ const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}
-        columns={PropertyColumns}
+        columns={PropertyColumns(current)}
         showChangeBtn={false}
         dataSource={current.propertys}
       />

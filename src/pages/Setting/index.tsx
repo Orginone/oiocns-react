@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import {
-  ICohort,
-  ICompany,
-  IDepartment,
-  IGroup,
-  ISpeciesItem,
-  IStation,
-  ITarget,
-  TargetType,
-  companyTypes,
-} from '@/ts/core';
+import { ITarget, TargetType, companyTypes } from '@/ts/core';
 import Content from './content';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from '@/bizcomponents/GlobalComps/createSpecies';
 import AuthorityModal from '@/bizcomponents/GlobalComps/createAuthority';
+import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
+import DictModal from '@/bizcomponents/GlobalComps/createDict';
 import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
 import SearchCompany from '@/bizcomponents/SearchCompany';
@@ -23,7 +15,6 @@ import { XTarget } from '@/ts/base/schema';
 import { useHistory } from 'react-router-dom';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import * as config from './config/menuOperate';
-import DictModal from './content/Dict/dictModal';
 
 const TeamSetting: React.FC = () => {
   const history = useHistory();
@@ -40,29 +31,20 @@ const TeamSetting: React.FC = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
+        if (data.onClick) {
+          await data.onClick();
+        }
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
         switch (key) {
-          case '删除字典':
-            Modal.confirm({
-              content: '确定要删除吗?',
-              onOk: async () => {
-                if (await data.item.belong.dict.deleteDict(data.item.dict.id)) {
-                  setSelectMenu(selectMenu.parentMenu!);
-                }
-              },
-            });
+          case '回退':
+            if (selectMenu.parentMenu) {
+              setSelectMenu(selectMenu.parentMenu);
+            }
             break;
-          case '删除':
-            Modal.confirm({
-              content: '确定要删除吗?',
-              onOk: async () => {
-                if (await (data.item as ITarget).delete()) {
-                  setSelectMenu(selectMenu.parentMenu!);
-                }
-              },
-            });
+          case '刷新':
+            setSelectMenu(selectMenu);
             break;
           case '退出':
             Modal.confirm({
@@ -71,16 +53,6 @@ const TeamSetting: React.FC = () => {
                 let item = data.item as ITarget;
                 await item.exit();
                 setSelectMenu(selectMenu.parentMenu!);
-              },
-            });
-            break;
-          case '移除':
-            Modal.confirm({
-              content: '确定要删除吗?',
-              onOk: async () => {
-                if (await (data.item as ISpeciesItem).delete()) {
-                  setSelectMenu(selectMenu.parentMenu!);
-                }
               },
             });
             break;
@@ -94,32 +66,8 @@ const TeamSetting: React.FC = () => {
             history.push('/chat');
             break;
           default:
-            if (key.startsWith('重载')) {
-              const type = key.split('|')[1];
-              switch (type) {
-                case TargetType.Cohort:
-                  await (data.item as ICohort).deepLoad(true);
-                  break;
-                case TargetType.Company:
-                case TargetType.Hospital:
-                case TargetType.University:
-                  await (data.item as ICompany).deepLoad(true);
-                  break;
-                case TargetType.Department:
-                  await (data.item as IDepartment).deepLoad(true);
-                  break;
-                case TargetType.Group:
-                  await (data.item as IGroup).deepLoad(true);
-                  break;
-                case TargetType.Station:
-                  await (data.item as IStation).deepLoad(true);
-                  break;
-              }
-              orgCtrl.changCallback();
-            } else {
-              setEditTarget(data.item);
-              setOperateKeys(key.split('|'));
-            }
+            setEditTarget(data.item);
+            setOperateKeys(key.split('|'));
             break;
         }
       }}
@@ -147,21 +95,31 @@ const TeamSetting: React.FC = () => {
           <DictModal
             title={operateKeys[0] + '字典'}
             space={
-              selectMenu.itemType == MenuType.Dict
-                ? selectMenu.item.belong
-                : selectMenu.item
+              selectMenu.itemType == GroupMenuType.DictGroup ? selectMenu.item : undefined
             }
             open={['新增', '修改'].includes(operateKeys[0])}
             handleCancel={() => setOperateKeys([''])}
-            data={selectMenu.itemType == MenuType.Dict ? selectMenu.item.dict : undefined}
-            handleOk={(success) => {
-              if (success) {
-                message.success('操作成功');
-                setOperateKeys(['']);
-              }
+            dict={selectMenu.itemType == MenuType.Dict ? selectMenu.item : undefined}
+            handleOk={() => {
+              setOperateKeys(['']);
+              setSelectMenu(selectMenu);
             }}
           />
         )}
+      {/** 属性模态框 */}
+      {selectMenu.itemType === MenuType.Species && (
+        <PropertyModal
+          species={selectMenu.item}
+          open={['添加属性'].includes(operateKeys[0])}
+          handleCancel={() => {
+            setOperateKeys(['']);
+          }}
+          handleOk={function (): void {
+            setOperateKeys(['']);
+            setSelectMenu(selectMenu);
+          }}
+        />
+      )}
       {/** 分类模态框 */}
       {(selectMenu.itemType === GroupMenuType.SpeciesGroup ||
         selectMenu.itemType === MenuType.Species) && (

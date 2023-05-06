@@ -22,8 +22,9 @@ const useMenuUpdate = (
   const [selectMenu, setSelectMenu] = useState<MenuItemType>();
 
   /** 刷新菜单 */
-  const refreshMenu = async () => {
-    const newMenus = await loadMenu();
+  const refreshMenu = () => {
+    setKey(key + '1');
+    const newMenus = loadMenu();
     var item = findMenuItemByKey(newMenus, orgCtrl.currentKey);
     if (item === undefined) {
       item = newMenus;
@@ -31,6 +32,16 @@ const useMenuUpdate = (
     orgCtrl.currentKey = item.key;
     setSelectMenu(item);
     setRootMenu(newMenus);
+  };
+
+  /** 选中菜单 */
+  const onSelectMenu = (item: MenuItemType | string) => {
+    if (typeof item === 'string') {
+      orgCtrl.currentKey = item;
+    } else {
+      orgCtrl.currentKey = item.key;
+    }
+    refreshMenu();
   };
 
   useEffect(() => {
@@ -42,16 +53,7 @@ const useMenuUpdate = (
       orgCtrl.unsubscribe(id);
     };
   }, []);
-  return [
-    key,
-    rootMenu,
-    selectMenu,
-    (item) => {
-      orgCtrl.currentKey = item.key;
-      setSelectMenu(item);
-      refreshMenu();
-    },
-  ];
+  return [key, rootMenu, selectMenu, onSelectMenu];
 };
 
 export default useMenuUpdate;

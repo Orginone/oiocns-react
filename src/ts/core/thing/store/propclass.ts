@@ -70,7 +70,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
         page: PageAll,
       });
       if (res.success) {
-        this.propertys = this.propertys.splice(index, 1);
+        this.propertys.splice(index, 1);
       }
       return res.success;
     }

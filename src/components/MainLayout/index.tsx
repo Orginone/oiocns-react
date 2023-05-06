@@ -35,6 +35,20 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
   const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];
+  const onMenuClick = async (item: MenuItemType, key: string) => {
+    if (item.menus) {
+      const menu = item.menus.find((i) => i.key == key);
+      if (menu && menu.onClick) {
+        if (await menu.onClick()) {
+          props.onMenuClick?.apply(this, [item, '回退']);
+        } else {
+          props.onMenuClick?.apply(this, [item, '刷新']);
+        }
+      } else {
+        props.onMenuClick?.apply(this, [item, key]);
+      }
+    }
+  };
   return (
     <Layout
       className={`${props.className}`}
@@ -65,9 +79,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             onSelect={(item) => {
               props.onSelect?.apply(this, [item]);
             }}
-            onMenuClick={(item, key) => {
-              props.onMenuClick?.apply(this, [item, key]);
-            }}
+            onMenuClick={onMenuClick}
           />
         </div>
         <div
@@ -76,7 +88,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             location.reload();
           }}>
-          <TeamIcon share={orgCtrl.user.shareInfo} />
+          <TeamIcon share={orgCtrl.user.share} />
           <span>退出登录</span>
         </div>
       </Sider>
@@ -114,7 +126,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                       title={item.label}
                       style={{ fontSize: 18 }}
                       onClick={() => {
-                        props.onMenuClick?.apply(this, [props.selectMenu, item.key]);
+                        onMenuClick(props.selectMenu, item.key);
                       }}>
                       {item.icon}
                     </Typography.Link>
@@ -125,7 +137,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   menu={{
                     items: inside,
                     onClick: ({ key }) => {
-                      props.onMenuClick?.apply(this, [props.selectMenu, key]);
+                      onMenuClick(props.selectMenu, key);
                     },
                   }}
                   dropdownRender={(menu) => (

@@ -8,7 +8,7 @@ import { IPropClass } from '@/ts/core';
 interface Iprops {
   open: boolean;
   species: IPropClass;
-  data: XProperty | undefined;
+  data?: XProperty;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
 }
