@@ -1,4 +1,3 @@
-import { createSpecies } from '..';
 import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll, ShareIdSet } from '../../public/consts';
 import { ITarget } from '../../target/base/target';
@@ -76,10 +75,18 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
     if (this.speciesTypes.includes(data.typeName)) {
       const res = await kernel.createSpecies(data);
       if (res.success && res.data.id) {
-        const species = createSpecies(res.data, this.current);
-        this.children.push(species);
-        return species;
+        const species = this.createChildren(res.data, this.current);
+        if (species) {
+          this.children.push(species);
+          return species;
+        }
       }
     }
+  }
+  createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+  ): ISpeciesItem | undefined {
+    return undefined;
   }
 }

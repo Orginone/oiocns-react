@@ -16,4 +16,10 @@ export class AppPackage extends SpeciesItem implements IAppPackage {
     }
     this.speciesTypes = [SpeciesType.Application];
   }
+  override createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+  ): ISpeciesItem | undefined {
+    return new Application(_metadata, _current, this);
+  }
 }

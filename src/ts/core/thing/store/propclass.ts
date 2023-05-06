@@ -42,6 +42,12 @@ export class PropClass extends SpeciesItem implements IPropClass {
     }
     return this.propertys;
   }
+  override createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+  ): ISpeciesItem | undefined {
+    return new PropClass(_metadata, _current, this);
+  }
   async createProperty(data: model.PropertyModel): Promise<schema.XProperty | undefined> {
     data.speciesId = this.metadata.id;
     const res = await kernel.createProperty(data);

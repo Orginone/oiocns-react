@@ -17,21 +17,26 @@ export class AppModule extends SpeciesItem implements IAppModule {
       SpeciesType.ReportBI,
     ];
     for (const item of _metadata.nodes || []) {
-      switch (item.typeName) {
-        case SpeciesType.AppModule:
-          this.children.push(new AppModule(_metadata, _current, this));
-          break;
-        case SpeciesType.WorkForm:
-          this.children.push(new WorkForm(_metadata, _current, this));
-          break;
-        case SpeciesType.WorkItem:
-          this.children.push(new WorkItem(_metadata, _current, this));
-          break;
-        case SpeciesType.ReportBI:
-          this.children.push(new ReportBI(_metadata, _current, this));
-          break;
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
       }
     }
     this.parent = _parent;
+  }
+  override createChildren(
+    _metadata: schema.XSpecies,
+    _current: ITarget,
+  ): ISpeciesItem | undefined {
+    switch (_metadata.typeName) {
+      case SpeciesType.WorkForm:
+        return new WorkForm(_metadata, _current, this);
+      case SpeciesType.WorkItem:
+        return new WorkItem(_metadata, _current, this);
+      case SpeciesType.ReportBI:
+        return new ReportBI(_metadata, _current, this);
+      case SpeciesType.AppModule:
+        return new AppModule(_metadata, _current, this);
+    }
   }
 }

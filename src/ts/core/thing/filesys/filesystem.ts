@@ -71,4 +71,7 @@ export class FileSystem extends SpeciesItem implements IFileSystem {
       this.home = root;
     }
   }
+  createChildren(_metadata: schema.XSpecies, _current: ITarget): ISpeciesItem {
+    return new FileSystem(_metadata, _current);
+  }
 }
