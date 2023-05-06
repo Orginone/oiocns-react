@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from 'antd';
-import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import { XOperation } from '@/ts/base/schema';
 import CardDescriptions from '@/components/CardDescriptions';
+import { IWorkForm } from '@/ts/core';
 
 interface IThingCardProps {
   thingId: string;
+  species: IWorkForm;
 }
 /**
  * 仓库-物-卡片
  */
-const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
-  const [operations, setOperations] = useState<XOperation[]>([]);
+const ThingCard: React.FC<IThingCardProps> = ({ thingId, species }) => {
   const [formValue, setFormValue] = useState<any>({});
   useEffect(() => {
-    const findThing = async () => {
-      const res = await kernel.anystore.loadThing<any>(orgCtrl.user.id, {
+    kernel.anystore
+      .loadThing<any>(species.current.space.metadata.id, {
         options: {
           match: {
             _id: {
@@ -25,62 +24,22 @@ const ThingCard: React.FC<IThingCardProps> = ({ thingId }) => {
           },
         },
         userData: [],
+      })
+      .then((res) => {
+        setFormValue(res.data.data[0].Propertys);
       });
-      let thing: any;
-      const data = res.data?.data;
-      if (data && data.length > 0) {
-        thing = data[0];
-      }
-      if (thing) {
-        const speciesIds: string[] = [];
-        let formValue: any = {};
-        for (const key in thing) {
-          if (Object.prototype.hasOwnProperty.call(thing, key)) {
-            const element = thing[key];
-            if (key.startsWith('S')) {
-              const id = key.substring(1, key.length);
-              if (id.length >= 16 && id.length <= 20) {
-                formValue = { ...formValue, ...element };
-                speciesIds.push(id);
-              }
-            }
-          }
-        }
-        setFormValue(formValue);
-        const attrIds: string[] = [];
-        for (const key in formValue) {
-          if (Object.prototype.hasOwnProperty.call(formValue, key)) {
-            attrIds.push(key.substring(1, key.length));
-          }
-        }
-        // 2、查询表单
-        const operationsRes = await kernel.queryOperationBySpeciesIds({
-          ids: speciesIds,
-          spaceId: orgCtrl.user.id,
-        });
-        let operations = operationsRes.data.result || [];
-        operations = operations.filter((operation) => {
-          let exist = false;
-          for (const item of operation.items || []) {
-            if (attrIds.includes(item.attrId)) {
-              exist = true;
-              break;
-            }
-          }
-          return exist;
-        });
-        setOperations(operations);
-      }
-    };
-    findThing();
   }, [thingId]);
 
   return (
     <Card bordered={false} title="资产卡片">
-      {operations.map((operation) => {
+      {species.forms.map((form) => {
         return (
-          <div key={operation.id} style={{ paddingBottom: '16px' }}>
-            <CardDescriptions operation={operation} fieldsValue={formValue} />
+          <div key={form.id} style={{ paddingBottom: '16px' }}>
+            <CardDescriptions
+              form={form}
+              fieldsValue={formValue}
+              attrs={species.attributes}
+            />
           </div>
         );
       })}

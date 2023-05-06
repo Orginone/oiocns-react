@@ -1,4 +1,3 @@
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
 import { XFlowDefine, XOperation } from '@/ts/base/schema';

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import { ISpeciesItem } from '@/ts/core';
+import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
 
 const { Panel } = Collapse;
 
@@ -18,16 +18,19 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
   const [archives, setArchives] = useState<any[]>([]);
   useEffect(() => {
     const findThing = async () => {
-      const res = await kernel.anystore.loadThingArchives(species.team.space.id, {
-        options: {
-          match: {
-            _id: {
-              _eq_: thingId,
+      const res = await kernel.anystore.loadThingArchives(
+        species.current.space.metadata.id,
+        {
+          options: {
+            match: {
+              _id: {
+                _eq_: thingId,
+              },
             },
           },
+          userData: [],
         },
-        userData: [],
-      });
+      );
       const resData = res.data as { data: any };
       const ts = (resData?.data || [])[0];
       let data = [];
@@ -70,17 +73,17 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
                   <div>{record.comment && <div>审批意见：{record.comment}</div>}</div>
                 </div>
                 <Collapse ghost>
-                  {(a.node?.bindOperations || []).map((operation: any) => {
+                  {(a.node?.bindForms || []).map((form: any) => {
                     let formValue = {};
                     if (record?.data) {
                       formValue = JSON.parse(record?.data);
                     }
                     return (
-                      <Panel header={operation.name} key={operation.id}>
+                      <Panel header={form.name} key={form.id}>
                         <OioForm
-                          space={species.team.space}
-                          key={operation.id}
-                          operation={operation}
+                          belong={species.current.space}
+                          key={form.id}
+                          form={form}
                           formRef={undefined}
                           fieldsValue={formValue}
                           disabled={true}></OioForm>

@@ -20,13 +20,13 @@ type PlanType = {
 };
 
 const TaskListComp: React.FC<PlanType> = (props: PlanType) => {
-  const [taskList, setTaskList] = useState(props.target.taskList);
+  const [taskList, setTaskList] = useState(props.target.filesys.taskList);
   useEffect(() => {
-    const id = setInterval(() => {
-      setTaskList([...props.target.taskList]);
-    }, 1000);
+    props.target.filesys.onTaskChange((data) => {
+      setTaskList([...data]);
+    });
     return () => {
-      clearInterval(id);
+      props.target.filesys.unTaskChange();
     };
   }, []);
   const taskGroup = () => {

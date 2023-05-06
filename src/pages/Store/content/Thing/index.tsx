@@ -5,8 +5,7 @@ import { ISpeciesItem } from '@/ts/core';
 
 interface IProps {
   species: ISpeciesItem;
-  selectable: boolean;
-  checkedList?: any[];
+  selectable?: boolean;
 }
 /**
  * 仓库-物
@@ -22,7 +21,7 @@ const ThingIndex: React.FC<IProps> = ({ species, selectable }) => {
     case 0:
       return (
         <Thing
-          species={[species]}
+          species={species}
           selectable={selectable}
           onBack={() => setTabKey(1)}
           setThingId={setThingId}

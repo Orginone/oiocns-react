@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
-import { ISpace } from '@/ts/core';
 
 const { Panel } = Collapse;
 

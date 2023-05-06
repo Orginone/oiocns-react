@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Dropdown } from 'antd';
 import orgCtrl from '@/ts/controller';
-import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { XAttribute } from '@/ts/base/schema';
+import { XProperty } from '@/ts/base/schema';
 import DataGrid, {
   Column,
   ColumnChooser,
@@ -20,7 +19,7 @@ import DataGrid, {
   HeaderFilter,
   Scrolling,
 } from 'devextreme-react/data-grid';
-import { ISpeciesItem } from '@/ts/core';
+import { IPropClass, ISpeciesItem, IWorkForm, SpeciesType } from '@/ts/core';
 import CustomStore from 'devextreme/data/custom_store';
 import { kernel } from '@/ts/base';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
@@ -30,7 +29,7 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 type ThingItemType = ItemType & { click: (data: any) => void };
 
 interface IProps {
-  species: ISpeciesItem[];
+  species: ISpeciesItem;
   selectable?: boolean;
   height?: any;
   width?: any;
@@ -52,62 +51,7 @@ interface IProps {
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const { menuItems, selectable = true, deferred = false } = props;
-  const [key] = useCtrlUpdate(orgCtrl);
-  const [thingAttrs, setThingAttrs] = useState<any[]>([]);
-
-  const getSortedList = (
-    speciesArray: ISpeciesItem[],
-    array: ISpeciesItem[],
-    front: boolean,
-  ): ISpeciesItem[] => {
-    for (let species of speciesArray) {
-      if (!array.includes(species)) {
-        //没有就放在最前面 改为父级放前，子级放后
-        if (front) {
-          array = [species, ...array];
-        } else {
-          array = [...array, species];
-        }
-      }
-      if (species.parent) {
-        array = getSortedList([species.parent], array, true);
-      }
-    }
-    return array;
-  };
-
-  const loadAttrs = async (speciesArray: ISpeciesItem[]) => {
-    let parentHeaders: any[] = [];
-    for (let species of speciesArray) {
-      await species.loadAttrs(false);
-    }
-    //属性set
-    let attrArray: XAttribute[] = [];
-    for (let species of speciesArray) {
-      for (let attr of species.attrs || []) {
-        if (!attrArray.map((item) => item.id).includes(attr.id)) {
-          attrArray.push(attr);
-        }
-      }
-    }
-
-    let sortedSpecies = getSortedList(speciesArray, [], false);
-    for (let species of sortedSpecies) {
-      if (attrArray.map((attr: XAttribute) => attr.speciesId).includes(species.id)) {
-        let attrs =
-          attrArray?.filter((attr: XAttribute) => attr.speciesId == species.id) || [];
-        if (!species.parent) {
-          parentHeaders = [...parentHeaders, ...attrs];
-        } else {
-          parentHeaders.push({
-            caption: attrs[0].species?.name || species.name,
-            children: attrs,
-          });
-        }
-      }
-    }
-    setThingAttrs(parentHeaders);
-  };
+  const [propertys, setPropertys] = useState<XProperty[]>([]);
 
   const allMenuItems: ThingItemType[] = [...(menuItems || [])];
 
@@ -119,38 +63,48 @@ const Thing: React.FC<IProps> = (props: IProps) => {
   };
 
   useEffect(() => {
-    loadAttrs(props.species);
+    const temp: XProperty[] = [];
+    switch (props.species.metadata.typeName) {
+      case SpeciesType.WorkForm:
+        (props.species as IWorkForm).attributes.forEach((i) => {
+          if (i.linkPropertys && i.linkPropertys.length > 0) {
+            const item = i.linkPropertys.find(
+              (a) => a.belongId === props.species.current.space.metadata.id,
+            );
+            if (item) {
+              item.name = i.name;
+              temp.push(item);
+            }
+          }
+        });
+        break;
+      case SpeciesType.Store:
+        temp.push(...(props.species as IPropClass).propertys);
+        break;
+    }
+    setPropertys(temp);
   }, [props.species]);
 
-  const getColumns = (records: any[]) => {
-    let columns = [];
-    for (let record of records) {
-      if (record.caption) {
-        columns.push(
-          <Column key={record.caption} caption={record.caption}>
-            {record.children.map((attr: XAttribute) =>
-              getColumn(
-                attr.id,
-                attr.name,
-                attr.property?.valueType ?? '',
-                attr.belongId ? `T${attr.id}` : attr.property?.code || '',
-                attr.property?.dict?.dictItems,
-              ),
-            )}
-          </Column>,
-        );
-      } else {
-        columns.push(
-          getColumn(
-            record.id,
-            record.name,
-            record.property?.valueType,
-            // record.belongId ? `Propertys.T${record.id}` : record.code,
-            record.belongId ? `T${record.id}` : record.property?.code || '',
-            record.property?.dict?.dictItems,
-          ),
-        );
-      }
+  const getColumns = () => {
+    const columns = [];
+    columns.push(getColumn('1', '标识', '描述型', 'Id'));
+    columns.push(getColumn('2', '创建者', '用户型', 'Creater'));
+    columns.push(
+      getColumn('3', '状态', '选择型', 'Status', [
+        {
+          name: '正常',
+          value: '正常',
+        },
+        {
+          name: '已销毁',
+          value: '已销毁',
+        },
+      ]),
+    );
+    columns.push(getColumn('4', '创建时间', '时间型', 'CreateTime'));
+    columns.push(getColumn('5', '修改时间', '时间型', 'ModifiedTime'));
+    for (const p of propertys) {
+      columns.push(getColumn(p.id, p.name, p.valueType, p.code, p.dict?.dictItems || []));
     }
     return columns;
   };
@@ -233,7 +187,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             width={150}
             allowFiltering={false}
             cellRender={(data: any) => {
-              var share = orgCtrl.provider.findUserById(data.value);
+              var share = orgCtrl.user.findShareById(data.value);
               if (data) {
                 return (
                   <>
@@ -269,9 +223,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           new CustomStore({
             key: 'Id',
             async load(loadOptions) {
-              loadOptions.userData = props.species
-                .filter((item) => item.target.code != 'anything')
-                .map((item) => `S${item.id}`);
+              loadOptions.userData = `S${props.species.metadata.id}`;
               let request: any = { ...loadOptions };
               if (props.byIds) {
                 request.options = {
@@ -282,12 +234,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing(
-                props.species[0].team.space.id,
+              const result = await kernel.anystore.loadThing<any[]>(
+                props.species.current.space.metadata.id,
                 request,
               );
               if (result.success) {
-                return result.data;
+                return result.data.map((i: any) => i.Propertys);
               }
               return [];
             },
@@ -317,7 +269,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         height={props.height || 'calc(100vh - 175px)'}
         width="100%"
         showBorders={true}>
-        {getColumns(thingAttrs)}
+        {getColumns()}
         <ColumnChooser
           enabled={true}
           title={'列选择器'}
@@ -389,10 +341,6 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     );
   };
 
-  return (
-    <Card id={key} bordered={false}>
-      {getComponent()}
-    </Card>
-  );
+  return <Card bordered={false}>{getComponent()}</Card>;
 };
 export default Thing;

@@ -3,17 +3,17 @@ import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
 import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
-import { SpeciesType, TargetType } from '../public/enums';
+import { TargetType } from '../public/enums';
 import { ICompany } from './team/company';
 import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
-import { IFileSystem } from '../thing/filesys/filesystem';
+import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
   /** 文件系统 */
-  filesys: IFileSystem | undefined;
+  filesys: IFileSystem;
   /** 加入/管理的单位 */
   companys: ICompany[];
   /** 赋予人的身份(角色)实体 */
@@ -36,7 +36,14 @@ export interface IPerson extends IBelong {
 export class Person extends Belong implements IPerson {
   constructor(_metadata: schema.XTarget) {
     super(_metadata, ['本人']);
+    this.filesys = new FileSystem(
+      {
+        id: this.metadata.id,
+      } as schema.XSpecies,
+      this,
+    );
   }
+  filesys: IFileSystem;
   companys: ICompany[] = [];
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
@@ -148,14 +155,6 @@ export class Person extends Belong implements IPerson {
     });
     return res.success;
   }
-  get filesys(): IFileSystem | undefined {
-    for (const item of this.species) {
-      if (item.metadata.typeName === SpeciesType.FileSystem) {
-        return item as IFileSystem;
-      }
-    }
-    return undefined;
-  }
   get subTarget(): ITarget[] {
     return [];
   }
@@ -214,18 +213,6 @@ export class Person extends Belong implements IPerson {
     }
     for (const cohort of this.cohorts) {
       await cohort.deepLoad(reload);
-    }
-    if (
-      this.species.findIndex((i) => i.metadata.typeName === SpeciesType.FileSystem) < 1
-    ) {
-      await this.createSpecies({
-        name: '文件夹',
-        code: 'filesystem',
-        typeName: SpeciesType.FileSystem,
-        remark: '个人文件夹',
-        shareId: this.metadata.id,
-        authId: this.superAuth?.metadata.id,
-      } as model.SpeciesModel);
     }
   }
   findShareById(id: string): model.ShareIcon {
