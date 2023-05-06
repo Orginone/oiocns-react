@@ -79,7 +79,7 @@ const CreateTeamModal = (props: Iprops) => {
     },
     {
       title: '名称',
-      dataIndex: 'teamName',
+      dataIndex: 'name',
       formItemProps: {
         rules: [{ required: true, message: '名称为必填项' }],
       },
@@ -109,7 +109,7 @@ const CreateTeamModal = (props: Iprops) => {
     },
     {
       title: '简称',
-      dataIndex: 'name',
+      dataIndex: 'TeamName',
     },
     {
       title: '标识',
@@ -117,7 +117,7 @@ const CreateTeamModal = (props: Iprops) => {
     },
     {
       title: '简介',
-      dataIndex: 'teamRemark',
+      dataIndex: 'remark',
       valueType: 'textarea',
       colProps: { span: 24 },
       formItemProps: {

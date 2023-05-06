@@ -93,6 +93,11 @@ export class Authority extends MsgChat implements IAuthority {
     const res = await kernel.updateAuthority(data);
     if (res.success && res.data?.id) {
       this.metadata = res.data;
+      this.share = {
+        name: this.metadata.name,
+        typeName: '权限',
+        avatar: parseAvatar(this.metadata.icon),
+      };
     }
     return res.success;
   }

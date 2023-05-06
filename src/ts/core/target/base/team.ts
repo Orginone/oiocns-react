@@ -130,6 +130,11 @@ export abstract class Team extends MsgChat implements ITeam {
     const res = await kernel.updateTarget(data);
     if (res.success && res.data?.id) {
       this.metadata = res.data;
+      this.share = {
+        name: this.metadata.name,
+        typeName: this.metadata.typeName,
+        avatar: parseAvatar(this.metadata.icon),
+      };
     }
     return res.success;
   }
