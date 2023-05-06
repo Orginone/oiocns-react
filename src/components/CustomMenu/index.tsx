@@ -18,9 +18,7 @@ const CustomMenu = (props: CustomMenuType) => {
   const [visibleMenu, setVisibleMenu] = useState<boolean>();
   const [data, setData] = useState<MenuProps['items']>([]);
   useEffect(() => {
-    if (!selectedKeys.includes(props.selectMenu.key)) {
-      reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
-    }
+    reloadData(loadOpenKeys(props.item.children, props.selectMenu.key));
   }, [props]);
 
   useEffect(() => {
@@ -63,7 +61,7 @@ const CustomMenu = (props: CustomMenuType) => {
         result.push({
           key: item.key,
           title: item.label,
-          label: renderLabel(item, expKeys),
+          label: renderLabel(item),
           children: loadMenus(item.children, expKeys),
           icon: item.expIcon && expKeys.includes(item.key) ? item.expIcon : item.icon,
         });
@@ -90,7 +88,7 @@ const CustomMenu = (props: CustomMenuType) => {
     return result;
   };
   /** 渲染标题,支持更多操作 */
-  const renderLabel = (item: MenuItemType, expKeys: string[]) => {
+  const renderLabel = (item: MenuItemType) => {
     return (
       <span
         onClick={() => {

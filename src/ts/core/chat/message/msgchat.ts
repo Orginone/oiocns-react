@@ -90,6 +90,13 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       fullId: `${_belongId}-${_chatId}`,
     };
     ShareIdSet.set(this.chatId, this.share);
+    kernel.anystore.subscribed(
+      '0',
+      hisMsgCollName + '.T' + this.chatdata.fullId,
+      (data: MsgChatData) => {
+        this.loadCache(data);
+      },
+    );
   }
   chatId: string;
   belongId: string;

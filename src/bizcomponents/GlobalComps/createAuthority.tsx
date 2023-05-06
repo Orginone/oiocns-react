@@ -97,6 +97,14 @@ const AuthorityModal = (props: Iprops) => {
       valueType: 'select',
       initialValue: formValue.shareId,
       formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
+      fieldProps: {
+        options: props.current.space.parentTarget.map((i) => {
+          return {
+            label: i.metadata.name,
+            value: i.metadata.id,
+          };
+        }),
+      },
     },
     {
       title: '是否公开',

@@ -433,14 +433,16 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
         },
       });
     } else {
-      menus.push({
-        key: '退出',
-        icon: <im.ImBin />,
-        label: '退出' + item.metadata.typeName,
-        // onClick: async () => {
-        //   return await item.exit();
-        // },
-      });
+      if ('species' in item) {
+        menus.push({
+          key: '退出',
+          icon: <im.ImBin />,
+          label: '退出' + item.metadata.typeName,
+          onClick: async () => {
+            return await (item as ITarget).exit();
+          },
+        });
+      }
     }
   }
   return menus;

@@ -213,27 +213,29 @@ export class Company extends Belong implements ICompany {
     return chats;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
-    _newMembers.forEach((i) => {
-      if (_isAdd) {
-        this.memberChats.push(
-          new PersonMsgChat(
-            this.metadata.id,
-            i.id,
-            {
-              name: i.name,
-              typeName: i.typeName,
-              avatar: parseAvatar(i.icon),
-            },
-            ['同事'],
-            i.remark,
-          ),
-        );
-      } else {
-        this.memberChats = this.memberChats.filter(
-          (a) => !(a.belongId === i.id && a.chatId === i.id),
-        );
-      }
-    });
+    _newMembers
+      .filter((i) => i.id != this.user.metadata.id)
+      .forEach((i) => {
+        if (_isAdd) {
+          this.memberChats.push(
+            new PersonMsgChat(
+              this.metadata.id,
+              i.id,
+              {
+                name: i.name,
+                typeName: i.typeName,
+                avatar: parseAvatar(i.icon),
+              },
+              ['同事'],
+              i.remark,
+            ),
+          );
+        } else {
+          this.memberChats = this.memberChats.filter(
+            (a) => !(a.belongId === i.id && a.chatId === i.id),
+          );
+        }
+      });
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadGroups(reload);

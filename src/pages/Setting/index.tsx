@@ -129,8 +129,8 @@ const TeamSetting: React.FC = () => {
           handleCancel={() => setOperateKeys([''])}
           handleOk={(newItem) => {
             if (newItem) {
-              setSelectMenu(selectMenu);
               setOperateKeys(['']);
+              setSelectMenu(selectMenu);
             }
           }}
           current={selectMenu.item}

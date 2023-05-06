@@ -8,9 +8,6 @@ export class UserProvider extends common.Emitter {
   private _preMessages: model.MsgSaveModel[] = [];
   constructor() {
     super();
-    kernel.on('ChatRefresh', async () => {
-      await this.refresh();
-    });
     kernel.on('RecvMsg', (data) => {
       if (this._inited) {
         this._recvMessage(data);
@@ -96,7 +93,10 @@ export class UserProvider extends common.Emitter {
   private _recvMessage(data: model.MsgSaveModel): void {
     for (const c of this.user?.chats || []) {
       let isMatch = data.sessionId === c.chatId;
-      if (c.share.typeName == TargetType.Person && isMatch) {
+      if (
+        (c.share.typeName === TargetType.Person || c.share.typeName === '权限') &&
+        isMatch
+      ) {
         isMatch = data.belongId == c.belongId;
       }
       if (isMatch) {

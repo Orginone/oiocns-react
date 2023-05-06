@@ -23,7 +23,6 @@ const useMenuUpdate = (
 
   /** 刷新菜单 */
   const refreshMenu = () => {
-    setKey(key + '1');
     const newMenus = loadMenu();
     var item = findMenuItemByKey(newMenus, orgCtrl.currentKey);
     if (item === undefined) {

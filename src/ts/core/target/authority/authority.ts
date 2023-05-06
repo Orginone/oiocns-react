@@ -37,7 +37,7 @@ export interface IAuthority extends IMsgChat {
 export class Authority extends MsgChat implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
     super(
-      _metadata.belongId,
+      _space.metadata.id,
       _metadata.id,
       {
         name: _metadata.name,
