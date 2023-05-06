@@ -94,12 +94,8 @@ export class UserProvider extends common.Emitter {
    * @param cache 是否缓存
    */
   private _recvMessage(data: model.MsgSaveModel): void {
-    let chatId = data.toId;
-    if (data.toId === this.user?.metadata.id) {
-      chatId = data.fromId;
-    }
     for (const c of this.user?.chats || []) {
-      let isMatch = chatId === c.chatId;
+      let isMatch = data.sessionId === c.chatId;
       if (c.share.typeName == TargetType.Person && isMatch) {
         isMatch = data.belongId == c.belongId;
       }
