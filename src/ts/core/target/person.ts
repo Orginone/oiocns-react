@@ -168,7 +168,7 @@ export class Person extends Belong implements IPerson {
       chats.push(...item.chats);
     }
     for (const item of this.cohorts) {
-      if (chats.filter((i) => i.chatId === item.metadata.id).length < 0) {
+      if (chats.findIndex((i) => i.chatId === item.chatId) < 0) {
         chats.push(...item.chats);
       }
     }
@@ -209,7 +209,6 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }

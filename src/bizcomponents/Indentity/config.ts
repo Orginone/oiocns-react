@@ -17,15 +17,7 @@ export const columns: ColumnsType<any> = [
     dataIndex: 'name',
   },
   {
-    title: '姓名',
-    dataIndex: ['team', 'name'],
-  },
-  {
     title: '备注',
-    dataIndex: ['team', 'remark'],
-  },
-  {
-    title: '手机号',
-    dataIndex: ['team', 'code'],
+    dataIndex: 'remark',
   },
 ];

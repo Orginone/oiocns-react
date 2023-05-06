@@ -3,16 +3,16 @@ import { AiOutlineSearch } from 'react-icons/ai';
 import cls from './index.module.less';
 import { Input, Tooltip } from 'antd';
 import { schema } from '@/ts/base';
-import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-components';
 import CardOrTableComp from '@/components/CardOrTableComp';
+import { XTarget } from '@/ts/base/schema';
 interface indexType {
   searchFn: Function;
-  personData?: any;
+  members: XTarget[];
 }
 
 const MemberList: React.FC<indexType> = (props) => {
-  const { searchFn, personData } = props;
+  const { searchFn, members } = props;
   const [searchValue, setSearchValue] = useState<string>('');
   const keyWordChange = async (e: any) => {
     const int = setTimeout(() => {
@@ -30,16 +30,8 @@ const MemberList: React.FC<indexType> = (props) => {
       dataIndex: 'name',
     },
     {
-      title: '姓名',
-      dataIndex: ['team', 'name'],
-    },
-    {
-      title: '手机号',
-      dataIndex: ['team', 'code'],
-    },
-    {
       title: '座右铭',
-      dataIndex: ['team', 'remark'],
+      dataIndex: 'remark',
     },
   ];
   return (
@@ -63,14 +55,8 @@ const MemberList: React.FC<indexType> = (props) => {
               searchFn(selectedRows);
             },
           }}
-          dataSource={personData ?? []}
+          dataSource={members}
           params={{ filter: searchValue }}
-          request={
-            //TODO 这里有问题
-            personData
-              ? undefined
-              : async (params) => await orgCtrl.user.loadMembers(params)
-          }
           hideOperation={true}
           scroll={{ y: 300 }}
           columns={cohortColumn}

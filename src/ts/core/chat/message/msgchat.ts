@@ -248,9 +248,6 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   }
   private loadMessages(msgs: model.MsgSaveModel[]): void {
     msgs.forEach((item: any) => {
-      if (item.chatId) {
-        item.id = item.chatId;
-      }
       item.showTxt = common.StringPako.inflate(item.msgBody);
       this.messages.unshift(item);
     });

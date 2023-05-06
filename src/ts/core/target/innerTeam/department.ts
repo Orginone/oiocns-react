@@ -82,9 +82,11 @@ export class Department extends Target implements IDepartment {
     data.public = false;
     const metadata = await this.create(data);
     if (metadata) {
-      const department = new Department(metadata, this.company);
-      this.children.push(department);
-      return department;
+      const department = new Department(metadata, this.company, this);
+      if (await this.pullSubTarget(department)) {
+        this.children.push(department);
+        return department;
+      }
     }
   }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
@@ -133,7 +135,6 @@ export class Department extends Target implements IDepartment {
     await this.loadChildren(reload);
     await this.loadMembers(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
     for (const department of this.children) {
       await department.deepLoad(reload);
     }

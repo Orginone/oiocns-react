@@ -131,8 +131,10 @@ export class Company extends Belong implements ICompany {
     const metadata = await this.create(data);
     if (metadata) {
       const department = new Department(metadata, this);
-      this.departments.push(department);
-      return department;
+      if (await this.pullSubTarget(department)) {
+        this.departments.push(department);
+        return department;
+      }
     }
   }
   async createStation(data: model.TargetModel): Promise<IStation | undefined> {
@@ -141,8 +143,10 @@ export class Company extends Belong implements ICompany {
     const metadata = await this.create(data);
     if (metadata) {
       const station = new Station(metadata, this);
-      this.stations.push(station);
-      return station;
+      if (await this.pullSubTarget(station)) {
+        this.stations.push(station);
+        return station;
+      }
     }
   }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
@@ -240,7 +244,6 @@ export class Company extends Belong implements ICompany {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
     for (const group of this.groups) {
       await group.deepLoad(reload);
     }

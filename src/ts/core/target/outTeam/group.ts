@@ -97,7 +97,6 @@ export class Group extends Target implements IGroup {
     await this.loadChildren(reload);
     await this.loadMembers(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
     for (const group of this.children) {
       await group.deepLoad(reload);
     }

@@ -231,6 +231,8 @@ export type MsgTagModel = {
 export type MsgSaveModel = {
   // 唯一ID
   id: string;
+  // 会话ID
+  sessionId: string;
   // 归属用户ID
   belongId: string;
   // 发起方Id

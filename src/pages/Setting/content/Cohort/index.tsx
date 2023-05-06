@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, message, Modal, Typography } from 'antd';
 import { ICohort } from '@/ts/core';
 import { schema } from '@/ts/base';
@@ -11,9 +11,9 @@ import cls from './index.module.less';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import AssignModal from '@/bizcomponents/AssignModal';
 import Description from '../../components/Description';
-import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 import orgCtrl from '@/ts/controller';
 import { AiOutlineExclamationCircle } from 'react-icons/ai';
+import { orgAuth } from '@/ts/core/public/consts';
 interface IProps {
   current: ICohort;
 }
@@ -24,17 +24,8 @@ interface IProps {
 const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
-  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
-  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [selectMember, setSelectMember] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-
-  useEffect(() => {
-    setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(current.space));
-    }, 10);
-  }, [current]);
 
   // 标题tabs页
   const TitleItems = [
@@ -69,7 +60,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
           },
         ],
       );
-      if (isSuperAdmin) {
+      if (current.hasAuthoritys([orgAuth.RelationAuthId])) {
         operations.push({
           key: 'remove',
           label: '踢出',
@@ -115,7 +106,7 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {isRelationAdmin && (
+              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
                 <Button type="link" onClick={() => setActiveModal('addOne')}>
                   邀请成员
                 </Button>
@@ -129,7 +120,6 @@ const CohortSetting: React.FC<IProps> = ({ current }: IProps) => {
         </PageCard>
         <IndentityManage
           current={current}
-          isAdmin={isSuperAdmin}
           open={activeModal === 'indentity'}
           onCancel={() => setActiveModal('')}
         />

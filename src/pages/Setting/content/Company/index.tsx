@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -21,8 +21,8 @@ import IndentityManage from '@/bizcomponents/Indentity';
 import cls from './index.module.less';
 import SearchCompany from '@/bizcomponents/SearchCompany';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 import { RiMore2Fill } from 'react-icons/ri';
+import { orgAuth } from '@/ts/core/public/consts';
 
 interface IProps {
   current: ICompany;
@@ -35,18 +35,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
   const [ellipsis] = useState(true);
   const parentRef = useRef<any>(null);
   const [key, forceUpdate] = useObjectUpdate(current);
-  const [isSuperAdmin, SetIsSuperAdmin] = useState(false);
-  const [isRelationAdmin, SetIsRelationAdmin] = useState(false);
   const [activeModal, setActiveModal] = useState<string>(''); // 模态框
   const [activeTab, setActiveTab] = useState<string>('members');
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>(); // 需要邀请的部门成员
-
-  useEffect(() => {
-    setTimeout(async () => {
-      SetIsSuperAdmin(await IsSuperAdmin(current));
-      SetIsRelationAdmin(await IsRelationAdmin(current));
-    }, 10);
-  }, [current]);
 
   const menu = [
     { key: 'auth', label: '认证' },
@@ -174,7 +165,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
               <Button type="link" onClick={() => setActiveModal('indentity')}>
                 角色设置
               </Button>
-              {isRelationAdmin && (
+              {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
                 <>
                   <Button type="link" onClick={() => setActiveModal('addOne')}>
                     邀请成员
@@ -192,7 +183,6 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         </PageCard>
       </div>
       <IndentityManage
-        isAdmin={isSuperAdmin}
         open={activeModal === 'indentity'}
         current={current}
         onCancel={() => setActiveModal('')}
