@@ -1,10 +1,7 @@
 /** 分组菜单类型 */
 export enum GroupMenuType {
-  'Organization' = '组织',
+  'SpeciesGroup' = '类别定义',
   'Species' = '分类',
-}
-
-export enum OrganizationType {
-  'Cohort' = '群组',
-  'Group' = '外部机构',
+  'OutAgency' = '外部机构',
+  'Cohort' = '自由群组',
 }

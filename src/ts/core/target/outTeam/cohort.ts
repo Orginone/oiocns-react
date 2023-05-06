@@ -3,6 +3,7 @@ import { ITarget, Target } from '../base/target';
 import { IBelong } from '../base/belong';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
+import { ITodo } from '../../work/todo';
 export interface ICohort extends ITarget {}
 
 export class Cohort extends Target implements ICohort {
@@ -33,6 +34,9 @@ export class Cohort extends Target implements ICohort {
   }
   get chats(): IMsgChat[] {
     return [this];
+  }
+  get todos(): ITodo[] {
+    return [];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);

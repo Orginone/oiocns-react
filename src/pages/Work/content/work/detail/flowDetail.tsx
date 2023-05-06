@@ -1,6 +1,5 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { kernel } from '@/ts/base';
 import { XWorkInstance, XWorkTaskHistory } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import { IBelong, ISpeciesItem } from '@/ts/core';
@@ -10,13 +9,15 @@ import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import { FlowTodo } from '@/ts/core/target/work/todo';
+import { WorkTodo } from '@/ts/core/work/todo';
 import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
+import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 const { Panel } = Collapse;
 
 interface IApproveProps {
-  todo: FlowTodo;
+  todo: WorkTodo;
   space: IBelong;
+  species: IWorkItem;
   onBack: (success: boolean) => void;
 }
 const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
@@ -32,7 +33,7 @@ const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
   return result;
 };
 
-const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
+const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
   let comment = '';
   const formRef = useRef<ProFormInstance<any>>();
   const [taskHistory, setTaskHistorys] = useState<XWorkTaskHistory[]>();
@@ -42,9 +43,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      const res = await kernel.queryInstanceById({
-        id: todo.target.instanceId,
-      });
+      const res = await todo.getInstance();
       if (res.success) {
         setInstance(res.data);
         let speciesIds = res.data.define!.sourceIds?.split(',') || [];
@@ -170,7 +169,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
               <Thing
                 species={speciesItem}
                 height={'400px'}
-                byIds={(todo.target?.instance?.thingIds ?? '')
+                byIds={(todo.metadata?.instance?.thingIds ?? '')
                   .split(',')
                   .filter((id: any) => id != '')}
                 selectable={false}
@@ -214,7 +213,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
       label: `流程图`,
       children: instance?.define ? (
         <Design
-          species={}
+          species={species}
           current={instance.define}
           instance={instance}
           IsEdit={false}

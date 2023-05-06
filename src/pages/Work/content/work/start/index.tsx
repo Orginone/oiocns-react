@@ -1,8 +1,7 @@
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
-import { XFlowDefine, XOperation } from '@/ts/base/schema';
-import { ISpace, ISpeciesItem } from '@/ts/core';
+import { XWorkDefine, XForm } from '@/ts/base/schema';
+import { IBelong, ISpeciesItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -11,12 +10,13 @@ import TabPane from 'antd/lib/tabs/TabPane';
 import { Editing, Item } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
+import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
 
 // 卡片渲染
 interface IProps {
-  space: ISpace;
+  space: IBelong;
   goBack: Function;
-  current: XFlowDefine;
+  current: XWorkDefine;
 }
 
 /**
@@ -26,7 +26,7 @@ interface IProps {
 const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
   const [data, setData] = useState<any>({});
   const [filterSpecies, setFilterSpecies] = useState<ISpeciesItem[]>([]);
-  const [operations, setOperations] = useState<XOperation[]>([]);
+  const [operations, setOperations] = useState<XForm[]>([]);
   const [rows, setRows] = useState<any>([]);
   const [gridInstance, setGridInstance] = useState<any>();
   const formRef = useRef<ProFormInstance<any>>();
@@ -65,11 +65,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
   return (
     <>
       {operations.length > 0 &&
-        operations.map((operation: XOperation) => (
+        operations.map((operation: XForm) => (
           <OioForm
             key={operation.id}
-            space={space}
-            operation={operation}
+            belong={space}
+            form={operation}
             formRef={formRef}
             submitter={{
               resetButtonProps: {

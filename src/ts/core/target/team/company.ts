@@ -10,6 +10,7 @@ import { TargetType } from '../../public/enums';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
+import { ITodo } from '../../work/todo';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -211,6 +212,16 @@ export class Company extends Belong implements ICompany {
     }
     chats.push(...this.memberChats);
     return chats;
+  }
+  get todos(): ITodo[] {
+    const todos: ITodo[] = [];
+    for (const item of this.cohorts) {
+      todos.push(...item.todos);
+    }
+    for (const item of this.groups) {
+      todos.push(...item.todos);
+    }
+    return todos;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers
