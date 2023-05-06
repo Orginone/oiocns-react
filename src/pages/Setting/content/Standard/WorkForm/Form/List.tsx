@@ -34,16 +34,14 @@ const List = ({
   const [dataSource, setDataSource] = useState<XForm[]>([]);
 
   useEffect(() => {
-    setTimeout(async () => {
-      let data = await current.loadForms();
-      if (!recursionOrg) {
-        data = data.filter((a) => a.belongId == current.current.metadata.id);
-      }
-      if (!recursionSpecies) {
-        data = data.filter((a) => a.speciesId == current.metadata.id);
-      }
-      setDataSource(data);
-    }, 100);
+    let data = current.forms;
+    if (!recursionOrg) {
+      data = data.filter((a) => a.belongId == current.current.metadata.id);
+    }
+    if (!recursionSpecies) {
+      data = data.filter((a) => a.speciesId == current.metadata.id);
+    }
+    setDataSource(data);
     tforceUpdate();
   }, [recursionSpecies, recursionOrg]);
 

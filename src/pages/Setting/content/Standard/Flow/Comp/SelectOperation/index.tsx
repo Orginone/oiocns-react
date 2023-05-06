@@ -7,12 +7,13 @@ import CustomTree from '@/components/CustomTreeComp';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { IAppModule } from '@/ts/core/thing/app/appmodule';
 import { SpeciesType } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
 let originalSelected: any[] = []; //存储当前选择 以获分配数据
 
 interface IProps {
   current: IAppModule;
   showData: any[];
-  setShowData: Function;
+  setShowData: (forms: XForm[]) => void;
 }
 
 const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) => {
@@ -25,8 +26,8 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
   const onSelect: TreeProps['onSelect'] = async (selectedKeys, info: any) => {
     setLeftTreeSelectedKeys(selectedKeys);
     const species: IWorkForm = info.node.item;
-    let res = await species.loadForms();
-    setCenterTreeData(buildSpeciesChildrenTree(res));
+    let forms = await species.loadForms();
+    setCenterTreeData(forms);
   };
   // 左侧树选中事件
   const handleCheckChange: TreeProps['onCheck'] = (checkedKeys, info: any) => {
@@ -41,13 +42,13 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
     }
     const isOriginal = originalSelected.includes(info.node.id);
     let newArr = showData.filter((v: any) => {
-      return v.id !== info.node.item.id;
+      return v.id !== info.node.id;
     });
     let obj = {
-      id: info.node.item.id,
-      name: info.node.item.name,
+      id: info.node.id,
+      name: info.node.name,
       type: 'has',
-      item: info.node.item,
+      item: info.node,
     };
 
     let newShowData = [...newArr];
@@ -69,8 +70,8 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
       return parent.map((species) => {
         return {
           key: species.id,
-          title: species.name,
-          value: species.id,
+          title: species.metadata.name,
+          value: species.metadata.id,
           item: species,
           children: species.children ? buildSpeciesChildrenTree(species.children) : [],
         };
@@ -127,11 +128,11 @@ const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) =
               checkable
               checkedKeys={centerCheckedKeys}
               autoExpandParent={true}
-              // fieldNames={{
-              //   title: 'name',
-              //   key: 'id',
-              //   children: 'nodes',
-              // }}
+              fieldNames={{
+                title: 'name',
+                key: 'id',
+                children: 'nodes',
+              }}
               onCheck={onCheck}
               treeData={centerTreeData}
             />

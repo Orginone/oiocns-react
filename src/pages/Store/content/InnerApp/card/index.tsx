@@ -5,13 +5,13 @@ import './index.less';
 import AppLogo from '/img/appLogo.png';
 import { common } from 'typings/common';
 import orgCtrl from '@/ts/controller';
-import { XFlowDefine } from '@/ts/base/schema';
+import { XWorkDefine } from '@/ts/base/schema';
 
 interface IProps {
-  current: XFlowDefine;
+  current: XWorkDefine;
   className?: string;
   onClick?: (event?: any) => void;
-  operation?: (_item: XFlowDefine) => common.OperationType[]; //操作区域数据
+  operation?: (_item: XWorkDefine) => common.OperationType[]; //操作区域数据
 }
 
 const AppCard: React.FC<IProps> = ({ className, current, onClick, operation }) => {
@@ -27,7 +27,7 @@ const AppCard: React.FC<IProps> = ({ className, current, onClick, operation }) =
               <Tag color="success">{current.isCreate ? '创建类' : '附加类'}</Tag>
             </div>
             <span className="app-size">
-              需求主体: {orgCtrl.provider.findNameById(current.belongId)}
+              需求主体: {orgCtrl.provider.user?.findShareById(current.belongId).name}
             </span>
           </div>
         </div>

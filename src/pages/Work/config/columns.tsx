@@ -25,7 +25,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     title: '共享组织',
     dataIndex: 'shareId',
     render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.findNameById(record.shareId);
+      return orgCtrl.provider.user?.findShareById(record.shareId).name;
     },
   },
   {
@@ -34,7 +34,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     title: '申请人',
     dataIndex: 'createUser',
     render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.findNameById(record.createUser);
+      return orgCtrl.provider.user?.findShareById(record.createUser).name;
     },
   },
   {

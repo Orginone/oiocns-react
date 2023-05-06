@@ -89,20 +89,8 @@ const ConditionNode: React.FC<IProps> = (props) => {
     }
     return name;
   };
-  // TODO 这里有问题
-  const isEditable = (): boolean => {
-    let editable = props.defaultEditable;
-    if (
-      props.config.belongId &&
-      props.config.belongId != '' &&
-      props.config.belongId != orgCtrl.user.id
-    ) {
-      editable = false;
-    }
-    return editable;
-  };
   useEffect(() => {
-    setEditable(isEditable());
+    setEditable(props.defaultEditable);
   }, []);
   const content = useMemo(() => {
     const conditions = props.config.conditions;
@@ -176,11 +164,7 @@ const ConditionNode: React.FC<IProps> = (props) => {
       <Tooltip
         title={
           <span>
-            创建组织:{' '}
-            {
-              // userCtrl.getBelongName(props.config.belongId)
-              orgCtrl.provider.findNameById(props.config.belongId)
-            }
+            创建组织: {orgCtrl.provider.user?.findShareById(props.config.belongId).name}
           </span>
         }
         placement="right">

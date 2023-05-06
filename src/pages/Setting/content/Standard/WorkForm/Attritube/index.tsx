@@ -100,7 +100,7 @@ const Attritube = ({
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}
-        columns={AttributeColumns([current])}
+        columns={AttributeColumns(current)}
         showChangeBtn={false}
         dataSource={dataSource}
       />
