@@ -321,7 +321,7 @@ const Design: React.FC<IProps> = ({
           name: resource.name,
           desc: '',
           props: {
-            operations: resource.operations,
+            operations: resource.forms,
             assignedType: 'JOB',
             mode: 'AND',
             assignedUser: [

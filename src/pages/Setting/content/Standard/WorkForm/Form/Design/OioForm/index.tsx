@@ -33,7 +33,7 @@ const OioForm: React.FC<IProps> = ({
 }) => {
   let config: any = { col: 12, layout: 'horizontal' };
   let items = formItems ? formItems : form.items;
-  if (form.remark != '') {
+  if (form.remark?.length > 0) {
     config = JSON.parse(form.remark);
   }
   useEffect(() => {

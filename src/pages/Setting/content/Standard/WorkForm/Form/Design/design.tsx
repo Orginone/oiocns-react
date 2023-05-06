@@ -323,12 +323,11 @@ const Design: React.FC<IProps> = ({ form: operation, current, setFormModel }) =>
   useEffect(() => {
     const queryItems = async () => {
       // 查询特性
-      const attrs = await current.loadAttributes();
       let operateItems = operation.items;
       const attrIds = operateItems?.map((item) => item.attrId);
-      items['operationItems'] = operateItems;
+      items['operationItems'] = operateItems || [];
       // 过滤出特性
-      items['attrs'] = attrs
+      items['attrs'] = current.attributes
         .filter((attr) => !attrIds?.includes(attr.id))
         .filter((attr) => attr.belongId);
       setItems(items);
@@ -605,9 +604,8 @@ const Design: React.FC<IProps> = ({ form: operation, current, setFormModel }) =>
                     sm: { span: 10 },
                   }}>
                   <Row gutter={24}>
-                    {items['operationItems']
-                      .filter((i: XFormItem) => i.attrId)
-                      .map((item: any) => (
+                    {items['operationItems'] &&
+                      items['operationItems'].map((item: any) => (
                         <Col span={formLayout.col} key={item.id}>
                           <OperateItem item={item} belong={current.current.space} />
                         </Col>

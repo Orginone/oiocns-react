@@ -1,4 +1,4 @@
-import { XOperation } from "@/ts/base/schema";
+import { XForm } from '@/ts/base/schema';
 
 // 类型 枚举
 export enum dataType {
@@ -6,7 +6,7 @@ export enum dataType {
   'NUMERIC' = 'NUMERIC',
   'DICT' = 'DICT',
   'DATE' = 'DATE',
-  'BELONG' = 'BELONG'
+  'BELONG' = 'BELONG',
 }
 
 export enum AddNodeType {
@@ -66,7 +66,12 @@ export type NodeType = {
   belongId?: string;
   task?: any;
   conditions: conditiondType[];
-  props: { operations: XOperation[], assignedUser: any; assignedType: {}; num: number | null };
+  props: {
+    operations: XForm[];
+    assignedUser: any;
+    assignedType: {};
+    num: number | null;
+  };
 };
 
 export const getConditionKeys: (type: string) => any[] = (type: string) => {

@@ -1,43 +1,71 @@
-.company-top-content {
+.dept-content-box {
+  background-color: #eff4f9;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.company-dept-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.company-dept-content {
+  // margin-bottom: 8px !important;
+
   :global {
-    .rowClass {
-      .ogo-table-cell-row-hover {
-        background: rgba(5, 5, 232, 0.3) !important;
+    .ogo-card-body {
+      padding: 20px;
+      color: #606266;
+      .ogo-descriptions-header {
+        margin-bottom: 8px;
       }
     }
   }
 }
-.operation-btn {
-  display: flex;
-  align-items: center;
-  height: 20px;
-  width: 40px;
-  padding: 4px 10px;
-  cursor: pointer;
-  border-radius: 12px;
-  font-size: 18px;
+.dept-wrap-pages {
+  // height: calc(100% - 200px);
+  flex: 1;
   overflow: hidden;
-  &:hover {
-    background-color: @primary-color;
-    color: @white-color;
+  :global {
+    .ogo-card {
+      height: 100%;
+    }
+    .ogo-card-body {
+      padding: 0;
+      height: calc(100% - 68px);
+    }
   }
 }
-.app-wrap {
-  height: 800px;
+.pages-wrap {
+  flex: 1;
+  .page-content-table {
+    :global {
+      .ogo-card.ogo-card-bordered.ogo-card-contain-tabs {
+        border: none;
+      }
 
-}
-.rowClass {
-  // background: rgba(5, 5, 232, 0.3);
-  :global {
-    .ogo-table-cell-row-hover {
-      background: rgba(91, 91, 92, 0.1) !important;
+      .ogo-card-head {
+        border: none;
+        padding: 0 24px;
+      }
+
+      .ogo-tabs-nav::before {
+        border: none !important;
+      }
+
+      .ogo-card-body {
+        padding: 4px;
+      }
+
+      .ogo-tabs-tab {
+        padding: 7px 0 !important;
+        font-size: 13px !important;
+      }
     }
-    td {
-      background: rgba(91, 91, 92, 0.1) !important;
-    }
-    .ogo-table-cell-fix-left,
-    .ogo-table-cell-fix-right {
-      background: rgba(91, 91, 92, 0.1) !important;
-    }
+  }
+  .page-content-table {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 }

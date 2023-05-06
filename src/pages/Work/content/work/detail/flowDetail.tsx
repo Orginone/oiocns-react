@@ -1,10 +1,9 @@
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
-import { XFlowInstance, XFlowTaskHistory } from '@/ts/base/schema';
+import { XWorkInstance, XWorkTaskHistory } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { ISpace, ISpeciesItem } from '@/ts/core';
+import { IBelong, ISpeciesItem } from '@/ts/core';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
@@ -12,17 +11,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import { FlowTodo } from '@/ts/core/target/work/todo';
+import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
 const { Panel } = Collapse;
 
 interface IApproveProps {
   todo: FlowTodo;
-  space: ISpace;
+  space: IBelong;
   onBack: (success: boolean) => void;
 }
 const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
   let result: ISpeciesItem[] = [];
   for (let sp of species) {
-    if (ids.includes(sp.id)) {
+    if (ids.includes(sp.metadata.id)) {
       result.push(sp);
     }
     if (sp.children.length > 0) {
@@ -35,8 +35,8 @@ const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
 const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
   let comment = '';
   const formRef = useRef<ProFormInstance<any>>();
-  const [taskHistory, setTaskHistorys] = useState<XFlowTaskHistory[]>();
-  const [instance, setInstance] = useState<XFlowInstance>();
+  const [taskHistory, setTaskHistorys] = useState<XWorkTaskHistory[]>();
+  const [instance, setInstance] = useState<XWorkInstance>();
   const [speciesItem, setSpeciesItem] = useState<ISpeciesItem[]>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -94,14 +94,15 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                                   {th.node?.nodeType}
                                 </div>
                                 <div style={{ paddingRight: '24px' }}>
-                                  {orgCtrl.provider.findNameById(th.node?.belongId!)}
-                                </div>
-                                <div style={{ paddingRight: '24px' }}>
                                   {th.createTime.substring(0, th.createTime.length - 4)}
                                 </div>
                                 <div style={{ paddingRight: '24px' }}>
                                   {title}：
-                                  {orgCtrl.provider.findNameById(record.createUser)}
+                                  {
+                                    orgCtrl.provider.user?.findShareById(
+                                      record.createUser,
+                                    ).name
+                                  }
                                 </div>
                                 <div>
                                   {record.comment && (
@@ -110,7 +111,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                                 </div>
                               </div>
                               <Collapse ghost>
-                                {(th.node?.bindOperations || []).map((operation) => {
+                                {(th.node?.bindFroms || []).map((operation) => {
                                   let formValue = {};
                                   if (record?.data) {
                                     formValue = JSON.parse(record?.data);
@@ -119,11 +120,12 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                                     <Panel header={operation.name} key={operation.id}>
                                       <OioForm
                                         key={operation.id}
-                                        operation={operation}
+                                        form={operation}
                                         formRef={undefined}
                                         fieldsValue={formValue}
                                         disabled={th.status == 100}
-                                        space={space}></OioForm>
+                                        belong={space}
+                                      />
                                     </Panel>
                                   );
                                 })}
@@ -144,14 +146,14 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                             </div>
                             <div style={{ color: 'red' }}>待审批</div>
                           </div>
-                          {th.node?.bindOperations?.map((operation) => {
+                          {th.node?.bindFroms?.map((form) => {
                             return (
-                              <Card title={operation.name} key={th.id} bordered={false}>
+                              <Card title={form.name} key={th.id} bordered={false}>
                                 <OioForm
-                                  key={operation.id}
-                                  operation={operation}
+                                  key={form.id}
+                                  form={form}
                                   formRef={formRef}
-                                  space={space}
+                                  belong={space}
                                   disabled={th.status == 100}></OioForm>
                               </Card>
                             );
@@ -170,7 +172,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
                 height={'400px'}
                 byIds={(todo.target?.instance?.thingIds ?? '')
                   .split(',')
-                  .filter((id) => id != '')}
+                  .filter((id: any) => id != '')}
                 selectable={false}
               />
             )}
@@ -212,6 +214,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space }) => {
       label: `流程图`,
       children: instance?.define ? (
         <Design
+          species={}
           current={instance.define}
           instance={instance}
           IsEdit={false}

@@ -7,11 +7,11 @@ import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
 import { message, Modal } from 'antd';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import OioForm from '@/pages/Setting/content/Standard/Form/Design/OioForm';
 import { ProFormInstance } from '@ant-design/pro-components';
 import { IFileSystem, IFileSystemItem } from '@/ts/core';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import OioForm from '../Setting/content/Standard/WorkForm/Form/Design/OioForm';
 /** 仓库模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
@@ -103,7 +103,7 @@ const Package: React.FC = () => {
             setShowForm(false);
           }}>
           <OioForm
-            operation={showData[0]?.item}
+            form={showData[0]?.item}
             formRef={formRef}
             submitter={{
               resetButtonProps: {
@@ -113,7 +113,7 @@ const Package: React.FC = () => {
                 style: { display: 'none' },
               },
             }}
-            space={selectMenu.item.space}
+            belong={selectMenu.item.space}
           />
         </Modal>
       )}

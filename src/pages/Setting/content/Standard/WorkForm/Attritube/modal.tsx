@@ -2,8 +2,10 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
-import { XAttribute } from '@/ts/base/schema';
+import { XAttribute, XProperty } from '@/ts/base/schema';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { SpeciesType } from '@/ts/core';
+import { PropClass } from '@/ts/core/thing/store/propclass';
 
 interface Iprops {
   title: string;
@@ -34,25 +36,24 @@ const AttributeModal = (props: Iprops) => {
         rules: [{ required: true, message: '特性代码为必填项' }],
       },
     },
-    // {
-    //   title: '选择属性',
-    //   dataIndex: 'propId',
-    //   valueType: 'select',
-    //   formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
-    //   request: async () => {
-    //     const res = await props.current.team.space.property.loadPropertys({
-    //       offset: 0,
-    //       limit: common.Constants.MAX_UINT_16,
-    //       filter: '',
-    //     });
-    //     if (res && res.result && res.result.length > 0) {
-    //       return res.result.map((item) => {
-    //         return { label: item.name, value: item.id };
-    //       });
-    //     }
-    //     return [];
-    //   },
-    // },
+    {
+      title: '选择属性',
+      dataIndex: 'propId',
+      valueType: 'select',
+      formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
+      request: async () => {
+        const propClass = props.current.current.species.filter(
+          (a) => a.metadata.typeName == SpeciesType.PropClass,
+        );
+        let data: XProperty[] = [];
+        for (let prop of propClass) {
+          data.push(...(await (prop as PropClass).loadPropertys()));
+        }
+        return data.map((item) => {
+          return { label: item.name, value: item.id };
+        });
+      },
+    },
     {
       title: '选择管理权限',
       dataIndex: 'authId',
