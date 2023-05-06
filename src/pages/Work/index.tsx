@@ -32,6 +32,7 @@ const Todo: React.FC<any> = () => {
       return (
         <WorkStart
           current={selectWork}
+          species={selectMenu.item as IWorkItem}
           space={(selectMenu.item as ISpeciesItem).current.space}
           goBack={() => setSelectWork(undefined)}
         />
@@ -44,6 +45,9 @@ const Todo: React.FC<any> = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
+        if (data.onClick) {
+          await data.onClick();
+        }
         orgCtrl.currentKey = data.key;
         setSelectWork(undefined);
         setSelectMenu(data);
@@ -60,6 +64,7 @@ const Todo: React.FC<any> = () => {
       onMenuClick={async (_data, key) => {
         switch (key) {
           case '发起办事':
+            setSelectWork(undefined);
             setOpenFlow(true);
             break;
           default:
@@ -73,7 +78,10 @@ const Todo: React.FC<any> = () => {
         open={openFlow}
         destroyOnClose={true}
         onOk={() => setOpenFlow(false)}
-        onCancel={() => setOpenFlow(false)}>
+        onCancel={() => {
+          setOpenFlow(false);
+          setSelectWork(undefined);
+        }}>
         <CardOrTableComp<XWorkDefine>
           rowKey={'id'}
           columns={FlowColumn}

@@ -44,7 +44,7 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     onClick: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.WorkItem:
-          await (species as IWorkItem).loadWorkDefines();
+          await(species as IWorkItem).loadWorkDefines();
           break;
         default:
           break;

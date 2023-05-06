@@ -167,7 +167,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
             {/** 选中的操作对象 */}
             {speciesItem && !instance?.define?.isCreate && (
               <Thing
-                species={speciesItem}
+                species={speciesItem[0]}
                 height={'400px'}
                 byIds={(todo.metadata?.instance?.thingIds ?? '')
                   .split(',')
