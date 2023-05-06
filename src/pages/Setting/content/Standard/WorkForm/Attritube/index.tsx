@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ISpeciesItem } from '@/ts/core';
 import CardOrTable from '@/components/CardOrTableComp';
 import { XAttribute } from '@/ts/base/schema';
-import { PageRequest } from '@/ts/base/model';
 import { AttributeColumns } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import AttributeModal from './attributeModal';
+import AttributeModal from './modal';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface IProps {
-  current: ISpeciesItem;
+  current: IWorkForm;
   modalType: string;
   recursionOrg: boolean;
   recursionSpecies: boolean;
@@ -28,9 +27,13 @@ const Attritube = ({
 }: IProps) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
   const [editData, setEditData] = useState<XAttribute>();
+  const [dataSource, setDataSource] = useState<XAttribute[]>([]);
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
-    if (item.belongId === current.team.id || item.belongId === current.team.space.id) {
+    if (
+      item.belongId === current.current.metadata.id ||
+      item.belongId === current.current.space.metadata.id
+    ) {
       return [
         {
           key: '修改特性',
@@ -44,7 +47,7 @@ const Attritube = ({
           key: '删除特性',
           label: '删除特性',
           onClick: async () => {
-            await current?.deleteAttr(item.id);
+            await current.deleteAttribute(item);
             tforceUpdate();
           },
         },
@@ -60,58 +63,46 @@ const Attritube = ({
             setModalType('关联属性');
           },
         },
-        {
-          key: '复制属性',
-          label: '复制属性',
-          onClick: async () => {
-            if (item.property) {
-              const property = await current.team.space.property?.createProperty({
-                ...item.property,
-                belongId: current.team.target.belongId,
-                sourceId: item.property.belongId,
-              });
-              if (property) {
-                await current.updateAttr({
-                  ...item,
-                  propId: property.id,
-                });
-              }
-            }
-          },
-        },
+        // {
+        //   key: '复制属性',
+        //   label: '复制属性',
+        //   onClick: async () => {
+        //     if (item.property) {
+        //       const property = await current.team.space.property?.createProperty({
+        //         ...item.property,
+        //         belongId: current.team.target.belongId,
+        //         sourceId: item.property.belongId,
+        //       });
+        //       if (property) {
+        //         await current.updateAttribute({
+        //           ...item,
+        //           propId: property.id,
+        //         });
+        //       }
+        //     }
+        //   },
+        // },
       ];
     }
     return [];
   };
 
   useEffect(() => {
-    tforceUpdate();
-  }, [recursionOrg]);
+    setTimeout(async () => {
+      setDataSource(await current.loadAttributes());
+      tforceUpdate();
+    }, 100);
+  }, [current, recursionOrg, recursionSpecies]);
 
-  useEffect(() => {
-    tforceUpdate();
-  }, [recursionSpecies]);
-
-  const loadAttrs = async (page: PageRequest) => {
-    return await current!.loadAttrsByPage(
-      current.team.id,
-      recursionOrg,
-      recursionSpecies,
-      page,
-    );
-  };
   return (
     <>
       <CardOrTable<XAttribute>
         rowKey={'id'}
         params={tkey}
-        request={async (page) => {
-          return await loadAttrs(page);
-        }}
         operation={renderOperate}
-        columns={AttributeColumns(current.team.species || [])}
+        columns={AttributeColumns([current])}
         showChangeBtn={false}
-        dataSource={[]}
+        dataSource={dataSource}
       />
       {/** 新增/编辑特性模态框 */}
       <AttributeModal
@@ -127,7 +118,6 @@ const Attritube = ({
             tforceUpdate();
           }
         }}
-        target={current.team.space}
         current={current}
       />
       {/** 关联属性模态框 */}

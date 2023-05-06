@@ -22,18 +22,18 @@ import ProFormDict from './widgets/ProFormDict';
 import ProFormGroup from './widgets/ProFormGroup';
 import ProFormPerson from './widgets/ProFormPerson';
 import ProFormIdentity from './widgets/ProFormIdentity';
-import { XOperationItem } from '@/ts/base/schema';
-import { ISpace } from '@/ts/core';
+import { XFormItem } from '@/ts/base/schema';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
-  space: ISpace;
-  item: XOperationItem;
+  belong: IBelong;
+  item: XFormItem;
 }
 
 /**
  * 表单项渲染
  */
-const OioFormItem = ({ item, space }: IProps) => {
+const OioFormItem = ({ item, belong }: IProps) => {
   const rule = JSON.parse(item.rule);
   // 规则校验
   let rules: Rule[] = [];
@@ -182,7 +182,8 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'dict':
       return (
         <ProFormDict
-          space={space}
+          dictId={rule.dictId}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -195,7 +196,7 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'dept':
       return (
         <ProFormDept
-          space={space}
+          space={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -206,7 +207,7 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'person':
       return (
         <ProFormPerson
-          space={space}
+          space={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -217,7 +218,7 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'group':
       return (
         <ProFormGroup
-          space={space}
+          space={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -228,7 +229,7 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'auth':
       return (
         <ProFormAuth
-          space={space}
+          belong={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}
@@ -239,7 +240,7 @@ const OioFormItem = ({ item, space }: IProps) => {
     case 'identity':
       return (
         <ProFormIdentity
-          space={space}
+          space={belong}
           name={item.attrId}
           label={rule.title}
           rules={rules}

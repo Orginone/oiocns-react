@@ -1,18 +1,18 @@
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { OperationColumns } from '@/pages/Setting/config/columns';
-import { XOperation } from '@/ts/base/schema';
-import { ISpeciesItem } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
 import { message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
 import OperationModel from './modal';
 import ViewFormModal from './Design/viewFormModal';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface IProps {
-  current: ISpeciesItem;
+  current: IWorkForm;
   recursionOrg: boolean;
   recursionSpecies: boolean;
-  setSelectedOperation: (operation: XOperation) => void;
+  setSelectedOperation: (operation: XForm) => void;
   setTabKey: (tabKey: number) => void;
 }
 
@@ -27,17 +27,28 @@ const List = ({
   setSelectedOperation,
   setTabKey,
 }: IProps) => {
-  const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const [editData, setEditData] = useState<XOperation>();
-  const [viewFormOpen, setViewFormOpen] = useState(false);
   const [modalType, setModalType] = useState('');
+  const [tkey, tforceUpdate] = useObjectUpdate(current);
+  const [editData, setEditData] = useState<XForm>();
+  const [viewFormOpen, setViewFormOpen] = useState(false);
+  const [dataSource, setDataSource] = useState<XForm[]>([]);
 
   useEffect(() => {
+    setTimeout(async () => {
+      let data = await current.loadForms();
+      if (!recursionOrg) {
+        data = data.filter((a) => a.belongId == current.current.metadata.id);
+      }
+      if (!recursionSpecies) {
+        data = data.filter((a) => a.speciesId == current.metadata.id);
+      }
+      setDataSource(data);
+    }, 100);
     tforceUpdate();
   }, [recursionSpecies, recursionOrg]);
 
   // 操作内容渲染函数
-  const renderOperate = (item: XOperation) => {
+  const renderOperate = (item: XForm) => {
     return [
       {
         key: '修改',
@@ -80,7 +91,7 @@ const List = ({
             trigger={'click'}
             title={'确定删除吗？'}
             onConfirm={async () => {
-              await current.deleteOperation(item.id);
+              await current.deleteForm(item);
               tforceUpdate();
             }}
             okText="确定"
@@ -94,23 +105,14 @@ const List = ({
 
   return (
     <>
-      <CardOrTable<XOperation>
+      <CardOrTable<XForm>
         key={tkey}
         rowKey={'id'}
         params={tkey}
-        dataSource={[]}
+        dataSource={dataSource}
         showChangeBtn={false}
         operation={renderOperate}
-        request={async (page) => {
-          return await current.loadOperations(
-            current.team.id,
-            false,
-            recursionOrg,
-            recursionSpecies,
-            page,
-          );
-        }}
-        columns={OperationColumns(current.team.species)}
+        columns={OperationColumns([current])}
       />
       {/** 表单模态框 */}
       <OperationModel

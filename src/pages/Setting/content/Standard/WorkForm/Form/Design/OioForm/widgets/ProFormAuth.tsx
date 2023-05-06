@@ -1,11 +1,10 @@
-import { ISpace } from '@/ts/core';
-import { IAuthority } from '@/ts/core/target/authority/iauthority';
+import { IAuthority, IBelong } from '@/ts/core';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
 import { DefaultOptionType } from 'antd/lib/select';
 import React, { useEffect, useState } from 'react';
 
 interface IProps {
-  space: ISpace;
+  belong: IBelong;
   [key: string]: any;
 }
 
@@ -15,7 +14,7 @@ interface IProps {
 const ProFormAuth = (props: IProps) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   const loadTreeData = async () => {
-    let tree = await props.space.loadSpaceAuthorityTree(false);
+    let tree = await props.belong.loadSuperAuth(false);
     if (tree) {
       setTreeData([
         ...[{ label: '全员', value: '0', key: '0', children: [] }],
@@ -26,9 +25,9 @@ const ProFormAuth = (props: IProps) => {
   const getTreeData = (targets: IAuthority[]): DefaultOptionType[] => {
     return targets.map((item: IAuthority) => {
       return {
-        key: item.id,
-        label: item.name,
-        value: item.id,
+        key: item.metadata.id,
+        label: item.metadata.name,
+        value: item.metadata.id,
         children:
           item.children && item.children.length > 0 ? getTreeData(item.children) : [],
       };

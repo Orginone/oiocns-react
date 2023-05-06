@@ -1,12 +1,14 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import OioFormItem from './FormItems';
+import { XForm, XFormItem } from '@/ts/base/schema';
+import { IBelong } from '@/ts/core/target/base/belong';
 
 type IProps = {
-  space: ISpace;
-  operation: XOperation;
-  operationItems?: XOperationItem[];
+  belong: IBelong;
+  form: XForm;
+  formItems?: XFormItem[];
   submitter?: any;
   onValuesChange?: (changedValues: any, values: Record<string, any>) => void;
   onFinished?: Function;
@@ -19,9 +21,9 @@ type IProps = {
  * 奥集能表单
  */
 const OioForm: React.FC<IProps> = ({
-  space,
-  operation,
-  operationItems,
+  belong,
+  form,
+  formItems,
   submitter,
   onValuesChange,
   onFinished,
@@ -29,32 +31,16 @@ const OioForm: React.FC<IProps> = ({
   formRef,
   disabled,
 }) => {
-  const [items, setItems] = useState<XOperationItem[]>([]);
   let config: any = { col: 12, layout: 'horizontal' };
-  if (operation.remark != '') {
-    config = JSON.parse(operation.remark);
+  let items = formItems ? formItems : form.items;
+  if (form.remark != '') {
+    config = JSON.parse(form.remark);
   }
   useEffect(() => {
     if (fieldsValue) {
       formRef?.current?.setFieldsValue(fieldsValue);
     }
   }, [fieldsValue]);
-
-  useEffect(() => {
-    if (operationItems) {
-      setItems(operationItems);
-    } else {
-      const queryItems = async () => {
-        const operateItemRes = await kernel.queryOperationItems({
-          id: operation.id,
-          spaceId: space.id,
-          page: pageAll(),
-        });
-        setItems(operateItemRes.data.result || []);
-      };
-      queryItems();
-    }
-  }, [operation]);
 
   return (
     <ProForm
@@ -88,10 +74,10 @@ const OioForm: React.FC<IProps> = ({
         sm: { span: 10 },
       }}>
       <Row gutter={24}>
-        {items.length > 0 ? (
-          items.map((item: XOperationItem) => (
+        {items && items.length > 0 ? (
+          items.map((item: XFormItem) => (
             <Col span={config.col} key={item.id}>
-              <OioFormItem item={item} space={space} />
+              <OioFormItem item={item} belong={belong} />
             </Col>
           ))
         ) : (

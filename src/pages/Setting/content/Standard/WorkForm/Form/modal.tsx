@@ -1,17 +1,16 @@
-import { XOperation } from '@/ts/base/schema';
-import { ISpeciesItem } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
 import SchemaForm from '@/components/SchemaForm';
-import orgCtrl from '@/ts/controller';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface Iprops {
   title: string;
   open: boolean;
-  data?: XOperation;
+  data?: XForm;
   handleCancel: () => void;
   handleOk: (res: any) => void;
-  current: ISpeciesItem;
+  current: IWorkForm;
 }
 /**
  * 默认备注：表单默认布局
@@ -29,7 +28,7 @@ export const defaultRemark: any = {
 */
 const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) => {
   const formRef = useRef<ProFormInstance>();
-  const columns: ProFormColumnsType<XOperation>[] = [
+  const columns: ProFormColumnsType<XForm>[] = [
     {
       title: '表单名称',
       dataIndex: 'name',
@@ -42,21 +41,6 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
       dataIndex: 'code',
       formItemProps: {
         rules: [{ required: true, message: '请输入表单代码' }],
-      },
-    },
-    {
-      title: '选择共享组织',
-      dataIndex: 'belongId',
-      valueType: 'select',
-      initialValue: current.current.metadata.id,
-      formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
-      fieldProps: {
-        options: [
-          {
-            value: current.current.metadata.id,
-            label: current.current.metadata.name,
-          },
-        ],
       },
     },
     {
@@ -81,7 +65,7 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
     },
   ];
   return (
-    <SchemaForm<XOperation>
+    <SchemaForm<XForm>
       formRef={formRef}
       layoutType="ModalForm"
       width={640}
@@ -101,16 +85,16 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
           handleCancel();
         }
       }}
-      onFinish={async (values: XOperation) => {
+      onFinish={async (values: XForm) => {
         let success = false;
         if (data) {
-          success = await current.updateOperation({
+          success = await current.updateForm({
             ...data,
             ...values,
             ...{ remark: JSON.stringify(defaultRemark) },
           });
         } else {
-          success = (await current.createOperation(values)) != undefined;
+          success = (await current.createForm(values)) != undefined;
         }
         if (success) {
           handleOk(true);

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ISpeciesItem } from '@/ts/core';
-import { XOperation } from '@/ts/base/schema';
 import List from './List';
 import Design from './Design';
+import { XForm } from '@/ts/base/schema';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 interface IProps {
-  current: ISpeciesItem;
+  current: IWorkForm;
   recursionOrg: boolean;
   recursionSpecies: boolean;
 }
@@ -16,7 +16,7 @@ interface IProps {
  */
 const SpeciesForm = ({ current, recursionOrg, recursionSpecies }: IProps) => {
   const [tabKey, setTabKey] = useState(0);
-  const [selectedOperation, setSelectedOperation] = useState<XOperation>();
+  const [selectedForm, setSelectedForm] = useState<XForm>();
 
   useEffect(() => {
     setTabKey(0);
@@ -28,10 +28,10 @@ const SpeciesForm = ({ current, recursionOrg, recursionSpecies }: IProps) => {
       setTabKey={setTabKey}
       recursionOrg={recursionOrg}
       recursionSpecies={recursionSpecies}
-      setSelectedOperation={setSelectedOperation}
+      setSelectedOperation={setSelectedForm}
     />
-  ) : selectedOperation ? (
-    <Design current={current} operation={selectedOperation} onBack={() => setTabKey(0)} />
+  ) : selectedForm ? (
+    <Design current={current} form={selectedForm} onBack={() => setTabKey(0)} />
   ) : (
     <></>
   );
