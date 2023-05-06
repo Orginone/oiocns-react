@@ -36,25 +36,9 @@ export const PersonColumns: ProColumns<schema.XTarget>[] = [
     key: 'name',
   },
   {
-    title: '姓名',
-    key: 'realName',
-    render: (_key: any, _record: any, _: number) => {
-      return _record.team.name;
-    },
-  },
-  {
-    title: '手机号',
-    key: 'mobilephone',
-    render: (_key: any, _record: any, _: number) => {
-      return _record.team.code;
-    },
-  },
-  {
     title: '签名',
+    dataIndex: 'remark',
     key: 'remark',
-    render: (_key: any, _record: any, _: number) => {
-      return _record.team.remark;
-    },
   },
 ];
 

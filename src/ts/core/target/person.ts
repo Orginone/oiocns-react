@@ -209,7 +209,6 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }

@@ -1,6 +1,6 @@
 import CardOrTable from '@/components/CardOrTableComp';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import { OperationColumns } from '@/pages/Setting/config/columns';
+import { FormColumns } from '@/pages/Setting/config/columns';
 import { XForm } from '@/ts/base/schema';
 import { message, Popconfirm } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -112,7 +112,7 @@ const List = ({
         dataSource={dataSource}
         showChangeBtn={false}
         operation={renderOperate}
-        columns={OperationColumns([current])}
+        columns={FormColumns([current])}
       />
       {/** 表单模态框 */}
       <OperationModel

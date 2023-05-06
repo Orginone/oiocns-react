@@ -84,7 +84,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
     const identityData: IIdentity[] = [];
     result.map((item) => {
       item.identitys.map((obj) => {
-        obj.belong = item.target;
+        obj.metadata.belong = item.target;
         identityData.push(obj);
       });
     });
@@ -213,7 +213,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         onCancel={() => {
           setIsOpenPerson(false);
         }}>
-        <AssignPosts searchFn={setSelectPersons} />
+        <AssignPosts members={current.members} searchFn={setSelectPersons} />
       </Modal>
     </div>
   );

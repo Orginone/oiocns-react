@@ -3,15 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus, AiOutlineUser } from 'react-icons/ai';
 import MarketClassifyTree from '@/components/CustomTreeComp';
 import cls from './index.module.less';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
 import AddPosttionModal from '../AddPositionMoadl';
-import { ITarget } from '@/ts/core/target/itarget';
+import { IIdentity, ITarget } from '@/ts/core';
+import { orgAuth } from '@/ts/core/public/consts';
 type CreateGroupPropsType = {
   currentKey: string;
   setCurrent: (current: IIdentity) => void; // 点击操作触发的事件
   indentitys: IIdentity[];
   current: ITarget;
-  isAdmin: boolean;
 };
 type target = {
   title: string;
@@ -19,7 +18,7 @@ type target = {
   object: IIdentity;
 };
 const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
-  const { indentitys, setCurrent, current, currentKey, isAdmin } = props;
+  const { indentitys, setCurrent, current, currentKey } = props;
   const [selectMenu, setSelectMenu] = useState<string>(currentKey);
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
@@ -32,8 +31,8 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
     if (target != undefined) {
       for (const a of target) {
         result.push({
-          title: a.target.name,
-          key: a.target.id,
+          title: a.metadata.name,
+          key: a.metadata.id,
           object: a,
         });
       }
@@ -68,7 +67,7 @@ const CreatePosition: React.FC<CreateGroupPropsType> = (props) => {
   return (
     <div>
       <div className={cls.topMes}>
-        {isAdmin && (
+        {current.hasAuthoritys([orgAuth.RelationAuthId]) && (
           <Button
             className={cls.creatgroup}
             type="text"

@@ -140,7 +140,6 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
       </div>
       {/* 编辑机构角色 */}
       <IndentityManage
-        isAdmin={isSuperAdmin}
         open={activeModal === 'indentity'}
         current={current}
         onCancel={() => setActiveModal('')}

@@ -37,6 +37,5 @@ export class Cohort extends Target implements ICohort {
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);
     await this.loadSpecies(reload);
-    await this.loadIdentitys(reload);
   }
 }

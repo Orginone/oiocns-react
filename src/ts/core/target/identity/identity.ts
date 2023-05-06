@@ -12,6 +12,10 @@ export interface IIdentity extends common.IEntity {
   members: schema.XTarget[];
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
+  /** 身份（角色）拉入新成员 */
+  pullMembers(members: schema.XTarget[]): Promise<boolean>;
+  /** 身份（角色）移除成员 */
+  removeMembers(members: schema.XTarget[]): Promise<boolean>;
   /** 更新身份（角色）信息 */
   update(data: model.IdentityModel): Promise<boolean>;
   /** 删除身份（角色） */
@@ -41,6 +45,34 @@ export class Identity extends common.Entity implements IIdentity {
       }
     }
     return this.members;
+  }
+  async pullMembers(members: schema.XTarget[]): Promise<boolean> {
+    members = members.filter((i) => {
+      return this.members.filter((m) => m.id === i.id).length < 1;
+    });
+    if (members.length > 0) {
+      const res = await kernel.giveIdentity({
+        id: this.metadata.id,
+        subIds: members.map((i) => i.id),
+      });
+      if (res.success) {
+        this.members.push(...members);
+      }
+      return res.success;
+    }
+    return true;
+  }
+  async removeMembers(members: schema.XTarget[]): Promise<boolean> {
+    const res = await kernel.removeIdentity({
+      id: this.metadata.id,
+      subIds: members.map((i) => i.id),
+    });
+    if (res.success) {
+      for (const member of members) {
+        this.members = this.members.filter((i) => i.id != member.id);
+      }
+    }
+    return true;
   }
   async update(data: model.IdentityModel): Promise<boolean> {
     data.id = this.metadata.id;

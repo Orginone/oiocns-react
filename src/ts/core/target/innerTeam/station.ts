@@ -85,7 +85,6 @@ export class Station extends Team implements IStation {
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);
-    await this.loadIdentitys(reload);
   }
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {

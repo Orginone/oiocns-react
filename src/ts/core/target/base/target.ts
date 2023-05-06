@@ -106,6 +106,13 @@ export abstract class Target extends Team implements ITarget {
       return species;
     }
   }
+  protected async pullSubTarget(team: ITeam): Promise<boolean> {
+    const res = await kernel.pullAnyToTeam({
+      id: this.metadata.id,
+      subIds: [team.metadata.id],
+    });
+    return res.success;
+  }
   abstract exit(): Promise<boolean>;
   abstract get subTarget(): ITarget[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
