@@ -66,6 +66,11 @@ export abstract class SpeciesItem extends common.Entity implements ISpeciesItem 
     const res = await kernel.updateSpecies(data);
     if (res.success && res.data.id) {
       this.metadata = res.data;
+      this.share = {
+        name: this.metadata.name,
+        typeName: this.metadata.typeName,
+        avatar: parseAvatar(this.metadata.icon),
+      };
     }
     return res.success;
   }

@@ -1,5 +1,4 @@
 import React from 'react';
-import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
 import * as config from './config/menuOperate';
 import Content from './content';
@@ -12,7 +11,9 @@ const Package: React.FC = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        orgCtrl.currentKey = data.key;
+        if (data.onClick) {
+          await data.onClick();
+        }
         setSelectMenu(data);
       }}
       siderMenuData={rootMenu}>

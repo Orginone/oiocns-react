@@ -1,7 +1,7 @@
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import { MenuType } from '../config/menuType';
-import ThingIndex from './Thing';
+import ThingIndex from '@/pages/Store/content/Thing';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -10,26 +10,10 @@ interface IProps {
 
 /** 内容区 */
 const ContentIndex = (props: IProps) => {
-  if (props.checkedList && props.checkedList.length) {
-    return (
-      <ThingIndex
-        key={props.checkedList?.length}
-        species={props.selectMenu.item}
-        checkedList={props.checkedList}
-        selectable={false}
-      />
-    );
-  }
   /** 加载内容区 */
   switch (props.selectMenu.itemType) {
     case MenuType.Species:
-      return (
-        <ThingIndex
-          species={props.selectMenu.item}
-          checkedList={props.checkedList}
-          selectable={false}
-        />
-      );
+      return <ThingIndex species={props.selectMenu.item} selectable={false} />;
     default:
       return <></>;
   }

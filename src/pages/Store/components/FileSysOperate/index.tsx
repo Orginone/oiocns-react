@@ -4,7 +4,7 @@ import { Input, message, Modal, Upload, UploadProps } from 'antd';
 import CopyOrMoveModal from './CopyOrMove';
 import FilePreview from './FilePreview';
 import { FileItemShare } from '@/ts/base/model';
-import { IFileSystemItem } from '@/ts/core/target/store/ifilesys';
+import { IFileSystemItem } from '@/ts/core';
 
 interface IProps {
   operateKey?: string;
@@ -56,7 +56,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
       case '重命名':
         setModalType(key);
         setTarget(target);
-        setNewName(target.name);
+        setNewName(target.metadata.name);
         return;
       case '复制':
       case '移动':
@@ -70,8 +70,8 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
         await target.rename(newName);
         break;
       case '双击':
-        if (target.target.isDirectory) {
-          orgCtrl.currentKey = target.fullKey;
+        if (target.metadata.isDirectory) {
+          orgCtrl.currentKey = target.key;
           await target.loadChildren();
           orgCtrl.changCallback();
         } else {
@@ -98,7 +98,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
       {target && (
         <>
           <Modal
-            title={modalType + '-[' + target.name + ']'}
+            title={modalType + '-[' + target.metadata.name + ']'}
             open={['新建', '重命名'].includes(modalType)}
             onCancel={() => setModalType('')}
             onOk={async () => {
@@ -117,7 +117,7 @@ const FileSysOperate: React.FC<IProps> = (props: IProps) => {
             />
           </Modal>
           <CopyOrMoveModal
-            title={modalType + '-[' + target.name + ']'}
+            title={modalType + '-[' + target.metadata.name + ']'}
             open={['复制', '移动'].includes(modalType)}
             currentTaget={target}
             onChange={(success) => {

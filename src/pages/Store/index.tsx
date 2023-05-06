@@ -1,16 +1,14 @@
 import React, { useRef, useState } from 'react';
-import orgCtrl from '@/ts/controller';
 import MainLayout from '@/components/MainLayout';
 import { MenuType } from './config/menuType';
 import Content, { TopBarExtra } from './content';
 import { MenuItemType } from 'typings/globelType';
 import FileSysOperate from './components/FileSysOperate';
 import { message, Modal } from 'antd';
-import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
 import { ProFormInstance } from '@ant-design/pro-components';
-import { IFileSystem, IFileSystemItem } from '@/ts/core';
 import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
+import SelectOperation from '../Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '../Setting/content/Standard/WorkForm/Form/Design/OioForm';
 /** 仓库模块 */
 const Package: React.FC = () => {
@@ -25,14 +23,8 @@ const Package: React.FC = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        orgCtrl.currentKey = data.key;
-        switch (data.itemType) {
-          case MenuType.FileSystem:
-            await (data.item as IFileSystem).home?.loadChildren();
-            break;
-          case MenuType.FileSystemItem:
-            await (data.item as IFileSystemItem).loadChildren();
-            break;
+        if (data.onClick) {
+          await data.onClick();
         }
         setSelectMenu(data);
       }}

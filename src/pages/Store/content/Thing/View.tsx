@@ -3,7 +3,7 @@ import React from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import ThingArchive from './Archive';
 import ThingCard from './Card';
-import { ISpeciesItem } from '@/ts/core';
+import { ISpeciesItem, IWorkForm } from '@/ts/core';
 
 interface IThingViewProps {
   thingId: string;
@@ -23,7 +23,7 @@ const ThingView: React.FC<IThingViewProps> = ({ thingId, species, setTabKey }) =
           {
             key: '1',
             label: `资产卡片`,
-            children: <ThingCard thingId={thingId} />,
+            children: <ThingCard thingId={thingId} species={species as IWorkForm} />,
           },
           {
             key: '2',
