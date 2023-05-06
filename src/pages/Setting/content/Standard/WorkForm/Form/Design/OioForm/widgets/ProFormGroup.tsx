@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { ProFormTreeSelect } from '@ant-design/pro-components';
-import { ISpace } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 
 interface IProps {
-  space: ISpace;
+  space: IBelong;
   [key: string]: any;
 }
 

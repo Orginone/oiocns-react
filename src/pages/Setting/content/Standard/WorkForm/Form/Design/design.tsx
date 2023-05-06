@@ -21,10 +21,10 @@ import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { AiOutlineSearch } from 'react-icons/ai';
 import AttrItem from './AttrItem';
 import OperateItem from './OperateItem';
-import { ISpeciesItem } from '@/ts/core';
-import { XOperation, XOperationItem } from '@/ts/base/schema';
-import { OperationItemModel, OperationModel } from '@/ts/base/model';
+import { XForm, XFormItem } from '@/ts/base/schema';
+import { FormItemModel, FormModel } from '@/ts/base/model';
 import OioForm from './OioForm';
+import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 
 /**
  * 组件选择
@@ -199,11 +199,7 @@ const regexpOpts: SelectProps['options'] = [
 /**
  * 转化特性为表单项
  */
-const transformAttrToOperationItem = (
-  attr: any,
-  operationId: string,
-  belongId: string,
-): OperationItemModel => {
+const transformAttrToOperationItem = (attr: any, operationId: string): FormItemModel => {
   let widget = 'text';
   let type = 'string';
   let dictId: string | undefined = undefined;
@@ -245,7 +241,6 @@ const transformAttrToOperationItem = (
       id: attr.id,
       name: attr.name,
       code: attr.code,
-      belongId: belongId,
       operationId: operationId,
       attrId: attr.id,
       attr: attr,
@@ -287,9 +282,9 @@ const transformOperationItemToAttr = (operationItem: any) => {
 };
 
 type IProps = {
-  operation: XOperation;
-  current: ISpeciesItem;
-  setOperationModel: (operationModel: OperationModel) => void;
+  form: XForm;
+  current: IWorkForm;
+  setFormModel: (FormModel: FormModel) => void;
 };
 
 type FormLayout = {
@@ -301,9 +296,8 @@ type FormLayout = {
  * 表单设计器
  * @param props
  */
-const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => {
+const Design: React.FC<IProps> = ({ form: operation, current, setFormModel }) => {
   const [tkey, tforceUpdate] = useObjectUpdate(current);
-  const belongId = current.team.id;
   const [items, setItems] = useState<any>({
     // 特性
     attrs: [],
@@ -323,38 +317,25 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
           col: 12,
         },
   );
-  const [selectedItem, setSelectedItem] = useState<XOperationItem>();
+  const [selectedItem, setSelectedItem] = useState<XFormItem>();
   const [openPreviewModal, setOpenPreviewModal] = useState<boolean>(false);
 
   useEffect(() => {
     const queryItems = async () => {
-      // 查询操作项
-      const operateItemRes = await kernel.queryOperationItems({
-        id: operation.id,
-        spaceId: belongId,
-        page: pageAll(),
-      });
       // 查询特性
-      const attrRes = await current.loadAttrs(true);
-      let operateItems = operateItemRes.data?.result || [];
-      operateItems = operateItems.map((item: any) => {
-        if (item.containSpecies && item.containSpecies.length > 0) {
-          item.speciesIds = item.containSpecies.map((species: any) => species.id);
-        }
-        return item;
-      });
-      let attrs: any[] = attrRes;
-      const attrIds = operateItems.map((item) => item.attrId);
+      const attrs = await current.loadAttributes();
+      let operateItems = operation.items;
+      const attrIds = operateItems?.map((item) => item.attrId);
       items['operationItems'] = operateItems;
       // 过滤出特性
       items['attrs'] = attrs
-        .filter((attr) => !attrIds.includes(attr.id))
+        .filter((attr) => !attrIds?.includes(attr.id))
         .filter((attr) => attr.belongId);
       setItems(items);
       tforceUpdate();
     };
     queryItems();
-  }, [belongId, operation.id]);
+  }, [operation.id]);
 
   // 找到容器
   const findContaniner = (id: string) => {
@@ -384,7 +365,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
       // attr 转 operationItem
       if (activeContainer === 'attrs') {
         const attr = items[activeContainer].find((attr: any) => attr.id === active.id);
-        dragItem = transformAttrToOperationItem(attr, operation.id, belongId);
+        dragItem = transformAttrToOperationItem(attr, operation.id);
         itemClick(dragItem);
       } else if (items[activeContainer]) {
         const operationItem = items[activeContainer].find(
@@ -404,7 +385,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
             ...items[overContainer].slice(newIndex, items[overContainer].length),
           ],
         };
-        setOperationModel({
+        setFormModel({
           ...operation,
           ...{ items: data['operationItems'] },
         });
@@ -431,18 +412,14 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
         if (activeContainer === 'attrs') {
           // 特性转表单项
           const attr = items['attrs'].find((attr: any) => attr.id === active.id);
-          const operationItem = transformAttrToOperationItem(
-            attr,
-            operation.id,
-            belongId,
-          );
+          const operationItem = transformAttrToOperationItem(attr, operation.id);
           const data = {
             attrs: items['attrs'].filter((item: any) => {
               return item.id !== active.id;
             }),
             operationItems: [...items['operationItems'], operationItem],
           };
-          setOperationModel({
+          setFormModel({
             ...operation,
             ...{ items: data['operationItems'] },
           });
@@ -459,7 +436,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
             attrs: [...items['attrs'], transformOperationItemToAttr(operationItem)],
             operationItems,
           };
-          setOperationModel({
+          setFormModel({
             ...operation,
             ...{ items: operationItems },
           });
@@ -469,7 +446,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
           }
         }
       } else {
-        setOperationModel({
+        setFormModel({
           ...operation,
           ...{ items: items['operationItems'] },
         });
@@ -487,13 +464,13 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
       if (overContainer == 'operationItems') {
         itemClick(activeItems.find((item: any) => item.id === activeId));
       }
-      setOperationModel({
+      setFormModel({
         ...operation,
         ...{ items: items['operationItems'] },
       });
     } else {
       itemClick(activeItems.find((item: any) => item.id === activeId));
-      setOperationModel({
+      setFormModel({
         ...operation,
         ...{ items: items['operationItems'] },
       });
@@ -512,7 +489,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
   const layoutChange = (value: any) => {
     const newFormLayout = { ...formLayout, ...value };
     setFormLayout(newFormLayout);
-    setOperationModel({
+    setFormModel({
       ...operation,
       items: items['operationItems'],
       remark: JSON.stringify({ ...JSON.parse(operation.remark), ...newFormLayout }),
@@ -534,7 +511,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
         return oi;
       });
       const data = { ...items, ...{ operationItems } };
-      setOperationModel({
+      setFormModel({
         ...operation,
         ...{ items: operationItems },
       });
@@ -629,10 +606,10 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
                   }}>
                   <Row gutter={24}>
                     {items['operationItems']
-                      .filter((i: XOperationItem) => i.attrId)
+                      .filter((i: XFormItem) => i.attrId)
                       .map((item: any) => (
                         <Col span={formLayout.col} key={item.id}>
-                          <OperateItem item={item} space={current.team.space} />
+                          <OperateItem item={item} belong={current.current.space} />
                         </Col>
                       ))}
                   </Row>
@@ -643,13 +620,7 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
           <Col span={4}>
             <Card title="表单项配置">
               <Card bordered={false} title={selectedItem?.name}>
-                <Form
-                  form={form}
-                  disabled={
-                    selectedItem?.belongId != undefined &&
-                    selectedItem?.belongId !== belongId
-                  }
-                  onValuesChange={formValuesChange}>
+                <Form form={form} onValuesChange={formValuesChange}>
                   <Form.Item label="组件" name="widget">
                     <Select options={widgetsOpts} />
                   </Form.Item>
@@ -706,9 +677,9 @@ const Design: React.FC<IProps> = ({ operation, current, setOperationModel }) => 
         maskClosable={false}
         width={900}>
         <OioForm
-          space={current.team.space}
-          operation={operation}
-          operationItems={items['operationItems']}
+          belong={current.current.space}
+          form={operation}
+          formItems={items['operationItems']}
           formRef={undefined}
           onValuesChange={(values) => console.log('values', values)}
         />
