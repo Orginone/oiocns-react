@@ -29,10 +29,21 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectTodo, setSelectTodo] = useState<ITodo>();
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
-  const [workSpecies, setWorkSpecies] = useState<IWorkItem[]>([]);
   const [selectWorkSpecies, setSelectWorkSpecies] = useState<IWorkItem>();
-  const [dataSource, setDataSource] = useState<ITodo[]>([]);
 
+  let workSpecies: IWorkItem[] = [];
+
+  const loadWorkSpecies = (species: ISpeciesItem[]) => {
+    let spList: IWorkItem[] = species.filter(
+      (a) => a.metadata.typeName == SpeciesType.WorkItem,
+    ) as IWorkItem[];
+    for (let sp of species) {
+      if (sp.children.length > 0) {
+        spList.push(...loadWorkSpecies(sp.children));
+      }
+    }
+    return spList;
+  };
   useEffect(() => {
     setTimeout(async () => {
       for (let work of workSpecies) {
@@ -44,49 +55,44 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     }, 10);
   }, [selectTodo]);
 
-  useEffect(() => {
-    let todos = orgCtrl.user.todos.filter(
-      (a) =>
-        a.metadata.title.includes(filter) ||
-        a.metadata.taskType.includes(filter) ||
-        a.metadata.remark.includes(filter),
-    );
-    switch (selectMenu.itemType) {
-      case GroupMenuType.Work:
-        break;
-      case GroupMenuType.Species:
-        {
-          const species = selectMenu.item as ISpeciesItem;
-          const speciesList = loadWorkSpecies([species]);
-          setWorkSpecies(speciesList);
-          todos = todos.filter(
-            (a) =>
-              a.metadata.taskType == '事项' &&
-              a.metadata.shareId == species.current.metadata.id &&
-              speciesList.find((s) => s.metadata.id == a.metadata.id),
-          );
-        }
-        break;
-      default:
-        {
-          let target = selectMenu.item as ITarget;
-          if (target) {
-            if (target.space.metadata.id == target.metadata.id) {
-              todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
-            } else {
-              todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
-            }
-            setWorkSpecies(loadWorkSpecies(target.workSpecies));
+  let todos = orgCtrl.user.todos.filter(
+    (a) =>
+      a.metadata.title.includes(filter) ||
+      a.metadata.taskType.includes(filter) ||
+      a.metadata.remark.includes(filter),
+  );
+  switch (selectMenu.itemType) {
+    case GroupMenuType.Work:
+      break;
+    case GroupMenuType.Species:
+      {
+        const species = selectMenu.item as ISpeciesItem;
+        const speciesList = loadWorkSpecies([species]);
+        workSpecies = speciesList;
+        todos = todos.filter(
+          (a) =>
+            a.metadata.taskType == '事项' &&
+            a.metadata.shareId == species.current.metadata.id &&
+            speciesList.find((s) => s.metadata.id == a.metadata.id),
+        );
+      }
+      break;
+    default:
+      {
+        let target = selectMenu.item as ITarget;
+        if (target) {
+          if (target.space.metadata.id == target.metadata.id) {
+            todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
           } else {
-            setWorkSpecies(loadWorkSpecies(orgCtrl.user.workSpecies));
+            todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
           }
+          workSpecies = loadWorkSpecies(target.workSpecies);
+        } else {
+          workSpecies = loadWorkSpecies(orgCtrl.user.workSpecies);
         }
-        break;
-    }
-    setDataSource(todos);
-    // forceUpdate()
-    setPageKey('List');
-  }, [selectMenu, filter]);
+      }
+      break;
+  }
 
   const rowsOperation = (
     <Space>
@@ -111,25 +117,13 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
       </Button>
     </Space>
   );
-
-  const loadWorkSpecies = (species: ISpeciesItem[]) => {
-    let spList: IWorkItem[] = species.filter(
-      (a) => a.metadata.typeName == SpeciesType.WorkItem,
-    ) as IWorkItem[];
-    for (let sp of species) {
-      if (sp.children.length > 0) {
-        spList.push(...loadWorkSpecies(sp.children));
-      }
-    }
-    return spList;
-  };
   switch (pageKey) {
     case 'List':
       return (
         <PageCard bordered={false} tabBarExtraContent={rowsOperation}>
           <div key={workKey} className={cls['page-content-table']}>
             <CardOrTableComp<ITodo>
-              dataSource={dataSource}
+              dataSource={todos}
               rowKey={(record: ITodo) => record.metadata.id}
               columns={WorkColumns}
               operation={(item: ITodo) => {
