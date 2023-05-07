@@ -1,6 +1,5 @@
 import { kernel, model, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
-import { SpeciesType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from '../base/species';
 
@@ -25,7 +24,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
     for (const item of _metadata.nodes || []) {
       this.children.push(new PropClass(item, this.current, this));
     }
-    this.speciesTypes = [SpeciesType.Store];
+    this.speciesTypes = [_metadata.typeName];
   }
   propertys: schema.XProperty[] = [];
   private _propertyLoaded: boolean = false;
