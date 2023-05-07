@@ -13,6 +13,7 @@ export type { ICohort } from './target/outTeam/cohort';
 export type { IGroup } from './target/outTeam/group';
 export type { IPerson } from './target/person';
 export type { ICompany } from './target/team/company';
+export type { IAppModule } from './thing/app/appmodule';
 export type { IWorkForm } from './thing/app/work/workform';
 export type { IWorkItem } from './thing/app/work/workitem';
 export type { IForm } from './thing/base/form';

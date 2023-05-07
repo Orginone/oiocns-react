@@ -32,7 +32,7 @@ const buildFileSysTree = (targets: IFileSystemItem[]) => {
         icon: <im.ImFolder color="#c09553" />,
         expIcon: <im.ImFolderOpen color="#c09553" />,
         children: buildFileSysTree(item.children),
-        onClick: async () => {
+        clickEvent: async () => {
           await item.loadChildren();
         },
       });
@@ -105,7 +105,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
             menus: [],
             tag: [item.metadata.typeName],
             children: buildFileSysTree(filesys.home ? filesys.home.children : []),
-            onClick: async () => {
+            clickEvent: async () => {
               await filesys.home?.loadChildren();
             },
           });
@@ -127,7 +127,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           menus: [],
           tag: [item.metadata.typeName],
           children: buildSpeciesTree(item.children),
-          onClick: async () => {
+          clickEvent: async () => {
             switch (item.metadata.typeName) {
               case SpeciesType.Market:
               case SpeciesType.WorkItem:

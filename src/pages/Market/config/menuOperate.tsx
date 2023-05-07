@@ -21,7 +21,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           menus: [],
           tag: [item.metadata.typeName],
           children: buildSpeciesTree(item.children),
-          onClick: async () => {
+          clickEvent: async () => {
             switch (item.metadata.typeName) {
               case SpeciesType.Market:
                 await (item as IWork).loadWorkDefines();
@@ -43,11 +43,11 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
 const buildTargetTree = (item: ITarget, market: IMarket) => {
   return {
     key: item.key,
-    item: item,
-    label: item.metadata.name,
-    itemType: item.metadata.typeName,
+    item: market,
+    label: market.metadata.name,
+    itemType: market.metadata.typeName,
     menus: [],
-    tag: [item.space.metadata.name, item.metadata.typeName + '市场'],
+    tag: [item.space.metadata.name],
     icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
     children: buildSpeciesTree(market.children),
   };

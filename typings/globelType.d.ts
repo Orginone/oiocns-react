@@ -50,7 +50,7 @@ interface MenuItemType {
   menus?: OperateMenuType[];
   children: MenuItemType[];
   parentMenu?: MenuItemType;
-  onClick?: () => Promise<void>;
+  clickEvent?: () => Promise<void>;
 }
 
 interface OperateMenuType {
@@ -58,5 +58,5 @@ interface OperateMenuType {
   label: string;
   model?: string;
   icon: React.ReactNode;
-  onClick?: () => Promise<boolean>;
+  clickEvent?: () => Promise<boolean>;
 }

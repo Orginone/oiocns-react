@@ -1,6 +1,6 @@
 import { model, common, schema, kernel } from '../../../base';
 import { ShareIdSet } from '../../public/consts';
-import { MessageType } from '../../public/enums';
+import { MessageType, TargetType } from '../../public/enums';
 // 历史会话存储集合名称
 const hisMsgCollName = 'chat-message';
 // 空时间
@@ -32,6 +32,8 @@ export interface IMsgChat extends common.IEntity {
   chatdata: MsgChatData;
   /** 会话Id */
   chatId: string;
+  /** 当前用户Id */
+  userId: string;
   /** 会话归属Id */
   belongId: string;
   /** 共享信息 */
@@ -42,6 +44,8 @@ export interface IMsgChat extends common.IEntity {
   members: schema.XTarget[];
   /** 会话的成员的会话 */
   memberChats: PersonMsgChat[];
+  /** 是否为我的会话 */
+  isMyChat: boolean;
   /** 禁用通知 */
   unMessage(): void;
   /** 消息变更通知 */
@@ -70,6 +74,7 @@ export interface IMsgChat extends common.IEntity {
 
 export abstract class MsgChat extends common.Entity implements IMsgChat {
   constructor(
+    _userId: string,
     _belongId: string,
     _chatId: string,
     _share: model.ShareIcon,
@@ -79,6 +84,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     super();
     this.share = _share;
     this.chatId = _chatId;
+    this.userId = _userId;
     this.belongId = _belongId;
     this.chatdata = {
       noReadCount: 0,
@@ -99,6 +105,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     );
   }
   chatId: string;
+  userId: string;
   belongId: string;
   share: model.ShareIcon;
   messages: model.MsgSaveModel[] = [];
@@ -106,6 +113,12 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   chatdata: MsgChatData;
   memberChats: PersonMsgChat[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
+  get isMyChat(): boolean {
+    if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
+      return true;
+    }
+    return this.members.filter((i) => i.id === this.userId).length > 0;
+  }
   unMessage(): void {
     this.messageNotify = undefined;
   }
@@ -119,7 +132,6 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     if (this.messages.length < 10) {
       this.moreMessage();
     }
-    this.loadMembers();
   }
   cache(): void {
     kernel.anystore.set('0', hisMsgCollName + '.T' + this.chatdata.fullId, {
@@ -267,13 +279,14 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
 
 export class PersonMsgChat extends MsgChat implements IMsgChat {
   constructor(
+    _userId: string,
     _belongId: string,
     _chatId: string,
     _share: model.ShareIcon,
     _labels: string[],
     _remark: string,
   ) {
-    super(_belongId, _chatId, _share, _labels, _remark);
+    super(_userId, _belongId, _chatId, _share, _labels, _remark);
   }
   async loadMembers(_reload: boolean = false): Promise<schema.XTarget[]> {
     return [];

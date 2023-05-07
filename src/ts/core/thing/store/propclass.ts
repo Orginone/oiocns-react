@@ -7,6 +7,8 @@ import { ISpeciesItem, SpeciesItem } from '../base/species';
 export interface IPropClass extends ISpeciesItem {
   /** 类别属性 */
   propertys: schema.XProperty[];
+  /** 加载所有属性 */
+  loadAllProperty(): Promise<schema.XProperty[]>;
   /** 加载属性 */
   loadPropertys(reload?: boolean): Promise<schema.XProperty[]>;
   /** 新建表单特性 */
@@ -28,6 +30,15 @@ export class PropClass extends SpeciesItem implements IPropClass {
   }
   propertys: schema.XProperty[] = [];
   private _propertyLoaded: boolean = false;
+  async loadAllProperty(): Promise<schema.XProperty[]> {
+    const result = [];
+    await this.loadPropertys();
+    result.push(...this.propertys);
+    for (const item of this.children) {
+      result.push(...(await (item as IPropClass).loadAllProperty()));
+    }
+    return result;
+  }
   async loadPropertys(reload: boolean = false): Promise<schema.XProperty[]> {
     if (!this._propertyLoaded || reload) {
       const res = await kernel.queryPropertys({

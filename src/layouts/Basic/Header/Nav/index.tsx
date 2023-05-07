@@ -17,6 +17,7 @@ import { workNotify } from '@/ts/core/user';
  */
 const HeaderNav: React.FC<RouteComponentProps> = () => {
   const [msgKey, setMsgKey] = useState('');
+  const [taskKey, setTaskKey] = useState('');
   const [workCount, setWorkCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   useEffect(() => {
@@ -31,7 +32,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
     const workId = workNotify.subscribe(async (key) => {
       let todos = await orgCtrl.user.loadTodos(false);
       setWorkCount(todos.length);
-      setMsgKey(key);
+      setTaskKey(key);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
@@ -52,7 +53,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       },
     },
     {
-      key: 'work',
+      key: taskKey,
       path: '/work',
       title: '办事',
       icon: 'icon-todo',
@@ -81,7 +82,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       title: '流通',
       icon: 'icon-guangshangcheng',
       count: 0,
-      fath: '/store',
+      fath: '/market',
       onClick: () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
@@ -91,7 +92,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'setting',
       path: '/setting',
       title: orgCtrl.user.metadata.name,
-      icon: <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />,
+      icon: <TeamIcon share={orgCtrl.user.share} size={30} title="设置" />,
       count: 0,
       fath: '/setting',
       onClick: () => {

@@ -3,7 +3,6 @@ import Content from './content';
 import * as config from './config/menuOperate';
 import MainLayout from '@/components/MainLayout';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
-import orgCtrl from '@/ts/controller';
 import { Input } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { IMsgChat, msgChatNotify } from '@/ts/core';
@@ -16,7 +15,6 @@ const Setting: React.FC<any> = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        orgCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       rightBar={

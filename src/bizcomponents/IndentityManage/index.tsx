@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
 import { TreeProps } from 'antd';
 import StoreClassifyTree from '@/components/CustomTreeComp';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import ShareShowComp from './ShareShowComp';
 import cls from './index.module.less';
-import { IIdentity, ITarget } from '@/ts/core';
+import { IBelong, IIdentity, ITarget } from '@/ts/core';
 import { XTarget } from '@/ts/base/schema';
 import { generateUuid } from '@/ts/base/common';
 import TeamIcon from '../GlobalComps/teamIcon';
@@ -15,61 +15,33 @@ export type ResultType = {
 };
 interface Iprops {
   multiple: boolean;
-  orgId?: string;
-  target: ITarget;
+  space: IBelong;
   onChecked?: (select: ResultType) => void;
   onCheckeds?: (selects: ResultType[]) => void;
 }
 const ShareRecent = (props: Iprops) => {
   const [key, setKey] = useState<string>('');
-  const [data, setData] = useState<any[]>([]);
   const [identitys, setIdentitys] = useState<any[]>([]);
   const [current, setCurrent] = useState<ResultType>();
   const [resultData, setResultData] = useState<ResultType[]>([]);
-
-  const loadTeamTree = async () => {
-    setData(buildTargetTree([props.target], false));
-  };
-
   /** 加载组织树 */
-  const buildTargetTree = (targets: ITarget[], isChild: boolean) => {
+  const buildTargetTree = (targets: ITarget[]) => {
     const result: any[] = [];
     if (targets) {
       for (const item of targets) {
-        if (props.orgId && !isChild) {
-          if (item.metadata.id == props.orgId) {
-            result.push({
-              key: item.metadata.id,
-              title: item.metadata.name,
-              item: item,
-              isLeaf: item.subTarget.length === 0,
-              icon: <TeamIcon share={item.share} size={18} />,
-              children: buildTargetTree(item.subTarget, true),
-            });
-          } else {
-            let children = buildTargetTree(item.subTarget, false);
-            for (let child of children) {
-              result.push(child);
-            }
-          }
-        } else {
-          result.push({
-            key: item.metadata.id,
-            title: item.metadata.name,
-            item: item,
-            isLeaf: item.subTarget.length === 0,
-            icon: <TeamIcon share={item.share} size={18} />,
-            children: buildTargetTree(item.subTarget, isChild),
-          });
-        }
+        result.push({
+          key: item.metadata.id,
+          title: item.metadata.name,
+          item: item,
+          isLeaf: item.subTarget.length === 0,
+          icon: <TeamIcon share={item.share} size={18} />,
+          children: buildTargetTree(item.subTarget),
+        });
       }
     }
     return result;
   };
-
-  useEffect(() => {
-    loadTeamTree();
-  }, [props.orgId]);
+  const agency = buildTargetTree(props.space.parentTarget);
 
   const onSelect: TreeProps['onSelect'] = async (_, info: any) => {
     const item: ITarget = info.node.item;
@@ -89,13 +61,11 @@ const ShareRecent = (props: Iprops) => {
         setResultData(resultData);
         setCurrent(newItem);
       }
-      loadTeamTree();
       const result = (await item.loadIdentitys()).map((i) => {
-        // i.target.name = `[${item.name}]` + i.target.name;
         return {
           title: `[${item.metadata.name}]` + i.metadata.name,
           key: i.metadata.id,
-          data: i.metadata,
+          data: i,
         };
       });
       setIdentitys(result);
@@ -107,6 +77,7 @@ const ShareRecent = (props: Iprops) => {
     const item = getIdentityItem(info.node.key);
     if (current && item) {
       if (info.checked) {
+        item.data.name = info.node.title;
         current.identitys.push(item.data);
       } else {
         current.identitys = current.identitys.filter((i: any) => {
@@ -129,11 +100,11 @@ const ShareRecent = (props: Iprops) => {
 
   const getSelectData = () => {
     const result = [];
-    for (const item of resultData) {
-      for (const id of item.identitys) {
+    for (const data of resultData) {
+      for (const item of data.identitys) {
         result.push({
-          id: id.metadata.id,
-          name: id.metadata.name,
+          id: item.metadata.id,
+          name: item.metadata.name,
           type: 'add',
         });
       }
@@ -166,7 +137,7 @@ const ShareRecent = (props: Iprops) => {
             isDirectoryTree
             searchable
             showIcon
-            treeData={data}
+            treeData={agency}
             onSelect={onSelect}
           />
         </div>

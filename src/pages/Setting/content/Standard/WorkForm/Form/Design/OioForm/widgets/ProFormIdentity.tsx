@@ -23,7 +23,6 @@ interface IProps {
  * 角色组件(Todo 待完善)
  */
 const ProFormIdentity = (props: IProps) => {
-  const nodeOperateOrgId = props.belong.metadata.id;
   const [id, setId] = useState();
   const [name, setName] = useState();
   const [identity, setIdentity] = useState<any>({});
@@ -60,9 +59,8 @@ const ProFormIdentity = (props: IProps) => {
         }}
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
-          target={props.belong}
+          space={props.belong}
           multiple={false}
-          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
             console.log('params', params);
             setIdentity(params.data);

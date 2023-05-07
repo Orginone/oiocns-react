@@ -7,6 +7,10 @@ import { ISpeciesItem, SpeciesItem } from './species';
 export interface IWork extends ISpeciesItem {
   /** 流程定义 */
   defines: schema.XWorkDefine[];
+  /** 加载所有可选表单 */
+  loadForms(): Promise<schema.XForm[]>;
+  /** 表单特性 */
+  loadAttributes(): Promise<schema.XAttribute[]>;
   /** 加载办事 */
   loadWorkDefines(reload?: boolean): Promise<schema.XWorkDefine[]>;
   /** 加载办事节点 */
@@ -23,7 +27,7 @@ export interface IWork extends ISpeciesItem {
   deleteWorkDefine(data: schema.XWorkDefine): Promise<boolean>;
 }
 
-export class Work extends SpeciesItem implements IWork {
+export abstract class Work extends SpeciesItem implements IWork {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
     super(_metadata, _current, _parent);
   }
@@ -97,4 +101,6 @@ export class Work extends SpeciesItem implements IWork {
     }
     return false;
   }
+  abstract loadForms(): Promise<schema.XForm[]>;
+  abstract loadAttributes(): Promise<schema.XAttribute[]>;
 }

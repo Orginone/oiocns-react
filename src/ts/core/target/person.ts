@@ -184,15 +184,18 @@ export class Person extends Belong implements IPerson {
     for (const item of this.companys) {
       chats.push(...item.chats);
     }
+    chats.push(...this.cohortChats);
+    chats.push(...this.memberChats);
+    return chats;
+  }
+  get cohortChats(): IMsgChat[] {
+    const chats: IMsgChat[] = [];
     for (const item of this.cohorts) {
-      if (chats.findIndex((i) => i.chatId === item.chatId) < 0) {
-        chats.push(...item.chats);
-      }
+      chats.push(...item.chats);
     }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
-    chats.push(...this.memberChats);
     return chats;
   }
   get workSpecies(): IApplication[] {
@@ -216,6 +219,7 @@ export class Person extends Belong implements IPerson {
       if (_isAdd) {
         this.memberChats.push(
           new PersonMsgChat(
+            this.metadata.id,
             this.metadata.id,
             i.id,
             {
@@ -242,13 +246,13 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
-    await this.loadTodos(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }
     for (const cohort of this.cohorts) {
       await cohort.deepLoad(reload);
     }
+    this.superAuth?.deepLoad(reload);
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {

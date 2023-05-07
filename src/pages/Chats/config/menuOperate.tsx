@@ -5,7 +5,7 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IconFont } from '@/components/IconFont';
-import { IAuthority, IDepartment, IMsgChat } from '@/ts/core';
+import { IMsgChat } from '@/ts/core';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -21,20 +21,6 @@ const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
   };
 };
 
-/** 编译部门树 */
-const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
-  return departments.map((item) =>
-    createChatMenu(item, buildDepartmentTree(item.children)),
-  );
-};
-
-const buildAuthorityTree = (authority: IAuthority): MenuItemType => {
-  return createChatMenu(
-    authority,
-    authority.children.map((item) => buildAuthorityTree(item)),
-  );
-};
-
 const loadBookMenu = () => {
   const companyItems = [];
   for (const company of orgCtrl.user.companys) {
@@ -45,7 +31,7 @@ const loadBookMenu = () => {
     companyItems.push({
       key: company.key + '同事',
       label: company.metadata.name,
-      item: company.chats,
+      item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
@@ -53,28 +39,26 @@ const loadBookMenu = () => {
           company,
           company.memberChats.map((item) => createChatMenu(item, [])),
         ),
-        ...buildDepartmentTree(company.departments),
-        ...company.stations.map((item) => createChatMenu(item, [])),
-        ...company.cohorts.map((item) => createChatMenu(item, [])),
+        ...company.cohortChats
+          .filter((i) => i.isMyChat)
+          .map((item) => createChatMenu(item, [])),
       ],
     });
-    if (company.superAuth) {
-      companyItems[companyItems.length - 1].children.push(
-        buildAuthorityTree(company.superAuth),
-      );
-    }
   }
   return [
     {
-      key: '通讯录',
+      key: orgCtrl.user.key,
       label: orgCtrl.user.chatdata.chatName,
       itemType: orgCtrl.user.chatdata.chatName,
-      item: orgCtrl.user.chats.filter((i) => i.belongId === orgCtrl.user.metadata.id),
+      item: orgCtrl.user.chats.filter((i) => i.isMyChat && i.belongId === i.userId),
       children: [
-        createChatMenu(orgCtrl.user, []),
-        ...orgCtrl.user.memberChats.map((chat) => createChatMenu(chat, [])),
-        ...orgCtrl.user.cohorts.map((chat) => createChatMenu(chat, [])),
-        buildAuthorityTree(orgCtrl.user.superAuth!),
+        createChatMenu(
+          orgCtrl.user,
+          orgCtrl.user.memberChats.map((chat) => createChatMenu(chat, [])),
+        ),
+        ...orgCtrl.user.cohortChats
+          .filter((i) => i.isMyChat)
+          .map((item) => createChatMenu(item, [])),
       ],
       icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
     },

@@ -191,26 +191,31 @@ export class Company extends Belong implements ICompany {
     return res.success;
   }
   get subTarget(): ITarget[] {
-    return this.departments;
+    return [...this.departments, ...this.cohorts];
   }
   get parentTarget(): ITarget[] {
     return [this, ...this.groups];
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];
-    for (const item of this.cohorts) {
-      chats.push(...item.chats);
-    }
+    chats.push(...this.cohortChats);
+    chats.push(...this.memberChats);
+    return chats;
+  }
+  get cohortChats(): IMsgChat[] {
+    const chats: IMsgChat[] = [];
     for (const item of this.departments) {
       chats.push(...item.chats);
     }
     for (const item of this.stations) {
       chats.push(...item.chats);
     }
+    for (const item of this.cohorts) {
+      chats.push(...item.chats);
+    }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
-    chats.push(...this.memberChats);
     return chats;
   }
   get workSpecies(): IApplication[] {
@@ -232,6 +237,7 @@ export class Company extends Belong implements ICompany {
         if (_isAdd) {
           this.memberChats.push(
             new PersonMsgChat(
+              this.user.metadata.id,
               this.metadata.id,
               i.id,
               {
@@ -271,5 +277,6 @@ export class Company extends Belong implements ICompany {
     for (const cohort of this.cohorts) {
       await cohort.deepLoad(reload);
     }
+    this.superAuth?.deepLoad(reload);
   }
 }

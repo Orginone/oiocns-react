@@ -10,11 +10,11 @@ export enum MenuType {
 export enum GroupMenuType {
   'DictGroup' = '字典定义',
   'StandardGroup' = '标准设置',
-  'Authority' = '角色群',
-  'InnerAgency' = '部门群',
-  'OutAgency' = '单位群',
-  'Friends' = '好友',
-  'Cohort' = '群组',
-  'Station' = '岗位',
+  'Authority' = '权限定义',
+  'InnerAgency' = '内部机构',
+  'OutAgency' = '外部机构',
+  'Friends' = '我的好友',
+  'Cohort' = '外部群组',
+  'Station' = '单位岗位',
   'ResouceSetting' = '资源设置',
 }

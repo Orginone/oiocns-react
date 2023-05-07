@@ -35,19 +35,25 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
   const outside =
     props.selectMenu.menus?.filter((item) => item.model === 'outside') ?? [];
   const inside = props.selectMenu.menus?.filter((item) => item.model != 'outside') ?? [];
-  const onMenuClick = async (item: MenuItemType, key: string) => {
+  const onOperateMenuClick = async (item: MenuItemType, key: string) => {
     if (item.menus) {
       const menu = item.menus.find((i) => i.key == key);
-      if (menu && menu.onClick) {
-        if (await menu.onClick()) {
-          props.onMenuClick?.apply(this, [item, '回退']);
+      if (menu && menu.clickEvent) {
+        if (await menu.clickEvent()) {
+          onSelectClick(parentMenu);
         } else {
-          props.onMenuClick?.apply(this, [item, '刷新']);
+          onSelectClick(props.selectMenu);
         }
       } else {
         props.onMenuClick?.apply(this, [item, key]);
       }
     }
+  };
+  const onSelectClick = async (item: MenuItemType) => {
+    if (item.clickEvent) {
+      await item.clickEvent();
+    }
+    props.onSelect?.apply(this, [item]);
   };
   return (
     <Layout
@@ -58,7 +64,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           className={cls.title}
           title={parentMenu.label}
           onClick={() => {
-            props.onSelect?.apply(this, [parentMenu]);
+            onSelectClick(parentMenu);
           }}>
           {parentMenu.key != props.siderMenuData.key && (
             <div className={cls.backup}>
@@ -77,9 +83,9 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             item={parentMenu}
             selectMenu={props.selectMenu}
             onSelect={(item) => {
-              props.onSelect?.apply(this, [item]);
+              onSelectClick(item);
             }}
-            onMenuClick={onMenuClick}
+            onMenuClick={onOperateMenuClick}
           />
         </div>
         <div
@@ -112,7 +118,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
               selectKey={props.selectMenu.key}
               item={props.siderMenuData}
               onSelect={(item) => {
-                props.onSelect?.apply(this, [item]);
+                onSelectClick(item);
               }}></CustomBreadcrumb>
           </Col>
           <Col className={cls.rightstyle}>
@@ -126,7 +132,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                       title={item.label}
                       style={{ fontSize: 18 }}
                       onClick={() => {
-                        onMenuClick(props.selectMenu, item.key);
+                        onOperateMenuClick(props.selectMenu, item.key);
                       }}>
                       {item.icon}
                     </Typography.Link>
@@ -137,7 +143,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
                   menu={{
                     items: inside,
                     onClick: ({ key }) => {
-                      onMenuClick(props.selectMenu, key);
+                      onOperateMenuClick(props.selectMenu, key);
                     },
                   }}
                   dropdownRender={(menu) => (

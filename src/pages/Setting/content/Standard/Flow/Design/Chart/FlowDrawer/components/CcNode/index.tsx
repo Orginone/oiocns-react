@@ -70,18 +70,16 @@ const CcNode: React.FC<IProps> = (props) => {
         destroyOnClose={true}
         onOk={() => {
           props.current.props.assignedUser = [
-            { name: currentData.title, id: currentData.data.id },
+            { name: currentData.title, id: currentData.key },
           ];
           setIsApprovalOpen(false);
         }}
         onCancel={() => setIsApprovalOpen(false)}>
         <IndentityManage
-          target={props.species.current.space}
+          space={props.species.current.space}
           multiple={false}
           onChecked={(params: any) => {
-            props.current.props.assignedUser = [
-              { name: params.title, id: params.data.id },
-            ];
+            props.current.props.assignedUser = [{ name: params.title, id: params.key }];
             setCurrentData(params);
           }}
         />

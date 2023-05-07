@@ -2,10 +2,8 @@ import React, { useRef } from 'react';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { AttributeModel } from '@/ts/base/model';
-import { XAttribute, XProperty } from '@/ts/base/schema';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
-import { SpeciesType } from '@/ts/core';
-import { PropClass } from '@/ts/core/thing/store/propclass';
+import { XAttribute } from '@/ts/base/schema';
+import { IForm } from '@/ts/core';
 
 interface Iprops {
   title: string;
@@ -13,7 +11,7 @@ interface Iprops {
   data: XAttribute | undefined;
   handleCancel: () => void;
   handleOk: (success: boolean) => void;
-  current: IWorkForm;
+  current: IForm;
 }
 /*
   特性编辑模态框
@@ -42,14 +40,7 @@ const AttributeModal = (props: Iprops) => {
       valueType: 'select',
       formItemProps: { rules: [{ required: true, message: '属性为必填项' }] },
       request: async () => {
-        const propClasses = props.current.current.species.filter(
-          (a) => a.metadata.typeName == SpeciesType.Store,
-        );
-        let data: XProperty[] = [];
-        for (let prop of propClasses) {
-          data.push(...(await (prop as PropClass).loadPropertys()));
-        }
-        return data.map((item) => {
+        return (await props.current.loadPropertys()).map((item) => {
           return { label: item.name, value: item.id };
         });
       },

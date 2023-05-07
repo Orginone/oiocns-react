@@ -17,6 +17,8 @@ export interface IAuthority extends IMsgChat {
   children: IAuthority[];
   /** 用户相关的所有会话 */
   chats: IMsgChat[];
+  /** 深加载 */
+  deepLoad(reload?: boolean): Promise<void>;
   /** 加载成员用户实体 */
   loadMembers(reload?: boolean): Promise<schema.XTarget[]>;
   /** 创建权限 */
@@ -37,6 +39,7 @@ export interface IAuthority extends IMsgChat {
 export class Authority extends MsgChat implements IAuthority {
   constructor(_metadata: schema.XAuthority, _space: IBelong, _parent?: IAuthority) {
     super(
+      _space.user.metadata.id,
       _space.metadata.id,
       _metadata.id,
       {
@@ -44,7 +47,7 @@ export class Authority extends MsgChat implements IAuthority {
         typeName: '权限',
         avatar: parseAvatar(_metadata.icon),
       },
-      [_metadata.belong?.name ?? '', '角色群'],
+      [_space.metadata.name ?? '', '角色群'],
       _metadata.remark,
     );
     this.space = _space;
@@ -134,12 +137,10 @@ export class Authority extends MsgChat implements IAuthority {
       }
     }
   }
-  private _appendParentId(auth: IAuthority, authIds: string[]) {
-    if (!authIds.includes(auth.metadata.id)) {
-      authIds.push(auth.metadata.id);
-    }
-    if (auth.parent) {
-      this._appendParentId(auth.parent, authIds);
+  async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadMembers(reload);
+    for (const item of this.children) {
+      await item.deepLoad(reload);
     }
   }
   get chats(): IMsgChat[] {
@@ -156,5 +157,13 @@ export class Authority extends MsgChat implements IAuthority {
       orgIds.push(this.metadata.shareId);
     }
     return this.space.user.authenticate(orgIds, authIds);
+  }
+  private _appendParentId(auth: IAuthority, authIds: string[]) {
+    if (!authIds.includes(auth.metadata.id)) {
+      authIds.push(auth.metadata.id);
+    }
+    if (auth.parent) {
+      this._appendParentId(auth.parent, authIds);
+    }
   }
 }

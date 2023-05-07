@@ -135,8 +135,10 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
                   required={true}
                   colProps={{ span: 12 }}
                   request={async () => {
-                    let tree = (await item.current.loadSpecies()).filter(
-                      (i) => i.metadata.typeName === SpeciesType.Store,
+                    let tree = (await item.current.space.loadSpecies()).filter(
+                      (i) =>
+                        i.metadata.typeName === SpeciesType.Store ||
+                        i.metadata.typeName === SpeciesType.PropClass,
                     );
                     return tree.map((a) => a.metadata);
                   }}

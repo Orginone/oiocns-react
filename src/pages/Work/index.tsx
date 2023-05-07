@@ -1,14 +1,13 @@
 import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
-import orgCtrl from '@/ts/controller/';
-import { Input, Modal } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { XWorkDefine } from '@/ts/base/schema';
 import WorkStart from './content/work/start';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
+import { Input } from 'antd';
 
 const Todo: React.FC<any> = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(loadWorkMenu);
@@ -35,10 +34,6 @@ const Todo: React.FC<any> = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        if (data.onClick) {
-          await data.onClick();
-        }
-        orgCtrl.currentKey = data.key;
         setSelectMenu(data);
       }}
       rightBar={

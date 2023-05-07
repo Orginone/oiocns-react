@@ -23,9 +23,6 @@ const Package: React.FC = () => {
     <MainLayout
       selectMenu={selectMenu}
       onSelect={async (data) => {
-        if (data.onClick) {
-          await data.onClick();
-        }
         setSelectMenu(data);
       }}
       rightBar={<TopBarExtra key={key} selectMenu={selectMenu} />}

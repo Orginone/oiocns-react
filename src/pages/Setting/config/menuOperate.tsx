@@ -72,7 +72,7 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: species.children.map((i) => buildSpeciesTree(i)),
-    onClick: async () => {
+    clickEvent: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.Commodity:
         case SpeciesType.WorkForm:
@@ -127,13 +127,13 @@ const buildDictMenus = (dict: IDict) => {
         icon: <im.ImCross />,
         label: '删除字典',
         model: 'outside',
-        onClick: async () => {
+        clickEvent: async () => {
           return await dict.delete();
         },
       },
     ],
     children: [],
-    onClick: async () => {
+    clickEvent: async () => {
       await dict.loadItems();
     },
   };
@@ -197,7 +197,7 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
       key: '移除|类别',
       icon: <im.ImBin />,
       label: '删除类别',
-      onClick: async () => {
+      clickEvent: async () => {
         return await species.delete();
       },
     },
@@ -336,7 +336,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       icon: <im.ImSpinner9 />,
       label: '刷新' + param.typeName,
       model: 'inside',
-      onClick: async () => {
+      clickEvent: async () => {
         await param.item.deepLoad(true);
         return false;
       },
@@ -391,7 +391,7 @@ const loadAuthorityMenus = (item: IAuthority) => {
         key: '移除',
         icon: <im.ImBin />,
         label: '删除权限',
-        onClick: async () => {
+        clickEvent: async () => {
           return await item.delete();
         },
       },
@@ -425,7 +425,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
         key: '删除',
         icon: <im.ImBin />,
         label: '删除用户',
-        onClick: async () => {
+        clickEvent: async () => {
           return await item.delete();
         },
       });
@@ -435,7 +435,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
           key: '退出',
           icon: <im.ImBin />,
           label: '退出' + item.metadata.typeName,
-          onClick: async () => {
+          clickEvent: async () => {
             return await (item as ITarget).exit();
           },
         });

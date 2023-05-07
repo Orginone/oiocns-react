@@ -62,7 +62,7 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     itemType: GroupMenuType.Species,
     menus: [],
     children: children,
-    onClick: async () => {
+    clickEvent: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.WorkItem:
           await (species as IWorkItem).loadWorkDefines();

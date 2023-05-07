@@ -4,16 +4,14 @@ import { Row, Button, Divider, Col, Radio, Space, Form, InputNumber, Modal } fro
 import IndentitySelect from '@/bizcomponents/IndentityManage';
 import cls from './index.module.less';
 import { NodeType } from '../../processType';
-import orgCtrl from '@/ts/controller';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import ViewFormModal from '@/pages/Setting/content/Standard/WorkForm/Form/Design/viewFormModal';
+import { IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;
-  orgId?: string;
-  species: IWorkItem;
+  species: IWork;
 }
 
 /**
@@ -41,11 +39,6 @@ const ApprovalNode: React.FC<IProps> = (props) => {
     }
   }, [props.current]);
 
-  // const [processValue, setProcessValue] = useState(1);
-  const [nodeOperateOrgId, setNodeOperateOrgId] = useState<string>(
-    props.current.belongId || props.orgId || orgCtrl.user.metadata.id,
-  );
-
   const [currentData, setCurrentData] = useState({
     title: props.current.props.assignedUser[0]?.name,
     key: props.current.props.assignedUser[0]?.id,
@@ -54,15 +47,6 @@ const ApprovalNode: React.FC<IProps> = (props) => {
       name: props.current.props.assignedUser[0]?.name,
     },
   });
-  useEffect(() => {
-    if (!props.current.belongId) {
-      setNodeOperateOrgId(
-        props.orgId ||
-          (props.species?.current.space.metadata.id ?? orgCtrl.user.metadata.id),
-      );
-      props.current.belongId = props.orgId;
-    }
-  }, []);
 
   return (
     <div className={cls[`app-roval-node`]}>
@@ -186,7 +170,7 @@ const ApprovalNode: React.FC<IProps> = (props) => {
           }}
           onCancel={() => setOperationModal(undefined)}>
           <SelectOperation
-            current={props.species.parent!}
+            current={props.species}
             showData={showData}
             setShowData={setShowData}></SelectOperation>
         </Modal>
@@ -202,14 +186,11 @@ const ApprovalNode: React.FC<IProps> = (props) => {
         onCancel={() => setIsOpen(false)}>
         <IndentitySelect
           multiple={false}
-          orgId={nodeOperateOrgId}
           onChecked={(params: any) => {
-            props.current.props.assignedUser = [
-              { name: params.title, id: params.data.id },
-            ];
+            props.current.props.assignedUser = [{ name: params.title, id: params.key }];
             setCurrentData(params);
           }}
-          target={props.species.current.space}
+          space={props.species.current.space}
         />
       </Modal>
       <ViewFormModal

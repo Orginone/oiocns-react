@@ -1,13 +1,16 @@
 import { PageAll } from '@/ts/core/public/consts';
-import { TargetType } from '@/ts/core/public/enums';
+import { SpeciesType, TargetType } from '@/ts/core/public/enums';
 import { ISpeciesItem, SpeciesItem } from './species';
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget } from '../../target/base/target';
+import { IPropClass } from '../store/propclass';
 export interface IForm extends ISpeciesItem {
   /** 表单 */
   forms: schema.XForm[];
   /** 表单特性 */
   attributes: schema.XAttribute[];
+  /** 加载可选属性 */
+  loadPropertys(): Promise<schema.XProperty[]>;
   /** 加载表单 */
   loadForms(reload?: boolean): Promise<schema.XForm[]>;
   /** 新建表单 */
@@ -34,6 +37,17 @@ export abstract class Form extends SpeciesItem implements IForm {
   attributes: schema.XAttribute[] = [];
   private _formLoaded: boolean = false;
   private _attributeLoaded: boolean = false;
+  async loadPropertys(): Promise<schema.XProperty[]> {
+    const result = [];
+    for (const item of this.current.space.species) {
+      switch (item.metadata.typeName) {
+        case SpeciesType.Store:
+        case SpeciesType.PropClass:
+          result.push(...(await (item as IPropClass).loadAllProperty()));
+      }
+    }
+    return result;
+  }
   async loadForms(reload: boolean = false): Promise<schema.XForm[]> {
     if (!this._formLoaded || reload) {
       const res = await kernel.querySpeciesForms({

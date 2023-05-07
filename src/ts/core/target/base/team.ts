@@ -3,7 +3,6 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
-import { IWorkItem } from '../../thing/app/work/workitem';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChat {
@@ -42,6 +41,7 @@ export abstract class Team extends MsgChat implements ITeam {
     _memberTypes: TargetType[] = [TargetType.Person],
   ) {
     super(
+      _metadata.id,
       _metadata.belongId,
       _metadata.id,
       {
@@ -55,6 +55,10 @@ export abstract class Team extends MsgChat implements ITeam {
     this.metadata = _metadata;
     this.memberTypes = _memberTypes;
     this.space = _space || (this as unknown as IBelong);
+    this.userId = this.space.metadata.id;
+    if (this.space.user) {
+      this.userId = this.space.user.metadata.id;
+    }
   }
   space: IBelong;
   metadata: schema.XTarget;

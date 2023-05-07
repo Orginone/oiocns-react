@@ -29,22 +29,11 @@ const TeamSetting: React.FC = () => {
   return (
     <MainLayout
       selectMenu={selectMenu}
-      onSelect={async (data) => {
-        if (data.onClick) {
-          await data.onClick();
-        }
+      onSelect={(data) => {
         setSelectMenu(data);
       }}
       onMenuClick={async (data, key) => {
         switch (key) {
-          case '回退':
-            if (selectMenu.parentMenu) {
-              setSelectMenu(selectMenu.parentMenu);
-            }
-            break;
-          case '刷新':
-            setSelectMenu(selectMenu);
-            break;
           case '退出':
             Modal.confirm({
               content: '确定要退出吗?',

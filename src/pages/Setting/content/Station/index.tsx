@@ -84,7 +84,6 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
     const identityData: IIdentity[] = [];
     result.map((item) => {
       item.identitys.map((obj) => {
-        obj.metadata.belong = item.target;
         identityData.push(obj);
       });
     });
@@ -195,7 +194,7 @@ const Station: React.FC<IProps> = ({ current }: IProps) => {
         }}
         onCancel={() => setIsOpenIdentityModal(false)}
         width="1050px">
-        <IndentityManage target={current.space} multiple={true} onCheckeds={onCheckeds} />
+        <IndentityManage space={current.space} multiple={true} onCheckeds={onCheckeds} />
       </Modal>
       <Modal
         title="添加岗位成员"

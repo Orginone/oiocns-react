@@ -13,16 +13,14 @@ import {
 import { getUuid } from '@/utils/tools';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
-import { XAttribute, XWorkDefine, XWorkInstance, XWorkNode } from '@/ts/base/schema';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
-import { SpeciesType } from '@/ts/core';
-import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { XAttribute, XWorkDefine, XWorkInstance } from '@/ts/base/schema';
+import { IWork } from '@/ts/core';
 import { ImWarning } from 'react-icons/im';
 
 interface IProps {
   IsEdit: boolean;
   current: XWorkDefine;
-  species: IWorkItem;
+  species: IWork;
   instance?: XWorkInstance;
   nodes?: WorkNodeModel;
   onBack: () => void;
@@ -81,12 +79,7 @@ const Design: React.FC<IProps> = ({
         setResource(resourceData);
       }
       if (IsEdit && species) {
-        let attrs: XAttribute[] = [];
-        for (let form of species!.parent!.children?.filter(
-          (a) => a.metadata.typeName == SpeciesType.WorkForm,
-        )) {
-          attrs.push(...(form as IWorkForm).attributes);
-        }
+        let attrs: XAttribute[] = await species.loadAttributes();
         let fields: FieldCondition[] = [];
         for (let attr of attrs) {
           switch (attr.property!.valueType) {
@@ -94,19 +87,21 @@ const Design: React.FC<IProps> = ({
               fields.push({ label: attr.name, value: attr.id, type: dataType.NUMERIC });
               break;
             case '选择型':
-              const dict = species.current.space.dicts.find(
-                (a) => a.metadata.id == attr.property?.dictId,
-              );
-              if (dict) {
-                fields.push({
-                  label: attr.name,
-                  value: attr.id,
-                  type: dataType.DICT,
-                  dict:
-                    (await dict.loadItems())?.map((a) => {
-                      return { label: a.name, value: a.value };
-                    }) || [],
-                });
+              {
+                const dict = species.current.space.dicts.find(
+                  (a) => a.metadata.id == attr.property?.dictId,
+                );
+                if (dict) {
+                  fields.push({
+                    label: attr.name,
+                    value: attr.id,
+                    type: dataType.DICT,
+                    dict:
+                      (await dict.loadItems())?.map((a) => {
+                        return { label: a.name, value: a.value };
+                      }) || [],
+                  });
+                }
               }
               break;
             default:
@@ -140,20 +135,20 @@ const Design: React.FC<IProps> = ({
   };
 
   /** 获取所有分支节点 */
-  const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
-    if (resource.children) {
-      array = getAllBranches(resource.children, array);
-    }
-    if (resource.branches && resource.branches.length > 0) {
-      array.push(...resource.branches);
-      for (let branch of resource.branches) {
-        if (branch.children) {
-          array = getAllBranches(branch.children, array);
-        }
-      }
-    }
-    return array;
-  };
+  // const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
+  //   if (resource.children) {
+  //     array = getAllBranches(resource.children, array);
+  //   }
+  //   if (resource.branches && resource.branches.length > 0) {
+  //     array.push(...resource.branches);
+  //     for (let branch of resource.branches) {
+  //       if (branch.children) {
+  //         array = getAllBranches(branch.children, array);
+  //       }
+  //     }
+  //   }
+  //   return array;
+  // };
 
   const getErrorItem = (text: string | ReactNode): ReactNode => {
     return (
@@ -195,9 +190,9 @@ const Design: React.FC<IProps> = ({
       }
     }
     //条件节点条件不为空  分支下最多只能有n个分支children为空
-    let n = 0;
-    let parentIdSet: Set<string> = new Set();
-    let allBranches: Branche[] = getAllBranches(resource, []);
+    // let n = 0;
+    // let parentIdSet: Set<string> = new Set();
+    // let allBranches: Branche[] = getAllBranches(resource, []);
     // for (let branch of allBranches) {
     //   if (branch.conditions && branch.conditions.length > 0) {
     //     for (let condition of branch.conditions) {
