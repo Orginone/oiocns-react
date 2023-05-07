@@ -114,7 +114,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   memberChats: PersonMsgChat[] = [];
   private messageNotify?: (messages: model.MsgSaveModel[]) => void;
   get isMyChat(): boolean {
-    if (this.share.typeName === TargetType.Person) {
+    if (this.chatdata.noReadCount > 0 || this.share.typeName === TargetType.Person) {
       return true;
     }
     return this.members.filter((i) => i.id === this.userId).length > 0;

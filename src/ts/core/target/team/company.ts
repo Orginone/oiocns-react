@@ -203,13 +203,13 @@ export class Company extends Belong implements ICompany {
   }
   get cohortChats(): IMsgChat[] {
     const chats: IMsgChat[] = [];
-    for (const item of this.cohorts) {
-      chats.push(...item.chats);
-    }
     for (const item of this.departments) {
       chats.push(...item.chats);
     }
     for (const item of this.stations) {
+      chats.push(...item.chats);
+    }
+    for (const item of this.cohorts) {
       chats.push(...item.chats);
     }
     if (this.superAuth) {

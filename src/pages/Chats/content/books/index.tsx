@@ -4,7 +4,7 @@ import orgCtrl from '@/ts/controller';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { AiOutlineWechat } from 'react-icons/ai';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { IMsgChat, MessageType, TargetType, msgChatNotify } from '@/ts/core';
+import { IMsgChat, MessageType, msgChatNotify } from '@/ts/core';
 
 /**
  * @description: 通讯录
@@ -20,14 +20,9 @@ const Book: React.FC<any> = ({
 }) => {
   const [msgKey] = useCtrlUpdate(msgChatNotify);
   if (chats === undefined) {
-    chats = orgCtrl.user.chats;
+    chats = orgCtrl.user.chats.filter((i) => i.isMyChat);
   }
   chats = chats
-    .filter(
-      (a) =>
-        a.share.typeName === TargetType.Person ||
-        a.members.findIndex((i) => i.id === orgCtrl.user.metadata.id) > -1,
-    )
     .filter(
       (a) =>
         a.chatdata.chatName.includes(filter) ||

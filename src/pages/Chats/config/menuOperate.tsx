@@ -31,7 +31,7 @@ const loadBookMenu = () => {
     companyItems.push({
       key: company.key + '同事',
       label: company.metadata.name,
-      item: company.chats,
+      item: company.chats.filter((i) => i.isMyChat),
       itemType: MenuType.Books,
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
@@ -50,7 +50,7 @@ const loadBookMenu = () => {
       key: orgCtrl.user.key,
       label: orgCtrl.user.chatdata.chatName,
       itemType: orgCtrl.user.chatdata.chatName,
-      item: orgCtrl.user.chats.filter((i) => i.belongId === orgCtrl.user.metadata.id),
+      item: orgCtrl.user.chats.filter((i) => i.isMyChat && i.belongId === i.userId),
       children: [
         createChatMenu(
           orgCtrl.user,
