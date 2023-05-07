@@ -25,7 +25,7 @@ export interface IDepartment extends ITarget {
 /** 单位内部机构（部门）实现 */
 export class Department extends Target implements IDepartment {
   constructor(_metadata: schema.XTarget, _space: ICompany, parent?: IDepartment) {
-    super(_metadata, [_metadata.typeName + '群'], _space);
+    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName + '群'], _space);
     this.company = _space;
     this.parent = parent;
     switch (_metadata.typeName as TargetType) {

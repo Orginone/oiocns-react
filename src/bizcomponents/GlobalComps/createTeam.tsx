@@ -128,7 +128,7 @@ const CreateTeamModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       formRef={formRef}
-      title={props.title}
+      title={props.title + '用户'}
       open={props.open}
       width={640}
       onOpenChange={(open: boolean) => {

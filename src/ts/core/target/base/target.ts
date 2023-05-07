@@ -79,6 +79,8 @@ export abstract class Target extends Team implements ITarget {
           this.speciesTypes.push(SpeciesType.FileSystem);
         }
         if (
+          (this.metadata.typeName === TargetType.Cohort ||
+            this.metadata.typeName === TargetType.Group) &&
           this.species.findIndex((i) => i.metadata.typeName === SpeciesType.Market) < 0
         ) {
           this.speciesTypes.push(SpeciesType.Market);

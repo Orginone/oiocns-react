@@ -21,5 +21,6 @@ export type { IWork } from './thing/base/work';
 export type { IDict } from './thing/dict/dict';
 export type { IFileSystemItem } from './thing/filesys/filesysItem';
 export type { IFileSystem, TaskModel } from './thing/filesys/filesystem';
+export type { IMarket } from './thing/market/market';
 export type { IPropClass } from './thing/store/propclass';
 export { UserProvider } from './user';

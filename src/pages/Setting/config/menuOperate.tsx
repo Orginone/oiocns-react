@@ -37,6 +37,7 @@ const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemTyp
     label: team.metadata.name,
     itemType: team.metadata.typeName,
     menus: menus,
+    tag: [team.metadata.typeName],
     icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
     children: children,
   };
@@ -45,7 +46,7 @@ const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemTyp
 const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
   return departments.map((item) =>
     createMenu(item, loadTypeMenus(item, item.childrenTypes, true), [
-      buildTargetSpeciesTree(item),
+      ...item.species.map((i) => buildSpeciesTree(i)),
       ...buildDepartmentTree(item.children),
     ]),
   );
@@ -54,46 +55,31 @@ const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
   return groups.map((item) =>
     createMenu(item, loadTypeMenus(item, [TargetType.Group], true), [
-      buildTargetSpeciesTree(item),
+      ...item.species.map((i) => buildSpeciesTree(i)),
       ...buildGroupTree(item.children),
     ]),
   );
 };
 
-const buildTargetSpeciesTree = (target: ITarget) => {
-  return {
-    children: target.species.map((i) => buildSpeciesTree(i)),
-    key: target.key + '-' + GroupMenuType.SpeciesGroup,
-    label: GroupMenuType.SpeciesGroup,
-    itemType: GroupMenuType.SpeciesGroup,
-    item: target,
-    icon: <im.ImNewspaper />,
-    menus: [
-      {
-        key: '新增',
-        icon: <im.ImPlus />,
-        label: '新增分类',
-      },
-    ],
-  };
-};
-
-/** 编译分类树 */
+/** 编译类别树 */
 const buildSpeciesTree = (species: ISpeciesItem) => {
   const result: MenuItemType = {
     key: species.key,
     item: species,
     label: species.metadata.name,
+    tag: [species.metadata.typeName],
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: MenuType.Species,
     menus: loadSpeciesMenus(species),
     children: species.children.map((i) => buildSpeciesTree(i)),
     onClick: async () => {
       switch (species.metadata.typeName) {
+        case SpeciesType.Commodity:
         case SpeciesType.WorkForm:
           await (species as IWorkForm).loadForms();
           await (species as IWorkForm).loadAttributes();
           break;
+        case SpeciesType.Market:
         case SpeciesType.WorkItem:
           await (species as IWorkItem).loadWorkDefines();
           break;
@@ -113,6 +99,7 @@ const buildAuthorityTree = (authority: IAuthority) => {
     label: authority.metadata.name,
     icon: <im.ImTree />,
     itemType: MenuType.Authority,
+    tag: [MenuType.Authority],
     menus: loadAuthorityMenus(authority),
     children: authority.children?.map((i) => buildAuthorityTree(i)) ?? [],
   };
@@ -125,6 +112,7 @@ const buildDictMenus = (dict: IDict) => {
     key: dict.key,
     item: dict,
     label: dict.metadata.name,
+    tag: ['字典'],
     icon: <TeamIcon share={dict.share} size={18} fontSize={16} />,
     itemType: MenuType.Dict,
     menus: [
@@ -152,6 +140,17 @@ const buildDictMenus = (dict: IDict) => {
   return result;
 };
 
+const LoadStandardMenus = (target: ITarget) => {
+  return [
+    {
+      key: '新增|类别',
+      icon: <im.ImPlus />,
+      label: '新增类别',
+      model: 'outside',
+    },
+  ];
+};
+
 /** 加载标准菜单 */
 const loadStandardSetting = (belong: IBelong) => {
   const result: MenuItemType[] = [];
@@ -174,38 +173,30 @@ const loadStandardSetting = (belong: IBelong) => {
       },
     ],
   });
-  result.push(buildTargetSpeciesTree(belong));
+  result.push(...belong.species.map((i) => buildSpeciesTree(i)));
   return result;
 };
 
 /** 加载右侧菜单 */
 const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
-  if (species.metadata.typeName === SpeciesType.Store) {
-    items.push({
-      key: '添加属性',
-      icon: <im.ImPlus />,
-      label: '添加属性',
-      model: 'outside',
-    });
-  }
   if (species.speciesTypes.length > 0) {
     items.push({
-      key: '新增',
+      key: '新增|类别',
       icon: <im.ImPlus />,
-      label: '新增分类',
+      label: '新增类别',
     });
   }
   items.push(
     {
-      key: '修改',
+      key: '修改|类别',
       icon: <im.ImCog />,
-      label: '编辑分类',
+      label: '编辑类别',
     },
     {
-      key: '移除',
+      key: '移除|类别',
       icon: <im.ImBin />,
-      label: '删除分类',
+      label: '删除类别',
       onClick: async () => {
         return await species.delete();
       },
@@ -244,7 +235,7 @@ const getUserMenu = () => {
         item: orgCtrl.user,
         label: GroupMenuType.StandardGroup,
         itemType: GroupMenuType.StandardGroup,
-        menus: [],
+        menus: LoadStandardMenus(orgCtrl.user),
         icon: <im.ImNewspaper />,
         children: loadStandardSetting(orgCtrl.user),
       },
@@ -255,7 +246,11 @@ const getUserMenu = () => {
           item: orgCtrl.user,
           typeName: TargetType.Cohort,
           children: orgCtrl.user.cohorts.map((i) =>
-            createMenu(i, loadTypeMenus(i, [], true), [buildTargetSpeciesTree(i)]),
+            createMenu(
+              i,
+              loadTypeMenus(i, [], true),
+              i.species.map((i) => buildSpeciesTree(i)),
+            ),
           ),
         },
         [TargetType.Cohort],
@@ -275,7 +270,7 @@ const getTeamMenu = () => {
           item: company,
           label: GroupMenuType.StandardGroup,
           itemType: GroupMenuType.StandardGroup,
-          menus: [],
+          menus: LoadStandardMenus(company),
           icon: <im.ImNewspaper />,
           children: loadStandardSetting(company),
         },
@@ -318,7 +313,11 @@ const getTeamMenu = () => {
             item: company,
             typeName: TargetType.Cohort,
             children: company.cohorts.map((i) =>
-              createMenu(i, loadTypeMenus(i, [], true), [buildTargetSpeciesTree(i)]),
+              createMenu(
+                i,
+                loadTypeMenus(i, [], true),
+                i.species.map((i) => buildSpeciesTree(i)),
+              ),
             ),
           },
           [TargetType.Cohort],
@@ -404,19 +403,17 @@ const loadAuthorityMenus = (item: IAuthority) => {
 /** 加载类型更多操作 */
 const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) => {
   const menus: OperateMenuType[] = [];
-  if (item.metadata.typeName != TargetType.Group) {
+  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
-      key: '打开会话',
-      icon: <im.ImBubbles />,
-      label: '打开会话',
+      key: '新增|类别',
+      icon: <im.ImPlus />,
+      label: '新增类别',
       model: 'outside',
     });
-  }
-  if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
       key: '新建|' + subTypes.join('|'),
       icon: <im.ImPlus />,
-      label: '新建子组织',
+      label: '新建用户',
     });
     menus.push({
       key: '编辑',
@@ -427,7 +424,7 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
       menus.push({
         key: '删除',
         icon: <im.ImBin />,
-        label: '删除' + item.metadata.typeName,
+        label: '删除用户',
         onClick: async () => {
           return await item.delete();
         },

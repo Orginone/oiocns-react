@@ -17,7 +17,7 @@ interface IProps {
 }
 
 const SelectOperation: React.FC<IProps> = ({ current, showData, setShowData }) => {
-  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //集团列表
+  const [leftTreeSelectedKeys, setLeftTreeSelectedKeys] = useState<Key[]>([]); //单位群列表
   const [leftCheckedKeys, setLeftCheckedKeys] = useState<Key[]>([]);
   const [leftTreeData, setLeftTreeData] = useState<any>([]);
   const [centerTreeData, setCenterTreeData] = useState<any>([]);

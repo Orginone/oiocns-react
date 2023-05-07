@@ -456,13 +456,13 @@ export interface ICompany extends ISpace, ITarget {
   departments: IDepartment[];
   /** 我的子工作组 */
   workings: IWorking[];
-  /** 我加入的集团 */
+  /** 我加入的单位群 */
   joinedGroup: IGroup[];
   /** 岗位 */
   stations: IStation[];
   /**
-   * 删除集团
-   * @param id 集团Id
+   * 删除单位群
+   * @param id 单位群Id
    */
   deleteGroup(id: string): Promise<boolean>;
   /**
@@ -484,8 +484,8 @@ export interface ICompany extends ISpace, ITarget {
    */
   deleteWorking(id: string): Promise<boolean>;
   /**
-   *  退出集团
-   * @param id 集团Id
+   *  退出单位群
+   * @param id 单位群Id
    * @returns
    */
   quitGroup(id: string): Promise<boolean>;
@@ -507,13 +507,13 @@ export interface ICompany extends ISpace, ITarget {
    */
   getWorkings(reload?: boolean): Promise<IWorking[]>;
   /**
-   * @description: 查询我加入的集团
+   * @description: 查询我加入的单位群
    * @param reload 是否强制刷新
    * @return {*} 查询到的群组
    */
   getJoinedGroups(reload?: boolean): Promise<IGroup[]>;
   /**
-   * 申请加入集团
+   * 申请加入单位群
    * @param id 目标Id
    * @returns
    */
@@ -529,36 +529,36 @@ export interface ICompany extends ISpace, ITarget {
    */
   cancelJoinApply(id: string): Promise<boolean>;
   /**
-   * 查询集团
-   * @param code 集团编号
+   * 查询单位群
+   * @param code 单位群编号
    */
   searchGroup(code: string): Promise<schema.XTargetArray>;
   /** 加载所有相关组织 */
   deepLoad(reload?: boolean): Promise<void>;
 }
-/** 集团操作 */
+/** 单位群操作 */
 export interface IGroup extends ITarget {
-  /** 子集团 */
+  /** 子单位群 */
   subGroup: IGroup[];
   /**
-   * 申请加入集团
+   * 申请加入单位群
    * @param id 目标Id
    * @returns
    */
   applyJoinGroup(id: string): Promise<boolean>;
   /**
-   * 创建子集团
-   * @param data 子集团基本信息
+   * 创建子单位群
+   * @param data 子单位群基本信息
    */
   createSubGroup(data: TargetParam): Promise<IGroup | undefined>;
   /**
-   * 删除子集团
-   * @param id 集团Id
+   * 删除子单位群
+   * @param id 单位群Id
    * @returns
    */
   deleteSubGroup(id: string): Promise<boolean>;
   /**
-   * 获取子集团
+   * 获取子单位群
    * @param reload 是否强制刷新
    * @returns
    */

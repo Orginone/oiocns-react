@@ -212,7 +212,7 @@ export default class Company extends MarketTarget implements ICompany {
         return group;
       }
     } else {
-      logger.warn('该集团已存在!');
+      logger.warn('该单位群已存在!');
     }
   }
   private async createDepartment(

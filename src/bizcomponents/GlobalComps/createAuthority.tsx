@@ -139,7 +139,7 @@ const AuthorityModal = (props: Iprops) => {
   return (
     <SchemaForm
       formRef={formRef}
-      title={props.title}
+      title={props.title + '权限'}
       open={props.open}
       width={640}
       layoutType="ModalForm"

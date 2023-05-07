@@ -223,12 +223,12 @@ export const routerInfo = [
           },
           {
             path: '/setting/group/:id',
-            title: '集团设置',
+            title: '单位群设置',
             icon: 'icon-setting',
           },
           {
             path: '/setting/group',
-            title: '集团设置',
+            title: '单位群设置',
             icon: 'icon-setting',
           },
           {

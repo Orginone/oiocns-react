@@ -71,7 +71,7 @@ export default class Group extends BaseTarget implements IGroup {
         return group;
       }
     } else {
-      logger.warn('该集团已存在');
+      logger.warn('该单位群已存在');
     }
   }
   public async deleteSubGroup(id: string): Promise<boolean> {

@@ -86,7 +86,7 @@ export const loadWorkMenu = async (): Promise<MenuItemType> => {
           key: company.key + OrganizationType.Group,
           label: OrganizationType.Group,
           itemType: GroupMenuType.Organization,
-          tag: [company.metadata.name, '集团'],
+          tag: [company.metadata.name, '单位群'],
           icon: (
             <TeamIcon
               share={{ typeName: TargetType.Working, name: OrganizationType.Working }}

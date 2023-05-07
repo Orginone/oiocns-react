@@ -2,7 +2,7 @@
 
 /** 组织对象类型 */
 export enum TargetType {
-  Group = '集团',
+  Group = '单位群',
   Person = '人员',
   Cohort = '群组',
   Company = '单位',
@@ -68,7 +68,7 @@ export enum OrderStatus {
 export enum WorkType {
   OrgTodo = '组织待办',
   FriendTodo = '好友待办',
-  GroupTodo = '集团待办',
+  GroupTodo = '单位群待办',
   CohortTodo = '群组待办',
   CompanyTodo = '单位待办',
   OrderTodo = '订单待办',
@@ -77,7 +77,7 @@ export enum WorkType {
   JoinStoreTodo = '加入市场待办',
   OrgApply = '组织申请',
   FriendApply = '好友申请',
-  GroupApply = '集团申请',
+  GroupApply = '单位群申请',
   CohortApply = '群组申请',
   CompanyApply = '单位申请',
   OrderApply = '订单申请',

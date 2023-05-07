@@ -3,11 +3,16 @@ import { ITarget, Target } from '../base/target';
 import { IBelong } from '../base/belong';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
-export interface ICohort extends ITarget {}
+import { IMarket } from '../../thing/market/market';
+import { SpeciesType } from '../../public/enums';
+export interface ICohort extends ITarget {
+  /** 流通交易 */
+  market: IMarket | undefined;
+}
 
 export class Cohort extends Target implements ICohort {
   constructor(_metadata: schema.XTarget, _space: IBelong) {
-    super(_metadata, [_metadata.typeName], _space);
+    super(_metadata, [_metadata.belong?.name ?? '', _metadata.typeName], _space);
   }
   async exit(): Promise<boolean> {
     if (this.metadata.belongId !== this.space.metadata.id) {
@@ -33,6 +38,13 @@ export class Cohort extends Target implements ICohort {
   }
   get chats(): IMsgChat[] {
     return [this];
+  }
+  get market(): IMarket | undefined {
+    const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);
+    if (find) {
+      return find as IMarket;
+    }
+    return undefined;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);

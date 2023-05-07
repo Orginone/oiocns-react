@@ -20,8 +20,8 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
 
   const items = [
     {
-      label: `分类特性`,
-      tab: '分类特性',
+      label: `表单特性`,
+      tab: '表单特性',
       key: 'attr',
     },
     {
@@ -48,9 +48,9 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
               }}
             />
             <Segmented
-              options={['全部', '本分类']}
+              options={['全部', '本类别']}
               onChange={(value) => {
-                if (value === '本分类') {
+                if (value === '本类别') {
                   setRecursionSpecies(false);
                 } else {
                   setRecursionSpecies(true);

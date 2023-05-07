@@ -88,10 +88,14 @@ const Attritube = ({
   };
 
   useEffect(() => {
-    setTimeout(async () => {
-      setDataSource(await current.loadAttributes());
-      tforceUpdate();
-    }, 100);
+    let temp = current.attributes;
+    if (!recursionOrg) {
+      temp = temp.filter((i) => i.shareId === current.current.metadata.id);
+    }
+    if (!recursionSpecies) {
+      temp = temp.filter((i) => i.speciesId === current.metadata.id);
+    }
+    setDataSource(temp);
   }, [current, recursionOrg, recursionSpecies]);
 
   return (
