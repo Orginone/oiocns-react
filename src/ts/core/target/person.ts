@@ -100,9 +100,7 @@ export class Person extends Belong implements IPerson {
       let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
       if (res.success) {
         this._todoLoaded = true;
-        if (res.data.result && res.data.result.length > 0) {
-          this.todos.push(...res.data.result?.map((a) => new WorkTodo(a)));
-        }
+        this.todos = (res.data.result || []).map((i) => new WorkTodo(i));
       }
     }
     return this.todos;

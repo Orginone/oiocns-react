@@ -7,6 +7,7 @@ import Application from './InnerApp';
 import TaskListComp from '../components/TaskListComp';
 import { Badge, Typography } from 'antd';
 import { FaTasks } from 'react-icons/fa';
+import { ISpeciesItem, SpeciesType } from '@/ts/core';
 
 interface IProps {
   selectMenu: MenuItemType;
@@ -21,7 +22,16 @@ const ContentIndex = (props: IProps) => {
     case MenuType.FileSystemItem:
       return <FileSystem current={props.selectMenu.item} />;
     case MenuType.Species:
-      return <ThingIndex species={props.selectMenu.item} />;
+      {
+        const species = props.selectMenu.item as ISpeciesItem;
+        switch (species.metadata.typeName) {
+          case SpeciesType.WorkForm:
+          case SpeciesType.Commodity:
+          case SpeciesType.Store:
+            return <ThingIndex species={props.selectMenu.item} />;
+        }
+      }
+      return <></>;
     default:
       return <></>;
   }

@@ -105,7 +105,15 @@ const Thing: React.FC<IProps> = (props: IProps) => {
     columns.push(getColumn('4', '创建时间', '时间型', 'CreateTime'));
     columns.push(getColumn('5', '修改时间', '时间型', 'ModifiedTime'));
     for (const p of propertys) {
-      columns.push(getColumn(p.id, p.name, p.valueType, p.code, p.dict?.dictItems || []));
+      columns.push(
+        getColumn(
+          p.id,
+          p.name,
+          p.valueType,
+          `Propertys.${p.code}`,
+          p.dict?.dictItems || [],
+        ),
+      );
     }
     return columns;
   };
@@ -178,7 +186,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
             allowHeaderFiltering={false}
           />
         );
-      case '组织型':
+      case '用户型':
         return (
           <Column
             key={id}
@@ -224,7 +232,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           new CustomStore({
             key: 'Id',
             async load(loadOptions) {
-              loadOptions.userData = `S${props.species.metadata.id}`;
+              loadOptions.userData = [`S${props.species.metadata.id}`];
               let request: any = { ...loadOptions };
               if (props.byIds) {
                 request.options = {
@@ -235,12 +243,12 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                   },
                 };
               }
-              const result = await kernel.anystore.loadThing<any[]>(
+              const result = await kernel.anystore.loadThing<any>(
                 props.species.current.space.metadata.id,
                 request,
               );
               if (result.success) {
-                return result.data.map((i: any) => i.Propertys);
+                return result.data?.data || [];
               }
               return [];
             },
