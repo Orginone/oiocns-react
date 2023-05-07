@@ -19,6 +19,12 @@ export class Commodity extends Form implements ICommodity {
     super(_metadata, _current, _parent);
     this.market = _market;
     this.speciesTypes = [SpeciesType.Commodity];
+    for (const item of _metadata.nodes || []) {
+      const subItem = this.createChildren(item, _current);
+      if (subItem) {
+        this.children.push(subItem);
+      }
+    }
   }
   market: IMarket;
   override createChildren(

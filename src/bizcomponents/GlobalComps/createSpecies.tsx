@@ -178,7 +178,7 @@ const CreateSpeciesModal = (props: Iprops) => {
   return (
     <SchemaForm<SpeciesModel>
       formRef={formRef}
-      title={props.title}
+      title={props.title + '类别'}
       open={props.open}
       width={640}
       onOpenChange={(open: boolean) => {

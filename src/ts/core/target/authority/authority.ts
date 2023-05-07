@@ -44,7 +44,7 @@ export class Authority extends MsgChat implements IAuthority {
         typeName: '权限',
         avatar: parseAvatar(_metadata.icon),
       },
-      ['角色群'],
+      [_metadata.belong?.name ?? '', '角色群'],
       _metadata.remark,
     );
     this.space = _space;

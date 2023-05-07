@@ -18,17 +18,17 @@ export interface ICompany extends IBelong {
   groups: IGroup[];
   /** 设立的岗位 */
   stations: IStation[];
-  /** 设立的内部机构 */
+  /** 设立的部门 */
   departments: IDepartment[];
   /** 支持的内设机构类型 */
   departmentTypes: string[];
   /** 退出单位 */
   exit(): Promise<boolean>;
-  /** 加载集团 */
+  /** 加载单位群 */
   loadGroups(reload?: boolean): Promise<IGroup[]>;
   /** 加载创建的群 */
   loadStations(reload?: boolean): Promise<IStation[]>;
-  /** 加载单位的内设机构 */
+  /** 加载单位的部门 */
   loadDepartments(reload?: boolean): Promise<IDepartment[]>;
   /** 设立岗位 */
   createStation(data: model.TargetModel): Promise<IStation | undefined>;
@@ -41,7 +41,7 @@ export interface ICompany extends IBelong {
 /** 单位类型实现 */
 export class Company extends Belong implements ICompany {
   constructor(_metadata: schema.XTarget, _user: IPerson) {
-    super(_metadata, [_metadata.typeName + '群'], _user);
+    super(_metadata, ['全员群'], _user);
     this.departmentTypes = [
       TargetType.Office,
       TargetType.Working,

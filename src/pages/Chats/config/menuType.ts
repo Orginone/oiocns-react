@@ -6,9 +6,9 @@ export enum MenuType {
 
 export enum GroupMenuType {
   'Authority' = '角色群',
-  'InnerAgency' = '内部机构',
-  'OutAgency' = '外部机构',
-  'Friends' = '我的好友',
-  'Station' = '单位岗位',
-  'Cohort' = '我的群组',
+  'InnerAgency' = '部门群',
+  'OutAgency' = '单位群',
+  'Friends' = '好友',
+  'Station' = '岗位',
+  'Cohort' = '群组',
 }

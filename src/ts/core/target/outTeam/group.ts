@@ -1,10 +1,11 @@
 import { kernel, model, schema } from '@/ts/base';
 import { ITarget, Target } from '../base/target';
 import { PageAll, companyTypes } from '../../public/consts';
-import { TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
+import { IMarket } from '../../thing/market/market';
 
 /** 单位群接口 */
 export interface IGroup extends ITarget {
@@ -14,6 +15,8 @@ export interface IGroup extends ITarget {
   parent?: IGroup;
   /** 子单位群 */
   children: IGroup[];
+  /** 流通交易 */
+  market: IMarket | undefined;
   /** 加载子单位群 */
   loadChildren(reload?: boolean): Promise<IGroup[]>;
   /** 设立子单位群 */
@@ -23,7 +26,7 @@ export interface IGroup extends ITarget {
 /** 单位群实现 */
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _company: ICompany) {
-    super(_metadata, ['集团群'], _company, companyTypes);
+    super(_metadata, [_metadata.belong?.name ?? '', '单位群'], _company, companyTypes);
     this.company = _company;
   }
   company: ICompany;
@@ -34,7 +37,7 @@ export class Group extends Target implements IGroup {
     if (!this._childrenLoaded || reload) {
       const res = await kernel.querySubTargetById({
         id: this.metadata.id,
-        subTypeNames: this.memberTypes,
+        subTypeNames: [TargetType.Group],
         page: PageAll,
       });
       if (res.success) {
@@ -92,6 +95,13 @@ export class Group extends Target implements IGroup {
       chats.push(...item.chats);
     }
     return chats;
+  }
+  get market(): IMarket | undefined {
+    const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);
+    if (find) {
+      return find as IMarket;
+    }
+    return undefined;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadChildren(reload);

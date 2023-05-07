@@ -10,8 +10,9 @@ import orgCtrl from '@/ts/controller';
  * @return {*}
  */
 const Description = ({ current }: { current: ISpeciesItem }) => {
-  const belongInfo = orgCtrl.provider.user!.findShareById(current.metadata.belongId);
-  const createInfo = orgCtrl.provider.user!.findShareById(current.metadata.createUser);
+  const share = orgCtrl.provider.user!.findShareById(current.metadata.shareId);
+  const belong = orgCtrl.provider.user!.findShareById(current.metadata.belongId);
+  const create = orgCtrl.provider.user!.findShareById(current.metadata.createUser);
   return (
     <Card bordered={false} className={cls['company-dept-content']}>
       <Descriptions
@@ -25,16 +26,22 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
         column={3}
         labelStyle={{ textAlign: 'center', color: '#606266', width: '160px' }}
         contentStyle={{ textAlign: 'center', color: '#606266' }}>
-        <Descriptions.Item label="共享组织">
+        <Descriptions.Item label="共享用户">
           <Space>
-            <TeamIcon share={belongInfo} />
-            <strong>{belongInfo.name}</strong>
+            <TeamIcon share={share} />
+            <strong>{share.name}</strong>
+          </Space>
+        </Descriptions.Item>
+        <Descriptions.Item label="归属用户">
+          <Space>
+            <TeamIcon share={belong} />
+            <strong>{belong.name}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="创建人">
           <Space>
-            <TeamIcon share={createInfo} />
-            <strong>{createInfo.name}</strong>
+            <TeamIcon share={create} />
+            <strong>{create.name}</strong>
           </Space>
         </Descriptions.Item>
         <Descriptions.Item label="分类代码">{current.metadata.code}</Descriptions.Item>
@@ -43,14 +50,10 @@ const Description = ({ current }: { current: ISpeciesItem }) => {
             <strong>{current.metadata.typeName}</strong>
           </Space>
         </Descriptions.Item>
-        <Descriptions.Item label="创建时间" span={2}>
+        <Descriptions.Item label="创建时间">
           {current.metadata.createTime}
         </Descriptions.Item>
-        <Descriptions.Item
-          contentStyle={{ textAlign: 'left' }}
-          labelStyle={{ textAlign: 'center' }}
-          label="分类定义"
-          span={3}>
+        <Descriptions.Item contentStyle={{ textAlign: 'left' }} label="分类定义">
           {current.metadata.remark}
         </Descriptions.Item>
       </Descriptions>

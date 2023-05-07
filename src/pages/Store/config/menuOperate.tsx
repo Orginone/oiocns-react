@@ -7,7 +7,6 @@ import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import { IconFont } from '@/components/IconFont';
 import {
-  IBelong,
   IFileSystem,
   IFileSystemItem,
   IForm,
@@ -15,7 +14,6 @@ import {
   ITarget,
   IWork,
   SpeciesType,
-  TargetType,
 } from '@/ts/core';
 
 /** 编译文件系统树 */
@@ -27,6 +25,7 @@ const buildFileSysTree = (targets: IFileSystemItem[]) => {
         key: item.key,
         item: item,
         label: item.metadata.name,
+        tag: ['目录'],
         itemType: MenuType.FileSystemItem,
         menus: loadFileSysItemMenus(),
         icon: <im.ImFolder color="#c09553" />,
@@ -103,6 +102,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
             ),
             itemType: MenuType.FileSystemItem,
             menus: [],
+            tag: [item.metadata.typeName],
             children: buildFileSysTree(filesys.home ? filesys.home.children : []),
             onClick: async () => {
               await filesys.home?.loadChildren();
@@ -123,6 +123,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
           icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
           itemType: MenuType.Species,
           menus: [],
+          tag: [item.metadata.typeName],
           children: buildSpeciesTree(item.children),
           onClick: async () => {
             switch (item.metadata.typeName) {
@@ -154,29 +155,12 @@ const buildTargetTree = (targets: ITarget[]) => {
       label: item.metadata.name,
       itemType: item.metadata.typeName,
       menus: [],
+      tag: [item.metadata.typeName],
       icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
       children: buildSpeciesTree(item.species),
     });
   }
   return result;
-};
-
-/** 机构分组加载 */
-const loadAgencyGroup = (
-  space: IBelong,
-  children: MenuItemType[],
-  type: string,
-  typeName: string,
-) => {
-  return {
-    key: space.key + type,
-    item: space,
-    label: type,
-    itemType: type,
-    icon: <TeamIcon share={{ name: type, typeName: typeName }} size={18} fontSize={16} />,
-    menus: [],
-    children: children,
-  };
 };
 
 /** 获取个人菜单 */
@@ -189,24 +173,8 @@ const getUserMenu = () => {
     icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,
     menus: [],
     children: [
-      {
-        key: orgCtrl.user.key + GroupMenuType.Asset,
-        item: orgCtrl.user,
-        label: GroupMenuType.Asset,
-        itemType: GroupMenuType.Asset,
-        icon: <im.ImNewspaper />,
-        menus: [],
-        children: buildSpeciesTree(orgCtrl.user.species),
-      },
-      {
-        key: orgCtrl.user.key + GroupMenuType.UserCohort,
-        item: orgCtrl.user,
-        label: GroupMenuType.UserCohort,
-        itemType: GroupMenuType.UserCohort,
-        icon: <im.ImNewspaper />,
-        menus: [],
-        children: buildTargetTree(orgCtrl.user.cohorts),
-      },
+      ...buildSpeciesTree(orgCtrl.user.species),
+      ...buildTargetTree(orgCtrl.user.cohorts),
     ],
   };
 };
@@ -223,33 +191,10 @@ const getTeamMenu = () => {
       menus: [],
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
-        {
-          key: company.key + GroupMenuType.Asset,
-          item: company,
-          label: GroupMenuType.Asset,
-          itemType: GroupMenuType.Asset,
-          icon: <im.ImNewspaper />,
-          menus: [],
-          children: buildSpeciesTree(company.species),
-        },
-        loadAgencyGroup(
-          company,
-          buildTargetTree(company.departments),
-          GroupMenuType.InnerAgency,
-          TargetType.Department,
-        ),
-        loadAgencyGroup(
-          company,
-          buildTargetTree(company.groups),
-          GroupMenuType.OutAgency,
-          TargetType.Group,
-        ),
-        loadAgencyGroup(
-          company,
-          buildTargetTree(company.cohorts),
-          GroupMenuType.CompanyCohort,
-          TargetType.Cohort,
-        ),
+        ...buildSpeciesTree(company.species),
+        ...buildTargetTree(company.departments),
+        ...buildTargetTree(company.groups),
+        ...buildTargetTree(company.cohorts),
       ],
     });
   }

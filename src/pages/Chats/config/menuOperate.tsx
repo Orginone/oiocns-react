@@ -1,11 +1,11 @@
 import React from 'react';
-import { GroupMenuType, MenuType } from './menuType';
+import { MenuType } from './menuType';
 import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IconFont } from '@/components/IconFont';
-import { IAuthority, IDepartment, IMsgChat, TargetType } from '@/ts/core';
+import { IAuthority, IDepartment, IMsgChat } from '@/ts/core';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -53,52 +53,15 @@ const loadBookMenu = () => {
           company,
           company.memberChats.map((item) => createChatMenu(item, [])),
         ),
-        {
-          key: company.key + GroupMenuType.InnerAgency,
-          label: GroupMenuType.InnerAgency,
-          item: innnerChats,
-          itemType: MenuType.Books,
-          icon: (
-            <TeamIcon
-              share={{ typeName: TargetType.Department, name: GroupMenuType.InnerAgency }}
-              size={18}
-              fontSize={16}
-            />
-          ),
-          children: buildDepartmentTree(company.departments),
-        },
-        {
-          key: company.key + GroupMenuType.Station,
-          label: GroupMenuType.Station,
-          item: company.stations.map((i) => i.chats[0]),
-          itemType: MenuType.Books,
-          icon: (
-            <TeamIcon
-              share={{ typeName: TargetType.Station, name: GroupMenuType.Station }}
-              size={18}
-              fontSize={16}
-            />
-          ),
-          children: company.stations.map((item) => createChatMenu(item, [])),
-        },
-        {
-          key: company.key + GroupMenuType.Cohort,
-          label: GroupMenuType.Cohort,
-          item: company.cohorts.map((i) => i.chats[0]),
-          itemType: MenuType.Books,
-          icon: (
-            <TeamIcon
-              share={{ typeName: TargetType.Cohort, name: GroupMenuType.Cohort }}
-              size={18}
-              fontSize={16}
-            />
-          ),
-          children: company.cohorts.map((item) => createChatMenu(item, [])),
-        },
+        ...buildDepartmentTree(company.departments),
+        ...company.stations.map((item) => createChatMenu(item, [])),
+        ...company.cohorts.map((item) => createChatMenu(item, [])),
       ],
     });
     if (company.superAuth) {
-      companyItems.push(buildAuthorityTree(company.superAuth));
+      companyItems[companyItems.length - 1].children.push(
+        buildAuthorityTree(company.superAuth),
+      );
     }
   }
   return [
@@ -109,22 +72,8 @@ const loadBookMenu = () => {
       item: orgCtrl.user.chats.filter((i) => i.belongId === orgCtrl.user.metadata.id),
       children: [
         createChatMenu(orgCtrl.user, []),
-        {
-          key: GroupMenuType.Friends,
-          label: GroupMenuType.Friends,
-          itemType: MenuType.Books,
-          icon: <im.ImUser />,
-          item: orgCtrl.user.memberChats,
-          children: orgCtrl.user.memberChats.map((chat) => createChatMenu(chat, [])),
-        },
-        {
-          key: GroupMenuType.Cohort,
-          label: GroupMenuType.Cohort,
-          itemType: MenuType.Books,
-          icon: <im.ImUsers />,
-          item: orgCtrl.user.cohorts.map((i) => i.chats[0]),
-          children: orgCtrl.user.cohorts.map((chat) => createChatMenu(chat, [])),
-        },
+        ...orgCtrl.user.memberChats.map((chat) => createChatMenu(chat, [])),
+        ...orgCtrl.user.cohorts.map((chat) => createChatMenu(chat, [])),
         buildAuthorityTree(orgCtrl.user.superAuth!),
       ],
       icon: <TeamIcon share={orgCtrl.user.share} size={18} fontSize={16} />,

@@ -102,7 +102,7 @@ const DictModal = (props: Iprops) => {
   return (
     <SchemaForm<DictModel>
       formRef={formRef}
-      title={title}
+      title={title + '字典'}
       open={open}
       width={640}
       layoutType="ModalForm"

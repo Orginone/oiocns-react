@@ -6,7 +6,6 @@ import Content from './content';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from '@/bizcomponents/GlobalComps/createSpecies';
 import AuthorityModal from '@/bizcomponents/GlobalComps/createAuthority';
-import PropertyModal from '@/bizcomponents/GlobalComps/createProperty';
 import DictModal from '@/bizcomponents/GlobalComps/createDict';
 import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
@@ -106,26 +105,11 @@ const TeamSetting: React.FC = () => {
             }}
           />
         )}
-      {/** 属性模态框 */}
-      {selectMenu.itemType === MenuType.Species && (
-        <PropertyModal
-          species={selectMenu.item}
-          open={['添加属性'].includes(operateKeys[0])}
-          handleCancel={() => {
-            setOperateKeys(['']);
-          }}
-          handleOk={function (): void {
-            setOperateKeys(['']);
-            setSelectMenu(selectMenu);
-          }}
-        />
-      )}
       {/** 分类模态框 */}
-      {(selectMenu.itemType === GroupMenuType.SpeciesGroup ||
-        selectMenu.itemType === MenuType.Species) && (
+      {operateKeys.length > 1 && operateKeys[1] === '类别' && (
         <SpeciesModal
           title={operateKeys[0]}
-          open={['新增', '修改'].includes(operateKeys[0])}
+          open={true}
           handleCancel={() => setOperateKeys([''])}
           handleOk={(newItem) => {
             if (newItem) {
