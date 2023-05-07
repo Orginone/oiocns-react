@@ -1,11 +1,18 @@
 import { common, kernel, model, schema } from '../base';
+import { Emitter } from '../base/common';
+import { XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
+import { WorkTodo } from './work/todo';
 const sessionUserName = 'sessionUser';
+
+// 消息变更推送
+export const workNotify = new Emitter();
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _inited: boolean = false;
   private _preMessages: model.MsgSaveModel[] = [];
+  private _preTask: XWorkTask[] = [];
   constructor() {
     super();
     kernel.on('RecvMsg', (data) => {
@@ -13,6 +20,13 @@ export class UserProvider extends common.Emitter {
         this._recvMessage(data);
       } else {
         this._preMessages.push(data);
+      }
+    });
+    kernel.on('RecvTask', (data: XWorkTask) => {
+      if (this._inited) {
+        this._recvTask(data);
+      } else {
+        this._preTask.push(data);
       }
     });
     const userJson = sessionStorage.getItem(sessionUserName);
@@ -84,6 +98,7 @@ export class UserProvider extends common.Emitter {
         this._recvMessage(item);
         return false;
       });
+    this._preTask.forEach((a) => this._recvTask(a));
   }
   /**
    * 接收到新信息
@@ -103,5 +118,17 @@ export class UserProvider extends common.Emitter {
         c.receiveMessage(data);
       }
     }
+  }
+  /**
+   * 接收到新任务
+   * @param data 新任务
+   */
+  private _recvTask(data: XWorkTask): void {
+    if (data.status >= 100) {
+      this.user!.todos = this.user!.todos.filter((a) => a.metadata.id == data.id);
+    } else {
+      this.user!.todos.unshift(new WorkTodo(data));
+    }
+    workNotify.changCallback();
   }
 }

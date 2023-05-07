@@ -8,7 +8,7 @@ import cls from './index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
-import { workNotify } from '@/ts/core/work/todo';
+import { workNotify } from '@/ts/core/user';
 
 /**
  * 顶部导航
