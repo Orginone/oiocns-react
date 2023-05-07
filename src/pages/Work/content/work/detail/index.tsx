@@ -1,6 +1,6 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XForm, XWorkInstance, XWorkRecord } from '@/ts/base/schema';
+import { XForm, XWorkInstance } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
 import { ISpeciesItem, IWorkForm, SpeciesType } from '@/ts/core';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
@@ -15,57 +15,61 @@ import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { WorkNodeModel } from '@/ts/base/model';
 const { Panel } = Collapse;
 
-interface IApproveProps {
+interface IProp {
   todo: ITodo;
-  species: IWorkItem;
+  work: IWorkItem;
   onBack: (success: boolean) => void;
 }
 
-const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
+const Detail: React.FC<IProp> = ({ todo, onBack, work }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
   const [nodes, setNodes] = useState<WorkNodeModel>();
-  const [instance, setInstance] = useState<XWorkInstance>();
   const [speciesItem, setSpeciesItem] = useState<ISpeciesItem[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [allForms, setAllForms] = useState<XForm[]>([]);
-
-  const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
-    let result: ISpeciesItem[] = [];
-    for (let sp of species) {
-      if (ids && ids.includes(sp.metadata.id)) {
-        result.push(sp);
-      }
-      if (sp.children.length > 0) {
-        result.push(...GetSpeciesByIds(sp.children, ids));
-      }
-    }
-    return result;
-  };
+  const [instance, setInstance] = useState<XWorkInstance>();
 
   useEffect(() => {
     setTimeout(async () => {
-      const xinstance = await todo.getInstance();
+      let xinstance = await todo.getInstance();
       if (xinstance) {
         setInstance(xinstance);
-        setNodes(await species.loadWorkNode(xinstance.defineId));
+        setNodes(await work.loadWorkNode(xinstance.defineId));
         setSpeciesItem(
-          await GetSpeciesByIds(
-            species.current.species,
-            xinstance.define!.sourceIds?.split(','),
+          await filterSpeciesByIds(
+            work.current.species,
+            xinstance.define!.sourceIds?.split(',') || [],
           ),
         );
       }
       let wforms: XForm[] = [];
-      for (let workform of species.parent?.children.filter(
+      for (let workform of work.parent?.children.filter(
         (a) => a.metadata.typeName == SpeciesType.WorkForm,
       ) || []) {
         wforms.push(...(await (workform as IWorkForm).loadForms()));
       }
       setAllForms(wforms);
     }, 100);
-  }, [todo]);
+  }, []);
 
+  /** 再分类集合中过滤出指定Id的分类 */
+  const filterSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
+    let result: ISpeciesItem[] = [];
+    if (ids?.length > 0) {
+      for (let sp of species) {
+        if (ids.includes(sp.metadata.id)) {
+          result.push(sp);
+        }
+        if (sp.children.length > 0) {
+          result.push(...filterSpeciesByIds(sp.children, ids));
+        }
+      }
+    }
+    return result;
+  };
+
+  /** 加载表单 */
   const loadForm = (forms: XForm[], disabled: boolean, data?: any) => {
     let content = [];
     for (let form of forms) {
@@ -78,7 +82,7 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
             formRef={undefined}
             fieldsValue={data}
             disabled={disabled}
-            belong={species.current.space}
+            belong={work.current.space}
           />
         </Panel>,
       );
@@ -86,29 +90,89 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
     return content;
   };
 
-  const loadBegin = () => {
-    return instance ? (
-      <Timeline.Item key={'begin'} color={'green'}>
-        <Card>
-          <div style={{ display: 'flex' }}>
-            <div style={{ paddingRight: '24px' }}>起始</div>
-            <div style={{ paddingRight: '24px' }}>
-              {instance!.createTime.substring(0, instance.createTime.length - 4)}
-            </div>
-            <div style={{ paddingRight: '24px' }}>
-              发起人：
-              {orgCtrl.provider.user?.findShareById(instance.createUser).name}
-            </div>
-          </div>
-          <Collapse ghost>
-            {nodes?.forms &&
-              loadForm(nodes?.forms, true, JSON.parse(instance.data).formData)}
-          </Collapse>
-        </Card>
-      </Timeline.Item>
-    ) : (
-      <></>
-    );
+  /** 加载时间条 */
+  const loadTimeline = () => {
+    if (instance) {
+      return (
+        <Timeline>
+          <Timeline.Item key={'begin'} color={'green'}>
+            <Card>
+              <div style={{ display: 'flex' }}>
+                <div style={{ paddingRight: '24px' }}>起始</div>
+                <div style={{ paddingRight: '24px' }}>
+                  {instance!.createTime.substring(0, instance.createTime.length - 4)}
+                </div>
+                <div style={{ paddingRight: '24px' }}>
+                  发起人：
+                  {orgCtrl.provider.user?.findShareById(instance.createUser).name}
+                </div>
+              </div>
+              <Collapse ghost>
+                {nodes?.forms &&
+                  loadForm(nodes?.forms, true, JSON.parse(instance.data).formData)}
+              </Collapse>
+            </Card>
+          </Timeline.Item>
+          {instance.tasks?.map((task, _index) => {
+            return (
+              <div key={task.id}>
+                {task.status >= 100 ? (
+                  task.records?.map((record) => {
+                    return (
+                      <Timeline.Item key={record.id} color={'green'}>
+                        <Card>
+                          <div style={{ display: 'flex' }}>
+                            <div style={{ paddingRight: '24px' }}>
+                              {task.node?.nodeType}
+                            </div>
+                            <div style={{ paddingRight: '24px' }}>
+                              {task.createTime.substring(0, task.createTime.length - 4)}
+                            </div>
+                            <div style={{ paddingRight: '24px' }}>
+                              审批人：
+                              {
+                                orgCtrl.provider.user?.findShareById(record.createUser)
+                                  .name
+                              }
+                            </div>
+                            <div>
+                              {record.comment && <div>审批意见：{record.comment}</div>}
+                            </div>
+                          </div>
+                          <Collapse ghost>
+                            {task.node?.bindFroms &&
+                              loadForm(
+                                task.node.bindFroms,
+                                task.status == 100,
+                                record.data,
+                              )}
+                          </Collapse>
+                        </Card>
+                      </Timeline.Item>
+                    );
+                  })
+                ) : (
+                  <Timeline.Item color={'red'}>
+                    <Card>
+                      <div style={{ display: 'flex' }}>
+                        <div style={{ paddingRight: '24px' }}>{task.node?.nodeType}</div>
+                        <div style={{ paddingRight: '24px' }}>
+                          {task.createTime.substring(0, task.createTime.length - 4)}
+                        </div>
+                        <div style={{ color: 'red' }}>待审批</div>
+                      </div>
+                      {task.node?.bindFroms &&
+                        loadForm(task.node.bindFroms, task.status == 100)}
+                    </Card>
+                  </Timeline.Item>
+                )}
+              </div>
+            );
+          })}
+        </Timeline>
+      );
+    }
+    return <></>;
   };
 
   // 审批
@@ -125,6 +189,7 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
     setLoading(false);
   };
 
+  /** tab标签页 */
   const items: TabsProps['items'] = [
     {
       key: '1',
@@ -133,76 +198,9 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
         <>
           <div className={cls['content']}>
             {/** 时间轴 */}
-            <Timeline>
-              {loadBegin()}
-              {instance?.tasks?.map((th, index) => {
-                const isCur = th.status != 100;
-                const color = isCur ? 'red' : 'green';
-                const title = index == 0 ? '发起人' : '审批人';
-                const records = th.records || [];
-                return (
-                  <div key={th.id}>
-                    {!isCur &&
-                      records.map((record) => {
-                        return (
-                          <Timeline.Item key={record.id} color={color}>
-                            <Card>
-                              <div style={{ display: 'flex' }}>
-                                <div style={{ paddingRight: '24px' }}>
-                                  {th.node?.nodeType}
-                                </div>
-                                <div style={{ paddingRight: '24px' }}>
-                                  {th.createTime.substring(0, th.createTime.length - 4)}
-                                </div>
-                                <div style={{ paddingRight: '24px' }}>
-                                  {title}：
-                                  {
-                                    orgCtrl.provider.user?.findShareById(
-                                      record.createUser,
-                                    ).name
-                                  }
-                                </div>
-                                <div>
-                                  {record.comment && (
-                                    <div>审批意见：{record.comment}</div>
-                                  )}
-                                </div>
-                              </div>
-                              <Collapse ghost>
-                                {th.node?.bindFroms &&
-                                  loadForm(
-                                    th.node.bindFroms,
-                                    th.status == 100,
-                                    record.data,
-                                  )}
-                              </Collapse>
-                            </Card>
-                          </Timeline.Item>
-                        );
-                      })}
-                    {isCur && (
-                      <Timeline.Item color={color}>
-                        <Card>
-                          <div style={{ display: 'flex' }}>
-                            <div style={{ paddingRight: '24px' }}>
-                              {th.node?.nodeType}
-                            </div>
-                            <div style={{ paddingRight: '24px' }}>
-                              {th.createTime.substring(0, th.createTime.length - 4)}
-                            </div>
-                            <div style={{ color: 'red' }}>待审批</div>
-                          </div>
-                          {th.node?.bindFroms &&
-                            loadForm(th.node.bindFroms, th.status == 100)}
-                        </Card>
-                      </Timeline.Item>
-                    )}
-                  </div>
-                );
-              })}
-            </Timeline>
+            {loadTimeline()}
             {/** 选中的操作对象 */}
-            {speciesItem && !instance?.define?.isCreate && (
+            {!instance?.define?.isCreate && speciesItem && (
               <Thing
                 species={speciesItem[0]}
                 height={'400px'}
@@ -251,8 +249,8 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
       children: instance?.define ? (
         <Design
           nodes={nodes}
-          species={species}
-          current={instance.define}
+          species={work}
+          current={instance!.define}
           instance={instance}
           IsEdit={false}
           onBack={() => {}}
@@ -263,27 +261,25 @@ const todoDetail: React.FC<IApproveProps> = ({ todo, onBack, species }) => {
     },
   ];
 
-  const tabBarExtraContent = (
-    <div
-      style={{ display: 'flex', cursor: 'pointer' }}
-      onClick={() => {
-        onBack(true);
-      }}>
-      <a style={{ paddingTop: '2px' }}>
-        <ImUndo2 />
-      </a>
-      <a style={{ paddingLeft: '6px' }}>返回</a>
-    </div>
-  );
-
   return (
     <Card>
       <Tabs
         defaultActiveKey="1"
         items={items}
-        tabBarExtraContent={tabBarExtraContent}></Tabs>
+        tabBarExtraContent={
+          <div
+            style={{ display: 'flex', cursor: 'pointer' }}
+            onClick={() => {
+              onBack(true);
+            }}>
+            <a style={{ paddingTop: '2px' }}>
+              <ImUndo2 />
+            </a>
+            <a style={{ paddingLeft: '6px' }}>返回</a>
+          </div>
+        }></Tabs>
     </Card>
   );
 };
 
-export default todoDetail;
+export default Detail;

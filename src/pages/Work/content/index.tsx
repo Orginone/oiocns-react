@@ -13,12 +13,6 @@ import Detail from './work/detail';
 import { workNotify } from '@/ts/core/work/todo';
 import { ITodo } from '@/ts/core/work/todo';
 
-/** 通用状态 */
-export enum CommonStatus {
-  ApplyStartStatus = 1,
-  ApproveStartStatus = 100,
-  RejectStartStatus = 200,
-}
 interface IProps {
   filter: string;
   selectMenu: MenuItemType;
@@ -29,10 +23,11 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectTodo, setSelectTodo] = useState<ITodo>();
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
-  const [selectWorkSpecies, setSelectWorkSpecies] = useState<IWorkItem>();
+  const [selectWork, setSelectWork] = useState<IWorkItem>();
 
   let workSpecies: IWorkItem[] = [];
 
+  /** 加载所有办事分类 */
   const loadWorkSpecies = (species: ISpeciesItem[]) => {
     let spList: IWorkItem[] = species.filter(
       (a) => a.metadata.typeName == SpeciesType.WorkItem,
@@ -44,15 +39,24 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     }
     return spList;
   };
-  useEffect(() => {
-    setTimeout(async () => {
+
+  /** 查找当前选中待办的办事分类 */
+  const findWorkByTodo = async () => {
+    if (selectTodo) {
+      workSpecies = workSpecies.filter(
+        (a) => a.current.metadata.id == selectTodo?.metadata.shareId,
+      );
       for (let work of workSpecies) {
         let defines = await work.loadWorkDefines();
         if (defines.find((a) => a.id == selectTodo?.metadata.defineId)) {
-          setSelectWorkSpecies(work);
+          setSelectWork(work);
         }
       }
-    }, 10);
+    }
+  };
+
+  useEffect(() => {
+    findWorkByTodo();
   }, [selectTodo]);
 
   let todos = orgCtrl.user.todos.filter(
@@ -93,30 +97,55 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
       }
       break;
   }
-
+  /** 多行操作 */
   const rowsOperation = (
     <Space>
       <Button
         type="link"
         onClick={async () => {
-          selectedRows.forEach(
-            async (a) => await a.approval(CommonStatus.ApproveStartStatus, '', ''),
-          );
+          selectedRows.forEach(async (a) => await a.approval(100));
         }}>
         同意
       </Button>
       <Button
         type="link"
         onClick={async () => {
-          selectedRows.forEach(
-            async (a) => await a.approval(CommonStatus.RejectStartStatus, '', ''),
-          );
+          selectedRows.forEach(async (a) => await a.approval(200));
         }}
         style={{ color: 'red' }}>
         拒绝
       </Button>
     </Space>
   );
+
+  /** 单行操作 */
+  const rowOperation = (item: ITodo) => {
+    return [
+      {
+        key: 'detail',
+        label: '详情',
+        onClick: async () => {
+          setSelectTodo(item);
+          setPageKey('Detail');
+        },
+      },
+      {
+        key: 'approve',
+        label: '同意',
+        onClick: async () => {
+          await item.approval(100);
+        },
+      },
+      {
+        key: 'refuse',
+        label: '拒绝',
+        onClick: async () => {
+          await item.approval(200);
+        },
+      },
+    ];
+  };
+
   switch (pageKey) {
     case 'List':
       return (
@@ -126,32 +155,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
               dataSource={todos}
               rowKey={(record: ITodo) => record.metadata.id}
               columns={WorkColumns}
-              operation={(item: ITodo) => {
-                return [
-                  {
-                    key: 'detail',
-                    label: '详情',
-                    onClick: async () => {
-                      setSelectTodo(item);
-                      setPageKey('Detail');
-                    },
-                  },
-                  {
-                    key: 'approve',
-                    label: '同意',
-                    onClick: async () => {
-                      await item.approval(CommonStatus.ApproveStartStatus, '', '');
-                    },
-                  },
-                  {
-                    key: 'refuse',
-                    label: '拒绝',
-                    onClick: async () => {
-                      await item.approval(CommonStatus.RejectStartStatus, '', '');
-                    },
-                  },
-                ];
-              }}
+              operation={rowOperation}
               rowSelection={{
                 type: 'checkbox',
                 onChange: (_: React.Key[], selectedRows: ITodo[]) => {
@@ -163,15 +167,16 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         </PageCard>
       );
     case 'Detail':
-      if (!selectTodo || !selectWorkSpecies) return <></>;
+      if (!selectTodo || !selectWork) return <></>;
       return (
         <Detail
           todo={selectTodo}
-          species={selectWorkSpecies}
+          work={selectWork}
           onBack={(success: boolean) => {
             if (success) {
-              setPageKey('List');
+              setSelectTodo(undefined);
               forceUpdate();
+              setPageKey('List');
             }
           }}
         />

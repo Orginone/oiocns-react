@@ -6,13 +6,15 @@ import { PageAll } from '../public/consts';
 
 // 消息变更推送
 export const workNotify = new Emitter();
+
+/** 待办项 */
 export interface ITodo {
   /** 数据 */
   metadata: XWorkTask;
   /** 获取实例 */
   getInstance(): Promise<XWorkInstance>;
   /** 审批办事 */
-  approval(status: number, comment: string, data: string): Promise<boolean>;
+  approval(status: number, comment?: string, data?: string): Promise<boolean>;
 }
 
 export class WorkTodo extends common.Entity implements ITodo {
@@ -21,7 +23,11 @@ export class WorkTodo extends common.Entity implements ITodo {
     super();
     this.metadata = metadata;
   }
-  async approval(status: number, comment: string, data: string): Promise<boolean> {
+  async approval(
+    status: number,
+    comment: string = '',
+    data: string = '',
+  ): Promise<boolean> {
     const res = await kernel.approvalTask({
       id: this.metadata.id,
       comment: comment,
