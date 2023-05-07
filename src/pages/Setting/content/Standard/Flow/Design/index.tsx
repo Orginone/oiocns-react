@@ -17,6 +17,7 @@ import { XAttribute, XWorkDefine, XWorkInstance } from '@/ts/base/schema';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { SpeciesType } from '@/ts/core';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import { ImWarning } from 'react-icons/im';
 
 interface IProps {
   IsEdit: boolean;
@@ -115,121 +116,123 @@ const Design: React.FC<IProps> = ({
     load();
   }, [current]);
 
-  // const getAllNodes = (resource: any, array: any[]): any[] => {
-  //   array = [...array, resource];
-  //   if (resource.children) {
-  //     array = getAllNodes(resource.children, array);
-  //   }
-  //   if (resource.branches && resource.branches.length > 0) {
-  //     for (let branch of resource.branches) {
-  //       if (branch.children) {
-  //         array = getAllNodes(branch.children, array);
-  //       }
-  //     }
-  //   }
-  //   return array;
-  // };
+  /** 获取所有节点 */
+  const getAllNodes = (
+    resource: WorkNodeModel,
+    array: WorkNodeModel[],
+  ): WorkNodeModel[] => {
+    array = [...array, resource];
+    if (resource.children) {
+      array = getAllNodes(resource.children, array);
+    }
+    if (resource.branches && resource.branches.length > 0) {
+      for (let branch of resource.branches) {
+        if (branch.children) {
+          array = getAllNodes(branch.children, array);
+        }
+      }
+    }
+    return array;
+  };
 
-  // const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
-  //   if (resource.children) {
-  //     array = getAllBranches(resource.children, array);
-  //   }
-  //   if (resource.branches && resource.branches.length > 0) {
-  //     resource.branches = resource.branches.map((item) => {
-  //       item.parentId = resource.code;
-  //       return item;
-  //     });
-  //     array = [...array, ...resource.branches];
-  //     for (let branch of resource.branches) {
-  //       if (branch.children) {
-  //         array = getAllBranches(branch.children, array);
-  //       }
-  //     }
-  //   }
-  //   return array;
-  // };
+  /** 获取所有分支节点 */
+  const getAllBranches = (resource: WorkNodeModel, array: Branche[]): Branche[] => {
+    if (resource.children) {
+      array = getAllBranches(resource.children, array);
+    }
+    if (resource.branches && resource.branches.length > 0) {
+      resource.branches.forEach((a) => a.parentId == resource.code);
+      array.push(...resource.branches);
+      for (let branch of resource.branches) {
+        if (branch.children) {
+          array = getAllBranches(branch.children, array);
+        }
+      }
+    }
+    return array;
+  };
 
-  // const getErrorItem = (text: string | ReactNode): ReactNode => {
-  //   return (
-  //     <div style={{ padding: 10 }}>
-  //       <ImWarning color="orange" />
-  //       {text}
-  //     </div>
-  //   );
-  // };
+  const getErrorItem = (text: string | ReactNode): ReactNode => {
+    return (
+      <div style={{ padding: 10 }}>
+        <ImWarning color="orange" />
+        {text}
+      </div>
+    );
+  };
 
-  // const checkValid = (resource: WorkNodeModel): ReactNode[] => {
-  //   let errors: ReactNode[] = [];
-  //   //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
-  //   let allNodes: WorkNodeModel[] = getAllNodes(resource, []);
-  //   let allBranches: Branche[] = getAllBranches(resource, []);
-  //   //校验Root根节点角色不为空
-  //   if (!resource.forms || resource.forms.length == 0) {
-  //     errors.push(getErrorItem('ROOT节点未绑定表单'));
-  //   }
-  //   //校验Root类型节点角色不为空
-  //   let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
-  //   for (let rootNode of rootNodes) {
-  //     if (rootNode.destId == undefined) {
-  //       errors.push(getErrorItem('ROOT节点缺少角色'));
-  //     }
-  //   }
-  //   //每个节点的 belongId  审核和抄送和子流程的destId
-  //   for (let node of allNodes) {
-  //     if (
-  //       (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
-  //       (!node.destId || node.destId == '0' || node.destId == '')
-  //     ) {
-  //       errors.push(
-  //         getErrorItem(
-  //           <>
-  //             节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
-  //           </>,
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   //条件节点条件不为空  分支下最多只能有n个分支children为空
-  //   let n = 0;
-  //   let parentIdSet: Set<string> = new Set();
-  //   for (let branch of allBranches) {
-  //     if (branch.conditions && branch.conditions.length > 0) {
-  //       for (let condition of branch.conditions) {
-  //         if (!condition.key || !condition.paramKey || !condition.val) {
-  //           errors.push(getErrorItem(`分支: branch.name的条件未完成`));
-  //         }
-  //       }
-  //     } else {
-  //       let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
-  //       if (parent.type == 'CONDITIONS') {
-  //         errors.push(getErrorItem(`条件分支: 缺少条件`));
-  //       }
-  //       if (parent.type == 'ORGANIZATIONAL') {
-  //         errors.push(getErrorItem(`组织分支: 请选择组织`));
-  //       }
-  //     }
-  //     parentIdSet.add(branch.parentId as string);
-  //   }
+  const checkValid = (resource: WorkNodeModel): ReactNode[] => {
+    let errors: ReactNode[] = [];
+    //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
+    let allNodes: WorkNodeModel[] = getAllNodes(resource, []);
+    let allBranches: Branche[] = getAllBranches(resource, []);
+    //校验Root根节点角色不为空
+    if (!resource.forms || resource.forms.length == 0) {
+      errors.push(getErrorItem('ROOT节点未绑定表单'));
+    }
+    //校验Root类型节点角色不为空
+    let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
+    for (let rootNode of rootNodes) {
+      if (rootNode.destId == undefined) {
+        errors.push(getErrorItem('ROOT节点缺少角色'));
+      }
+    }
+    //每个节点的 belongId  审核和抄送和子流程的destId
+    for (let node of allNodes) {
+      if (
+        (node.type == 'APPROVAL' || node.type == 'CC' || node.type == 'CHILDWORK') &&
+        (!node.destId || node.destId == '0' || node.destId == '')
+      ) {
+        errors.push(
+          getErrorItem(
+            <>
+              节点： <span style={{ color: 'blue' }}>{node.name} </span>缺少操作对象
+            </>,
+          ),
+        );
+      }
+    }
+    //条件节点条件不为空  分支下最多只能有n个分支children为空
+    let n = 0;
+    let parentIdSet: Set<string> = new Set();
+    for (let branch of allBranches) {
+      if (branch.conditions && branch.conditions.length > 0) {
+        for (let condition of branch.conditions) {
+          if (!condition.key || !condition.paramKey || !condition.val) {
+            errors.push(getErrorItem(`分支: branch.name的条件未完成`));
+          }
+        }
+      } else {
+        let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
+        if (parent.type == 'CONDITIONS') {
+          errors.push(getErrorItem(`条件分支: 缺少条件`));
+        }
+        if (parent.type == 'ORGANIZATIONAL') {
+          errors.push(getErrorItem(`组织分支: 请选择组织`));
+        }
+      }
+      parentIdSet.add(branch.parentId as string);
+    }
 
-  //   for (let parentId of Array.from(parentIdSet)) {
-  //     let parent = allNodes.filter((item) => item.code == parentId)[0];
-  //     let branches = allBranches.filter(
-  //       (item) => item.parentId == parentId && !item.children,
-  //     );
-  //     if (branches.length > n) {
-  //       errors.push(
-  //         getErrorItem(
-  //           n == 0
-  //             ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-  //             : `${
-  //                 parent.type == 'CONDITIONS' ? '条件' : '并行'
-  //               }节点分支下最多只能有${n}个分支节点为空`,
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   return errors;
-  // };
+    for (let parentId of Array.from(parentIdSet)) {
+      let parent = allNodes.filter((item) => item.code == parentId)[0];
+      let branches = allBranches.filter(
+        (item) => item.parentId == parentId && !item.children,
+      );
+      if (branches.length > n) {
+        errors.push(
+          getErrorItem(
+            n == 0
+              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+              : `${
+                  parent.type == 'CONDITIONS' ? '条件' : '并行'
+                }节点分支下最多只能有${n}个分支节点为空`,
+          ),
+        );
+      }
+    }
+    return errors;
+  };
 
   const loadResource = (
     resource: any,
@@ -467,6 +470,7 @@ const Design: React.FC<IProps> = ({
       obj = flowNode;
     } else if (type == 'branch') {
       let branch: Branche = {
+        parentId: '',
         conditions: resource.conditions
           ? resource.conditions.map((item: any) => {
               return {
@@ -582,11 +586,11 @@ const Design: React.FC<IProps> = ({
                             resource,
                             'flowNode',
                           ) as WorkNodeModel;
-                          // let errors = checkValid(resource_);
-                          // if (errors.length > 0) {
-                          //   setShowErrorsModal(errors);
-                          //   return;
-                          // }
+                          let errors = checkValid(resource_);
+                          if (errors.length > 0) {
+                            setShowErrorsModal(errors);
+                            return;
+                          }
                           if (
                             await species?.updateWorkDefine({
                               id: current?.id,

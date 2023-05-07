@@ -6,8 +6,8 @@ import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { ISpeciesItem, ITarget } from '@/ts/core';
-import { Button, Space } from 'antd';
+import { ISpeciesItem, ITarget, SpeciesType } from '@/ts/core';
+import { Button, Space, message } from 'antd';
 import { WorkColumns } from '../config/columns';
 import Detail from './work/detail';
 import { workNotify } from '@/ts/core/work/todo';
@@ -32,7 +32,16 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [species, setSpecies] = useState<ISpeciesItem[]>([]);
   const [dataSource, setDataSource] = useState<ITodo[]>([]);
 
+  const findAllSpecies = () => {
+    let speciesList = [...orgCtrl.user.species];
+    for (let company of orgCtrl.user.companys) {
+      speciesList.push(...company.species);
+    }
+    setSpecies(loadSpecies(speciesList));
+  };
+
   useEffect(() => {
+    findAllSpecies();
     let todos = orgCtrl.user.todos.filter(
       (a) =>
         a.name.includes(filter) ||
@@ -44,7 +53,6 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         {
           const species = selectMenu.item as ISpeciesItem;
           const speciesList = loadSpecies([species]);
-          setSpecies(speciesList);
           todos = todos.filter(
             (a) =>
               a.typeName == '事项' &&
@@ -57,7 +65,6 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         {
           let target = selectMenu.item as ITarget;
           if (target) {
-            setSpecies(loadSpecies(target.species));
             if (target.space.metadata.id == target.metadata.id) {
               todos = todos.filter((a) => a.belongId == target.metadata.id);
             } else {
@@ -161,7 +168,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         return (
           <Detail
             todo={selectTodo}
-            species={species.find((a) => a.metadata.id == selectTodo.id)}
+            species={species.find((a) => a.metadata.id == selectTodo.speciesId)}
             onBack={(success: boolean) => {
               if (success) {
                 setPageKey('List');

@@ -2,7 +2,7 @@ import React from 'react';
 import { Tag } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
-import ITodo from '@/ts/core/target/work/todo';
+import { ITodo } from '@/ts/core/work/todo';
 
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
@@ -13,7 +13,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '类型',
-    dataIndex: ['type'],
+    dataIndex: ['typeName'],
   },
   {
     title: '内容',

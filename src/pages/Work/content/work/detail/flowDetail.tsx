@@ -1,8 +1,8 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XWorkInstance, XWorkTaskHistory } from '@/ts/base/schema';
+import { XForm, XWorkInstance, XWorkRecord, XWorkTaskHistory } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { IBelong, ISpeciesItem } from '@/ts/core';
+import { IBelong, ISpeciesItem, IWorkForm, SpeciesType } from '@/ts/core';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
@@ -40,6 +40,7 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
   const [instance, setInstance] = useState<XWorkInstance>();
   const [speciesItem, setSpeciesItem] = useState<ISpeciesItem[]>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [allForms, setAllForms] = useState<XForm[]>([]);
 
   useEffect(() => {
     setTimeout(async () => {
@@ -50,8 +51,39 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
         setSpeciesItem(await GetSpeciesByIds(space.species, speciesIds));
         setTaskHistorys(res.data.historyTasks);
       }
+      let wforms: XForm[] = [];
+      for (let workform of species.parent?.children.filter(
+        (a) => a.metadata.typeName == SpeciesType.WorkForm,
+      ) || []) {
+        wforms.push(...await(workform as IWorkForm).loadForms());
+      }
+      setAllForms(wforms);
     }, 100);
   }, [todo]);
+
+  const loadForm = (forms: XForm[], disabled: boolean, record?: XWorkRecord) => {
+    let content = [];
+    for (let form of forms) {
+      form = allForms.find((a) => a.id == form.id) || form;
+      let formValue = {};
+      if (record?.data) {
+        formValue = JSON.parse(record?.data);
+      }
+      content.push(
+        <Panel header={form.name} key={form.id}>
+          <OioForm
+            key={form.id}
+            form={form}
+            formRef={undefined}
+            fieldsValue={formValue}
+            disabled={disabled}
+            belong={space}
+          />
+        </Panel>,
+      );
+    }
+    return content;
+  };
 
   // 审批
   const approvalTask = async (status: number) => {
@@ -110,24 +142,8 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
                                 </div>
                               </div>
                               <Collapse ghost>
-                                {(th.node?.bindFroms || []).map((operation) => {
-                                  let formValue = {};
-                                  if (record?.data) {
-                                    formValue = JSON.parse(record?.data);
-                                  }
-                                  return (
-                                    <Panel header={operation.name} key={operation.id}>
-                                      <OioForm
-                                        key={operation.id}
-                                        form={operation}
-                                        formRef={undefined}
-                                        fieldsValue={formValue}
-                                        disabled={th.status == 100}
-                                        belong={space}
-                                      />
-                                    </Panel>
-                                  );
-                                })}
+                                {th.node?.bindFroms &&
+                                  loadForm(th.node.bindFroms, th.status == 100, record)}
                               </Collapse>
                             </Card>
                           </Timeline.Item>
@@ -145,18 +161,8 @@ const Approve: React.FC<IApproveProps> = ({ todo, onBack, space, species }) => {
                             </div>
                             <div style={{ color: 'red' }}>待审批</div>
                           </div>
-                          {th.node?.bindFroms?.map((form) => {
-                            return (
-                              <Card title={form.name} key={th.id} bordered={false}>
-                                <OioForm
-                                  key={form.id}
-                                  form={form}
-                                  formRef={formRef}
-                                  belong={space}
-                                  disabled={th.status == 100}></OioForm>
-                              </Card>
-                            );
-                          })}
+                          {th.node?.bindFroms &&
+                            loadForm(th.node.bindFroms, th.status == 100)}
                         </Card>
                       </Timeline.Item>
                     )}
