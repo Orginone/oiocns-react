@@ -1,7 +1,7 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { kernel } from '@/ts/base';
-import { XFlowDefine, XOperation } from '@/ts/base/schema';
-import { ISpace, ISpeciesItem } from '@/ts/core';
+import { XWorkDefine, XForm } from '@/ts/base/schema';
+import { IBelong, ISpeciesItem, IWorkForm, IWorkItem, SpeciesType } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -10,22 +10,24 @@ import TabPane from 'antd/lib/tabs/TabPane';
 import { Editing, Item } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
+import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
 
 // 卡片渲染
 interface IProps {
-  space: ISpace;
+  space: IBelong;
+  species: IWorkItem;
   goBack: Function;
-  current: XFlowDefine;
+  current: XWorkDefine;
 }
 
 /**
  * 办事-业务流程--发起
  * @returns
  */
-const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
+const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
   const [data, setData] = useState<any>({});
   const [filterSpecies, setFilterSpecies] = useState<ISpeciesItem[]>([]);
-  const [operations, setOperations] = useState<XOperation[]>([]);
+  const [operations, setOperations] = useState<XForm[]>([]);
   const [rows, setRows] = useState<any>([]);
   const [gridInstance, setGridInstance] = useState<any>();
   const formRef = useRef<ProFormInstance<any>>();
@@ -34,7 +36,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
   const GetSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
     let result: ISpeciesItem[] = [];
     for (let sp of species) {
-      if (ids.includes(sp.id)) {
+      if (ids.includes(sp.metadata.id)) {
         result.push(sp);
       }
       if (sp.children.length > 0) {
@@ -46,13 +48,13 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      let node = await space.loadWorkNode(current.id);
-      if (!node.operations) {
+      let node = await species.loadWorkNode(current.id);
+      if (!node.forms) {
         message.error('流程未绑定表单');
         goBack();
         return;
       }
-      setOperations(node.operations);
+      setOperations(node.forms);
       if (current.isCreate) {
         setFilterSpecies([]);
       } else {
@@ -64,11 +66,11 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
   return (
     <>
       {operations.length > 0 &&
-        operations.map((operation: XOperation) => (
+        operations.map((operation: XForm) => (
           <OioForm
             key={operation.id}
-            space={space}
-            operation={operation}
+            belong={space}
+            form={operation}
             formRef={formRef}
             submitter={{
               resetButtonProps: {
@@ -80,24 +82,25 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
             }}
             onFinished={async (values: any) => {
               let rows_ = rows;
-              if (current?.isCreate) {
-                let res = await kernel.anystore.createThing(current.belongId, 1);
-                if (res && res.success) {
-                  rows_ = res.data;
-                }
-              }
+              // if (current?.isCreate) {
+              //   let res = await kernel.anystore.createThing(current.belongId, 1);
+              //   if (res && res.success) {
+              //     rows_ = res.data;
+              //   }
+              // }
               //发起流程tableKey
-              let res = await kernel.createInstance({
-                hook: '',
-                content: '',
-                SpaceId: space.id,
-                contentType: 'Text',
-                title: current.name,
-                defineId: current.id,
-                data: JSON.stringify({ ...data, ...values }),
-                thingIds: rows_.map((row: any) => row['Id']),
-              });
-              if (res.success) {
+              if (
+                await species.createWorkInstance({
+                  hook: '',
+                  content: '',
+                  contentType: 'Text',
+                  title: current.name,
+                  defineId: current.id,
+                  data: JSON.stringify({ ...data, ...values }),
+                  // thingIds: rows_.map((row: any) => row['Id']),
+                  thingIds: ['1'],
+                })
+              ) {
                 setOperations([]);
                 goBack();
               }
@@ -113,7 +116,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
             <Thing
               keyExpr="Id"
               dataSource={rows}
-              species={filterSpecies}
+              species={filterSpecies[0]}
               selectable={false}
               toolBarItems={[
                 <Item key={getUuid()}>
@@ -182,7 +185,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space }) => {
           <Thing
             setGridInstance={setGridInstance}
             deferred={true}
-            species={filterSpecies}
+            species={filterSpecies[0]}
             height={'calc(80vh - 175px)'}
             editingTool={
               <Editing

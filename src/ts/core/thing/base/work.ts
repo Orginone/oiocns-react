@@ -13,6 +13,10 @@ export interface IWork extends ISpeciesItem {
   loadWorkNode(id: string): Promise<model.WorkNodeModel>;
   /** 新建办事 */
   createWorkDefine(data: model.WorkDefineModel): Promise<schema.XWorkDefine | undefined>;
+  /** 新建办事实例 */
+  createWorkInstance(
+    data: model.WorkInstanceModel,
+  ): Promise<schema.XWorkInstance | undefined>;
   /** 更新办事 */
   updateWorkDefine(data: model.WorkDefineModel): Promise<boolean>;
   /** 删除办事 */
@@ -60,6 +64,11 @@ export class Work extends SpeciesItem implements IWork {
       this.defines.push(res.data);
       return res.data;
     }
+  }
+  async createWorkInstance(
+    data: model.WorkInstanceModel,
+  ): Promise<schema.XWorkInstance | undefined> {
+    return (await kernel.createWorkInstance(data)).data;
   }
   async updateWorkDefine(data: model.WorkDefineModel): Promise<boolean> {
     const index = this.defines.findIndex((i) => i.id === data.id);

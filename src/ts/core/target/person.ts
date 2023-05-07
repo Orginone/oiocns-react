@@ -9,6 +9,7 @@ import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
 import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
+import { ITodo, OrgTodo, WorkTodo } from '../work/todo';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -16,6 +17,8 @@ export interface IPerson extends IBelong {
   filesys: IFileSystem;
   /** 加入/管理的单位 */
   companys: ICompany[];
+  /** 待办 */
+  todos: ITodo[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdentity[];
   /** 根据ID查询共享信息 */
@@ -26,6 +29,8 @@ export interface IPerson extends IBelong {
   loadGivedIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /** 加载单位 */
   loadCompanys(reload?: boolean): Promise<ICompany[]>;
+  /** 加载待办 */
+  loadTodos(reload?: boolean): Promise<ITodo[]>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -45,8 +50,10 @@ export class Person extends Belong implements IPerson {
   }
   filesys: IFileSystem;
   companys: ICompany[] = [];
+  todos: ITodo[] = [];
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
+  private _todoLoaded: boolean = false;
   givedIdentitys: schema.XIdentity[] = [];
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdentity[]> {
@@ -86,6 +93,23 @@ export class Person extends Belong implements IPerson {
       }
     }
     return this.companys;
+  }
+  async loadTodos(reload?: boolean): Promise<ITodo[]> {
+    this.todos = [];
+    if (!this._todoLoaded || reload) {
+      let org = await kernel.queryTeamJoinApproval({ id: '0', page: PageAll });
+      if (org.success && org.data.result) {
+        this.todos.push(...org.data.result.map((a) => new OrgTodo(a)));
+      }
+    }
+    if (!this._todoLoaded || reload) {
+      let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
+      if (res.success && res.data.result) {
+        this._todoLoaded = true;
+        this.todos.push(...res.data.result.map((a) => new WorkTodo(a)));
+      }
+    }
+    return this.todos;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
@@ -212,6 +236,7 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
+    await this.loadTodos(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }

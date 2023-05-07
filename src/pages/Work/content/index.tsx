@@ -3,16 +3,22 @@ import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from '../config/menuType';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
-import { workNotify } from '@/ts/core/target/work/work';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
-import ITodo from '@/ts/core/target/work/todo';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { CommonStatus, ISpeciesItem, ITarget } from '@/ts/core';
+import { ISpeciesItem, ITarget } from '@/ts/core';
 import { Button, Space } from 'antd';
 import { WorkColumns } from '../config/columns';
 import Detail from './work/detail';
+import { workNotify } from '@/ts/core/work/todo';
+import { ITodo } from '@/ts/core/work/todo';
 
+/** 通用状态 */
+export enum CommonStatus {
+  ApplyStartStatus = 1,
+  ApproveStartStatus = 100,
+  RejectStartStatus = 200,
+}
 interface IProps {
   filter: string;
   selectMenu: MenuItemType;
@@ -23,8 +29,49 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectTodo, setSelectTodo] = useState<ITodo>();
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
+  const [species, setSpecies] = useState<ISpeciesItem[]>([]);
+  const [dataSource, setDataSource] = useState<ITodo[]>([]);
 
   useEffect(() => {
+    let todos = orgCtrl.user.todos.filter(
+      (a) =>
+        a.name.includes(filter) ||
+        a.typeName.includes(filter) ||
+        a.remark.includes(filter),
+    );
+    switch (selectMenu.itemType) {
+      case GroupMenuType.Species:
+        {
+          const species = selectMenu.item as ISpeciesItem;
+          const speciesList = loadSpecies([species]);
+          setSpecies(speciesList);
+          todos = todos.filter(
+            (a) =>
+              a.typeName == '事项' &&
+              a.belongId == species.current.metadata.id &&
+              speciesList.find((s) => s.metadata.id == a.speciesId),
+          );
+        }
+        break;
+      default:
+        {
+          let target = selectMenu.item as ITarget;
+          if (target) {
+            setSpecies(loadSpecies(target.species));
+            if (target.space.metadata.id == target.metadata.id) {
+              todos = todos.filter((a) => a.belongId == target.metadata.id);
+            } else {
+              todos = todos.filter(
+                (a) =>
+                  a.belongId == target.space.metadata.id &&
+                  a.shareId == target.metadata.id,
+              );
+            }
+          }
+        }
+        break;
+    }
+    setDataSource(todos);
     setPageKey('List');
     forceUpdate();
   }, [selectMenu, filter]);
@@ -34,20 +81,34 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
       <Button
         type="link"
         onClick={async () => {
-          orgCtrl.user.work.approvals(selectedRows, CommonStatus.ApproveStartStatus);
+          selectedRows.forEach(
+            async (a) => await a.approval(CommonStatus.ApproveStartStatus, '', ''),
+          );
         }}>
         同意
       </Button>
       <Button
         type="link"
         onClick={async () => {
-          orgCtrl.user.work.approvals(selectedRows, CommonStatus.RejectStartStatus);
+          selectedRows.forEach(
+            async (a) => await a.approval(CommonStatus.RejectStartStatus, '', ''),
+          );
         }}
         style={{ color: 'red' }}>
         拒绝
       </Button>
     </Space>
   );
+
+  const loadSpecies = (species: ISpeciesItem[]) => {
+    let spList: ISpeciesItem[] = [...species];
+    for (let sp of species) {
+      if (sp.children.length > 0) {
+        spList.push(...loadSpecies(sp.children));
+      }
+    }
+    return spList;
+  };
 
   const content = () => {
     switch (pageKey) {
@@ -56,7 +117,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
           <PageCard key={workKey} bordered={false} tabBarExtraContent={rowsOperation}>
             <div className={cls['page-content-table']}>
               <CardOrTableComp<ITodo>
-                dataSource={[]}
+                dataSource={dataSource}
                 rowKey={(record: ITodo) => record.id}
                 columns={WorkColumns}
                 operation={(item: ITodo) => {
@@ -73,14 +134,14 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
                       key: 'approve',
                       label: '同意',
                       onClick: async () => {
-                        orgCtrl.user.work.approval(item, CommonStatus.ApproveStartStatus);
+                        await item.approval(CommonStatus.ApproveStartStatus, '', '');
                       },
                     },
                     {
                       key: 'refuse',
                       label: '拒绝',
                       onClick: async () => {
-                        orgCtrl.user.work.approval(item, CommonStatus.RejectStartStatus);
+                        await item.approval(CommonStatus.RejectStartStatus, '', '');
                       },
                     },
                   ];
@@ -91,46 +152,6 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
                     setSelectRows(selectedRows);
                   },
                 }}
-                request={async (page) => {
-                  let todos = (await orgCtrl.user.work.loadTodo(true)).filter(
-                    (a) =>
-                      a.name.includes(filter) ||
-                      a.type.includes(filter) ||
-                      a.remark.includes(filter),
-                  );
-                  switch (selectMenu.itemType) {
-                    case GroupMenuType.Organization:
-                      {
-                        let targets = selectMenu.item as ITarget[];
-                        if (targets.length == 1 && targets[0].space.id == targets[0].id) {
-                          todos = todos.filter((a) => a.spaceId == targets[0].space.id);
-                        } else {
-                          todos = todos.filter(
-                            (a) =>
-                              a.spaceId == targets[0].space.id &&
-                              targets.findIndex((s) => s.id == a.shareId) > 0,
-                          );
-                        }
-                      }
-                      break;
-                    case GroupMenuType.Species:
-                      const species = selectMenu.item as ISpeciesItem[];
-                      todos = todos.filter(
-                        (a) =>
-                          a.spaceId == species[0].team.space.id &&
-                          species.findIndex((s) => s.id == a.speciesId) > 0,
-                      );
-                      break;
-                    default:
-                      break;
-                  }
-                  return {
-                    total: todos.length,
-                    offset: page.offset,
-                    limit: page.limit,
-                    result: todos.slice(page.offset, page.offset + page.limit),
-                  };
-                }}
               />
             </div>
           </PageCard>
@@ -140,6 +161,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         return (
           <Detail
             todo={selectTodo}
+            species={species.find((a) => a.metadata.id == selectTodo.id)}
             onBack={(success: boolean) => {
               if (success) {
                 setPageKey('List');

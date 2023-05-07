@@ -488,8 +488,6 @@ export type WorkInstanceModel = {
   title: string;
   // 回调地址
   hook: string;
-  // 对应父流程实例节点任务Id
-  taskId: string;
   // 操作对象Id集合
   thingIds: string[];
 };
