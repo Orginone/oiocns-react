@@ -1,11 +1,7 @@
 import { common, kernel } from '@/ts/base';
-import { Emitter } from '@/ts/base/common';
 import orgCtrl from '@/ts/controller';
 import { XWorkInstance, XWorkTask } from '@/ts/base/schema';
 import { PageAll } from '../public/consts';
-
-// 消息变更推送
-export const workNotify = new Emitter();
 
 /** 待办项 */
 export interface ITodo {
@@ -38,7 +34,6 @@ export class WorkTodo extends common.Entity implements ITodo {
       orgCtrl.user.todos = orgCtrl.user.todos.filter(
         (a) => a.metadata.id != this.metadata.id,
       );
-      workNotify.changCallback();
     }
     return res.success;
   }

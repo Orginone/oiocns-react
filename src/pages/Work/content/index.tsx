@@ -10,7 +10,7 @@ import { ISpeciesItem, ITarget, IWorkItem, SpeciesType } from '@/ts/core';
 import { Button, Space } from 'antd';
 import { WorkColumns } from '../config/columns';
 import Detail from './work/detail';
-import { workNotify } from '@/ts/core/work/todo';
+import { workNotify } from '@/ts/core/user';
 import { ITodo } from '@/ts/core/work/todo';
 
 interface IProps {
