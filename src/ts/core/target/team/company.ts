@@ -197,6 +197,12 @@ export class Company extends Belong implements ICompany {
   }
   get chats(): IMsgChat[] {
     const chats: IMsgChat[] = [this];
+    chats.push(...this.cohortChats);
+    chats.push(...this.memberChats);
+    return chats;
+  }
+  get cohortChats(): IMsgChat[] {
+    const chats: IMsgChat[] = [];
     for (const item of this.cohorts) {
       chats.push(...item.chats);
     }
@@ -209,7 +215,6 @@ export class Company extends Belong implements ICompany {
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
-    chats.push(...this.memberChats);
     return chats;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
@@ -219,6 +224,7 @@ export class Company extends Belong implements ICompany {
         if (_isAdd) {
           this.memberChats.push(
             new PersonMsgChat(
+              this.user.metadata.id,
               this.metadata.id,
               i.id,
               {
@@ -258,5 +264,6 @@ export class Company extends Belong implements ICompany {
     for (const cohort of this.cohorts) {
       await cohort.deepLoad(reload);
     }
+    this.superAuth?.deepLoad(reload);
   }
 }

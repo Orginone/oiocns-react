@@ -7,6 +7,7 @@ import { Cohort, ICohort } from '../outTeam/cohort';
 import { IPerson } from '../person';
 import { ITarget, Target } from './target';
 import { IChatMessage, ChatMessage } from '../../chat/message/message';
+import { IMsgChat } from '../../chat/message/msgchat';
 
 /** 自归属用户接口类 */
 export interface IBelong extends ITarget {
@@ -22,6 +23,8 @@ export interface IBelong extends ITarget {
   cohorts: ICohort[];
   /** 上级用户 */
   parentTarget: ITarget[];
+  /** 群会话 */
+  cohortChats: IMsgChat[];
   /** 加载群 */
   loadCohorts(reload?: boolean): Promise<ICohort[]>;
   /** 加载超管权限 */
@@ -106,6 +109,7 @@ export abstract class Belong extends Target implements IBelong {
       return cohort;
     }
   }
+  abstract cohortChats: IMsgChat[];
   abstract get parentTarget(): ITarget[];
   abstract applyJoin(members: schema.XTarget[]): Promise<boolean>;
   abstract loadCohorts(reload?: boolean | undefined): Promise<ICohort[]>;

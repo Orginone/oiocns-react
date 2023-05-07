@@ -80,7 +80,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       title: '流通',
       icon: 'icon-guangshangcheng',
       count: 0,
-      fath: '/store',
+      fath: '/market',
       onClick: () => {
         orgCtrl.currentKey = '';
         orgCtrl.changCallback();
