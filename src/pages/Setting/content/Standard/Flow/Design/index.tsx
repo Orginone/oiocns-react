@@ -13,7 +13,7 @@ import {
 import { getUuid } from '@/utils/tools';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
-import { XAttribute, XWorkDefine, XWorkInstance } from '@/ts/base/schema';
+import { XAttribute, XWorkDefine, XWorkInstance, XWorkNode } from '@/ts/base/schema';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { SpeciesType } from '@/ts/core';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
@@ -24,6 +24,7 @@ interface IProps {
   current: XWorkDefine;
   species: IWorkItem;
   instance?: XWorkInstance;
+  nodes?: WorkNodeModel;
   onBack: () => void;
 }
 
@@ -32,6 +33,7 @@ const Design: React.FC<IProps> = ({
   current,
   instance,
   onBack,
+  nodes,
   IsEdit = true,
 }) => {
   const [scale, setScale] = useState<number>(100);
@@ -41,10 +43,12 @@ const Design: React.FC<IProps> = ({
 
   useEffect(() => {
     const load = async () => {
+      if (nodes == undefined) {
+        nodes = await species.loadWorkNode(current.id);
+      }
       // content字段可能取消
-      let resource_ = await species.loadWorkNode(current.id);
-      let resourceData = loadResource(resource_, 'flowNode', '', '', undefined, '');
-      if (resource_.id == undefined) {
+      let resourceData = loadResource(nodes, 'flowNode', '', '', undefined, '');
+      if (nodes.id == undefined) {
         resourceData = {
           nodeId: `node_${getUuid()}`,
           parentId: '',
@@ -141,7 +145,6 @@ const Design: React.FC<IProps> = ({
       array = getAllBranches(resource.children, array);
     }
     if (resource.branches && resource.branches.length > 0) {
-      resource.branches.forEach((a) => a.parentId == resource.code);
       array.push(...resource.branches);
       for (let branch of resource.branches) {
         if (branch.children) {
@@ -165,7 +168,6 @@ const Design: React.FC<IProps> = ({
     let errors: ReactNode[] = [];
     //校验Root类型节点角色不为空  至少有一个审批节点 + 每个节点的 belongId + 审核和抄送的destId + 条件节点条件不为空 + 分支下最多只能有n个分支children为空
     let allNodes: WorkNodeModel[] = getAllNodes(resource, []);
-    let allBranches: Branche[] = getAllBranches(resource, []);
     //校验Root根节点角色不为空
     if (!resource.forms || resource.forms.length == 0) {
       errors.push(getErrorItem('ROOT节点未绑定表单'));
@@ -195,42 +197,43 @@ const Design: React.FC<IProps> = ({
     //条件节点条件不为空  分支下最多只能有n个分支children为空
     let n = 0;
     let parentIdSet: Set<string> = new Set();
-    for (let branch of allBranches) {
-      if (branch.conditions && branch.conditions.length > 0) {
-        for (let condition of branch.conditions) {
-          if (!condition.key || !condition.paramKey || !condition.val) {
-            errors.push(getErrorItem(`分支: branch.name的条件未完成`));
-          }
-        }
-      } else {
-        let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
-        if (parent.type == 'CONDITIONS') {
-          errors.push(getErrorItem(`条件分支: 缺少条件`));
-        }
-        if (parent.type == 'ORGANIZATIONAL') {
-          errors.push(getErrorItem(`组织分支: 请选择组织`));
-        }
-      }
-      parentIdSet.add(branch.parentId as string);
-    }
+    let allBranches: Branche[] = getAllBranches(resource, []);
+    // for (let branch of allBranches) {
+    //   if (branch.conditions && branch.conditions.length > 0) {
+    //     for (let condition of branch.conditions) {
+    //       if (!condition.key || !condition.paramKey || !condition.val) {
+    //         errors.push(getErrorItem(`分支: branch.name的条件未完成`));
+    //       }
+    //     }
+    //   } else {
+    //     let parent = allNodes.filter((item) => item.code == branch.parentId)[0];
+    //     if (parent.type == 'CONDITIONS') {
+    //       errors.push(getErrorItem(`条件分支: 缺少条件`));
+    //     }
+    //     if (parent.type == 'ORGANIZATIONAL') {
+    //       errors.push(getErrorItem(`组织分支: 请选择组织`));
+    //     }
+    //   }
+    //   parentIdSet.add(branch.parentId as string);
+    // }
 
-    for (let parentId of Array.from(parentIdSet)) {
-      let parent = allNodes.filter((item) => item.code == parentId)[0];
-      let branches = allBranches.filter(
-        (item) => item.parentId == parentId && !item.children,
-      );
-      if (branches.length > n) {
-        errors.push(
-          getErrorItem(
-            n == 0
-              ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
-              : `${
-                  parent.type == 'CONDITIONS' ? '条件' : '并行'
-                }节点分支下最多只能有${n}个分支节点为空`,
-          ),
-        );
-      }
-    }
+    // for (let parentId of Array.from(parentIdSet)) {
+    //   let parent = allNodes.filter((item) => item.code == parentId)[0];
+    //   let branches = allBranches.filter(
+    //     (item) => item.parentId == parentId && !item.children,
+    //   );
+    //   if (branches.length > n) {
+    //     errors.push(
+    //       getErrorItem(
+    //         n == 0
+    //           ? `${parent.type == 'CONDITIONS' ? '条件' : '并行'}节点分支下不能为空`
+    //           : `${
+    //               parent.type == 'CONDITIONS' ? '条件' : '并行'
+    //             }节点分支下最多只能有${n}个分支节点为空`,
+    //       ),
+    //     );
+    //   }
+    // }
     return errors;
   };
 
@@ -470,7 +473,6 @@ const Design: React.FC<IProps> = ({
       obj = flowNode;
     } else if (type == 'branch') {
       let branch: Branche = {
-        parentId: '',
         conditions: resource.conditions
           ? resource.conditions.map((item: any) => {
               return {

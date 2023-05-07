@@ -1,7 +1,6 @@
 import { kernel, model, schema } from '../../../base';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { PageAll } from '../../public/consts';
-import { ITodo } from '../../work/todo';
 import { ITeam, Team } from '../base/team';
 import { IIdentity, Identity } from '../identity/identity';
 import { ICompany } from '../team/company';
@@ -83,9 +82,6 @@ export class Station extends Team implements IStation {
   }
   get chats(): IMsgChat[] {
     return [this];
-  }
-  get todos(): ITodo[] {
-    return [];
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadMembers(reload);

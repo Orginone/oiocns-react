@@ -6,11 +6,11 @@ import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
-import { TargetType } from '../../public/enums';
+import { SpeciesType, TargetType } from '../../public/enums';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
-import { ITodo } from '../../work/todo';
+import { IApplication } from '../../thing/app/application';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -213,15 +213,17 @@ export class Company extends Belong implements ICompany {
     chats.push(...this.memberChats);
     return chats;
   }
-  get todos(): ITodo[] {
-    const todos: ITodo[] = [];
+  get workSpecies(): IApplication[] {
+    const workItems: IApplication[] = this.species.filter(
+      (a) => a.metadata.typeName == SpeciesType.Application,
+    ) as IApplication[];
     for (const item of this.cohorts) {
-      todos.push(...item.todos);
+      workItems.push(...item.workSpecies);
     }
-    for (const item of this.groups) {
-      todos.push(...item.todos);
+    for (const group of this.groups) {
+      workItems.push(...group.workSpecies);
     }
-    return todos;
+    return workItems;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers

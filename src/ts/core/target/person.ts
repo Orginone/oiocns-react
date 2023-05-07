@@ -3,13 +3,14 @@ import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
 import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
-import { TargetType } from '../public/enums';
+import { SpeciesType, TargetType } from '../public/enums';
 import { ICompany } from './team/company';
 import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
 import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
-import { ITodo, OrgTodo, WorkTodo } from '../work/todo';
+import { ITodo, WorkTodo } from '../work/todo';
+import { IApplication } from '../thing/app/application';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -95,18 +96,13 @@ export class Person extends Belong implements IPerson {
     return this.companys;
   }
   async loadTodos(reload?: boolean): Promise<ITodo[]> {
-    this.todos = [];
-    if (!this._todoLoaded || reload) {
-      let org = await kernel.queryTeamJoinApproval({ id: '0', page: PageAll });
-      if (org.success && org.data.result) {
-        this.todos.push(...org.data.result.map((a) => new OrgTodo(a)));
-      }
-    }
     if (!this._todoLoaded || reload) {
       let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
-      if (res.success && res.data.result) {
+      if (res.success) {
         this._todoLoaded = true;
-        this.todos.push(...res.data.result.map((a) => new WorkTodo(a)));
+        if (res.data.result && res.data.result.length > 0) {
+          this.todos.push(...res.data.result?.map((a) => new WorkTodo(a)));
+        }
       }
     }
     return this.todos;
@@ -200,6 +196,22 @@ export class Person extends Belong implements IPerson {
     }
     chats.push(...this.memberChats);
     return chats;
+  }
+  get workSpecies(): IApplication[] {
+    const workItems: IApplication[] = this.species.filter(
+      (a) => a.metadata.typeName == SpeciesType.Application,
+    ) as IApplication[];
+    for (const item of this.companys) {
+      workItems.push(...item.workSpecies);
+    }
+    for (const item of this.cohorts) {
+      workItems.push(
+        ...(item.species.filter(
+          (a) => a.metadata.typeName == SpeciesType.WorkItem,
+        ) as IApplication[]),
+      );
+    }
+    return workItems;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers.forEach((i) => {

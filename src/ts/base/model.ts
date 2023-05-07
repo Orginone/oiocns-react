@@ -519,7 +519,6 @@ export type WorkNodeModel = {
 };
 
 export type Branche = {
-  parentId: string;
   conditions: Condition[] | undefined;
   children: WorkNodeModel | undefined;
 };

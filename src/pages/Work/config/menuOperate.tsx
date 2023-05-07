@@ -1,6 +1,6 @@
 import React from 'react';
 import * as im from 'react-icons/im';
-import { IGroup, ISpeciesItem, ITarget, ITeam, SpeciesType, TargetType } from '@/ts/core';
+import { IGroup, ISpeciesItem, ITarget, ITeam, SpeciesType } from '@/ts/core';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
@@ -8,39 +8,60 @@ import { GroupMenuType } from './menuType';
 import { IconFont } from '@/components/IconFont';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 
-/** 加载分组菜单参数 */
-interface groupMenuParams {
-  item: ITarget;
-  key: string;
-  label: string;
-  typeName: string;
-  children: MenuItemType[];
-}
+const buildTargetSpeciesTree = (target: ITarget) =>
+  target.species
+    .filter((a) => SpeciesType.Application == a.metadata.typeName)
+    .map((i) => buildSpeciesTree(i));
 
-const buildTargetSpeciesTree = (target: ITarget) => {
-  return {
-    children: target.species
-      .filter((a) => SpeciesType.Application == a.metadata.typeName)
-      .map((i) => buildSpeciesTree(i)),
-    key: target.key + '-' + GroupMenuType.SpeciesGroup,
-    label: GroupMenuType.SpeciesGroup,
-    itemType: GroupMenuType.SpeciesGroup,
-    item: target,
-    icon: <im.ImNewspaper />,
-    menus: [],
-  };
+/** 加载右键菜单 */
+const loadSpeciesMenus = () => {
+  const items: OperateMenuType[] = [];
+  items.push({
+    key: '发起办事',
+    icon: <im.ImPlus />,
+    label: '发起办事',
+    model: 'outside',
+  });
+  return items;
+};
+
+/** 编译事项 */
+const buildWorkDefine = (workItem: IWorkItem) => {
+  return workItem.defines.map((a) => {
+    return {
+      key: workItem.key + a.id,
+      item: a,
+      label: a.name,
+      icon: <TeamIcon share={workItem.share} size={18} fontSize={16} />,
+      itemType: GroupMenuType.Work,
+      menus: loadSpeciesMenus(),
+      children: [],
+    };
+  });
 };
 
 /** 编译分类树 */
 const buildSpeciesTree = (species: ISpeciesItem) => {
+  let children: MenuItemType[] = [];
+  if (species.metadata.typeName == SpeciesType.WorkItem) {
+    children = buildWorkDefine(species as IWorkItem);
+  } else {
+    children = species.children
+      .filter((a) =>
+        [SpeciesType.AppModule, SpeciesType.WorkItem].includes(
+          a.metadata.typeName as SpeciesType,
+        ),
+      )
+      .map((i) => buildSpeciesTree(i));
+  }
   const result: MenuItemType = {
     key: species.key,
     item: species,
     label: species.metadata.name,
     icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
     itemType: GroupMenuType.Species,
-    menus: loadSpeciesMenus(species),
-    children: species.children.map((i) => buildSpeciesTree(i)),
+    menus: [],
+    children: children,
     onClick: async () => {
       switch (species.metadata.typeName) {
         case SpeciesType.WorkItem:
@@ -52,19 +73,6 @@ const buildSpeciesTree = (species: ISpeciesItem) => {
     },
   };
   return result;
-};
-/** 加载右侧菜单 */
-const loadSpeciesMenus = (species: ISpeciesItem) => {
-  const items: OperateMenuType[] = [];
-  if (species.metadata.typeName === SpeciesType.WorkItem) {
-    items.push({
-      key: '发起办事',
-      icon: <im.ImPlus />,
-      label: '发起办事',
-      model: 'outside',
-    });
-  }
-  return items;
 };
 
 /** 创建团队菜单 */
@@ -86,16 +94,8 @@ const getUserMenu = () => {
     orgCtrl.user,
     [],
     [
-      buildTargetSpeciesTree(orgCtrl.user),
-      loadGroupMenus({
-        key: orgCtrl.user.key + GroupMenuType.Cohort,
-        label: GroupMenuType.Cohort,
-        item: orgCtrl.user,
-        typeName: TargetType.Cohort,
-        children: orgCtrl.user.cohorts.map((i) =>
-          createMenu(i, [], [buildTargetSpeciesTree(i)]),
-        ),
-      }),
+      ...buildTargetSpeciesTree(orgCtrl.user),
+      ...orgCtrl.user.cohorts.map((i) => createMenu(i, [], buildTargetSpeciesTree(i))),
     ],
   );
 };
@@ -109,31 +109,9 @@ const getTeamMenu = () => {
         company,
         [],
         [
-          {
-            key: company.key + GroupMenuType.SpeciesGroup,
-            item: company,
-            label: GroupMenuType.SpeciesGroup,
-            itemType: GroupMenuType.SpeciesGroup,
-            menus: [],
-            icon: <im.ImNewspaper />,
-            children: [buildTargetSpeciesTree(company)],
-          },
-          loadGroupMenus({
-            key: company.key + GroupMenuType.OutAgency,
-            label: GroupMenuType.OutAgency,
-            item: company,
-            typeName: TargetType.Group,
-            children: buildGroupTree(company.groups),
-          }),
-          loadGroupMenus({
-            key: company.key + GroupMenuType.Cohort,
-            label: GroupMenuType.Cohort,
-            item: company,
-            typeName: TargetType.Cohort,
-            children: company.cohorts.map((i) =>
-              createMenu(i, [], [buildTargetSpeciesTree(i)]),
-            ),
-          }),
+          ...buildTargetSpeciesTree(company),
+          ...buildGroupTree(company.groups),
+          ...company.cohorts.map((i) => createMenu(i, [], buildTargetSpeciesTree(i))),
         ],
       ),
     );
@@ -147,31 +125,9 @@ const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
     createMenu(
       item,
       [],
-      [buildTargetSpeciesTree(item), ...buildGroupTree(item.children)],
+      [...buildTargetSpeciesTree(item), ...buildGroupTree(item.children)],
     ),
   );
-};
-/** 加载分组菜单 */
-const loadGroupMenus = (param: groupMenuParams) => {
-  return {
-    key: param.key,
-    label: param.label,
-    itemType: param.key,
-    icon: (
-      <TeamIcon
-        share={{
-          name: param.key,
-          typeName: param.typeName,
-        }}
-        size={18}
-        fontSize={16}
-        notAvatar={true}
-      />
-    ),
-    menus: [],
-    item: param.item,
-    children: param.children,
-  };
 };
 
 export const loadWorkMenu = (): MenuItemType => {

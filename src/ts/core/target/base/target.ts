@@ -5,6 +5,7 @@ import { PageAll } from '../../public/consts';
 import { ISpeciesItem, createSpecies } from '../../thing/';
 import { ITeam, Team } from './team';
 import { IBelong } from './belong';
+import { IApplication } from '../../thing/app/application';
 
 /** 用户抽象接口类 */
 export interface ITarget extends ITeam {
@@ -12,6 +13,8 @@ export interface ITarget extends ITeam {
   identitys: IIdentity[];
   /** 用户设立的管理类别 */
   species: ISpeciesItem[];
+  /** 办事分类 */
+  workSpecies: IApplication[];
   /** 支持的类别类型 */
   speciesTypes: string[];
   /** 子用户 */
@@ -117,6 +120,7 @@ export abstract class Target extends Team implements ITarget {
   }
   abstract exit(): Promise<boolean>;
   abstract get subTarget(): ITarget[];
+  abstract get workSpecies(): IApplication[];
   createTarget(_data: model.TargetModel): Promise<ITeam | undefined> {
     return new Promise((resolve) => {
       resolve(undefined);

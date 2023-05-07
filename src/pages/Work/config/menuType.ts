@@ -2,6 +2,7 @@
 export enum GroupMenuType {
   'SpeciesGroup' = '类别定义',
   'Species' = '分类',
+  'Work' = '事项',
   'OutAgency' = '外部机构',
   'Cohort' = '自由群组',
 }

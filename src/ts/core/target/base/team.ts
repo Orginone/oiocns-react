@@ -3,6 +3,7 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IBelong } from './belong';
 import { IMsgChat, MsgChat } from '../../chat/message/msgchat';
+import { IWorkItem } from '../../thing/app/work/workitem';
 
 /** 团队抽象接口类 */
 export interface ITeam extends IMsgChat {

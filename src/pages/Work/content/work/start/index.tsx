@@ -1,7 +1,6 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { kernel } from '@/ts/base';
 import { XWorkDefine, XForm } from '@/ts/base/schema';
-import { IBelong, ISpeciesItem, IWorkForm, IWorkItem, SpeciesType } from '@/ts/core';
+import { IBelong, ISpeciesItem, IWorkItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -11,6 +10,7 @@ import { Editing, Item } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
+import { kernel } from '@/ts/base';
 
 // 卡片渲染
 interface IProps {
@@ -82,12 +82,12 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
             }}
             onFinished={async (values: any) => {
               let rows_ = rows;
-              // if (current?.isCreate) {
-              //   let res = await kernel.anystore.createThing(current.belongId, 1);
-              //   if (res && res.success) {
-              //     rows_ = res.data;
-              //   }
-              // }
+              if (current?.isCreate) {
+                let res = await kernel.anystore.createThing(current.belongId, 1);
+                if (res && res.success) {
+                  rows_ = res.data;
+                }
+              }
               //发起流程tableKey
               if (
                 await species.createWorkInstance({
@@ -97,8 +97,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
                   title: current.name,
                   defineId: current.id,
                   data: JSON.stringify({ ...data, ...values }),
-                  // thingIds: rows_.map((row: any) => row['Id']),
-                  thingIds: ['1'],
+                  thingIds: rows_.map((row: any) => row['Id']),
                 })
               ) {
                 setOperations([]);

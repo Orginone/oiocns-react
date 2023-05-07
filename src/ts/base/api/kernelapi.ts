@@ -1161,7 +1161,7 @@ export default class KernelApi {
    */
   public async queryApproveTask(
     params: model.IdModel,
-  ): Promise<model.ResultType<schema.XWorkTaskHistoryArray>> {
+  ): Promise<model.ResultType<schema.XWorkTaskArray>> {
     return await this.request({
       module: 'work',
       action: 'QueryApproveTask',

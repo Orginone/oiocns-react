@@ -8,6 +8,7 @@ import cls from './index.module.less';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
+import { workNotify } from '@/ts/core/work/todo';
 
 /**
  * 顶部导航
@@ -27,14 +28,14 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setMsgCount(noReadCount);
       setMsgKey(key);
     });
-    // const workId = workNotify.subscribe(async (key) => {
-    //   let todos = await orgCtrl.user.work.loadTodo(true);
-    //   setWorkCount(todos.length);
-    //   setMsgKey(key);
-    // });
+    const workId = workNotify.subscribe(async (key) => {
+      let todos = await orgCtrl.user.loadTodos(false);
+      setWorkCount(todos.length);
+      setMsgKey(key);
+    });
     return () => {
       msgChatNotify.unsubscribe(id);
-      // workNotify.unsubscribe(workId);
+      workNotify.unsubscribe(workId);
     };
   }, []);
   const navs = [

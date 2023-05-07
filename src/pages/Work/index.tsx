@@ -1,13 +1,10 @@
 import MainLayout from '@/components/MainLayout';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Content from './content';
 import orgCtrl from '@/ts/controller/';
 import { Input, Modal } from 'antd';
 import { ImSearch } from 'react-icons/im';
 import { XWorkDefine } from '@/ts/base/schema';
-import CardOrTableComp from '@/components/CardOrTableComp';
-import { ISpeciesItem } from '@/ts/core';
-import { FlowColumn } from '../Setting/config/columns';
 import WorkStart from './content/work/start';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';
@@ -16,25 +13,18 @@ import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 const Todo: React.FC<any> = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(loadWorkMenu);
   const [openFlow, setOpenFlow] = useState(false);
-  const [dataSource, setDataSource] = useState<XWorkDefine[]>([]);
-  const [selectWork, setSelectWork] = useState<XWorkDefine>();
   const [filter, setFilter] = useState('');
-  useEffect(() => {
-    if (selectMenu?.item) {
-      setDataSource((selectMenu.item as IWorkItem).defines);
-    }
-  }, [selectMenu]);
 
   if (!selectMenu || !rootMenu) return <></>;
 
   const content = () => {
-    if (selectWork) {
+    if (openFlow) {
       return (
         <WorkStart
-          current={selectWork}
-          species={selectMenu.item as IWorkItem}
-          space={(selectMenu.item as ISpeciesItem).current.space}
-          goBack={() => setSelectWork(undefined)}
+          current={selectMenu.item as XWorkDefine}
+          species={selectMenu.parentMenu?.item as IWorkItem}
+          space={(selectMenu.parentMenu?.item as IWorkItem).current.space}
+          goBack={() => setOpenFlow(false)}
         />
       );
     }
@@ -49,7 +39,6 @@ const Todo: React.FC<any> = () => {
           await data.onClick();
         }
         orgCtrl.currentKey = data.key;
-        setSelectWork(undefined);
         setSelectMenu(data);
       }}
       rightBar={
@@ -64,7 +53,6 @@ const Todo: React.FC<any> = () => {
       onMenuClick={async (_data, key) => {
         switch (key) {
           case '发起办事':
-            setSelectWork(undefined);
             setOpenFlow(true);
             break;
           default:
@@ -72,29 +60,6 @@ const Todo: React.FC<any> = () => {
         }
       }}
       siderMenuData={rootMenu}>
-      <Modal
-        width="800px"
-        title="发起办事"
-        open={openFlow}
-        destroyOnClose={true}
-        onOk={() => setOpenFlow(false)}
-        onCancel={() => {
-          setOpenFlow(false);
-          setSelectWork(undefined);
-        }}>
-        <CardOrTableComp<XWorkDefine>
-          rowKey={'id'}
-          columns={FlowColumn}
-          hideOperation={true}
-          dataSource={dataSource}
-          rowSelection={{
-            type: 'radio',
-            onSelect: (record: XWorkDefine, _: any) => {
-              setSelectWork(record);
-            },
-          }}
-        />
-      </Modal>
       {content()}
     </MainLayout>
   );

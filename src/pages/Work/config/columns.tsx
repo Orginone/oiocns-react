@@ -13,11 +13,11 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '类型',
-    dataIndex: ['typeName'],
+    dataIndex: ['metadata', 'taskType'],
   },
   {
     title: '内容',
-    dataIndex: ['name'],
+    dataIndex: ['metadata', 'title'],
   },
   {
     key: 'shareId',
@@ -25,7 +25,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     title: '共享组织',
     dataIndex: 'shareId',
     render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.user?.findShareById(record.shareId).name;
+      return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
     },
   },
   {
@@ -34,25 +34,25 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     title: '申请人',
     dataIndex: 'createUser',
     render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.user?.findShareById(record.createUser).name;
+      return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
     },
   },
   {
     title: '状态',
     dataIndex: 'status',
     render: (_: any, record: ITodo) => {
-      const status = statusMap.get(record.status as number);
+      const status = statusMap.get(record.metadata.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
     title: '备注',
-    dataIndex: 'remark',
+    dataIndex: ['metadata', 'remark'],
   },
   {
     title: '申请时间',
-    dataIndex: 'createTime',
     valueType: 'dateTime',
+    dataIndex: ['metadata', 'createTime'],
   },
 ];
 

@@ -1263,7 +1263,7 @@ export type XWorkRecord = {
   // 更新时间
   updateTime: string;
   // 办事的定义
-  historyTask: XWorkTaskHistory | undefined;
+  task: XWorkTask | undefined;
 };
 
 //办事节点数据查询返回集合
@@ -1284,8 +1284,24 @@ export type XWorkTask = {
   id: string;
   // 办事定义节点id
   nodeId: string;
+  // 任务标题
+  title: string;
+  // 审批类型
+  approveType: string;
+  // 任务类型
+  taskType: string;
+  // 审批人数
+  count: number;
+  // 流程定义Id
+  defineId: string;
+  // 归属组织Id
+  shareId: string;
   // 办事实例id
   instanceId: string;
+  // 身份Id
+  identityId: string;
+  // 备注
+  remark: string;
   // 状态
   status: number;
   // 创建人员ID
@@ -1298,6 +1314,8 @@ export type XWorkTask = {
   createTime: string;
   // 更新时间
   updateTime: string;
+  // 办事节点记录
+  records: XWorkRecord[] | undefined;
   // 办事节点
   node: XWorkNode | undefined;
   // 办事的定义
