@@ -2,11 +2,9 @@ import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
 import { ImSearch } from 'react-icons/im';
-import { XWorkDefine } from '@/ts/base/schema';
 import WorkStart from './content/work/start';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { Input } from 'antd';
 
 const Todo: React.FC<any> = () => {
@@ -18,14 +16,7 @@ const Todo: React.FC<any> = () => {
 
   const content = () => {
     if (openFlow) {
-      return (
-        <WorkStart
-          current={selectMenu.item as XWorkDefine}
-          species={selectMenu.parentMenu?.item as IWorkItem}
-          space={(selectMenu.parentMenu?.item as IWorkItem).current.space}
-          goBack={() => setOpenFlow(false)}
-        />
-      );
+      return <WorkStart current={selectMenu.item} goBack={() => setOpenFlow(false)} />;
     }
     return <Content key={key} selectMenu={selectMenu} filter={filter} />;
   };

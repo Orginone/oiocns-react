@@ -3,7 +3,6 @@ import React, { useRef, useState } from 'react';
 import cls from './index.module.less';
 import { AiOutlineExclamation } from 'react-icons/ai';
 import CardOrTable from '@/components/CardOrTableComp';
-import { XWorkDefine } from '@/ts/base/schema';
 import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
@@ -12,6 +11,7 @@ import Design from './Design';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 interface IProps {
   current: IWorkItem;
@@ -25,7 +25,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [activeTab, setActiveTab] = useState<string>('work');
   const [key, setForceUpdate] = useObjectUpdate(current);
-  const [define, setDefine] = useState<XWorkDefine>();
+  const [define, setDefine] = useState<IWorkDefine>();
   const [modalType, setModalType] = useState('');
   const items = [
     {
@@ -34,7 +34,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       key: 'work',
     },
   ];
-  const renderOperation = (record: XWorkDefine): any[] => {
+  const renderOperation = (record: IWorkDefine): any[] => {
     let operations: any[] = [
       {
         key: 'editor',
@@ -66,7 +66,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
             okType: 'danger',
             cancelText: '取消',
             onOk: async () => {
-              if (await current.deleteWorkDefine(record)) {
+              if (await record.deleteDefine()) {
                 message.success('删除成功');
                 setForceUpdate();
               }
@@ -117,7 +117,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
               <div style={{ background: '#EFF4F8' }}>
                 <Card bordered={false} bodyStyle={{ paddingTop: 0 }}>
                   <div className={cls['app-wrap']} ref={parentRef}>
-                    <CardOrTable<XWorkDefine>
+                    <CardOrTable<IWorkDefine>
                       extra={[
                         <Button
                           key="edit"
@@ -132,13 +132,13 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       parentRef={parentRef}
                       dataSource={current.defines}
                       operation={renderOperation}
-                      rowKey={(record: XWorkDefine) => record.id}
+                      rowKey={(record: IWorkDefine) => record.metadata.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard
                             className="card"
                             data={item}
-                            key={item.id}
+                            key={item.metadata.id}
                             operation={renderOperation}
                           />
                         ));

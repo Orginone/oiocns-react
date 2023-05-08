@@ -29,9 +29,9 @@ const loadSpeciesMenus = () => {
 const buildWorkDefine = (workItem: IWorkItem) => {
   return workItem.defines.map((a) => {
     return {
-      key: workItem.key + a.id,
+      key: workItem.key + a.metadata.id,
       item: a,
-      label: a.name,
+      label: a.metadata.name,
       icon: <TeamIcon share={workItem.share} size={18} fontSize={16} />,
       itemType: GroupMenuType.Work,
       menus: loadSpeciesMenus(),

@@ -1,6 +1,6 @@
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XWorkDefine, XForm } from '@/ts/base/schema';
-import { IBelong, ISpeciesItem, IWorkItem } from '@/ts/core';
+import { XForm } from '@/ts/base/schema';
+import { ISpeciesItem } from '@/ts/core';
 import { getUuid } from '@/utils/tools';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { ProFormInstance } from '@ant-design/pro-form';
@@ -11,20 +11,19 @@ import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
 import { kernel } from '@/ts/base';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 // 卡片渲染
 interface IProps {
-  space: IBelong;
-  species: IWorkItem;
   goBack: Function;
-  current: XWorkDefine;
+  current: IWorkDefine;
 }
 
 /**
  * 办事-业务流程--发起
  * @returns
  */
-const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
+const WorkStartDo: React.FC<IProps> = ({ current, goBack }) => {
   const [data, setData] = useState<any>({});
   const [filterSpecies, setFilterSpecies] = useState<ISpeciesItem[]>([]);
   const [operations, setOperations] = useState<XForm[]>([]);
@@ -48,17 +47,22 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      let node = await species.loadWorkNode(current.id);
+      let node = await current.loadWorkNode();
       if (!node.forms) {
         message.error('流程未绑定表单');
         goBack();
         return;
       }
       setOperations(node.forms);
-      if (current.isCreate) {
+      if (current.metadata.isCreate) {
         setFilterSpecies([]);
       } else {
-        setFilterSpecies(GetSpeciesByIds(space.species, current.sourceIds.split(',')));
+        setFilterSpecies(
+          GetSpeciesByIds(
+            current.workItem.current.space.species,
+            current.metadata.sourceIds.split(','),
+          ),
+        );
       }
     }, 100);
   }, [current]);
@@ -69,7 +73,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
         operations.map((operation: XForm) => (
           <OioForm
             key={operation.id}
-            belong={space}
+            belong={current.workItem.current.space}
             form={operation}
             formRef={formRef}
             submitter={{
@@ -82,20 +86,20 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
             }}
             onFinished={async (values: any) => {
               let rows_ = rows;
-              if (current?.isCreate) {
-                let res = await kernel.anystore.createThing(current.belongId, 1);
+              if (current.metadata.isCreate) {
+                let res = await kernel.anystore.createThing(current.metadata.belongId, 1);
                 if (res && res.success) {
                   rows_ = res.data;
                 }
               }
               //发起流程tableKey
               if (
-                await species.createWorkInstance({
+                await current.createWorkInstance({
                   hook: '',
                   content: '',
                   contentType: 'Text',
-                  title: current.name,
-                  defineId: current.id,
+                  title: current.metadata.name,
+                  defineId: current.metadata.id,
                   data: JSON.stringify({ ...data, ...values }),
                   thingIds: rows_.map((row: any) => row['Id']),
                 })
@@ -109,7 +113,7 @@ const WorkStartDo: React.FC<IProps> = ({ current, goBack, space, species }) => {
             }}
           />
         ))}
-      {!current.isCreate && (
+      {!current.metadata.isCreate && (
         <Tabs defaultActiveKey="1">
           <TabPane tab="实体" key="1">
             <Thing

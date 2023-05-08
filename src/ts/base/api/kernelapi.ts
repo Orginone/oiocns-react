@@ -1213,6 +1213,20 @@ export default class KernelApi {
   /**
    * 查询发起的办事
    * @param {model.IdModel} params 请求参数
+   * @returns {model.ResultType<schema.XWorkInstance>} 请求结果
+   */
+  public async queryWorkApply(
+    params: model.QueryWorkApplyReq,
+  ): Promise<model.ResultType<schema.XWorkInstanceArray>> {
+    return await this.request({
+      module: 'work',
+      action: 'QueryWorkApply',
+      params: params,
+    });
+  }
+  /**
+   * 查询发起的办事
+   * @param {model.IdModel} params 请求参数
    * @returns {model.ResultType<schema.XWorkInstanceArray>} 请求结果
    */
   public async queryMyWorkInstance(

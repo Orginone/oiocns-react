@@ -2,7 +2,7 @@ import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
 import { XForm, XWorkInstance } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { ISpeciesItem, IWorkForm, SpeciesType } from '@/ts/core';
+import { ISpeciesItem } from '@/ts/core';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
@@ -11,17 +11,17 @@ import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
 import { ITodo } from '@/ts/core/work/todo';
 import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { WorkNodeModel } from '@/ts/base/model';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 const { Panel } = Collapse;
 
 interface IProp {
   todo: ITodo;
-  work: IWorkItem;
+  define: IWorkDefine;
   onBack: (success: boolean) => void;
 }
 
-const Detail: React.FC<IProp> = ({ todo, onBack, work }) => {
+const Detail: React.FC<IProp> = ({ todo, onBack, define }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
   const [nodes, setNodes] = useState<WorkNodeModel>();
@@ -29,27 +29,22 @@ const Detail: React.FC<IProp> = ({ todo, onBack, work }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [allForms, setAllForms] = useState<XForm[]>([]);
   const [instance, setInstance] = useState<XWorkInstance>();
+  let isTodo = todo != undefined;
 
   useEffect(() => {
     setTimeout(async () => {
+      setNodes(await define.loadWorkNode());
+      setAllForms(await define.workItem.loadForms());
       let xinstance = await todo.getInstance();
       if (xinstance) {
         setInstance(xinstance);
-        setNodes(await work.loadWorkNode(xinstance.defineId));
         setSpeciesItem(
           await filterSpeciesByIds(
-            work.current.species,
+            define.workItem.current.species,
             xinstance.define!.sourceIds?.split(',') || [],
           ),
         );
       }
-      let wforms: XForm[] = [];
-      for (let workform of work.parent?.children.filter(
-        (a) => a.metadata.typeName == SpeciesType.WorkForm,
-      ) || []) {
-        wforms.push(...(await (workform as IWorkForm).loadForms()));
-      }
-      setAllForms(wforms);
     }, 100);
   }, []);
 
@@ -82,7 +77,7 @@ const Detail: React.FC<IProp> = ({ todo, onBack, work }) => {
             formRef={undefined}
             fieldsValue={data}
             disabled={disabled}
-            belong={work.current.space}
+            belong={define.workItem.current.space}
           />
         </Panel>,
       );
@@ -248,9 +243,8 @@ const Detail: React.FC<IProp> = ({ todo, onBack, work }) => {
       label: `流程图`,
       children: instance?.define ? (
         <Design
-          nodes={nodes}
-          species={work}
-          current={instance!.define}
+          species={define.workItem}
+          current={define}
           instance={instance}
           IsEdit={false}
           onBack={() => {}}

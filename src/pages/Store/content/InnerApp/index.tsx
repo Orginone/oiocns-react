@@ -4,41 +4,46 @@ import { common } from 'typings/common';
 import AppCard from './card';
 import CardOrTable from '@/components/CardOrTableComp';
 import { InnerApplicationColumns } from '@/pages/Store/config/columns';
-import { XFlowDefine } from '@/ts/base/schema';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import cls from './index.module.less';
 import WorkStartDo from '@/pages/Work/content/work/start';
+import { IBelong } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
-const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
+const InnerApp: React.FC<any> = ({ current }: { current: IBelong }) => {
   const [tableKey, setTableKey] = useState('全部');
   const [key, forceUpdate] = useObjectUpdate(current);
   const [modalType, setModalType] = useState('');
-  const [define, setDefine] = useState<XFlowDefine>();
-  const [dataSource, setDataSource] = useState<XFlowDefine[]>([]);
+  const [define, setDefine] = useState<IWorkDefine>();
+  const [dataSource, setDataSource] = useState<IWorkDefine[]>([]);
 
   useEffect(() => {
     setTimeout(async () => {
-      let data = (await current.loadWork(pageAll())).result || [];
-      switch (tableKey) {
-        case '共享的':
-          data = data.filter(
-            (a) => a.target.id != current.id && a.target.belongId != current.id,
-          );
-          break;
-        case '创建的':
-          data = data.filter(
-            (a) => a.target.id == current.id || a.target.belongId == current.id,
-          );
-          break;
-        default:
-          break;
-      }
-      setDataSource(data);
+      // let data = (await current.loadWork(pageAll())).result || [];
+      // switch (tableKey) {
+      //   case '共享的':
+      //     data = data.filter(
+      //       (a) =>
+      //         a.target.id != current.metadata.id &&
+      //         a.target.belongId != current.metadata.id,
+      //     );
+      //     break;
+      //   case '创建的':
+      //     data = data.filter(
+      //       (a) =>
+      //         a.target.id == current.metadata.id ||
+      //         a.target.belongId == current.metadata.id,
+      //     );
+      //     break;
+      //   default:
+      //     break;
+      // }
+      // setDataSource(data);
       forceUpdate();
     }, 10);
   }, [tableKey]);
 
-  const renderOperation = (item: XFlowDefine): common.OperationType[] => {
+  const renderOperation = (item: IWorkDefine): common.OperationType[] => {
     // let isCommon = appCtrl.caches.map((cache) => cache.key).includes(item.id);
     return [
       {
@@ -77,13 +82,13 @@ const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
     ];
   };
   //卡片内容渲染函数;
-  const renderCardFun = (dataArr: XFlowDefine[]): React.ReactNode[] => {
-    return dataArr.map((item: XFlowDefine) => {
+  const renderCardFun = (dataArr: IWorkDefine[]): React.ReactNode[] => {
+    return dataArr.map((item: IWorkDefine) => {
       return (
         <AppCard
           className="card"
           current={item}
-          key={item.id}
+          key={item.metadata.id}
           operation={renderOperation}
         />
       );
@@ -99,7 +104,6 @@ const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
             goBack={() => {
               setModalType('');
             }}
-            space={current}
           />
         );
       default:
@@ -119,7 +123,7 @@ const InnerApp: React.FC<any> = ({ current }: { current: ISpace }) => {
               setTableKey(k);
             }}>
             <div className={cls['page-content-table']}>
-              <CardOrTable<XFlowDefine>
+              <CardOrTable<IWorkDefine>
                 key={key}
                 dataSource={dataSource}
                 renderCardContent={renderCardFun}

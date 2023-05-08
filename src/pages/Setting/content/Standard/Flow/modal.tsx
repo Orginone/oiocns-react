@@ -9,13 +9,13 @@ import {
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
-import { XWorkDefine } from '@/ts/base/schema';
 import { IWorkItem, SpeciesType } from '@/ts/core';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 interface Iprops {
   open: boolean;
   title: string;
-  current?: XWorkDefine;
+  current?: IWorkDefine;
   item: IWorkItem;
   handleOk: () => void;
   handleCancel: () => void;
@@ -28,8 +28,9 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
   const [form] = useForm<any>();
   if (current) {
     form.setFieldsValue({
-      ...current,
-      operationIds: current?.sourceIds?.split(',').filter((id: any) => id != '') || [],
+      ...current.metadata,
+      operationIds:
+        current?.metadata.sourceIds?.split(',').filter((id: any) => id != '') || [],
     });
   } else {
     form.setFieldsValue({});
@@ -46,8 +47,8 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
         };
         value.sourceIds = value.isCreate ? '' : value.operationIds?.join(',');
         if (current) {
-          value.id = current.id;
-          await item.updateWorkDefine(value);
+          value.id = current.metadata.id;
+          await current.updateDefine(value);
         } else {
           await item.createWorkDefine(value);
         }
@@ -104,7 +105,7 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
           placeholder="请选择是否创建实体"
           required={true}
           colProps={{ span: 12 }}
-          initialValue={current?.isCreate}
+          initialValue={current?.metadata.isCreate}
           request={async () => {
             let array: any[] = [
               {

@@ -3,37 +3,28 @@ import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from './species';
+import { IWorkDefine, WorkDefine } from '../app/work/workDefine';
 
 export interface IWork extends ISpeciesItem {
   /** 流程定义 */
-  defines: schema.XWorkDefine[];
+  defines: IWorkDefine[];
   /** 加载所有可选表单 */
   loadForms(): Promise<schema.XForm[]>;
   /** 表单特性 */
   loadAttributes(): Promise<schema.XAttribute[]>;
   /** 加载办事 */
-  loadWorkDefines(reload?: boolean): Promise<schema.XWorkDefine[]>;
-  /** 加载办事节点 */
-  loadWorkNode(id: string): Promise<model.WorkNodeModel>;
+  loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
-  createWorkDefine(data: model.WorkDefineModel): Promise<schema.XWorkDefine | undefined>;
-  /** 新建办事实例 */
-  createWorkInstance(
-    data: model.WorkInstanceModel,
-  ): Promise<schema.XWorkInstance | undefined>;
-  /** 更新办事 */
-  updateWorkDefine(data: model.WorkDefineModel): Promise<boolean>;
-  /** 删除办事 */
-  deleteWorkDefine(data: schema.XWorkDefine): Promise<boolean>;
+  createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
     super(_metadata, _current, _parent);
   }
-  defines: schema.XWorkDefine[] = [];
+  defines: IWorkDefine[] = [];
   private _defineLoaded: boolean = false;
-  async loadWorkDefines(reload: boolean = false): Promise<schema.XWorkDefine[]> {
+  async loadWorkDefines(reload: boolean = false): Promise<IWorkDefine[]> {
     if (!this._defineLoaded || reload) {
       const res = await kernel.queryWorkDefine({
         id: this.current.metadata.id,
@@ -45,61 +36,20 @@ export abstract class Work extends SpeciesItem implements IWork {
       });
       if (res.success) {
         this._defineLoaded = true;
-        this.defines = res.data.result || [];
+        this.defines = (res.data.result || []).map((a) => new WorkDefine(a, this));
       }
     }
     return this.defines;
   }
-  async loadWorkNode(id: string): Promise<model.WorkNodeModel> {
-    return (
-      await kernel.queryWorkNodes({
-        id,
-        page: PageAll,
-      })
-    ).data;
-  }
-  async createWorkDefine(
-    data: model.WorkDefineModel,
-  ): Promise<schema.XWorkDefine | undefined> {
+  async createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined> {
     data.shareId = this.current.metadata.id;
     data.speciesId = this.metadata.id;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
-      this.defines.push(res.data);
-      return res.data;
+      let define = new WorkDefine(res.data, this);
+      this.defines.push(define);
+      return define;
     }
-  }
-  async createWorkInstance(
-    data: model.WorkInstanceModel,
-  ): Promise<schema.XWorkInstance | undefined> {
-    return (await kernel.createWorkInstance(data)).data;
-  }
-  async updateWorkDefine(data: model.WorkDefineModel): Promise<boolean> {
-    const index = this.defines.findIndex((i) => i.id === data.id);
-    if (index > -1) {
-      data.shareId = this.current.metadata.id;
-      data.speciesId = this.metadata.id;
-      const res = await kernel.createWorkDefine(data);
-      if (res.success && res.data.id) {
-        this.defines[index] = res.data;
-      }
-      return res.success;
-    }
-    return false;
-  }
-  async deleteWorkDefine(data: schema.XWorkDefine): Promise<boolean> {
-    const index = this.defines.findIndex((i) => i.id === data.id);
-    if (index > -1) {
-      const res = await kernel.deleteWorkDefine({
-        id: data.id,
-        page: PageAll,
-      });
-      if (res.success) {
-        this.defines.splice(index, 1);
-      }
-      return res.success;
-    }
-    return false;
   }
   abstract loadForms(): Promise<schema.XForm[]>;
   abstract loadAttributes(): Promise<schema.XAttribute[]>;

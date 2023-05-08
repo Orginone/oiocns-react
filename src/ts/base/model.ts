@@ -491,6 +491,14 @@ export type WorkInstanceModel = {
   // 操作对象Id集合
   thingIds: string[];
 };
+export type QueryWorkApplyReq = {
+  // 共享组织Id
+  shareId: string;
+  // 办事定义Id
+  defineId: string;
+  // 分页
+  page: PageModel;
+};
 
 export type WorkNodeModel = {
   id: string;

@@ -7,11 +7,13 @@ import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { ISpeciesItem, ITarget, IWorkItem, SpeciesType } from '@/ts/core';
-import { Button, Space } from 'antd';
-import { WorkColumns } from '../config/columns';
+import { Button, Space, message } from 'antd';
+import { ApplyColumns, DoneColumns, WorkColumns } from '../config/columns';
 import Detail from './work/detail';
 import { workNotify } from '@/ts/core/user';
-import { ITodo } from '@/ts/core/work/todo';
+import { ITodo, WorkTodo } from '@/ts/core/work/todo';
+import { XWorkInstance, XWorkRecord } from '@/ts/base/schema';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 interface IProps {
   filter: string;
@@ -22,8 +24,9 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [pageKey, setPageKey] = useState('List');
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectTodo, setSelectTodo] = useState<ITodo>();
+  const [activeTab, setActiveTab] = useState<string>('todo');
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
-  const [selectWork, setSelectWork] = useState<IWorkItem>();
+  const [selectDefine, setSelectDefine] = useState<IWorkDefine>();
 
   let workSpecies: IWorkItem[] = [];
 
@@ -47,9 +50,11 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         (a) => a.current.metadata.id == selectTodo?.metadata.shareId,
       );
       for (let work of workSpecies) {
-        let defines = await work.loadWorkDefines();
-        if (defines.find((a) => a.id == selectTodo?.metadata.defineId)) {
-          setSelectWork(work);
+        let define = (await work.loadWorkDefines()).find(
+          (a) => a.metadata.id == selectTodo?.metadata.defineId,
+        );
+        if (define) {
+          setSelectDefine(define);
         }
       }
     }
@@ -67,6 +72,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   );
   switch (selectMenu.itemType) {
     case GroupMenuType.Work:
+      workSpecies = [selectMenu.parentMenu!.item as IWorkItem];
       break;
     case GroupMenuType.Species:
       {
@@ -77,7 +83,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
           (a) =>
             a.metadata.taskType == '事项' &&
             a.metadata.shareId == species.current.metadata.id &&
-            speciesList.find((s) => s.metadata.id == a.metadata.id),
+            speciesList.find((s) => s.metadata.id == a.metadata.defineId),
         );
       }
       break;
@@ -97,8 +103,9 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
       }
       break;
   }
-  /** 多行操作 */
-  const rowsOperation = (
+
+  /** 待办多行操作 */
+  const todoRowsOperation = (
     <Space>
       <Button
         type="link"
@@ -118,8 +125,8 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     </Space>
   );
 
-  /** 单行操作 */
-  const rowOperation = (item: ITodo) => {
+  /** 待办单行操作 */
+  const todoRowOperation = (item: ITodo) => {
     return [
       {
         key: 'detail',
@@ -146,32 +153,157 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     ];
   };
 
+  /** 已发起单行操作 */
+  const applyRowOperation = (item: XWorkInstance) => {
+    let operItems: { key: string; label: React.ReactNode; onClick: Function }[] = [];
+    if (selectMenu.itemType == GroupMenuType.Work) {
+      operItems = [
+        {
+          key: 'detail',
+          label: '详情',
+          onClick: async () => {
+            setPageKey('Detail');
+          },
+        },
+      ];
+    }
+    if (item.status < 100) {
+      operItems.push({
+        key: 'cancel',
+        label: '取消',
+        onClick: async () => {
+          if (item.defineId != '') {
+            let success = await (selectMenu.item as IWorkDefine).deleteInstance(item.id);
+            if (success) {
+              message.info('操作成功');
+              forceUpdate();
+            }
+          } else {
+            //TODO 组织取消申请
+          }
+        },
+      });
+    }
+    return operItems;
+  };
+
+  // 标题tabs页
+  const titleItems = () => {
+    let items = [
+      {
+        tab: `待办`,
+        key: 'todo',
+      },
+      {
+        tab: `已办`,
+        key: 'done',
+      },
+    ];
+    items.push({
+      tab: `已发起`,
+      key: 'apply',
+    });
+    return items;
+  };
+
+  const loadContent = () => {
+    switch (activeTab) {
+      case 'todo':
+        return (
+          <CardOrTableComp<ITodo>
+            key={'todo'}
+            dataSource={todos}
+            columns={WorkColumns}
+            operation={todoRowOperation}
+            tabBarExtraContent={todoRowsOperation}
+            rowKey={(record: ITodo) => record.metadata.id}
+            rowSelection={{
+              type: 'checkbox',
+              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                setSelectRows(selectedRows);
+              },
+            }}
+          />
+        );
+      case 'done':
+        return (
+          <CardOrTableComp<XWorkRecord>
+            key={'done'}
+            columns={DoneColumns}
+            dataSource={[]}
+            operation={(item) => {
+              if (item.task && item.task.taskType == '事项') {
+                return [
+                  {
+                    key: 'detail',
+                    label: '详情',
+                    onClick: async () => {
+                      setSelectTodo(new WorkTodo(item.task!));
+                      setPageKey('Detail');
+                    },
+                  },
+                ];
+              }
+              return [];
+            }}
+            rowKey={(record: XWorkRecord) => record.id}
+            request={async (page) => {
+              return await orgCtrl.user.loadDones('0', '0', page);
+            }}
+          />
+        );
+      case 'apply':
+        return (
+          <CardOrTableComp<XWorkInstance>
+            key={'apply'}
+            dataSource={[]}
+            rowKey={(record: XWorkInstance) => record.id}
+            columns={ApplyColumns}
+            request={async (page) => {
+              let defineId = '0';
+              let shareId = '0';
+              switch (selectMenu.itemType) {
+                case GroupMenuType.Species:
+                  shareId = (selectMenu.item as ISpeciesItem).current.metadata.id;
+                case GroupMenuType.Work:
+                  return await (selectMenu.item as IWorkDefine).loadInstance(page);
+                default:
+                  shareId = (selectMenu.item as ITarget).metadata.id;
+              }
+              return await orgCtrl.user.loadApply(defineId, shareId, page);
+            }}
+            rowSelection={{
+              type: 'checkbox',
+              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                setSelectRows(selectedRows);
+              },
+            }}
+          />
+        );
+    }
+  };
+
   switch (pageKey) {
     case 'List':
       return (
-        <PageCard bordered={false} tabBarExtraContent={rowsOperation}>
+        <PageCard
+          bordered={false}
+          activeTabKey={activeTab}
+          onTabChange={(key) => {
+            setActiveTab(key);
+          }}
+          tabList={titleItems()}>
           <div key={workKey} className={cls['page-content-table']}>
-            <CardOrTableComp<ITodo>
-              dataSource={todos}
-              rowKey={(record: ITodo) => record.metadata.id}
-              columns={WorkColumns}
-              operation={rowOperation}
-              rowSelection={{
-                type: 'checkbox',
-                onChange: (_: React.Key[], selectedRows: ITodo[]) => {
-                  setSelectRows(selectedRows);
-                },
-              }}
-            />
+            {loadContent()}
           </div>
         </PageCard>
       );
     case 'Detail':
-      if (!selectTodo || !selectWork) return <></>;
+      if (!selectDefine || !selectTodo) return <></>;
       return (
         <Detail
           todo={selectTodo}
-          work={selectWork}
+          define={selectDefine}
           onBack={(success: boolean) => {
             if (success) {
               setSelectTodo(undefined);

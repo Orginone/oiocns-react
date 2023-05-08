@@ -11,6 +11,8 @@ import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { ITodo, WorkTodo } from '../work/todo';
 import { IApplication } from '../thing/app/application';
+import { XWorkInstanceArray, XWorkRecordArray } from '@/ts/base/schema';
+import { PageModel } from '@/ts/base/model';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -32,6 +34,18 @@ export interface IPerson extends IBelong {
   loadCompanys(reload?: boolean): Promise<ICompany[]>;
   /** 加载待办 */
   loadTodos(reload?: boolean): Promise<ITodo[]>;
+  /** 加载已办 */
+  loadDones(
+    defineId: string,
+    shareId: string,
+    page: PageModel,
+  ): Promise<XWorkRecordArray>;
+  /** 加载已办 */
+  loadApply(
+    defineId: string,
+    shareId: string,
+    page: PageModel,
+  ): Promise<XWorkInstanceArray>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -105,6 +119,29 @@ export class Person extends Belong implements IPerson {
       }
     }
     return this.todos;
+  }
+  async loadDones(
+    defineId: string,
+    _shareId: string,
+    page: PageModel,
+  ): Promise<XWorkRecordArray> {
+    let dones = await kernel.queryWorkRecord({
+      id: defineId,
+      page,
+    });
+    return dones.data;
+  }
+  async loadApply(
+    defineId: string,
+    shareId: string,
+    page: PageModel,
+  ): Promise<XWorkInstanceArray> {
+    let dones = await kernel.queryWorkApply({
+      defineId: defineId,
+      shareId: shareId,
+      page,
+    });
+    return dones.data;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
@@ -247,6 +284,7 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
+    await this.loadTodos(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }

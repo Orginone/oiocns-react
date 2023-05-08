@@ -2,6 +2,7 @@ import { schema } from '@/ts/base';
 import { ISpeciesItem } from '@/ts/core';
 import { ProColumns } from '@ant-design/pro-table';
 import orgCtrl from '@/ts/controller';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 const getSpeciesName = (
   id: string,
@@ -310,7 +311,7 @@ export const FormItemColumns: ProColumns<schema.XFormItem>[] = [
   { title: '规则', dataIndex: 'rule', key: 'rule', ellipsis: true },
 ];
 
-export const FlowColumn: ProColumns<schema.XWorkDefine>[] = [
+export const FlowColumn: ProColumns<IWorkDefine>[] = [
   {
     title: '序号',
     valueType: 'index',
@@ -318,20 +319,20 @@ export const FlowColumn: ProColumns<schema.XWorkDefine>[] = [
   },
   {
     title: '办事名称',
-    dataIndex: 'name',
+    dataIndex: ['metadata', 'name'],
   },
   {
     title: '办事标识',
-    dataIndex: 'code',
+    dataIndex: ['metadata', 'code'],
   },
   {
     title: '创建时间',
-    dataIndex: 'createTime',
+    dataIndex: ['metadata', 'createTime'],
   },
   {
     title: '备注',
     ellipsis: true,
-    dataIndex: 'remark',
+    dataIndex: ['metadata', 'remark'],
   },
 ];
 

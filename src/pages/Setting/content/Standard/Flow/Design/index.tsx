@@ -13,16 +13,16 @@ import {
 import { getUuid } from '@/utils/tools';
 import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
-import { XAttribute, XWorkDefine, XWorkInstance } from '@/ts/base/schema';
+import { XAttribute, XWorkInstance } from '@/ts/base/schema';
 import { IWork } from '@/ts/core';
 import { ImWarning } from 'react-icons/im';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
 interface IProps {
   IsEdit: boolean;
-  current: XWorkDefine;
+  current: IWorkDefine;
   species: IWork;
   instance?: XWorkInstance;
-  nodes?: WorkNodeModel;
   onBack: () => void;
 }
 
@@ -31,7 +31,6 @@ const Design: React.FC<IProps> = ({
   current,
   instance,
   onBack,
-  nodes,
   IsEdit = true,
 }) => {
   const [scale, setScale] = useState<number>(100);
@@ -41,9 +40,7 @@ const Design: React.FC<IProps> = ({
 
   useEffect(() => {
     const load = async () => {
-      if (nodes == undefined) {
-        nodes = await species.loadWorkNode(current.id);
-      }
+      let nodes = await current.loadWorkNode();
       // content字段可能取消
       let resourceData = loadResource(nodes, 'flowNode', '', '', undefined, '');
       if (nodes.id == undefined) {
@@ -171,7 +168,7 @@ const Design: React.FC<IProps> = ({
     let rootNodes = allNodes.filter((item) => item.type == 'ROOT');
     for (let rootNode of rootNodes) {
       if (rootNode.destId == undefined) {
-        errors.push(getErrorItem('ROOT节点缺少角色'));
+        rootNode.destId = '0';
       }
     }
     //每个节点的 belongId  审核和抄送和子流程的destId
@@ -429,7 +426,7 @@ const Design: React.FC<IProps> = ({
     if (type == 'flowNode') {
       let flowNode: WorkNodeModel = {
         id: resource.id,
-        defineId: current.id,
+        defineId: current.metadata.id,
         code: resource.nodeId,
         type: resource.type,
         name: resource.name,
@@ -589,16 +586,10 @@ const Design: React.FC<IProps> = ({
                             return;
                           }
                           if (
-                            await species?.updateWorkDefine({
-                              id: current?.id,
-                              speciesId: species.metadata.id,
-                              code: current.name,
-                              name: current.name,
-                              sourceIds: current.sourceIds,
-                              remark: current.remark,
+                            await current.updateDefine({
+                              ...current.metadata,
                               resource: resource_,
-                              shareId: current.shareId,
-                              isCreate: current.isCreate,
+                              speciesId: species.metadata.id,
                             })
                           ) {
                             message.success('保存成功');
@@ -635,9 +626,9 @@ const Design: React.FC<IProps> = ({
               {/* 基本信息组件 */}
               <div>
                 <ChartDesign
-                  disableIds={[current?.id || '']}
+                  disableIds={[current.metadata.id]}
                   // key={key}
-                  current={current}
+                  current={current.metadata}
                   conditions={conditions}
                   species={species}
                   defaultEditable={IsEdit}

@@ -5,7 +5,7 @@ import { Dropdown, Pagination, Result } from 'antd';
 import { ProTable } from '@ant-design/pro-components';
 import { IconFont } from '@/components/IconFont';
 import { PageShowType } from 'typings/globelType';
-import { PageRequest } from '@/ts/base/model';
+import { PageModel } from '@/ts/base/model';
 import { RiMoreFill } from 'react-icons/ri';
 
 interface PageType<T> {
@@ -27,7 +27,7 @@ interface PageType<T> {
   renderCardContent?: (
     dataArr: T[], //渲染卡片样式 Data保持与dataSource 类型一致;或者直接传进展示组件
   ) => React.ReactNode | React.ReactNode[] | React.ReactElement;
-  request?: (params: PageRequest & { [key: string]: any }) => Promise<
+  request?: (params: PageModel & { [key: string]: any }) => Promise<
     | {
         result: T[] | undefined;
         offset: number;
@@ -159,7 +159,7 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
             ...other
           } = params;
           if (request) {
-            const page: PageRequest = {
+            const page: PageModel = {
               filter: filter || keyword,
               limit: pageSize,
               offset: (pageIndex - 1) * pageSize,

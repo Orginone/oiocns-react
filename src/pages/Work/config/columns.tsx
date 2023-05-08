@@ -4,6 +4,7 @@ import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { ITodo } from '@/ts/core/work/todo';
 import { schema } from '@/ts/base';
+import { XWorkInstance } from '@/ts/base/schema';
 
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
@@ -67,6 +68,113 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     valueType: 'dateTime',
     width: 200,
     dataIndex: ['metadata', 'createTime'],
+  },
+];
+export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '类型',
+    dataIndex: ['task', 'taskType'],
+  },
+  {
+    title: '内容',
+    dataIndex: ['task', 'title'],
+  },
+  {
+    key: 'shareId',
+    width: 200,
+    title: '共享组织',
+    dataIndex: 'shareId',
+    render: (_: any, record: schema.XWorkRecord) => {
+      return orgCtrl.provider.user?.findShareById(record.task!.shareId).name;
+    },
+  },
+  {
+    key: 'createUser',
+    width: 200,
+    title: '申请人',
+    dataIndex: 'createUser',
+    render: (_: any, record: schema.XWorkRecord) => {
+      return orgCtrl.provider.user?.findShareById(record.task!.createUser).name;
+    },
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    render: (_: any, record: schema.XWorkRecord) => {
+      const status = statusMap.get(record.status as number);
+      return <Tag color={status!.color}>{status!.text}</Tag>;
+    },
+  },
+  {
+    title: '意见',
+    dataIndex: 'comment',
+  },
+  {
+    title: '审批时间',
+    valueType: 'dateTime',
+    dataIndex: 'createTime',
+  },
+];
+
+export const ApplyColumns: ProColumns<XWorkInstance>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '类型',
+    dataIndex: 'contentType',
+    width: 80,
+  },
+  {
+    title: '内容',
+    width: 100,
+    dataIndex: 'title',
+  },
+  {
+    key: 'shareId',
+    width: 200,
+    title: '共享组织',
+    dataIndex: 'shareId',
+    render: (_: any, record: XWorkInstance) => {
+      return orgCtrl.provider.user?.findShareById(record.belongId).name;
+    },
+  },
+  {
+    key: 'createUser',
+    width: 100,
+    title: '申请人',
+    dataIndex: 'createUser',
+    render: (_: any, record: XWorkInstance) => {
+      return orgCtrl.provider.user?.findShareById(record.createUser).name;
+    },
+  },
+  {
+    title: '状态',
+    width: 80,
+    dataIndex: 'status',
+    render: (_: any, record: XWorkInstance) => {
+      const status = statusMap.get(record.status as number);
+      return <Tag color={status!.color}>{status!.text}</Tag>;
+    },
+  },
+  {
+    title: '备注',
+    dataIndex: 'content',
+  },
+  {
+    title: '申请时间',
+    valueType: 'dateTime',
+    width: 200,
+    dataIndex: 'createTime',
   },
 ];
 
