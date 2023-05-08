@@ -1,10 +1,9 @@
 import React, { useRef } from 'react';
 import { message } from 'antd';
 import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
-import { ITarget } from '@/ts/core/target/itarget';
 import SchemaForm from '@/components/SchemaForm';
 import { XIdentity } from '@/ts/base/schema';
-import { IIdentity } from '@/ts/core/target/authority/iidentity';
+import { IIdentity, ITarget } from '@/ts/core';
 
 /*
   编辑
@@ -42,12 +41,12 @@ const EditCustomModal = (props: Iprops) => {
       valueType: 'treeSelect',
       formItemProps: { rules: [{ required: true, message: '设置权限为必填项' }] },
       request: async () => {
-        const data = await current.space.loadSpaceAuthorityTree(false);
-        return data ? [data] : [];
+        const data = await current.space.loadSuperAuth(false);
+        return data ? [data.metadata] : [];
       },
       fieldProps: {
         disabled: title === '编辑',
-        fieldNames: { label: 'name', value: 'id' },
+        fieldNames: { label: 'name', value: 'id', children: 'nodes' },
         showSearch: true,
         filterTreeNode: true,
         treeNodeFilterProp: 'name',
@@ -72,7 +71,7 @@ const EditCustomModal = (props: Iprops) => {
       onOpenChange={(open: boolean) => {
         if (open) {
           if (editData) {
-            formRef.current?.setFieldsValue({ ...editData.target });
+            formRef.current?.setFieldsValue({ ...editData.metadata });
           }
         } else {
           formRef.current?.resetFields();
@@ -86,6 +85,8 @@ const EditCustomModal = (props: Iprops) => {
       onFinish={async (values) => {
         if (title === '新增') {
           const res = await current.createIdentity({
+            id: values.id,
+            shareId: values.shareId,
             name: values.name,
             code: values.code,
             remark: values.remark,
@@ -100,17 +101,10 @@ const EditCustomModal = (props: Iprops) => {
           }
         } else {
           if (!editData) return;
-          const res = await editData.updateIdentity(
-            values.name,
-            values.code,
-            values.remark,
-          );
-          if (res.success) {
+          const res = await editData.update({ ...editData.metadata, ...values });
+          if (res) {
             message.success('修改成功');
             handleOk();
-          } else {
-            message.error(res.msg);
-            return false;
           }
         }
       }}

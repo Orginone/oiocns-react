@@ -1,10 +1,10 @@
-import { OperationItem } from '@/ts/base/model';
+import { FormItemModel } from '@/ts/base/model';
 import { ProField } from '@ant-design/pro-components';
 import React from 'react';
 import DictField from './fields/DictField';
 
 export interface IOioFieldProp {
-  item: OperationItem;
+  item: FormItemModel;
   value: any;
 }
 
