@@ -10,7 +10,7 @@ type IProps = {
 };
 
 /**
- * 奥集能--万物卡片
+ * 资产共享云--万物卡片
  */
 const CardDescriptions: React.FC<IProps> = ({ form, attrs, fieldsValue }) => {
   let config: any = { col: 12, layout: 'horizontal' };

@@ -13,7 +13,7 @@ interface IProps {
  */
 const AuthorityStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null); //父级容器Dom
-  let shareName = '奥集能';
+  let shareName = '资产共享云';
   if (current.metadata.shareId) {
     shareName = current.space.user.findShareById(current.metadata.shareId).name;
   }

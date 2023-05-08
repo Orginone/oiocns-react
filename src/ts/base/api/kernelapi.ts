@@ -5,7 +5,7 @@ import type * as schema from '../schema';
 import axios from 'axios';
 import { logger } from '../common';
 /**
- * 奥集能内核api
+ * 资产共享云内核api
  */
 export default class KernelApi {
   // 存储集线器

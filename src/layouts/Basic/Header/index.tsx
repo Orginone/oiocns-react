@@ -19,7 +19,7 @@ const BasicHeader: React.FC = () => {
             size={22}
             style={{ marginRight: 10 }}
           />
-          <Typography.Text className={styles['space-list']}>奥集能</Typography.Text>
+          <Typography.Text className={styles['space-list']}>资产共享云</Typography.Text>
         </Link>
       </Space>
       <Space size={32} align="center">

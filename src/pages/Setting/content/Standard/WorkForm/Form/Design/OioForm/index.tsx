@@ -18,7 +18,7 @@ type IProps = {
 };
 
 /**
- * 奥集能表单
+ * 资产共享云表单
  */
 const OioForm: React.FC<IProps> = ({
   belong,

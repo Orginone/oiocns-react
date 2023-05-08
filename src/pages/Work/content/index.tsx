@@ -72,7 +72,13 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   );
   switch (selectMenu.itemType) {
     case GroupMenuType.Work:
+      let curDefine = selectMenu.item as IWorkDefine;
       workSpecies = [selectMenu.parentMenu!.item as IWorkItem];
+      todos = todos.filter(
+        (a) =>
+          a.metadata.defineId == curDefine.metadata.id &&
+          a.metadata.shareId == curDefine.workItem.current.metadata.id,
+      );
       break;
     case GroupMenuType.Species:
       {

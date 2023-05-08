@@ -129,7 +129,7 @@ export class UserProvider extends common.Emitter {
    */
   private _recvTask(data: XWorkTask): void {
     if (data.status >= 100) {
-      this.user!.todos = this.user!.todos.filter((a) => a.metadata.id == data.id);
+      this.user!.todos = this.user!.todos.filter((a) => a.metadata.id != data.id);
     } else {
       this.user!.todos.unshift(new WorkTodo(data));
     }

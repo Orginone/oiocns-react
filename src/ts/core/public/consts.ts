@@ -1,7 +1,7 @@
 import { PageModel, ShareIcon } from '../../base/model';
 import { TargetType } from './enums';
 
-/** 奥集能模块权限Id */
+/** 资产共享云模块权限Id */
 export const orgAuth = {
   // 超管权限
   SuperAuthId: '361356410044420096',
