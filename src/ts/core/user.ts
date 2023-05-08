@@ -85,6 +85,10 @@ export class UserProvider extends common.Emitter {
     this._user = new Person(person);
     this.changCallback();
   }
+  /** 更新用户 */
+  public update(person: schema.XTarget) {
+    sessionStorage.setItem(sessionUserName, JSON.stringify(person));
+  }
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;

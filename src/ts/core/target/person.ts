@@ -98,6 +98,7 @@ export class Person extends Belong implements IPerson {
   async loadTodos(reload?: boolean): Promise<ITodo[]> {
     if (!this._todoLoaded || reload) {
       let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
+      console.log(res);
       if (res.success) {
         this._todoLoaded = true;
         this.todos = (res.data.result || []).map((i) => new WorkTodo(i));

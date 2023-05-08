@@ -3,6 +3,7 @@ import { Tag } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { ITodo } from '@/ts/core/work/todo';
+import { schema } from '@/ts/base';
 
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
@@ -14,9 +15,11 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   {
     title: '类型',
     dataIndex: ['metadata', 'taskType'],
+    width: 80,
   },
   {
     title: '内容',
+    width: 100,
     dataIndex: ['metadata', 'title'],
   },
   {
@@ -30,7 +33,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     key: 'createUser',
-    width: 200,
+    width: 100,
     title: '申请人',
     dataIndex: 'createUser',
     render: (_: any, record: ITodo) => {
@@ -39,6 +42,7 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '状态',
+    width: 80,
     dataIndex: 'status',
     render: (_: any, record: ITodo) => {
       const status = statusMap.get(record.metadata.status as number);
@@ -47,11 +51,21 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '备注',
-    dataIndex: ['metadata', 'remark'],
+    dataIndex: 'remark',
+    render: (_: any, record: ITodo) => {
+      if (record.metadata.taskType === '加用户') {
+        const targets: schema.XTarget[] = JSON.parse(record.metadata.remark);
+        if (targets.length === 2) {
+          return `${targets[0].name}[${targets[0].typeName}]申请加入${targets[1].name}[${targets[1].typeName}]`;
+        }
+      }
+      return record.metadata.remark;
+    },
   },
   {
     title: '申请时间',
     valueType: 'dateTime',
+    width: 200,
     dataIndex: ['metadata', 'createTime'],
   },
 ];

@@ -72,19 +72,24 @@ export abstract class Target extends Team implements ITarget {
       });
       if (res.success) {
         this._speciesLoaded = true;
+        let hasFilesystem = false;
+        let hasMarket = false;
         this.species = (res.data.result || []).map((item) => {
+          if (item.typeName === SpeciesType.FileSystem) {
+            hasFilesystem = true;
+          }
+          if (item.typeName === SpeciesType.Market) {
+            hasMarket = true;
+          }
           return createSpecies(item, this);
         });
-        if (
-          this.species.findIndex((i) => i.metadata.typeName === SpeciesType.FileSystem) <
-          0
-        ) {
+        if (!hasFilesystem) {
           this.speciesTypes.push(SpeciesType.FileSystem);
         }
         if (
+          !hasMarket &&
           (this.metadata.typeName === TargetType.Cohort ||
-            this.metadata.typeName === TargetType.Group) &&
-          this.species.findIndex((i) => i.metadata.typeName === SpeciesType.Market) < 0
+            this.metadata.typeName === TargetType.Group)
         ) {
           this.speciesTypes.push(SpeciesType.Market);
         }

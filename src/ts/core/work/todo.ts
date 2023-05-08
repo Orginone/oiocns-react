@@ -1,4 +1,4 @@
-import { common, kernel } from '@/ts/base';
+import { common, kernel, schema } from '@/ts/base';
 import orgCtrl from '@/ts/controller';
 import { XWorkInstance, XWorkTask } from '@/ts/base/schema';
 import { PageAll } from '../public/consts';
@@ -18,6 +18,12 @@ export class WorkTodo extends common.Entity implements ITodo {
   constructor(metadata: XWorkTask) {
     super();
     this.metadata = metadata;
+    if (metadata.approveType === '用户') {
+      const targets: schema.XTarget[] = JSON.parse(metadata.remark);
+      if (targets.length === 2) {
+        metadata.remark = targets[0].name + '申请加入' + targets[1].name;
+      }
+    }
   }
   async approval(
     status: number,
