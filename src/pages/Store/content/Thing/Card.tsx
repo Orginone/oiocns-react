@@ -9,7 +9,7 @@ interface IThingCardProps {
   species: IWorkForm;
 }
 /**
- * 仓库-物-卡片
+ * 存储-物-卡片
  */
 const ThingCard: React.FC<IThingCardProps> = ({ thingId, species }) => {
   const [formValue, setFormValue] = useState<any>({});

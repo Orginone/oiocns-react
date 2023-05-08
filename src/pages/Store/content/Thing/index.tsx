@@ -8,7 +8,7 @@ interface IProps {
   selectable?: boolean;
 }
 /**
- * 仓库-物
+ * 存储-物
  */
 const ThingIndex: React.FC<IProps> = ({ species, selectable }) => {
   const [tabKey, setTabKey] = useState(0);

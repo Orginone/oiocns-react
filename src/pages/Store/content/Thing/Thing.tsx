@@ -47,7 +47,7 @@ interface IProps {
 }
 
 /**
- * 仓库-物
+ * 存储-物
  */
 const Thing: React.FC<IProps> = (props: IProps) => {
   const { menuItems, selectable = true, deferred = false } = props;

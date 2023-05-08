@@ -10,7 +10,7 @@ import * as config from './config/menuOperate';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import SelectOperation from '../Setting/content/Standard/Flow/Comp/SelectOperation';
 import OioForm from '../Setting/content/Standard/WorkForm/Form/Design/OioForm';
-/** 仓库模块 */
+/** 存储模块 */
 const Package: React.FC = () => {
   const formRef = useRef<ProFormInstance<any>>();
   const [operateTarget, setOperateTarget] = useState<MenuItemType>();

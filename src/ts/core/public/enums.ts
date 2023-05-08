@@ -28,7 +28,7 @@ export enum SpeciesType {
   'Market' = '流通市场',
   'Resource' = '服务资源',
   'PropClass' = '属性分类',
-  'Store' = '仓库物资',
+  'Store' = '存储物资',
   /** 类别类目 */
   'Commodity' = '商品类别',
   'SpeciesForm' = '表单类别',

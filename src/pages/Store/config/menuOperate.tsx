@@ -102,7 +102,7 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
               <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />
             ),
             itemType: MenuType.FileSystemItem,
-            menus: [],
+            menus: loadFileSysItemMenus(),
             tag: [item.metadata.typeName],
             children: buildFileSysTree(filesys.home ? filesys.home.children : []),
             clickEvent: async () => {
@@ -207,11 +207,11 @@ const getTeamMenu = () => {
   return children;
 };
 
-/** 获取仓库模块菜单 */
+/** 获取存储模块菜单 */
 export const loadStoreMenu = () => {
   return {
-    key: '仓库',
-    label: '仓库',
+    key: '存储',
+    label: '存储',
     itemType: 'group',
     icon: <IconFont type={'icon-store'} />,
     children: [getUserMenu(), ...getTeamMenu()],

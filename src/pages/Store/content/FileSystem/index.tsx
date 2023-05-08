@@ -15,7 +15,7 @@ interface IProps {
   current: IFileSystemItem;
 }
 /**
- * 仓库-文件系统
+ * 存储-文件系统
  */
 const FileSystem: React.FC<IProps> = ({ current }: IProps) => {
   const [key] = useCtrlUpdate(orgCtrl);

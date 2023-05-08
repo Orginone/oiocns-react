@@ -12,7 +12,7 @@ interface IThingCardProps {
   thingId: string;
 }
 /**
- * 仓库-物-归档日志
+ * 存储-物-归档日志
  */
 const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
   const [archives, setArchives] = useState<any[]>([]);

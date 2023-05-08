@@ -78,7 +78,7 @@ const MarketRouter: IRouteConfig[] = [
 const StoreRouter: IRouteConfig[] = [
   {
     path: '/store',
-    title: '仓库',
+    title: '存储',
     icon: 'icon-setting',
     component: React.lazy(() => import('@/pages/Store')),
     routes: [],

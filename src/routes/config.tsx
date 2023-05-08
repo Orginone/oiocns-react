@@ -96,7 +96,7 @@ export const routerInfo = [
       },
       {
         path: '/store',
-        title: '仓库',
+        title: '存储',
         icon: 'icon-store',
         routes: [
           {

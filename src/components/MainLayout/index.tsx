@@ -4,9 +4,7 @@ import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
-import { ImArrowLeft2 } from 'react-icons/im';
-import orgCtrl from '@/ts/controller';
-import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
+import { ImArrowLeft2, ImExit } from 'react-icons/im';
 import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
 const { Content, Sider } = Layout;
 
@@ -94,8 +92,8 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             location.reload();
           }}>
-          <TeamIcon share={orgCtrl.user.share} />
-          <span>退出登录</span>
+          <ImExit fontSize={26} title="注销" />
+          {!collapsed && <span>注销</span>}
         </div>
       </Sider>
       <Layout className={cls.container}>
