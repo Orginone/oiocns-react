@@ -1,8 +1,7 @@
 /** 分组菜单类型 */
 export enum GroupMenuType {
-  'SpeciesGroup' = '类别定义',
-  'Species' = '分类',
-  'Work' = '事项',
-  'OutAgency' = '外部机构',
-  'Cohort' = '自由群组',
+  'Start' = '发起',
+  'Todo' = '待办',
+  'Done' = '已办',
+  'Apply' = '已发起',
 }

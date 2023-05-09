@@ -4,7 +4,7 @@ import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { ITodo } from '@/ts/core/work/todo';
 import { schema } from '@/ts/base';
-import { XWorkInstance } from '@/ts/base/schema';
+import { XWorkTask } from '@/ts/base/schema';
 
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
@@ -122,7 +122,7 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
   },
 ];
 
-export const ApplyColumns: ProColumns<XWorkInstance>[] = [
+export const ApplyColumns: ProColumns<XWorkTask>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -131,7 +131,7 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
   },
   {
     title: '类型',
-    dataIndex: 'contentType',
+    dataIndex: 'taskType',
     width: 80,
   },
   {
@@ -144,8 +144,8 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     width: 200,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_: any, record: XWorkInstance) => {
-      return orgCtrl.provider.user?.findShareById(record.belongId).name;
+    render: (_: any, record: XWorkTask) => {
+      return orgCtrl.provider.user?.findShareById(record.shareId).name;
     },
   },
   {
@@ -153,7 +153,7 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     width: 100,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_: any, record: XWorkInstance) => {
+    render: (_: any, record: XWorkTask) => {
       return orgCtrl.provider.user?.findShareById(record.createUser).name;
     },
   },
@@ -161,13 +161,14 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     title: '状态',
     width: 80,
     dataIndex: 'status',
-    render: (_: any, record: XWorkInstance) => {
+    render: (_: any, record: XWorkTask) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
     title: '备注',
+    width: 200,
     dataIndex: 'content',
   },
   {

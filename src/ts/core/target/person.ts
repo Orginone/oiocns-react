@@ -11,8 +11,8 @@ import { ITarget } from './base/target';
 import { ITeam } from './base/team';
 import { ITodo, WorkTodo } from '../work/todo';
 import { IApplication } from '../thing/app/application';
-import { XWorkInstanceArray, XWorkRecordArray } from '@/ts/base/schema';
-import { PageModel } from '@/ts/base/model';
+import { XWorkInstanceArray, XWorkRecordArray, XWorkTaskArray } from '@/ts/base/schema';
+import { IdModel } from '@/ts/base/model';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -35,17 +35,9 @@ export interface IPerson extends IBelong {
   /** 加载待办 */
   loadTodos(reload?: boolean): Promise<ITodo[]>;
   /** 加载已办 */
-  loadDones(
-    defineId: string,
-    shareId: string,
-    page: PageModel,
-  ): Promise<XWorkRecordArray>;
+  loadDones(req: IdModel): Promise<XWorkRecordArray>;
   /** 加载已办 */
-  loadApply(
-    defineId: string,
-    shareId: string,
-    page: PageModel,
-  ): Promise<XWorkInstanceArray>;
+  loadApply(req: IdModel): Promise<XWorkTaskArray>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -120,28 +112,11 @@ export class Person extends Belong implements IPerson {
     }
     return this.todos;
   }
-  async loadDones(
-    defineId: string,
-    _shareId: string,
-    page: PageModel,
-  ): Promise<XWorkRecordArray> {
-    let dones = await kernel.queryWorkRecord({
-      id: defineId,
-      page,
-    });
-    return dones.data;
+  async loadDones(req: IdModel): Promise<XWorkRecordArray> {
+    return (await kernel.queryWorkRecord(req)).data;
   }
-  async loadApply(
-    defineId: string,
-    shareId: string,
-    page: PageModel,
-  ): Promise<XWorkInstanceArray> {
-    let dones = await kernel.queryWorkApply({
-      defineId: defineId,
-      shareId: shareId,
-      page,
-    });
-    return dones.data;
+  async loadApply(req: IdModel): Promise<XWorkTaskArray> {
+    return (await kernel.queryMyApply(req)).data;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {

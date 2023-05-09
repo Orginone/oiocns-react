@@ -18,8 +18,6 @@ export interface IWorkDefine {
   updateDefine(req: WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(): Promise<WorkNodeModel>;
-  /** 加载办事实例 */
-  loadInstance(page: PageModel): Promise<XWorkInstanceArray>;
   /** 删除办事定义 */
   deleteDefine(): Promise<boolean>;
   /** 删除办事实例 */
@@ -61,15 +59,6 @@ export class WorkDefine implements IWorkDefine {
   }
   async loadWorkNode(): Promise<WorkNodeModel> {
     return (await kernel.queryWorkNodes({ id: this.metadata.id, page: PageAll })).data;
-  }
-  async loadInstance(page: PageModel): Promise<XWorkInstanceArray> {
-    return (
-      await kernel.queryWorkApply({
-        defineId: this.metadata.id,
-        shareId: this.workItem.current.metadata.id,
-        page,
-      })
-    ).data;
   }
   async deleteInstance(id: string): Promise<boolean> {
     return (await kernel.recallWorkInstance({ id, page: PageAll })).success;

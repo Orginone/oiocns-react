@@ -1,19 +1,20 @@
 import { MenuItemType } from 'typings/globelType';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { GroupMenuType } from '../config/menuType';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 import PageCard from '@/components/PageCard';
 import cls from './index.module.less';
 import CardOrTableComp from '@/components/CardOrTableComp';
-import { ISpeciesItem, ITarget, IWorkItem, SpeciesType } from '@/ts/core';
+import { IBelong, ISpeciesItem, IWork, SpeciesType } from '@/ts/core';
 import { Button, Space, message } from 'antd';
 import { ApplyColumns, DoneColumns, WorkColumns } from '../config/columns';
 import Detail from './work/detail';
 import { workNotify } from '@/ts/core/user';
 import { ITodo, WorkTodo } from '@/ts/core/work/todo';
-import { XWorkInstance, XWorkRecord } from '@/ts/base/schema';
+import { XWorkInstance, XWorkRecord, XWorkTask } from '@/ts/base/schema';
 import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import WorkStartDo from '@/pages/Work/content/work/start';
 
 interface IProps {
   filter: string;
@@ -24,91 +25,23 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   const [pageKey, setPageKey] = useState('List');
   const [workKey, forceUpdate] = useCtrlUpdate(workNotify);
   const [selectTodo, setSelectTodo] = useState<ITodo>();
-  const [activeTab, setActiveTab] = useState<string>('todo');
   const [selectedRows, setSelectRows] = useState<ITodo[]>([]);
   const [selectDefine, setSelectDefine] = useState<IWorkDefine>();
+  const [openStart, setOpenStart] = useState<boolean>(false);
 
-  let workSpecies: IWorkItem[] = [];
+  let workDefines: IWorkDefine[] = [];
 
   /** 加载所有办事分类 */
-  const loadWorkSpecies = (species: ISpeciesItem[]) => {
-    let spList: IWorkItem[] = species.filter(
-      (a) => a.metadata.typeName == SpeciesType.WorkItem,
-    ) as IWorkItem[];
+  const loadWorkDefines = (species: ISpeciesItem[]) => {
+    for (let work of species.filter((a) => a.metadata.typeName == SpeciesType.WorkItem)) {
+      workDefines.push(...(work as IWork).defines);
+    }
     for (let sp of species) {
       if (sp.children.length > 0) {
-        spList.push(...loadWorkSpecies(sp.children));
-      }
-    }
-    return spList;
-  };
-
-  /** 查找当前选中待办的办事分类 */
-  const findWorkByTodo = async () => {
-    if (selectTodo) {
-      workSpecies = workSpecies.filter(
-        (a) => a.current.metadata.id == selectTodo?.metadata.shareId,
-      );
-      for (let work of workSpecies) {
-        let define = (await work.loadWorkDefines()).find(
-          (a) => a.metadata.id == selectTodo?.metadata.defineId,
-        );
-        if (define) {
-          setSelectDefine(define);
-        }
+        loadWorkDefines(sp.children);
       }
     }
   };
-
-  useEffect(() => {
-    findWorkByTodo();
-  }, [selectTodo]);
-
-  let todos = orgCtrl.user.todos.filter(
-    (a) =>
-      a.metadata.title.includes(filter) ||
-      a.metadata.taskType.includes(filter) ||
-      a.metadata.remark.includes(filter),
-  );
-  switch (selectMenu.itemType) {
-    case GroupMenuType.Work:
-      let curDefine = selectMenu.item as IWorkDefine;
-      workSpecies = [selectMenu.parentMenu!.item as IWorkItem];
-      todos = todos.filter(
-        (a) =>
-          a.metadata.defineId == curDefine.metadata.id &&
-          a.metadata.shareId == curDefine.workItem.current.metadata.id,
-      );
-      break;
-    case GroupMenuType.Species:
-      {
-        const species = selectMenu.item as ISpeciesItem;
-        const speciesList = loadWorkSpecies([species]);
-        workSpecies = speciesList;
-        todos = todos.filter(
-          (a) =>
-            a.metadata.taskType == '事项' &&
-            a.metadata.shareId == species.current.metadata.id &&
-            speciesList.find((s) => s.metadata.id == a.metadata.defineId),
-        );
-      }
-      break;
-    default:
-      {
-        let target = selectMenu.item as ITarget;
-        if (target) {
-          if (target.space.metadata.id == target.metadata.id) {
-            todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
-          } else {
-            todos = todos.filter((a) => a.metadata.shareId == target.metadata.id);
-          }
-          workSpecies = loadWorkSpecies(target.workSpecies);
-        } else {
-          workSpecies = loadWorkSpecies(orgCtrl.user.workSpecies);
-        }
-      }
-      break;
-  }
 
   /** 待办多行操作 */
   const todoRowsOperation = (
@@ -139,6 +72,13 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
         label: '详情',
         onClick: async () => {
           setSelectTodo(item);
+          setSelectDefine(
+            workDefines.find(
+              (a) =>
+                a.metadata.id == item.metadata.defineId &&
+                a.metadata.shareId == item.metadata.shareId,
+            ),
+          );
           setPageKey('Detail');
         },
       },
@@ -160,9 +100,9 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   };
 
   /** 已发起单行操作 */
-  const applyRowOperation = (item: XWorkInstance) => {
+  const applyRowOperation = (item: XWorkTask) => {
     let operItems: { key: string; label: React.ReactNode; onClick: Function }[] = [];
-    if (selectMenu.itemType == GroupMenuType.Work) {
+    if (item.taskType == '事项') {
       operItems = [
         {
           key: 'detail',
@@ -193,28 +133,50 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
     return operItems;
   };
 
-  // 标题tabs页
-  const titleItems = () => {
-    let items = [
-      {
-        tab: `待办`,
-        key: 'todo',
-      },
-      {
-        tab: `已办`,
-        key: 'done',
-      },
-    ];
-    items.push({
-      tab: `已发起`,
-      key: 'apply',
-    });
-    return items;
-  };
+  let todos = orgCtrl.user.todos.filter(
+    (a) =>
+      a.metadata.title.includes(filter) ||
+      a.metadata.taskType.includes(filter) ||
+      a.metadata.remark.includes(filter),
+  );
 
   const loadContent = () => {
-    switch (activeTab) {
-      case 'todo':
+    if (openStart && selectDefine) {
+      return (
+        <WorkStartDo
+          current={selectDefine}
+          goBack={() => {
+            setOpenStart(false);
+          }}
+        />
+      );
+    }
+    switch (selectMenu.itemType) {
+      case GroupMenuType.Start: {
+        let belong = selectMenu.item as IBelong;
+        loadWorkDefines(belong.workSpecies);
+        return (
+          <CardOrTableComp<IWorkDefine>
+            key={'todo'}
+            dataSource={workDefines}
+            columns={WorkColumns}
+            operation={(item: IWorkDefine) => [
+              {
+                key: 'start',
+                label: '发起',
+                onClick: async () => {
+                  setSelectDefine(item);
+                  setOpenStart(true);
+                },
+              },
+            ]}
+            rowKey={(record: IWorkDefine) => record.metadata.id}
+          />
+        );
+      }
+      case GroupMenuType.Todo: {
+        let belong = selectMenu.item as IBelong;
+        todos = todos.filter((a) => a.metadata.shareId == belong.metadata.id);
         return (
           <CardOrTableComp<ITodo>
             key={'todo'}
@@ -231,7 +193,9 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
             }}
           />
         );
-      case 'done':
+      }
+      case GroupMenuType.Done: {
+        let belong = selectMenu.item as IBelong;
         return (
           <CardOrTableComp<XWorkRecord>
             key={'done'}
@@ -254,30 +218,44 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
             }}
             rowKey={(record: XWorkRecord) => record.id}
             request={async (page) => {
-              return await orgCtrl.user.loadDones('0', '0', page);
+              return await orgCtrl.user.loadDones({ id: belong.metadata.id, page });
             }}
           />
         );
-      case 'apply':
+      }
+      case GroupMenuType.Apply: {
+        let belong = selectMenu.item as IBelong;
         return (
-          <CardOrTableComp<XWorkInstance>
+          <CardOrTableComp<XWorkTask>
             key={'apply'}
             dataSource={[]}
-            rowKey={(record: XWorkInstance) => record.id}
+            rowKey={(record: XWorkTask) => record.id}
             columns={ApplyColumns}
             request={async (page) => {
-              let defineId = '0';
-              let shareId = '0';
-              switch (selectMenu.itemType) {
-                case GroupMenuType.Species:
-                  shareId = (selectMenu.item as ISpeciesItem).current.metadata.id;
-                case GroupMenuType.Work:
-                  return await (selectMenu.item as IWorkDefine).loadInstance(page);
-                default:
-                  shareId = (selectMenu.item as ITarget).metadata.id;
-              }
-              return await orgCtrl.user.loadApply(defineId, shareId, page);
+              return await orgCtrl.user.loadApply({ id: belong.metadata.id, page });
             }}
+            rowSelection={{
+              type: 'checkbox',
+              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                setSelectRows(selectedRows);
+              },
+            }}
+          />
+        );
+      }
+      default:
+        if (selectMenu.item) {
+          let belong = selectMenu.item as IBelong;
+          todos = todos.filter((a) => a.metadata.shareId == belong.metadata.id);
+        }
+        return (
+          <CardOrTableComp<ITodo>
+            key={'todo'}
+            dataSource={todos}
+            columns={WorkColumns}
+            operation={todoRowOperation}
+            tabBarExtraContent={todoRowsOperation}
+            rowKey={(record: ITodo) => record.metadata.id}
             rowSelection={{
               type: 'checkbox',
               onChange: (_: React.Key[], selectedRows: ITodo[]) => {
@@ -292,13 +270,7 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
   switch (pageKey) {
     case 'List':
       return (
-        <PageCard
-          bordered={false}
-          activeTabKey={activeTab}
-          onTabChange={(key) => {
-            setActiveTab(key);
-          }}
-          tabList={titleItems()}>
+        <PageCard bordered={false}>
           <div key={workKey} className={cls['page-content-table']}>
             {loadContent()}
           </div>

@@ -1,17 +1,11 @@
 import React from 'react';
 import * as im from 'react-icons/im';
-import { IGroup, ISpeciesItem, ITarget, ITeam, SpeciesType } from '@/ts/core';
+import { IBelong } from '@/ts/core';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { GroupMenuType } from './menuType';
 import { IconFont } from '@/components/IconFont';
-import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
-
-const buildTargetSpeciesTree = (target: ITarget) =>
-  target.species
-    .filter((a) => SpeciesType.Application == a.metadata.typeName)
-    .map((i) => buildSpeciesTree(i));
+import { GroupMenuType } from './menuType';
 
 /** 加载右键菜单 */
 const loadSpeciesMenus = () => {
@@ -24,110 +18,68 @@ const loadSpeciesMenus = () => {
   });
   return items;
 };
-
-/** 编译事项 */
-const buildWorkDefine = (workItem: IWorkItem) => {
-  return workItem.defines.map((a) => {
-    return {
-      key: workItem.key + a.metadata.id,
-      item: a,
-      label: a.metadata.name,
-      icon: <TeamIcon share={workItem.share} size={18} fontSize={16} />,
-      itemType: GroupMenuType.Work,
+const loadChildren = (team: IBelong) => {
+  return [
+    {
+      key: team.key + GroupMenuType.Start,
+      item: team,
+      label: GroupMenuType.Start,
+      itemType: GroupMenuType.Apply,
       menus: loadSpeciesMenus(),
       children: [],
-    };
-  });
-};
-
-/** 编译分类树 */
-const buildSpeciesTree = (species: ISpeciesItem) => {
-  let children: MenuItemType[] = [];
-  if (species.metadata.typeName == SpeciesType.WorkItem) {
-    children = buildWorkDefine(species as IWorkItem);
-  } else {
-    children = species.children
-      .filter((a) =>
-        [SpeciesType.AppModule, SpeciesType.WorkItem].includes(
-          a.metadata.typeName as SpeciesType,
-        ),
-      )
-      .map((i) => buildSpeciesTree(i));
-  }
-  const result: MenuItemType = {
-    key: species.key,
-    item: species,
-    label: species.metadata.name,
-    icon: <TeamIcon share={species.share} size={18} fontSize={16} />,
-    itemType: GroupMenuType.Species,
-    menus: [],
-    children: children,
-    clickEvent: async () => {
-      switch (species.metadata.typeName) {
-        case SpeciesType.WorkItem:
-          await (species as IWorkItem).loadWorkDefines();
-          break;
-        default:
-          break;
-      }
     },
-  };
-  return result;
+    {
+      key: team.key + GroupMenuType.Todo,
+      item: team,
+      label: GroupMenuType.Todo,
+      itemType: GroupMenuType.Todo,
+      menus: [],
+      children: [],
+    },
+    {
+      key: team.key + GroupMenuType.Done,
+      item: team,
+      label: GroupMenuType.Done,
+      itemType: GroupMenuType.Done,
+      menus: [],
+      children: [],
+    },
+    {
+      key: team.key + GroupMenuType.Apply,
+      item: team,
+      label: GroupMenuType.Apply,
+      itemType: GroupMenuType.Apply,
+      menus: [],
+      children: [],
+    },
+  ];
 };
 
 /** 创建团队菜单 */
-const createMenu = (team: ITeam, menus: OperateMenuType[], children: MenuItemType[]) => {
+const createMenu = (team: IBelong) => {
   return {
     key: team.key,
     item: team,
     label: team.metadata.name,
     itemType: team.metadata.typeName,
-    menus: menus,
+    menus: [],
     icon: <TeamIcon notAvatar={true} share={team.share} size={18} fontSize={16} />,
-    children: children,
+    children: loadChildren(team),
   };
 };
 
 /** 获取个人菜单 */
 const getUserMenu = () => {
-  return createMenu(
-    orgCtrl.user,
-    [],
-    [
-      ...buildTargetSpeciesTree(orgCtrl.user),
-      ...orgCtrl.user.cohorts.map((i) => createMenu(i, [], buildTargetSpeciesTree(i))),
-    ],
-  );
+  return createMenu(orgCtrl.user);
 };
 
 /** 获取组织菜单 */
 const getTeamMenu = () => {
   const children: MenuItemType[] = [];
   for (const company of orgCtrl.user.companys) {
-    children.push(
-      createMenu(
-        company,
-        [],
-        [
-          ...buildTargetSpeciesTree(company),
-          ...buildGroupTree(company.groups),
-          ...company.cohorts.map((i) => createMenu(i, [], buildTargetSpeciesTree(i))),
-        ],
-      ),
-    );
+    children.push(createMenu(company));
   }
   return children;
-};
-
-/** 编译单位群树 */
-const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
-  return groups.map((item) =>
-    createMenu(
-      item,
-      [],
-      [...buildTargetSpeciesTree(item), ...buildGroupTree(item.children)],
-    ),
-  );
 };
 
 export const loadWorkMenu = (): MenuItemType => {
