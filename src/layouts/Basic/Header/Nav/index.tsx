@@ -55,7 +55,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/chat',
       onClick: () => {
         orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
       },
     },
     {
@@ -67,7 +66,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/work',
       onClick: () => {
         orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
       },
     },
     {
@@ -79,7 +77,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/store',
       onClick: () => {
         orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
       },
     },
     {
@@ -91,7 +88,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/market',
       onClick: () => {
         orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
       },
     },
     {
@@ -103,7 +99,6 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       fath: '/setting',
       onClick: () => {
         orgCtrl.currentKey = '';
-        orgCtrl.changCallback();
       },
     },
   ];

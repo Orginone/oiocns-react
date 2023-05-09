@@ -6,12 +6,12 @@ import { parseAvatar, schema } from '@/ts/base';
 import AssignPosts from '@/bizcomponents/Indentity/components/AssignPosts';
 import { getUuid } from '@/utils/tools';
 import { ICohort, IMsgChat, TargetType } from '@/ts/core';
+import orgCtrl from '@/ts/controller';
 
 const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
   const [open, setOpen] = useState<boolean>(false); // 邀请弹窗开关
   const [removeOpen, setRemoveOpen] = useState<boolean>(false); // 移出弹窗开关
   const [selectPerson, setSelectPerson] = useState<schema.XTarget[]>([]); // 需要邀请的部门成员
-  const [removePerosn, setRemovePerosn] = useState<any>();
 
   /**
    * @description: 邀请确认
@@ -96,7 +96,6 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
               setOpen(true);
-              setRemovePerosn(undefined);
             }}>
             +
           </div>
@@ -104,7 +103,6 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
             className={`${detailStyle.img_list_con} ${detailStyle.img_list_add}`}
             onClick={() => {
               setRemoveOpen(true);
-              setRemovePerosn(chat.members);
             }}>
             -
           </div>
@@ -132,7 +130,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         width={1024}
         onOk={onOk}
         onCancel={onCancel}>
-        <AssignPosts searchFn={setSelectPerson} />
+        <AssignPosts members={orgCtrl.user.members} searchFn={setSelectPerson} />
       </Modal>
       <Modal
         title={'移出成员'}
@@ -141,7 +139,7 @@ const Groupdetail: React.FC<any> = ({ chat }: { chat: IMsgChat }) => {
         width={1024}
         onCancel={onCancel}
         onOk={onRemoveOk}>
-        <AssignPosts searchFn={setSelectPerson} personData={removePerosn} />
+        <AssignPosts searchFn={setSelectPerson} members={chat.members} />
       </Modal>
     </>
   );

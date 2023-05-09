@@ -153,16 +153,18 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
 const buildTargetTree = (targets: ITarget[]) => {
   const result: MenuItemType[] = [];
   for (const item of targets) {
-    result.push({
-      key: item.key,
-      item: item,
-      label: item.metadata.name,
-      itemType: item.metadata.typeName,
-      menus: [],
-      tag: [item.metadata.typeName],
-      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
-      children: buildSpeciesTree(item.species),
-    });
+    if (item.species.length > 0) {
+      result.push({
+        key: item.key,
+        item: item,
+        label: item.metadata.name,
+        itemType: item.metadata.typeName,
+        menus: [],
+        tag: [item.metadata.typeName],
+        icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+        children: buildSpeciesTree(item.species),
+      });
+    }
   }
   return result;
 };
@@ -196,9 +198,7 @@ const getTeamMenu = () => {
       icon: <TeamIcon share={company.share} size={18} fontSize={16} />,
       children: [
         ...buildSpeciesTree(company.species),
-        ...buildTargetTree(company.departments),
-        ...buildTargetTree(company.groups),
-        ...buildTargetTree(company.cohorts),
+        ...buildTargetTree(company.targets.slice(1)),
       ],
     });
   }
