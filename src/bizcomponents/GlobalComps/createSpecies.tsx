@@ -184,7 +184,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (props.title.includes('修改')) {
+          if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.species?.metadata.icon));
             formRef.current?.setFieldsValue(props.species?.metadata);
           }

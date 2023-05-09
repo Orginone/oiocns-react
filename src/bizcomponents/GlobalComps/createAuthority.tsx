@@ -149,7 +149,7 @@ const AuthorityModal = (props: Iprops) => {
       }}
       onOpenChange={(open: boolean) => {
         if (open) {
-          if (props.title.includes('修改') || props.title.includes('编辑')) {
+          if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.current.metadata.icon));
             formRef.current?.setFieldsValue(formValue);
           }
