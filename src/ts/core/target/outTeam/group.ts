@@ -8,26 +8,26 @@ import { ITeam } from '../base/team';
 import { IMarket } from '../../thing/market/market';
 import { IApplication } from '../../thing/app/application';
 
-/** 单位群接口 */
+/** 组织群接口 */
 export interface IGroup extends ITarget {
-  /** 加载单位群的单位 */
+  /** 加载组织群的单位 */
   company: ICompany;
-  /** 父级单位群  */
+  /** 父级组织群  */
   parent?: IGroup;
-  /** 子单位群 */
+  /** 子组织群 */
   children: IGroup[];
   /** 流通交易 */
   market: IMarket | undefined;
-  /** 加载子单位群 */
+  /** 加载子组织群 */
   loadChildren(reload?: boolean): Promise<IGroup[]>;
-  /** 设立子单位群 */
+  /** 设立子组织群 */
   createChildren(data: model.TargetModel): Promise<IGroup | undefined>;
 }
 
-/** 单位群实现 */
+/** 组织群实现 */
 export class Group extends Target implements IGroup {
   constructor(_metadata: schema.XTarget, _company: ICompany) {
-    super(_metadata, [_metadata.belong?.name ?? '', '单位群'], _company, companyTypes);
+    super(_metadata, [_metadata.belong?.name ?? '', '组织群'], _company, companyTypes);
     this.company = _company;
   }
   company: ICompany;

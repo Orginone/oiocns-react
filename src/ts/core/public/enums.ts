@@ -1,7 +1,7 @@
 /** 用户对象类型 */
 export enum TargetType {
   /** 外部用户 */
-  'Group' = '单位群',
+  'Group' = '组织群',
   'Cohort' = '群组',
   /** 内部用户 */
   'College' = '学院',

@@ -9,7 +9,7 @@ import AuthorityModal from '@/bizcomponents/GlobalComps/createAuthority';
 import DictModal from '@/bizcomponents/GlobalComps/createDict';
 import { GroupMenuType, MenuType } from './config/menuType';
 import { Modal, message } from 'antd';
-import SearchCompany from '@/bizcomponents/SearchCompany';
+import SearchTarget from '@/bizcomponents/SearchCompany';
 import { XTarget } from '@/ts/base/schema';
 import { useHistory } from 'react-router-dom';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
@@ -47,7 +47,9 @@ const TeamSetting: React.FC = () => {
           case '创建单位':
             setShowFormModal(true);
             break;
+          case '加入群组':
           case '加入单位':
+            setOperateKeys(key.split('|'));
             setShowModal(true);
             break;
           case '打开会话':
@@ -143,7 +145,7 @@ const TeamSetting: React.FC = () => {
         typeNames={companyTypes}
       />
       <Modal
-        title="加入单位"
+        title={operateKeys[0]}
         width={670}
         destroyOnClose={true}
         open={showModal}
@@ -153,14 +155,16 @@ const TeamSetting: React.FC = () => {
           // 加入单位
           setShowModal(false);
           await orgCtrl.user.applyJoin(searchCallback || []);
-          message.success('已申请加入单位成功.');
+          message.success('已申请加入成功.');
         }}
         onCancel={() => {
           setShowModal(false);
         }}>
-        <SearchCompany
+        <SearchTarget
           searchCallback={setSearchCallback}
-          searchType={TargetType.Company}
+          searchType={
+            operateKeys.includes('单位') ? TargetType.Company : TargetType.Cohort
+          }
         />
       </Modal>
       <Content key={key} selectMenu={selectMenu} />

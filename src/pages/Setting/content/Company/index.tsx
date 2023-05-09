@@ -70,7 +70,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
       key: 'members',
     },
     {
-      tab: `加入的单位群`,
+      tab: `加入的组织群`,
       key: 'groups',
     },
   ];
@@ -171,7 +171,7 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
                     邀请成员
                   </Button>
                   <Button type="link" onClick={() => setActiveModal('joinGroup')}>
-                    加入单位群
+                    加入组织群
                   </Button>
                 </>
               )}
@@ -207,9 +207,9 @@ const CompanySetting: React.FC<IProps> = ({ current }) => {
         }}>
         <SearchCompany searchCallback={setSelectPerson} searchType={TargetType.Person} />
       </Modal>
-      {/* 申请加入单位群*/}
+      {/* 申请加入组织群*/}
       <Modal
-        title="申请加入单位群"
+        title="申请加入组织群"
         destroyOnClose
         open={activeModal === 'joinGroup'}
         width={600}

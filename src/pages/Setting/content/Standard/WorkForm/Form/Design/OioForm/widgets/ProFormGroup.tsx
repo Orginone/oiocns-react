@@ -23,7 +23,7 @@ type OptionType = {
 };
 
 /**
- * 单位群组件
+ * 组织群组件
  */
 const ProFormGroup = (props: IProps) => {
   const [treeData, setTreeData] = useState<OptionType[]>([]);

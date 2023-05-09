@@ -7,7 +7,7 @@ export enum MenuType {
 export enum GroupMenuType {
   'Authority' = '角色群',
   'InnerAgency' = '部门群',
-  'OutAgency' = '单位群',
+  'OutAgency' = '组织群',
   'Friends' = '好友',
   'Station' = '岗位',
   'Cohort' = '群组',

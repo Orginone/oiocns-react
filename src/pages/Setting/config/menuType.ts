@@ -12,7 +12,7 @@ export enum GroupMenuType {
   'StandardGroup' = '标准设置',
   'Authority' = '权限定义',
   'InnerAgency' = '内部机构',
-  'OutAgency' = '外部机构',
+  'OutAgency' = '组织群组',
   'Friends' = '我的好友',
   'Cohort' = '外部群组',
   'Station' = '单位岗位',

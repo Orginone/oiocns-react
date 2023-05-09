@@ -284,7 +284,6 @@ export class Person extends Belong implements IPerson {
     await this.loadSuperAuth(reload);
     await this.loadDicts(reload);
     await this.loadSpecies(reload);
-    await this.loadTodos(reload);
     for (const company of this.companys) {
       await company.deepLoad(reload);
     }
@@ -292,6 +291,7 @@ export class Person extends Belong implements IPerson {
       await cohort.deepLoad(reload);
     }
     this.superAuth?.deepLoad(reload);
+    await this.loadTodos(reload);
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {

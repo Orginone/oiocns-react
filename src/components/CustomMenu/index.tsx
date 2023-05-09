@@ -6,6 +6,7 @@ import { MenuItemType } from 'typings/globelType';
 import style from './index.module.less';
 
 interface CustomMenuType {
+  collapsed: boolean;
   selectMenu: MenuItemType;
   item: MenuItemType;
   onSelect?: (item: MenuItemType) => void;
@@ -138,15 +139,19 @@ const CustomMenu = (props: CustomMenuType) => {
 
   return (
     <>
-      <span style={{ display: 'flex' }}>
-        <Input
-          style={{ height: 36, fontSize: 15 }}
-          placeholder="搜索"
-          prefix={<ImSearch />}
-          onChange={(e) => {
-            setFilter(e.target.value);
-          }}
-        />
+      <span style={{ display: 'flex', justifyContent: 'center' }}>
+        {props.collapsed ? (
+          <ImSearch />
+        ) : (
+          <Input
+            style={{ height: 36, fontSize: 15 }}
+            placeholder="搜索"
+            prefix={<ImSearch />}
+            onChange={(e) => {
+              setFilter(e.target.value);
+            }}
+          />
+        )}
       </span>
 
       <Menu
@@ -154,6 +159,7 @@ const CustomMenu = (props: CustomMenuType) => {
         mode="inline"
         inlineIndent={10}
         items={data}
+        inlineCollapsed={props.collapsed}
         triggerSubMenuAction="click"
         onContextMenu={(e) => {
           e.preventDefault();

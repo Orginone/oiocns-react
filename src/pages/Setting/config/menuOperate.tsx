@@ -51,7 +51,7 @@ const buildDepartmentTree = (departments: IDepartment[]): MenuItemType[] => {
     ]),
   );
 };
-/** 编译单位群树 */
+/** 编译组织群树 */
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
   return groups.map((item) =>
     createMenu(item, loadTypeMenus(item, [TargetType.Group], true), [
@@ -242,7 +242,7 @@ const getUserMenu = () => {
       loadGroupMenus(
         {
           key: orgCtrl.user.key + GroupMenuType.Cohort,
-          label: GroupMenuType.Cohort,
+          label: '个人群组',
           item: orgCtrl.user,
           typeName: TargetType.Cohort,
           children: orgCtrl.user.cohorts.map((i) =>
@@ -342,8 +342,16 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
       },
     },
   ];
+  if (teamTypes.includes(TargetType.Cohort)) {
+    menus.push({
+      key: '加入群组',
+      icon: <im.ImTree />,
+      label: '加入群组',
+      model: 'outside',
+    });
+  }
   if (param.item.hasAuthoritys([OrgAuth.RelationAuthId])) {
-    menus.unshift({
+    menus.push({
       key: '新建|' + teamTypes.join('|'),
       icon: <im.ImPlus />,
       label: '新建' + param.typeName,

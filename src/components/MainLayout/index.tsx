@@ -64,21 +64,18 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
           onClick={() => {
             onSelectClick(parentMenu);
           }}>
-          {parentMenu.key != props.siderMenuData.key && (
+          {!collapsed && parentMenu.key != props.siderMenuData.key && (
             <div className={cls.backup}>
               <ImArrowLeft2 fontSize={20} />
             </div>
           )}
-          {!collapsed && (
-            <>
-              <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
-              <strong>{parentMenu.label}</strong>
-            </>
-          )}
+          <span style={{ fontSize: 20, margin: '0 6px' }}>{parentMenu.icon}</span>
+          {!collapsed && <strong>{parentMenu.label}</strong>}
         </div>
         <div className={cls.container} id="templateMenu">
           <CustomMenu
             item={parentMenu}
+            collapsed={collapsed}
             selectMenu={props.selectMenu}
             onSelect={(item) => {
               onSelectClick(item);

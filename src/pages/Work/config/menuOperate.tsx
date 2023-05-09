@@ -119,7 +119,7 @@ const getTeamMenu = () => {
   return children;
 };
 
-/** 编译单位群树 */
+/** 编译组织群树 */
 const buildGroupTree = (groups: IGroup[]): MenuItemType[] => {
   return groups.map((item) =>
     createMenu(
