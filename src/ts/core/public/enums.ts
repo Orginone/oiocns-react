@@ -47,3 +47,10 @@ export enum MessageType {
   Recall = '撤回',
   Readed = '已读',
 }
+
+/** 任务状态 */
+export enum TaskStatus {
+  ApplyStart = 0,
+  ApprovalStart = 100,
+  RefuseStart = 200,
+}

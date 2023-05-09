@@ -29,7 +29,7 @@ import { ItemType } from 'antd/lib/menu/hooks/useItems';
 type ThingItemType = ItemType & { click: (data: any) => void };
 
 interface IProps {
-  species: ISpeciesItem;
+  species?: ISpeciesItem;
   selectable?: boolean;
   height?: any;
   width?: any;
@@ -64,13 +64,13 @@ const Thing: React.FC<IProps> = (props: IProps) => {
 
   useEffect(() => {
     const temp: XProperty[] = [];
-    switch (props.species.metadata.typeName) {
+    switch (props.species?.metadata.typeName) {
       case SpeciesType.WorkForm:
       case SpeciesType.Commodity:
         (props.species as IForm).attributes.forEach((i) => {
           if (i.linkPropertys && i.linkPropertys.length > 0) {
             const item = i.linkPropertys.find(
-              (a) => a.belongId === props.species.current.space.metadata.id,
+              (a) => a.belongId === props.species?.current.space.metadata.id,
             );
             if (item) {
               item.name = i.name;
@@ -232,7 +232,9 @@ const Thing: React.FC<IProps> = (props: IProps) => {
           new CustomStore({
             key: 'Id',
             async load(loadOptions) {
-              loadOptions.userData = [`S${props.species.metadata.id}`];
+              loadOptions.userData = props.species
+                ? [`S${props.species.metadata.id}`]
+                : [];
               let request: any = { ...loadOptions };
               if (props.byIds) {
                 request.options = {
@@ -244,7 +246,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
                 };
               }
               const result = await kernel.anystore.loadThing<any>(
-                props.species.current.space.metadata.id,
+                props.species?.current.space.metadata.id ?? orgCtrl.user.metadata.id,
                 request,
               );
               if (result.success) {

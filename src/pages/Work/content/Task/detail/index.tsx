@@ -1,68 +1,38 @@
 import Design from '@/pages/Setting/content/Standard/Flow/Design';
 import Thing from '@/pages/Store/content/Thing/Thing';
-import { XForm, XWorkInstance } from '@/ts/base/schema';
+import { XForm } from '@/ts/base/schema';
 import orgCtrl from '@/ts/controller';
-import { ISpeciesItem } from '@/ts/core';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProFormInstance } from '@ant-design/pro-form';
 import { Button, Card, Collapse, Input, Tabs, TabsProps, Timeline } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { ImUndo2 } from 'react-icons/im';
 import cls from './index.module.less';
-import { ITodo } from '@/ts/core/work/todo';
-import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
 import { WorkNodeModel } from '@/ts/base/model';
-import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import { schema } from '@/ts/base';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
 const { Panel } = Collapse;
 
-interface IProp {
-  todo: ITodo;
+export interface TaskDetailType {
+  task: schema.XWorkTask;
   define: IWorkDefine;
-  onBack: (success: boolean) => void;
+  instance: schema.XWorkInstance;
+  onBack?: () => void;
 }
 
-const Detail: React.FC<IProp> = ({ todo, onBack, define }) => {
+const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) => {
   const formRef = useRef<ProFormInstance<any>>();
   const [comment, setComment] = useState<string>('');
   const [nodes, setNodes] = useState<WorkNodeModel>();
-  const [speciesItem, setSpeciesItem] = useState<ISpeciesItem[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [allForms, setAllForms] = useState<XForm[]>([]);
-  const [instance, setInstance] = useState<XWorkInstance>();
-  let isTodo = todo != undefined;
-
   useEffect(() => {
     setTimeout(async () => {
       setNodes(await define.loadWorkNode());
       setAllForms(await define.workItem.loadForms());
-      let xinstance = await todo.getInstance();
-      if (xinstance) {
-        setInstance(xinstance);
-        setSpeciesItem(
-          await filterSpeciesByIds(
-            define.workItem.current.species,
-            xinstance.define!.sourceIds?.split(',') || [],
-          ),
-        );
-      }
     }, 100);
   }, []);
-
-  /** 再分类集合中过滤出指定Id的分类 */
-  const filterSpeciesByIds = (species: ISpeciesItem[], ids: string[]) => {
-    let result: ISpeciesItem[] = [];
-    if (ids?.length > 0) {
-      for (let sp of species) {
-        if (ids.includes(sp.metadata.id)) {
-          result.push(sp);
-        }
-        if (sp.children.length > 0) {
-          result.push(...filterSpeciesByIds(sp.children, ids));
-        }
-      }
-    }
-    return result;
-  };
 
   /** 加载表单 */
   const loadForm = (forms: XForm[], disabled: boolean, data?: any) => {
@@ -174,13 +144,13 @@ const Detail: React.FC<IProp> = ({ todo, onBack, define }) => {
   const approvalTask = async (status: number) => {
     await formRef.current?.validateFields();
     setLoading(true);
-    onBack(
-      await todo.approval(
-        status,
-        comment,
-        JSON.stringify(formRef.current?.getFieldsValue()) ?? '',
-      ),
+    await orgCtrl.work.approvalTask(
+      [task],
+      status,
+      comment,
+      JSON.stringify(formRef.current?.getFieldValues()),
     );
+    onBack?.apply(this);
     setLoading(false);
   };
 
@@ -195,13 +165,10 @@ const Detail: React.FC<IProp> = ({ todo, onBack, define }) => {
             {/** 时间轴 */}
             {loadTimeline()}
             {/** 选中的操作对象 */}
-            {!instance?.define?.isCreate && speciesItem && (
+            {instance.define?.isCreate && (
               <Thing
-                species={speciesItem[0]}
                 height={'400px'}
-                byIds={(todo.metadata?.instance?.thingIds ?? '')
-                  .split(',')
-                  .filter((id: any) => id != '')}
+                byIds={instance.thingIds.split(',').filter((id: any) => id != '')}
                 selectable={false}
               />
             )}
@@ -264,7 +231,7 @@ const Detail: React.FC<IProp> = ({ todo, onBack, define }) => {
           <div
             style={{ display: 'flex', cursor: 'pointer' }}
             onClick={() => {
-              onBack(true);
+              onBack?.apply(this);
             }}>
             <a style={{ paddingTop: '2px' }}>
               <ImUndo2 />

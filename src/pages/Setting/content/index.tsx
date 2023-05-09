@@ -20,6 +20,8 @@ const ContentIndex = ({ selectMenu }: IProps) => {
   switch (selectMenu.itemType) {
     case TargetType.Person:
       return <PersonSetting />;
+    case TargetType.Group:
+      return <AgencySetting current={selectMenu.item} />;
     case TargetType.Station:
       return <StationSetting current={selectMenu.item} />;
     case TargetType.Cohort:

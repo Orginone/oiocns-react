@@ -1040,6 +1040,8 @@ export type XWorkDefine = {
   code: string;
   // 名称
   name: string;
+  // 图标
+  icon: string;
   // 是否创建实体
   isCreate: boolean;
   // 备注

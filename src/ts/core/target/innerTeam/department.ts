@@ -5,7 +5,6 @@ import { TargetType } from '../../public/enums';
 import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
-import { IApplication } from '../../thing/app/application';
 
 /** 单位内部机构（部门）接口 */
 export interface IDepartment extends ITarget {
@@ -126,14 +125,14 @@ export class Department extends Target implements IDepartment {
     return this.children;
   }
   get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
-    for (const item of this.children) {
-      chats.push(...item.chats);
-    }
-    return chats;
+    return this.targets;
   }
-  get workSpecies(): IApplication[] {
-    return [];
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [this];
+    for (const item of this.children) {
+      targets.push(...item.targets);
+    }
+    return targets;
   }
   async deepLoad(reload: boolean = false): Promise<void> {
     await this.loadChildren(reload);

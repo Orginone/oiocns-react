@@ -6,7 +6,6 @@ import { ICompany } from '../team/company';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { ITeam } from '../base/team';
 import { IMarket } from '../../thing/market/market';
-import { IApplication } from '../../thing/app/application';
 
 /** 组织群接口 */
 export interface IGroup extends ITarget {
@@ -91,16 +90,14 @@ export class Group extends Target implements IGroup {
     return this.children;
   }
   get chats(): IMsgChat[] {
-    const chats: IMsgChat[] = [this];
-    for (const item of this.children) {
-      chats.push(...item.chats);
-    }
-    return chats;
+    return [];
   }
-  get workSpecies(): IApplication[] {
-    return this.species.filter(
-      (a) => a.metadata.typeName == SpeciesType.Application,
-    ) as IApplication[];
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [this];
+    for (const item of this.children) {
+      targets.push(...item.targets);
+    }
+    return targets;
   }
   get market(): IMarket | undefined {
     const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);

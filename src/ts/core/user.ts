@@ -3,16 +3,16 @@ import { Emitter } from '../base/common';
 import { XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
-import { WorkTodo } from './work/todo';
+import { IWorkProvider, WorkProvider } from './work/provider';
 const sessionUserName = 'sessionUser';
 
 // 消息变更推送
 export const workNotify = new Emitter();
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
+  private _work: IWorkProvider | undefined;
   private _inited: boolean = false;
   private _preMessages: model.MsgSaveModel[] = [];
-  private _preTask: XWorkTask[] = [];
   constructor() {
     super();
     kernel.on('RecvMsg', (data) => {
@@ -23,10 +23,8 @@ export class UserProvider extends common.Emitter {
       }
     });
     kernel.on('RecvTask', (data: XWorkTask) => {
-      if (this._inited) {
-        this._recvTask(data);
-      } else {
-        this._preTask.push(data);
+      if (this._inited && this._work) {
+        this._work.updateTask(data);
       }
     });
     const userJson = sessionStorage.getItem(sessionUserName);
@@ -37,6 +35,10 @@ export class UserProvider extends common.Emitter {
   /** 当前用户 */
   get user(): IPerson | undefined {
     return this._user;
+  }
+  /** 办事提供层 */
+  get work(): IWorkProvider | undefined {
+    return this._work;
   }
   /** 是否完成初始化 */
   get inited(): boolean {
@@ -83,6 +85,7 @@ export class UserProvider extends common.Emitter {
   private _loadUser(person: schema.XTarget) {
     sessionStorage.setItem(sessionUserName, JSON.stringify(person));
     this._user = new Person(person);
+    this._work = new WorkProvider(this._user);
     this.changCallback();
   }
   /** 更新用户 */
@@ -92,7 +95,8 @@ export class UserProvider extends common.Emitter {
   /** 重载数据 */
   public async refresh(): Promise<void> {
     this._inited = false;
-    await this.user?.deepLoad(true);
+    await this._user?.deepLoad(true);
+    await this.work?.loadTodos(true);
     this._inited = true;
     this._preMessages = this._preMessages
       .sort((a, b) => {
@@ -102,7 +106,6 @@ export class UserProvider extends common.Emitter {
         this._recvMessage(item);
         return false;
       });
-    this._preTask.forEach((a) => this._recvTask(a));
   }
   /**
    * 接收到新信息
@@ -110,7 +113,7 @@ export class UserProvider extends common.Emitter {
    * @param cache 是否缓存
    */
   private _recvMessage(data: model.MsgSaveModel): void {
-    for (const c of this.user?.chats || []) {
+    for (const c of this._user?.chats || []) {
       let isMatch = data.sessionId === c.chatId;
       if (
         (c.share.typeName === TargetType.Person || c.share.typeName === '权限') &&
@@ -122,17 +125,5 @@ export class UserProvider extends common.Emitter {
         c.receiveMessage(data);
       }
     }
-  }
-  /**
-   * 接收到新任务
-   * @param data 新任务
-   */
-  private _recvTask(data: XWorkTask): void {
-    if (data.status >= 100) {
-      this.user!.todos = this.user!.todos.filter((a) => a.metadata.id != data.id);
-    } else {
-      this.user!.todos.unshift(new WorkTodo(data));
-    }
-    workNotify.changCallback();
   }
 }

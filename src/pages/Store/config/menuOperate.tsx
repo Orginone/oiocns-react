@@ -116,7 +116,6 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
       case SpeciesType.WorkForm:
       case SpeciesType.AppModule:
       case SpeciesType.Commodity:
-      case SpeciesType.PropClass:
       case SpeciesType.Application:
         result.push({
           key: item.key,
@@ -139,7 +138,6 @@ const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
                 await (item as IForm).loadForms();
                 break;
               case SpeciesType.Store:
-              case SpeciesType.PropClass:
                 await (item as IPropClass).loadPropertys();
                 break;
             }

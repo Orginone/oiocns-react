@@ -1,21 +1,22 @@
-import { XWorkDefine, XWorkInstanceArray } from '@/ts/base/schema';
-import { kernel, model, schema } from '../../../base';
+import { XWorkDefine } from '@/ts/base/schema';
+import { common, kernel, model, parseAvatar, schema } from '../../../base';
 import { PageAll } from '../../public/consts';
 import { TargetType } from '../../public/enums';
 import { ITarget } from '../../target/base/target';
 import { ISpeciesItem, SpeciesItem } from './species';
+import { ShareIcon } from '@/ts/base/model';
 
-export interface IFlowDefine {
+export interface IWorkDefine extends common.IEntity {
   /** 办事分类 */
   workItem: IWork;
   /** 数据 */
   metadata: XWorkDefine;
+  /** 共享信息 */
+  share: ShareIcon;
   /** 更新办事定义 */
   updateDefine(req: model.WorkDefineModel): Promise<boolean>;
   /** 加载事项定义节点 */
   loadWorkNode(): Promise<model.WorkNodeModel | undefined>;
-  /** 加载办事实例 */
-  loadInstance(page: model.PageModel): Promise<schema.XWorkInstanceArray>;
   /** 删除办事定义 */
   deleteDefine(): Promise<boolean>;
   /** 删除办事实例 */
@@ -26,13 +27,20 @@ export interface IFlowDefine {
   ): Promise<schema.XWorkInstance | undefined>;
 }
 
-export class FlowDefine implements IFlowDefine {
+export class FlowDefine extends common.Entity implements IWorkDefine {
   workItem: IWork;
   metadata: XWorkDefine;
   constructor(define: XWorkDefine, work: IWork) {
+    super();
     this.workItem = work;
     this.metadata = define;
+    this.share = {
+      name: this.metadata.name,
+      typeName: '办事项',
+      avatar: parseAvatar(this.metadata.icon),
+    };
   }
+  share: model.ShareIcon;
   async createWorkInstance(
     data: model.WorkInstanceModel,
   ): Promise<schema.XWorkInstance | undefined> {
@@ -65,15 +73,6 @@ export class FlowDefine implements IFlowDefine {
       return res.data;
     }
   }
-  async loadInstance(page: model.PageModel): Promise<XWorkInstanceArray> {
-    return (
-      await kernel.queryWorkApply({
-        defineId: this.metadata.id,
-        shareId: this.workItem.current.metadata.id,
-        page,
-      })
-    ).data;
-  }
   async deleteInstance(id: string): Promise<boolean> {
     return (await kernel.recallWorkInstance({ id, page: PageAll })).success;
   }
@@ -81,24 +80,24 @@ export class FlowDefine implements IFlowDefine {
 
 export interface IWork extends ISpeciesItem {
   /** 流程定义 */
-  defines: IFlowDefine[];
+  defines: IWorkDefine[];
   /** 加载所有可选表单 */
   loadForms(): Promise<schema.XForm[]>;
   /** 表单特性 */
   loadAttributes(): Promise<schema.XAttribute[]>;
   /** 加载办事 */
-  loadWorkDefines(reload?: boolean): Promise<IFlowDefine[]>;
+  loadWorkDefines(reload?: boolean): Promise<IWorkDefine[]>;
   /** 新建办事 */
-  createWorkDefine(data: model.WorkDefineModel): Promise<IFlowDefine | undefined>;
+  createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined>;
 }
 
 export abstract class Work extends SpeciesItem implements IWork {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: ISpeciesItem) {
     super(_metadata, _current, _parent);
   }
-  defines: IFlowDefine[] = [];
+  defines: IWorkDefine[] = [];
   private _defineLoaded: boolean = false;
-  async loadWorkDefines(reload: boolean = false): Promise<IFlowDefine[]> {
+  async loadWorkDefines(reload: boolean = false): Promise<IWorkDefine[]> {
     if (!this._defineLoaded || reload) {
       const res = await kernel.queryWorkDefine({
         id: this.current.metadata.id,
@@ -115,7 +114,7 @@ export abstract class Work extends SpeciesItem implements IWork {
     }
     return this.defines;
   }
-  async createWorkDefine(data: model.WorkDefineModel): Promise<IFlowDefine | undefined> {
+  async createWorkDefine(data: model.WorkDefineModel): Promise<IWorkDefine | undefined> {
     data.shareId = this.current.metadata.id;
     data.speciesId = this.metadata.id;
     const res = await kernel.createWorkDefine(data);

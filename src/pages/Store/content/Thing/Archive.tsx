@@ -3,7 +3,7 @@ import { Card, Collapse, Timeline } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { ISpeciesItem } from '@/ts/core';
-import OioForm from '@/pages/Setting/content/Standard/WorkForm/Form/Design/OioForm';
+import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
 
 const { Panel } = Collapse;
 

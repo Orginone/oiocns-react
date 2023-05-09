@@ -2,10 +2,10 @@ import { IWorkForm } from '@/ts/core/thing/app/work/workform';
 import { Button, Segmented, message } from 'antd';
 import React, { useState } from 'react';
 import Attritube from './Attritube';
-import SpeciesForm from './Form';
+import SpeciesForm from '@/bizcomponents/FormDesign';
 import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
-import FormModal from './Form/modal';
+import FormModal from '@/bizcomponents/FormDesign/modal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {

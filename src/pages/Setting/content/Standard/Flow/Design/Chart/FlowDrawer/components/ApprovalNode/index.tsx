@@ -7,7 +7,7 @@ import { NodeType } from '../../processType';
 import { XForm } from '@/ts/base/schema';
 import ShareShowComp from '@/bizcomponents/IndentityManage/ShareShowComp';
 import SelectOperation from '@/pages/Setting/content/Standard/Flow/Comp/SelectOperation';
-import ViewFormModal from '@/pages/Setting/content/Standard/WorkForm/Form/Design/viewFormModal';
+import ViewFormModal from '@/bizcomponents/FormDesign/Design/viewFormModal';
 import { IWork } from '@/ts/core';
 interface IProps {
   current: NodeType;

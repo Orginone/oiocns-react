@@ -1,21 +1,13 @@
-import {
-  ProForm,
-  ProFormDependency,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-  ProFormTreeSelect,
-} from '@ant-design/pro-components';
+import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { Modal } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import React from 'react';
-import { IWorkItem, SpeciesType } from '@/ts/core';
-import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import { IFlowDefine, IWorkItem } from '@/ts/core';
 
 interface Iprops {
   open: boolean;
   title: string;
-  current?: IWorkDefine;
+  current?: IFlowDefine;
   item: IWorkItem;
   handleOk: () => void;
   handleCancel: () => void;
@@ -29,8 +21,6 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
   if (current) {
     form.setFieldsValue({
       ...current.metadata,
-      operationIds:
-        current?.metadata.sourceIds?.split(',').filter((id: any) => id != '') || [],
     });
   } else {
     form.setFieldsValue({});
@@ -45,7 +35,6 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
           ...current,
           ...form.getFieldsValue(),
         };
-        value.sourceIds = value.isCreate ? '' : value.operationIds?.join(',');
         if (current) {
           value.id = current.metadata.id;
           await current.updateDefine(value);
@@ -98,62 +87,6 @@ const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Ipr
           colProps={{ span: 12 }}
           rules={[{ required: true, message: '办事标识为必填项' }]}
         />
-        <ProFormSelect
-          width="md"
-          name="isCreate"
-          label="是否创建实体"
-          placeholder="请选择是否创建实体"
-          required={true}
-          colProps={{ span: 12 }}
-          initialValue={current?.metadata.isCreate}
-          request={async () => {
-            let array: any[] = [
-              {
-                value: true,
-                label: '是',
-              },
-              {
-                value: false,
-                label: '否',
-              },
-            ];
-            return array;
-          }}
-          fieldProps={{
-            showSearch: true,
-            allowClear: true,
-          }}
-        />
-        <ProFormDependency name={['isCreate']}>
-          {({ isCreate }) => {
-            if (!isCreate)
-              return (
-                <ProFormTreeSelect
-                  width="md"
-                  name="operationIds"
-                  label="操作实体"
-                  placeholder="请选择操作实体"
-                  required={true}
-                  colProps={{ span: 12 }}
-                  request={async () => {
-                    let tree = (await item.current.space.loadSpecies()).filter(
-                      (i) =>
-                        i.metadata.typeName === SpeciesType.Store ||
-                        i.metadata.typeName === SpeciesType.PropClass,
-                    );
-                    return tree.map((a) => a.metadata);
-                  }}
-                  fieldProps={{
-                    fieldNames: { label: 'name', value: 'id', children: 'nodes' },
-                    showSearch: true,
-                    multiple: true,
-                    allowClear: true,
-                  }}
-                />
-              );
-            return null;
-          }}
-        </ProFormDependency>
         <ProFormTextArea
           width="md"
           name="remark"

@@ -5,7 +5,6 @@ import { PageAll } from '../../public/consts';
 import { IMsgChat } from '../../chat/message/msgchat';
 import { IMarket } from '../../thing/market/market';
 import { SpeciesType } from '../../public/enums';
-import { IApplication } from '../../thing/app/application';
 export interface ICohort extends ITarget {
   /** 流通交易 */
   market: IMarket | undefined;
@@ -38,12 +37,10 @@ export class Cohort extends Target implements ICohort {
     return [];
   }
   get chats(): IMsgChat[] {
-    return [this];
+    return this.targets;
   }
-  get workSpecies(): IApplication[] {
-    return this.species.filter(
-      (a) => a.metadata.typeName == SpeciesType.Application,
-    ) as IApplication[];
+  get targets(): ITarget[] {
+    return [this];
   }
   get market(): IMarket | undefined {
     const find = this.species.find((i) => i.metadata.typeName === SpeciesType.Market);

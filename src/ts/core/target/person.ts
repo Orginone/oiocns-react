@@ -3,16 +3,12 @@ import { IBelong, Belong } from './base/belong';
 import { ICohort, Cohort } from './outTeam/cohort';
 import { createCompany } from './team';
 import { PageAll, ShareIdSet, companyTypes } from '../public/consts';
-import { SpeciesType, TargetType } from '../public/enums';
+import { TargetType } from '../public/enums';
 import { ICompany } from './team/company';
 import { IMsgChat, PersonMsgChat } from '../chat/message/msgchat';
 import { IFileSystem, FileSystem } from '../thing/filesys/filesystem';
 import { ITarget } from './base/target';
 import { ITeam } from './base/team';
-import { ITodo, WorkTodo } from '../work/todo';
-import { IApplication } from '../thing/app/application';
-import { XWorkRecordArray, XWorkTaskArray } from '@/ts/base/schema';
-import { IdModel } from '@/ts/base/model';
 
 /** 人员类型接口 */
 export interface IPerson extends IBelong {
@@ -20,8 +16,6 @@ export interface IPerson extends IBelong {
   filesys: IFileSystem;
   /** 加入/管理的单位 */
   companys: ICompany[];
-  /** 待办 */
-  todos: ITodo[];
   /** 赋予人的身份(角色)实体 */
   givedIdentitys: schema.XIdentity[];
   /** 根据ID查询共享信息 */
@@ -32,12 +26,6 @@ export interface IPerson extends IBelong {
   loadGivedIdentitys(reload?: boolean): Promise<schema.XIdentity[]>;
   /** 加载单位 */
   loadCompanys(reload?: boolean): Promise<ICompany[]>;
-  /** 加载待办 */
-  loadTodos(reload?: boolean): Promise<ITodo[]>;
-  /** 加载已办 */
-  loadDones(req: IdModel): Promise<XWorkRecordArray>;
-  /** 加载已办 */
-  loadApply(req: IdModel): Promise<XWorkTaskArray>;
   /** 创建单位 */
   createCompany(data: model.TargetModel): Promise<ICompany | undefined>;
   /** 搜索用户 */
@@ -57,10 +45,8 @@ export class Person extends Belong implements IPerson {
   }
   filesys: IFileSystem;
   companys: ICompany[] = [];
-  todos: ITodo[] = [];
   private _cohortLoaded: boolean = false;
   private _companyLoaded: boolean = false;
-  private _todoLoaded: boolean = false;
   givedIdentitys: schema.XIdentity[] = [];
   private _givedIdentityLoaded: boolean = false;
   async loadGivedIdentitys(reload: boolean = false): Promise<schema.XIdentity[]> {
@@ -100,23 +86,6 @@ export class Person extends Belong implements IPerson {
       }
     }
     return this.companys;
-  }
-  async loadTodos(reload?: boolean): Promise<ITodo[]> {
-    if (!this._todoLoaded || reload) {
-      let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
-      console.log(res);
-      if (res.success) {
-        this._todoLoaded = true;
-        this.todos = (res.data.result || []).map((i) => new WorkTodo(i));
-      }
-    }
-    return this.todos;
-  }
-  async loadDones(req: IdModel): Promise<XWorkRecordArray> {
-    return (await kernel.queryWorkRecord(req)).data;
-  }
-  async loadApply(req: IdModel): Promise<XWorkTaskArray> {
-    return (await kernel.queryMyApply(req)).data;
   }
   async createCompany(data: model.TargetModel): Promise<ICompany | undefined> {
     if (!companyTypes.includes(data.typeName as TargetType)) {
@@ -211,21 +180,31 @@ export class Person extends Belong implements IPerson {
     }
     return chats;
   }
-  get workSpecies(): IApplication[] {
-    const workItems: IApplication[] = this.species.filter(
-      (a) => a.metadata.typeName == SpeciesType.Application,
-    ) as IApplication[];
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [this];
     for (const item of this.companys) {
-      workItems.push(...item.workSpecies);
+      targets.push(...item.targets);
     }
     for (const item of this.cohorts) {
-      workItems.push(
-        ...(item.species.filter(
-          (a) => a.metadata.typeName == SpeciesType.WorkItem,
-        ) as IApplication[]),
-      );
+      targets.push(...item.targets);
     }
-    return workItems;
+    return targets;
+  }
+  async deepLoad(reload: boolean = false): Promise<void> {
+    await this.loadGivedIdentitys(reload);
+    await this.loadCompanys(reload);
+    await this.loadCohorts(reload);
+    await this.loadMembers(reload);
+    await this.loadSuperAuth(reload);
+    await this.loadDicts(reload);
+    await this.loadSpecies(reload);
+    for (const company of this.companys) {
+      await company.deepLoad(reload);
+    }
+    for (const cohort of this.cohorts) {
+      await cohort.deepLoad(reload);
+    }
+    this.superAuth?.deepLoad(reload);
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers.forEach((i) => {
@@ -250,23 +229,6 @@ export class Person extends Belong implements IPerson {
         );
       }
     });
-  }
-  async deepLoad(reload: boolean = false): Promise<void> {
-    await this.loadGivedIdentitys(reload);
-    await this.loadCompanys(reload);
-    await this.loadCohorts(reload);
-    await this.loadMembers(reload);
-    await this.loadSuperAuth(reload);
-    await this.loadDicts(reload);
-    await this.loadSpecies(reload);
-    for (const company of this.companys) {
-      await company.deepLoad(reload);
-    }
-    for (const cohort of this.cohorts) {
-      await cohort.deepLoad(reload);
-    }
-    this.superAuth?.deepLoad(reload);
-    await this.loadTodos(reload);
   }
   findShareById(id: string): model.ShareIcon {
     const share = ShareIdSet.get(id) || {

@@ -10,7 +10,7 @@ import cls from './index.module.less';
 import AssignModal from '@/bizcomponents/AssignModal';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { CompanyColumn, PersonColumns } from '../../config/columns';
-import SearchCompany from '@/bizcomponents/SearchCompany';
+import SearchTarget from '@/bizcomponents/SearchCompany';
 import { schema } from '@/ts/base';
 import { IsRelationAdmin, IsSuperAdmin } from '@/utils/authority';
 interface IProps {
@@ -58,7 +58,7 @@ const AgencySetting: React.FC<IProps> = ({ current }: IProps) => {
     switch (current.metadata.typeName) {
       case TargetType.Group:
         return (
-          <SearchCompany
+          <SearchTarget
             searchCallback={setSelectMember}
             searchType={TargetType.Company}
           />

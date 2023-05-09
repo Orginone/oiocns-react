@@ -1,32 +1,118 @@
 import React from 'react';
-import * as im from 'react-icons/im';
-import { IBelong } from '@/ts/core';
-import { MenuItemType, OperateMenuType } from 'typings/globelType';
+import {
+  IAppModule,
+  IBelong,
+  IMarket,
+  ISpeciesItem,
+  IWorkItem,
+  SpeciesType,
+} from '@/ts/core';
+import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { IconFont } from '@/components/IconFont';
 import { GroupMenuType } from './menuType';
+import { IWorkDefine } from '@/ts/core/thing/base/work';
+import { IApplication } from '@/ts/core/thing/app/application';
 
-/** 加载右键菜单 */
-const loadSpeciesMenus = () => {
-  const items: OperateMenuType[] = [];
-  items.push({
-    key: '发起办事',
-    icon: <im.ImPlus />,
-    label: '发起办事',
-    model: 'outside',
-  });
+const buildWorkItem = (defines: IWorkDefine[]) => {
+  const items: MenuItemType[] = [];
+  for (const item of defines) {
+    items.push({
+      key: item.key,
+      item: item,
+      label: item.metadata.name,
+      itemType: GroupMenuType.WorkItem,
+      menus: [],
+      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+      children: [],
+    });
+  }
   return items;
 };
+
+const buildSpeciesTree = (species: ISpeciesItem[]) => {
+  const items: MenuItemType[] = [];
+  for (const item of species) {
+    const children: MenuItemType[] = [];
+    const defines: IWorkDefine[] = [];
+    switch (item.metadata.typeName) {
+      case SpeciesType.Market:
+        defines.push(...(item as IMarket).defines);
+        children.push(...buildWorkItem(defines));
+        break;
+      case SpeciesType.AppModule:
+      case SpeciesType.Application:
+        defines.push(...(item as IAppModule).defines);
+        break;
+      case SpeciesType.WorkItem:
+        defines.push(...(item as IWorkItem).defines);
+        children.push(...buildWorkItem(defines));
+        break;
+    }
+    if (defines.length < 1) {
+      continue;
+    }
+    children.push(...buildSpeciesTree(item.children));
+    items.push({
+      key: item.key,
+      item: defines,
+      label: item.metadata.name,
+      itemType: GroupMenuType.Species,
+      menus: [],
+      icon: <TeamIcon notAvatar={true} share={item.share} size={18} fontSize={16} />,
+      children: children,
+      clickEvent: async () => {
+        switch (item.metadata.typeName) {
+          case SpeciesType.AppModule:
+          case SpeciesType.Application:
+            await (item as IAppModule).loadWorkDefines();
+            break;
+        }
+      },
+    });
+  }
+  return items;
+};
+
 const loadChildren = (team: IBelong) => {
+  const defines: IWorkDefine[] = [];
+  const species: ISpeciesItem[] = [];
+  for (const item of team.targets) {
+    species.push(...item.species);
+    for (const species of item.species) {
+      switch (species.metadata.typeName) {
+        case SpeciesType.Market:
+          defines.push(...(species as IMarket).defines);
+          break;
+        case SpeciesType.Application:
+          defines.push(...(species as IApplication).defines);
+          break;
+      }
+    }
+  }
   return [
     {
-      key: team.key + GroupMenuType.Start,
-      item: team,
-      label: GroupMenuType.Start,
-      itemType: GroupMenuType.Start,
-      menus: loadSpeciesMenus(),
-      children: [],
+      key: team.key + '发起办事',
+      item: defines,
+      label: '发起办事',
+      itemType: GroupMenuType.Species,
+      menus: [],
+      children: buildSpeciesTree(species),
+      clickEvent: async () => {
+        for (const item of team.targets) {
+          for (const species of item.species) {
+            switch (species.metadata.typeName) {
+              case SpeciesType.Market:
+                await (species as IMarket).loadWorkDefines();
+                break;
+              case SpeciesType.Application:
+                await (species as IApplication).loadWorkDefines();
+                break;
+            }
+          }
+        }
+      },
     },
     {
       key: team.key + GroupMenuType.Todo,
@@ -68,26 +154,16 @@ const createMenu = (team: IBelong) => {
   };
 };
 
-/** 获取个人菜单 */
-const getUserMenu = () => {
-  return createMenu(orgCtrl.user);
-};
-
-/** 获取组织菜单 */
-const getTeamMenu = () => {
-  const children: MenuItemType[] = [];
+export const loadWorkMenu = (): MenuItemType => {
+  const children: MenuItemType[] = [createMenu(orgCtrl.user)];
   for (const company of orgCtrl.user.companys) {
     children.push(createMenu(company));
   }
-  return children;
-};
-
-export const loadWorkMenu = (): MenuItemType => {
   return {
     key: '办事',
     label: '办事',
     itemType: 'Tab',
     icon: <IconFont type={'icon-todo'} />,
-    children: [getUserMenu(), ...getTeamMenu()],
+    children: children,
   };
 };

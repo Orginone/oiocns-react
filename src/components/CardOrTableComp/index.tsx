@@ -85,14 +85,19 @@ const Index: <T extends unknown>(props: PageType<T>) => React.ReactElement = ({
         valueType: 'option',
         fixed: 'right',
         render: (_text, record) => {
-          return [
-            <Dropdown
-              className={cls['operation-btn']}
-              menu={{ items: operation(record) }}
-              key="key">
-              <RiMoreFill />
-            </Dropdown>,
-          ];
+          const items = operation(record);
+          return items && items.length > 0 ? (
+            [
+              <Dropdown
+                className={cls['operation-btn']}
+                menu={{ items: items }}
+                key="key">
+                <RiMoreFill />
+              </Dropdown>,
+            ]
+          ) : (
+            <></>
+          );
         },
       });
     }

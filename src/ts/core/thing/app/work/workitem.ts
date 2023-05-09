@@ -4,6 +4,7 @@ import { IAppModule } from '../appmodule';
 import { IWork, Work } from '../../base/work';
 import { PageAll } from '@/ts/core/public/consts';
 export interface IWorkItem extends IWork {
+  /** 对应的模块/应用 */
   appModule: IAppModule;
   /** 删除办事实例 */
   deleteInstance(id: string): Promise<boolean>;

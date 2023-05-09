@@ -1,7 +1,7 @@
 export type { IMsgChat } from './chat/message/msgchat';
 export { msgChatNotify } from './chat/message/msgchat';
 export { companyTypes, departmentTypes, orgAuth as OrgAuth } from './public/consts';
-export { MessageType, SpeciesType, TargetType } from './public/enums';
+export { MessageType, SpeciesType, TargetType, TaskStatus } from './public/enums';
 export type { IAuthority } from './target/authority/authority';
 export type { IBelong } from './target/base/belong';
 export type { ITarget } from './target/base/target';
@@ -18,6 +18,7 @@ export type { IWorkForm } from './thing/app/work/workform';
 export type { IWorkItem } from './thing/app/work/workitem';
 export type { IForm } from './thing/base/form';
 export type { ISpeciesItem } from './thing/base/species';
+export type { IWorkDefine as IFlowDefine } from './thing/base/work';
 export type { IWork } from './thing/base/work';
 export type { IDict } from './thing/dict/dict';
 export type { IFileSystemItem } from './thing/filesys/filesysItem';

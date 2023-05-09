@@ -6,11 +6,10 @@ import { IDepartment, Department } from '../innerTeam/department';
 import { IStation, Station } from '../innerTeam/station';
 import { IPerson } from '../person';
 import { PageAll } from '../../public/consts';
-import { SpeciesType, TargetType } from '../../public/enums';
+import { TargetType } from '../../public/enums';
 import { IMsgChat, PersonMsgChat } from '../../chat/message/msgchat';
 import { ITarget } from '../base/target';
 import { ITeam } from '../base/team';
-import { IApplication } from '../../thing/app/application';
 
 /** 单位类型接口 */
 export interface ICompany extends IBelong {
@@ -210,25 +209,23 @@ export class Company extends Belong implements ICompany {
     for (const item of this.stations) {
       chats.push(...item.chats);
     }
-    for (const item of this.cohorts) {
-      chats.push(...item.chats);
-    }
     if (this.superAuth) {
       chats.push(...this.superAuth.chats);
     }
     return chats;
   }
-  get workSpecies(): IApplication[] {
-    const workItems: IApplication[] = this.species.filter(
-      (a) => a.metadata.typeName == SpeciesType.Application,
-    ) as IApplication[];
+  get targets(): ITarget[] {
+    const targets: ITarget[] = [this];
+    for (const item of this.groups) {
+      targets.push(...item.targets);
+    }
+    for (const item of this.departments) {
+      targets.push(...item.targets);
+    }
     for (const item of this.cohorts) {
-      workItems.push(...item.workSpecies);
+      targets.push(...item.targets);
     }
-    for (const group of this.groups) {
-      workItems.push(...group.workSpecies);
-    }
-    return workItems;
+    return targets;
   }
   override loadMemberChats(_newMembers: schema.XTarget[], _isAdd: boolean): void {
     _newMembers

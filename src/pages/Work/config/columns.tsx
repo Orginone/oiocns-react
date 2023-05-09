@@ -2,12 +2,11 @@ import React from 'react';
 import { Tag } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
-import { ITodo } from '@/ts/core/work/todo';
 import { schema } from '@/ts/base';
 import { XWorkTask } from '@/ts/base/schema';
-import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import { IFlowDefine } from '@/ts/core';
 
-export const DefineColumns: ProColumns<IWorkDefine>[] = [
+export const DefineColumns: ProColumns<IFlowDefine>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -29,7 +28,7 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 200,
     title: '创建类',
     dataIndex: ['metadata', 'isCreate'],
-    render: (_: any, record: IWorkDefine) => {
+    render: (_: any, record: IFlowDefine) => {
       return record.metadata.isCreate ? '是' : '否';
     },
   },
@@ -38,7 +37,7 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '归属用户',
     dataIndex: ['metadata', 'belongId'],
-    render: (_: any, record: IWorkDefine) => {
+    render: (_: any, record: IFlowDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.belongId).name;
     },
   },
@@ -47,7 +46,7 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '共享用户',
     dataIndex: ['metadata', 'shareId'],
-    render: (_: any, record: IWorkDefine) => {
+    render: (_: any, record: IFlowDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
     },
   },
@@ -56,7 +55,7 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     width: 100,
     title: '创建人员',
     dataIndex: 'createUser',
-    render: (_: any, record: IWorkDefine) => {
+    render: (_: any, record: IFlowDefine) => {
       return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
     },
   },
@@ -72,7 +71,7 @@ export const DefineColumns: ProColumns<IWorkDefine>[] = [
     dataIndex: ['metadata', 'createTime'],
   },
 ];
-export const WorkColumns: ProColumns<ITodo>[] = [
+export const WorkColumns: ProColumns<schema.XWorkTask>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -81,21 +80,21 @@ export const WorkColumns: ProColumns<ITodo>[] = [
   },
   {
     title: '类型',
-    dataIndex: ['metadata', 'taskType'],
+    dataIndex: 'taskType',
     width: 80,
   },
   {
     title: '内容',
     width: 100,
-    dataIndex: ['metadata', 'title'],
+    dataIndex: 'title',
   },
   {
     key: 'shareId',
     width: 200,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
+    render: (_: any, record: schema.XWorkTask) => {
+      return orgCtrl.provider.user?.findShareById(record.shareId).name;
     },
   },
   {
@@ -103,37 +102,37 @@ export const WorkColumns: ProColumns<ITodo>[] = [
     width: 100,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_: any, record: ITodo) => {
-      return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
+    render: (_: any, record: schema.XWorkTask) => {
+      return orgCtrl.provider.user?.findShareById(record.createUser).name;
     },
   },
   {
     title: '状态',
     width: 80,
     dataIndex: 'status',
-    render: (_: any, record: ITodo) => {
-      const status = statusMap.get(record.metadata.status as number);
+    render: (_: any, record: schema.XWorkTask) => {
+      const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
     title: '备注',
     dataIndex: 'remark',
-    render: (_: any, record: ITodo) => {
-      if (record.metadata.taskType === '加用户') {
-        const targets: schema.XTarget[] = JSON.parse(record.metadata.remark);
+    render: (_: any, record: schema.XWorkTask) => {
+      if (record.taskType === '加用户') {
+        const targets: schema.XTarget[] = JSON.parse(record.remark);
         if (targets.length === 2) {
           return `${targets[0].name}[${targets[0].typeName}]申请加入${targets[1].name}[${targets[1].typeName}]`;
         }
       }
-      return record.metadata.remark;
+      return record.remark;
     },
   },
   {
     title: '申请时间',
     valueType: 'dateTime',
     width: 200,
-    dataIndex: ['metadata', 'createTime'],
+    dataIndex: 'createTime',
   },
 ];
 export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
