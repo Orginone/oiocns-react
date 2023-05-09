@@ -6,12 +6,12 @@ import CardOrTable from '@/components/CardOrTableComp';
 import FlowCard from './Comp/FlowCard';
 import { FlowColumn } from '@/pages/Setting/config/columns';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
-import DefineModal from './modal';
+import WorkDefineModal from './modal';
 import Design from './Design';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { orgAuth } from '@/ts/core/public/consts';
 import PageCard from '@/components/PageCard';
-import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import { IFlowDefine } from '@/ts/core';
 
 interface IProps {
   current: IWorkItem;
@@ -25,7 +25,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
   const parentRef = useRef<any>(null);
   const [activeTab, setActiveTab] = useState<string>('work');
   const [key, setForceUpdate] = useObjectUpdate(current);
-  const [define, setDefine] = useState<IWorkDefine>();
+  const [define, setDefine] = useState<IFlowDefine>();
   const [modalType, setModalType] = useState('');
   const items = [
     {
@@ -34,7 +34,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
       key: 'work',
     },
   ];
-  const renderOperation = (record: IWorkDefine): any[] => {
+  const renderOperation = (record: IFlowDefine): any[] => {
     let operations: any[] = [
       {
         key: 'editor',
@@ -117,7 +117,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
               <div style={{ background: '#EFF4F8' }}>
                 <Card bordered={false} bodyStyle={{ paddingTop: 0 }}>
                   <div className={cls['app-wrap']} ref={parentRef}>
-                    <CardOrTable<IWorkDefine>
+                    <CardOrTable<IFlowDefine>
                       extra={[
                         <Button
                           key="edit"
@@ -132,7 +132,7 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
                       parentRef={parentRef}
                       dataSource={current.defines}
                       operation={renderOperation}
-                      rowKey={(record: IWorkDefine) => record.metadata.id}
+                      rowKey={(record: IFlowDefine) => record.metadata.id}
                       renderCardContent={(items) => {
                         return items.map((item) => (
                           <FlowCard
@@ -169,10 +169,9 @@ const FlowList: React.FC<IProps> = ({ current }: IProps) => {
         {content()}
       </PageCard>
       {
-        <DefineModal
+        <WorkDefineModal
           item={current}
           current={define}
-          title={modalType == 'create' ? '新增办事' : '编辑办事'}
           open={['edit', 'create'].includes(modalType)}
           handleCancel={function (): void {
             setModalType('');

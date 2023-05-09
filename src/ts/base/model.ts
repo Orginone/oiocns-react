@@ -461,6 +461,8 @@ export type WorkDefineModel = {
   name: string;
   // 流程编号
   code: string;
+  // 图标
+  icon: string;
   // 流程节点
   resource: WorkNodeModel | undefined;
   // 备注
@@ -469,10 +471,6 @@ export type WorkDefineModel = {
   shareId: string;
   // 归属分类Id
   speciesId: string;
-  // 源数据分类Id
-  sourceIds: string;
-  // 是否创建实体
-  isCreate: boolean;
 };
 
 export type WorkInstanceModel = {

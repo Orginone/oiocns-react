@@ -1,12 +1,16 @@
-import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { Modal } from 'antd';
-import { useForm } from 'antd/es/form/Form';
-import React from 'react';
+import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { Avatar, Button, Space, Upload, UploadProps, Image, message } from 'antd';
+import React, { useRef, useState } from 'react';
 import { IFlowDefine, IWorkItem } from '@/ts/core';
+import { model } from '@/ts/base';
+import SchemaForm from '@/components/SchemaForm';
+import { FileItemShare, WorkDefineModel } from '@/ts/base/model';
+import { AiOutlineBank } from 'react-icons/ai';
+import { parseAvatar } from '@/ts/base';
+import orgCtrl from '@/ts/controller';
 
 interface Iprops {
   open: boolean;
-  title: string;
   current?: IFlowDefine;
   item: IWorkItem;
   handleOk: () => void;
@@ -16,88 +20,144 @@ interface Iprops {
 /*
   业务标准编辑模态框
 */
-const DefineModal = ({ open, title, handleOk, handleCancel, item, current }: Iprops) => {
-  const [form] = useForm<any>();
-  if (current) {
-    form.setFieldsValue({
-      ...current.metadata,
-    });
-  } else {
-    form.setFieldsValue({});
-  }
-
-  return (
-    <Modal
-      title={title}
-      open={open}
-      onOk={async () => {
-        const value = {
-          ...current,
-          ...form.getFieldsValue(),
-        };
-        if (current) {
-          value.id = current.metadata.id;
-          await current.updateDefine(value);
-        } else {
-          await item.createWorkDefine(value);
+const WorkDefineModal = ({ open, handleOk, handleCancel, item, current }: Iprops) => {
+  const formRef = useRef<ProFormInstance>();
+  const [avatar, setAvatar] = useState<FileItemShare>();
+  const uploadProps: UploadProps = {
+    multiple: false,
+    showUploadList: false,
+    maxCount: 1,
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith('image');
+      if (!isImage) {
+        message.error(`${file.name} 不是一个图片文件`);
+      }
+      return isImage;
+    },
+    async customRequest(options) {
+      const file = options.file as File;
+      const docDir = await orgCtrl.user.filesys?.home?.create('头像');
+      if (docDir && file) {
+        const result = await docDir.upload(file.name, file);
+        if (result) {
+          setAvatar(result.shareInfo());
         }
-        handleOk();
+      }
+    },
+  };
+  const columns: ProFormColumnsType<WorkDefineModel>[] = [
+    {
+      title: '图标',
+      dataIndex: 'icon',
+      colProps: { span: 24 },
+      renderFormItem: () => {
+        return (
+          <Space>
+            <Avatar
+              size={64}
+              style={{ background: '#f9f9f9', color: '#606060', fontSize: 10 }}
+              src={
+                avatar ? (
+                  <Image src={avatar.thumbnail} preview={{ src: avatar.shareLink }} />
+                ) : (
+                  <AiOutlineBank style={{ fontSize: 16 }} />
+                )
+              }
+            />
+            <Upload {...uploadProps}>
+              <Button type="link">上传图标</Button>
+            </Upload>
+            {avatar ? (
+              <Button type="link" onClick={() => setAvatar(undefined)}>
+                清除图标
+              </Button>
+            ) : (
+              ''
+            )}
+          </Space>
+        );
+      },
+    },
+    {
+      title: '事项名称',
+      dataIndex: 'name',
+      formItemProps: {
+        rules: [{ required: true, message: '事项名称为必填项' }],
+      },
+    },
+    {
+      title: '事项编号',
+      dataIndex: 'code',
+      formItemProps: {
+        rules: [{ required: true, message: '事项编号为必填项' }],
+      },
+    },
+    {
+      title: '是否创建实体',
+      dataIndex: 'isCreate',
+      valueType: 'select',
+      colProps: { span: 24 },
+      fieldProps: {
+        options: [
+          {
+            value: true,
+            label: '是',
+          },
+          {
+            value: false,
+            label: '否',
+          },
+        ],
+      },
+      formItemProps: {
+        rules: [{ required: true, message: '是否创建实体为必填项' }],
+      },
+    },
+    {
+      title: '备注',
+      dataIndex: 'remark',
+      valueType: 'textarea',
+      colProps: { span: 24 },
+      formItemProps: {
+        rules: [{ required: true, message: '分类定义为必填项' }],
+      },
+    },
+  ];
+  return (
+    <SchemaForm<model.WorkDefineModel>
+      key={'workDefineModal'}
+      formRef={formRef}
+      open={open}
+      width={640}
+      layoutType="ModalForm"
+      title={`${current ? '编辑' : '新建'}办事`}
+      onOpenChange={(open: boolean) => {
+        if (open) {
+          if (current) {
+            setAvatar(parseAvatar(current?.metadata.icon));
+            formRef.current?.setFieldsValue(current.metadata);
+          }
+        } else {
+          formRef.current?.resetFields();
+          handleCancel();
+        }
       }}
-      onCancel={() => {
-        form.resetFields();
-        handleCancel();
+      rowProps={{
+        gutter: [24, 0],
       }}
-      destroyOnClose={true}
-      cancelText={'关闭'}
-      width={700}>
-      <ProForm<any>
-        layout="vertical"
-        grid={true}
-        form={form}
-        rowProps={{
-          gutter: [12, 0],
-        }}
-        submitter={{
-          searchConfig: {
-            resetText: '重置',
-            submitText: '提交',
-          },
-          resetButtonProps: {
-            style: { display: 'none' },
-          },
-          submitButtonProps: {
-            style: { display: 'none' },
-          },
-        }}>
-        <ProFormText
-          width="md"
-          name="name"
-          label="办事名称"
-          placeholder="请输入办事名称"
-          required={true}
-          colProps={{ span: 12 }}
-          rules={[{ required: true, message: '办事名称为必填项' }]}
-        />
-        <ProFormText
-          width="md"
-          name="code"
-          label="办事标识"
-          placeholder="请输入办事标识"
-          required={true}
-          colProps={{ span: 12 }}
-          rules={[{ required: true, message: '办事标识为必填项' }]}
-        />
-        <ProFormTextArea
-          width="md"
-          name="remark"
-          label="备注"
-          placeholder="请输入备注信息"
-          required={false}
-          colProps={{ span: 24 }}
-        />
-      </ProForm>
-    </Modal>
+      onFinish={async (model) => {
+        if (current) {
+          model.id = current.metadata.id;
+          if (await current.updateDefine(model)) {
+            handleOk();
+          }
+        } else if ((await item.createWorkDefine(model)) != undefined) {
+          handleOk();
+        }
+      }}
+      columns={columns}
+    />
   );
 };
 
-export default DefineModal;
+export default WorkDefineModal;

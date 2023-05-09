@@ -1048,8 +1048,6 @@ export type XWorkDefine = {
   remark: string;
   // 类别ID
   speciesId: string;
-  // 操作主体的分类集合
-  sourceIds: string;
   // 共享用户ID
   shareId: string;
   // 归属用户ID
@@ -1108,6 +1106,8 @@ export type XWorkInstance = {
   thingIds: string;
   // 回调钩子
   hook: string;
+  // 共享用户ID
+  shareId: string;
   // 归属用户ID
   belongId: string;
   // 状态
@@ -1298,6 +1298,8 @@ export type XWorkTask = {
   defineId: string;
   // 归属组织Id
   shareId: string;
+  // 归属组织Id
+  belongId: string;
   // 办事实例id
   instanceId: string;
   // 身份Id
