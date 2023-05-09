@@ -24,7 +24,7 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
         title: '属性名称',
         dataIndex: 'name',
         formItemProps: {
-          rules: [{ required: true, message: '特性名称为必填项' }],
+          rules: [{ required: true, message: '属性名称为必填项' }],
         },
       },
       {
