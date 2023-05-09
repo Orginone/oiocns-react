@@ -4,8 +4,8 @@ import * as im from 'react-icons/im';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
-import { IconFont } from '@/components/IconFont';
 import { IMsgChat, TargetType } from '@/ts/core';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -105,7 +105,7 @@ export const loadChatMenu = () => {
     label: '沟通',
     itemType: 'Tab',
     children: [],
-    icon: <IconFont type={'icon-message'} />,
+    icon: <OrgIcons chat />,
   } as MenuItemType;
   chatMenus.children = loadBookMenu();
   return chatMenus;

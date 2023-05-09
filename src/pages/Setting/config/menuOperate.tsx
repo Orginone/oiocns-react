@@ -4,7 +4,6 @@ import React from 'react';
 import * as im from 'react-icons/im';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
-import { AiOutlineSetting } from 'react-icons/ai';
 import {
   IAuthority,
   IBelong,
@@ -461,6 +460,8 @@ export const loadSettingMenu = () => {
     label: '设置',
     itemType: 'Tab',
     children: [getUserMenu(), ...getTeamMenu()],
-    icon: <AiOutlineSetting />,
+    icon: (
+      <TeamIcon notAvatar={true} share={orgCtrl.user.share} size={18} fontSize={16} />
+    ),
   };
 };

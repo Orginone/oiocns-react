@@ -5,7 +5,6 @@ import * as fa from 'react-icons/fa';
 import { MenuItemType, OperateMenuType } from 'typings/globelType';
 import { GroupMenuType, MenuType } from './menuType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IconFont } from '@/components/IconFont';
 import {
   IFileSystem,
   IFileSystemItem,
@@ -16,6 +15,7 @@ import {
   IWork,
   SpeciesType,
 } from '@/ts/core';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 /** 编译文件系统树 */
 const buildFileSysTree = (targets: IFileSystemItem[]) => {
@@ -211,7 +211,7 @@ export const loadStoreMenu = () => {
     key: '存储',
     label: '存储',
     itemType: 'group',
-    icon: <IconFont type={'icon-store'} />,
+    icon: <OrgIcons store />,
     children: [getUserMenu(), ...getTeamMenu()],
   } as MenuItemType;
 };

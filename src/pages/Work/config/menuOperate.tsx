@@ -10,10 +10,10 @@ import {
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
-import { IconFont } from '@/components/IconFont';
 import { GroupMenuType } from './menuType';
 import { IWorkDefine } from '@/ts/core/thing/base/work';
 import { IApplication } from '@/ts/core/thing/app/application';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 const buildWorkItem = (defines: IWorkDefine[]) => {
   const items: MenuItemType[] = [];
@@ -165,7 +165,7 @@ export const loadWorkMenu = (): MenuItemType => {
     key: '办事',
     label: '办事',
     itemType: 'Tab',
-    icon: <IconFont type={'icon-todo'} />,
+    icon: <OrgIcons work />,
     children: children,
   };
 };

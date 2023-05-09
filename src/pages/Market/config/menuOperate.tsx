@@ -2,8 +2,8 @@ import orgCtrl from '@/ts/controller';
 import React from 'react';
 import { MenuItemType } from 'typings/globelType';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
-import { IconFont } from '@/components/IconFont';
 import { IForm, IMarket, ISpeciesItem, ITarget, IWork, SpeciesType } from '@/ts/core';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 
 /** 编译组织分类树 */
 const buildSpeciesTree = (species: ISpeciesItem[]): MenuItemType[] => {
@@ -70,7 +70,7 @@ export const loadMarketMenu = () => {
     key: '流通',
     label: '流通',
     itemType: 'group',
-    icon: <IconFont type={'icon-guangshangcheng'} />,
+    icon: <OrgIcons market />,
     children: markets,
   };
 };
