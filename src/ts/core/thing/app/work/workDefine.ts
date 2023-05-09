@@ -6,7 +6,7 @@ import {
   WorkInstanceModel,
   WorkNodeModel,
 } from '../../../../base/model';
-import { XWorkDefine, XWorkInstance, XWorkInstanceArray } from '../../../../base/schema';
+import { XWorkDefine, XWorkInstance } from '../../../../base/schema';
 import { IWork } from '../../base/work';
 
 export interface IWorkDefine {

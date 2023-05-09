@@ -28,7 +28,7 @@ const Todo: React.FC<any> = () => {
           }}></Input>
       }
       siderMenuData={rootMenu}>
-      return <Content key={key} selectMenu={selectMenu} filter={filter} />
+      <Content key={key} selectMenu={selectMenu} filter={filter} />
     </MainLayout>
   );
 };

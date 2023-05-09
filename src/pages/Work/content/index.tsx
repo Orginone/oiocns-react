@@ -8,11 +8,11 @@ import cls from './index.module.less';
 import CardOrTableComp from '@/components/CardOrTableComp';
 import { IBelong, ISpeciesItem, IWork, SpeciesType } from '@/ts/core';
 import { Button, Space, message } from 'antd';
-import { ApplyColumns, DoneColumns, WorkColumns } from '../config/columns';
+import { ApplyColumns, DefineColumns, DoneColumns, WorkColumns } from '../config/columns';
 import Detail from './work/detail';
 import { workNotify } from '@/ts/core/user';
 import { ITodo, WorkTodo } from '@/ts/core/work/todo';
-import { XWorkInstance, XWorkRecord, XWorkTask } from '@/ts/base/schema';
+import { XWorkRecord, XWorkTask } from '@/ts/base/schema';
 import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 import WorkStartDo from '@/pages/Work/content/work/start';
 
@@ -150,120 +150,121 @@ const TypeSetting = ({ filter, selectMenu }: IProps) => {
           }}
         />
       );
-    }
-    switch (selectMenu.itemType) {
-      case GroupMenuType.Start: {
-        let belong = selectMenu.item as IBelong;
-        loadWorkDefines(belong.workSpecies);
-        return (
-          <CardOrTableComp<IWorkDefine>
-            key={'todo'}
-            dataSource={workDefines}
-            columns={WorkColumns}
-            operation={(item: IWorkDefine) => [
-              {
-                key: 'start',
-                label: '发起',
-                onClick: async () => {
-                  setSelectDefine(item);
-                  setOpenStart(true);
-                },
-              },
-            ]}
-            rowKey={(record: IWorkDefine) => record.metadata.id}
-          />
-        );
-      }
-      case GroupMenuType.Todo: {
-        let belong = selectMenu.item as IBelong;
-        todos = todos.filter((a) => a.metadata.shareId == belong.metadata.id);
-        return (
-          <CardOrTableComp<ITodo>
-            key={'todo'}
-            dataSource={todos}
-            columns={WorkColumns}
-            operation={todoRowOperation}
-            tabBarExtraContent={todoRowsOperation}
-            rowKey={(record: ITodo) => record.metadata.id}
-            rowSelection={{
-              type: 'checkbox',
-              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
-                setSelectRows(selectedRows);
-              },
-            }}
-          />
-        );
-      }
-      case GroupMenuType.Done: {
-        let belong = selectMenu.item as IBelong;
-        return (
-          <CardOrTableComp<XWorkRecord>
-            key={'done'}
-            columns={DoneColumns}
-            dataSource={[]}
-            operation={(item) => {
-              if (item.task && item.task.taskType == '事项') {
-                return [
-                  {
-                    key: 'detail',
-                    label: '详情',
-                    onClick: async () => {
-                      setSelectTodo(new WorkTodo(item.task!));
-                      setPageKey('Detail');
-                    },
+    } else {
+      switch (selectMenu.itemType) {
+        case GroupMenuType.Start: {
+          let belong = selectMenu.item as IBelong;
+          loadWorkDefines(belong.workSpecies);
+          return (
+            <CardOrTableComp<IWorkDefine>
+              key={'start'}
+              dataSource={workDefines}
+              columns={DefineColumns}
+              rowKey={(record: IWorkDefine) => record.metadata.id}
+              operation={(item: IWorkDefine) => [
+                {
+                  key: 'start',
+                  label: '发起',
+                  onClick: async () => {
+                    setSelectDefine(item);
+                    setOpenStart(true);
                   },
-                ];
-              }
-              return [];
-            }}
-            rowKey={(record: XWorkRecord) => record.id}
-            request={async (page) => {
-              return await orgCtrl.user.loadDones({ id: belong.metadata.id, page });
-            }}
-          />
-        );
-      }
-      case GroupMenuType.Apply: {
-        let belong = selectMenu.item as IBelong;
-        return (
-          <CardOrTableComp<XWorkTask>
-            key={'apply'}
-            dataSource={[]}
-            rowKey={(record: XWorkTask) => record.id}
-            columns={ApplyColumns}
-            request={async (page) => {
-              return await orgCtrl.user.loadApply({ id: belong.metadata.id, page });
-            }}
-            rowSelection={{
-              type: 'checkbox',
-              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
-                setSelectRows(selectedRows);
-              },
-            }}
-          />
-        );
-      }
-      default:
-        if (selectMenu.item) {
+                },
+              ]}
+            />
+          );
+        }
+        case GroupMenuType.Todo: {
           let belong = selectMenu.item as IBelong;
           todos = todos.filter((a) => a.metadata.shareId == belong.metadata.id);
+          return (
+            <CardOrTableComp<ITodo>
+              key={'todo'}
+              dataSource={todos}
+              columns={WorkColumns}
+              operation={todoRowOperation}
+              tabBarExtraContent={todoRowsOperation}
+              rowKey={(record: ITodo) => record.metadata.id}
+              rowSelection={{
+                type: 'checkbox',
+                onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                  setSelectRows(selectedRows);
+                },
+              }}
+            />
+          );
         }
-        return (
-          <CardOrTableComp<ITodo>
-            key={'todo'}
-            dataSource={todos}
-            columns={WorkColumns}
-            operation={todoRowOperation}
-            tabBarExtraContent={todoRowsOperation}
-            rowKey={(record: ITodo) => record.metadata.id}
-            rowSelection={{
-              type: 'checkbox',
-              onChange: (_: React.Key[], selectedRows: ITodo[]) => {
-                setSelectRows(selectedRows);
-              },
-            }}
-          />
-        );
+        case GroupMenuType.Done: {
+          let belong = selectMenu.item as IBelong;
+          return (
+            <CardOrTableComp<XWorkRecord>
+              key={'done'}
+              columns={DoneColumns}
+              dataSource={[]}
+              operation={(item) => {
+                if (item.task && item.task.taskType == '事项') {
+                  return [
+                    {
+                      key: 'detail',
+                      label: '详情',
+                      onClick: async () => {
+                        setSelectTodo(new WorkTodo(item.task!));
+                        setPageKey('Detail');
+                      },
+                    },
+                  ];
+                }
+                return [];
+              }}
+              rowKey={(record: XWorkRecord) => record.id}
+              request={async (page) => {
+                return await orgCtrl.user.loadDones({ id: belong.metadata.id, page });
+              }}
+            />
+          );
+        }
+        case GroupMenuType.Apply: {
+          let belong = selectMenu.item as IBelong;
+          return (
+            <CardOrTableComp<XWorkTask>
+              key={'apply'}
+              dataSource={[]}
+              rowKey={(record: XWorkTask) => record.id}
+              columns={ApplyColumns}
+              request={async (page) => {
+                return await orgCtrl.user.loadApply({ id: belong.metadata.id, page });
+              }}
+              rowSelection={{
+                type: 'checkbox',
+                onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                  setSelectRows(selectedRows);
+                },
+              }}
+            />
+          );
+        }
+        default:
+          if (selectMenu.item) {
+            let belong = selectMenu.item as IBelong;
+            todos = todos.filter((a) => a.metadata.shareId == belong.metadata.id);
+          }
+          return (
+            <CardOrTableComp<ITodo>
+              key={'todo'}
+              dataSource={todos}
+              columns={WorkColumns}
+              operation={todoRowOperation}
+              tabBarExtraContent={todoRowsOperation}
+              rowKey={(record: ITodo) => record.metadata.id}
+              rowSelection={{
+                type: 'checkbox',
+                onChange: (_: React.Key[], selectedRows: ITodo[]) => {
+                  setSelectRows(selectedRows);
+                },
+              }}
+            />
+          );
+      }
     }
   };
 

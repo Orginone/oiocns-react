@@ -5,7 +5,73 @@ import { ProColumns } from '@ant-design/pro-table';
 import { ITodo } from '@/ts/core/work/todo';
 import { schema } from '@/ts/base';
 import { XWorkTask } from '@/ts/base/schema';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
+export const DefineColumns: ProColumns<IWorkDefine>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '名称',
+    dataIndex: ['metadata', 'name'],
+    width: 100,
+  },
+  {
+    title: '编码',
+    width: 100,
+    dataIndex: ['metadata', 'code'],
+  },
+  {
+    key: 'isCreate',
+    width: 200,
+    title: '创建类',
+    dataIndex: ['metadata', 'isCreate'],
+    render: (_: any, record: IWorkDefine) => {
+      return record.metadata.isCreate ? '是' : '否';
+    },
+  },
+  {
+    key: 'belongId',
+    width: 100,
+    title: '归属用户',
+    dataIndex: ['metadata', 'belongId'],
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.belongId).name;
+    },
+  },
+  {
+    key: 'shareId',
+    width: 100,
+    title: '共享用户',
+    dataIndex: ['metadata', 'shareId'],
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
+    },
+  },
+  {
+    key: 'createUser',
+    width: 100,
+    title: '创建人员',
+    dataIndex: 'createUser',
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
+    },
+  },
+  {
+    title: '备注',
+    width: 200,
+    dataIndex: 'remark',
+  },
+  {
+    title: '创建时间',
+    valueType: 'dateTime',
+    width: 200,
+    dataIndex: ['metadata', 'createTime'],
+  },
+];
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
     title: '序号',

@@ -24,7 +24,7 @@ const loadChildren = (team: IBelong) => {
       key: team.key + GroupMenuType.Start,
       item: team,
       label: GroupMenuType.Start,
-      itemType: GroupMenuType.Apply,
+      itemType: GroupMenuType.Start,
       menus: loadSpeciesMenus(),
       children: [],
     },
