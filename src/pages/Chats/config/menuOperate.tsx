@@ -5,7 +5,7 @@ import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { MenuItemType } from 'typings/globelType';
 import { IconFont } from '@/components/IconFont';
-import { IMsgChat } from '@/ts/core';
+import { IMsgChat, TargetType } from '@/ts/core';
 
 /** 创建会话菜单 */
 const createChatMenu = (chat: IMsgChat, children: MenuItemType[]) => {
@@ -50,7 +50,11 @@ const loadBookMenu = () => {
       key: orgCtrl.user.key,
       label: orgCtrl.user.chatdata.chatName,
       itemType: orgCtrl.user.chatdata.chatName,
-      item: orgCtrl.user.chats.filter((i) => i.isMyChat && i.belongId === i.userId),
+      item: orgCtrl.user.chats.filter(
+        (i) =>
+          i.isMyChat &&
+          (i.belongId === i.userId || i.share.typeName === TargetType.Cohort),
+      ),
       children: [
         createChatMenu(
           orgCtrl.user,

@@ -79,15 +79,17 @@ const loadChildren = (team: IBelong) => {
   const defines: IWorkDefine[] = [];
   const species: ISpeciesItem[] = [];
   for (const item of team.targets) {
-    species.push(...item.species);
-    for (const species of item.species) {
-      switch (species.metadata.typeName) {
-        case SpeciesType.Market:
-          defines.push(...(species as IMarket).defines);
-          break;
-        case SpeciesType.Application:
-          defines.push(...(species as IApplication).defines);
-          break;
+    if (item.space === team.space) {
+      species.push(...item.species);
+      for (const species of item.species) {
+        switch (species.metadata.typeName) {
+          case SpeciesType.Market:
+            defines.push(...(species as IMarket).defines);
+            break;
+          case SpeciesType.Application:
+            defines.push(...(species as IApplication).defines);
+            break;
+        }
       }
     }
   }
