@@ -19,7 +19,6 @@ const SettingStandrad: React.FC<IProps> = ({ current }: IProps) => {
   const Content = () => {
     switch (current.metadata.typeName) {
       case SpeciesType.Store:
-      case SpeciesType.PropClass:
         return <Property current={current} />;
       case SpeciesType.WorkForm:
       case SpeciesType.Commodity:

@@ -55,7 +55,8 @@ export class PropClass extends SpeciesItem implements IPropClass {
       });
       if (res.success) {
         this._propertyLoaded = true;
-        this._propertyChanged('updated', res.data.result || []);
+        this.propertys = [];
+        this._propertyChanged('added', res.data.result || []);
       }
     }
     return this.propertys;

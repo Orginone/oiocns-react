@@ -15,7 +15,6 @@ export const createSpecies = (
 ): ISpeciesItem => {
   switch (_metadata.typeName as SpeciesType) {
     case SpeciesType.Store:
-    case SpeciesType.PropClass:
       return new PropClass(_metadata, _current);
     case SpeciesType.Application:
       return new Application(_metadata, _current);

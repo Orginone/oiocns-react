@@ -159,7 +159,6 @@ const CustomMenu = (props: CustomMenuType) => {
         mode="inline"
         inlineIndent={10}
         items={data}
-        inlineCollapsed={props.collapsed}
         triggerSubMenuAction="click"
         onContextMenu={(e) => {
           e.preventDefault();

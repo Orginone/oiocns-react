@@ -42,7 +42,6 @@ export abstract class Form extends SpeciesItem implements IForm {
     for (const item of this.current.space.species) {
       switch (item.metadata.typeName) {
         case SpeciesType.Store:
-        case SpeciesType.PropClass:
           result.push(...(await (item as IPropClass).loadAllProperty()));
       }
     }
@@ -60,7 +59,8 @@ export abstract class Form extends SpeciesItem implements IForm {
       });
       if (res.success) {
         this._formLoaded = true;
-        this.forms = res.data.result || [];
+        this.forms = [];
+        this._formChanged('added', res.data.result || []);
       }
     }
     return this.forms;
@@ -70,7 +70,7 @@ export abstract class Form extends SpeciesItem implements IForm {
     data.speciesId = this.metadata.id;
     const res = await kernel.createForm(data);
     if (res.success && res.data.id) {
-      this.forms.push(res.data);
+      this._formChanged('added', [res.data]);
       return res.data;
     }
   }
@@ -81,7 +81,7 @@ export abstract class Form extends SpeciesItem implements IForm {
       data.speciesId = this.metadata.id;
       const res = await kernel.updateForm(data);
       if (res.success && res.data.id) {
-        this.forms[index] = res.data;
+        this._formChanged('updated', [res.data]);
       }
       return res.success;
     }
@@ -95,7 +95,7 @@ export abstract class Form extends SpeciesItem implements IForm {
         page: PageAll,
       });
       if (res.success) {
-        this.forms.splice(index, 1);
+        this._formChanged('deleted', [data]);
       }
       return res.success;
     }
@@ -113,7 +113,8 @@ export abstract class Form extends SpeciesItem implements IForm {
       });
       if (res.success) {
         this._attributeLoaded = true;
-        this.attributes = res.data.result || [];
+        this.attributes = [];
+        this._attributeChanged('added', res.data.result || []);
       }
     }
     return this.attributes;
@@ -125,7 +126,7 @@ export abstract class Form extends SpeciesItem implements IForm {
     data.speciesId = this.metadata.id;
     const res = await kernel.createAttribute(data);
     if (res.success && res.data.id) {
-      this.attributes.push(res.data);
+      this._attributeChanged('added', [res.data]);
       return res.data;
     }
   }
@@ -136,7 +137,7 @@ export abstract class Form extends SpeciesItem implements IForm {
       data.speciesId = this.metadata.id;
       const res = await kernel.updateAttribute(data);
       if (res.success && res.data.id) {
-        this.attributes[index] = res.data;
+        this._attributeChanged('updated', [res.data]);
       }
       return res.success;
     }
@@ -150,7 +151,7 @@ export abstract class Form extends SpeciesItem implements IForm {
         page: PageAll,
       });
       if (res.success) {
-        this.attributes.splice(index, 1);
+        this._attributeChanged('deleted', [data]);
       }
       return res.success;
     }
