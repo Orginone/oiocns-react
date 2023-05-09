@@ -23,6 +23,9 @@ export interface IPropClass extends ISpeciesItem {
 export class PropClass extends SpeciesItem implements IPropClass {
   constructor(_metadata: schema.XSpecies, _current: ITarget, _parent?: IPropClass) {
     super(_metadata, _current, _parent);
+    if (_parent) {
+      this.propertys.push(..._parent.propertys);
+    }
     for (const item of _metadata.nodes || []) {
       this.children.push(new PropClass(item, this.current, this));
     }
@@ -35,7 +38,12 @@ export class PropClass extends SpeciesItem implements IPropClass {
     await this.loadPropertys();
     result.push(...this.propertys);
     for (const item of this.children) {
-      result.push(...(await (item as IPropClass).loadAllProperty()));
+      const subPropertys = await (item as IPropClass).loadAllProperty();
+      for (const sub of subPropertys) {
+        if (result.findIndex((i) => i.id === sub.id) < 0) {
+          result.push(sub);
+        }
+      }
     }
     return result;
   }
@@ -47,7 +55,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
       });
       if (res.success) {
         this._propertyLoaded = true;
-        this.propertys = res.data.result || [];
+        this._propertyChanged('updated', res.data.result || []);
       }
     }
     return this.propertys;
@@ -62,7 +70,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
     data.speciesId = this.metadata.id;
     const res = await kernel.createProperty(data);
     if (res.success && res.data.id) {
-      this.propertys.push(res.data);
+      this._propertyChanged('added', [res.data]);
       return res.data;
     }
   }
@@ -72,7 +80,7 @@ export class PropClass extends SpeciesItem implements IPropClass {
       data.speciesId = this.metadata.id;
       const res = await kernel.updateProperty(data);
       if (res.success && res.data.id) {
-        this.propertys[index] = res.data;
+        this._propertyChanged('updated', [res.data]);
       }
       return res.success;
     }
@@ -86,10 +94,35 @@ export class PropClass extends SpeciesItem implements IPropClass {
         page: PageAll,
       });
       if (res.success) {
-        this.propertys.splice(index, 1);
+        this._propertyChanged('deleted', [data]);
       }
       return res.success;
     }
     return false;
+  }
+  _propertyChanged(type: string, props: schema.XProperty[]) {
+    if (this._propertyLoaded) {
+      for (const item of props) {
+        switch (type) {
+          case 'deleted':
+            this.propertys = this.propertys.filter((i) => i.id != item.id);
+            break;
+          case 'added':
+            this.propertys.push(item);
+            break;
+          case 'updated':
+            {
+              const index = this.propertys.findIndex((i) => i.id === item.id);
+              if (index > -1) {
+                this.propertys[index] = item;
+              }
+            }
+            break;
+        }
+      }
+      for (const item of this.children) {
+        (item as PropClass)._propertyChanged(type, props);
+      }
+    }
   }
 }

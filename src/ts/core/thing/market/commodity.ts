@@ -38,20 +38,30 @@ export class Commodity extends Form implements ICommodity {
     return new Commodity(_metadata, _current, this, this.market);
   }
   async loadAllForms(): Promise<schema.XForm[]> {
-    const result: schema.XForm[] = [];
+    const result = [];
     await this.loadForms();
     result.push(...this.forms);
     for (const item of this.children) {
-      result.push(...(await (item as ICommodity).loadAllForms()));
+      const subForms = await (item as Commodity).loadAllForms();
+      for (const sub of subForms) {
+        if (result.findIndex((i) => i.id === sub.id) < 0) {
+          result.push(sub);
+        }
+      }
     }
     return result;
   }
   async loadAllAttributes(): Promise<schema.XAttribute[]> {
-    const result: schema.XAttribute[] = [];
+    const result = [];
     await this.loadAttributes();
     result.push(...this.attributes);
     for (const item of this.children) {
-      result.push(...(await (item as ICommodity).loadAllAttributes()));
+      const subAttribute = await (item as Commodity).loadAllAttributes();
+      for (const sub of subAttribute) {
+        if (result.findIndex((i) => i.id === sub.id) < 0) {
+          result.push(sub);
+        }
+      }
     }
     return result;
   }

@@ -156,4 +156,64 @@ export abstract class Form extends SpeciesItem implements IForm {
     }
     return false;
   }
+  _attributeChanged(type: string, props: schema.XAttribute[]) {
+    if (this._attributeLoaded) {
+      for (const item of props) {
+        switch (type) {
+          case 'deleted':
+            this.attributes = this.attributes.filter((i) => i.id != item.id);
+            break;
+          case 'added':
+            this.attributes.push(item);
+            break;
+          case 'updated':
+            {
+              const index = this.attributes.findIndex((i) => i.id === item.id);
+              if (index > -1) {
+                this.attributes[index] = item;
+              }
+            }
+            break;
+        }
+      }
+      for (const item of this.children) {
+        switch (item.metadata.typeName) {
+          case SpeciesType.Commodity:
+          case SpeciesType.WorkForm:
+            (item as Form)._attributeChanged(type, props);
+            break;
+        }
+      }
+    }
+  }
+  _formChanged(type: string, props: schema.XForm[]) {
+    if (this._formLoaded) {
+      for (const item of props) {
+        switch (type) {
+          case 'deleted':
+            this.forms = this.forms.filter((i) => i.id != item.id);
+            break;
+          case 'added':
+            this.forms.push(item);
+            break;
+          case 'updated':
+            {
+              const index = this.forms.findIndex((i) => i.id === item.id);
+              if (index > -1) {
+                this.forms[index] = item;
+              }
+            }
+            break;
+        }
+      }
+      for (const item of this.children) {
+        switch (item.metadata.typeName) {
+          case SpeciesType.Commodity:
+          case SpeciesType.WorkForm:
+            (item as Form)._formChanged(type, props);
+            break;
+        }
+      }
+    }
+  }
 }
