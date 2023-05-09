@@ -60,7 +60,7 @@ export class FlowDefine extends common.Entity implements IWorkDefine {
   }
   async updateDefine(data: model.WorkDefineModel): Promise<boolean> {
     data.shareId = this.workItem.current.metadata.id;
-    data.speciesId = this.metadata.id;
+    data.speciesId = this.metadata.speciesId;
     const res = await kernel.createWorkDefine(data);
     if (res.success && res.data.id) {
       this.metadata = res.data;
