@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import React, { useState } from 'react';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
@@ -20,8 +20,6 @@ interface Iprops {
 */
 const AuthorityModal = (props: Iprops) => {
   if (!props.open) return <></>;
-  const formValue = props.current.metadata;
-  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const uploadProps: UploadProps = {
     multiple: false,
@@ -96,7 +94,7 @@ const AuthorityModal = (props: Iprops) => {
       title: '选择共享组织',
       dataIndex: 'shareId',
       valueType: 'select',
-      initialValue: formValue.shareId,
+      initialValue: props.current.metadata.shareId,
       formItemProps: { rules: [{ required: true, message: '请选择共享组织' }] },
       fieldProps: {
         options: props.current.space.parentTarget.map((i) => {
@@ -139,7 +137,6 @@ const AuthorityModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm
-      formRef={formRef}
       title={props.title + '权限'}
       open={props.open}
       width={640}
@@ -147,14 +144,13 @@ const AuthorityModal = (props: Iprops) => {
       rowProps={{
         gutter: [24, 0],
       }}
+      initialValues={props.title.includes('编辑') ? props.current.metadata : {}}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.current.metadata.icon));
-            formRef.current?.setFieldsValue(formValue);
           }
         } else {
-          formRef.current?.resetFields();
           props.handleCancel();
         }
       }}

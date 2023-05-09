@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import React, { useState } from 'react';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import { PropertyModel } from '@/ts/base/model';
 import { XProperty } from '@/ts/base/schema';
@@ -18,7 +18,6 @@ interface Iprops {
 const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) => {
   if (!open) return <></>;
   const [selectType, setSelectType] = useState<string>();
-  const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {
     const columns: ProFormColumnsType<PropertyModel>[] = [
       {
@@ -121,19 +120,17 @@ const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) 
   return (
     <SchemaForm<PropertyModel>
       key={'propertyModal'}
-      formRef={formRef}
       open={open}
       width={640}
       layoutType="ModalForm"
+      initialValues={data || {}}
       title={`${data ? '编辑' : '新建'}属性`}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (data) {
             setSelectType(data?.valueType);
-            formRef.current?.setFieldsValue(data);
           }
         } else {
-          formRef.current?.resetFields();
           handleCancel();
         }
       }}

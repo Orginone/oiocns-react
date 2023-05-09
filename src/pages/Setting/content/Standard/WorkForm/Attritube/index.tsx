@@ -31,8 +31,9 @@ const Attritube = ({
   // 操作内容渲染函数
   const renderOperate = (item: XAttribute) => {
     if (
-      item.belongId === current.current.metadata.id ||
-      item.belongId === current.current.space.metadata.id
+      item.speciesId === current.metadata.id &&
+      (item.belongId === current.current.metadata.id ||
+        item.belongId === current.current.space.metadata.id)
     ) {
       return [
         {

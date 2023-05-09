@@ -1,10 +1,8 @@
 import { Badge, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
-
-import { IconFont } from '@/components/IconFont';
-
 import cls from './index.module.less';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
@@ -40,10 +38,19 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
   }, []);
   const navs = [
     {
+      key: 'home',
+      path: '/home',
+      title: '门户',
+      icon: 'home',
+      count: 0,
+      fath: '/home',
+      onClick: () => {},
+    },
+    {
       key: msgKey,
       path: '/chat',
       title: '沟通',
-      icon: 'icon-message',
+      icon: 'chat',
       count: msgCount,
       fath: '/chat',
       onClick: () => {
@@ -55,7 +62,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: taskKey,
       path: '/work',
       title: '办事',
-      icon: 'icon-todo',
+      icon: 'work',
       count: workCount,
       fath: '/work',
       onClick: () => {
@@ -67,7 +74,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'store',
       path: '/store',
       title: '存储',
-      icon: 'icon-store',
+      icon: 'store',
       count: 0,
       fath: '/store',
       onClick: () => {
@@ -79,7 +86,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'market',
       path: '/market',
       title: '流通',
-      icon: 'icon-guangshangcheng',
+      icon: 'market',
       count: 0,
       fath: '/market',
       onClick: () => {
@@ -109,13 +116,16 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
         title={item.title}
         onClick={() => {
           item.onClick();
-        }}
-        className={`${
-          location.hash.startsWith('#' + item.fath)
-            ? `${cls['active-icon']}`
-            : `${cls['un-active-icon']}`
-        }`}>
-        {typeof item.icon !== 'string' ? item.icon : <IconFont type={item.icon} />}
+        }}>
+        {typeof item.icon !== 'string' ? (
+          item.icon
+        ) : (
+          <OrgIcons
+            size={30}
+            type={item.icon}
+            selected={location.hash.startsWith('#' + item.fath)}
+          />
+        )}
       </Link>
     );
   };

@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import SchemaForm from '@/components/SchemaForm';
 import { DictModel, FileItemShare } from '@/ts/base/model';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import { IBelong, IDict } from '@/ts/core';
 import { Avatar, Button, Space, Image, Upload, message, UploadProps } from 'antd';
 import { AiOutlineBank } from 'react-icons/ai';
@@ -23,7 +23,6 @@ const DictModal = (props: Iprops) => {
   if (!props.open) return <></>;
   const { title, open, dict, handleCancel, handleOk } = props;
   const [avatar, setAvatar] = useState<FileItemShare>();
-  const formRef = useRef<ProFormInstance>();
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -102,19 +101,17 @@ const DictModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<DictModel>
-      formRef={formRef}
       title={title + '字典'}
       open={open}
       width={640}
       layoutType="ModalForm"
+      initialValues={dict?.metadata || {}}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (dict) {
             setAvatar(parseAvatar(dict.metadata.icon));
-            formRef.current?.setFieldsValue(dict.metadata);
           }
         } else {
-          formRef.current?.resetFields();
           handleCancel();
         }
       }}

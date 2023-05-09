@@ -22,24 +22,27 @@ const Property: React.FC<any> = ({ current }: { current: IPropClass }) => {
   }, []);
   // 操作内容渲染函数
   const renderOperate = (item: XProperty) => {
-    return [
-      {
-        key: '修改属性',
-        label: '编辑属性',
-        onClick: () => {
-          setEditData(item);
-          setModalType('修改属性');
+    if (item.speciesId === current.metadata.id) {
+      return [
+        {
+          key: '修改属性',
+          label: '编辑属性',
+          onClick: () => {
+            setEditData(item);
+            setModalType('修改属性');
+          },
         },
-      },
-      {
-        key: '删除属性',
-        label: '删除属性',
-        onClick: async () => {
-          await current.deleteProperty(item);
-          tforceUpdate();
+        {
+          key: '删除属性',
+          label: '删除属性',
+          onClick: async () => {
+            await current.deleteProperty(item);
+            tforceUpdate();
+          },
         },
-      },
-    ];
+      ];
+    }
+    return [];
   };
 
   useEffect(() => {

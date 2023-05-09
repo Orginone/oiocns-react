@@ -48,6 +48,7 @@ const TeamSetting: React.FC = () => {
           operateKey={operateKey}
           confrim={() => {
             setOperateKey('');
+            setSelectMenu(selectMenu);
           }}
         />
       ) : (

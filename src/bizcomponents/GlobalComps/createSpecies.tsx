@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare } from '@/ts/base/model';
@@ -8,6 +8,7 @@ import { ITarget, ISpeciesItem } from '@/ts/core';
 import { AiOutlineBank } from 'react-icons/ai';
 import { SpeciesModel } from '@/ts/base/model';
 import { parseAvatar } from '@/ts/base';
+import { orgAuth } from '@/ts/core/public/consts';
 
 interface Iprops {
   title: string;
@@ -22,7 +23,6 @@ interface Iprops {
 */
 const CreateSpeciesModal = (props: Iprops) => {
   if (!props.open) return <></>;
-  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const speciesTypes: string[] = [];
   let target = props.current;
@@ -133,6 +133,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       title: '管理权限',
       dataIndex: 'authId',
       valueType: 'treeSelect',
+      initialValue: orgAuth.SuperAuthId,
       formItemProps: { rules: [{ required: true, message: '管理权限为必填项' }] },
       request: async () => {
         const data = await target.space.loadSuperAuth();
@@ -150,6 +151,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       title: '向下级组织公开',
       dataIndex: 'public',
       valueType: 'select',
+      initialValue: true,
       fieldProps: {
         options: [
           {
@@ -178,19 +180,16 @@ const CreateSpeciesModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<SpeciesModel>
-      formRef={formRef}
       title={props.title + '类别'}
       open={props.open}
       width={640}
+      initialValues={props.title.includes('编辑') ? props.current.metadata : {}}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (props.title.includes('编辑')) {
             setAvatar(parseAvatar(props.species?.metadata.icon));
-            formRef.current?.setFieldsValue(props.species?.metadata);
           }
-          formRef.current?.setFieldValue('shareId', target.metadata.id);
         } else {
-          formRef.current?.resetFields();
           setAvatar(undefined);
           props.handleCancel();
         }
@@ -202,7 +201,7 @@ const CreateSpeciesModal = (props: Iprops) => {
       onFinish={async (values) => {
         values.icon = JSON.stringify(avatar);
         if (props.species) {
-          if (props.title.includes('修改')) {
+          if (props.title.includes('编辑')) {
             await props.species.update(values);
             props.handleOk(props.species);
           } else {

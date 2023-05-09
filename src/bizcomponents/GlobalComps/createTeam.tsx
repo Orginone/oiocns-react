@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { message, Upload, UploadProps, Image, Button, Space, Avatar } from 'antd';
-import { ProFormColumnsType, ProFormInstance } from '@ant-design/pro-components';
+import { ProFormColumnsType } from '@ant-design/pro-components';
 import SchemaForm from '@/components/SchemaForm';
 import orgCtrl from '@/ts/controller';
 import { FileItemShare, TargetModel } from '@/ts/base/model';
@@ -21,7 +21,6 @@ interface Iprops {
   编辑
 */
 const CreateTeamModal = (props: Iprops) => {
-  const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   if (props.isEdit) {
     props.typeNames.unshift(props.current.metadata.typeName);
@@ -96,6 +95,7 @@ const CreateTeamModal = (props: Iprops) => {
       title: '类型',
       dataIndex: 'typeName',
       valueType: 'select',
+      initialValue: props.typeNames[0],
       fieldProps: {
         options: props.typeNames.map((i) => {
           return {
@@ -135,20 +135,16 @@ const CreateTeamModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<TargetModel>
-      formRef={formRef}
       title={props.title}
       open={props.open}
       width={640}
+      initialValues={props.isEdit ? props.current.metadata : {}}
       onOpenChange={(open: boolean) => {
         if (open) {
           if (props.isEdit) {
             setAvatar(parseAvatar(props.current.metadata.icon));
-            formRef.current?.setFieldsValue(props.current.metadata);
-          } else {
-            formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           }
         } else {
-          formRef.current?.resetFields();
           setAvatar(undefined);
           props.handleCancel();
         }

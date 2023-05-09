@@ -4,8 +4,9 @@ import cls from './index.module.less';
 import CustomMenu from '@/components/CustomMenu';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import { MenuItemType } from 'typings/globelType';
-import { ImArrowLeft2, ImExit } from 'react-icons/im';
+import { ImArrowLeft2 } from 'react-icons/im';
 import { RiMenuFoldFill, RiMenuUnfoldFill, RiMore2Fill } from 'react-icons/ri';
+import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 const { Content, Sider } = Layout;
 
 /**
@@ -89,7 +90,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             location.reload();
           }}>
-          <ImExit fontSize={26} title="注销" />
+          <OrgIcons size={26} exit title="注销" />
           {!collapsed && <span>注销</span>}
         </div>
       </Sider>
