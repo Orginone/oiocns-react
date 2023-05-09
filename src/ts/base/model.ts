@@ -491,7 +491,7 @@ export type WorkInstanceModel = {
   // 操作对象Id集合
   thingIds: string[];
 };
-export type QueryWorkApplyReq = {
+export type QueryWorkReq = {
   // 共享组织Id
   shareId: string;
   // 办事定义Id

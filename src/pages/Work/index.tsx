@@ -2,24 +2,15 @@ import MainLayout from '@/components/MainLayout';
 import React, { useState } from 'react';
 import Content from './content';
 import { ImSearch } from 'react-icons/im';
-import WorkStart from './content/work/start';
 import useMenuUpdate from '@/hooks/useMenuUpdate';
 import { loadWorkMenu } from './config/menuOperate';
 import { Input } from 'antd';
 
 const Todo: React.FC<any> = () => {
   const [key, rootMenu, selectMenu, setSelectMenu] = useMenuUpdate(loadWorkMenu);
-  const [openFlow, setOpenFlow] = useState(false);
   const [filter, setFilter] = useState('');
 
   if (!selectMenu || !rootMenu) return <></>;
-
-  const content = () => {
-    if (openFlow) {
-      return <WorkStart current={selectMenu.item} goBack={() => setOpenFlow(false)} />;
-    }
-    return <Content key={key} selectMenu={selectMenu} filter={filter} />;
-  };
 
   return (
     <MainLayout
@@ -36,17 +27,8 @@ const Todo: React.FC<any> = () => {
             setFilter(e.target.value);
           }}></Input>
       }
-      onMenuClick={async (_data, key) => {
-        switch (key) {
-          case '发起办事':
-            setOpenFlow(true);
-            break;
-          default:
-            break;
-        }
-      }}
       siderMenuData={rootMenu}>
-      {content()}
+      <Content key={key} selectMenu={selectMenu} filter={filter} />
     </MainLayout>
   );
 };

@@ -4,8 +4,74 @@ import orgCtrl from '@/ts/controller';
 import { ProColumns } from '@ant-design/pro-table';
 import { ITodo } from '@/ts/core/work/todo';
 import { schema } from '@/ts/base';
-import { XWorkInstance } from '@/ts/base/schema';
+import { XWorkTask } from '@/ts/base/schema';
+import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
 
+export const DefineColumns: ProColumns<IWorkDefine>[] = [
+  {
+    title: '序号',
+    dataIndex: 'index',
+    valueType: 'index',
+    width: 60,
+  },
+  {
+    title: '名称',
+    dataIndex: ['metadata', 'name'],
+    width: 100,
+  },
+  {
+    title: '编码',
+    width: 100,
+    dataIndex: ['metadata', 'code'],
+  },
+  {
+    key: 'isCreate',
+    width: 200,
+    title: '创建类',
+    dataIndex: ['metadata', 'isCreate'],
+    render: (_: any, record: IWorkDefine) => {
+      return record.metadata.isCreate ? '是' : '否';
+    },
+  },
+  {
+    key: 'belongId',
+    width: 100,
+    title: '归属用户',
+    dataIndex: ['metadata', 'belongId'],
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.belongId).name;
+    },
+  },
+  {
+    key: 'shareId',
+    width: 100,
+    title: '共享用户',
+    dataIndex: ['metadata', 'shareId'],
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.shareId).name;
+    },
+  },
+  {
+    key: 'createUser',
+    width: 100,
+    title: '创建人员',
+    dataIndex: 'createUser',
+    render: (_: any, record: IWorkDefine) => {
+      return orgCtrl.provider.user?.findShareById(record.metadata.createUser).name;
+    },
+  },
+  {
+    title: '备注',
+    width: 200,
+    dataIndex: 'remark',
+  },
+  {
+    title: '创建时间',
+    valueType: 'dateTime',
+    width: 200,
+    dataIndex: ['metadata', 'createTime'],
+  },
+];
 export const WorkColumns: ProColumns<ITodo>[] = [
   {
     title: '序号',
@@ -122,7 +188,7 @@ export const DoneColumns: ProColumns<schema.XWorkRecord>[] = [
   },
 ];
 
-export const ApplyColumns: ProColumns<XWorkInstance>[] = [
+export const ApplyColumns: ProColumns<XWorkTask>[] = [
   {
     title: '序号',
     dataIndex: 'index',
@@ -131,7 +197,7 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
   },
   {
     title: '类型',
-    dataIndex: 'contentType',
+    dataIndex: 'taskType',
     width: 80,
   },
   {
@@ -144,8 +210,8 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     width: 200,
     title: '共享组织',
     dataIndex: 'shareId',
-    render: (_: any, record: XWorkInstance) => {
-      return orgCtrl.provider.user?.findShareById(record.belongId).name;
+    render: (_: any, record: XWorkTask) => {
+      return orgCtrl.provider.user?.findShareById(record.shareId).name;
     },
   },
   {
@@ -153,7 +219,7 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     width: 100,
     title: '申请人',
     dataIndex: 'createUser',
-    render: (_: any, record: XWorkInstance) => {
+    render: (_: any, record: XWorkTask) => {
       return orgCtrl.provider.user?.findShareById(record.createUser).name;
     },
   },
@@ -161,13 +227,14 @@ export const ApplyColumns: ProColumns<XWorkInstance>[] = [
     title: '状态',
     width: 80,
     dataIndex: 'status',
-    render: (_: any, record: XWorkInstance) => {
+    render: (_: any, record: XWorkTask) => {
       const status = statusMap.get(record.status as number);
       return <Tag color={status!.color}>{status!.text}</Tag>;
     },
   },
   {
     title: '备注',
+    width: 200,
     dataIndex: 'content',
   },
   {
