@@ -17,6 +17,7 @@ import {
   OrgAuth,
   SpeciesType,
   TargetType,
+  companyTypes,
 } from '@/ts/core';
 import { IWorkItem } from '@/ts/core/thing/app/work/workitem';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
@@ -117,7 +118,7 @@ const buildDictMenus = (dict: IDict) => {
     itemType: MenuType.Dict,
     menus: [
       {
-        key: '修改|字典',
+        key: '编辑字典',
         icon: <im.ImPencil />,
         label: '编辑字典',
         model: 'outside',
@@ -143,7 +144,7 @@ const buildDictMenus = (dict: IDict) => {
 const LoadStandardMenus = (target: ITarget) => {
   return [
     {
-      key: '新增|类别',
+      key: '新增类别',
       icon: <im.ImPlus />,
       label: '新增类别',
       model: 'outside',
@@ -166,7 +167,7 @@ const loadStandardSetting = (belong: IBelong) => {
     icon: <im.ImNewspaper />,
     menus: [
       {
-        key: '新增',
+        key: '新增字典',
         icon: <im.ImPlus />,
         label: '新增字典',
         model: 'outside',
@@ -182,19 +183,19 @@ const loadSpeciesMenus = (species: ISpeciesItem) => {
   const items: OperateMenuType[] = [];
   if (species.speciesTypes.length > 0) {
     items.push({
-      key: '新增|类别',
+      key: '新增类别',
       icon: <im.ImPlus />,
       label: '新增类别',
     });
   }
   items.push(
     {
-      key: '修改|类别',
+      key: '编辑类别',
       icon: <im.ImCog />,
       label: '编辑类别',
     },
     {
-      key: '移除|类别',
+      key: '删除类别',
       icon: <im.ImBin />,
       label: '删除类别',
       clickEvent: async () => {
@@ -211,19 +212,19 @@ const getUserMenu = () => {
     orgCtrl.user,
     [
       {
-        key: '创建单位',
+        key: '创建用户|' + companyTypes.join('|'),
         icon: <im.ImOffice />,
         label: '创建单位',
         model: 'outside',
       },
       {
-        key: '加入单位',
+        key: '加入|单位',
         icon: <im.ImTree />,
         label: '加入单位',
         model: 'outside',
       },
       {
-        key: '编辑',
+        key: '编辑用户',
         icon: <im.ImPencil />,
         label: '编辑信息',
         model: 'outside',
@@ -344,7 +345,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
   ];
   if (teamTypes.includes(TargetType.Cohort)) {
     menus.push({
-      key: '加入群组',
+      key: '加入|' + TargetType.Cohort,
       icon: <im.ImTree />,
       label: '加入群组',
       model: 'outside',
@@ -352,7 +353,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
   }
   if (param.item.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
-      key: '新建|' + teamTypes.join('|'),
+      key: '新建用户|' + teamTypes.join('|'),
       icon: <im.ImPlus />,
       label: '新建' + param.typeName,
       model: 'outside',
@@ -383,7 +384,7 @@ const loadGroupMenus = (param: groupMenuParams, teamTypes: string[]) => {
 const loadAuthorityMenus = (item: IAuthority) => {
   const items: OperateMenuType[] = [
     {
-      key: '新增',
+      key: '新增权限',
       icon: <im.ImPlus />,
       label: '新增权限',
     },
@@ -391,12 +392,12 @@ const loadAuthorityMenus = (item: IAuthority) => {
   if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
     items.push(
       {
-        key: '修改',
+        key: '编辑权限',
         icon: <im.ImCog />,
         label: '编辑权限',
       },
       {
-        key: '移除',
+        key: '删除权限',
         icon: <im.ImBin />,
         label: '删除权限',
         clickEvent: async () => {
@@ -413,18 +414,18 @@ const loadTypeMenus = (item: ITeam, subTypes: string[], allowDelete: boolean) =>
   const menus: OperateMenuType[] = [];
   if (item.hasAuthoritys([OrgAuth.RelationAuthId])) {
     menus.push({
-      key: '新增|类别',
+      key: '新增类别',
       icon: <im.ImPlus />,
       label: '新增类别',
       model: 'outside',
     });
     menus.push({
-      key: '新建|' + subTypes.join('|'),
+      key: '新建用户|' + subTypes.join('|'),
       icon: <im.ImPlus />,
       label: '新建用户',
     });
     menus.push({
-      key: '编辑',
+      key: '编辑用户',
       icon: <im.ImPencil />,
       label: '编辑信息',
     });

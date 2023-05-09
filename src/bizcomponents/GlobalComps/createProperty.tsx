@@ -16,6 +16,7 @@ interface Iprops {
   特性编辑模态框
 */
 const PropertyModal = ({ open, handleOk, species, data, handleCancel }: Iprops) => {
+  if (!open) return <></>;
   const [selectType, setSelectType] = useState<string>();
   const formRef = useRef<ProFormInstance>();
   const getFromColumns = () => {

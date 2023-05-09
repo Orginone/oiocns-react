@@ -21,6 +21,7 @@ interface Iprops {
   编辑
 */
 const CreateSpeciesModal = (props: Iprops) => {
+  if (!props.open) return <></>;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
   const speciesTypes: string[] = [];

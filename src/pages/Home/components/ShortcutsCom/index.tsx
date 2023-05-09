@@ -120,7 +120,8 @@ const BannerCom: React.FC<ShortcutsComType> = () => {
       </Modal>
       {/* 创建单位 */}
       <CreateTeamModal
-        title={'新建'}
+        title={'创建单位'}
+        isEdit={false}
         open={showFormModal}
         handleCancel={onCancel}
         handleOk={(item) => {

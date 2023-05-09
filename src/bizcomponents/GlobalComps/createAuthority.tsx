@@ -19,6 +19,7 @@ interface Iprops {
   权限编辑模态框
 */
 const AuthorityModal = (props: Iprops) => {
+  if (!props.open) return <></>;
   const formValue = props.current.metadata;
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();

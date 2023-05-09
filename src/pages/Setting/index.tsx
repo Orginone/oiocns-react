@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MainLayout from '@/components/MainLayout';
 import orgCtrl from '@/ts/controller';
-import { ITarget, TargetType, companyTypes } from '@/ts/core';
+import { ITarget, TargetType } from '@/ts/core';
 import Content from './content';
 import TeamModal from '@/bizcomponents/GlobalComps/createTeam';
 import SpeciesModal from '@/bizcomponents/GlobalComps/createSpecies';
@@ -21,9 +21,7 @@ const TeamSetting: React.FC = () => {
     config.loadSettingMenu,
   );
   const [editTarget, setEditTarget] = useState<ITarget>();
-  const [operateKeys, setOperateKeys] = useState<string[]>(['']);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [showFormModal, setShowFormModal] = useState<boolean>(false);
+  const [operateKey, setOperateKey] = useState<string>('');
   const [searchCallback, setSearchCallback] = useState<XTarget[]>();
   if (!selectMenu || !rootMenu) return <></>;
   return (
@@ -44,126 +42,91 @@ const TeamSetting: React.FC = () => {
               },
             });
             break;
-          case '创建单位':
-            setShowFormModal(true);
-            break;
-          case '加入群组':
-          case '加入单位':
-            setOperateKeys(key.split('|'));
-            setShowModal(true);
-            break;
           case '打开会话':
             history.push('/chat');
             break;
           default:
             setEditTarget(data.item);
-            setOperateKeys(key.split('|'));
+            setOperateKey(key);
             break;
         }
       }}
       siderMenuData={rootMenu}>
       {/** 组织模态框 */}
       <TeamModal
-        title={operateKeys[0]}
-        open={['新建', '编辑'].includes(operateKeys[0])}
-        handleCancel={function (): void {
-          setOperateKeys(['']);
-        }}
+        isEdit={operateKey.includes('编辑')}
+        title={operateKey.split('|')[0]}
+        open={operateKey.includes('用户')}
+        handleCancel={() => setOperateKey('')}
         handleOk={(newItem) => {
           if (newItem) {
+            setOperateKey('');
             setSelectMenu(selectMenu);
-            setOperateKeys(['']);
           }
         }}
         current={editTarget || orgCtrl.user}
-        typeNames={operateKeys.slice(1)}
+        typeNames={operateKey.split('|')}
       />
       {/** 字典模态框 */}
-      {(selectMenu.itemType == MenuType.Dict ||
-        selectMenu.itemType == GroupMenuType.DictGroup) &&
-        ['新增', '修改'].includes(operateKeys[0]) && (
-          <DictModal
-            title={operateKeys[0] + '字典'}
-            space={
-              selectMenu.itemType == GroupMenuType.DictGroup ? selectMenu.item : undefined
-            }
-            open={['新增', '修改'].includes(operateKeys[0])}
-            handleCancel={() => setOperateKeys([''])}
-            dict={selectMenu.itemType == MenuType.Dict ? selectMenu.item : undefined}
-            handleOk={() => {
-              setOperateKeys(['']);
-              setSelectMenu(selectMenu);
-            }}
-          />
-        )}
-      {/** 分类模态框 */}
-      {operateKeys.length > 1 && operateKeys[1] === '类别' && (
-        <SpeciesModal
-          title={operateKeys[0]}
-          open={true}
-          handleCancel={() => setOperateKeys([''])}
-          handleOk={(newItem) => {
-            if (newItem) {
-              setOperateKeys(['']);
-              setSelectMenu(selectMenu);
-            }
-          }}
-          current={selectMenu.item}
-          species={selectMenu.itemType === MenuType.Species ? selectMenu.item : undefined}
-        />
-      )}
-      {/** 权限模态框 */}
-      {selectMenu.itemType == MenuType.Authority &&
-        ['新增', '修改'].includes(operateKeys[0]) && (
-          <AuthorityModal
-            open={['新增', '修改'].includes(operateKeys[0])}
-            current={selectMenu.item}
-            title={operateKeys[0] + '权限'}
-            handleCancel={() => setOperateKeys([''])}
-            handleOk={(success) => {
-              if (success) {
-                setSelectMenu(selectMenu);
-                setOperateKeys(['']);
-              }
-            }}
-          />
-        )}
-      {/** 单位 */}
-      <TeamModal
-        title={'新建单位'}
-        open={showFormModal}
-        handleCancel={function (): void {
-          setShowFormModal(false);
-        }}
-        handleOk={(item) => {
-          if (item) {
-            setShowFormModal(false);
+      <DictModal
+        title={operateKey}
+        space={
+          selectMenu.itemType == GroupMenuType.DictGroup ? selectMenu.item : undefined
+        }
+        open={operateKey.includes('字典')}
+        handleCancel={() => setOperateKey('')}
+        dict={selectMenu.itemType == MenuType.Dict ? selectMenu.item : undefined}
+        handleOk={(success) => {
+          if (success) {
+            setOperateKey('');
             setSelectMenu(selectMenu);
           }
         }}
-        current={orgCtrl.user}
-        typeNames={companyTypes}
+      />
+      {/** 分类模态框 */}
+      <SpeciesModal
+        title={operateKey}
+        open={operateKey.includes('类别')}
+        handleCancel={() => setOperateKey('')}
+        handleOk={(newItem) => {
+          if (newItem) {
+            setOperateKey('');
+            setSelectMenu(selectMenu);
+          }
+        }}
+        current={selectMenu.item}
+        species={selectMenu.itemType === MenuType.Species ? selectMenu.item : undefined}
+      />
+      {/** 权限模态框 */}
+      <AuthorityModal
+        title={operateKey}
+        open={operateKey.includes('权限')}
+        current={selectMenu.item}
+        handleCancel={() => setOperateKey('')}
+        handleOk={(success) => {
+          if (success) {
+            setOperateKey('');
+            setSelectMenu(selectMenu);
+          }
+        }}
       />
       <Modal
-        title={operateKeys[0]}
+        title={'搜索' + operateKey.split('|')[1]}
+        open={operateKey.includes('加入')}
         width={670}
         destroyOnClose={true}
-        open={showModal}
         bodyStyle={{ padding: 0 }}
         okText="确定"
         onOk={async () => {
-          // 加入单位
-          setShowModal(false);
+          setOperateKey('');
           await orgCtrl.user.applyJoin(searchCallback || []);
           message.success('已申请加入成功.');
         }}
-        onCancel={() => {
-          setShowModal(false);
-        }}>
+        onCancel={() => setOperateKey('')}>
         <SearchTarget
           searchCallback={setSearchCallback}
           searchType={
-            operateKeys.includes('单位') ? TargetType.Company : TargetType.Cohort
+            operateKey.includes('单位') ? TargetType.Company : TargetType.Cohort
           }
         />
       </Modal>

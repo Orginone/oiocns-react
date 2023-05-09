@@ -15,6 +15,7 @@ interface Iprops {
   handleOk: (newItem: ITeam | undefined) => void;
   current: ITeam;
   typeNames: string[];
+  isEdit: boolean;
 }
 /*
   编辑
@@ -22,6 +23,13 @@ interface Iprops {
 const CreateTeamModal = (props: Iprops) => {
   const formRef = useRef<ProFormInstance>();
   const [avatar, setAvatar] = useState<FileItemShare>();
+  if (props.isEdit) {
+    props.typeNames.unshift(props.current.metadata.typeName);
+    props.typeNames.splice(1);
+  } else if (props.typeNames.includes(props.title)) {
+    props.typeNames.splice(0, 1);
+  }
+  if (!props.open || props.typeNames.length === 0) return <></>;
   const uploadProps: UploadProps = {
     multiple: false,
     showUploadList: false,
@@ -128,20 +136,16 @@ const CreateTeamModal = (props: Iprops) => {
   return (
     <SchemaForm<TargetModel>
       formRef={formRef}
-      title={props.title + '用户'}
+      title={props.title}
       open={props.open}
       width={640}
       onOpenChange={(open: boolean) => {
         if (open) {
-          formRef.current?.setFieldValue('typeName', props.typeNames[0]);
-          if (props.title === '编辑') {
+          if (props.isEdit) {
             setAvatar(parseAvatar(props.current.metadata.icon));
-            formRef.current?.setFieldsValue({
-              ...props.current.metadata,
-              teamName: props.current.metadata.team?.name,
-              teamCode: props.current.metadata.team?.code,
-              teamRemark: props.current.metadata.remark,
-            });
+            formRef.current?.setFieldsValue(props.current.metadata);
+          } else {
+            formRef.current?.setFieldValue('typeName', props.typeNames[0]);
           }
         } else {
           formRef.current?.resetFields();

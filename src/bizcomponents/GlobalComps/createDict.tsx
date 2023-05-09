@@ -20,6 +20,7 @@ interface Iprops {
   特性编辑模态框
 */
 const DictModal = (props: Iprops) => {
+  if (!props.open) return <></>;
   const { title, open, dict, handleCancel, handleOk } = props;
   const [avatar, setAvatar] = useState<FileItemShare>();
   const formRef = useRef<ProFormInstance>();

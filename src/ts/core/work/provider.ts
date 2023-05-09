@@ -52,7 +52,6 @@ export class WorkProvider implements IWorkProvider {
   async loadTodos(reload?: boolean): Promise<schema.XWorkTask[]> {
     if (!this._todoLoaded || reload) {
       let res = await kernel.queryApproveTask({ id: '0', page: PageAll });
-      console.log(res);
       if (res.success) {
         this._todoLoaded = true;
         this.todos = res.data.result || [];
