@@ -259,6 +259,7 @@ const Thing: React.FC<IProps> = (props: IProps) => {
         onInitialized={(e) => {
           props.setGridInstance?.call(this, e.component);
         }}
+        remoteOperations={true}
         columnMinWidth={80}
         focusedRowEnabled={true}
         allowColumnReordering={true}

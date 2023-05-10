@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import orgCtrl from '@/ts/controller';
-import CardOrTableComp from '@/components/CardOrTableComp';
 import { IBelong, TaskStatus } from '@/ts/core';
 import { XWorkTask } from '@/ts/base/schema';
 import { model, schema } from '@/ts/base';
-import { GroupMenuType } from '../../config/menuType';
 import { WorkColumns } from '../../config/columns';
+import { GroupMenuType } from '../../config/menuType';
 import TaskDetail, { TaskDetailType } from './detail';
 import useCtrlUpdate from '@/hooks/useCtrlUpdate';
+import CardOrTableComp from '@/components/CardOrTableComp';
 
 interface IProps {
   filter: string;
