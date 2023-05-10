@@ -90,7 +90,7 @@ const MainLayout: React.FC<MainLayoutType> = (props) => {
             sessionStorage.clear();
             location.reload();
           }}>
-          <OrgIcons size={26} exit title="注销" />
+          <OrgIcons size={26} exit title="注销" selected />
           {!collapsed && <span>注销</span>}
         </div>
       </Sider>

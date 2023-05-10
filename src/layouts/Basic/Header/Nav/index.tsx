@@ -6,7 +6,6 @@ import OrgIcons from '@/bizcomponents/GlobalComps/orgIcons';
 import TeamIcon from '@/bizcomponents/GlobalComps/teamIcon';
 import orgCtrl from '@/ts/controller';
 import { msgChatNotify } from '@/ts/core';
-import { workNotify } from '@/ts/core/user';
 
 /**
  * 顶部导航
@@ -27,13 +26,13 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       setMsgCount(noReadCount);
       setMsgKey(key);
     });
-    const workId = workNotify.subscribe(async (key) => {
+    const workId = orgCtrl.work.notity.subscribe(async (key) => {
       setWorkCount(orgCtrl.work.todos.length);
       setTaskKey(key);
     });
     return () => {
       msgChatNotify.unsubscribe(id);
-      workNotify.unsubscribe(workId);
+      orgCtrl.work.notity.unsubscribe(workId);
     };
   }, []);
   const navs = [
@@ -94,7 +93,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
       key: 'setting',
       path: '/setting',
       title: orgCtrl.user.metadata.name,
-      icon: <TeamIcon share={orgCtrl.user.share} size={30} title="设置" />,
+      icon: <TeamIcon share={orgCtrl.user.share} size={28} title="设置" />,
       count: 0,
       fath: '/setting',
       onClick: () => {
@@ -116,7 +115,7 @@ const HeaderNav: React.FC<RouteComponentProps> = () => {
           item.icon
         ) : (
           <OrgIcons
-            size={30}
+            size={26}
             type={item.icon}
             selected={location.hash.startsWith('#' + item.fath)}
           />

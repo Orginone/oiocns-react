@@ -7,6 +7,7 @@ import { model, schema } from '@/ts/base';
 import { GroupMenuType } from '../../config/menuType';
 import { WorkColumns } from '../../config/columns';
 import TaskDetail, { TaskDetailType } from './detail';
+import useCtrlUpdate from '@/hooks/useCtrlUpdate';
 
 interface IProps {
   filter: string;
@@ -15,6 +16,7 @@ interface IProps {
 }
 
 const TaskContent = (props: IProps) => {
+  const [key] = useCtrlUpdate(orgCtrl.work.notity);
   const [task, setTask] = useState<TaskDetailType>();
   const [selectedRows, setSelectRows] = useState<schema.XWorkTask[]>([]);
   /** 查询任务项 */
@@ -76,7 +78,20 @@ const TaskContent = (props: IProps) => {
       });
     }
     switch (props.taskType) {
-      case GroupMenuType.Todo:
+      case GroupMenuType.Done:
+        break;
+      case GroupMenuType.Apply:
+        if (items.filter((i) => i.status < TaskStatus.ApplyStart).length > 0) {
+          operates.push({
+            key: 'confirm',
+            label: '取消',
+            onClick: async () => {
+              await orgCtrl.work.approvalTask(items, -1);
+            },
+          });
+        }
+        break;
+      default:
         operates.push(
           {
             key: 'confirm',
@@ -93,19 +108,6 @@ const TaskContent = (props: IProps) => {
             },
           },
         );
-        break;
-      case GroupMenuType.Apply:
-        if (items.filter((i) => i.status < TaskStatus.ApplyStart).length > 0) {
-          operates.push({
-            key: 'confirm',
-            label: '取消',
-            onClick: async () => {
-              await orgCtrl.work.approvalTask(items, -1);
-            },
-          });
-        }
-        break;
-      default:
         break;
     }
     return operates;
@@ -125,7 +127,7 @@ const TaskContent = (props: IProps) => {
   }
   return (
     <CardOrTableComp<schema.XWorkTask>
-      key={'todo'}
+      key={key}
       columns={WorkColumns}
       operation={(item) => getOperation([item])}
       tabBarExtraContent={selectedRows.length > 0 ? getOperation(selectedRows) : []}

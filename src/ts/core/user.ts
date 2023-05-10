@@ -1,13 +1,10 @@
 import { common, kernel, model, schema } from '../base';
-import { Emitter } from '../base/common';
 import { XWorkTask } from '../base/schema';
 import { TargetType } from './public/enums';
 import { IPerson, Person } from './target/person';
 import { IWorkProvider, WorkProvider } from './work/provider';
 const sessionUserName = 'sessionUser';
 
-// 消息变更推送
-export const workNotify = new Emitter();
 export class UserProvider extends common.Emitter {
   private _user: IPerson | undefined;
   private _work: IWorkProvider | undefined;

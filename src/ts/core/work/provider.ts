@@ -1,4 +1,4 @@
-import { kernel, model, schema } from '../../base';
+import { common, kernel, model, schema } from '../../base';
 import { PageAll } from '../public/consts';
 import { SpeciesType, TaskStatus } from '../public/enums';
 import { IPerson } from '../target/person';
@@ -6,9 +6,12 @@ import { IApplication } from '../thing/app/application';
 import { IWorkDefine } from '../thing/base/work';
 import { IMarket } from '../thing/market/market';
 export interface IWorkProvider {
+  /** 当前用户 */
   user: IPerson;
   /** 待办 */
   todos: schema.XWorkTask[];
+  /** 变更通知 */
+  notity: common.Emitter;
   /** 加载待办任务 */
   loadTodos(reload?: boolean): Promise<schema.XWorkTask[]>;
   /** 加载已办任务 */
@@ -33,8 +36,10 @@ export interface IWorkProvider {
 export class WorkProvider implements IWorkProvider {
   constructor(_user: IPerson) {
     this.user = _user;
+    this.notity = new common.Emitter();
   }
   user: IPerson;
+  notity: common.Emitter;
   todos: schema.XWorkTask[] = [];
   private _todoLoaded: boolean = false;
   updateTask(task: schema.XWorkTask): void {
@@ -48,6 +53,7 @@ export class WorkProvider implements IWorkProvider {
     } else if (index > -1) {
       this.todos.splice(index, 1);
     }
+    this.notity.changCallback();
   }
   async loadTodos(reload?: boolean): Promise<schema.XWorkTask[]> {
     if (!this._todoLoaded || reload) {
@@ -55,6 +61,7 @@ export class WorkProvider implements IWorkProvider {
       if (res.success) {
         this._todoLoaded = true;
         this.todos = res.data.result || [];
+        this.notity.changCallback();
       }
     }
     return this.todos;

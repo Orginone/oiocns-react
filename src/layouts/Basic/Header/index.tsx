@@ -16,7 +16,7 @@ const BasicHeader: React.FC = () => {
             shape="square"
             src="/img/logo/logo3.jpg"
             alt="首页"
-            size={22}
+            size={30}
             style={{ marginRight: 10 }}
           />
           <Typography.Text className={styles['space-list']}>资产共享云</Typography.Text>
