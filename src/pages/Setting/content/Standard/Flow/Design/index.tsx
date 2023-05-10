@@ -1,10 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import cls from './index.module.less';
 import ChartDesign from './Chart';
+import GroupBtn from '@/components/GroupBtn';
 import { Branche, WorkNodeModel } from '@/ts/base/model';
 import { Button, Card, Layout, message, Modal, Space, Typography } from 'antd';
 import {
-  AiOutlineExclamationCircle,
   AiOutlineSend,
   AiOutlineMinus,
   AiOutlinePlus,
@@ -15,12 +15,12 @@ import { FieldCondition } from './Chart/FlowDrawer/processType';
 import { dataType } from './Chart/FlowDrawer/processType';
 import { XAttribute, XWorkInstance } from '@/ts/base/schema';
 import { IWork } from '@/ts/core';
-import { ImWarning } from 'react-icons/im';
-import { IWorkDefine } from '@/ts/core/thing/app/work/workDefine';
+import { ImUndo2, ImWarning } from 'react-icons/im';
+import { IFlowDefine } from '@/ts/core';
 
 interface IProps {
   IsEdit: boolean;
-  current: IWorkDefine;
+  current: IFlowDefine;
   species: IWork;
   instance?: XWorkInstance;
   onBack: () => void;
@@ -43,7 +43,7 @@ const Design: React.FC<IProps> = ({
       let nodes = await current.loadWorkNode();
       // content字段可能取消
       let resourceData = loadResource(nodes, 'flowNode', '', '', undefined, '');
-      if (nodes.id == undefined) {
+      if (nodes == undefined) {
         resourceData = {
           nodeId: `node_${getUuid()}`,
           parentId: '',
@@ -528,6 +528,67 @@ const Design: React.FC<IProps> = ({
     setResource(resource_showState);
   };
 
+  const loadGroupBth = () => {
+    if (IsEdit) {
+      return (
+        <GroupBtn
+          showDivider={false}
+          list={[
+            {
+              size: 'small',
+              icon: <AiOutlineSend />,
+              text: '发布',
+              className: cls['publis-issue'],
+              type: 'primary',
+              onClick: async () => {
+                //数据结构转化
+                let resource_: WorkNodeModel = changeResource(
+                  resource,
+                  'flowNode',
+                ) as WorkNodeModel;
+                let errors = checkValid(resource_);
+                if (errors.length > 0) {
+                  setShowErrorsModal(errors);
+                  return;
+                }
+                if (
+                  await current.updateDefine({
+                    ...current.metadata,
+                    resource: resource_,
+                    speciesId: species.metadata.id,
+                  })
+                ) {
+                  message.success('保存成功');
+                  onBack();
+                }
+              },
+            },
+            {
+              size: 'small',
+              danger: true,
+              text: '返回',
+              type: 'primary',
+              icon: <AiOutlineClockCircle />,
+              className: cls['publis-issue'],
+              onClick: async () => {
+                Modal.confirm({
+                  title: '未发布的内容将不会被保存，是否直接退出?',
+                  icon: <ImUndo2 />,
+                  okText: '确认',
+                  okType: 'danger',
+                  cancelText: '取消',
+                  onOk() {
+                    onBack();
+                  },
+                });
+              },
+            },
+          ]}
+        />
+      );
+    }
+  };
+
   return (
     <div className={cls['company-info-content']}>
       <Card bordered={false}>
@@ -568,59 +629,7 @@ const Design: React.FC<IProps> = ({
                     onClick={() => setScale(scale + 10)}>
                     <AiOutlinePlus />
                   </Button>
-                  {IsEdit && (
-                    <>
-                      <Button
-                        className={cls['publis-issue']}
-                        size="small"
-                        type="primary"
-                        onClick={async () => {
-                          //数据结构转化
-                          let resource_: WorkNodeModel = changeResource(
-                            resource,
-                            'flowNode',
-                          ) as WorkNodeModel;
-                          let errors = checkValid(resource_);
-                          if (errors.length > 0) {
-                            setShowErrorsModal(errors);
-                            return;
-                          }
-                          if (
-                            await current.updateDefine({
-                              ...current.metadata,
-                              resource: resource_,
-                              speciesId: species.metadata.id,
-                            })
-                          ) {
-                            message.success('保存成功');
-                            onBack();
-                          }
-                        }}>
-                        <AiOutlineSend />
-                        发布
-                      </Button>
-                      <Button
-                        danger
-                        className={cls['publis-issue']}
-                        size="small"
-                        type="primary"
-                        onClick={async () => {
-                          Modal.confirm({
-                            title: '未发布的内容将不会被保存，是否直接退出?',
-                            icon: <AiOutlineExclamationCircle />,
-                            okText: '确认',
-                            okType: 'danger',
-                            cancelText: '取消',
-                            onOk() {
-                              onBack();
-                            },
-                          });
-                        }}>
-                        <AiOutlineClockCircle />
-                        返回
-                      </Button>
-                    </>
-                  )}
+                  {loadGroupBth()}
                 </Space>
               </div>
               {/* 基本信息组件 */}

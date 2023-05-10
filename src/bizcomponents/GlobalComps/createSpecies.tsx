@@ -180,7 +180,7 @@ const CreateSpeciesModal = (props: Iprops) => {
   ];
   return (
     <SchemaForm<SpeciesModel>
-      title={props.title + '类别'}
+      title={props.title}
       open={props.open}
       width={640}
       initialValues={props.title.includes('编辑') ? props.current.metadata : {}}

@@ -1042,8 +1042,6 @@ export type XWorkDefine = {
   name: string;
   // 图标
   icon: string;
-  // 是否创建实体
-  isCreate: boolean;
   // 备注
   remark: string;
   // 类别ID

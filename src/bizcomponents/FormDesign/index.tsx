@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import List from './List';
+import React, { useState } from 'react';
+import FormList from './List';
 import Design from './Design';
 import { XForm } from '@/ts/base/schema';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
@@ -14,26 +14,25 @@ interface IProps {
  * @description: 分类--业务表单
  * @return {*}
  */
-const SpeciesForm = ({ current, recursionOrg, recursionSpecies }: IProps) => {
-  const [tabKey, setTabKey] = useState(0);
+const SpeciesForm = (props: IProps) => {
   const [selectedForm, setSelectedForm] = useState<XForm>();
 
-  useEffect(() => {
-    setTabKey(0);
-  }, [current]);
-
-  return tabKey == 0 ? (
-    <List
-      current={current}
-      setTabKey={setTabKey}
-      recursionOrg={recursionOrg}
-      recursionSpecies={recursionSpecies}
+  if (selectedForm) {
+    return (
+      <Design
+        current={props.current}
+        form={selectedForm}
+        onBack={() => setSelectedForm(undefined)}
+      />
+    );
+  }
+  return (
+    <FormList
+      current={props.current}
+      recursionOrg={props.recursionOrg}
+      recursionSpecies={props.recursionSpecies}
       setSelectedOperation={setSelectedForm}
     />
-  ) : selectedForm ? (
-    <Design current={current} form={selectedForm} onBack={() => setTabKey(0)} />
-  ) : (
-    <></>
   );
 };
 export default SpeciesForm;

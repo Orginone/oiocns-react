@@ -1,6 +1,6 @@
 import { ProForm } from '@ant-design/pro-components';
 import { Col, Row } from 'antd';
-import React, { useEffect } from 'react';
+import React from 'react';
 import OioFormItem from './FormItems';
 import { XForm, XFormItem } from '@/ts/base/schema';
 import { IBelong } from '@/ts/core/target/base/belong';
@@ -31,16 +31,14 @@ const OioForm: React.FC<IProps> = ({
   formRef,
   disabled,
 }) => {
-  let config: any = { col: 12, layout: 'horizontal' };
+  let config: any =
+    form.remark != undefined
+      ? JSON.parse(form.remark)
+      : { col: 12, layout: 'horizontal' };
   let items = formItems ? formItems : form.items;
-  if (form.remark?.length > 0) {
-    config = JSON.parse(form.remark);
+  if (fieldsValue) {
+    formRef?.current?.setFieldsValue(fieldsValue);
   }
-  useEffect(() => {
-    if (fieldsValue) {
-      formRef?.current?.setFieldsValue(fieldsValue);
-    }
-  }, [fieldsValue]);
 
   return (
     <>

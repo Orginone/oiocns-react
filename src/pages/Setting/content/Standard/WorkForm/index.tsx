@@ -141,12 +141,10 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
         handleCancel={function (): void {
           setModalType('');
         }}
-        handleOk={async (res: any) => {
-          if (res) {
-            message.success('保存成功');
-            forceUpdate();
-            setModalType('');
-          }
+        handleOk={async () => {
+          message.success('保存成功');
+          setModalType('');
+          forceUpdate();
         }}
       />
     </div>

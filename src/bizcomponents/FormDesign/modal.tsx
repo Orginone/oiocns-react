@@ -9,7 +9,7 @@ interface Iprops {
   open: boolean;
   data?: XForm;
   handleCancel: () => void;
-  handleOk: (res: any) => void;
+  handleOk: () => void;
   current: IWorkForm;
 }
 /**
@@ -91,14 +91,14 @@ const Modal = ({ open, title, handleOk, data, current, handleCancel }: Iprops) =
           success = await current.updateForm({
             ...data,
             ...values,
-            ...{ remark: JSON.stringify(defaultRemark) },
+            remark: JSON.stringify(defaultRemark),
           });
         } else {
           success = (await current.createForm(values)) != undefined;
         }
         if (success) {
-          handleOk(true);
           formRef.current?.resetFields();
+          handleOk();
         }
       }}
     />

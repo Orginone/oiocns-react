@@ -4,6 +4,7 @@ import orgCtrl from '@/ts/controller';
 import { kernel } from '@/ts/base';
 import { ISpeciesItem } from '@/ts/core';
 import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
+import { XWorkInstance } from '@/ts/base/schema';
 
 const { Panel } = Collapse;
 
@@ -15,7 +16,7 @@ interface IThingCardProps {
  * 存储-物-归档日志
  */
 const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
-  const [archives, setArchives] = useState<any[]>([]);
+  const [instances, setInstances] = useState<XWorkInstance[]>([]);
   useEffect(() => {
     const findThing = async () => {
       const res = await kernel.anystore.loadThingArchives(
@@ -46,51 +47,90 @@ const ThingArchive: React.FC<IThingCardProps> = ({ thingId, species }) => {
           }
         }
       }
-      setArchives(data.sort((a, b) => a.sort_time - b.sort_time));
+      setInstances(data.sort((a, b) => a.sort_time - b.sort_time) as XWorkInstance[]);
     };
     findThing();
   }, [thingId]);
 
+  const loadTaskContent = (instance: XWorkInstance) => {
+    if (instance.tasks == undefined) return <></>;
+    let tasks = instance.tasks!.sort((a, b) => {
+      let date1 = new Date(a.createTime).getTime();
+      let date2 = new Date(b.createTime).getTime();
+      return date1 - date2;
+    });
+    return tasks.map((a) => {
+      const records = a.records?.sort((a, b) => {
+        let date1 = new Date(a.createTime).getTime();
+        let date2 = new Date(b.createTime).getTime();
+        return date1 - date2;
+      });
+      if (records) {
+        return records?.map((record) => (
+          <Timeline.Item key={record.id}>
+            <Card>
+              <div style={{ display: 'flex' }}>
+                <div style={{ paddingRight: '24px' }}>{a.node?.nodeType}</div>
+                <div style={{ paddingRight: '24px' }}>
+                  {record.createTime.substring(0, record.createTime.length - 4)}
+                </div>
+                <div style={{ paddingRight: '24px' }}>{a.node?.destName}</div>
+                <div style={{ paddingRight: '24px' }}>
+                  操作人：{orgCtrl.provider.user?.findShareById(record.createUser).name}
+                </div>
+                <div>
+                  <div>审批意见：{record.comment || ''}</div>
+                </div>
+              </div>
+              <Collapse ghost>
+                {(
+                  instance.define?.nodes?.find((q) => q.id == a.node?.id)?.bindFroms || []
+                ).map((form: any) => {
+                  let formValue = {};
+                  if (record?.data) {
+                    formValue = JSON.parse(record?.data);
+                  }
+                  return (
+                    <Panel header={form.name} key={form.id}>
+                      <OioForm
+                        belong={species.current.space}
+                        key={form.id}
+                        form={form}
+                        formRef={undefined}
+                        fieldsValue={formValue}
+                        disabled={true}
+                      />
+                    </Panel>
+                  );
+                })}
+              </Collapse>
+            </Card>
+          </Timeline.Item>
+        ));
+      }
+    });
+  };
+
   return (
     <Card bordered={false} title="归档痕迹">
       <Timeline>
-        {archives.map((a) => {
-          const record = a.record;
+        {instances.map((a) => {
           return (
-            <Timeline.Item key={record.id}>
+            <Timeline.Item key={a.id}>
               <Card>
                 <div style={{ display: 'flex' }}>
-                  <div style={{ paddingRight: '24px' }}>{a.node?.nodeType}</div>
+                  <div style={{ paddingRight: '24px' }}>{a.title}</div>
                   <div style={{ paddingRight: '24px' }}>
-                    {record.createTime.substring(0, record.createTime.length - 4)}
+                    {a.createTime.substring(0, a.createTime.length - 4)}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    {orgCtrl.provider.user?.findShareById(a.node?.belongId!).name}
+                    归属用户：{orgCtrl.provider.user?.findShareById(a.belongId!).name}
                   </div>
                   <div style={{ paddingRight: '24px' }}>
-                    操作人：{orgCtrl.provider.user?.findShareById(record.createUser).name}
+                    操作人：{orgCtrl.provider.user?.findShareById(a.createUser).name}
                   </div>
-                  <div>{record.comment && <div>审批意见：{record.comment}</div>}</div>
-                </div>
-                <Collapse ghost>
-                  {(a.node?.bindForms || []).map((form: any) => {
-                    let formValue = {};
-                    if (record?.data) {
-                      formValue = JSON.parse(record?.data);
-                    }
-                    return (
-                      <Panel header={form.name} key={form.id}>
-                        <OioForm
-                          belong={species.current.space}
-                          key={form.id}
-                          form={form}
-                          formRef={undefined}
-                          fieldsValue={formValue}
-                          disabled={true}></OioForm>
-                      </Panel>
-                    );
-                  })}
-                </Collapse>
+                </div>{' '}
+                <Collapse ghost>{loadTaskContent(a)}</Collapse>
               </Card>
             </Timeline.Item>
           );

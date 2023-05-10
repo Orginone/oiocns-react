@@ -2,13 +2,14 @@ import Thing from '@/pages/Store/content/Thing/Thing';
 import { XForm, XFormItem } from '@/ts/base/schema';
 import { IFlowDefine } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
-import { message, Modal, Tabs } from 'antd';
-import TabPane from 'antd/lib/tabs/TabPane';
+import { message } from 'antd';
+import orgCtrl from '@/ts/controller';
 import { Editing } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
 import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
 import { kernel } from '@/ts/base';
+import { GroupMenuType } from '../../config/menuType';
 
 // 卡片渲染
 interface IProps {
@@ -63,7 +64,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           }}
           onFinished={async (values: any) => {
             let rows_ = rows;
-            if (current.metadata.isCreate) {
+            if (rows == undefined) {
               let res = await kernel.anystore.createThing(current.metadata.belongId, 1);
               if (res && res.success) {
                 rows_ = res.data;
@@ -82,6 +83,8 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
               })
             ) {
               message.success('发起成功!');
+              orgCtrl.currentKey = current.workItem.current.key + GroupMenuType.Apply;
+              orgCtrl.changCallback();
             }
           }}
           onValuesChange={(_changedValues, values) => {

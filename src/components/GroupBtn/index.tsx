@@ -1,11 +1,15 @@
 import { Button, Divider, Space } from 'antd';
+import { SizeType } from 'antd/es/config-provider/SizeContext';
 import React from 'react';
 interface BtnItemType {
   text: string;
   key?: string;
-  type?: 'link' | 'text' | 'ghost' | 'default' | 'primary' | 'dashed' | undefined;
-  className?: string;
+  size?: SizeType;
+  danger?: boolean;
+  icon?: React.ReactNode;
   onClick?: Function;
+  className?: string;
+  type?: 'link' | 'text' | 'ghost' | 'default' | 'primary' | 'dashed' | undefined;
 }
 interface IProps {
   onClick?: Function;
@@ -16,15 +20,19 @@ interface IProps {
 /*******
  * @desc:按钮组 统一组件
  */
-export const GroupBtn: React.FC<IProps> = ({ list, showDivider = true, onClick }) => {
+const GroupBtn: React.FC<IProps> = ({ list, showDivider = true, onClick }) => {
   return (
     <Space>
       {list.map((item: BtnItemType, index: number) => {
         return (
           <div key={index}>
             <Button
-              className={item.className}
+              icon={item.icon}
+              size={item.size}
+              danger={item.danger}
               type={item.type || 'link'}
+              className={item.className}
+              style={{ margin: 5 }}
               onClick={() => {
                 if (item.onClick) {
                   item.onClick();
@@ -34,12 +42,12 @@ export const GroupBtn: React.FC<IProps> = ({ list, showDivider = true, onClick }
               }}>
               {item.text}
             </Button>
-            {showDivider && index === list.length - 1 && (
-              <Divider key={'Divider' + index} type="vertical" />
-            )}
           </div>
         );
       })}
+      {showDivider && <Divider key={'Divider' + list.length} type="vertical" />}
     </Space>
   );
 };
+
+export default GroupBtn;

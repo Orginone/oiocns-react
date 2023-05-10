@@ -1,59 +1,46 @@
 import CardOrTable from '@/components/CardOrTableComp';
-import useObjectUpdate from '@/hooks/useObjectUpdate';
 import { FormColumns } from '@/pages/Setting/config/columns';
 import { XForm } from '@/ts/base/schema';
 import { message, Popconfirm } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import OperationModel from './modal';
 import ViewFormModal from './Design/viewFormModal';
 import { IWorkForm } from '@/ts/core/thing/app/work/workform';
+import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {
   current: IWorkForm;
   recursionOrg: boolean;
   recursionSpecies: boolean;
   setSelectedOperation: (operation: XForm) => void;
-  setTabKey: (tabKey: number) => void;
 }
 
 /**
  * @description: 分类--表单列表
  * @return {*}
  */
-const List = ({
-  current,
-  recursionOrg,
-  recursionSpecies,
-  setSelectedOperation,
-  setTabKey,
-}: IProps) => {
+const FormList = (props: IProps) => {
   const [modalType, setModalType] = useState('');
-  const [tkey, tforceUpdate] = useObjectUpdate(current);
+  const [key, forceUpdate] = useObjectUpdate('');
   const [editData, setEditData] = useState<XForm>();
-  const [viewFormOpen, setViewFormOpen] = useState(false);
-  const [dataSource, setDataSource] = useState<XForm[]>([]);
 
-  useEffect(() => {
-    let data = current.forms;
-    if (!recursionOrg) {
-      data = data.filter((a) => a.belongId == current.current.metadata.id);
-    }
-    if (!recursionSpecies) {
-      data = data.filter((a) => a.speciesId == current.metadata.id);
-    }
-    setDataSource(data);
-    tforceUpdate();
-  }, [recursionSpecies, recursionOrg]);
+  let data = props.current.forms;
+  if (!props.recursionOrg) {
+    data = data.filter((a) => a.belongId == props.current.current.metadata.id);
+  }
+  if (!props.recursionSpecies) {
+    data = data.filter((a) => a.speciesId == props.current.metadata.id);
+  }
 
   // 操作内容渲染函数
   const renderOperate = (item: XForm) => {
     return [
       {
         key: '修改',
-        label: '编辑',
+        label: '编辑表单',
         onClick: () => {
           setEditData(item);
-          setModalType('修改表单');
+          setModalType('编辑表单');
         },
       },
       {
@@ -61,8 +48,7 @@ const List = ({
         label: '设计表单',
         onClick: () => {
           setEditData(item);
-          setSelectedOperation(item);
-          setTabKey(1);
+          props.setSelectedOperation(item);
         },
       },
       {
@@ -70,23 +56,22 @@ const List = ({
         label: '预览表单',
         onClick: () => {
           setEditData(item);
-          setViewFormOpen(true);
+          setModalType('预览表单');
         },
       },
       {
-        key: '删除',
+        key: '删除表单',
         label: (
           <Popconfirm
             placement="left"
             trigger={'click'}
             title={'确定删除吗？'}
             onConfirm={async () => {
-              await current.deleteForm(item);
-              tforceUpdate();
+              await props.current.deleteForm(item);
             }}
             okText="确定"
             cancelText="取消">
-            <div>删除</div>
+            <div>删除表单</div>
           </Popconfirm>
         ),
       },
@@ -96,43 +81,40 @@ const List = ({
   return (
     <>
       <CardOrTable<XForm>
-        key={tkey}
+        key={key}
         rowKey={'id'}
-        params={tkey}
-        dataSource={dataSource}
+        dataSource={data}
         showChangeBtn={false}
         operation={renderOperate}
-        columns={FormColumns(current)}
+        columns={FormColumns(props.current)}
       />
       {/** 表单模态框 */}
       <OperationModel
         data={editData}
         title={modalType}
-        current={current}
-        open={modalType.includes('表单')}
+        current={props.current}
+        open={modalType == '编辑表单'}
         handleCancel={() => setModalType('')}
-        handleOk={async (res: any) => {
+        handleOk={async () => {
           setModalType('');
-          if (res) {
-            message.success('保存成功');
-            setEditData(undefined);
-            tforceUpdate();
-          }
+          setEditData(undefined);
+          forceUpdate();
+          message.success('保存成功');
         }}
       />
-      {/** 预览表单 */}
+      ;{/** 预览表单 */}
       <ViewFormModal
-        belong={current.current.space}
+        belong={props.current.current.space}
         data={editData}
-        open={viewFormOpen}
+        open={modalType == '预览表单'}
         handleCancel={() => {
-          setViewFormOpen(false);
+          setModalType('');
         }}
         handleOk={() => {
-          setViewFormOpen(false);
+          setModalType('');
         }}
       />
     </>
   );
 };
-export default List;
+export default FormList;
