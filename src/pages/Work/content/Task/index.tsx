@@ -97,7 +97,7 @@ const TaskContent = (props: IProps) => {
             key: 'confirm',
             label: '通过',
             onClick: async () => {
-              await orgCtrl.work.approvalTask(items, TaskStatus.RefuseStart);
+              await orgCtrl.work.approvalTask(items, TaskStatus.ApprovalStart);
             },
           },
           {
