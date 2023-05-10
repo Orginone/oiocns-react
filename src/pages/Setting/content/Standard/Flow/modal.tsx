@@ -148,6 +148,7 @@ const WorkDefineModal = ({ open, handleOk, handleCancel, item, current }: Iprops
       onFinish={async (model) => {
         if (current) {
           model.id = current.metadata.id;
+          model.icon = JSON.stringify(avatar);
           if (await current.updateDefine(model)) {
             handleOk();
           }
