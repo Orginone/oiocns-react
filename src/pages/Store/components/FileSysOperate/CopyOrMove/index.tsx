@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Modal, Tree } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { ImFolder, ImFolderOpen } from 'react-icons/im';
-import { IFileSystemItem, IObjectItem } from '@/ts/core/target/store/ifilesys';
+import { IFileSystemItem } from '@/ts/core';
 const { DirectoryTree } = Tree;
 
 /** 移动或复制复选框 */
@@ -16,27 +16,30 @@ const CopyOrMoveModal = (props: {
   const { open, title, onChange, currentTaget } = props;
   const [selectNode, setSelectNode] = useState<IFileSystemItem>();
   const treeData = useMemo(() => {
-    const loadTreeData = (item: any) => {
+    const loadTreeData = (item: IFileSystemItem) => {
       let result: any = {
         key: item.key,
-        title: item.name,
+        title: item.metadata.name,
         children: [],
-        isLeaf: !item.target.hasSubDirectories,
+        isLeaf: !item.metadata.hasSubDirectories,
       };
       if (item.children.length > 0) {
         for (let i = 0; i < item.children.length; i++) {
-          if (item.children[i].target.isDirectory) {
+          if (item.children[i].metadata.isDirectory) {
             result.children.push(loadTreeData(item.children[i]));
           }
         }
       }
       return result;
     };
-    const data = loadTreeData(orgCtrl.user.root);
+    const data = loadTreeData(currentTaget.filesys.home!);
     return [data];
   }, [currentTaget]);
 
-  const searchItemByKey = (item: IFileSystemItem, key: string): IObjectItem => {
+  const searchItemByKey = (
+    item: IFileSystemItem,
+    key: string,
+  ): IFileSystemItem | undefined => {
     if (item.key === key) return item;
     for (const subItem of item.children) {
       const find = searchItemByKey(subItem, key);
@@ -84,7 +87,9 @@ const CopyOrMoveModal = (props: {
           treeData={treeData}
           onSelect={(keys) => {
             if (keys.length > 0) {
-              setSelectNode(searchItemByKey(orgCtrl.user.root, keys[0].toString()));
+              setSelectNode(
+                searchItemByKey(currentTaget.filesys.home!, keys[0].toString()),
+              );
             }
           }}
           defaultExpandedKeys={['']}
