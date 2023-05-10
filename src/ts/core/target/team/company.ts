@@ -118,6 +118,7 @@ export class Company extends Belong implements ICompany {
     const metadata = await this.create(data);
     if (metadata) {
       const group = new Group(metadata, this);
+      await group.deepLoad();
       this.groups.push(group);
       await group.pullMembers([this.metadata]);
       return group;
