@@ -48,8 +48,9 @@ const Attritube = ({
           key: '删除特性',
           label: '删除特性',
           onClick: async () => {
-            await current.deleteAttribute(item);
-            tforceUpdate();
+            if (await current.deleteAttribute(item)) {
+              tforceUpdate();
+            }
           },
         },
       ];
@@ -102,6 +103,7 @@ const Attritube = ({
   return (
     <>
       <CardOrTable<XAttribute>
+        key={tkey}
         rowKey={'id'}
         params={tkey}
         operation={renderOperate}

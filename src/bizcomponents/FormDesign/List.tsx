@@ -67,7 +67,9 @@ const FormList = (props: IProps) => {
             trigger={'click'}
             title={'确定删除吗？'}
             onConfirm={async () => {
-              await props.current.deleteForm(item);
+             if (await props.current.deleteForm(item)) {
+               forceUpdate();
+             }
             }}
             okText="确定"
             cancelText="取消">
