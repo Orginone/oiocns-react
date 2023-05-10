@@ -157,7 +157,7 @@ const CreateTeamModal = (props: Iprops) => {
         values.teamName = values.teamName ?? values.name;
         values.teamCode = values.teamCode ?? values.code;
         values.icon = JSON.stringify(avatar);
-        if (props.title === '编辑') {
+        if (props.isEdit) {
           if (await props.current.update(values)) {
             orgCtrl.provider.update(orgCtrl.user.metadata);
           }
