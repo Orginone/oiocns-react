@@ -52,8 +52,10 @@ export class Group extends Target implements IGroup {
     const metadata = await this.create(data);
     if (metadata) {
       const group = new Group(metadata, this.company);
-      this.children.push(group);
-      return group;
+      if (await this.pullSubTarget(group)) {
+        this.children.push(group);
+        return group;
+      }
     }
   }
   async createTarget(data: model.TargetModel): Promise<ITeam | undefined> {
