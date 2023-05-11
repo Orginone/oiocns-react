@@ -1,4 +1,4 @@
-import { model, common, schema, kernel } from '../../../base';
+import { model, common, schema, kernel, List } from '../../../base';
 import { ShareIdSet } from '../../public/consts';
 import { MessageType, TargetType } from '../../public/enums';
 // 历史会话存储集合名称
@@ -30,6 +30,8 @@ export type MsgChatData = {
 export interface IMsgChat extends common.IEntity {
   /** 消息类会话元数据 */
   chatdata: MsgChatData;
+  /** 回话的标签列表 */
+  labels: List<string>;
   /** 会话Id */
   chatId: string;
   /** 当前用户Id */
@@ -95,6 +97,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
       lastMsgTime: nullTime,
       fullId: `${_belongId}-${_chatId}`,
     };
+    this.labels = new List(_labels);
     ShareIdSet.set(this.chatId, this.share);
     kernel.anystore.subscribed(
       '0',
@@ -107,6 +110,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   chatId: string;
   userId: string;
   belongId: string;
+  labels: List<string>;
   share: model.ShareIcon;
   messages: model.MsgSaveModel[] = [];
   members: schema.XTarget[] = [];
@@ -134,6 +138,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
     }
   }
   cache(): void {
+    this.chatdata.labels = this.labels.ToArray();
     kernel.anystore.set('0', hisMsgCollName + '.T' + this.chatdata.fullId, {
       operation: 'replaceAll',
       data: this.chatdata,
@@ -141,7 +146,7 @@ export abstract class MsgChat extends common.Entity implements IMsgChat {
   }
   loadCache(cache: MsgChatData): void {
     if (this.chatdata.fullId === cache.fullId) {
-      this.chatdata.labels = cache.labels || this.chatdata.labels;
+      this.labels = this.labels.Union(new List<string>(cache.labels ?? []));
       this.chatdata.chatName = cache.chatName || this.chatdata.chatName;
       this.share.name = this.chatdata.chatName;
       ShareIdSet.set(this.chatId, this.share);
