@@ -5,7 +5,7 @@ import Attritube from './Attritube';
 import SpeciesForm from '@/bizcomponents/FormDesign';
 import cls from '../index.module.less';
 import PageCard from '@/components/PageCard';
-import FormModal from '@/bizcomponents/FormDesign/modal';
+import FormModal from '@/bizcomponents/GlobalComps/createForm';
 import useObjectUpdate from '@/hooks/useObjectUpdate';
 
 interface IProps {
@@ -135,7 +135,6 @@ const WorkForm: React.FC<IProps> = ({ current }: IProps) => {
       </div>
       {/** 表单模态框 */}
       <FormModal
-        title={modalType}
         current={current}
         open={modalType.includes('表单')}
         handleCancel={function (): void {

@@ -2,7 +2,7 @@ import Thing from '@/pages/Store/content/Thing/Thing';
 import { XForm, XFormItem } from '@/ts/base/schema';
 import { IFlowDefine } from '@/ts/core';
 import { ProFormInstance } from '@ant-design/pro-form';
-import { message } from 'antd';
+import { Button, Card, Input, message } from 'antd';
 import orgCtrl from '@/ts/controller';
 import { Editing } from 'devextreme-react/data-grid';
 import React, { useEffect, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import cls from './index.module.less';
 import OioForm from '@/bizcomponents/FormDesign/Design/OioForm';
 import { kernel } from '@/ts/base';
 import { GroupMenuType } from '../../config/menuType';
+import { CheckOutlined } from '@ant-design/icons';
 
 // 卡片渲染
 interface IProps {
@@ -24,6 +25,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
   const [data, setData] = useState<any>({});
   const [forms, setForms] = useState<XForm[]>([]);
   const [rows, setRows] = useState<any>([]);
+  const [content, setContent] = useState<string>('');
   const formRef = useRef<ProFormInstance<any>>();
 
   useEffect(() => {
@@ -45,6 +47,35 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
     return items;
   };
 
+  const submit = async () => {
+    let rows_ = rows;
+    if (rows.length == 0) {
+      let res = await kernel.anystore.createThing(current.metadata.belongId, 1);
+      if (res && res.success) {
+        rows_ = res.data;
+      } else {
+        message.error('创建物失败!');
+        return;
+      }
+    }
+    //发起流程tableKey
+    if (
+      await current.createWorkInstance({
+        hook: '',
+        content: content,
+        contentType: 'Text',
+        title: current.metadata.name,
+        defineId: current.metadata.id,
+        data: JSON.stringify(data),
+        thingIds: rows_.map((row: any) => row['Id']),
+      })
+    ) {
+      message.success('发起成功!');
+      orgCtrl.currentKey = current.workItem.current.key + GroupMenuType.Apply;
+      orgCtrl.changCallback();
+    }
+  };
+
   return (
     <div className={cls.content}>
       {forms.length > 0 && (
@@ -58,34 +89,7 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
             resetButtonProps: {
               style: { display: 'none' },
             },
-            render: (_: any, dom: any) => (
-              <div className={cls['bootom_right']}>{dom}</div>
-            ),
-          }}
-          onFinished={async (values: any) => {
-            let rows_ = rows;
-            if (rows == undefined) {
-              let res = await kernel.anystore.createThing(current.metadata.belongId, 1);
-              if (res && res.success) {
-                rows_ = res.data;
-              }
-            }
-            //发起流程tableKey
-            if (
-              await current.createWorkInstance({
-                hook: '',
-                content: '',
-                contentType: 'Text',
-                title: current.metadata.name,
-                defineId: current.metadata.id,
-                data: JSON.stringify({ ...data, ...values }),
-                thingIds: rows_.map((row: any) => row['Id']),
-              })
-            ) {
-              message.success('发起成功!');
-              orgCtrl.currentKey = current.workItem.current.key + GroupMenuType.Apply;
-              orgCtrl.changCallback();
-            }
+            render: (_: any, _dom: any) => <></>,
           }}
           onValuesChange={(_changedValues, values) => {
             setData({ ...data, ...values });
@@ -121,6 +125,28 @@ const WorkStartDo: React.FC<IProps> = ({ current }) => {
           }
         />
       }
+      <Card className={cls['bootom_content']}>
+        <div style={{ display: 'flex', width: '100%' }}>
+          <Input.TextArea
+            style={{ width: '92%' }}
+            placeholder="请填写备注信息"
+            onChange={(e) => {
+              setContent(e.target.value);
+            }}
+          />
+          <div
+            style={{
+              width: '8%',
+              display: 'flex',
+              marginTop: '18px',
+              marginLeft: '18px',
+            }}>
+            <Button type="primary" onClick={submit}>
+              提交
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

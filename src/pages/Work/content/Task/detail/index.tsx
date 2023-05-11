@@ -148,7 +148,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
       [task],
       status,
       comment,
-      JSON.stringify(formRef.current?.getFieldValues()),
+      JSON.stringify(formRef.current?.getFieldsValue()),
     );
     onBack?.apply(this);
     setLoading(false);
@@ -165,7 +165,7 @@ const Detail: React.FC<TaskDetailType> = ({ task, define, instance, onBack }) =>
             {/** 时间轴 */}
             {loadTimeline()}
             {/** 选中的操作对象 */}
-            {instance.define?.isCreate && (
+            {instance.thingIds?.length > 0 && (
               <Thing
                 height={'400px'}
                 byIds={instance.thingIds.split(',').filter((id: any) => id != '')}

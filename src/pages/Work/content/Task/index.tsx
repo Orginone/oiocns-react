@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import orgCtrl from '@/ts/controller';
 import { IBelong, TaskStatus } from '@/ts/core';
 import { XWorkTask } from '@/ts/base/schema';
@@ -16,9 +16,14 @@ interface IProps {
 }
 
 const TaskContent = (props: IProps) => {
-  const [key] = useCtrlUpdate(orgCtrl.work.notity);
+  const [key, tforceUpdate] = useCtrlUpdate(orgCtrl.work.notity);
   const [task, setTask] = useState<TaskDetailType>();
   const [selectedRows, setSelectRows] = useState<schema.XWorkTask[]>([]);
+
+  // useEffect(() => {
+  //   tforceUpdate();
+  // }, [props]);
+
   /** 查询任务项 */
   const getTaskList = async (page: model.PageModel) => {
     let taskList: schema.XWorkTaskArray = {
@@ -31,7 +36,7 @@ const TaskContent = (props: IProps) => {
       case GroupMenuType.Done:
         {
           const res = await orgCtrl.work.loadDones({
-            page: page,
+            page: { ...page, filter: props.filter },
             id: props.space?.metadata.id || '0',
           });
           taskList.total = res.total;
@@ -45,13 +50,26 @@ const TaskContent = (props: IProps) => {
         break;
       case GroupMenuType.Apply:
         taskList = await orgCtrl.work.loadApply({
-          page: page,
+          page: { ...page, filter: props.filter },
           id: props.space?.metadata.id || '0',
         });
         break;
       default:
-        taskList.total = orgCtrl.work.todos.length;
-        taskList.result = orgCtrl.work.todos.slice(page.offset, page.limit);
+        let todos = orgCtrl.work.todos;
+        if (props.space) {
+          todos = todos.filter(
+            (a) =>
+              a.belongId == props.space!.metadata.id ||
+              a.shareId == props.space!.metadata.id,
+          );
+        }
+        if (props.filter != '') {
+          todos = todos.filter(
+            (a) => a.title.includes(props.filter) || a.remark.includes(props.filter),
+          );
+        }
+        taskList.total = todos.length;
+        taskList.result = todos.slice(page.offset, page.limit);
         break;
     }
     return taskList;
